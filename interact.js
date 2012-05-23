@@ -17,12 +17,12 @@ window.interact = (function () {
 		console = window.console;
 	
 	// Should change this so devices with mouse and touch can use both
-
 	if (supportsTouch) {
 		downEvent = 'touchstart',
 		upEvent = 'touchend',
 		moveEvent = 'touchmove';
-	} else {
+	}
+	else {
 		downEvent = 'mousedown',
 		upEvent = 'mouseup',
 		moveEvent = 'mousemove';
@@ -149,203 +149,213 @@ window.interact = (function () {
 	var interact = {
 		nodes: [],
 		resizeTarget: resizeTarget,
-		dragTarget: dragTarget,
-		set: function (element, options) {
-			var	newNode = {
-					element: element,
-					drag: options.drag || false,
-					resize: options.resize || false,
-					parent: options.parent || false
-				};
-			addClass('interact-node');
-			interactNodes.push(newNode);
-			
-			// different things to be done for normal nodes and graphics nodes
-		},
-		unset: function (element) {
-			var i;
-			for (i = 0; i < interactNodes.length; i++) {
-				if (interactNodes[i].element === element) {
-					interactNodes.splice(i-1, 1);
-				}
-			}
-		},
-		mouseMove: function (event) {
-			if (event.target.actions && event.target.actions.resize) {		
-				var x = event.pageX,
-					y = event.pageY,
-					target = event.target.object,
-					right = (x - target.location.x > target.width - interact.resize.margin),
-					bottom = (y - target.location.y > target.height - interact.resize.margin);
+		dragTarget: dragTarget
+	}
 	
-				if (right) {
-					target.element.style.cursor = bottom?'se-resize' : 'e-resize';
+	interact.set = function (element, options) {
+		var	newNode = {
+				element: element,
+				drag: options.drag || false,
+				resize: options.resize || false,
+				parent: options.parent || false
+			};
+		addClass('interact-node');
+		interactNodes.push(newNode);
+		
+		// different things to be done for normal nodes and graphics nodes
+	};
+	
+	interact.unset = function (element) {
+		var i;
+		for (i = 0; i < interactNodes.length; i++) {
+			if (interactNodes[i].element === element) {
+				interactNodes.splice(i-1, 1);
+			}
+		}
+	};
+	
+	interact.mouseMove = function (event) {
+		if (event.target.actions && event.target.actions.resize) {		
+			var x = event.pageX,
+				y = event.pageY,
+				target = event.target.object,
+				right = (x - target.location.x > target.width - interact.resize.margin),
+				bottom = (y - target.location.y > target.height - interact.resize.margin);
+
+			if (right) {
+				target.element.style.cursor = bottom?'se-resize' : 'e-resize';
+			}
+			else {
+				target.element.style.cursor = bottom?'s-resize' : target.actions.drag? 'pointer' : 'default';
+			}
+		}
+	};
+	
+	interact.mouseDown = function (event) {
+		mouseIsDown = true;
+		if (event.target.actions && event.target.actions.resize) {
+			var	x = event.pageX,
+				y = event.pageY,
+				target = event.target.object,
+				right = (x - target.location.x > target.width - interact.resize.margin),
+				bottom = (y - target.location.y > target.height - interact.resize.margin);
+
+				prevX = x;
+				prevY = y;
+
+			if (right) {
+				event.preventDefault();
+				clearTargets();
+				resizeTarget[0] = target;
+
+				interact.events.remove(document, moveEvent);
+				console.log('resizing on right');
+				if (bottom) {
+					interact.events.add( document, moveEvent, interact.resize.xyResize );
 				}
 				else {
-					target.element.style.cursor = bottom?'s-resize' : target.actions.drag? 'pointer' : 'default';
+					interact.events.add( document, moveEvent, interact.resize.xResize ) ;
 				}
 			}
-		},
-		mouseDown: function (event) {
-			mouseIsDown = true;
-			if (event.target.actions && event.target.actions.resize) {		
+			else if (bottom) {
+				resizeTarget[0] = target;
+
+				console.log('resizing on bottom');
+				interact.events.remove(document, moveEvent);
+				interact.events.add( document, moveEvent, interact.resize.yResize );
+			}
+			else if (target.actions.drag) {
+				event.preventDefault();
+				clearTargets();
+				dragTarget[0] = target;
+
+				bringToFront(target.element);
+				console.log('moving node');
+				interact.events.remove(document, moveEvent);
+				interact.events.add( document, moveEvent, interact.drag.xyDrag );
+				target.element.style.cursor = 'move';					
+			}
+		return false;
+		}
+	};
+	interact.resize = {
+		// greater margin for touch device (less precision)
+		margin: (supportsTouch? 30 : 10),
+		xResize: function (event) {
+			event.preventDefault();
+			var target = resizeTarget[0];
+			
+			if (mouseIsDown && target.actions.resize) {
+				addClass(target.element, 'interact-target');
 				
-				var	x = event.pageX,
-					y = event.pageY,
-					target = event.target.object,
-					right = (x - target.location.x > target.width - interact.resize.margin),
-					bottom = (y - target.location.y > target.height - interact.resize.margin);
+				var x = event.pageX,
+				newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
 
-					prevX = x;
-					prevY = y;
+				target.setSize(newWidth, target.height);
+				prevX = x;
+			}
+		},
+		yResize: function (event) {
+			event.preventDefault();
+			var target = resizeTarget[0];
+			
+			if (mouseIsDown && target.actions.resize) {
+				addClass(target.element, 'interact-target');
+				var y = event.pageY,
+				newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
-	
-				if (right) {
-					event.preventDefault();
-					clearTargets();
-					resizeTarget[0] = target;
+				target.setSize(target.width, newHeight);
+				prevY = y;
+			}
+		},
+		xyResize: function (event) {
+			event.preventDefault();
+			var target = resizeTarget[0];
+			
+			if (mouseIsDown && target.actions.resize) {	
+				addClass(target.element, 'interact-target');	
+				var x = event.pageX, y = event.pageY,
+				newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
+				newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
-					interact.events.remove(document, moveEvent);
-					console.log('resizing on right');
-					if (bottom) {
-						interact.events.add( document, moveEvent, interact.resize.xyResize );
+				target.setSize(newWidth, newHeight);
+				prevX = x;
+				prevY = y;
+			}
+		}
+	};
+	interact.drag = {
+		xyDrag: function (event) {
+			event.preventDefault();
+			var target = dragTarget[0];
+			
+			if (mouseIsDown && target.actions.resize) {
+				addClass(target.element, 'interact-target');
+				var x = event.pageX,
+					y = event.pageY;
+
+				target.position(target.location.x + x - prevX , target.location.y + (y - prevY));
+				prevX = x;
+				prevY = y;
+			}
+		}
+	};
+	interact.events = {
+		add: function (target, type, listener, useCapture) {
+			if (target.events === undefined) {
+				target.events = [];
+			}
+			if (target.events[type] === undefined) {
+				target.events[type] = [];
+			}
+			target.addEventListener(type, listener, useCapture || false);
+			target.events[type].push(listener);
+			return listener;
+		},
+		remove: function (target, type, listener, useCapture) {
+			if (target && target.events && target.events[type]) {
+				var i;
+				if (listener === undefined) {
+					for (i=0; i < target.events[type].length; i++) {
+						target.removeEventListener(type, target.events[type][i], useCapture || false);
+						target.events[type].splice(i, 1);
 					}
-					else {
-						interact.events.add( document, moveEvent, interact.resize.xResize ) ;
-					}
 				}
-				else if (bottom) {
-					resizeTarget[0] = target;
-
-					console.log('resizing on bottom');
-					interact.events.remove(document, moveEvent);
-					interact.events.add( document, moveEvent, interact.resize.yResize );
-				}
-				else if (target.actions.drag) {
-					event.preventDefault();
-					clearTargets();
-					dragTarget[0] = target;
-
-					bringToFront(target.element);
-					console.log('moving node');
-					interact.events.remove(document, moveEvent);
-					interact.events.add( document, moveEvent, interact.drag.xyDrag );
-					target.element.style.cursor = 'move';					
-				}
-			return false;
-			}
-		},
-		resize: {
-			margin: (supportsTouch? 30 : 10),			// greater margin for touch device
-			xResize: function (event) {
-				event.preventDefault();
-				var target = resizeTarget[0];
-				if (mouseIsDown && target.actions.resize) {
-					addClass(target.element, 'interact-target');
-					var x = event.pageX,
-					newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
-	
-					target.setSize(newWidth, target.height);
-					prevX = x;
-				}
-			},
-			yResize: function (event) {
-				event.preventDefault();
-				var target = resizeTarget[0];
-				if (mouseIsDown && target.actions.resize) {
-					addClass(target.element, 'interact-target');
-					var y = event.pageY,
-					newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
-	
-					target.setSize(target.width, newHeight);
-					prevY = y;
-				}
-			},
-			xyResize: function (event) {
-				var target = resizeTarget[0];
-				if (mouseIsDown && target.actions.resize) {	
-					addClass(target.element, 'interact-target');	
-					var x = event.pageX, y = event.pageY,
-					newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
-					newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
-	
-					target.setSize(newWidth, newHeight);
-					prevX = x;
-					prevY = y;
-				}
-			}
-		},
-		drag: {
-			xyDrag: function (event) {
-				event.preventDefault();
-				var target = dragTarget[0];
-				if (mouseIsDown && target.actions.resize) {
-					addClass(target.element, 'interact-target');
-					var x = event.pageX, y = event.pageY;
-	
-					target.position(target.location.x + x - prevX , target.location.y + (y - prevY));
-					prevX = x;
-					prevY = y;
-				}
-			}
-		},
-		events: {
-			add: function (target, type, listener, useCapture) {
-				if (target.events === undefined) {
-					target.events = [];
-				}
-				if (target.events[type] === undefined) {
-					target.events[type] = [];
-				}
-
-				target.addEventListener(type, listener, useCapture || false);
-				target.events[type].push(listener);
-				return listener;
-			},
-			remove: function (target, type, listener, useCapture) {
-				if (target && target.events && target.events[type]) {
-					var i;
-					if (listener === undefined) {
-						for (i=0; i < target.events[type].length; i++) {
-							target.removeEventListener(type, target.events[type][i], useCapture || false);
+				else {
+					for (i=0; i < target.events[type].length; i++) {
+						if (target.events[type][i] === listener) {
+							target.removeEventListener(type, listener, useCapture || false);
 							target.events[type].splice(i, 1);
 						}
 					}
-					else {
-						for (i=0; i < target.events[type].length; i++) {
-							if (target.events[type][i] === listener) {
-								target.removeEventListener(type, listener, useCapture || false);
-								target.events[type].splice(i, 1);
-							}
-						}
-					}
 				}
 			}
-		},
-		docMouseUp: function (event) {
-			interact.events.remove(document, moveEvent, interact.resize.xResize);
-			interact.events.remove(document, moveEvent, interact.resize.yResize);
-			interact.events.remove(document, moveEvent, interact.resize.xyResize);
-			interact.events.remove(document, moveEvent, interact.drag.xyDrag);
-			
-			mouseIsDown = false;
-			interact.events.add(document, moveEvent, interact.mouseMove);
-		},
-		randomNodes: function (n, parent) {
-			n = n || 10;
-			parent = parent || document.body;
-			
-			for (var i = 0; i < n; i++) {
-				if (interact.nodes[i]!==undefined && interact.nodes[i].element.parentNode === parent) {
-					var par = interact.nodes[i].element.parentNode;
-					par.removeChild(interact.nodes[i].element);
-					interact.nodes[i] = new DivNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
-					give(par, interact.nodes[interact].element);
-				}
-				else {
-					interact.nodes.push(new DivNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200));
-					give(document.body, interact.nodes[i].element);
-				}
+		}
+	};
+	interact.docMouseUp = function (event) {
+		interact.events.remove(document, moveEvent, interact.resize.xResize);
+		interact.events.remove(document, moveEvent, interact.resize.yResize);
+		interact.events.remove(document, moveEvent, interact.resize.xyResize);
+		interact.events.remove(document, moveEvent, interact.drag.xyDrag);
+		
+		mouseIsDown = false;
+		interact.events.add(document, moveEvent, interact.mouseMove);
+	};
+	interact.randomNodes = function (n, parent) {
+		n = n || 10;
+		parent = parent || document.body;
+		
+		for (var i = 0; i < n; i++) {
+			if (interact.nodes[i]!==undefined && interact.nodes[i].element.parentNode === parent) {
+				var par = interact.nodes[i].element.parentNode;
+				
+				par.removeChild(interact.nodes[i].element);
+				interact.nodes[i] = new DivNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
+				give(par, interact.nodes[interact].element);
+			}
+			else {
+				interact.nodes.push(new DivNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200));
+				give(document.body, interact.nodes[i].element);
 			}
 		}
 	};
