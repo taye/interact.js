@@ -5,10 +5,12 @@
  * @name interact
  */
 window.interact = (function () {
-	"use strict";
+	'use strict';
 
 	var prevX = 0,
 		prevY = 0,
+		x0,
+		y0,
 		interactNodes = [],
 		nodeStyle,
 		target = null,
@@ -28,6 +30,8 @@ window.interact = (function () {
 					target.events[type] = [];
 				}
 				target.addEventListener(type, listener, useCapture || false);
+				// Should soon be
+				// target.addEventListener(type.element, listener, useCapture || false);
 				target.events[type].push(listener);
 				return listener;
 			},
@@ -37,6 +41,8 @@ window.interact = (function () {
 					if (listener === undefined) {
 						for (i = 0; i < target.events[type].length; i++) {
 							target.removeEventListener(type, target.events[type][i], useCapture || false);
+							// Should soon be
+							// target.element.removeEventListener(type, target.events[type][i], useCapture || false);
 							target.events[type].splice(i, 1);
 						}
 					}
@@ -81,10 +87,13 @@ window.interact = (function () {
 	/** @private */
 	function xyResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.actions.resize) {			addClass(target.element, 'interact-target');			var x = event.pageX, y = event.pageY,
+			if (mouseIsDown && target.actions.resize) {
+			var x = event.pageX,
+				y = event.pageY,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
 			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
+			addClass(target.element, 'interact-target');
 			target.setSize(newWidth, newHeight);
 			prevX = x;
 			prevY = y;
@@ -132,9 +141,7 @@ window.interact = (function () {
 		}
 	}
 
-	/**
-	 * @private
-	 */
+	/** @private */
 	function mouseDown(event) {
 		mouseIsDown = true;
 		if (event.target.actions && (event.target.actions.resize || event.target.actions.drag)) {
@@ -171,9 +178,20 @@ window.interact = (function () {
 				console.log('moving node');
 				events.remove(document, moveEvent);
 				events.add( document, moveEvent, interact.drag.xyDrag );
-				target.element.style.cursor = 'move';							}
+				target.element.style.cursor = 'move';
+			}
 		return false;
 		}
+	}
+	
+	/** @private */
+	function getIneractNode(element) {
+		for(var i=0; i < interactNodes.length; i++) {
+			if (interactNodes[i] === element) {
+				return interactNides[i];
+			}
+		}
+		return null;
 	}
 
 	/** @private */
@@ -215,6 +233,7 @@ window.interact = (function () {
 		this.x = x || 0;
 		this.y = y || 0;
 	}
+
 	/** @private */
 	Vector.prototype.set = function (x, y) {
 		this.x = x;
@@ -238,26 +257,26 @@ window.interact = (function () {
 	 * @param {number} w Element width
 	 * @param {number} h Element height
 	 */
-	function demoNode(x, y, w, h) {
+	function DemoNode(x, y, w, h) {
 		this.location = new Vector(x, y);
 		this.width = w || 0;
 		this.height = h || 0;
 		this.actions = {resize: true, drag: true};
 
-			this.element = document.createElement('div');
+		this.element = document.createElement('div');
 		this.element.actions = this.actions;
 		this.element.object = this;
-			this.element.style.setProperty('width', this.width + 'px', '');
+		this.element.style.setProperty('width', this.width + 'px', '');
 		this.element.style.setProperty('height', this.height + 'px', '');
 		this.element.style.setProperty('left', x + 'px', '');
 		this.element.style.setProperty('top', y + 'px', '');
 		this.element.className += ' interact-node ';
-			if (!nodeStyle) {
+		if (!nodeStyle) {
 			nodeStyle = document.createElement('style');
 			nodeStyle.type = 'text/css';
-			nodeStyle.innerHTML =' .interact-node { background-color:#2288FF; border:5px solid #333333; border-radius:10px; cursor:move; position:absolute; width:100px; height: 100px}';
-			nodeStyle.innerHTML +=' .interact-node:hover { border-color: #AAAAAA; }';
-			nodeStyle.innerHTML +=' .interact-target { border-style: dashed; }';
+			nodeStyle.innerHTML = ' .interact-node { background-color:#2288FF; border:5px solid #333333; border-radius:10px; cursor:move; position:absolute; width:100px; height: 100px}';
+			nodeStyle.innerHTML += ' .interact-node:hover { border-color: #AAAAAA; }';
+			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; }';
 			document.body.appendChild(nodeStyle);
 		}
 	}
@@ -265,7 +284,7 @@ window.interact = (function () {
 	/**
 	 * @throws typeError
 	 */
-	demoNode.prototype.setSize = function (x, y) {
+	DemoNode.prototype.setSize = function (x, y) {
 		if (x && x.constructor.name === 'Vector') {
 			this.width =  x.x;
 			this.height =  x.y;
@@ -273,7 +292,7 @@ window.interact = (function () {
 		else {
 			if (typeof x !== 'number' || typeof y !== 'number') {
 				typeErr.name = 'Incorrect parameter types';
-				typeErr.message = 'demoNode.setSize parameters must be a single Vector or two numbers.';
+				typeErr.message = 'DemoNode.setSize parameters must be a single Vector or two numbers.';
 				throw (typeErr);
 			}
 			this.width = x;
@@ -286,14 +305,14 @@ window.interact = (function () {
 	/**
 	 * @throws typeError
 	 */
-	demoNode.prototype.position = function (x, y) {
+	DemoNode.prototype.position = function (x, y) {
 		if (x && x.constructor.name === 'Vector') {
 		this.location.copy(x);
 		}
 		else {
 			if (typeof x !== 'number' || typeof y !== 'number') {
 				typeErr.name = 'Incorrect parameter types';
-				typeErr.message = 'demoNode.position parameters must be a single Vector or two numbers.';
+				typeErr.message = 'DemoNode.position parameters must be a single Vector or two numbers.';
 				throw (typeErr);
 			}
 			this.location.set(x, y);
@@ -331,11 +350,22 @@ window.interact = (function () {
 	 * @description Displays debugging data in the browser console
 	 */
 	interact.debug = function () {
-		console.log('target   : ' + target);
-		console.log('prevX    : ' + prevX);
-		console.log('prevY    : ' + prevY);
-		console.log('nodes    : ' + interact.nodes.length);
-	}
+		console.log('target         :  ' + target);
+		console.log('prevX, prevY   :  (' + prevX + ', ' + prevY);
+		console.log('x0, y0         :  (' + x0 + ', ' + y0);
+		console.log('nodes          : ' + interact.nodes.length);
+		console.log('supportsTouch  :  ' + supportsTouch);
+		
+		return {
+			target: target,
+			prevCoords: new Vector(prevX, prevY),
+			dragStartLocation: new Vector(x0, y0),
+			nodes: interact.nodes,
+			supportsTouch: supportsTouch
+		};
+			
+			
+	};
 
 	/**
 	 * @function
@@ -344,15 +374,32 @@ window.interact = (function () {
 	 * @param {object} options An object whose properties are the drag/resize options
 	 */
 	interact.set = function (element, options) {
-		var	newNode = {
+		var nodeAlreadySet = false,
+			i = 0,
+			newNode;
+
+		/** Check if element was already set */
+		for (; i < interactNodes.length; i++) {
+			if (interactNodes[i].element === element) {
+				nodeAlreadySet = true;
+				break;
+			}
+		}
+		newNode = {
 				element: element,
 				drag: options.drag || false,
 				resize: options.resize || false,
 				parent: options.parent || false,
-				axis: options.axis || 'xy'
+				axis: options.axis || 'xy',
+				events: {}
 			};
+		if (nodeAlreadySet) {
+			interactNodes[i] = newNode;
+		}
+		else {
+			interactNodes.push(newNode);
+		}
 		addClass(element, 'interact-node');
-		interactNodes.push(newNode);
 	};
 
 	/**
@@ -362,6 +409,7 @@ window.interact = (function () {
 	 */
 	interact.unset = function (element) {
 		var i;
+		
 		for (i = 0; i < interactNodes.length; i++) {
 			if (interactNodes[i].element === element) {
 				interactNodes.splice(i-1, 1);
@@ -397,22 +445,23 @@ window.interact = (function () {
 
 		n = n || 10;
 		parent = parent || document.body;
-			for (i = 0; i < n; i++) {
+		for (i = 0; i < n; i++) {
 			if (interact.nodes[i]!==undefined && interact.nodes[i].element.parentNode === parent) {
 				var par = interact.nodes[i].element.parentNode;
-							par.removeChild(interact.nodes[i].element);
-				interact.nodes[i] = new demoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
-				give(par, interact.nodes[interact].element);
+				
+				par.removeChild(interact.nodes[i].element);
+				interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
+				give(par, interact.nodes[i].element);
 			}
 			else {
-				interact.nodes.push(new demoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200));
+				interact.nodes.push(new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200));
 				give(document.body, interact.nodes[i].element);
 			}
 		}
 	};
 	events.add( document, moveEvent, mouseMove);
 	events.add( document, downEvent, mouseDown);
-	events.add( document, 'dragenter', function (event) { event.preventDefault(); });
+//	events.add( document, 'dragenter', function (event) { event.preventDefault(); });
 	events.add(document, upEvent, docMouseUp);
 	return interact;
 }());
