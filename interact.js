@@ -79,9 +79,19 @@ window.interact = (function () {
 		moveEvent = 'mousemove';
 	}
 
-	/** @private */
+	/** 
+	 * @private
+	 * @event
+	 */
 	function xResize(event) {
 		if (!resizeHasStarted) {
+		
+			/*
+			 * @static
+			 * @type MouseEvent
+			 * @memberOf interact
+			 * @description ...
+			 */
 			var resizeStart = document.createEvent('MouseEvents');
 			
 			resizeStart.initMouseEvent('interactresizestart', false, false, window,
@@ -110,16 +120,20 @@ window.interact = (function () {
 		}
 		event.preventDefault();
 		if (mouseIsDown && target.resize) {
-			addClass(target.element, 'interact-target');
 					var x = event.pageX,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
 
+			addClass(target.element, 'interact-target');
 			setSize(target, newWidth, target.height);
 			prevX = x;
 		}
 	}
 
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function yResize(event) {
 		if (!resizeHasStarted) {
 			var resizeStart = document.createEvent('MouseEvents');
@@ -159,7 +173,11 @@ window.interact = (function () {
 		}
 	}
 
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function xyResize(event) {
 		if (!resizeHasStarted) {
 			var resizeStart = document.createEvent('MouseEvents');
@@ -201,7 +219,11 @@ window.interact = (function () {
 		}
 	}
 	
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function xyDrag(event) {
 		if (!dragHasStarted) {
 			var dragStart = document.createEvent('MouseEvents');
@@ -242,9 +264,13 @@ window.interact = (function () {
 		}
 	}
 
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function mouseMove(event) {
-		if ( !dragHasStarted && !resizeHasStarted && (target = getInteractNode(event.target))) {
+		if ( !mouseIsDown && (target = getInteractNode(event.target))) {
 			if (target.resize) {
 				var	x = event.pageX,
 					y = event.pageY,
@@ -264,7 +290,11 @@ window.interact = (function () {
 		}
 	}
 
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function mouseDown(event) {
 		mouseIsDown = true;
 		if ((target = getInteractNode(event.target))) {
@@ -304,33 +334,41 @@ window.interact = (function () {
 		}
 	}
 
-	/** @private */
+
+	/** 
+	 * @private
+	 * @event
+	 */
 	function docMouseUp (event) {
+		var detail;
+		
 		if (dragHasStarted) {
-			var drop = document.createEvent('CustomEvent'),
-				detail = {
-					x0: x0,
-					y0: y0,
-					dx: event.pageX - x0,
-					dy: event.pageY - y0,
-					pageX: event.pageX,
-					pageY: event.pageY
-				};
-			drop.initCustomEvent('interactdrop', false, false, detail);
+			var drop = document.createEvent('CustomEvent');
+			
+			detail = {
+				x0: x0,
+				y0: y0,
+				dx: event.pageX - x0,
+				dy: event.pageY - y0,
+				pageX: event.pageX,
+				pageY: event.pageY
+			};
+			drop.initCustomEvent('interactdrop', true, false, detail);
 			target.element.dispatchEvent(drop);
 			dragHasStarted = false;
 		}
-		if (resizeHasStarted) {
-			var resizeEnd = document.createEvent('CustomEvent'),
-				detail = {
-					x0: x0,
-					y0: y0,
-					dx: event.pageX - x0,
-					dy: event.pageY - y0,
-					pageX: event.pageX,
-					pageY: event.pageY
-				};
-			resizeEnd.initCustomEvent('interactdrop', false, false, detail);
+		else if (resizeHasStarted) {
+			var resizeEnd = document.createEvent('CustomEvent');
+			
+			detail = {
+				x0: x0,
+				y0: y0,
+				dx: event.pageX - x0,
+				dy: event.pageY - y0,
+				pageX: event.pageX,
+				pageY: event.pageY
+			};
+			resizeEnd.initCustomEvent('interactdrop', true, false, detail);
 			target.element.dispatchEvent(resizeEnd);
 			resizeHasStarted = false;
 		}
@@ -442,6 +480,34 @@ window.interact = (function () {
 			document.body.appendChild(nodeStyle);
 		}
 		return newNode;
+	}
+	
+
+	/** 
+	 * @private
+	 * @event
+	 */
+	function nodeEventDebug(e) {
+		/** Display event properties for debugging */
+		if (e.type === 'interactresizestart') {
+			e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ')';
+		}
+		
+		else if (e.type === 'interactresizemove') {
+			e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+			e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
+			e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+		}
+		
+		else if (e.type === 'interactdragstart') {
+			e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ') <br>';
+		}
+		
+		else if (e.type === 'interactdragmove') {
+			e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+			e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
+			e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+		}
 	}
 
 	/**
@@ -636,25 +702,10 @@ window.interact = (function () {
 			interact.set(interact.nodes[i], {drag:true, resize:true});
 			
 			/** Display event properties for debugging */
-			events.add(interactNodes[i], 'interactresizestart', function(e) {
-				e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ')';
-			});
-			
-			events.add(interactNodes[i], 'interactresizemove', function(e) {
-				e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
-				e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
-				e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
-			});
-			
-			events.add(interactNodes[i], 'interactdragstart', function(e) {
-				e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ') <br>';
-			});
-			
-			events.add(interactNodes[i], 'interactdragmove', function(e) {
-				e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
-				e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
-				e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
-			});
+			events.add(interactNodes[i], 'interactresizestart', nodeEventDebug);
+			events.add(interactNodes[i], 'interactresizemove', nodeEventDebug);
+			events.add(interactNodes[i], 'interactdragstart', nodeEventDebug);
+			events.add(interactNodes[i], 'interactdragmove', nodeEventDebug);
 			
 			if (i === 0) {
 				interact.nodes[0].style.backgroundColor = '#ff0';
