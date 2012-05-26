@@ -1,5 +1,4 @@
 // Taye Adeyemi
-
 /**
  * @namespace interact.js module
  * @name interact
@@ -61,13 +60,54 @@ window.interact = (function () {
 			},
 			removeAll: function (target) {
 				for (var type in target.evetns) {
-					evetnst.remove(target, type, 'all');
+					if (target.events.hasOwnProperty(type)) {
+						events.remove(target, type, 'all');
+					}
 				}
 			}
 		};
+	
+	/** Should change this so devices with mouse and touch can use both */
+	if (supportsTouch) {
+		downEvent = 'touchstart',
+		upEvent = 'touchend',
+		moveEvent = 'touchmove';
+	}
+	else {
+		downEvent = 'mousedown',
+		upEvent = 'mouseup',
+		moveEvent = 'mousemove';
+	}
 
 	/** @private */
 	function xResize(event) {
+		if (!resizeHasStarted) {
+			var resizeStart = document.createEvent('MouseEvents');
+			
+			resizeStart.initMouseEvent('interactresizestart', false, false, window,
+				1, event.screenX, event.screenY, event.clientX, event.clientY, 
+				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
+				event.button, null);
+			target.element.dispatchEvent(resizeStart);
+			x0 = event.pageX;
+			y0 = event.pageY;
+			console.log('resizing on x axis');
+			resizeHasStarted = true;
+			addClass(target.element, 'interact-resize-target');
+		}
+		else {
+			var resizeMove = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: event.pageX - x0,
+					dy: 0,
+					pageX: event.pageX,
+					pageY: event.pageY
+				};
+			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			target.element.dispatchEvent(resizeMove);
+		}
 		event.preventDefault();
 		if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
@@ -81,6 +121,33 @@ window.interact = (function () {
 
 	/** @private */
 	function yResize(event) {
+		if (!resizeHasStarted) {
+			var resizeStart = document.createEvent('MouseEvents');
+			
+			resizeStart.initMouseEvent('interactresizestart', false, false, window,
+				1, event.screenX, event.screenY, event.clientX, event.clientY, 
+				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
+				event.button, null);
+			target.element.dispatchEvent(resizeStart);
+			x0 = event.pageX;
+			y0 = event.pageY;
+			console.log('resizing on y axis');
+			resizeHasStarted = true;
+			addClass(target.element, 'interact-resize-target');
+		}
+		else {
+			var resizeMove = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: 0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY
+				};
+			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			target.element.dispatchEvent(resizeMove);
+		}
 		event.preventDefault();
 		if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
@@ -104,8 +171,22 @@ window.interact = (function () {
 			target.element.dispatchEvent(resizeStart);
 			x0 = event.pageX;
 			y0 = event.pageY;
-			console.log('resizing node' );
+			console.log('resizing on x and y axes');
 			resizeHasStarted = true;
+			addClass(target.element, 'interact-resize-target');
+		}
+		else {
+			var resizeMove = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: event.pageX - x0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY
+				};
+			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			target.element.dispatchEvent(resizeMove);
 		}
 		event.preventDefault();
 		if (mouseIsDown && target.resize) {
@@ -114,7 +195,6 @@ window.interact = (function () {
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
 			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
-			addClass(target.element, 'interact-target');
 			setSize(target, newWidth, newHeight);
 			prevX = x;
 			prevY = y;
@@ -161,18 +241,6 @@ window.interact = (function () {
 			prevY = y;
 		}
 	}
-	
-	/** Should change this so devices with mouse and touch can use both */
-	if (supportsTouch) {
-		downEvent = 'touchstart',
-		upEvent = 'touchend',
-		moveEvent = 'touchmove';
-	}
-	else {
-		downEvent = 'mousedown',
-		upEvent = 'mouseup',
-		moveEvent = 'mousemove';
-	}
 
 	/** @private */
 	function mouseMove(event) {
@@ -199,7 +267,7 @@ window.interact = (function () {
 	/** @private */
 	function mouseDown(event) {
 		mouseIsDown = true;
-		if (target = getInteractNode(event.target)) {
+		if ((target = getInteractNode(event.target))) {
 			var	right,
 				bottom;
 
@@ -212,7 +280,6 @@ window.interact = (function () {
 				event.preventDefault();
 
 				events.remove(docTarget, moveEvent, 'all');
-				console.log('resizing on right');
 				if (bottom) {
 					events.add(docTarget, moveEvent, xyResize);
 				}
@@ -223,7 +290,6 @@ window.interact = (function () {
 			else if (bottom) {
 				event.preventDefault();
 				
-				console.log('resizing on bottom');
 				events.remove(docTarget, moveEvent, 'all');
 				events.add(docTarget, moveEvent, yResize);
 			}
@@ -253,6 +319,20 @@ window.interact = (function () {
 			drop.initCustomEvent('interactdrop', false, false, detail);
 			target.element.dispatchEvent(drop);
 			dragHasStarted = false;
+		}
+		if (resizeHasStarted) {
+			var resizeEnd = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: event.pageX - x0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY
+				};
+			resizeEnd.initCustomEvent('interactdrop', false, false, detail);
+			target.element.dispatchEvent(resizeEnd);
+			resizeHasStarted = false;
 		}
 			
 		events.remove(docTarget, moveEvent, xResize);
@@ -358,6 +438,7 @@ window.interact = (function () {
 			nodeStyle.innerHTML = ' .interact-node { background-color:#2288FF; border:5px solid #333333; border-radius:10px; cursor:move; position:absolute; width:100px; height: 100px}';
 			nodeStyle.innerHTML += ' .interact-node:hover { border-color: #AAAAAA; }';
 			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; border-color: #AAAAAA; }';
+			nodeStyle.innerHTML += ' #node0::before { content: "interact.nodes[0] \t"; border-bottom: 2px solid red; white-space: pre}';
 			document.body.appendChild(nodeStyle);
 		}
 		return newNode;
@@ -382,7 +463,7 @@ window.interact = (function () {
 		}
 		node.element.style.setProperty('width', Math.max(x, 20) + 'px', '');
 		node.element.style.setProperty('height', Math.max(y, 20) + 'px', '');
-	};
+	}
 
 	/**
 	 * @throws typeError
@@ -401,7 +482,7 @@ window.interact = (function () {
 		}
 		node.element.style.setProperty('left', x + 'px', '');
 		node.element.style.setProperty('top', y + 'px', '');
-	};
+	}
 
 	/** @private */
 	function bringToFront(element) {
@@ -483,8 +564,7 @@ window.interact = (function () {
 				width: getElementDimensions(element).x,
 				height: getElementDimensions(element).y,
 				drag: options.drag || true,
-				resize: options.resize || true,
-				axis: options.axis || 'xy',
+				resize: options.resize || true
 			};
 		if (nodeAlreadySet) {
 			interactNodes[i] = newNode;
@@ -527,7 +607,7 @@ window.interact = (function () {
 			}
 		}
 		return false;
-	}
+	};
 
 	/**
 	 * @function
@@ -554,6 +634,28 @@ window.interact = (function () {
 				give(document.body, interact.nodes[i]);
 			}
 			interact.set(interact.nodes[i], {drag:true, resize:true});
+			
+			/** Display event properties for debugging */
+			events.add(interactNodes[i], 'interactresizestart', function(e) {
+				e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ')';
+			});
+			
+			events.add(interactNodes[i], 'interactresizemove', function(e) {
+				e.target.innerHTML = '<br> resizestart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+				e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
+				e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+			});
+			
+			events.add(interactNodes[i], 'interactdragstart', function(e) {
+				e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.pageX + ', ' + e.pageY + ') <br>';
+			});
+			
+			events.add(interactNodes[i], 'interactdragmove', function(e) {
+				e.target.innerHTML = '<br> dragstart x0, y0	:	(' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+				e.target.innerHTML += '<br> dx, dy			:	(' + e.detail.dx + ', ' + e.detail.dy + ')';
+				e.target.innerHTML += '<br> pageX, pageY		:	(' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+			});
+			
 			if (i === 0) {
 				interact.nodes[0].style.backgroundColor = '#ff0';
 				interact.nodes[0].id = 'node0';
