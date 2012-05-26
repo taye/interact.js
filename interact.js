@@ -19,6 +19,7 @@ window.interact = (function () {
 		downEvent,
 		upEvent,
 		moveEvent,
+		xyDrag,
 		margin = supportsTouch ? 30 : 10,
 		typeErr = new TypeError('Type Error'),
 		docTarget = {
@@ -100,7 +101,24 @@ window.interact = (function () {
 			prevY = y;
 		}
 	}
-	/* Should change this so devices with mouse and touch can use both */
+	
+	/** @private */
+	xyDrag = function (event) {
+		//target.element.dispatchEvent(dragStart);
+		
+		event.preventDefault();
+		if (mouseIsDown && target.drag) {
+			addClass(target.element, 'interact-target');
+			var x = event.pageX,
+				y = event.pageY;
+
+			position(target, target.location.x + x - prevX , target.location.y + (y - prevY));
+			prevX = x;
+			prevY = y;
+		}
+	};
+	
+	/** Should change this so devices with mouse and touch can use both */
 	if (supportsTouch) {
 		downEvent = 'touchstart',
 		upEvent = 'touchend',
@@ -117,7 +135,7 @@ window.interact = (function () {
 		events.remove(docTarget, moveEvent, xResize);
 		events.remove(docTarget, moveEvent, yResize);
 		events.remove(docTarget, moveEvent, xyResize);
-		events.remove(docTarget, moveEvent, interact.drag.xyDrag);
+		events.remove(docTarget, moveEvent, xyDrag);
 			mouseIsDown = false;
 		clearTarget();
 		events.add(docTarget, moveEvent, mouseMove);
@@ -172,12 +190,19 @@ window.interact = (function () {
 				events.add(docTarget, moveEvent, yResize);
 			}
 			else if (target.drag) {
+				var dragStart = document.createEvent('MouseEvents');
+				dragStart.initMouseEvent('dragstart', false, false, window,
+					0, event.screenX, event.screenY, event.clientX, event.clientY, 
+					event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
+					event.button, null);
+				target.element.dispatchEvent(dragStart);
+				
 				event.preventDefault();
 
 				bringToFront(target.element);
 				console.log('moving node');
 				events.remove(docTarget, moveEvent);
-				events.add(docTarget, moveEvent, interact.drag.xyDrag);
+				events.add(docTarget, moveEvent, xyDrag);
 				target.element.style.cursor = 'move';
 			}
 		}
@@ -435,23 +460,6 @@ window.interact = (function () {
 		}
 		removeClass(element, 'interact-node interact-target');
 	};
-	/**
-	 * @description Contains drag functions. Currently here for debugging. Will be made private.
-	 */
-	interact.drag = {
-		xyDrag: function (event) {
-			event.preventDefault();
-			if (mouseIsDown && target.drag) {
-				addClass(target.element, 'interact-target');
-				var x = event.pageX,
-					y = event.pageY;
-
-				position(target, target.location.x + x - prevX , target.location.y + (y - prevY));
-				prevX = x;
-				prevY = y;
-			}
-		}
-	};
 
 	/**
 	 * @function
@@ -478,7 +486,10 @@ window.interact = (function () {
 				give(document.body, interact.nodes[i]);
 			}
 			interact.set(interact.nodes[i], {drag:true, resize:true});
-			interact.nodes[0].style.backgroundColor = '#ff0';
+			if (i == 0) {
+				interact.nodes[0].style.backgroundColor = '#ff0';
+				events.add(interactNodes[0], 'dragStart', function (event) {console.log(event);});
+			}
 		}
 	};
 	events.add(docTarget, moveEvent, mouseMove);
