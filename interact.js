@@ -29,7 +29,7 @@ window.interact = (function () {
 		events = {
 			add: function (target, type, listener, useCapture) {
 				if (target.events === undefined) {
-					target.events = [];
+					target.events = {};
 				}
 				if (target.events[type] === undefined) {
 					target.events[type] = [];
@@ -42,7 +42,7 @@ window.interact = (function () {
 				if (target && target.events && target.events[type]) {
 					var i;
 
-					if (listener === undefined) {
+					if (listener === 'all') {
 						for (i = 0; i < target.events[type].length; i++) {
 							target.element.removeEventListener(type, target.events[type][i], useCapture || false);
 							target.events[type].splice(i, 1);
@@ -56,6 +56,11 @@ window.interact = (function () {
 							}
 						}
 					}
+				}
+			},
+			removeAll: function (target) {
+				for (var type in target.evetns) {
+					evetnst.remove(target, type, 'all');
 				}
 			}
 		};
@@ -108,10 +113,12 @@ window.interact = (function () {
 			var dragStart = document.createEvent('MouseEvents');
 			
 			dragStart.initMouseEvent('interactdragstart', false, false, window,
-				0, event.screenX, event.screenY, event.clientX, event.clientY, 
+				1, event.screenX, event.screenY, event.clientX, event.clientY, 
 				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
 				event.button, null);
 			target.element.dispatchEvent(dragStart);
+			x0 = event.pageX;
+			y0 = event.pageY;
 			console.log('moving node');
 			dragHasStarted = true;
 		}
@@ -120,16 +127,16 @@ window.interact = (function () {
 				detail = {
 					x0: x0,
 					y0: y0,
-					dx: event.pageX - prevX,
-					dy: event.pageY - prevY,
+					dx: event.pageX - x0,
+					dy: event.pageY - y0,
 					pageX: event.pageX,
 					pageY: event.pageY
-				}
+				};
 			dragMove.initCustomEvent('interactdragmove', false, false, detail);
 			target.element.dispatchEvent(dragMove);
 		}
 		if (mouseIsDown && target.drag) {
-			event.preventDefault();
+		//	event.preventDefault();
 			
 			addClass(target.element, 'interact-target');
 			var x = event.pageX,
@@ -154,18 +161,6 @@ window.interact = (function () {
 	}
 
 	/** @private */
-	function docMouseUp (event) {
-		events.remove(docTarget, moveEvent, xResize);
-		events.remove(docTarget, moveEvent, yResize);
-		events.remove(docTarget, moveEvent, xyResize);
-		events.remove(docTarget, moveEvent, xyDrag);
-		events.add(docTarget, moveEvent, mouseMove);
-		mouseIsDown = false;
-		dragHasStarted = false;
-		clearTarget();
-	}
-
-	/** @private */
 	function mouseMove(event) {
 		if ( target = getInteractNode(event.target)) {
 			if (target.resize) {
@@ -180,6 +175,9 @@ window.interact = (function () {
 				else {
 					target.element.style.cursor = bottom?'s-resize' : '';
 				}
+			}
+			else {
+				target.element.style.cursor = '';
 			}
 		}
 	}
@@ -199,7 +197,7 @@ window.interact = (function () {
 			if (right) {
 				event.preventDefault();
 
-				events.remove(docTarget, moveEvent);
+				events.remove(docTarget, moveEvent, 'all');
 				console.log('resizing on right');
 				if (bottom) {
 					events.add(docTarget, moveEvent, xyResize);
@@ -212,18 +210,43 @@ window.interact = (function () {
 				event.preventDefault();
 				
 				console.log('resizing on bottom');
-				events.remove(docTarget, moveEvent);
+				events.remove(docTarget, moveEvent, 'all');
 				events.add(docTarget, moveEvent, yResize);
 			}
 			else if (target.drag) {
 				event.preventDefault();
 
 				bringToFront(target.element);
-				events.remove(docTarget, moveEvent);
+				events.remove(docTarget, moveEvent, 'all');
 				events.add(docTarget, moveEvent, xyDrag);
 				addClass(target.element, 'ineract-dragging');
 			}
 		}
+	}
+
+	/** @private */
+	function docMouseUp (event) {
+		if (dragHasStarted) {
+			var dragMove = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: event.pageX - x0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY
+				};
+			dragMove.initCustomEvent('interactdragmove', false, false, detail);
+		dragHasStarted = false;
+		}
+			
+		events.remove(docTarget, moveEvent, xResize);
+		events.remove(docTarget, moveEvent, yResize);
+		events.remove(docTarget, moveEvent, xyResize);
+		events.remove(docTarget, moveEvent, xyDrag);
+		events.add(docTarget, moveEvent, mouseMove);
+		mouseIsDown = false;
+		clearTarget();
 	}
 
 	/** @private */
@@ -316,13 +339,13 @@ window.interact = (function () {
 		newNode.style.setProperty('height', newNode.height + 'px', '');
 		newNode.style.setProperty('left', x + 'px', '');
 		newNode.style.setProperty('top', y + 'px', '');
-		newNode.className += ' interact-node ';
+		newNode.className += ' interact-demo-node ';
 		if (!nodeStyle) {
 			nodeStyle = document.createElement('style');
 			nodeStyle.type = 'text/css';
 			nodeStyle.innerHTML = ' .interact-node { background-color:#2288FF; border:5px solid #333333; border-radius:10px; cursor:move; position:absolute; width:100px; height: 100px}';
 			nodeStyle.innerHTML += ' .interact-node:hover { border-color: #AAAAAA; }';
-			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; }';
+			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; border-color: #AAAAAA; }';
 			document.body.appendChild(nodeStyle);
 		}
 		return newNode;
@@ -447,20 +470,20 @@ window.interact = (function () {
 				location: getElementLocation(element),
 				width: getElementDimensions(element).x,
 				height: getElementDimensions(element).y,
-				drag: options.drag || false,
-				resize: options.resize || false,
+				drag: options.drag || true,
+				resize: options.resize || true,
 				parent: options.parent || false,
 				axis: options.axis || 'xy',
-				events: {}
 			};
 		if (nodeAlreadySet) {
 			interactNodes[i] = newNode;
+			events.add(newNode, moveEvent, mouseMove);
 		}
 		else {
 			interactNodes.push(newNode);
+			events.add(newNode, moveEvent, mouseMove);
 		}
 		addClass(element, 'interact-node');
-		//events.add(
 	};
 
 	/**
@@ -473,11 +496,27 @@ window.interact = (function () {
 
 		for (i = 0; i < interactNodes.length; i++) {
 			if (interactNodes[i].element === element) {
-				interactNodes.splice(i-1, 1);
+				interactNodes.splice(i, 1);
+				events.removeAll(interactNodes[i]);
 			}
 		}
 		removeClass(element, 'interact-node interact-target interact-dragging interact-resizing');
 	};
+	
+	/**
+	 * @function
+	 * @description Check if an element has been set
+	 * @param {object HTMLElement} element The DOM Element that will be searched for
+	 * @returns bool
+	 */
+	interact.isSet = function(element) {
+		for(var i=0; i < interactNodes.length; i++) {
+			if (interactNodes[i].element === element) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * @function
@@ -504,20 +543,22 @@ window.interact = (function () {
 				give(document.body, interact.nodes[i]);
 			}
 			interact.set(interact.nodes[i], {drag:true, resize:true});
-			if (i == 0) {
+			if (i === 0) {
 				interact.nodes[0].style.backgroundColor = '#ff0';
+				interact.nodes[0].id = 'node0';
 				events.add(interactNodes[0], 'interactdragstart', function (event) {console.log(event);});
 				events.add(interactNodes[0], 'interactdragmove', function (event) {console.log(event);});
 			}
 		}
 	};
-	events.add(docTarget, moveEvent, mouseMove);
+//	events.add(docTarget, moveEvent, mouseMove);
 	events.add(docTarget, downEvent, mouseDown);
 //	events.add(docTarget, 'dragenter', function (event) { event.preventDefault(); });
 	events.add(docTarget, upEvent, docMouseUp);
 	
 	/**
-	 * Handy Debuggy things
+	 * Used for debugging
+	 * @type Array
 	 */
 	interact.inodes = interactNodes;
 	interact.position = position;
