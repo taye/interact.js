@@ -17,6 +17,7 @@ window.interact = (function () {
 		supportsTouch = 'createTouch' in document,
 		mouseIsDown = false,
 		dragHasStarted = false,
+		resizeHasStarted = false,
 		downEvent,
 		upEvent,
 		moveEvent,
@@ -68,7 +69,7 @@ window.interact = (function () {
 	/** @private */
 	function xResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.resize) {
+		if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
 					var x = event.pageX,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
@@ -81,7 +82,7 @@ window.interact = (function () {
 	/** @private */
 	function yResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.resize) {
+		if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
 			var y = event.pageY,
 			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
@@ -93,8 +94,21 @@ window.interact = (function () {
 
 	/** @private */
 	function xyResize(event) {
+		if (!resizeHasStarted) {
+			var resizeStart = document.createEvent('MouseEvents');
+			
+			resizeStart.initMouseEvent('interactresizestart', false, false, window,
+				1, event.screenX, event.screenY, event.clientX, event.clientY, 
+				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
+				event.button, null);
+			target.element.dispatchEvent(resizeStart);
+			x0 = event.pageX;
+			y0 = event.pageY;
+			console.log('resizing node' );
+			resizeHasStarted = true;
+		}
 		event.preventDefault();
-			if (mouseIsDown && target.resize) {
+		if (mouseIsDown && target.resize) {
 			var x = event.pageX,
 				y = event.pageY,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
@@ -119,7 +133,7 @@ window.interact = (function () {
 			target.element.dispatchEvent(dragStart);
 			x0 = event.pageX;
 			y0 = event.pageY;
-			console.log('moving node');
+			console.log('dragging node' );
 			dragHasStarted = true;
 		}
 		else {
@@ -162,7 +176,7 @@ window.interact = (function () {
 
 	/** @private */
 	function mouseMove(event) {
-		if ( target = getInteractNode(event.target)) {
+		if ( !dragHasStarted && !resizeHasStarted && (target = getInteractNode(event.target))) {
 			if (target.resize) {
 				var	x = event.pageX,
 					y = event.pageY,
@@ -227,7 +241,7 @@ window.interact = (function () {
 	/** @private */
 	function docMouseUp (event) {
 		if (dragHasStarted) {
-			var dragMove = document.createEvent('CustomEvent'),
+			var drop = document.createEvent('CustomEvent'),
 				detail = {
 					x0: x0,
 					y0: y0,
@@ -236,8 +250,9 @@ window.interact = (function () {
 					pageX: event.pageX,
 					pageY: event.pageY
 				};
-			dragMove.initCustomEvent('interactdragmove', false, false, detail);
-		dragHasStarted = false;
+			drop.initCustomEvent('interactdrop', false, false, detail);
+			target.element.dispatchEvent(drop);
+			dragHasStarted = false;
 		}
 			
 		events.remove(docTarget, moveEvent, xResize);
@@ -331,15 +346,12 @@ window.interact = (function () {
 	 */
 	function DemoNode(x, y, w, h) {
 		var newNode = document.createElement('div');
-		newNode.width = w || 0;
-		newNode.height = h || 0;
-		newNode.actions = {resize: true, drag: true};
 
-		newNode.style.setProperty('width', newNode.width + 'px', '');
-		newNode.style.setProperty('height', newNode.height + 'px', '');
+		newNode.style.setProperty('width', w + 'px', '');
+		newNode.style.setProperty('height', h + 'px', '');
 		newNode.style.setProperty('left', x + 'px', '');
 		newNode.style.setProperty('top', y + 'px', '');
-		newNode.className += ' interact-demo-node ';
+		newNode.className += ' interact-demo-node';
 		if (!nodeStyle) {
 			nodeStyle = document.createElement('style');
 			nodeStyle.type = 'text/css';
@@ -472,7 +484,6 @@ window.interact = (function () {
 				height: getElementDimensions(element).y,
 				drag: options.drag || true,
 				resize: options.resize || true,
-				parent: options.parent || false,
 				axis: options.axis || 'xy',
 			};
 		if (nodeAlreadySet) {
@@ -546,8 +557,6 @@ window.interact = (function () {
 			if (i === 0) {
 				interact.nodes[0].style.backgroundColor = '#ff0';
 				interact.nodes[0].id = 'node0';
-				events.add(interactNodes[0], 'interactdragstart', function (event) {console.log(event);});
-				events.add(interactNodes[0], 'interactdragmove', function (event) {console.log(event);});
 			}
 		}
 	};
