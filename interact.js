@@ -7,7 +7,7 @@
 window.interact = (function () {
 	'use strict';
 
-	var prevX = 0,
+	var	prevX = 0,
 		prevY = 0,
 		x0,
 		y0,
@@ -21,6 +21,10 @@ window.interact = (function () {
 		moveEvent,
 		margin = supportsTouch ? 30 : 10,
 		typeErr = new TypeError('Type Error'),
+		docTarget = {
+			element: document,
+			events: []
+		},
 		events = {
 			add: function (target, type, listener, useCapture) {
 				if (target.events === undefined) {
@@ -29,27 +33,24 @@ window.interact = (function () {
 				if (target.events[type] === undefined) {
 					target.events[type] = [];
 				}
-				target.addEventListener(type, listener, useCapture || false);
-				// Should soon be
-				// target.addEventListener(type.element, listener, useCapture || false);
 				target.events[type].push(listener);
-				return listener;
+				
+				return target.element.addEventListener(type, listener, useCapture || false);
 			},
 			remove: function (target, type, listener, useCapture) {
 				if (target && target.events && target.events[type]) {
 					var i;
+
 					if (listener === undefined) {
 						for (i = 0; i < target.events[type].length; i++) {
-							target.removeEventListener(type, target.events[type][i], useCapture || false);
-							// Should soon be
-							// target.element.removeEventListener(type, target.events[type][i], useCapture || false);
+							target.element.removeEventListener(type, target.events[type][i], useCapture || false);
 							target.events[type].splice(i, 1);
 						}
 					}
 					else {
 						for (i = 0; i < target.events[type].length; i++) {
 							if (target.events[type][i] === listener) {
-								target.removeEventListener(type, listener, useCapture || false);
+								target.element.removeEventListener(type, target.events[type][i], useCapture || false);
 								target.events[type].splice(i, 1);
 							}
 						}
@@ -61,12 +62,12 @@ window.interact = (function () {
 	/** @private */
 	function xResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.actions.resize) {
+			if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
 					var x = event.pageX,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
 
-			target.setSize(newWidth, target.height);
+			setSize(target, newWidth, target.height);
 			prevX = x;
 		}
 	}
@@ -74,12 +75,12 @@ window.interact = (function () {
 	/** @private */
 	function yResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.actions.resize) {
+			if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
 			var y = event.pageY,
 			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
-			target.setSize(target.width, newHeight);
+			setSize(target, target.width, newHeight);
 			prevY = y;
 		}
 	}
@@ -87,14 +88,14 @@ window.interact = (function () {
 	/** @private */
 	function xyResize(event) {
 		event.preventDefault();
-			if (mouseIsDown && target.actions.resize) {
+			if (mouseIsDown && target.resize) {
 			var x = event.pageX,
 				y = event.pageY,
 			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
 			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
 
 			addClass(target.element, 'interact-target');
-			target.setSize(newWidth, newHeight);
+			setSize(target, newWidth, newHeight);
 			prevX = x;
 			prevY = y;
 		}
@@ -113,30 +114,30 @@ window.interact = (function () {
 
 	/** @private */
 	function docMouseUp (event) {
-		console.log('target = ' + target);
-		events.remove(document, moveEvent, xResize);
-		events.remove(document, moveEvent, yResize);
-		events.remove(document, moveEvent, xyResize);
-		events.remove(document, moveEvent, interact.drag.xyDrag);
+		events.remove(docTarget, moveEvent, xResize);
+		events.remove(docTarget, moveEvent, yResize);
+		events.remove(docTarget, moveEvent, xyResize);
+		events.remove(docTarget, moveEvent, interact.drag.xyDrag);
 			mouseIsDown = false;
 		clearTarget();
-		events.add(document, moveEvent, mouseMove);
+		events.add(docTarget, moveEvent, mouseMove);
 	}
 
 	/** @private */
 	function mouseMove(event) {
-		if (event.target.actions && (event.target.actions.resize || event.target.actions.drag)) {
-			var x = event.pageX,
-				y = event.pageY,
-				target = event.target.object,
-				right = (x - target.location.x > target.width - margin),
-				bottom = (y - target.location.y > target.height - margin);
+		if ( target = getInteractNode(event.target)) {
+			if (target.resize) {
+				var	x = event.pageX,
+					y = event.pageY,
+					right = (x - target.location.x > target.width - margin),
+					bottom = (y - target.location.y > target.height - margin);
 
-			if (right) {
-				target.element.style.cursor = bottom?'se-resize' : 'e-resize';
-			}
-			else {
-				target.element.style.cursor = bottom?'s-resize' : target.actions.drag? 'pointer' : 'default';
+				if (right) {
+					target.element.style.cursor = bottom?'se-resize' : 'e-resize';
+				}
+				else {
+					target.element.style.cursor = bottom?'s-resize' : '';
+				}
 			}
 		}
 	}
@@ -144,51 +145,49 @@ window.interact = (function () {
 	/** @private */
 	function mouseDown(event) {
 		mouseIsDown = true;
-		if (event.target.actions && (event.target.actions.resize || event.target.actions.drag)) {
+		if (target = getInteractNode(event.target)) {
 			var	right,
 				bottom;
 
 				prevX = event.pageX;
 				prevY = event.pageY;
-				target = event.target.object;
 				right = (prevX - target.location.x > target.width - margin),
 				bottom = (prevY - target.location.y > target.height - margin);
 
 			if (right) {
 				event.preventDefault();
 
-				events.remove(document, moveEvent);
+				events.remove(docTarget, moveEvent);
 				console.log('resizing on right');
 				if (bottom) {
-					events.add( document, moveEvent, xyResize );
+					events.add(docTarget, moveEvent, xyResize);
 				}
 				else {
-					events.add( document, moveEvent, xResize ) ;
+					events.add(docTarget, moveEvent, xResize) ;
 				}
 			}
 			else if (bottom) {
 				console.log('resizing on bottom');
-				events.remove(document, moveEvent);
-				events.add( document, moveEvent, yResize );
+				events.remove(docTarget, moveEvent);
+				events.add(docTarget, moveEvent, yResize);
 			}
-			else if (target.actions.drag) {
+			else if (target.drag) {
 				event.preventDefault();
 
 				bringToFront(target.element);
 				console.log('moving node');
-				events.remove(document, moveEvent);
-				events.add( document, moveEvent, interact.drag.xyDrag );
+				events.remove(docTarget, moveEvent);
+				events.add(docTarget, moveEvent, interact.drag.xyDrag);
 				target.element.style.cursor = 'move';
 			}
-		return false;
 		}
 	}
-	
+
 	/** @private */
-	function getIneractNode(element) {
+	function getInteractNode(element) {
 		for(var i=0; i < interactNodes.length; i++) {
-			if (interactNodes[i] === element) {
-				return interactNides[i];
+			if (interactNodes[i].element === element) {
+				return interactNodes[i];
 			}
 		}
 		return null;
@@ -211,15 +210,21 @@ window.interact = (function () {
 	}
 
 	/** @private */
-	function removeClass(element, className) {
-		element.className =
-			element.className.replace( new RegExp( '(?:^|\\s)' + className + '(?!\\S)' ) , '' );
+	function removeClass(element, classNames) {
+		classNames = classNames.split(' ');
+		for (var i = 0; i < classNames.length; i++) {
+			element.className =
+				element.className.replace( new RegExp( '(?:^|\\s)' + classNames + '(?!\\S)' ) , '' );
+		}
 	}
 
 	/** @private */
-	function addClass(element, className) {
-		if (!element.className.match( new RegExp( '(?:^|\\s)' + className + '(?!\\S)' ))) {
-			element.className += ' ' + className;
+	function addClass(element, classNames) {
+		classNames = classNames.split(' ');
+		for (var i = 0; i < classNames.length; i++) {
+			if (!element.className.match( new RegExp( '(?:^|\\s)' + classNames + '(?!\\S)' )) ) {
+				element.className += ' ' + classNames;
+			}
 		}
 	}
 
@@ -252,25 +257,23 @@ window.interact = (function () {
 	/**
 	 * @class Node for demonstrating interact functionality
 	 * @private
+	 * @returns object HTMLDivElement
 	 * @param {number} x Horizontal position
 	 * @param {number} y Vertical position
 	 * @param {number} w Element width
 	 * @param {number} h Element height
 	 */
 	function DemoNode(x, y, w, h) {
-		this.location = new Vector(x, y);
-		this.width = w || 0;
-		this.height = h || 0;
-		this.actions = {resize: true, drag: true};
+		var newNode = document.createElement('div');
+		newNode.width = w || 0;
+		newNode.height = h || 0;
+		newNode.actions = {resize: true, drag: true};
 
-		this.element = document.createElement('div');
-		this.element.actions = this.actions;
-		this.element.object = this;
-		this.element.style.setProperty('width', this.width + 'px', '');
-		this.element.style.setProperty('height', this.height + 'px', '');
-		this.element.style.setProperty('left', x + 'px', '');
-		this.element.style.setProperty('top', y + 'px', '');
-		this.element.className += ' interact-node ';
+		newNode.style.setProperty('width', newNode.width + 'px', '');
+		newNode.style.setProperty('height', newNode.height + 'px', '');
+		newNode.style.setProperty('left', x + 'px', '');
+		newNode.style.setProperty('top', y + 'px', '');
+		newNode.className += ' interact-node ';
 		if (!nodeStyle) {
 			nodeStyle = document.createElement('style');
 			nodeStyle.type = 'text/css';
@@ -279,15 +282,16 @@ window.interact = (function () {
 			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; }';
 			document.body.appendChild(nodeStyle);
 		}
+		return newNode;
 	}
 
 	/**
 	 * @throws typeError
 	 */
-	DemoNode.prototype.setSize = function (x, y) {
+	function setSize(node, x, y) {
 		if (x && x.constructor.name === 'Vector') {
-			this.width =  x.x;
-			this.height =  x.y;
+			node.width =  x.x;
+			node.height =  x.y;
 		}
 		else {
 			if (typeof x !== 'number' || typeof y !== 'number') {
@@ -295,19 +299,19 @@ window.interact = (function () {
 				typeErr.message = 'DemoNode.setSize parameters must be a single Vector or two numbers.';
 				throw (typeErr);
 			}
-			this.width = x;
-			this.height = y;
+			node.width = x;
+			node.height = y;
 		}
-		this.element.style.setProperty('width', Math.max(x, 20) + 'px', '');
-		this.element.style.setProperty('height', Math.max(y, 20) + 'px', '');
+		node.element.style.setProperty('width', Math.max(x, 20) + 'px', '');
+		node.element.style.setProperty('height', Math.max(y, 20) + 'px', '');
 	};
 
 	/**
 	 * @throws typeError
 	 */
-	DemoNode.prototype.position = function (x, y) {
+	function position(node, x, y) {
 		if (x && x.constructor.name === 'Vector') {
-		this.location.copy(x);
+		node.location.copy(x);
 		}
 		else {
 			if (typeof x !== 'number' || typeof y !== 'number') {
@@ -315,10 +319,10 @@ window.interact = (function () {
 				typeErr.message = 'DemoNode.position parameters must be a single Vector or two numbers.';
 				throw (typeErr);
 			}
-			this.location.set(x, y);
+			node.location.set(x, y);
 		}
-		this.element.style.setProperty('left', x + 'px', '');
-		this.element.style.setProperty('top', y + 'px', '');
+		node.element.style.setProperty('left', x + 'px', '');
+		node.element.style.setProperty('top', y + 'px', '');
 	};
 
 	/** @private */
@@ -355,7 +359,7 @@ window.interact = (function () {
 		console.log('x0, y0         :  (' + x0 + ', ' + y0);
 		console.log('nodes          : ' + interact.nodes.length);
 		console.log('supportsTouch  :  ' + supportsTouch);
-		
+
 		return {
 			target: target,
 			prevCoords: new Vector(prevX, prevY),
@@ -363,9 +367,17 @@ window.interact = (function () {
 			nodes: interact.nodes,
 			supportsTouch: supportsTouch
 		};
-			
-			
+
+
 	};
+
+	function getElementLocation(element) {
+		return new Vector( Number(element.style.left.match(/[0-9]*/)[0]), Number(element.style.top.match(/[0-9]*/)[0]));
+	}
+
+	function getElementDimensions(element) {
+		return new Vector( Number(element.style.width.match(/[0-9]*/)[0]), Number(element.style.height.match(/[0-9]*/)[0]) );
+	}
 
 	/**
 	 * @function
@@ -378,6 +390,8 @@ window.interact = (function () {
 			i = 0,
 			newNode;
 
+		options = options || {};
+
 		/** Check if element was already set */
 		for (; i < interactNodes.length; i++) {
 			if (interactNodes[i].element === element) {
@@ -387,6 +401,9 @@ window.interact = (function () {
 		}
 		newNode = {
 				element: element,
+				location: getElementLocation(element),
+				width: getElementDimensions(element).x,
+				height: getElementDimensions(element).y,
 				drag: options.drag || false,
 				resize: options.resize || false,
 				parent: options.parent || false,
@@ -400,6 +417,7 @@ window.interact = (function () {
 			interactNodes.push(newNode);
 		}
 		addClass(element, 'interact-node');
+		//events.add(
 	};
 
 	/**
@@ -409,12 +427,13 @@ window.interact = (function () {
 	 */
 	interact.unset = function (element) {
 		var i;
-		
+
 		for (i = 0; i < interactNodes.length; i++) {
 			if (interactNodes[i].element === element) {
 				interactNodes.splice(i-1, 1);
 			}
 		}
+		removeClass(element, 'interact-node interact-target');
 	};
 	/**
 	 * @description Contains drag functions. Currently here for debugging. Will be made private.
@@ -422,12 +441,12 @@ window.interact = (function () {
 	interact.drag = {
 		xyDrag: function (event) {
 			event.preventDefault();
-			if (mouseIsDown && target.actions.drag) {
+			if (mouseIsDown && target.drag) {
 				addClass(target.element, 'interact-target');
 				var x = event.pageX,
 					y = event.pageY;
 
-				target.position(target.location.x + x - prevX , target.location.y + (y - prevY));
+				position(target, target.location.x + x - prevX , target.location.y + (y - prevY));
 				prevX = x;
 				prevY = y;
 			}
@@ -448,21 +467,31 @@ window.interact = (function () {
 		for (i = 0; i < n; i++) {
 			if (interact.nodes[i]!==undefined && interact.nodes[i].element.parentNode === parent) {
 				var par = interact.nodes[i].element.parentNode;
-				
+
 				par.removeChild(interact.nodes[i].element);
-				interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
+				//interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
+				interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), 200, 200);
 				give(par, interact.nodes[i].element);
 			}
 			else {
-				interact.nodes.push(new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200));
-				give(document.body, interact.nodes[i].element);
+				interact.nodes.push(new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), 200, 200));
+				give(document.body, interact.nodes[i]);
 			}
+			interact.set(interact.nodes[i], {drag:true, resize:true});
+			interact.nodes[0].style.backgroundColor = '#ff0';
 		}
 	};
-	events.add( document, moveEvent, mouseMove);
-	events.add( document, downEvent, mouseDown);
-//	events.add( document, 'dragenter', function (event) { event.preventDefault(); });
-	events.add(document, upEvent, docMouseUp);
+	events.add(docTarget, moveEvent, mouseMove);
+	events.add(docTarget, downEvent, mouseDown);
+//	events.add(docTarget, 'dragenter', function (event) { event.preventDefault(); });
+	events.add(docTarget, upEvent, docMouseUp);
+	
+	/**
+	 * Handy Debuggy things
+	 */
+	interact.inodes = interactNodes;
+	interact.position = position;
+	
 	return interact;
 }());
 
