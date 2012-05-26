@@ -9,17 +9,17 @@ window.interact = (function () {
 
 	var	prevX = 0,
 		prevY = 0,
-		x0,
-		y0,
+		x0 = 0,
+		y0 = 0,
 		interactNodes = [],
 		nodeStyle,
 		target = null,
 		supportsTouch = 'createTouch' in document,
 		mouseIsDown = false,
+		dragHasStarted = false,
 		downEvent,
 		upEvent,
 		moveEvent,
-		xyDrag,
 		margin = supportsTouch ? 30 : 10,
 		typeErr = new TypeError('Type Error'),
 		docTarget = {
@@ -103,11 +103,34 @@ window.interact = (function () {
 	}
 	
 	/** @private */
-	xyDrag = function (event) {
-		//target.element.dispatchEvent(dragStart);
-		
-		event.preventDefault();
+	function xyDrag(event) {
+		if (!dragHasStarted) {
+			var dragStart = document.createEvent('MouseEvents');
+			
+			dragStart.initMouseEvent('interactdragstart', false, false, window,
+				0, event.screenX, event.screenY, event.clientX, event.clientY, 
+				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
+				event.button, null);
+			target.element.dispatchEvent(dragStart);
+			console.log('moving node');
+			dragHasStarted = true;
+		}
+		else {
+			var dragMove = document.createEvent('CustomEvent'),
+				detail = {
+					x0: x0,
+					y0: y0,
+					dx: event.pageX - prevX,
+					dy: event.pageY - prevY,
+					pageX: event.pageX,
+					pageY: event.pageY
+				}
+			dragMove.initCustomEvent('interactdragmove', false, false, detail);
+			target.element.dispatchEvent(dragMove);
+		}
 		if (mouseIsDown && target.drag) {
+			event.preventDefault();
+			
 			addClass(target.element, 'interact-target');
 			var x = event.pageX,
 				y = event.pageY;
@@ -116,7 +139,7 @@ window.interact = (function () {
 			prevX = x;
 			prevY = y;
 		}
-	};
+	}
 	
 	/** Should change this so devices with mouse and touch can use both */
 	if (supportsTouch) {
@@ -136,9 +159,10 @@ window.interact = (function () {
 		events.remove(docTarget, moveEvent, yResize);
 		events.remove(docTarget, moveEvent, xyResize);
 		events.remove(docTarget, moveEvent, xyDrag);
-			mouseIsDown = false;
-		clearTarget();
 		events.add(docTarget, moveEvent, mouseMove);
+		mouseIsDown = false;
+		dragHasStarted = false;
+		clearTarget();
 	}
 
 	/** @private */
@@ -185,25 +209,19 @@ window.interact = (function () {
 				}
 			}
 			else if (bottom) {
+				event.preventDefault();
+				
 				console.log('resizing on bottom');
 				events.remove(docTarget, moveEvent);
 				events.add(docTarget, moveEvent, yResize);
 			}
 			else if (target.drag) {
-				var dragStart = document.createEvent('MouseEvents');
-				dragStart.initMouseEvent('dragstart', false, false, window,
-					0, event.screenX, event.screenY, event.clientX, event.clientY, 
-					event.ctrlKey, event.altKey, event.shiftKey, event.metaKey, 
-					event.button, null);
-				target.element.dispatchEvent(dragStart);
-				
 				event.preventDefault();
 
 				bringToFront(target.element);
-				console.log('moving node');
 				events.remove(docTarget, moveEvent);
 				events.add(docTarget, moveEvent, xyDrag);
-				target.element.style.cursor = 'move';
+				addClass(target.element, 'ineract-dragging');
 			}
 		}
 	}
@@ -239,7 +257,7 @@ window.interact = (function () {
 		classNames = classNames.split(' ');
 		for (var i = 0; i < classNames.length; i++) {
 			element.className =
-				element.className.replace( new RegExp( '(?:^|\\s)' + classNames + '(?!\\S)' ) , '' );
+				element.className.replace( new RegExp( '(?:^|\\s)' + classNames[i] + '(?!\\S)' ) , '' );
 		}
 	}
 
@@ -360,7 +378,7 @@ window.interact = (function () {
 	/** @private */
 	function clearTarget() {
 		if (target) {
-			removeClass(target.element, 'interact-target');
+			removeClass(target.element, 'interact-target interact-dragging interact-resizing');
 		}
 		target = null;
 	}
@@ -458,7 +476,7 @@ window.interact = (function () {
 				interactNodes.splice(i-1, 1);
 			}
 		}
-		removeClass(element, 'interact-node interact-target');
+		removeClass(element, 'interact-node interact-target interact-dragging interact-resizing');
 	};
 
 	/**
@@ -488,7 +506,8 @@ window.interact = (function () {
 			interact.set(interact.nodes[i], {drag:true, resize:true});
 			if (i == 0) {
 				interact.nodes[0].style.backgroundColor = '#ff0';
-				events.add(interactNodes[0], 'dragStart', function (event) {console.log(event);});
+				events.add(interactNodes[0], 'interactdragstart', function (event) {console.log(event);});
+				events.add(interactNodes[0], 'interactdragmove', function (event) {console.log(event);});
 			}
 		}
 	};
