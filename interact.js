@@ -26,6 +26,7 @@ window.interact = (function () {
 			element: document,
 			events: []
 		},
+		/** interactNode events wrapper */
 		events = {
 			add: function (target, type, listener, useCapture) {
 				if (target.events === undefined) {
@@ -121,7 +122,7 @@ window.interact = (function () {
 		event.preventDefault();
 		if (mouseIsDown && target.resize) {
 					var x = event.pageX,
-			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ;
+			newWidth = ( event.pageX > target.x)? target.width + (x - prevX) : 0 ;
 
 			addClass(target.element, 'interact-target');
 			setSize(target, newWidth, target.height);
@@ -166,7 +167,7 @@ window.interact = (function () {
 		if (mouseIsDown && target.resize) {
 			addClass(target.element, 'interact-target');
 			var y = event.pageY,
-			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
+			newHeight = ( event.pageY > target.y)? target.height + (y - prevY) : 0 ;
 
 			setSize(target, target.width, newHeight);
 			prevY = y;
@@ -210,8 +211,8 @@ window.interact = (function () {
 		if (mouseIsDown && target.resize) {
 			var x = event.pageX,
 				y = event.pageY,
-			newWidth = ( event.pageX > target.location.x)? target.width + (x - prevX) : 0 ,
-			newHeight = ( event.pageY > target.location.y)? target.height + (y - prevY) : 0 ;
+			newWidth = ( event.pageX > target.x)? target.width + (x - prevX) : 0 ,
+			newHeight = ( event.pageY > target.y)? target.height + (y - prevY) : 0 ;
 
 			setSize(target, newWidth, newHeight);
 			prevX = x;
@@ -258,7 +259,7 @@ window.interact = (function () {
 			var x = event.pageX,
 				y = event.pageY;
 
-			position(target, target.location.x + x - prevX , target.location.y + (y - prevY));
+			position(target, target.x + x - prevX , target.y + (y - prevY));
 			prevX = x;
 			prevY = y;
 		}
@@ -270,12 +271,12 @@ window.interact = (function () {
 	 * @event
 	 */
 	function mouseMove(event) {
-		if ( !mouseIsDown && (target = getInteractNode(event.target))) {
+		if ( !mouseIsDown && (target = getInteractNode(event.currentTarget))) {
 			if (target.resize) {
 				var	x = event.pageX,
 					y = event.pageY,
-					right = (x - target.location.x > target.width - margin),
-					bottom = (y - target.location.y > target.height - margin);
+					right = ((x - target.x) > (target.width - margin)),
+					bottom = ((y - target.y) > (target.height - margin));
 
 				if (right) {
 					target.element.style.cursor = bottom?'se-resize' : 'e-resize';
@@ -303,8 +304,8 @@ window.interact = (function () {
 
 				prevX = event.pageX;
 				prevY = event.pageY;
-				right = (prevX - target.location.x > target.width - margin),
-				bottom = (prevY - target.location.y > target.height - margin);
+				right = (prevX - target.x > target.width - margin),
+				bottom = (prevY - target.y > target.height - margin);
 
 			if (right) {
 				event.preventDefault();
@@ -428,61 +429,17 @@ window.interact = (function () {
 	}
 
 	/**
-	 * @class Vector Class for locations and dimensions
-	 * @private
-	 * @param {number} x Value of X ordinate
-	 * @param {number} y Value of Y ordinate
-	 */
-	function Vector(x, y) {
-		this.x = x || 0;
-		this.y = y || 0;
-	}
-
-	/** @private */
-	Vector.prototype.set = function (x, y) {
-		this.x = x;
-		this.y = y || x;
-	};
-
-	/** @private */
-	Vector.prototype.copy = function (other) {
-		if (!other.x && other.y) {
-			return;
-		}
-		this.x = other.x;
-		this.y = other.y;
-	};
-
-	/**
 	 * @class Node for demonstrating interact functionality
 	 * @private
 	 * @returns object HTMLDivElement
-	 * @param {number} x Horizontal position
-	 * @param {number} y Vertical position
-	 * @param {number} w Element width
-	 * @param {number} h Element height
 	 */
-	function DemoNode(x, y, w, h) {
+	function DemoNode() {
 		var newNode = document.createElement('div');
 
-		newNode.style.setProperty('width', w + 'px', '');
-		newNode.style.setProperty('height', h + 'px', '');
-		newNode.style.setProperty('left', x + 'px', '');
-		newNode.style.setProperty('top', y + 'px', '');
-		newNode.className += ' interact-demo-node';
-		if (!nodeStyle) {
-			nodeStyle = document.createElement('style');
-			nodeStyle.type = 'text/css';
-			nodeStyle.innerHTML = ' .interact-node { background-color:#2288FF; border:5px solid #333333; border-radius:10px; width:100px; height: 100px; overflow: hidden;}';
-			nodeStyle.innerHTML += ' .interact-node:hover { border-color: #AAAAAA; }';
-			nodeStyle.innerHTML += ' .interact-target { border-style: dashed; border-color: #AAAAAA; }';
-			nodeStyle.innerHTML += ' .interact-node:before { content: attr(id); border-bottom: 2px solid red; white-space: pre}';
-			nodeStyle.innerHTML += ' .interact-draggable { position: absolute; cursor:move; }';
-			document.body.appendChild(nodeStyle);
-		}
+		newNode.className += ' interact-demo-node interact-node';
+		
 		return newNode;
 	}
-
 
 	/**
 	 * @private
@@ -515,19 +472,13 @@ window.interact = (function () {
 	 * @throws typeError
 	 */
 	function setSize(node, x, y) {
-		if (x && x.constructor.name === 'Vector') {
-			node.width =  x.x;
-			node.height =  x.y;
+		if (typeof x !== 'number' || typeof y !== 'number') {
+			typeErr.name = 'Incorrect parameter types';
+			typeErr.message = 'setSize parameters must be a node and two numbers.';
+			throw (typeErr);
 		}
-		else {
-			if (typeof x !== 'number' || typeof y !== 'number') {
-				typeErr.name = 'Incorrect parameter types';
-				typeErr.message = 'DemoNode.setSize parameters must be a single Vector or two numbers.';
-				throw (typeErr);
-			}
-			node.width = x;
-			node.height = y;
-		}
+		node.width = x;
+		node.height = y;
 		node.element.style.setProperty('width', Math.max(x, 20) + 'px', '');
 		node.element.style.setProperty('height', Math.max(y, 20) + 'px', '');
 	}
@@ -536,17 +487,13 @@ window.interact = (function () {
 	 * @throws typeError
 	 */
 	function position(node, x, y) {
-		if (x && x.constructor.name === 'Vector') {
-		node.location.copy(x);
+		if (typeof x !== 'number' || typeof y !== 'number') {
+			typeErr.name = 'Incorrect parameter types';
+			typeErr.message = 'setSize parameters must be a node and two numbers.';
+			throw (typeErr);
 		}
-		else {
-			if (typeof x !== 'number' || typeof y !== 'number') {
-				typeErr.name = 'Incorrect parameter types';
-				typeErr.message = 'DemoNode.position parameters must be a single Vector or two numbers.';
-				throw (typeErr);
-			}
-			node.location.set(x, y);
-		}
+		node.x = x;
+		node.y = y;
 		node.element.style.setProperty('left', x + 'px', '');
 		node.element.style.setProperty('top', y + 'px', '');
 	}
@@ -588,22 +535,16 @@ window.interact = (function () {
 
 		return {
 			target: target,
-			prevCoords: new Vector(prevX, prevY),
-			dragStartLocation: new Vector(x0, y0),
+			prevX: prevX,
+			prevY: prevY,
+			startX: x0,
+			startY: y0,
 			nodes: interact.nodes,
 			supportsTouch: supportsTouch
 		};
 
 
 	};
-
-	function getElementLocation(element) {
-		return new Vector( Number(element.style.left.match(/[0-9]*/)[0]), Number(element.style.top.match(/[0-9]*/)[0]));
-	}
-
-	function getElementDimensions(element) {
-		return new Vector( Number(element.style.width.match(/[0-9]*/)[0]), Number(element.style.height.match(/[0-9]*/)[0]) );
-	}
 
 	/**
 	 * @function
@@ -615,13 +556,14 @@ window.interact = (function () {
 		var nodeAlreadySet = false,
 			i = 0,
 			newNode,
-			styleClass = 'interact-node';
+			styleClass = 'interact-node',
+			clientRect = element.getClientRects()[0];
 
 		if (typeof options !== 'object') {
 			options = {};
 		}
 
-		/** Check if element was already set */
+		/** Check if element is already set */
 		for (; i < interactNodes.length; i++) {
 			if (interactNodes[i].element === element) {
 				nodeAlreadySet = true;
@@ -630,9 +572,10 @@ window.interact = (function () {
 		}
 		newNode = {
 				element: element,
-				location: getElementLocation(element),
-				width: getElementDimensions(element).x,
-				height: getElementDimensions(element).y,
+				x: (options.x)? options.x : clientRect.left,
+				y: (options.y)? options.y : clientRect.top,
+				width: clientRect.width,
+				height: clientRect.height,
 				drag: (options.drag !== undefined)? options.drag : false,
 				resize: (options.resize !== undefined)? options.resize : false
 			};
@@ -640,8 +583,8 @@ window.interact = (function () {
 			interactNodes[i] = newNode;
 		}
 		else {
-			//element.style.top = element.style.left = 0;
 			interactNodes.push(newNode);
+			position(newNode, newNode.x, newNode.y);
 			events.add(newNode, moveEvent, mouseMove);
 			events.add(newNode, downEvent, mouseDown, true);
 		}
@@ -649,7 +592,7 @@ window.interact = (function () {
 			styleClass += ' interact-draggable';
 		}
 		if (newNode.resize) {
-			styleClass += ' interact-resizeable'
+			styleClass += ' interact-resizeable';
 		}
 		addClass(element, styleClass);
 	};
@@ -703,14 +646,14 @@ window.interact = (function () {
 
 				par.removeChild(interact.nodes[i].element);
 				//interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), Math.random()* 200, Math.random()* 200);
-				interact.nodes[i] = new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), 200, 200);
+				interact.nodes[i] = new DemoNode();
 				give(par, interact.nodes[i].element);
 			}
 			else {
-				interact.nodes.push(new DemoNode(Math.random()*(window.screen.width - 20), Math.random()*(window.screen.height - 20), 200, 200));
+				interact.nodes.push(new DemoNode());
 				give(document.body, interact.nodes[i]);
 			}
-			interact.set(interact.nodes[i], {drag:true, resize:false});
+			interact.set(interact.nodes[i], {drag:true, resize:true, x:Math.random()*(window.innerWidth - 20), y:Math.random()*(window.innerHeight - 20)});
 
 			/** Display event properties for debugging */
 			events.add(interactNodes[i], 'interactresizestart', nodeEventDebug);
@@ -724,9 +667,6 @@ window.interact = (function () {
 			}
 		}
 	};
-//	events.add(docTarget, moveEvent, mouseMove);
-//	events.add(docTarget, downEvent, mouseDown, true);
-//	events.add(docTarget, 'dragenter', function (event) { event.preventDefault(); });
 	events.add(docTarget, upEvent, docMouseUp);
 
 	/**
@@ -734,7 +674,6 @@ window.interact = (function () {
 	 * @type Array
 	 */
 	interact.inodes = interactNodes;
-	interact.position = position;
 
 	return interact;
 }());
