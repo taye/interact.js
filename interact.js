@@ -29,10 +29,10 @@ window.interact = (function () {
 		/** interactNode events wrapper */
 		events = {
 			add: function (target, type, listener, useCapture) {
-				if (target.events === undefined) {
+				if (typeof target.events !== 'object') {
 					target.events = {};
 				}
-				if (target.events[type] === undefined) {
+				if (typeof target.events[type] !== 'array') {
 					target.events[type] = [];
 				}
 				target.events[type].push(listener);
@@ -86,23 +86,26 @@ window.interact = (function () {
 	 */
 	function xResize(event) {
 		if (!resizeHasStarted) {
-
-			/*
-			 * @static
-			 * @type MouseEvent
-			 * @memberOf interact
-			 * @description ...
-			 */
-			var resizeStart = document.createEvent('MouseEvents');
-
-			resizeStart.initMouseEvent('interactresizestart', false, false, window,
-				1, event.screenX, event.screenY, event.clientX, event.clientY,
-				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-				event.button, null);
+			var resizeStart = document.createEvent('CustomEvent'),
+				detail = {
+					x0: prevX,
+					y0: prevX,
+					dx: event.pageX - x0,
+					dy: 0,
+					pageX: event.pageX,
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
+				};
+			resizeStart.initCustomEvent('interactresizestart', true, true, detail);
 			target.element.dispatchEvent(resizeStart);
-			x0 = event.pageX;
-			y0 = event.pageY;
-			console.log('resizing on x axis');
+
+			x0 = prevX;
+			y0 = prevY;
+			console.log('resizing on x and y axes');
 			resizeHasStarted = true;
 			addClass(target.element, 'interact-resize-target');
 		}
@@ -114,9 +117,14 @@ window.interact = (function () {
 					dx: event.pageX - x0,
 					dy: 0,
 					pageX: event.pageX,
-					pageY: event.pageY
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
 				};
-			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			resizeMove.initCustomEvent('interactresizemove', true, true, detail);
 			target.element.dispatchEvent(resizeMove);
 		}
 		event.preventDefault();
@@ -137,15 +145,25 @@ window.interact = (function () {
 	 */
 	function yResize(event) {
 		if (!resizeHasStarted) {
-			var resizeStart = document.createEvent('MouseEvents');
-
-			resizeStart.initMouseEvent('interactresizestart', false, false, window,
-				1, event.screenX, event.screenY, event.clientX, event.clientY,
-				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-				event.button, null);
+			var resizeStart = document.createEvent('CustomEvent'),
+				detail = {
+					x0: prevX,
+					y0: prevX,
+					dx: 0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
+				};
+			resizeStart.initCustomEvent('interactresizestart', true, true, detail);
 			target.element.dispatchEvent(resizeStart);
-			x0 = event.pageX;
-			y0 = event.pageY;
+
+			x0 = prevX;
+			y0 = prevY;
 			console.log('resizing on y axis');
 			resizeHasStarted = true;
 			addClass(target.element, 'interact-resize-target');
@@ -158,9 +176,14 @@ window.interact = (function () {
 					dx: 0,
 					dy: event.pageY - y0,
 					pageX: event.pageX,
-					pageY: event.pageY
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
 				};
-			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			resizeMove.initCustomEvent('interactresizemove', true, true, detail);
 			target.element.dispatchEvent(resizeMove);
 		}
 		event.preventDefault();
@@ -181,15 +204,25 @@ window.interact = (function () {
 	 */
 	function xyResize(event) {
 		if (!resizeHasStarted) {
-			var resizeStart = document.createEvent('MouseEvents');
-
-			resizeStart.initMouseEvent('interactresizestart', false, false, window,
-				1, event.screenX, event.screenY, event.clientX, event.clientY,
-				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-				event.button, null);
+			var resizeStart = document.createEvent('CustomEvent'),
+				detail = {
+					x0: prevX,
+					y0: prevX,
+					dx: event.pageX - x0,
+					dy: event.pageY - y0,
+					pageX: event.pageX,
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
+				};
+			resizeStart.initCustomEvent('interactresizestart', true, true, detail);
 			target.element.dispatchEvent(resizeStart);
-			x0 = event.pageX;
-			y0 = event.pageY;
+
+			x0 = prevX;
+			y0 = prevY;
 			console.log('resizing on x and y axes');
 			resizeHasStarted = true;
 			addClass(target.element, 'interact-resize-target');
@@ -202,9 +235,14 @@ window.interact = (function () {
 					dx: event.pageX - x0,
 					dy: event.pageY - y0,
 					pageX: event.pageX,
-					pageY: event.pageY
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
 				};
-			resizeMove.initCustomEvent('interactresizemove', false, false, detail);
+			resizeMove.initCustomEvent('interactresizemove', true, true, detail);
 			target.element.dispatchEvent(resizeMove);
 		}
 		event.preventDefault();
@@ -229,7 +267,7 @@ window.interact = (function () {
 		if (!dragHasStarted) {
 			var dragStart = document.createEvent('MouseEvents');
 
-			dragStart.initMouseEvent('interactdragstart', false, false, window,
+			dragStart.initMouseEvent('interactdragstart', true, true, window,
 				1, event.screenX, event.screenY, event.clientX, event.clientY,
 				event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
 				event.button, null);
@@ -247,9 +285,14 @@ window.interact = (function () {
 					dx: event.pageX - x0,
 					dy: event.pageY - y0,
 					pageX: event.pageX,
-					pageY: event.pageY
+					pageY: event.pageY,
+					ctrlKey: event.ctrlKey,
+					altKey: event.altKey,
+					shiftKey: event.shiftKey,
+					metaKey: event.metaKey,
+					button: event.button
 				};
-			dragMove.initCustomEvent('interactdragmove', false, false, detail);
+			dragMove.initCustomEvent('interactdragmove', true, true, detail);
 			target.element.dispatchEvent(dragMove);
 		}
 		if (mouseIsDown && target.drag) {
@@ -329,7 +372,9 @@ window.interact = (function () {
 			else if (target.drag) {
 				event.preventDefault();
 
-				bringToFront(target.element);
+				if (target.stack) {
+					bringToFront(target.element);
+				}
 				events.remove(docTarget, moveEvent, 'all');
 				events.add(docTarget, moveEvent, xyDrag);
 				addClass(target.element, 'ineract-dragging');
@@ -356,7 +401,7 @@ window.interact = (function () {
 				pageX: event.pageX,
 				pageY: event.pageY
 			};
-			drop.initCustomEvent('interactdrop', true, false, detail);
+			drop.initCustomEvent('interactdrop', true, true, detail);
 			target.element.dispatchEvent(drop);
 			dragHasStarted = false;
 		}
@@ -371,7 +416,7 @@ window.interact = (function () {
 				pageX: event.pageX,
 				pageY: event.pageY
 			};
-			resizeEnd.initCustomEvent('interactdrop', true, false, detail);
+			resizeEnd.initCustomEvent('interactdrop', true, true, detail);
 			target.element.dispatchEvent(resizeEnd);
 			resizeHasStarted = false;
 		}
@@ -439,7 +484,7 @@ window.interact = (function () {
 		var newNode = document.createElement('div');
 
 		newNode.className += ' interact-demo-node interact-node';
-		
+
 		return newNode;
 	}
 
@@ -579,7 +624,8 @@ window.interact = (function () {
 				width: clientRect.width,
 				height: clientRect.height,
 				drag: (options.drag !== undefined)? options.drag : false,
-				resize: (options.resize !== undefined)? options.resize : false
+				resize: (options.resize !== undefined)? options.resize : false,
+				stack: (options.stack !== undefined)? options.stack : true
 			};
 		if (nodeAlreadySet) {
 			interactNodes[i] = newNode;
@@ -670,6 +716,7 @@ window.interact = (function () {
 		}
 	};
 	events.add(docTarget, upEvent, docMouseUp);
+	events.add(docTarget, 'interactresizestart', function(e) {console.log(e)});
 
 	/**
 	 * Used for debugging
