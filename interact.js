@@ -275,8 +275,9 @@ window.interact = (function () {
 			if (target.resize) {
 				var	x = event.pageX,
 					y = event.pageY,
-					right = ((x - target.x) > (target.width - margin)),
-					bottom = ((y - target.y) > (target.height - margin));
+					clientRect = target.element.getClientRects()[0],
+					right = ((x - clientRect.left) > (clientRect.width - margin)),
+					bottom = ((y - clientRect.top) > (clientRect.height - margin));
 
 				if (right) {
 					target.element.style.cursor = bottom?'se-resize' : 'e-resize';
@@ -300,12 +301,13 @@ window.interact = (function () {
 		mouseIsDown = true;
 		if ((target = getInteractNode(event.currentTarget))) {
 			var	right,
-				bottom;
+				bottom,
+				clientRect = target.element.getClientRects()[0];
 
 				prevX = event.pageX;
 				prevY = event.pageY;
-				right = (prevX - target.x > target.width - margin),
-				bottom = (prevY - target.y > target.height - margin);
+				right = ((prevX - clientRect.left) > (clientRect.width - margin)),
+				bottom = ((prevY - clientRect.top) > (clientRect.height - margin));
 
 			if (right) {
 				event.preventDefault();

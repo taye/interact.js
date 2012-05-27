@@ -1,6 +1,5 @@
 
 .interact-node {
-	background-color: #2288FF;
 	border: 5px solid #333333;
 	border-radius: 10px;
 }
@@ -28,4 +27,5 @@
 	width: 200px;
 	height: 200px;
 	overflow: hidden;
+	background-color: #2288FF;
 }
