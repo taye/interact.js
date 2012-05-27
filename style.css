@@ -1,0 +1,31 @@
+
+.interact-node {
+	background-color: #2288FF;
+	border: 5px solid #333333;
+	border-radius: 10px;
+}
+
+.interact-node:hover {
+	border-color: #AAAAAA;
+}
+
+.interact-target {
+	border-style: dashed;
+	border-color: #AAAAAA;
+}
+
+#node0:before {
+	content: attr(id);
+	border-bottom: 2px solid red;
+}
+
+.interact-draggable {
+	position: absolute;
+	cursor:move;
+}
+
+.interact-demo-node {
+	width: 200px;
+	height: 200px;
+	overflow: hidden;
+}
