@@ -1,7 +1,7 @@
 
 .interact-node {
-	border: 0px solid #333333; 
 	border-radius: 10px;
+	border: 5px solid #333333;
 }
 
 .interact-node:hover {
@@ -15,7 +15,7 @@
 
 .interact-demo-node:before {
 	content: attr(id);
-	border-bottom: solid red;
+	border-bottom: 2px solid red;
 }
 
 .interact-draggable {
@@ -24,10 +24,10 @@
 }
 
 .interact-demo-node {
+	border: 5px solid #333333;
 	width: 200px;
 	height: 200px;
 	overflow: auto;
 	background-color: #2288FF;
-	padding: 5px;
+	padding: 15px;
 }
-
