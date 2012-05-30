@@ -11,7 +11,7 @@ window.interactDemo = (function() {
     var interact = window.interact,
         interactDemo = {};
 
-    function parseStyleLength(string) {
+    function parseStyleLength(string, element) {
         var lastChar = string[string.length - 1];
 
         if (lastChar === 'x') {
@@ -212,7 +212,7 @@ window.interactDemo = (function() {
     interactDemo.nodeEventDebug = nodeEventDebug;
     interactDemo.eventProperties = eventProperties;
     
-    if (!'$' in window) {
+    if (!('$' in window)) {
         window.$ = function (id) {
             return document.getElementById(id);
         };

@@ -1,4 +1,4 @@
-
+	
 .interact-node {
 	border-radius: 10px;
 	border: 5px solid #333333;
@@ -31,3 +31,16 @@
 	background-color: #2288FF;
 	padding: 15px;
 }
+
+.interact-xyresize {
+	cursor: se-resize;
+}
+
+.interact-xresize {
+	cursor: e-resize;
+}
+
+.interact-yresize {
+	cursor: s-resize;
+}
+
