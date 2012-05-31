@@ -76,6 +76,8 @@ window.interactDemo = (function() {
             text = newDiv.appendChild(document.createElement('p'));
             newDiv.text = text;
             newDiv.appendChild(document.createElement('br'));
+            newDiv.style.left = Math.random()*(window.innerWidth - 200) + 'px';
+            newDiv.style.top = Math.random()*(window.innerHeight - 200) + 'px';
 
             button = newDiv.appendChild(document.createElement('button'));
             button.innerHTML = 'button gets event?';
@@ -90,9 +92,7 @@ window.interactDemo = (function() {
             interact.set(newDiv, {
                 drag: true,
                 resize: true,
-                order: false,
-                x: Math.random()*(window.innerWidth - 200),
-                y: Math.random()*(window.innerHeight - 200)
+                order: false
             });
         }
     }
