@@ -3,56 +3,40 @@
  * Open source under the MIT License.
  * https://raw.github.com/biographer/interact.js/master/LICENSE
  */
+
 /*jshint smarttabs:true */
 
+/**
+ * @namespace interact.js module
+ * @name interact
+ */
 window.interactDemo = (function() {
     'use strict';
 
     var interact = window.interact,
         interactDemo = {};
 
-    function parseStyleLength(string, element) {
+    function parseStyleLength(element, string) {
         var lastChar = string[string.length - 1];
 
         if (lastChar === 'x') {
             return Number(string.substring(string.length - 2, 0));
-        }
-        else if (lastChar === '%') {
+        } else if (lastChar === '%') {
             return parseStyleLength(element.parent) * Number(string.substring(string.length - 1, 0)) / 100;
-        }
-        else if (lastChar === 'm') {
+        } else if (lastChar === 'm') {
             // Not Ready ***
-            return Number(string.substring(string.length - 2, 0));
+            return Number(string.substring(string.length - 2, 0)) * parseStyleLength(element, window.getComputedStyle(element).fontSize);
         }
+        return string;
     }
 
     function getWidth(element) {
-        /* I should use this to get the width of the element
-         * by looking through the stylesheets for a width value
-         *
-         * should also take into account the top and left margin, border and padding
-         *
-
-        var sheets = document.styleSheets,
-            rules,
-            sheetInd,
-            ruleInd;
-
-        for (sheetInd = 0; sheetInd < sheets.length; sheetInd ++) {
-            rules = sheets[sheetInd].cssRules;
-            for (ruleInd = 0;ruleInd < rules.length; ruleInd ++) {
-                rules;
-                // document.querySelectorAll....
-            }
-        }
-        */
         var width = element.style.width;
 
         if(width !== '') {
-            return parseStyleLength(width, element);
-        }
-        else {
-            return element.offsetWidth;
+            return parseStyleLength(element, width);
+        } else {
+            return parseStyleLength(element, window.getComputedStyle(element).width);
         }
     }
 
@@ -60,10 +44,9 @@ window.interactDemo = (function() {
         var height = element.style.height;
 
         if(height !== '') {
-            return parseStyleLength(height, element);
-        }
-        else {
-            return element.offsetHeight;
+            return parseStyleLength(element, height);
+        } else {
+            return parseStyleLength(element, window.getComputedStyle(element).height);
         }
     }
     /**
@@ -83,7 +66,7 @@ window.interactDemo = (function() {
 
         n = n || 10;
         parent = parent || document.body;
-        
+
         for (i = 0; i < n; i++) {
             newDiv = document.body.appendChild(document.createElement('div'));
             newDiv.className = 'interact-demo-node';
@@ -139,7 +122,7 @@ window.interactDemo = (function() {
     }
 
     function nodeEventDebug(e) {
-        /** Display event properties for debugging */
+        // Display event properties for debugging
         if ( e.target.interactDemo && e.type in interact.eventDict()) {
             e.target.text.innerHTML = '<br> ' + interact.eventDict(e.type) + ' x0, y0    :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
             e.target.text.innerHTML += '<br> dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
@@ -147,7 +130,7 @@ window.interactDemo = (function() {
         }
     }
 
-    function eventProperties(e) {
+    function eventProps(e) {
         var debug = '',
             prop;
         if (typeof e.detail === 'object') {
@@ -158,18 +141,17 @@ window.interactDemo = (function() {
                 }
             }
         }
-
         if (event.touches && event.touches.length) {
             debug += 'touches[0]: ';
             for (prop in e.touches[0]) {
                 if (e.touches[0].hasOwnProperty(prop)) {
-                    debug += '\n\t' + prop + ' : ' + e.touches[0][prop];
+                    debug += '\n    ' + prop + ' : ' + e.touches[0][prop];
                 }
             }
         }
         for (prop in e) {
             if (e.hasOwnProperty(prop)) {
-                debug += '\n ' + prop + ' : ' + e[prop];
+                debug += '\n' + prop + ' : ' + e[prop];
             }
         }
 
@@ -182,7 +164,11 @@ window.interactDemo = (function() {
             newHeight = Math.max((getHeight(e.target) + e.detail.dy), 0);
 
         if (e.detail.shiftKey) {
-            newWidth = newHeight = Math.max(newWidth, newHeight);
+            if (newWidth > newHeight) {
+                newHeight = newWidth;
+            } else {
+                newWidth = newHeight;
+            }
         }
 
         setSize(e.target, newWidth, newHeight);
@@ -190,15 +176,16 @@ window.interactDemo = (function() {
 
     document.addEventListener('interactdragend', function(e) {
         var clientRect = e.target.getClientRects()[0],
-            left = clientRect.left + (e.detail.pageX - e.detail.x0),
-            top = clientRect.top + (e.detail.pageY - e.detail.y0),
+            compStyle = window.getComputedStyle(e.target),
+            left = clientRect.left + (e.detail.pageX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
+            top = clientRect.top + (e.detail.pageY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
             debug = '';
 
 
         position(e.target, left, top);
     });
 
-    /** Display event properties for debugging */
+    // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
     document.addEventListener('interactresizeend', nodeEventDebug);
@@ -210,8 +197,8 @@ window.interactDemo = (function() {
     interactDemo.setSize = setSize;
     interactDemo.position = position;
     interactDemo.nodeEventDebug = nodeEventDebug;
-    interactDemo.eventProperties = eventProperties;
-    
+    interactDemo.eventProps = eventProps;
+
     if (!('$' in window)) {
         window.$ = function (id) {
             return document.getElementById(id);

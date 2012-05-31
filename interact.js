@@ -36,60 +36,64 @@ window.interact = (function () {
             interactdragend: 'dragend'
         },
         margin = supportsTouch ? 30 : 10,
-        typeErr = new TypeError('Type Error'),
         docTarget = {
             element: document,
-            events: []
+            events: {}
         },
-        /* interactNode events wrapper */
-        events = {
-            add: function (target, type, listener, useCapture) {
-                if (typeof target.events !== 'object') {
-                    target.events = {};
-                }
-                if (typeof target.events[type] !== 'array') {
-                    target.events[type] = [];
-                }
-                target.events[type].push(listener);
+        // interact events wrapper
+        events = {};
 
-                return target.element.addEventListener(type, listener, useCapture || false);
-            },
-            remove: function (target, type, listener, useCapture) {
-                if (target && target.events && target.events[type]) {
-                    var i;
+        events.add = function (target, type, listener, useCapture) {
+            if (typeof target.events !== 'object') {
+                target.events = {};
+            }
+            
+            if (typeof target.events[type] !== 'array') {
+                target.events[type] = [];
+            }
+            
+            target.events[type].push(listener);
 
-                    if (listener === 'all') {
-                        for (i = 0; i < target.events[type].length; i++) {
+            return target.element.addEventListener(type, listener, useCapture || false);
+        };
+
+        events.remove = function (target, type, listener, useCapture) {
+            var i;
+
+            if (target && target.events && target.events[type]) {
+
+                if (listener === 'all') {
+                    for (i = 0; i < target.events[type].length; i++) {
+                        target.element.removeEventListener(type, target.events[type][i], useCapture || false);
+                        target.events[type].splice(i, 1);
+                    }
+                } else {
+                    for (i = 0; i < target.events[type].length; i++) {
+                        if (target.events[type][i] === listener) {
                             target.element.removeEventListener(type, target.events[type][i], useCapture || false);
                             target.events[type].splice(i, 1);
                         }
-                    }
-                    else {
-                        for (i = 0; i < target.events[type].length; i++) {
-                            if (target.events[type][i] === listener) {
-                                target.element.removeEventListener(type, target.events[type][i], useCapture || false);
-                                target.events[type].splice(i, 1);
-                            }
-                        }
-                    }
-                }
-            },
-            removeAll: function (target) {
-                for (var type in target.evetns) {
-                    if (target.events.hasOwnProperty(type)) {
-                        events.remove(target, type, 'all');
                     }
                 }
             }
         };
 
-    /* Should change this so devices with mouse and touch can use both */
+        events.removeAll = function (target) {
+            var type;
+
+            for (type in target.events) {
+                if (target.events.hasOwnProperty(type)) {
+                    events.remove(target, type, 'all');
+                }
+            }
+        };
+
+    // Should change this so devices with mouse and touch can use both
     if (supportsTouch) {
         downEvent = 'touchstart',
         upEvent = 'touchend',
         moveEvent = 'touchmove';
-    }
-    else {
+    } else {
         downEvent = 'mousedown',
         upEvent = 'mouseup',
         moveEvent = 'mousemove';
@@ -100,11 +104,11 @@ window.interact = (function () {
      * @event
      */
     function resizeMove(event) {
-        var detail;
+        var detail,
+            resizeEvent;
 
         if (!resizing) {
-            var resizeStartEvent = document.createEvent('CustomEvent');
-
+            resizeEvent = document.createEvent('CustomEvent');
             detail = {
                 x0: x0,
                 y0: y0,
@@ -118,15 +122,12 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            resizeStartEvent.initCustomEvent('interactresizestart', true, true, detail);
-            target.element.dispatchEvent(resizeStartEvent);
-
+            resizeEvent.initCustomEvent('interactresizestart', true, true, detail);
+            target.element.dispatchEvent(resizeEvent);
             resizing = true;
             addClass(target.element, 'interact-resize-target');
-        }
-        else {
-            var resizeMoveEvent = document.createEvent('CustomEvent');
-
+        } else {
+            resizeEvent = document.createEvent('CustomEvent');
             detail = {
                 x0: x0,
                 y0: y0,
@@ -140,32 +141,23 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            resizeMoveEvent.initCustomEvent('interactresizemove', true, true, detail);
-            target.element.dispatchEvent(resizeMoveEvent);
+            resizeEvent.initCustomEvent('interactresizemove', true, true, detail);
+            target.element.dispatchEvent(resizeEvent);
         }
-        if (mouseIsDown && target.resize) {
-            prevX = event.pageX;
-            prevY = event.pageY;
-        }
+        prevX = event.pageX;
+        prevY = event.pageY;
     }
-
 
     /**
      * @private
      * @event
      */
     function dragMove(event) {
-        var detail;
+        var detail,
+            dragEvent;
 
-        /* if(initialDownEvent) {//
-            initialDownEvent.preventDefault();
-            initialDownEvent.stopPropagation();
-        }
-        */
-        //event.preventDefault();
         if (!dragging) {
-            var dragStartEvent = document.createEvent('CustomEvent');
-
+            dragEvent = document.createEvent('CustomEvent');
             detail = {
                 x0: x0,
                 y0: y0,
@@ -179,13 +171,11 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            dragStartEvent.initCustomEvent('interactdragstart', true, true, detail);
-            target.element.dispatchEvent(dragStartEvent);
+            dragEvent.initCustomEvent('interactdragstart', true, true, detail);
+            target.element.dispatchEvent(dragEvent);
             dragging = true;
-        }
-        else {
-            var dragMoveEvent = document.createEvent('CustomEvent');
-
+        } else {
+            dragEvent = document.createEvent('CustomEvent');
             detail = {
                 x0: x0,
                 y0: y0,
@@ -199,47 +189,51 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            dragMoveEvent.initCustomEvent('interactdragmove', true, true, detail);
-            target.element.dispatchEvent(dragMoveEvent);
+            dragEvent.initCustomEvent('interactdragmove', true, true, detail);
+            target.element.dispatchEvent(dragEvent);
         }
-        if (true) {
-            prevX = event.pageX;
-            prevY = event.pageY;
-        }
+        
+        prevX = event.pageX;
+        prevY = event.pageY;
     }
-
 
     /**
      * @private
      * @event
      */
     function mouseMove(event) {
+        var clientRect,
+            right,
+            bottom,
+            axes;
+
         if (!mouseIsDown && (target = getInteractNode(event.target))) {
             if (target.resize) {
-                var clientRect = target.element.getClientRects()[0],
-                    axes,
-                    right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
-                    bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin));
+                clientRect = target.element.getClientRects()[0];
+                right = ((event.pageX - clientRect.left) > (clientRect.width - margin));
+                bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin));
+                axes = (right?'x': '') + (bottom?'y': '');
 
                 removeClass(target.element, 'interact-xyresize interact-xresize interact-yresize');
-                axes = (right?'x': '') + (bottom?'y': '');
-                
+
                 if (axes) {
                     addClass(target.element, 'interact-' + axes + 'resize');
                 }
             }
-        }
-        else if (dragging || resizing) {
+        } else if (dragging || resizing) {
             event.preventDefault();
         }
     }
-
 
     /**
      * @private
      * @event
      */
     function mouseDown(event) {
+        var right,
+            bottom,
+            clientRect;
+            
         mouseIsDown = true;
         if ((target = getInteractNode(event.currentTarget))) {
             initialDownEvent = event;
@@ -250,17 +244,17 @@ window.interact = (function () {
                 y0 = prevY = event.pageY;
                 events.remove(docTarget, moveEvent, 'all');
             }
-            var clientRect = target.element.getClientRects()[0],
-                right = ((x0 - clientRect.left) > (clientRect.width - margin)),
-                bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
+            
+            clientRect = target.element.getClientRects()[0];
+            right = ((x0 - clientRect.left) > (clientRect.width - margin));
+            bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
 
             if (right || bottom) {
                 resizeAxes = (right?'x': '') + (bottom?'y': '');
                 addClass(document.documentElement, 'interact-' + resizeAxes + 'resize');
                 addClass(target.element, 'interact-target ineract-resizing');
                 events.add(docTarget, moveEvent, resizeMove);
-            }
-            else if (target.drag) {
+            } else if (target.drag) {
                 events.add(docTarget, moveEvent, dragMove);
                 addClass(target.element, 'interact-target ineract-dragging');
             }
@@ -274,10 +268,11 @@ window.interact = (function () {
     function docMouseUp (event) {
         var detail,
             pageX,
-            pageY;
+            pageY,
+            endEvent;
 
         if (dragging) {
-            var dragEnd = document.createEvent('CustomEvent');
+            endEvent = document.createEvent('CustomEvent');
 
             pageX = prevX;
             pageY = prevY;
@@ -294,12 +289,13 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            dragEnd.initCustomEvent('interactdragend', true, true, detail);
-            target.element.dispatchEvent(dragEnd);
+            endEvent.initCustomEvent('interactdragend', true, true, detail);
+            target.element.dispatchEvent(endEvent);
             dragging = false;
         }
+        
         if (resizing) {
-            var resizeEnd = document.createEvent('CustomEvent');
+            endEvent = document.createEvent('CustomEvent');
 
             pageX = prevX;
             pageY = prevY;
@@ -316,11 +312,12 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
-            resizeEnd.initCustomEvent('interactresizeend', true, true, detail);
-            target.element.dispatchEvent(resizeEnd);
+            endEvent.initCustomEvent('interactresizeend', true, true, detail);
+            target.element.dispatchEvent(endEvent);
             resizing = false;
         }
-        /* Add and remove appropriate events */
+        
+        // Add and remove appropriate events
         events.remove(docTarget, moveEvent, resizeMove);
         events.remove(docTarget, moveEvent, dragMove);
         events.add(docTarget, upEvent, docMouseUp, false);
@@ -330,10 +327,11 @@ window.interact = (function () {
         clearTarget();
     }
 
-
     /** @private */
     function getInteractNode(element) {
-        for(var i=0; i < interactNodes.length; i++) {
+        var i;
+        
+        for(i=0; i < interactNodes.length; i++) {
             if (interactNodes[i].element === element) {
                 return interactNodes[i];
             }
@@ -343,16 +341,20 @@ window.interact = (function () {
 
     /** @private */
     function addClass(element, classNames) {
+        var i;
+        
         classNames = classNames.split(' ');
-        for (var i = 0; i < classNames.length; i++) {
+        for (i = 0; i < classNames.length; i++) {
             element.classList.add(classNames[i]);
         }
     }
 
     /** @private */
     function removeClass(element, classNames) {
+        var i;
+        
         classNames = classNames.split(' ');
-        for (var i = 0; i < classNames.length; i++) {
+        for (i = 0; i < classNames.length; i++) {
             element.classList.remove(classNames[i]);
         }
     }
@@ -422,24 +424,24 @@ window.interact = (function () {
                 drag: ('drag' in options)? options.drag : false,
                 resize: ('resize' in options)? options.resize : false
             };
+            
         if (nodeAlreadySet) {
             interactNodes[i] = newNode;
-        }
-        else {
-            /* Add event listeners */
-//            events.add(newNode, moveEvent, mouseMove);
+        } else {
+            // Add event listeners
             events.add(newNode, downEvent, mouseDown, false);
 
             interactNodes.push(newNode);
         }
+        
         if (newNode.drag) {
-            newNode.element.style.setProperty('left', (options.x? options.x : clientRect.left) + 'px', '');
-            newNode.element.style.setProperty('top', (options.y? options.y : clientRect.top) + 'px', '');
             styleClass += ' interact-draggable';
         }
+        
         if (newNode.resize) {
             styleClass += ' interact-resizeable';
         }
+        
         addClass(element, styleClass);
     };
 
@@ -457,6 +459,7 @@ window.interact = (function () {
                 events.removeAll(interactNodes[i]);
             }
         }
+        
         removeClass(element, 'interact-node interact-target interact-dragging interact-resizing interact-draggable interact-resizeable interact-resize-xy interact-resize-x interact-resize-y');
     };
 
@@ -467,7 +470,9 @@ window.interact = (function () {
      * @returns bool
      */
     interact.isSet = function(element) {
-        for(var i=0; i < interactNodes.length; i++) {
+        var i;
+        
+        for(i = 0; i < interactNodes.length; i++) {
             if (interactNodes[i].element === element) {
                 return true;
             }
@@ -488,6 +493,7 @@ window.interact = (function () {
         if (arguments.length === 0) {
             return eventDict;
         }
+        
         return eventDict[type];
     };
     events.add(docTarget, upEvent, docMouseUp);
