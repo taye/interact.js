@@ -10,11 +10,15 @@
  * @namespace interact.js module
  * @name interact
  */
-window.interactDemo = (function() {
+window.interactDemo = (function(interact) {
     'use strict';
 
-    var interact = window.interact,
+    var interact = interact || window.interact,
         interactDemo = {};
+        
+        if (!interact) {
+            return false;
+        }
 
     function parseStyleLength(element, string) {
         var lastChar = string[string.length - 1];
@@ -49,26 +53,50 @@ window.interactDemo = (function() {
             return parseStyleLength(element, window.getComputedStyle(element).height);
         }
     }
+    
+    function myActionChecker(event) {
+        var right,
+            bottom,
+            clientRect,
+            action,
+            axes;
+    
+        clientRect = target.element.getClientRects()[0];
+        right = ((x0 - clientRect.left) > (clientRect.width - margin));
+        bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
+
+        if (right || bottom) {
+            axes = (right?'x': '') + (bottom?'y': '');
+            action = 'resize' + axes;
+        } else if (target.drag) {
+            action = 'drag';
+        }
+        return action;
+    }
     /**
      * @function
      * @description Introduce random draggable, resizeable nodes to the document (for testing)
      * @param {number} [n] The number of nodes to be added (default: 10)
      * @param {object} [parent] An object with boolean properties (default: document.body)
      */
-    function randomNodes(n, parent) {
+    function randomDivs(n, parent) {
         var newDiv,
             text,
             button,
             i,
             buttunFunction = function (e) {
                 e.target.innerHTML = e.type;
-            };
+            },
+            mouseMove = function () {console.log();};
 
-        n = n || 10;
+        if (n <0 || typeof n !== 'number') {
+            n = 5;
+        }
+        
         parent = parent || document.body;
 
         for (i = 0; i < n; i++) {
-            newDiv = document.body.appendChild(document.createElement('div'));
+            newDiv = parent.appendChild(document.createElement('div'));
             newDiv.className = 'interact-demo-node';
             newDiv.id = 'node' + i;
             newDiv.interactDemo = true;
@@ -92,7 +120,9 @@ window.interactDemo = (function() {
             interact.set(newDiv, {
                 drag: true,
                 resize: true,
-                order: false
+                order: false,
+                mouseMove: mouseMove,
+                actionChecker: 'auto'//myActionChecker
             });
         }
     }
@@ -185,6 +215,14 @@ window.interactDemo = (function() {
         position(e.target, left, top);
     });
 
+/*    document.addEventListener('interactdragmove', function(e) {
+        var compStyle = window.getComputedStyle(e.target),
+            left = parseStyleLength(e.target, compStyle.left),
+            right = parseStyleLength(e.target, compStyle.top);
+
+        position(e.target, left + e.detail.dx, right + e.detail.dy);
+    });
+*/
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
@@ -193,7 +231,7 @@ window.interactDemo = (function() {
     document.addEventListener('interactdragmove', nodeEventDebug);
     document.addEventListener('interactdragend', nodeEventDebug);
 
-    interactDemo.randomNodes = randomNodes;
+    interactDemo.randomDivs = randomDivs;
     interactDemo.setSize = setSize;
     interactDemo.position = position;
     interactDemo.nodeEventDebug = nodeEventDebug;
@@ -205,6 +243,5 @@ window.interactDemo = (function() {
         };
     }
     return interactDemo;
-}());
-
+}(interact));
 

@@ -21,7 +21,7 @@
 
 .interact-draggable {
 	position: absolute;
-	cursor:move;
+	/*cursor:move;*/
 }
 
 .interact-demo-node {
@@ -33,17 +33,5 @@
 	background-color: #2288FF;
 	padding: 15px;
 	margin: 15px;
-}
-
-.interact-xyresize {
-	cursor: se-resize;
-}
-
-.interact-xresize {
-	cursor: e-resize;
-}
-
-.interact-yresize {
-	cursor: s-resize;
 }
 
