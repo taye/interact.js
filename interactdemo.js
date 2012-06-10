@@ -15,7 +15,14 @@ window.interactDemo = (function(interact) {
 
     var interact = interact || window.interact,
         interactDemo = {},
-        svg;
+        svg,
+        svgTags = {
+            g: 'g',
+            rect: 'rect',
+            circle: 'circle',
+            text: 'text',
+        },
+        margin = 20;
 
         if (!interact) {
             return false;
@@ -37,9 +44,9 @@ window.interactDemo = (function(interact) {
 
     function getWidth(element) {
         var width;
-        
-        if (element.nodeName === 'g') {
-            width = element.getAttributeNS(null, 'width');
+
+        if (element.nodeName in svgTags) {
+            width = Number(element.getAttributeNS(null, 'width'));
         } else {
             width = element.style.width;
 
@@ -54,9 +61,9 @@ window.interactDemo = (function(interact) {
 
     function getHeight(element) {
         var height;
-        
-        if (element.nodeName === 'g') {
-            height = element.getAttributeNS(null, 'height');
+
+        if (element.nodeName in svgTags) {
+            height = Number(element.getAttributeNS(null, 'height'));
         } else {
             height = element.style.height;
 
@@ -69,23 +76,24 @@ window.interactDemo = (function(interact) {
         return height;
     }
 
-    function myActionChecker(event) {
-        var right,
-            bottom,
-            clientRect,
-            action,
-            axes;
+    function divActionChecker(event) {
+        var clientRect = target.element.getClientRects()[0],
+            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin)),
+            axes = (right?'x': '') + (bottom?'y': ''),
+            action = (axes)? 'resize' + axes: 'drag';
 
-        clientRect = target.element.getClientRects()[0];
-        right = ((x0 - clientRect.left) > (clientRect.width - margin));
-        bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
+        return action;
+    }
 
-        if (right || bottom) {
-            axes = (right?'x': '') + (bottom?'y': '');
-            action = 'resize' + axes;
-        } else if (target.drag) {
-            action = 'drag';
-        }
+    function graphicActionChecker(event) {
+        var target = event.target,
+            clientRect = target.getClientRects()[0],
+            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin)),
+            axes = (right?'x': '') + (bottom?'y': ''),
+            action = (axes)? 'resize' + axes: 'drag';
+
         return action;
     }
 
@@ -120,11 +128,11 @@ window.interactDemo = (function(interact) {
         }
 
         parent = svg;
-        
+
         svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
         svg.setAttributeNS (null, 'width', width);
         svg.setAttributeNS (null, 'height', height);
-        
+
         for (i = 0; i < n; i++) {
             newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
 //            newGraphic.className = 'interact-demo-node';
@@ -133,31 +141,29 @@ window.interactDemo = (function(interact) {
             newGraphic.setAttributeNS (null, 'fill', '#ee0');
             newGraphic.setAttributeNS (null, 'stroke', '#000');
             newGraphic.setAttributeNS (null, 'stroke-width', '2px');
-            newGraphic.setAttributeNS (null, 'width', 150);
-            newGraphic.setAttributeNS (null, 'height', 150);
 
             text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
             text.setAttributeNS (null, 'fill', '#000');
             text.setAttributeNS (null, 'stroke', '#000');
             text.setAttributeNS (null, 'stroke-width', '0px');
-            
+
             newGraphic.text = text;
 
             x = Math.random()*(width - 200);
             y = Math.random()*(width - 200);
-            
+
             translate = 'translate(' + x + ', ' + y + ')';
             newGraphic.setAttributeNS (null, 'transform', translate );
-            
+
             rect = document.createElementNS(svgNS, 'rect');
             rect.setAttributeNS (null, 'width', 150);
             rect.setAttributeNS (null, 'height', 150);
-            newGraphic.appendChild(rect);
+            newGraphic.mainElement = newGraphic.appendChild(rect);
 
             interact.set(newGraphic, {
                 drag: true,
                 resize: true,
-                actionChecker: 'auto'//myActionChecker
+                actionChecker: graphicActionChecker
             });
         }
 
@@ -215,7 +221,7 @@ window.interactDemo = (function(interact) {
     }
 
     function setSize(element, x, y) {
-        if (element.nodeName === 'g') {
+        if (element.nodeName in svgTags) {
             if (typeof x === 'number' && typeof y === 'number') {
                 element.setAttributeNS(null, 'width', x);
                 element.setAttributeNS(null, 'height', y);
@@ -234,8 +240,8 @@ window.interactDemo = (function(interact) {
 
     function position(element, x, y) {
         var translate;
-        
-        if (element.nodeName === 'g') {
+
+        if (element.nodeName in svgTags) {
             if (typeof x === 'number' && typeof y === 'number') {
                 translate = 'translate(' + x + ', ' + y + ')';
                 element.setAttributeNS(null, 'transform', translate);
@@ -250,15 +256,15 @@ window.interactDemo = (function(interact) {
     function nodeEventDebug(e) {
         var textProp,
             nl;
-        
-        if (e.target.nodeName === 'g') {
+
+        if (e.target.nodeName in svgTags) {
             textProp = 'textContent';
             nl = '\n';
         } else {
             textProp = 'innerHTML';
             nl = '<br> ';
         }
-        
+
         if ( e.target.interactDemo && e.type in interact.eventDict()) {
             e.target.text[textProp] = nl + interact.eventDict(e.type) + ' x0, y0    :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
             e.target.text[textProp] += nl + ' dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
@@ -295,9 +301,20 @@ window.interactDemo = (function(interact) {
     }
 
     document.addEventListener('interactresizeend', function(e) {
-        var clientRect = e.target.getClientRects()[0],
-            newWidth = Math.max((getWidth(e.target) + e.detail.dx), 0),
-            newHeight = Math.max((getHeight(e.target) + e.detail.dy), 0);
+        var target,
+            clientRect,
+            newWidth,
+            newHeight;
+
+        if (e.target.nodeName in svgTags) {
+            target = e.target.mainElement;
+        } else {
+            target = e.target;
+        }
+
+        clientRect = target.getClientRects()[0];
+        newWidth = Math.max((getWidth(target) + e.detail.dx), 0);
+        newHeight = Math.max((getHeight(target) + e.detail.dy), 0);
 
         if (e.detail.shiftKey) {
             if (newWidth > newHeight) {
@@ -307,7 +324,8 @@ window.interactDemo = (function(interact) {
             }
         }
 
-        setSize(e.target, newWidth, newHeight);
+        setSize(target, newWidth, newHeight);
+        //if (e.target.nodeName === 'rect') alert('rect');
     });
 
     document.addEventListener('interactdragend', function(e) {
