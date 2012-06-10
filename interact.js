@@ -19,6 +19,7 @@ window.interact = (function () {
         nodeStyle,
         target = null,
         supportsTouch = 'createTouch' in document,
+        margin = supportsTouch ? 30 : 10,
         mouseIsDown = false,
         dragging = false,
         resizing = false,
@@ -68,7 +69,6 @@ window.interact = (function () {
             interactdragmove: 'dragmove',
             interactdragend: 'dragend'
         },
-        margin = supportsTouch ? 30 : 10,
         docTarget = {
             element: document,
             events: {}
@@ -258,7 +258,7 @@ window.interact = (function () {
             if (target.resize) {
                 removeClass(target.element, 'interact-xyresize interact-xresize interact-yresize');
 
-                action =target.getAction(event);
+                action = target.getAction(event);
 
                 target.element.style.cursor = actions[action].cursor;
             } else if (dragging || resizing) {
@@ -444,7 +444,7 @@ window.interact = (function () {
             element: element,
             drag: ('drag' in options)? options.drag : false,
             resize: ('resize' in options)? options.resize : false,
-            getAction: (typeof options.actionChecker === 'Function')? options.actionChecker: autoCheck
+            getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck
         };
 
         if (nodeAlreadySet) {
