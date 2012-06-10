@@ -4,8 +4,6 @@
  * https://raw.github.com/biographer/interact.js/master/LICENSE
  */
 
-/*jshint smarttabs:true */
-
 /**
  * @namespace interact.js module
  * @name interact
@@ -13,8 +11,7 @@
 window.interactDemo = (function(interact) {
     'use strict';
 
-    var interact = interact || window.interact,
-        interactDemo = {},
+    var interactDemo = {},
         svg,
         svgTags = {
             g: 'g',
@@ -28,8 +25,9 @@ window.interactDemo = (function(interact) {
         margin = 20,
         prevX = 0,
         prevY = 0,
-        dynamic = false;
+        realtime = true;
 
+        interact = interact || window.interact;
         if (!interact) {
             return;
         }
@@ -83,11 +81,14 @@ window.interactDemo = (function(interact) {
     }
 
     function divActionChecker(event) {
-        var clientRect = target.element.getClientRects()[0],
-            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
-            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin)),
+        var target = event.target,
+            clientRect = target.element.getClientRects()[0],
+            right = ((event.pageX - window.scrollY - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
-            action = (axes)? 'resize' + axes: 'drag';
+            action = (axes)?
+                'resize' + axes:
+                'drag';
 
         return action;
     }
@@ -95,10 +96,12 @@ window.interactDemo = (function(interact) {
     function graphicActionChecker(event) {
         var target = event.target,
             clientRect = target.getClientRects()[0],
-            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
-            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin)),
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
-            action = (axes)? 'resize' + axes: 'drag';
+            action = (axes)?
+                'resize' + axes:
+                'drag';
 
         return action;
     }
@@ -126,6 +129,11 @@ window.interactDemo = (function(interact) {
 
         if (!svg) {
             svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
+            svg.setAttributeNS (null, 'width', width);
+            svg.setAttributeNS (null, 'height', height);
+ //           svg.style.setProperty('margin', 0);
+
             document.body.appendChild(svg);
         }
 
@@ -135,25 +143,14 @@ window.interactDemo = (function(interact) {
 
         parent = svg;
 
-        svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
-        svg.setAttributeNS (null, 'width', width);
-        svg.setAttributeNS (null, 'height', height);
-
         for (i = 0; i < n; i++) {
             newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
-//            newGraphic.className = 'interact-demo-node';
+//            newGraphic.style.setProperty('class', 'interact-demo-node');
             newGraphic.id = 'graphic' + i;
             newGraphic.interactDemo = true;
             newGraphic.setAttributeNS (null, 'fill', '#ee0');
             newGraphic.setAttributeNS (null, 'stroke', '#000');
             newGraphic.setAttributeNS (null, 'stroke-width', '2px');
-
-            text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
-            text.setAttributeNS (null, 'fill', '#000');
-            text.setAttributeNS (null, 'stroke', '#000');
-            text.setAttributeNS (null, 'stroke-width', '0px');
-
-            newGraphic.text = text;
 
             x = Math.random()*(width - 200);
             y = Math.random()*(width - 200);
@@ -164,6 +161,13 @@ window.interactDemo = (function(interact) {
             rect = document.createElementNS(svgNS, 'rect');
             rect.setAttributeNS (null, 'width', 150);
             rect.setAttributeNS (null, 'height', 150);
+
+            text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
+            text.setAttributeNS (null, 'fill', '#000');
+            text.setAttributeNS (null, 'stroke', '#000');
+            text.setAttributeNS (null, 'stroke-width', '0px');
+            rect.text = text;
+
             newGraphic.appendChild(rect);
 
             interact.set(rect, {
@@ -171,10 +175,7 @@ window.interactDemo = (function(interact) {
                 resize: true,
                 actionChecker: graphicActionChecker
             });
-            newGraphic.addEventListener('mousemove', function(e) {
-                console.log(e.pageX, e.pageY);
-                console.log(e.target);
-            });
+            window['g' + i] = newGraphic;
         }
     }
     /**
@@ -225,6 +226,7 @@ window.interactDemo = (function(interact) {
                 resize: true,
                 actionChecker: 'auto'//myActionChecker
             });
+            window['d' + i] = newDiv;
         }
     }
 
@@ -246,7 +248,22 @@ window.interactDemo = (function(interact) {
         }
     }
 
-    function position(element, x, y) {
+    function getPosition(element){
+        var clientRect = element.getClientRects()[0],
+            compStyle = window.getComputedStyle(element),
+            left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
+            top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginRight);
+        
+        if (element.nodeName in svgTags) {
+            var container = element.ownerSVGElement;
+                
+            left -= container.offsetLeft;
+            top -= container.offsetTop;
+        }
+        return {x: left, y: top};
+    }
+
+    function setPosition(element, x, y) {
         var translate;
 
         if (element.nodeName in svgTags) {
@@ -307,43 +324,30 @@ window.interactDemo = (function(interact) {
 
         return debug;
     }
-    
+
     function dynamicMove(e) {
-        var clientRect = e.target.getClientRects()[0],
-            compStyle = window.getComputedStyle(e.target),
-            left = clientRect.left + (e.detail.pageX + window.scrollX - prevX) - parseStyleLength(e.target, compStyle.marginLeft),
-            top = clientRect.top + (e.detail.pageY + window.scrollY - prevY) - parseStyleLength(e.target, compStyle.marginRight),
-            debug = '';
+        var position = getPosition(e.target),
+            left = position.x + (e.detail.pageX - prevX),
+            top = position.y + (e.detail.pageY - prevY);
 
-
-        position(e.target, left, top);
+        setPosition(e.target, left, top);
     }
-    
+
     function staticMove(e) {
-        var clientRect = e.target.getClientRects()[0],
-            compStyle = window.getComputedStyle(e.target),
-            left = clientRect.left + (e.detail.pageX + window.scrollX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
-            top = clientRect.top + (e.detail.pageY + window.scrollY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
+        var position = getPosition(e.target),
+            left = position.x + e.detail.dx,
+            top = position.y + e.detail.dy,
             debug = '';
 
-
-        position(e.target, left, top);
+        setPosition(e.target, left, top);
     }
 
-    document.addEventListener('interactresizeend', function(e) {
+    function staticResize(e) {
         var target = e.target,
-            clientRect,
-            newWidth,
-            newHeight;
-/*
-        if (e.target.nodeName in svgTags) {
-            target = target.mainElement;
-        }
-*/
-        clientRect = target.getClientRects()[0];
-        newWidth = Math.max((getWidth(target) + e.detail.dx), 0);
-        newHeight = Math.max((getHeight(target) + e.detail.dy), 0);
+            newWidth = Math.max((getWidth(target) + e.detail.dx), 0),
+            newHeight = Math.max((getHeight(target) + e.detail.dy), 0);
 
+        // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
             if (newWidth > newHeight) {
                 newHeight = newWidth;
@@ -353,15 +357,57 @@ window.interactDemo = (function(interact) {
         }
 
         setSize(target, newWidth, newHeight);
-        //if (e.target.nodeName === 'rect') alert('rect');
-    });
+    }
 
-    if (dynamic) {
-        document.addEventListener('interactdragmove', dynamicMove);
-    } else {
-        document.addEventListener('interactdragend', staticMove);
+    function dynamicResize(e) {
+        var target = e.target,
+            newWidth = Math.max(getWidth(target) + (e.detail.pageX - prevX), 0),
+            newHeight = Math.max(getHeight(target) + (e.detail.pageY - prevY), 0);
+
+        // Square resizing when Shift key is held
+        if (e.detail.shiftKey) {
+            if (newWidth > newHeight) {
+                newHeight = newWidth;
+            } else {
+                newWidth = newHeight;
+            }
+        }
+
+        setSize(target, newWidth, newHeight);
     }
     
+    function realtimeUpdate(newValue) {
+        if (newValue !== undefined) {
+            return realtime = Boolean(newValue);
+        } else {
+            return realtime;
+        }
+    }
+    
+    document.addEventListener('interactresizeend', function (e) {
+        if (!realtime) {
+            staticResize(e);
+        }
+    });
+    
+    document.addEventListener('interactresizemove', function (e) {
+        if (realtime) {
+            dynamicResize(e);
+        }
+    });
+
+    document.addEventListener('interactdragmove', function (e) {
+        if (realtime) {
+            dynamicMove(e);
+        }
+    });
+    
+    document.addEventListener('interactdragend', function (e) {
+        if (!realtime) {
+            staticMove(e);
+        }
+    });
+
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
@@ -391,9 +437,14 @@ window.interactDemo = (function(interact) {
     interactDemo.randomDivs = randomDivs;
     interactDemo.randomGraphics = randomGraphics;
     interactDemo.setSize = setSize;
-    interactDemo.position = position;
+    interactDemo.setPosition = setPosition;
     interactDemo.nodeEventDebug = nodeEventDebug;
     interactDemo.eventProps = eventProps;
+    interactDemo.staticMove = staticMove;
+    interactDemo.dynamicMove = dynamicMove;
+    interactDemo.graphicActionChecker = graphicActionChecker;
+    interactDemo.getPosition = getPosition;
+    interactDemo.realtimeUpdate = realtimeUpdate;
 
     if (!('$' in window)) {
         window.$ = function (id) {
@@ -401,5 +452,5 @@ window.interactDemo = (function(interact) {
         };
     }
     return interactDemo;
-}(interact));
+}(window.interact));
 
