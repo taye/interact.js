@@ -14,8 +14,9 @@ window.interactDemo = (function(interact) {
     'use strict';
 
     var interact = interact || window.interact,
-        interactDemo = {};
-        
+        interactDemo = {},
+        svg;
+
         if (!interact) {
             return false;
         }
@@ -35,32 +36,46 @@ window.interactDemo = (function(interact) {
     }
 
     function getWidth(element) {
-        var width = element.style.width;
-
-        if(width !== '') {
-            return parseStyleLength(element, width);
+        var width;
+        
+        if (element.nodeName === 'g') {
+            width = element.getAttributeNS(null, 'width');
         } else {
-            return parseStyleLength(element, window.getComputedStyle(element).width);
+            width = element.style.width;
+
+            if(width !== '') {
+                width = parseStyleLength(element, width);
+            } else {
+                width =  parseStyleLength(element, window.getComputedStyle(element).width);
+            }
         }
+        return width;
     }
 
     function getHeight(element) {
-        var height = element.style.height;
-
-        if(height !== '') {
-            return parseStyleLength(element, height);
+        var height;
+        
+        if (element.nodeName === 'g') {
+            height = element.getAttributeNS(null, 'height');
         } else {
-            return parseStyleLength(element, window.getComputedStyle(element).height);
+            height = element.style.height;
+
+            if(height !== '') {
+                height = parseStyleLength(element, height);
+            } else {
+                height =  parseStyleLength(element, window.getComputedStyle(element).height);
+            }
         }
+        return height;
     }
-    
+
     function myActionChecker(event) {
         var right,
             bottom,
             clientRect,
             action,
             axes;
-    
+
         clientRect = target.element.getClientRects()[0];
         right = ((x0 - clientRect.left) > (clientRect.width - margin));
         bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
@@ -73,10 +88,85 @@ window.interactDemo = (function(interact) {
         }
         return action;
     }
+
+    /**
+     * @function
+     * @description Introduce random draggable, resizeable graphic nodes to the document (for testing)
+     * @param {number} [n] The number of nodes to be added (default: 5)
+     */
+    function randomGraphics(n) {
+        var svgNS = 'http://www.w3.org/2000/svg',
+            newGraphic,
+            rect,
+            parent,
+            text,
+            width = window.innerWidth,
+            height = window.innerHeight,
+            x,
+            y,
+            translate,
+            i,
+            buttunFunction = function (e) {
+                e.target.innerHTML = e.type;
+            };
+
+        if (!svg) {
+            svg = document.createElementNS(svgNS, 'svg');
+            document.body.appendChild(svg);
+        }
+
+        if (n < 0 || typeof n !== 'number') {
+            n = 5;
+        }
+
+        parent = svg;
+        
+        svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
+        svg.setAttributeNS (null, 'width', width);
+        svg.setAttributeNS (null, 'height', height);
+        
+        for (i = 0; i < n; i++) {
+            newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
+//            newGraphic.className = 'interact-demo-node';
+            newGraphic.id = 'graphic' + i;
+            newGraphic.interactDemo = true;
+            newGraphic.setAttributeNS (null, 'fill', '#ee0');
+            newGraphic.setAttributeNS (null, 'stroke', '#000');
+            newGraphic.setAttributeNS (null, 'stroke-width', '2px');
+            newGraphic.setAttributeNS (null, 'width', 150);
+            newGraphic.setAttributeNS (null, 'height', 150);
+
+            text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
+            text.setAttributeNS (null, 'fill', '#000');
+            text.setAttributeNS (null, 'stroke', '#000');
+            text.setAttributeNS (null, 'stroke-width', '0px');
+            
+            newGraphic.text = text;
+
+            x = Math.random()*(width - 200);
+            y = Math.random()*(width - 200);
+            
+            translate = 'translate(' + x + ', ' + y + ')';
+            newGraphic.setAttributeNS (null, 'transform', translate );
+            
+            rect = document.createElementNS(svgNS, 'rect');
+            rect.setAttributeNS (null, 'width', 150);
+            rect.setAttributeNS (null, 'height', 150);
+            newGraphic.appendChild(rect);
+
+            interact.set(newGraphic, {
+                drag: true,
+                resize: true,
+                actionChecker: 'auto'//myActionChecker
+            });
+        }
+
+
+    }
     /**
      * @function
      * @description Introduce random draggable, resizeable nodes to the document (for testing)
-     * @param {number} [n] The number of nodes to be added (default: 10)
+     * @param {number} [n] The number of nodes to be added (default: 5)
      * @param {object} [parent] An object with boolean properties (default: document.body)
      */
     function randomDivs(n, parent) {
@@ -86,13 +176,12 @@ window.interactDemo = (function(interact) {
             i,
             buttunFunction = function (e) {
                 e.target.innerHTML = e.type;
-            },
-            mouseMove = function () {console.log();};
+            };
 
-        if (n <0 || typeof n !== 'number') {
+        if (n < 0 || typeof n !== 'number') {
             n = 5;
         }
-        
+
         parent = parent || document.body;
 
         for (i = 0; i < n; i++) {
@@ -120,43 +209,60 @@ window.interactDemo = (function(interact) {
             interact.set(newDiv, {
                 drag: true,
                 resize: true,
-                order: false,
-                mouseMove: mouseMove,
                 actionChecker: 'auto'//myActionChecker
             });
         }
     }
 
     function setSize(element, x, y) {
-        if (typeof x === 'number' ) {
-            element.style.setProperty('width', Math.max(x, 20) + 'px', '');
+        if (element.nodeName === 'g') {
+            if (typeof x === 'number' && typeof y === 'number') {
+                element.setAttributeNS(null, 'width', x);
+                element.setAttributeNS(null, 'height', y);
+            }
         }
-        if (typeof y === 'number' ) {
-            element.style.setProperty('height', Math.max(y, 20) + 'px', '');
-        }
-        if (typeof x === 'string' ) {
-            element.style.setProperty('width', Math.max(x, 20), '');
-        }
-        if (typeof y === 'string' ) {
-            element.style.setProperty('height', Math.max(y, 20), '');
+        else {
+            if (typeof x === 'string' && typeof y === 'string') {
+                element.style.setProperty('width', Math.max(x, 20), '');
+                element.style.setProperty('height', Math.max(y, 20), '');
+            } else if (typeof x === 'number' && typeof y === 'number') {
+                element.style.setProperty('width', Math.max(x, 20) + 'px', '');
+                element.style.setProperty('height', Math.max(y, 20) + 'px', '');
+            }
         }
     }
 
     function position(element, x, y) {
-        if (typeof x === 'number' ) {
+        var translate;
+        
+        if (element.nodeName === 'g') {
+            if (typeof x === 'number' && typeof y === 'number') {
+                translate = 'translate(' + x + ', ' + y + ')';
+                element.setAttributeNS(null, 'transform', translate);
+            }
+        } else if (typeof x === 'number' && typeof y === 'number') {
             element.style.setProperty('left', x + 'px', '');
-        }
-        if (typeof y === 'number' ) {
             element.style.setProperty('top', y + 'px', '');
         }
     }
 
+    // Display event properties for debugging
     function nodeEventDebug(e) {
-        // Display event properties for debugging
+        var textProp,
+            nl;
+        
+        if (e.target.nodeName === 'g') {
+            textProp = 'textContent';
+            nl = '\n';
+        } else {
+            textProp = 'innerHTML';
+            nl = '<br> ';
+        }
+        
         if ( e.target.interactDemo && e.type in interact.eventDict()) {
-            e.target.text.innerHTML = '<br> ' + interact.eventDict(e.type) + ' x0, y0    :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
-            e.target.text.innerHTML += '<br> dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
-            e.target.text.innerHTML += '<br> pageX, pageY    :    (' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+            e.target.text[textProp] = nl + interact.eventDict(e.type) + ' x0, y0    :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+            e.target.text[textProp] += nl + ' dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
+            e.target.text[textProp] += nl + ' pageX, pageY    :    (' + e.detail.pageX + ', ' + e.detail.pageY + ')';
         }
     }
 
@@ -207,8 +313,8 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragend', function(e) {
         var clientRect = e.target.getClientRects()[0],
             compStyle = window.getComputedStyle(e.target),
-            left = clientRect.left + (e.detail.pageX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
-            top = clientRect.top + (e.detail.pageY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
+            left = clientRect.left + (e.detail.pageX + window.scrollX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
+            top = clientRect.top + (e.detail.pageY + window.scrollY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
             debug = '';
 
 
@@ -232,6 +338,7 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragend', nodeEventDebug);
 
     interactDemo.randomDivs = randomDivs;
+    interactDemo.randomGraphics = randomGraphics;
     interactDemo.setSize = setSize;
     interactDemo.position = position;
     interactDemo.nodeEventDebug = nodeEventDebug;
