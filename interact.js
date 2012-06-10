@@ -230,6 +230,19 @@ window.interact = (function () {
         prevY = event.pageY;
     }
 
+    function autoCheck(event) {
+        var clientRect = target.element.getClientRects()[0],
+            action,
+            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin));
+
+        resizeAxes = (right?'x': '') + (bottom?'y': '');
+        action = (resizeAxes && target.resize)? 'resize' + resizeAxes:
+            (target.drag)? 'drag': '';
+
+        return action;
+    }
+
     /**
      * @private
      * @event
@@ -245,24 +258,12 @@ window.interact = (function () {
             if (target.resize) {
                 removeClass(target.element, 'interact-xyresize interact-xresize interact-yresize');
 
-                if (target.getAction === 'auto') {
-                    clientRect = target.element.getClientRects()[0];
-                    right = ((event.pageX - clientRect.left) > (clientRect.width - margin));
-                    bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin));
-                    axes = (right?'x': '') + (bottom?'y': '');
-                    
-                    if (axes) {
-                        target.element.style.cursor = actions['resize' + axes].cursor;
-                    } else {
-                        target.element.style.cursor = actions['drag'].cursor;
-                    }
-                } else if (target.getAction) {
-                    action = target.getAction();
-                    target.element.style.cursor = actions[action].cursor;
-                }
+                action =target.getAction(event);
+
+                target.element.style.cursor = actions[action].cursor;
+            } else if (dragging || resizing) {
+                event.preventDefault();
             }
-        } else if (dragging || resizing) {
-            event.preventDefault();
         }
     }
 
@@ -285,24 +286,10 @@ window.interact = (function () {
                 y0 = prevY = event.pageY;
                 events.remove(docTarget, moveEvent, 'all');
             }
-            if (target.getAction === 'auto') {
-                clientRect = target.element.getClientRects()[0];
-                right = ((x0 - clientRect.left) > (clientRect.width - margin));
-                bottom = ((y0 - clientRect.top) > (clientRect.height - margin));
-                resizeAxes = (right?'x': '') + (bottom?'y': '');
-
-                action = (resizeAxes && target.resize)? 'resize' + resizeAxes:
-                    (target.drag)? 'drag': '';
-                    
-                
-                document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
-                actions[action].ready();
-            } else if (typeof target.getActions === 'Function') {
-                action = target.getAction(event);
-                
-                document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
-                actions[action].ready();
-            }
+            action = target.getAction(event);
+            
+            document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
+            actions[action].ready();
         }
     }
 
@@ -457,15 +444,13 @@ window.interact = (function () {
             element: element,
             drag: ('drag' in options)? options.drag : false,
             resize: ('resize' in options)? options.resize : false,
-            getAction: (typeof options.actionChecker === 'Function')? options.actionChecker: (options.actionChecker === 'auto')? options.actionChecker: null
+            getAction: (typeof options.actionChecker === 'Function')? options.actionChecker: autoCheck
         };
 
         if (nodeAlreadySet) {
             interactNodes[i] = newNode;
         } else {
-            // Add event listeners
             events.add(newNode, downEvent, mouseDown, false);
-
             interactNodes.push(newNode);
         }
 
