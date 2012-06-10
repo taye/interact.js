@@ -21,11 +21,17 @@ window.interactDemo = (function(interact) {
             rect: 'rect',
             circle: 'circle',
             text: 'text',
+            path: 'path',
+            line: 'line',
+            image: 'image'
         },
-        margin = 20;
+        margin = 20,
+        prevX = 0,
+        prevY = 0,
+        dynamic = false;
 
         if (!interact) {
-            return false;
+            return;
         }
 
     function parseStyleLength(element, string) {
@@ -158,16 +164,18 @@ window.interactDemo = (function(interact) {
             rect = document.createElementNS(svgNS, 'rect');
             rect.setAttributeNS (null, 'width', 150);
             rect.setAttributeNS (null, 'height', 150);
-            newGraphic.mainElement = newGraphic.appendChild(rect);
+            newGraphic.appendChild(rect);
 
-            interact.set(newGraphic, {
+            interact.set(rect, {
                 drag: true,
                 resize: true,
                 actionChecker: graphicActionChecker
             });
+            newGraphic.addEventListener('mousemove', function(e) {
+                console.log(e.pageX, e.pageY);
+                console.log(e.target);
+            });
         }
-
-
     }
     /**
      * @function
@@ -244,7 +252,7 @@ window.interactDemo = (function(interact) {
         if (element.nodeName in svgTags) {
             if (typeof x === 'number' && typeof y === 'number') {
                 translate = 'translate(' + x + ', ' + y + ')';
-                element.setAttributeNS(null, 'transform', translate);
+                element.parentNode.setAttributeNS(null, 'transform', translate);
             }
         } else if (typeof x === 'number' && typeof y === 'number') {
             element.style.setProperty('left', x + 'px', '');
@@ -299,19 +307,39 @@ window.interactDemo = (function(interact) {
 
         return debug;
     }
+    
+    function dynamicMove(e) {
+        var clientRect = e.target.getClientRects()[0],
+            compStyle = window.getComputedStyle(e.target),
+            left = clientRect.left + (e.detail.pageX + window.scrollX - prevX) - parseStyleLength(e.target, compStyle.marginLeft),
+            top = clientRect.top + (e.detail.pageY + window.scrollY - prevY) - parseStyleLength(e.target, compStyle.marginRight),
+            debug = '';
+
+
+        position(e.target, left, top);
+    }
+    
+    function staticMove(e) {
+        var clientRect = e.target.getClientRects()[0],
+            compStyle = window.getComputedStyle(e.target),
+            left = clientRect.left + (e.detail.pageX + window.scrollX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
+            top = clientRect.top + (e.detail.pageY + window.scrollY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
+            debug = '';
+
+
+        position(e.target, left, top);
+    }
 
     document.addEventListener('interactresizeend', function(e) {
-        var target,
+        var target = e.target,
             clientRect,
             newWidth,
             newHeight;
-
+/*
         if (e.target.nodeName in svgTags) {
-            target = e.target.mainElement;
-        } else {
-            target = e.target;
+            target = target.mainElement;
         }
-
+*/
         clientRect = target.getClientRects()[0];
         newWidth = Math.max((getWidth(target) + e.detail.dx), 0);
         newHeight = Math.max((getHeight(target) + e.detail.dy), 0);
@@ -328,25 +356,12 @@ window.interactDemo = (function(interact) {
         //if (e.target.nodeName === 'rect') alert('rect');
     });
 
-    document.addEventListener('interactdragend', function(e) {
-        var clientRect = e.target.getClientRects()[0],
-            compStyle = window.getComputedStyle(e.target),
-            left = clientRect.left + (e.detail.pageX + window.scrollX - e.detail.x0) - parseStyleLength(e.target, compStyle.marginLeft),
-            top = clientRect.top + (e.detail.pageY + window.scrollY - e.detail.y0) - parseStyleLength(e.target, compStyle.marginRight),
-            debug = '';
-
-
-        position(e.target, left, top);
-    });
-
-/*    document.addEventListener('interactdragmove', function(e) {
-        var compStyle = window.getComputedStyle(e.target),
-            left = parseStyleLength(e.target, compStyle.left),
-            right = parseStyleLength(e.target, compStyle.top);
-
-        position(e.target, left + e.detail.dx, right + e.detail.dy);
-    });
-*/
+    if (dynamic) {
+        document.addEventListener('interactdragmove', dynamicMove);
+    } else {
+        document.addEventListener('interactdragend', staticMove);
+    }
+    
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
@@ -354,6 +369,24 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragstart', nodeEventDebug);
     document.addEventListener('interactdragmove', nodeEventDebug);
     document.addEventListener('interactdragend', nodeEventDebug);
+
+    // These events must happen after the others so preVx !== e.detail.pageX for other event listeners
+    document.addEventListener('interactdragstart', function(e) {
+        prevX = e.detail.pageX;
+        prevY = e.detail.pageY;
+    });
+    document.addEventListener('interactdragmove', function(e) {
+        prevX = e.detail.pageX;
+        prevY = e.detail.pageY;
+    });
+    document.addEventListener('interactresizestart', function(e) {
+        prevX = e.detail.pageX;
+        prevY = e.detail.pageY;
+    });
+    document.addEventListener('interactresizemove', function(e) {
+        prevX = e.detail.pageX;
+        prevY = e.detail.pageY;
+    });
 
     interactDemo.randomDivs = randomDivs;
     interactDemo.randomGraphics = randomGraphics;
