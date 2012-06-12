@@ -23,6 +23,7 @@ window.interactDemo = (function(interact) {
             image: 'image'
         },
         margin = 20,
+        minSize = 30,
         prevX = 0,
         prevY = 0,
         realtime = true;
@@ -82,7 +83,7 @@ window.interactDemo = (function(interact) {
 
     function divActionChecker(event) {
         var target = event.target,
-            clientRect = target.element.getClientRects()[0],
+            clientRect = target.getClientRects()[0],
             right = ((event.pageX - window.scrollY - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
@@ -95,7 +96,7 @@ window.interactDemo = (function(interact) {
 
     function graphicActionChecker(event) {
         var target = event.target,
-            clientRect = target.getClientRects()[0],
+            clientRect = target.parentNode.getBoundingClientRect(),
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
@@ -224,7 +225,7 @@ window.interactDemo = (function(interact) {
             interact.set(newDiv, {
                 drag: true,
                 resize: true,
-                actionChecker: 'auto'//myActionChecker
+                actionChecker: divActionChecker
             });
             window['d' + i] = newDiv;
         }
@@ -239,26 +240,36 @@ window.interactDemo = (function(interact) {
         }
         else {
             if (typeof x === 'string' && typeof y === 'string') {
-                element.style.setProperty('width', Math.max(x, 20), '');
-                element.style.setProperty('height', Math.max(y, 20), '');
+                element.style.setProperty('width', x, '');
+                element.style.setProperty('height', y, '');
             } else if (typeof x === 'number' && typeof y === 'number') {
-                element.style.setProperty('width', Math.max(x, 20) + 'px', '');
-                element.style.setProperty('height', Math.max(y, 20) + 'px', '');
+                element.style.setProperty('width', x + 'px', '');
+                element.style.setProperty('height', y + 'px', '');
             }
         }
     }
 
     function getPosition(element){
-        var clientRect = element.getClientRects()[0],
+        var clientRect = element.getBoundingClientRect(),
             compStyle = window.getComputedStyle(element),
             left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
             top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginRight);
-        
+
         if (element.nodeName in svgTags) {
-            var container = element.ownerSVGElement;
-                
-            left -= container.offsetLeft;
-            top -= container.offsetTop;
+            var svgElement = element.ownerSVGElement,
+                //svgStyle = window.getComputedStyle(element.ownerSVGElement),
+                svgParent = svgElement.parentNode,
+                svgParentPosition = getPosition(svgParent),
+                svgParentStyle = window.getComputedStyle(svgParent);
+
+            left -= (svgParentPosition.x +
+                parseStyleLength(svgParent, svgParentStyle.marginLeft) +
+                parseStyleLength(svgParent, svgParentStyle.paddingLeft) +
+                parseStyleLength(svgParent, svgParentStyle.borderLeftWidth));
+            top -= (svgParentPosition.y +
+                parseStyleLength(svgParent, svgParentStyle.marginTop) +
+                parseStyleLength(svgParent, svgParentStyle.paddingTop) +
+                parseStyleLength(svgParent, svgParentStyle.borderTopWidth));
         }
         return {x: left, y: top};
     }
@@ -344,8 +355,8 @@ window.interactDemo = (function(interact) {
 
     function staticResize(e) {
         var target = e.target,
-            newWidth = Math.max((getWidth(target) + e.detail.dx), 0),
-            newHeight = Math.max((getHeight(target) + e.detail.dy), 0);
+            newWidth = Math.max((getWidth(target) + e.detail.dx), minSize),
+            newHeight = Math.max((getHeight(target) + e.detail.dy), minSize);
 
         // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
@@ -361,8 +372,24 @@ window.interactDemo = (function(interact) {
 
     function dynamicResize(e) {
         var target = e.target,
-            newWidth = Math.max(getWidth(target) + (e.detail.pageX - prevX), 0),
-            newHeight = Math.max(getHeight(target) + (e.detail.pageY - prevY), 0);
+            position = getPosition(target),
+            newWidth,
+            newHeight;
+
+        if (e.detail.pageX < (position.x + minSize + margin)) {
+            newWidth = getWidth(target);
+        } else {
+            newWidth = (e.detail.axes === 'x' || e.detail.axes === 'xy' )?
+                Math.max(getWidth(target) + (e.detail.pageX - prevX), minSize):
+                getWidth(target);
+        }
+        if (e.detail.pageY < (position.y + minSize + margin)) {
+            newHeight = getHeight(target);
+        } else {
+            newHeight = (e.detail.axes === 'y' || e.detail.axes === 'xy' )?
+                Math.max(getHeight(target) + (e.detail.pageY - prevY), minSize):
+                getHeight(target);
+        }
 
         // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
@@ -375,7 +402,7 @@ window.interactDemo = (function(interact) {
 
         setSize(target, newWidth, newHeight);
     }
-    
+
     function realtimeUpdate(newValue) {
         if (newValue !== undefined) {
             return realtime = Boolean(newValue);
@@ -383,13 +410,13 @@ window.interactDemo = (function(interact) {
             return realtime;
         }
     }
-    
+
     document.addEventListener('interactresizeend', function (e) {
         if (!realtime) {
             staticResize(e);
         }
     });
-    
+
     document.addEventListener('interactresizemove', function (e) {
         if (realtime) {
             dynamicResize(e);
@@ -401,7 +428,7 @@ window.interactDemo = (function(interact) {
             dynamicMove(e);
         }
     });
-    
+
     document.addEventListener('interactdragend', function (e) {
         if (!realtime) {
             staticMove(e);

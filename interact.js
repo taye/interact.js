@@ -143,6 +143,7 @@ window.interact = (function () {
         if (!resizing) {
             resizeEvent = document.createEvent('CustomEvent');
             detail = {
+                axes: resizeAxes,
                 x0: x0,
                 y0: y0,
                 dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (event.pageX - x0): 0,
@@ -162,6 +163,7 @@ window.interact = (function () {
         } else {
             resizeEvent = document.createEvent('CustomEvent');
             detail = {
+                axes: resizeAxes,
                 x0: x0,
                 y0: y0,
                 dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (event.pageX - x0): 0,
