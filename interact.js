@@ -30,7 +30,7 @@ window.interact = (function () {
                 ready: function () {
                     resizeAxes = 'x';
                     events.add(docTarget, moveEvent, resizeMove);
-                    addClass(target.element, 'interact-target ineract-resizex');
+                    addClass(target.element, 'interact-target interact-resizex');
                 },
                 start: function() {}
             },
@@ -39,7 +39,7 @@ window.interact = (function () {
                 ready: function () {
                     resizeAxes = 'y';
                     events.add(docTarget, moveEvent, resizeMove);
-                    addClass(target.element, 'interact-target ineract-resizey');
+                    addClass(target.element, 'interact-target interact-resizey');
                 }
             },
             resizexy: {
@@ -47,14 +47,14 @@ window.interact = (function () {
                 ready: function () {
                     resizeAxes = 'xy';
                     events.add(docTarget, moveEvent, resizeMove);
-                    addClass(target.element, 'interact-target ineract-resizexy');
+                    addClass(target.element, 'interact-target interact-resizexy');
                 }
             },
             drag: {
                 cursor: 'move',
                 ready: function () {
                     events.add(docTarget, moveEvent, dragMove);
-                    addClass(target.element, 'interact-target ineract-dragging');
+                    addClass(target.element, 'interact-target interact-dragging');
                 }
             }
         },
@@ -71,6 +71,10 @@ window.interact = (function () {
         },
         docTarget = {
             element: document,
+            events: {}
+        },
+        windowTarget = {
+            element: window,
             events: {}
         },
         // interact events wrapper
@@ -235,8 +239,8 @@ window.interact = (function () {
     function autoCheck(event) {
         var clientRect = target.element.getClientRects()[0],
             action,
-            right = ((event.pageX - clientRect.left) > (clientRect.width - margin)),
-            bottom = ((event.pageY - clientRect.top) > (clientRect.height - margin));
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
 
         resizeAxes = (right?'x': '') + (bottom?'y': '');
         action = (resizeAxes && target.resize)? 'resize' + resizeAxes:
@@ -250,15 +254,14 @@ window.interact = (function () {
      * @event
      */
     function mouseMove(event) {
-        var clientRect,
-            right,
+        var right,
             bottom,
             axes,
             action;
 
         if (!mouseIsDown && (target = getInteractNode(event.target))) {
             if (target.resize) {
-                removeClass(target.element, 'interact-xyresize interact-xresize interact-yresize');
+                removeClass(target.element, 'interact-resizexy interact-resizex interact-resizey');
 
                 action = target.getAction(event);
 
@@ -276,7 +279,6 @@ window.interact = (function () {
     function mouseDown(event) {
         var right,
             bottom,
-            clientRect,
             action = '';
 
         mouseIsDown = true;
@@ -409,7 +411,7 @@ window.interact = (function () {
     /** @private */
     function clearTarget() {
         if (target) {
-            removeClass(target.element, 'interact-target interact-dragging interact-resizing');
+            removeClass(target.element, 'interact-target interact-dragging interact-resizing interact-resizexy interact-resizex interact-resizexy');
         }
         target = null;
     }
@@ -435,8 +437,7 @@ window.interact = (function () {
     interact.set = function (element, options) {
         var nodeAlreadySet = getInteractNode(element, 'test'),
             i = 0,
-            newNode,
-            clientRect = element.getClientRects()[0];
+            newNode;
 
         if (typeof options !== 'object') {
             options = {};
@@ -533,9 +534,11 @@ window.interact = (function () {
             supportsTouch: supportsTouch
         };
     };
+    interact.removeClass = removeClass;
     
     events.add(docTarget, upEvent, docMouseUp);
-    events.add(docTarget, moveEvent, mouseMove);
+    events.add(windowTarget, 'blur' , docMouseUp);
+    events.add(docTarget, moveEvent, mouseMove, 'true');
 
     return interact;
 }());
