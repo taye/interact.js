@@ -258,15 +258,20 @@ window.interactDemo = (function(interact) {
     function getPosition(element){
         var clientRect = element.getBoundingClientRect(),
             compStyle = window.getComputedStyle(element),
-            left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
-            top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginTop);
+            left,
+            top;
 
         if (element.nodeName in svgTags) {
             var svgElement = element.ownerSVGElement,
                 svgParent = svgElement.parentNode,
                 svgParentPosition = getPosition(svgParent),
-                svgParentStyle = window.getComputedStyle(svgParent);
+                svgParentStyle = window.getComputedStyle(svgParent),
+                matrix = element.getTransformToElement(svgElement);
 
+            // using transform matrix seems a little slow in Opera
+            left = matrix.e;
+            top = matrix.f;
+/*
             left -= (svgParentPosition.x +
                 parseStyleLength(svgParent, svgParentStyle.marginLeft) +
                 parseStyleLength(svgParent, svgParentStyle.paddingLeft) +
@@ -275,6 +280,10 @@ window.interactDemo = (function(interact) {
                 parseStyleLength(svgParent, svgParentStyle.marginTop) +
                 parseStyleLength(svgParent, svgParentStyle.paddingTop) +
                 parseStyleLength(svgParent, svgParentStyle.borderTopWidth));
+*/
+        } else {
+            left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
+            top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginTop);
         }
         return {x: left, y: top};
     }
@@ -292,8 +301,55 @@ window.interactDemo = (function(interact) {
             element.style.setProperty('top', y + 'px', '');
         }
     }
-    
-    // /translate[\s]*[(][\s]*([0-9]+)[,\s]+([0-9]+)\s*[)]/
+
+    function changePosition(element, dx, dy) {
+        var variable,
+            x,
+            y;
+
+        if (element.nodeName in svgTags) {
+            if (typeof dx === 'number' && typeof dy === 'number') {
+                variable = getTransform(element, 'translate');
+                x = new Number(variable[0]);
+                y = new Number(variable[1]);
+
+                setTransform(element, 'translate',  [ x + dx, y + dy]);
+            }
+        } else if (typeof dx === 'number' && typeof dy === 'number') {
+            variable = window.getComputedStyle(element);
+            x = parseStyleLength(element, variable.left);
+            y = parseStyleLength(element, variable.top);
+            
+            setPosition(element, x + dx, y + dy);
+        }
+    }
+
+    function setTransform(element, property, valueArray) {
+        var transform = element.getAttribute('transform'),
+            transformFunction,
+            regExp;
+
+        if (!property) {
+            element.setAttribute('transform', '');
+        } else if (typeof property !== 'string') {
+            return false;
+        }
+
+        // To remove the property from the previous transform attribute
+        regExp = new RegExp('/([\s\S]*)(?:' + property + '\\s*\\(\\s*)[^\\)]+\\)([\\s\\S]*)/', 'i');
+        transform = transform.match(regExp);
+        if (transform) {
+            transform = transform[0];
+        } else {
+            transform = '';
+        }
+        if (typeof valueArray === 'object') {
+            valueArray = valueArray.join(', ');
+        }
+        transformFunction = property + '(' + valueArray + ') ';
+        element.setAttribute('transform', transformFunction + transform);
+    }
+
     function getTransform(element, property) {
         var transform = element.getAttribute('transform'),
             transformations = {
@@ -305,20 +361,17 @@ window.interactDemo = (function(interact) {
                 matrix: 6
             },
             regExp = new RegExp(property + '\\s*\\(\\s*[^)]*\\)', 'i'),
-            numbers,
-            i,
             r;
-        
+
         if (property in transformations && (transform = transform.match(regExp))) {
-            
+
             if (transform) {
                 transform = transform[0];
             }
-            
-            // Get the numbers out
+
+            // To get the numbers out
             regExp = /([\d\.]+)/g;
-            numbers = transform.match(regExp);
-            r = numbers;
+            r = transform.match(regExp);
         } else {
             r = transform;
         }
@@ -516,6 +569,8 @@ window.interactDemo = (function(interact) {
     interactDemo.getPosition = getPosition;
     interactDemo.realtimeUpdate = realtimeUpdate;
     interactDemo.getTransform = getTransform;
+    interactDemo.setTransform = setTransform;
+    interactDemo.changePosition = changePosition;
 
     if (!('$' in window)) {
         window.$ = function (id) {
@@ -530,10 +585,11 @@ window.setTimeout(function () {
     window.g = document.getElementById('graphic0');
     window.r = document.querySelector('#graphic0 rect');
     p = s.createSVGPoint();
-}, 2000);
+}, 500);
 
 
 
 window.getTransform = interactDemo.getTransform;
-    
-    
+window.setTransform = interactDemo.setTransform;
+window.changePosition = interactDemo.changePosition;
+
