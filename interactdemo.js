@@ -17,6 +17,7 @@ window.interactDemo = (function(interact) {
             g: 'g',
             rect: 'rect',
             circle: 'circle',
+            ellipse: 'ellipse',
             text: 'text',
             path: 'path',
             line: 'line',
@@ -39,52 +40,39 @@ window.interactDemo = (function(interact) {
         if (lastChar === 'x') {
             return Number(string.substring(string.length - 2, 0));
         } else if (lastChar === '%') {
-            return parseStyleLength(element.parent) * Number(string.substring(string.length - 1, 0)) / 100;
+            return parseStyleLength(element.parentNode) * Number(string.substring(string.length - 1, 0)) / 100;
         } else if (lastChar === 'm') {
             // Not Ready ***
             return Number(string.substring(string.length - 2, 0)) * parseStyleLength(element, window.getComputedStyle(element).fontSize);
         }
         return string;
     }
-
-    function getWidth(element) {
-        var width;
+    function getSize(element) {
+        var width,
+            height;
 
         if (element.nodeName in svgTags) {
             width = Number(element.getAttributeNS(null, 'width'));
+            height = Number(element.getAttributeNS(null, 'height'));
         } else {
             width = element.style.width;
+            height = element.style.height;
 
             if(width !== '') {
                 width = parseStyleLength(element, width);
+                height  = parseStyleLength(element, height);
             } else {
-                width =  parseStyleLength(element, window.getComputedStyle(element).width);
+                width = parseStyleLength(element, window.getComputedStyle(element).width);
+                height = parseStyleLength(element, window.getComputedStyle(element).height);
             }
         }
-        return width;
-    }
-
-    function getHeight(element) {
-        var height;
-
-        if (element.nodeName in svgTags) {
-            height = Number(element.getAttributeNS(null, 'height'));
-        } else {
-            height = element.style.height;
-
-            if(height !== '') {
-                height = parseStyleLength(element, height);
-            } else {
-                height =  parseStyleLength(element, window.getComputedStyle(element).height);
-            }
-        }
-        return height;
+        return {x: width,y: height};
     }
 
     function divActionChecker(event) {
-        var target = event.target,
+        var target = (event.currentTarget === document)? event.target: event.currentTarget,
             clientRect = target.getClientRects()[0],
-            right = ((event.pageX - window.scrollY - clientRect.left) > (clientRect.width - margin)),
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
             action = (axes)?
@@ -95,8 +83,11 @@ window.interactDemo = (function(interact) {
     }
 
     function graphicActionChecker(event) {
-        var target = event.target,
-            clientRect = target.parentNode.getBoundingClientRect(),
+        var target = (event.currentTarget === document)? event.target: event.currentTarget,
+/*            clientRect = target.parentNode.getBoundingClientRect(),
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
+            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
+*/            clientRect = target.getBoundingClientRect(),
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
@@ -118,6 +109,7 @@ window.interactDemo = (function(interact) {
             rect,
             parent,
             text,
+            title,
             width = window.innerWidth,
             height = window.innerHeight,
             x,
@@ -148,7 +140,6 @@ window.interactDemo = (function(interact) {
             newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
 //            newGraphic.style.setProperty('class', 'interact-demo-node');
             newGraphic.id = 'graphic' + i;
-            newGraphic.interactDemo = true;
             newGraphic.setAttributeNS (null, 'fill', '#ee0');
             newGraphic.setAttributeNS (null, 'stroke', '#000');
             newGraphic.setAttributeNS (null, 'stroke-width', '2px');
@@ -156,12 +147,14 @@ window.interactDemo = (function(interact) {
             x = Math.random()*(width - 200);
             y = Math.random()*(width - 200);
 
-            translate = 'translate(' + x + ', ' + y + ')';
+            translate = ['translate(', x, ', ', y, ')'].join('');
             newGraphic.setAttributeNS (null, 'transform', translate );
 
             rect = document.createElementNS(svgNS, 'rect');
+            rect.interactDemo = true;
             rect.setAttributeNS (null, 'width', 150);
             rect.setAttributeNS (null, 'height', 150);
+            newGraphic.appendChild(rect);
 
             text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
             text.setAttributeNS (null, 'fill', '#000');
@@ -169,7 +162,13 @@ window.interactDemo = (function(interact) {
             text.setAttributeNS (null, 'stroke-width', '0px');
             rect.text = text;
 
-            newGraphic.appendChild(rect);
+            title = newGraphic.appendChild(document.createElementNS(svgNS, 'text'));
+            title.textContent = newGraphic.id;
+            title.setAttributeNS (null, 'fill', '#000');
+            title.setAttributeNS (null, 'stroke', '#000');
+            title.setAttributeNS (null, 'stroke-width', '0px');
+            title.setAttributeNS (null, 'x', 50);
+            title.setAttributeNS (null, 'y', 20);
 
             interact.set(rect, {
                 drag: true,
@@ -233,18 +232,25 @@ window.interactDemo = (function(interact) {
 
     function setSize(element, x, y) {
         if (element.nodeName in svgTags) {
-            if (typeof x === 'number' && typeof y === 'number') {
+            if (typeof x === 'number') {
                 element.setAttributeNS(null, 'width', x);
+            }
+            if (typeof y === 'number') {
                 element.setAttributeNS(null, 'height', y);
             }
-        }
-        else {
-            if (typeof x === 'string' && typeof y === 'string') {
-                element.style.setProperty('width', x, '');
-                element.style.setProperty('height', y, '');
-            } else if (typeof x === 'number' && typeof y === 'number') {
-                element.style.setProperty('width', x + 'px', '');
-                element.style.setProperty('height', y + 'px', '');
+        } else {
+            if (typeof x === 'number') {
+                x += 'px';
+            }
+            if (typeof y === 'number') {
+                y += 'px';
+            }
+
+            if (typeof x === 'string') {
+                element.style.setProperty('width', x);
+            }
+            if (typeof y === 'string') {
+                element.style.setProperty('height', y);
             }
         }
     }
@@ -253,11 +259,10 @@ window.interactDemo = (function(interact) {
         var clientRect = element.getBoundingClientRect(),
             compStyle = window.getComputedStyle(element),
             left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
-            top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginRight);
+            top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginTop);
 
         if (element.nodeName in svgTags) {
             var svgElement = element.ownerSVGElement,
-                //svgStyle = window.getComputedStyle(element.ownerSVGElement),
                 svgParent = svgElement.parentNode,
                 svgParentPosition = getPosition(svgParent),
                 svgParentStyle = window.getComputedStyle(svgParent);
@@ -286,6 +291,38 @@ window.interactDemo = (function(interact) {
             element.style.setProperty('left', x + 'px', '');
             element.style.setProperty('top', y + 'px', '');
         }
+    }
+    
+    // /translate[\s]*[(][\s]*([0-9]+)[,\s]+([0-9]+)\s*[)]/
+    function getTransform(element, property) {
+        var transform = element.getAttribute('transform'),
+            transformations = {
+                translate: 2,
+                scale: 2,
+                rotate: 3,
+                skewX: 1,
+                skewY: 1,
+                matrix: 6
+            },
+            regExp = new RegExp(property + '\\s*\\(\\s*[^)]*\\)', 'i'),
+            numbers,
+            i,
+            r;
+        
+        if (property in transformations && (transform = transform.match(regExp))) {
+            
+            if (transform) {
+                transform = transform[0];
+            }
+            
+            // Get the numbers out
+            regExp = /([\d\.]+)/g;
+            numbers = transform.match(regExp);
+            r = numbers;
+        } else {
+            r = transform;
+        }
+        return r;
     }
 
     // Display event properties for debugging
@@ -336,7 +373,7 @@ window.interactDemo = (function(interact) {
         return debug;
     }
 
-    function dynamicMove(e) {
+    function realtimeMove(e) {
         var position = getPosition(e.target),
             left = position.x + (e.detail.pageX - prevX),
             top = position.y + (e.detail.pageY - prevY);
@@ -355,8 +392,9 @@ window.interactDemo = (function(interact) {
 
     function staticResize(e) {
         var target = e.target,
-            newWidth = Math.max((getWidth(target) + e.detail.dx), minSize),
-            newHeight = Math.max((getHeight(target) + e.detail.dy), minSize);
+            size = getSize(target),
+            newWidth = Math.max((size.x + e.detail.dx), minSize),
+            newHeight = Math.max((size.y + e.detail.dy), minSize);
 
         // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
@@ -370,25 +408,28 @@ window.interactDemo = (function(interact) {
         setSize(target, newWidth, newHeight);
     }
 
-    function dynamicResize(e) {
+    function ResizeMove(e) {
         var target = e.target,
             position = getPosition(target),
+            size,
             newWidth,
             newHeight;
 
         if (e.detail.pageX < (position.x + minSize + margin)) {
-            newWidth = getWidth(target);
+            newWidth = null;
         } else {
+            size = getSize(target);
             newWidth = (e.detail.axes === 'x' || e.detail.axes === 'xy' )?
-                Math.max(getWidth(target) + (e.detail.pageX - prevX), minSize):
-                getWidth(target);
+                Math.max(size.x + (e.detail.pageX - prevX), minSize):
+                null;
         }
         if (e.detail.pageY < (position.y + minSize + margin)) {
-            newHeight = getHeight(target);
+            newHeight = null;
         } else {
+            size = size || getSize(target);
             newHeight = (e.detail.axes === 'y' || e.detail.axes === 'xy' )?
-                Math.max(getHeight(target) + (e.detail.pageY - prevY), minSize):
-                getHeight(target);
+                Math.max(size.y + (e.detail.pageY - prevY), minSize):
+                null;
         }
 
         // Square resizing when Shift key is held
@@ -419,13 +460,13 @@ window.interactDemo = (function(interact) {
 
     document.addEventListener('interactresizemove', function (e) {
         if (realtime) {
-            dynamicResize(e);
+            ResizeMove(e);
         }
     });
 
     document.addEventListener('interactdragmove', function (e) {
         if (realtime) {
-            dynamicMove(e);
+            realtimeMove(e);
         }
     });
 
@@ -468,10 +509,13 @@ window.interactDemo = (function(interact) {
     interactDemo.nodeEventDebug = nodeEventDebug;
     interactDemo.eventProps = eventProps;
     interactDemo.staticMove = staticMove;
-    interactDemo.dynamicMove = dynamicMove;
+    interactDemo.realtimeMove = realtimeMove;
     interactDemo.graphicActionChecker = graphicActionChecker;
+    interactDemo.divActionChecker = divActionChecker;
+    interactDemo.getSize = getSize;
     interactDemo.getPosition = getPosition;
     interactDemo.realtimeUpdate = realtimeUpdate;
+    interactDemo.getTransform = getTransform;
 
     if (!('$' in window)) {
         window.$ = function (id) {
@@ -481,3 +525,15 @@ window.interactDemo = (function(interact) {
     return interactDemo;
 }(window.interact));
 
+window.setTimeout(function () {
+    window.s = document.querySelector('svg');
+    window.g = document.getElementById('graphic0');
+    window.r = document.querySelector('#graphic0 rect');
+    p = s.createSVGPoint();
+}, 2000);
+
+
+
+window.getTransform = interactDemo.getTransform;
+    
+    
