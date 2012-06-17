@@ -23,7 +23,7 @@ window.interactDemo = (function(interact) {
             line: 'line',
             image: 'image'
         },
-        margin = 20,
+        margin = 15,
         minSize = 30,
         prevX = 0,
         prevY = 0,
@@ -52,8 +52,8 @@ window.interactDemo = (function(interact) {
             height;
 
         if (element.nodeName in svgTags) {
-            width = Number(element.getAttributeNS(null, 'width'));
-            height = Number(element.getAttributeNS(null, 'height'));
+            width = Number(element.getAttribute('width'));
+            height = Number(element.getAttribute('height'));
         } else {
             width = element.style.width;
             height = element.style.height;
@@ -114,7 +114,6 @@ window.interactDemo = (function(interact) {
             height = window.innerHeight,
             x,
             y,
-            translate,
             i,
             buttunFunction = function (e) {
                 e.target.innerHTML = e.type;
@@ -147,8 +146,7 @@ window.interactDemo = (function(interact) {
             x = Math.random()*(width - 200);
             y = Math.random()*(width - 200);
 
-            translate = ['translate(', x, ', ', y, ')'].join('');
-            newGraphic.setAttributeNS (null, 'transform', translate );
+            setTransform(newGraphic, 'translate', [x, y]);
 
             rect = document.createElementNS(svgNS, 'rect');
             rect.interactDemo = true;
@@ -233,10 +231,10 @@ window.interactDemo = (function(interact) {
     function setSize(element, x, y) {
         if (element.nodeName in svgTags) {
             if (typeof x === 'number') {
-                element.setAttributeNS(null, 'width', x);
+                element.setAttribute('width', x);
             }
             if (typeof y === 'number') {
-                element.setAttributeNS(null, 'height', y);
+                element.setAttribute('height', y);
             }
         } else {
             if (typeof x === 'number') {
@@ -254,6 +252,20 @@ window.interactDemo = (function(interact) {
             }
         }
     }
+    
+    function changeSize(element, dx, dy, minx, miny) {
+        var size = getSize(element),
+            width = size.x,
+            height = size.y;
+        
+        minx = Number(minx) || minSize;
+        miny = Number(miny) || minSize;
+        
+        width = Math.max(width + dx, minx);
+        height = Math.max(height + dy, miny);
+        
+        setSize(element, width, height);
+    }
 
     function getPosition(element){
         var clientRect = element.getBoundingClientRect(),
@@ -262,25 +274,10 @@ window.interactDemo = (function(interact) {
             top;
 
         if (element.nodeName in svgTags) {
-            var svgElement = element.ownerSVGElement,
-                svgParent = svgElement.parentNode,
-                svgParentPosition = getPosition(svgParent),
-                svgParentStyle = window.getComputedStyle(svgParent),
-                matrix = element.getTransformToElement(svgElement);
+            var matrix = element.getTransformToElement(element.ownerSVGElement);
 
-            // using transform matrix seems a little slow in Opera
             left = matrix.e;
             top = matrix.f;
-/*
-            left -= (svgParentPosition.x +
-                parseStyleLength(svgParent, svgParentStyle.marginLeft) +
-                parseStyleLength(svgParent, svgParentStyle.paddingLeft) +
-                parseStyleLength(svgParent, svgParentStyle.borderLeftWidth));
-            top -= (svgParentPosition.y +
-                parseStyleLength(svgParent, svgParentStyle.marginTop) +
-                parseStyleLength(svgParent, svgParentStyle.paddingTop) +
-                parseStyleLength(svgParent, svgParentStyle.borderTopWidth));
-*/
         } else {
             left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
             top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginTop);
@@ -294,7 +291,7 @@ window.interactDemo = (function(interact) {
         if (element.nodeName in svgTags) {
             if (typeof x === 'number' && typeof y === 'number') {
                 translate = 'translate(' + x + ', ' + y + ')';
-                element.parentNode.setAttributeNS(null, 'transform', translate);
+                element.parentNode.setAttribute('transform', translate);
             }
         } else if (typeof x === 'number' && typeof y === 'number') {
             element.style.setProperty('left', x + 'px', '');
@@ -307,11 +304,11 @@ window.interactDemo = (function(interact) {
             x,
             y;
 
-        if (element.nodeName in svgTags) {
-            if (typeof dx === 'number' && typeof dy === 'number') {
+    if (element.nodeName in svgTags) {
+        if (typeof dx === 'number' && typeof dy === 'number') {
                 variable = getTransform(element, 'translate');
-                x = new Number(variable[0]);
-                y = new Number(variable[1]);
+                x = Number(variable[0]);
+                y = Number(variable[1]);
 
                 setTransform(element, 'translate',  [ x + dx, y + dy]);
             }
@@ -319,13 +316,13 @@ window.interactDemo = (function(interact) {
             variable = window.getComputedStyle(element);
             x = parseStyleLength(element, variable.left);
             y = parseStyleLength(element, variable.top);
-            
+
             setPosition(element, x + dx, y + dy);
         }
     }
 
     function setTransform(element, property, valueArray) {
-        var transform = element.getAttribute('transform'),
+        var transform = element.getAttribute('transform') || property + '(0, 0)',
             transformFunction,
             regExp;
 
@@ -336,7 +333,7 @@ window.interactDemo = (function(interact) {
         }
 
         // To remove the property from the previous transform attribute
-        regExp = new RegExp('/([\s\S]*)(?:' + property + '\\s*\\(\\s*)[^\\)]+\\)([\\s\\S]*)/', 'i');
+        regExp = new RegExp('/([\\s\\S]*)(?:' + property + '\\s*\\(\\s*)[^\\)]+\\)([\\s\\S]*)/', 'i');
         transform = transform.match(regExp);
         if (transform) {
             transform = transform[0];
@@ -351,7 +348,7 @@ window.interactDemo = (function(interact) {
     }
 
     function getTransform(element, property) {
-        var transform = element.getAttribute('transform'),
+        var transform = element.getAttribute('transform') || property + '(0, 0)',
             transformations = {
                 translate: 2,
                 scale: 2,
@@ -361,9 +358,9 @@ window.interactDemo = (function(interact) {
                 matrix: 6
             },
             regExp = new RegExp(property + '\\s*\\(\\s*[^)]*\\)', 'i'),
-            r;
+            r = [0, 0, 0];
 
-        if (property in transformations && (transform = transform.match(regExp))) {
+        if (property in transformations && transform && (transform = transform.match(regExp))) {
 
             if (transform) {
                 transform = transform[0];
@@ -427,79 +424,70 @@ window.interactDemo = (function(interact) {
     }
 
     function realtimeMove(e) {
-        var position = getPosition(e.target),
-            left = position.x + (e.detail.pageX - prevX),
-            top = position.y + (e.detail.pageY - prevY);
-
-        setPosition(e.target, left, top);
+        if (e.target.nodeName in svgTags) {
+            changePosition(e.target.parentNode, e.detail.pageX - prevX, e.detail.pageY - prevY);
+        } else {
+            changePosition(e.target, e.detail.pageX - prevX, e.detail.pageY - prevY);
+        }
     }
 
     function staticMove(e) {
-        var position = getPosition(e.target),
-            left = position.x + e.detail.dx,
-            top = position.y + e.detail.dy,
-            debug = '';
-
-        setPosition(e.target, left, top);
+        if (e.target.nodeName in svgTags) {
+            changePosition(e.target.parentNode, e.detail.dx, e.detail.dy);
+        } else {
+            changePosition(e.target, e.detail.dx, e.detail.dy);
+        }
     }
 
     function staticResize(e) {
         var target = e.target,
             size = getSize(target),
-            newWidth = Math.max((size.x + e.detail.dx), minSize),
-            newHeight = Math.max((size.y + e.detail.dy), minSize);
+            dx = event.detail.dx,
+            dy = event.detail.dy;
 
         // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
-            if (newWidth > newHeight) {
-                newHeight = newWidth;
+            if (dx > dy) {
+                dy = dx;
             } else {
-                newWidth = newHeight;
+                dx = dy;
             }
         }
 
-        setSize(target, newWidth, newHeight);
+        changeSize(target, dx, dy);
     }
 
-    function ResizeMove(e) {
+    function realtimeResize(e) {
         var target = e.target,
             position = getPosition(target),
-            size,
             newWidth,
-            newHeight;
+            newHeight,
+            dx = 0,
+            dy = 0;
 
-        if (e.detail.pageX < (position.x + minSize + margin)) {
-            newWidth = null;
-        } else {
-            size = getSize(target);
-            newWidth = (e.detail.axes === 'x' || e.detail.axes === 'xy' )?
-                Math.max(size.x + (e.detail.pageX - prevX), minSize):
-                null;
+        // + (margin * 1.5) so the mouse must be in the middle of the margin space
+        if ((e.detail.axes === 'x' || e.detail.axes === 'xy') && e.detail.pageX > position.x + (margin * 1.5)) {
+            dx = Math.max(e.detail.pageX - prevX);
         }
-        if (e.detail.pageY < (position.y + minSize + margin)) {
-            newHeight = null;
-        } else {
-            size = size || getSize(target);
-            newHeight = (e.detail.axes === 'y' || e.detail.axes === 'xy' )?
-                Math.max(size.y + (e.detail.pageY - prevY), minSize):
-                null;
+
+        if ((e.detail.axes === 'y' || e.detail.axes === 'xy') && e.detail.pageY > position.y + (margin * 1.5)) {
+            dy = Math.max(e.detail.pageY - prevY);
         }
 
         // Square resizing when Shift key is held
         if (e.detail.shiftKey) {
-            if (newWidth > newHeight) {
-                newHeight = newWidth;
+            if (dx > dy) {
+                dy = dx;
             } else {
-                newWidth = newHeight;
+                dx = dy;
             }
         }
-
-        setSize(target, newWidth, newHeight);
+        changeSize(target, dx, dy);
     }
 
     function realtimeUpdate(newValue) {
         if (newValue !== undefined) {
-            return realtime = Boolean(newValue);
+            return (realtime = Boolean(newValue));
         } else {
             return realtime;
         }
@@ -513,7 +501,7 @@ window.interactDemo = (function(interact) {
 
     document.addEventListener('interactresizemove', function (e) {
         if (realtime) {
-            ResizeMove(e);
+            realtimeResize(e);
         }
     });
 
@@ -571,6 +559,7 @@ window.interactDemo = (function(interact) {
     interactDemo.getTransform = getTransform;
     interactDemo.setTransform = setTransform;
     interactDemo.changePosition = changePosition;
+    interactDemo.changeSize = changeSize;
 
     if (!('$' in window)) {
         window.$ = function (id) {
@@ -581,15 +570,18 @@ window.interactDemo = (function(interact) {
 }(window.interact));
 
 window.setTimeout(function () {
+    'use strict';
+    
     window.s = document.querySelector('svg');
     window.g = document.getElementById('graphic0');
     window.r = document.querySelector('#graphic0 rect');
-    p = s.createSVGPoint();
+    window.p = window.s.createSVGPoint();
+    window.d = document.getElementById('node0');
+    changeSize(g, 50, 50);
 }, 500);
 
-
-
-window.getTransform = interactDemo.getTransform;
-window.setTransform = interactDemo.setTransform;
-window.changePosition = interactDemo.changePosition;
+window.getTransform = window.interactDemo.getTransform;
+window.setTransform = window.interactDemo.setTransform;
+window.changePosition = window.interactDemo.changePosition;
+window.changeSize = window.interactDemo.changeSize;
 
