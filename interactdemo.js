@@ -31,43 +31,9 @@ window.interactDemo = (function(interact) {
 
         interact = interact || window.interact;
         if (!interact) {
+            console.log('interact not included');
             return;
         }
-
-    function parseStyleLength(element, string) {
-        var lastChar = string[string.length - 1];
-
-        if (lastChar === 'x') {
-            return Number(string.substring(string.length - 2, 0));
-        } else if (lastChar === '%') {
-            return parseStyleLength(element.parentNode) * Number(string.substring(string.length - 1, 0)) / 100;
-        } else if (lastChar === 'm') {
-            // Not Ready ***
-            return Number(string.substring(string.length - 2, 0)) * parseStyleLength(element, window.getComputedStyle(element).fontSize);
-        }
-        return string;
-    }
-    function getSize(element) {
-        var width,
-            height;
-
-        if (element.nodeName in svgTags) {
-            width = Number(element.getAttribute('width'));
-            height = Number(element.getAttribute('height'));
-        } else {
-            width = element.style.width;
-            height = element.style.height;
-
-            if(width !== '') {
-                width = parseStyleLength(element, width);
-                height  = parseStyleLength(element, height);
-            } else {
-                width = parseStyleLength(element, window.getComputedStyle(element).width);
-                height = parseStyleLength(element, window.getComputedStyle(element).height);
-            }
-        }
-        return {x: width, y: height};
-    }
 
     function divActionChecker(event) {
         var target = (event.currentTarget === document)? event.target: event.currentTarget,
@@ -118,14 +84,15 @@ window.interactDemo = (function(interact) {
 
         if (!svg) {
             svg = document.createElementNS(svgNS, 'svg');
-            svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
-            svg.setAttributeNS (null, 'width', width);
-            svg.setAttributeNS (null, 'height', height);
+            svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+            svg.setAttribute('width', width);
+            svg.setAttribute('height', height);
 
             document.body.appendChild(svg);
+            window.s = svg;
         }
 
-        if (n < 0 || typeof n !== 'number') {
+        if (n < 0 || !Number(n)) {
             n = 5;
         }
 
@@ -135,9 +102,9 @@ window.interactDemo = (function(interact) {
             newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
             newGraphic.style.setProperty('class', 'interact-demo-node');
             newGraphic.id = 'graphic' + i;
-            newGraphic.setAttributeNS (null, 'fill', '#ee0');
-            newGraphic.setAttributeNS (null, 'stroke', '#000');
-            newGraphic.setAttributeNS (null, 'stroke-width', '2px');
+            newGraphic.setAttribute('fill', '#ee0');
+            newGraphic.setAttribute('stroke', '#000');
+            newGraphic.setAttribute('stroke-width', '2px');
 
             x = Math.random()*(width - 200);
             y = Math.random()*(height - 200);
@@ -146,23 +113,24 @@ window.interactDemo = (function(interact) {
 
             rect = document.createElementNS(svgNS, 'rect');
             rect.interactDemo = true;
-            rect.setAttributeNS (null, 'width', 150);
-            rect.setAttributeNS (null, 'height', 150);
+            rect.setAttribute('width', 150);
+            rect.setAttribute('height', 150);
             newGraphic.appendChild(rect);
+            window['r'+i] = rect;
 
             text = newGraphic.appendChild(document.createElementNS( svgNS, 'text'));
-            text.setAttributeNS (null, 'fill', '#000');
-            text.setAttributeNS (null, 'stroke', '#000');
-            text.setAttributeNS (null, 'stroke-width', '0px');
+            text.setAttribute('fill', '#000');
+            text.setAttribute('stroke', '#000');
+            text.setAttribute('stroke-width', '0px');
             rect.text = text;
 
             title = newGraphic.appendChild(document.createElementNS(svgNS, 'text'));
             title.textContent = newGraphic.id;
-            title.setAttributeNS (null, 'fill', '#000');
-            title.setAttributeNS (null, 'stroke', '#000');
-            title.setAttributeNS (null, 'stroke-width', '0px');
-            title.setAttributeNS (null, 'x', 50);
-            title.setAttributeNS (null, 'y', 20);
+            title.setAttribute('fill', '#000');
+            title.setAttribute('stroke', '#000');
+            title.setAttribute('stroke-width', '0px');
+            title.setAttribute('x', 50);
+            title.setAttribute('y', 20);
 
             interact.set(rect, {
                 drag: true,
@@ -172,6 +140,7 @@ window.interactDemo = (function(interact) {
             window['g' + i] = newGraphic;
         }
     }
+
     /**
      * @function
      * @description Introduce random draggable, resizeable nodes to the document (for testing)
@@ -222,6 +191,42 @@ window.interactDemo = (function(interact) {
             });
             window['d' + i] = newDiv;
         }
+    }
+
+    function parseStyleLength(element, string) {
+        var lastChar = string[string.length - 1];
+
+        if (lastChar === 'x') {
+            return Number(string.substring(string.length - 2, 0));
+        } else if (lastChar === '%') {
+            return parseStyleLength(element.parentNode) * Number(string.substring(string.length - 1, 0)) / 100;
+        } else if (lastChar === 'm') {
+            // Not Ready ***
+            return Number(string.substring(string.length - 2, 0)) * parseStyleLength(element, window.getComputedStyle(element).fontSize);
+        }
+        return string;
+    }
+
+    function getSize(element) {
+        var width,
+            height;
+
+        if (element.nodeName in svgTags) {
+            width = Number(element.getAttribute('width'));
+            height = Number(element.getAttribute('height'));
+        } else {
+            width = element.style.width;
+            height = element.style.height;
+
+            if(width !== '') {
+                width = parseStyleLength(element, width);
+                height  = parseStyleLength(element, height);
+            } else {
+                width = parseStyleLength(element, window.getComputedStyle(element).width);
+                height = parseStyleLength(element, window.getComputedStyle(element).height);
+            }
+        }
+        return {x: width, y: height};
     }
 
     function setSize(element, x, y) {
@@ -300,8 +305,8 @@ window.interactDemo = (function(interact) {
             x,
             y;
 
-    if (element.nodeName in svgTags) {
-        if (typeof dx === 'number' && typeof dy === 'number') {
+        if (element.nodeName in svgTags) {
+            if (typeof dx === 'number' && typeof dy === 'number') {
                 variable = getTransform(element, 'translate');
                 x = Number(variable[0]);
                 y = Number(variable[1]);
@@ -315,32 +320,6 @@ window.interactDemo = (function(interact) {
 
             setPosition(element, x + dx, y + dy);
         }
-    }
-
-    function setTransform(element, property, valueArray) {
-        var transform = element.getAttribute('transform') || property + '(0, 0)',
-            transformFunction,
-            regExp;
-
-        if (!property) {
-            element.setAttribute('transform', '');
-        } else if (typeof property !== 'string') {
-            return false;
-        }
-
-        // To remove the property from the previous transform attribute
-        regExp = new RegExp('/([\\s\\S]*)(?:' + property + '\\s*\\(\\s*)[^\\)]+\\)([\\s\\S]*)/', 'i');
-        transform = transform.match(regExp);
-        if (transform) {
-            transform = transform[0];
-        } else {
-            transform = '';
-        }
-        if (typeof valueArray === 'object') {
-            valueArray = valueArray.join(', ');
-        }
-        transformFunction = property + '(' + valueArray + ') ';
-        element.setAttribute('transform', transformFunction + transform);
     }
 
     function getTransform(element, property) {
@@ -371,6 +350,32 @@ window.interactDemo = (function(interact) {
         return r;
     }
 
+    function setTransform(element, property, valueArray) {
+        var transform = element.getAttribute('transform') || property + '(0, 0)',
+            transformFunction,
+            regExp;
+
+        if (!property) {
+            element.setAttribute('transform', '');
+        } else if (typeof property !== 'string') {
+            return false;
+        }
+
+        // To remove the property from the previous transform attribute
+        regExp = new RegExp('/([\\s\\S]*)(?:' + property + '\\s*\\(\\s*)[^\\)]+\\)([\\s\\S]*)/', 'i');
+        transform = transform.match(regExp);
+        if (transform) {
+            transform = transform[0];
+        } else {
+            transform = '';
+        }
+        if (typeof valueArray === 'object') {
+            valueArray = valueArray.join(', ');
+        }
+        transformFunction = property + '(' + valueArray + ') ';
+        element.setAttribute('transform', transformFunction + transform);
+    }
+
     // Display event properties for debugging
     function nodeEventDebug(e) {
         var textProp,
@@ -392,13 +397,13 @@ window.interactDemo = (function(interact) {
     }
 
     function eventProps(e) {
-        var debug = '',
+        var debug = [],
             prop;
         if (typeof e.detail === 'object') {
-            debug += 'event.detail: ';
+            debug.push['event.detail: '];
             for (prop in e.detail) {
                 if (e.detail.hasOwnProperty(prop)) {
-                    debug += '\n    ' + prop + ' : ' + e.detail[prop];
+                    debug.push('\n    ' + prop + ' : ' + e.detail[prop]);
                 }
             }
         }
@@ -406,25 +411,17 @@ window.interactDemo = (function(interact) {
             debug += 'touches[0]: ';
             for (prop in e.touches[0]) {
                 if (e.touches[0].hasOwnProperty(prop)) {
-                    debug += '\n    ' + prop + ' : ' + e.touches[0][prop];
+                    debug.push('\n    ' + prop + ' : ' + e.touches[0][prop]);
                 }
             }
         }
         for (prop in e) {
             if (e.hasOwnProperty(prop)) {
-                debug += '\n' + prop + ' : ' + e[prop];
+                debug.push('\n' + prop + ' : ' + e[prop]);
             }
         }
 
-        return debug;
-    }
-
-    function realtimeMove(e) {
-        if (e.target.nodeName in svgTags) {
-            changePosition(e.target.parentNode, e.detail.pageX - prevX, e.detail.pageY - prevY);
-        } else {
-            changePosition(e.target, e.detail.pageX - prevX, e.detail.pageY - prevY);
-        }
+        return debug.join('');
     }
 
     function staticMove(e) {
@@ -432,6 +429,14 @@ window.interactDemo = (function(interact) {
             changePosition(e.target.parentNode, e.detail.dx, e.detail.dy);
         } else {
             changePosition(e.target, e.detail.dx, e.detail.dy);
+        }
+    }
+
+    function realtimeMove(e) {
+        if (e.target.nodeName in svgTags) {
+            changePosition(e.target.parentNode, e.detail.pageX - prevX, e.detail.pageY - prevY);
+        } else {
+            changePosition(e.target, e.detail.pageX - prevX, e.detail.pageY - prevY);
         }
     }
 
@@ -470,6 +475,11 @@ window.interactDemo = (function(interact) {
             return realtime;
         }
     }
+    
+    function setPrevMouse(e) {
+        prevX = e.detail.pageX;
+        prevY = e.detail.pageY;
+    }
 
     document.addEventListener('interactresizeend', function (e) {
         if (!realtime) {
@@ -503,23 +513,12 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragmove', nodeEventDebug);
     document.addEventListener('interactdragend', nodeEventDebug);
 
-    // These events must happen after the others so preVx !== e.detail.pageX for other event listeners
-    document.addEventListener('interactdragstart', function(e) {
-        prevX = e.detail.pageX;
-        prevY = e.detail.pageY;
-    });
-    document.addEventListener('interactdragmove', function(e) {
-        prevX = e.detail.pageX;
-        prevY = e.detail.pageY;
-    });
-    document.addEventListener('interactresizestart', function(e) {
-        prevX = e.detail.pageX;
-        prevY = e.detail.pageY;
-    });
-    document.addEventListener('interactresizemove', function(e) {
-        prevX = e.detail.pageX;
-        prevY = e.detail.pageY;
-    });
+    // These listeners must be triggered after the others
+    // so prevX !== e.detail.pageX for other event listeners
+    document.addEventListener('interactdragstart', setPrevMouse);
+    document.addEventListener('interactdragmove', setPrevMouse);
+    document.addEventListener('interactresizestart', setPrevMouse);
+    document.addEventListener('interactresizemove', setPrevMouse);
 
     interactDemo.randomDivs = randomDivs;
     interactDemo.randomGraphics = randomGraphics;
@@ -546,16 +545,6 @@ window.interactDemo = (function(interact) {
     }
     return interactDemo;
 }(window.interact));
-
-window.setTimeout(function () {
-    'use strict';
-
-    window.s = document.querySelector('svg');
-    window.g = document.getElementById('graphic0');
-    window.r = document.querySelector('#graphic0 rect');
-    window.p = window.s.createSVGPoint();
-    window.d = document.getElementById('node0');
-}, 500);
 
 window.getTransform = window.interactDemo.getTransform;
 window.setTransform = window.interactDemo.setTransform;
