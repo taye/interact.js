@@ -291,7 +291,7 @@ window.interact = (function () {
                 events.remove(docTarget, moveEvent, 'all');
             }
             action = target.getAction(event);
-            
+
             document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
             actions[action].ready();
         }
@@ -356,9 +356,8 @@ window.interact = (function () {
         // Add and remove appropriate events
         events.remove(docTarget, moveEvent, resizeMove);
         events.remove(docTarget, moveEvent, dragMove);
-        events.add(docTarget, upEvent, docMouseUp, false);
         events.add(docTarget, moveEvent, mouseMove);
-        
+
         document.documentElement.style.cursor = '';
         mouseIsDown = false;
         clearTarget();
@@ -535,7 +534,7 @@ window.interact = (function () {
         };
     };
     interact.removeClass = removeClass;
-    
+
     events.add(docTarget, upEvent, docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
     events.add(docTarget, moveEvent, mouseMove, 'true');

@@ -66,7 +66,7 @@ window.interactDemo = (function(interact) {
                 height = parseStyleLength(element, window.getComputedStyle(element).height);
             }
         }
-        return {x: width,y: height};
+        return {x: width, y: height};
     }
 
     function divActionChecker(event) {
@@ -84,10 +84,7 @@ window.interactDemo = (function(interact) {
 
     function graphicActionChecker(event) {
         var target = (event.currentTarget === document)? event.target: event.currentTarget,
-/*            clientRect = target.parentNode.getBoundingClientRect(),
-            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
-            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
-*/            clientRect = target.getBoundingClientRect(),
+            clientRect = target.getBoundingClientRect(),
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
             axes = (right?'x': '') + (bottom?'y': ''),
@@ -124,7 +121,6 @@ window.interactDemo = (function(interact) {
             svg.setAttributeNS (null, 'viewBox', '0 0 ' + width + ' ' + height);
             svg.setAttributeNS (null, 'width', width);
             svg.setAttributeNS (null, 'height', height);
- //           svg.style.setProperty('margin', 0);
 
             document.body.appendChild(svg);
         }
@@ -137,14 +133,14 @@ window.interactDemo = (function(interact) {
 
         for (i = 0; i < n; i++) {
             newGraphic = svg.appendChild(document.createElementNS(svgNS, 'g'));
-//            newGraphic.style.setProperty('class', 'interact-demo-node');
+            newGraphic.style.setProperty('class', 'interact-demo-node');
             newGraphic.id = 'graphic' + i;
             newGraphic.setAttributeNS (null, 'fill', '#ee0');
             newGraphic.setAttributeNS (null, 'stroke', '#000');
             newGraphic.setAttributeNS (null, 'stroke-width', '2px');
 
             x = Math.random()*(width - 200);
-            y = Math.random()*(width - 200);
+            y = Math.random()*(height - 200);
 
             setTransform(newGraphic, 'translate', [x, y]);
 
@@ -252,18 +248,18 @@ window.interactDemo = (function(interact) {
             }
         }
     }
-    
+
     function changeSize(element, dx, dy, minx, miny) {
         var size = getSize(element),
             width = size.x,
             height = size.y;
-        
+
         minx = Number(minx) || minSize;
         miny = Number(miny) || minSize;
-        
+
         width = Math.max(width + dx, minx);
         height = Math.max(height + dy, miny);
-        
+
         setSize(element, width, height);
     }
 
@@ -441,18 +437,8 @@ window.interactDemo = (function(interact) {
 
     function staticResize(e) {
         var target = e.target,
-            size = getSize(target),
             dx = event.detail.dx,
             dy = event.detail.dy;
-
-        // Square resizing when Shift key is held
-        if (e.detail.shiftKey) {
-            if (dx > dy) {
-                dy = dx;
-            } else {
-                dx = dy;
-            }
-        }
 
         changeSize(target, dx, dy);
     }
@@ -474,14 +460,6 @@ window.interactDemo = (function(interact) {
             dy = Math.max(e.detail.pageY - prevY);
         }
 
-        // Square resizing when Shift key is held
-        if (e.detail.shiftKey) {
-            if (dx > dy) {
-                dy = dx;
-            } else {
-                dx = dy;
-            }
-        }
         changeSize(target, dx, dy);
     }
 
@@ -571,13 +549,12 @@ window.interactDemo = (function(interact) {
 
 window.setTimeout(function () {
     'use strict';
-    
+
     window.s = document.querySelector('svg');
     window.g = document.getElementById('graphic0');
     window.r = document.querySelector('#graphic0 rect');
     window.p = window.s.createSVGPoint();
     window.d = document.getElementById('node0');
-    changeSize(g, 50, 50);
 }, 500);
 
 window.getTransform = window.interactDemo.getTransform;
