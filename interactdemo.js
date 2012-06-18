@@ -84,7 +84,7 @@ window.interactDemo = (function(interact) {
 
         if (!svg) {
             svg = document.createElementNS(svgNS, 'svg');
-            svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+            svg.setAttribute('viewBox', '0 0 0 0');
             svg.setAttribute('width', width);
             svg.setAttribute('height', height);
 
@@ -269,17 +269,19 @@ window.interactDemo = (function(interact) {
     }
 
     function getPosition(element){
-        var clientRect = element.getBoundingClientRect(),
-            compStyle = window.getComputedStyle(element),
-            left,
+        var left,
             top;
 
         if (element.nodeName in svgTags) {
-            var matrix = element.getTransformToElement(element.ownerSVGElement);
+            var screenCTM = element.getScreenCTM();
 
-            left = matrix.e;
-            top = matrix.f;
+            left = screenCTM.e;
+            top = screenCTM.f;
         } else {
+            var clientRect = element.getBoundingClientRect(),
+                compStyle = window.getComputedStyle(element);
+                
+            
             left = clientRect.left + window.scrollX - parseStyleLength(element, compStyle.marginLeft),
             top = clientRect.top + window.scrollY - parseStyleLength(element, compStyle.marginTop);
         }
@@ -477,8 +479,8 @@ window.interactDemo = (function(interact) {
     }
     
     function setPrevMouse(e) {
-        prevX = e.detail.pageX;
-        prevY = e.detail.pageY;
+        prevX = e.pageX || e.detail.pageX;
+        prevY = e.pageX || e.detail.pageY;
     }
 
     document.addEventListener('interactresizeend', function (e) {
