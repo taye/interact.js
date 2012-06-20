@@ -16,7 +16,16 @@ window.interact = (function () {
         x0 = 0,
         y0 = 0,
         interactNodes = [],
-        nodeStyle,
+        svgTags = {
+            g: 'g',
+            rect: 'rect',
+            circle: 'circle',
+            ellipse: 'ellipse',
+            text: 'text',
+            path: 'path',
+            line: 'line',
+            image: 'image'
+        },
         target = null,
         supportsTouch = 'createTouch' in document,
         margin = supportsTouch ? 30 : 10,
@@ -28,6 +37,9 @@ window.interact = (function () {
             resizex: {
                 cursor: 'e-resize',
                 ready: function () {
+                    if (!target.resize) {
+                        return false;
+                    }
                     resizeAxes = 'x';
                     events.add(docTarget, moveEvent, resizeMove);
                     addClass(target.element, 'interact-target interact-resizex');
@@ -37,6 +49,9 @@ window.interact = (function () {
             resizey: {
                 cursor: 's-resize',
                 ready: function () {
+                    if (!target.resize) {
+                        return false;
+                    }
                     resizeAxes = 'y';
                     events.add(docTarget, moveEvent, resizeMove);
                     addClass(target.element, 'interact-target interact-resizey');
@@ -45,6 +60,9 @@ window.interact = (function () {
             resizexy: {
                 cursor: 'se-resize',
                 ready: function () {
+                    if (!target.resize) {
+                        return false;
+                    }
                     resizeAxes = 'xy';
                     events.add(docTarget, moveEvent, resizeMove);
                     addClass(target.element, 'interact-target interact-resizexy');
@@ -53,6 +71,9 @@ window.interact = (function () {
             drag: {
                 cursor: 'move',
                 ready: function () {
+                    if (!target.drag) {
+                        return false;
+                    }
                     events.add(docTarget, moveEvent, dragMove);
                     addClass(target.element, 'interact-target interact-dragging');
                 }
@@ -237,14 +258,32 @@ window.interact = (function () {
     }
 
     function autoCheck(event) {
-        var clientRect = target.element.getClientRects()[0],
-            action,
-            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
+        var clientRect,
+            right,
+            bottom,
+            action;
+            
+        if (target.element.nodeName in svgTags) {
+            clientRect = target.element.getBoundingClientRect();
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
+            resizeAxes = (right?'x': '') + (bottom?'y': '');
+            action = (resizeAxes && target.resize)?
+                'resize' + resizeAxes:
+                'drag';
+
+            return action;
+        }
+        
+        clientRect = target.element.getClientRects()[0];
+        action,
+        right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
+        bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
 
         resizeAxes = (right?'x': '') + (bottom?'y': '');
-        action = (resizeAxes && target.resize)? 'resize' + resizeAxes:
-            (target.drag)? 'drag': '';
+        action = (resizeAxes && target.resize)?
+            'resize' + resizeAxes:
+            'drag';
 
         return action;
     }
@@ -362,21 +401,24 @@ window.interact = (function () {
         mouseIsDown = false;
         clearTarget();
     }
-
+    
     /** @private */
-    function getInteractNode(element, option) {
+    interactNodes.indexOf = function (element) {
         var i;
-
-        for(i=0; i < interactNodes.length; i++) {
+        
+        for (i = 0; i < interactNodes.length; i++) {
             if (interactNodes[i].element === element) {
-                if(option === 'test') {
-                    return true;
-                } else {
-                    return interactNodes[i];
-                }
+                return i;
             }
         }
-        return null;
+        return -1;
+    }
+
+    /** @private */
+    function getInteractNode(element) {
+        var i = interactNodes.indexOf(element) ;
+        
+        return interactNodes[i];
     }
 
     /** @private */
@@ -430,12 +472,11 @@ window.interact = (function () {
     /**
      * @function
      * @description Add an element to the list of interact nodes
-     * @param {object HTMLElement} element The DOM Element that will be added
+     * @param {object HTMLElement} {object SVGElement} element The DOM Element that will be added
      * @param {object} options An object whose properties are the drag/resize options
      */
     interact.set = function (element, options) {
-        var nodeAlreadySet = getInteractNode(element, 'test'),
-            i = 0,
+        var indexOfElement = interactNodes.indexOf(element),
             newNode;
 
         if (typeof options !== 'object') {
@@ -449,8 +490,8 @@ window.interact = (function () {
             getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck
         };
 
-        if (nodeAlreadySet) {
-            interactNodes[i] = newNode;
+        if (indexOfElement !== -1) {
+            interactNodes[indexOfElement] = newNode;
         } else {
             events.add(newNode, downEvent, mouseDown, false);
             interactNodes.push(newNode);
@@ -465,16 +506,14 @@ window.interact = (function () {
      * @param {object HTMLElement} element The DOM Element that will be removed
      */
     interact.unset = function (element) {
-        var i;
+        var i = interactNodes.indexOf(element);
 
-        for (i = 0; i < interactNodes.length; i++) {
-            if (interactNodes[i].element === element) {
-                interactNodes.splice(i, 1);
-                events.removeAll(interactNodes[i]);
-            }
+        if (i !== -1) {
+            events.removeAll(interactNodes[i]);
+            interactNodes.splice(i, 1);
+            removeClass(element, 'interact-node interact-target interact-dragging interact-draggable interact-resizeable interact-resize-xy interact-resize-x interact-resize-y');
         }
 
-        removeClass(element, 'interact-node interact-target interact-dragging interact-draggable interact-resizeable interact-resize-xy interact-resize-x interact-resize-y');
     };
 
     /**
@@ -486,14 +525,9 @@ window.interact = (function () {
     interact.isSet = function(element) {
         var i;
 
-        for(i = 0; i < interactNodes.length; i++) {
-            if (interactNodes[i].element === element) {
-                return true;
-            }
-        }
-        return false;
+        return interactNodes.indexOf(element !== -1);
     };
-
+        
 
     /**
      * @function
@@ -517,8 +551,8 @@ window.interact = (function () {
      */
     interact.debug = function () {
         console.log('target         :  ' + target);
-        console.log('prevX, prevY   :  ' + prevX + ', ' + prevY);
-        console.log('x0, y0         :  ' + x0 + ', ' + y0);
+        console.log('prevX, prevY   :  ' + prevX, prevY);
+        console.log('x0, y0         :  ' + x0, y0);
         console.log('supportsTouch  :  ' + supportsTouch);
         console.log('mouseIsDown    :  ' + mouseIsDown);
 
@@ -534,6 +568,7 @@ window.interact = (function () {
         };
     };
     interact.removeClass = removeClass;
+    window.nodes = interactNodes;
 
     events.add(docTarget, upEvent, docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
