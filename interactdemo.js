@@ -134,8 +134,7 @@ window.interactDemo = (function(interact) {
 
             interact.set(rect, {
                 drag: true,
-                resize: true,
-                actionChecker: graphicActionChecker
+                resize: true
             });
             window['g' + i] = newGraphic;
         }
@@ -186,8 +185,7 @@ window.interactDemo = (function(interact) {
 
             interact.set(newDiv, {
                 drag: true,
-                resize: true,
-                actionChecker: divActionChecker
+                resize: true
             });
             window['d' + i] = newDiv;
         }
@@ -436,7 +434,12 @@ window.interactDemo = (function(interact) {
 
     function realtimeMove(e) {
         if (e.target.nodeName in svgTags) {
-            changePosition(e.target.parentNode, e.detail.pageX - prevX, e.detail.pageY - prevY);
+            changePosition(
+                e.target.nodeName === 'g'?
+                    e.target:
+                    e.target.parentNode,
+                e.detail.pageX - prevX,
+                e.detail.pageY - prevY);
         } else {
             changePosition(e.target, e.detail.pageX - prevX, e.detail.pageY - prevY);
         }
