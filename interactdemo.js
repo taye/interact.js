@@ -489,10 +489,10 @@ window.interactDemo = (function(interact) {
                 e.target.nodeName === 'g'?
                     e.target:
                     e.target.parentNode,
-                e.detail.pageX - prevX,
-                e.detail.pageY - prevY);
+                e.detail.dx,
+                e.detail.dy);
         } else {
-            changePosition(e.target, e.detail.pageX - prevX, e.detail.pageY - prevY);
+            changePosition(e.target, e.detail.dx, e.detail.dy);
         }
     }
 
@@ -514,11 +514,11 @@ window.interactDemo = (function(interact) {
 
         // + (margin * 1.5) so the mouse must be in the middle of the margin space
         if ((e.detail.axes === 'x' || e.detail.axes === 'xy') && e.detail.pageX > position.x + (margin * 1.5)) {
-            dx = Math.max(e.detail.pageX - prevX);
+            dx = Math.max(e.detail.dx);
         }
 
         if ((e.detail.axes === 'y' || e.detail.axes === 'xy') && e.detail.pageY > position.y + (margin * 1.5)) {
-            dy = Math.max(e.detail.pageY - prevY);
+            dy = Math.max(e.detail.dy);
         }
 
         changeSize(target, dx, dy);
