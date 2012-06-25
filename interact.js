@@ -26,6 +26,49 @@ window.interact = (function () {
             line: 'line',
             image: 'image'
         },
+        autoScrollMargin = 70,
+        scrollDistance = 30,
+        topEdge = document.createElement('div'),
+        rightEdge = document.createElement('div'),
+        bottomEdge = document.createElement('div'),
+        leftEdge = document.createElement('div'),
+        edgeCSS = [
+            'position: fixed !important;',
+            'background-color: transparent !important;',
+            'z-index: 9000 !important;',
+            'margin: 0 !important;',
+            'padding: 0 !important;',
+            'border: none 0 !important;'
+        ].join('\n'),
+        topEdgeCSS = [
+            '',
+            'top: 0;',
+            'left: 0;',
+            'width: ' + window.screen.width * 4 + 'px !important;',
+            'height: ' + autoScrollMargin + 'px !important;'
+        ].join('\n'),
+        rightEdgeCSS = [
+            '',
+            'top: 0;',
+            'right: 0;',
+            'width: ' + autoScrollMargin + 'px !important;',
+            'height: ' + window.screen.height * 4 + 'px !important;'
+        ].join('\n'),
+        bottomEdgeCSS = [
+            '',
+            'bottom: 0;',
+            'left: 0;',
+            'width: ' + window.screen.width * 4 + 'px !important;',
+            'height: ' + autoScrollMargin + 'px !important;'
+        ].join('\n'),
+        leftEdgeCSS = [
+            '',
+            'top: 0;',
+            'left: 0;',
+            'width: ' + autoScrollMargin + 'px !important;',
+            'height: ' + window.screen.height * 4 + 'px !important;'
+        ].join('\n'),
+        edgesInBody = false,
         target = null,
         supportsTouch = 'createTouch' in document,
         margin = supportsTouch ? 30 : 10,
@@ -157,13 +200,52 @@ window.interact = (function () {
         moveEvent = 'mousemove';
     }
 
-    /**
+    topEdge.style.cssText =
+        rightEdge.style.cssText =
+            bottomEdge.style.cssText =
+                leftEdge.style.cssText = edgeCSS;
+
+    topEdge.style.cssText += topEdgeCSS;
+    rightEdge.style.cssText += rightEdgeCSS;
+    bottomEdge.style.cssText += bottomEdgeCSS;
+    leftEdge.style.cssText += leftEdgeCSS;
+
+    topEdge.y = -1;
+    rightEdge.x = 1;
+    bottomEdge.y = 1;
+    leftEdge.x = -1
+
+    function addScrollEdges() {
+        document.body.appendChild(topEdge);
+        document.body.appendChild(rightEdge);
+        document.body.appendChild(bottomEdge);
+        document.body.appendChild(leftEdge);
+        
+        edgesInBody = true;
+    }
+    
+    function edgeMoveListener(event) {
+        if (dragging || resizing) {
+            var x = scrollDistance * (event.target.x || 0),
+                y = scrollDistance * (event.target.y || 0);
+            
+            window.scrollBy(x, y);
+        }
+    }
+
+    topEdge.addEventListener(moveEvent, edgeMoveListener);
+    rightEdge.addEventListener(moveEvent, edgeMoveListener);
+    bottomEdge.addEventListener(moveEvent, edgeMoveListener);
+    leftEdge.addEventListener(moveEvent, edgeMoveListener);
+    
+    /**    function addScrollEd
      * @private
      * @event
      */
     function resizeMove(event) {
         var detail,
-            resizeEvent;
+            resizeEvent,
+            autoScroll = checkScrollEdges();
 
         if (!resizing) {
             resizeEvent = document.createEvent('CustomEvent');
@@ -479,6 +561,9 @@ window.interact = (function () {
         var indexOfElement = interactNodes.indexOf(element),
             newNode;
 
+        if (!edgesInBody) {
+            addScrollEdges();
+        }
         if (typeof options !== 'object') {
             options = {};
         }
