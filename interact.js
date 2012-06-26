@@ -254,19 +254,50 @@ window.interact = (function () {
             scroll.i = window.setInterval(scroll.autoScroll, scroll.interval );
         }
     }
-    
+
+    function edgeMove(event) {
+        var top = event.clientY < edges.bottom.element.offsetHeight,
+            right = event.clientX > edges.right.element.offsetLeft,
+            bottom = event.clientY > edges.bottom.element.offsetTop,
+            left = event.clientX < edges.left.element.offsetWidth;
+        /*
+         * If the mouse is not over the right or left edge,
+         * Don't scroll in x
+         */
+        if (scroll.vector.x !== 0 &&
+            !right &&
+            !left) {
+            scroll.vector.x = 0;
+        } else {
+            scroll.vector.x = scroll.distance * (right? 1: left? -1: 0);
+        }
+        /*
+         * If the mouse is not over the bottom or top edge,
+         * Don't scroll in y
+         */
+        if (scroll.vector.y !== 0 &&
+            !top &&
+            !bottom) {
+            scroll.vector.y = 0;
+        } else {
+            scroll.vector.y = scroll.distance * (bottom? 1: top? -1: 0);
+        }
+    }
+            
     function edgeOut(event) {
-/*            if (event.target.x !== undefined) {
-                scroll.vector.x = 0;
-            }
-            if (event.target.y !== undefined) {
-                scroll.vector.y = 0;
-            }
+        var edge = event.target;
+
+        /*
+         * Mouse may have entered another edge while still being above this one
+         * Need to check if mouse is still above this element
+         */
+        edgeMove(event);
+
         // If the window is not supposed to be scrolling in any direction, clear interval
         if (!scroll.vector.x && !scroll.vector.y) {
             window.clearInterval(scroll.i);
         }
-*/    }
+    }
     
     function showEdges (event) {
         for (var edge in edges) {
@@ -291,6 +322,7 @@ window.interact = (function () {
             edges[edge].element.classList.add('interact-edge');
             
             events.add(edges[edge], 'mouseenter', edgeEnter);
+            events.add(edges[edge], moveEvent, edgeMove);
             events.add(edges[edge], 'mouseout', edgeOut);
         }
     }
@@ -338,6 +370,9 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
+            if (target.squareResize || event.shiftKey) {
+                detail.dx = detail.dy = Math.max(detail.dx, detail.dy);
+            }
             resizeEvent.initCustomEvent('interactresizestart', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
             addClass(target.element, 'interact-resize-target');
@@ -358,6 +393,9 @@ window.interact = (function () {
                 metaKey: event.metaKey,
                 button: event.button
             };
+            if (target.squareResize || event.shiftKey) {
+                detail.dx = detail.dy = Math.max(detail.dx, detail.dy);
+            }
             resizeEvent.initCustomEvent('interactresizemove', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
         }
@@ -556,6 +594,7 @@ window.interact = (function () {
         
         // Stop AutoScroll
         window.clearInterval(scroll.i);
+        scroll.vector.x = scroll.vector.y = 0;
 
         document.documentElement.style.cursor = '';
         mouseIsDown = false;
@@ -650,6 +689,7 @@ window.interact = (function () {
             element: element,
             drag: ('drag' in options)? options.drag : false,
             resize: ('resize' in options)? options.resize : false,
+            squareResize: ('squareResize' in options)? options.squareResize : false,
             getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck
         };
 
@@ -743,8 +783,8 @@ window.interact = (function () {
      */
      events.add(docTarget, 'interactresizestart', showEdges);
      events.add(docTarget, 'interactdragstart', showEdges)
-     events.add(docTarget, 'interactresizestop', hideEdges);
-     events.add(docTarget, 'interactdragstop', hideEdges)
+     events.add(docTarget, 'interactresizeend', hideEdges);
+     events.add(docTarget, 'interactdragend', hideEdges)
 
     return interact;
 }());
