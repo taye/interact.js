@@ -61,19 +61,7 @@ window.interactDemo = (function(interact) {
                 }
             },
             text: 'text',
-            path: {
-                setSize: function (element, x, y) {
-                    element.setAttribute('d', generatePathData(x, y, 10, 10));
-                },
-                getSize: function (element) {
-                    var clientRect = element.getBoundingClientRect();
-                        
-                    return {
-                        x: clientRect.width,
-                        y: clientRect.height
-                    }
-                }
-            },
+            path: 'path',
             line: 'line',
             image: 'image'
         },
@@ -188,7 +176,8 @@ window.interactDemo = (function(interact) {
 
             interact.set(rect, {
                 drag: true,
-                resize: true
+                resize: true,
+                squareResize: true
             });
             window['g' + i] = newGraphic;
         }
@@ -531,79 +520,6 @@ window.interactDemo = (function(interact) {
             return realtime;
         }
     }
-    
-    // generate a path's arc data parameter
-    // http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
-    var arcParameter = function(rx, ry, xAxisRotation, largeArcFlag, sweepFlag,
-                              x, y) {
-        return [rx,
-                ',',
-                ry,
-                ' ',
-                xAxisRotation,
-                ' ',
-                largeArcFlag,
-                ',',
-                sweepFlag,
-                ' ',
-                x,
-                ',',
-                y].join('');
-    };
-    
-     /**
-     * Generate a path's data attribute
-     *
-     * @param {Number} width Width of the rectangular shape
-     * @param {Number} height Height of the rectangular shape
-     * @param {Number} tr Top border radius of the rectangular shape
-     * @param {Number} br Bottom border radius of the rectangular shape
-     * @return {String} a path's data attribute value
-     */
-    function generatePathData(width, height, tr, br) {
-        var data = [];
-
-        // start point in top-middle of the rectangle
-        data.push('M' + width / 2 + ',' + 0);
-
-        // next we go to the right
-        data.push('H' + (width - tr));
-
-        if (tr > 0) {
-            // now we draw the arc in the top-right corner
-            data.push('A' + arcParameter(tr, tr, 0, 0, 1, width, tr));
-        }
-
-        // next we go down
-        data.push('V' + (height - br));
-
-        if (br > 0) {
-            // now we draw the arc in the lower-right corner
-            data.push('A' + arcParameter(br, br, 0, 0, 1, width - br,
-                    height));
-        }
-
-        // now we go to the left
-        data.push('H' + br);
-
-        if (br > 0) {
-            // now we draw the arc in the lower-left corner
-            data.push('A' + arcParameter(br, br, 0, 0, 1, 0, height - br));
-        }
-
-        // next we go up
-        data.push('V' + tr);
-
-        if (tr > 0) {
-            // now we draw the arc in the top-left corner
-            data.push('A' + arcParameter(tr, tr, 0, 0, 1, tr, 0));
-        }
-
-        // and we close the path
-        data.push('Z');
-
-        return data.join(' ');
-    };
     
     function setPrevMouse(e) {
         prevX = e.pageX || e.detail.pageX;
