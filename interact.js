@@ -344,8 +344,47 @@ window.interact = (function () {
                 currentEdge.element.y = currentEdge.y;
             }
         }
+        edgesInBody = true;
     }
     
+    function autoCheck(event) {
+        var clientRect,
+            right,
+            bottom,
+            action;
+            
+        if (target.element.nodeName in svgTags) {
+            clientRect = target.element.getBoundingClientRect();
+            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
+            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
+            resizeAxes = (right?'x': '') + (bottom?'y': '');
+            action = (resizeAxes && target.resize)?
+                'resize' + resizeAxes:
+                'drag';
+
+            return action;
+        }
+        
+        clientRect = target.element.getClientRects()[0];
+        right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
+        bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
+
+        resizeAxes = (right?'x': '') + (bottom?'y': '');
+        action = (resizeAxes && target.resize)?
+            'resize' + resizeAxes:
+            'drag';
+
+        return action;
+    }
+    
+    function bringToFront(element) {
+        if (element.nodeName in svgTags) {
+            element.parentNode.parentNode.appendChild(element.parentNode);
+        } else {
+            element.parentNode.appendChild(element);
+        }
+    }
+
     /**
      * @private
      * @event
@@ -371,7 +410,12 @@ window.interact = (function () {
                 button: event.button
             };
             if (target.squareResize || event.shiftKey) {
-                detail.dx = detail.dy = Math.max(detail.dx, detail.dy);
+                if (resizeAxes === 'xy' || resizeAxes === 'x') {
+                    detail.dy = detail.dx;// = Math.max(detail.dx, detail.dy);
+                } else {
+                    detail.dx = detail.dy;
+                }
+                detail.axes = 'xy';
             }
             resizeEvent.initCustomEvent('interactresizestart', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
@@ -394,7 +438,12 @@ window.interact = (function () {
                 button: event.button
             };
             if (target.squareResize || event.shiftKey) {
-                detail.dx = detail.dy = Math.max(detail.dx, detail.dy);
+                if (resizeAxes === 'xy' || resizeAxes === 'x') {
+                    detail.dy = detail.dx;// = Math.max(detail.dx, detail.dy);
+                } else {
+                    detail.dx = detail.dy;
+                }
+                detail.axes = 'xy';
             }
             resizeEvent.initCustomEvent('interactresizemove', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
@@ -452,37 +501,6 @@ window.interact = (function () {
         prevY = event.pageY;
     }
 
-    function autoCheck(event) {
-        var clientRect,
-            right,
-            bottom,
-            action;
-            
-        if (target.element.nodeName in svgTags) {
-            clientRect = target.element.getBoundingClientRect();
-            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
-            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-            action = (resizeAxes && target.resize)?
-                'resize' + resizeAxes:
-                'drag';
-
-            return action;
-        }
-        
-        clientRect = target.element.getClientRects()[0];
-        action,
-        right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
-        bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
-
-        resizeAxes = (right?'x': '') + (bottom?'y': '');
-        action = (resizeAxes && target.resize)?
-            'resize' + resizeAxes:
-            'drag';
-
-        return action;
-    }
-
     /**
      * @private
      * @event
@@ -523,11 +541,16 @@ window.interact = (function () {
                 x0 = prevX = event.pageX;
                 y0 = prevY = event.pageY;
                 events.remove(docTarget, moveEvent, 'all');
-            }
-            action = target.getAction(event);
 
-            document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
-            actions[action].ready();
+                action = target.getAction(event);
+
+                document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
+                actions[action].ready();
+                
+                if (action === 'drag') {
+                    bringToFront(target.element);
+                }
+            }
         }
     }
 
@@ -541,6 +564,13 @@ window.interact = (function () {
             pageY,
             endEvent;
 
+        /*
+         * With the way autoScroll currently works, it might be a good idea to
+         * use the pageX/Y from the previous mousemove event (prevX, prevY)
+         * so in situation where page is crolled but element position remains the same,
+         * the element being dragged/moved doesn't jump or explode after mouseup
+         */ 
+         
         if (dragging) {
             endEvent = document.createEvent('CustomEvent');
 
@@ -611,7 +641,7 @@ window.interact = (function () {
             }
         }
         return -1;
-    }
+    };
 
     /** @private */
     function getInteractNode(element) {
@@ -690,7 +720,8 @@ window.interact = (function () {
             drag: ('drag' in options)? options.drag : false,
             resize: ('resize' in options)? options.resize : false,
             squareResize: ('squareResize' in options)? options.squareResize : false,
-            getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck
+            getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck,
+            order: ('order' in options)? options.order : false
         };
 
         if (indexOfElement !== -1) {
@@ -782,9 +813,9 @@ window.interact = (function () {
      * edges when interaction starts and hide them when it ends
      */
      events.add(docTarget, 'interactresizestart', showEdges);
-     events.add(docTarget, 'interactdragstart', showEdges)
+     events.add(docTarget, 'interactdragstart', showEdges);
      events.add(docTarget, 'interactresizeend', hideEdges);
-     events.add(docTarget, 'interactdragend', hideEdges)
+     events.add(docTarget, 'interactdragend', hideEdges);
 
     return interact;
 }());
