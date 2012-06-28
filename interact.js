@@ -48,8 +48,8 @@ window.interact = (function () {
                     '',
                     'top: 0px;',
                     'left: 0px;',
-                    // screen width * 4 in case page is zoomed out
-                    'width: ' + window.screen.width * 4 + 'px !important;',
+                    // screen width * 5 in case page is zoomed out
+                    'width: ' + window.screen.width * 5 + 'px !important;',
                     'height: ' + scroll.margin + 'px !important;'
                     ].join(''),
                 y: -1
@@ -256,10 +256,10 @@ window.interact = (function () {
     }
 
     function edgeMove(event) {
-        var top = event.clientY < edges.bottom.element.offsetHeight,
-            right = event.clientX > edges.right.element.offsetLeft,
-            bottom = event.clientY > edges.bottom.element.offsetTop,
-            left = event.clientX < edges.left.element.offsetWidth;
+        var top = event.clientY < edges.bottom.element.getBoundingClientRect().height,
+            right = event.clientX > edges.right.element.getBoundingClientRect().left,
+            bottom = event.clientY > edges.bottom.element.getBoundingClientRect().top,
+            left = event.clientX < edges.left.element.getBoundingClientRect().width;
         /*
          * If the mouse is not over the right or left edge,
          * Don't scroll in x
@@ -307,7 +307,7 @@ window.interact = (function () {
         }
     }
     
-    function hideEdges (event) {
+    function hideEdges () {
         for (var edge in edges) {
             if (edges.hasOwnProperty(edge)) {
                 edges[edge].element.classList.remove('show');
@@ -478,6 +478,9 @@ window.interact = (function () {
             dragEvent.initCustomEvent('interactdragstart', true, true, detail);
             target.element.dispatchEvent(dragEvent);
             dragging = true;
+            if (target.order) {
+                bringToFront(target.element);
+            }
         } else {
             dragEvent = document.createEvent('CustomEvent');
             detail = {
@@ -546,10 +549,6 @@ window.interact = (function () {
 
                 document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
                 actions[action].ready();
-                
-                if (action === 'drag') {
-                    bringToFront(target.element);
-                }
             }
         }
     }
@@ -623,6 +622,7 @@ window.interact = (function () {
         events.add(docTarget, moveEvent, mouseMove);
         
         // Stop AutoScroll
+        hideEdges();
         window.clearInterval(scroll.i);
         scroll.vector.x = scroll.vector.y = 0;
 
@@ -809,8 +809,8 @@ window.interact = (function () {
     events.add(docTarget, moveEvent, mouseMove, 'true');
 
     /*
-     * Drag and resize start and stop event listeners to show autoScroll
-     * edges when interaction starts and hide them when it ends
+     * Drag and resize start event listeners to show autoScroll
+     * edges when interaction starts (hidden on document mouseup)
      */
      events.add(docTarget, 'interactresizestart', showEdges);
      events.add(docTarget, 'interactdragstart', showEdges);
