@@ -234,6 +234,13 @@ window.interactDemo = (function(interact) {
         }
     }
 
+    /**
+     * @function
+     * @description Get pixel length from string
+     * @param {Object HTMLElement | Object SVGElement} element the element the style property belongs to
+     * @param {Sting} string The style length (px/%);
+     * @returns {Number}
+     */
     function parseStyleLength(element, string) {
         var lastChar = string[string.length - 1];
 
@@ -248,6 +255,12 @@ window.interactDemo = (function(interact) {
         return string;
     }
 
+    /**
+     * @function
+     * @description Get the size of a DOM element
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @returns {Object} {x: width, y: height}
+     */
     function getSize(element) {
         var width,
             height,
@@ -272,26 +285,42 @@ window.interactDemo = (function(interact) {
         return {x: width, y: height};
     }
 
-    function setSize(element, x, y) {
+    /**
+     * @function
+     * @description Set Element to the given Size
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @param {Number | String} width the new width of the element
+     * @param {Number | String} height the new height of the element
+     */
+    function setSize(element, width, height) {
         if (element.nodeName in svgTags) {
-            svgTags[element.nodeName].setSize(element, x, y);
+            svgTags[element.nodeName].setSize(element, width, height);
         } else {
-            if (typeof x === 'number') {
-                x += 'px';
+            if (typeof width === 'number') {
+                width += 'px';
             }
-            if (typeof y === 'number') {
-                y += 'px';
+            if (typeof height === 'number') {
+                height += 'px';
             }
 
-            if (typeof x === 'string') {
-                element.style.setProperty('width', x);
+            if (typeof width === 'string') {
+                element.style.setProperty('width', width);
             }
-            if (typeof y === 'string') {
-                element.style.setProperty('height', y);
+            if (typeof height === 'string') {
+                element.style.setProperty('height', height);
             }
         }
     }
 
+    /**
+     * @function
+     * @description Change the element's size by the given value
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @param {Number} dx the amount by which to change the width
+     * @param {Number} dy the amount by which to change the height
+     * @param {Number} [minx] the minimum width the element should have
+     * @param {Number} [miny] the minimum height the element should have
+     */
     function changeSize(element, dx, dy, minx, miny) {
         var size = getSize(element),
             width = size.x,
@@ -306,7 +335,13 @@ window.interactDemo = (function(interact) {
         setSize(element, width, height);
     }
 
-    function getPosition(element){
+    /**
+     * @function
+     * @description Get the position of a DOM element relative to the top left of the page
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @returns {Object} {x: left, y: top}
+     */
+    function getPosition(element) {
         var left,
             top;
 
@@ -326,6 +361,13 @@ window.interactDemo = (function(interact) {
         return {x: left, y: top};
     }
 
+    /**
+     * @function
+     * @description Move Element to the given position (assumes it is positioned absolutely or fixed)
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @param {Number} x position from the left of the element
+     * @param {Number} y position from the top of the element
+     */
     function setPosition(element, x, y) {
         var translate;
 
@@ -340,6 +382,13 @@ window.interactDemo = (function(interact) {
         }
     }
 
+    /**
+     * @function
+     * @description Change the element's position by the given value
+     * @param {Object HTMLElement | Object SVGElement} element
+     * @param {Number} dx the amount by which to change the distance from the left
+     * @param {Number} dy the amount by which to change the distance from the top
+     */
     function changePosition(element, dx, dy) {
         var variable,
             x,
@@ -362,6 +411,13 @@ window.interactDemo = (function(interact) {
         }
     }
 
+    /**
+     * @function
+     * @description Get the parameters of a property in an SVG Element's transform attribute
+     * @param {Object SVGElement} element
+     * @param {String} [property] The transform property to retrieve
+     * @returns {Array | String} Arrray of the values of given property or string of the element transform attribute
+     */
     function getTransform(element, property) {
         var transform = element.getAttribute('transform') || property + '(0, 0)',
             transformations = {
@@ -390,6 +446,15 @@ window.interactDemo = (function(interact) {
         return r;
     }
 
+
+    /**
+     * @function
+     * @description Set the parameters of a property in an SVG Element's transform attribute
+     * @param {Object SVGElement} element
+     * @param {String} [property] The transform property to set. If ommited or empty, the transform attribute is set to an empty String
+     * @param {Array | String} valueArray Array or space/comma separated string of values for the transform property
+     * @returns {Array | String} Arrray of the values of given property or string of the element transform attribute
+     */
     function setTransform(element, property, valueArray) {
         var transform = element.getAttribute('transform') || property + '(0, 0)',
             transformFunction,
@@ -413,10 +478,14 @@ window.interactDemo = (function(interact) {
             valueArray = valueArray.join(', ');
         }
         transformFunction = property + '(' + valueArray + ') ';
-        element.setAttribute('transform', transformFunction + transform);
+        return element.setAttribute('transform', transformFunction + transform);
     }
 
-    // Display event properties for debugging
+    /**
+     * @function
+     * @description Write interact event data to demo nodes for
+     * @param {Event} e Event whose properties will be logged
+     */
     function nodeEventDebug(e) {
         var textProp,
             nl;
@@ -436,6 +505,12 @@ window.interactDemo = (function(interact) {
         }
     }
 
+    /**
+     * @function
+     * @description Make a string that lists the name and value of all properties of an event
+     * @param {Event} e Event whose properties will be logged
+     * @returns {string}
+     */
     function eventProps(e) {
         var debug = [],
             prop;
@@ -583,16 +658,6 @@ window.interactDemo = (function(interact) {
     interactDemo.changePosition = changePosition;
     interactDemo.changeSize = changeSize;
 
-    if (!('$' in window)) {
-        window.$ = function (id) {
-            return document.getElementById(id);
-        };
-    }
     return interactDemo;
 }(window.interact));
-
-window.getTransform = window.interactDemo.getTransform;
-window.setTransform = window.interactDemo.setTransform;
-window.changePosition = window.interactDemo.changePosition;
-window.changeSize = window.interactDemo.changeSize;
 
