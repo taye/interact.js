@@ -114,7 +114,6 @@ window.interact = (function () {
                 '   display: block !important;',
                 '}'
                 ].join(''),
-            edgesInBody: false,
             edgeEnter: function (event) {
                 if (dragging || resizing) {
                     if (event.target.x !== undefined) {
@@ -177,6 +176,7 @@ window.interact = (function () {
                         scroll.edges[edge].element.classList.add('show');
                     }
                 }
+                scroll.edgesAreHidden = false;
             },
             hideEdges: function () {
                 for (var edge in scroll.edges) {
@@ -184,6 +184,7 @@ window.interact = (function () {
                         scroll.edges[edge].element.classList.remove('show');
                     }
                 }
+                scroll.edgesAreHidden = true;
             },
             addEdges: function () {
                 var currentEdge,
@@ -214,8 +215,12 @@ window.interact = (function () {
                         events.add(scroll.edges[edge], 'mouseout', scroll.edgeOut);
                     }
                 }
-
-                scroll.edgesInBody = true;
+            },
+            edgesAreHidden: true,
+            stop: function () {
+                scroll.hideEdges();
+                window.clearInterval(scroll.i);
+                scroll.vector.x = scroll.vector.y = 0;
             }
         },
         target = null,
@@ -366,19 +371,10 @@ window.interact = (function () {
             bottom,
             action;
 
-        if (target.element.nodeName in svgTags) {
-            clientRect = target.element.getBoundingClientRect();
-            right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
-            bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-            action = (resizeAxes && target.resize)?
-                'resize' + resizeAxes:
-                'drag';
+        clientRect = (target.element.nodeName in svgTags)?
+                target.element.getBoundingClientRect():
+                clientRect = target.element.getClientRects()[0];
 
-            return action;
-        }
-
-        clientRect = target.element.getClientRects()[0];
         right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
         bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
 
@@ -549,7 +545,7 @@ window.interact = (function () {
      * @event
      * Determine action to be performed on next mouseMove and add appropriate style and event Liseners
      */
-    function mouseDown(event) {
+    function mouseDown(event, forceAction) {
         var right,
             bottom,
             action = '';
@@ -563,7 +559,7 @@ window.interact = (function () {
                 y0 = prevY = event.pageY;
                 events.remove(docTarget, moveEvent, 'all');
 
-                action = target.getAction(event);
+                action = forceAction || target.getAction(event);
 
                 document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
                 actions[action].ready();
@@ -639,11 +635,6 @@ window.interact = (function () {
         events.remove(docTarget, moveEvent, resizeMove);
         events.remove(docTarget, moveEvent, dragMove);
         events.add(docTarget, moveEvent, mouseMove);
-
-        // Stop AutoScroll
-        scroll.hideEdges();
-        window.clearInterval(scroll.i);
-        scroll.vector.x = scroll.vector.y = 0;
 
         document.documentElement.style.cursor = '';
         mouseIsDown = false;
@@ -727,9 +718,6 @@ window.interact = (function () {
         var indexOfElement = interactNodes.indexOf(element),
             newNode;
 
-        if (!scroll.edgesInBody) {
-            scroll.addEdges();
-        }
         if (typeof options !== 'object') {
             options = {};
         }
@@ -781,10 +769,50 @@ window.interact = (function () {
         return interactNodes.indexOf(element !== -1);
     };
 
+    /**
+     * @function
+     * @description Simulate mouse down to begin drag/resize on an interactable element
+     * @param {String} action The action to be performed - drag, resize, resizex, resizey;
+     * @param {Object HTMLElement | Object SVGElement} element The DOM Element to resize/drag
+     * @param {MouseEvent} [mouseEvent] A mouse event whose pageX/Y coordinates will be the starting point of the interact drag/resize
+     */
+    interact.simulate = function (action, element, mouseEvent) {
+        var event = {},
+            prop,
+            clientRect;
+
+        if (mouseEvent) {
+            for (prop in mouseEvent) {
+                if (mouseEvent.hasOwnProperty(prop)) {
+                    event[prop] = mouseEvent[prop];
+                }
+            }
+        } else {
+            clientRect = (element.nodeName in svgTags)?
+                    element.getBoundingClientRect():
+                    clientRect = element.getClientRects()[0];
+            
+            if (action === 'drag') {
+                event.pageX = clientRect.left + clientRect.width / 2;
+                event.pageY = clientRect.top + clientRect.height / 2;
+            } else {
+                event.pageX = clientRect.right;
+                event.pageY = clientRect.bottom;
+            }
+        }
+        
+        if (action === 'resize') {
+            action = 'resizexy';
+        }
+        
+        event.target = event.currentTarget = element;
+        event.preventDefault = event.stopPropagation = function () {};
+
+        mouseDown(event, action);
+    }
 
     /**
      * @function
-     * @description
      * @param {string} [type] Event type to be searched for
      * @returns {string} The name of the custom interact event
      * @returns OR
@@ -820,18 +848,25 @@ window.interact = (function () {
             supportsTouch: supportsTouch
         };
     };
+    interact.margin = function () {
+        return margin;
+    }
     events.add(docTarget, upEvent, docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
-    events.add(docTarget, moveEvent, mouseMove, 'true');
+    events.add(docTarget, moveEvent, mouseMove);
+
+    events.add(docTarget, 'DOMContentLoaded', function () {
+            scroll.addEdges();
+        });
 
     /*
      * Drag and resize start event listeners to show autoScroll
-     * edges when interaction starts (hidden on document mouseup)
+     * edges when interaction starts and hide on drag and resize end
      */
      events.add(docTarget, 'interactresizestart', scroll.showEdges);
      events.add(docTarget, 'interactdragstart', scroll.showEdges);
-     events.add(docTarget, 'interactresizeend', scroll.hideEdges);
-     events.add(docTarget, 'interactdragend', scroll.hideEdges);
+     events.add(docTarget, 'interactresizeend', scroll.stop);
+     events.add(docTarget, 'interactdragend', scroll.stop);
 
     return interact;
 }());
