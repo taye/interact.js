@@ -47,7 +47,7 @@ window.interact = (function () {
             },
             // To store return value of window.setInterval
             i: null,
-            // Contains the DIV elements which frame the page and initiate autoScroll on mouseEnter
+            // Contains the DIV elements which frame the page and initiate autoScroll on mouseMove
             edges: {
                 top: {
                     element: document.createElement('div'),
@@ -369,14 +369,20 @@ window.interact = (function () {
         var clientRect,
             right,
             bottom,
-            action;
+            action,
+			pageX = (event.touches)?
+					event.touches[0].pageX:
+					event.pageX,
+			pageY = (event.touches)?
+					event.touches[0].pageY:
+					event.pageY;
 
         clientRect = (target.element.nodeName in svgTags)?
                 target.element.getBoundingClientRect():
                 clientRect = target.element.getClientRects()[0];
 
-        right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
-        bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
+        right = ((pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
+        bottom = ((pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
 
         resizeAxes = (right?'x': '') + (bottom?'y': '');
         action = (resizeAxes && target.resize)?
@@ -404,7 +410,13 @@ window.interact = (function () {
      */
     function resizeMove(event) {
         var detail,
-            resizeEvent;
+            resizeEvent,
+			pageX = (event.touches)?
+					event.touches[0].pageX:
+					event.pageX,
+			pageY = (event.touches)?
+					event.touches[0].pageY:
+					event.pageY;
 
         if (!resizing) {
             resizeEvent = document.createEvent('CustomEvent');
@@ -412,10 +424,10 @@ window.interact = (function () {
                 axes: resizeAxes,
                 x0: x0,
                 y0: y0,
-                dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (event.pageX - x0): 0,
-                dy: (resizeAxes === 'xy' || resizeAxes === 'y')? (event.pageY - y0): 0,
-                pageX: event.pageX,
-                pageY: event.pageY,
+                dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (pageX - x0): 0,
+                dy: (resizeAxes === 'xy' || resizeAxes === 'y')? (pageY - y0): 0,
+                pageX: pageX,
+                pageY: pageY,
                 ctrlKey: event.ctrlKey,
                 altKey: event.altKey,
                 shiftKey: event.shiftKey,
@@ -440,10 +452,10 @@ window.interact = (function () {
                 axes: resizeAxes,
                 x0: x0,
                 y0: y0,
-                dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (event.pageX - prevX): 0,
-                dy: (resizeAxes === 'xy' || resizeAxes === 'y')? (event.pageY - prevY): 0,
-                pageX: event.pageX,
-                pageY: event.pageY,
+                dx: (resizeAxes === 'xy' || resizeAxes === 'x')? (pageX - prevX): 0,
+                dy: (resizeAxes === 'xy' || resizeAxes === 'y')? (pageY - prevY): 0,
+                pageX: pageX,
+                pageY: pageY,
                 ctrlKey: event.ctrlKey,
                 altKey: event.altKey,
                 shiftKey: event.shiftKey,
@@ -461,8 +473,8 @@ window.interact = (function () {
             resizeEvent.initCustomEvent('interactresizemove', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
         }
-        prevX = event.pageX;
-        prevY = event.pageY;
+        prevX = pageX;
+        prevY = pageY;
     }
 
     /**
@@ -470,17 +482,23 @@ window.interact = (function () {
      */
     function dragMove(event) {
         var detail,
-            dragEvent;
+            dragEvent,
+			pageX = (event.touches)?
+					event.touches[0].pageX:
+					event.pageX,
+			pageY = (event.touches)?
+					event.touches[0].pageY:
+					event.pageY;
 
         if (!dragging) {
             dragEvent = document.createEvent('CustomEvent');
             detail = {
                 x0: x0,
                 y0: y0,
-                dx: event.pageX - x0,
-                dy: event.pageY - y0,
-                pageX: event.pageX,
-                pageY: event.pageY,
+                dx: pageX - x0,
+                dy: pageY - y0,
+                pageX: pageX,
+                pageY: pageY,
                 ctrlKey: event.ctrlKey,
                 altKey: event.altKey,
                 shiftKey: event.shiftKey,
@@ -498,10 +516,10 @@ window.interact = (function () {
             detail = {
                 x0: x0,
                 y0: y0,
-                dx: event.pageX - prevX,
-                dy: event.pageY - prevY,
-                pageX: event.pageX,
-                pageY: event.pageY,
+                dx: pageX - prevX,
+                dy: pageY - prevY,
+                pageX: pageX,
+                pageY: pageY,
                 ctrlKey: event.ctrlKey,
                 altKey: event.altKey,
                 shiftKey: event.shiftKey,
@@ -512,8 +530,8 @@ window.interact = (function () {
             target.element.dispatchEvent(dragEvent);
         }
 
-        prevX = event.pageX;
-        prevY = event.pageY;
+        prevX = pageX;
+        prevY = pageY;
     }
 
     /**
@@ -548,15 +566,21 @@ window.interact = (function () {
     function mouseDown(event, forceAction) {
         var right,
             bottom,
-            action = '';
+            action = '',
+			pageX = (event.touches)?
+					event.touches[0].pageX:
+					event.pageX,
+			pageY = (event.touches)?
+					event.touches[0].pageY:
+					event.pageY;
 
         mouseIsDown = true;
         if ((target = getInteractNode(event.currentTarget))) {
             event.preventDefault();
 
             if (target.drag || target.resize) {
-                x0 = prevX = event.pageX;
-                y0 = prevY = event.pageY;
+                x0 = prevX = pageX;
+                y0 = prevY = pageY;
                 events.remove(docTarget, moveEvent, 'all');
 
                 action = forceAction || target.getAction(event);
