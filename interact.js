@@ -130,17 +130,19 @@ window.interact = (function () {
                 '}'
                 ].join('\n'),
             edgeMove: function (event) {
-                var top = event.clientY < scroll.edges.bottom.element.offsetHeight,
-                    right = event.clientX > scroll.edges.right.element.offsetLeft,
-                    bottom = event.clientY > scroll.edges.bottom.element.offsetTop,
-                    left = event.clientX < scroll.edges.left.element.offsetWidth;
+            if (dragging || resizing) {
+		            var top = event.clientY < scroll.edges.bottom.element.offsetHeight,
+		                right = event.clientX > scroll.edges.right.element.offsetLeft,
+		                bottom = event.clientY > scroll.edges.bottom.element.offsetTop,
+		                left = event.clientX < scroll.edges.left.element.offsetWidth;
 
-                scroll.x = scroll.distance * (right? 1: left? -1: 0);
-                scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
+		            scroll.x = scroll.distance * (right? 1: left? -1: 0);
+		            scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
 
-                if (!scroll.isScrolling) {
-	                scroll.start();
-                }
+		            if (!scroll.isScrolling) {
+			            scroll.start();
+		            }
+	            }
             },
             edgeOut: function (event) {
                 var edge = event.target;
