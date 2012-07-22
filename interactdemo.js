@@ -224,6 +224,7 @@ window.interactDemo = (function(interact) {
             button.addEventListener('mouseleave', buttunFunction);
             button.addEventListener('touchstart', buttunFunction);
             button.addEventListener('touchmove', buttunFunction);
+            button.addEventListener('touchleave', buttunFunction);
             button.addEventListener('mouseup', buttunFunction);
 
             interact.set(newDiv, {
@@ -578,11 +579,11 @@ window.interactDemo = (function(interact) {
 
         // + (margin * 1.5) so the mouse must be in the middle of the margin space
         if ((e.detail.axes === 'x' || e.detail.axes === 'xy') && e.detail.pageX > position.x + (margin * 1.5)) {
-            dx = Math.max(e.detail.dx);
+            dx = e.detail.dx;
         }
 
         if ((e.detail.axes === 'y' || e.detail.axes === 'xy') && e.detail.pageY > position.y + (margin * 1.5)) {
-            dy = Math.max(e.detail.dy);
+            dy = e.detail.dy;
         }
 
         changeSize(target, dx, dy);
