@@ -547,7 +547,8 @@ window.interact = (function () {
             axes,
             action;
 
-        if (!mouseIsDown && (target = getInteractNode(event.target))) {
+        // Check if target element or it's parent is interactable
+        if (!mouseIsDown && (target = getInteractNode(event.target) || getInteractNode(event.target.parentNode))) {
             if (target.resize) {
                 removeClass(target.element, 'interact-resizexy interact-resizex interact-resizey');
 
