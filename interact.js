@@ -300,6 +300,7 @@ window.interact = (function (window) {
                         console.log('Gesture starting', target.element.id);
                         events.add(docTarget, moveEvent, gestureMove);
                         addClass(target.element, 'interact-target interact-gesturing');
+                        event.preventDefault();
                     }
                 }
             }
@@ -630,6 +631,7 @@ window.interact = (function (window) {
             pageX = page.x,
             pageY = page.y,
             distance = touchDistance(event),
+            scale,
             angle = touchAngle(event),
             rotation = 0;
             
@@ -654,6 +656,7 @@ window.interact = (function (window) {
                 pageY: pageY,
                 distance: distance,
                 scale: gesture.scale,
+                ds: 0,
                 angle: 180 * angle / Math.PI,
                 rotation: rotation
             };
@@ -661,8 +664,8 @@ window.interact = (function (window) {
             target.element.dispatchEvent(gestureEvent);
             gesturing = true;
         } else {
-            gesture.scale = distance / gesture.startDistance;
             rotation = angle - gesture.prevAngle;
+            scale = distance / gesture.startDistance;
             
             if (rotation > Math.PI) {
                 rotation -= 2 * Math.PI;
@@ -683,7 +686,8 @@ window.interact = (function (window) {
                 pageX: pageX,
                 pageY: pageY,
                 distance: distance,
-                scale: gesture.scale,
+                scale: scale,
+                ds: scale - gesture.scale,
                 angle: 180 * angle / Math.PI,
                 rotation: rotation
             };
@@ -695,7 +699,8 @@ window.interact = (function (window) {
         prevY = pageY;
         gesture.prevAngle = angle;
         gesture.prevDistance = distance;
-        
+        gesture.scale = scale;
+
         // No more auto check once gesture is ready to move
         // events.remove(docTarget, downEvent, mouseDown)
     }
@@ -825,6 +830,7 @@ window.interact = (function (window) {
                 pageY: pageY,
                 distance: gesture.prevDistance,
                 scale: gesture.scale,
+                ds: gesture.scale,
                 angle: 180 * gesture.prevAngle / Math.PI,
                 rotation: 180 * (gesture.prevAngle - gesture.startAngle) / Math.PI
             };
