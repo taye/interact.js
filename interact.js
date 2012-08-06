@@ -8,13 +8,40 @@
  * @namespace interact.js module
  * @name interact
  */
-window.interact = (function () {
+window.interact = (function (window) {
     'use strict';
 
-    var prevX = 0,
+    var document = window.document,
+        console = window.console,
+        
+        // Previous interact move event mouse/touch position
+        prevX = 0,
         prevY = 0,
+        
+        // Previos interact start event mouse/touch position
         x0 = 0,
         y0 = 0,
+        
+        gesture = {
+            start: {
+                x: 0,
+                y: 0
+            },
+            // Box enclosing all touch coordinates
+            box: {
+                left: 0,
+                top: 0,
+                width: 0,
+                height: 0
+            },
+            // distance between first two touche start events
+            startDistance: 0,
+            prevDistance: 0,
+            scale: 1,
+            startAngle: 0,
+            prevAngle: 0
+        },
+        
         interactNodes = [],
         svgTags = {
             g: 'g',
@@ -52,8 +79,8 @@ window.interact = (function () {
             
             // Contains the DIV elements which frame the page and initiate autoScroll on mouseMove
             edgeContainer: {
-            	element: document.createElement('div'),
-            	events: {}
+                element: document.createElement('div'),
+                events: {}
             },
             edges: {
                 top: {
@@ -107,14 +134,14 @@ window.interact = (function () {
                 }
             },
             edgeStyle: [
-            	'#edge-container {',
-            	'	width: 0;',
-            	'	height: 0;',
-            	'	margin: 0;',
-            	'	padding: 0;',
-            	'	border: none;',
-            	'}',
-            	
+                '#edge-container {',
+                '    width: 0;',
+                '    height: 0;',
+                '    margin: 0;',
+                '    padding: 0;',
+                '    border: none;',
+                '}',
+                
                 '.interact-edge {',
                 '   position: fixed !important;',
                 '   background-color: transparent !important;',
@@ -131,18 +158,18 @@ window.interact = (function () {
                 ].join('\n'),
             edgeMove: function (event) {
             if (dragging || resizing) {
-		            var top = event.clientY < scroll.edges.bottom.element.offsetHeight,
-		                right = event.clientX > scroll.edges.right.element.offsetLeft,
-		                bottom = event.clientY > scroll.edges.bottom.element.offsetTop,
-		                left = event.clientX < scroll.edges.left.element.offsetWidth;
+                    var top = event.clientY < scroll.edges.bottom.element.offsetHeight,
+                        right = event.clientX > scroll.edges.right.element.offsetLeft,
+                        bottom = event.clientY > scroll.edges.bottom.element.offsetTop,
+                        left = event.clientX < scroll.edges.left.element.offsetWidth;
 
-		            scroll.x = scroll.distance * (right? 1: left? -1: 0);
-		            scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
+                    scroll.x = scroll.distance * (right? 1: left? -1: 0);
+                    scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
 
-		            if (!scroll.isScrolling) {
-			            scroll.start();
-		            }
-	            }
+                    if (!scroll.isScrolling) {
+                        scroll.start();
+                    }
+                }
             },
             edgeOut: function (event) {
                 var edge = event.target;
@@ -165,8 +192,8 @@ window.interact = (function () {
                 scroll.edgesAreHidden = false;
             },
             hideEdges: function () {
-            	scroll.stop();
-            	
+                scroll.stop();
+                
                 for (var edge in scroll.edges) {
                     if (scroll.edges.hasOwnProperty(edge)) {
                         scroll.edges[edge].element.classList.remove('show');
@@ -219,6 +246,7 @@ window.interact = (function () {
         margin = supportsTouch ? 20 : 10,
 
         mouseIsDown = false,
+        gesturing = false,
         dragging = false,
         resizing = false,
         resizeAxes = 'xy',
@@ -231,9 +259,9 @@ window.interact = (function () {
                 cursor: 'e-resize',
                 ready: function () {
                     if (target.resize) {
-		                resizeAxes = 'x';
-		                events.add(docTarget, moveEvent, resizeMove);
-		                addClass(target.element, 'interact-target interact-resizex');
+                        resizeAxes = 'x';
+                        events.add(docTarget, moveEvent, resizeMove);
+                        addClass(target.element, 'interact-target interact-resizex');
                     }
                 },
                 start: function() {}
@@ -242,9 +270,9 @@ window.interact = (function () {
                 cursor: 's-resize',
                 ready: function () {
                     if (target.resize) {
-		                resizeAxes = 'y';
-		                events.add(docTarget, moveEvent, resizeMove);
-		                addClass(target.element, 'interact-target interact-resizey');
+                        resizeAxes = 'y';
+                        events.add(docTarget, moveEvent, resizeMove);
+                        addClass(target.element, 'interact-target interact-resizey');
                     }
                 }
             },
@@ -252,9 +280,9 @@ window.interact = (function () {
                 cursor: 'se-resize',
                 ready: function () {
                     if (target.resize) {
-		                resizeAxes = 'xy';
-		                events.add(docTarget, moveEvent, resizeMove);
-		                addClass(target.element, 'interact-target interact-resizexy');
+                        resizeAxes = 'xy';
+                        events.add(docTarget, moveEvent, resizeMove);
+                        addClass(target.element, 'interact-target interact-resizexy');
                     }
                 }
             },
@@ -262,8 +290,18 @@ window.interact = (function () {
                 cursor: 'move',
                 ready: function () {
                     if (target.drag) {
-		                events.add(docTarget, moveEvent, dragMove);
-		                addClass(target.element, 'interact-target interact-dragging');
+                        events.add(docTarget, moveEvent, dragMove);
+                        addClass(target.element, 'interact-target interact-dragging');
+                    }
+                }
+            },
+            gesture: {
+                cursor: '',
+                ready: function () {
+                   if (target.gesture) {
+                        console.log('Gesture starting', target.element.id);
+                        events.add(docTarget, moveEvent, gestureMove);
+                        addClass(target.element, 'interact-target interact-gesturing');
                     }
                 }
             }
@@ -275,14 +313,17 @@ window.interact = (function () {
         outEvent,
         enterEvent,
         leaveEvent,
-        eventDict = {
-            interactresizestart: 'resizestart',
-            interactresizemove: 'resizemove',
-            interactresizeend: 'resizeend',
-            interactdragstart: 'dragstart',
-            interactdragmove: 'dragmove',
-            interactdragend: 'dragend'
-        },
+        eventTypes = [
+            'interactresizestart',
+            'interactresizemove',
+            'interactresizeend',
+            'interactdragstart',
+            'interactdragmove',
+            'interactdragend',
+            'interactgesturestart',
+            'interactgesturemove',
+            'interactgestureend'
+        ],
         docTarget = {
             element: document,
             events: {}
@@ -291,18 +332,6 @@ window.interact = (function () {
             element: window,
             events: {}
         },
-        
-        // Get event.pageX/Y for mouse and event.touches[0].pageX/Y tor touch
-        getPageXY = function (event) {
-			return {
-				x: (event.touches)?
-					event.touches[0].pageX:
-					event.pageX,
-				y: (event.touches)?
-					event.touches[0].pageY:
-					event.pageY
-			};
-		},
         
         // Events wrapper
         events = {
@@ -378,12 +407,12 @@ window.interact = (function () {
             right,
             bottom,
             action,
-			pageX = (event.touches)?
-					event.touches[0].pageX:
-					event.pageX,
-			pageY = (event.touches)?
-					event.touches[0].pageY:
-					event.pageY;
+            pageX = (event.touches)?
+                    event.touches[0].pageX:
+                    event.pageX,
+            pageY = (event.touches)?
+                    event.touches[0].pageY:
+                    event.pageY;
 
         clientRect = (target.element.nodeName in svgTags)?
                 target.element.getBoundingClientRect():
@@ -392,11 +421,15 @@ window.interact = (function () {
         right = ((pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
         bottom = ((pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
 
-        resizeAxes = (right?'x': '') + (bottom?'y': '');
-        action = (resizeAxes && target.resize)?
-            'resize' + resizeAxes:
-            'drag';
-
+        if (event.touches && event.touches.length > 1 && !(dragging || resizing)) {
+            action = 'gesture';
+        } else {
+            resizeAxes = (right?'x': '') + (bottom?'y': '');
+            action = (resizeAxes && target.resize)?
+                'resize' + resizeAxes:
+                'drag';
+        }
+        
         return action;
     }
 
@@ -412,6 +445,78 @@ window.interact = (function () {
             return(element.parentNode.appendChild(element));
         }
     }
+    
+    // Get event.pageX/Y for mouse and event.touches[0].pageX/Y tor touch
+    function getPageXY(event) {
+        return {
+            x: (event.touches)?
+                event.touches[0].pageX:
+                event.pageX,
+            y: (event.touches)?
+                event.touches[0].pageY:
+                event.pageY
+        };
+    }
+    
+    function touchAverage(event) {
+        var i,
+            touches = event.touches,
+            pageX = 0,
+            pageY = 0;
+        
+        for (i = 0; i < touches.length; i++) {
+            pageX += touches[i].pageX / touches.length;
+            pageY += touches[i].pageY / touches.length;
+        }
+        
+        return {
+            x: pageX,
+            y: pageY
+        };
+    }
+    
+    function getTouchBBox(event) {
+        if (!event.touches.length) {
+            return;
+        }
+        
+        var i,
+            touches = event.touches,
+            minX = event.touches[0].pageX,
+            minY = event.touches[0].pageY,
+            maxX = minX,
+            maxY = minY,
+            width,
+            height;
+        
+        for (i = 0; i < touches.length; i++) {
+            minX = Math.max(minX, event.touches[i].pageX);
+            minY = Math.max(minY, event.touches[i].pageY);
+        }
+        width = maxX - minX;
+        height = maxY - minY;
+        
+        return {
+            left: minX,
+            top: minY,
+            width: width,
+            height: height
+        };
+    }
+    
+    function touchDistance(event) {
+        var dx = event.touches[0].pageX - event.touches[1].pageX,
+            dy = event.touches[0].pageY - event.touches[1].pageY;
+        
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    function touchAngle(event) {
+        var dx = event.touches[0].pageX - event.touches[1].pageX,
+            dy = event.touches[0].pageY - event.touches[1].pageY;
+        
+        return -Math.atan(dy / dx);
+    }
 
     /**
      * @private
@@ -419,9 +524,9 @@ window.interact = (function () {
     function resizeMove(event) {
         var detail,
             resizeEvent,
-			page = getPageXY(event),
-			pageX = page.x,
-			pageY = page.y;
+            page = getPageXY(event),
+            pageX = page.x,
+            pageY = page.y;
 
         if (!resizing) {
             resizeEvent = document.createEvent('CustomEvent');
@@ -488,9 +593,9 @@ window.interact = (function () {
     function dragMove(event) {
         var detail,
             dragEvent,
-			page = getPageXY(event),
-			pageX = page.x,
-			pageY = page.y;
+            page = getPageXY(event),
+            pageX = page.x,
+            pageY = page.y;
 
         if (!dragging) {
             dragEvent = document.createEvent('CustomEvent');
@@ -510,9 +615,6 @@ window.interact = (function () {
             dragEvent.initCustomEvent('interactdragstart', true, true, detail);
             target.element.dispatchEvent(dragEvent);
             dragging = true;
-            if (target.order) {
-                bringToFront(target.element);
-            }
         } else {
             dragEvent = document.createEvent('CustomEvent');
             detail = {
@@ -534,6 +636,78 @@ window.interact = (function () {
 
         prevX = pageX;
         prevY = pageY;
+    }
+    
+    function gestureMove(event) {
+        var detail,
+            gestureEvent,
+            page = touchAverage(event),
+            pageX = page.x,
+            pageY = page.y,
+            distance = touchDistance(event),
+            angle = touchAngle(event),
+            rotation = 0;
+            
+            gesture.box = getTouchBBox(event);
+            gesture.angle = touchAngle(event);
+
+        if (!gesturing) {
+            x0 = pageX;
+            y0 = pageY;
+            
+            gesture.startDistance = touchDistance(event);
+            gesture.startAngle = angle;
+            gesture.scale = 1;
+
+            gestureEvent = document.createEvent('CustomEvent');
+            detail = {
+                x0: x0,
+                y0: y0,
+                dx: pageX - x0,
+                dy: pageY - y0,
+                pageX: pageX,
+                pageY: pageY,
+                distance: distance,
+                scale: gesture.scale,
+                angle: 180 * angle / Math.PI,
+                rotation: rotation
+            };
+            gestureEvent.initCustomEvent('interactgesturestart', true, true, detail);
+            target.element.dispatchEvent(gestureEvent);
+            gesturing = true;
+        } else {
+            gesture.scale = distance / gesture.startDistance;
+            rotation = angle - gesture.prevAngle;
+            
+            if (rotation > Math.PI) rotation -= 2 * Math.PI;
+            if (rotation < -Math.PI) rotation += 2 * Math.PI;
+            
+            // Convert to degrees from radians
+            rotation = 180 * rotation / Math.PI;
+            
+            gestureEvent = document.createEvent('CustomEvent');
+            detail = {
+                x0: x0,
+                y0: y0,
+                dx: pageX - prevX,
+                dy: pageY - prevY,
+                pageX: pageX,
+                pageY: pageY,
+                scale: gesture.scale,
+                angle: 180 * angle / Math.PI,
+                rotation: rotation
+            };
+            gestureEvent.initCustomEvent('interactgesturemove', true, true, detail);
+            target.element.dispatchEvent(gestureEvent);
+        }
+
+        prevX = pageX;
+        prevY = pageY;
+        gesture.prevAngle = angle;
+        gesture.prevDistance = distance;
+        
+        // No more auto check once gesture is ready to move
+        // events.remove(docTarget, downEvent, mouseDown)
     }
 
     /**
@@ -570,12 +744,16 @@ window.interact = (function () {
         var right,
             bottom,
             action = '',
-			page = getPageXY(event),
-			pageX = page.x,
-			pageY = page.y;
+            page = getPageXY(event),
+            pageX = page.x,
+            pageY = page.y;
 
         mouseIsDown = true;
-        if ((target = getInteractNode(event.currentTarget))) {
+        
+        // If it is a multi-touch gesture, use target from first touch
+        if ((event.touches && event.touches.length > 1 && target)?
+                target:
+                target = getInteractNode(event.currentTarget)) {
             event.preventDefault();
 
             if (target.drag || target.resize) {
@@ -601,13 +779,6 @@ window.interact = (function () {
             pageX,
             pageY,
             endEvent;
-
-        /*
-         * With the way autoScroll currently works, it might be a good idea to
-         * use the pageX/Y from the previous mousemove event (prevX, prevY)
-         * so in situation where page is scrolled but element position remains the same,
-         * the element being dragged/moved doesn't jump or explode after mouseup
-         */
 
         if (dragging) {
             endEvent = document.createEvent('CustomEvent');
@@ -655,17 +826,39 @@ window.interact = (function () {
             resizing = false;
         }
 
+        if (gesturing) {
+            endEvent = document.createEvent('CustomEvent');
+
+            pageX = prevX;
+            pageY = prevY;
+            detail = {
+                x0: x0,
+                y0: y0,
+                dx: pageX - x0,
+                dy: pageY - y0,
+                pageX: pageX,
+                pageY: pageY,
+                scale: gesture.scale,
+                angle: 180 * gesture.prevAngle / Math.PI,
+                rotation: 180 * (gesture.prevAngle - gesture.startAngle) / Math.PI
+            };
+            endEvent.initCustomEvent('interactgestureend', true, true, detail);
+            target.element.dispatchEvent(endEvent);
+            gesturing = false;
+        }
+        
         // Add and remove appropriate events
         events.remove(docTarget, moveEvent, resizeMove);
         events.remove(docTarget, moveEvent, dragMove);
+        events.remove(docTarget, moveEvent, gestureMove);
         events.add(docTarget, moveEvent, mouseMove);
 
         document.documentElement.style.cursor = '';
         mouseIsDown = false;
-        
+    
         // prevent Default only if were previously interacting
         if (target) {
-        	event.preventDefault();
+            event.preventDefault();
         }
         clearTarget();
         
@@ -757,9 +950,9 @@ window.interact = (function () {
             element: element,
             drag: ('drag' in options)? options.drag : false,
             resize: ('resize' in options)? options.resize : false,
+            gesture: ('gesture' in options)? options.gesture : false,
             squareResize: ('squareResize' in options)? options.squareResize : false,
             getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck,
-            order: ('order' in options)? options.order : false
         };
 
         if (indexOfElement !== -1) {
@@ -842,20 +1035,7 @@ window.interact = (function () {
         mouseDown(event, action);
     }
 
-    /**
-     * @function
-     * @param {string} [type] Event type to be searched for
-     * @returns {string} The name of the custom interact event
-     * @returns OR
-     * @returns {Object} An object linking event types to string values
-     */
-    interact.eventDict = function (type) {
-        if (arguments.length === 0) {
-            return eventDict;
-        }
-
-        return eventDict[type];
-    };
+    interact.eventTypes = eventTypes;
 
     /**
      * @function
@@ -883,6 +1063,7 @@ window.interact = (function () {
         return margin;
     }
     events.add(docTarget, upEvent, docMouseUp);
+    events.add(docTarget, 'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
     events.add(docTarget, moveEvent, mouseMove);
 
@@ -900,5 +1081,5 @@ window.interact = (function () {
      events.add(docTarget, 'interactdragend', scroll.hideEdges);
 
     return interact;
-}());
+}(window));
 
