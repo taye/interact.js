@@ -229,7 +229,8 @@ window.interactDemo = (function(interact) {
 
             interact.set(newDiv, {
                 drag: true,
-                resize: true
+                resize: true,
+                gesture: true
             });
             window['d' + i] = newDiv;
         }
@@ -499,10 +500,18 @@ window.interactDemo = (function(interact) {
             nl = '<br> ';
         }
 
-        if ( e.target.interactDemo && e.type in interact.eventDict()) {
-            e.target.text[textProp] = nl + interact.eventDict(e.type) + ' x0, y0    :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
+        if ( e.target.interactDemo && interact.eventTypes.indexOf(e.type) !== -1 ) {
+            e.target.text[textProp] = nl + e.type;
+            e.target.text[textProp] += nl + ' x0, y0        :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
             e.target.text[textProp] += nl + ' dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
-            e.target.text[textProp] += nl + ' pageX, pageY    :    (' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+            e.target.text[textProp] += nl + ' pageX, pageY  :    (' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+
+            if (e.type.indexOf('gesture') !== -1) {
+                e.target.text[textProp] += nl + ' distance  :     ' + e.detail.distance;
+                e.target.text[textProp] += nl + ' scale     :     ' + e.detail.scale;
+                e.target.text[textProp] += nl + ' angle     :     ' + e.detail.angle;
+                e.target.text[textProp] += nl + ' rotation  :     ' + e.detail.rotation;
+            }
         }
     }
 
@@ -633,6 +642,9 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragstart', nodeEventDebug);
     document.addEventListener('interactdragmove', nodeEventDebug);
     document.addEventListener('interactdragend', nodeEventDebug);
+    document.addEventListener('interactgesturestart', nodeEventDebug);
+    document.addEventListener('interactgesturemove', nodeEventDebug);
+    document.addEventListener('interactgestureend', nodeEventDebug);
 
     // These listeners must be triggered after the others
     // so prevX !== e.detail.pageX for other event listeners
