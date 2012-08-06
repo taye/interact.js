@@ -28,20 +28,20 @@ window.interactDemo = (function(interact) {
                     return {
                         x: Number(element.getAttribute('width')),
                         y: Number(element.getAttribute('height'))
-                    }
+                    };
                 }
             },
             circle: {
-                setSize: function (element, x, y) {
-                    if (typeof x === 'number') {
-                        element.setAttribute('r', x * 0.5);
+                setSize: function (element, diameter) {
+                    if (typeof diameter === 'number') {
+                        element.setAttribute('r', diameter / 2);
                     }
                 },
                 getSize: function (element) {
                     return {
                         x: Number(element.getAttribute('r')) * 2,
                         y: Number(element.getAttribute('r')) * 2
-                    }
+                    };
                 }
             },
             ellipse: {
@@ -57,7 +57,7 @@ window.interactDemo = (function(interact) {
                     return {
                         x: Number(element.getAttribute('rx')) * 2,
                         y: Number(element.getAttribute('ry')) * 2
-                    }
+                    };
                 }
             },
             text: 'text',
@@ -119,10 +119,7 @@ window.interactDemo = (function(interact) {
             height = window.innerHeight,
             x,
             y,
-            i,
-            buttunFunction = function (e) {
-                e.target.innerHTML = e.type;
-            };
+            i;
 
         if (!svg) {
             svg = document.createElementNS(svgNS, 'svg');
@@ -193,10 +190,11 @@ window.interactDemo = (function(interact) {
         var newDiv,
             text,
             button,
-            i,
-            buttunFunction = function (e) {
-                e.target.innerHTML = e.type;
-            };
+            i;
+            
+        function buttunFunction(e) {
+            e.target.innerHTML = e.type;
+        }
 
         if (n < 0 || typeof n !== 'number') {
             n = 5;
@@ -525,7 +523,7 @@ window.interactDemo = (function(interact) {
         var debug = [],
             prop;
         if (typeof e.detail === 'object') {
-            debug.push['event.detail: '];
+            debug.push('event.detail: ');
             for (prop in e.detail) {
                 if (e.detail.hasOwnProperty(prop)) {
                     debug.push('\n    ' + prop + ' : ' + e.detail[prop]);
@@ -581,8 +579,6 @@ window.interactDemo = (function(interact) {
     function realtimeResize(e) {
         var target = e.target,
             position = getPosition(target),
-            newWidth,
-            newHeight,
             dx = 0,
             dy = 0;
 

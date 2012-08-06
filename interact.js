@@ -172,8 +172,6 @@ window.interact = (function (window) {
                 }
             },
             edgeOut: function (event) {
-                var edge = event.target;
-
                 // Mouse may have entered another edge while still being above this one
                 // Need to check if mouse is still above this element
                 scroll.edgeMove(event);
@@ -432,19 +430,6 @@ window.interact = (function (window) {
         
         return action;
     }
-
-    /**
-     * @private
-     * @param {Object HTMLElement | Object SVGElement} element
-     * Place element above others under the same parent
-     */
-    function bringToFront(element) {
-        if (element.nodeName in svgTags) {
-            return(element.parentNode.parentNode.appendChild(element.parentNode));
-        } else {
-            return(element.parentNode.appendChild(element));
-        }
-    }
     
     // Get event.pageX/Y for mouse and event.touches[0].pageX/Y tor touch
     function getPageXY(event) {
@@ -679,8 +664,12 @@ window.interact = (function (window) {
             gesture.scale = distance / gesture.startDistance;
             rotation = angle - gesture.prevAngle;
             
-            if (rotation > Math.PI) rotation -= 2 * Math.PI;
-            if (rotation < -Math.PI) rotation += 2 * Math.PI;
+            if (rotation > Math.PI) {
+                rotation -= 2 * Math.PI;
+            }
+            if (rotation < -Math.PI) {
+                rotation += 2 * Math.PI;
+            }
             
             // Convert to degrees from radians
             rotation = 180 * rotation / Math.PI;
@@ -693,6 +682,7 @@ window.interact = (function (window) {
                 dy: pageY - prevY,
                 pageX: pageX,
                 pageY: pageY,
+                distance: distance,
                 scale: gesture.scale,
                 angle: 180 * angle / Math.PI,
                 rotation: rotation
@@ -716,10 +706,7 @@ window.interact = (function (window) {
      * Check what action would be performed on mouseMove target if the mouse button were pressed and change the cursor accordingly
      */
     function mouseMove(event) {
-        var right,
-            bottom,
-            axes,
-            action;
+        var action;
 
         // Check if target element or it's parent is interactable
         if (!mouseIsDown && (target = getInteractNode(event.target) || getInteractNode(event.target.parentNode))) {
@@ -741,9 +728,7 @@ window.interact = (function (window) {
      * Determine action to be performed on next mouseMove and add appropriate style and event Liseners
      */
     function mouseDown(event, forceAction) {
-        var right,
-            bottom,
-            action = '',
+        var action = '',
             page = getPageXY(event),
             pageX = page.x,
             pageY = page.y;
@@ -838,6 +823,7 @@ window.interact = (function (window) {
                 dy: pageY - y0,
                 pageX: pageX,
                 pageY: pageY,
+                distance: gesture.prevDistance,
                 scale: gesture.scale,
                 angle: 180 * gesture.prevAngle / Math.PI,
                 rotation: 180 * (gesture.prevAngle - gesture.startAngle) / Math.PI
@@ -952,7 +938,9 @@ window.interact = (function (window) {
             resize: ('resize' in options)? options.resize : false,
             gesture: ('gesture' in options)? options.gesture : false,
             squareResize: ('squareResize' in options)? options.squareResize : false,
-            getAction: (typeof options.actionChecker === 'function')? options.actionChecker: autoCheck,
+            getAction: (typeof options.actionChecker === 'function')?
+                    options.actionChecker:
+                    autoCheck
         };
 
         if (indexOfElement !== -1) {
@@ -988,8 +976,6 @@ window.interact = (function (window) {
      * @returns bool
      */
     interact.isSet = function(element) {
-        var i;
-
         return interactNodes.indexOf(element !== -1);
     };
 
@@ -1033,7 +1019,7 @@ window.interact = (function (window) {
         event.preventDefault = event.stopPropagation = function () {};
 
         mouseDown(event, action);
-    }
+    };
 
     interact.eventTypes = eventTypes;
 
@@ -1059,9 +1045,11 @@ window.interact = (function (window) {
             supportsTouch: supportsTouch
         };
     };
+    
     interact.margin = function () {
         return margin;
-    }
+    };
+    
     events.add(docTarget, upEvent, docMouseUp);
     events.add(docTarget, 'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
