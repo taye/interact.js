@@ -594,6 +594,35 @@ window.interactDemo = (function(interact) {
         changeSize(target, dx, dy);
     }
 
+    function staticScale(e) {
+        var target = e.target,
+            scale = event.detail.scale,
+            position = getPosition(target),
+            size = getSize(target),
+            width = size.x * scale,
+            height = size.y * scale;
+        
+        changePosition(target,
+            e.detail.dx -(width - size.x) / 2,
+            e.detail.dy -(height - size.y) / 2);
+        setSize(target, width, height);
+    }
+
+    function realtimeScale(e) {
+        var target = e.target,
+            position = getPosition(target),
+            ds = event.detail.ds,
+            size = getSize(target),
+            dx = size.x * ds,
+            dy = size.y * ds;
+
+        changePosition(target,
+            // Values need to be adjusted by factor of ~0.13. Probably due to rounding errors
+            e.detail.dx + 0.13 - dx / 2,
+            e.detail.dy + 0.13 - dx / 2);
+        changeSize(target, dx, dy);
+    }
+
     function realtimeUpdate(newValue) {
         if (newValue !== undefined) {
             return (realtime = Boolean(newValue));
@@ -631,6 +660,18 @@ window.interactDemo = (function(interact) {
         }
     });
 
+    document.addEventListener('interactgesturemove', function (e) {
+        if (realtime) {
+            realtimeScale(e);
+        }
+    });
+
+    document.addEventListener('interactgestureend', function (e) {
+        if (!realtime) {
+            staticScale(e);
+        }
+    });
+
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
@@ -648,6 +689,8 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactdragmove', setPrevMouse);
     document.addEventListener('interactresizestart', setPrevMouse);
     document.addEventListener('interactresizemove', setPrevMouse);
+    document.addEventListener('interactgesturestart', setPrevMouse);
+    document.addEventListener('interactgesturemove', setPrevMouse);
 
     interactDemo.randomDivs = randomDivs;
     interactDemo.randomGraphics = randomGraphics;
