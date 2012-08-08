@@ -508,6 +508,8 @@ window.interact = (function (window) {
      * @private
      */
     function resizeMove(event) {
+        event.preventDefault();
+        
         var detail,
             resizeEvent,
             page = getPageXY(event),
@@ -577,6 +579,8 @@ window.interact = (function (window) {
      * @private
      */
     function dragMove(event) {
+        event.preventDefault();
+        
         var detail,
             dragEvent,
             page = getPageXY(event),
@@ -628,6 +632,8 @@ window.interact = (function (window) {
         if (event.touhces < 2) {
             return;
         }
+        event.preventDefault();
+        
         var detail,
             gestureEvent,
             page = touchAverage(event),
