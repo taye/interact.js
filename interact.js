@@ -699,7 +699,11 @@ window.interact = (function (window) {
         prevY = pageY;
         gesture.prevAngle = angle;
         gesture.prevDistance = distance;
-        gesture.scale = scale;
+        if (scale !== Infinity && scale !== null && scale !== undefined  && scale !== NaN) {
+			gesture.scale = scale;
+		} else {
+		//	gesture.scale = 1;
+		}
 
         // No more auto check once gesture is ready to move
         // events.remove(docTarget, downEvent, mouseDown)
@@ -719,9 +723,12 @@ window.interact = (function (window) {
                 removeClass(target.element, 'interact-resizexy interact-resizex interact-resizey');
 
                 action = target.getAction(event);
+				if (!action || !(target[action.match('resize') || action])) {
+					return event;
+				}
 
                 target.element.style.cursor = actions[action].cursor;
-            } else if (dragging || resizing) {
+            } else if (dragging || resizing || gesturing) {
                 event.preventDefault();
             }
         }
@@ -740,22 +747,28 @@ window.interact = (function (window) {
 
         mouseIsDown = true;
         
-        // If it is a multi-touch gesture, use target from first touch
-        if ((event.touches && event.touches.length > 1 && target)?
-                target:
-                target = getInteractNode(event.currentTarget)) {
+        // If it is the second touch of a multi-touch gesture, keep the target the same
+        if ((!event.touches && event.touches.length < 2) || !target) {
+            target = getInteractNode(this) || getInteractNode(event.target);
+		}
+		
+		if (target && !(dragging || resizing || gesturing)) {
+			
+			x0 = prevX = pageX;
+			y0 = prevY = pageY;
+			events.remove(docTarget, moveEvent, 'all');
+
+			action = forceAction || target.getAction(event);
+			if (!action || !(target[action.match('resize') || action])) {
+				return event;
+			}
+
+			document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
+			actions[action].ready();
+			
             event.preventDefault();
-
-            if (target.drag || target.resize) {
-                x0 = prevX = pageX;
-                y0 = prevY = pageY;
-                events.remove(docTarget, moveEvent, 'all');
-
-                action = forceAction || target.getAction(event);
-
-                document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
-                actions[action].ready();
-            }
+			event.stopPropagation();
+			return false;
         }
     }
 
@@ -1076,4 +1089,3 @@ window.interact = (function (window) {
 
     return interact;
 }(window));
-
