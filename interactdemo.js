@@ -614,13 +614,15 @@ window.interactDemo = (function(interact) {
             ds = event.detail.ds,
             size = getSize(target),
             dx = size.x * ds,
-            dy = size.y * ds;
+            dy = size.y * ds,
+            newSize;
 
-        changePosition(target,
-            // Values need to be adjusted by factor of ~0.13. Probably due to rounding errors
-            e.detail.dx + 0.13 - dx / 2,
-            e.detail.dy + 0.13 - dx / 2);
         changeSize(target, dx, dy);
+        
+        newSize = getSize(target);
+        changePosition(target,
+            Math.ceil(e.detail.dx - (newSize.x - size.x) / 2),
+            Math.ceil(e.detail.dy - (newSize.y - size.y) / 2));
     }
 
     function realtimeUpdate(newValue) {

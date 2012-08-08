@@ -625,6 +625,9 @@ window.interact = (function (window) {
     }
     
     function gestureMove(event) {
+        if (event.touhces < 2) {
+            return;
+        }
         var detail,
             gestureEvent,
             page = touchAverage(event),
