@@ -984,7 +984,7 @@ window.interact = (function (window) {
 
         addClass(element, [
                 'interact-node',
-                newNode.drag? 'interact-dragable': '',
+                newNode.drag? 'interact-draggable': '',
                 newNode.resize? 'interact-resizeable': '',
                 newNode.gesture? 'interact-gestureable': ''
             ].join(' '));
