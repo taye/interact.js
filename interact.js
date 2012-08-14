@@ -1001,7 +1001,18 @@ window.interact = (function (window) {
         if (i !== -1) {
             events.removeAll(interactNodes[i]);
             interactNodes.splice(i, 1);
-            removeClass(element, 'interact-node interact-target interact-dragging interact-draggable interact-resizeable interact-resize-xy interact-resize-x interact-resize-y');
+            removeClass(element, [
+                    'interact-node',
+                    'interact-target',
+                    'interact-dragging',
+                    'interact-draggable',
+                    'interact-resizeable',
+                    'interact-resize-xy',
+                    'interact-resize-x',
+                    'interact-resize-y',
+                    'interact-gestureable',
+                    'interact-gesturing',
+                ].join(' '));
         }
 
     };
@@ -1073,10 +1084,13 @@ window.interact = (function (window) {
 
         return {
             target: target,
+            dragging: dragging,
+            resizing: resizing,
+            gesturing: gesturing,
             prevX: prevX,
             prevY: prevY,
-            startX: x0,
-            startY: y0,
+            x0: x0,
+            y0: y0,
             nodes: interactNodes,
             mouseIsDown: mouseIsDown,
             supportsTouch: supportsTouch,
