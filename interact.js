@@ -400,7 +400,7 @@ window.interact = (function (window) {
      * @private
      * @returns{String} action to be performed - drag/resize[axes]
      */
-    function autoCheck(event) {
+    function actionCheck(event) {
         var clientRect,
             right,
             bottom,
@@ -972,7 +972,7 @@ window.interact = (function (window) {
             autoScroll: ('autoScroll' in options)? options.autoScroll : true,
             getAction: (typeof options.actionChecker === 'function')?
                     options.actionChecker:
-                    autoCheck
+                    actionCheck
         };
 
         if (indexOfElement !== -1) {
@@ -1079,7 +1079,8 @@ window.interact = (function (window) {
             startY: y0,
             nodes: interactNodes,
             mouseIsDown: mouseIsDown,
-            supportsTouch: supportsTouch
+            supportsTouch: supportsTouch,
+            defaultActionCheck: actionCheck
         };
     };
 
