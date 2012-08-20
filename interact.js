@@ -43,16 +43,16 @@ window.interact = (function (window) {
         },
 
         interactNodes = [],
-        svgTags = {
-            g: 'g',
-            rect: 'rect',
-            circle: 'circle',
-            ellipse: 'ellipse',
-            text: 'text',
-            path: 'path',
-            line: 'line',
-            image: 'image'
-        },
+        svgTags = [
+            'g',
+            'rect',
+            'circle',
+            'ellipse',
+            'text',
+            'path',
+            'line',
+            'image'
+        ],
         scrollMargin = 70,
 
         //All things relating to autoScroll
@@ -299,7 +299,6 @@ window.interact = (function (window) {
                    if (target.gesture) {
                         events.add(docTarget, moveEvent, gestureMove);
                         addClass(target.element, 'interact-target interact-gesturing');
-                        event.preventDefault();
                     }
                 }
             }
@@ -412,7 +411,7 @@ window.interact = (function (window) {
                     event.touches[0].pageY:
                     event.pageY;
 
-        clientRect = (target.element.nodeName in svgTags)?
+        clientRect = (svgTags.indexOf(target.element.nodeName) !== -1)?
                 target.element.getBoundingClientRect():
                 clientRect = target.element.getClientRects()[0];
 
@@ -434,10 +433,10 @@ window.interact = (function (window) {
     // Get event.pageX/Y for mouse and event.touches[0].pageX/Y tor touch
     function getPageXY(event) {
         return {
-            x: (event.touches)?
+            pageX: (event.touches)?
                 event.touches[0].pageX:
                 event.pageX,
-            y: (event.touches)?
+            pageY: (event.touches)?
                 event.touches[0].pageY:
                 event.pageY
         };
@@ -455,8 +454,8 @@ window.interact = (function (window) {
         }
 
         return {
-            x: pageX,
-            y: pageY
+            pageX: pageX,
+            pageY: pageY
         };
     }
 
@@ -512,8 +511,8 @@ window.interact = (function (window) {
         var detail,
             resizeEvent,
             page = getPageXY(event),
-            pageX = page.x,
-            pageY = page.y;
+            pageX = page.pageX,
+            pageY = page.pageY;
 
         if (!resizing) {
             resizeEvent = document.createEvent('CustomEvent');
@@ -583,8 +582,8 @@ window.interact = (function (window) {
         var detail,
             dragEvent,
             page = getPageXY(event),
-            pageX = page.x,
-            pageY = page.y;
+            pageX = page.pageX,
+            pageY = page.pageY;
 
         if (!dragging) {
             dragEvent = document.createEvent('CustomEvent');
@@ -628,7 +627,7 @@ window.interact = (function (window) {
     }
 
     function gestureMove(event) {
-        if (event.touhces < 2) {
+        if (event.touches.length < 2) {
             return;
         }
         event.preventDefault();
@@ -636,8 +635,8 @@ window.interact = (function (window) {
         var detail,
             gestureEvent,
             page = touchAverage(event),
-            pageX = page.x,
-            pageY = page.y,
+            pageX = page.pageX,
+            pageY = page.pageY,
             distance = touchDistance(event),
             scale,
             angle = touchAngle(event),
@@ -647,9 +646,6 @@ window.interact = (function (window) {
             gesture.angle = touchAngle(event);
 
         if (!gesturing) {
-            x0 = pageX;
-            y0 = pageY;
-
             gesture.startDistance = touchDistance(event);
             gesture.startAngle = angle;
             gesture.scale = 1;
@@ -730,9 +726,13 @@ window.interact = (function (window) {
                 removeClass(target.element, 'interact-resizexy interact-resizex interact-resizey');
 
                 action = target.getAction(event);
+
 				if (!action || !(target[action.match('resize') || action])) {
 					return event;
 				}
+                if (action === 'resize') {
+                    action = 'resizexy';
+                }
 
                 target.element.style.cursor = actions[action].cursor;
             } else if (dragging || resizing || gesturing) {
@@ -748,9 +748,11 @@ window.interact = (function (window) {
      */
     function mouseDown(event, forceAction) {
         var action = '',
-            page = getPageXY(event),
-            pageX = page.x,
-            pageY = page.y;
+            page = (event.touches)?
+                touchAverage(event):
+                getPageXY(event),
+            pageX = page.pageX,
+            pageY = page.pageY;
 
         mouseIsDown = true;
 
@@ -769,6 +771,10 @@ window.interact = (function (window) {
 			if (!action || !(target[action.match('resize') || action])) {
 				return event;
 			}
+
+            if (action === 'resize') {
+                action = 'resizexy';
+            }
 
 			document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
 			actions[action].ready();
@@ -1046,7 +1052,7 @@ window.interact = (function (window) {
                 }
             }
         } else {
-            clientRect = (element.nodeName in svgTags)?
+            clientRect = (svgTags.indexOf(element.nodeName) !== -1)?
                     element.getBoundingClientRect():
                     clientRect = element.getClientRects()[0];
 
@@ -1094,7 +1100,13 @@ window.interact = (function (window) {
             nodes: interactNodes,
             mouseIsDown: mouseIsDown,
             supportsTouch: supportsTouch,
-            defaultActionCheck: actionCheck
+            defaultActionCheck: actionCheck,
+            dragMove: dragMove,
+            resizeMove: resizeMove,
+            gestureMove: gestureMove,
+            mouseUp: docMouseUp,
+            mouseDown: mouseDown,
+            mouseMove: mouseMove
         };
     };
 
