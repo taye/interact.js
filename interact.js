@@ -57,6 +57,7 @@ window.interact = (function (window) {
 
         //All things relating to autoScroll
         scroll = {
+            isEnabled: true,
             margin: scrollMargin,
 
             // The distance in x and y that the page is scrolled
@@ -166,7 +167,7 @@ window.interact = (function (window) {
                     scroll.x = scroll.distance * (right? 1: left? -1: 0);
                     scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
 
-                    if (!scroll.isScrolling && target.autoScroll) {
+                    if (!scroll.isScrolling && scroll.isEnabled && target.autoScroll) {
                         scroll.start();
                     }
                 }
@@ -250,8 +251,8 @@ window.interact = (function (window) {
         resizeAxes = 'xy',
 
         // What to do depending on action returned by getAction() of node
-        // dictates what cursor should be used and
-        // what mouseMove event Listner to is to be added after mouseDown
+        // dictates what styles should be used and
+        // what mouseMove event Listner is to be added after mouseDown
         actions = {
             resizex: {
                 cursor: 'e-resize',
@@ -303,6 +304,7 @@ window.interact = (function (window) {
                 }
             }
         },
+        styleCursor = true,
         downEvent,
         upEvent,
         moveEvent,
@@ -540,7 +542,7 @@ window.interact = (function (window) {
             }
             resizeEvent.initCustomEvent('interactresizestart', true, true, detail);
             target.element.dispatchEvent(resizeEvent);
-            addClass(target.element, 'interact-resize-target');
+            addClass(target.element, 'interact-resizing');
             resizing = true;
         } else {
             resizeEvent = document.createEvent('CustomEvent');
@@ -706,35 +708,38 @@ window.interact = (function (window) {
         gesture.prevAngle = angle;
         gesture.prevDistance = distance;
         if (scale !== Infinity && scale !== null && scale !== undefined  && scale !== NaN) {
-			gesture.scale = scale;
-		} else {
-		//	gesture.scale = 1;
-		}
+            gesture.scale = scale;
+        } else {
+        //    gesture.scale = 1;
+        }
     }
 
     /**
      * @private
      * @event
-     * Check what action would be performed on mouseMove target if the mouse button were pressed and change the cursor accordingly
+     * Check what action would be performed on mouseMove target if the mouse button were pressed
+     * and change the element classes accordingly
      */
     function mouseMove(event) {
         var action;
 
         // Check if target element or it's parent is interactable
         if (!mouseIsDown && (target = getInteractNode(event.target) || getInteractNode(event.target.parentNode))) {
-            if (target.resize || target.drag) {
+            if ((target.resize || target.drag) && target.checkOnHover) {
                 removeClass(target.element, 'interact-resizexy interact-resizex interact-resizey');
 
                 action = target.getAction(event);
 
-				if (!action || !(target[action.match('resize') || action])) {
-					return event;
-				}
+                if (!action || !(target[action.match('resize') || action])) {
+                    return event;
+                }
                 if (action === 'resize') {
                     action = 'resizexy';
                 }
 
-                target.element.style.cursor = actions[action].cursor;
+                if (styleCursor) {
+                    target.element.style.cursor = actions[action].cursor;
+                }
             } else if (dragging || resizing || gesturing) {
                 event.preventDefault();
             }
@@ -759,29 +764,32 @@ window.interact = (function (window) {
         // If it is the second touch of a multi-touch gesture, keep the target the same
         if ((event.touches && event.touches.length < 2) || !target) {
             target = getInteractNode(this) || getInteractNode(event.target);
-		}
+        }
 
-		if (target && !(dragging || resizing || gesturing)) {
+        if (target && !(dragging || resizing || gesturing)) {
 
-			x0 = prevX = pageX;
-			y0 = prevY = pageY;
-			events.remove(docTarget, moveEvent, 'all');
+            x0 = prevX = pageX;
+            y0 = prevY = pageY;
+            events.remove(docTarget, moveEvent, 'all');
 
-			action = forceAction || target.getAction(event);
-			if (!action || !(target[action.match('resize') || action])) {
-				return event;
-			}
+            action = forceAction || target.getAction(event);
+            if (!action || !(target[action.match('resize') || action])) {
+                return event;
+            }
 
-            if (action === 'resize') {
+            if (action === 'resize' || action === 'resizeyx') {
                 action = 'resizexy';
             }
 
-			document.documentElement.style.cursor = target.element.style.cursor = actions[action].cursor;
-			actions[action].ready();
+            if (styleCursor) {
+                document.documentElement.style.cursor
+                    = target.element.style.cursor
+                        = actions[action].cursor;
+            }
+
+            actions[action].ready();
 
             event.preventDefault();
-			event.stopPropagation();
-			return false;
         }
     }
 
@@ -872,7 +880,10 @@ window.interact = (function (window) {
         events.remove(docTarget, moveEvent, gestureMove);
         events.add(docTarget, moveEvent, mouseMove);
 
-        document.documentElement.style.cursor = '';
+        if (styleCursor && target) {
+            document.documentElement.style.cursor = '';
+            target.element.style.cursor = '';
+        }
         mouseIsDown = false;
 
         // prevent Default only if were previously interacting
@@ -978,7 +989,8 @@ window.interact = (function (window) {
             autoScroll: ('autoScroll' in options)? options.autoScroll : true,
             getAction: (typeof options.actionChecker === 'function')?
                     options.actionChecker:
-                    actionCheck
+                    actionCheck,
+            checkOnHover: ('autoScroll' in options)? options.checkOnHover : true,
         };
 
         if (indexOfElement !== -1) {
@@ -994,6 +1006,8 @@ window.interact = (function (window) {
                 newNode.resize? 'interact-resizeable': '',
                 newNode.gesture? 'interact-gestureable': ''
             ].join(' '));
+
+        return interact;
     };
 
     /**
@@ -1002,10 +1016,14 @@ window.interact = (function (window) {
      * @param {HTMLElement | SVGElement} element The DOM Element that will be removed
      */
     interact.unset = function (element) {
-        var i = interactNodes.indexOf(element);
+        var i = interactNodes.indexOf(element),
+            node = interactNodes[i];
 
         if (i !== -1) {
-            events.removeAll(interactNodes[i]);
+            events.removeAll(node);
+            if (styleCursor) {
+                node.style.cursor = '';
+            }
             interactNodes.splice(i, 1);
             removeClass(element, [
                     'interact-node',
@@ -1020,7 +1038,7 @@ window.interact = (function (window) {
                     'interact-gesturing',
                 ].join(' '));
         }
-
+        return interact;
     };
 
     /**
@@ -1073,6 +1091,8 @@ window.interact = (function (window) {
         event.preventDefault = event.stopPropagation = function () {};
 
         mouseDown(event, action);
+        
+        return interact;
     };
 
     interact.eventTypes = eventTypes;
@@ -1110,14 +1130,47 @@ window.interact = (function (window) {
         };
     };
 
-    interact.margin = function () {
+    interact.margin = function (newMargin) {
+        if (typeof newMargin === 'number') {
+            margin = newMargin;
+            
+            return interact;
+        }
         return margin;
     };
+
+    interact.styleCursor = function (newValue) {
+        if (newValue !== null && newValue !== undefined) {
+            var i;
+
+            styleCursor = newValue;
+            
+            // If the element cursor styles are no longer being changed by
+            // interact, clear the cursor style
+            if (!styleCursor) {
+                for (i = 0; i < interactNodes.length; i++) {
+                    interactNodes[i].element.style.cursor = '';
+                }
+            }
+            return interact;
+        }
+        return styleCursor;
+    };
+
+    interact.enableAutoScroll = function (newValue) {
+        if (newValue !== null && newValue !== undefined) {
+            scroll.isEnabled  = newValue;
+            
+            return interact;
+        }
+        return scroll.isEnabled;
+    };
+    
+    events.add(docTarget, moveEvent, mouseMove);
 
     events.add(docTarget, upEvent, docMouseUp);
     events.add(docTarget, 'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
-    events.add(docTarget, moveEvent, mouseMove);
 
     events.add(docTarget, 'DOMContentLoaded', function () {
             scroll.addEdges();
