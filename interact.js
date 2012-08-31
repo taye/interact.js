@@ -749,7 +749,8 @@ window.interact = (function (window) {
     /**
      * @private
      * @event
-     * Determine action to be performed on next mouseMove and add appropriate style and event Liseners
+     * Determine action to be performed on next mouseMove and add appropriate 
+     * style and event Liseners
      */
     function mouseDown(event, forceAction) {
         var action = '',
@@ -762,7 +763,8 @@ window.interact = (function (window) {
         mouseIsDown = true;
 
         // If it is the second touch of a multi-touch gesture, keep the target the same
-        if ((event.touches && event.touches.length < 2) || !target) {
+        // If a target was set by the first touch (not always the case with simulated touches)
+        if ((event.touches && event.touches.length < 2 && !target) || !target) {
             target = getInteractNode(this) || getInteractNode(event.target);
         }
 
@@ -1022,7 +1024,7 @@ window.interact = (function (window) {
         if (i !== -1) {
             events.removeAll(node);
             if (styleCursor) {
-                node.style.cursor = '';
+                node.element.style.cursor = '';
             }
             interactNodes.splice(i, 1);
             removeClass(element, [
