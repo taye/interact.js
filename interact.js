@@ -774,7 +774,6 @@ window.interact = (function (window) {
 
             x0 = prevX = pageX;
             y0 = prevY = pageY;
-            events.remove(docTarget, moveEvent, 'all');
 
             action = forceAction || target._getAction(event);
             if (!action || !(target[action.match('resize')? '_resize': '_' + action])) {
@@ -882,7 +881,6 @@ window.interact = (function (window) {
         events.remove(docTarget, moveEvent, resizeMove);
         events.remove(docTarget, moveEvent, dragMove);
         events.remove(docTarget, moveEvent, gestureMove);
-        events.add(docTarget, moveEvent, mouseMove);
 
         if (styleCursor && target) {
             document.documentElement.style.cursor = '';
@@ -991,7 +989,7 @@ window.interact = (function (window) {
                 actionCheck,
         this._checkOnHover = ('autoScroll' in options)? options.checkOnHover : true;
 
-        events.add(docTarget, moveEvent, mouseMove);
+        events.add(this, moveEvent, mouseMove);
         events.add(this, downEvent, mouseDown, false);
 
         interactables.push(this);
