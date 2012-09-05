@@ -76,13 +76,13 @@ function simulate(eventType, eventProps) {
 document.simulate = div0.simulate = simulate;
 
 test('interact.set', function () {
-    var interactObject,
+    var interactable,
         expectedDrag = true,
         expectedResize = true,
         expectedGesture = true,
         expectedAutoScroll = false,
         expectedClassName = 'interact-node interact-draggable interact-resizeable interact-gestureable' ,
-        nodes,
+        interactables,
         expectedActionChecker = interact.debug().defaultActionChecker;
     
     interact.set(div0, {
@@ -91,37 +91,37 @@ test('interact.set', function () {
             gesture: expectedGesture,
             autoScroll: expectedAutoScroll
         });
-    nodes = interact.debug().nodes;
-    interactObject = interact(div0);
+    interactables = interact.debug().interactables;
+    interactable = interact(div0);
     
-    equal(interactObject, nodes[0], 'interact(element) returns correct object');
-    equal(interactObject.element, div0);
-    equal(interactObject.drag, expectedDrag, 'Drag option set correctly');
-    equal(interactObject.resize, expectedResize, 'Resize option set correctly');
-    equal(interactObject.gesture, expectedGesture, 'Gesture option set correctly');
-    equal(interactObject.autoScroll, expectedAutoScroll, 'AutoScroll option set correctly');
-    equal(interactObject.actionChecker, expectedActionChecker, 'Gesture option set correctly');
+    equal(interactable, interactables[0], 'interact(element) returns correct object');
+    equal(interactable.element(), div0);
+    equal(interactable.draggable(), expectedDrag, 'Drag option');
+    equal(interactable.resizeable(), expectedResize, 'Resize option');
+    equal(interactable.gestureable(), expectedGesture, 'Gesture option');
+    equal(interactable.autoScroll(), expectedAutoScroll, 'AutoScroll option');
+    equal(interactable.actionChecker(), expectedActionChecker, 'Action checker');
     equal(div0.className, expectedClassName, 'Element classes added correctly');
     
     interact.set(div0);
-    nodes = interact.debug().nodes;
-    interactObject = interact(div0);
+    interactables = interact.debug().interactables;
+    interactable = interact(div0);
     
-    equal(nodes.length, 1, 'Node reset - number of nodes does not change');
-    equal(interactObject.drag, expectedDrag = false, 'Drag option set to default');
-    equal(interactObject.resize, expectedResize = false, 'Resize option set to default');
-    equal(interactObject.gesture, expectedGesture = false, 'Gesture option set to default');
-    equal(interactObject.autoScroll, expectedAutoScroll = true, 'AutoScroll option set to default');
-    equal(interactObject.actionChecker, expectedActionChecker, 'Gesture option set to default');
+    equal(interactables.length, 1, 'interactable reset - number of interactables does not change');
+    equal(interactable.draggable(), expectedDrag = false, 'Drag option set to default');
+    equal(interactable.resizeable(), expectedResize = false, 'Resize option set to default');
+    equal(interactable.gestureable(), expectedGesture = false, 'Gesture option set to default');
+    equal(interactable.autoScroll(), expectedAutoScroll = true, 'AutoScroll option set to default');
+    equal(interactable.actionChecker(), expectedActionChecker, 'Gesture option set to default');
     
     interact.set(div1);
-    nodes = interact.debug().nodes;
-    equal(nodes.length, 2, 'Second node added correctly');
+    interactables = interact.debug().interactables;
+    equal(interactables.length, 2, 'Second interactable added correctly');
     
 });
 
 test('interact.unset', function () {
-    var interactObject,
+    var interactable,
         expectedClassName = '';
 
     interact.set(div0);
@@ -129,11 +129,11 @@ test('interact.unset', function () {
     interact.set(div2);
     interact.unset(div0);
     
-    nodes = interact.debug().nodes;
-    interactObject = interact(div0);
+    interactables = interact.debug().interactables;
+    interactable = interact(div0);
     
-    equal(nodes.length, 2, 'Element is removed from list');
-    equal(nodes[0].element, div1, 'node is spliced from array correctly');
+    equal(interactables.length, 2, 'Element is removed from list');
+    equal(interactables[0].element(), div1, 'interactable is spliced from array correctly');
     equal(div0.className, expectedClassName, 'Element classes are removed correctly');
     equal(interact(div0), undefined, 'unset element no longer recognised as an interactable');
 });
@@ -175,14 +175,14 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'interactdragstart', 'Event type');
-        equal(interact.debug().target.element, div0, 'interact\'s target element');
+        equal(interact.debug().target.element(), div0, 'interact\'s target element');
         equal(event.target, div0, 'Event is targeting the element correctly');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -239,9 +239,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -307,9 +307,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -347,36 +347,36 @@ var debug = interact.debug(),
         currentTarget: document,
         preventDefault: function () {},
         stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
+        pageX: expectedX0,
+        pageY: expectedY0
     },
     moveEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
+        pageX: expectedX0 + expectedDx,
+        pageY: expectedY0 + expectedDy
     },
     mouseUpEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
+        pageX: expectedX0 + expectedDx,
+        pageY: expectedY0 + expectedDy
     };
     
     var listener = function (event) {
         var debug = interact.debug();
         
         equal(event.type, 'interactresizestart', 'Event type');
-        equal(interact.debug().target.element, div0, 'interact\'s target element');
+        equal(interact.debug().target.element(), div0, 'interact\'s target element');
         equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -433,9 +433,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -501,9 +501,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in x-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -579,14 +579,14 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'interactgesturestart', 'Event type');
-        equal(interact.debug().target.element, div0, 'interact\'s target element');
+        equal(interact.debug().target.element(), div0, 'interact\'s target element');
         equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -678,9 +678,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
@@ -771,9 +771,9 @@ var debug = interact.debug(),
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.detail.x0, expectedX0, 'Starting x coordinate of event detail');
-        equal(event.detail.y0, expectedY0, 'Starting x coordinate of event detail');
-        equal(event.detail.dx, expectedDx, 'Distance moved in x coordinate of event detail');
-        equal(event.detail.dy, expectedDy, 'Distance moved in x coordinate of event detail');
+        equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
+        equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
+        equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
     };
     
     document.body.appendChild(div0);
