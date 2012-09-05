@@ -722,7 +722,8 @@ window.interact = (function (window) {
         var action;
 
         // Check if target element or it's parent is interactable
-        if (!mouseIsDown && (target = getInteractable(event.target) || getInteractable(event.target.parentNode))) {
+        if (!(mouseIsDown || dragging || resizing || gesturing) && 
+            (target = getInteractable(event.target) || getInteractable(event.target.parentNode))) {
             if ((target._resize || target._drag) && target._checkOnHover) {
                 removeClass(target._element, 'interact-resizexy interact-resizex interact-resizey');
 
@@ -758,15 +759,16 @@ window.interact = (function (window) {
             pageX = page.pageX,
             pageY = page.pageY;
 
-        mouseIsDown = true;
 
         // If it is the second touch of a multi-touch gesture, keep the target the same
         // if a target was set by the first touch (not always the case with simulated touches)
         if ((event.touches && event.touches.length < 2 && !target) ||
-            // Otherwise, set the target if no target or the target is not for this element
-            !(target && target._element === event.target)) {
-            target = (getInteractable(this) || getInteractable(event.target));
+            // Otherwise, set the target if the mouse is not down
+            !(mouseIsDown)) {
+            target = getInteractable(this);
         }
+        
+        mouseIsDown = true;
 
         if (target && !(dragging || resizing || gesturing)) {
 
@@ -989,6 +991,7 @@ window.interact = (function (window) {
                 actionCheck,
         this._checkOnHover = ('autoScroll' in options)? options.checkOnHover : true;
 
+        events.add(docTarget, moveEvent, mouseMove);
         events.add(this, downEvent, mouseDown, false);
 
         interactables.push(this);
@@ -1236,7 +1239,6 @@ window.interact = (function (window) {
     };
 
 
-    events.add(docTarget, moveEvent, mouseMove);
     events.add(docTarget, upEvent, docMouseUp);
     events.add(docTarget, 'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
