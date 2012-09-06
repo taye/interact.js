@@ -34,7 +34,7 @@ window.interact = (function (window) {
                 width: 0,
                 height: 0
             },
-            // distance between first two touche start events
+            // distance between first two touch start events
             startDistance: 0,
             prevDistance: 0,
             scale: 1,
@@ -43,6 +43,10 @@ window.interact = (function (window) {
         },
 
         interactables = [],
+        dropzones = [],
+        target = null,
+        dropTarget = null,
+
         svgTags = [
             'g',
             'rect',
@@ -238,7 +242,6 @@ window.interact = (function (window) {
                 scroll.isScrolling = false;
             }
         },
-        target = null,
         supportsTouch = 'createTouch' in document,
 
         // Less Precision with touch input
@@ -415,7 +418,7 @@ window.interact = (function (window) {
 
         clientRect = (svgTags.indexOf(target._element.nodeName) !== -1)?
                 target._element.getBoundingClientRect():
-                clientRect = target._element.getClientRects()[0];
+                target._element.getClientRects()[0];
 
         right = ((pageX - window.scrollX - clientRect.left) > (clientRect.width - margin));
         bottom = ((pageY - window.scrollY - clientRect.top) > (clientRect.height - margin));
@@ -722,8 +725,8 @@ window.interact = (function (window) {
         var action;
 
         // Check if target element or it's parent is interactable
-        if (!(mouseIsDown || dragging || resizing || gesturing) && 
-            (target = getInteractable(event.target) || getInteractable(event.target.parentNode))) {
+        if (!(mouseIsDown || dragging || resizing || gesturing) &&
+            (target = interactables.get(event.target) || interactables.get(event.target.parentNode))) {
             if ((target._resize || target._drag) && target._checkOnHover) {
                 removeClass(target._element, 'interact-resizexy interact-resizex interact-resizey');
 
@@ -765,9 +768,9 @@ window.interact = (function (window) {
         if ((event.touches && event.touches.length < 2 && !target) ||
             // Otherwise, set the target if the mouse is not down
             !(mouseIsDown)) {
-            target = getInteractable(this);
+            target = interactables.get(this);
         }
-        
+
         mouseIsDown = true;
 
         if (target && !(dragging || resizing || gesturing)) {
@@ -825,6 +828,25 @@ window.interact = (function (window) {
                 metaKey: event.metaKey,
                 button: event.button
             };
+            var dropzone,
+                dropEvent,
+                i;
+
+            for (i = 0; i < dropzones.length && !dropTarget; i++) {
+                dropzone = dropzones[i];
+
+                if (dropzone !== target && dropzone.dropCheck(event)) {
+                    dropTarget = dropzone;
+                    console.log(target._element.id, 'dropped to', dropTarget._element.id);
+                    
+                    detail.dropzone = dropTarget._element;
+                    
+                    dropEvent = document.createEvent('CustomEvent');
+                    dropEvent.initCustomEvent('interactdrop', true, true, detail);
+                    target._element.dispatchEvent(dropEvent);
+                }
+            }
+
             endEvent.initCustomEvent('interactdragend', true, true, detail);
             target._element.dispatchEvent(endEvent);
             dragging = false;
@@ -892,29 +914,28 @@ window.interact = (function (window) {
         if (target) {
             event.preventDefault();
         }
-        clearTarget();
+        clearTargets();
 
         return event;
     }
 
     /** @private */
-    interactables.indexOf = function (element) {
+    interactables.indexOf = dropzones.indexOf = function (element) {
         var i;
 
-        for (i = 0; i < interactables.length; i++) {
-            if (interactables[i]._element === element) {
+        for (i = 0; i < this.length; i++) {
+            if (this[i]._element === element) {
                 return i;
             }
         }
         return -1;
     };
 
-    /** @private */
-    function getInteractable(element) {
-        var i = interactables.indexOf(element) ;
+    interactables.get = dropzones.get = function (element) {
+        var i = this.indexOf(element) ;
 
         return interactables[i];
-    }
+    };
 
     /** @private */
     function addClass(element, classNames) {
@@ -949,11 +970,14 @@ window.interact = (function (window) {
     }
 
     /** @private */
-    function clearTarget() {
+    function clearTargets() {
         if (target) {
             removeClass(target._element, 'interact-target interact-dragging interact-resizing interact-resizex interact-resizey interact-resizexy');
         }
-        target = null;
+        if (dropTarget) {
+            removeClass(target._element, 'interact-droptarget');
+        }
+        target = dropTarget = null;
     }
 
     /**
@@ -965,7 +989,7 @@ window.interact = (function (window) {
         if (typeof element === 'string') {
             element = document.getElementById(element);
         }
-        return getInteractable(element);
+        return interactables.get(element);
     }
 
     /**
@@ -980,6 +1004,7 @@ window.interact = (function (window) {
 
         this._element = element,
         this._drag = ('drag' in options)? options.drag : false;
+        this._dropzone = ('dropzone' in options)? options.dropzone : false;
         this._resize = ('resize' in options)? options.resize : false;
         this._gesture = ('gesture' in options)? options.gesture : false;
         this._squareResize = ('squareResize' in options)? options.squareResize : false;
@@ -994,10 +1019,17 @@ window.interact = (function (window) {
 
         interactables.push(this);
         this._index = interactables.length - 1;
+        this._dropzoneIndex = -1;
+
+        if (this._dropzone) {
+            dropzones.push(this);
+            this._dropzoneIndex = dropzones.length - 1;
+        }
 
         addClass(element, [
                 'interact-node',
                 this._drag? 'interact-draggable': '',
+                this._dropzone? 'interact-dropzone': '',
                 this._resize? 'interact-resizeable': '',
                 this._gesture? 'interact-gestureable': ''
             ].join(' '));
@@ -1011,6 +1043,41 @@ window.interact = (function (window) {
                     return this;
                 }
                 return this._drag;
+            },
+        dropzone: function (newValue) {
+                if (newValue !== null && newValue !== undefined) {
+                    if (this._dropzone !== newValue) {
+                        if (newValue) {
+                            dropzones.push(this);
+                            this._dropzoneIndex = dropzones.length - 1;
+                        } else {
+                            dropzones.splice(this.dropIndex, 1);
+                            this._dropzoneIndex = -1;
+                        }
+                    }
+                    this._dropzone  = newValue;
+
+                    return this;
+                }
+                return this._dropzone;
+            },
+        dropCheck: function (event) {
+                var clientRect = (svgTags.indexOf(this._element.nodeName) !== -1)?
+                            this._element.getBoundingClientRect():
+                            this._element.getClientRects()[0],
+                    horizontal,
+                    vertical,
+                    x = (event.touches?
+                            event.touches[0].pageX:
+                            event.pageX) - window.scrollX,
+                    y = (event.touches?
+                            event.touches[0].pageY:
+                            event.pageY) - window.scrollY;
+
+                horizontal = (x > clientRect.left) && ( x < clientRect.left + clientRect.width);
+                vertical = (y > clientRect.top) && (y < clientRect.top + clientRect.height);
+
+                return (horizontal && vertical);
             },
         resizeable: function (newValue) {
                 if (newValue !== null && newValue !== undefined) {
@@ -1100,6 +1167,7 @@ window.interact = (function (window) {
                     'interact-target',
                     'interact-dragging',
                     'interact-draggable',
+                    'interact-dropzone',
                     'interact-resizeable',
                     'interact-resize-xy',
                     'interact-resize-x',
@@ -1188,6 +1256,7 @@ window.interact = (function (window) {
             x0: x0,
             y0: y0,
             interactables: interactables,
+            dropzones: dropzones,
             mouseIsDown: mouseIsDown,
             supportsTouch: supportsTouch,
             defaultActionChecker: actionCheck,
