@@ -173,6 +173,7 @@ window.interactDemo = (function(interact) {
 
             interact.set(rect, {
                 drag: true,
+                dropzone: true,
                 resize: true,
                 squareResize: true
             });
@@ -673,7 +674,25 @@ window.interactDemo = (function(interact) {
             staticScale(e);
         }
     });
-
+    
+    function dropNode (event) {
+        if (event.target.nodeName !== 'DIV') {
+            return;
+        }
+        var dropzone = event.detail.dropzone,
+            node = event.target,
+            dropPosition = getPosition(dropzone),
+            dropSize = getSize(dropzone);
+        
+        dropPosition.x += dropSize.x / 8;
+        dropPosition.y += dropSize.y / 8;
+        
+        dropSize.x /= 2;
+        dropSize.y /= 2;
+        
+        setPosition(node, dropPosition.x, dropPosition.y);
+        setSize(node, dropSize.x, dropSize.y);
+    }
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
     document.addEventListener('interactresizemove', nodeEventDebug);
@@ -684,6 +703,9 @@ window.interactDemo = (function(interact) {
     document.addEventListener('interactgesturestart', nodeEventDebug);
     document.addEventListener('interactgesturemove', nodeEventDebug);
     document.addEventListener('interactgestureend', nodeEventDebug);
+    
+    // Drop event listeners
+    document.addEventListener('interactdrop', dropNode)
 
     // These listeners must be triggered after the others
     // so prevX !== e.detail.pageX for other event listeners
