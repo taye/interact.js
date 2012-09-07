@@ -198,9 +198,9 @@ var debug = interact.debug(),
     div0.addEventListener('interactdragstart', listener);
     div0.addEventListener('interactdragmove', listener);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.dragMove(moveEvent);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.dragMove.call(div0, moveEvent);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactdragstart', listener);
     div0.removeEventListener('interactdragmove', listener);
@@ -256,10 +256,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.dragMove(mouseDownEvent);
-    debug.dragMove(moveEvent);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.dragMove.call(div0, mouseDownEvent);
+    debug.dragMove.call(div0, moveEvent);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactdragmove', listener);
 });
@@ -324,11 +324,11 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.dragMove(moveEvent0);
-    debug.dragMove(moveEvent1);
-    debug.dragMove(moveEvent2);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.dragMove.call(div0, moveEvent0);
+    debug.dragMove.call(div0, moveEvent1);
+    debug.dragMove.call(div0, moveEvent2);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactdragend', listener);
 });
@@ -392,9 +392,9 @@ var debug = interact.debug(),
     div0.addEventListener('interactresizestart', listener);
     div0.addEventListener('interactresizemove', listener);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.resizeMove(moveEvent);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.resizeMove.call(div0, moveEvent);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactresizestart', listener);
     div0.removeEventListener('interactresizemove', listener);
@@ -450,10 +450,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.resizeMove(mouseDownEvent);
-    debug.resizeMove(moveEvent);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.resizeMove.call(div0, mouseDownEvent);
+    debug.resizeMove.call(div0, moveEvent);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactresizemove', listener);
 });
@@ -518,11 +518,11 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(mouseDownEvent);
-    debug.resizeMove(moveEvent0);
-    debug.resizeMove(moveEvent1);
-    debug.resizeMove(moveEvent2);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.resizeMove.call(div0, moveEvent0);
+    debug.resizeMove.call(div0, moveEvent1);
+    debug.resizeMove.call(div0, moveEvent2);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactresizeend', listener);
 });
@@ -602,9 +602,9 @@ var debug = interact.debug(),
     div0.addEventListener('interactgesturestart', listener);
     div0.addEventListener('interactgesturemove', listener);
     
-    debug.mouseDown(touchStartEvent);
-    debug.gestureMove(moveEvent);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, touchStartEvent);
+    debug.gestureMove.call(div0, moveEvent);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactgesturestart', listener);
     div0.removeEventListener('interactgesturemove', listener);
@@ -695,10 +695,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(touchStartEvent);
-    debug.gestureMove(moveEvent0);
-    debug.gestureMove(moveEvent1);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, touchStartEvent);
+    debug.gestureMove.call(div0, moveEvent0);
+    debug.gestureMove.call(div0, moveEvent1);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactgesturemove', listener);
 });
@@ -788,10 +788,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown(touchStartEvent);
-    debug.gestureMove(moveEvent0);
-    debug.gestureMove(moveEvent1);
-    debug.mouseUp(mouseUpEvent);
+    debug.mouseDown.call(div0, touchStartEvent);
+    debug.gestureMove.call(div0, moveEvent0);
+    debug.gestureMove.call(div0, moveEvent1);
+    debug.mouseUp.call(div0, mouseUpEvent);
     
     div0.removeEventListener('interactgestureend', listener);
 });
