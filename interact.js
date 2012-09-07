@@ -437,13 +437,24 @@ window.interact = (function (window) {
 
     // Get event.pageX/Y for mouse and event.touches[0].pageX/Y tor touch
     function getPageXY(event) {
+        var touch,
+        x,
+        y;
+
+        if (event.touches) {
+            touch = (event.touches.length)?
+                    event.touches[0]:
+                    event.changedTouches[0];
+            x = touch.pageX;
+            y = touch.pageY;
+        } else {
+            x = event.pageX;
+            y = event.pageY;
+        }
+
         return {
-            pageX: (event.touches)?
-                event.touches[0].pageX:
-                event.pageX,
-            pageY: (event.touches)?
-                event.touches[0].pageY:
-                event.pageY
+            pageX: x,
+            pageY: y
         };
     }
 
@@ -506,26 +517,26 @@ window.interact = (function (window) {
 
         return -Math.atan(dy / dx);
     }
-    
+
     function resolveDrops(drops, event) {// Test to see which node is deepest in the DOM and is the latest of its siblings
         if (drops.length) {
-        
+
         var curDepth = 1,
             maxDepth = 0,
             dropzone,
             deepestZone,
             parent,
             i;
-            
+
             for (i = 0; i < drops.length; i++) {
                 dropzone = drops[i];
-                
+
                 parent = dropzone._element.parentNode;
 
                 for(curDepth = 1; parent !== document; curDepth++) {
                     parent = parent.parentNode;
                 }
-                
+
                 // If this is the deepest dropzone that the mouse is over
                 if (curDepth > maxDepth) {
                     maxDepth = curDepth;
@@ -539,7 +550,7 @@ window.interact = (function (window) {
                         dropzone._element,
                         deepestZone._element
                     ];
-                    
+
                     // climb up to nearest shared ancestor
                     while(parent[0] !== parent[1] &&
                             parent[0] !== document) {
@@ -550,11 +561,11 @@ window.interact = (function (window) {
                             parent[1]
                         ];
                     }
-                    
+
                     // if dropzone's ancestor is later than that of deepestZone's, set the
                     // deepestZone = dropzone
                     var child = parent[0].lastChild;
-                        
+
                     while (child) {
                         if (child === parent[2]) {
                             deepestZone = dropzone;
@@ -871,7 +882,8 @@ window.interact = (function (window) {
         var detail,
             pageX,
             pageY,
-            endEvent;
+            endEvent,
+            dropEvent;
 
         if (dragging) {
             endEvent = document.createEvent('CustomEvent');
@@ -894,20 +906,19 @@ window.interact = (function (window) {
 
             if (dropzones.length) {
                 var dropzone,
-                    dropEvent,
                     i,
                     drops = [];
-                
+
                 // collect all dropzones that qualify for a drop
                 for (i = 0; i < dropzones.length; i++) {
                     if (dropzones[i].dropCheck(event)) {
                         drops.push(dropzones[i]);
                     }
                 }
-                    
-                if (dropTarget = resolveDrops(drops, event)) {
+
+                if ((dropTarget = resolveDrops(drops, event))) {
                     detail.dropzone = dropTarget._element;
-                    
+
                     dropEvent = document.createEvent('CustomEvent');
                     dropEvent.initCustomEvent('interactdrop', true, true, detail);
                     target._element.dispatchEvent(dropEvent);
@@ -1131,20 +1142,17 @@ window.interact = (function (window) {
                 }
                 return this._dropzone;
             },
-        dropCheck: function (event, drops) {
+        dropCheck: function (event) {
                 if (target !== this) {
                     var clientRect = (svgTags.indexOf(this._element.nodeName) !== -1)?
                                 this._element.getBoundingClientRect():
                                 this._element.getClientRects()[0],
                         horizontal,
                         vertical,
-                        x = (event.touches?
-                                event.touches[0].pageX:
-                                event.pageX) - window.scrollX,
-                        y = (event.touches?
-                                event.touches[0].pageY:
-                                event.pageY) - window.scrollY;
-                    
+                        pageXY = getPageXY(event),
+                        x = pageXY.pageX,
+                        y = pageXY.pageY;
+
                     horizontal = (x > clientRect.left) && ( x < clientRect.left + clientRect.width);
                     vertical = (y > clientRect.top) && (y < clientRect.top + clientRect.height);
 
@@ -1222,8 +1230,8 @@ window.interact = (function (window) {
         var interactable = interactables.get(element);
 
         if (interactable) {
-            interactables.splice(indexOfElement, 1);
-            
+            interactables.splice(interactable._index, 1);
+
             if (interactable._dropzoneIndex !== -1) {
                 dropzones.splice(interactable._dropzoneIndex, 1);
             }
@@ -1237,15 +1245,14 @@ window.interact = (function (window) {
      * @param {HTMLElement | SVGElement} element The DOM Element that will be removed
      */
     interact.unset = function (element) {
-        var i = interactables.indexOf(element),
-            interactable = interactables[i];
+        var interactable = interactables.get(element);
 
-        if (i !== -1) {
+        if (interactable) {
             events.removeAll(interactable);
             if (styleCursor) {
                 interactable._element.style.cursor = '';
             }
-            interactables.splice(i, 1);
+            interactables.splice(interactable._index, 1);
             if (interactable._dropzoneIndex !== -1) {
                 dropzones.splice(interactable._dropzoneIndex, 1);
             }
