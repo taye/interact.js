@@ -123,6 +123,7 @@ window.interactDemo = (function(interact) {
 
         if (!svg) {
             svg = document.createElementNS(svgNS, 'svg');
+            svg.id = 'svg';
             svg.setAttribute('viewBox', '0 0 0 0');
             svg.setAttribute('width', width);
             svg.setAttribute('height', height);
@@ -228,6 +229,7 @@ window.interactDemo = (function(interact) {
 
             interact.set(newDiv, {
                 drag: true,
+                dropzone: true,
                 resize: true,
                 gesture: true
             });
@@ -676,22 +678,32 @@ window.interactDemo = (function(interact) {
     });
     
     function dropNode (event) {
-        if (event.target.nodeName !== 'DIV') {
+        if ((event.target.nodeName in svgTags) && (event.detail.dropzone.nodeName in svgTags)) {
             return;
         }
+            
         var dropzone = event.detail.dropzone,
             node = event.target,
             dropPosition = getPosition(dropzone),
-            dropSize = getSize(dropzone);
+            dropSize = getSize(dropzone),
+            parent = node.parentNode;
         
         dropPosition.x += dropSize.x / 8;
         dropPosition.y += dropSize.y / 8;
+        
+        if (node.nodeName in svgTags) {
+            dropPosition.x += window.scrollX;
+            dropPosition.y += window.scrollY;
+        }
         
         dropSize.x /= 2;
         dropSize.y /= 2;
         
         setPosition(node, dropPosition.x, dropPosition.y);
         setSize(node, dropSize.x, dropSize.y);
+        
+        
+        parent.appendChild(parent.removeChild(node));
     }
     // Display event properties for debugging
     document.addEventListener('interactresizestart', nodeEventDebug);
