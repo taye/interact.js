@@ -81,7 +81,7 @@ test('interact.set', function () {
         expectedResize = true,
         expectedGesture = true,
         expectedAutoScroll = false,
-        expectedClassName = 'interact-node interact-draggable interact-resizeable interact-gestureable' ,
+        expectedClassName = 'interactable interact-draggable interact-resizeable interact-gestureable' ,
         interactables,
         expectedActionChecker = interact.debug().defaultActionChecker;
     
@@ -127,7 +127,7 @@ test('interact.unset', function () {
     interact.set(div0);
     interact.set(div1);
     interact.set(div2);
-    interact.unset(div0);
+    interact(div0).unset();
     
     interactables = interact.debug().interactables;
     interactable = interact(div0);
@@ -567,13 +567,7 @@ var debug = interact.debug(),
             }
         ]
     },
-    mouseUpEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
+    mouseUpEvent = moveEvent;
     
     var listener = function (event) {
         var debug = interact.debug();
@@ -614,8 +608,20 @@ test('gesture move', function() {
 var debug = interact.debug(),
     expectedX0 = 0,
     expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
+    expectedDx = 300,
+    expectedDy = 400,
+    
+    // offset from average
+    offset = [20, -20, -10, 10],
+    
+    d1 = offset[0] - offset[1],
+    d2 = offset[2] - offset[3],
+    
+    startDistance = Math.sqrt(2 * d1 * d1),
+    expectedDistance = Math.sqrt(2 * d2 * d2),
+    startAngle = -Math.atan(d1 / d1),
+    expectedAngle = -Math.atan(d2 / d2),
+    expectedRotation = expectedAngle - startAngle,
     touchStartEvent = {
         target: div0,
         currentTarget: document,
@@ -623,12 +629,12 @@ var debug = interact.debug(),
         stopPropagation: function () {},
         touches: [
             {
-                pageX: 0,
-                pageY: 0
+                pageX: expectedX0 + offset[0],
+                pageY: expectedX0 + offset[0]
             },
             {
-                pageX: 0,
-                pageY: 0
+                pageX: expectedY0 + offset[1],
+                pageY: expectedY0 + offset[1]
             }
         ]
     },
@@ -638,12 +644,12 @@ var debug = interact.debug(),
         preventDefault: function () {},
         touches: [
             {
-                pageX: 0,
-                pageY: 0
+                pageX: expectedX0 + offset[0],
+                pageY: expectedY0 + offset[0]
             },
             {
-                pageX: 0,
-                pageY: 0
+                pageX: expectedX0 + offset[1],
+                pageY: expectedY0 + offset[1]
             }
         ]
     },
@@ -653,22 +659,25 @@ var debug = interact.debug(),
         preventDefault: function () {},
         touches: [
             {
-                pageX: expectedDx,
-                pageY: expectedDy
+                pageX: expectedDx + offset[2],
+                pageY: expectedDy + offset[2]
             },
             {
-                pageX: expectedDx,
-                pageY: expectedDy
+                pageX: expectedDx + offset[3],
+                pageY: expectedDy + offset[3]
             }
         ]
     },
-    mouseUpEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
+    mouseUpEvent = moveEvent1;
+
+    if (expectedRotation > Math.PI) {
+        expectedRotation -= 2 * Math.PI;
+    }else if (expectedRotation < -Math.PI) {
+        expectedRotation += 2 * Math.PI;
+    }
+    // Convert to degrees from radians
+    expectedAngle = 180 * expectedAngle / Math.PI;
+    expectedRotation = 180 * expectedRotation / Math.PI;
     
     var listener = function (event) {
         var debug = interact.debug();
@@ -681,6 +690,9 @@ var debug = interact.debug(),
         equal(event.detail.y0, expectedY0, 'Starting y coordinate of event detail');
         equal(event.detail.dx, expectedDx, 'Distance moved in x-axis of event detail');
         equal(event.detail.dy, expectedDy, 'Distance moved in y-axis of event detail');
+        equal(event.detail.distance, expectedDistance, 'Gesture distance');
+        equal(event.detail.angle, expectedAngle, 'Gesture angle');
+        equal(event.detail.rotation, expectedRotation, 'Gesture rotation');
     };
     
     document.body.appendChild(div0);
@@ -692,8 +704,6 @@ var debug = interact.debug(),
         });
     
     div0.addEventListener('interactgesturemove', listener);
-    
-    expect(8);
     
     debug.mouseDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent0);
@@ -755,13 +765,7 @@ var debug = interact.debug(),
             }
         ]
     },
-    mouseUpEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
+    mouseUpEvent = moveEvent1;
     
     var listener = function (event) {
         var debug = interact.debug();
