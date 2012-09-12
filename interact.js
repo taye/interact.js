@@ -484,76 +484,75 @@ window.interact = (function (window) {
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
-    // Test to see which node is deepest in the DOM and is the
-    // latest of its siblings
+    // Test to see which dropzone element is "above" all other qualifying
+    // dropzones on the page
     function resolveDrops(drops) {
         if (drops.length) {
 
-        var curDepth = 1,
-            maxDepth = 0,
-            dropzone,
+        var dropzone,
             deepestZone = drops[0],
             parent,
-            i;
+            deepestZoneParents = [],
+            dropzoneParents = [],
+            child,
+            i,
+            n;
 
-            for (i = 0; i < drops.length; i++) {
+            for (i = 1; i < drops.length; i++) {
                 dropzone = drops[i];
-
-                // Because SVGElements are alwayse behind HTMLElements
-                // if this dropzone is an svg element and the current deepest is
-                // an HTMLElement, do nothing and continue the loop
-                if (deepestZone._element instanceof HTMLElement &&
-                        dropzone._element instanceof SVGElement) {
-                    continue;
+                
+                //~~~***
+                if (!deepestZoneParents.length) {
+                    parent = deepestZone._element;
+                    while (parent.parentNode !== document) {
+                        deepestZoneParents.unshift(parent);
+                        parent = parent.parentNode;
+                    }
                 }
 
-                parent = dropzone._element.parentNode;
-
-                // Count the depth of the element in the DOM
-                for(curDepth = 1; parent !== document; curDepth++) {
+                // if this dropzone is an svg element and the current deepest is
+                // an HTMLElement
+                if (deepestZone._element instanceof HTMLElement &&
+                        dropzone._element instanceof SVGElement &&
+                        !(dropzone._element instanceof SVGSVGElement)) {
+                    
+                    if (dropzone._element.ownerSVGElement.parentNode === 
+                            deepestZone._element.parentNode) {
+                        continue;
+                    }
+                    parent = dropzone._element.ownerSVGElement;
+                } else {
+                    parent = dropzone._element;
+                }
+                dropzoneParents = [];
+                while (parent.parentNode !== document) {
+                    dropzoneParents.unshift(parent);
                     parent = parent.parentNode;
                 }
-
-                // If this is the deepest dropzone that the mouse is over
-                // update the deepestZone to this dropzone
-                if (curDepth > maxDepth) {
-                    maxDepth = curDepth;
-                    deepestZone = dropzone;
+                
+                // get (position of last common ancestor) + 1
+                n = 0;
+                while(dropzoneParents[n] && 
+                        dropzoneParents[n] === deepestZoneParents[n]) {
+                    n++;
                 }
+                
+                parent = [
+                    dropzoneParents[n - 1],
+                    dropzoneParents[n],
+                    deepestZoneParents[n]
+                ];
+                child = parent[0].lastChild;
 
-                // If they are in the same element, check which is on top
-                else if (curDepth === maxDepth) {
-                    parent = [
-                        dropzone._element.parentNode,       // current ancestor of current dropzone
-                        deepestZone._element.parentNode,    // current ancestor of deepest dropzone
-                        dropzone._element,                  // previous ancestore of dropzone
-                        deepestZone._element                // previous ancestor of deepestZone
-                    ];
-
-                    // climb up to nearest shared ancestor
-                    while(parent[0] !== parent[1] &&
-                            parent[0] !== document) {
-                        parent = [
-                            parent[0].parentNode,
-                            parent[1].parentNode,
-                            parent[0],
-                            parent[1]
-                        ];
+                while (child) {
+                    if (child === parent[1]) {
+                        deepestZone = dropzone;
+                        deepestZoneParents = [];
+                        break;
+                    } else if (child === parent[2]) {
+                        break;
                     }
-
-                    // if dropzone's ancestor is later than that of deepestZone's,
-                    // deepestZone = dropzone
-                    var child = parent[0].lastChild;
-
-                    while (child) {
-                        if (child === parent[2]) {
-                            deepestZone = dropzone;
-                            break;
-                        } else if (child === parent[3]) {
-                            break;
-                        }
-                        child = child.previousSibling;
-                    }
+                    child = child.previousSibling;
                 }
             }
             return deepestZone;
