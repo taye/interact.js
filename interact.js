@@ -247,6 +247,11 @@ window.interact = (function (window) {
         // dictates what styles should be used and
         // what mouseMove event Listner is to be added after mouseDown
         actions = {},
+        actionIsEnabled = {
+            drag: true,
+            resize: true,
+            gesture: true,
+        },
         prepared = null,
         styleCursor = true,
         downEvent,
@@ -358,16 +363,21 @@ window.interact = (function (window) {
                 target._element.getBoundingClientRect():
                 target._element.getClientRects()[0];
 
-        right = ((x - clientRect.left) > (clientRect.width - margin));
-        bottom = ((y - clientRect.top) > (clientRect.height - margin));
+        if (actionIsEnabled.resize && target._resize) {
+            right = ((x - clientRect.left) > (clientRect.width - margin));
+            bottom = ((y - clientRect.top) > (clientRect.height - margin));
+        }
 
-        if (event.touches && event.touches.length > 1 && !(dragging || resizing)) {
+        if (actionIsEnabled.gesture &&
+            event.touches && event.touches.length > 1 &&
+            !(dragging || resizing)) {
             action = 'gesture';
         } else {
             resizeAxes = (right?'x': '') + (bottom?'y': '');
-            action = (resizeAxes && target._resize)?
+            action = (resizeAxes)?
                 'resize' + resizeAxes:
-                'drag';
+                actionIsEnabled.drag?
+                    'drag': null;
         }
 
         return action;
@@ -638,6 +648,23 @@ window.interact = (function (window) {
         }
         return detail;
     }
+    
+    // Check if the action is enabled globally and the current target supports it
+    // If so, return the validated action. Otherwise, return null
+    function validateAction (action) {
+        var actionProperty;
+        
+        if (!action ||
+            !(actionProperty = action.match('resize')? 'resize': action) || 
+            !target['_' + actionProperty] ||
+            !actionIsEnabled[actionProperty]) {
+            return null;
+        }
+        if (action === 'resize' || action === 'resizexy' || action === 'resizeyx') {
+            action = 'resizexy';
+        }
+        return action;
+    }
 
     /**
      * @private
@@ -669,8 +696,8 @@ window.interact = (function (window) {
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
         // (not always the case with simulated touches)
+        // Otherwise, set the target if the mouse is not down
         if ((event.touches && event.touches.length < 2 && !target) ||
-            // Otherwise, set the target if the mouse is not down
             !(mouseIsDown)) {
             target = interactables.get(this);
         }
@@ -684,13 +711,10 @@ window.interact = (function (window) {
             clientX0 = prevClientX = client.x;
             clientY0 = prevClientY = client.y;
 
-            action = forceAction || target._getAction(event);
-            if (!action || !(target[action.match('resize')? '_resize': '_' + action])) {
+            action = validateAction(forceAction || target._getAction(event));
+            
+            if (!action) {
                 return event;
-            }
-
-            if (action === 'resize' || action === 'resizeyx') {
-                action = 'resizexy';
             }
 
             if (styleCursor) {
@@ -700,7 +724,8 @@ window.interact = (function (window) {
             }
             resizeAxes = (action === 'resizexy')?
                     'xy': (action === 'resizex')?
-                        'x': 'y';
+                        'x': (action === 'resizey')?
+                            'y': '';
 
             prepared = (action in actions)? action: null;
 
@@ -829,17 +854,14 @@ window.interact = (function (window) {
         if (!(mouseIsDown || dragging || resizing || gesturing) &&
             (target = interactables.get(event.target) || interactables.get(event.target.parentNode))) {
             if ((target._resize || target._drag) && target._checkOnHover) {
-                action = target._getAction(event);
-
-                if (!action || !(target[action.match('resize')? '_resize': '_' + action])) {
-                    return event;
-                }
-                if (action === 'resize') {
-                    action = 'resizexy';
-                }
+                action = validateAction(target._getAction(event));
 
                 if (styleCursor) {
-                    target._element.style.cursor = actions[action].cursor;
+                    if (action) {
+                        target._element.style.cursor = actions[action].cursor;
+                    } else {
+                        target._element.style.cursor = '';
+                    }
                 }
             } else if (dragging || resizing || gesturing) {
                 event.preventDefault();
@@ -911,6 +933,7 @@ window.interact = (function (window) {
 
             clearTargets();
         }
+        prepared = null;
 
         return event;
     }
@@ -1267,6 +1290,33 @@ window.interact = (function (window) {
 
         return interact;
     };
+    
+    interact.enableDragging = function (value) {
+        if (value !== null && value !== undefined) {
+            actionIsEnabled.drag = value;
+            
+            return interact;
+        }
+        return actionIsEnabled.drag;
+    }
+    
+    interact.enableResizing = function (value) {
+        if (value !== null && value !== undefined) {
+            actionIsEnabled.resize = value;
+            
+            return interact;
+        }
+        return actionIsEnabled.resize;
+    }
+    
+    interact.enableGesturing = function (value) {
+        if (value !== null && value !== undefined) {
+            actionIsEnabled.gesture = value;
+            
+            return interact;
+        }
+        return actionIsEnabled.gesture;
+    }
 
     interact.eventTypes = eventTypes;
 
@@ -1275,17 +1325,9 @@ window.interact = (function (window) {
      * @description Displays debugging data in the browser console
      */
     interact.debug = function () {
-        console.log('target         :  ' + target);
-        console.log('prevX, prevY   :  ' + prevX, prevY);
-        console.log('x0, y0         :  ' + x0, y0);
-        console.log('supportsTouch  :  ' + supportsTouch);
-        console.log('mouseIsDown    :  ' + mouseIsDown);
-        console.log('dragging       :  ' + dragging);
-        console.log('resizing       :  ' + resizing);
-        console.log('gesturing      :  ' + gesturing);
-
         return {
             target: target,
+            prepared: prepared,
             dragging: dragging,
             resizing: resizing,
             gesturing: gesturing,
@@ -1304,7 +1346,17 @@ window.interact = (function (window) {
             gestureMove: gestureMove,
             mouseUp: docMouseUp,
             mouseDown: mouseDown,
-            mouseHover: mouseHover
+            mouseHover: mouseHover,
+            log: function () {
+                console.log('target         :  ' + target);
+                console.log('prevX, prevY   :  ' + prevX, prevY);
+                console.log('x0, y0         :  ' + x0, y0);
+                console.log('supportsTouch  :  ' + supportsTouch);
+                console.log('mouseIsDown    :  ' + mouseIsDown);
+                console.log('dragging       :  ' + dragging);
+                console.log('resizing       :  ' + resizing);
+                console.log('gesturing      :  ' + gesturing);
+            }
         };
     };
 
