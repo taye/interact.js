@@ -260,7 +260,7 @@
         actionIsEnabled = {
             drag: true,
             resize: true,
-            gesture: true,
+            gesture: true
         },
         
         // Action that's ready to be fired on next move event
@@ -417,6 +417,12 @@
             x = event[type + 'X'];
             y = event[type + 'Y'];
         }
+
+		// Opera Mobile handles the viewport and scrolling oddly 
+		if (navigator.appName == 'Opera' && supportsTouch) {
+			x -= window.scrollX;
+			y -= window.scrollY;
+		}
 
         return {
             x: x,
