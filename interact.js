@@ -55,6 +55,7 @@
         dropzones = [],
         target = null,
         dropTarget = null,
+        prevDropTarget = null,
 
         //All things relating to autoScroll
         scrollMargin = 70,
@@ -418,11 +419,11 @@
             y = event[type + 'Y'];
         }
 
-		// Opera Mobile handles the viewport and scrolling oddly 
-		if (navigator.appName == 'Opera' && supportsTouch) {
-			x -= window.scrollX;
-			y -= window.scrollY;
-		}
+        // Opera Mobile handles the viewport and scrolling oddly 
+        if (navigator.appName == 'Opera' && supportsTouch) {
+            x -= window.scrollX;
+            y -= window.scrollY;
+        }
 
         return {
             x: x,
@@ -781,6 +782,50 @@
             detail = getEventDetail(event, 'drag', 'move');
             dragEvent = document.createEvent('CustomEvent');
             dragEvent.initCustomEvent('interactdragmove', true, true, detail);
+
+            if (dropzones.length) {
+                var i,
+                    drops = [];
+
+                // collect all dropzones that qualify for a drop
+                for (i = 0; i < dropzones.length; i++) {
+                    if (dropzones[i].dropCheck(event)) {
+                        drops.push(dropzones[i]);
+                    }
+                }
+
+                // get the most apprpriate dropzone based on DOM depth and order
+                dropTarget = resolveDrops(drops);
+
+                // If the current dropTarget is not the same as the previous one
+                if (dropTarget !== prevDropTarget) {
+                    // if there was a prevDropTarget, first dispatch a dragleave event
+                    if (prevDropTarget) {
+                        var dragLeaveEvent = document.createEvent('CustomEvent'),
+							dragLeaveDetail = getEventDetail(event, 'drag', 'leave');
+
+						dragLeaveDetail.draggable = target._element;
+                        dragLeaveEvent.initCustomEvent('interactdragleave', true, true, dragLeaveDetail);
+                        prevDropTarget._element.dispatchEvent(dragLeaveEvent);
+
+                        prevDropTarget.dragLeave = prevDropTarget._element;
+                        prevDropTarget = null;
+                    }
+					// If the dropTarget is not null, dispatch a dragenter event
+                    if (dropTarget) {
+                        var dragEnterEvent = document.createEvent('CustomEvent'),
+							dragEnterDetail = getEventDetail(event, 'drag', 'enter');
+
+						dragEnterDetail.draggable = target._element;
+
+                        dragEnterEvent.initCustomEvent('interactdragenter', true, true, dragEnterDetail);
+                        dropTarget._element.dispatchEvent(dragEnterEvent);
+
+                        detail.dragEnter = dropTarget._element;
+                        prevDropTarget = dropTarget;
+                    }
+                }
+            }
             target._element.dispatchEvent(dragEvent);
         }
 
@@ -923,6 +968,17 @@
                     dropEvent = document.createEvent('CustomEvent');
                     dropEvent.initCustomEvent('interactdrop', true, true, detail);
                 }
+                // Otherwise, If there was a prevDropTarget (perhaps if for some reason
+                // this dragend happens without the mouse moving out of the previousdroptarget)
+                else if (prevDropTarget) {
+                    var dragLeaveEvent = document.createEvent('CustomEvent'),
+						dragLeaveDetail = getEventDetail(event, 'drag', 'leave');
+
+                    dragLeaveEvent.initCustomEvent('interactdragleave', true, true, dragLeaveDetail);
+                    prevDropTarget._element.dispatchEvent(dragLeaveEvent);
+
+                    detail.dragLeave = prevDropTarget._element;
+                }
             }
 
             endEvent.initCustomEvent('interactdragend', true, true, detail);
@@ -1046,7 +1102,7 @@
         if (dropTarget) {
             removeClass(target._element, 'interact-droptarget');
         }
-        target = dropTarget = null;
+        target = dropTarget = prevDropTarget = null;
     }
 
     function interact(element) {
