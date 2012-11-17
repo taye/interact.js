@@ -669,6 +669,10 @@
                 }
             }
         }
+        else if (action === 'drop' ||
+                (action === 'drag' && (phase === 'enter' || phase === 'leave'))) {
+            detail.draggable = target._element;
+        }
         return detail;
     }
     
@@ -804,19 +808,16 @@
                         var dragLeaveEvent = document.createEvent('CustomEvent'),
 							dragLeaveDetail = getEventDetail(event, 'drag', 'leave');
 
-						dragLeaveDetail.draggable = target._element;
                         dragLeaveEvent.initCustomEvent('interactdragleave', true, true, dragLeaveDetail);
                         prevDropTarget._element.dispatchEvent(dragLeaveEvent);
 
-                        prevDropTarget.dragLeave = prevDropTarget._element;
+                        detail.dragLeave = prevDropTarget._element;
                         prevDropTarget = null;
                     }
 					// If the dropTarget is not null, dispatch a dragenter event
                     if (dropTarget) {
                         var dragEnterEvent = document.createEvent('CustomEvent'),
 							dragEnterDetail = getEventDetail(event, 'drag', 'enter');
-
-						dragEnterDetail.draggable = target._element;
 
                         dragEnterEvent.initCustomEvent('interactdragenter', true, true, dragEnterDetail);
                         dropTarget._element.dispatchEvent(dragEnterEvent);
@@ -943,8 +944,7 @@
      */
     function docMouseUp (event) {
         var detail,
-            endEvent,
-            dropEvent;
+            endEvent;
 
         if (dragging) {
             endEvent = document.createEvent('CustomEvent');
@@ -963,11 +963,14 @@
 
                 // get the most apprpriate dropzone based on DOM depth and order
                 if ((dropTarget = resolveDrops(drops))) {
-                    detail.dropzone = dropTarget._element;
+                    var dropDetail = getEventDetail(event, 'drop'),
+                        dropEvent = document.createEvent('CustomEvent');
 
-                    dropEvent = document.createEvent('CustomEvent');
-                    dropEvent.initCustomEvent('interactdrop', true, true, detail);
+                    dropEvent.initCustomEvent('interactdrop', true, true, dropDetail);
+
+                    detail.dropzone = dropTarget._element;
                 }
+
                 // Otherwise, If there was a prevDropTarget (perhaps if for some reason
                 // this dragend happens without the mouse moving out of the previousdroptarget)
                 else if (prevDropTarget) {
@@ -984,7 +987,7 @@
             endEvent.initCustomEvent('interactdragend', true, true, detail);
             target._element.dispatchEvent(endEvent);
             if (dropTarget) {
-                target._element.dispatchEvent(dropEvent);
+                dropTarget._element.dispatchEvent(dropEvent);
             }
         } else if (resizing) {
             endEvent = document.createEvent('CustomEvent');
