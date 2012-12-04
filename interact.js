@@ -1566,6 +1566,16 @@
         return scroll.isEnabled;
     };
 
+    /**
+     * Returns or sets whether or not the browser supports touch input
+     *
+     * @function
+     * @returns {bool}
+     */
+    interact.supportsTouch = function () {
+        return supportsTouch;
+    };
+
 
     events.add(docTarget, upEvent, docMouseUp);
     events.add(docTarget, moveEvent, mouseMove);
