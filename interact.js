@@ -166,12 +166,13 @@
                     var top = event.clientY < scroll.edges.bottom._element.offsetHeight,
                         right = event.clientX > scroll.edges.right._element.offsetLeft,
                         bottom = event.clientY > scroll.edges.bottom._element.offsetTop,
-                        left = event.clientX < scroll.edges.left._element.offsetWidth;
+                        left = event.clientX < scroll.edges.left._element.offsetWidth,
+                        options = target.options;
 
                     scroll.x = scroll.distance * (right? 1: left? -1: 0);
                     scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
 
-                    if (!scroll.isScrolling && scroll.isEnabled && target._autoScroll) {
+                    if (!scroll.isScrolling && scroll.isEnabled && options.autoScroll) {
                         scroll.start();
                     }
                 }
@@ -374,13 +375,15 @@
             action,
             page = getPageXY(event),
             x = page.x - window.scrollX,
-            y = page.y - window.scrollY;
+            y = page.y - window.scrollY,
+            options = target.options;
 
         clientRect = (target._element instanceof SVGElement)?
                 target._element.getBoundingClientRect():
                 target._element.getClientRects()[0];
 
-        if (actionIsEnabled.resize && target._resize) {
+
+        if (actionIsEnabled.resize && options.resize) {
             right = ((x - clientRect.left) > (clientRect.width - margin));
             bottom = ((y - clientRect.top) > (clientRect.height - margin));
         }
@@ -420,7 +423,7 @@
         }
 
         // Opera Mobile handles the viewport and scrolling oddly 
-        if (navigator.appName == 'Opera' && supportsTouch) {
+        if (window.navigator.appName == 'Opera' && supportsTouch) {
             x -= window.scrollX;
             y -= window.scrollY;
         }
@@ -595,7 +598,8 @@
     function getEventDetail(event, action, phase) {
         var client,
             page,
-            detail;
+            detail,
+            options = target.options;
 
         if (action === 'gesture') {
             var average = touchAverage(event);
@@ -632,7 +636,7 @@
         }
 
         if (action === 'resize') {
-            if (target._squareResize || event.shiftKey) {
+            if (options.squareResize || event.shiftKey) {
                 if (resizeAxes === 'y') {
                     detail.dx = detail.dy;
                 } else {
@@ -679,11 +683,12 @@
     // Check if the action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action) {
-        var actionProperty;
+        var actionProperty,
+        options = target.options;
         
         if (!action ||
             !(actionProperty = action.match('resize')? 'resize': action) || 
-            !target['_' + actionProperty] ||
+            !options[actionProperty] ||
             !actionIsEnabled[actionProperty]) {
             return null;
         }
@@ -732,13 +737,14 @@
         mouseIsDown = true;
 
         if (target && !(dragging || resizing || gesturing)) {
+            var options = target.options;
 
             x0 = prevX = page.x;
             y0 = prevY = page.y;
             clientX0 = prevClientX = client.x;
             clientY0 = prevClientY = client.y;
 
-            action = validateAction(forceAction || target._getAction(event));
+            action = validateAction(forceAction || options.getAction(event));
             
             if (!action) {
                 return event;
@@ -916,13 +922,16 @@
      * button were pressed and change the element classes accordingly
      */
     function mouseHover(event) {
-        var action;
+        var action,
+            options;
 
         // Check if target element or it's parent is interactable
         if (!(mouseIsDown || dragging || resizing || gesturing) &&
             (target = interactables.get(event.target) || interactables.get(event.target.parentNode))) {
-            if ((target._resize || target._drag) && target._checkOnHover) {
-                action = validateAction(target._getAction(event));
+            options = target.options;
+
+            if ((options.resize || options.drag) && options.checkOnHover) {
+                action = validateAction(options.getAction(event));
 
                 if (styleCursor) {
                     if (action) {
@@ -949,6 +958,7 @@
         if (dragging) {
             endEvent = document.createEvent('CustomEvent');
             detail = getEventDetail(event, 'drag', 'end');
+            var dropEvent;
 
             if (dropzones.length) {
                 var i,
@@ -963,9 +973,9 @@
 
                 // get the most apprpriate dropzone based on DOM depth and order
                 if ((dropTarget = resolveDrops(drops))) {
-                    var dropDetail = getEventDetail(event, 'drop'),
-                        dropEvent = document.createEvent('CustomEvent');
+                    var dropDetail = getEventDetail(event, 'drop');
 
+                    dropEvent = document.createEvent('CustomEvent');
                     dropEvent.initCustomEvent('interactdrop', true, true, dropDetail);
 
                     detail.dropzone = dropTarget._element;
@@ -1130,16 +1140,19 @@
         }
 
         this._element = element,
-        this._drag = ('drag' in options)? options.drag : false;
-        this._dropzone = ('dropzone' in options)? options.dropzone : false;
-        this._resize = ('resize' in options)? options.resize : false;
-        this._gesture = ('gesture' in options)? options.gesture : false;
-        this._squareResize = ('squareResize' in options)? options.squareResize : false;
-        this._autoScroll = ('autoScroll' in options)? options.autoScroll : true;
-        this._getAction = (typeof options.actionChecker === 'function')?
+
+        this.options = {
+            drag: ('drag' in options)? options.drag : false,
+            dropzone: ('dropzone' in options)? options.dropzone : false,
+            resize: ('resize' in options)? options.resize : false,
+            gesture: ('gesture' in options)? options.gesture : false,
+            squareResize: ('squareResize' in options)? options.squareResize : false,
+            autoScroll: ('autoScroll' in options)? options.autoScroll : true,
+            getAction: (options.actionChecker instanceof Function)?
                 options.actionChecker:
                 actionCheck,
-        this._checkOnHover = ('autoScroll' in options)? options.checkOnHover : true;
+            checkOnHover: ('checkOnHover' in options)? options.checkOnHover : true
+        };
 
         events.add(this, moveEvent, mouseHover);
         events.add(this, downEvent, mouseDown, false);
@@ -1148,17 +1161,17 @@
         this._index = interactables.length - 1;
         this._dropzoneIndex = -1;
 
-        if (this._dropzone) {
+        if (options.dropzone) {
             dropzones.push(this);
             this._dropzoneIndex = dropzones.length - 1;
         }
 
         addClass(element, [
                 'interactable',
-                this._drag? 'interact-draggable': '',
-                this._dropzone? 'interact-dropzone': '',
-                this._resize? 'interact-resizeable': '',
-                this._gesture? 'interact-gestureable': ''
+                options.drag? 'interact-draggable': '',
+                options.dropzone? 'interact-dropzone': '',
+                options.resize? 'interact-resizeable': '',
+                options.gesture? 'interact-gestureable': ''
             ].join(' '));
     }
 
@@ -1174,11 +1187,11 @@
          */
         draggable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._drag  = newValue;
+                this.options.drag = newValue;
 
                 return this;
             }
-            return this._drag;
+            return this.options.drag;
         },
 
         /**
@@ -1192,7 +1205,7 @@
          */
         dropzone: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                if (this._dropzone !== newValue) {
+                if (this.options.dropzone !== newValue) {
                     if (newValue) {
                         dropzones.push(this);
                         this._dropzoneIndex = dropzones.length - 1;
@@ -1201,11 +1214,11 @@
                         this._dropzoneIndex = -1;
                     }
                 }
-                this._dropzone  = newValue;
+                this.options.dropzone = newValue;
 
                 return this;
             }
-            return this._dropzone;
+            return this.options.dropzone;
         },
 
         /**
@@ -1263,11 +1276,11 @@
          */
         resizeable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._resize  = newValue;
+                this.options.resize = newValue;
 
                 return this;
             }
-            return this._resize;
+            return this.options.resize;
         },
 
         /**
@@ -1279,11 +1292,11 @@
          */
         squareResize: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._drag  = newValue;
+                this.options.drag = newValue;
 
                 return this;
             }
-            return this._squareResize;
+            return this.options.squareResize;
         },
 
         /**
@@ -1296,11 +1309,11 @@
          */
         gestureable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._gesture  = newValue;
+                this.options.gesture = newValue;
 
                 return this;
             }
-            return this._gesture;
+            return this.options.gesture;
         },
 
         /**
@@ -1313,11 +1326,11 @@
          */
         autoScroll: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._autoScroll  = newValue;
+                this.options.autoScroll = newValue;
 
                 return this;
             }
-            return this._autoScroll;
+            return this.options.autoScroll;
         },
 
         /**
@@ -1330,11 +1343,11 @@
          */
         actionChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this._getAction  = newValue;
+                this.options.getAction = newValue;
 
                 return this;
             }
-            return this._getAction;
+            return this.options.getAction;
         },
 
         /**
@@ -1348,11 +1361,11 @@
          */
         checkOnHover: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this._checkOnHover  = newValue;
+                this.options.checkOnHover = newValue;
 
                 return this;
             }
-            return this._checkOnHover;
+            return this.options.checkOnHover;
         },
 
         /**
@@ -1489,7 +1502,7 @@
             return interact;
         }
         return actionIsEnabled.drag;
-    }
+    };
     
     /**
      * Returns or sets whether resizing is disabled for all Interactables
@@ -1505,7 +1518,7 @@
             return interact;
         }
         return actionIsEnabled.resize;
-    }
+    };
     
     /**
      * Returns or sets whether gestures are disabled for all Interactables
@@ -1521,7 +1534,7 @@
             return interact;
         }
         return actionIsEnabled.gesture;
-    }
+    };
 
     interact.eventTypes = eventTypes;
 
@@ -1618,11 +1631,21 @@
      */
     interact.enableAutoScroll = function (newValue) {
         if (newValue !== null && newValue !== undefined) {
-            scroll.isEnabled  = newValue;
+            scroll.isEnabled = newValue;
 
             return interact;
         }
         return scroll.isEnabled;
+    };
+
+    /**
+     * Returns or sets whether or not the browser supports touch input
+     *
+     * @function
+     * @returns {bool}
+     */
+    interact.supportsTouch = function () {
+        return supportsTouch;
     };
 
     /**
