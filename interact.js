@@ -81,158 +81,25 @@
             // To store return value of window.setInterval
             i: null,
 
-            // Contains the DIV elements which frame the page and initiate
-            // autoScroll on mouseMove
-            edgeContainer: {
-                _element: document.createElement('div'),
-                events: {}
-            },
-            edges: {
-                top: {
-                    _element: document.createElement('div'),
-                    events: {},
-                    style: [
-                        '',
-                        'top: 0px;',
-                        'left: 0px;',
-                        // screen width * 5 in case page is zoomed out
-                        'width: ' + window.screen.width * 5 + 'px !important;',
-                        'height: ' + scrollMargin + 'px !important;'
-                        ].join(''),
-                    y: -1
-                },
-                right: {
-                    _element: document.createElement('div'),
-                    events: {},
-                    style: [
-                        '',
-                        'top: 0px;',
-                        'right: 0px;',
-                        'width: ' + scrollMargin + 'px !important;',
-                        'height: ' + window.screen.height * 4 + 'px !important;'
-                        ].join(''),
-                    x: 1
-                },
-                bottom: {
-                    _element: document.createElement('div'),
-                    events: {},
-                    style: [
-                        '',
-                        'bottom: 0px;',
-                        'left: 0px;',
-                        'width: ' + window.screen.width * 4 + 'px !important;',
-                        'height: ' + scrollMargin + 'px !important;'
-                        ].join(''),
-                    y: 1
-                },
-                left: {
-                    _element: document.createElement('div'),
-                    events: {},
-                    style: [
-                        '',
-                        'top: 0px;',
-                        'left: 0px;',
-                        'width: ' + scrollMargin + 'px !important;',
-                        'height: ' + window.screen.height * 4 + 'px !important;'
-                        ].join(''),
-                    x: -1
-                }
-            },
-            edgeStyle: [
-                '#edge-container {',
-                '    width: 0;',
-                '    height: 0;',
-                '    margin: 0;',
-                '    padding: 0;',
-                '    border: none;',
-                '}',
-
-                '.interact-edge {',
-                '   position: fixed !important;',
-                '   background-color: transparent !important;',
-                '   z-index: 9000 !important;',
-                '   margin: 0px !important;',
-                '   padding: 0px !important;',
-                '   border: none 0 !important;',
-                '   display: none',
-                '}',
-
-                '.interact-edge.show{',
-                '   display: block !important;',
-                '}'
-                ].join('\n'),
             edgeMove: function (event) {
-            if (dragging || resizing) {
-                    var top = event.clientY < scroll.edges.bottom._element.offsetHeight,
-                        right = event.clientX > scroll.edges.right._element.offsetLeft,
-                        bottom = event.clientY > scroll.edges.bottom._element.offsetTop,
-                        left = event.clientX < scroll.edges.left._element.offsetWidth,
+                if (scroll.isEnabled && (dragging || resizing)) {
+                    var top = event.clientY < scroll.margin,
+                        right = event.clientX > (window.innerWidth - scroll.margin),
+                        bottom = event.clientY > (window.innerHeight - scroll.margin),
+                        left = event.clientX < scroll.margin,
                         options = target.options;
 
                     scroll.x = scroll.distance * (right? 1: left? -1: 0);
                     scroll.y = scroll.distance * (bottom? 1: top? -1: 0);
 
-                    if (!scroll.isScrolling && scroll.isEnabled && options.autoScroll) {
+                    if (!scroll.isScrolling && options.autoScroll) {
                         scroll.start();
                     }
                 }
             },
-            edgeOut: function (event) {
-                // Mouse may have entered another edge while still being above
-                // this one; Need to check if mouse is still above this element
-                scroll.edgeMove(event);
 
-                // If the window is not supposed to be scrolling in any direction,
-                // clear interval
-                if (!scroll.x && !scroll.y) {
-                    scroll.stop();
-                }
-            },
-            showEdges: function () {
-                for (var edge in scroll.edges) {
-                    if (scroll.edges.hasOwnProperty(edge)) {
-                        scroll.edges[edge]._element.classList.add('show');
-                    }
-                }
-                scroll.edgesAreHidden = false;
-            },
-            hideEdges: function () {
-                scroll.stop();
-
-                for (var edge in scroll.edges) {
-                    if (scroll.edges.hasOwnProperty(edge)) {
-                        scroll.edges[edge]._element.classList.remove('show');
-                    }
-                }
-                scroll.edgesAreHidden = true;
-            },
-            addEdges: function () {
-                var currentEdge,
-                    style = document.createElement('style');
-
-                style.type = 'text/css';
-                style.innerHTML = scroll.edgeStyle;
-                scroll.edgeContainer._element.appendChild(style);
-
-                for (var edge in scroll.edges) {
-                    if (scroll.edges.hasOwnProperty(edge)) {
-                        currentEdge = scroll.edges[edge];
-                        scroll.edges[edge]._element.style.cssText = scroll.edges[edge].style;
-                        scroll.edges[edge]._element.classList.add('interact-edge');
-                        scroll.edgeContainer._element.appendChild(currentEdge._element);
-
-                        currentEdge._element.x = currentEdge.x;
-                        currentEdge._element.y = currentEdge.y;
-                    }
-                }
-                scroll.edgeContainer._element.id = 'edge-container';
-                document.body.appendChild(scroll.edgeContainer._element);
-
-                events.add(scroll.edgeContainer, moveEvent, scroll.edgeMove);
-                events.add(scroll.edgeContainer, outEvent, scroll.edgeOut);
-            },
-            edgesAreHidden: true,
             isScrolling: false,
+
             start: function () {
                 scroll.isScrolling = true;
                 window.clearInterval(scroll.i);
@@ -240,7 +107,6 @@
             },
             stop: function () {
                 window.clearInterval(scroll.i);
-                scroll.x = scroll.y = 0;
                 scroll.isScrolling = false;
             }
         },
@@ -771,6 +637,10 @@
             addClass(target._element, actions[prepared].className);
             actions[prepared].moveListener.call(this, event);
         }
+        
+        if (dragging || resizing) {
+            scroll.edgeMove(event);
+        }
     }
 
     /**
@@ -1019,10 +889,11 @@
                 document.documentElement.style.cursor = '';
                 target._element.style.cursor = '';
             }
+            scroll.stop();
+            clearTargets();
+
             // prevent Default only if were previously interacting
             event.preventDefault();
-
-            clearTargets();
         }
         prepared = null;
 
@@ -1676,19 +1547,7 @@
     events.add(docTarget, 'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur' , docMouseUp);
 
-    events.add(docTarget, 'DOMContentLoaded', function () {
-            scroll.addEdges();
-        });
-
-
-     // Drag and resize start event listeners to show autoScroll
-     // edges when interaction starts and hide on drag and resize end
-
-     events.add(docTarget, 'interactresizestart', scroll.showEdges);
-     events.add(docTarget, 'interactdragstart', scroll.showEdges);
-     events.add(docTarget, 'interactresizeend', scroll.hideEdges);
-     events.add(docTarget, 'interactdragend', scroll.hideEdges);
 
     window.interact = interact;
-}(window));
 
+}(window));
