@@ -1128,17 +1128,17 @@
     /**
      * A class for inheritance and easier setting of an Interactable's options
      *
-     * @class IOption
+     * @class IOptions
      */
-    function IOption(options) {
-        for (var option in IOption.prototype) {
-            if (options.hasOwnProperty(option) && typeof options[option] === typeof IOption.prototype[option]) {
+    function IOptions(options) {
+        for (var option in IOptions.prototype) {
+            if (options.hasOwnProperty(option) && typeof options[option] === typeof IOptions.prototype[option]) {
                 this[option] = options[option];
             }
         }
     }
 
-    IOption.prototype = {
+    IOptions.prototype = {
         drag: false,
         dropzone: false,
         resize: false,
@@ -1164,7 +1164,7 @@
 
         this._element = element,
 
-        this.options = new IOption(options);
+        this.options = new IOptions(options);
 
         events.add(this, moveEvent, mouseHover);
         events.add(this, downEvent, mouseDown, false);
