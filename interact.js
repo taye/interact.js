@@ -1125,6 +1125,29 @@
         return interactables.get(element);
     }
 
+    /**
+     * A class for inheritance and easier setting of an Interactable's options
+     *
+     * @class IOption
+     */
+    function IOption(options) {
+        for (var option in IOption.prototype) {
+            if (options.hasOwnProperty(option) && typeof options[option] === typeof IOption.prototype[option]) {
+                this[option] = options[option];
+            }
+        }
+    }
+
+    IOption.prototype = {
+        drag: false,
+        dropzone: false,
+        resize: false,
+        gesture: false,
+        squareResize: false,
+        autoScroll: true,
+        getAction: actionCheck,
+        checkOnHover: true
+    };
 
     /**
      * Object type returned by interact.set(element) and interact(element) if
@@ -1141,18 +1164,7 @@
 
         this._element = element,
 
-        this.options = {
-            drag: ('drag' in options)? options.drag : false,
-            dropzone: ('dropzone' in options)? options.dropzone : false,
-            resize: ('resize' in options)? options.resize : false,
-            gesture: ('gesture' in options)? options.gesture : false,
-            squareResize: ('squareResize' in options)? options.squareResize : false,
-            autoScroll: ('autoScroll' in options)? options.autoScroll : true,
-            getAction: (options.actionChecker instanceof Function)?
-                options.actionChecker:
-                actionCheck,
-            checkOnHover: ('checkOnHover' in options)? options.checkOnHover : true
-        };
+        this.options = new IOption(options);
 
         events.add(this, moveEvent, mouseHover);
         events.add(this, downEvent, mouseDown, false);
