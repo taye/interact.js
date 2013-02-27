@@ -1069,6 +1069,11 @@
             if (newValue !== null && newValue !== undefined) {
                 this.options.drag = newValue;
 
+                if (newValue) {
+                        addClass(this._element, 'interact-draggable');
+                } else {
+                        removeClass(this._element, 'interact-draggable');
+                }
                 return this;
             }
             return this.options.drag;
@@ -1088,8 +1093,12 @@
                 if (this.options.dropzone !== newValue) {
                     if (newValue) {
                         dropzones.push(this);
+
+                        addClass(this._element, 'interact-dropzone');
                     } else {
                         dropzones.splice(dropzones.indexOf(this), 1);
+
+                        removeClass(this._element, 'interact-dropzone');
                     }
                 }
                 this.options.dropzone = newValue;
@@ -1156,6 +1165,11 @@
             if (newValue !== null && newValue !== undefined) {
                 this.options.resize = newValue;
 
+                if (newValue) {
+                        addClass(this._element, 'interact-resizeable');
+                } else {
+                        removeClass(this._element, 'interact-resizeable');
+                }
                 return this;
             }
             return this.options.resize;
@@ -1189,6 +1203,11 @@
             if (newValue !== null && newValue !== undefined) {
                 this.options.gesture = newValue;
 
+                if (newValue) {
+                        addClass(this._element, 'interact-gestureable');
+                } else {
+                        removeClass(this._element, 'interact-gestureable');
+                }
                 return this;
             }
             return this.options.gesture;
