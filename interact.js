@@ -1041,12 +1041,9 @@
         events.add(this, downEvent, mouseDown, false);
 
         interactables.push(this);
-        this._index = interactables.length - 1;
-        this._dropzoneIndex = -1;
 
         if (options.dropzone) {
             dropzones.push(this);
-            this._dropzoneIndex = dropzones.length - 1;
         }
 
         addClass(element, [
@@ -1091,10 +1088,8 @@
                 if (this.options.dropzone !== newValue) {
                     if (newValue) {
                         dropzones.push(this);
-                        this._dropzoneIndex = dropzones.length - 1;
                     } else {
-                        dropzones.splice(this._dropzoneIndex, 1);
-                        this._dropzoneIndex = -1;
+                        dropzones.splice(dropzones.indexOf(this), 1);
                     }
                 }
                 this.options.dropzone = newValue;
@@ -1273,10 +1268,9 @@
                 if (styleCursor) {
                     this._element.style.cursor = '';
                 }
-                interactables.splice(this._index, 1);
-                if (this._dropzoneIndex !== -1) {
-                    dropzones.splice(this._dropzoneIndex, 1);
-                }
+                this.dropzone(false);
+                interactables.splice(interactables.indexOf(this), 1);
+
                 removeClass(this._element, [
                         'interactable',
                         'interact-draggable',
@@ -1302,11 +1296,7 @@
         var interactable = interactables.get(element);
 
         if (interactable) {
-            interactables.splice(interactable._index, 1);
-
-            if (interactable._dropzoneIndex !== -1) {
-                dropzones.splice(interactable._dropzoneIndex, 1);
-            }
+            interactable.unset();
         }
         return new Interactable(element, options);
     };
