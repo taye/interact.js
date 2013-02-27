@@ -929,7 +929,7 @@
     };
 
     /** @private */
-    interactables.indexOf = dropzones.indexOf = function (element) {
+    interactables.indexOfElement = dropzones.indexOfElement = function (element) {
         var i;
 
         for (i = 0; i < this.length; i++) {
@@ -941,7 +941,7 @@
     };
 
     interactables.get = dropzones.get = function (element) {
-        var i = this.indexOf(element) ;
+        var i = this.indexOfElement(element) ;
 
         return interactables[i];
     };
@@ -1327,7 +1327,7 @@
      * @returns {bool}
      */
     interact.isSet = function(element) {
-        return interactables.indexOf(element !== -1);
+        return interactables.indexOfElement(element) !== -1;
     };
 
     /**
