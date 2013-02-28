@@ -14,10 +14,10 @@ interact.set(element, options);
 where options is an object whose properties specify how you want the element to be interacted with. For example:
 ```javascript
 var options = {
-    drag: true,
+    draggable: true,
     dropzone: true,
-    resize: false,
-    gesture: true
+    resizeable: false,
+    gestureable: true
 };
 var element = document.getElementById('anElement');
 interact.set(element, options);
@@ -50,13 +50,13 @@ With interactgesture events, the coordinates of all touches are averaged. There 
  * **box** - a box enclosing all touch points
 
 ### Interacting
-For moving an element around, it is easiest to have it positioned _absolute_, _fixed_ or _relative_ so that the top and left style attributes can be used for positioning. The position of the element can then be changed by adding the change in position of the mouse to the position of the element. Here is a simple demonstration: http://jsfiddle.net/V2zP8/.
+For moving an element around, it is easiest to have it positioned _absolute_, _fixed_ or _relative_ so that the top and left style attributes can be used for positioning. The position of the element can then be changed by adding the change in position of the mouse to the position of the element.
 
 The above demo can be summarised as
 ```javascript
 // Set element
 interact.set(element, {
-        drag: true
+        draggable: true
     });
 // Listen for interactdragmove
 document.addEventListener('interactdragmove', function(event) {
@@ -69,6 +69,6 @@ document.addEventListener('interactdragmove', function(event) {
     });
 ```
 ### Further Demonstration
-Things get more complicated when dealing with elements that have padding and margins. The demo in this repository is live [here](http://t1.netsoc.ie/interact.js "interact.js drag, drop, resize and gesture demo"). The blue elements are divs which can be dragged and dropped onto each other, resized by dragging the botom and right edges and also by "pinching" on a multi-touch device. The yellow elements are SVG elements. These can be as interactable as regular HTML elements but are not in this example.
+The demo in this repository is live [here](http://t1.netsoc.ie/interact.js "interact.js drag, drop, resize and gesture demo"). The blue elements are divs which can be dragged and dropped onto each other, resized by dragging the botom and right edges and also by "pinching" on a multi-touch device. The yellow elements are SVG elements. These can be as interactable as regular HTML elements but are not in this example.
 
 [Biographer](https://code.google.com/p/biographer "Biographer on Google Code"), a biological network layout and visualization tool, uses interact.js to modify SVG elements and to pan and zoom the viewport using a mouse or touch screen device. The applicatin can be viewed [here](http://t1.netsoc.ie/biographer/test/showcase.html "Biographer Showcase").
