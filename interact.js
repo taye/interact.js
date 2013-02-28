@@ -249,7 +249,7 @@
                 target._element.getClientRects()[0];
 
 
-        if (actionIsEnabled.resize && options.resize) {
+        if (actionIsEnabled.resize && options.resizeable) {
             right = ((x - clientRect.left) > (clientRect.width - margin));
             bottom = ((y - clientRect.top) > (clientRect.height - margin));
         }
@@ -549,19 +549,22 @@
     // Check if the action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action) {
-        var actionProperty,
-        options = target.options;
-        
-        if (!action ||
-            !(actionProperty = action.match('resize')? 'resize': action) || 
-            !options[actionProperty] ||
-            !actionIsEnabled[actionProperty]) {
-            return null;
+        var actionType = action.indexOf('resize') !== -1? 'resize': action,
+            options = target.options;
+
+        if (action &&
+            ((actionType === 'resize'   && options.resizeable) ||
+            (action      === 'drag'     && options.draggable) ||
+            (action      === 'gesture'  && options.gestureable)) &&
+            actionIsEnabled[actionType]) {
+
+            if (action === 'resize' || action === 'resizeyx') {
+                action = 'resizexy';
+            }
+
+            return action;
         }
-        if (action === 'resize' || action === 'resizexy' || action === 'resizeyx') {
-            action = 'resizexy';
-        }
-        return action;
+        return null;
     }
 
     /**
@@ -800,7 +803,7 @@
             (target = interactables.get(event.target) || interactables.get(event.target.parentNode))) {
             options = target.options;
 
-            if ((options.resize || options.drag) && options.checkOnHover) {
+            if ((options.resizeable || options.draggable) && options.checkOnHover) {
                 action = validateAction(options.getAction(event));
 
                 if (styleCursor) {
@@ -1010,10 +1013,10 @@
     }
 
     IOptions.prototype = {
-        drag: false,
+        draggable: false,
         dropzone: false,
-        resize: false,
-        gesture: false,
+        resizeable: false,
+        gestureable: false,
         squareResize: false,
         autoScroll: true,
         getAction: actionCheck,
@@ -1048,10 +1051,10 @@
 
         addClass(element, [
                 'interactable',
-                options.drag? 'interact-draggable': '',
+                options.draggable? 'interact-draggable': '',
                 options.dropzone? 'interact-dropzone': '',
-                options.resize? 'interact-resizeable': '',
-                options.gesture? 'interact-gestureable': ''
+                options.resizeable? 'interact-resizeable': '',
+                options.gestureable? 'interact-gestureable': ''
             ].join(' '));
     }
 
@@ -1067,7 +1070,7 @@
          */
         draggable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.drag = newValue;
+                this.options.draggable = newValue;
 
                 if (newValue) {
                         addClass(this._element, 'interact-draggable');
@@ -1076,7 +1079,7 @@
                 }
                 return this;
             }
-            return this.options.drag;
+            return this.options.draggable;
         },
 
         /**
@@ -1163,7 +1166,7 @@
          */
         resizeable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.resize = newValue;
+                this.options.resizeable = newValue;
 
                 if (newValue) {
                         addClass(this._element, 'interact-resizeable');
@@ -1172,7 +1175,7 @@
                 }
                 return this;
             }
-            return this.options.resize;
+            return this.options.resizeable;
         },
 
         /**
@@ -1184,7 +1187,7 @@
          */
         squareResize: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.drag = newValue;
+                this.options.draggable = newValue;
 
                 return this;
             }
@@ -1201,7 +1204,7 @@
          */
         gestureable: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.gesture = newValue;
+                this.options.gestureable = newValue;
 
                 if (newValue) {
                         addClass(this._element, 'interact-gestureable');
@@ -1210,7 +1213,7 @@
                 }
                 return this;
             }
-            return this.options.gesture;
+            return this.options.gestureable;
         },
 
         /**
