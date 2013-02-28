@@ -86,9 +86,9 @@ test('interact.set', function () {
         expectedActionChecker = interact.debug().defaultActionChecker;
     
     interact.set(div0, {
-            drag: expectedDrag,
-            resize: expectedResize,
-            gesture: expectedGesture,
+            draggable: expectedDrag,
+            resizeable: expectedResize,
+            gestureable: expectedGesture,
             autoScroll: expectedAutoScroll
         });
     interactables = interact.debug().interactables;
@@ -187,7 +187,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            drag: true,
+            draggable: true,
             actionChecker: function () {
                 return 'drag';
             }
@@ -246,7 +246,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            drag: true,
+            draggable: true,
             actionChecker: function () {
                 return 'drag';
             }
@@ -314,7 +314,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            drag: true,
+            draggable: true,
             actionChecker: function () {
                 return 'drag';
             }
@@ -381,7 +381,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            resize: true,
+            resizeable: true,
             actionChecker: function () {
                 return 'resize';
             }
@@ -440,7 +440,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            resize: true,
+            resizeable: true,
             actionChecker: function () {
                 return 'resize';
             }
@@ -508,7 +508,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            resize: true,
+            resizeable: true,
             actionChecker: function () {
                 return 'resize';
             }
@@ -585,7 +585,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            gesture: true,
+            gestureable: true,
             actionChecker: function () {
                 return 'gesture';
             }
@@ -697,7 +697,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            gesture: true,
+            gestureable: true,
             actionChecker: function () {
                 return 'gesture';
             }
@@ -782,7 +782,7 @@ var debug = interact.debug(),
     
     document.body.appendChild(div0);
     interact.set(div0, {
-            gesture: true,
+            gestureable: true,
             actionChecker: function () {
                 return 'gesture';
             }
