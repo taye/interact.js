@@ -173,9 +173,9 @@ window.interactDemo = (function(interact) {
             title.setAttribute('y', 20);
 
             interact.set(rect, {
-                drag: true,
+                draggable: true,
                 dropzone: true,
-                resize: true,
+                resizeable: true,
                 squareResize: true
             });
             window['g' + i] = newGraphic;
@@ -228,10 +228,10 @@ window.interactDemo = (function(interact) {
             button.addEventListener('mouseup', buttunFunction);
 
             interact.set(newDiv, {
-                drag: true,
+                draggable: true,
                 dropzone: true,
-                resize: true,
-                gesture: true
+                resizeable: true,
+                gestureable: true
             });
             window['d' + i] = newDiv;
         }
