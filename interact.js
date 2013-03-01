@@ -1242,7 +1242,7 @@
          */
         squareResize: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.draggable = newValue;
+                this.options.squareResize = newValue;
 
                 return this;
             }
