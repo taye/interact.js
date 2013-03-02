@@ -71,14 +71,9 @@ window.interactDemo = (function(interact) {
         prevY = 0,
         realtime = true;
 
-        interact = interact || window.interact;
-        if (!interact) {
-            console.log('interact not included');
-            return;
-        }
 
     function divActionChecker(event) {
-        var target = (event.currentTarget === document)? event.target: event.currentTarget,
+        var target = event.target.element(),
             clientRect = target.getClientRects()[0],
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
@@ -91,7 +86,7 @@ window.interactDemo = (function(interact) {
     }
 
     function graphicActionChecker(event) {
-        var target = (event.currentTarget === document)? event.target: event.currentTarget,
+        var target = event.target.element(),
             clientRect = target.getBoundingClientRect(),
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
@@ -191,7 +186,6 @@ window.interactDemo = (function(interact) {
     function randomDivs(n, parent) {
         var newDiv,
             text,
-            button,
             i;
             
         function buttunFunction(e) {
@@ -215,17 +209,6 @@ window.interactDemo = (function(interact) {
             newDiv.appendChild(document.createElement('br'));
             newDiv.style.left = Math.random()*(window.innerWidth - 200) + 'px';
             newDiv.style.top = Math.random()*(window.innerHeight - 200) + 'px';
-
-            button = newDiv.appendChild(document.createElement('button'));
-            button.innerHTML = 'button gets event?';
-            button.addEventListener('click', buttunFunction);
-            button.addEventListener('mousedown', buttunFunction);
-            button.addEventListener('mouseenter', buttunFunction);
-            button.addEventListener('mouseleave', buttunFunction);
-            button.addEventListener('touchstart', buttunFunction);
-            button.addEventListener('touchmove', buttunFunction);
-            button.addEventListener('touchleave', buttunFunction);
-            button.addEventListener('mouseup', buttunFunction);
 
             interact.set(newDiv, {
                 draggable: true,
@@ -491,9 +474,10 @@ window.interactDemo = (function(interact) {
      */
     function nodeEventDebug(e) {
         var textProp,
+            target = e.target.element(),
             nl;
 
-        if (e.target.nodeName in svgTags) {
+        if (target.nodeName in svgTags) {
             textProp = 'textContent';
             nl = '\n';
         } else {
@@ -501,17 +485,17 @@ window.interactDemo = (function(interact) {
             nl = '<br> ';
         }
 
-        if ( e.target.interactDemo && interact.eventTypes.indexOf(e.type) !== -1 ) {
-            e.target.text[textProp] = nl + e.type;
-            e.target.text[textProp] += nl + ' x0, y0        :    (' + e.detail.x0 + ', ' + e.detail.y0 + ')';
-            e.target.text[textProp] += nl + ' dx, dy        :    (' + e.detail.dx + ', ' + e.detail.dy + ')';
-            e.target.text[textProp] += nl + ' pageX, pageY  :    (' + e.detail.pageX + ', ' + e.detail.pageY + ')';
+        if ( target.interactDemo && interact.eventTypes.indexOf(e.type) !== -1 ) {
+            target.text[textProp] = nl + e.type;
+            target.text[textProp] += nl + ' x0, y0        :    (' + e.x0 + ', ' + e.y0 + ')';
+            target.text[textProp] += nl + ' dx, dy        :    (' + e.dx + ', ' + e.dy + ')';
+            target.text[textProp] += nl + ' pageX, pageY  :    (' + e.pageX + ', ' + e.pageY + ')';
 
             if (e.type.indexOf('gesture') !== -1) {
-                e.target.text[textProp] += nl + ' distance  :     ' + e.detail.distance;
-                e.target.text[textProp] += nl + ' scale     :     ' + e.detail.scale;
-                e.target.text[textProp] += nl + ' angle     :     ' + e.detail.angle;
-                e.target.text[textProp] += nl + ' rotation  :     ' + e.detail.rotation;
+                target.text[textProp] += nl + ' distance  :     ' + e.distance;
+                target.text[textProp] += nl + ' scale     :     ' + e.scale;
+                target.text[textProp] += nl + ' angle     :     ' + e.angle;
+                target.text[textProp] += nl + ' rotation  :     ' + e.rotation;
             }
         }
     }
@@ -525,11 +509,11 @@ window.interactDemo = (function(interact) {
     function eventProps(e) {
         var debug = [],
             prop;
-        if (typeof e.detail === 'object') {
-            debug.push('event.detail: ');
-            for (prop in e.detail) {
-                if (e.detail.hasOwnProperty(prop)) {
-                    debug.push('\n    ' + prop + ' : ' + e.detail[prop]);
+        if (typeof e === 'object') {
+            debug.push('event: ');
+            for (prop in e) {
+                if (e.hasOwnProperty(prop)) {
+                    debug.push('\n    ' + prop + ' : ' + e[prop]);
                 }
             }
         }
@@ -552,69 +536,71 @@ window.interactDemo = (function(interact) {
 
     function staticMove(e) {
         if (e.target.nodeName in svgTags) {
-            changePosition(e.target.parentNode, e.detail.dx, e.detail.dy);
+            changePosition(e.target.parentNode, e.dx, e.dy);
         } else {
-            changePosition(e.target, e.detail.dx, e.detail.dy);
+            changePosition(e.target, e.dx, e.dy);
         }
     }
 
     function realtimeMove(e) {
+        var target = e.target.element();
+
         if (e.target.nodeName in svgTags) {
             changePosition(
                 e.target.nodeName === 'g'?
-                    e.target:
-                    e.target.parentNode,
-                e.detail.dx,
-                e.detail.dy);
+                    target:
+                    target.parentNode,
+                e.dx,
+                e.dy);
         } else {
-            changePosition(e.target, e.detail.dx, e.detail.dy);
+            changePosition(target, e.dx, e.dy);
         }
     }
 
     function staticResize(e) {
-        var target = e.target,
-            dx = event.detail.dx,
-            dy = event.detail.dy;
+        var target = e.target.element(),
+            dx = event.dx,
+            dy = event.dy;
 
         changeSize(target, dx, dy);
     }
 
     function realtimeResize(e) {
-        var target = e.target,
+        var target = e.target.element(),
             position = getPosition(target),
             dx = 0,
             dy = 0;
 
         // + (margin * 1.5) so the mouse must be in the middle of the margin space
-        if ((e.detail.axes === 'x' || e.detail.axes === 'xy') && e.detail.pageX > position.x + (margin * 1.5)) {
-            dx = e.detail.dx;
+        if ((e.axes === 'x' || e.axes === 'xy') && e.pageX > position.x + (margin * 1.5)) {
+            dx = e.dx;
         }
 
-        if ((e.detail.axes === 'y' || e.detail.axes === 'xy') && e.detail.pageY > position.y + (margin * 1.5)) {
-            dy = e.detail.dy;
+        if ((e.axes === 'y' || e.axes === 'xy') && e.pageY > position.y + (margin * 1.5)) {
+            dy = e.dy;
         }
 
         changeSize(target, dx, dy);
     }
 
     function staticScale(e) {
-        var target = e.target,
-            scale = event.detail.scale,
+        var target = e.target.element(),
+            scale = event.scale,
             position = getPosition(target),
             size = getSize(target),
             width = size.x * scale,
             height = size.y * scale;
         
         changePosition(target,
-            e.detail.dx -(width - size.x) / 2,
-            e.detail.dy -(height - size.y) / 2);
+            e.dx -(width - size.x) / 2,
+            e.dy -(height - size.y) / 2);
         setSize(target, width, height);
     }
 
     function realtimeScale(e) {
-        var target = e.target,
+        var target = e.target.element(),
             position = getPosition(target),
-            ds = event.detail.ds,
+            ds = e.ds,
             size = getSize(target),
             dx = size.x * ds,
             dy = size.y * ds,
@@ -624,8 +610,8 @@ window.interactDemo = (function(interact) {
         
         newSize = getSize(target);
         changePosition(target,
-            Math.ceil(e.detail.dx - (newSize.x - size.x) / 2),
-            Math.ceil(e.detail.dy - (newSize.y - size.y) / 2));
+            Math.ceil(e.dx - (newSize.x - size.x) / 2),
+            Math.ceil(e.dy - (newSize.y - size.y) / 2));
     }
 
     function realtimeUpdate(newValue) {
@@ -637,53 +623,53 @@ window.interactDemo = (function(interact) {
     }
     
     function setPrevMouse(e) {
-        prevX = e.pageX || e.detail.pageX;
-        prevY = e.pageX || e.detail.pageY;
+        prevX = e.pageX || e.pageX;
+        prevY = e.pageX || e.pageY;
     }
 
-    document.addEventListener('interactresizeend', function (e) {
+    interact.bind('resizeend', function (e) {
         if (!realtime) {
             staticResize(e);
         }
     });
 
-    document.addEventListener('interactresizemove', function (e) {
+    interact.bind('resizemove', function (e) {
         if (realtime) {
             realtimeResize(e);
         }
     });
 
-    document.addEventListener('interactdragmove', function (e) {
+    interact.bind('dragmove', function (e) {
         if (realtime) {
             realtimeMove(e);
         }
     });
 
-    document.addEventListener('interactdragend', function (e) {
+    interact.bind('dragend', function (e) {
         if (!realtime) {
             staticMove(e);
         }
     });
 
-    document.addEventListener('interactgesturemove', function (e) {
+    interact.bind('gesturemove', function (e) {
         if (realtime) {
             realtimeScale(e);
         }
     });
 
-    document.addEventListener('interactgestureend', function (e) {
+    interact.bind('gestureend', function (e) {
         if (!realtime) {
             staticScale(e);
         }
     });
     
     function dropNode (event) {
-        if ((event.detail.draggable.nodeName in svgTags) && (event.detail.dropzone.nodeName in svgTags)) {
+        if ((event.draggable.nodeName in svgTags) && (event.dropzone.nodeName in svgTags)) {
             return;
         }
             
         var dropzone = event.target,
-            node = event.detail.draggable,
+            node = event.draggable,
             dropPosition = getPosition(dropzone),
             dropSize = getSize(dropzone),
             parent = node.parentNode;
@@ -706,27 +692,27 @@ window.interactDemo = (function(interact) {
         parent.appendChild(parent.removeChild(node));
     }
     // Display event properties for debugging
-    document.addEventListener('interactresizestart', nodeEventDebug);
-    document.addEventListener('interactresizemove', nodeEventDebug);
-    document.addEventListener('interactresizeend', nodeEventDebug);
-    document.addEventListener('interactdragstart', nodeEventDebug);
-    document.addEventListener('interactdragmove', nodeEventDebug);
-    document.addEventListener('interactdragend', nodeEventDebug);
-    document.addEventListener('interactgesturestart', nodeEventDebug);
-    document.addEventListener('interactgesturemove', nodeEventDebug);
-    document.addEventListener('interactgestureend', nodeEventDebug);
+    interact.bind('resizestart', nodeEventDebug);
+    interact.bind('resizemove', nodeEventDebug);
+    interact.bind('resizeend', nodeEventDebug);
+    interact.bind('dragstart', nodeEventDebug);
+    interact.bind('dragmove', nodeEventDebug);
+    interact.bind('dragend', nodeEventDebug);
+    interact.bind('gesturestart', nodeEventDebug);
+    interact.bind('gesturemove', nodeEventDebug);
+    interact.bind('gestureend', nodeEventDebug);
     
     // Drop event listeners
-    document.addEventListener('interactdrop', dropNode)
+    interact.bind('drop', dropNode);
 
     // These listeners must be triggered after the others
-    // so prevX !== e.detail.pageX for other event listeners
-    document.addEventListener('interactdragstart', setPrevMouse);
-    document.addEventListener('interactdragmove', setPrevMouse);
-    document.addEventListener('interactresizestart', setPrevMouse);
-    document.addEventListener('interactresizemove', setPrevMouse);
-    document.addEventListener('interactgesturestart', setPrevMouse);
-    document.addEventListener('interactgesturemove', setPrevMouse);
+    // so prevX !== e.pageX for other event listeners
+    interact.bind('dragstart', setPrevMouse);
+    interact.bind('dragmove', setPrevMouse);
+    interact.bind('resizestart', setPrevMouse);
+    interact.bind('resizemove', setPrevMouse);
+    interact.bind('gesturestart', setPrevMouse);
+    interact.bind('gesturemove', setPrevMouse);
 
     interactDemo.randomDivs = randomDivs;
     interactDemo.randomGraphics = randomGraphics;
