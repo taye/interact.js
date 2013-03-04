@@ -523,7 +523,7 @@ var document = window.document,
         this.shiftKey = event.shiftKey;
         this.metaKey = event.metaKey;
         this.button = event.button;
-        this.target = target;
+        this.target = target._element;
         this.type = action + phase;
 
         // Start/end event dx, dy is difference between start and current points
