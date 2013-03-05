@@ -73,7 +73,7 @@ window.interactDemo = (function(interact) {
 
 
     function divActionChecker(event) {
-        var target = event.target.element(),
+        var target = event.target,
             clientRect = target.getClientRects()[0],
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
@@ -86,7 +86,7 @@ window.interactDemo = (function(interact) {
     }
 
     function graphicActionChecker(event) {
-        var target = event.target.element(),
+        var target = event.target,
             clientRect = target.getBoundingClientRect(),
             right = ((event.pageX - window.scrollX - clientRect.left) > (clientRect.width - margin)),
             bottom = ((event.pageY - window.scrollY - clientRect.top) > (clientRect.height - margin)),
@@ -474,7 +474,7 @@ window.interactDemo = (function(interact) {
      */
     function nodeEventDebug(e) {
         var textProp,
-            target = e.target.element(),
+            target = e.target,
             nl;
 
         if (target.nodeName in svgTags) {
@@ -543,7 +543,7 @@ window.interactDemo = (function(interact) {
     }
 
     function realtimeMove(e) {
-        var target = e.target.element();
+        var target = e.target;
 
         if (e.target.nodeName in svgTags) {
             changePosition(
@@ -558,7 +558,7 @@ window.interactDemo = (function(interact) {
     }
 
     function staticResize(e) {
-        var target = e.target.element(),
+        var target = e.target,
             dx = event.dx,
             dy = event.dy;
 
@@ -566,7 +566,7 @@ window.interactDemo = (function(interact) {
     }
 
     function realtimeResize(e) {
-        var target = e.target.element(),
+        var target = e.target,
             position = getPosition(target),
             dx = 0,
             dy = 0;
@@ -584,7 +584,7 @@ window.interactDemo = (function(interact) {
     }
 
     function staticScale(e) {
-        var target = e.target.element(),
+        var target = e.target,
             scale = event.scale,
             position = getPosition(target),
             size = getSize(target),
@@ -598,7 +598,7 @@ window.interactDemo = (function(interact) {
     }
 
     function realtimeScale(e) {
-        var target = e.target.element(),
+        var target = e.target,
             position = getPosition(target),
             ds = e.ds,
             size = getSize(target),
@@ -664,7 +664,7 @@ window.interactDemo = (function(interact) {
     });
     
     function dropNode (event) {
-        if ((event.draggable.nodeName in svgTags) && (event.dropzone.nodeName in svgTags)) {
+        if ((event.draggable.nodeName in svgTags) && (event.target.nodeName in svgTags)) {
             return;
         }
             
@@ -691,6 +691,7 @@ window.interactDemo = (function(interact) {
         
         parent.appendChild(parent.removeChild(node));
     }
+
     // Display event properties for debugging
     interact.bind('resizestart', nodeEventDebug);
     interact.bind('resizemove', nodeEventDebug);
