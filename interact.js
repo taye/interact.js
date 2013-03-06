@@ -171,56 +171,124 @@ var document = window.document,
     },
 
     // Events wrapper
-    events = {
-        // attach an event to a target
-        add: function (target, type, listener, useCapture) {
-            if (typeof target.events !== 'object') {
-                target.events = {};
+    events = (function () {
+        var addEvent = ('addEventListener' in document)?
+                'addEventListener': 'attachEvent',
+            removeEvent = ('removeEventListener' in document)?
+                'removeEventListener': 'detachEvent',
+            
+            elements = [],
+            targets  = [];
+
+        if (!('indexOf' in Array.prototype)) {
+            Array.prototype.indexOf = function(elt /*, from*/)   {
+            var len = this.length >>> 0;
+
+            var from = Number(arguments[1]) || 0;
+            from = (from < 0)?
+                Math.ceil(from):
+                Math.floor(from);
+
+            if (from < 0) {
+                from += len;
             }
 
-            if (typeof target.events[type] !== 'array') {
+            for (; from < len; from++) {
+                if (from in this && this[from] === elt) {
+                    return from;
+                }
+            }
+
+            return -1;
+            };
+        }
+
+        function add (element, type, listener, useCapture) {
+            if (!(element instanceof window.Element) && element !== window.document) {
+                return;
+            }
+
+            var target = targets[elements.indexOf(element)];
+
+            if (!target) {
+                target = {
+                    events: {},
+                    typeCount: 0
+                };
+
+                elements.push(element);
+                targets.push(target);
+            }
+            if (!target.events[type]) {
                 target.events[type] = [];
+                target.typeCount++;
             }
 
-            target.events[type].push(listener);
+            if (target.events[type].indexOf(listener) === -1) {
+                target.events[type].push(listener);
 
-            return target._element.addEventListener(type, listener, useCapture || false);
-        },
+                return element[addEvent](type, listener, useCapture || false);
+            }
+        }
 
-        // remove an event from a target
-        remove: function (target, type, listener, useCapture) {
-            var i;
+        function remove (element, type, listener, useCapture) {
+            var i,
+            target = targets[elements.indexOf(element)];
 
-            if (target && target.events && target.events[type]) {
+            if (!target || !target.events) {
+                return;
+            }
 
-                if (listener === 'all') {
-                    for (i = 0; i < target.events[type].length; i++) {
-                        target._element.removeEventListener(type, target.events[type][i], useCapture || false);
-                        target.events[type].splice(i, 1);
+            if (type === 'all') {
+                for (type in target.events) {
+                    if (target.events.hasOwnProperty(type)) {
+                        remove(element, type, 'all');
                     }
                 }
-                else {
-                    for (i = 0; i < target.events[type].length; i++) {
+                return;
+            }
+
+            if (target.events[type]) {
+                var len = target.events[type].length;
+
+                if (listener === 'all') {
+                    for (i = 0; i < len; i++) {
+                        element[removeEvent](type, target.events[type][i], useCapture || false);
+                    }
+                    target.events[type] = null;
+                    target.typeCount--;
+                } else {
+                    for (i = 0; i < len; i++) {
                         if (target.events[type][i] === listener) {
-                            target._element.removeEventListener(type, target.events[type][i], useCapture || false);
+
+                            element[removeEvent](type, target.events[type][i], useCapture || false);
                             target.events[type].splice(i, 1);
+
+                            break;
                         }
                     }
                 }
-            }
-        },
-
-        // remove all events from a target
-        removeAll: function (target) {
-            var type;
-
-            for (type in target.events) {
-                if (target.events.hasOwnProperty(type)) {
-                    events.remove(target, type, 'all');
+                if (target.events[type] && target.events[type].length === 0) {
+                    target.events[type] = null;
+                    target.typeCount--;
                 }
             }
+
+            if (!target.typeCount) {
+                targets.splice(targets.indexOf(target), 1);
+                elements.splice(elements.indexOf(element), 1);
+            }
         }
-    };
+
+        return {
+            add: function (target, type, listener, useCapture) {
+                add(target._element, type, listener, useCapture);
+            },
+            remove: function (target, type, listener, useCapture) {
+                remove(target._element, type, listener, useCapture);
+            }
+        };
+    }());
 
     // Set event types to be used depending on input available
     if (supportsTouch) {
