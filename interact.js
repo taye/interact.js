@@ -1460,7 +1460,7 @@ var document = window.document,
          * @returns {} {@link interact}
          */
         unset: function () {
-            events.removeAll(this);
+            events.remove(this, 'all');
             if (styleCursor) {
                 this._element.style.cursor = '';
             }
