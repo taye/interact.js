@@ -114,11 +114,12 @@ var document = window.document,
     // Less Precision with touch input
     margin = supportsTouch ? 20 : 10,
 
-    mouseIsDown = false,
-    gesturing   = false,
-    dragging    = false,
-    resizing    = false,
-    resizeAxes  = 'xy',
+    mouseIsDown   = false,
+    mouseWasMoved = false,
+    gesturing     = false,
+    dragging      = false,
+    resizing      = false,
+    resizeAxes    = 'xy',
 
     // What to do depending on action returned by getAction() of node
     // Dictates what styles should be used and what mouseMove event Listner
@@ -155,7 +156,9 @@ var document = window.document,
         'drop',
         'gesturestart',
         'gesturemove',
-        'gestureend'
+        'gestureend',
+
+        'click'
     ],
 
     globalEvents = [],
@@ -719,6 +722,7 @@ var document = window.document,
             // Register that the mouse is down after succesfully validating action.
             // This way, a new target can be gotten in the next downEvent propagation
             mouseIsDown = true;
+            mouseWasMoved = false;
 
             if (styleCursor) {
                 document.documentElement.style.cursor =
@@ -740,9 +744,14 @@ var document = window.document,
     }
 
     function mouseMove (event) {
-        if (mouseIsDown && prepared && target) {
+        if (mouseIsDown) {
+           if (x0 === prevX && y0 === prevY) { 
+               mouseWasMoved = true;
+           }
+           if (prepared && target) {
             addClass(target._element, actions[prepared].className);
             actions[prepared].moveListener(event);
+           }
         }
 
         if (dragging || resizing) {
@@ -968,8 +977,21 @@ var document = window.document,
             endEvent.ds = endEvent.scale;
             target.fire(endEvent);
         }
+        else if (event.type === 'mouseup' && target && mouseIsDown && !mouseWasMoved) {
+            var click = {};
+
+            for (var prop in event) {
+                if (event.hasOwnProperty(prop)) {
+                    click[prop] = event[prop];
+                }
+            }
+            click.type = 'click';
+            target.fire(click);
+        }
 
         mouseIsDown = dragging = resizing = gesturing = false;
+
+        mouseWasMoved = true;
 
         if (target) {
             if (styleCursor) {
