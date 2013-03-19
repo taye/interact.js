@@ -1165,6 +1165,18 @@ var document = window.document,
     }
 
     Interactable.prototype = {
+        setOnEvents: function (action, phases) {
+            var start = phases.onstart || phases.onStart,
+                move  = phases.onmove  || phases.onMove,
+                end   = phases.onend   || phases.onEnd;
+
+            action = 'on' + action;
+
+            if (typeof start === 'function') { this[action + 'start'] = start; }
+            if (typeof move  === 'function') { this[action + 'move' ] = move ; }
+            if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
+        },
+
         /**
          * Returns or sets whether multitouch this Interactable's element can be
          * dragged
@@ -1173,9 +1185,17 @@ var document = window.document,
          * @param {bool} newValue
          * @returns {bool | Interactable}
          */
-        draggable: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
-                this.options.draggable = newValue;
+        draggable: function (options) {
+            if (typeof options === 'object') {
+                this.options.draggable = true;
+                this.setOnEvents('drag', options);
+
+                addClass(this._element, 'interact-draggable');
+
+                return this;
+            }
+            if (typeof options === 'boolean') {
+                this.options.draggable = options;
 
                 if (newValue) {
                     addClass(this._element, 'interact-draggable');
@@ -1185,6 +1205,7 @@ var document = window.document,
                 }
                 return this;
             }
+
             return this.options.draggable;
         },
 
@@ -1197,9 +1218,19 @@ var document = window.document,
          *              the current value
          * @returns {bool | Interactable}
          */
-        dropzone: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
-                if (this.options.dropzone !== newValue) {
+        dropzone: function (options) {
+            if (typeof options === 'object') {
+                var ondrop = options.ondrop || options.onDrop;
+                if (typeof ondrop === 'function') { this.ondrop = ondrop; }
+
+                this.options.dropzone = true;
+                dropzones.push(this);
+                addClass(this._element, 'interact-dropzone');
+
+                return this;
+            }
+            if (typeof options === 'boolean') {
+                if (this.options.dropzone !== options) {
                     if (newValue) {
                         dropzones.push(this);
 
@@ -1211,7 +1242,7 @@ var document = window.document,
                         removeClass(this._element, 'interact-dropzone');
                     }
                 }
-                this.options.dropzone = newValue;
+                this.options.dropzone = options;
 
                 return this;
             }
@@ -1268,11 +1299,19 @@ var document = window.document,
          * Interactable
          *
          * @function
-         * @param {bool} newValue
+         * @param {} options An object with event listeners to be fired on resize events
          * @returns {bool | Interactable}
          */
-        resizeable: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
+        resizeable: function (options) {
+            if (typeof options === 'object') {
+                this.options.resizeable = true;
+                this.setOnEvents('resize', options);
+
+                addClass(this._element, 'interact-resizeable');
+
+                return this;
+            }
+            if (typeof options === 'boolean') {
                 this.options.resizeable = newValue;
 
                 if (newValue) {
@@ -1311,6 +1350,14 @@ var document = window.document,
          * @returns {bool | Interactable}
          */
         gestureable: function (newValue) {
+            if (typeof options === 'object') {
+                this.options.gestureable = true;
+                this.setOnEvents('gesture', options);
+
+                addClass(this._element, 'interact-gestureable');
+
+                return this;
+            }
             if (newValue !== null && newValue !== undefined) {
                 this.options.gestureable = newValue;
 
@@ -1394,13 +1441,18 @@ var document = window.document,
          * @returns {Interactable}
          */
         fire: function (iEvent) {
-            if (!iEvent) {
+            if (!(iEvent && iEvent.type) || eventTypes.indexOf(iEvent.type) === -1) {
                 return this;
             }
 
             var listeners,
                 len,
-                i;
+                i,
+                onEvent = 'on' + iEvent.type;
+
+            if (typeof this[onEvent] === 'function') {
+                this[onEvent](iEvent);
+            }
 
             if (iEvent.type in this._iEvents) {
                 listeners = this._iEvents[iEvent.type];
