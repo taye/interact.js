@@ -2,6 +2,19 @@ interact.js
 ===========
 Javascript drag, drop, resizing and gestures for modern desktop and mobile browsers.
 
+```javascript
+
+var x = 0, y = 0;
+
+interact.set(document.body)
+    .draggable({
+        onmove: function (event) {
+            // use event properties to respond to drag
+        }
+    })
+    .autoScroll(false);
+```
+
 Usage
 -------
 
@@ -45,7 +58,7 @@ InteractEvent properties include the usual properties of mouse/touch events such
 | ----------------------- | --------------------------------------------------|
 | `x0`, `y0`              | Page x and y coordinates of the starting event    |
 | `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
-| `dx`, `dy`              | Change in coordinates of the mouse/touch*         |
+| `dx`, `dy`              | Change in coordinates of the mouse/touch *        |
 | target                  | The element that is being interacted with         |
 
 | Drag                    |                                                   |
@@ -74,7 +87,7 @@ InteractEvent properties include the usual properties of mouse/touch events such
 | `ds`                    | The change in scale since the previous even       |
 | `box`                   | A box enclosing all touch points                  |
 
-*In interact move events, these are the changes since the previous InteractEvent. However, in end events, these are the changes from the position of the start event to the end event. In gesture events, coordinates are the averages of touch coordinates.
+\* In interact move events, these are the changes since the previous InteractEvent. However, in end events, these are the changes from the position of the start event to the end event. In gesture events, coordinates are the averages of touch coordinates.
 
 
 ### Interacting
