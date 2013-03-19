@@ -135,7 +135,8 @@ var document = window.document,
     prepared    = null,
     styleCursor = true,
 
-    // User interaction event types. will be set depending on touch input is supported
+    // User interaction event types. will be set depending on touch input is
+    // supported
     downEvent,
     upEvent,
     moveEvent,
@@ -647,7 +648,7 @@ var document = window.document,
         }
     }
 
-    // Check if the action is enabled globally and the current target supports it
+    // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action) {
         var actionType = action.indexOf('resize') !== -1? 'resize': action,
@@ -719,8 +720,9 @@ var document = window.document,
                 return event;
             }
 
-            // Register that the mouse is down after succesfully validating action.
-            // This way, a new target can be gotten in the next downEvent propagation
+            // Register that the mouse is down after succesfully validating
+            // action. This way, a new target can be gotten in the next
+            // downEvent propagation
             mouseIsDown = true;
             mouseWasMoved = false;
 
@@ -952,8 +954,9 @@ var document = window.document,
                     endEvent.dropzone = dropTarget._element;
                 }
 
-                // otherwise, if there was a prevDropTarget (perhaps if for some reason
-                // this dragend happens without the mouse moving out of the previousdroptarget)
+                // otherwise, if there was a prevDropTarget (perhaps if for
+                // some reason this dragend happens without the mouse moving
+                // out of the previousdroptarget)
                 else if (prevDropTarget) {
                     var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave');
 
@@ -1284,7 +1287,7 @@ var document = window.document,
         },
 
         /**
-         * Returns or sets whether resizing can only be done on both axes equally
+         * Returns or sets whether resizing on both axes equally is forced equal
          *
          * @function
          * @param {bool} newValue
@@ -1485,8 +1488,9 @@ var document = window.document,
     /**
      * @function
      * @description Add an element to the list of interact nodes
-     * @param {HTMLElement | SVGElement} element The DOM Element that will be added
-     * @param {Object} options An object whose properties are the drag/resize/gesture options
+     * @param {HTMLElement | SVGElement} element The Element that will be set
+     * @param {Object} options An object whose properties are the
+     *                         drag/resize/gesture options
      * @returns {Interactable}
      */
     interact.set = function (element, options) {
@@ -1501,7 +1505,7 @@ var document = window.document,
     /**
      * @function
      * @description Check if an element has been set
-     * @param {HTMLElement | SVGElement} element The DOM Element that will be searched for
+     * @param {HTMLElement | SVGElement} element The Element being searched for
      * @returns {bool}
      */
     interact.isSet = function(element) {
@@ -1548,8 +1552,8 @@ var document = window.document,
 
     /**
      * @function
-     * @description Simulate mouse down to begin drag/resize on an interactable element
-     * @param {String} action The action to be performed - drag, resize, resizex, resizey;
+     * @description Simulate mouse down to interact with an interactable element
+     * @param {String} action The action to be performed - drag, resize, etc.
      * @param {HTMLElement | SVGElement} element The DOM Element to resize/drag
      * @param {MouseEvent | TouchEvent} [mouseEvent] A mouse event whose pageX/Y
      *        coordinates will be the starting point of the interact drag/resize
@@ -1706,7 +1710,7 @@ var document = window.document,
     };
 
     /**
-     * Returns or sets whether or not the cursor style of the document is changed
+     * Returns or sets whether if the cursor style of the document is changed
      * depending on what action is being performed
      *
      * @function
