@@ -176,7 +176,7 @@ var debug = interact.debug(),
         
         equal(event.type, 'dragstart', 'Event type');
         equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target.element(), div0, 'Event is targeting the element correctly');
+        equal(event.target, div0, 'Event is targeting the element correctly');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -235,7 +235,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'dragmove', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -303,7 +303,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'dragend', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -370,7 +370,7 @@ var debug = interact.debug(),
         
         equal(event.type, 'resizestart', 'Event type');
         equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -429,7 +429,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'resizemove', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -497,7 +497,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'resizeend', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -574,7 +574,7 @@ var debug = interact.debug(),
         
         equal(event.type, 'gesturestart', 'Event type');
         equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -683,7 +683,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'gesturemove', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
@@ -771,7 +771,7 @@ var debug = interact.debug(),
         var debug = interact.debug();
         
         equal(event.type, 'gestureend', 'Event type');
-        equal(event.target.element(), div0, 'Event target element');
+        equal(event.target, div0, 'Event target element');
         equal(debug.x0, expectedX0);
         equal(debug.y0, expectedY0);
         equal(event.x0, expectedX0, 'Starting x coordinate of event');
