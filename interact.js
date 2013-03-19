@@ -651,11 +651,12 @@ var document = window.document,
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action) {
+        if (typeof action !== 'string') { return null; }
+
         var actionType = action.indexOf('resize') !== -1? 'resize': action,
             options = target.options;
 
-        if (action &&
-                ((actionType  === 'resize'   && options.resizeable) ||
+        if (((actionType  === 'resize'   && options.resizeable) ||
                  (action      === 'drag'     && options.draggable) ||
                  (action      === 'gesture'  && options.gestureable)) &&
                 actionIsEnabled[actionType]) {
