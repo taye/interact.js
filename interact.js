@@ -1485,7 +1485,7 @@ var document = window.document,
                             listeners = this._iEvents[iEvent.type];
 
                             for (var len = listeners.length; i < len && !imPropStopped; i++) {
-                                listeners[i].call(this, iEvent);
+                                listeners[i](iEvent);
                             }
                             break;
                         }
@@ -1498,7 +1498,7 @@ var document = window.document,
                             listeners = globalEvents[iEvent.type];
 
                             for (var len = listeners.length; i < len && !imPropStopped; i++) {
-                                listeners[i].call(this, iEvent);
+                                listeners[i](iEvent);
                             }
                         }
                     }
