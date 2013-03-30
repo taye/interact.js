@@ -1507,9 +1507,13 @@ var document = window.document,
                     fireState++;
                 }
                 catch (error) {
-                    console.log('Error thrown from ' + iEvent.type + ' listener ' + 
-                                (listeners[i].name? listeners[i].name: ''));
-                    console.log(error);
+                    console.error('Error thrown from ' + iEvent.type + ' listener');
+                    console.error(error);
+                    i++;
+
+                    if (fireState === fireStates.onevent) {
+                        fireState++;
+                    }
                 }
             }
 
