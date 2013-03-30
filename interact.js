@@ -125,7 +125,34 @@ var document = window.document,
     // What to do depending on action returned by getAction() of node
     // Dictates what styles should be used and what mouseMove event Listner
     // is to be added after mouseDown
-    actions = {},
+    actions = {
+        drag: {
+            cursor      : 'move',
+            className   : 'interact-dragging',
+            moveListener: dragMove
+        },
+        resizex: {
+            cursor      : 'e-resize',
+            className   : 'interact-resizing',
+            moveListener: resizeMove
+        },
+        resizey: {
+            cursor      : 's-resize',
+            className   : 'interact-resizing',
+            moveListener: resizeMove
+        },
+        resizexy: {
+            cursor      : 'se-resize',
+            className   : 'interact-resizing',
+            moveListener: resizeMove
+        },
+        gesture: {
+            cursor      : '',
+            className   : 'interact-gesturing',
+            moveListener: gestureMove
+        }
+    },
+
     actionIsEnabled = {
         drag   : true,
         resize : true,
@@ -1023,34 +1050,6 @@ var document = window.document,
 
         return event;
     }
-
-    actions = {
-        drag: {
-            cursor      : 'move',
-            className   : 'interact-dragging',
-            moveListener: dragMove
-        },
-        resizex: {
-            cursor      : 'e-resize',
-            className   : 'interact-resizing',
-            moveListener: resizeMove
-        },
-        resizey: {
-            cursor      : 's-resize',
-            className   : 'interact-resizing',
-            moveListener: resizeMove
-        },
-        resizexy: {
-            cursor      : 'se-resize',
-            className   : 'interact-resizing',
-            moveListener: resizeMove
-        },
-        gesture: {
-            cursor      : '',
-            className   : 'interact-gesturing',
-            moveListener: gestureMove
-        }
-    };
 
     interactables.indexOfElement = dropzones.indexOfElement = function (element) {
         var i;
