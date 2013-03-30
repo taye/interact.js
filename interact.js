@@ -192,6 +192,12 @@ var document = window.document,
 
     globalEvents = [],
 
+    fireStates = {
+        onevent   : 0,
+        directBind: 1,
+        globalBind: 2
+    },
+
    // used for adding event listeners to window and document
     windowTarget = {
         _element: window,
@@ -1457,25 +1463,53 @@ var document = window.document,
             }
 
             var listeners,
-                len,
-                i,
+                fireState = 0,
+                i = 0,
                 onEvent = 'on' + iEvent.type;
 
-            if (typeof this[onEvent] === 'function') {
-                this[onEvent](iEvent);
-            }
+            // Try-catch and loop so an exception thrown from a listener
+            // doesn't ruin everything for everyone
+            while (fireState < 3) {
+                try {
+                    switch (fireState) {
+                        // interactable.onevent listener
+                        case fireStates.onevent:
+                            if (typeof this[onEvent] === 'function') {
+                            this[onEvent](iEvent);
+                        }
+                        break;
 
-            if (iEvent.type in this._iEvents) {
-                listeners = this._iEvents[iEvent.type];
+                        // Interactable#bind() listeners
+                        case fireStates.directBind:
+                            if (iEvent.type in this._iEvents) {
+                            listeners = this._iEvents[iEvent.type];
 
-                for (i = 0, len = listeners.length; i < len && !imPropStopped; i++) {
-                    listeners[i].call(this, iEvent);
+                            for (var len = listeners.length; i < len && !imPropStopped; i++) {
+                                listeners[i].call(this, iEvent);
+                            }
+                            break;
+                        }
+
+                        break;
+
+                        // interact.bind() listeners
+                        case fireStates.globalBind:
+                            if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
+                            listeners = globalEvents[iEvent.type];
+
+                            for (var len = listeners.length; i < len && !imPropStopped; i++) {
+                                listeners[i].call(this, iEvent);
+                            }
+                        }
+                    }
+
+                    i = 0;
+                    fireState++;
                 }
-            }
-
-            if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
-                for (i = 0, len = listeners.length; i < len && !imPropStopped; i++) {
-                    listeners[i].call(this, iEvent);
+                catch (error) {
+                    console.log('Error thrown from ' + iEvent.type + ' listener ' + 
+                                (listeners[i].name? listeners[i].name: ''));
+                    console.log(error);
                 }
             }
 
