@@ -116,6 +116,7 @@ var document = window.document,
 
     mouseIsDown   = false,
     mouseWasMoved = false,
+    imPropStopped = false,
     gesturing     = false,
     dragging      = false,
     resizing      = false,
@@ -647,6 +648,16 @@ var document = window.document,
             this.draggable = target._element;
         }
     }
+
+    function blank () {}
+
+    InteractEvent.prototype = {
+        preventDefault: blank,
+        stopImmediatePropagation: function (event) {
+            imPropStopped = true;
+        },
+        stopPropagation: blank
+    };
 
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
@@ -1458,16 +1469,18 @@ var document = window.document,
             if (iEvent.type in this._iEvents) {
                 listeners = this._iEvents[iEvent.type];
 
-                for (i = 0, len = listeners.length; i < len; i++) {
+                for (i = 0, len = listeners.length; i < len && !imPropStopped; i++) {
                     listeners[i].call(this, iEvent);
                 }
             }
 
             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
-                for (i = 0, len = listeners.length; i < len; i++) {
+                for (i = 0, len = listeners.length; i < len && !imPropStopped; i++) {
                     listeners[i].call(this, iEvent);
                 }
             }
+
+            imPropStopped = false;
 
             return this;
         },
