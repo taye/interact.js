@@ -1199,7 +1199,7 @@ var document = window.document,
          * dragged
          *
          * @function
-         * @param {bool} newValue
+         * @param {bool} options
          * @returns {bool | Interactable}
          */
         draggable: function (options) {
@@ -1214,11 +1214,11 @@ var document = window.document,
             if (typeof options === 'boolean') {
                 this.options.draggable = options;
 
-                if (newValue) {
+                if (options) {
                     addClass(this._element, 'interact-draggable');
                 }
                 else {
-                    removeClass(this._element, 'interact-draggable');
+                    removeClass(this._element, 'interact-draggable interact-dragging');
                 }
                 return this;
             }
@@ -1231,7 +1231,7 @@ var document = window.document,
          * Interactable to trigger interactdrop events
          *
          * @function
-         * @param {bool} newValue The new value to be set. Passing null returns
+         * @param {bool} options The new value to be set. Passing null returns
          *              the current value
          * @returns {bool | Interactable}
          */
@@ -1248,7 +1248,7 @@ var document = window.document,
             }
             if (typeof options === 'boolean') {
                 if (this.options.dropzone !== options) {
-                    if (newValue) {
+                    if (options) {
                         dropzones.push(this);
 
                         addClass(this._element, 'interact-dropzone');
@@ -1329,13 +1329,13 @@ var document = window.document,
                 return this;
             }
             if (typeof options === 'boolean') {
-                this.options.resizeable = newValue;
+                this.options.resizeable = options;
 
-                if (newValue) {
+                if (options) {
                     addClass(this._element, 'interact-resizeable');
                 }
                 else {
-                    removeClass(this._element, 'interact-resizeable');
+                    removeClass(this._element, 'interact-resizeable interact-resizing');
                 }
                 return this;
             }
@@ -1363,10 +1363,10 @@ var document = window.document,
          * Interactables element
          *
          * @function
-         * @param {bool} newValue
+         * @param {bool} options
          * @returns {bool | Interactable}
          */
-        gestureable: function (newValue) {
+        gestureable: function (options) {
             if (typeof options === 'object') {
                 this.options.gestureable = true;
                 this.setOnEvents('gesture', options);
@@ -1375,14 +1375,14 @@ var document = window.document,
 
                 return this;
             }
-            if (newValue !== null && newValue !== undefined) {
-                this.options.gestureable = newValue;
+            if (options !== null && options !== undefined) {
+                this.options.gestureable = options;
 
-                if (newValue) {
+                if (options) {
                     addClass(this._element, 'interact-gestureable');
                 }
                 else {
-                    removeClass(this._element, 'interact-gestureable');
+                    removeClass(this._element, 'interact-gestureable interact-gesturing');
                 }
                 return this;
             }
@@ -1570,19 +1570,14 @@ var document = window.document,
             if (styleCursor) {
                 this._element.style.cursor = '';
             }
-            this.dropzone(false);
-            interactables.splice(interactables.indexOf(this), 1);
 
-            removeClass(this._element, [
-                    'interactable',
-                    'interact-draggable',
-                    'interact-dragging',
-                    'interact-dropzone',
-                    'interact-resizeable',
-                    'interact-resizeing',
-                    'interact-gestureable',
-                    'interact-gesturing'
-                ].join(' '));
+            this.draggable  (false);
+            this.dropzone   (false);
+            this.resizeable (false);
+            this.gestureable(false);
+
+            interactables.splice(interactables.indexOf(this), 1);
+            removeClass(this._element, 'interactable');
 
             return interact;
         }
