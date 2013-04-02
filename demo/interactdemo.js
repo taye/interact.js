@@ -167,7 +167,7 @@ window.interactDemo = (function(interact) {
             title.setAttribute('x', 50);
             title.setAttribute('y', 20);
 
-            interact.set(rect, {
+            interact(rect).set({
                 draggable: true,
                 dropzone: true,
                 resizeable: true,
@@ -210,7 +210,7 @@ window.interactDemo = (function(interact) {
             newDiv.style.left = Math.random()*(window.innerWidth - 200) + 'px';
             newDiv.style.top = Math.random()*(window.innerHeight - 200) + 'px';
 
-            interact.set(newDiv, {
+            interact(newDiv).set({
                 draggable: true,
                 dropzone: true,
                 resizeable: true,

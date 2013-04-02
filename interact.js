@@ -1118,7 +1118,8 @@ var document = window.document,
         if (typeof element === 'string') {
             element = document.getElementById(element);
         }
-        return interactables.get(element);
+
+        return interactables.get(element) || new Interactable(element);
     }
 
     /**
@@ -1146,39 +1147,22 @@ var document = window.document,
     };
 
     /**
-     * Object type returned by interact.set(element) and interact(element) if
-     * the element was previously set.
+     * Object type returned by interact(element)
      *
      * @class Interactable
      * @name Interactable
      */
     function Interactable (element, options) {
-
-        if (typeof options !== 'object') {
-            options = {};
-        }
-
         this._element = element,
-
-        this.options = new IOptions(options);
-        this._iEvents = {};
+        this._iEvents = this._iEvents || {};
 
         events.add(this, moveEvent, mouseHover);
-        events.add(this, downEvent, mouseDown, false);
+        events.add(this, downEvent, mouseDown);
 
         interactables.push(this);
+        addClass(this._element, 'interactable');
 
-        if (options.dropzone) {
-            dropzones.push(this);
-        }
-
-        addClass(element, [
-                 'interactable',
-                 options.draggable  ? 'interact-draggable'  : '',
-                 options.dropzone   ? 'interact-dropzone'   : '',
-                 options.resizeable ? 'interact-resizeable' : '',
-                 options.gestureable? 'interact-gestureable': ''
-        ].join(' '));
+        this.set(options);
     }
 
     Interactable.prototype = {
@@ -1559,6 +1543,26 @@ var document = window.document,
         },
 
         /**
+         * @function
+         * @description Add an element to the list of interact nodes
+         * @param {HTMLElement | SVGElement | Interactable} element The Element that will be set
+         * @param {Object} options An object whose properties are the
+         *                         drag/resize/gesture options
+         * @returns {Interactable}
+         */
+        set: function (options) {
+            if (!options || typeof options !== 'object') {
+                options = {};
+            }
+            this.options = new IOptions(options);
+
+            this.draggable  (this.options.draggable);
+            this.dropzone   (this.options.dropzone);
+            this.resizeable (this.options.resizeable);
+            this.gestureable(this.options.gestureable);
+        },
+
+        /**
          * Remove this interactable from the list of interactables
          * and remove it's drag, drop, resize and gesture capabilities
          *
@@ -1581,23 +1585,6 @@ var document = window.document,
 
             return interact;
         }
-    };
-
-    /**
-     * @function
-     * @description Add an element to the list of interact nodes
-     * @param {HTMLElement | SVGElement} element The Element that will be set
-     * @param {Object} options An object whose properties are the
-     *                         drag/resize/gesture options
-     * @returns {Interactable}
-     */
-    interact.set = function (element, options) {
-        var interactable = interactables.get(element);
-
-        if (interactable) {
-            interactable.unset();
-        }
-        return new Interactable(element, options);
     };
 
     /**

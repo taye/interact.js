@@ -75,7 +75,7 @@ function simulate(eventType, eventProps) {
 
 document.simulate = div0.simulate = simulate;
 
-test('interact.set', function () {
+test('Interactable', function () {
     var interactable,
         expectedDrag = true,
         expectedResize = true,
@@ -85,7 +85,7 @@ test('interact.set', function () {
         interactables,
         expectedActionChecker = interact.debug().defaultActionChecker;
     
-    interact.set(div0, {
+    interact(div0).set({
             draggable: expectedDrag,
             resizeable: expectedResize,
             gestureable: expectedGesture,
@@ -103,7 +103,7 @@ test('interact.set', function () {
     equal(interactable.actionChecker(), expectedActionChecker, 'Action checker');
     equal(div0.className, expectedClassName, 'Element classes added correctly');
     
-    interact.set(div0);
+    interact(div0).unset()(div0);
     interactables = interact.debug().interactables;
     interactable = interact(div0);
     
@@ -114,28 +114,26 @@ test('interact.set', function () {
     equal(interactable.autoScroll(), expectedAutoScroll = true, 'AutoScroll option set to default');
     equal(interactable.actionChecker(), expectedActionChecker, 'Gesture option set to default');
     
-    interact.set(div1);
+    interact(div1);
     interactables = interact.debug().interactables;
     equal(interactables.length, 2, 'Second interactable added correctly');
     
 });
 
 test('interact.unset', function () {
-    var interactable,
-        expectedClassName = '';
+    var expectedClassName = '';
 
-    interact.set(div0);
-    interact.set(div1);
-    interact.set(div2);
+    interact(div0).set();
+    interact(div1).set();
+    interact(div2).set();
     interact(div0).unset();
     
     interactables = interact.debug().interactables;
-    interactable = interact(div0);
     
     equal(interactables.length, 2, 'Element is removed from list');
     equal(interactables[0].element(), div1, 'interactable is spliced from array correctly');
     equal(div0.className, expectedClassName, 'Element classes are removed correctly');
-    equal(interact(div0), undefined, 'unset element no longer recognised as an interactable');
+    equal(interact.isSet(div0), false, 'unset element no longer recognised as an interactable');
 });
 
 //test('defaultActionChecker', function () {
@@ -186,7 +184,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             draggable: true,
             actionChecker: function () {
                 return 'drag';
@@ -245,7 +243,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             draggable: true,
             actionChecker: function () {
                 return 'drag';
@@ -313,7 +311,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             draggable: true,
             actionChecker: function () {
                 return 'drag';
@@ -380,7 +378,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             resizeable: true,
             actionChecker: function () {
                 return 'resize';
@@ -439,7 +437,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             resizeable: true,
             actionChecker: function () {
                 return 'resize';
@@ -507,7 +505,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             resizeable: true,
             actionChecker: function () {
                 return 'resize';
@@ -584,7 +582,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             gestureable: true,
             actionChecker: function () {
                 return 'gesture';
@@ -696,7 +694,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             gestureable: true,
             actionChecker: function () {
                 return 'gesture';
@@ -781,7 +779,7 @@ var debug = interact.debug(),
     };
     
     document.body.appendChild(div0);
-    interact.set(div0, {
+    interact(div0).set({
             gestureable: true,
             actionChecker: function () {
                 return 'gesture';

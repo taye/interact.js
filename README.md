@@ -1,42 +1,39 @@
 interact.js
 ===========
-Javascript drag, drop, resizing and gestures for modern desktop and mobile browsers.
+Javascript drag, drop, resizing and gestures for HTML and SVG elements on modern desktop and mobile browsers.
 
 ```javascript
-
 var x = 0, y = 0;
 
-interact.set(document.body)
-    .draggable({
-        onmove: function (event) {
-            // use event properties to respond to drag
-        }
-    })
-    .autoScroll(false);
+interact(document.body).draggable({
+    onmove: function (event) {
+        x += event.dx;
+        y += event.dy;
+
+        document.body.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+    }
+});
 ```
 
 Usage
 -------
 
 ### Interactables
-Before interact.js pays attention to any element, it must individually be `set`. To set a DOM element as an Interactable, call `interact.set(element, options)` where options is an object whose properties specify how you want the element to be interacted with. For example:
-```javascript
-var element = document.getElementById('anElement');
-var options = {
-    dropzone: true,
-    resizeable: true,
-    gestureable: true
-};
-interact.set(element, options);
-```
-The interact.set function adds mouse or touch event listeners to the object and returns a new _Interactable_ object which has several methods and properties to configure how it behaves. These methods have a fluent interface so method calls can be chained nicely. So, to do what the code above did, you could also use
-```javascript
+The `interact` function adds mouse or touch event listeners to the object and returns an `Interactable` object which has several methods and properties to configure how it behaves and what it can do. These methods have a fluent interface so method calls can be chained nicely.
 
-interact.set(document.getElementById('anElement'))
-    .draggable(true)
-    .dropzone(true)
-    .resizeable(false)
-    .gestureable(true);
+ For example, to make a DOM element dragagble and resizeable you can call the `Interactable#set` with an object with the properties you want to set
+```javascript
+interact(document.getElementById('anElement'))
+    .set({
+        draggable: true,
+        resizeable: true
+    });
+```
+or you can call each {action}able method with the options for each.
+```jacascript
+interact(document.getElementById('anElement'))
+        .draggable (true)
+        .resizeable(true);
 ```
 
 ### Acting
@@ -47,9 +44,9 @@ When a sequence of user actions results in an InteractEvent, that event type is 
 Even though InteractEvents are being fired, the element is not actually modified by interact.js (apart from styling the cursor and setting classes). To do that, you need to bind listeners for InteractEvents either to each Interactable or globally for all Interacables  and style the element according to event data.
 
 ### Listening
-The InteractEvent types are _drag_, _resize_ and _gesture_ suffixed with "start", "move" or "end" depending on the current phase of the action, and `dragenter`, `dragleave` and `drop`when dragging over dropzones.
+The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
 
-To respond to an InteractEvent, you must `bind` a listener for its event type either directly to an interactable `interact(element).bind('resizemove', resizeElement);` or globally for all events of that type `interact.bind('resizemove', resizeElement);`. The InteractEvent object that was created is passed to these functions as the first parameter.
+To respond to an InteractEvent, you must `bind` a listener for its event type either directly to an interactable `Interactable#bind(eventType, listenerFunction)` or globally for all events of that type `interact.bind('resizemove', resizeElement)`. The InteractEvent object that was created is passed to these functions as the first parameter.
 
 InteractEvent properties include the usual properties of mouse/touch events such as pageX/Y, clientX/Y, modifier keys etc. but also some properties providing information about the change in cordinates and event specific data. The table below displays all of these events.
 
@@ -96,16 +93,16 @@ To move an element in response to a dragmove, a listener can be bound that trans
 ```javascript
 
 // Set element and listen for dragmove events
-interact.set(element)
-    .draggable(true)
-    .bind('dragmove', function(event) {
-        // Add the change in mouse/touch coordinates to the element's current position
-        event.target.style.left =
-            event.target.offsetLeft + event.detail.dx + "px";
+interact(element)
+    .draggable({
+        onmove: function(event) {
+            // Add the change in mouse/touch coordinates to the element's current position
+            event.target.style.left =
+                event.target.offsetLeft + event.detail.dx + "px";
 
-        event.target.style.top =
-            event.target.offsetTop + event.detail.dy + "px";
-    });
+            event.target.style.top =
+                event.target.offsetTop + event.detail.dy + "px";
+        });
 ```
 ### interact.js in use
 
