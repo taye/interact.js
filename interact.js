@@ -1553,10 +1553,8 @@ var document = window.document,
 
         /**
          * @function
-         * @description Add an element to the list of interact nodes
-         * @param {HTMLElement | SVGElement | Interactable} element The Element that will be set
-         * @param {Object} options An object whose properties are the
-         *                         drag/resize/gesture options
+         * @description Reset the options of this Interactable
+         * @param {Object} options
          * @returns {Interactable}
          */
         set: function (options) {
@@ -1569,6 +1567,8 @@ var document = window.document,
             this.dropzone   (this.options.dropzone);
             this.resizeable (this.options.resizeable);
             this.gestureable(this.options.gestureable);
+
+            return this;
         },
 
         /**
