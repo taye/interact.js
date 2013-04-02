@@ -1507,38 +1507,47 @@ var document = window.document,
         },
 
         /**
-         * Binds a listener to an InteractEvent
+         * Binds a listener to an InteractEvent or DOM event
          *
          * @function
          * @returns {Interactable}
          */
-        bind: function (iEventType, listener) {
-            // The event must be an InteractEvent type
-            if (eventTypes.indexOf(iEventType) !== -1) {
+        bind: function (eventType, listener, useCapture) {
+            if (eventTypes.indexOf(eventType) !== -1) {
                 // if this type of event was never bound to this Interactable
-                if (!(iEventType in this._iEvents)) {
-                    this._iEvents[iEventType] = [listener];
+                if (!(eventType in this._iEvents)) {
+                    this._iEvents[eventType] = [listener];
                 }
                 // if the event listener is not already bound for this type
-                else if (this._iEvents[iEventType].indexOf(listener) === -1) {
-                    this._iEvents[iEventType].push(listener);
+                else if (this._iEvents[eventType].indexOf(listener) === -1) {
+                    this._iEvents[eventType].push(listener);
                 }
             }
+            else {
+                events.add(this, eventType, listener, useCapture);
+            }
+
             return this;
         },
 
         /**
-         * Unbinds an InteractEvent listener
+         * Unbinds an InteractEvent or DOM event listener
          *
          * @function
          * @returns {Interactable}
          */
-        unbind: function (iEventType, listener) {
-            var index = this._iEvents[iEventType].indexOf(listener);
+        unbind: function (eventType, listener, useCapture) {
+            if (eventTypes.indexOf(eventType) !== -1) {
+                var index = this._iEvents[eventType].indexOf(listener);
 
-            if (index !== -1) {
-                this._iEvents[iEventType].splice(index, 1);
+                if (index !== -1) {
+                    this._iEvents[eventType].splice(index, 1);
+                }
             }
+            else {
+                events.remove(this._element, listener, useCapture);
+            }
+
             return this;
         },
 
