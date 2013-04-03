@@ -345,7 +345,7 @@ var document = window.document,
         downEvent   = 'mousedown',
         upEvent     = 'mouseup',
         moveEvent   = 'mousemove',
-        overEvent   = 'mosueover',
+        overEvent   = 'mouseover',
         outEvent    = 'mouseout';
         enterEvent  = 'touchenter',
         leaveEvent  = 'touchleave';
@@ -353,7 +353,7 @@ var document = window.document,
 
     /**
      * @private
-     * @returns{String} action to be performed - drag/resize[axes]
+     * @returns{String} action to be performed - drag/resize[axes]/gesture
      */
     function actionCheck (event) {
         var clientRect,
@@ -1182,8 +1182,8 @@ var document = window.document,
         },
 
         /**
-         * Returns or sets whether multitouch this Interactable's element can be
-         * dragged
+         * Returns or sets whether drag actions can be performed on the
+         * Interactable
          *
          * @function
          * @param {bool} options
@@ -1330,7 +1330,7 @@ var document = window.document,
         },
 
         /**
-         * Returns or sets whether resizing on both axes equally is forced equal
+         * Returns or sets whether resizing is forced 1:1 aspect
          *
          * @function
          * @param {bool} newValue
@@ -1439,7 +1439,8 @@ var document = window.document,
         },
 
         /**
-         * Fires the event type of the InteractEvent passed as a parameterj
+         * Calls listeners for the given event type bound globablly
+         * and directly to this Interactable
          *
          * @function
          * @returns {Interactable}
