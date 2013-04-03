@@ -173,6 +173,9 @@ var document = window.document,
     enterEvent,
     leaveEvent,
 
+    // because Webkit and Opera still use 'mousewheel' event type
+    wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
+
     eventTypes = [
         'resizestart',
         'resizemove',
@@ -1524,6 +1527,9 @@ var document = window.document,
                 }
             }
             else {
+                if (eventType === 'wheel') {
+                    eventType = wheelEvent;
+                }
                 events.add(this, eventType, listener, useCapture);
             }
 
@@ -1545,6 +1551,9 @@ var document = window.document,
                 }
             }
             else {
+                if (eventType === 'wheel') {
+                    eventType = wheelEvent;
+                }
                 events.remove(this._element, listener, useCapture);
             }
 
