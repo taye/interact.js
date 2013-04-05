@@ -1866,11 +1866,20 @@ var document = window.document,
         return supportsTouch;
     };
 
+    /**
+     * Returns what action is currently being performed
+     *
+     * @function
+     * @returns {String | null}
+     */
+    interact.currentAction = function () {
+        return (dragging && 'drag') || (resizing && 'resize') || (gesturing && 'gesture') || null;
+    };
+
     events.add(docTarget,    upEvent,       docMouseUp);
     events.add(docTarget,    moveEvent,     mouseMove);
     events.add(docTarget,    'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur',        docMouseUp);
-
 
     window.interact = interact;
 
