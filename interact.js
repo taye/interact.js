@@ -119,6 +119,7 @@ var document = window.document,
     imPropStopped = false,
     gesturing     = false,
     dragging      = false,
+    dynamicDrop   = false,
     resizing      = false,
     resizeAxes    = 'xy',
 
@@ -517,6 +518,22 @@ var document = window.document,
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
+    function calcDropRects (dropzones) {
+        for (var i = 0, len = dropzones.length; i < len; i++) {
+            var dropzone = dropzones[i],
+                clientRect = (dropzone._element instanceof SVGElement)?
+                    dropzone._element.getBoundingClientRect():
+                    dropzone._element.getClientRects()[0];
+
+            dropzone.dropRect = {
+                left  : clientRect.left,
+                top   : clientRect.top,
+                width : clientRect.width,
+                height: clientRect.height
+            };
+        }
+    }
+
     // Test for the dropzone element that's "above" all other qualifiers
     function resolveDrops (drops) {
         if (drops.length) {
@@ -820,6 +837,10 @@ var document = window.document,
         if (!dragging) {
             dragEvent = new InteractEvent(event, 'drag', 'start');
             dragging = true;
+
+            if (!dynamicDrop) {
+                calcDropRects(dropzones);
+            }
         }
         else {
             dragEvent = new InteractEvent(event, 'drag', 'move');
@@ -1231,21 +1252,29 @@ var document = window.document,
                 dropzones.push(this);
                 addClass(this._element, 'interact-dropzone');
 
+                if (!dynamicDrop) {
+                    calcDropRects([this]);
+                }
                 return this;
             }
             if (typeof options === 'boolean') {
-                if (this.options.dropzone !== options) {
-                    if (options) {
-                        dropzones.push(this);
+                if (options) {
+                    dropzones.push(this);
+                    addClass(this._element, 'interact-dropzone');
 
-                        addClass(this._element, 'interact-dropzone');
-                    }
-                    else {
-                        dropzones.splice(dropzones.indexOf(this), 1);
-
-                        removeClass(this._element, 'interact-dropzone');
+                    if (!dynamicDrop) {
+                        calcDropRects([this]);
                     }
                 }
+                else {
+                    var index = dropzones.indexOf(this);
+                    if (index !== -1) {
+                        dropzones.splice(index, 1);
+                    }
+
+                    removeClass(this._element, 'interact-dropzone');
+                }
+
                 this.options.dropzone = options;
 
                 return this;
@@ -1264,19 +1293,28 @@ var document = window.document,
          */
         dropCheck: function (event) {
             if (target !== this) {
-                var clientRect = (this._element instanceof SVGElement)?
-                    this._element.getBoundingClientRect():
-                    this._element.getClientRects()[0],
-                horizontal,
-                vertical,
-                page = getPageXY(event),
-                x = page.x - window.scrollX,
-                y = page.y - window.scrollY;
+                var page = getPageXY(event);
 
-                horizontal = (x > clientRect.left) && (x < clientRect.left + clientRect.width);
-                vertical   = (y > clientRect.top ) && (y < clientRect.top  + clientRect.height);
+                if (dynamicDrop) {
+                    var clientRect = (this._element instanceof SVGElement)?
+                            this._element.getBoundingClientRect():
+                            this._element.getClientRects()[0],
+                        x = page.x - window.scrollX,
+                        y = page.y - window.scrollY,
+                        horizontal = (x > clientRect.left) && (x < clientRect.left + clientRect.width),
+                        vertical   = (y > clientRect.top ) && (y < clientRect.top  + clientRect.height);
 
-                return horizontal && vertical;
+
+                    return horizontal && vertical;
+                }
+                else {
+                    var x = page.x,
+                        y = page.y,
+                        horizontal = (x > this.dropRect.left) && (x < this.dropRect.left + this.dropRect.width),
+                        vertical   = (y > this.dropRect.top ) && (y < this.dropRect.top  + this.dropRect.height);
+
+                    return horizontal && vertical;
+                }
             }
         },
 
@@ -1875,6 +1913,29 @@ var document = window.document,
     interact.currentAction = function () {
         return (dragging && 'drag') || (resizing && 'resize') || (gesturing && 'gesture') || null;
     };
+
+    /**
+     * Returns or sets wheather the dimensions of dropzone elements are
+     * calculated on every dragmove or only on dragstart for the default
+     * dropChecker
+     *
+     * @function
+     * @param {bool} newValue True to check on each move
+     * @returns {bool | @link interact}
+     */
+    interact.dynamicDrop = function (newValue) {
+        if (typeof newValue === 'boolean') {
+            if (dragging && dynamicDrop !== newValue && !newValue) {
+                calcDropRects(dropzones);
+            }
+
+            dynamicDrop = newValue;
+
+            return interact;
+        }
+        return dynamicDrop;
+    };
+
 
     events.add(docTarget,    upEvent,       docMouseUp);
     events.add(docTarget,    moveEvent,     mouseMove);
