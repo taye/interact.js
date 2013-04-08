@@ -8,7 +8,7 @@
  * @namespace interact.js
  * @name interact
  * @function interact
- * @param {HTMLElement | SVGElement} element The previously set document element
+ * @param {HTMLElement | svgelement} element The previously set document element
  * @returns {Interactable | null} Returns an Interactable if the element passed
  *          was previously set. Returns null otherwise.
  * @description The properties of this variable can be used to set elements as
@@ -21,9 +21,9 @@
 
 var document = window.document,
     console = window.console,
-    SVGElement = window.SVGElement,
-    SVGSVGElement = window.SVGSVGElement,
-    HTMLElement = window.HTMLElement,
+    SVGElement = window.SVGElement || blank,
+    SVGSVGElement = window.SVGSVGElement || blank,
+    HTMLElement = window.HTMLElement || window.Element,
 
     // Previous interact move event mouse/touch position
     prevX       = 0,
@@ -61,7 +61,7 @@ var document = window.document,
 
     // All things relating to autoScroll
     scrollMargin = 70,
-    scroll = {
+    autoscroll = {
         isEnabled: true,
         margin   : scrollMargin,
 
@@ -74,22 +74,22 @@ var document = window.document,
 
         // scroll the window by the values in scroll.x/y
         autoScroll: function () {
-            window.scrollBy(scroll.x, scroll.y);
+            window.scrollBy(autoscroll.x, autoscroll.y);
         },
 
         edgeMove: function (event) {
-            if (scroll.isEnabled && (dragging || resizing)) {
-                var top = event.clientY < scroll.margin,
-                    right = event.clientX > (window.innerWidth - scroll.margin),
-                    bottom = event.clientY > (window.innerHeight - scroll.margin),
-                    left = event.clientX < scroll.margin,
+            if (autoscroll.isEnabled && (dragging || resizing)) {
+                var top = event.clientY < autoscroll.margin,
+                    right = event.clientX > (window.innerWidth - autoscroll.margin),
+                    bottom = event.clientY > (window.innerHeight - autoscroll.margin),
+                    left = event.clientX < autoscroll.margin,
                     options = target.options;
 
-                scroll.x = scroll.distance * (right ? 1: left? -1: 0);
-                scroll.y = scroll.distance * (bottom? 1:  top? -1: 0);
+                autoscroll.x = autoscroll.distance * (right ? 1: left? -1: 0);
+                autoscroll.y = autoscroll.distance * (bottom? 1:  top? -1: 0);
 
-                if (!scroll.isScrolling && options.autoScroll) {
-                    scroll.start();
+                if (!autoscroll.isScrolling && options.autoScroll) {
+                    autoscroll.start();
                 }
             }
         },
@@ -97,14 +97,14 @@ var document = window.document,
         isScrolling: false,
 
         start: function () {
-            scroll.isScrolling = true;
-            window.clearInterval(scroll.i);
-            scroll.i = window.setInterval(scroll.autoScroll, scroll.interval);
+            autoscroll.isScrolling = true;
+            window.clearInterval(autoscroll.i);
+            autoscroll.i = window.setInterval(autoscroll.autoScroll, autoscroll.interval);
         },
 
         stop: function () {
-            window.clearInterval(scroll.i);
-            scroll.isScrolling = false;
+            window.clearInterval(autoscroll.i);
+            autoscroll.isScrolling = false;
         }
     },
 
@@ -202,7 +202,12 @@ var document = window.document,
         globalBind: 2
     },
 
-   // used for adding event listeners to window and document
+    // Opera must be handled differently
+    isOperaMobile = navigator.appName == 'Opera' &&
+        supportsTouch &&
+        navigator.userAgent.match('Presto'),
+
+    // used for adding event listeners to window and document
     windowTarget = {
         _element: window,
         events  : {}
@@ -214,10 +219,11 @@ var document = window.document,
 
     // Events wrapper
     events = (function () {
-        var addEvent = ('addEventListener' in document)?
-                'addEventListener': 'attachEvent',
-            removeEvent = ('removeEventListener' in document)?
-                'removeEventListener': 'detachEvent',
+        var Event = window.Event,
+            useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
+            addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
+            removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
+            on = useAttachEvent? 'on': '',
             
             elements = [],
             targets  = [];
@@ -244,12 +250,25 @@ var document = window.document,
             return -1;
             };
         }
+        if (!('stopPropagation' in Event.prototype)) {
+            Event.prototype.stopPropagation = function () {
+                this.cancelBubble = true;
+            };
+            Event.prototype.stopImmediatePropagation = function () {
+                this.cancelBubble = true;
+                this.immediatePropagationStopped = true;
+            };
+        }
+        if (!('preventDefault' in Event.prototype)) {
+            Event.prototype.preventDefault = function () {
+                this.returnValue = false;
+            };
+        }
+        if (!('hasOwnProperty' in Event.prototype)) {
+            Event.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
+        }
 
         function add (element, type, listener, useCapture) {
-            if (!(element instanceof window.Element) && element !== window.document) {
-                return;
-            }
-
             var target = targets[elements.indexOf(element)];
 
             if (!target) {
@@ -261,15 +280,36 @@ var document = window.document,
                 elements.push(element);
                 targets.push(target);
             }
-            if (!target.events[type]) {
+
+            if (!(type in target.events)) {
                 target.events[type] = [];
                 target.typeCount++;
             }
 
             if (target.events[type].indexOf(listener) === -1) {
+                var ret;
+
+                if (useAttachEvent) {
+                    ret = element[addEvent](on + type, function (event) {
+                        if (!event.immediatePropagationStopped) {
+                            event.target = event.srcElement;
+                            event.currentTarget = element;
+
+                            if (event.type.match(/mouse|click/)) {
+                                event.pageX = event.clientX + document.documentElement.scrollLeft;
+                                event.pageY = event.clientY + document.documentElement.scrollTop;
+                            }
+
+                            listener(event);
+                        }
+                    }, listener, useCapture || false);
+                }
+                else {
+                    ret = element[addEvent](type, listener, useCapture || false);
+                }
                 target.events[type].push(listener);
 
-                return element[addEvent](type, listener, useCapture || false);
+                return ret;
             }
         }
 
@@ -295,7 +335,7 @@ var document = window.document,
 
                 if (listener === 'all') {
                     for (i = 0; i < len; i++) {
-                        element[removeEvent](type, target.events[type][i], useCapture || false);
+                        element[removeEvent](on + type, target.events[type][i], useCapture || false);
                     }
                     target.events[type] = null;
                     target.typeCount--;
@@ -303,7 +343,7 @@ var document = window.document,
                     for (i = 0; i < len; i++) {
                         if (target.events[type][i] === listener) {
 
-                            element[removeEvent](type, target.events[type][i], useCapture || false);
+                            element[removeEvent](on + type, target.events[type][i], useCapture || false);
                             target.events[type].splice(i, 1);
 
                             break;
@@ -328,7 +368,8 @@ var document = window.document,
             },
             remove: function (target, type, listener, useCapture) {
                 remove(target._element, type, listener, useCapture);
-            }
+            },
+            useAttachEvent: useAttachEvent
         };
     }());
 
@@ -362,8 +403,9 @@ var document = window.document,
             bottom,
             action,
             page = getPageXY(event),
-            x = page.x - window.scrollX,
-            y = page.y - window.scrollY,
+            scroll = getScrollXY(),
+            x = page.x - scroll.x,
+            y = page.y - scroll.y,
             options = target.options;
 
         clientRect = (target._element instanceof SVGElement)?
@@ -372,8 +414,8 @@ var document = window.document,
 
 
         if (actionIsEnabled.resize && options.resizeable) {
-            right = (x - clientRect.left) > (clientRect.width - margin);
-            bottom = (y - clientRect.top) > (clientRect.height - margin);
+            right  = x > (clientRect.right  - margin);
+            bottom = y > (clientRect.bottom - margin);
         }
 
         if (actionIsEnabled.gesture &&
@@ -414,7 +456,7 @@ var document = window.document,
         }
 
         // Opera Mobile handles the viewport and scrolling oddly
-        if (window.navigator.appName == 'Opera' && supportsTouch) {
+        if (isOperaMobile) {
             x -= window.scrollX;
             y -= window.scrollY;
         }
@@ -431,6 +473,13 @@ var document = window.document,
 
     function getClientXY (event) {
         return getXY(event, 'client');
+    }
+
+    function getScrollXY () {
+        return {
+            x: window.scrollX || document.documentElement.scrollLeft,
+            y: window.scrollY || document.documentElement.scrollTop
+        };
     }
 
     function touchAverage (event) {
@@ -521,13 +570,18 @@ var document = window.document,
     function calcDropRects (dropzones) {
         for (var i = 0, len = dropzones.length; i < len; i++) {
             var dropzone = dropzones[i],
+                scroll = isOperaMobile?
+                    {x: 0, y: 0}:
+                    getScrollXY(),
                 clientRect = (dropzone._element instanceof SVGElement)?
                     dropzone._element.getBoundingClientRect():
                     dropzone._element.getClientRects()[0];
 
             dropzone.dropRect = {
-                left  : clientRect.left,
-                top   : clientRect.top,
+                left  : clientRect.left   + scroll.x,
+                right : clientRect.right  + scroll.x,
+                top   : clientRect.top    + scroll.y,
+                bottom: clientRect.bottom + scroll.y,
                 width : clientRect.width,
                 height: clientRect.height
             };
@@ -741,6 +795,12 @@ var document = window.document,
      * style and event Liseners
      */
     function mouseDown (event, forceAction) {
+        // document and window can't be interacted with but their Interactables
+        // can be used for binding events
+        if (!((events.useAttachEvent? event.currentTarget: this) instanceof window.Element)) {
+            return;
+        }
+
         var action = '',
             average,
             page,
@@ -768,7 +828,7 @@ var document = window.document,
         // Otherwise, set the target if the mouse is not down
         if ((event.touches && event.touches.length < 2 && !target) ||
                 !(mouseIsDown)) {
-            target = interactables.get(this);
+            target = interactables.get(events.useAttachEvent? event.currentTarget: this);
         }
 
         if (target && !(dragging || resizing || gesturing)) {
@@ -822,7 +882,7 @@ var document = window.document,
         }
 
         if (dragging || resizing) {
-            scroll.edgeMove(event);
+            autoscroll.edgeMove(event);
         }
     }
 
@@ -955,7 +1015,11 @@ var document = window.document,
 
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
-        if (gestureEvent.scale !== Infinity && gestureEvent.scale !== null && gestureEvent.scale !== undefined  && !isNaN(gestureEvent.scale)) {
+        if (gestureEvent.scale !== Infinity && 
+            gestureEvent.scale !== null &&
+            gestureEvent.scale !== undefined  &&
+            !isNaN(gestureEvent.scale)) {
+
             gesture.scale = gestureEvent.scale;
         }
     }
@@ -967,29 +1031,28 @@ var document = window.document,
      * button were pressed and change the element classes accordingly
      */
     function mouseHover (event) {
-        var action,
-            options;
-
-        // Check if target element or it's parent is interactable
         if (!(mouseIsDown || dragging || resizing || gesturing) &&
-            (target = interactables.get(event.target) || interactables.get(event.target.parentNode))) {
-            options = target.options;
+            (target = interactables.get(event.target))) {
+            var options = target.options;
 
-        if ((options.resizeable || options.draggable) && options.checkOnHover) {
-            action = validateAction(options.getAction(event));
+            if (((actionIsEnabled.drag && options.draggable) ||
+                    (actionIsEnabled.resize && options.resizeable)) &&
+                options.checkOnHover) {
 
-            if (styleCursor) {
-                if (action) {
-                    target._element.style.cursor = actions[action].cursor;
-                }
-                else {
-                    target._element.style.cursor = '';
+                var action = validateAction(options.getAction(event));
+
+                if (styleCursor) {
+                    if (action) {
+                        target._element.style.cursor = actions[action].cursor;
+                    }
+                    else {
+                        target._element.style.cursor = '';
+                    }
                 }
             }
-        }
-        else if (dragging || resizing || gesturing) {
-            event.preventDefault();
-        }
+            else if (dragging || resizing || gesturing) {
+                event.preventDefault();
+            }
         }
     }
 
@@ -1070,7 +1133,7 @@ var document = window.document,
                 document.documentElement.style.cursor = '';
                 target._element.style.cursor = '';
             }
-            scroll.stop();
+            autoscroll.stop();
             clearTargets();
 
             // prevent Default only if were previously interacting
@@ -1293,25 +1356,29 @@ var document = window.document,
          */
         dropCheck: function (event) {
             if (target !== this) {
-                var page = getPageXY(event);
+                var horizontal,
+                    vertical;
 
                 if (dynamicDrop) {
+
                     var clientRect = (this._element instanceof SVGElement)?
                             this._element.getBoundingClientRect():
                             this._element.getClientRects()[0],
-                        x = page.x - window.scrollX,
-                        y = page.y - window.scrollY,
-                        horizontal = (x > clientRect.left) && (x < clientRect.left + clientRect.width),
-                        vertical   = (y > clientRect.top ) && (y < clientRect.top  + clientRect.height);
+                        client = (isOperaMobile)?
+                            getPageXY(event):
+                            getClientXY(event);
+
+                    horizontal = (client.x > clientRect.left) && (client.x < clientRect.right);
+                    vertical   = (client.y > clientRect.top ) && (client.y < clientRect.bottom);
 
 
                     return horizontal && vertical;
                 }
                 else {
-                    var x = page.x,
-                        y = page.y,
-                        horizontal = (x > this.dropRect.left) && (x < this.dropRect.left + this.dropRect.width),
-                        vertical   = (y > this.dropRect.top ) && (y < this.dropRect.top  + this.dropRect.height);
+                    var page = getPageXY(event);
+
+                    horizontal = (page.x > this.dropRect.left) && (page.x < this.dropRect.right);
+                    vertical   = (page.y > this.dropRect.top ) && (page.y < this.dropRect.bottom);
 
                     return horizontal && vertical;
                 }
@@ -1491,6 +1558,7 @@ var document = window.document,
             var listeners,
                 fireState = 0,
                 i = 0,
+                len,
                 onEvent = 'on' + iEvent.type;
 
             // Try-catch and loop so an exception thrown from a listener
@@ -1510,7 +1578,7 @@ var document = window.document,
                             if (iEvent.type in this._iEvents) {
                             listeners = this._iEvents[iEvent.type];
 
-                            for (var len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !imPropStopped; i++) {
                                 listeners[i](iEvent);
                             }
                             break;
@@ -1523,7 +1591,7 @@ var document = window.document,
                             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
                             listeners = globalEvents[iEvent.type];
 
-                            for (var len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !imPropStopped; i++) {
                                 listeners[i](iEvent);
                             }
                         }
@@ -1820,6 +1888,7 @@ var document = window.document,
             mouseUp             : docMouseUp,
             mouseDown           : mouseDown,
             mouseHover          : mouseHover,
+            events              : events,
             log: function () {
                 console.log('target         :  ' + target);
                 console.log('prevX, prevY   :  ' + prevX, prevY);
@@ -1887,11 +1956,11 @@ var document = window.document,
      */
     interact.enableAutoScroll = function (newValue) {
         if (newValue !== null && newValue !== undefined) {
-            scroll.isEnabled = newValue;
+            autoscroll.isEnabled = newValue;
 
             return interact;
         }
-        return scroll.isEnabled;
+        return autoscroll.isEnabled;
     };
 
     /**
@@ -1941,6 +2010,13 @@ var document = window.document,
     events.add(docTarget,    moveEvent,     mouseMove);
     events.add(docTarget,    'touchcancel', docMouseUp);
     events.add(windowTarget, 'blur',        docMouseUp);
+
+    // For IE's lack of preventDefault
+    events.add(docTarget,    'selectstart', function (e) {
+        if (dragging || resizing || gesturing) {
+            e.preventDefault();
+        }
+    });
 
     window.interact = interact;
 
