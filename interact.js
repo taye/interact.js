@@ -129,27 +129,22 @@ var document = window.document,
     actions = {
         drag: {
             cursor      : 'move',
-            className   : 'interact-dragging',
             moveListener: dragMove
         },
         resizex: {
             cursor      : 'e-resize',
-            className   : 'interact-resizing',
             moveListener: resizeMove
         },
         resizey: {
             cursor      : 's-resize',
-            className   : 'interact-resizing',
             moveListener: resizeMove
         },
         resizexy: {
             cursor      : 'se-resize',
-            className   : 'interact-resizing',
             moveListener: resizeMove
         },
         gesture: {
             cursor      : '',
-            className   : 'interact-gesturing',
             moveListener: gestureMove
         }
     },
@@ -876,7 +871,6 @@ var document = window.document,
                mouseWasMoved = true;
            }
            if (prepared && target) {
-            addClass(target._element, actions[prepared].className);
             actions[prepared].moveListener(event);
            }
         }
@@ -1028,7 +1022,7 @@ var document = window.document,
      * @private
      * @event
      * Check what action would be performed on mouseMove target if the mouse
-     * button were pressed and change the element classes accordingly
+     * button were pressed and change the cursor accordingly
      */
     function mouseHover (event) {
         if (!(mouseIsDown || dragging || resizing || gesturing) &&
@@ -1161,43 +1155,7 @@ var document = window.document,
         return interactables[i];
     };
 
-    function addClass (element, classNames) {
-        var i;
-
-        if (!element.classList) {
-            return false;
-        }
-
-        classNames = classNames.split(' ');
-        for (i = 0; i < classNames.length; i++) {
-            if (classNames[i] !== '') {
-                element.classList.add(classNames[i]);
-            }
-        }
-    }
-
-    function removeClass (element, classNames) {
-        var i;
-
-        if (!element.classList) {
-            return false;
-        }
-
-        classNames = classNames.split(' ');
-        for (i = 0; i < classNames.length; i++) {
-            if (classNames[i] !== '') {
-                element.classList.remove(classNames[i]);
-            }
-        }
-    }
-
     function clearTargets () {
-        if (target) {
-            removeClass(target._element, 'interact-dragging interact-resizing interact-gesturing');
-        }
-        if (dropTarget) {
-            removeClass(target._element, 'interact-droptarget');
-        }
         target = dropTarget = prevDropTarget = null;
     }
 
@@ -1247,7 +1205,6 @@ var document = window.document,
         events.add(this, downEvent, mouseDown);
 
         interactables.push(this);
-        addClass(this._element, 'interactable');
 
         this.set(options);
     }
@@ -1278,19 +1235,11 @@ var document = window.document,
                 this.options.draggable = true;
                 this.setOnEvents('drag', options);
 
-                addClass(this._element, 'interact-draggable');
-
                 return this;
             }
             if (typeof options === 'boolean') {
                 this.options.draggable = options;
 
-                if (options) {
-                    addClass(this._element, 'interact-draggable');
-                }
-                else {
-                    removeClass(this._element, 'interact-draggable interact-dragging');
-                }
                 return this;
             }
 
@@ -1313,7 +1262,6 @@ var document = window.document,
 
                 this.options.dropzone = true;
                 dropzones.push(this);
-                addClass(this._element, 'interact-dropzone');
 
                 if (!dynamicDrop) {
                     calcDropRects([this]);
@@ -1323,7 +1271,6 @@ var document = window.document,
             if (typeof options === 'boolean') {
                 if (options) {
                     dropzones.push(this);
-                    addClass(this._element, 'interact-dropzone');
 
                     if (!dynamicDrop) {
                         calcDropRects([this]);
@@ -1334,8 +1281,6 @@ var document = window.document,
                     if (index !== -1) {
                         dropzones.splice(index, 1);
                     }
-
-                    removeClass(this._element, 'interact-dropzone');
                 }
 
                 this.options.dropzone = options;
@@ -1416,19 +1361,11 @@ var document = window.document,
                 this.options.resizeable = true;
                 this.setOnEvents('resize', options);
 
-                addClass(this._element, 'interact-resizeable');
-
                 return this;
             }
             if (typeof options === 'boolean') {
                 this.options.resizeable = options;
 
-                if (options) {
-                    addClass(this._element, 'interact-resizeable');
-                }
-                else {
-                    removeClass(this._element, 'interact-resizeable interact-resizing');
-                }
                 return this;
             }
             return this.options.resizeable;
@@ -1463,19 +1400,11 @@ var document = window.document,
                 this.options.gestureable = true;
                 this.setOnEvents('gesture', options);
 
-                addClass(this._element, 'interact-gestureable');
-
                 return this;
             }
             if (options !== null && options !== undefined) {
                 this.options.gestureable = options;
 
-                if (options) {
-                    addClass(this._element, 'interact-gestureable');
-                }
-                else {
-                    removeClass(this._element, 'interact-gestureable interact-gesturing');
-                }
                 return this;
             }
             return this.options.gestureable;
@@ -1706,7 +1635,6 @@ var document = window.document,
             this.gestureable(false);
 
             interactables.splice(interactables.indexOf(this), 1);
-            removeClass(this._element, 'interactable');
 
             return interact;
         }

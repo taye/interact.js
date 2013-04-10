@@ -81,7 +81,6 @@ test('Interactable', function () {
         expectedResize = true,
         expectedGesture = true,
         expectedAutoScroll = false,
-        expectedClassName = 'interactable interact-draggable interact-resizeable interact-gestureable' ,
         interactables,
         expectedActionChecker = interact.debug().defaultActionChecker;
     
@@ -101,7 +100,6 @@ test('Interactable', function () {
     equal(interactable.gestureable(), expectedGesture, 'Gesture option');
     equal(interactable.autoScroll(), expectedAutoScroll, 'AutoScroll option');
     equal(interactable.actionChecker(), expectedActionChecker, 'Action checker');
-    equal(div0.className, expectedClassName, 'Element classes added correctly');
     
     interact(div0).unset()(div0);
     interactables = interact.debug().interactables;
@@ -121,8 +119,6 @@ test('Interactable', function () {
 });
 
 test('interact.unset', function () {
-    var expectedClassName = '';
-
     interact(div0).set();
     interact(div1).set();
     interact(div2).set();
@@ -132,7 +128,6 @@ test('interact.unset', function () {
     
     equal(interactables.length, 2, 'Element is removed from list');
     equal(interactables[0].element(), div1, 'interactable is spliced from array correctly');
-    equal(div0.className, expectedClassName, 'Element classes are removed correctly');
     equal(interact.isSet(div0), false, 'unset element no longer recognised as an interactable');
 });
 

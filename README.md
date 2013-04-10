@@ -41,7 +41,7 @@ Now that the element has been made interactable, when it is clicked on or touche
 
 When a sequence of user actions results in an InteractEvent, that event type is fired and all listeners of that type which were bound to that Interactable or bound globally are called.
 
-Even though InteractEvents are being fired, the element is not actually modified by interact.js (apart from styling the cursor and setting classes). To do that, you need to bind listeners for InteractEvents either to each Interactable or globally for all Interacables  and style the element according to event data.
+Even though InteractEvents are being fired, the element is not actually modified by interact.js at all. To do that, you need to bind listeners for InteractEvents either to each Interactable or globally for all Interacables and style the element according to event data.
 
 ### Listening
 The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
