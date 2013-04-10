@@ -1,49 +1,31 @@
-.interactable {
-    position: absolute;
-	border-radius: 10px;
-	border: 5px solid #333333;
-}
-
-.interact-node:hover {
-	border-color: #AAAAAA;
-}
-
-.interact-target {
-	border-style: dashed;
-	border-color: #AAAAAA;
-}
-
 .interact-demo-node:before {
-	content: attr(id);
-	border-bottom: 2px solid red;
+	content         : attr(id);
+	border-bottom   : 2px solid red;
 }
 
-.interact-draggable {
-	position: absolute;
-	/*cursor:move;*/
-}
-
-.interact-demo-node {
-    position: absolute;
-	border: 5px solid #333333;
-	width: 200px;
-	height: 200px;
-	overflow: auto;
+.demo-node {
+    position        : absolute;
+	border-radius   : 10px;
+	border          : 5px solid #333333;
+	border          : 5px solid #333333;
+	width           : 200px;
+	height          : 200px;
+	padding         : 15px;
+	margin          : 15px;
+	overflow        : auto;
 	background-color: #2288FF;
-	padding: 15px;
-	margin: 15px;
 }
 
 ellipse {
-    fill: #EEEE00;
-    stroke: #000000;
-    stroke-width: 3px;
+    fill            : #EEEE00;
+    stroke          : #000000;
+    stroke-width    : 3px;
 }
 
 svg text.title {
-   transform: translate(20px, 20px);
+   transform        : translate(0px, 20px);
 }
 
 svg text.eventData {
-   transform: translate(0px, -10px);
+   transform        : translate(0px, -10px);
 }

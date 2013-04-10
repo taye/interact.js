@@ -19,18 +19,14 @@
             var width = window.innerWidth,
                 height = window.innerHeight,
                 group = svg.appendChild(document.createElementNS(svgNS, 'g')),
-                ellipse = document.createElementNS(svgNS, 'ellipse'),
-            text = group.appendChild(document.createElementNS( svgNS, 'text')),
-            title = group.appendChild(document.createElementNS(svgNS, 'text'));
+                ellipse = group.appendChild(document.createElementNS(svgNS, 'ellipse')),
+                text = group.appendChild(document.createElementNS( svgNS, 'text')),
+                title = group.appendChild(document.createElementNS(svgNS, 'text'));
 
-            group.style.setProperty('class', 'interact-demo-node');
 
             ellipse.demo = true;
-            group.appendChild(ellipse);
-            window[id] = ellipse;
-
-            text.classList.add('eventData');
             ellipse.text = text;
+            window[id] = ellipse;
 
             ellipse.dragX = Math.random()*(width - 200);
             ellipse.dragY = Math.random()*(height - 200);
@@ -38,13 +34,17 @@
             ellipse.resizeHeight = 80;
 
             group.setAttribute('transform', ['translate(', ellipse.dragX, ellipse.dragY, ')'].join(' '));
+            group.setAttribute('class', 'interact-demo-node');
+
             ellipse.setAttribute('cx', 0);
             ellipse.setAttribute('cy', 0);
             ellipse.setAttribute('rx', ellipse.resizeWidth);
             ellipse.setAttribute('ry', ellipse.resizeHeight);
 
-            title.textContent = group.id;
-            title.classList.add('title');
+            title.textContent = id;
+            title.setAttribute('class', 'title');
+            text.setAttribute('class', 'eventData');
+
 
             this.group = group;
             this.ellipse = ellipse;
@@ -60,7 +60,7 @@
 
     function DemoNode (id) {
         this.element = document.body.appendChild(document.createElement('div'));
-        this.element.className = 'interact-demo-node';
+        this.element.className = 'demo-node';
         this.element.id = id;
         this.element.demo = true;
         this.element.style.width  = '200px';
