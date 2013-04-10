@@ -1,4 +1,4 @@
-.interact-demo-node:before {
+.demo-node:before {
 	content         : attr(id);
 	border-bottom   : 2px solid red;
 }
