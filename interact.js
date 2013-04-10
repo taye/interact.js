@@ -1106,7 +1106,7 @@ var document = window.document,
             endEvent.ds = endEvent.scale;
             target.fire(endEvent);
         }
-        else if (event.type === 'mouseup' && target && mouseIsDown && !mouseWasMoved) {
+        else if (event.type === upEvent && target && mouseIsDown && !mouseWasMoved) {
             var click = {};
 
             for (var prop in event) {
