@@ -60,10 +60,9 @@ var document = window.document,
     prevDropTarget  = null, // the dropzone that was recently dragged away from
 
     // All things relating to autoScroll
-    scrollMargin = 70,
-    autoscroll = {
+    autoScroll = {
         isEnabled: true,
-        margin   : scrollMargin,
+        margin   : 60,
 
         interval : 20,      // pause in ms between each scroll pulse
         i        : null,    // the handle returned by window.setInterval
@@ -74,22 +73,22 @@ var document = window.document,
 
         // scroll the window by the values in scroll.x/y
         autoScroll: function () {
-            window.scrollBy(autoscroll.x, autoscroll.y);
+            window.scrollBy(autoScroll.x, autoScroll.y);
         },
 
         edgeMove: function (event) {
-            if (autoscroll.isEnabled && (dragging || resizing)) {
-                var top = event.clientY < autoscroll.margin,
-                    right = event.clientX > (window.innerWidth - autoscroll.margin),
-                    bottom = event.clientY > (window.innerHeight - autoscroll.margin),
-                    left = event.clientX < autoscroll.margin,
+            if (autoScroll.isEnabled && (dragging || resizing)) {
+                var top = event.clientY < autoScroll.margin,
+                    right = event.clientX > (window.innerWidth - autoScroll.margin),
+                    bottom = event.clientY > (window.innerHeight - autoScroll.margin),
+                    left = event.clientX < autoScroll.margin,
                     options = target.options;
 
-                autoscroll.x = autoscroll.distance * (right ? 1: left? -1: 0);
-                autoscroll.y = autoscroll.distance * (bottom? 1:  top? -1: 0);
+                autoScroll.x = autoScroll.distance * (right ? 1: left? -1: 0);
+                autoScroll.y = autoScroll.distance * (bottom? 1:  top? -1: 0);
 
-                if (!autoscroll.isScrolling && options.autoScroll) {
-                    autoscroll.start();
+                if (!autoScroll.isScrolling && options.autoScroll) {
+                    autoScroll.start();
                 }
             }
         },
@@ -97,14 +96,14 @@ var document = window.document,
         isScrolling: false,
 
         start: function () {
-            autoscroll.isScrolling = true;
-            window.clearInterval(autoscroll.i);
-            autoscroll.i = window.setInterval(autoscroll.autoScroll, autoscroll.interval);
+            autoScroll.isScrolling = true;
+            window.clearInterval(autoScroll.i);
+            autoScroll.i = window.setInterval(autoScroll.autoScroll, autoScroll.interval);
         },
 
         stop: function () {
-            window.clearInterval(autoscroll.i);
-            autoscroll.isScrolling = false;
+            window.clearInterval(autoScroll.i);
+            autoScroll.isScrolling = false;
         }
     },
 
@@ -876,7 +875,7 @@ var document = window.document,
         }
 
         if (dragging || resizing) {
-            autoscroll.edgeMove(event);
+            autoScroll.edgeMove(event);
         }
     }
 
@@ -1127,7 +1126,7 @@ var document = window.document,
                 document.documentElement.style.cursor = '';
                 target._element.style.cursor = '';
             }
-            autoscroll.stop();
+            autoScroll.stop();
             clearTargets();
 
             // prevent Default only if were previously interacting
@@ -1412,7 +1411,7 @@ var document = window.document,
 
         /**
          * Returns or sets whether dragging and resizing near the edges of the
-         * screen will trigger autoscroll
+         * screen will trigger autoScroll
          *
          * @function
          * @param {bool} newValue
@@ -1879,16 +1878,26 @@ var document = window.document,
      * trigger autoScroll
      *
      * @function
-     * @param {bool} newValue
+     * @param {bool | Object} options true or false to simply enable or disable
+              or an object with options margin, distance and frequency
      * @returns {bool | interact}
      */
-    interact.enableAutoScroll = function (newValue) {
-        if (newValue !== null && newValue !== undefined) {
-            autoscroll.isEnabled = newValue;
+    interact.autoScroll = function (options) {
+        if (typeof options === 'object') {
+            autoScroll.isEnabled = true;
+
+            if (typeof options.margin   === 'number') { autoScroll.margin   = options.margin  ; }
+            if (typeof options.distance === 'number') { autoScroll.distance = options.distance; }
+            if (typeof options.interval === 'number') { autoScroll.interval = options.interval; }
 
             return interact;
         }
-        return autoscroll.isEnabled;
+        if (typeof autoScroll === 'boolean') {
+            autoScroll.isEnabled = options;
+
+            return interact;
+        }
+        return autoScroll.isEnabled;
     };
 
     /**
