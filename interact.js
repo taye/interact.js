@@ -1999,7 +1999,9 @@ var document = window.document,
             // interact, clear the cursor style
             if (!styleCursor) {
                 for (i = 0; i < interactables.length; i++) {
-                    interactables[i]._element.style.cursor = '';
+                    if (interactables[i]._element !== document) {
+                        interactables[i]._element.style.cursor = '';
+                    }
                 }
             }
             return interact;
