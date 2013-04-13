@@ -63,7 +63,7 @@
 
         for (var i = 0, len = anchors.length; i < len; i++) {
             var anchor = anchors[i],
-                range = anchor.range === 'number'? anchor.range: snap.range;
+                range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
             if (range > 0) {
                 guidesContext.circle(anchor.x, anchor.y, range, blue).fill();
