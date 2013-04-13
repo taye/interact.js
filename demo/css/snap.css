@@ -12,6 +12,8 @@ canvas {
     margin: 0;
     padding: 0;
     border: none;
+    border-right: dashed;
+    border-bottom: dashed;
 }
 
 #status {
@@ -34,4 +36,8 @@ canvas {
 
 input[type=radio], input[type=checkbox], label {
     cursor: pointer;
+}
+
+#status [disabled] {
+    visibility: hidden;
 }

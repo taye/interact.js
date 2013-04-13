@@ -39,8 +39,8 @@
             guidesContext.fillRect(0, 0, width, height);
         }
 
-        for (var i = 0, lenX = width / grid.x; i < lenX; i++) {
-            for (var j = 0, lenY = height / grid.y; j < lenY; j++) {
+        for (var i = 0, lenX = width / grid.x + 1; i < lenX; i++) {
+            for (var j = 0, lenY = height / grid.y + 1; j < lenY; j++) {
                 if (snap.range > 0) {
                     guidesContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, blue).fill();
                 }
@@ -83,9 +83,12 @@
     function dragMove (event) {
         context.clearRect(0, 0, width, height);
 
-        var highlightRadius = snap.range > 0? snap.range + 1: 10;
+        if (snap.enabled) {
+            var highlightRadius = snap.range > 0? snap.range + 1: 10;
 
-        context.circle(snap.x, snap.y, highlightRadius, 'rgba(102, 225, 117, 0.8)').fill();
+            context.circle(snap.x, snap.y, highlightRadius, 'rgba(102, 225, 117, 0.8)').fill();
+        }
+
         context.circle(event.pageX, event.pageY, 10, tango).fill();
 
         prevX = event.pageX;
@@ -129,9 +132,10 @@
         snap.grid.offsetY = Number(status.offsetY.value);
 
         snap.range = Number(status.range.value);
+        snap.enabled = !status.offMode.checked;
 
         if (status.anchorDrag.checked) {
-            status.anchorMode.disabled = status.gridMode.disabled = true;
+            status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = true;
             snap.mode = 'anchor';
 
             interact(canvas)
@@ -143,7 +147,7 @@
                 .checkOnHover(false);
         }
         else {
-            status.anchorMode.disabled = status.gridMode.disabled = false;
+            status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
 
             interact(canvas)
                 .bind('dragmove', dragMove)
@@ -157,11 +161,17 @@
         snap.mode = status.anchorMode.checked || status.anchorDrag.checked? 'anchor': 'grid';
 
         context.clearRect(0, 0, width, height);
-        if (snap.mode === 'grid') {
-            drawGrid(snap.grid);
+        if (snap.enabled) {
+            if (snap.mode === 'grid') {
+                drawGrid(snap.grid);
+            }
+            else if (snap.mode === 'anchor') {
+                drawAnchors(snap.anchors);
+            }
         }
-        else if (snap.mode === 'anchor') {
-            drawAnchors(snap.anchors);
+        else {
+            context.clearRect(0, 0, width, height);
+            guidesContext.clearRect(0, 0, width, height);
         }
     }
 
@@ -182,6 +192,7 @@
 
         status = {
             container: document.getElementById('status'),
+            offMode: document.getElementById('off-mode'),
             gridMode: document.getElementById('grid-mode'),
             anchorMode: document.getElementById('anchor-mode'),
             range: document.getElementById('snap-range'),
