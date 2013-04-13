@@ -1579,9 +1579,10 @@ var document = window.document,
          */
         unbind: function (eventType, listener, useCapture) {
             if (eventTypes.indexOf(eventType) !== -1) {
-                var index = this._iEvents[eventType].indexOf(listener);
-
-                if (index !== -1) {
+                var eventArray = this._iEvents[eventType],
+                    index;
+                    
+                if (eventArray && (index = eventArray.indexOf(listener)) !== -1) {;
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
