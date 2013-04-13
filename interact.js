@@ -107,6 +107,29 @@ var document = window.document,
         }
     },
 
+    // aww snap
+    snap = {
+        enabled: true,
+
+        mode: 'grid',
+        range: -1,
+        grid: {
+            x: 100,
+            y: 100,
+            offsetX: 0,
+            offsetY: 0
+        },
+        anchors: [],
+
+        locked: false,
+        x : 0,
+        y : 0,
+        dX: 0,
+        dY: 0,
+        realX: 0,
+        realY: 0
+    },
+
     // Does the browser support touch input?
     supportsTouch = 'createTouch' in document,
 
@@ -429,6 +452,14 @@ var document = window.document,
         return action;
     }
 
+    function setPrevXY (event) {
+        prevX = event.pageX;
+        prevY = event.pageY;
+
+        prevClientX = event.clientX;
+        prevClientY = event.clientY;
+    }
+
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (event, type) {
         var touch,
@@ -671,6 +702,13 @@ var document = window.document,
         else {
             client = getClientXY(event);
             page = getPageXY(event);
+
+            if (snap.enabled && snap.locked) {
+                page.x += snap.dX;
+                page.y += snap.dY;
+                client.x += snap.dX;
+                client.y += snap.dY;
+            }
         }
 
         this.x0       = x0;
@@ -866,12 +904,50 @@ var document = window.document,
 
     function mouseMove (event) {
         if (mouseIsDown) {
-           if (x0 === prevX && y0 === prevY) { 
-               mouseWasMoved = true;
-           }
-           if (prepared && target) {
-            actions[prepared].moveListener(event);
-           }
+            if (x0 === prevX && y0 === prevY) { 
+                mouseWasMoved = true;
+            }
+            if (prepared && target) {
+
+                if (snap.enabled) {
+                    var page = getPageXY(event);
+
+                    snap.realX = page.x;
+                    snap.realY = page.y;
+
+                    if (snap.mode === 'grid') {
+                        var gridX = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
+                            gridY = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
+
+                            newX = gridX * snap.grid.x + snap.grid.offsetX,
+                            newY = gridY * snap.grid.y + snap.grid.offsetY,
+
+                            distX = newX - page.x,
+                            distY = newY - page.y,
+                            
+                            distance = Math.sqrt(distX * distX + distY * distY),
+                            inRange = distance < snap.range || snap.range < 0,
+                            anchorChanged = (newX !== snap.x || newY !== snap.y);
+
+                        snap.x = newX;
+                        snap.y = newY;
+                        snap.dX = distX;
+                        snap.dY = distY;
+
+                        if ((anchorChanged  || !snap.locked) && inRange)  {
+                            snap.locked = true;
+                            actions[prepared].moveListener(event);
+                        }
+                        else if (anchorChanged || !inRange) {
+                            snap.locked = false;
+                            actions[prepared].moveListener(event);
+                        }
+                    }
+                }
+                else {
+                    actions[prepared].moveListener(event);
+                }
+            }
         }
 
         if (dragging || resizing) {
@@ -942,11 +1018,7 @@ var document = window.document,
             dropTarget.fire(dragEnterEvent);
         }
 
-        prevX = dragEvent.pageX;
-        prevY = dragEvent.pageY;
-
-        prevClientX = dragEvent.clientX;
-        prevClientY = dragEvent.clientY;
+        setPrevXY(dragEvent);
     }
 
     function resizeMove (event) {
@@ -965,11 +1037,7 @@ var document = window.document,
             target.fire(resizeEvent);
         }
 
-        prevX = resizeEvent.pageX;
-        prevY = resizeEvent.pageY;
-
-        prevClientX = resizeEvent.clientX;
-        prevClientY = resizeEvent.clientY;
+        setPrevXY(resizeEvent);
     }
 
     function gestureMove (event) {
@@ -1000,11 +1068,7 @@ var document = window.document,
             target.fire(gestureEvent);
         }
 
-        prevX = gestureEvent.pageX;
-        prevY = gestureEvent.pageY;
-
-        prevClientX = gestureEvent.clientX;
-        prevClientY = gestureEvent.clientY;
+        setPrevXY(gestureEvent);
 
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
@@ -1117,7 +1181,7 @@ var document = window.document,
             target.fire(click);
         }
 
-        mouseIsDown = dragging = resizing = gesturing = false;
+        mouseIsDown = snap.locked = dragging = resizing = gesturing = false;
 
         mouseWasMoved = true;
 
@@ -1866,9 +1930,7 @@ var document = window.document,
             // interact, clear the cursor style
             if (!styleCursor) {
                 for (i = 0; i < interactables.length; i++) {
-                    if (interactables[i]._element !== document) {
-                        interactables[i]._element.style.cursor = '';
-                    }
+                    interactables[i]._element.style.cursor = '';
                 }
             }
             return interact;
@@ -1901,6 +1963,44 @@ var document = window.document,
             return interact;
         }
         return autoScroll.isEnabled;
+    };
+
+    /**
+     * Returns or sets whether actions are constrained to a grid or a 
+     * collection of coordinates
+     *
+     * @function
+     * @param {bool | Object} options true or false to simply enable or disable
+     *        or an object with properties
+     *        mode   : 'grid' or 'anchor',
+     *        range  : the distance within which snapping to a point occurs,
+     *        grid   : an object with properties
+     *                 x      : the distance between x-axis snap points,
+     *                 y      : the distance between y-axis snap points,
+     *                 offsetX: the x-axis value of the grid origin
+     *                 offsetX: the y-axis value of the grid origin
+     *        anchors: an array of objects with x, y and optional range
+     *                 eg [{x: 200, y: 300, range: 40}, {x: 5, y: 0}],
+     *        
+     * @returns {Object | interact}
+     */
+    interact.snap = function (options) {
+        if (typeof options === 'object') {
+            snap.enabled = true;
+
+            if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
+            if (typeof options.range === 'number') { snap.range   = options.range;  }
+            if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
+            if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
+
+            return interact;
+        }
+        if (typeof options === 'boolean') {
+            snap.enabled = options;
+
+            return interact;
+        }
+        return snap.enabled? snap: false;
     };
 
     /**
