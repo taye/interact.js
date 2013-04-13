@@ -16,15 +16,24 @@
         <div id="status">
             <div id="controls">
                 <h3> grid spacing </h3>
-                <input id="grid-x" type="range" value="100" title="x-axis">
-                <input id="grid-y" type="range" value="100" title="x-axis">
+                <input id="grid-x" type="range" value="100" min="20" max="500" title="x-axis">
+                <input id="grid-y" type="range" value="100" min="20" max="500" title="x-axis">
                 <br>
                 <h3> grid offset </h3>
-                <input id="offset-x" type="range" value="50" title="x-axis">
-                <input id="offset-y" type="range" value="50" title="x-axis">
+                <input id="offset-x" type="range" value="50" max="500" title="x-axis">
+                <input id="offset-y" type="range" value="50" max="500" title="x-axis">
                 <br>
                 <h3> snap range </h3>
-                <input id="snap-range" type="range" min="-1" value="40" title="snap range">
+                <input id="snap-range" type="range" min="-1" value="40" min="10" max="300" title="snap range">
+                <br>
+                <h3> snap mode </h3>
+                <label for="grid-mode"> Grid Mode </label>
+                <input id="grid-mode" type="radio" name="snap-mode" checked="true"> 
+                <label for="anchor-mode"> Anchor Mode </label>
+                <input id="anchor-mode" type="radio" name="snap-mode">
+                <br>
+                <label for="drag-anchors"> Anchor drag mode </label>
+                <input id="drag-anchors" type="checkbox" >
             </div>
         </div>
 	</body>

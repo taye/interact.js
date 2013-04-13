@@ -32,11 +32,6 @@ canvas {
 	line-height: 22px;
 }
 
-#controls .control_property {
-	overflow: hidden;
-	width: 300px;
-	margin: 0 auto 15px auto;
-	border-radius: 4px;
-	background-color: #121212;
-	padding: 5px 15px;
+input[type=radio], input[type=checkbox], label {
+    cursor: pointer;
 }

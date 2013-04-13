@@ -13,41 +13,60 @@
 
     var canvas,
         context,
-        gridCanvas,
-        gridContext,
+        guidesCanvas,
+        guidesContext,
         width = 800,
         height = 800,
         snap = interact.snap(),
         status,
         prevX = 0,
         prevY = 0,
-        quickClear = true;
+        blue = '#2299ee',
+        peppermint = '#66e075',
+        tango = '#ff4400',
+        draggingAnchor = false;
 
     function drawGrid (grid) {
         var barWidth = 4,
             barLength = 16;
 
-        gridContext.clearRect(0, 0, width, height);
+        guidesContext.clearRect(0, 0, width, height);
 
-        if (snap.mode === 'grid') {
-            gridCanvas.fillStyle = '#2299ee';
+        guidesCanvas.fillStyle = blue;
 
-            for (var i = 0, lenX = width / grid.x; i < lenX; i++) {
-                for (var j = 0, lenY = height / grid.y; j < lenY; j++) {
-                    if (snap.range > 0) {
-                        gridContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, '#2299ee').fill();
-                    }
+        if (snap.range < 0) {
+            guidesContext.fillStyle = 'rgba(34, 153, 238, 0.5)';
+            guidesContext.fillRect(0, 0, width, height);
+        }
 
-                    gridContext.beginPath();
-                    gridContext.moveTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY - barLength / 2);
-                    gridContext.lineTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY + barLength / 2);
-                    gridContext.stroke();
-
-                    gridContext.beginPath();
-                    gridContext.moveTo(i * grid.x + grid.offsetX - barLength / 2, j * grid.y + grid.offsetY);
-                    gridContext.lineTo(i * grid.x + grid.offsetX + barLength / 2, j * grid.y + grid.offsetY);
-                    gridContext.stroke();
+        for (var i = 0, lenX = width / grid.x; i < lenX; i++) {
+            for (var j = 0, lenY = height / grid.y; j < lenY; j++) {
+                if (snap.range > 0) {
+                    guidesContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, blue).fill();
                 }
+
+                guidesContext.beginPath();
+                guidesContext.moveTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY - barLength / 2);
+                guidesContext.lineTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY + barLength / 2);
+                guidesContext.stroke();
+
+                guidesContext.beginPath();
+                guidesContext.moveTo(i * grid.x + grid.offsetX - barLength / 2, j * grid.y + grid.offsetY);
+                guidesContext.lineTo(i * grid.x + grid.offsetX + barLength / 2, j * grid.y + grid.offsetY);
+                guidesContext.stroke();
+            }
+        }
+    }
+
+    function drawAnchors (anchors) {
+        guidesContext.clearRect(0, 0, width, height);
+
+        for (var i = 0, len = anchors.length; i < len; i++) {
+            var anchor = anchors[i],
+                range = anchor.range === 'number'? anchor.range: snap.range;
+
+            if (range > 0) {
+                guidesContext.circle(anchor.x, anchor.y, range, blue).fill();
             }
         }
     }
@@ -60,42 +79,47 @@
         return this;
     }
     window.CanvasRenderingContext2D.prototype.circle = circle;
- 
-    function dragStart (event) {
-        context.clearRect(0, 0, width, height);
-        context.circle(event.pageX, event.pageY, 10, '#ff4400').fill();
-
-        prevX = event.pageX;
-        prevY = event.pageY;
-    }
 
     function dragMove (event) {
-        if (quickClear) {
-            context.clearRect(0, 0, width, height);
-        }
+        context.clearRect(0, 0, width, height);
 
         var highlightRadius = snap.range > 0? snap.range + 1: 10;
 
         context.circle(snap.x, snap.y, highlightRadius, 'rgba(102, 225, 117, 0.8)').fill();
-        context.circle(event.pageX, event.pageY, 10, '#ff4400').fill();
+        context.circle(event.pageX, event.pageY, 10, tango).fill();
 
         prevX = event.pageX;
         prevY = event.pageY;
     }
 
     function dragEnd (event) {
-        context.circle(event.pageX, event.pageY, 10, '#ff4400').fill();
+        context.circle(event.pageX, event.pageY, 10, tango).fill();
 
         prevX = event.pageX;
         prevY = event.pageY;
     }
 
-    function mouseMove (event) {
-        if (snap && snap.enabled && snap.locked) {
-            context.circle(snap.realX,
-                snap.realY,
-                3, '#aaaaaa');
+    function anchorDragStart (event) {
+        if (snap.locked) {
+            snap.enabled = false;
+            draggingAnchor = true;
+
+            anchorDragMove(event);
         }
+    }
+
+    function anchorDragMove (event) {
+        if (draggingAnchor && snap.anchors.closest) {
+            snap.anchors.closest.x += event.dx;
+            snap.anchors.closest.y += event.dy;
+
+            drawAnchors(snap.anchors);
+        }
+    }
+
+    function anchorDragEnd (event) {
+        snap.enabled = true;
+        draggingAnchor = false;
     }
 
     function statusChange (event) {
@@ -106,50 +130,81 @@
 
         snap.range = Number(status.range.value);
 
-        drawGrid(snap.grid);
+        if (status.anchorDrag.checked) {
+            status.anchorMode.disabled = status.gridMode.disabled = true;
+            snap.mode = 'anchor';
+
+            interact(canvas)
+                .unbind('dragmove', dragMove)
+                .unbind('dragend', dragEnd)
+                .bind('dragstart', anchorDragStart)
+                .bind('dragmove', anchorDragMove)
+                .bind('dragend', anchorDragEnd)
+                .checkOnHover(false);
+        }
+        else {
+            status.anchorMode.disabled = status.gridMode.disabled = false;
+
+            interact(canvas)
+                .bind('dragmove', dragMove)
+                .bind('dragend', dragEnd)
+                .unbind('dragstart', anchorDragStart)
+                .unbind('dragmove', anchorDragMove)
+                .unbind('dragend', anchorDragEnd)
+                .checkOnHover(false);
+        }
+
+        snap.mode = status.anchorMode.checked || status.anchorDrag.checked? 'anchor': 'grid';
+
+        context.clearRect(0, 0, width, height);
+        if (snap.mode === 'grid') {
+            drawGrid(snap.grid);
+        }
+        else if (snap.mode === 'anchor') {
+            drawAnchors(snap.anchors);
+        }
     }
 
-    interact.styleCursor(false)(document).bind('DOMContentLoaded', function () {
+    interact.styleCursor(false);
+
+    interact(document).bind('DOMContentLoaded', function () {
         canvas = document.getElementById('drag');
         canvas.width = width;
         canvas.height = height;
         context = canvas.getContext('2d');
 
-        gridCanvas = document.getElementById('grid');
-        gridCanvas.width = width;
-        gridCanvas.height = height;
-        gridContext = gridCanvas.getContext('2d');
+        interact(canvas).draggable(true);
 
-        interact(canvas)
-            .draggable({
-                onstart: dragStart,
-                onmove: dragMove,
-                onend: dragEnd
-            })
-            .bind('mousemove', mouseMove)
-            .checkOnHover(false);
+        guidesCanvas = document.getElementById('grid');
+        guidesCanvas.width = width;
+        guidesCanvas.height = height;
+        guidesContext = guidesCanvas.getContext('2d');
 
         status = {
             container: document.getElementById('status'),
+            gridMode: document.getElementById('grid-mode'),
+            anchorMode: document.getElementById('anchor-mode'),
             range: document.getElementById('snap-range'),
             snapX: document.getElementById('snap-x'),
             snapY: document.getElementById('snap-y'),
             gridX: document.getElementById('grid-x'),
             gridY: document.getElementById('grid-y'),
             offsetX: document.getElementById('offset-x'),
-            offsetY: document.getElementById('offset-y')
+            offsetY: document.getElementById('offset-y'),
+            anchorDrag: document.getElementById('drag-anchors')
         }
 
         interact(status.container).bind('change', statusChange);
 
-        statusChange();
-        drawGrid(snap.grid);
-    });
+        snap.anchors = [
+            {x: 100, y: 100},
+            {x: 600, y: 400},
+            {x: 500, y: 150},
+            {x: 900, y: 300},
+            {x: 300, y: 300}
+        ];
 
-    interact.bind('dragmove', function (event) {
-        if (snap.enabled && snap.locked && event.pageX % snap.grid.x) {
-            console.log(e.pageX, e.pageY);
-        }
+        statusChange();
     });
 
     window.grid = {
