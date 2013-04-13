@@ -910,7 +910,9 @@ var document = window.document,
             if (prepared && target) {
 
                 if (snap.enabled) {
-                    var page = getPageXY(event);
+                    var page = getPageXY(event),
+                        anchorChanged,
+                        inRange;
 
                     snap.realX = page.x;
                     snap.realY = page.y;
@@ -925,23 +927,65 @@ var document = window.document,
                             distX = newX - page.x,
                             distY = newY - page.y,
                             
-                            distance = Math.sqrt(distX * distX + distY * distY),
-                            inRange = distance < snap.range || snap.range < 0,
-                            anchorChanged = (newX !== snap.x || newY !== snap.y);
+                            distance = Math.sqrt(distX * distX + distY * distY);
+
+                        inRange = distance < snap.range || snap.range < 0;
+                        anchorChanged = (newX !== snap.x || newY !== snap.y);
 
                         snap.x = newX;
                         snap.y = newY;
                         snap.dX = distX;
                         snap.dY = distY;
+                    }
+                    else if (snap.mode === 'anchor' && snap.anchors.length) {
+                        var closest = {
+                                anchor: null,
+                                distance: 0,
+                                range: 0,
+                                distX: 0,
+                                distY: 0
+                            },
+                            distX,
+                            distY;
 
-                        if ((anchorChanged  || !snap.locked) && inRange)  {
-                            snap.locked = true;
-                            actions[prepared].moveListener(event);
+                        for (var i = 0, len = snap.anchors.length; i < len; i++) {
+                            var thisAnchor = snap.anchors[i],
+                                distX = thisAnchor.x - page.x,
+                                distY = thisAnchor.y - page.y,
+                                range = typeof thisAnchor.range === 'number'? thisAnchor.range: snap.range,
+                                distance = Math.sqrt(distX * distX + distY * distY);
+
+                            if (!closest.anchor ||
+                                distance < closest.distance && 
+                                (range < 0 || distance - range < closest.distance - closest.range)) {
+
+                                closest = {
+                                    anchor: thisAnchor,
+                                    distance: distance,
+                                    range: range,
+                                    distX: distX,
+                                    distY: distY
+                                };
+                            }
                         }
-                        else if (anchorChanged || !inRange) {
-                            snap.locked = false;
-                            actions[prepared].moveListener(event);
-                        }
+
+                        anchorChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
+                        inRange = closest.distance < closest.range;
+
+                        snap.x = closest.anchor.x;
+                        snap.y = closest.anchor.y;
+                        snap.dX = closest.distX;
+                        snap.dY = closest.distY;
+                        snap.anchors.closest = closest.anchor;
+                    }
+
+                    if ((anchorChanged || !snap.locked) && inRange)  {
+                        snap.locked = true;
+                        actions[prepared].moveListener(event);
+                    }
+                    else if (anchorChanged || !inRange) {
+                        snap.locked = false;
+                        actions[prepared].moveListener(event);
                     }
                 }
                 else {
