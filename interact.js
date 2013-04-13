@@ -109,7 +109,7 @@ var document = window.document,
 
     // aww snap
     snap = {
-        enabled: true,
+        enabled: false,
 
         mode: 'grid',
         range: -1,

@@ -17,7 +17,7 @@
         guidesContext,
         width = 800,
         height = 800,
-        snap = interact.snap(),
+        snap = interact.snap(true).snap(),
         status,
         prevX = 0,
         prevY = 0,
