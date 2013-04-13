@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+#status {
+    position: fixed;
+    right: 0;
+    top: 10%;
+
+    padding: 5px 10px;
+    border-radius: 5px;
+
+    background-color: #cccccc;
+}
+
+#status h3 {
+	font-size: 16px;
+	margin: 10px 0px 0px 0px;
+	padding: 0;
+	line-height: 22px;
+}
+
+#controls .control_property {
+	overflow: hidden;
+	width: 300px;
+	margin: 0 auto 15px auto;
+	border-radius: 4px;
+	background-color: #121212;
+	padding: 5px 15px;
+}
