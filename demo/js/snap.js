@@ -22,25 +22,25 @@
         prevX = 0,
         prevY = 0,
         blue = '#2299ee',
+        lightBlue = '#88ccff',
         peppermint = '#66e075',
         tango = '#ff4400',
         draggingAnchor = false;
 
     function drawGrid (grid) {
-        var barWidth = 4,
-            barLength = 16;
+        var barLength = 16;
 
         guidesContext.clearRect(0, 0, width, height);
 
         guidesCanvas.fillStyle = blue;
 
         if (snap.range < 0) {
-            guidesContext.fillStyle = 'rgba(34, 153, 238, 0.5)';
+            guidesContext.fillStyle = lightBlue;
             guidesContext.fillRect(0, 0, width, height);
         }
 
-        for (var i = 0, lenX = width / grid.x + 1; i < lenX; i++) {
-            for (var j = 0, lenY = height / grid.y + 1; j < lenY; j++) {
+        for (var i = -(1 + grid.offsetX / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
+            for (var j = -( 1 + grid.offsetY / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
                 if (snap.range > 0) {
                     guidesContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, blue).fill();
                 }
@@ -59,7 +59,14 @@
     }
 
     function drawAnchors (anchors) {
+        var barLength = 16;
+ 
         guidesContext.clearRect(0, 0, width, height);
+
+        if (snap.range < 0) {
+            guidesContext.fillStyle = lightBlue;
+            guidesContext.fillRect(0, 0, width, height);
+        }
 
         for (var i = 0, len = anchors.length; i < len; i++) {
             var anchor = anchors[i],
@@ -68,6 +75,16 @@
             if (range > 0) {
                 guidesContext.circle(anchor.x, anchor.y, range, blue).fill();
             }
+
+            guidesContext.beginPath();
+            guidesContext.moveTo(anchor.x, anchor.y - barLength / 2);
+            guidesContext.lineTo(anchor.x, anchor.y + barLength / 2);
+            guidesContext.stroke();
+
+            guidesContext.beginPath();
+            guidesContext.moveTo(anchor.x - barLength / 2, anchor.y);
+            guidesContext.lineTo(anchor.x + barLength / 2, anchor.y);
+            guidesContext.stroke();
         }
     }
 
@@ -81,10 +98,18 @@
     window.CanvasRenderingContext2D.prototype.circle = circle;
 
     function dragMove (event) {
+        var range;
+        if (snap.mode === 'grid') {
+            range = snap.range;
+        }
+        else {
+            range = typeof snap.anchors.closest.range === 'number'? snap.anchors.closest.range: snap.range;
+        }
+
         context.clearRect(0, 0, width, height);
 
         if (snap.enabled) {
-            var highlightRadius = snap.range > 0? snap.range + 1: 10;
+            var highlightRadius = range > 0? range + 1: 10;
 
             context.circle(snap.x, snap.y, highlightRadius, 'rgba(102, 225, 117, 0.8)').fill();
         }
@@ -136,9 +161,9 @@
 
         if (status.anchorDrag.checked) {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = true;
-            snap.mode = 'anchor';
 
             interact(canvas)
+                .unbind('dragstart', dragMove)
                 .unbind('dragmove', dragMove)
                 .unbind('dragend', dragEnd)
                 .bind('dragstart', anchorDragStart)
@@ -150,6 +175,7 @@
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
 
             interact(canvas)
+                .bind('dragstart', dragMove)
                 .bind('dragmove', dragMove)
                 .bind('dragend', dragEnd)
                 .unbind('dragstart', anchorDragStart)
@@ -157,6 +183,11 @@
                 .unbind('dragend', anchorDragEnd)
                 .checkOnHover(false);
         }
+
+        snap.range = status.anchorDrag.checked?
+                        snap.range: status.gridMode.checked && snap.mode !== 'grid'?
+                            snap.grid.x / 3: status.anchorMode.checked && snap.mode !== 'anchor'?
+                                60: snap.range;
 
         snap.mode = status.anchorMode.checked || status.anchorDrag.checked? 'anchor': 'grid';
 
@@ -173,6 +204,17 @@
             context.clearRect(0, 0, width, height);
             guidesContext.clearRect(0, 0, width, height);
         }
+    }
+
+    function statusInput (event) {
+        if (event.target.type === 'range' &&
+            (Number(event.target.value) > Number(event.target.getAttribute('max')) ||
+            Number(event.target.value) < Number(event.target.getAttribute('min')))) {
+
+            return;
+        }
+
+        statusChange(event);
     }
 
     interact.styleCursor(false);
@@ -206,6 +248,7 @@
         }
 
         interact(status.container).bind('change', statusChange);
+        interact(status.container).bind('input', statusInput);
 
         snap.anchors = [
             {x: 100, y: 100},

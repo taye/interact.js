@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
     border: 0;
+    font-family: "Arial", sans-serif;
 }
 
 canvas {
@@ -17,6 +18,7 @@ canvas {
 }
 
 #status {
+    width: 180px;
     position: fixed;
     right: 0;
     top: 10%;
@@ -32,6 +34,8 @@ canvas {
 	margin: 10px 0px 0px 0px;
 	padding: 0;
 	line-height: 22px;
+    text-transform: capitalize;
+    font-weight: normal
 }
 
 input[type=radio], input[type=checkbox], label {
