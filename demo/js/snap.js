@@ -155,8 +155,14 @@
         snap.range = Number(status.range.value);
         snap.enabled = !status.offMode.checked;
 
+        if (status.anchorDrag.checked && !status.anchorMode.checked) {
+            status.anchorMode.checked = true;
+            return;
+        }
+
         if (status.anchorDrag.checked) {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = true;
+            status.modes.classList.add('disabled');
 
             interact(canvas)
                 .unbind('dragstart', dragMove)
@@ -169,6 +175,7 @@
         }
         else {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
+            status.modes.classList.remove('disabled');
 
             interact(canvas)
                 .bind('dragstart', dragMove)
@@ -230,6 +237,7 @@
 
         status = {
             container: document.getElementById('status'),
+            modes: document.getElementById('modes'),
             offMode: document.getElementById('off-mode'),
             gridMode: document.getElementById('grid-mode'),
             anchorMode: document.getElementById('anchor-mode'),

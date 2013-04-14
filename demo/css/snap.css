@@ -21,12 +21,13 @@ canvas {
     width: 180px;
     position: fixed;
     right: 0;
-    top: 10%;
+    top: 2%;
 
-    padding: 5px 10px;
+    padding: 5px 5px;
     border-radius: 5px;
 
     background-color: #cccccc;
+    text-align: center;
 }
 
 #status h3 {
@@ -38,10 +39,28 @@ canvas {
     font-weight: normal
 }
 
-input[type=radio], input[type=checkbox], label {
-    cursor: pointer;
+#status input[type=radio], #status input[type=checkbox] {
+    float: right;
 }
 
 #status [disabled] {
-    visibility: hidden;
+    cursor: default;
+}
+
+#status label {
+    float: left;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
+#modes {
+    overflow: hidden;
+    width: 90%;
+    margin: auto;
+}
+
+#modes.disabled label.snap-mode {
+    cursor: default;
+    color: gray;
 }

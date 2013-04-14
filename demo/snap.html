@@ -1,43 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<title>interact.js drag snapping</title>
-        <meta name="description" content="A demonstration of interact.js drag snapping" />
-		<meta name="author" content="Taye Adeyemi" />
-		<script type="text/javascript" src="../interact.js"></script>
-		<script type="text/javascript" src="js/snap.js"></script>
-		<link rel="stylesheet" href="css/snap.css" type="text/css"/>
-	</head>
-	<body>
-        <canvas id="grid"> Your browser does not support the HTML5 canvas</canvas>
-        <canvas id="drag"> </canvas>
+<head>
+<meta charset="utf-8" />
+<title>interact.js drag snapping</title>
+<meta name="description" content="A demonstration of interact.js drag snapping" />
+<meta name="author" content="Taye Adeyemi" />
+<script type="text/javascript" src="../interact.js"></script>
+<script type="text/javascript" src="js/snap.js"></script>
+<link rel="stylesheet" href="css/snap.css" type="text/css"/>
+</head>
+<body>
+<canvas id="grid"> Your browser does not support the HTML5 canvas</canvas>
+<canvas id="drag"> </canvas>
 
-        <div id="status">
-            <div id="controls">
-                <h3> grid spacing </h3>
-                <input id="grid-x" type="range" value="100" min="20" max="500" title="x-axis">
-                <input id="grid-y" type="range" value="100" min="20" max="500" title="x-axis">
-                <br>
-                <h3> grid offset </h3>
-                <input id="offset-x" type="range" value="50" min="30" max="500" title="x-axis">
-                <input id="offset-y" type="range" value="50" min="30" max="500" title="x-axis">
-                <br>
-                <h3> snap range </h3>
-                <input id="snap-range" type="range" min="-1" value="40" min="10" max="150" title="snap range">
-                <br>
-                <h3> snap mode </h3>
-                <label for="off-mode"> Off </label>
+<div id="status">
+    <div id="controls">
+        <h3> grid spacing </h3>
+        <input id="grid-x" type="range" value="100" min="20" max="500" title="x-axis">
+        <input id="grid-y" type="range" value="100" min="20" max="500" title="x-axis">
+        <br>
+        <h3> grid offset </h3>
+        <input id="offset-x" type="range" value="50" min="30" max="500" title="x-axis">
+        <input id="offset-y" type="range" value="50" min="30" max="500" title="x-axis">
+        <br>
+        <h3> snap range </h3>
+        <input id="snap-range" type="range" min="-1" value="40" min="10" max="150" title="snap range">
+        <br>
+        <h3> snap mode </h3>
+        <div id="modes">
+            <label for="off-mode" class="snap-mode">
+                Off
                 <input id="off-mode" type="radio" name="snap-mode" checked="true"> 
-                <label for="grid-mode"> Grid Mode </label>
+            </label> <br>
+            <label for="grid-mode" class="snap-mode">
+                Grid Mode 
                 <input id="grid-mode" type="radio" name="snap-mode" checked="true"> 
-                <label for="anchor-mode"> Anchor Mode </label>
+            </label> <br>
+            <label for="anchor-mode" class="snap-mode">
+                Anchor Mode 
                 <input id="anchor-mode" type="radio" name="snap-mode">
-                <br>
-                <label for="drag-anchors"> Anchor drag mode </label>
+            </label> <br>
+            <br>
+            <label for="drag-anchors">
+                Anchor drag mode
                 <input id="drag-anchors" type="checkbox" >
-            </div>
+            </label>
         </div>
-	</body>
+    </div>
+</div>
+</body>
 </html>
 
