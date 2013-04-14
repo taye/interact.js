@@ -911,8 +911,8 @@ var document = window.document,
 
                 if (snap.enabled) {
                     var page = getPageXY(event),
-                        anchorChanged,
-                        inRange;
+                        inRange,
+                        anchorChanged;
 
                     snap.realX = page.x;
                     snap.realY = page.y;
@@ -949,28 +949,34 @@ var document = window.document,
                             distY;
 
                         for (var i = 0, len = snap.anchors.length; i < len; i++) {
-                            var thisAnchor = snap.anchors[i],
-                                distX = thisAnchor.x - page.x,
-                                distY = thisAnchor.y - page.y,
-                                range = typeof thisAnchor.range === 'number'? thisAnchor.range: snap.range,
+                            var anchor = snap.anchors[i],
+                                distX = anchor.x - page.x,
+                                distY = anchor.y - page.y,
+
+                                range = typeof anchor.range === 'number'? anchor.range: snap.range,
                                 distance = Math.sqrt(distX * distX + distY * distY);
 
+                            inRange = range < 0? true: distance < range;
+
                             if (!closest.anchor ||
-                                distance < closest.distance && 
-                                (range < 0 || distance - range < closest.distance - closest.range)) {
+                                (range > 0?
+                                    (inRange && !closest.inRange) || (distance - range < closest.distance - closest.range):
+                                    (closest.range < 0)? distance < closest.distance: !closest.inRange)) {
+
 
                                 closest = {
-                                    anchor: thisAnchor,
+                                    anchor: anchor,
                                     distance: distance,
                                     range: range,
+                                    inRange: inRange,
                                     distX: distX,
                                     distY: distY
                                 };
                             }
                         }
 
+                        inRange = closest.inRange;
                         anchorChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
-                        inRange = closest.distance < closest.range;
 
                         snap.x = closest.anchor.x;
                         snap.y = closest.anchor.y;
