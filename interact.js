@@ -958,9 +958,15 @@ var document = window.document,
 
                             inRange = range < 0? true: distance < range;
 
+                            // New closest anchor if 
+                            // 1. there was none before
                             if (!closest.anchor ||
                                 (range > 0?
-                                    (inRange && !closest.inRange) || (distance - range < closest.distance - closest.range):
+                                    // 2. non infinite range and this is in range and closest isn't
+                                    // 3. non infinite range and both are in range but mouse is relatively deeper in this one
+                                    (inRange && !closest.inRange) || (distance / range < closest.distance / closest.range):
+                                    // 4. both have infinite range and this is closer or
+                                    // 5. infinite range and the other is not in range
                                     (closest.range < 0)? distance < closest.distance: !closest.inRange)) {
 
 
