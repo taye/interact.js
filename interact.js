@@ -917,6 +917,9 @@ var document = window.document,
                     snap.realX = page.x;
                     snap.realY = page.y;
 
+                    // change to infinite range when range is negative
+                    if (snap.range < 0) { snap.range = Infinity; }
+
                     if (snap.mode === 'grid') {
                         var gridX = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
                             gridY = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
