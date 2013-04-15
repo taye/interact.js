@@ -93,6 +93,15 @@
     }
     window.CanvasRenderingContext2D.prototype.circle = circle;
 
+    function mouseMove (event) {
+
+        if (snap.locked && !status.anchorDrag.checked) {
+            context.clearRect(0, 0, width, height);
+            dragMove({pageX: snap.x, pageY: snap.y});
+            context.circle(snap.realX, snap.realY, 5, 'white').fill();
+        }
+    }
+
     function dragMove (event) {
         var range;
         if (snap.mode === 'grid') {
@@ -251,8 +260,12 @@
             anchorDrag: document.getElementById('drag-anchors')
         }
 
-        interact(status.container).bind('change', statusChange);
-        interact(status.container).bind('input', statusInput);
+        interact(status.container)
+            .bind('change', statusChange)
+            .bind('input', statusInput);
+
+        interact(canvas)
+                .bind('mousemove', mouseMove);
 
         snap.anchors = [
             {x: 100, y: 100},
