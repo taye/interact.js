@@ -961,16 +961,25 @@ var document = window.document,
 
                             inRange = distance < range;
 
-                            // New closest anchor if 
-                            // 1. there was none before
-                            if (!closest.anchor ||
-                                    // 2. this is in range and closest isn't
-                                    (inRange && !closest.inRange) ||
-                                    // 3. the mouse is relatively deeper in this one or
-                                    (distance / range < closest.distance / closest.range) ||
-                                    // 4. this is closer
-                                    distance < closest.distance) {
+                            // Infinite anchors count as being out of range
+                            // compared to non infinite ones that are in range
+                            if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                                inRange = false;
+                            }
 
+                            if (!closest.anchor || (inRange?
+                                // is the closest anchor in range?
+                                (closest.inRange && range !== Infinity)?
+                                    // the pointer is relatively deeper in this anchor
+                                    distance / range < closest.distance / closest.range:
+                                    //the pointer is closer to this anchor
+                                    distance < closest.distance:
+                                // The other is not in range and the pointer is closer to this anchor
+                                (!closest.inRange && distance < closest.distance))) {
+
+                                if (range === Infinity) {
+                                    inRange = true;
+                                }
 
                                 closest = {
                                     anchor: anchor,
