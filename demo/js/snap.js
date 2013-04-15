@@ -30,14 +30,14 @@
 
         guidesCanvas.fillStyle = blue;
 
-        if (snap.range < 0) {
+        if (snap.range < 0 || snap.range === Infinity) {
             guidesContext.fillStyle = lightBlue;
             guidesContext.fillRect(0, 0, width, height);
         }
 
         for (var i = -(1 + grid.offsetX / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
             for (var j = -( 1 + grid.offsetY / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
-                if (snap.range > 0) {
+                if (snap.range > 0 && snap.range !== Infinity) {
                     guidesContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, blue).fill();
                 }
 
@@ -59,7 +59,7 @@
  
         guidesContext.clearRect(0, 0, width, height);
 
-        if (snap.range < 0) {
+        if (snap.range < 0 && snap.range !== Infinity) {
             guidesContext.fillStyle = lightBlue;
             guidesContext.fillRect(0, 0, width, height);
         }
@@ -68,7 +68,7 @@
             var anchor = anchors[i],
                 range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
-            if (range > 0) {
+            if (range > 0 && snap.range !== Infinity) {
                 guidesContext.circle(anchor.x, anchor.y, range, blue).fill();
             }
 
@@ -113,10 +113,8 @@
 
         context.clearRect(0, 0, width, height);
 
-        if (snap.enabled) {
-            var highlightRadius = range > 0? range + 1: 10;
-
-            context.circle(snap.x, snap.y, highlightRadius, 'rgba(102, 225, 117, 0.8)').fill();
+        if (snap.enabled && range !== Infinity) {
+            context.circle(snap.x, snap.y, range + 1, 'rgba(102, 225, 117, 0.8)').fill();
         }
 
         context.circle(event.pageX, event.pageY, 10, tango).fill();
@@ -162,6 +160,7 @@
         snap.grid.offsetY = Number(status.offsetY.value);
 
         snap.range = Number(status.range.value);
+
         snap.enabled = !status.offMode.checked;
 
         if (status.anchorDrag.checked && !status.anchorMode.checked) {
@@ -268,11 +267,10 @@
                 .bind('mousemove', mouseMove);
 
         snap.anchors = [
-            {x: 100, y: 100},
+            {x: 100, y: 100, range: 200},
             {x: 600, y: 400},
             {x: 500, y: 150},
-            {x: 900, y: 300},
-            {x: 300, y: 300}
+            {x: 250, y: 250}
         ];
 
         statusChange();
