@@ -124,8 +124,8 @@ var document = window.document,
         locked: false,
         x : 0,
         y : 0,
-        dX: 0,
-        dY: 0,
+        dx: 0,
+        dy: 0,
         realX: 0,
         realY: 0
     },
@@ -704,10 +704,10 @@ var document = window.document,
             page = getPageXY(event);
 
             if (snap.enabled && snap.locked) {
-                page.x += snap.dX;
-                page.y += snap.dY;
-                client.x += snap.dX;
-                client.y += snap.dY;
+                page.x += snap.dx;
+                page.y += snap.dy;
+                client.x += snap.dx;
+                client.y += snap.dy;
             }
         }
 
@@ -921,11 +921,11 @@ var document = window.document,
                     if (snap.range < 0) { snap.range = Infinity; }
 
                     if (snap.mode === 'grid') {
-                        var gridX = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
-                            gridY = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
+                        var gridx = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
+                            gridy = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
 
-                            newX = gridX * snap.grid.x + snap.grid.offsetX,
-                            newY = gridY * snap.grid.y + snap.grid.offsetY,
+                            newX = gridx * snap.grid.x + snap.grid.offsetX,
+                            newY = gridy * snap.grid.y + snap.grid.offsetY,
 
                             distX = newX - page.x,
                             distY = newY - page.y,
@@ -937,8 +937,8 @@ var document = window.document,
 
                         snap.x = newX;
                         snap.y = newY;
-                        snap.dX = distX;
-                        snap.dY = distY;
+                        snap.dx = distX;
+                        snap.dy = distY;
                     }
                     else if (snap.mode === 'anchor' && snap.anchors.length) {
                         var closest = {
@@ -997,8 +997,8 @@ var document = window.document,
 
                         snap.x = closest.anchor.x;
                         snap.y = closest.anchor.y;
-                        snap.dX = closest.distX;
-                        snap.dY = closest.distY;
+                        snap.dx = closest.distX;
+                        snap.dy = closest.distY;
                         snap.anchors.closest = closest.anchor;
                     }
 
