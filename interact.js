@@ -112,7 +112,7 @@ var document = window.document,
         enabled: false,
 
         mode: 'grid',
-        range: -1,
+        range: Infinity,
         grid: {
             x: 100,
             y: 100,
@@ -929,7 +929,7 @@ var document = window.document,
                             
                             distance = Math.sqrt(distX * distX + distY * distY);
 
-                        inRange = distance < snap.range || snap.range < 0;
+                        inRange = distance < snap.range;
                         anchorChanged = (newX !== snap.x || newY !== snap.y);
 
                         snap.x = newX;
@@ -956,18 +956,17 @@ var document = window.document,
                                 range = typeof anchor.range === 'number'? anchor.range: snap.range,
                                 distance = Math.sqrt(distX * distX + distY * distY);
 
-                            inRange = range < 0? true: distance < range;
+                            inRange = distance < range;
 
                             // New closest anchor if 
                             // 1. there was none before
                             if (!closest.anchor ||
-                                (range > 0?
-                                    // 2. non infinite range and this is in range and closest isn't
-                                    // 3. non infinite range and both are in range but mouse is relatively deeper in this one
-                                    (inRange && !closest.inRange) || (distance / range < closest.distance / closest.range):
-                                    // 4. both have infinite range and this is closer or
-                                    // 5. infinite range and the other is not in range
-                                    (closest.range < 0)? distance < closest.distance: !closest.inRange)) {
+                                    // 2. this is in range and closest isn't
+                                    (inRange && !closest.inRange) ||
+                                    // 3. the mouse is relatively deeper in this one or
+                                    (distance / range < closest.distance / closest.range) ||
+                                    // 4. this is closer
+                                    distance < closest.distance) {
 
 
                                 closest = {
