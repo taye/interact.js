@@ -16,7 +16,7 @@
  *              a function with an element which was previously set returns an
  *              Interactable object which has various methods to configure it.
  */
-(function (window) {
+window.interact = (function () {
    'use strict';
 
 var document = window.document,
@@ -2125,6 +2125,5 @@ var document = window.document,
         }
     });
 
-    window.interact = interact;
-
-} (window));
+    return interact;
+} ());
