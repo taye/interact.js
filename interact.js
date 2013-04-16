@@ -912,7 +912,7 @@ var document = window.document,
                 if (snap.enabled) {
                     var page = getPageXY(event),
                         inRange,
-                        anchorChanged;
+                        snapChanged;
 
                     snap.realX = page.x;
                     snap.realY = page.y;
@@ -920,27 +920,7 @@ var document = window.document,
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
 
-                    if (snap.mode === 'grid') {
-                        var gridx = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
-                            gridy = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
-
-                            newX = gridx * snap.grid.x + snap.grid.offsetX,
-                            newY = gridy * snap.grid.y + snap.grid.offsetY,
-
-                            distX = newX - page.x,
-                            distY = newY - page.y,
-                            
-                            distance = Math.sqrt(distX * distX + distY * distY);
-
-                        inRange = distance < snap.range;
-                        anchorChanged = (newX !== snap.x || newY !== snap.y);
-
-                        snap.x = newX;
-                        snap.y = newY;
-                        snap.dx = distX;
-                        snap.dy = distY;
-                    }
-                    else if (snap.mode === 'anchor' && snap.anchors.length) {
+                    if (snap.mode === 'anchor' && snap.anchors.length) {
                         var closest = {
                                 anchor: null,
                                 distance: 0,
@@ -993,7 +973,7 @@ var document = window.document,
                         }
 
                         inRange = closest.inRange;
-                        anchorChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
+                        snapChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
 
                         snap.x = closest.anchor.x;
                         snap.y = closest.anchor.y;
@@ -1001,12 +981,32 @@ var document = window.document,
                         snap.dy = closest.distY;
                         snap.anchors.closest = closest.anchor;
                     }
+                    else {
+                        var gridx = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
+                            gridy = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
 
-                    if ((anchorChanged || !snap.locked) && inRange)  {
+                            newX = gridx * snap.grid.x + snap.grid.offsetX,
+                            newY = gridy * snap.grid.y + snap.grid.offsetY,
+
+                            distX = newX - page.x,
+                            distY = newY - page.y,
+                            
+                            distance = Math.sqrt(distX * distX + distY * distY);
+
+                        inRange = distance < snap.range;
+                        snapChanged = (newX !== snap.x || newY !== snap.y);
+
+                        snap.x = newX;
+                        snap.y = newY;
+                        snap.dx = distX;
+                        snap.dy = distY;
+                    }
+
+                    if ((snapChanged || !snap.locked) && inRange)  {
                         snap.locked = true;
                         actions[prepared].moveListener(event);
                     }
-                    else if (anchorChanged || !inRange) {
+                    else if (snapChanged || !inRange) {
                         snap.locked = false;
                         actions[prepared].moveListener(event);
                     }
