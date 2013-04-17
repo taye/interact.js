@@ -107,8 +107,11 @@
         if (snap.mode === 'grid') {
             range = snap.range;
         }
-        else {
+        else if (snap.mode === 'anchor') {
             range = typeof snap.anchors.closest.range === 'number'? snap.anchors.closest.range: snap.range;
+        }
+        else {
+            range = 80;
         }
 
         context.clearRect(0, 0, width, height);
@@ -153,7 +156,10 @@
         draggingAnchor = false;
     }
 
-    function statusChange (event) {
+    function statusChange (event, valid) {
+        if (!valid) {
+            return;
+        }
         snap.grid.x = Number(status.gridX.value);
         snap.grid.y = Number(status.gridY.value);
         snap.grid.offsetX = Number(status.offsetX.value);
@@ -219,13 +225,13 @@
 
     function statusInput (event) {
         if (event.target.type === 'range' &&
-            (Number(event.target.value) > Number(event.target.getAttribute('max')) ||
-            Number(event.target.value) < Number(event.target.getAttribute('min')))) {
+            (Number(event.target.value) > Number(event.target.max)) ||
+            Number(event.target.value) < Number(event.target.min)) {
 
             return;
         }
 
-        statusChange(event);
+        statusChange(event, true);
     }
 
     interact.styleCursor(false);
@@ -273,7 +279,7 @@
             {x: 250, y: 250}
         ];
 
-        statusChange();
+        statusChange(null, true);
     });
 
     window.grid = {
