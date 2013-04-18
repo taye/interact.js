@@ -1,21 +1,75 @@
 interact.js
 ===========
-Javascript drag, drop, resizing and gestures for HTML and SVG elements on modern desktop and mobile browsers.
+Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
+Awesomeness includes:
+ - [**snapping**](http://t1.netsoc.ie/interact.js/demo/snap.html) to a grid or to custom anchor points
+ - cross browser and device, supporting {Chrome,Firefox,Opera}{ **mobile, desktop**} and **Internet Explorer 8+**
+ - interaction with **SVG** elements
+ - being **standalone** (not _yet another_ jQuery plugin)
+ - having(a). **fluent** ().interface
+ - **not modifying anything** it doesn't own (except to support IE8)
+
+ ___
+
+Example
+-------
 ```javascript
-var x = 0, y = 0;
+// snap to the corners of the specified grid
+interact.snap({
+    mdoe: 'grid',
+    grid: {
+        x: 100,
+        y: 5,
+        offsetX: 20,
+        offsetY: 10
+    },
+    range: 40
+});
+    
+var // x and y to keep the position that's been dragged to
+    x = 0,
+    y = 0,
+    // vendor prefixes (prefices?)
+    transformProp = 'transform' in document.body.style?
+                'transform': 'webkitTransform' in document.body.style?
+                    'webkitTransform': 'MozTransform' in document.body.style?
+                        'MozTransform': 'oTransform' in document.body.style?
+                            'oTransform': 'msTransform';
 
-interact(document.body).draggable({
-    onmove: function (event) {
-        x += event.dx;
-        y += event.dy;
+// make an Interactable of the document body element
+interact(document.body)
+    // make a draggable of the Interactable
+    .draggable({
+        // on(drag)move
+        // could also have done interact(document.body).draggable(true).ondragmove = function...
+        onmove: function (event) {
+            x += event.dx;
+            y += event.dy;
 
-        document.body.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-    }
+            // translate the document body by the change in pointer position
+            document.body.style[transformProp] = 'translate(' + x + 'px, ' + y + 'px)';
+        }
+    })
+    // but you should really bind like this which lets you bind multiple listeners
+    .bind('dragend', function (event) {
+        console.log('dragged a distance of ' + 
+            Math.sqrt(event.dx*event.dx + event.dy*event.dy) + 
+            ' pixels to ' + event.pageX + ', ' + event.pageY);
+    });
+
+// or you could listen to InteractEvents for every Interactable
+interact.bind('dragstart', function (event) {
+    console.log('starting drag from ' + event.x0 + ', ' + event.y0);
 });
 ```
 
 Usage
+-----
+Pass the element you want to interact with to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `bind` which let's you add event listeners for InteractEvents and any DOM event.
+The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
+
+Details
 -------
 
 ### Interactables
@@ -64,7 +118,7 @@ InteractEvent properties include the usual properties of mouse/touch events such
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
 | **dragenter, dragLeave**|                                                   |
-| `draggable`             | The draggable that over this dropzone             |
+| `draggable`             | The draggable that's over this dropzone           |
 
 | Drop                    |                                                   |
 | ----------------------- | --------------------------------------------------|
@@ -81,7 +135,7 @@ InteractEvent properties include the usual properties of mouse/touch events such
 | `angle`                 | The angle of the line made by the two touches     |
 | `rotation`              | The change in angle since previous event          |
 | `scale`                 | The ratio of the distance of the start event to the distance of the current event |
-| `ds`                    | The change in scale since the previous even       |
+| `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
 
 \* In interact move events, these are the changes since the previous InteractEvent. However, in end events, these are the changes from the position of the start event to the end event. In gesture events, coordinates are the averages of touch coordinates.
@@ -106,6 +160,8 @@ interact(element)
 ```
 ### interact.js in use
 
-interact.js was written as a Google Summer of Code 2012 project for [Biographer](https://code.google.com/p/biographer "Biographer on Google Code"), a biological network layout and visualization tool. It uses interact.js to modify SVG elements and to pan and zoom the viewport using a mouse or touch screen device. A small demonstration can be viewed [here](http://t1.netsoc.ie/biographer/test/showcase.html "Biographer Showcase").
+interact.js began as a Google Summer of Code 2012 project for [Biographer](https://code.google.com/p/biographer "Biographer on Google Code"), a biological network layout and visualization tool. It uses interact.js to modify SVG elements and to pan and zoom the viewport using a mouse or touch screen device. A small demonstration can be viewed [here](http://t1.netsoc.ie/biographer/test/showcase.html "Biographer Showcase").
 
-The demo in this repository is live [here](http://t1.netsoc.ie/interact.js "interact.js drag, drop, resize and gesture demo"). The blue elements are divs which can be dragged and dropped onto each other, resized by dragging the botom and right edges and also by "pinching" on a multi-touch device. The yellow elements are SVG elements.
+The [demo here](http://t1.netsoc.ie/interact.js/demo "interact.js drag, drop, resize and gesture demo") shows div elements which can be dragged and dropped onto each other and resized by dragging the botom and right edges. The yellow elements are SVG elements (these won't show up on IE8).
+
+The [snapping demo](http://t1.netsoc.ie/interact.js/demo/snap.html "Oh snap!") shows how flexible the snapping system is and it's pretty fun.
