@@ -35,20 +35,20 @@
             guidesContext.fillRect(0, 0, width, height);
         }
 
-        for (var i = -(1 + grid.offsetX / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
-            for (var j = -( 1 + grid.offsetY / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
+        for (var i = -(1 + grid.offset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
+            for (var j = -( 1 + grid.offset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
                 if (snap.range > 0 && snap.range !== Infinity) {
-                    guidesContext.circle(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY, snap.range, blue).fill();
+                    guidesContext.circle(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y, snap.range, blue).fill();
                 }
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY - barLength / 2);
-                guidesContext.lineTo(i * grid.x + grid.offsetX, j * grid.y + grid.offsetY + barLength / 2);
+                guidesContext.moveTo(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y - barLength / 2);
+                guidesContext.lineTo(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y + barLength / 2);
                 guidesContext.stroke();
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + grid.offsetX - barLength / 2, j * grid.y + grid.offsetY);
-                guidesContext.lineTo(i * grid.x + grid.offsetX + barLength / 2, j * grid.y + grid.offsetY);
+                guidesContext.moveTo(i * grid.x + grid.offset.x - barLength / 2, j * grid.y + grid.offset.y);
+                guidesContext.lineTo(i * grid.x + grid.offset.x + barLength / 2, j * grid.y + grid.offset.y);
                 guidesContext.stroke();
             }
         }
@@ -162,8 +162,8 @@
         }
         snap.grid.x = Number(status.gridX.value);
         snap.grid.y = Number(status.gridY.value);
-        snap.grid.offsetX = Number(status.offsetX.value);
-        snap.grid.offsetY = Number(status.offsetY.value);
+        snap.grid.offset.x = Number(status.offsetX.value);
+        snap.grid.offset.y = Number(status.offsetY.value);
 
         snap.range = Number(status.range.value);
 

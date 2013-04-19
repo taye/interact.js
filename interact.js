@@ -116,8 +116,10 @@ var document = window.document,
         grid: {
             x: 100,
             y: 100,
-            offsetX: 0,
-            offsetY: 0
+            offset: {
+                x: 0,
+                y: 0
+            }
         },
         anchors: [],
 
@@ -982,11 +984,11 @@ var document = window.document,
                         snap.anchors.closest = closest.anchor;
                     }
                     else {
-                        var gridx = Math.round((page.x - snap.grid.offsetX) / snap.grid.x),
-                            gridy = Math.round((page.y - snap.grid.offsetY) / snap.grid.y),
+                        var gridx = Math.round((page.x - snap.grid.offset.x) / snap.grid.x),
+                            gridy = Math.round((page.y - snap.grid.offset.y) / snap.grid.y),
 
-                            newX = gridx * snap.grid.x + snap.grid.offsetX,
-                            newY = gridy * snap.grid.y + snap.grid.offsetY,
+                            newX = gridx * snap.grid.x + snap.grid.offset.x,
+                            newY = gridy * snap.grid.y + snap.grid.offset.y,
 
                             distX = newX - page.x,
                             distY = newY - page.y,
@@ -2042,10 +2044,10 @@ var document = window.document,
      *        mode   : 'grid' or 'anchor',
      *        range  : the distance within which snapping to a point occurs,
      *        grid   : an object with properties
-     *                 x      : the distance between x-axis snap points,
-     *                 y      : the distance between y-axis snap points,
-     *                 offsetX: the x-axis value of the grid origin
-     *                 offsetX: the y-axis value of the grid origin
+     *                 x     : the distance between x-axis snap points,
+     *                 y     : the distance between y-axis snap points,
+     *                 offset: an object with
+     *                         x, y: the x/y-axis values of the grid origin
      *        anchors: an array of objects with x, y and optional range
      *                 eg [{x: 200, y: 300, range: 40}, {x: 5, y: 0}],
      *        
@@ -2057,7 +2059,10 @@ var document = window.document,
 
             if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
             if (typeof options.range === 'number') { snap.range   = options.range;  }
-            if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
+            if (typeof options.grid  === 'object') {
+                snap.grid = options.grid;
+                snap.grid.offset = options.grid.offset || {x: 0, y: 0};
+            }
             if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
 
             return interact;
