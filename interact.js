@@ -243,7 +243,7 @@ var document = window.document,
             addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
             removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
             on = useAttachEvent? 'on': '',
-            
+
             elements = [],
             targets  = [];
 
@@ -906,7 +906,7 @@ var document = window.document,
 
     function mouseMove (event) {
         if (mouseIsDown) {
-            if (x0 === prevX && y0 === prevY) { 
+            if (x0 === prevX && y0 === prevY) {
                 mouseWasMoved = true;
             }
             if (prepared && target) {
@@ -992,7 +992,7 @@ var document = window.document,
 
                             distX = newX - page.x,
                             distY = newY - page.y,
-                            
+
                             distance = Math.sqrt(distX * distX + distY * distY);
 
                         inRange = distance < snap.range;
@@ -1141,7 +1141,7 @@ var document = window.document,
 
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
-        if (gestureEvent.scale !== Infinity && 
+        if (gestureEvent.scale !== Infinity &&
             gestureEvent.scale !== null &&
             gestureEvent.scale !== undefined  &&
             !isNaN(gestureEvent.scale)) {
@@ -1714,7 +1714,7 @@ var document = window.document,
             if (eventTypes.indexOf(eventType) !== -1) {
                 var eventArray = this._iEvents[eventType],
                     index;
-                    
+
                 if (eventArray && (index = eventArray.indexOf(listener)) !== -1) {;
                     this._iEvents[eventType].splice(index, 1);
                 }
@@ -2035,7 +2035,7 @@ var document = window.document,
     };
 
     /**
-     * Returns or sets whether actions are constrained to a grid or a 
+     * Returns or sets whether actions are constrained to a grid or a
      * collection of coordinates
      *
      * @function
@@ -2050,7 +2050,7 @@ var document = window.document,
      *                         x, y: the x/y-axis values of the grid origin
      *        anchors: an array of objects with x, y and optional range
      *                 eg [{x: 200, y: 300, range: 40}, {x: 5, y: 0}],
-     *        
+     *
      * @returns {Object | interact}
      */
     interact.snap = function (options) {
