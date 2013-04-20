@@ -115,11 +115,11 @@ var document = window.document,
         range: Infinity,
         grid: {
             x: 100,
-            y: 100,
-            offset: {
-                x: 0,
-                y: 0
-            }
+            y: 100
+        },
+        gridOffset: {
+            x: 0,
+            y: 0
         },
         anchors: [],
 
@@ -984,11 +984,11 @@ var document = window.document,
                         snap.anchors.closest = closest.anchor;
                     }
                     else {
-                        var gridx = Math.round((page.x - snap.grid.offset.x) / snap.grid.x),
-                            gridy = Math.round((page.y - snap.grid.offset.y) / snap.grid.y),
+                        var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
+                            gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
 
-                            newX = gridx * snap.grid.x + snap.grid.offset.x,
-                            newY = gridy * snap.grid.y + snap.grid.offset.y,
+                            newX = gridx * snap.grid.x + snap.gridOffset.x,
+                            newY = gridy * snap.grid.y + snap.gridOffset.y,
 
                             distX = newX - page.x,
                             distY = newY - page.y,
@@ -2061,10 +2061,8 @@ var document = window.document,
 
             if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
             if (typeof options.range === 'number') { snap.range   = options.range;  }
-            if (typeof options.grid  === 'object') {
-                snap.grid = options.grid;
-                snap.grid.offset = options.grid.offset || {x: 0, y: 0};
-            }
+            if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
+            if (typeof options.gridOffset === 'object') { snap.gridOffset = options.gridOffset; }
             if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
 
             return interact;

@@ -13,7 +13,12 @@
         guidesContext,
         width = 800,
         height = 800,
-        snap = interact.snap(true).snap(),
+        snap = {
+            mode: 'grid',
+            grid: {x: 0, y: 0},
+            gridOffset: {x: 0, y: 0},
+            range: Infinity
+        },
         status,
         prevX = 0,
         prevY = 0,
@@ -23,7 +28,7 @@
         tango = '#ff4400',
         draggingAnchor = false;
 
-    function drawGrid (grid) {
+    function drawGrid (grid, gridOffset) {
         var barLength = 16;
 
         guidesContext.clearRect(0, 0, width, height);
@@ -35,20 +40,20 @@
             guidesContext.fillRect(0, 0, width, height);
         }
 
-        for (var i = -(1 + grid.offset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
-            for (var j = -( 1 + grid.offset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
+        for (var i = -(1 + gridOffset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
+            for (var j = -( 1 + gridOffset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
                 if (snap.range > 0 && snap.range !== Infinity) {
-                    guidesContext.circle(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y, snap.range, blue).fill();
+                    guidesContext.circle(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y, snap.range, blue).fill();
                 }
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y - barLength / 2);
-                guidesContext.lineTo(i * grid.x + grid.offset.x, j * grid.y + grid.offset.y + barLength / 2);
+                guidesContext.moveTo(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y - barLength / 2);
+                guidesContext.lineTo(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y + barLength / 2);
                 guidesContext.stroke();
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + grid.offset.x - barLength / 2, j * grid.y + grid.offset.y);
-                guidesContext.lineTo(i * grid.x + grid.offset.x + barLength / 2, j * grid.y + grid.offset.y);
+                guidesContext.moveTo(i * grid.x + gridOffset.x - barLength / 2, j * grid.y + gridOffset.y);
+                guidesContext.lineTo(i * grid.x + gridOffset.x + barLength / 2, j * grid.y + gridOffset.y);
                 guidesContext.stroke();
             }
         }
@@ -162,8 +167,8 @@
         }
         snap.grid.x = Number(status.gridX.value);
         snap.grid.y = Number(status.gridY.value);
-        snap.grid.offset.x = Number(status.offsetX.value);
-        snap.grid.offset.y = Number(status.offsetY.value);
+        snap.gridOffset.x = Number(status.offsetX.value);
+        snap.gridOffset.y = Number(status.offsetY.value);
 
         snap.range = Number(status.range.value);
 
@@ -211,7 +216,7 @@
         context.clearRect(0, 0, width, height);
         if (snap.enabled) {
             if (snap.mode === 'grid') {
-                drawGrid(snap.grid);
+                drawGrid(snap.grid, snap.gridOffset);
             }
             else if (snap.mode === 'anchor') {
                 drawAnchors(snap.anchors);
@@ -234,6 +239,10 @@
         statusChange(event, true);
     }
 
+    function setSnap () {
+        snap = interact.snap(snap).snap();
+    }
+
     interact.styleCursor(false);
 
     interact(document).bind('DOMContentLoaded', function () {
@@ -242,7 +251,10 @@
         canvas.height = height;
         context = canvas.getContext('2d');
 
-        interact(canvas).draggable(true);
+        interact(canvas)
+            .draggable(true)
+            .bind('mousedown', setSnap)
+            .bind('touchdown', setSnap);
 
         guidesCanvas = document.getElementById('grid');
         guidesCanvas.width = width;
