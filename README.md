@@ -20,11 +20,13 @@ interact.snap({
     mdoe: 'grid',
     grid: {
         x: 100,
-        y: 5,
-        offsetX: 20,
-        offsetY: 10
+        y: 5
     },
-    range: 40
+    gridOffset: {
+        x: 20,
+        y: 10
+    },
+    range: Infinity // can also use -1 which gets changed to Infinity
 });
     
 var // x and y to keep the position that's been dragged to
