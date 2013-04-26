@@ -2072,7 +2072,22 @@ var document = window.document,
 
             return interact;
         }
-        return snap.enabled? snap: false;
+
+        return {
+            enabled   : snap.enabled,
+            mode      : snap.mode,
+            grid      : snap.grid,
+            gridOffset: snap.gridOffset,
+            anchors   : snap.anchors,
+            range     : snap.range,
+            locked    : snap.locked,
+            x         : snap.x,
+            y         : snap.y,
+            realX     : snap.realX,
+            realY     : snap.realY,
+            dx        : snap.dx,
+            dy        : snap.dy
+        };
     };
 
     /**
