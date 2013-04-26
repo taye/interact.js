@@ -15,6 +15,7 @@
 
 <div id="status">
     <div id="controls">
+    <section id="sliders">
         <h3> grid spacing </h3>
         <input id="grid-x" type="range" value="100" min="20" max="500" title="x-axis">
         <input id="grid-y" type="range" value="100" min="20" max="500" title="x-axis">
@@ -25,9 +26,10 @@
         <br>
         <h3> snap range </h3>
         <input id="snap-range" type="range" min="-1" value="40" min="10" max="150" title="snap range">
+    </section>
         <br>
+        <section id="modes">
         <h3> snap mode </h3>
-        <div id="modes">
             <label for="off-mode" class="snap-mode">
                 Off
                 <input id="off-mode" type="radio" name="snap-mode" checked="true"> 
@@ -45,7 +47,7 @@
                 Anchor drag mode
                 <input id="drag-anchors" type="checkbox" >
             </label>
-        </div>
+        </section>
     </div>
 </div>
 </body>

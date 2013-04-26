@@ -89,6 +89,22 @@
         }
     }
 
+    function drawSnap () {
+        context.clearRect(0, 0, width, height);
+        if (!status.offMode.checked) {
+            if (snap.mode === 'grid') {
+                drawGrid(snap.grid, snap.gridOffset);
+            }
+            else if (snap.mode === 'anchor') {
+                drawAnchors(snap.anchors);
+            }
+        }
+        else {
+            context.clearRect(0, 0, width, height);
+            guidesContext.clearRect(0, 0, width, height);
+        }
+    }
+
     function circle (x, y, radius, color) {
         this.fillStyle = color || this.fillStyle;
         this.beginPath();
@@ -98,17 +114,11 @@
     }
     window.CanvasRenderingContext2D.prototype.circle = circle;
 
-    function mouseMove (event) {
-
-        if (snap.locked && !status.anchorDrag.checked) {
-            context.clearRect(0, 0, width, height);
-            dragMove({pageX: snap.x, pageY: snap.y});
-            context.circle(snap.realX, snap.realY, 5, 'white').fill();
-        }
-    }
-
     function dragMove (event) {
         var range;
+
+        snap = interact.snap();
+
         if (snap.mode === 'grid') {
             range = snap.range;
         }
@@ -139,11 +149,9 @@
     }
 
     function anchorDragStart (event) {
-        if (snap.locked) {
-            snap.enabled = false;
+        if (interact.snap().locked) {
+            interact.snap(false);
             draggingAnchor = true;
-
-            anchorDragMove(event);
         }
     }
 
@@ -161,7 +169,7 @@
         draggingAnchor = false;
     }
 
-    function statusChange (event, valid) {
+    function sliderChange (event, valid) {
         if (!valid) {
             return;
         }
@@ -174,9 +182,12 @@
 
         snap.enabled = !status.offMode.checked;
 
+        drawSnap();
+    }
+
+    function modeChange (event) {
         if (status.anchorDrag.checked && !status.anchorMode.checked) {
             status.anchorMode.checked = true;
-            return;
         }
 
         if (status.anchorDrag.checked) {
@@ -206,29 +217,16 @@
                 .checkOnHover(false);
         }
 
-        snap.range = status.anchorDrag.checked?
-                        snap.range: status.gridMode.checked && snap.mode !== 'grid'?
-                            snap.grid.x / 3: status.anchorMode.checked && snap.mode !== 'anchor'?
-                                60: snap.range;
+        if (status.offMode.checked) {
+            snap.enabled = false;
+        }
 
         snap.mode = status.anchorMode.checked || status.anchorDrag.checked? 'anchor': 'grid';
 
-        context.clearRect(0, 0, width, height);
-        if (snap.enabled) {
-            if (snap.mode === 'grid') {
-                drawGrid(snap.grid, snap.gridOffset);
-            }
-            else if (snap.mode === 'anchor') {
-                drawAnchors(snap.anchors);
-            }
-        }
-        else {
-            context.clearRect(0, 0, width, height);
-            guidesContext.clearRect(0, 0, width, height);
-        }
+        drawSnap();
     }
 
-    function statusInput (event) {
+    function sliderInput (event) {
         if (event.target.type === 'range' &&
             (Number(event.target.value) > Number(event.target.max)) ||
             Number(event.target.value) < Number(event.target.min)) {
@@ -236,11 +234,16 @@
             return;
         }
 
-        statusChange(event, true);
+        sliderChange(event, true);
     }
 
     function setSnap () {
-        snap = interact.snap(snap).snap();
+        if (status.offMode.checked) {
+            interact.snap(false);
+        }
+        else {
+            snap = interact.snap(snap).snap();
+        }
     }
 
     interact.styleCursor(false);
@@ -254,7 +257,7 @@
         interact(canvas)
             .draggable(true)
             .bind('mousedown', setSnap)
-            .bind('touchdown', setSnap);
+            .bind('touchstart', setSnap);
 
         guidesCanvas = document.getElementById('grid');
         guidesCanvas.width = width;
@@ -263,26 +266,27 @@
 
         status = {
             container: document.getElementById('status'),
-            modes: document.getElementById('modes'),
-            offMode: document.getElementById('off-mode'),
-            gridMode: document.getElementById('grid-mode'),
-            anchorMode: document.getElementById('anchor-mode'),
-            range: document.getElementById('snap-range'),
-            snapX: document.getElementById('snap-x'),
-            snapY: document.getElementById('snap-y'),
+
+            sliders: document.getElementById('sliders'),
             gridX: document.getElementById('grid-x'),
             gridY: document.getElementById('grid-y'),
             offsetX: document.getElementById('offset-x'),
             offsetY: document.getElementById('offset-y'),
+            range: document.getElementById('snap-range'),
+
+            modes: document.getElementById('modes'),
+            offMode: document.getElementById('off-mode'),
+            gridMode: document.getElementById('grid-mode'),
+            anchorMode: document.getElementById('anchor-mode'),
             anchorDrag: document.getElementById('drag-anchors')
         }
 
-        interact(status.container)
-            .bind('change', statusChange)
-            .bind('input', statusInput);
+        interact(status.sliders)
+            .bind('change', sliderChange)
+            .bind('input', sliderInput);
 
-        interact(canvas)
-                .bind('mousemove', mouseMove);
+        interact(document.getElementById('modes'))
+            .bind('change', modeChange);
 
         snap.anchors = [
             {x: 100, y: 100, range: 200},
@@ -291,7 +295,8 @@
             {x: 250, y: 250}
         ];
 
-        statusChange(null, true);
+        sliderChange(null, true);
+        modeChange();
     });
 
     window.grid = {
