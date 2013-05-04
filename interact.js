@@ -713,21 +713,22 @@ var document = window.document,
             }
         }
 
-        this.x0       = x0;
-        this.y0       = y0;
-        this.clientX0 = clientX0;
-        this.clientY0 = clientY0;
-        this.pageX    = page.x;
-        this.pageY    = page.y;
-        this.clientX  = client.x;
-        this.clientY  = client.y;
-        this.ctrlKey  = event.ctrlKey;
-        this.altKey   = event.altKey;
-        this.shiftKey = event.shiftKey;
-        this.metaKey  = event.metaKey;
-        this.button   = event.button;
-        this.target   = action === 'drop' && dropTarget._element || target._element;
-        this.type     = action + (phase || '');
+        this.x0        = x0;
+        this.y0        = y0;
+        this.clientX0  = clientX0;
+        this.clientY0  = clientY0;
+        this.pageX     = page.x;
+        this.pageY     = page.y;
+        this.clientX   = client.x;
+        this.clientY   = client.y;
+        this.ctrlKey   = event.ctrlKey;
+        this.altKey    = event.altKey;
+        this.shiftKey  = event.shiftKey;
+        this.metaKey   = event.metaKey;
+        this.button    = event.button;
+        this.target    = action === 'drop' && dropTarget._element || target._element;
+        this.timeStamp = new Date().getTime();
+        this.type      = action + (phase || '');
 
         // start/end event dx, dy is difference between start and current points
         if (phase === 'start' || phase === 'end' || action === 'drop') {
