@@ -141,7 +141,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -156,7 +156,7 @@ var debug = interact.debug(),
         pageX: expectedDx,
         pageY: expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -191,9 +191,9 @@ var debug = interact.debug(),
     interact(div0).bind('dragstart', listener);
     interact(div0).bind('dragmove', listener);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
     debug.dragMove.call(div0, moveEvent);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('dragstart', listener);
     interact(div0).unbind('dragmove', listener);
@@ -205,7 +205,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -218,7 +218,7 @@ var debug = interact.debug(),
         pageX: expectedDx,
         pageY: expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         preventDefault: function () {},
         pageX: expectedDx,
         pageY: expectedDy
@@ -249,10 +249,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
-    debug.dragMove.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
+    debug.dragMove.call(div0, pointerDownEvent);
     debug.dragMove.call(div0, moveEvent);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('dragmove', listener);
 });
@@ -263,7 +263,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -286,7 +286,7 @@ var debug = interact.debug(),
         pageX: expectedDx,
         pageY: expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         preventDefault: function () {},
         pageX: expectedDx,
         pageY: expectedDy
@@ -317,11 +317,11 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
     debug.dragMove.call(div0, moveEvent0);
     debug.dragMove.call(div0, moveEvent1);
     debug.dragMove.call(div0, moveEvent2);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('dragend', listener);
 });
@@ -335,7 +335,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -350,7 +350,7 @@ var debug = interact.debug(),
         pageX: expectedX0 + expectedDx,
         pageY: expectedY0 + expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -385,9 +385,9 @@ var debug = interact.debug(),
     interact(div0).bind('resizestart', listener);
     interact(div0).bind('resizemove', listener);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
     debug.resizeMove.call(div0, moveEvent);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('resizestart', listener);
     interact(div0).unbind('resizemove', listener);
@@ -399,7 +399,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -412,7 +412,7 @@ var debug = interact.debug(),
         pageX: expectedDx,
         pageY: expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         preventDefault: function () {},
         pageX: expectedDx,
         pageY: expectedDy
@@ -443,10 +443,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
-    debug.resizeMove.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
+    debug.resizeMove.call(div0, pointerDownEvent);
     debug.resizeMove.call(div0, moveEvent);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('resizemove', listener);
 });
@@ -457,7 +457,7 @@ var debug = interact.debug(),
     expectedY0 = 0,
     expectedDx = 50,
     expectedDy = 100,
-    mouseDownEvent = {
+    pointerDownEvent = {
         target: div0,
         currentTarget: document,
         preventDefault: function () {},
@@ -480,7 +480,7 @@ var debug = interact.debug(),
         pageX: expectedDx,
         pageY: expectedDy
     },
-    mouseUpEvent = {
+    pointerUpEvent = {
         preventDefault: function () {},
         pageX: expectedDx,
         pageY: expectedDy
@@ -511,11 +511,11 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown.call(div0, mouseDownEvent);
+    debug.pointerDown.call(div0, pointerDownEvent);
     debug.resizeMove.call(div0, moveEvent0);
     debug.resizeMove.call(div0, moveEvent1);
     debug.resizeMove.call(div0, moveEvent2);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('resizeend', listener);
 });
@@ -560,7 +560,7 @@ var debug = interact.debug(),
             }
         ]
     },
-    mouseUpEvent = moveEvent;
+    pointerUpEvent = moveEvent;
     
     var listener = function (event) {
         var debug = interact.debug();
@@ -589,9 +589,9 @@ var debug = interact.debug(),
     interact(div0).bind('gesturestart', listener);
     interact(div0).bind('gesturemove', listener);
     
-    debug.mouseDown.call(div0, touchStartEvent);
+    debug.pointerDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('gesturestart', listener);
     interact(div0).unbind('gesturemove', listener);
@@ -661,7 +661,7 @@ var debug = interact.debug(),
             }
         ]
     },
-    mouseUpEvent = moveEvent1;
+    pointerUpEvent = moveEvent1;
 
     if (expectedRotation > Math.PI) {
         expectedRotation -= 2 * Math.PI;
@@ -698,10 +698,10 @@ var debug = interact.debug(),
     
     interact(div0).bind('gesturemove', listener);
     
-    debug.mouseDown.call(div0, touchStartEvent);
+    debug.pointerDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent0);
     debug.gestureMove.call(div0, moveEvent1);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('gesturemove', listener);
 });
@@ -758,7 +758,7 @@ var debug = interact.debug(),
             }
         ]
     },
-    mouseUpEvent = moveEvent1;
+    pointerUpEvent = moveEvent1;
     
     var listener = function (event) {
         var debug = interact.debug();
@@ -785,10 +785,10 @@ var debug = interact.debug(),
     
     expect(8);
     
-    debug.mouseDown.call(div0, touchStartEvent);
+    debug.pointerDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent0);
     debug.gestureMove.call(div0, moveEvent1);
-    debug.mouseUp.call(div0, mouseUpEvent);
+    debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).unbind('gestureend', listener);
 });
