@@ -1155,7 +1155,7 @@ var document = window.document,
      */
     function pointerHover (event) {
         if (!(pointerIsDown || dragging || resizing || gesturing) &&
-            (target = interactables.get(event.target))) {
+            (target = interactables.get(event.currentTarget))) {
             var options = target.options;
 
             if (((actionIsEnabled.drag && options.draggable) ||
