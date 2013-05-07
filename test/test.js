@@ -109,7 +109,7 @@ test('Interactable', function () {
     equal(interactable.draggable(), expectedDrag = false, 'Drag option set to default');
     equal(interactable.resizeable(), expectedResize = false, 'Resize option set to default');
     equal(interactable.gestureable(), expectedGesture = false, 'Gesture option set to default');
-    equal(interactable.autoScroll(), expectedAutoScroll = true, 'AutoScroll option set to default');
+    equal(interactable.autoScroll(), expectedAutoScroll = interact.debug().defaultOptions.autoScroll, 'AutoScroll option set to default');
     equal(interactable.actionChecker(), expectedActionChecker, 'Gesture option set to default');
     
     interact(div1);

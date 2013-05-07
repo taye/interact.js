@@ -56,11 +56,30 @@ var document = window.document,
     dropTarget      = null, // the dropzone a drag target might be dropped into
     prevDropTarget  = null, // the dropzone that was recently dragged away from
 
-    // All things relating to autoScroll
-    autoScroll = {
-        isEnabled: true,
-        margin   : 60,
+    // The default Interatable options which will be IOptions.prototype
+    defaultOptions = {
+        draggable   : false,
+        dropzone    : false,
+        resizeable  : false,
+        squareResize: false,
+        gestureable : false,
+        getAction   : actionCheck,
 
+        styleCursor : true,
+        snap        : snap,
+
+        autoScroll  : {
+            container: window,  // the item that is scrolled
+            margin   : 60,
+            interval : 20,      // pause in ms between each scroll pulse
+            distance : 10,      // the distance in x and y that the page is scrolled
+        },
+        autoScrollEnabled: true
+    },
+
+    // Things related to autoScroll
+    autoScroll = {
+        margin   : 60,      // page margin in which pointer triggers autoScroll
         interval : 20,      // pause in ms between each scroll pulse
         i        : null,    // the handle returned by window.setInterval
         distance : 10,      // the distance in x and y that the page is scrolled
@@ -69,22 +88,51 @@ var document = window.document,
         y: 0,
 
         // scroll the window by the values in scroll.x/y
-        autoScroll: function () {
-            window.scrollBy(autoScroll.x, autoScroll.y);
+        scroll: function () {
+            var container = target.options.autoScroll.container;
+
+            if (container === window) {
+                window.scrollBy(autoScroll.x, autoScroll.y);
+            }
+            else if (container) {
+                container.scrollLeft += autoScroll.x;
+                container.scrollTop  += autoScroll.y;
+            }
         },
 
         edgeMove: function (event) {
-            if (autoScroll.isEnabled && (dragging || resizing)) {
-                var top = event.clientY < autoScroll.margin,
-                    right = event.clientX > (window.innerWidth - autoScroll.margin),
-                    bottom = event.clientY > (window.innerHeight - autoScroll.margin),
-                    left = event.clientX < autoScroll.margin,
-                    options = target.options;
+            if (target && target.options.autoScrollEnabled && (dragging || resizing)) {
+                var top,
+                    right,
+                    bottom,
+                    left,
+                    options = target.options.autoScroll;
+
+                if (options.container === window) {
+                    left   = event.clientX < autoScroll.margin;
+                    top    = event.clientY < autoScroll.margin;
+                    right  = event.clientX > window.innerWidth  - autoScroll.margin;
+                    bottom = event.clientY > window.innerHeight - autoScroll.margin;
+                }
+                else {
+                    calcDropRects([interact(options.container)]);
+                    var rect = interact(options.container).dropRect;
+
+                    left   = event.clientX < rect.left   + autoScroll.margin;
+                    top    = event.clientY < rect.top    + autoScroll.margin;
+                    right  = event.clientX > rect.right  - autoScroll.margin;
+                    bottom = event.clientY > rect.bottom - autoScroll.margin;
+                }
 
                 autoScroll.x = autoScroll.distance * (right ? 1: left? -1: 0);
                 autoScroll.y = autoScroll.distance * (bottom? 1:  top? -1: 0);
 
-                if (!autoScroll.isScrolling && options.autoScroll) {
+                if (!autoScroll.isScrolling) {
+                    // set the autoScroll properties to those of the target
+                    autoScroll.margin   = 'margin'   in options? options.margin  : autoScroll.margin;
+                    autoScroll.distance = 'distance' in options? options.distance: autoScroll.distance;
+                    autoScroll.interval = 'interval' in options? options.interval: autoScroll.interval;
+
                     autoScroll.start();
                 }
             }
@@ -95,7 +143,7 @@ var document = window.document,
         start: function () {
             autoScroll.isScrolling = true;
             window.clearInterval(autoScroll.i);
-            autoScroll.i = window.setInterval(autoScroll.autoScroll, autoScroll.interval);
+            autoScroll.i = window.setInterval(autoScroll.scroll, autoScroll.interval);
         },
 
         stop: function () {
@@ -133,7 +181,7 @@ var document = window.document,
     supportsTouch = 'createTouch' in document,
 
     // Less Precision with touch input
-    margin = supportsTouch ? 20 : 10,
+    margin = supportsTouch? 20: 10,
 
     pointerIsDown   = false,
     pointerWasMoved = false,
@@ -882,10 +930,9 @@ var document = window.document,
             pointerIsDown = true;
             pointerWasMoved = false;
 
-            if (styleCursor) {
+            if (defaultOptions.styleCursor) {
                 document.documentElement.style.cursor =
-                    target._element.style.cursor =
-                    actions[action].cursor;
+                    actions[action].cursor + ' !important';
             }
             resizeAxes = (action === 'resizexy')?
                 'xy':
@@ -1160,11 +1207,11 @@ var document = window.document,
 
             if (((actionIsEnabled.drag && options.draggable) ||
                     (actionIsEnabled.resize && options.resizeable)) &&
-                options.checkOnHover) {
+                options.styleCursor) {
 
                 var action = validateAction(options.getAction(event));
 
-                if (styleCursor) {
+                if (defaultOptions.styleCursor) {
                     if (action) {
                         target._element.style.cursor = actions[action].cursor;
                     }
@@ -1254,7 +1301,6 @@ var document = window.document,
         if (target) {
             if (styleCursor) {
                 document.documentElement.style.cursor = '';
-                target._element.style.cursor = '';
             }
             autoScroll.stop();
             clearTargets();
@@ -1297,28 +1343,20 @@ var document = window.document,
     }
 
     /**
-     * A class for inheritance and easier setting of an Interactable's options
+     * A class for easy inheritance and setting of an Interactable's options
      *
      * @class IOptions
      */
     function IOptions (options) {
-        for (var option in IOptions.prototype) {
-            if (options.hasOwnProperty(option) && typeof options[option] === typeof IOptions.prototype[option]) {
+        for (var option in defaultOptions) {
+            if (options.hasOwnProperty(option)
+                && typeof options[option] === typeof defaultOptions[option]) {
                 this[option] = options[option];
             }
         }
     }
 
-    IOptions.prototype = {
-        draggable   : false,
-        dropzone    : false,
-        resizeable  : false,
-        gestureable : false,
-        squareResize: false,
-        autoScroll  : true,
-        getAction   : actionCheck,
-        checkOnHover: true
-    };
+    IOptions.prototype = defaultOptions;
 
     /**
      * Object type returned by interact(element)
@@ -1542,20 +1580,41 @@ var document = window.document,
         },
 
         /**
-         * Returns or sets whether dragging and resizing near the edges of the
-         * screen will trigger autoScroll
+         * Returns or sets whether or not any actions near the edges of the
+         * window/container trigger autoScroll for this Interactable
          *
          * @function
-         * @param {bool} newValue
-         * @returns {bool | Interactable}
+         * @param {Object | Boolean | null} options either
+         *          an object with margin, distance and interval properties,
+         *          true or false to enable or disable autoScroll,
+         *          null to use default settings
+         * @returns {bool | interact}
          */
         autoScroll: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
-                this.options.autoScroll = newValue;
+            var defaults = defaultOptions.autoScroll;
+
+            if (newValue instanceof Object) {
+                if (newValue !== defaults) {
+                    if (typeof (newValue.margin  ) !== 'number') { newValue.margin    = defaults.margin   ; }
+                    if (typeof (newValue.distance) !== 'number') { newValue.distance  = defaults.distance ; }
+                    if (typeof (newValue.interval) !== 'number') { newValue.interval  = defaults.interval ; }
+
+                    if (!(newValue.container instanceof Element)){ newValue.container = defaults.container; }
+
+                    this.options.autoScrollEnabled = true;
+                    this.options.autoScroll = newValue;
+                }
 
                 return this;
             }
-            return this.options.autoScroll;
+
+            if (typeof newValue === 'boolean') {
+                this.options.autoScrollEnabled = newValue;
+
+                return this;
+            }
+
+            return this.options.autoScrollEnabled? this.options.autoScroll: false;
         },
 
         /**
@@ -1584,13 +1643,13 @@ var document = window.document,
          * @param {function} newValue
          * @returns {Function | Interactable}
          */
-        checkOnHover: function (newValue) {
+        styleCursor: function (newValue) {
             if (newValue !== null && newValue !== undefined) {
-                this.options.checkOnHover = newValue;
+                this.options.styleCursor = newValue;
 
                 return this;
             }
-            return this.options.checkOnHover;
+            return this.options.styleCursor;
         },
 
         /**
@@ -1740,10 +1799,12 @@ var document = window.document,
             }
             this.options = new IOptions(options);
 
-            this.draggable  (this.options.draggable);
-            this.dropzone   (this.options.dropzone);
-            this.resizeable (this.options.resizeable);
-            this.gestureable(this.options.gestureable);
+            this.draggable  ('draggable'   in options? options.draggable  : this.options.draggable  );
+            this.dropzone   ('dropzone'    in options? options.dropzone   : this.options.dropzone   );
+            this.resizeable ('resizeable'  in options? options.resizeable : this.options.resizeable );
+            this.gestureable('gestureable' in options? options.gestureable: this.options.gestureable);
+
+            if ('autoScroll'  in options) { this.autoScroll (options.autoScroll ); }
 
             return this;
         },
@@ -1757,9 +1818,6 @@ var document = window.document,
          */
         unset: function () {
             events.remove(this, 'all');
-            if (styleCursor) {
-                this._element.style.cursor = '';
-            }
 
             this.draggable  (false);
             this.dropzone   (false);
@@ -1937,10 +1995,12 @@ var document = window.document,
             x0                    : x0,
             y0                    : y0,
             Interactable          : Interactable,
+            IOptions              : IOptions,
             interactables         : interactables,
             dropzones             : dropzones,
             pointerIsDown         : pointerIsDown,
             supportsTouch         : supportsTouch,
+            defaultOptions        : defaultOptions,
             defaultActionChecker  : actionCheck,
             dragMove              : dragMove,
             resizeMove            : resizeMove,
@@ -1989,50 +2049,49 @@ var document = window.document,
      * @returns {bool | interact}
      */
     interact.styleCursor = function (newValue) {
-        if (newValue !== null && newValue !== undefined) {
-            var i;
+        if (typeof newValue === 'boolean') {
+            defaultOptions.styleCursor = newValue;
 
-            styleCursor = newValue;
-
-            // If the element cursor styles are no longer being changed by
-            // interact, clear the cursor style
-            if (!styleCursor) {
-                for (i = 0; i < interactables.length; i++) {
-                    if (interactables[i]._element !== document) {
-                        interactables[i]._element.style.cursor = '';
-                    }
-                }
-            }
             return interact;
         }
-        return styleCursor;
+        return defaultOptions.styleCursor;
     };
 
     /**
      * Returns or sets whether or not any actions near the edges of the page
-     * trigger autoScroll
+     * trigger autoScroll by default
      *
      * @function
      * @param {bool | Object} options true or false to simply enable or disable
-              or an object with options margin, distance and frequency
+              or an object with margin, distance and interval properties
      * @returns {bool | interact}
      */
     interact.autoScroll = function (options) {
+        var defaults = defaultOptions.autoScroll;
+            
         if (typeof options === 'object') {
-            autoScroll.isEnabled = true;
+            defaultOptions.autoScrollEnabled = true;
 
-            if (typeof options.margin   === 'number') { autoScroll.margin   = options.margin  ; }
-            if (typeof options.distance === 'number') { autoScroll.distance = options.distance; }
-            if (typeof options.interval === 'number') { autoScroll.interval = options.interval; }
+            if (typeof (options.margin)   === 'number') { defaults.margin    = options.margin   ; }
+            if (typeof (options.distance) === 'number') { defaults.distance  = options.distance ; }
+            if (typeof (options.interval) === 'number') { defaults.interval  = options.interval ; }
+
+            defaults.container = options.container instanceof Element?
+                options.container:
+                defaults.container;
 
             return interact;
         }
-        if (typeof autoScroll === 'boolean') {
-            autoScroll.isEnabled = options;
+
+        if (typeof options === 'boolean') {
+            defaultOptions.autoScrollEnabled = options;
 
             return interact;
         }
-        return autoScroll.isEnabled;
+
+        // return the autoScroll settings if autoScroll is enabled
+        // otherwise, return false
+        return defaultOptions.autoScrollEnabled? defaults: false;
     };
 
     /**
