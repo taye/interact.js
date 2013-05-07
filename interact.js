@@ -2010,14 +2010,12 @@ var document = window.document,
             pointerHover          : pointerHover,
             events                : events,
             log: function () {
-                console.log('target           :  ' + target);
-                console.log('prevX, prevY     :  ' + prevX, prevY);
-                console.log('x0, y0           :  ' + x0, y0);
-                console.log('supportsTouch    :  ' + supportsTouch);
-                console.log('pointerIsDown    :  ' + pointerIsDown);
-                console.log('dragging         :  ' + dragging);
-                console.log('resizing         :  ' + resizing);
-                console.log('gesturing        :  ' + gesturing);
+                console.log('target         :  ' + target);
+                console.log('prevX, prevY   :  ' + prevX, prevY);
+                console.log('x0, y0         :  ' + x0, y0);
+                console.log('supportsTouch  :  ' + supportsTouch);
+                console.log('pointerIsDown  :  ' + pointerIsDown);
+                console.log('currentAction  :  ' + interact.currentAction());
             }
         };
     };
