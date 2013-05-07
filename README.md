@@ -8,7 +8,7 @@ Awesomeness includes:
  - interaction with **SVG** elements
  - being **standalone** (not _yet another_ jQuery plugin)
  - having(a). **fluent** ().interface
- - **not modifying anything** it doesn't own (except to support IE8)
+ - **not modifying anything** it doesn't own (except to support IE8 and to change the cursor unless you don't want it to)
 
  ___
 
