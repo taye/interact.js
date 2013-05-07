@@ -1194,6 +1194,13 @@ var document = window.document,
         }
     }
 
+    function pointerOver (event) {
+        if (pointerIsDown || dragging || resizing || gesturing) { return; }
+
+        target = interactables.get(event.target);
+    }
+
+
     /**
      * @private
      * @event
@@ -1201,17 +1208,12 @@ var document = window.document,
      * button were pressed and change the cursor accordingly
      */
     function pointerHover (event) {
-        if (!(pointerIsDown || dragging || resizing || gesturing) &&
-            (target = interactables.get(event.currentTarget))) {
-            var options = target.options;
+        if (!(pointerIsDown || dragging || resizing || gesturing) && target) {
 
-            if (((actionIsEnabled.drag && options.draggable) ||
-                    (actionIsEnabled.resize && options.resizeable)) &&
-                options.styleCursor) {
+            var action = validateAction(target.options.getAction(event));
 
-                var action = validateAction(options.getAction(event));
-
-                if (defaultOptions.styleCursor) {
+            if (action) {
+                if (styleCursor) {
                     if (action) {
                         target._element.style.cursor = actions[action].cursor;
                     }
@@ -2189,10 +2191,11 @@ var document = window.document,
     };
 
 
-    events.add(docTarget,    upEvent,       docPointerUp);
-    events.add(docTarget,    moveEvent,     pointerMove);
-    events.add(docTarget,    'touchcancel', docPointerUp);
-    events.add(windowTarget, 'blur',        docPointerUp);
+    events.add(docTarget   , moveEvent    , pointerMove );
+    events.add(docTarget   , overEvent    , pointerOver );
+    events.add(docTarget   , upEvent      , docPointerUp);
+    events.add(docTarget   , 'touchcancel', docPointerUp);
+    events.add(windowTarget, 'blur'       , docPointerUp);
 
     // For IE's lack of preventDefault
     events.add(docTarget,    'selectstart', function (e) {
