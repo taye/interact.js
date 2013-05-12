@@ -195,7 +195,7 @@ var document = window.document,
     resizing        = false,
     resizeAxes      = 'xy',
 
-    // What to do depending on action returned by getAction() of node
+    // What to do depending on action returned by getAction() of interactable
     // Dictates what styles should be used and what pointerMove event Listner
     // is to be added after pointerDown
     actions = {
@@ -277,9 +277,12 @@ var document = window.document,
     // prefix matchesSelector
     matchesSelector = 'matchesSelector' in Element.prototype?
             'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
-                'webkitMatchesSelector': 'MozMatchesSelector' in Element.prototype?
-                    'MozMatchesSelector': 'oMatchesSelector' in Element.prototype?
+                'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
+                    'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                         'oMatchesSelector': 'msMatchesSelector',
+
+    // will be polyfill function if browser is IE8
+    IE8MatchesSelector,
 
     // used for adding event listeners to window and document
     windowTarget = {
@@ -473,7 +476,7 @@ var document = window.document,
      * @private
      * @returns{String} action to be performed - drag/resize[axes]/gesture
      */
-    function actionCheck (event) {
+    function actionCheck (event, interactable) {
         var clientRect,
             right,
             bottom,
@@ -482,11 +485,14 @@ var document = window.document,
             scroll = getScrollXY(),
             x = page.x - scroll.x,
             y = page.y - scroll.y,
-            options = target.options;
+            options;
 
-        clientRect = (target._element instanceof SVGElement)?
-            target._element.getBoundingClientRect():
-            target._element.getClientRects()[0];
+        interactable = interactable || target;
+        options = interactable.options;
+
+        clientRect = (interactable._element instanceof SVGElement)?
+            interactable._element.getBoundingClientRect():
+            interactable._element.getClientRects()[0];
 
 
         if (actionIsEnabled.resize && options.resizeable) {
@@ -862,13 +868,15 @@ var document = window.document,
     function validateAction (action, interactable) {
         if (typeof action !== 'string') { return null; }
 
+        interactable = interactable || target;
+
         var actionType = action.indexOf('resize') !== -1? 'resize': action,
             options = (interactable || target).options;
 
-        if (((actionType  === 'resize'   && options.resizeable) ||
-                 (action      === 'drag'     && options.draggable) ||
-                 (action      === 'gesture'  && options.gestureable)) &&
-                actionIsEnabled[actionType]) {
+        if ((  (actionType  === 'resize'   && options.resizeable )
+            || (action      === 'drag'     && options.draggable  )
+            || (action      === 'gesture'  && options.gestureable))
+            && actionIsEnabled[actionType]) {
 
             if (action === 'resize' || action === 'resizeyx') {
                 action = 'resizexy';
@@ -879,6 +887,42 @@ var document = window.document,
         return null;
     }
 
+    function selectorDown (event, forceAction) {
+        var action;
+
+        if (matches.length) {
+            action = validateSelector(event, matches);
+        }
+        else {
+            var selector,
+                element = event.target,
+                elements,
+                action;
+
+            while (element !== document.documentElement && !action) {
+                matches = [];
+
+                for (selector in selectors) {
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector?
+                        document.querySelectorAll(selector): undefined;
+
+                    if (element[matchesSelector](selector, elements)) {
+                        selectors[selector]._element = element;
+                        matches.push(selectors[selector]);
+                    }
+                }
+
+                action = validateSelector(event, matches);
+                element = element.parentNode;
+            }
+        }
+
+        if (action) {
+            pointerIsDown = true;
+            return pointerDown(event, action);
+        }
+    }
+
     /**
      * @private
      * @event
@@ -886,58 +930,49 @@ var document = window.document,
      * style and event Liseners
      */
     function pointerDown (event, forceAction) {
-        var fromSelector = target && target.selector,
-            getFrom = fromSelector? target.selector: this;
-
-        // document and window can't be interacted with but their Interactables
-        // can be used for binding events
-        if (!fromSelector && !((events.useAttachEvent? event.currentTarget: this) instanceof window.Element)) {
-            return;
-        }
-
-        var action = '',
-            average,
-            page,
-            client;
-
-        if (event.touches) {
-            average = touchAverage(event);
-            page = {
-                x: average.pageX,
-                y: average.pageY
-            };
-            client = {
-                x: average.clientX,
-                y: average.clientY
-            };
-        }
-        else {
-            page = getPageXY(event);
-            client = getClientXY(event);
-        }
-
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
-        // (not always the case with simulated touches)
         // Otherwise, set the target if the pointer is not down
-        if ((event.touches && event.touches.length < 2 && !target) ||
-                !(pointerIsDown)) {
-            target = interactables.get(events.useAttachEvent? event.currentTarget: getFrom);
+        if ((event.touches && event.touches.length < 2 && !target)
+            || !pointerIsDown) {
+
+            var getFrom = events.useAttachEvent? event.currentTarget: this;
+
+            target = interactables.get(getFrom);
         }
 
+        var options = target.options;
+
         if (target && !(dragging || resizing || gesturing)) {
-            var options = target.options;
+            var action = validateAction(forceAction || options.getAction(event)),
+                average,
+                page,
+                client;
+
+            if (event.touches) {
+                average = touchAverage(event);
+                page = {
+                    x: average.pageX,
+                    y: average.pageY
+                };
+                client = {
+                    x: average.clientX,
+                    y: average.clientY
+                };
+            }
+            else {
+                page = getPageXY(event);
+                client = getClientXY(event);
+            }
+
+            if (!action) {
+                return event;
+            }
 
             x0 = prevX = page.x;
             y0 = prevY = page.y;
             clientX0 = prevClientX = client.x;
             clientY0 = prevClientY = client.y;
-
-            action = validateAction(forceAction || options.getAction(event));
-
-            if (!action) {
-                return event;
-            }
 
             // Register that the pointer is down after succesfully validating
             // action. This way, a new target can be gotten in the next
@@ -945,19 +980,19 @@ var document = window.document,
             pointerIsDown = true;
             pointerWasMoved = false;
 
-            if (defaultOptions.styleCursor) {
+            if (options.styleCursor) {
                 document.documentElement.style.cursor =
                     actions[action].cursor + ' !important';
             }
-            resizeAxes = (action === 'resizexy')?
-                'xy':
-                (action === 'resizex')?
-                'x':
-                (action === 'resizey')?
-                'y':
-                '';
+            resizeAxes = action === 'resizexy'?
+                    'xy':
+                    action === 'resizex'?
+                        'x':
+                        action === 'resizey'?
+                            'y':
+                            '';
 
-            prepared = (action in actions)? action: null;
+            prepared = action;
 
             event.preventDefault();
         }
@@ -1209,18 +1244,30 @@ var document = window.document,
         }
     }
 
- 
+    function validateSelector (event, matches) {
+        for (var i = 0, len = matches.length; i < len; i++) {
+            var match = matches[i],
+                action = validateAction(match.options.getAction(event, match), match);
+
+            if (action) {
+                target = match;
+
+                return action;
+            }
+        }
+    }
  
     function pointerOver (event) {
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
-        matches.splice(0);
+        matches = [];
 
         for (var selector in selectors) {
             if (selectors.hasOwnProperty(selector)
                 && selectors[selector]
                 && event.target[matchesSelector](selector)) {
 
+                selectors[selector]._element = event.target;
                 matches.push(selectors[selector]);
             }
         }
@@ -1228,24 +1275,22 @@ var document = window.document,
         target = interactables.get(event.target);
 
         if (matches.length && !target) {
-            // just use the first matched selector
-            // I should really go through each one and use the first Interactable that gives a valid action
-            target = matches[0];
-            target._element = event.target;
-
-            pointerHover(event);
-            events.addToElement(event.target, moveEvent, pointerHover);
             events.addToElement(this, downEvent, pointerDown);
+            pointerHover(event, matches);
+            events.addToElement(event.target, moveEvent, pointerHover);
         }
     }
 
     function pointerOut (event) {
+        // Remove temporary event listeners for selector Interactables
+
         if (!interactables.get(event.target)) {
             events.removeFromElement(event.target, pointerHover);
-            events.addToElement(this, downEvent, pointerDown);
+            events.removeFromElement(this, downEvent, pointerDown);
         }
-        if (target && target.selector && !(dragging || resizing || gesturing)) {
-            target = null;
+
+        if (target && target.options.styleCursor && !(dragging || resizing || gesturing)) {
+            document.documentElement.style.cursor = '';
         }
     }
 
@@ -1255,24 +1300,29 @@ var document = window.document,
      * Check what action would be performed on pointerMove target if a mouse
      * button were pressed and change the cursor accordingly
      */
-    function pointerHover (event) {
-        if (!(pointerIsDown || dragging || resizing || gesturing) && target) {
+    function pointerHover (event, matches) {
+        if (!(pointerIsDown || dragging || resizing || gesturing)) {
 
-            var action = validateAction(target.options.getAction(event));
+            var action;
 
-            if (action) {
-                if (styleCursor) {
-                    if (action) {
-                        target._element.style.cursor = actions[action].cursor;
-                    }
-                    else {
-                        target._element.style.cursor = '';
-                    }
+            if (matches) {
+                action = validateSelector(event, matches);
+            }
+            else if (target) {
+                action = validateAction(target.options.getAction(event));
+            }
+
+            if (styleCursor) {
+                if (action) {
+                    document.documentElement.style.cursor = actions[action].cursor;
+                }
+                else {
+                    document.documentElement.style.cursor = '';
                 }
             }
-            else if (dragging || resizing || gesturing) {
-                event.preventDefault();
-            }
+        }
+        else {
+            event.preventDefault();
         }
     }
 
@@ -1344,6 +1394,10 @@ var document = window.document,
             target.fire(click);
         }
 
+        if (dragging || resizing || gesturing) {
+            matches = [];
+        }
+
         pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
 
         pointerWasMoved = true;
@@ -1363,29 +1417,36 @@ var document = window.document,
         return event;
     }
 
-    interactables.indexOfElement = dropzones.indexOfElement = function (element) {
-        var i;
+    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element) {
+        for (var i = 0; i < this.length; i++) {
+            var interactable = this[i];
 
-        for (i = 0; i < this.length; i++) {
-            if ((this[i].selector && this[i].selector === element) || this[i]._element === element) {
+            if (interactable.selector === element
+                || (!interactable.selector && interactable._element === element)) {
                 return i;
             }
         }
         return -1;
     };
 
-    interactables.get = dropzones.get = function (element) {
+    interactables.get = function interactableGet (element) {
         if (typeof element === 'string') {
             return selectors[element];
         }
 
-        var i = this.indexOfElement(element) ;
+        return this[this.indexOfElement(element)];
+    };
 
-        return interactables[i];
+    dropzones.get = function dropzoneGet (element) {
+        return this[this.indexOfElement(element)];
     };
 
     function clearTargets () {
-        target = dropTarget = prevDropTarget = null;
+        if (!target.selector) {
+            target = null;
+        }
+
+        dropTarget = prevDropTarget = null;
     }
 
     function interact (element) {
@@ -1426,8 +1487,10 @@ var document = window.document,
             this.selector = element;
         }
         else {
-            events.add(this, moveEvent, pointerHover);
-            events.add(this, downEvent, pointerDown);
+            if(element instanceof Element) {
+                events.add(this, moveEvent, pointerHover);
+                events.add(this, downEvent, pointerDown);
+            }
 
             elements.push(this);
         }
@@ -1872,7 +1935,7 @@ var document = window.document,
 
         /**
          * Remove this interactable from the list of interactables
-         * and remove it's drag, drop, resize and gesture capabilities
+         *remove it's drag, drop, resize and gesture capabilities and remove it's drag, drop, resize and gesture capabilities
          *
          * @function
          * @returns {} {@link interact}
@@ -1880,7 +1943,7 @@ var document = window.document,
         unset: function () {
             events.remove(this, 'all');
 
-            if (typeof this.selector) {
+            if (typeof this.selector === 'string') {
                 selectors[this.selector] = undefined;
             }
             else {
@@ -2263,6 +2326,7 @@ var document = window.document,
 
     events.add(docTarget   , overEvent    , pointerOver );
     events.add(docTarget   , outEvent     , pointerOut  );
+    events.add(docTarget   , downEvent    , selectorDown);
     events.add(docTarget   , moveEvent    , pointerMove );
     events.add(docTarget   , upEvent      , docPointerUp);
     events.add(docTarget   , 'touchcancel', docPointerUp);
@@ -2277,9 +2341,10 @@ var document = window.document,
 
     // For IE8's lack of an Element#matchesSelector
     if (!matchesSelector in Element.prototype || typeof (Element.prototype[matchesSelector]) !== 'function') {
-        Element.prototype[matchesSelector] = function (selector) {
+        Element.prototype[matchesSelector] = IE8MatchesSelector = function (selector, elems) {
             // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
-            var elems = this.parentNode.querySelectorAll(selector),
+            // modified for better performance
+            elems = elems || this.parentNode.querySelectorAll(selector),
             count = elems.length;
 
             for (var i = 0; i < count; i++) {
