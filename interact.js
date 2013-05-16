@@ -511,7 +511,7 @@ var document = window.document,
                 'resize' + resizeAxes:
                 actionIsEnabled.drag && options.draggable?
                     'drag':
-                    null;
+                    '';
         }
 
         return action;
@@ -1260,7 +1260,7 @@ var document = window.document,
     function pointerOver (event) {
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
-        matches = [];
+        var curMatches = [];
 
         for (var selector in selectors) {
             if (selectors.hasOwnProperty(selector)
@@ -1268,16 +1268,29 @@ var document = window.document,
                 && event.target[matchesSelector](selector)) {
 
                 selectors[selector]._element = event.target;
-                matches.push(selectors[selector]);
+                curMatches.push(selectors[selector]);
             }
         }
 
-        target = interactables.get(event.target);
+        var elementInteractable = interactables.get(event.target),
+            action = elementInteractable && validateAction(elementInteractable.getAction(event), elementInteractable);
 
-        if (matches.length && !target) {
-            events.addToElement(this, downEvent, pointerDown);
-            pointerHover(event, matches);
-            events.addToElement(event.target, moveEvent, pointerHover);
+        if (!elementInteractable) {
+            if (curMatches.length) {
+                matches = curMatches;
+
+                pointerHover(event, matches);
+                events.addToElement(event.target, moveEvent, pointerHover);
+            }
+            else if (target) {
+                var prevTargetChildren = target._element.querySelectorAll('*');
+                
+                prevTargetChildren.indexOf = Array.prototype.indexOf;
+                if (prevTargetChildren.indexOf(event.target) !== -1) {
+                    pointerHover(event, matches);
+                    events.addToElement(target._element, moveEvent, pointerHover);
+                }
+             }
         }
     }
 
