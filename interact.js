@@ -1244,7 +1244,10 @@ var document      = window.document,
         }
 
         var elementInteractable = interactables.get(event.target),
-            action = elementInteractable && validateAction(elementInteractable.getAction(event), elementInteractable);
+            action = elementInteractable
+                     && validateAction(
+                         elementInteractable.options.getAction(event, elementInteractable),
+                         elementInteractable);
 
         if (!elementInteractable) {
             if (validateSelector(event, curMatches)) {
