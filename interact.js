@@ -19,11 +19,11 @@
 window.interact = (function () {
    'use strict';
 
-var document = window.document,
-    console = window.console,
-    SVGElement = window.SVGElement || blank,
+var document      = window.document,
+    console       = window.console,
+    SVGElement    = window.SVGElement    || blank,
     SVGSVGElement = window.SVGSVGElement || blank,
-    HTMLElement = window.HTMLElement || window.Element,
+    HTMLElement   = window.HTMLElement   || window.Element,
 
     // Previous interact move event pointer position
     prevX       = 0,
