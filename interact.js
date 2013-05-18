@@ -1260,7 +1260,8 @@ var document = window.document,
     function pointerOver (event) {
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
-        var curMatches = [];
+        var curMatches = [],
+            prevTargetElement = target && target._element;
 
         for (var selector in selectors) {
             if (selectors.hasOwnProperty(selector)
@@ -1276,17 +1277,22 @@ var document = window.document,
             action = elementInteractable && validateAction(elementInteractable.getAction(event), elementInteractable);
 
         if (!elementInteractable) {
-            if (curMatches.length) {
+            if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
                 pointerHover(event, matches);
                 events.addToElement(event.target, moveEvent, pointerHover);
             }
             else if (target) {
-                var prevTargetChildren = target._element.querySelectorAll('*');
+                // reset the elemens of the matches to the old target
+                for (var i = 0; i < matches.length; i++) {
+                    matches[i]._element = prevTargetElement;
+                }
+
+                var prevTargetChildren = prevTargetElement.querySelectorAll('*');
                 
-                prevTargetChildren.indexOf = Array.prototype.indexOf;
-                if (prevTargetChildren.indexOf(event.target) !== -1) {
+                if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
+
                     pointerHover(event, matches);
                     events.addToElement(target._element, moveEvent, pointerHover);
                 }
