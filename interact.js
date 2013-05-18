@@ -19,11 +19,11 @@
 window.interact = (function () {
    'use strict';
 
-var document = window.document,
-    console = window.console,
-    SVGElement = window.SVGElement || blank,
+var document      = window.document,
+    console       = window.console,
+    SVGElement    = window.SVGElement    || blank,
     SVGSVGElement = window.SVGSVGElement || blank,
-    HTMLElement = window.HTMLElement || window.Element,
+    HTMLElement   = window.HTMLElement   || window.Element,
 
     // Previous interact move event pointer position
     prevX       = 0,
@@ -231,16 +231,6 @@ var document = window.document,
     prepared    = null,
     styleCursor = true,
 
-    // User interaction event types. will be set depending on touch input is
-    // supported
-    downEvent,
-    upEvent,
-    moveEvent,
-    overEvent,
-    outEvent,
-    enterEvent,
-    leaveEvent,
-
     // because Webkit and Opera still use 'mousewheel' event type
     wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
 
@@ -372,7 +362,7 @@ var document = window.document,
                             event.target = event.srcElement;
                             event.currentTarget = element;
 
-                            if (event.type.match(/mouse|click/)) {
+                            if (/mouse|click/.test(event.type)) {
                                 event.pageX = event.clientX + document.documentElement.scrollLeft;
                                 event.pageY = event.clientY + document.documentElement.scrollTop;
                             }
@@ -451,26 +441,6 @@ var document = window.document,
             useAttachEvent: useAttachEvent
         };
     }());
-
-    // Set event types to be used depending on input available
-    if (supportsTouch) {
-        downEvent   = 'touchstart',
-        upEvent     = 'touchend',
-        moveEvent   = 'touchmove',
-        overEvent   = 'touchover',
-        outEvent    = 'touchout';
-        enterEvent  = 'touchover',
-        leaveEvent  = 'touchout';
-    }
-    else {
-        downEvent   = 'mousedown',
-        upEvent     = 'mouseup',
-        moveEvent   = 'mousemove',
-        overEvent   = 'mouseover',
-        outEvent    = 'mouseout';
-        enterEvent  = 'mouseenter',
-        leaveEvent  = 'mouseleave';
-    }
 
     /**
      * @private
@@ -1281,7 +1251,7 @@ var document = window.document,
                 matches = curMatches;
 
                 pointerHover(event, matches);
-                events.addToElement(event.target, moveEvent, pointerHover);
+                events.addToElement(event.target, 'mousemove', pointerHover);
             }
             else if (target) {
                 // reset the elemens of the matches to the old target
@@ -1294,7 +1264,7 @@ var document = window.document,
                 if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
 
                     pointerHover(event, matches);
-                    events.addToElement(target._element, moveEvent, pointerHover);
+                    events.addToElement(target._element, 'mousemove', pointerHover);
                 }
              }
         }
@@ -1305,7 +1275,8 @@ var document = window.document,
 
         if (!interactables.get(event.target)) {
             events.removeFromElement(event.target, pointerHover);
-            events.removeFromElement(this, downEvent, pointerDown);
+            events.removeFromElement(this, 'mousedown', pointerDown);
+            events.removeFromElement(this, 'touchend', pointerDown);
         }
 
         if (target && target.options.styleCursor && !(dragging || resizing || gesturing)) {
@@ -1401,7 +1372,7 @@ var document = window.document,
             endEvent.ds = endEvent.scale;
             target.fire(endEvent);
         }
-        else if (event.type === upEvent && target && pointerIsDown && !pointerWasMoved) {
+        else if ((event.type === 'mouseup' || event.type === 'touchend') && target && pointerIsDown && !pointerWasMoved) {
             var click = {};
 
             for (var prop in event) {
@@ -1507,8 +1478,10 @@ var document = window.document,
         }
         else {
             if(element instanceof Element) {
-                events.add(this, moveEvent, pointerHover);
-                events.add(this, downEvent, pointerDown);
+                events.add(this, 'mousemove' , pointerHover);
+                events.add(this, 'mousedown' , pointerDown );
+                events.add(this, 'touchmove' , pointerHover);
+                events.add(this, 'touchstart', pointerDown );
             }
 
             elements.push(this);
@@ -2343,13 +2316,16 @@ var document = window.document,
     };
 
 
-    events.add(docTarget   , overEvent    , pointerOver );
-    events.add(docTarget   , outEvent     , pointerOut  );
-    events.add(docTarget   , downEvent    , selectorDown);
-    events.add(docTarget   , moveEvent    , pointerMove );
-    events.add(docTarget   , upEvent      , docPointerUp);
-    events.add(docTarget   , 'touchcancel', docPointerUp);
-    events.add(windowTarget, 'blur'       , docPointerUp);
+    events.add(docTarget   , 'mousedown'    , selectorDown);
+    events.add(docTarget   , 'touchstart'   , selectorDown);
+    events.add(docTarget   , 'mousemove'    , pointerMove );
+    events.add(docTarget   , 'touchmove'    , pointerMove );
+    events.add(docTarget   , 'mouseover'    , pointerOver );
+    events.add(docTarget   , 'mouseout'     , pointerOut  );
+    events.add(docTarget   , 'mouseup'      , docPointerUp);
+    events.add(docTarget   , 'touchend'     , docPointerUp);
+    events.add(docTarget   , 'touchcancel'  , docPointerUp);
+    events.add(windowTarget, 'blur'         , docPointerUp);
 
     // For IE's lack of Event#preventDefault
     events.add(docTarget,    'selectstart', function (e) {
