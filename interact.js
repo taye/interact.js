@@ -860,7 +860,7 @@ var document      = window.document,
     function selectorDown (event, forceAction) {
         var action;
 
-        if (matches.length) {
+        if (matches.length && event.type === 'mousedown') {
             action = validateSelector(event, matches);
         }
         else {
@@ -1254,19 +1254,23 @@ var document      = window.document,
                 events.addToElement(event.target, 'mousemove', pointerHover);
             }
             else if (target) {
-                // reset the elemens of the matches to the old target
-                for (var i = 0; i < matches.length; i++) {
-                    matches[i]._element = prevTargetElement;
-                }
-
                 var prevTargetChildren = prevTargetElement.querySelectorAll('*');
                 
                 if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
 
+                    // reset the elements of the matches to the old target
+                    for (var i = 0; i < matches.length; i++) {
+                        matches[i]._element = prevTargetElement;
+                    }
+
                     pointerHover(event, matches);
                     events.addToElement(target._element, 'mousemove', pointerHover);
                 }
-             }
+                else {
+                    target = null;
+                    matches = [];
+                }
+            }
         }
     }
 
