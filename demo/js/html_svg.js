@@ -34,7 +34,7 @@
             ellipse.resizeHeight = 80;
 
             group.setAttribute('transform', ['translate(', ellipse.dragX, ellipse.dragY, ')'].join(' '));
-            group.setAttribute('class', 'interact-demo-node');
+            group.setAttribute('class', 'demo-node');
 
             ellipse.setAttribute('cx', 0);
             ellipse.setAttribute('cy', 0);
@@ -51,11 +51,13 @@
             this.text = text;
             this.title = title;
 
+            /*
             interact(this.ellipse).set({
                 draggable: true,
                 dropzone: true,
                 resizeable: true
             });
+           */
     }
 
     function DemoNode (id) {
@@ -71,12 +73,12 @@
         this.element.style.left = Math.random()*((window.innerWidth || 800) - 200) + 'px';
         this.element.style.top = Math.random()*((window.innerHeight || 800) - 200) + 'px';
 
-        interact(this.element).set({
+        /*interact(this.element).set({
             draggable: true,
             dropzone: true,
             resizeable: true,
             gestureable: true
-        });
+        });*/
         window[id] = this.element;
     }
 
@@ -221,6 +223,15 @@
         for (i = 0; i < 4; i++) {
             new DemoNode('node' + i);
         }
+
+        interact('div.demo-node')
+            .draggable(true)
+            .resizeable(true)
+            .gestureable(true);
+
+        interact('.demo-node ellipse')
+            .draggable(true)
+            .resizeable(true);
     }
 
     interact(window).bind('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);

@@ -1,9 +1,9 @@
-.demo-node:before {
+div.demo-node:before {
 	content         : attr(id);
 	border-bottom   : 2px solid red;
 }
 
-.demo-node {
+div.demo-node {
     position        : absolute;
 	border-radius   : 10px;
 	border          : 5px solid #333333;
