@@ -63,7 +63,6 @@ var document      = window.document,
         resizeable  : false,
         squareResize: false,
         gestureable : false,
-        getAction   : actionCheck,
 
         styleCursor : true,
         snap        : snap,
@@ -426,48 +425,6 @@ var document      = window.document,
             useAttachEvent: useAttachEvent
         };
     }());
-
-    /**
-     * @private
-     * @returns{String} action to be performed - drag/resize[axes]/gesture
-     */
-    function actionCheck (event) {
-        var clientRect,
-            right,
-            bottom,
-            action,
-            page = getPageXY(event),
-            scroll = getScrollXY(),
-            x = page.x - scroll.x,
-            y = page.y - scroll.y,
-            options = target.options;
-
-        clientRect = (target._element instanceof SVGElement)?
-            target._element.getBoundingClientRect():
-            target._element.getClientRects()[0];
-
-
-        if (actionIsEnabled.resize && options.resizeable) {
-            right  = x > (clientRect.right  - margin);
-            bottom = y > (clientRect.bottom - margin);
-        }
-
-        if (actionIsEnabled.gesture &&
-                event.touches && event.touches.length >= 2 &&
-                !(dragging || resizing)) {
-            action = 'gesture';
-        }
-        else {
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-            action = (resizeAxes)?
-                'resize' + resizeAxes:
-                actionIsEnabled.drag && options.draggable?
-                    'drag':
-                    null;
-        }
-
-        return action;
-    }
 
     function setPrevXY (event) {
         prevX = event.pageX;
@@ -866,14 +823,12 @@ var document      = window.document,
         }
 
         if (target && !(dragging || resizing || gesturing)) {
-            var options = target.options;
-
             x0 = prevX = page.x;
             y0 = prevY = page.y;
             clientX0 = prevClientX = client.x;
             clientY0 = prevClientY = client.y;
 
-            action = validateAction(forceAction || options.getAction(event));
+            action = validateAction(forceAction || target.getAction(event));
 
             if (!action) {
                 return event;
@@ -1165,7 +1120,7 @@ var document      = window.document,
     function pointerHover (event) {
         if (!(pointerIsDown || dragging || resizing || gesturing) && target) {
 
-            var action = validateAction(target.options.getAction(event));
+            var action = validateAction(target.getAction(event));
 
             if (action) {
                 if (styleCursor) {
@@ -1580,6 +1535,48 @@ var document      = window.document,
         },
 
         /**
+         * @private
+         * @returns{String} action to be performed - drag/resize[axes]/gesture
+         */
+        getAction: function actionCheck (event) {
+            var clientRect,
+                right,
+                bottom,
+                action,
+                page = getPageXY(event),
+                scroll = getScrollXY(),
+                x = page.x - scroll.x,
+                y = page.y - scroll.y,
+                options = target.options;
+
+            clientRect = (target._element instanceof SVGElement)?
+                this._element.getBoundingClientRect():
+                this._element.getClientRects()[0];
+
+
+            if (actionIsEnabled.resize && options.resizeable) {
+                right  = x > (clientRect.right  - margin);
+                bottom = y > (clientRect.bottom - margin);
+            }
+
+            if (actionIsEnabled.gesture &&
+                    event.touches && event.touches.length >= 2 &&
+                    !(dragging || resizing)) {
+                action = 'gesture';
+            }
+            else {
+                resizeAxes = (right?'x': '') + (bottom?'y': '');
+                action = (resizeAxes)?
+                    'resize' + resizeAxes:
+                    actionIsEnabled.drag && options.draggable?
+                        'drag':
+                        null;
+            }
+
+            return action;
+        },
+
+        /**
          * Returns or sets the function used to check action to be performed on
          * pointerDown
          *
@@ -1589,11 +1586,11 @@ var document      = window.document,
          */
         actionChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.options.getAction = newValue;
+                this.getAction = newValue;
 
                 return this;
             }
-            return this.options.getAction;
+            return this.getAction;
         },
 
         /**
@@ -1630,7 +1627,7 @@ var document      = window.document,
          */
         rectChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.options.getRect = newValue;
+                this.getRect = newValue;
 
                 return this;
             }
