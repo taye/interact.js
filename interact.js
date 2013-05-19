@@ -610,22 +610,7 @@ var document      = window.document,
 
     function calcRects (interactables) {
         for (var i = 0, len = interactables.length; i < len; i++) {
-            var interactable = interactables[i],
-                scroll = isOperaMobile?
-                    {x: 0, y: 0}:
-                    getScrollXY(),
-                clientRect = (interactable._element instanceof SVGElement)?
-                    interactable._element.getBoundingClientRect():
-                    interactable._element.getClientRects()[0];
-
-            interactable.rect = {
-                left  : clientRect.left   + scroll.x,
-                right : clientRect.right  + scroll.x,
-                top   : clientRect.top    + scroll.y,
-                bottom: clientRect.bottom + scroll.y,
-                width : clientRect.width,
-                height: clientRect.height
-            };
+            interactables[i].rect = interactables[i].getRect();
         }
     }
 
@@ -1609,6 +1594,47 @@ var document      = window.document,
                 return this;
             }
             return this.options.getAction;
+        },
+
+        /**
+         * Return an object with the left, right, top, bottom, width and height
+         * of the interactable's element
+         *
+         * @function
+         * @param {function} newValue
+         * @returns {Function | Interactable}
+         */
+        getRect: function rectCheck () {
+            var scroll = isOperaMobile? { x: 0, y: 0 }: getScrollXY(),
+                clientRect = (this._element instanceof SVGElement)?
+                    this._element.getBoundingClientRect():
+                    this._element.getClientRects()[0];
+
+            return {
+                left  : clientRect.left   + scroll.x,
+                right : clientRect.right  + scroll.x,
+                top   : clientRect.top    + scroll.y,
+                bottom: clientRect.bottom + scroll.y,
+                width : clientRect.width || clientRect.right - clientRect.left,
+                height: clientRect.heigh || clientRect.top - clientRect.top
+            };
+        },
+
+        /**
+         * Returns or sets the function used to calculate the interactable's
+         * element rectangle
+         *
+         * @function
+         * @param {function} newValue
+         * @returns {Function | Interactable}
+         */
+        rectChecker: function (newValue) {
+            if (typeof newValue === 'function') {
+                this.options.getRect = newValue;
+
+                return this;
+            }
+            return this.getRect;
         },
 
         /**
