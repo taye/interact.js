@@ -571,12 +571,12 @@ var document      = window.document,
         }
     }
 
-    // Test for the dropzone element that's "above" all other qualifiers
-    function resolveDrops (drops) {
-        if (drops.length) {
+    // Test for the element that's "above" all other qualifiers
+    function resolveDrops (elements) {
+        if (elements.length) {
 
             var dropzone,
-                deepestZone = drops[0],
+                deepestZone = elements[0],
                 parent,
                 deepestZoneParents = [],
                 dropzoneParents = [],
@@ -584,31 +584,31 @@ var document      = window.document,
                 i,
                 n;
 
-            for (i = 1; i < drops.length; i++) {
-                dropzone = drops[i];
+            for (i = 1; i < elements.length; i++) {
+                dropzone = elements[i];
 
                 if (!deepestZoneParents.length) {
-                    parent = deepestZone._element;
+                    parent = deepestZone;
                     while (parent.parentNode !== document) {
                         deepestZoneParents.unshift(parent);
                         parent = parent.parentNode;
                     }
                 }
 
-                // if this dropzone is an svg element and the current deepest is
+                // if this element is an svg element and the current deepest is
                 // an HTMLElement
-                if (deepestZone._element instanceof HTMLElement &&
-                        dropzone._element instanceof SVGElement &&
-                        !(dropzone._element instanceof SVGSVGElement)) {
+                if (deepestZone instanceof HTMLElement &&
+                        dropzone instanceof SVGElement &&
+                        !(dropzone instanceof SVGSVGElement)) {
 
-                    if (dropzone._element.ownerSVGElement.parentNode ===
-                            deepestZone._element.parentNode) {
+                    if (dropzone ===
+                            deepestZone.parentNode) {
                         continue;
                     }
-                    parent = dropzone._element.ownerSVGElement;
+                    parent = dropzone.ownerSVGElement;
                 }
                 else {
-                    parent = dropzone._element;
+                    parent = dropzone;
                 }
                 dropzoneParents = [];
                 while (parent.parentNode !== document) {
@@ -642,7 +642,10 @@ var document      = window.document,
                     child = child.previousSibling;
                 }
             }
-            return deepestZone;
+            return {
+                element: deepestZone,
+                index: elements.indexOf(deepestZone)
+            };
         }
     }
 
@@ -999,17 +1002,21 @@ var document      = window.document,
 
             if (dropzones.length) {
                 var i,
-                    drops = [];
+                    drops = [],
+                    elements = [],
+                    drop;
 
                 // collect all dropzones that qualify for a drop
                 for (i = 0; i < dropzones.length; i++) {
                     if (dropzones[i].dropCheck(event)) {
                         drops.push(dropzones[i]);
+                        elements.push(dropzones[i]._element);
                     }
                 }
 
                 // get the most apprpriate dropzone based on DOM depth and order
-                dropTarget = resolveDrops(drops);
+                drop = resolveDrops(elements);
+                dropTarget = drop? dropzones[drop.index]: null;
 
                 // if the current dropTarget is not the same as the previous one
                 if (dropTarget !== prevDropTarget) {
@@ -1148,21 +1155,25 @@ var document      = window.document,
 
         if (dragging) {
             endEvent = new InteractEvent(event, 'drag', 'end');
-            var dropEvent;
+            var dropEvent,
+                drop;
 
             if (dropzones.length) {
                 var i,
-                    drops = [];
+                    drops = [],
+                    elements = [];
 
                 // collect all dropzones that qualify for a drop
                 for (i = 0; i < dropzones.length; i++) {
                     if (dropzones[i].dropCheck(event)) {
                         drops.push(dropzones[i]);
+                        elements.push(dropzones[i]._element);
                     }
                 }
 
                 // get the most apprpriate dropzone based on DOM depth and order
-                if ((dropTarget = resolveDrops(drops))) {
+                if ((drop = resolveDrops(elements))) {
+                    dropTarget = drops[drop.index];
                     dropEvent = new InteractEvent(event, 'drop');
 
                     endEvent.dropzone = dropTarget._element;
