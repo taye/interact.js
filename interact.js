@@ -66,7 +66,6 @@ var document      = window.document,
         resizeable  : false,
         squareResize: false,
         gestureable : false,
-        getAction   : actionCheck,
 
         styleCursor : true,
         snap        : snap,
@@ -118,8 +117,8 @@ var document      = window.document,
                     bottom = event.clientY > window.innerHeight - autoScroll.margin;
                 }
                 else {
-                    calcDropRects([interact(options.container)]);
-                    var rect = interact(options.container).dropRect;
+                    calcRects([interact(options.container)]);
+                    var rect = interact(options.container).rect;
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -442,51 +441,6 @@ var document      = window.document,
         };
     }());
 
-    /**
-     * @private
-     * @returns{String} action to be performed - drag/resize[axes]/gesture
-     */
-    function actionCheck (event, interactable) {
-        var clientRect,
-            right,
-            bottom,
-            action,
-            page = getPageXY(event),
-            scroll = getScrollXY(),
-            x = page.x - scroll.x,
-            y = page.y - scroll.y,
-            options;
-
-        interactable = interactable || target;
-        options = interactable.options;
-
-        clientRect = (interactable._element instanceof SVGElement)?
-            interactable._element.getBoundingClientRect():
-            interactable._element.getClientRects()[0];
-
-
-        if (actionIsEnabled.resize && options.resizeable) {
-            right  = x > (clientRect.right  - margin);
-            bottom = y > (clientRect.bottom - margin);
-        }
-
-        if (actionIsEnabled.gesture &&
-                event.touches && event.touches.length >= 2 &&
-                !(dragging || resizing)) {
-            action = 'gesture';
-        }
-        else {
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-            action = (resizeAxes)?
-                'resize' + resizeAxes:
-                actionIsEnabled.drag && options.draggable?
-                    'drag':
-                    '';
-        }
-
-        return action;
-    }
-
     function setPrevXY (event) {
         prevX = event.pageX;
         prevY = event.pageY;
@@ -626,24 +580,9 @@ var document      = window.document,
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
-    function calcDropRects (dropzones) {
-        for (var i = 0, len = dropzones.length; i < len; i++) {
-            var dropzone = dropzones[i],
-                scroll = isOperaMobile?
-                    {x: 0, y: 0}:
-                    getScrollXY(),
-                clientRect = (dropzone._element instanceof SVGElement)?
-                    dropzone._element.getBoundingClientRect():
-                    dropzone._element.getClientRects()[0];
-
-            dropzone.dropRect = {
-                left  : clientRect.left   + scroll.x,
-                right : clientRect.right  + scroll.x,
-                top   : clientRect.top    + scroll.y,
-                bottom: clientRect.bottom + scroll.y,
-                width : clientRect.width,
-                height: clientRect.height
-            };
+    function calcRects (interactables) {
+        for (var i = 0, len = interactables.length; i < len; i++) {
+            interactables[i].rect = interactables[i].getRect();
         }
     }
 
@@ -914,7 +853,7 @@ var document      = window.document,
         var options = target.options;
 
         if (target && !(dragging || resizing || gesturing)) {
-            var action = validateAction(forceAction || options.getAction(event)),
+            var action = validateAction(forceAction || target.getAction(event)),
                 average,
                 page,
                 client;
@@ -938,11 +877,6 @@ var document      = window.document,
             if (!action) {
                 return event;
             }
-
-            x0 = prevX = page.x;
-            y0 = prevY = page.y;
-            clientX0 = prevClientX = client.x;
-            clientY0 = prevClientY = client.y;
 
             // Register that the pointer is down after succesfully validating
             // action. This way, a new target can be gotten in the next
@@ -1101,7 +1035,7 @@ var document      = window.document,
             dragging = true;
 
             if (!dynamicDrop) {
-                calcDropRects(dropzones);
+                calcRects(dropzones);
             }
         }
         else {
@@ -1217,7 +1151,7 @@ var document      = window.document,
     function validateSelector (event, matches) {
         for (var i = 0, len = matches.length; i < len; i++) {
             var match = matches[i],
-                action = validateAction(match.options.getAction(event, match), match);
+                action = validateAction(match.getAction(event, match), match);
 
             if (action) {
                 target = match;
@@ -1246,7 +1180,7 @@ var document      = window.document,
         var elementInteractable = interactables.get(event.target),
             action = elementInteractable
                      && validateAction(
-                         elementInteractable.options.getAction(event, elementInteractable),
+                         elementInteractable.getAction(event, elementInteractable),
                          elementInteractable);
 
         if (!elementInteractable) {
@@ -1306,7 +1240,7 @@ var document      = window.document,
                 action = validateSelector(event, matches);
             }
             else if (target) {
-                action = validateAction(target.options.getAction(event));
+                action = validateAction(target.getAction(event));
             }
 
             if (styleCursor) {
@@ -1554,7 +1488,7 @@ var document      = window.document,
                 dropzones.push(this);
 
                 if (!dynamicDrop) {
-                    calcDropRects([this]);
+                    calcRects([this]);
                 }
                 return this;
             }
@@ -1563,7 +1497,7 @@ var document      = window.document,
                     dropzones.push(this);
 
                     if (!dynamicDrop) {
-                        calcDropRects([this]);
+                        calcRects([this]);
                     }
                 }
                 else {
@@ -1612,8 +1546,8 @@ var document      = window.document,
                 else {
                     var page = getPageXY(event);
 
-                    horizontal = (page.x > this.dropRect.left) && (page.x < this.dropRect.right);
-                    vertical   = (page.y > this.dropRect.top ) && (page.y < this.dropRect.bottom);
+                    horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+                    vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
 
                     return horizontal && vertical;
                 }
@@ -1633,11 +1567,11 @@ var document      = window.document,
          */
         dropChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.dropChecker = newValue;
+                this.dropCheck = newValue;
 
                 return this;
             }
-            return this.dropChecker;
+            return this.dropCheck;
         },
 
         /**
@@ -1741,6 +1675,40 @@ var document      = window.document,
         },
 
         /**
+         * @private
+         * @returns{String} action to be performed - drag/resize[axes]/gesture
+         */
+        getAction: function actionCheck (event) {
+            var rect = this.getRect(),
+                right,
+                bottom,
+                action,
+                page = getPageXY(event),
+                options = this.options;
+
+            if (actionIsEnabled.resize && options.resizeable) {
+                right  = page.x > (rect.right  - margin);
+                bottom = page.y > (rect.bottom - margin);
+            }
+
+            if (actionIsEnabled.gesture &&
+                    event.touches && event.touches.length >= 2 &&
+                    !(dragging || resizing)) {
+                action = 'gesture';
+            }
+            else {
+                resizeAxes = (right?'x': '') + (bottom?'y': '');
+                action = (resizeAxes)?
+                    'resize' + resizeAxes:
+                    actionIsEnabled.drag && options.draggable?
+                        'drag':
+                        null;
+            }
+
+            return action;
+        },
+
+        /**
          * Returns or sets the function used to check action to be performed on
          * pointerDown
          *
@@ -1750,11 +1718,52 @@ var document      = window.document,
          */
         actionChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.options.getAction = newValue;
+                this.getAction = newValue;
 
                 return this;
             }
-            return this.options.getAction;
+            return this.getAction;
+        },
+
+        /**
+         * Return an object with the left, right, top, bottom, width and height
+         * of the interactable's element
+         *
+         * @function
+         * @param {function} newValue
+         * @returns {Function | Interactable}
+         */
+        getRect: function rectCheck () {
+            var scroll = isOperaMobile? { x: 0, y: 0 }: getScrollXY(),
+                clientRect = (this._element instanceof SVGElement)?
+                    this._element.getBoundingClientRect():
+                    this._element.getClientRects()[0];
+
+            return {
+                left  : clientRect.left   + scroll.x,
+                right : clientRect.right  + scroll.x,
+                top   : clientRect.top    + scroll.y,
+                bottom: clientRect.bottom + scroll.y,
+                width : clientRect.width || clientRect.right - clientRect.left,
+                height: clientRect.heigh || clientRect.top - clientRect.top
+            };
+        },
+
+        /**
+         * Returns or sets the function used to calculate the interactable's
+         * element rectangle
+         *
+         * @function
+         * @param {function} newValue
+         * @returns {Function | Interactable}
+         */
+        rectChecker: function (newValue) {
+            if (typeof newValue === 'function') {
+                this.getRect = newValue;
+
+                return this;
+            }
+            return this.getRect;
         },
 
         /**
@@ -1953,10 +1962,7 @@ var document      = window.document,
                 elements.splice(elements.indexOf(this.element()));
             }
 
-            this.draggable  (false);
             this.dropzone   (false);
-            this.resizeable (false);
-            this.gestureable(false);
 
             interactables.splice(interactables.indexOf(this), 1);
 
@@ -2135,7 +2141,7 @@ var document      = window.document,
             pointerIsDown         : pointerIsDown,
             supportsTouch         : supportsTouch,
             defaultOptions        : defaultOptions,
-            defaultActionChecker  : actionCheck,
+            defaultActionChecker  : Interactable.prototype.getAction,
             dragMove              : dragMove,
             resizeMove            : resizeMove,
             gestureMove           : gestureMove,
@@ -2312,7 +2318,7 @@ var document      = window.document,
     interact.dynamicDrop = function (newValue) {
         if (typeof newValue === 'boolean') {
             if (dragging && dynamicDrop !== newValue && !newValue) {
-                calcDropRects(dropzones);
+                calcRects(dropzones);
             }
 
             dynamicDrop = newValue;
