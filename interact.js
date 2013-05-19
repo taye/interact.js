@@ -1266,9 +1266,6 @@ var document      = window.document,
                 this[option] = options[option];
             }
         }
-        if (typeof options.actionChecker === 'function') {
-            this.getAction = options.actionChecker;
-        }
     }
 
     IOptions.prototype = defaultOptions;
