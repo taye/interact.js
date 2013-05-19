@@ -115,8 +115,8 @@ var document      = window.document,
                     bottom = event.clientY > window.innerHeight - autoScroll.margin;
                 }
                 else {
-                    calcDropRects([interact(options.container)]);
-                    var rect = interact(options.container).dropRect;
+                    calcRects([interact(options.container)]);
+                    var rect = interact(options.container).rect;
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -608,17 +608,17 @@ var document      = window.document,
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
-    function calcDropRects (dropzones) {
-        for (var i = 0, len = dropzones.length; i < len; i++) {
-            var dropzone = dropzones[i],
+    function calcRects (interactables) {
+        for (var i = 0, len = interactables.length; i < len; i++) {
+            var interactable = interactables[i],
                 scroll = isOperaMobile?
                     {x: 0, y: 0}:
                     getScrollXY(),
-                clientRect = (dropzone._element instanceof SVGElement)?
-                    dropzone._element.getBoundingClientRect():
-                    dropzone._element.getClientRects()[0];
+                clientRect = (interactable._element instanceof SVGElement)?
+                    interactable._element.getBoundingClientRect():
+                    interactable._element.getClientRects()[0];
 
-            dropzone.dropRect = {
+            interactable.rect = {
                 left  : clientRect.left   + scroll.x,
                 right : clientRect.right  + scroll.x,
                 top   : clientRect.top    + scroll.y,
@@ -1051,7 +1051,7 @@ var document      = window.document,
             dragging = true;
 
             if (!dynamicDrop) {
-                calcDropRects(dropzones);
+                calcRects(dropzones);
             }
         }
         else {
@@ -1408,7 +1408,7 @@ var document      = window.document,
                 dropzones.push(this);
 
                 if (!dynamicDrop) {
-                    calcDropRects([this]);
+                    calcRects([this]);
                 }
                 return this;
             }
@@ -1417,7 +1417,7 @@ var document      = window.document,
                     dropzones.push(this);
 
                     if (!dynamicDrop) {
-                        calcDropRects([this]);
+                        calcRects([this]);
                     }
                 }
                 else {
@@ -1466,8 +1466,8 @@ var document      = window.document,
                 else {
                     var page = getPageXY(event);
 
-                    horizontal = (page.x > this.dropRect.left) && (page.x < this.dropRect.right);
-                    vertical   = (page.y > this.dropRect.top ) && (page.y < this.dropRect.bottom);
+                    horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+                    vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
 
                     return horizontal && vertical;
                 }
@@ -2155,7 +2155,7 @@ var document      = window.document,
     interact.dynamicDrop = function (newValue) {
         if (typeof newValue === 'boolean') {
             if (dragging && dynamicDrop !== newValue && !newValue) {
-                calcDropRects(dropzones);
+                calcRects(dropzones);
             }
 
             dynamicDrop = newValue;
