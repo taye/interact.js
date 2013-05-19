@@ -1487,11 +1487,11 @@ var document      = window.document,
          */
         dropChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.dropChecker = newValue;
+                this.dropCheck = newValue;
 
                 return this;
             }
-            return this.dropChecker;
+            return this.dropCheck;
         },
 
         /**
