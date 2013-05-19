@@ -1536,24 +1536,16 @@ var document      = window.document,
          * @returns{String} action to be performed - drag/resize[axes]/gesture
          */
         getAction: function actionCheck (event) {
-            var clientRect,
+            var rect = this.getRect(),
                 right,
                 bottom,
                 action,
                 page = getPageXY(event),
-                scroll = getScrollXY(),
-                x = page.x - scroll.x,
-                y = page.y - scroll.y,
-                options = target.options;
-
-            clientRect = (target._element instanceof SVGElement)?
-                this._element.getBoundingClientRect():
-                this._element.getClientRects()[0];
-
+                options = this.options;
 
             if (actionIsEnabled.resize && options.resizeable) {
-                right  = x > (clientRect.right  - margin);
-                bottom = y > (clientRect.bottom - margin);
+                right  = page.x > (rect.right  - margin);
+                bottom = page.y > (rect.bottom - margin);
             }
 
             if (actionIsEnabled.gesture &&
