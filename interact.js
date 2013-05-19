@@ -1819,10 +1819,7 @@ var document      = window.document,
         unset: function () {
             events.remove(this, 'all');
 
-            this.draggable  (false);
             this.dropzone   (false);
-            this.resizeable (false);
-            this.gestureable(false);
 
             interactables.splice(interactables.indexOf(this), 1);
 
