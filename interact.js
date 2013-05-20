@@ -114,8 +114,7 @@ var document      = window.document,
                     bottom = event.clientY > window.innerHeight - autoScroll.margin;
                 }
                 else {
-                    calcRects([interact(options.container)]);
-                    var rect = interact(options.container).rect;
+                    var rect = interact(options.container).getRect();
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -1360,8 +1359,8 @@ var document      = window.document,
                 this.options.dropzone = true;
                 dropzones.push(this);
 
-                if (!dynamicDrop) {
-                    calcRects([this]);
+                if (!dynamicDrop && !this.selector) {
+                    this.rect = this.getRect();
                 }
                 return this;
             }
@@ -1369,8 +1368,8 @@ var document      = window.document,
                 if (options) {
                     dropzones.push(this);
 
-                    if (!dynamicDrop) {
-                        calcRects([this]);
+                    if (!dynamicDrop && !this.selector) {
+                        this.rect = this.getRect();
                     }
                 }
                 else {
