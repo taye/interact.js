@@ -1398,30 +1398,17 @@ var document      = window.document,
          */
         dropCheck: function (event) {
             if (target !== this) {
-                var horizontal,
+                var page = getPageXY(event),
+                    horizontal,
                     vertical;
 
                 if (dynamicDrop) {
-
-                    var clientRect = (this._element instanceof SVGElement)?
-                            this._element.getBoundingClientRect():
-                            this._element.getClientRects()[0],
-                        client = getClientXY(event);
-
-                    horizontal = (client.x > clientRect.left) && (client.x < clientRect.right);
-                    vertical   = (client.y > clientRect.top ) && (client.y < clientRect.bottom);
-
-
-                    return horizontal && vertical;
+                    this.rect = this.getRect();
                 }
-                else {
-                    var page = getPageXY(event);
+                horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+                vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
 
-                    horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-                    vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
-
-                    return horizontal && vertical;
-                }
+                return horizontal && vertical;
             }
         },
 
