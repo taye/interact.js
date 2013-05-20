@@ -454,11 +454,6 @@ var document      = window.document,
             y = event[type + 'Y'];
         }
 
-        // Opera Mobile handles the viewport and scrolling oddly
-        if (isOperaMobile) {
-            x -= window.scrollX;
-            y -= window.scrollY;
-        }
         return {
             x: x,
             y: y
@@ -466,11 +461,21 @@ var document      = window.document,
     }
 
     function getPageXY (event) {
+        // Opera Mobile handles the viewport and scrolling oddly
+        if (isOperaMobile) {
+            var page = getXY('screen', event);
+
+            page.x += window.scrollX;
+            page.y += window.scrollY;
+
+            return page;
+        }
         return getXY('page', event);
     }
 
     function getClientXY (event) {
-        return getXY('client', event);
+        // Opera Mobile handles the viewport and scrolling oddly
+        return getXY(isOperaMobile? 'screen': 'client', event);
     }
 
     function getScrollXY () {
@@ -1401,9 +1406,7 @@ var document      = window.document,
                     var clientRect = (this._element instanceof SVGElement)?
                             this._element.getBoundingClientRect():
                             this._element.getClientRects()[0],
-                        client = (isOperaMobile)?
-                            getPageXY(event):
-                            getClientXY(event);
+                        client = getClientXY(event);
 
                     horizontal = (client.x > clientRect.left) && (client.x < clientRect.right);
                     vertical   = (client.y > clientRect.top ) && (client.y < clientRect.bottom);
@@ -1602,7 +1605,7 @@ var document      = window.document,
          * @returns {Function | Interactable}
          */
         getRect: function rectCheck () {
-            var scroll = isOperaMobile? { x: 0, y: 0 }: getScrollXY(),
+            var scroll = getScrollXY(),
                 clientRect = (this._element instanceof SVGElement)?
                     this._element.getBoundingClientRect():
                     this._element.getClientRects()[0];
