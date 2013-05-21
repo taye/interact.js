@@ -117,8 +117,7 @@ var document      = window.document,
                     bottom = event.clientY > window.innerHeight - autoScroll.margin;
                 }
                 else {
-                    calcRects([interact(options.container)]);
-                    var rect = interact(options.container).rect;
+                    var rect = interact(options.container).getRect();
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -469,11 +468,6 @@ var document      = window.document,
             y = event[type + 'Y'];
         }
 
-        // Opera Mobile handles the viewport and scrolling oddly
-        if (isOperaMobile) {
-            x -= window.scrollX;
-            y -= window.scrollY;
-        }
         return {
             x: x,
             y: y
@@ -481,11 +475,21 @@ var document      = window.document,
     }
 
     function getPageXY (event) {
+        // Opera Mobile handles the viewport and scrolling oddly
+        if (isOperaMobile) {
+            var page = getXY('screen', event);
+
+            page.x += window.scrollX;
+            page.y += window.scrollY;
+
+            return page;
+        }
         return getXY('page', event);
     }
 
     function getClientXY (event) {
-        return getXY('client', event);
+        // Opera Mobile handles the viewport and scrolling oddly
+        return getXY(isOperaMobile? 'screen': 'client', event);
     }
 
     function getScrollXY () {
@@ -1498,8 +1502,8 @@ var document      = window.document,
                 this.options.dropzone = true;
                 dropzones.push(this);
 
-                if (!dynamicDrop) {
-                    calcRects([this]);
+                if (!dynamicDrop && !this.selector) {
+                    this.rect = this.getRect();
                 }
                 return this;
             }
@@ -1507,8 +1511,8 @@ var document      = window.document,
                 if (options) {
                     dropzones.push(this);
 
-                    if (!dynamicDrop) {
-                        calcRects([this]);
+                    if (!dynamicDrop && !this.selector) {
+                        this.rect = this.getRect();
                     }
                 }
                 else {
@@ -1536,32 +1540,17 @@ var document      = window.document,
          */
         dropCheck: function (event) {
             if (target !== this) {
-                var horizontal,
+                var page = getPageXY(event),
+                    horizontal,
                     vertical;
 
                 if (dynamicDrop) {
-
-                    var clientRect = (this._element instanceof SVGElement)?
-                            this._element.getBoundingClientRect():
-                            this._element.getClientRects()[0],
-                        client = (isOperaMobile)?
-                            getPageXY(event):
-                            getClientXY(event);
-
-                    horizontal = (client.x > clientRect.left) && (client.x < clientRect.right);
-                    vertical   = (client.y > clientRect.top ) && (client.y < clientRect.bottom);
-
-
-                    return horizontal && vertical;
+                    this.rect = this.getRect();
                 }
-                else {
-                    var page = getPageXY(event);
+                horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+                vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
 
-                    horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-                    vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
-
-                    return horizontal && vertical;
-                }
+                return horizontal && vertical;
             }
         },
 
@@ -1745,7 +1734,7 @@ var document      = window.document,
          * @returns {Function | Interactable}
          */
         getRect: function rectCheck () {
-            var scroll = isOperaMobile? { x: 0, y: 0 }: getScrollXY(),
+            var scroll = getScrollXY(),
                 clientRect = (this._element instanceof SVGElement)?
                     this._element.getBoundingClientRect():
                     this._element.getClientRects()[0];
