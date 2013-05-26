@@ -178,9 +178,9 @@
         }
   
         var dropzone = e.target,
-            node = e.draggable,
+            draggable = e.relatedTarget,
             dropzoneRect = dropzone.getClientRects()[0],
-            parent = node.parentNode,
+            parent = draggable.parentNode,
             dropRect = {
                 x: dropzoneRect.left + 20,
                 y: dropzoneRect.top  + 20
@@ -191,12 +191,12 @@
         dropRect.width  = (dropzoneRect.right  - dropzoneRect.left) / 2;
         dropRect.height = (dropzoneRect.bottom - dropzoneRect.top)  / 2;
         
-        node.style.left = dropRect.x + 'px';
-        node.style.top  = dropRect.y + 'px';
-        node.style.width  = dropRect.width  + 'px';
-        node.style.height = dropRect.height + 'px';
+        draggable.style.left = dropRect.x + 'px';
+        draggable.style.top  = dropRect.y + 'px';
+        draggable.style.width  = dropRect.width  + 'px';
+        draggable.style.height = dropRect.height + 'px';
         
-        parent.appendChild(parent.removeChild(node));
+        parent.appendChild(parent.removeChild(draggable));
     }
 
     function onReady () {
@@ -227,11 +227,13 @@
         interact('div.demo-node')
             .draggable(true)
             .resizeable(true)
-            .gestureable(true);
+            .gestureable(true)
+            .dropzone(true);
 
         interact('.demo-node ellipse')
             .draggable(true)
-            .resizeable(true);
+            .resizeable(true)
+            .dropzone(true);
     }
 
     interact(window).bind('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
