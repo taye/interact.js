@@ -169,8 +169,8 @@
         }
     }
 
-    interact.bind('resizemove', resizeMove);
-    interact.bind('dragmove', dragMove);
+    interact.on('resizemove', resizeMove);
+    interact.on('dragmove', dragMove);
 
     function dropNode (e) {
         if ('SVGElement' in window && e.draggable instanceof SVGElement) {
@@ -236,20 +236,20 @@
             .dropzone(true);
     }
 
-    interact(window).bind('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
+    interact(window).on('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
 
     // Display event properties for debugging
-    interact.bind('resizestart', nodeEventDebug);
-    interact.bind('resizemove', nodeEventDebug);
-    interact.bind('resizeend', nodeEventDebug);
-    interact.bind('gesturestart', nodeEventDebug);
-    interact.bind('gesturemove', nodeEventDebug);
-    interact.bind('gestureend', nodeEventDebug);
-    interact.bind('dragstart', nodeEventDebug);
-    interact.bind('dragmove', nodeEventDebug);
-    interact.bind('dragend', nodeEventDebug);
+    interact.on('resizestart', nodeEventDebug);
+    interact.on('resizemove', nodeEventDebug);
+    interact.on('resizeend', nodeEventDebug);
+    interact.on('gesturestart', nodeEventDebug);
+    interact.on('gesturemove', nodeEventDebug);
+    interact.on('gestureend', nodeEventDebug);
+    interact.on('dragstart', nodeEventDebug);
+    interact.on('dragmove', nodeEventDebug);
+    interact.on('dragend', nodeEventDebug);
 
-    interact.bind('drop', dropNode);
+    interact.on('drop', dropNode);
 
     window.demo = {
         DemoNode      : DemoNode,

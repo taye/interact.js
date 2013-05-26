@@ -188,15 +188,15 @@ var debug = interact.debug(),
     
     expect(9);
     
-    interact(div0).bind('dragstart', listener);
-    interact(div0).bind('dragmove', listener);
+    interact(div0).on('dragstart', listener);
+    interact(div0).on('dragmove', listener);
     
     debug.pointerDown.call(div0, pointerDownEvent);
     debug.dragMove.call(div0, moveEvent);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('dragstart', listener);
-    interact(div0).unbind('dragmove', listener);
+    interact(div0).off('dragstart', listener);
+    interact(div0).off('dragmove', listener);
 });
 
 test('drag move', function() {
@@ -245,7 +245,7 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('dragmove', listener);
+    interact(div0).on('dragmove', listener);
     
     expect(8);
     
@@ -254,7 +254,7 @@ var debug = interact.debug(),
     debug.dragMove.call(div0, moveEvent);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('dragmove', listener);
+    interact(div0).off('dragmove', listener);
 });
 
 test('drag end', function() {
@@ -313,7 +313,7 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('dragend', listener);
+    interact(div0).on('dragend', listener);
     
     expect(8);
     
@@ -323,7 +323,7 @@ var debug = interact.debug(),
     debug.dragMove.call(div0, moveEvent2);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('dragend', listener);
+    interact(div0).off('dragend', listener);
 });
 
 
@@ -382,15 +382,15 @@ var debug = interact.debug(),
     
     expect(9);
     
-    interact(div0).bind('resizestart', listener);
-    interact(div0).bind('resizemove', listener);
+    interact(div0).on('resizestart', listener);
+    interact(div0).on('resizemove', listener);
     
     debug.pointerDown.call(div0, pointerDownEvent);
     debug.resizeMove.call(div0, moveEvent);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('resizestart', listener);
-    interact(div0).unbind('resizemove', listener);
+    interact(div0).off('resizestart', listener);
+    interact(div0).off('resizemove', listener);
 });
 
 test('resize move', function() {
@@ -439,7 +439,7 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('resizemove', listener);
+    interact(div0).on('resizemove', listener);
     
     expect(8);
     
@@ -448,7 +448,7 @@ var debug = interact.debug(),
     debug.resizeMove.call(div0, moveEvent);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('resizemove', listener);
+    interact(div0).off('resizemove', listener);
 });
 
 test('resize end', function() {
@@ -507,7 +507,7 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('resizeend', listener);
+    interact(div0).on('resizeend', listener);
     
     expect(8);
     
@@ -517,7 +517,7 @@ var debug = interact.debug(),
     debug.resizeMove.call(div0, moveEvent2);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('resizeend', listener);
+    interact(div0).off('resizeend', listener);
 });
 
 
@@ -586,15 +586,15 @@ var debug = interact.debug(),
     
     expect(9);
     
-    interact(div0).bind('gesturestart', listener);
-    interact(div0).bind('gesturemove', listener);
+    interact(div0).on('gesturestart', listener);
+    interact(div0).on('gesturemove', listener);
     
     debug.pointerDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('gesturestart', listener);
-    interact(div0).unbind('gesturemove', listener);
+    interact(div0).off('gesturestart', listener);
+    interact(div0).off('gesturemove', listener);
 });
 
 test('gesture move', function() {
@@ -696,14 +696,14 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('gesturemove', listener);
+    interact(div0).on('gesturemove', listener);
     
     debug.pointerDown.call(div0, touchStartEvent);
     debug.gestureMove.call(div0, moveEvent0);
     debug.gestureMove.call(div0, moveEvent1);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('gesturemove', listener);
+    interact(div0).off('gesturemove', listener);
 });
 
 test('gesture end', function() {
@@ -781,7 +781,7 @@ var debug = interact.debug(),
             }
         });
     
-    interact(div0).bind('gestureend', listener);
+    interact(div0).on('gestureend', listener);
     
     expect(8);
     
@@ -790,6 +790,6 @@ var debug = interact.debug(),
     debug.gestureMove.call(div0, moveEvent1);
     debug.pointerUp.call(div0, pointerUpEvent);
     
-    interact(div0).unbind('gestureend', listener);
+    interact(div0).off('gestureend', listener);
 });
 

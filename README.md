@@ -36,8 +36,8 @@ var // x and y to keep the position that's been dragged to
     // vendor prefixes (prefices?)
     transformProp = 'transform' in document.body.style?
                 'transform': 'webkitTransform' in document.body.style?
-                    'webkitTransform': 'MozTransform' in document.body.style?
-                        'MozTransform': 'oTransform' in document.body.style?
+                    'webkitTransform': 'mozTransform' in document.body.style?
+                        'mozTransform': 'oTransform' in document.body.style?
                             'oTransform': 'msTransform';
 
 // make an Interactable of the document body element
@@ -54,22 +54,22 @@ interact(document.body)
             document.body.style[transformProp] = 'translate(' + x + 'px, ' + y + 'px)';
         }
     })
-    // but you should really bind like this which lets you bind multiple listeners
-    .bind('dragend', function (event) {
+    // but you should really add listeners like this which lets you add multiple listeners
+    .on('dragend', function (event) {
         console.log('dragged a distance of ' + 
             Math.sqrt(event.dx*event.dx + event.dy*event.dy) + 
             ' pixels to ' + event.pageX + ', ' + event.pageY);
     });
 
 // or you could listen to InteractEvents for every Interactable
-interact.bind('dragstart', function (event) {
+interact.on('dragstart', function (event) {
     console.log('starting drag from ' + event.x0 + ', ' + event.y0);
 });
 ```
 
 Usage
 -----
-Pass the element you want to interact with or a CSS selector string to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `bind` which let's you add event listeners for InteractEvents and any DOM event.
+Pass the element you want to interact with or a CSS selector string to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `on` which let's you add event listeners for InteractEvents and any DOM event.
 The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
 
 Details
@@ -98,12 +98,12 @@ Now that the element has been made interactable, when it is clicked on or touche
 
 When a sequence of user actions results in an InteractEvent, that event type is fired and all listeners of that type which were bound to that Interactable or bound globally are called.
 
-Even though InteractEvents are being fired, the element is not actually modified by interact.js at all. To do that, you need to bind listeners for InteractEvents either to each Interactable or globally for all Interacables and style the element according to event data.
+Even though InteractEvents are being fired, the element is not actually modified by interact.js at all. To do that, you need to add listeners for InteractEvents either to each Interactable or globally for all Interacables and style the element according to event data.
 
 ### Listening
 The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
 
-To respond to an InteractEvent, you must `bind` a listener for its event type either directly to an interactable `Interactable#bind(eventType, listenerFunction)` or globally for all events of that type `interact.bind('resizemove', resizeElement)`. The InteractEvent object that was created is passed to these functions as the first parameter.
+To respond to an InteractEvent, you must add a listener for its event type either directly to an interactable `Interactable#on(eventType, listenerFunction)` or globally for all events of that type `interact.on('resizemove', resizeElement)`. The InteractEvent object that was created is passed to these functions as the first parameter.
 
 InteractEvent properties include the usual properties of mouse/touch events such as pageX/Y, clientX/Y, modifier keys etc. but also some properties providing information about the change in cordinates and event specific data. The table below displays all of these events.
 

@@ -8,7 +8,7 @@
  * @namespace interact.js
  * @name interact
  * @function interact
- * @param {HTMLElement | svgelement} element The previously set document element
+ * @param {HTMLElement | SVGelement} element The previously set document element
  * @returns {Interactable | null} Returns an Interactable if the element passed
  *          was previously set. Returns null otherwise.
  * @description The properties of this variable can be used to set elements as
@@ -1874,7 +1874,7 @@ var document      = window.document,
                         }
                         break;
 
-                        // Interactable#bind() listeners
+                        // Interactable#on() listeners
                         case fireStates.directBind:
                             if (iEvent.type in this._iEvents) {
                             listeners = this._iEvents[iEvent.type];
@@ -1887,7 +1887,7 @@ var document      = window.document,
 
                         break;
 
-                        // interact.bind() listeners
+                        // interact.on() listeners
                         case fireStates.globalBind:
                             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
                             listeners = globalEvents[iEvent.type];
@@ -1923,7 +1923,7 @@ var document      = window.document,
          * @function
          * @returns {Interactable}
          */
-        bind: function (eventType, listener, useCapture) {
+        on: function (eventType, listener, useCapture) {
             if (eventTypes.indexOf(eventType) !== -1) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
@@ -1945,12 +1945,12 @@ var document      = window.document,
         },
 
         /**
-         * Unbinds an InteractEvent or DOM event listener
+         * Removes an InteractEvent or DOM event listener
          *
          * @function
          * @returns {Interactable}
          */
-        unbind: function (eventType, listener, useCapture) {
+        off: function (eventType, listener, useCapture) {
             if (eventTypes.indexOf(eventType) !== -1) {
                 var eventArray = this._iEvents[eventType],
                     index;
@@ -2031,12 +2031,12 @@ var document      = window.document,
     };
 
     /**
-     * Binds a global listener to an InteractEvent
+     * Adds a global listener to an InteractEvent
      *
      * @function
      * @returns {interact}
      */
-    interact.bind = function (iEventType, listener) {
+    interact.on = function (iEventType, listener) {
         // The event must be an InteractEvent type
         if (eventTypes.indexOf(iEventType) !== -1) {
             // if this type of event was never bound to this Interactable
@@ -2054,12 +2054,12 @@ var document      = window.document,
     },
 
     /**
-     * Unbinds a global InteractEvent listener
+     * Removes a global InteractEvent listener
      *
      * @function
      * @returns {interact}
      */
-    interact.unbind = function (iEventType, listener) {
+    interact.off = function (iEventType, listener) {
         var index = globalEvents[iEventType].indexOf(listener);
 
         if (index !== -1) {
