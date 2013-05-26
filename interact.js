@@ -8,7 +8,7 @@
  * @namespace interact.js
  * @name interact
  * @function interact
- * @param {HTMLElement | svgelement} element The previously set document element
+ * @param {HTMLElement | SVGelement} element The previously set document element
  * @returns {Interactable | null} Returns an Interactable if the element passed
  *          was previously set. Returns null otherwise.
  * @description The properties of this variable can be used to set elements as
