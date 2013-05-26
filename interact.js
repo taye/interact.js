@@ -50,8 +50,14 @@ var document      = window.document,
         prevAngle : 0       // angle of the previous gesture event
     },
 
-    interactables   = [],   // array of all set interactables
-    dropzones       = [],   // array of all dropzone interactables
+    interactables   = [],   // all set interactables
+    dropzones       = [],   // all dropzone element interactables
+    elements        = [],   // all elements that have been made interactable
+
+    selectors       = {},   // all css selector interactables
+    selectorDZs     = [],   // all dropzone selector interactables
+    matches         = [],   // all selectors that are matched by target element
+
     target          = null, // current interactable being interacted with
     dropTarget      = null, // the dropzone a drag target might be dropped into
     prevDropTarget  = null, // the dropzone that was recently dragged away from
@@ -190,7 +196,7 @@ var document      = window.document,
     resizing        = false,
     resizeAxes      = 'xy',
 
-    // What to do depending on action returned by getAction() of node
+    // What to do depending on action returned by getAction() of interactable
     // Dictates what styles should be used and what pointerMove event Listner
     // is to be added after pointerDown
     actions = {
@@ -258,6 +264,16 @@ var document      = window.document,
     isOperaMobile = navigator.appName == 'Opera' &&
         supportsTouch &&
         navigator.userAgent.match('Presto'),
+
+    // prefix matchesSelector
+    matchesSelector = 'matchesSelector' in Element.prototype?
+            'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
+                'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
+                    'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
+                        'oMatchesSelector': 'msMatchesSelector',
+
+    // will be polyfill function if browser is IE8
+    IE8MatchesSelector,
 
     // used for adding event listeners to window and document
     windowTarget = {
@@ -421,6 +437,8 @@ var document      = window.document,
             remove: function (target, type, listener, useCapture) {
                 remove(target._element, type, listener, useCapture);
             },
+            addToElement: add,
+            removeFromElement: remove,
             useAttachEvent: useAttachEvent
         };
     }());
@@ -569,9 +587,9 @@ var document      = window.document,
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
-    function calcRects (interactables) {
-        for (var i = 0, len = interactables.length; i < len; i++) {
-            interactables[i].rect = interactables[i].getRect();
+    function calcRects (interactableList) {
+        for (var i = 0, len = interactableList.length; i < len; i++) {
+            interactableList[i].rect = interactableList[i].getRect();
         }
     }
 
@@ -653,10 +671,77 @@ var document      = window.document,
         }
     }
 
-    function InteractEvent (event, action, phase) {
+    function getDrop (event, draggable) {
+        if (dropzones.length || selectorDZs.length) {
+            var i,
+                drops = [],
+                elements = [],
+                selectorDrops = [],
+                selectorElements = [],
+                drop;
+
+            // collect all element dropzones that qualify for a drop
+            for (i = 0; i < dropzones.length; i++) {
+                if (dropzones[i].dropCheck(event)) {
+                    drops.push(dropzones[i]);
+                    elements.push(dropzones[i]._element);
+                }
+            }
+
+            // get the most apprpriate dropzone based on DOM depth and order
+            drop = resolveDrops(elements);
+            dropTarget = drop? dropzones[drop.index]: null;
+
+            if (selectorDZs.length) {
+                var draggableElement = target._element;
+
+                for (i = 0; i < selectorDZs.length; i++) {
+                    var selector = selectorDZs[i],
+                        nodeList = document.querySelectorAll(selector.selector);
+
+                    for (var j = 0, len = nodeList.length; j < len; j++) {
+                        selector._element = nodeList[j];
+                        selector.rect = selector.getRect();
+
+                        if (selector._element !== draggableElement
+                            && elements.indexOf(selector._element) === -1
+                            && selectorElements.indexOf(selector._element === -1)
+                            && selector.dropCheck(event)) {
+
+                            selectorDrops.push(selector);
+                            selectorElements.push(selector._element);
+                        }
+                    }
+                }
+
+                if (selectorElements.length) {
+                    if (dropTarget) {
+                        selectorDrops.push(dropTarget);
+                        selectorElements.push(dropTarget._element);
+                    }
+
+                    drop = resolveDrops(selectorElements);
+
+                    if (drop) {
+                        dropTarget = selectorDrops[drop.index];
+
+                        if (dropTarget.selector) {
+                            dropTarget._element = selectorElements[drop.index];
+                        }
+                    }
+                }
+            }
+            
+            return dropTarget;
+        }
+    }
+
+    function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
             options = target.options;
+
+        element = element || target._element;
 
         if (action === 'gesture') {
             var average = touchAverage(event);
@@ -689,9 +774,13 @@ var document      = window.document,
         this.shiftKey  = event.shiftKey;
         this.metaKey   = event.metaKey;
         this.button    = event.button;
-        this.target    = action === 'drop' && dropTarget._element || target._element;
+        this.target    = element;
         this.timeStamp = new Date().getTime();
         this.type      = action + (phase || '');
+
+        if (related) {
+            this.relatedTarget = related;
+        }
 
         // start/end event dx, dy is difference between start and current points
         if (phase === 'start' || phase === 'end' || action === 'drop') {
@@ -747,11 +836,6 @@ var document      = window.document,
                 }
             }
         }
-
-        else if (action === 'drop' ||
-                (action === 'drag' && (phase === 'enter' || phase === 'leave'))) {
-            this.draggable = target._element;
-        }
     }
 
     function blank () {}
@@ -766,16 +850,18 @@ var document      = window.document,
 
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
-    function validateAction (action) {
+    function validateAction (action, interactable) {
         if (typeof action !== 'string') { return null; }
 
-        var actionType = action.indexOf('resize') !== -1? 'resize': action,
-            options = target.options;
+        interactable = interactable || target;
 
-        if (((actionType  === 'resize'   && options.resizeable) ||
-                 (action      === 'drag'     && options.draggable) ||
-                 (action      === 'gesture'  && options.gestureable)) &&
-                actionIsEnabled[actionType]) {
+        var actionType = action.indexOf('resize') !== -1? 'resize': action,
+            options = (interactable || target).options;
+
+        if ((  (actionType  === 'resize'   && options.resizeable )
+            || (action      === 'drag'     && options.draggable  )
+            || (action      === 'gesture'  && options.gestureable))
+            && actionIsEnabled[actionType]) {
 
             if (action === 'resize' || action === 'resizeyx') {
                 action = 'resizexy';
@@ -786,6 +872,42 @@ var document      = window.document,
         return null;
     }
 
+    function selectorDown (event, forceAction) {
+        var action;
+
+        if (matches.length && event.type === 'mousedown') {
+            action = validateSelector(event, matches);
+        }
+        else {
+            var selector,
+                element = event.target,
+                elements,
+                action;
+
+            while (element !== document.documentElement && !action) {
+                matches = [];
+
+                for (selector in selectors) {
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector?
+                        document.querySelectorAll(selector): undefined;
+
+                    if (element[matchesSelector](selector, elements)) {
+                        selectors[selector]._element = element;
+                        matches.push(selectors[selector]);
+                    }
+                }
+
+                action = validateSelector(event, matches);
+                element = element.parentNode;
+            }
+        }
+
+        if (action) {
+            pointerIsDown = true;
+            return pointerDown(event, action);
+        }
+    }
+
     /**
      * @private
      * @event
@@ -793,49 +915,40 @@ var document      = window.document,
      * style and event Liseners
      */
     function pointerDown (event, forceAction) {
-        // document and window can't be interacted with but their Interactables
-        // can be used for adding events
-        if (!((events.useAttachEvent? event.currentTarget: this) instanceof window.Element)) {
-            return;
-        }
-
-        var action = '',
-            average,
-            page,
-            client;
-
-        if (event.touches) {
-            average = touchAverage(event);
-            page = {
-                x: average.pageX,
-                y: average.pageY
-            };
-            client = {
-                x: average.clientX,
-                y: average.clientY
-            };
-        }
-        else {
-            page = getPageXY(event);
-            client = getClientXY(event);
-        }
-
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
-        // (not always the case with simulated touches)
         // Otherwise, set the target if the pointer is not down
-        if ((event.touches && event.touches.length < 2 && !target) ||
-                !(pointerIsDown)) {
-            target = interactables.get(events.useAttachEvent? event.currentTarget: this);
+        if ((event.touches && event.touches.length < 2 && !target)
+            || !pointerIsDown) {
+
+            var getFrom = events.useAttachEvent? event.currentTarget: this;
+
+            target = interactables.get(getFrom);
         }
 
-        if (target && !(dragging || resizing || gesturing)) {
-            x0 = prevX = page.x;
-            y0 = prevY = page.y;
-            clientX0 = prevClientX = client.x;
-            clientY0 = prevClientY = client.y;
+        var options = target.options;
 
-            action = validateAction(forceAction || target.getAction(event));
+        if (target && !(dragging || resizing || gesturing)) {
+            var action = validateAction(forceAction || target.getAction(event)),
+                average,
+                page,
+                client;
+
+            if (event.touches) {
+                average = touchAverage(event);
+                page = {
+                    x: average.pageX,
+                    y: average.pageY
+                };
+                client = {
+                    x: average.clientX,
+                    y: average.clientY
+                };
+            }
+            else {
+                page = getPageXY(event);
+                client = getClientXY(event);
+            }
 
             if (!action) {
                 return event;
@@ -847,19 +960,19 @@ var document      = window.document,
             pointerIsDown = true;
             pointerWasMoved = false;
 
-            if (defaultOptions.styleCursor) {
+            if (options.styleCursor) {
                 document.documentElement.style.cursor =
                     actions[action].cursor + ' !important';
             }
-            resizeAxes = (action === 'resizexy')?
-                'xy':
-                (action === 'resizex')?
-                'x':
-                (action === 'resizey')?
-                'y':
-                '';
+            resizeAxes = action === 'resizexy'?
+                    'xy':
+                    action === 'resizex'?
+                        'x':
+                        action === 'resizey'?
+                            'y':
+                            '';
 
-            prepared = (action in actions)? action: null;
+            prepared = action;
 
             event.preventDefault();
         }
@@ -999,46 +1112,37 @@ var document      = window.document,
 
             if (!dynamicDrop) {
                 calcRects(dropzones);
+                for (var i = 0; i < selectorDZs.length; i++) {
+                    selectorDZs[i]._elements = document.querySelectorAll(selectorDZs[i].selector);
+                }
             }
         }
         else {
             dragEvent = new InteractEvent(event, 'drag', 'move');
 
-            if (dropzones.length) {
-                var i,
-                    drops = [],
-                    elements = [],
-                    drop;
+            var draggableElement = target._element,
+                dropTarget = getDrop(event, target),
+                dropzoneElement = dropTarget? dropTarget._element: null;
 
-                // collect all dropzones that qualify for a drop
-                for (i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].dropCheck(event)) {
-                        drops.push(dropzones[i]);
-                        elements.push(dropzones[i]._element);
-                    }
+            // Make sure that the target selector draggable's element is
+            // restored after dropChecks
+            target._element = draggableElement;
+
+            if (dropTarget !== prevDropTarget) {
+                // if there was a prevDropTarget, create a dragleave event
+                if (prevDropTarget) {
+                    dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
+
+                    dragEvent.dragLeave = prevDropTarget._element;
+                    leaveDropTarget = prevDropTarget;
+                    prevDropTarget = null;
                 }
+                // if the dropTarget is not null, create a dragenter event
+                if (dropTarget) {
+                    dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
 
-                // get the most apprpriate dropzone based on DOM depth and order
-                drop = resolveDrops(elements);
-                dropTarget = drop? dropzones[drop.index]: null;
-
-                // if the current dropTarget is not the same as the previous one
-                if (dropTarget !== prevDropTarget) {
-                    // if there was a prevDropTarget, create a dragleave event
-                    if (prevDropTarget) {
-                        dragLeaveEvent = new InteractEvent(event, 'drag', 'leave');
-
-                        dragEvent.dragLeave = prevDropTarget._element;
-                        leaveDropTarget = prevDropTarget;
-                        prevDropTarget = null;
-                    }
-                    // if the dropTarget is not null, create a dragenter event
-                    if (dropTarget) {
-                        dragEnterEvent = new InteractEvent(event, 'drag', 'enter');
-
-                        dragEvent.dragEnter = dropTarget._element;
-                        prevDropTarget = dropTarget;
-                    }
+                    dragEvent.dragEnter = dropTarget._element;
+                    prevDropTarget = dropTarget;
                 }
             }
         }
@@ -1115,12 +1219,82 @@ var document      = window.document,
         }
     }
 
+    function validateSelector (event, matches) {
+        for (var i = 0, len = matches.length; i < len; i++) {
+            var match = matches[i],
+                action = validateAction(match.getAction(event, match), match);
+
+            if (action) {
+                target = match;
+
+                return action;
+            }
+        }
+    }
+ 
     function pointerOver (event) {
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
-        target = interactables.get(event.target);
+        var curMatches = [],
+            prevTargetElement = target && target._element;
+
+        for (var selector in selectors) {
+            if (selectors.hasOwnProperty(selector)
+                && selectors[selector]
+                && event.target[matchesSelector](selector)) {
+
+                selectors[selector]._element = event.target;
+                curMatches.push(selectors[selector]);
+            }
+        }
+
+        var elementInteractable = interactables.get(event.target),
+            action = elementInteractable
+                     && validateAction(
+                         elementInteractable.getAction(event, elementInteractable),
+                         elementInteractable);
+
+        if (!elementInteractable) {
+            if (validateSelector(event, curMatches)) {
+                matches = curMatches;
+
+                pointerHover(event, matches);
+                events.addToElement(event.target, 'mousemove', pointerHover);
+            }
+            else if (target) {
+                var prevTargetChildren = prevTargetElement.querySelectorAll('*');
+                
+                if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
+
+                    // reset the elements of the matches to the old target
+                    for (var i = 0; i < matches.length; i++) {
+                        matches[i]._element = prevTargetElement;
+                    }
+
+                    pointerHover(event, matches);
+                    events.addToElement(target._element, 'mousemove', pointerHover);
+                }
+                else {
+                    target = null;
+                    matches = [];
+                }
+            }
+        }
     }
 
+    function pointerOut (event) {
+        // Remove temporary event listeners for selector Interactables
+
+        if (!interactables.get(event.target)) {
+            events.removeFromElement(event.target, pointerHover);
+            events.removeFromElement(this, 'mousedown', pointerDown);
+            events.removeFromElement(this, 'touchend', pointerDown);
+        }
+
+        if (target && target.options.styleCursor && !(dragging || resizing || gesturing)) {
+            document.documentElement.style.cursor = '';
+        }
+    }
 
     /**
      * @private
@@ -1128,24 +1302,29 @@ var document      = window.document,
      * Check what action would be performed on pointerMove target if a mouse
      * button were pressed and change the cursor accordingly
      */
-    function pointerHover (event) {
-        if (!(pointerIsDown || dragging || resizing || gesturing) && target) {
+    function pointerHover (event, matches) {
+        if (!(pointerIsDown || dragging || resizing || gesturing)) {
 
-            var action = validateAction(target.getAction(event));
+            var action;
 
-            if (action) {
-                if (styleCursor) {
-                    if (action) {
-                        target._element.style.cursor = actions[action].cursor;
-                    }
-                    else {
-                        target._element.style.cursor = '';
-                    }
+            if (matches) {
+                action = validateSelector(event, matches);
+            }
+            else if (target) {
+                action = validateAction(target.getAction(event));
+            }
+
+            if (styleCursor) {
+                if (action) {
+                    document.documentElement.style.cursor = actions[action].cursor;
+                }
+                else {
+                    document.documentElement.style.cursor = '';
                 }
             }
-            else if (dragging || resizing || gesturing) {
-                event.preventDefault();
-            }
+        }
+        else {
+            event.preventDefault();
         }
     }
 
@@ -1159,40 +1338,31 @@ var document      = window.document,
 
         if (dragging) {
             endEvent = new InteractEvent(event, 'drag', 'end');
+
             var dropEvent,
-                drop;
+                draggableElement = target._element,
+                drop = getDrop(event, target),
+                dropzoneElement = drop? drop._element: null;
 
-            if (dropzones.length) {
-                var i,
-                    drops = [],
-                    elements = [];
+            // getDrop changes target._element
+            target._element = draggableElement;
 
-                // collect all dropzones that qualify for a drop
-                for (i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].dropCheck(event)) {
-                        drops.push(dropzones[i]);
-                        elements.push(dropzones[i]._element);
-                    }
-                }
+            // get the most apprpriate dropzone based on DOM depth and order
+            if (drop) {
+                dropEvent = new InteractEvent(event, 'drop', null, dropzoneElement, draggableElement);
 
-                // get the most apprpriate dropzone based on DOM depth and order
-                if ((drop = resolveDrops(elements))) {
-                    dropTarget = drops[drop.index];
-                    dropEvent = new InteractEvent(event, 'drop');
+                endEvent.dropzone = dropzoneElement;
+            }
 
-                    endEvent.dropzone = dropTarget._element;
-                }
+            // if there was a prevDropTarget (perhaps if for some reason this
+            // dragend happens without the mouse moving of the previous drop
+            // target)
+            else if (prevDropTarget) {
+                var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
 
-                // otherwise, if there was a prevDropTarget (perhaps if for
-                // some reason this dragend happens without the mouse moving
-                // out of the previousdroptarget)
-                else if (prevDropTarget) {
-                    var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave');
+                prevDropTarget.fire(dragLeaveEvent, draggableElement);
 
-                    prevDropTarget.fire(dragLeaveEvent);
-
-                    endEvent.dragLeave = prevDropTarget._element;
-                }
+                endEvent.dragLeave = prevDropTarget._element;
             }
 
             target.fire(endEvent);
@@ -1221,51 +1391,62 @@ var document      = window.document,
             target.fire(click);
         }
 
-        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        if (dragging || resizing || gesturing) {
+            autoScroll.stop();
+            matches = [];
 
-        pointerWasMoved = true;
-
-        if (target) {
             if (styleCursor) {
                 document.documentElement.style.cursor = '';
             }
-            autoScroll.stop();
             clearTargets();
+
+            for (var i = 0; i < selectorDZs.length; i++) {
+                selectorDZs._elements = [];
+            }
 
             // prevent Default only if were previously interacting
             event.preventDefault();
         }
+        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        pointerWasMoved = true;
         prepared = null;
 
         return event;
     }
 
-    interactables.indexOfElement = dropzones.indexOfElement = function (element) {
-        var i;
+    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element) {
+        for (var i = 0; i < this.length; i++) {
+            var interactable = this[i];
 
-        for (i = 0; i < this.length; i++) {
-            if (this[i]._element === element) {
+            if (interactable.selector === element
+                || (!interactable.selector && interactable._element === element)) {
                 return i;
             }
         }
         return -1;
     };
 
-    interactables.get = dropzones.get = function (element) {
-        var i = this.indexOfElement(element) ;
+    interactables.get = function interactableGet (element) {
+        if (typeof element === 'string') {
+            return selectors[element];
+        }
 
-        return interactables[i];
+        return this[this.indexOfElement(element)];
+    };
+
+    dropzones.get = function dropzoneGet (element) {
+        return this[this.indexOfElement(element)];
     };
 
     function clearTargets () {
-        target = dropTarget = prevDropTarget = null;
+        if (!target.selector) {
+            target = null;
+        }
+
+        dropTarget = prevDropTarget = null;
     }
 
     function interact (element) {
-        if (typeof element === 'string') {
-            element = document.getElementById(element);
-        }
-
         return interactables.get(element) || new Interactable(element);
     }
 
@@ -1295,10 +1476,23 @@ var document      = window.document,
         this._element = element,
         this._iEvents = this._iEvents || {};
 
-        events.add(this, 'mousemove' , pointerHover);
-        events.add(this, 'mousedown' , pointerDown );
-        events.add(this, 'touchmove' , pointerHover);
-        events.add(this, 'touchstart', pointerDown );
+        if (typeof element === 'string') {
+            // if the selector is invalid,
+            // an exception will be raised
+            document.querySelector(element);
+            selectors[element] = this;
+            this.selector = element;
+        }
+        else {
+            if(element instanceof Element) {
+                events.add(this, 'mousemove' , pointerHover);
+                events.add(this, 'mousedown' , pointerDown );
+                events.add(this, 'touchmove' , pointerHover);
+                events.add(this, 'touchstart', pointerDown );
+            }
+
+            elements.push(this);
+        }
 
         interactables.push(this);
 
@@ -1357,7 +1551,7 @@ var document      = window.document,
                 if (typeof ondrop === 'function') { this.ondrop = ondrop; }
 
                 this.options.dropzone = true;
-                dropzones.push(this);
+                (this.selector? selectorDZs: dropzones).push(this);
 
                 if (!dynamicDrop && !this.selector) {
                     this.rect = this.getRect();
@@ -1366,16 +1560,17 @@ var document      = window.document,
             }
             if (typeof options === 'boolean') {
                 if (options) {
-                    dropzones.push(this);
+                    (this.selector? selectorDZs: dropzones).push(this);
 
                     if (!dynamicDrop && !this.selector) {
                         this.rect = this.getRect();
                     }
                 }
                 else {
-                    var index = dropzones.indexOf(this);
+                    var array = this.selectors? selectorDZs: dropzones,
+                        index = array.indexOf(this);
                     if (index !== -1) {
-                        dropzones.splice(index, 1);
+                        array.splice(index, 1);
                     }
                 }
 
@@ -1396,19 +1591,17 @@ var document      = window.document,
          * @returns {bool}
          */
         dropCheck: function (event) {
-            if (target !== this) {
-                var page = getPageXY(event),
-                    horizontal,
-                    vertical;
+            var page = getPageXY(event),
+                horizontal,
+                vertical;
 
-                if (dynamicDrop) {
-                    this.rect = this.getRect();
-                }
-                horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-                vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
-
-                return horizontal && vertical;
+            if (dynamicDrop) {
+                this.rect = this.getRect();
             }
+            horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+            vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
+
+            return horizontal && vertical;
         },
 
         /**
@@ -1762,7 +1955,7 @@ var document      = window.document,
                 var eventArray = this._iEvents[eventType],
                     index;
 
-                if (eventArray && (index = eventArray.indexOf(listener)) !== -1) {;
+                if (eventArray && (index = eventArray.indexOf(listener)) !== -1) {
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
@@ -1800,13 +1993,24 @@ var document      = window.document,
 
         /**
          * Remove this interactable from the list of interactables
-         * and remove it's drag, drop, resize and gesture capabilities
+         *remove it's drag, drop, resize and gesture capabilities and remove it's drag, drop, resize and gesture capabilities
          *
          * @function
          * @returns {} {@link interact}
          */
         unset: function () {
             events.remove(this, 'all');
+
+            if (typeof this.selector === 'string') {
+                selectors[this.selector] = undefined;
+            }
+            else {
+                events.remove(this, 'all');
+                if (styleCursor) {
+                    this._element.style.cursor = '';
+                }
+                elements.splice(elements.indexOf(this.element()));
+            }
 
             this.dropzone   (false);
 
@@ -2175,20 +2379,41 @@ var document      = window.document,
     };
 
 
+    events.add(docTarget   , 'mousedown'    , selectorDown);
+    events.add(docTarget   , 'touchstart'   , selectorDown);
     events.add(docTarget   , 'mousemove'    , pointerMove );
     events.add(docTarget   , 'touchmove'    , pointerMove );
     events.add(docTarget   , 'mouseover'    , pointerOver );
+    events.add(docTarget   , 'mouseout'     , pointerOut  );
     events.add(docTarget   , 'mouseup'      , docPointerUp);
     events.add(docTarget   , 'touchend'     , docPointerUp);
     events.add(docTarget   , 'touchcancel'  , docPointerUp);
     events.add(windowTarget, 'blur'         , docPointerUp);
 
-    // For IE's lack of preventDefault
+    // For IE's lack of Event#preventDefault
     events.add(docTarget,    'selectstart', function (e) {
         if (dragging || resizing || gesturing) {
             e.preventDefault();
         }
     });
+
+    // For IE8's lack of an Element#matchesSelector
+    if (!matchesSelector in Element.prototype || typeof (Element.prototype[matchesSelector]) !== 'function') {
+        Element.prototype[matchesSelector] = IE8MatchesSelector = function (selector, elems) {
+            // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
+            // modified for better performance
+            elems = elems || this.parentNode.querySelectorAll(selector),
+            count = elems.length;
+
+            for (var i = 0; i < count; i++) {
+                if (elems[i] === this) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 
     return interact;
 } ());

@@ -69,7 +69,7 @@ interact.on('dragstart', function (event) {
 
 Usage
 -----
-Pass the element you want to interact with to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `on` which let's you add event listeners for InteractEvents and any DOM event.
+Pass the element you want to interact with or a CSS selector string to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `on` which let's you add event listeners for InteractEvents and any DOM event.
 The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
 
 Details
