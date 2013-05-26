@@ -195,12 +195,12 @@
             status.modes.classList.add('disabled');
 
             interact(canvas)
-                .unbind('dragstart', dragMove)
-                .unbind('dragmove', dragMove)
-                .unbind('dragend', dragEnd)
-                .bind('dragstart', anchorDragStart)
-                .bind('dragmove', anchorDragMove)
-                .bind('dragend', anchorDragEnd)
+                .off('dragstart', dragMove)
+                .off('dragmove', dragMove)
+                .off('dragend', dragEnd)
+                .on('dragstart', anchorDragStart)
+                .on('dragmove', anchorDragMove)
+                .on('dragend', anchorDragEnd)
                 .checkOnHover(false);
         }
         else {
@@ -208,12 +208,12 @@
             status.modes.classList.remove('disabled');
 
             interact(canvas)
-                .bind('dragstart', dragMove)
-                .bind('dragmove', dragMove)
-                .bind('dragend', dragEnd)
-                .unbind('dragstart', anchorDragStart)
-                .unbind('dragmove', anchorDragMove)
-                .unbind('dragend', anchorDragEnd)
+                .on('dragstart', dragMove)
+                .on('dragmove', dragMove)
+                .on('dragend', dragEnd)
+                .off('dragstart', anchorDragStart)
+                .off('dragmove', anchorDragMove)
+                .off('dragend', anchorDragEnd)
                 .checkOnHover(false);
         }
 
@@ -248,7 +248,7 @@
 
     interact.styleCursor(false);
 
-    interact(document).bind('DOMContentLoaded', function () {
+    interact(document).on('DOMContentLoaded', function () {
         canvas = document.getElementById('drag');
         canvas.width = width;
         canvas.height = height;
@@ -256,8 +256,8 @@
 
         interact(canvas)
             .draggable(true)
-            .bind('mousedown', setSnap)
-            .bind('touchstart', setSnap);
+            .on('mousedown', setSnap)
+            .on('touchstart', setSnap);
 
         guidesCanvas = document.getElementById('grid');
         guidesCanvas.width = width;
@@ -282,11 +282,11 @@
         }
 
         interact(status.sliders)
-            .bind('change', sliderChange)
-            .bind('input', sliderInput);
+            .on('change', sliderChange)
+            .on('input', sliderInput);
 
         interact(document.getElementById('modes'))
-            .bind('change', modeChange);
+            .on('change', modeChange);
 
         snap.anchors = [
             {x: 100, y: 100, range: 200},
