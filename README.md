@@ -7,6 +7,7 @@ Awesomeness includes:
  - cross browser and device, supporting {Chrome,Firefox,Opera}{ **mobile, desktop**} and **Internet Explorer 8+**
  - interaction with **SVG** elements
  - being **standalone** (not _yet another_ jQuery plugin)
+ - introducing **0 additional DOM elements**
  - having(a). **fluent** ().interface
  - **not modifying anything** it doesn't own (except to support IE8 and to change the cursor unless you don't want it to)
 
