@@ -51,10 +51,13 @@ var document      = window.document,
     },
 
     interactables   = [],   // all set interactables
-    dropzones       = [],   // all dropzone interactables
+    dropzones       = [],   // all dropzone element interactables
     elements        = [],   // all elements that have been made interactable
+
     selectors       = {},   // all css selector interactables
+    selectorDZs     = [],   // all dropzone selector interactables
     matches         = [],   // all selectors that are matched by target element
+
     target          = null, // current interactable being interacted with
     dropTarget      = null, // the dropzone a drag target might be dropped into
     prevDropTarget  = null, // the dropzone that was recently dragged away from
@@ -584,9 +587,9 @@ var document      = window.document,
         return 180 * -Math.atan(dy / dx) / Math.PI;
     }
 
-    function calcRects (interactables) {
-        for (var i = 0, len = interactables.length; i < len; i++) {
-            interactables[i].rect = interactables[i].getRect();
+    function calcRects (interactableList) {
+        for (var i = 0, len = interactableList.length; i < len; i++) {
+            interactableList[i].rect = interactableList[i].getRect();
         }
     }
 
@@ -668,10 +671,77 @@ var document      = window.document,
         }
     }
 
-    function InteractEvent (event, action, phase) {
+    function getDrop (event, draggable) {
+        if (dropzones.length || selectorDZs.length) {
+            var i,
+                drops = [],
+                elements = [],
+                selectorDrops = [],
+                selectorElements = [],
+                drop;
+
+            // collect all element dropzones that qualify for a drop
+            for (i = 0; i < dropzones.length; i++) {
+                if (dropzones[i].dropCheck(event)) {
+                    drops.push(dropzones[i]);
+                    elements.push(dropzones[i]._element);
+                }
+            }
+
+            // get the most apprpriate dropzone based on DOM depth and order
+            drop = resolveDrops(elements);
+            dropTarget = drop? dropzones[drop.index]: null;
+
+            if (selectorDZs.length) {
+                var draggableElement = target._element;
+
+                for (i = 0; i < selectorDZs.length; i++) {
+                    var selector = selectorDZs[i],
+                        nodeList = document.querySelectorAll(selector.selector);
+
+                    for (var j = 0, len = nodeList.length; j < len; j++) {
+                        selector._element = nodeList[j];
+                        selector.rect = selector.getRect();
+
+                        if (selector._element !== draggableElement
+                            && elements.indexOf(selector._element) === -1
+                            && selectorElements.indexOf(selector._element === -1)
+                            && selector.dropCheck(event)) {
+
+                            selectorDrops.push(selector);
+                            selectorElements.push(selector._element);
+                        }
+                    }
+                }
+
+                if (selectorElements.length) {
+                    if (dropTarget) {
+                        selectorDrops.push(dropTarget);
+                        selectorElements.push(dropTarget._element);
+                    }
+
+                    drop = resolveDrops(selectorElements);
+
+                    if (drop) {
+                        dropTarget = selectorDrops[drop.index];
+
+                        if (dropTarget.selector) {
+                            dropTarget._element = selectorElements[drop.index];
+                        }
+                    }
+                }
+            }
+            
+            return dropTarget;
+        }
+    }
+
+    function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
             options = target.options;
+
+        element = element || target._element;
 
         if (action === 'gesture') {
             var average = touchAverage(event);
@@ -704,9 +774,13 @@ var document      = window.document,
         this.shiftKey  = event.shiftKey;
         this.metaKey   = event.metaKey;
         this.button    = event.button;
-        this.target    = action === 'drop' && dropTarget._element || target._element;
+        this.target    = element;
         this.timeStamp = new Date().getTime();
         this.type      = action + (phase || '');
+
+        if (related) {
+            this.relatedTarget = related;
+        }
 
         // start/end event dx, dy is difference between start and current points
         if (phase === 'start' || phase === 'end' || action === 'drop') {
@@ -761,11 +835,6 @@ var document      = window.document,
                     this.ds = this.scale - gesture.prevScale;
                 }
             }
-        }
-
-        else if (action === 'drop' ||
-                (action === 'drag' && (phase === 'enter' || phase === 'leave'))) {
-            this.draggable = target._element;
         }
     }
 
@@ -1043,46 +1112,37 @@ var document      = window.document,
 
             if (!dynamicDrop) {
                 calcRects(dropzones);
+                for (var i = 0; i < selectorDZs.length; i++) {
+                    selectorDZs[i]._elements = document.querySelectorAll(selectorDZs[i].selector);
+                }
             }
         }
         else {
             dragEvent = new InteractEvent(event, 'drag', 'move');
 
-            if (dropzones.length) {
-                var i,
-                    drops = [],
-                    elements = [],
-                    drop;
+            var draggableElement = target._element,
+                dropTarget = getDrop(event, target),
+                dropzoneElement = dropTarget? dropTarget._element: null;
 
-                // collect all dropzones that qualify for a drop
-                for (i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].dropCheck(event)) {
-                        drops.push(dropzones[i]);
-                        elements.push(dropzones[i]._element);
-                    }
+            // Make sure that the target selector draggable's element is
+            // restored after dropChecks
+            target._element = draggableElement;
+
+            if (dropTarget !== prevDropTarget) {
+                // if there was a prevDropTarget, create a dragleave event
+                if (prevDropTarget) {
+                    dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
+
+                    dragEvent.dragLeave = prevDropTarget._element;
+                    leaveDropTarget = prevDropTarget;
+                    prevDropTarget = null;
                 }
+                // if the dropTarget is not null, create a dragenter event
+                if (dropTarget) {
+                    dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
 
-                // get the most apprpriate dropzone based on DOM depth and order
-                drop = resolveDrops(elements);
-                dropTarget = drop? dropzones[drop.index]: null;
-
-                // if the current dropTarget is not the same as the previous one
-                if (dropTarget !== prevDropTarget) {
-                    // if there was a prevDropTarget, create a dragleave event
-                    if (prevDropTarget) {
-                        dragLeaveEvent = new InteractEvent(event, 'drag', 'leave');
-
-                        dragEvent.dragLeave = prevDropTarget._element;
-                        leaveDropTarget = prevDropTarget;
-                        prevDropTarget = null;
-                    }
-                    // if the dropTarget is not null, create a dragenter event
-                    if (dropTarget) {
-                        dragEnterEvent = new InteractEvent(event, 'drag', 'enter');
-
-                        dragEvent.dragEnter = dropTarget._element;
-                        prevDropTarget = dropTarget;
-                    }
+                    dragEvent.dragEnter = dropTarget._element;
+                    prevDropTarget = dropTarget;
                 }
             }
         }
@@ -1278,40 +1338,31 @@ var document      = window.document,
 
         if (dragging) {
             endEvent = new InteractEvent(event, 'drag', 'end');
+
             var dropEvent,
-                drop;
+                draggableElement = target._element,
+                drop = getDrop(event, target),
+                dropzoneElement = drop? drop._element: null;
 
-            if (dropzones.length) {
-                var i,
-                    drops = [],
-                    elements = [];
+            // getDrop changes target._element
+            target._element = draggableElement;
 
-                // collect all dropzones that qualify for a drop
-                for (i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].dropCheck(event)) {
-                        drops.push(dropzones[i]);
-                        elements.push(dropzones[i]._element);
-                    }
-                }
+            // get the most apprpriate dropzone based on DOM depth and order
+            if (drop) {
+                dropEvent = new InteractEvent(event, 'drop', null, dropzoneElement, draggableElement);
 
-                // get the most apprpriate dropzone based on DOM depth and order
-                if ((drop = resolveDrops(elements))) {
-                    dropTarget = drops[drop.index];
-                    dropEvent = new InteractEvent(event, 'drop');
+                endEvent.dropzone = dropzoneElement;
+            }
 
-                    endEvent.dropzone = dropTarget._element;
-                }
+            // if there was a prevDropTarget (perhaps if for some reason this
+            // dragend happens without the mouse moving of the previous drop
+            // target)
+            else if (prevDropTarget) {
+                var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
 
-                // otherwise, if there was a prevDropTarget (perhaps if for
-                // some reason this dragend happens without the mouse moving
-                // out of the previousdroptarget)
-                else if (prevDropTarget) {
-                    var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave');
+                prevDropTarget.fire(dragLeaveEvent, draggableElement);
 
-                    prevDropTarget.fire(dragLeaveEvent);
-
-                    endEvent.dragLeave = prevDropTarget._element;
-                }
+                endEvent.dragLeave = prevDropTarget._element;
             }
 
             target.fire(endEvent);
@@ -1341,23 +1392,23 @@ var document      = window.document,
         }
 
         if (dragging || resizing || gesturing) {
+            autoScroll.stop();
             matches = [];
-        }
 
-        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
-
-        pointerWasMoved = true;
-
-        if (target) {
             if (styleCursor) {
                 document.documentElement.style.cursor = '';
             }
-            autoScroll.stop();
             clearTargets();
+
+            for (var i = 0; i < selectorDZs.length; i++) {
+                selectorDZs._elements = [];
+            }
 
             // prevent Default only if were previously interacting
             event.preventDefault();
         }
+        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        pointerWasMoved = true;
         prepared = null;
 
         return event;
@@ -1500,7 +1551,7 @@ var document      = window.document,
                 if (typeof ondrop === 'function') { this.ondrop = ondrop; }
 
                 this.options.dropzone = true;
-                dropzones.push(this);
+                (this.selector? selectorDZs: dropzones).push(this);
 
                 if (!dynamicDrop && !this.selector) {
                     this.rect = this.getRect();
@@ -1509,16 +1560,17 @@ var document      = window.document,
             }
             if (typeof options === 'boolean') {
                 if (options) {
-                    dropzones.push(this);
+                    (this.selector? selectorDZs: dropzones).push(this);
 
                     if (!dynamicDrop && !this.selector) {
                         this.rect = this.getRect();
                     }
                 }
                 else {
-                    var index = dropzones.indexOf(this);
+                    var array = this.selectors? selectorDZs: dropzones,
+                        index = array.indexOf(this);
                     if (index !== -1) {
-                        dropzones.splice(index, 1);
+                        array.splice(index, 1);
                     }
                 }
 
@@ -1539,19 +1591,17 @@ var document      = window.document,
          * @returns {bool}
          */
         dropCheck: function (event) {
-            if (target !== this) {
-                var page = getPageXY(event),
-                    horizontal,
-                    vertical;
+            var page = getPageXY(event),
+                horizontal,
+                vertical;
 
-                if (dynamicDrop) {
-                    this.rect = this.getRect();
-                }
-                horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-                vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
-
-                return horizontal && vertical;
+            if (dynamicDrop) {
+                this.rect = this.getRect();
             }
+            horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
+            vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
+
+            return horizontal && vertical;
         },
 
         /**
