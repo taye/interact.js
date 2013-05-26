@@ -36,8 +36,8 @@ var // x and y to keep the position that's been dragged to
     // vendor prefixes (prefices?)
     transformProp = 'transform' in document.body.style?
                 'transform': 'webkitTransform' in document.body.style?
-                    'webkitTransform': 'MozTransform' in document.body.style?
-                        'MozTransform': 'oTransform' in document.body.style?
+                    'webkitTransform': 'mozTransform' in document.body.style?
+                        'mozTransform': 'oTransform' in document.body.style?
                             'oTransform': 'msTransform';
 
 // make an Interactable of the document body element
