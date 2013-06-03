@@ -1409,7 +1409,7 @@ var document      = window.document,
             // prevent Default only if were previously interacting
             event.preventDefault();
         }
-        pointerIsDown = target.options.snap.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = defaultOptions.snap.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = null;
 
