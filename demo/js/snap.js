@@ -201,7 +201,7 @@
                 .on('dragstart', anchorDragStart)
                 .on('dragmove', anchorDragMove)
                 .on('dragend', anchorDragEnd)
-                .checkOnHover(false);
+                .styleCursor(false);
         }
         else {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
@@ -214,7 +214,7 @@
                 .off('dragstart', anchorDragStart)
                 .off('dragmove', anchorDragMove)
                 .off('dragend', anchorDragEnd)
-                .checkOnHover(false);
+                .styleCursor(false);
         }
 
         if (status.offMode.checked) {
