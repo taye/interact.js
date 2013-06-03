@@ -71,7 +71,31 @@ var document      = window.document,
         gestureable : false,
 
         styleCursor : true,
-        snap        : snap,
+
+        // aww snap
+        snap: {
+            enabled: false,
+
+            mode: 'grid',
+            range: Infinity,
+            grid: {
+                x: 100,
+                y: 100
+            },
+            gridOffset: {
+                x: 0,
+                y: 0
+            },
+            anchors: [],
+
+            locked: false,
+            x : 0,
+            y : 0,
+            dx: 0,
+            dy: 0,
+            realX: 0,
+            realY: 0
+        },
 
         autoScroll  : {
             container: window,  // the item that is scrolled
@@ -154,31 +178,6 @@ var document      = window.document,
             window.clearInterval(autoScroll.i);
             autoScroll.isScrolling = false;
         }
-    },
-
-    // aww snap
-    snap = {
-        enabled: false,
-
-        mode: 'grid',
-        range: Infinity,
-        grid: {
-            x: 100,
-            y: 100
-        },
-        gridOffset: {
-            x: 0,
-            y: 0
-        },
-        anchors: [],
-
-        locked: false,
-        x : 0,
-        y : 0,
-        dx: 0,
-        dy: 0,
-        realX: 0,
-        realY: 0
     },
 
     // Does the browser support touch input?
@@ -750,6 +749,8 @@ var document      = window.document,
             client = { x: average.clientX, y: average.clientY };
         }
         else {
+            var snap = options.snap;
+
             client = getClientXY(event);
             page = getPageXY(event);
 
@@ -984,6 +985,7 @@ var document      = window.document,
                 pointerWasMoved = true;
             }
             if (prepared && target) {
+                var snap = target.options.snap;
 
                 if (snap.enabled) {
                     var page = getPageXY(event),
@@ -1407,7 +1409,7 @@ var document      = window.document,
             // prevent Default only if were previously interacting
             event.preventDefault();
         }
-        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = target.options.snap.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = null;
 
@@ -2302,6 +2304,8 @@ var document      = window.document,
      * @returns {Object | interact}
      */
     interact.snap = function (options) {
+        var snap = defaultOptions.snap;
+
         if (typeof options === 'object') {
             snap.enabled = true;
 
