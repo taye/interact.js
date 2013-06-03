@@ -86,15 +86,7 @@ var document      = window.document,
                 x: 0,
                 y: 0
             },
-            anchors: [],
-
-            locked: false,
-            x : 0,
-            y : 0,
-            dx: 0,
-            dy: 0,
-            realX: 0,
-            realY: 0
+            anchors: []
         },
 
         autoScroll  : {
@@ -104,6 +96,16 @@ var document      = window.document,
             distance : 10,      // the distance in x and y that the page is scrolled
         },
         autoScrollEnabled: true
+    },
+
+    snapStatus = {
+        locked: false,
+        x     : 0,
+        y     : 0,
+        dx    : 0,
+        dy    : 0,
+        realX : 0,
+        realY : 0
     },
 
     // Things related to autoScroll
@@ -738,7 +740,7 @@ var document      = window.document,
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
-            options = target.options;
+            options = target? target.options: defaultOptions;
 
         element = element || target._element;
 
@@ -754,11 +756,11 @@ var document      = window.document,
             client = getClientXY(event);
             page = getPageXY(event);
 
-            if (snap.enabled && snap.locked) {
-                page.x += snap.dx;
-                page.y += snap.dy;
-                client.x += snap.dx;
-                client.y += snap.dy;
+            if (snap.enabled && snapStatus.locked) {
+                page.x += snapStatus.dx;
+                page.y += snapStatus.dy;
+                client.x += snapStatus.dx;
+                client.y += snapStatus.dy;
             }
         }
 
@@ -992,8 +994,8 @@ var document      = window.document,
                         inRange,
                         snapChanged;
 
-                    snap.realX = page.x;
-                    snap.realY = page.y;
+                    snapStatus.realX = page.x;
+                    snapStatus.realY = page.y;
 
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
@@ -1051,13 +1053,13 @@ var document      = window.document,
                         }
 
                         inRange = closest.inRange;
-                        snapChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
+                        snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
 
-                        snap.x = closest.anchor.x;
-                        snap.y = closest.anchor.y;
-                        snap.dx = closest.distX;
-                        snap.dy = closest.distY;
-                        snap.anchors.closest = closest.anchor;
+                        snapStatus.x = closest.anchor.x;
+                        snapStatus.y = closest.anchor.y;
+                        snapStatus.dx = closest.distX;
+                        snapStatus.dy = closest.distY;
+                        snapStatus.anchors.closest = closest.anchor;
                     }
                     else {
                         var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
@@ -1072,20 +1074,20 @@ var document      = window.document,
                             distance = Math.sqrt(distX * distX + distY * distY);
 
                         inRange = distance < snap.range;
-                        snapChanged = (newX !== snap.x || newY !== snap.y);
+                        snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
 
-                        snap.x = newX;
-                        snap.y = newY;
-                        snap.dx = distX;
-                        snap.dy = distY;
+                        snapStatus.x = newX;
+                        snapStatus.y = newY;
+                        snapStatus.dx = distX;
+                        snapStatus.dy = distY;
                     }
 
-                    if ((snapChanged || !snap.locked) && inRange)  {
-                        snap.locked = true;
+                    if ((snapChanged || !snapStatus.locked) && inRange)  {
+                        snapStatus.locked = true;
                         actions[prepared].moveListener(event);
                     }
                     else if (snapChanged || !inRange) {
-                        snap.locked = false;
+                        snapStatus.locked = false;
                         actions[prepared].moveListener(event);
                     }
                 }
@@ -1409,7 +1411,7 @@ var document      = window.document,
             // prevent Default only if were previously interacting
             event.preventDefault();
         }
-        pointerIsDown = defaultOptions.snap.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = null;
 
@@ -2330,13 +2332,13 @@ var document      = window.document,
             gridOffset: snap.gridOffset,
             anchors   : snap.anchors,
             range     : snap.range,
-            locked    : snap.locked,
-            x         : snap.x,
-            y         : snap.y,
-            realX     : snap.realX,
-            realY     : snap.realY,
-            dx        : snap.dx,
-            dy        : snap.dy
+            locked    : snapStatus.locked,
+            x         : snapStatus.x,
+            y         : snapStatus.y,
+            realX     : snapStatus.realX,
+            realY     : snapStatus.realY,
+            dx        : snapStatus.dx,
+            dy        : snapStatus.dy
         };
     };
 
