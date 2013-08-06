@@ -99,13 +99,14 @@ var document      = window.document,
     },
 
     snapStatus = {
-        locked: false,
-        x     : 0,
-        y     : 0,
-        dx    : 0,
-        dy    : 0,
-        realX : 0,
-        realY : 0
+        locked : false,
+        x      : 0,
+        y      : 0,
+        dx     : 0,
+        dy     : 0,
+        realX  : 0,
+        realY  : 0,
+        anchors: []
     },
 
     // Things related to autoScroll
@@ -756,11 +757,25 @@ var document      = window.document,
             client = getClientXY(event);
             page = getPageXY(event);
 
-            if (snap.enabled && snapStatus.locked) {
-                page.x += snapStatus.dx;
-                page.y += snapStatus.dy;
-                client.x += snapStatus.dx;
-                client.y += snapStatus.dy;
+            if (snap.enabled) {
+                this.snap = {
+                    mode  : snap.mode,
+                    range : snapStatus.range,
+                    locked: snapStatus.locked,
+                    x     : snapStatus.x,
+                    y     : snapStatus.y,
+                    realX : snapStatus.realX,
+                    realY : snapStatus.realY,
+                    dx    : snapStatus.dx,
+                    dy    : snapStatus.dy
+                };
+
+                if (snapStatus.locked) {
+                    page.x += snapStatus.dx;
+                    page.y += snapStatus.dy;
+                    client.x += snapStatus.dx;
+                    client.y += snapStatus.dy;
+                }
             }
         }
 
@@ -1049,6 +1064,8 @@ var document      = window.document,
                                     distX: distX,
                                     distY: distY
                                 };
+
+                                snapStatus.range = range;
                             }
                         }
 
@@ -1059,7 +1076,7 @@ var document      = window.document,
                         snapStatus.y = closest.anchor.y;
                         snapStatus.dx = closest.distX;
                         snapStatus.dy = closest.distY;
-                        snapStatus.anchors.closest = closest.anchor;
+                        target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
                     }
                     else {
                         var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
@@ -1080,6 +1097,8 @@ var document      = window.document,
                         snapStatus.y = newY;
                         snapStatus.dx = distX;
                         snapStatus.dy = distY;
+
+                        snapStatus.range = snap.range;
                     }
 
                     if ((snapChanged || !snapStatus.locked) && inRange)  {
@@ -1836,6 +1855,36 @@ var document      = window.document,
                 return this;
             }
             return this.options.styleCursor;
+        },
+
+        snap: function (options) {
+            var snap = this.options.snap;
+
+            if (typeof options === 'object') {
+                snap.enabled = true;
+
+                if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
+                if (typeof options.range === 'number') { snap.range   = options.range;  }
+                if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
+                if (typeof options.gridOffset === 'object') { snap.gridOffset = options.gridOffset; }
+                if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
+
+                return this;
+            }
+            if (typeof options === 'boolean') {
+                snap.enabled = options;
+
+                return this;
+            }
+
+            return {
+                enabled   : snap.enabled,
+                mode      : snap.mode,
+                grid      : snap.grid,
+                gridOffset: snap.gridOffset,
+                anchors   : snap.anchors,
+                range     : snap.range,
+            };
         },
 
         /**
