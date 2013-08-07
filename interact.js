@@ -289,6 +289,7 @@ var document      = window.document,
 
     // Events wrapper
     events = (function () {
+        /* jshint -W001 */ // ignore warning about setting IE8 Event#hasOwnProperty
         var Event = window.Event,
             useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
             addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
@@ -899,8 +900,7 @@ var document      = window.document,
         else {
             var selector,
                 element = event.target,
-                elements,
-                action;
+                elements;
 
             while (element !== document.documentElement && !action) {
                 matches = [];
@@ -1007,7 +1007,10 @@ var document      = window.document,
                 if (snap.enabled) {
                     var page = getPageXY(event),
                         inRange,
-                        snapChanged;
+                        snapChanged,
+                        distX,
+                        distY,
+                        distance;
 
                     snapStatus.realX = page.x;
                     snapStatus.realY = page.y;
@@ -1022,17 +1025,15 @@ var document      = window.document,
                                 range: 0,
                                 distX: 0,
                                 distY: 0
-                            },
-                            distX,
-                            distY;
+                            };
 
                         for (var i = 0, len = snap.anchors.length; i < len; i++) {
                             var anchor = snap.anchors[i],
-                                distX = anchor.x - page.x,
-                                distY = anchor.y - page.y,
+                                range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
-                                range = typeof anchor.range === 'number'? anchor.range: snap.range,
-                                distance = Math.sqrt(distX * distX + distY * distY);
+                            distX = anchor.x - page.x;
+                            distY = anchor.y - page.y;
+                            distance = Math.sqrt(distX * distX + distY * distY);
 
                             inRange = distance < range;
 
@@ -1083,12 +1084,12 @@ var document      = window.document,
                             gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
 
                             newX = gridx * snap.grid.x + snap.gridOffset.x,
-                            newY = gridy * snap.grid.y + snap.gridOffset.y,
+                            newY = gridy * snap.grid.y + snap.gridOffset.y;
 
-                            distX = newX - page.x,
-                            distY = newY - page.y,
+                        distX = newX - page.x;
+                        distY = newY - page.y;
 
-                            distance = Math.sqrt(distX * distX + distY * distY);
+                        distance = Math.sqrt(distX * distX + distY * distY);
 
                         inRange = distance < snap.range;
                         snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
@@ -1127,6 +1128,7 @@ var document      = window.document,
         var dragEvent,
             dragEnterEvent,
             dragLeaveEvent,
+            dropTarget,
             leaveDropTarget;
 
         if (!dragging) {
@@ -1141,11 +1143,11 @@ var document      = window.document,
             }
         }
         else {
-            dragEvent = new InteractEvent(event, 'drag', 'move');
+            dragEvent  = new InteractEvent(event, 'drag', 'move');
+            dropTarget = getDrop(event, target);
 
             var draggableElement = target._element,
-                dropTarget = getDrop(event, target),
-                dropzoneElement = dropTarget? dropTarget._element: null;
+                dropzoneElement  = dropTarget? dropTarget._element: null;
 
             // Make sure that the target selector draggable's element is
             // restored after dropChecks
@@ -1154,18 +1156,18 @@ var document      = window.document,
             if (dropTarget !== prevDropTarget) {
                 // if there was a prevDropTarget, create a dragleave event
                 if (prevDropTarget) {
-                    dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
+                    dragLeaveEvent      = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
 
                     dragEvent.dragLeave = prevDropTarget._element;
-                    leaveDropTarget = prevDropTarget;
-                    prevDropTarget = null;
+                    leaveDropTarget     = prevDropTarget;
+                    prevDropTarget      = null;
                 }
                 // if the dropTarget is not null, create a dragenter event
                 if (dropTarget) {
-                    dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
+                    dragEnterEvent      = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
 
                     dragEvent.dragEnter = dropTarget._element;
-                    prevDropTarget = dropTarget;
+                    prevDropTarget      = dropTarget;
                 }
             }
         }
@@ -1414,25 +1416,7 @@ var document      = window.document,
             target.fire(click);
         }
 
-        if (dragging || resizing || gesturing) {
-            autoScroll.stop();
-            matches = [];
-
-            if (styleCursor) {
-                document.documentElement.style.cursor = '';
-            }
-            clearTargets();
-
-            for (var i = 0; i < selectorDZs.length; i++) {
-                selectorDZs._elements = [];
-            }
-
-            // prevent Default only if were previously interacting
-            event.preventDefault();
-        }
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        pointerWasMoved = true;
-        prepared = null;
+        interact.stop();
 
         return event;
     }
@@ -1496,7 +1480,7 @@ var document      = window.document,
      * @name Interactable
      */
     function Interactable (element, options) {
-        this._element = element,
+        this._element = element;
         this._iEvents = this._iEvents || {};
 
         if (typeof element === 'string') {
@@ -2104,7 +2088,7 @@ var document      = window.document,
             }
         }
         return interact;
-    },
+    };
 
     /**
      * Removes a global InteractEvent listener
@@ -2119,7 +2103,7 @@ var document      = window.document,
             globalEvents[iEventType].splice(index, 1);
         }
         return interact;
-    },
+    };
 
     /**
      * @function
@@ -2166,7 +2150,7 @@ var document      = window.document,
         }
 
         event.target = event.currentTarget = element;
-        event.preventDefault = event.stopPropagation = function () {};
+        event.preventDefault = event.stopPropagation = blank;
 
         pointerDown(event, action);
 
@@ -2412,6 +2396,37 @@ var document      = window.document,
     };
 
     /**
+     * Ends the current action
+     *
+     * @function
+     * @returns {@link interact}
+     */
+    interact.stop = function () {
+        if (dragging || resizing || gesturing) {
+            autoScroll.stop();
+            matches = [];
+
+            if (styleCursor) {
+                document.documentElement.style.cursor = '';
+            }
+            clearTargets();
+
+            for (var i = 0; i < selectorDZs.length; i++) {
+                selectorDZs._elements = [];
+            }
+
+            // prevent Default only if were previously interacting
+            event.preventDefault();
+        }
+
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
+        pointerWasMoved = true;
+        prepared = null;
+
+        return interact;
+    };
+
+    /**
      * Returns or sets wheather the dimensions of dropzone elements are
      * calculated on every dragmove or only on dragstart for the default
      * dropChecker
@@ -2453,11 +2468,11 @@ var document      = window.document,
     });
 
     // For IE8's lack of an Element#matchesSelector
-    if (!matchesSelector in Element.prototype || typeof (Element.prototype[matchesSelector]) !== 'function') {
+    if (!(matchesSelector in Element.prototype) || typeof (Element.prototype[matchesSelector]) !== 'function') {
         Element.prototype[matchesSelector] = IE8MatchesSelector = function (selector, elems) {
             // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
             // modified for better performance
-            elems = elems || this.parentNode.querySelectorAll(selector),
+            elems = elems || this.parentNode.querySelectorAll(selector);
             count = elems.length;
 
             for (var i = 0; i < count; i++) {
@@ -2467,7 +2482,7 @@ var document      = window.document,
             }
 
             return false;
-        }
+        };
     }
 
     return interact;
