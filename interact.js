@@ -1393,25 +1393,7 @@ var document      = window.document,
             target.fire(click);
         }
 
-        if (dragging || resizing || gesturing) {
-            autoScroll.stop();
-            matches = [];
-
-            if (styleCursor) {
-                document.documentElement.style.cursor = '';
-            }
-            clearTargets();
-
-            for (var i = 0; i < selectorDZs.length; i++) {
-                selectorDZs._elements = [];
-            }
-
-            // prevent Default only if were previously interacting
-            event.preventDefault();
-        }
-        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
-        pointerWasMoved = true;
-        prepared = null;
+        interact.stop();
 
         return event;
     }
@@ -2356,6 +2338,37 @@ var document      = window.document,
      */
     interact.currentAction = function () {
         return (dragging && 'drag') || (resizing && 'resize') || (gesturing && 'gesture') || null;
+    };
+
+    /**
+     * Ends the current action
+     *
+     * @function
+     * @returns {@link interact}
+     */
+    interact.stop = function () {
+        if (dragging || resizing || gesturing) {
+            autoScroll.stop();
+            matches = [];
+
+            if (styleCursor) {
+                document.documentElement.style.cursor = '';
+            }
+            clearTargets();
+
+            for (var i = 0; i < selectorDZs.length; i++) {
+                selectorDZs._elements = [];
+            }
+
+            // prevent Default only if were previously interacting
+            event.preventDefault();
+        }
+
+        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        pointerWasMoved = true;
+        prepared = null;
+
+        return interact;
     };
 
     /**
