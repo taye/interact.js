@@ -760,15 +760,16 @@ var document      = window.document,
 
             if (snap.enabled) {
                 this.snap = {
-                    mode  : snap.mode,
-                    range : snapStatus.range,
-                    locked: snapStatus.locked,
-                    x     : snapStatus.x,
-                    y     : snapStatus.y,
-                    realX : snapStatus.realX,
-                    realY : snapStatus.realY,
-                    dx    : snapStatus.dx,
-                    dy    : snapStatus.dy
+                    mode   : snap.mode,
+                    anchors: snapStatus.anchors,
+                    range  : snapStatus.range,
+                    locked : snapStatus.locked,
+                    x      : snapStatus.x,
+                    y      : snapStatus.y,
+                    realX  : snapStatus.realX,
+                    realY  : snapStatus.realY,
+                    dx     : snapStatus.dx,
+                    dy     : snapStatus.dy
                 };
 
                 if (snapStatus.locked) {

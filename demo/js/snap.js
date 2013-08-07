@@ -20,7 +20,7 @@
         lightBlue = '#88ccff',
         peppermint = '#66e075',
         tango = '#ff4400',
-        draggingAnchor = false;
+        draggingAnchor = null;
 
     function drawGrid (grid, gridOffset, range) {
         var barLength = 16;
@@ -132,23 +132,25 @@
 
     function anchorDragStart (event) {
         if (event.snap.locked) {
-            interact(event.target).snap(false);
-            draggingAnchor = true;
+            interact(canvas).snap(false);
+            draggingAnchor = event.snap.anchors.closest;
         }
     }
 
     function anchorDragMove (event) {
-        if (draggingAnchor && event.snap.anchors.closest) {
-            snap.anchors.closest.x += event.dx;
-            snap.anchors.closest.y += event.dy;
+        if (draggingAnchor) {
+            var snap = interact(canvas).snap();
 
-            drawAnchors(event.snap.anchors);
+            draggingAnchor.x += event.dx;
+            draggingAnchor.y += event.dy;
+
+            drawAnchors(snap.anchors, snap.range);
         }
     }
 
     function anchorDragEnd (event) {
-        snap.enabled = true;
-        draggingAnchor = false;
+        interact(canvas).snap(true);
+        draggingAnchor = null;
     }
 
     function sliderChange (event, valid) {
@@ -206,7 +208,12 @@
                 .styleCursor(false);
         }
 
-        interact(canvas).snap({ mode: status.anchorMode.checked? 'anchor': 'grid' });
+        interact(canvas).snap({
+            mode: status.anchorMode.checked
+                ? 'anchor'
+                : 'grid',
+            enabled: true
+        });
 
         if (status.offMode.checked) {
             interact(canvas).snap(false);
