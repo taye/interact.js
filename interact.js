@@ -71,7 +71,23 @@ var document      = window.document,
         gestureable : false,
 
         styleCursor : true,
-        snap        : snap,
+
+        // aww snap
+        snap: {
+            enabled: false,
+
+            mode: 'grid',
+            range: Infinity,
+            grid: {
+                x: 100,
+                y: 100
+            },
+            gridOffset: {
+                x: 0,
+                y: 0
+            },
+            anchors: []
+        },
 
         autoScroll  : {
             container: window,  // the item that is scrolled
@@ -80,6 +96,17 @@ var document      = window.document,
             distance : 10,      // the distance in x and y that the page is scrolled
         },
         autoScrollEnabled: true
+    },
+
+    snapStatus = {
+        locked : false,
+        x      : 0,
+        y      : 0,
+        dx     : 0,
+        dy     : 0,
+        realX  : 0,
+        realY  : 0,
+        anchors: []
     },
 
     // Things related to autoScroll
@@ -154,31 +181,6 @@ var document      = window.document,
             window.clearInterval(autoScroll.i);
             autoScroll.isScrolling = false;
         }
-    },
-
-    // aww snap
-    snap = {
-        enabled: false,
-
-        mode: 'grid',
-        range: Infinity,
-        grid: {
-            x: 100,
-            y: 100
-        },
-        gridOffset: {
-            x: 0,
-            y: 0
-        },
-        anchors: [],
-
-        locked: false,
-        x : 0,
-        y : 0,
-        dx: 0,
-        dy: 0,
-        realX: 0,
-        realY: 0
     },
 
     // Does the browser support touch input?
@@ -740,7 +742,7 @@ var document      = window.document,
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
-            options = target.options;
+            options = target? target.options: defaultOptions;
 
         element = element || target._element;
 
@@ -751,14 +753,31 @@ var document      = window.document,
             client = { x: average.clientX, y: average.clientY };
         }
         else {
+            var snap = options.snap;
+
             client = getClientXY(event);
             page = getPageXY(event);
 
-            if (snap.enabled && snap.locked) {
-                page.x += snap.dx;
-                page.y += snap.dy;
-                client.x += snap.dx;
-                client.y += snap.dy;
+            if (snap.enabled) {
+                this.snap = {
+                    mode   : snap.mode,
+                    anchors: snapStatus.anchors,
+                    range  : snapStatus.range,
+                    locked : snapStatus.locked,
+                    x      : snapStatus.x,
+                    y      : snapStatus.y,
+                    realX  : snapStatus.realX,
+                    realY  : snapStatus.realY,
+                    dx     : snapStatus.dx,
+                    dy     : snapStatus.dy
+                };
+
+                if (snapStatus.locked) {
+                    page.x += snapStatus.dx;
+                    page.y += snapStatus.dy;
+                    client.x += snapStatus.dx;
+                    client.y += snapStatus.dy;
+                }
             }
         }
 
@@ -984,6 +1003,7 @@ var document      = window.document,
                 pointerWasMoved = true;
             }
             if (prepared && target) {
+                var snap = target.options.snap;
 
                 if (snap.enabled) {
                     var page = getPageXY(event),
@@ -993,8 +1013,8 @@ var document      = window.document,
                         distY,
                         distance;
 
-                    snap.realX = page.x;
-                    snap.realY = page.y;
+                    snapStatus.realX = page.x;
+                    snapStatus.realY = page.y;
 
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
@@ -1046,17 +1066,19 @@ var document      = window.document,
                                     distX: distX,
                                     distY: distY
                                 };
+
+                                snapStatus.range = range;
                             }
                         }
 
                         inRange = closest.inRange;
-                        snapChanged = (closest.anchor.x !== snap.x || closest.anchor.y !== snap.y);
+                        snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
 
-                        snap.x = closest.anchor.x;
-                        snap.y = closest.anchor.y;
-                        snap.dx = closest.distX;
-                        snap.dy = closest.distY;
-                        snap.anchors.closest = closest.anchor;
+                        snapStatus.x = closest.anchor.x;
+                        snapStatus.y = closest.anchor.y;
+                        snapStatus.dx = closest.distX;
+                        snapStatus.dy = closest.distY;
+                        target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
                     }
                     else {
                         var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
@@ -1071,20 +1093,22 @@ var document      = window.document,
                         distance = Math.sqrt(distX * distX + distY * distY);
 
                         inRange = distance < snap.range;
-                        snapChanged = (newX !== snap.x || newY !== snap.y);
+                        snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
 
-                        snap.x = newX;
-                        snap.y = newY;
-                        snap.dx = distX;
-                        snap.dy = distY;
+                        snapStatus.x = newX;
+                        snapStatus.y = newY;
+                        snapStatus.dx = distX;
+                        snapStatus.dy = distY;
+
+                        snapStatus.range = snap.range;
                     }
 
-                    if ((snapChanged || !snap.locked) && inRange)  {
-                        snap.locked = true;
+                    if ((snapChanged || !snapStatus.locked) && inRange)  {
+                        snapStatus.locked = true;
                         actions[prepared].moveListener(event);
                     }
                     else if (snapChanged || !inRange) {
-                        snap.locked = false;
+                        snapStatus.locked = false;
                         actions[prepared].moveListener(event);
                     }
                 }
@@ -1818,6 +1842,36 @@ var document      = window.document,
             return this.options.styleCursor;
         },
 
+        snap: function (options) {
+            var snap = this.options.snap;
+
+            if (typeof options === 'object') {
+                snap.enabled = true;
+
+                if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
+                if (typeof options.range === 'number') { snap.range   = options.range;  }
+                if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
+                if (typeof options.gridOffset === 'object') { snap.gridOffset = options.gridOffset; }
+                if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
+
+                return this;
+            }
+            if (typeof options === 'boolean') {
+                snap.enabled = options;
+
+                return this;
+            }
+
+            return {
+                enabled   : snap.enabled,
+                mode      : snap.mode,
+                grid      : snap.grid,
+                gridOffset: snap.gridOffset,
+                anchors   : snap.anchors,
+                range     : snap.range,
+            };
+        },
+
         /**
          * returns the element this interactable represents
          *
@@ -2286,6 +2340,8 @@ var document      = window.document,
      * @returns {Object | interact}
      */
     interact.snap = function (options) {
+        var snap = defaultOptions.snap;
+
         if (typeof options === 'object') {
             snap.enabled = true;
 
@@ -2310,13 +2366,13 @@ var document      = window.document,
             gridOffset: snap.gridOffset,
             anchors   : snap.anchors,
             range     : snap.range,
-            locked    : snap.locked,
-            x         : snap.x,
-            y         : snap.y,
-            realX     : snap.realX,
-            realY     : snap.realY,
-            dx        : snap.dx,
-            dy        : snap.dy
+            locked    : snapStatus.locked,
+            x         : snapStatus.x,
+            y         : snapStatus.y,
+            realX     : snapStatus.realX,
+            realY     : snapStatus.realY,
+            dx        : snapStatus.dx,
+            dy        : snapStatus.dy
         };
     };
 
@@ -2364,7 +2420,7 @@ var document      = window.document,
             event.preventDefault();
         }
 
-        pointerIsDown = snap.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = null;
 
