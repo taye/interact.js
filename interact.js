@@ -2417,7 +2417,9 @@ var document      = window.document,
             }
 
             // prevent Default only if were previously interacting
-            event.preventDefault();
+            if (event && typeof event.preventDefault === 'function') {
+               event.preventDefault();
+            }
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
