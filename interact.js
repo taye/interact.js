@@ -1761,14 +1761,10 @@ var document      = window.document,
 
                 snap.mode       = this.validateSetting('snap', 'mode', newValue.mode);
                 snap.range       = this.validateSetting('snap', 'range', newValue.range);
-                //snap.mode  = (typeof newValue.mode  === 'string'? newValue.mode: defaults.mode);
-                //snap.range = (typeof newValue.range === 'number'? newValue.range: defaults.range);
 
                 snap.grid       = this.validateSetting('snap', 'grid', newValue.grid);
                 snap.gridOffset = this.validateSetting('snap', 'gridOffset', newValue.gridOffset);
                 snap.anchors    = this.validateSetting('snap', 'anchors', newValue.anchors);
-                //snap.gridOffset = (newValue.gridOffset instanceof Object? newValue: (snap.gridOffset instanceof Object? snap: defaults)).gridOffset;
-                //snap.anchors    = (newValue.anchors    instanceof Array ? newValue: (snap.anchors    instanceof Array ? snap: defaults)).anchors;
 
                 this.options.snapEnabled = true;
                 this.options.snap = snap;
@@ -1789,10 +1785,9 @@ var document      = window.document,
                 return this;
             }
 
-            return this.options.snap;
-            //return ((this.options.snapEnabled === null? defaultOptions: this.options).snapEnabled)
-                //? this.options.snap
-                //: false;
+            return ((this.options.snapEnabled === null? defaultOptions: this.options).snapEnabled)
+                ? this.options.snap
+                : false;
         },
 
         /**
