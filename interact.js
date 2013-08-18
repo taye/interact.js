@@ -1146,11 +1146,11 @@ var document      = window.document,
             }
         }
         else {
-            dragEvent  = new InteractEvent(event, 'drag', 'move');
-            dropTarget = getDrop(event, target);
-
             var draggableElement = target._element,
                 dropzoneElement  = dropTarget? dropTarget._element: null;
+
+            dragEvent  = new InteractEvent(event, 'drag', 'move');
+            dropTarget = getDrop(event, target);
 
             // Make sure that the target selector draggable's element is
             // restored after dropChecks
