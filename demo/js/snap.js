@@ -23,14 +23,15 @@
         draggingAnchor = null;
 
     function drawGrid (grid, gridOffset, range) {
+        if (!grid.x || !grid.y) { return; }
+
         var barLength = 16;
 
         guidesContext.clearRect(0, 0, width, height);
 
-        guidesCanvas.fillStyle = blue;
+        guidesContext.fillStyle = lightBlue;
 
         if (range < 0 || range === Infinity) {
-            guidesContext.fillStyle = lightBlue;
             guidesContext.fillRect(0, 0, width, height);
         }
 
@@ -109,11 +110,9 @@
     function dragMove (event) {
         var snap = event.snap;
 
-        if (!snap) { return; }
-
         context.clearRect(0, 0, width, height);
 
-        if (snap.range !== Infinity) {
+        if (snap && snap.range !== Infinity) {
             context.circle(snap.x, snap.y, snap.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
         }
 
@@ -124,6 +123,7 @@
     }
 
     function dragEnd (event) {
+        context.clearRect(0, 0, width, height);
         context.circle(event.pageX, event.pageY, 10, tango).fill();
 
         prevX = event.pageX;
@@ -167,15 +167,14 @@
                 x: Number(status.offsetX.value),
                 y: Number(status.offsetY.value)
             },
-            range: Number(status.range.value),
-            enabled: !status.offMode.checked
+            range: Number(status.range.value)
         });
 
         drawSnap(interact(canvas).snap());
     }
 
     function modeChange (event) {
-        var snap = interact(canvas).snap();
+        var snap = interact(canvas).snap(true).snap();
 
         if (status.anchorDrag.checked && !status.anchorMode.checked) {
             status.anchorMode.checked = true;
@@ -191,8 +190,7 @@
                 .off('dragend', dragEnd)
                 .on('dragstart', anchorDragStart)
                 .on('dragmove', anchorDragMove)
-                .on('dragend', anchorDragEnd)
-                .styleCursor(false);
+                .on('dragend', anchorDragEnd);
         }
         else {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
@@ -204,20 +202,16 @@
                 .on('dragend', dragEnd)
                 .off('dragstart', anchorDragStart)
                 .off('dragmove', anchorDragMove)
-                .off('dragend', anchorDragEnd)
-                .styleCursor(false);
+                .off('dragend', anchorDragEnd);
         }
 
         interact(canvas).snap({
             mode: status.anchorMode.checked
                 ? 'anchor'
-                : 'grid',
-            enabled: true
-        });
+                : 'grid'
+            });
 
-        if (status.offMode.checked) {
-            interact(canvas).snap(false);
-        }
+        interact(canvas).snap(status.offMode.checked? false: true);
 
         drawSnap(interact(canvas).snap());
     }
@@ -231,15 +225,6 @@
         }
 
         sliderChange(event, true);
-    }
-
-    function setSnap (snap) {
-        if (status.offMode.checked) {
-            interact(canvas).snap(false);
-        }
-        else {
-            interact(canvas).snap(snap);
-        }
     }
 
     interact.styleCursor(false);
@@ -263,9 +248,7 @@
                     {x: 250, y: 250}
                 ]
             })
-            .draggable(true)
-            .on('mousedown', setSnap)
-            .on('touchstart', setSnap);
+            .draggable(true);
 
         guidesCanvas = document.getElementById('grid');
         guidesCanvas.width = width;
