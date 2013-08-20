@@ -2486,7 +2486,7 @@ var document      = window.document,
      * @function
      * @returns {@link interact}
      */
-    interact.stop = function () {
+    interact.stop = function (event) {
         if (dragging || resizing || gesturing) {
             autoScroll.stop();
             matches = [];
