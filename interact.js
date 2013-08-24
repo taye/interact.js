@@ -74,16 +74,16 @@ var document      = window.document,
 
         // aww snap
         snap: {
-            mode       : 'grid',
-            range      : Infinity,
-            grid       : { x: 100, y: 100 },
-            gridOffset : { x:   0, y:   0 },
-            anchors    : [],
-            
-            arrayTypes : /^anchors$/,
-            objectTypes: /^grid$|^gridOffset$/,
-            stringTypes: /^mode$/,
-            numberTypes: /^range$/
+            mode        : 'grid',
+            range       : Infinity,
+            grid        : { x: 100, y: 100 },
+            gridOffset  : { x:   0, y:   0 },
+            anchors     : [],
+
+            arrayTypes  : /^anchors$/,
+            objectTypes : /^grid$|^gridOffset$/,
+            stringTypes : /^mode$/,
+            numberTypes : /^range$/
         },
         snapEnabled : false,
 
@@ -735,7 +735,7 @@ var document      = window.document,
                     }
                 }
             }
-            
+
             return dropTarget;
         }
     }
@@ -1262,7 +1262,7 @@ var document      = window.document,
             }
         }
     }
- 
+
     function pointerOver (event) {
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
@@ -1294,7 +1294,7 @@ var document      = window.document,
             }
             else if (target) {
                 var prevTargetChildren = prevTargetElement.querySelectorAll('*');
-                
+
                 if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
 
                     // reset the elements of the matches to the old target
@@ -1761,14 +1761,14 @@ var document      = window.document,
          *          an object with margin, distance and interval properties,
          *          true or false to enable or disable autoScroll,
          *          null to use default settings
-         * @returns {bool | interact}
+         * @returns {Boolean | Object | Interactable}
          */
         snap: function (newValue) {
             var defaults = defaultOptions.snap;
 
             if (newValue instanceof Object) {
                 var snap = this.options.snap;
-                
+
                 if (snap === defaults) {
                    snap = this.options.snap = {
                        mode      : defaults.mode,
@@ -1779,12 +1779,11 @@ var document      = window.document,
                    };
                 }
 
-                snap.mode       = this.validateSetting('snap', 'mode', newValue.mode);
-                snap.range       = this.validateSetting('snap', 'range', newValue.range);
-
-                snap.grid       = this.validateSetting('snap', 'grid', newValue.grid);
+                snap.mode       = this.validateSetting('snap', 'mode'      , newValue.mode);
+                snap.range      = this.validateSetting('snap', 'range'     , newValue.range);
+                snap.grid       = this.validateSetting('snap', 'grid'      , newValue.grid);
                 snap.gridOffset = this.validateSetting('snap', 'gridOffset', newValue.gridOffset);
-                snap.anchors    = this.validateSetting('snap', 'anchors', newValue.anchors);
+                snap.anchors    = this.validateSetting('snap', 'anchors'   , newValue.anchors);
 
                 this.options.snapEnabled = true;
                 this.options.snap = snap;
@@ -1805,9 +1804,9 @@ var document      = window.document,
                 return this;
             }
 
-            return ((this.options.snapEnabled === null? defaultOptions: this.options).snapEnabled)
+            return (((this.options.snapEnabled === null? defaultOptions: this.options).snapEnabled)
                 ? this.options.snap
-                : false;
+                : false);
         },
 
         /**
@@ -1944,7 +1943,7 @@ var document      = window.document,
                             : defaults[option]);
                     }
                 }
-                
+
                 if ('arrayTypes' in defaults && defaults.arrayTypes.test(option)) {
                     if (value instanceof Array) { return value; }
                     else {
@@ -1953,7 +1952,7 @@ var document      = window.document,
                             : defaults[option]);
                     }
                 }
-                
+
                 if ('stringTypes' in defaults && defaults.stringTypes.test(option)) {
                     if (typeof value === 'string') { return value; }
                     else {
@@ -1962,7 +1961,7 @@ var document      = window.document,
                             : defaults[option]);
                     }
                 }
-                
+
                 if ('numberTypes' in defaults && defaults.numberTypes.test(option)) {
                     if (typeof value === 'number') { return value; }
                     else {
@@ -2408,7 +2407,7 @@ var document      = window.document,
      */
     interact.autoScroll = function (options) {
         var defaults = defaultOptions.autoScroll;
-            
+
         if (typeof options === 'object') {
             defaultOptions.autoScrollEnabled = true;
 
