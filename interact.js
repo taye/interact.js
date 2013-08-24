@@ -2124,7 +2124,7 @@ var document      = window.document,
             events.remove(this, 'all');
 
             if (typeof this.selector === 'string') {
-                selectors[this.selector] = undefined;
+                delete selectors[this.selector];
             }
             else {
                 events.remove(this, 'all');
