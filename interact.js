@@ -2321,6 +2321,7 @@ var document      = window.document,
             pointerDown           : pointerDown,
             pointerHover          : pointerHover,
             events                : events,
+            globalEvents          : globalEvents,
             log: function () {
                 console.log('target         :  ' + target);
                 console.log('prevX, prevY   :  ' + prevX, prevY);
