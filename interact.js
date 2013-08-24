@@ -87,11 +87,14 @@ var document      = window.document,
         },
         snapEnabled : false,
 
-        autoScroll  : {
-            container: window,  // the item that is scrolled
-            margin   : 60,
-            interval : 20,      // pause in ms between each scroll pulse
-            distance : 10,      // the distance in x and y that the page is scrolled
+        autoScroll: {
+            container   : window,  // the item that is scrolled
+            margin      : 60,
+            interval    : 20,      // pause in ms between each scroll pulse
+            distance    : 10,      // the distance in x and y that the page is scrolled
+
+            elementTypes: /^container$/,
+            numberTypes : /^range$|^interval$|^distance$/
         },
         autoScrollEnabled: true
     },
@@ -1701,26 +1704,34 @@ var document      = window.document,
          * window/container trigger autoScroll for this Interactable
          *
          * @function
-         * @param {Object | Boolean | null} options either
+         * @param {Object | Boolean | null} newValue either
          *          an object with margin, distance and interval properties,
          *          true or false to enable or disable autoScroll,
          *          null to use default settings
-         * @returns {bool | interact}
+         * @returns {Boolean | Object | Interactable}
          */
         autoScroll: function (newValue) {
             var defaults = defaultOptions.autoScroll;
 
             if (newValue instanceof Object) {
-                if (newValue !== defaults) {
-                    if (typeof (newValue.margin  ) !== 'number') { newValue.margin    = defaults.margin   ; }
-                    if (typeof (newValue.distance) !== 'number') { newValue.distance  = defaults.distance ; }
-                    if (typeof (newValue.interval) !== 'number') { newValue.interval  = defaults.interval ; }
+                var autoScroll = this.options.autoScroll;
 
-                    if (!(newValue.container instanceof Element)){ newValue.container = defaults.container; }
-
-                    this.options.autoScrollEnabled = true;
-                    this.options.autoScroll = newValue;
+                if (autoScroll === defaults) {
+                   autoScroll = this.options.autoScroll = {
+                       margin   : defaults.margin,
+                       distance : defaults.distance,
+                       interval : defaults.interval,
+                       container: defaults.container,
+                   };
                 }
+
+                autoScroll.margin    = this.validateSetting('autoScroll', 'margin'   , newValue.margin);
+                autoScroll.distance  = this.validateSetting('autoScroll', 'distance' , newValue.distance);
+                autoScroll.interval  = this.validateSetting('autoScroll', 'interval' , newValue.interval);
+                autoScroll.container = this.validateSetting('autoScroll', 'container', newValue.container);
+
+                this.options.autoScrollEnabled = true;
+                this.options.autoScroll = autoScroll;
 
                 return this;
             }
@@ -1731,7 +1742,16 @@ var document      = window.document,
                 return this;
             }
 
-            return this.options.autoScrollEnabled? this.options.autoScroll: false;
+            if (newValue === null) {
+                this.options.autoScrollEnabled = null;
+                this.options.autoScroll = defaults;
+
+                return this;
+            }
+
+            return (((this.options.autoScrollEnabled === null? defaultOptions: this.options).autoScrollEnabled)
+                ? this.options.autoScroll
+                : false);
         },
 
         /**
