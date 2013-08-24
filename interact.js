@@ -1916,7 +1916,7 @@ var document      = window.document,
                 current = this.options[context];
 
             if (defaults !== undefined && defaults[option] !== undefined) {
-                if (defaults.objectTypes.test(option)) {
+                if ('objectTypes' in defaults && defaults.objectTypes.test(option)) {
                     if (value instanceof Object) { return value; }
                     else {
                         return (option in current && current[option] instanceof Object
@@ -1925,7 +1925,7 @@ var document      = window.document,
                     }
                 }
                 
-                if (defaults.arrayTypes.test(option)) {
+                if ('arrayTypes' in defaults && defaults.arrayTypes.test(option)) {
                     if (value instanceof Array) { return value; }
                     else {
                         return (option in current && current[option] instanceof Array
@@ -1934,7 +1934,7 @@ var document      = window.document,
                     }
                 }
                 
-                if (defaults.stringTypes.test(option)) {
+                if ('stringTypes' in defaults && defaults.stringTypes.test(option)) {
                     if (typeof value === 'string') { return value; }
                     else {
                         return (option in current && typeof current[option] === 'string'
@@ -1943,10 +1943,19 @@ var document      = window.document,
                     }
                 }
                 
-                if (defaults.numberTypes.test(option)) {
+                if ('numberTypes' in defaults && defaults.numberTypes.test(option)) {
                     if (typeof value === 'number') { return value; }
                     else {
                         return (option in current && typeof current[option] === 'number'
+                            ? current[option]
+                            : defaults[option]);
+                    }
+                }
+
+                if ('elementTypes' in defaults && defaults.elementTypes.test(option)) {
+                    if (value instanceof Element) { return value; }
+                    else {
+                        return (option in current && current[option] instanceof Element
                             ? current[option]
                             : defaults[option]);
                     }
