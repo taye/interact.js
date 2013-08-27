@@ -255,7 +255,7 @@ var document      = window.document,
         'click'
     ],
 
-    globalEvents = [],
+    globalEvents = {},
 
     fireStates = {
         onevent   : 0,
