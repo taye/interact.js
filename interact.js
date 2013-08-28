@@ -1580,7 +1580,7 @@ var document      = window.document,
                     }
                 }
                 else {
-                    var array = this.selectors? selectorDZs: dropzones,
+                    var array = this.selector? selectorDZs: dropzones,
                         index = array.indexOf(this);
                     if (index !== -1) {
                         array.splice(index, 1);
