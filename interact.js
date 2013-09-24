@@ -758,9 +758,7 @@ var document      = window.document,
             client = getClientXY(event);
             page = getPageXY(event);
 
-            if (target.options.snapEnabled === null
-                ? defaultOptions.snapEnabled
-                : target.options.snapEnabled) {
+            if (target.options.snapEnabled) {
             var snap = options.snap;
 
                 this.snap = {
@@ -1007,9 +1005,7 @@ var document      = window.document,
                 pointerWasMoved = true;
             }
             if (prepared && target) {
-                if (target.options.snapEnabled === null
-                    ? defaultOptions.snapEnabled
-                    : target.options.snapEnabled) {
+                if (target.options.snapEnabled) {
                     var snap = target.options.snap,
                         page = getPageXY(event),
                         inRange,
@@ -1534,14 +1530,21 @@ var document      = window.document,
          * @returns {bool | Interactable}
          */
         draggable: function (options) {
-            if (typeof options === 'object') {
+            if (options instanceof Object) {
                 this.options.draggable = true;
                 this.setOnEvents('drag', options);
 
                 return this;
             }
+
             if (typeof options === 'boolean') {
                 this.options.draggable = options;
+
+                return this;
+            }
+
+            if (options === null) {
+                delete this.options.draggable;
 
                 return this;
             }
@@ -1559,7 +1562,7 @@ var document      = window.document,
          * @returns {bool | Interactable}
          */
         dropzone: function (options) {
-            if (typeof options === 'object') {
+            if (options instanceof Object) {
                 var ondrop = options.ondrop || options.onDrop;
                 if (typeof ondrop === 'function') { this.ondrop = ondrop; }
 
@@ -1571,6 +1574,7 @@ var document      = window.document,
                 }
                 return this;
             }
+
             if (typeof options === 'boolean') {
                 if (options) {
                     (this.selector? selectorDZs: dropzones).push(this);
@@ -1591,6 +1595,13 @@ var document      = window.document,
 
                 return this;
             }
+
+            if (options === null) {
+                delete this.options.dropzone;
+
+                return this;
+            }
+
             return this.options.dropzone;
         },
 
@@ -1646,7 +1657,7 @@ var document      = window.document,
          * @returns {bool | Interactable}
          */
         resizeable: function (options) {
-            if (typeof options === 'object') {
+            if (options instanceof Object) {
                 this.options.resizeable = true;
                 this.setOnEvents('resize', options);
 
@@ -1668,11 +1679,18 @@ var document      = window.document,
          * @returns {bool | Interactable}
          */
         squareResize: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
+            if (typeof newValue === 'boolean') {
                 this.options.squareResize = newValue;
 
                 return this;
             }
+
+            if (newValue === null) {
+                delete this.options.squareResize;
+
+                return this;
+            }
+
             return this.options.squareResize;
         },
 
@@ -1685,17 +1703,25 @@ var document      = window.document,
          * @returns {bool | Interactable}
          */
         gestureable: function (options) {
-            if (typeof options === 'object') {
+            if (options instanceof Object) {
                 this.options.gestureable = true;
                 this.setOnEvents('gesture', options);
 
                 return this;
             }
-            if (options !== null && options !== undefined) {
+
+            if (typeof options === 'boolean') {
                 this.options.gestureable = options;
 
                 return this;
             }
+
+            if (options === null) {
+                delete this.options.gestureable;
+
+                return this;
+            }
+
             return this.options.gestureable;
         },
 
@@ -1743,13 +1769,13 @@ var document      = window.document,
             }
 
             if (newValue === null) {
-                this.options.autoScrollEnabled = null;
-                this.options.autoScroll = defaults;
+                delete this.options.autoScrollEnabled;
+                delete this.options.autoScroll;
 
                 return this;
             }
 
-            return (((this.options.autoScrollEnabled === null? defaultOptions: this.options).autoScrollEnabled)
+            return (this.options.autoScrollEnabled
                 ? this.options.autoScroll
                 : false);
         },
@@ -1798,13 +1824,13 @@ var document      = window.document,
             }
 
             if (newValue === null) {
-                this.options.snapEnabled = null;
-                this.options.snap = defaults;
+                delete this.options.snapEnabled;
+                delete this.options.snap;
 
                 return this;
             }
 
-            return (((this.options.snapEnabled === null? defaultOptions: this.options).snapEnabled)
+            return (this.options.snapEnabled
                 ? this.options.snap
                 : false);
         },
@@ -1857,6 +1883,13 @@ var document      = window.document,
 
                 return this;
             }
+
+            if (newValue === null) {
+                delete this.options.getAction;
+
+                return this;
+            }
+
             return this.getAction;
         },
 
@@ -1898,6 +1931,13 @@ var document      = window.document,
 
                 return this;
             }
+
+            if (newValue === null) {
+                delete this.options.getRect;
+
+                return this;
+            }
+
             return this.getRect;
         },
 
@@ -1911,11 +1951,18 @@ var document      = window.document,
          * @returns {Function | Interactable}
          */
         styleCursor: function (newValue) {
-            if (newValue !== null && newValue !== undefined) {
+            if (typeof newValue === 'boolean') {
                 this.options.styleCursor = newValue;
 
                 return this;
             }
+
+            if (newValue === null) {
+                delete this.options.styleCursor;
+
+                return this;
+            }
+
             return this.options.styleCursor;
         },
 
@@ -2408,7 +2455,7 @@ var document      = window.document,
     interact.autoScroll = function (options) {
         var defaults = defaultOptions.autoScroll;
 
-        if (typeof options === 'object') {
+        if (options instanceof Object) {
             defaultOptions.autoScrollEnabled = true;
 
             if (typeof (options.margin)   === 'number') { defaults.margin    = options.margin   ; }
@@ -2455,14 +2502,14 @@ var document      = window.document,
     interact.snap = function (options) {
         var snap = defaultOptions.snap;
 
-        if (typeof options === 'object') {
+        if (options instanceof Object) {
             defaultOptions.snapEnabled = true;
 
             if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
             if (typeof options.range === 'number') { snap.range   = options.range;  }
-            if (typeof options.grid  === 'object') { snap.grid    = options.grid;   }
-            if (typeof options.gridOffset === 'object') { snap.gridOffset = options.gridOffset; }
             if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
+            if (options.grid instanceof   Object ) { snap.grid    = options.grid;   }
+            if (options.gridOffset instanceof Object) { snap.gridOffset = options.gridOffset; }
 
             return interact;
         }
