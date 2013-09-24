@@ -1064,14 +1064,12 @@ var document      = window.document,
                                     inRange = true;
                                 }
 
-                                closest = {
-                                    anchor: anchor,
-                                    distance: distance,
-                                    range: range,
-                                    inRange: inRange,
-                                    distX: distX,
-                                    distY: distY
-                                };
+                                closest.anchor = anchor;
+                                closest.distance = distance;
+                                closest.range = range;
+                                closest.inRange = inRange;
+                                closest.distX = distX;
+                                closest.distY = distY;
 
                                 snapStatus.range = range;
                             }
