@@ -995,6 +995,11 @@ var document      = window.document,
 
             prepared = action;
 
+            x0 = page.x;
+            y0 = page.y;
+            clientX0 = client.x;
+            clientY0 = client.y;
+
             event.preventDefault();
         }
     }
