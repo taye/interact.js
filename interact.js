@@ -1139,7 +1139,7 @@ var document      = window.document,
                             var path = snap.paths[i],
                                 snapToX = false,
                                 snapToY = false,
-                                pathXY,
+                                pathXY = path,
                                 pathX,
                                 pathY;
 
