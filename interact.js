@@ -2057,7 +2057,7 @@ var document      = window.document,
                 top   : clientRect.top    + scroll.y,
                 bottom: clientRect.bottom + scroll.y,
                 width : clientRect.width || clientRect.right - clientRect.left,
-                height: clientRect.heigh || clientRect.top - clientRect.top
+                height: clientRect.heigh || clientRect.bottom - clientRect.top
             };
         },
 
