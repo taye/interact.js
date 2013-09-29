@@ -97,7 +97,9 @@ var document      = window.document,
             elementTypes: /^container$/,
             numberTypes : /^range$|^interval$|^distance$/
         },
-        autoScrollEnabled: true
+        autoScrollEnabled: true,
+
+        origin      : { x: 0, y: 0 },
     },
 
     snapStatus = {
@@ -752,13 +754,16 @@ var document      = window.document,
         if (action === 'gesture') {
             var average = touchAverage(event);
 
-            page   = { x: average.pageX,   y: average.pageY   };
-            client = { x: average.clientX, y: average.clientY };
+            page   = { x: (average.pageX   - options.origin.x), y: (average.pageY   - options.origin.y) };
+            client = { x: (average.clientX - options.origin.x), y: (average.clientY - options.origin.y) };
         }
         else {
 
             client = getClientXY(event);
             page = getPageXY(event);
+
+            page.x -= options.origin.x;
+            page.y -= options.origin.y;
 
             if (target.options.snapEnabled) {
             var snap = options.snap;
@@ -1009,10 +1014,10 @@ var document      = window.document,
 
             prepared = action;
 
-            x0 = page.x;
-            y0 = page.y;
-            clientX0 = client.x;
-            clientY0 = client.y;
+            x0 = page.x - options.origin.x;
+            y0 = page.y - options.origin.y;
+            clientX0 = client.x - options.origin.x;
+            clientY0 = client.y - options.origin.y;
 
             snapStatus.x = null;
             snapStatus.y = null;
@@ -1041,6 +1046,9 @@ var document      = window.document,
 
                     snapStatus.realX = page.x;
                     snapStatus.realY = page.y;
+
+                    page.x -= target.options.origin.x;
+                    page.y -= target.options.origin.y;
 
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
@@ -2108,6 +2116,29 @@ var document      = window.document,
             }
 
             return this.options.styleCursor;
+        },
+
+        /**
+         * Returns or sets the origin of the Interactable's element
+         *
+         * @function
+         * @param {Object} newValue
+         * @returns {Object | Interactable}
+         */
+        origin: function (newValue) {
+            if (newValue instanceof Object) {
+                this.options.origin = newValue;
+
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.origin;
+
+                return this;
+            }
+
+            return this.options.origin;
         },
 
         /**
