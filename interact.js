@@ -79,8 +79,9 @@ var document      = window.document,
             grid        : { x: 100, y: 100 },
             gridOffset  : { x:   0, y:   0 },
             anchors     : [],
+            paths       : [],
 
-            arrayTypes  : /^anchors$/,
+            arrayTypes  : /^anchors$|^paths$/,
             objectTypes : /^grid$|^gridOffset$/,
             stringTypes : /^mode$/,
             numberTypes : /^range$/
@@ -96,7 +97,9 @@ var document      = window.document,
             elementTypes: /^container$/,
             numberTypes : /^range$|^interval$|^distance$/
         },
-        autoScrollEnabled: true
+        autoScrollEnabled: true,
+
+        origin      : { x: 0, y: 0 },
     },
 
     snapStatus = {
@@ -107,7 +110,8 @@ var document      = window.document,
         dy     : 0,
         realX  : 0,
         realY  : 0,
-        anchors: []
+        anchors: [],
+        paths  : []
     },
 
     // Things related to autoScroll
@@ -750,13 +754,16 @@ var document      = window.document,
         if (action === 'gesture') {
             var average = touchAverage(event);
 
-            page   = { x: average.pageX,   y: average.pageY   };
-            client = { x: average.clientX, y: average.clientY };
+            page   = { x: (average.pageX   - options.origin.x), y: (average.pageY   - options.origin.y) };
+            client = { x: (average.clientX - options.origin.x), y: (average.clientY - options.origin.y) };
         }
         else {
 
             client = getClientXY(event);
             page = getPageXY(event);
+
+            page.x -= options.origin.x;
+            page.y -= options.origin.y;
 
             if (target.options.snapEnabled) {
             var snap = options.snap;
@@ -775,10 +782,22 @@ var document      = window.document,
                 };
 
                 if (snapStatus.locked) {
-                    page.x += snapStatus.dx;
-                    page.y += snapStatus.dy;
-                    client.x += snapStatus.dx;
-                    client.y += snapStatus.dy;
+                    if (snap.mode === 'path') {
+                        if (snapStatus.xInRange) {
+                            page.x += snapStatus.dx;
+                            client.x += snapStatus.dx;
+                        }
+                        if (snapStatus.yInRange) {
+                            page.y += snapStatus.dy;
+                            client.y += snapStatus.dy;
+                        }
+                    }
+                    else {
+                        page.x += snapStatus.dx;
+                        page.y += snapStatus.dy;
+                        client.x += snapStatus.dx;
+                        client.y += snapStatus.dy;
+                    }
                 }
             }
         }
@@ -995,10 +1014,13 @@ var document      = window.document,
 
             prepared = action;
 
-            x0 = page.x;
-            y0 = page.y;
-            clientX0 = client.x;
-            clientY0 = client.y;
+            x0 = page.x - options.origin.x;
+            y0 = page.y - options.origin.y;
+            clientX0 = client.x - options.origin.x;
+            clientY0 = client.y - options.origin.y;
+
+            snapStatus.x = null;
+            snapStatus.y = null;
 
             event.preventDefault();
         }
@@ -1013,30 +1035,37 @@ var document      = window.document,
                 if (target.options.snapEnabled) {
                     var snap = target.options.snap,
                         page = getPageXY(event),
+                        closest,
+                        range,
                         inRange,
                         snapChanged,
                         distX,
                         distY,
-                        distance;
+                        distance,
+                        i, len;
 
                     snapStatus.realX = page.x;
                     snapStatus.realY = page.y;
+
+                    page.x -= target.options.origin.x;
+                    page.y -= target.options.origin.y;
 
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
 
                     if (snap.mode === 'anchor' && snap.anchors.length) {
-                        var closest = {
-                                anchor: null,
-                                distance: 0,
-                                range: 0,
-                                distX: 0,
-                                distY: 0
-                            };
+                        closest = {
+                            anchor: null,
+                            distance: 0,
+                            range: 0,
+                            distX: 0,
+                            distY: 0
+                        };
 
-                        for (var i = 0, len = snap.anchors.length; i < len; i++) {
-                            var anchor = snap.anchors[i],
-                                range = typeof anchor.range === 'number'? anchor.range: snap.range;
+                        for (i = 0, len = snap.anchors.length; i < len; i++) {
+                            var anchor = snap.anchors[i];
+
+                            range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
                             distX = anchor.x - page.x;
                             distY = anchor.y - page.y;
@@ -1064,14 +1093,12 @@ var document      = window.document,
                                     inRange = true;
                                 }
 
-                                closest = {
-                                    anchor: anchor,
-                                    distance: distance,
-                                    range: range,
-                                    inRange: inRange,
-                                    distX: distX,
-                                    distY: distY
-                                };
+                                closest.anchor = anchor;
+                                closest.distance = distance;
+                                closest.range = range;
+                                closest.inRange = inRange;
+                                closest.distX = distX;
+                                closest.distY = distY;
 
                                 snapStatus.range = range;
                             }
@@ -1086,7 +1113,7 @@ var document      = window.document,
                         snapStatus.dy = closest.distY;
                         target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
                     }
-                    else {
+                    else if (snap.mode === 'grid') {
                         var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
                             gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
 
@@ -1107,6 +1134,125 @@ var document      = window.document,
                         snapStatus.dy = distY;
 
                         snapStatus.range = snap.range;
+                    }
+                    if (snap.mode === 'path' && snap.paths.length) {
+                        closest = {
+                            path: {},
+                            distX: 0,
+                            distY: 0,
+                            range: 0
+                        };
+
+                        for (i = 0, len = snap.paths.length; i < len; i++) {
+                            var path = snap.paths[i],
+                                snapToX = false,
+                                snapToY = false,
+                                pathXY = path,
+                                pathX,
+                                pathY;
+
+                            if (typeof path === 'function') {
+                                pathXY = path(page.x, page.y);
+                            }
+
+                            if (typeof pathXY.x === 'number') {
+                                pathX = pathXY.x;
+                                snapToX = true;
+                            }
+                            else {
+                                pathX = page.x;
+                            }
+
+                            if (typeof pathXY.y === 'number') {
+                                pathY = pathXY.y;
+                                snapToY = true;
+                            }
+                            else {
+                                pathY = page.y;
+                            }
+
+                            range = typeof pathXY.range === 'number'? pathXY.range: snap.range;
+
+                            distX = pathX - page.x;
+                            distY = pathY - page.y;
+
+                            var xInRange = Math.abs(distX) < range && snapToX,
+                                yInRange = Math.abs(distY) < range && snapToY;
+
+                            // Infinite paths count as being out of range
+                            // compared to non infinite ones that are in range
+                            if (range === Infinity && closest.xInRange && closest.range !== Infinity) {
+                                xInRange = false;
+                            }
+
+                            if (!('x' in closest.path) || (xInRange
+                                // is the closest path in range?
+                                ? (closest.xInRange && range !== Infinity)
+                                    // the pointer is relatively deeper in this path
+                                    ? distance / range < closest.distX / closest.range
+                                    //the pointer is closer to this path
+                                    : Math.abs(distX) < Math.abs(closest.distX)
+                                // The other is not in range and the pointer is closer to this path
+                                : (!closest.xInRange && Math.abs(distX) < Math.abs(closest.distX)))) {
+
+                                if (range === Infinity) {
+                                    xInRange = true;
+                                }
+
+                                closest.path.x   = pathX;
+                                closest.distX    = distX;
+                                closest.xInRange = xInRange;
+                                closest.range    = range;
+
+                                snapStatus.range = range;
+                            }
+
+                            // Infinite paths count as being out of range
+                            // compared to non infinite ones that are in range
+                            if (range === Infinity && closest.yInRange && closest.range !== Infinity) {
+                                yInRange = false;
+                            }
+                            if (!('y' in closest.path) || (yInRange
+                                // is the closest path in range?
+                                ? (closest.yInRange && range !== Infinity)
+                                    // the pointer is relatively deeper in this path
+                                    ? distance / range < closest.distY / closest.range
+                                    //the pointer is closer to this path
+                                    : Math.abs(distY) < Math.abs(closest.distY)
+                                // The other is not in range and the pointer is closer to this path
+                                : (!closest.yInRange && Math.abs(distY) < Math.abs(closest.distY)))) {
+
+                                if (range === Infinity) {
+                                    yInRange = true;
+                                }
+
+                                closest.path.y   = pathY;
+                                closest.distY    = distY;
+                                closest.yInRange = yInRange;
+                                closest.range    = range;
+
+                                snapStatus.range = range;
+                            }
+                        }
+
+                        inRange = closest.xInRange || closest.yInRange;
+
+                        if (closest.xInRange && closest.yInRange && (!snapStatus.xInRange || !snapStatus.yInRange)) {
+                            snapChanged = true;
+                        }
+                        else {
+                            snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== snapStatus.x || closest.path.y !== snapStatus.y);
+                        }
+
+                        snapStatus.x = closest.path.x;
+                        snapStatus.y = closest.path.y;
+                        snapStatus.dx = closest.distX;
+                        snapStatus.dy = closest.distY;
+
+                        snapStatus.xInRange = closest.xInRange;
+                        snapStatus.yInRange = closest.yInRange;
+
+                        target.options.snap.paths.closest = snapStatus.paths.closest = closest.path;
                     }
 
                     if ((snapChanged || !snapStatus.locked) && inRange)  {
@@ -1812,6 +1958,7 @@ var document      = window.document,
 
                 snap.mode       = this.validateSetting('snap', 'mode'      , newValue.mode);
                 snap.range      = this.validateSetting('snap', 'range'     , newValue.range);
+                snap.paths      = this.validateSetting('snap', 'paths'     , newValue.paths);
                 snap.grid       = this.validateSetting('snap', 'grid'      , newValue.grid);
                 snap.gridOffset = this.validateSetting('snap', 'gridOffset', newValue.gridOffset);
                 snap.anchors    = this.validateSetting('snap', 'anchors'   , newValue.anchors);
@@ -1918,7 +2065,7 @@ var document      = window.document,
                 top   : clientRect.top    + scroll.y,
                 bottom: clientRect.bottom + scroll.y,
                 width : clientRect.width || clientRect.right - clientRect.left,
-                height: clientRect.heigh || clientRect.top - clientRect.top
+                height: clientRect.heigh || clientRect.bottom - clientRect.top
             };
         },
 
@@ -1969,6 +2116,29 @@ var document      = window.document,
             }
 
             return this.options.styleCursor;
+        },
+
+        /**
+         * Returns or sets the origin of the Interactable's element
+         *
+         * @function
+         * @param {Object} newValue
+         * @returns {Object | Interactable}
+         */
+        origin: function (newValue) {
+            if (newValue instanceof Object) {
+                this.options.origin = newValue;
+
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.origin;
+
+                return this;
+            }
+
+            return this.options.origin;
         },
 
         /**
@@ -2530,6 +2700,7 @@ var document      = window.document,
             grid      : snap.grid,
             gridOffset: snap.gridOffset,
             anchors   : snap.anchors,
+            paths     : snap.paths,
             range     : snap.range,
             locked    : snapStatus.locked,
             x         : snapStatus.x,
