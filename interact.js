@@ -564,32 +564,32 @@ var document      = window.document,
     }
 
     function touchDistance (event) {
-        var dx = event.touches[0].pageX,
-            dy = event.touches[0].pageY;
+        var dx = event.touches[0].clientX,
+            dy = event.touches[0].clientY;
 
         if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0].pageX;
-            dy -= event.changedTouches[0].pageY;
+            dx -= event.changedTouches[0].clientX;
+            dy -= event.changedTouches[0].clientY;
         }
         else {
-            dx -= event.touches[1].pageX;
-            dy -= event.touches[1].pageY;
+            dx -= event.touches[1].clientX;
+            dy -= event.touches[1].clientY;
         }
 
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     function touchAngle (event) {
-        var dx = event.touches[0].pageX,
-            dy = event.touches[0].pageY;
+        var dx = event.touches[0].clientX,
+            dy = event.touches[0].clientY;
 
         if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0].pageX;
-            dy -= event.changedTouches[0].pageY;
+            dx -= event.changedTouches[0].clientX;
+            dy -= event.changedTouches[0].clientY;
         }
         else {
-            dx -= event.touches[1].pageX;
-            dy -= event.touches[1].pageY;
+            dx -= event.touches[1].clientX;
+            dy -= event.touches[1].clientY;
         }
 
         return 180 * -Math.atan(dy / dx) / Math.PI;
@@ -829,8 +829,8 @@ var document      = window.document,
             this.dy = page.y - y0;
         }
         else {
-            this.dx = page.x - prevX;
-            this.dy = page.y - prevY;
+            this.dx = client.x - prevClientX;
+            this.dy = client.y - prevClientY;
         }
 
         if (action === 'resize') {
