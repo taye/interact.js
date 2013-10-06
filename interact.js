@@ -100,6 +100,7 @@ var document      = window.document,
         autoScrollEnabled: true,
 
         origin      : { x: 0, y: 0 },
+        deltaSource : 'page'
     },
 
     snapStatus = {
@@ -564,32 +565,35 @@ var document      = window.document,
     }
 
     function touchDistance (event) {
-        var dx = event.touches[0].clientX,
-            dy = event.touches[0].clientY;
+        var deltaSource = (target && target.options || defaultOptions).deltaSource,
+            sourceX = deltaSource + 'X',
+            sourceY = deltaSource + 'Y',
+            dx = event.touches[0][sourceX],
+            dy = event.touches[0][sourceX];
 
         if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0].clientX;
-            dy -= event.changedTouches[0].clientY;
+            dx -= event.changedTouches[0][sourceX];
+            dy -= event.changedTouches[0][sourceX];
         }
         else {
-            dx -= event.touches[1].clientX;
-            dy -= event.touches[1].clientY;
+            dx -= event.touches[1][sourceX];
+            dy -= event.touches[1][sourceX];
         }
 
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     function touchAngle (event) {
-        var dx = event.touches[0].clientX,
-            dy = event.touches[0].clientY;
+        var dx = event.touches[0][sourceX],
+            dy = event.touches[0][sourceX];
 
         if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0].clientX;
-            dy -= event.changedTouches[0].clientY;
+            dx -= event.changedTouches[0][sourceX];
+            dy -= event.changedTouches[0][sourceX];
         }
         else {
-            dx -= event.touches[1].clientX;
-            dy -= event.touches[1].clientY;
+            dx -= event.touches[1][sourceX];
+            dy -= event.touches[1][sourceX];
         }
 
         return 180 * -Math.atan(dy / dx) / Math.PI;
@@ -747,6 +751,9 @@ var document      = window.document,
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
+            deltaSource = (target && target.options || defaultOptions).deltaSource,
+            sourceX = deltaSource + 'X',
+            sourceY = deltaSource + 'Y',
             options = target? target.options: defaultOptions;
 
         element = element || target._element;
@@ -825,12 +832,24 @@ var document      = window.document,
 
         // start/end event dx, dy is difference between start and current points
         if (phase === 'start' || phase === 'end' || action === 'drop') {
-            this.dx = page.x - x0;
-            this.dy = page.y - y0;
+            if (deltaSource === 'client') {
+                this.dx = client.x - x0;
+                this.dy = client.y - y0;
+            }
+            else {
+                this.dx = page.x - x0;
+                this.dy = page.y - y0;
+            }
         }
         else {
-            this.dx = client.x - prevClientX;
-            this.dy = client.y - prevClientY;
+            if (deltaSource === 'client') {
+                this.dx = client.x - prevClientX;
+                this.dy = client.y - prevClientY;
+            }
+            else {
+                this.dx = page.x - prevX;
+                this.dy = page.y - prevY;
+            }
         }
 
         if (action === 'resize') {
@@ -2141,6 +2160,22 @@ var document      = window.document,
             return this.options.origin;
         },
 
+        deltaSource: function (newValue) {
+            if (newValue === 'page' || newValue === 'client') {
+                this.options.deltaSource = newValue;
+
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.deltaSource;
+
+                return this;
+            }
+
+            return this.options.deltaSource;
+        },
+
         /**
          * @function
          * @param {String} context eg. 'snap', 'autoScroll'
@@ -2785,6 +2820,22 @@ var document      = window.document,
             return interact;
         }
         return dynamicDrop;
+    };
+
+    /**
+     * Returns or sets weather pageX or clientX is used to calculate dx/dy
+     *
+     * @function
+     * @param {string} newValue 'page' or 'client'
+     * @returns {string | Interactable}
+     */
+    interact.deltaSource = function (newValue) {
+        if (newValue === 'page' || newValue === 'client') {
+            defaultOptions.deltaSource = newValue;
+
+            return this;
+        }
+        return defaultOptions.deltaSource;
     };
 
 
