@@ -292,6 +292,14 @@ var document      = window.document,
         _element: document,
         events  : {}
     },
+    parentWindowTarget = {
+        _element: window.parent,
+        events  : {}
+    },
+    parentDocTarget = {
+        _element: window.parent.document,
+        events  : {}
+    },
 
     // Events wrapper
     events = (function () {
@@ -2852,6 +2860,18 @@ var document      = window.document,
     events.add(docTarget   , 'touchend'     , docPointerUp);
     events.add(docTarget   , 'touchcancel'  , docPointerUp);
     events.add(windowTarget, 'blur'         , docPointerUp);
+
+    if (window.parent !== window) {
+        try {
+            events.add(parentDocTarget   , 'mouseup'      , docPointerUp);
+            events.add(parentDocTarget   , 'touchend'     , docPointerUp);
+            events.add(parentDocTarget   , 'touchcancel'  , docPointerUp);
+            events.add(parentWindowTarget, 'blur'         , docPointerUp);
+        }
+        catch (error) {
+            interact.windowParentError = error;
+        }
+    }
 
     // For IE's lack of Event#preventDefault
     events.add(docTarget,    'selectstart', function (e) {
