@@ -584,7 +584,10 @@ var document      = window.document,
     }
 
     function touchAngle (event) {
-        var dx = event.touches[0][sourceX],
+        var deltaSource = (target && target.options || defaultOptions).deltaSource,
+            sourceX = deltaSource + 'X',
+            sourceY = deltaSource + 'Y',
+            dx = event.touches[0][sourceX],
             dy = event.touches[0][sourceX];
 
         if (event.type === 'touchend' && event.touches.length === 1) {
