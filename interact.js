@@ -97,7 +97,7 @@ var document      = window.document,
             elementTypes: /^container$/,
             numberTypes : /^range$|^interval$|^distance$/
         },
-        autoScrollEnabled: true,
+        autoScrollEnabled: false,
 
         origin      : { x: 0, y: 0 },
         deltaSource : 'page'
