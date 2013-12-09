@@ -1,6 +1,4 @@
 ![interact.js](http://taye.me/interact.js/img/ijs-anim.svg)
-
-interact.js
 ===========
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
