@@ -18,7 +18,7 @@
         prevY = 0,
         blue = '#2299ee',
         lightBlue = '#88ccff',
-        peppermint = '#66e075',
+        peppermint = '#44ee44',
         tango = '#ff4400',
         draggingAnchor = null;
 
