@@ -1,17 +1,17 @@
-![interact.js](https://interactjs.io/repo/img/ijs-anim.svg)
+![interact.js](http://interactjs.io/repo/img/ijs-anim.svg)
 ===========
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
 Awesomeness includes:
- - [**snapping**](http://t1.netsoc.ie/interact.js/demo/snap.html) to a grid or to custom anchor points
- - cross browser and device, supporting {Chrome,Firefox,Opera}{ **mobile, desktop**} and **Internet Explorer 8+**
+ - [**snapping**](http://interactjs.io/repo/demo/snap.html) to a grid, to custom anchor or paths.
+ - cross browser and device, supporting {Chrome,Firefox,Opera}' '{**mobile,desktop**}', ' and **Internet Explorer 8+**
  - interaction with **SVG** elements
  - being **standalone** (not _yet another_ jQuery plugin)
  - introducing **0 additional DOM elements**
  - having(a). **fluent** ().interface
- - **not modifying anything** it doesn't own (except to support IE8 and to change the cursor unless you don't want it to)
+ - **not modifying anything** it doesn't own (except to support IE8 and to change the cursor (but you can disable that))
 
- ___
+---
 
 Example
 -------
@@ -70,7 +70,7 @@ interact.on('dragstart', function (event) {
 Usage
 -----
 Pass the element you want to interact with or a CSS selector string to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `on` which let's you add event listeners for InteractEvents and any DOM event.
-The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
+The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', ', `dragenter`, `dragleave` and `drop` when dragging over dropzones.
 
 Details
 -------
