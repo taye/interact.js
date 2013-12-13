@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
     interact('.point-handle')
         .draggable({
             onmove: function (event) {
-                var i = event.target.getAttribute('data-index'),
+                var i = event.target.getAttribute('data-index')|0,
                     point = star.points.getItem(i);
 
                 point.x += event.dx;
