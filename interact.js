@@ -19,11 +19,12 @@
 window.interact = (function () {
    'use strict';
 
-var document      = window.document,
-    console       = window.console,
-    SVGElement    = window.SVGElement    || blank,
-    SVGSVGElement = window.SVGSVGElement || blank,
-    HTMLElement   = window.HTMLElement   || window.Element,
+var document           = window.document,
+    console            = window.console,
+    SVGElement         = window.SVGElement         || blank,
+    SVGSVGElement      = window.SVGSVGElement      || blank,
+    SVGElementInstance = window.SVGElementInstance || blank,
+    HTMLElement        = window.HTMLElement        || window.Element,
 
     // Previous interact move event pointer position
     prevX       = 0,
@@ -951,7 +952,9 @@ var document      = window.document,
         }
         else {
             var selector,
-                element = event.target,
+                element = (event.target instanceof SVGElementInstance
+                ? event.target.correspondingUseElement
+                : event.target),
                 elements;
 
             while (element !== document.documentElement && !action) {
@@ -996,7 +999,7 @@ var document      = window.document,
             target = interactables.get(getFrom);
         }
 
-        var options = target.options;
+        var options = target && target.options;
 
         if (target && !(dragging || resizing || gesturing)) {
             var action = validateAction(forceAction || target.getAction(event)),
@@ -1444,19 +1447,22 @@ var document      = window.document,
         if (pointerIsDown || dragging || resizing || gesturing) { return; }
 
         var curMatches = [],
-            prevTargetElement = target && target._element;
+            prevTargetElement = target && target._element,
+            eventTarget = (event.target instanceof SVGElementInstance
+                ? event.target.correspondingUseElement
+                : event.target);
 
         for (var selector in selectors) {
             if (selectors.hasOwnProperty(selector)
                 && selectors[selector]
-                && event.target[matchesSelector](selector)) {
+                && eventTarget[matchesSelector](selector)) {
 
-                selectors[selector]._element = event.target;
+                selectors[selector]._element = eventTarget;
                 curMatches.push(selectors[selector]);
             }
         }
 
-        var elementInteractable = interactables.get(event.target),
+        var elementInteractable = interactables.get(eventTarget),
             action = elementInteractable
                      && validateAction(
                          elementInteractable.getAction(event, elementInteractable),
@@ -1467,12 +1473,12 @@ var document      = window.document,
                 matches = curMatches;
 
                 pointerHover(event, matches);
-                events.addToElement(event.target, 'mousemove', pointerHover);
+                events.addToElement(eventTarget, 'mousemove', pointerHover);
             }
             else if (target) {
                 var prevTargetChildren = prevTargetElement.querySelectorAll('*');
 
-                if (Array.prototype.indexOf.call(prevTargetChildren, event.target) !== -1) {
+                if (Array.prototype.indexOf.call(prevTargetChildren, eventTarget) !== -1) {
 
                     // reset the elements of the matches to the old target
                     for (var i = 0; i < matches.length; i++) {
@@ -1492,9 +1498,12 @@ var document      = window.document,
 
     function pointerOut (event) {
         // Remove temporary event listeners for selector Interactables
+        var eventTarget = (event.target instanceof SVGElementInstance
+            ? event.target.correspondingUseElement
+            : event.target);
 
-        if (!interactables.get(event.target)) {
-            events.removeFromElement(event.target, pointerHover);
+        if (!interactables.get(eventTarget)) {
+            events.removeFromElement(eventTarget, pointerHover);
             events.removeFromElement(this, 'mousedown', pointerDown);
             events.removeFromElement(this, 'touchend', pointerDown);
         }
