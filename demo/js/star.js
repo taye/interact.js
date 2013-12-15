@@ -46,6 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     interact('.point-handle')
         .draggable({
+            onstart: function (event) {
+                root.setAttribute('class', 'dragging');
+            },
             onmove: function (event) {
                 var i = event.target.getAttribute('data-index')|0,
                     point = star.points.getItem(i);
@@ -55,11 +58,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 event.target.x.baseVal.value = point.x;
                 event.target.y.baseVal.value = point.y;
-            }
+            },
+            onend: function (event) {
+                root.setAttribute('class', '');
+            },
         })
         .snap({
             mode: 'anchor',
             anchors: originalPoints,
             range: 10
-        });
+        })
+        .styleCursor(false);
 });

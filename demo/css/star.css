@@ -1,0 +1,13 @@
+.point-handle {
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: -ms-grab;
+    cursor: grab;
+}
+
+.dragging, .dragging .point-handle {
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+    cursor: -ms-grabbing;
+    cursor: grabbing;
+}

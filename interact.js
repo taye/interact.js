@@ -1033,7 +1033,7 @@ var document           = window.document,
             pointerWasMoved = false;
 
             if (options.styleCursor) {
-                document.documentElement.style.setProperty('cursor', actions[action].cursor, 'important');
+                document.documentElement.style.cursor = actions[action].cursor;
             }
 
             resizeAxes = action === 'resizexy'?
