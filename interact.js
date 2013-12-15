@@ -239,7 +239,6 @@ var document           = window.document,
 
     // Action that's ready to be fired on next move event
     prepared    = null,
-    styleCursor = true,
 
     // because Webkit and Opera still use 'mousewheel' event type
     wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
@@ -460,6 +459,8 @@ var document           = window.document,
             useAttachEvent: useAttachEvent
         };
     }());
+
+    function blank () {}
 
     function setPrevXY (event) {
         prevX = event.pageX;
@@ -910,8 +911,6 @@ var document           = window.document,
         }
     }
 
-    function blank () {}
-
     InteractEvent.prototype = {
         preventDefault: blank,
         stopImmediatePropagation: function (event) {
@@ -1034,9 +1033,9 @@ var document           = window.document,
             pointerWasMoved = false;
 
             if (options.styleCursor) {
-                document.documentElement.style.cursor =
-                    actions[action].cursor + ' !important';
+                document.documentElement.style.setProperty('cursor', actions[action].cursor, 'important');
             }
+
             resizeAxes = action === 'resizexy'?
                     'xy':
                     action === 'resizex'?
@@ -1468,7 +1467,7 @@ var document           = window.document,
                          elementInteractable.getAction(event, elementInteractable),
                          elementInteractable);
 
-        if (!elementInteractable) {
+        if (!elementInteractable || !validateAction(elementInteractable.getAction(event))) {
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
@@ -1504,8 +1503,6 @@ var document           = window.document,
 
         if (!interactables.get(eventTarget)) {
             events.removeFromElement(eventTarget, pointerHover);
-            events.removeFromElement(this, 'mousedown', pointerDown);
-            events.removeFromElement(this, 'touchend', pointerDown);
         }
 
         if (target && target.options.styleCursor && !(dragging || resizing || gesturing)) {
@@ -1531,7 +1528,7 @@ var document           = window.document,
                 action = validateAction(target.getAction(event));
             }
 
-            if (styleCursor) {
+            if (target && target.options.styleCursor) {
                 if (action) {
                     document.documentElement.style.cursor = actions[action].cursor;
                 }
@@ -2433,7 +2430,7 @@ var document           = window.document,
             }
             else {
                 events.remove(this, 'all');
-                if (styleCursor) {
+                if (this.options.styleCursor) {
                     this._element.style.cursor = '';
                 }
                 elements.splice(elements.indexOf(this.element()));
@@ -2798,7 +2795,7 @@ var document           = window.document,
             autoScroll.stop();
             matches = [];
 
-            if (styleCursor) {
+            if (target.options.styleCursor) {
                 document.documentElement.style.cursor = '';
             }
             clearTargets();
