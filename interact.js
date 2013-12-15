@@ -2348,6 +2348,10 @@ var document           = window.document,
          * @returns {Interactable}
          */
         on: function (eventType, listener, useCapture) {
+            if (eventType === 'wheel') {
+                eventType = wheelEvent;
+            }
+
             if (eventTypes.indexOf(eventType) !== -1) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
@@ -2358,10 +2362,14 @@ var document           = window.document,
                     this._iEvents[eventType].push(listener);
                 }
             }
-            else {
-                if (eventType === 'wheel') {
-                    eventType = wheelEvent;
+            else if (this.selector) {
+                var elements = document.querySelectorAll(this.selector);
+
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    events.addToElement(elements[i], eventType, listener, useCapture);
                 }
+            }
+            else {
                 events.add(this, eventType, listener, useCapture);
             }
 
@@ -2375,6 +2383,10 @@ var document           = window.document,
          * @returns {Interactable}
          */
         off: function (eventType, listener, useCapture) {
+            if (eventType === 'wheel') {
+                eventType = wheelEvent;
+            }
+
             if (eventTypes.indexOf(eventType) !== -1) {
                 var eventArray = this._iEvents[eventType],
                     index;
@@ -2383,10 +2395,14 @@ var document           = window.document,
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
-            else {
-                if (eventType === 'wheel') {
-                    eventType = wheelEvent;
+            else if (this.selector) {
+                var elements = document.querySelectorAll(this.selector);
+
+                for (var i = 0, len = elements.length; i < len; i++) {
+                    events.removeFromElement(elements[i], eventType, listener, useCapture);
                 }
+            }
+            else {
                 events.remove(this._element, listener, useCapture);
             }
 
