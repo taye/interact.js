@@ -1,17 +1,40 @@
 ![interact.js](http://interactjs.io/repo/img/ijs-anim.svg)
-===========
+
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
 Awesomeness includes:
- - [**snapping**](http://interactjs.io/repo/demo/snap.html) to a grid, to custom anchor or paths.
+ - [**snapping**](http://interactjs.io/repo/demo/snap.html) to a grid, custom
+   anchors or paths.
  - cross browser and device, supporting {Chrome,Firefox,Opera}' '{**mobile,desktop**}', ' and **Internet Explorer 8+**
  - interaction with [**SVG**](http://interactjs.io/repo/demo/star.svg) elements
  - being **standalone** (not _yet another_ jQuery plugin)
  - introducing **0 additional DOM elements**
  - having(a). **fluent** ().interface
- - **not modifying anything** it doesn't own (except to support IE8 and to change the cursor (but you can disable that))
+ - **not modifying anything** it doesn't own (except to support IE8 and to
+   change the cursor (but you can disable that))
 
----
+## Demos
+
+ - The [html & svg demo](http://interactjs.io/demos/html_svg.html "drag, drop,
+   resize and gesture demo") shows div elements which can be dragged and
+   dropped onto each other and resized by dragging the botom and right edges. The
+   yellow elements are SVG elements (these won't show up on IE8).
+
+ - [star.svg](http://interactjs.io/demos/star.svg "editing an SVG document")
+   demonstrates interact.js being used within an SVG document.
+
+ - The [snapping demo](http://interactjs.io/demos/snap.html "Oh snap!") shows
+   how flexible the grid and anchor snapping system is and it's pretty fun.
+
+ - This [blog post on path
+   snapping](http://taye.me/blog/interact-js/snap/2013/09/29/interactjs-path-snapping.html)
+   demonstrates and graphs some interesting path snapping functions.
+
+interact.js began as a Google Summer of Code 2012 project for
+[Biographer](https://code.google.com/p/biographer "Biographer on Google Code"),
+a biological network layout and visualization tool. It uses interact.js to
+modify SVG elements and to pan and zoom the viewport using a mouse or touch
+screen device.
 
 Example
 -------
@@ -69,16 +92,25 @@ interact.on('dragstart', function (event) {
 
 Usage
 -----
-Pass the element you want to interact with or a CSS selector string to `interact`. That returns an object with methods, notably `draggable`, `resizeable`, `gestureable`, `dropzone` which let you allow or disallow the related actions and `on` which let's you add event listeners for InteractEvents and any DOM event.
-The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', ', `dragenter`, `dragleave` and `drop` when dragging over dropzones.
+Pass the element you want to interact with or a CSS selector string to
+`interact`. That returns an object with methods, notably `draggable`,
+`resizeable`, `gestureable`, `dropzone` which let you allow or disallow the
+related actions and `on` which let's you add event listeners for
+InteractEvents and any DOM event.  The `InteractEvent` types are
+{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', ' `dragenter`, `dragleave`
+and `drop` when dragging over dropzones.
 
 Details
 -------
 
 ### Interactables
-The `interact` function adds mouse or touch event listeners to the object and returns an `Interactable` object which has several methods and properties to configure how it behaves and what it can do. These methods have a fluent interface so method calls can be chained nicely.
+The `interact` function adds mouse or touch event listeners to the object and
+returns an `Interactable` object which has several methods and properties to
+configure how it behaves and what it can do. These methods have a fluent
+interface so method calls can be chained nicely.
 
- For example, to make a DOM element dragagble and resizeable you can call the `Interactable#set` with an object with the properties you want to set
+For example, to make a DOM element dragagble and resizeable you can call the
+`Interactable#set` with an object with the properties you want to set
 ```javascript
 interact(document.getElementById('anElement'))
     .set({
@@ -94,18 +126,36 @@ interact(document.getElementById('anElement'))
 ```
 
 ### Acting
-Now that the element has been made interactable, when it is clicked on or touched and then dragged, an action is determined depending on the input type and position of the event over the element. InteractEvents are then fired as the mouse/touch moves around the page until it is finally released or the window loses focus.
+Now that the element has been made interactable, when it is clicked on or
+touched and then dragged, an action is determined depending on the input type
+and position of the event over the element. InteractEvents are then fired as
+the mouse/touch moves around the page until it is finally released or the
+window loses focus.
 
-When a sequence of user actions results in an InteractEvent, that event type is fired and all listeners of that type which were bound to that Interactable or bound globally are called.
+When a sequence of user actions results in an InteractEvent, that event type is
+fired and all listeners of that type which were bound to that Interactable or
+bound globally are called.
 
-Even though InteractEvents are being fired, the element is not actually modified by interact.js at all. To do that, you need to add listeners for InteractEvents either to each Interactable or globally for all Interacables and style the element according to event data.
+Even though InteractEvents are being fired, the element is not actually
+modified by interact.js at all. To do that, you need to add listeners for
+InteractEvents either to each Interactable or globally for all Interacables and
+style the element according to event data.
 
 ### Listening
-The `InteractEvent` types are {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and `drop` when dragging over dropzones.
+The `InteractEvent` types are
+{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and
+`drop` when dragging over dropzones.
 
-To respond to an InteractEvent, you must add a listener for its event type either directly to an interactable `Interactable#on(eventType, listenerFunction)` or globally for all events of that type `interact.on('resizemove', resizeElement)`. The InteractEvent object that was created is passed to these functions as the first parameter.
+To respond to an InteractEvent, you must add a listener for its event type
+either directly to an interactable
+`Interactable#on(eventType, listenerFunction)` or globally for all events of
+that type `interact.on('resizemove', resizeElement)`. The InteractEvent object
+that was created is passed to these functions as the first parameter.
 
-InteractEvent properties include the usual properties of mouse/touch events such as pageX/Y, clientX/Y, modifier keys etc. but also some properties providing information about the change in cordinates and event specific data. The table below displays all of these events.
+InteractEvent properties include the usual properties of mouse/touch events
+such as pageX/Y, clientX/Y, modifier keys etc. but also some properties
+providing information about the change in cordinates and event specific data.
+The table below displays all of these events.
 
 #### InteractEvent properties
 | Common                  |                                                   |
@@ -141,11 +191,18 @@ InteractEvent properties include the usual properties of mouse/touch events such
 | `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
 
-\* In interact move events, these are the changes since the previous InteractEvent. However, in end events, these are the changes from the position of the start event to the end event. In gesture events, coordinates are the averages of touch coordinates.
+\* In interact move events, these are the changes since the previous
+InteractEvent. However, in end events, these are the changes from the position
+of the start event to the end event. In gesture events, coordinates are the
+averages of touch coordinates.
 
 
 ### Interacting
-To move an element in response to a dragmove, a listener can be bound that transforms the element accoding to `dy` and `dx` of the InteractEvent. It can also be done by having the element positioned `absolute`, `fixed` or `relative` and adding the change in coordinates to the `top` and `left` position of the element.
+To move an element in response to a dragmove, a listener can be bound that
+transforms the element accoding to `dy` and `dx` of the InteractEvent. It can
+also be done by having the element positioned `absolute`, `fixed` or `relative`
+and adding the change in coordinates to the `top` and `left` position of the
+element.
 
 ```javascript
 
@@ -161,10 +218,7 @@ interact(element)
                 event.target.offsetTop + event.detail.dy + "px";
         });
 ```
-### interact.js in use
 
-interact.js began as a Google Summer of Code 2012 project for [Biographer](https://code.google.com/p/biographer "Biographer on Google Code"), a biological network layout and visualization tool. It uses interact.js to modify SVG elements and to pan and zoom the viewport using a mouse or touch screen device. A small demonstration can be viewed [here](http://t1.netsoc.ie/biographer/test/showcase.html "Biographer Showcase").
-
-The [demo here](http://t1.netsoc.ie/interact.js/demo "interact.js drag, drop, resize and gesture demo") shows div elements which can be dragged and dropped onto each other and resized by dragging the botom and right edges. The yellow elements are SVG elements (these won't show up on IE8).
-
-The [snapping demo](http://t1.netsoc.ie/interact.js/demo/snap.html "Oh snap!") shows how flexible the snapping system is and it's pretty fun.
+License
+-------
+interact.js is released under the [MIT License](http://taye.mit-license.org).
