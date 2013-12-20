@@ -10,6 +10,8 @@
     }],
     "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
     "keywords"   : [
+        "draggable",
+        "droppable",
         "drag",
         "drop",
         "resize",
@@ -19,7 +21,8 @@
         "snap",
         "grid",
         "autoscroll",
-        "SVG"
+        "SVG",
+        "interactjs"
     ],
     "license"    : "MIT",
     "ignore"     : [
