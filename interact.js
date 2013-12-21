@@ -4,6 +4,7 @@
  * https://raw.github.com/taye/interact.js/master/LICENSE
  *
  * @file
+ * @version 1.0.1
  * @author Taye Adeyemi <dev@taye.me>
  */
 window.interact = (function () {

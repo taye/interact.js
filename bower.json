@@ -1,7 +1,7 @@
 {
     "name"       : "interact.js",
     "main"       : "interact.js",
-    "version"    : "1.0.0",
+    "version"    : "1.0.1",
     "homepage"   : "http://interactjs.io",
     "authors"    : [{
         "name" : "Taye Adeyemi",
