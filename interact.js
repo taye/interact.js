@@ -572,15 +572,15 @@ window.interact = (function () {
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             dx = event.touches[0][sourceX],
-            dy = event.touches[0][sourceX];
+            dy = event.touches[0][sourceY];
 
         if (event.type === 'touchend' && event.touches.length === 1) {
             dx -= event.changedTouches[0][sourceX];
-            dy -= event.changedTouches[0][sourceX];
+            dy -= event.changedTouches[0][sourceY];
         }
         else {
             dx -= event.touches[1][sourceX];
-            dy -= event.touches[1][sourceX];
+            dy -= event.touches[1][sourceY];
         }
 
         return Math.sqrt(dx * dx + dy * dy);
@@ -591,15 +591,15 @@ window.interact = (function () {
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             dx = event.touches[0][sourceX],
-            dy = event.touches[0][sourceX];
+            dy = event.touches[0][sourceY];
 
         if (event.type === 'touchend' && event.touches.length === 1) {
             dx -= event.changedTouches[0][sourceX];
-            dy -= event.changedTouches[0][sourceX];
+            dy -= event.changedTouches[0][sourceY];
         }
         else {
             dx -= event.touches[1][sourceX];
-            dy -= event.touches[1][sourceX];
+            dy -= event.touches[1][sourceY];
         }
 
         return 180 * -Math.atan(dy / dx) / Math.PI;
