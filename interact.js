@@ -167,9 +167,9 @@ window.interact = (function () {
 
                     if (!autoScroll.isScrolling) {
                         // set the autoScroll properties to those of the target
-                        autoScroll.margin   = 'margin'   in options? options.margin  : autoScroll.margin;
-                        autoScroll.distance = 'distance' in options? options.distance: autoScroll.distance;
-                        autoScroll.interval = 'interval' in options? options.interval: autoScroll.interval;
+                        autoScroll.margin   = options.margin;
+                        autoScroll.distance = options.distance;
+                        autoScroll.interval = options.interval;
 
                         autoScroll.start();
                     }
