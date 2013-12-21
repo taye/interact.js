@@ -946,6 +946,11 @@ window.interact = (function () {
     function selectorDown (event, forceAction) {
         var action;
 
+        // do nothing if interacting
+        if (dragging || resizing || gesturing) {
+            return;
+        }
+
         if (matches.length && event.type === 'mousedown') {
             action = validateSelector(event, matches);
         }
@@ -1389,9 +1394,10 @@ window.interact = (function () {
     }
 
     function gestureMove (event) {
-        if (event.touches.length < 2) {
+        if (!event.touches || event.touches.length < 2) {
             return;
         }
+
         event.preventDefault();
 
         var gestureEvent;
@@ -1549,6 +1555,10 @@ window.interact = (function () {
      */
     function docPointerUp (event) {
         var endEvent;
+
+        if (event.touches && event.touches.length >= 2) {
+            return;
+        }
 
         if (dragging) {
             endEvent = new InteractEvent(event, 'drag', 'end');
