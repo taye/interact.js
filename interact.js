@@ -1,20 +1,10 @@
-/*
+/**
  * Copyright (c) 2012, 2013 Taye Adeyemi
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
- */
-
-/**
- * @namespace interact.js
- * @name interact
- * @function interact
- * @param {HTMLElement | SVGelement} element The previously set document element
- * @returns {Interactable | null} Returns an Interactable if the element passed
- *          was previously set. Returns null otherwise.
- * @description The properties of this variable can be used to set elements as
- *              interactables and also to change various settings. Calling it as
- *              a function with an element which was previously set returns an
- *              Interactable object which has various methods to configure it.
+ *
+ * @file
+ * @author Taye Adeyemi <dev@taye.me>
  */
 window.interact = (function () {
     'use strict';
@@ -63,7 +53,9 @@ window.interact = (function () {
         dropTarget      = null, // the dropzone a drag target might be dropped into
         prevDropTarget  = null, // the dropzone that was recently dragged away from
 
-        // The default Interatable options which will be IOptions.prototype
+        /**
+         * @lends IOptions.prototype
+         */
         defaultOptions = {
             draggable   : false,
             dropzone    : false,
@@ -761,6 +753,10 @@ window.interact = (function () {
         }
     }
 
+    /**
+     * Constructor of interact action event objects
+     * @event
+     */
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
@@ -786,7 +782,7 @@ window.interact = (function () {
             page.y -= options.origin.y;
 
             if (target.options.snapEnabled) {
-            var snap = options.snap;
+                var snap = options.snap;
 
                 this.snap = {
                     mode   : snap.mode,
@@ -911,11 +907,28 @@ window.interact = (function () {
         }
     }
 
+    /**
+     * @global
+     */
     InteractEvent.prototype = {
+        /**
+         * Does nothing
+         * @method
+         */
         preventDefault: blank,
+
+        /**
+         * Stops the event bubbling similar to Event#stopImmediatePropagation
+         * @method
+         */
         stopImmediatePropagation: function (event) {
             imPropStopped = true;
         },
+
+        /**
+         * Stops the event bubbling similar to Event#stopPropagation
+         * @method
+         */
         stopPropagation: blank
     };
 
@@ -985,12 +998,8 @@ window.interact = (function () {
         }
     }
 
-    /**
-     * @private
-     * @event
-     * Determine action to be performed on next pointerMove and add appropriate
-     * style and event Liseners
-     */
+    // Determine action to be performed on next pointerMove and add appropriate
+    // style and event Liseners
     function pointerDown (event, forceAction) {
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
@@ -1516,12 +1525,8 @@ window.interact = (function () {
         }
     }
 
-    /**
-     * @private
-     * @event
-     * Check what action would be performed on pointerMove target if a mouse
-     * button were pressed and change the cursor accordingly
-     */
+    // Check what action would be performed on pointerMove target if a mouse
+    // button were pressed and change the cursor accordingly
     function pointerHover (event, matches) {
         if (!(pointerIsDown || dragging || resizing || gesturing)) {
 
@@ -1548,11 +1553,7 @@ window.interact = (function () {
         }
     }
 
-    /**
-     * @private
-     * @event
-     * End interact move events and stop auto-scroll
-     */
+    // End interact move events and stop auto-scroll
     function docPointerUp (event) {
         var endEvent;
 
@@ -1652,6 +1653,22 @@ window.interact = (function () {
         dropTarget = prevDropTarget = null;
     }
 
+    /**
+     * The properties of this variable can be used to set elements as
+     * interactables and also to change various settings (see {@link module:interact}).
+     *
+     * Calling it as a function and passing an element or a CSS selector string
+     * returns an Interactable object which has various methods to configure
+     * it.
+     *
+     * @function interact
+     * @param {Element | string} element The Element to interact with or CSS selector
+     * @returns {Interactable} 
+     */
+    /**
+     * @exports interact
+     * @global
+     */
     function interact (element) {
         return interactables.get(element) || new Interactable(element);
     }
@@ -1659,7 +1676,7 @@ window.interact = (function () {
     /**
      * A class for easy inheritance and setting of an Interactable's options
      *
-     * @class IOptions
+     * @class
      */
     function IOptions (options) {
         for (var option in defaultOptions) {
@@ -1670,13 +1687,15 @@ window.interact = (function () {
         }
     }
 
+    /**
+     * @global
+     */
     IOptions.prototype = defaultOptions;
 
     /**
      * Object type returned by interact(element)
      *
      * @class Interactable
-     * @name Interactable
      */
     function Interactable (element, options) {
         this._element = element;
@@ -1705,6 +1724,9 @@ window.interact = (function () {
         this.set(options);
     }
 
+    /**
+     * @global
+     */
     Interactable.prototype = {
         setOnEvents: function (action, phases) {
             var start = phases.onstart || phases.onStart,
@@ -1722,8 +1744,8 @@ window.interact = (function () {
          * Returns or sets whether drag actions can be performed on the
          * Interactable
          *
-         * @function
-         * @param {bool} options
+         * @method
+         * @param {bool | Object} options
          * @returns {bool | Interactable}
          */
         draggable: function (options) {
@@ -1751,10 +1773,10 @@ window.interact = (function () {
 
         /**
          * Returns or sets whether elements can be dropped onto this
-         * Interactable to trigger interactdrop events
+         * Interactable to trigger drop events
          *
          * @function
-         * @param {bool} options The new value to be set. Passing null returns
+         * @param {bool | Object} [options] The new value to be set. Passing null returns
          *              the current value
          * @returns {bool | Interactable}
          */
@@ -1803,7 +1825,7 @@ window.interact = (function () {
         },
 
         /**
-         * The default function to determine if an interactdragend event occured
+         * The default function to determine if adragend event occured
          * over this Interactable's element
          *
          * @function
@@ -1830,7 +1852,7 @@ window.interact = (function () {
          * dropped over this Interactable
          *
          * @function
-         * @param {function} newValue A function which takes a mouseUp/touchEnd
+         * @param {function} [newValue] A function which takes a mouseUp/touchEnd
          *                   event as a parameter and returns true or false to
          *                   indicate if the the current draggable can be
          *                   dropped into this Interactable
@@ -1850,7 +1872,7 @@ window.interact = (function () {
          * Interactable
          *
          * @function
-         * @param {} options An object with event listeners to be fired on resize events
+         * @param {bool | Object} [options] An object with event listeners to be fired on resize events
          * @returns {bool | Interactable}
          */
         resizeable: function (options) {
@@ -1872,7 +1894,7 @@ window.interact = (function () {
          * Returns or sets whether resizing is forced 1:1 aspect
          *
          * @function
-         * @param {bool} newValue
+         * @param {bool} [newValue]
          * @returns {bool | Interactable}
          */
         squareResize: function (newValue) {
@@ -1896,7 +1918,7 @@ window.interact = (function () {
          * Interactables element
          *
          * @function
-         * @param {bool} options
+         * @param {bool} [options]
          * @returns {bool | Interactable}
          */
         gestureable: function (options) {
@@ -1927,16 +1949,16 @@ window.interact = (function () {
          * window/container trigger autoScroll for this Interactable
          *
          * @function
-         * @param {Object | Boolean | null} newValue either
-         *          an object with margin, distance and interval properties,
-         *          true or false to enable or disable autoScroll,
-         *          null to use default settings
+         * @param {Object | Boolean | null} [options] either
+         *          - an object with margin, distance and interval properties,
+         *          - true or false to enable or disable autoScroll or
+         *          - null to use default settings
          * @returns {Boolean | Object | Interactable}
          */
-        autoScroll: function (newValue) {
+        autoScroll: function (options) {
             var defaults = defaultOptions.autoScroll;
 
-            if (newValue instanceof Object) {
+            if (options instanceof Object) {
                 var autoScroll = this.options.autoScroll;
 
                 if (autoScroll === defaults) {
@@ -1948,10 +1970,10 @@ window.interact = (function () {
                    };
                 }
 
-                autoScroll.margin    = this.validateSetting('autoScroll', 'margin'   , newValue.margin);
-                autoScroll.distance  = this.validateSetting('autoScroll', 'distance' , newValue.distance);
-                autoScroll.interval  = this.validateSetting('autoScroll', 'interval' , newValue.interval);
-                autoScroll.container = this.validateSetting('autoScroll', 'container', newValue.container);
+                autoScroll.margin    = this.validateSetting('autoScroll', 'margin'   , options.margin);
+                autoScroll.distance  = this.validateSetting('autoScroll', 'distance' , options.distance);
+                autoScroll.interval  = this.validateSetting('autoScroll', 'interval' , options.interval);
+                autoScroll.container = this.validateSetting('autoScroll', 'container', options.container);
 
                 this.options.autoScrollEnabled = true;
                 this.options.autoScroll = autoScroll;
@@ -1959,13 +1981,13 @@ window.interact = (function () {
                 return this;
             }
 
-            if (typeof newValue === 'boolean') {
-                this.options.autoScrollEnabled = newValue;
+            if (typeof options === 'boolean') {
+                this.options.autoScrollEnabled = options;
 
                 return this;
             }
 
-            if (newValue === null) {
+            if (options === null) {
                 delete this.options.autoScrollEnabled;
                 delete this.options.autoScroll;
 
@@ -1980,16 +2002,16 @@ window.interact = (function () {
         /**
          *
          * @function
-         * @param {Object | Boolean | null} options either
-         *          an object with margin, distance and interval properties,
-         *          true or false to enable or disable autoScroll,
-         *          null to use default settings
+         * @param {Object | Boolean | null} [options] either
+         *          - an object with margin, distance and interval properties,
+         *          - true or false to enable or disable autoScroll or
+         *          - null to use default settings
          * @returns {Boolean | Object | Interactable}
          */
-        snap: function (newValue) {
+        snap: function (options) {
             var defaults = defaultOptions.snap;
 
-            if (newValue instanceof Object) {
+            if (options instanceof Object) {
                 var snap = this.options.snap;
 
                 if (snap === defaults) {
@@ -2002,12 +2024,12 @@ window.interact = (function () {
                    };
                 }
 
-                snap.mode       = this.validateSetting('snap', 'mode'      , newValue.mode);
-                snap.range      = this.validateSetting('snap', 'range'     , newValue.range);
-                snap.paths      = this.validateSetting('snap', 'paths'     , newValue.paths);
-                snap.grid       = this.validateSetting('snap', 'grid'      , newValue.grid);
-                snap.gridOffset = this.validateSetting('snap', 'gridOffset', newValue.gridOffset);
-                snap.anchors    = this.validateSetting('snap', 'anchors'   , newValue.anchors);
+                snap.mode       = this.validateSetting('snap', 'mode'      , options.mode);
+                snap.range      = this.validateSetting('snap', 'range'     , options.range);
+                snap.paths      = this.validateSetting('snap', 'paths'     , options.paths);
+                snap.grid       = this.validateSetting('snap', 'grid'      , options.grid);
+                snap.gridOffset = this.validateSetting('snap', 'gridOffset', options.gridOffset);
+                snap.anchors    = this.validateSetting('snap', 'anchors'   , options.anchors);
 
                 this.options.snapEnabled = true;
                 this.options.snap = snap;
@@ -2015,13 +2037,13 @@ window.interact = (function () {
                 return this;
             }
 
-            if (typeof newValue === 'boolean') {
-                this.options.snapEnabled = newValue;
+            if (typeof options === 'boolean') {
+                this.options.snapEnabled = options;
 
                 return this;
             }
 
-            if (newValue === null) {
+            if (options === null) {
                 delete this.options.snapEnabled;
                 delete this.options.snap;
 
@@ -2035,7 +2057,7 @@ window.interact = (function () {
 
         /**
          * @private
-         * @returns{String} action to be performed - drag/resize[axes]/gesture
+         * @returns {String} action to be performed - drag/resize[axes]/gesture
          */
         getAction: function actionCheck (event) {
             var rect = this.getRect(),
@@ -2072,7 +2094,7 @@ window.interact = (function () {
          * pointerDown
          *
          * @function
-         * @param {function} newValue
+         * @param {function} [newValue]
          * @returns {Function | Interactable}
          */
         actionChecker: function (newValue) {
@@ -2096,7 +2118,7 @@ window.interact = (function () {
          * of the interactable's element
          *
          * @function
-         * @param {function} newValue
+         * @param {function} [newValue]
          * @returns {Function | Interactable}
          */
         getRect: function rectCheck () {
@@ -2120,7 +2142,7 @@ window.interact = (function () {
          * element rectangle
          *
          * @function
-         * @param {function} newValue
+         * @param {function} [newValue]
          * @returns {Function | Interactable}
          */
         rectChecker: function (newValue) {
@@ -2145,7 +2167,7 @@ window.interact = (function () {
          * styled appropriately
          *
          * @function
-         * @param {function} newValue
+         * @param {function} [newValue]
          * @returns {Function | Interactable}
          */
         styleCursor: function (newValue) {
@@ -2168,7 +2190,7 @@ window.interact = (function () {
          * Returns or sets the origin of the Interactable's element
          *
          * @function
-         * @param {Object} newValue
+         * @param {Object} [newValue]
          * @returns {Object | Interactable}
          */
         origin: function (newValue) {
@@ -2187,6 +2209,16 @@ window.interact = (function () {
             return this.options.origin;
         },
 
+        /**
+         * Returns or sets the mouse coordinate types used to calculate the
+         * movement of the pointer.
+         *
+         * @function
+         * @param {string} [newValue] Use:
+         *                  'client' if you will be scrolling while interacting
+         *                  'page' if you want autoScroll to work
+         * @returns {Object | Interactable}
+         */
         deltaSource: function (newValue) {
             if (newValue === 'page' || newValue === 'client') {
                 this.options.deltaSource = newValue;
@@ -2269,7 +2301,7 @@ window.interact = (function () {
         },
 
         /**
-         * returns the element this interactable represents
+         * Returns the element this interactable represents
          *
          * @function
          * @returns {HTMLElement | SVGElement}
@@ -2283,6 +2315,8 @@ window.interact = (function () {
          * and directly to this Interactable
          *
          * @function
+         * @param {InteractEvent} iEvent The InteractEvent object to be fired on this
+         *                               Interactable
          * @returns {Interactable}
          */
         fire: function (iEvent) {
@@ -2355,6 +2389,9 @@ window.interact = (function () {
          * Binds a listener to an InteractEvent or DOM event
          *
          * @function
+         * @param {string} eventType The type of event to listen for
+         * @param {Function} listener The function to be called on that event
+         * @param {bool} [useCapture]
          * @returns {Interactable}
          */
         on: function (eventType, listener, useCapture) {
@@ -2390,6 +2427,9 @@ window.interact = (function () {
          * Removes an InteractEvent or DOM event listener
          *
          * @function
+         * @param {string} eventType The type of event that was listened for
+         * @param {Function} listener The listener function to be removed
+         * @param {bool} [useCapture]
          * @returns {Interactable}
          */
         off: function (eventType, listener, useCapture) {
@@ -2446,7 +2486,7 @@ window.interact = (function () {
          *remove it's drag, drop, resize and gesture capabilities and remove it's drag, drop, resize and gesture capabilities
          *
          * @function
-         * @returns {} {@link interact}
+         * @returns {interact}
          */
         unset: function () {
             events.remove(this, 'all');
@@ -2471,7 +2511,8 @@ window.interact = (function () {
     };
 
     /**
-     * @function
+     * @method
+     * @memberof interact
      * @description Check if an element has been set
      * @param {HTMLElement | SVGElement} element The Element being searched for
      * @returns {bool}
@@ -2484,6 +2525,8 @@ window.interact = (function () {
      * Adds a global listener to an InteractEvent
      *
      * @function
+     * @param {string} eventType The type of event to listen for
+     * @param {Function} listener The function to be called on that event
      * @returns {interact}
      */
     interact.on = function (iEventType, listener) {
@@ -2507,6 +2550,8 @@ window.interact = (function () {
      * Removes a global InteractEvent listener
      *
      * @function
+     * @param {string} eventType The type of event that was listened for
+     * @param {Function} listener The listener function to be removed
      * @returns {interact}
      */
     interact.off = function (iEventType, listener) {
@@ -2525,7 +2570,7 @@ window.interact = (function () {
      * @param {HTMLElement | SVGElement} element The DOM Element to resize/drag
      * @param {MouseEvent | TouchEvent} [pointerEvent] A pointer event whose pageX/Y
      *        coordinates will be the starting point of the interact drag/resize
-     * @returns {} {@link interact}
+     * @returns {interact}
      */
     interact.simulate = function (action, element, pointerEvent) {
         var event = {},
@@ -2574,12 +2619,12 @@ window.interact = (function () {
      * Returns or sets whether dragging is disabled for all Interactables
      *
      * @function
-     * @param {bool} newValue
+     * @param {bool} [newValue]
      * @returns {bool | interact}
      */
-    interact.enableDragging = function (value) {
-        if (value !== null && value !== undefined) {
-            actionIsEnabled.drag = value;
+    interact.enableDragging = function (newValue) {
+        if (newValue !== null && newValue !== undefined) {
+            actionIsEnabled.drag = newValue;
 
             return interact;
         }
@@ -2590,12 +2635,12 @@ window.interact = (function () {
      * Returns or sets whether resizing is disabled for all Interactables
      *
      * @function
-     * @param {bool} newValue
+     * @param {bool} [newValue]
      * @returns {bool | interact}
      */
-    interact.enableResizing = function (value) {
-        if (value !== null && value !== undefined) {
-            actionIsEnabled.resize = value;
+    interact.enableResizing = function (newValue) {
+        if (newValue !== null && newValue !== undefined) {
+            actionIsEnabled.resize = newValue;
 
             return interact;
         }
@@ -2606,12 +2651,12 @@ window.interact = (function () {
      * Returns or sets whether gestures are disabled for all Interactables
      *
      * @function
-     * @param {bool} newValue
+     * @param {bool} [newValue]
      * @returns {bool | interact}
      */
-    interact.enableGesturing = function (value) {
-        if (value !== null && value !== undefined) {
-            actionIsEnabled.gesture = value;
+    interact.enableGesturing = function (newValue) {
+        if (newValue !== null && newValue !== undefined) {
+            actionIsEnabled.gesture = newValue;
 
             return interact;
         }
@@ -2667,12 +2712,12 @@ window.interact = (function () {
      * start resizing
      *
      * @function
-     * @param {number} newValue
+     * @param {number} [newvalue]
      * @returns {number | interact}
      */
-    interact.margin = function (newMargin) {
-        if (typeof newMargin === 'number') {
-            margin = newMargin;
+    interact.margin = function (newvalue) {
+        if (typeof newvalue === 'number') {
+            margin = newvalue;
 
             return interact;
         }
@@ -2684,7 +2729,7 @@ window.interact = (function () {
      * depending on what action is being performed
      *
      * @function
-     * @param {bool} newValue
+     * @param {bool} [newValue]
      * @returns {bool | interact}
      */
     interact.styleCursor = function (newValue) {
@@ -2701,7 +2746,7 @@ window.interact = (function () {
      * trigger autoScroll by default
      *
      * @function
-     * @param {bool | Object} options true or false to simply enable or disable
+     * @param {bool | Object} [options] true or false to simply enable or disable
               or an object with margin, distance and interval properties
      * @returns {bool | interact}
      */
@@ -2738,7 +2783,7 @@ window.interact = (function () {
      * collection of coordinates
      *
      * @function
-     * @param {bool | Object} options true or false to simply enable or disable
+     * @param {bool | Object} [options] true or false to simply enable or disable
      *        or an object with properties
      *        mode   : 'grid' or 'anchor',
      *        range  : the distance within which snapping to a point occurs,
@@ -2811,10 +2856,11 @@ window.interact = (function () {
     };
 
     /**
-     * Ends the current action
+     * Ends the current interaction
      *
      * @function
-     * @returns {@link interact}
+     * @param {Event} [event] An event on which to call preventDefault()
+     * @returns {interact}
      */
     interact.stop = function (event) {
         if (dragging || resizing || gesturing) {
@@ -2849,8 +2895,8 @@ window.interact = (function () {
      * dropChecker
      *
      * @function
-     * @param {bool} newValue True to check on each move
-     * @returns {bool | @link interact}
+     * @param {bool} [newValue] True to check on each move
+     * @returns {bool | interact}
      */
     interact.dynamicDrop = function (newValue) {
         if (typeof newValue === 'boolean') {
@@ -2869,7 +2915,7 @@ window.interact = (function () {
      * Returns or sets weather pageX or clientX is used to calculate dx/dy
      *
      * @function
-     * @param {string} newValue 'page' or 'client'
+     * @param {string} [newValue] 'page' or 'client'
      * @returns {string | Interactable}
      */
     interact.deltaSource = function (newValue) {
