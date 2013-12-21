@@ -119,6 +119,7 @@ test('Interactable', function () {
     interactables = interact.debug().interactables;
     equal(interactables.length, 2, 'Second interactable added correctly');
     
+    interact.stop();
 });
 
 test('interact.unset', function () {
@@ -200,6 +201,8 @@ var debug = interact.debug(),
     
     interact(div0).off('dragstart', listener);
     interact(div0).off('dragmove', listener);
+
+    interact.stop();
 });
 
 test('drag move', function() {
@@ -258,6 +261,8 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('dragmove', listener);
+
+    interact.stop();
 });
 
 test('drag end', function() {
@@ -327,6 +332,8 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('dragend', listener);
+
+    interact.stop();
 });
 
 
@@ -394,6 +401,8 @@ var debug = interact.debug(),
     
     interact(div0).off('resizestart', listener);
     interact(div0).off('resizemove', listener);
+
+    interact.stop();
 });
 
 test('resize move', function() {
@@ -452,6 +461,8 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('resizemove', listener);
+
+    interact.stop();
 });
 
 test('resize end', function() {
@@ -521,6 +532,8 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('resizeend', listener);
+
+    interact.stop();
 });
 
 
@@ -598,6 +611,8 @@ var debug = interact.debug(),
     
     interact(div0).off('gesturestart', listener);
     interact(div0).off('gesturemove', listener);
+
+    interact.stop();
 });
 
 test('gesture move', function() {
@@ -707,6 +722,8 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('gesturemove', listener);
+
+    interact.stop();
 });
 
 test('gesture end', function() {
@@ -794,5 +811,7 @@ var debug = interact.debug(),
     debug.pointerUp.call(div0, pointerUpEvent);
     
     interact(div0).off('gestureend', listener);
+
+    interact.stop();
 });
 
