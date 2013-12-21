@@ -104,6 +104,9 @@ test('Interactable', function () {
     interact(div0).unset()(div0);
     interactables = interact.debug().interactables;
     interactable = interact(div0);
+
+    // enable autoSCroll by default
+    interact.autoScroll(true);
     
     equal(interactables.length, 1, 'interactable reset - number of interactables does not change');
     equal(interactable.draggable(), expectedDrag = false, 'Drag option set to default');
