@@ -778,7 +778,24 @@ var debug = interact.debug(),
             }
         ]
     },
-    pointerUpEvent = moveEvent1;
+    pointerUpEvent = {
+        target: div0,
+        type: 'touchend',
+        currentTarget: document,
+        preventDefault: function () {},
+        touches: [
+            {
+                pageX: expectedDx,
+                pageY: expectedDy
+            }
+        ],
+        changedTouches: [
+            {
+                pageX: expectedDx,
+                pageY: expectedDy
+            }
+        ]
+    };
     
     var listener = function (event) {
         var debug = interact.debug();
@@ -802,7 +819,7 @@ var debug = interact.debug(),
         });
     
     interact(div0).on('gestureend', listener);
-    
+
     expect(8);
     
     debug.pointerDown.call(div0, touchStartEvent);
