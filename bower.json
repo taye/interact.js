@@ -1,5 +1,5 @@
 {
-    "name"       : "interact.js",
+    "name"       : "interactjs",
     "main"       : "interact.js",
     "version"    : "1.0.2",
     "homepage"   : "http://interactjs.io",
@@ -10,6 +10,7 @@
     }],
     "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
     "keywords"   : [
+        "interact",
         "draggable",
         "droppable",
         "drag",
@@ -21,8 +22,7 @@
         "snap",
         "grid",
         "autoscroll",
-        "SVG",
-        "interactjs"
+        "SVG"
     ],
     "license"    : "MIT",
     "ignore"     : [
