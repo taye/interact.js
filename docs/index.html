@@ -1,0 +1,3331 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>interact.js API Reference</title>
+        <meta name="viewport" content="device-width">
+        <link rel="stylesheet" href="fonts/stylesheet.css">
+        <link rel="stylesheet" href="css/topcoat-desktop-light.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/dr.css">
+        <link rel="stylesheet" href="css/prism.css">
+        <!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    </head>
+      <body class="light">
+          <div id="wrapper">
+              <div class="max-width">
+                  <div id="sideNav">
+                      <div class="combo">
+                          <input type="search" id="dr-filter" value="" placeholder="search" class="topcoat-search-input">
+                      </div>
+                      <div id="pageNav">
+                          <ol id="dr-toc">
+                              
+                              <li class="dr-lvl0">
+                                  <a href="#Interactable" class="dr-property"><span>Interactable</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.actionChecker" class="dr-method"><span>Interactable.actionChecker()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.autoScroll" class="dr-method"><span>Interactable.autoScroll()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.deltaSource" class="dr-method"><span>Interactable.deltaSource()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.draggable" class="dr-method"><span>Interactable.draggable()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.dropCheck" class="dr-method"><span>Interactable.dropCheck()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.dropChecker" class="dr-method"><span>Interactable.dropChecker()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.dropzone" class="dr-method"><span>Interactable.dropzone()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.element" class="dr-method"><span>Interactable.element()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.fire" class="dr-method"><span>Interactable.fire()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.gestureable" class="dr-method"><span>Interactable.gestureable()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.getAction" class="dr-method"><span>Interactable.getAction()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.getRect" class="dr-method"><span>Interactable.getRect()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.off" class="dr-method"><span>Interactable.off()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.on" class="dr-method"><span>Interactable.on()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.origin" class="dr-method"><span>Interactable.origin()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.rectChecker" class="dr-method"><span>Interactable.rectChecker()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.resizeable" class="dr-method"><span>Interactable.resizeable()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.set" class="dr-method"><span>Interactable.set()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.snap" class="dr-method"><span>Interactable.snap()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.squareResize" class="dr-method"><span>Interactable.squareResize()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.styleCursor" class="dr-method"><span>Interactable.styleCursor()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.unset" class="dr-method"><span>Interactable.unset()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interactable.validateSetting" class="dr-method"><span>Interactable.validateSetting()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl0">
+                                  <a href="#interact" class="dr-method"><span>interact()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.autoScroll" class="dr-method"><span>interact.autoScroll()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.currentAction" class="dr-method"><span>interact.currentAction()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.debug" class="dr-method"><span>interact.debug()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.deltaSource" class="dr-method"><span>interact.deltaSource()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.dynamicDrop" class="dr-method"><span>interact.dynamicDrop()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.enableDragging" class="dr-method"><span>interact.enableDragging()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.enableGesturing" class="dr-method"><span>interact.enableGesturing()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.enableResizing" class="dr-method"><span>interact.enableResizing()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.isSet" class="dr-method"><span>interact.isSet()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.margin" class="dr-method"><span>interact.margin()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.off" class="dr-method"><span>interact.off()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.on" class="dr-method"><span>interact.on()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.simulate" class="dr-method"><span>interact.simulate()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.snap" class="dr-method"><span>interact.snap()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.stop" class="dr-method"><span>interact.stop()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.styleCursor" class="dr-styleCursor"><span>interact.styleCursor</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#interact.supportsTouch" class="dr-method"><span>interact.supportsTouch()</span></a>
+                              </li>
+                              
+                          </ol>
+                      </div>
+                  </div>
+              </div>
+              <div id="site">
+                  <header id="main-header">
+                      <div class="max-width">
+                          <hgroup>
+                              <h1><img src="../img/ijs-anim.svg" height="80px" alt="interact.js"></h1>
+                              <p>API Reference</p>
+                          </hgroup>
+                      </div>
+                  </header>
+                  <div id="content" class="max-width">
+                      
+                      <article id="interact">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["element"]],"line":1656,"title":"interact","name":"interact(element)"}; </script>
+                              <h3 class="dr-method">interact(element)<a href="#interact" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1656 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1656">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>The methods of this variable can be used to set elements as
+interactables and also to change various default settings.
+</p><p>Calling it as a function and passing an element or a valid CSS selector
+string returns an Interactable object which has various methods to
+configure it.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">element</span>
+                                              <span class="dr-type"><em class="dr-type-Element">Element</em> <em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The HTML or SVG Element to interact with or CSS selector</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">An <a href="#Interactable" class="dr-link">Interactable</a></span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <h3>Usage</h3>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(document.getElementById('draggable')).draggable(true);
+
+var rectables = interact('rect');
+rectables
+    .gestureable(true)
+    .on('gesturemove', function (event) {
+        // something cool...
+    })
+    .autoScroll(true);</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable">
+                          <header>
+                          <script> data = {"type":["property"],"clas":"dr-property","line":1678,"title":"Interactable","name":"Interactable"}; </script>
+                              <h3 class="dr-property">Interactable<a href="#Interactable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1678 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1678">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable-extra"></div>
+                              <div class="dr-property">
+                                  
+                                  
+                                  
+                                  
+                                  <p>Object type returned by <a href="#interact" class="dr-link">interact</a>
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.draggable">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":1736,"title":"Interactable.draggable","name":"Interactable.draggable([options])"}; </script>
+                              <h3 class="dr-method">Interactable.draggable([options])<a href="#Interactable.draggable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1736 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1736">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.draggable-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets whether drag actions can be performed on the
+Interactable
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Indicates if this can be the target of drag events</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">var isDraggable = interact('ul li').draggable();</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>or
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">true/false or An object with event listeners to be fired on drag events (object makes the Interactable draggable)</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">This Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(element).draggable({
+    onstart: function (event) {},
+    onmove : function (event) {},
+    onend  : function (event) {}
+});</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.dropzone">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":1769,"title":"Interactable.dropzone","name":"Interactable.dropzone([options])"}; </script>
+                              <h3 class="dr-method">Interactable.dropzone([options])<a href="#Interactable.dropzone" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1769 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1769">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.dropzone-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether elements can be dropped onto this
+Interactable to trigger drop events
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> <em class="dr-type-null">null</em> </span>
+                                              <span class="dr-description">The new value to be set.</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current setting or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.dropCheck">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["event"]],"line":1824,"title":"Interactable.dropCheck","name":"Interactable.dropCheck(event)"}; </script>
+                              <h3 class="dr-method">Interactable.dropCheck(event)<a href="#Interactable.dropCheck" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1824 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1824">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.dropCheck-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>The default function to determine if a dragend event occured over
+this Interactable&#39;s element. Can be overridden using
+<a href="#Interactable.dropChecker" class="dr-link">Interactable.dropChecker</a>.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">event</span>
+                                              <span class="dr-type"><em class="dr-type-MouseEvent">MouseEvent</em> <em class="dr-type-TouchEvent">TouchEvent</em> </span>
+                                              <span class="dr-description">The event that ends a drag</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">whether the pointer was over this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.dropChecker">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[checker]"]],"line":1852,"title":"Interactable.dropChecker","name":"Interactable.dropChecker([checker])"}; </script>
+                              <h3 class="dr-method">Interactable.dropChecker([checker])<a href="#Interactable.dropChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1852 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1852">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.dropChecker-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets the function used to check if a dragged element is
+over this Interactable. See <a href="#Interactable.dropCheck" class="dr-link">Interactable.dropCheck</a>.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">checker</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>The checker is a function which takes a mouseUp/touchEnd event as a
+parameter and returns true or false to indicate if the the current
+draggable can be dropped into this Interactable
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Function">Function</em>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">The checker function or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.resizeable">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":1879,"title":"Interactable.resizeable","name":"Interactable.resizeable([options])"}; </script>
+                              <h3 class="dr-method">Interactable.resizeable([options])<a href="#Interactable.resizeable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1879 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1879">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.resizeable-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets whether resize actions can be performed on the
+Interactable
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Indicates if this can be the target of resize elements</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">var isResizeable = interact('input[type=text]').resizeable();</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>or
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">true/false or An object with event listeners to be fired on resize events (object makes the Interactable resizeable)</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">This Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(element).resizeable({
+    onstart: function (event) {},
+    onmove : function (event) {},
+    onend  : function (event) {}
+});</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.squareResize">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":1907,"title":"Interactable.squareResize","name":"Interactable.squareResize([newValue])"}; </script>
+                              <h3 class="dr-method">Interactable.squareResize([newValue])<a href="#Interactable.squareResize" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1907 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1907">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.squareResize-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets whether resizing is forced 1:1 aspect
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Current setting</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>or
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.gestureable">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":1939,"title":"Interactable.gestureable","name":"Interactable.gestureable([options])"}; </script>
+                              <h3 class="dr-method">Interactable.gestureable([options])<a href="#Interactable.gestureable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1939 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1939">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.gestureable-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets whether multitouch gestures can be performed on the
+Interactable&#39;s element
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Indicates if this can be the target of gesture events</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">var isGestureable = interact(element).gestureable();</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>or
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">true/false or An object with event listeners to be fired on gesture events (makes the Interactable gestureable)</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(element).gestureable({
+    onmove: function (event) {}
+});</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.autoScroll">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":1982,"title":"Interactable.autoScroll","name":"Interactable.autoScroll([options])"}; </script>
+                              <h3 class="dr-method">Interactable.autoScroll([options])<a href="#Interactable.autoScroll" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 1982 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L1982">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.autoScroll-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether or not any actions near the edges of the
+window/container trigger autoScroll for this Interactable
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description"></span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p><code>false</code> if autoScroll is disabled; object with autoScroll properties
+if autoScroll is enabled
+</p><p>or
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> <em class="dr-type-boolean">boolean</em> <em class="dr-type-null">null</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>options can be:
+<li>an object with margin, distance and interval properties,</li>
+<li>true or false to enable or disable autoScroll or</li>
+<li>null to use default settings</li>
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.snap">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":2071,"title":"Interactable.snap","name":"Interactable.snap([options])"}; </script>
+                              <h3 class="dr-method">Interactable.snap([options])<a href="#Interactable.snap" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2071 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2071">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.snap-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p>Returns or sets if and how action coordinates are snapped
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description"><code>false</code> if snap is disabled; object with snap properties if snap is enabled</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>or
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> <em class="dr-type-boolean">boolean</em> <em class="dr-type-null">null</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <h3>Usage</h3>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact('.handle').snap({
+    mode        : 'grid',
+    range       : Infinity,
+    grid        : { x: 100, y: 100 },
+    gridOffset  : { x:   0, y:   0 },
+});
+
+interact('.handle').snap({
+    mode        : 'anchor',
+    anchors     : [
+        { x: 100, y: 100, range: 25 },
+        { x: 200, y: 200 }
+    ]
+});
+
+interact(document.querySelector('#thing')).snap({
+    mode : 'path',
+    paths: [
+        {
+            x: 100,
+            y: 100,
+            range: 25
+        },
+        function (x, y) {
+            return {
+                x: x,
+                y: (75 + 50 * Math.sin(x * 0.04)),
+                range: 40
+            };
+        }]
+})</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.getAction">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["event"]],"line":2129,"title":"Interactable.getAction","name":"Interactable.getAction(event)"}; </script>
+                              <h3 class="dr-method">Interactable.getAction(event)<a href="#Interactable.getAction" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2129 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2129">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.getAction-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>The default function to get the action resulting from a pointer
+event. overridden using <a href="#Interactable.actionChecker" class="dr-link">Interactable.actionChecker</a>
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">event</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">The mouse/touch event</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-string">string</em>
+                                      
+                                      <em class="dr-type-null">null</em>
+                                      
+                                      <span class="dr-description">The action (drag/resize[axes]/gesture) or null if none can be performed</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.actionChecker">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[checker]"]],"line":2169,"title":"Interactable.actionChecker","name":"Interactable.actionChecker([checker])"}; </script>
+                              <h3 class="dr-method">Interactable.actionChecker([checker])<a href="#Interactable.actionChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2169 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2169">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.actionChecker-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets the function used to check action to be performed on
+pointerDown
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">checker</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">A function which takes a mouse or touch event event as a parameter and returns &#39;drag&#39; &#39;resize&#39; or &#39;gesture&#39; or null</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Function">Function</em>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">The checker function or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.getRect">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2202,"title":"Interactable.getRect","name":"Interactable.getRect()"}; </script>
+                              <h3 class="dr-method">Interactable.getRect()<a href="#Interactable.getRect" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2202 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2202">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.getRect-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>The default function to get an Interactables bounding rect. Can be
+overridden using <a href="#Interactable.rectChecker" class="dr-link">Interactable.rectChecker</a>.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The object&#39;s bounding rectangle. The properties are numbers with no units.</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <ol class="dr-json">
+                                      
+                                      
+                                      <li>{<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>    top: -,</li>
+                                      
+                                      
+                                      
+                                      <li>    left: -, </li>
+                                      
+                                      
+                                      
+                                      <li>    bottom: -,</li>
+                                      
+                                      
+                                      
+                                      <li>    right: -,</li>
+                                      
+                                      
+                                      
+                                      <li>    width: -,</li>
+                                      
+                                      
+                                      
+                                      <li>    height: -</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>}</li>
+                                      
+                                      
+                                  </ol>
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.rectChecker">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[checker]"]],"line":2228,"title":"Interactable.rectChecker","name":"Interactable.rectChecker([checker])"}; </script>
+                              <h3 class="dr-method">Interactable.rectChecker([checker])<a href="#Interactable.rectChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2228 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2228">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.rectChecker-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets the function used to calculate the interactable&#39;s
+element&#39;s rectangle
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">checker</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">A function which returns this Interactable&#39;s bounding rectangle. See <a href="#Interactable.getRect" class="dr-link">Interactable.getRect</a></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-function">function</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The checker function or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.styleCursor">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":2255,"title":"Interactable.styleCursor","name":"Interactable.styleCursor([newValue])"}; </script>
+                              <h3 class="dr-method">Interactable.styleCursor([newValue])<a href="#Interactable.styleCursor" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2255 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2255">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.styleCursor-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether the action that would be performed when the
+mouse on the element are checked on <code>mousemove</code> so that the cursor
+may be styled appropriately
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Function">Function</em>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">The current setting or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.origin">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[origin]"]],"line":2281,"title":"Interactable.origin","name":"Interactable.origin([origin])"}; </script>
+                              <h3 class="dr-method">Interactable.origin([origin])<a href="#Interactable.origin" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2281 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2281">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.origin-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Gets or sets the origin of the Interactable&#39;s element.  The x and y
+of the origin will be subtracted from action event coordinates.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">origin</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">An object with x and y properties which are numbers</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current origin or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.deltaSource">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[source]"]],"line":2307,"title":"Interactable.deltaSource","name":"Interactable.deltaSource([source])"}; </script>
+                              <h3 class="dr-method">Interactable.deltaSource([source])<a href="#Interactable.deltaSource" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2307 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2307">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.deltaSource-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets the mouse coordinate types used to calculate the
+movement of the pointer.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">source</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">Use &#39;client&#39; if you will be scrolling while interacting; Use &#39;page&#39; if you want autoScroll to work</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-string">string</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current deltaSource or this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.validateSetting">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["context","option","value"]],"line":2337,"title":"Interactable.validateSetting","name":"Interactable.validateSetting(context, option, value)"}; </script>
+                              <h3 class="dr-method">Interactable.validateSetting(context, option, value)<a href="#Interactable.validateSetting" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2337 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2337">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.validateSetting-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">context</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">eg. &#39;snap&#39;, &#39;autoScroll&#39;</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">option</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The name of the value being set</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">value</span>
+                                              <span class="dr-type"><em class="dr-type-any type">any type</em> </span>
+                                              <span class="dr-description">The value being validated</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-typeof value">typeof value</em>
+                                      
+                                      <span class="dr-description">A valid value for the give context-option pair</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p><li>null if defaultOptions[context][value] is undefined</li>
+<li>value if it is the same type as defaultOptions[context][value],</li>
+<li>this.options[context][value] if it is the same type as defaultOptions[context][value],</li>
+<li>or defaultOptions[context][value]</li>
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.element">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2400,"title":"Interactable.element","name":"Interactable.element()"}; </script>
+                              <h3 class="dr-method">Interactable.element()<a href="#Interactable.element" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2400 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2400">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.element-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>If this is not a selector Interactable, it returns the element this
+interactable represents
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Element">Element</em>
+                                      
+                                      <span class="dr-description">HTML / SVG Element</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.fire">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["iEvent"]],"line":2414,"title":"Interactable.fire","name":"Interactable.fire(iEvent)"}; </script>
+                              <h3 class="dr-method">Interactable.fire(iEvent)<a href="#Interactable.fire" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2414 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2414">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.fire-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Calls listeners for the given InteractEvent type bound globablly
+and directly to this Interactable
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">iEvent</span>
+                                              <span class="dr-type"><em class="dr-type-InteractEvent">InteractEvent</em> </span>
+                                              <span class="dr-description">The InteractEvent object to be fired on this Interactable</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">this Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.on">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["eventType","listener","[useCapture]"]],"line":2491,"title":"Interactable.on","name":"Interactable.on(eventType, listener, [useCapture])"}; </script>
+                              <h3 class="dr-method">Interactable.on(eventType, listener, [useCapture])<a href="#Interactable.on" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2491 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2491">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.on-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Binds a listener for an InteractEvent or DOM event
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">eventType</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The type of event to listen for</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">listener</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">The function to be called on that event</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">useCapture</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description">useCapture flag for addEventListener</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">This Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.off">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["eventType","listener","[useCapture]"]],"line":2531,"title":"Interactable.off","name":"Interactable.off(eventType, listener, [useCapture])"}; </script>
+                              <h3 class="dr-method">Interactable.off(eventType, listener, [useCapture])<a href="#Interactable.off" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2531 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2531">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.off-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Removes an InteractEvent or DOM event listener
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">eventType</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The type of event that was listened for</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">listener</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">The listener function to be removed</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">useCapture</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description">useCapture flag for removeEventListener</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">This Interactable</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.set">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["options"]],"line":2566,"title":"Interactable.set","name":"Interactable.set(options)"}; </script>
+                              <h3 class="dr-method">Interactable.set(options)<a href="#Interactable.set" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2566 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2566">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.set-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Reset the options of this Interactable
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">The new settings to apply</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">This Interactablw</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interactable.unset">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2591,"title":"Interactable.unset","name":"Interactable.unset()"}; </script>
+                              <h3 class="dr-method">Interactable.unset()<a href="#Interactable.unset" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2591 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2591">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interactable.unset-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Remove this interactable from the list of interactables and remove
+it&#39;s drag, drop, resize and gesture capabilities
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description"><a href="#interact" class="dr-link">interact</a></span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.isSet">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["element"]],"line":2621,"title":"interact.isSet","name":"interact.isSet(element)"}; </script>
+                              <h3 class="dr-method">interact.isSet(element)<a href="#interact.isSet" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2621 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2621">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.isSet-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Check if an element has been set
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">element</span>
+                                              <span class="dr-type"><em class="dr-type-Element">Element</em> </span>
+                                              <span class="dr-description">The Element being searched for</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Indicates if the element or CSS selector was previously passed to interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.on">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["eventType","listener"]],"line":2635,"title":"interact.on","name":"interact.on(eventType, listener)"}; </script>
+                              <h3 class="dr-method">interact.on(eventType, listener)<a href="#interact.on" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2635 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2635">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.on-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Adds a global listener for an InteractEvent
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">eventType</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The type of event to listen for</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">listener</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">The function to be called on that event</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.off">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["eventType","listener"]],"line":2662,"title":"interact.off","name":"interact.off(eventType, listener)"}; </script>
+                              <h3 class="dr-method">interact.off(eventType, listener)<a href="#interact.off" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2662 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2662">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.off-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Removes a global InteractEvent listener
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">eventType</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The type of event that was listened for</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">listener</span>
+                                              <span class="dr-type"><em class="dr-type-function">function</em> </span>
+                                              <span class="dr-description">The listener function to be removed</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.simulate">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["action","element","[pointerEvent]"]],"line":2681,"title":"interact.simulate","name":"interact.simulate(action, element, [pointerEvent])"}; </script>
+                              <h3 class="dr-method">interact.simulate(action, element, [pointerEvent])<a href="#interact.simulate" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2681 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2681">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.simulate-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Simulate pointer down to begin to interact with an interactable element
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">action</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">The action to be performed - drag, resize, etc.</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">element</span>
+                                              <span class="dr-type"><em class="dr-type-Element">Element</em> </span>
+                                              <span class="dr-description">The DOM Element to resize/drag</span></li>
+                                          <li class="topcoat-list__item"><span class="dr-param">pointerEvent</span>
+                                              <span class="dr-type"><em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">Pointer event whose pageX/Y coordinates will be the starting point of the interact drag/resize</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.enableDragging">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":2733,"title":"interact.enableDragging","name":"interact.enableDragging([newValue])"}; </script>
+                              <h3 class="dr-method">interact.enableDragging([newValue])<a href="#interact.enableDragging" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2733 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2733">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.enableDragging-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether dragging is enabled for any Interactables
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description"><code>true</code> to allow the action; <code>false</code> to disable action for all Interactables</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current setting or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.enableResizing">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":2751,"title":"interact.enableResizing","name":"interact.enableResizing([newValue])"}; </script>
+                              <h3 class="dr-method">interact.enableResizing([newValue])<a href="#interact.enableResizing" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2751 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2751">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.enableResizing-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether resizing is enabled for any Interactables
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description"><code>true</code> to allow the action; <code>false</code> to disable action for all Interactables</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current setting or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.enableGesturing">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":2769,"title":"interact.enableGesturing","name":"interact.enableGesturing([newValue])"}; </script>
+                              <h3 class="dr-method">interact.enableGesturing([newValue])<a href="#interact.enableGesturing" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2769 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2769">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.enableGesturing-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether gesturing is enabled for any Interactables
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description"><code>true</code> to allow the action; <code>false</code> to disable action for all Interactables</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">The current setting or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.debug">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2787,"title":"interact.debug","name":"interact.debug()"}; </script>
+                              <h3 class="dr-method">interact.debug()<a href="#interact.debug" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2787 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2787">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.debug-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns debugging data
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">An object with properties that outline the current state and expose internal functions and variables</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.margin">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":2835,"title":"interact.margin","name":"interact.margin([newValue])"}; </script>
+                              <h3 class="dr-method">interact.margin([newValue])<a href="#interact.margin" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2835 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2835">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.margin-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets the margin for autocheck resizing used in
+<a href="#Interactable.getAction" class="dr-link">Interactable.getAction</a>. That is the distance from the bottom and right
+edges of an element clicking in which will start resizing
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-number">number</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-number">number</em>
+                                      
+                                      <em class="dr-type-interact">interact</em>
+                                      
+                                      <span class="dr-description">The current margin value or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.styleCursor">
+                          <header>
+                          <script> data = {"type":["styleCursor"],"clas":"dr-styleCursor","params":[["[newValue]"]],"line":2854,"title":"interact.styleCursor","name":"interact.styleCursor(event)"}; </script>
+                              <h3 class="dr-styleCursor">interact.styleCursor(event)<a href="#interact.styleCursor" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2854 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2854">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.styleCursor-extra"></div>
+                              <div class="dr-styleCursor">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether the cursor style of the document is changed
+depending on what action is being performed
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-interact">interact</em>
+                                      
+                                      <span class="dr-description">The current setting of interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.autoScroll">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["options"]],"line":2875,"title":"interact.autoScroll","name":"interact.autoScroll(options)"}; </script>
+                              <h3 class="dr-method">interact.autoScroll(options)<a href="#interact.autoScroll" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2875 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2875">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.autoScroll-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether or not actions near the edges of the window or
+specified container element trigger autoScroll by default
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">true or false to simply enable or disable or an object with margin, distance, container and interval properties</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p>or
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description"><code>false</code> if autoscroll is disabled and the default autoScroll settings if it is enabled</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.snap">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[options]"]],"line":2937,"title":"interact.snap","name":"interact.snap([options])"}; </script>
+                              <h3 class="dr-method">interact.snap([options])<a href="#interact.snap" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2937 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2937">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.snap-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether actions are constrained to a grid or a
+collection of coordinates
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">options</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> <em class="dr-type-object">object</em> </span>
+                                              <span class="dr-description">New settings</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p><code>true</code> or <code>false</code> to simply enable or disable
+or an object with some of the following properties
+</p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <ol class="dr-json">
+                                      
+                                      
+                                      <li>{<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>    mode   : 'grid', 'anchor' or 'path',</li>
+                                      
+                                      
+                                      
+                                      <li>    range  : the distance within which snapping to a point occurs,</li>
+                                      
+                                      
+                                      
+                                      <li>    grid   : {<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>        x: the distance between x-axis snap points,</li>
+                                      
+                                      
+                                      
+                                      <li>        y: the distance between y-axis snap points</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>    },</li>
+                                      
+                                      
+                                      
+                                      <li>    gridOffset: {<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>            x, y: the x/y-axis values of the grid origin</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>    },</li>
+                                      
+                                      
+                                      
+                                      <li>    anchors: [</li>
+                                      
+                                      
+                                      
+                                      <li>        {<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>            x: x coordinate to snap to,</li>
+                                      
+                                      
+                                      
+                                      <li>            y: y coordinate to snap to,</li>
+                                      
+                                      
+                                      
+                                      <li>            range: optional range for this anchor</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>        }</li>
+                                      
+                                      
+                                      
+                                      <li>        {<ol class="dr-json">
+                                      
+                                      
+                                      
+                                      <li>            another anchor</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>        }</li>
+                                      
+                                      
+                                      
+                                      <li>    ]</li>
+                                      
+                                      
+                                      
+                                      </ol></li><li>}</li>
+                                      
+                                      
+                                  </ol>
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <em class="dr-type-interact">interact</em>
+                                      
+                                      <span class="dr-description">The default snap settings object or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.supportsTouch">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2981,"title":"interact.supportsTouch","name":"interact.supportsTouch()"}; </script>
+                              <h3 class="dr-method">interact.supportsTouch()<a href="#interact.supportsTouch" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2981 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2981">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.supportsTouch-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <span class="dr-description">Whether or not the browser supports touch input</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.currentAction">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","line":2991,"title":"interact.currentAction","name":"interact.currentAction()"}; </script>
+                              <h3 class="dr-method">interact.currentAction()<a href="#interact.currentAction" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 2991 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L2991">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.currentAction-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-string">string</em>
+                                      
+                                      <span class="dr-description">What action is currently being performed</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.stop">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["event"]],"line":3004,"title":"interact.stop","name":"interact.stop(event)"}; </script>
+                              <h3 class="dr-method">interact.stop(event)<a href="#interact.stop" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 3004 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L3004">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.stop-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Ends the current interaction
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">event</span>
+                                              <span class="dr-type"><em class="dr-type-Event">Event</em> </span>
+                                              <span class="dr-description">An event on which to call preventDefault()</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-object">object</em>
+                                      
+                                      <span class="dr-description">interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.dynamicDrop">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":3042,"title":"interact.dynamicDrop","name":"interact.dynamicDrop([newValue])"}; </script>
+                              <h3 class="dr-method">interact.dynamicDrop([newValue])<a href="#interact.dynamicDrop" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 3042 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L3042">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.dynamicDrop-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Returns or sets whether the dimensions of dropzone elements are
+calculated on every dragmove or only on dragstart for the default
+dropChecker
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
+                                              <span class="dr-description">True to check on each move. False to check only before start</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-boolean">boolean</em>
+                                      
+                                      <em class="dr-type-interact">interact</em>
+                                      
+                                      <span class="dr-description">The current setting or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="interact.deltaSource">
+                          <header>
+                          <script> data = {"type":["method"],"clas":"dr-method","params":[["[newValue]"]],"line":3065,"title":"interact.deltaSource","name":"interact.deltaSource([newValue])"}; </script>
+                              <h3 class="dr-method">interact.deltaSource([newValue])<a href="#interact.deltaSource" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 3065 in the source" href="https://github.com/taye/interact.js/blob/master/interact.js#L3065">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="interact.deltaSource-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p>Returns or sets weather pageX/Y or clientX/Y is used to calculate dx/dy.
+</p><p>See <a href="#Interactable.deltaSource" class="dr-link">Interactable.deltaSource</a>
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
+                                              <span class="dr-type"><em class="dr-type-string">string</em> </span>
+                                              <span class="dr-description">&#39;page&#39; or &#39;client&#39;</span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <p class="dr-returns">
+                                      <strong class="dr-title">Returns:</strong>
+                                      
+                                      <em class="dr-type-string">string</em>
+                                      
+                                      <em class="dr-type-Interactable">Interactable</em>
+                                      
+                                      <span class="dr-description">The current setting or interact</span>
+                                  </p>
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                  </div>
+        <footer></footer>
+      </div>
+    </div>
+    <script src="js/prism.js"></script>
+    
+<script>!function(e){if(e){for(var t=function(e,t){var n=t.toUpperCase().split(""),r=n.shift(),a=RegExp("^["+r.toLowerCase()+r+"][a-z]*"+n.join("[a-z]*")+"[a-z]*$")
+return!!(e+"").match(a)},n=function(e,n){e+="",n+=""
+var r,a=0
+if(e==n)return 1
+if(!e||!n)return 0
+if(t(e,n))return.9
+a=0,r=e.toLowerCase()
+for(var i,o=0,l=n.length;l>o;o++)i=r.indexOf(n.charAt(o)),~i&&(r=r.substring(i+1),a+=1/(i+1))
+return a=Math.max(a/l-Math.abs(e.length-l)/e.length/2,0)},r=e.getElementsByTagName("span"),a=[],i=/[^\.\(]*(?=(\(\))?$)/,o=0,l=r.length;l>o;o++)a[o]={li:r[o].parentNode.parentNode,text:r[o].innerHTML.match(i)[0]}
+var h=document.getElementById("dr-filter"),f=function(e,t){return t.weight-e.weight}
+h.onclick=h.onchange=h.onkeydown=h.onkeyup=function(){var t=h.value,r=[]
+if(t.length>1){for(var i=0,o=a.length;o>i;i++)r[i]={li:a[i].li,weight:n(a[i].text,t)}
+r.sort(f)}else r=a
+for(i=0,o=r.length;o>i;i++)e.appendChild(r[i].li)}}}(document.getElementById("dr-toc"))</script>
+</body></html>
