@@ -90,6 +90,10 @@ interact.on('dragstart', function (event) {
 });
 ```
 
+Documentation
+-------------
+http://interactjs.io/docs
+
 Usage
 -----
 Pass the element you want to interact with or a CSS selector string to
