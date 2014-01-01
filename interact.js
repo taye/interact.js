@@ -7,7 +7,7 @@
  * @version 1.0.2
  * @author Taye Adeyemi <dev@taye.me>
  */
-window.interact = (function () {
+(function (window) {
     'use strict';
 
     var document           = window.document,
@@ -2977,5 +2977,15 @@ window.interact = (function () {
         };
     }
 
-    return interact;
-} ());
+    // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
+    if (typeof exports !== 'undefined') {
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = interact;
+        }
+        exports.interact = interact;
+    }
+    else {
+        window.interact = interact;
+    }
+
+} (this));
