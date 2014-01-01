@@ -1,0 +1,6 @@
+.git*
+bower.json
+demo/
+docs/
+img/
+test/

@@ -24,11 +24,5 @@
         "autoscroll",
         "SVG"
     ],
-    "license"    : "MIT",
-    "ignore"     : [
-        ".*",
-        "test",
-        "demo",
-        "img"
-    ]
+    "license"    : "MIT"
 }
