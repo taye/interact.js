@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012, 2013 Taye Adeyemi
+ * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  *
