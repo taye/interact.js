@@ -214,12 +214,14 @@ element.
 interact(element)
     .draggable({
         onmove: function(event) {
-            // Add the change in mouse/touch coordinates to the element's current position
-            event.target.style.left =
-                event.target.offsetLeft + event.detail.dx + "px";
+            var elementStyle = event.target.style;
 
-            event.target.style.top =
-                event.target.offsetTop + event.detail.dy + "px";
+            // Add the change in mouse/touch coordinates to the element's current position
+            elementStyle.left =
+                parseInt(elementStyle.left) + event.dx + "px";
+
+            elementStyle.top =
+                parseInt(elementStyle.top) + event.dy + "px";
         });
 ```
 
