@@ -1457,7 +1457,7 @@
                          elementInteractable.getAction(event, elementInteractable),
                          elementInteractable);
 
-        if (!elementInteractable || !validateAction(elementInteractable.getAction(event))) {
+        if (!elementInteractable || !validateAction(elementInteractable.getAction(event), elementInteractable)) {
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
