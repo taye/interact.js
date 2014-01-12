@@ -245,7 +245,7 @@
             'gesturemove',
             'gestureend',
 
-            'click'
+            'tap'
         ],
 
         globalEvents = {},
@@ -1587,7 +1587,7 @@
                     click[prop] = event[prop];
                 }
             }
-            click.type = 'click';
+            click.type = 'tap';
             target.fire(click);
         }
 
