@@ -581,7 +581,7 @@
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    function touchAngle (event) {
+    function touchAngle (event, prevAngle) {
         var deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
@@ -597,7 +597,27 @@
             dy -= event.touches[1][sourceY];
         }
 
-        return 180 * -Math.atan(dy / dx) / Math.PI;
+        var angle = 180 * Math.atan(dy / dx) / Math.PI;
+
+        if (typeof prevAngle === 'number') {
+            var dr = angle - prevAngle,
+                drClamped = dr % 360;
+
+            if (drClamped > 315) {
+                angle -= 360 + (angle / 360)|0 * 360;
+            }
+            else if (drClamped > 135) {
+                angle -= 180 + (angle / 360)|0 * 360;
+            }
+            else if (drClamped < -315) {
+                angle += 360 + (angle / 360)|0 * 360;
+            }
+            else if (drClamped < -135) {
+                angle += 180 + (angle / 360)|0 * 360;
+            }
+        }
+
+        return  angle;
     }
 
     function calcRects (interactableList) {
@@ -878,15 +898,17 @@
             this.touches  = event.touches;
             this.distance = touchDistance(event);
             this.box      = getTouchBBox(event);
-            this.angle    = touchAngle(event);
 
             if (phase === 'start') {
                 this.scale = 1;
                 this.ds = 0;
+
+                this.angle    = touchAngle(event);
                 this.da = 0;
             }
             else {
                 this.scale = this.distance / gesture.startDistance;
+                this.angle = touchAngle(event, gesture.prevAngle);
                 if (phase === 'end') {
                     this.da = this.angle - gesture.startAngle;
                     this.ds = this.scale - 1;
