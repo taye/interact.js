@@ -883,16 +883,16 @@
             if (phase === 'start') {
                 this.scale = 1;
                 this.ds = 0;
-                this.rotation = 0;
+                this.da = 0;
             }
             else {
                 this.scale = this.distance / gesture.startDistance;
                 if (phase === 'end') {
-                    this.rotation = this.angle - gesture.startAngle;
+                    this.da = this.angle - gesture.startAngle;
                     this.ds = this.scale - 1;
                 }
                 else {
-                    this.rotation = this.angle - gesture.prevAngle;
+                    this.da = this.angle - gesture.prevAngle;
                     this.ds = this.scale - gesture.prevScale;
                 }
             }

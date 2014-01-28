@@ -190,7 +190,7 @@ The table below displays all of these events.
 | `touches`               | The array of touches that triggered the event     |
 | `distance`              | The distance between the event's first two touches|
 | `angle`                 | The angle of the line made by the two touches     |
-| `rotation`              | The change in angle since previous event          |
+| `da`                    | The change in angle since previous event          |
 | `scale`                 | The ratio of the distance of the start event to the distance of the current event |
 | `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
