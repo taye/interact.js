@@ -2012,7 +2012,7 @@
                        margin   : defaults.margin,
                        distance : defaults.distance,
                        interval : defaults.interval,
-                       container: defaults.container,
+                       container: defaults.container
                    };
                 }
 
