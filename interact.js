@@ -64,13 +64,14 @@
             // aww snap
             snap: {
                 mode        : 'grid',
+                actions     : ['drag'],
                 range       : Infinity,
                 grid        : { x: 100, y: 100 },
                 gridOffset  : { x:   0, y:   0 },
                 anchors     : [],
                 paths       : [],
 
-                arrayTypes  : /^anchors$|^paths$/,
+                arrayTypes  : /^anchors$|^paths$|^actions$/,
                 objectTypes : /^grid$|^gridOffset$/,
                 stringTypes : /^mode$/,
                 numberTypes : /^range$/
@@ -793,7 +794,7 @@
             page.x -= options.origin.x;
             page.y -= options.origin.y;
 
-            if (target.options.snapEnabled) {
+            if (target.options.snapEnabled && target.options.snap.actions.indexOf(action) !== -1) {
                 var snap = options.snap;
 
                 this.snap = {
@@ -1075,7 +1076,7 @@
                 pointerWasMoved = true;
             }
             if (prepared && target) {
-                if (target.options.snapEnabled) {
+                if (target.options.snapEnabled && target.options.snap.actions.indexOf(prepared) !== -1) {
                     var snap = target.options.snap,
                         page = getPageXY(event),
                         closest,
@@ -2107,6 +2108,7 @@
                 }
 
                 snap.mode       = this.validateSetting('snap', 'mode'      , options.mode);
+                snap.actions    = this.validateSetting('snap', 'actions'   , options.actions);
                 snap.range      = this.validateSetting('snap', 'range'     , options.range);
                 snap.paths      = this.validateSetting('snap', 'paths'     , options.paths);
                 snap.grid       = this.validateSetting('snap', 'grid'      , options.grid);
@@ -2962,10 +2964,11 @@
         if (options instanceof Object) {
             defaultOptions.snapEnabled = true;
 
-            if (typeof options.mode  === 'string') { snap.mode    = options.mode;   }
-            if (typeof options.range === 'number') { snap.range   = options.range;  }
-            if (options.anchors instanceof Array ) { snap.anchors = options.anchors;}
-            if (options.grid instanceof   Object ) { snap.grid    = options.grid;   }
+            if (typeof options.mode  === 'string') { snap.mode  = options.mode;  }
+            if (typeof options.range === 'number') { snap.range = options.range; }
+            if (options.actions    instanceof Array ) { snap.actions    = options.actions;    }
+            if (options.anchors    instanceof Array ) { snap.anchors    = options.anchors;    }
+            if (options.grid       instanceof Object) { snap.grid       = options.grid;       }
             if (options.gridOffset instanceof Object) { snap.gridOffset = options.gridOffset; }
 
             return interact;
@@ -2979,6 +2982,7 @@
         return {
             enabled   : defaultOptions.snapEnabled,
             mode      : snap.mode,
+            actions   : snap.actions,
             grid      : snap.grid,
             gridOffset: snap.gridOffset,
             anchors   : snap.anchors,
