@@ -3,6 +3,8 @@
     cursor: -moz-grab;
     cursor: -ms-grab;
     cursor: grab;
+
+    touch-action: none;
 }
 
 .dragging, .dragging .point-handle {
