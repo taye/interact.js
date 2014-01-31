@@ -286,7 +286,7 @@
             events  : {}
         },
         parentDocTarget = {
-            _element: window.parent.document,
+            _element: null,
             events  : {}
         },
 
@@ -3109,8 +3109,10 @@
     events.add(docTarget   , 'touchcancel'  , docPointerUp);
     events.add(windowTarget, 'blur'         , docPointerUp);
 
-    if (window.parent !== window) {
+    if (window.frameElement) {
         try {
+            parentDocTarget._element = window.frameElement.ownerDocument;
+
             events.add(parentDocTarget   , 'mouseup'      , docPointerUp);
             events.add(parentDocTarget   , 'touchend'     , docPointerUp);
             events.add(parentDocTarget   , 'touchcancel'  , docPointerUp);
