@@ -3109,8 +3109,8 @@
     events.add(docTarget   , 'touchcancel'  , docPointerUp);
     events.add(windowTarget, 'blur'         , docPointerUp);
 
-    if (window.frameElement) {
-        try {
+    try {
+        if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
             events.add(parentDocTarget   , 'mouseup'      , docPointerUp);
@@ -3118,9 +3118,9 @@
             events.add(parentDocTarget   , 'touchcancel'  , docPointerUp);
             events.add(parentWindowTarget, 'blur'         , docPointerUp);
         }
-        catch (error) {
-            interact.windowParentError = error;
-        }
+    }
+    catch (error) {
+        interact.windowParentError = error;
     }
 
     // For IE's lack of Event#preventDefault
