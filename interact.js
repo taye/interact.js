@@ -788,11 +788,14 @@
         }
         else {
 
+            page   = getPageXY(event);
             client = getClientXY(event);
-            page = getPageXY(event);
 
             page.x -= options.origin.x;
             page.y -= options.origin.y;
+
+            client.x -= options.origin.x;
+            client.y -= options.origin.y;
 
             if (target.options.snapEnabled && target.options.snap.actions.indexOf(action) !== -1) {
                 var snap = options.snap;
@@ -2224,6 +2227,10 @@
          o }
         \*/
         getRect: function rectCheck () {
+            if (this.selector && !(this._element instanceof Element)) {
+                this._element = document.querySelector(this.selector);
+            }
+
             var scroll = getScrollXY(),
                 clientRect = (this._element instanceof SVGElement)?
                     this._element.getBoundingClientRect():
