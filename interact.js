@@ -78,6 +78,8 @@
             },
             snapEnabled : false,
 
+            restrictions: {},
+
             autoScroll: {
                 container   : window,  // the item that is scrolled
                 margin      : 60,
@@ -834,6 +836,46 @@
             }
         }
 
+        if (target.options.restrictions[action]) {
+            var restriction = target.options.restrictions[action],
+                rect,
+                originalPageX = page.x,
+                originalPageY = page.y;
+
+            if (restriction instanceof Element) {
+                rect = interact(restriction).getRect();
+            }
+            else {
+                if (typeof restriction === 'function') {
+                    restriction = restriction(page.x, page.y, target._element);
+                }
+
+                rect = restriction;
+
+                // object is assumed to have
+                // x, y, width, height or
+                // left, top, right, bottom
+                if ('x' in restriction && 'y' in restriction) {
+                    rect = {
+                        left  : restriction.x,
+                        top   : restriction.y,
+                        right : restriction.x + restriction.width,
+                        bottom: restriction.y + restriction.height
+                    };
+                }
+            }
+
+            page.x = Math.max(Math.min(rect.right , page.x), rect.left);
+            page.y = Math.max(Math.min(rect.bottom, page.y), rect.top );
+
+            var restrictDx = page.x - originalPageX,
+                restrictDy = page.y - originalPageY;
+
+            client.x += restrictDx;
+            client.y += restrictDy;
+        }
+
+
         this.x0        = x0;
         this.y0        = y0;
         this.clientX0  = clientX0;
@@ -1078,7 +1120,9 @@
             if (x0 === prevX && y0 === prevY) {
                 pointerWasMoved = true;
             }
+
             if (prepared && target) {
+
                 if (target.options.snapEnabled && target.options.snap.actions.indexOf(prepared) !== -1) {
                     var snap = target.options.snap,
                         page = getPageXY(event),
@@ -2358,6 +2402,40 @@
         },
 
         /*\
+         * Interactable.restrict
+         [ method ]
+         *
+         * Returns or sets the rectangles within which actions on this
+         * interactable (after snap calculations) are restricted.
+         *
+         - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
+         = (object) The current restrictions object or this Interactable
+         **
+         | interact(element).restrict({
+         |     // the rect will be `interactable(element.parentNode).getRect()`
+         |     drag: element.parentNode,
+         |
+         |     // x and y are relative to the the interactable's origin
+         |     resize: { x: 100, y: 100, width: 200, height: 200 }
+         | })
+        \*/
+        restrict: function (newValue) {
+            if (newValue === undefined) {
+                return this.options.restrictions;
+            }
+
+            if (newValue instanceof Object) {
+                this.options.restrictions = newValue;
+            }
+
+            else if (newValue === null) {
+               delete this.options.restrictions;
+            }
+
+            return this;
+        },
+
+        /*\
          * Interactable.validateSetting
          [ method ]
          *
@@ -3108,6 +3186,35 @@
             return this;
         }
         return defaultOptions.deltaSource;
+    };
+
+
+    /*\
+     * interact.restrict
+     [ method ]
+     *
+     * Returns or sets the default rectangles within which actions (after snap
+     * calculations) are restricted.
+     *
+     * See @Interactable.restrict
+     *
+     - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects as values
+     = (object) The current restrictions object or interact
+    \*/
+    interact.restrict = function (newValue, noArray) {
+        if (newValue === undefined) {
+            return defaultOptions.restrictions;
+        }
+
+        if (newValue instanceof Object) {
+            defaultOptions.restrictions = newValue;
+        }
+
+        else if (newValue === null) {
+           defaultOptions.restrictions = {};
+        }
+
+        return this;
     };
 
 
