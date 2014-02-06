@@ -1335,40 +1335,43 @@
             dragEvent = new InteractEvent(event, 'drag', 'start');
             dragging = true;
 
+            target.fire(dragEvent);
+
             if (!dynamicDrop) {
                 calcRects(dropzones);
                 for (var i = 0; i < selectorDZs.length; i++) {
                     selectorDZs[i]._elements = document.querySelectorAll(selectorDZs[i].selector);
                 }
             }
+
+            setPrevXY(dragEvent);
         }
-        else {
-            var draggableElement = target._element,
-                dropzoneElement  = dropTarget? dropTarget._element: null;
 
-            dragEvent  = new InteractEvent(event, 'drag', 'move');
-            dropTarget = getDrop(event, target);
+        var draggableElement = target._element,
+            dropzoneElement  = dropTarget? dropTarget._element: null;
 
-            // Make sure that the target selector draggable's element is
-            // restored after dropChecks
-            target._element = draggableElement;
+        dragEvent  = new InteractEvent(event, 'drag', 'move');
+        dropTarget = getDrop(event, target);
 
-            if (dropTarget !== prevDropTarget) {
-                // if there was a prevDropTarget, create a dragleave event
-                if (prevDropTarget) {
-                    dragLeaveEvent      = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
+        // Make sure that the target selector draggable's element is
+        // restored after dropChecks
+        target._element = draggableElement;
 
-                    dragEvent.dragLeave = prevDropTarget._element;
-                    leaveDropTarget     = prevDropTarget;
-                    prevDropTarget      = null;
-                }
-                // if the dropTarget is not null, create a dragenter event
-                if (dropTarget) {
-                    dragEnterEvent      = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
+        if (dropTarget !== prevDropTarget) {
+            // if there was a prevDropTarget, create a dragleave event
+            if (prevDropTarget) {
+                dragLeaveEvent      = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
 
-                    dragEvent.dragEnter = dropTarget._element;
-                    prevDropTarget      = dropTarget;
-                }
+                dragEvent.dragLeave = prevDropTarget._element;
+                leaveDropTarget     = prevDropTarget;
+                prevDropTarget      = null;
+            }
+            // if the dropTarget is not null, create a dragenter event
+            if (dropTarget) {
+                dragEnterEvent      = new InteractEvent(event, 'drag', 'enter', dropzoneElement, draggableElement);
+
+                dragEvent.dragEnter = dropTarget._element;
+                prevDropTarget      = dropTarget;
             }
         }
 
@@ -1393,12 +1396,14 @@
             resizeEvent = new InteractEvent(event, 'resize', 'start');
             target.fire(resizeEvent);
 
-            resizing = true;
-        }
-        else {
-            resizeEvent = new InteractEvent(event, 'resize', 'move');
             target.fire(resizeEvent);
+            resizing = true;
+
+            setPrevXY(resizeEvent);
         }
+
+        resizeEvent = new InteractEvent(event, 'resize', 'move');
+        target.fire(resizeEvent);
 
         setPrevXY(resizeEvent);
     }
@@ -1414,23 +1419,24 @@
 
         if (!gesturing) {
 
-            gestureEvent = new InteractEvent(event, 'gesture', 'start');
+            var gestureEvent = new InteractEvent(event, 'gesture', 'start');
             gestureEvent.ds = 0;
 
             gesture.startDistance = gestureEvent.distance;
             gesture.startAngle = gestureEvent.angle;
             gesture.scale = 1;
 
-            target.fire(gestureEvent);
-
             gesturing = true;
-        }
-        else {
-            gestureEvent = new InteractEvent(event, 'gesture', 'move');
-            gestureEvent.ds = gestureEvent.scale - gesture.scale;
 
             target.fire(gestureEvent);
+
+            setPrevXY(gestureEvent);
         }
+
+        gestureEvent = new InteractEvent(event, 'gesture', 'move');
+        gestureEvent.ds = gestureEvent.scale - gesture.scale;
+
+        target.fire(gestureEvent);
 
         setPrevXY(gestureEvent);
 
