@@ -623,6 +623,26 @@
         return  angle;
     }
 
+    function getOriginXY (interactable) {
+        interactable = interactable || target;
+
+        var origin = interactable
+                ? interactable.options.origin
+                : defaultOptions.origin;
+
+        if (origin instanceof Element)  {
+            origin = interact(origin).getRect();
+
+            origin.x = origin.left;
+            origin.y = origin.top;
+        }
+        else if (typeof origin === 'function') {
+            origin = origin(interactable && interactable._element);
+        }
+
+        return origin;
+    }
+
     function calcRects (interactableList) {
         for (var i = 0, len = interactableList.length; i < len; i++) {
             interactableList[i].rect = interactableList[i].getRect();
@@ -778,26 +798,27 @@
             deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            options = target? target.options: defaultOptions;
+            options = target? target.options: defaultOptions,
+            origin = getOriginXY(target);
 
         element = element || target._element;
 
         if (action === 'gesture') {
             var average = touchAverage(event);
 
-            page   = { x: (average.pageX   - options.origin.x), y: (average.pageY   - options.origin.y) };
-            client = { x: (average.clientX - options.origin.x), y: (average.clientY - options.origin.y) };
+            page   = { x: (average.pageX   - origin.x), y: (average.pageY   - origin.y) };
+            client = { x: (average.clientX - origin.x), y: (average.clientY - origin.y) };
         }
         else {
 
             page   = getPageXY(event);
             client = getClientXY(event);
 
-            page.x -= options.origin.x;
-            page.y -= options.origin.y;
+            page.x -= origin.x;
+            page.y -= origin.y;
 
-            client.x -= options.origin.x;
-            client.y -= options.origin.y;
+            client.x -= origin.x;
+            client.y -= origin.y;
 
             if (target.options.snapEnabled && target.options.snap.actions.indexOf(action) !== -1) {
                 var snap = options.snap;
@@ -1072,7 +1093,8 @@
             var action = validateAction(forceAction || target.getAction(event)),
                 average,
                 page,
-                client;
+                client,
+                origin = getOriginXY(target);
 
             if (event.touches) {
                 average = touchAverage(event);
@@ -1114,10 +1136,10 @@
 
             prepared = action;
 
-            x0 = page.x - options.origin.x;
-            y0 = page.y - options.origin.y;
-            clientX0 = client.x - options.origin.x;
-            clientY0 = client.y - options.origin.y;
+            x0 = page.x - origin.x;
+            y0 = page.y - origin.y;
+            clientX0 = client.x - origin.x;
+            clientY0 = client.y - origin.y;
 
             snapStatus.x = null;
             snapStatus.y = null;
@@ -1137,6 +1159,7 @@
                 if (target.options.snapEnabled && target.options.snap.actions.indexOf(prepared) !== -1) {
                     var snap = target.options.snap,
                         page = getPageXY(event),
+                        origin = getOriginXY(target),
                         closest,
                         range,
                         inRange,
@@ -1149,8 +1172,8 @@
                     snapStatus.realX = page.x;
                     snapStatus.realY = page.y;
 
-                    page.x -= target.options.origin.x;
-                    page.y -= target.options.origin.y;
+                    page.x -= origin.x;
+                    page.y -= origin.y;
 
                     // change to infinite range when range is negative
                     if (snap.range < 0) { snap.range = Infinity; }
@@ -1366,11 +1389,11 @@
                             var p = getPageXY(event),
                                 c = getClientXY(event);
 
-                            x0 = p.x - target.options.origin.x + snapStatus.dx;
-                            y0 = p.y - target.options.origin.y + snapStatus.dy;
+                            x0 = p.x - origin.x + snapStatus.dx;
+                            y0 = p.y - origin.y + snapStatus.dy;
 
-                            clientX0 = c.x - target.options.origin.x + snapStatus.dx;
-                            clientY0 = c.y - target.options.origin.y + snapStatus.dy;
+                            clientX0 = c.x - origin.x + snapStatus.dx;
+                            clientY0 = c.y - origin.y + snapStatus.dy;
                         }
 
                         actions[prepared].moveListener(event);
@@ -2382,6 +2405,9 @@
          * of the origin will be subtracted from action event coordinates.
          *
          - origin (object) #optional An object with x and y properties which are numbers
+         * OR
+         - origin (Element) #optional An HTML or SVG Element whose rect will be used
+         **
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
