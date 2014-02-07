@@ -27,6 +27,8 @@
         clientX0 = 0,
         clientY0 = 0,
 
+        downEvent = null,
+
         gesture = {
             start: { x: 0, y: 0 },
 
@@ -918,18 +920,7 @@
             this.relatedTarget = related;
         }
 
-        // start event dx, dy are both 0
-        if (phase === 'start') {
-            this.pageX = x0;
-            this.pageY = y0;
-
-            this.clientX = clientX0;
-            this.clientY = clientY0;
-
-            this.dx = this.dy = 0;
-        }
-
-        // end event dx, dy is difference between start and current points
+        // end event dx, dy is difference between start and end points
         if (phase === 'end' || action === 'drop') {
             if (deltaSource === 'client') {
                 this.dx = client.x - x0;
@@ -981,12 +972,13 @@
                 this.scale = 1;
                 this.ds = 0;
 
-                this.angle    = touchAngle(event);
+                this.angle = touchAngle(event);
                 this.da = 0;
             }
             else {
                 this.scale = this.distance / gesture.startDistance;
                 this.angle = touchAngle(event, gesture.prevAngle);
+
                 if (phase === 'end') {
                     this.da = this.angle - gesture.startAngle;
                     this.ds = this.scale - 1;
@@ -1145,6 +1137,7 @@
             snapStatus.y = null;
 
             event.preventDefault();
+            downEvent = event;
         }
     }
 
@@ -1424,7 +1417,7 @@
             leaveDropTarget;
 
         if (!dragging) {
-            dragEvent = new InteractEvent(event, 'drag', 'start');
+            dragEvent = new InteractEvent(downEvent, 'drag', 'start');
             dragging = true;
 
             target.fire(dragEvent);
@@ -1485,7 +1478,7 @@
         var resizeEvent;
 
         if (!resizing) {
-            resizeEvent = new InteractEvent(event, 'resize', 'start');
+            resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
             target.fire(resizeEvent);
 
             target.fire(resizeEvent);
@@ -1511,11 +1504,11 @@
 
         if (!gesturing) {
 
-            var gestureEvent = new InteractEvent(event, 'gesture', 'start');
+            var gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
             gestureEvent.ds = 0;
 
-            gesture.startDistance = gestureEvent.distance;
-            gesture.startAngle = gestureEvent.angle;
+            gesture.startDistance = gesture.prevDistance = gestureEvent.distance;
+            gesture.startAngle = gesture.prevAngle = gestureEvent.angle;
             gesture.scale = 1;
 
             gesturing = true;
@@ -1534,6 +1527,7 @@
 
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
+
         if (gestureEvent.scale !== Infinity &&
             gestureEvent.scale !== null &&
             gestureEvent.scale !== undefined  &&
@@ -3191,7 +3185,7 @@
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
-        prepared = null;
+        prepared = downEvent = null;
 
         return interact;
     };
