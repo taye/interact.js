@@ -249,7 +249,7 @@
     interact.on('dragmove', nodeEventDebug);
     interact.on('dragend', nodeEventDebug);
 
-    //interact.on('drop', dropNode);
+    interact.on('drop', dropNode);
 
     window.demo = {
         DemoNode      : DemoNode,

@@ -281,9 +281,10 @@
 
         sliderChange(null, true);
         modeChange();
-
-        interact(canvas).origin({x: 50, y: 50});
-        interact.restrict({drag: {x: 50, y: 50, width: 100, height: 100}});
     });
+
+    window.grid = {
+        drawGrid: drawGrid
+    };
 
 }(window.interact));
