@@ -234,9 +234,6 @@
             .draggable(true)
             .resizeable(true)
             .dropzone(true);
-
-        interact.restrict({ drag: {x: 400, y:400, width: 100, height: 100}});
-        //interact.restrictTo(node0);
     }
 
     interact(window).on('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
