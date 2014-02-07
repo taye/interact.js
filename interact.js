@@ -897,8 +897,19 @@
             this.relatedTarget = related;
         }
 
-        // start/end event dx, dy is difference between start and current points
-        if (phase === 'start' || phase === 'end' || action === 'drop') {
+        // start event dx, dy are both 0
+        if (phase === 'start') {
+            this.pageX = x0;
+            this.pageY = y0;
+
+            this.clientX = clientX0;
+            this.clientY = clientY0;
+
+            this.dx = this.dy = 0;
+        }
+
+        // end event dx, dy is difference between start and current points
+        if (phase === 'end' || action === 'drop') {
             if (deltaSource === 'client') {
                 this.dx = client.x - x0;
                 this.dy = client.y - y0;
@@ -1348,6 +1359,20 @@
 
                     if ((snapChanged || !snapStatus.locked) && inRange)  {
                         snapStatus.locked = true;
+
+                        // if snap is locked at the start of an action
+                        if (!(dragging || resizing || gesturing)) {
+                            // set the starting point to be the snap coorinates
+                            var p = getPageXY(event),
+                                c = getClientXY(event);
+
+                            x0 = p.x - target.options.origin.x + snapStatus.dx;
+                            y0 = p.y - target.options.origin.y + snapStatus.dy;
+
+                            clientX0 = c.x - target.options.origin.x + snapStatus.dx;
+                            clientY0 = c.y - target.options.origin.y + snapStatus.dy;
+                        }
+
                         actions[prepared].moveListener(event);
                     }
                     else if (snapChanged || !inRange) {
