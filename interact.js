@@ -3243,7 +3243,7 @@
      *
      * See @Interactable.restrict
      *
-     - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects as values
+     - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
      = (object) The current restrictions object or interact
     \*/
     interact.restrict = function (newValue, noArray) {
