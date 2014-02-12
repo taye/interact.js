@@ -748,7 +748,7 @@
 
             // get the most apprpriate dropzone based on DOM depth and order
             drop = resolveDrops(elements);
-            dropTarget = drop? dropzones[drop.index]: null;
+            dropTarget = drop? drops[drop.index]: null;
 
             if (selectorDZs.length) {
                 var draggableElement = target._element;
