@@ -1647,7 +1647,7 @@
     }
 
     // End interact move events and stop auto-scroll
-    function docPointerUp (event) {
+    function pointerUp (event) {
         var endEvent;
 
         if (event.touches && event.touches.length >= 2) {
@@ -2965,7 +2965,7 @@
             dragMove              : dragMove,
             resizeMove            : resizeMove,
             gestureMove           : gestureMove,
-            pointerUp             : docPointerUp,
+            pointerUp             : pointerUp,
             pointerDown           : pointerDown,
             pointerHover          : pointerHover,
             events                : events,
@@ -3269,19 +3269,19 @@
     events.add(docTarget   , 'touchmove'    , pointerMove );
     events.add(docTarget   , 'mouseover'    , pointerOver );
     events.add(docTarget   , 'mouseout'     , pointerOut  );
-    events.add(docTarget   , 'mouseup'      , docPointerUp);
-    events.add(docTarget   , 'touchend'     , docPointerUp);
-    events.add(docTarget   , 'touchcancel'  , docPointerUp);
-    events.add(windowTarget, 'blur'         , docPointerUp);
+    events.add(docTarget   , 'mouseup'      , pointerUp   );
+    events.add(docTarget   , 'touchend'     , pointerUp   );
+    events.add(docTarget   , 'touchcancel'  , pointerUp   );
+    events.add(windowTarget, 'blur'         , pointerUp   );
 
     try {
         if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
-            events.add(parentDocTarget   , 'mouseup'      , docPointerUp);
-            events.add(parentDocTarget   , 'touchend'     , docPointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , docPointerUp);
-            events.add(parentWindowTarget, 'blur'         , docPointerUp);
+            events.add(parentDocTarget   , 'mouseup'      , pointerUp);
+            events.add(parentDocTarget   , 'touchend'     , pointerUp);
+            events.add(parentDocTarget   , 'touchcancel'  , pointerUp);
+            events.add(parentWindowTarget, 'blur'         , pointerUp);
         }
     }
     catch (error) {
