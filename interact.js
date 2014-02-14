@@ -2967,6 +2967,7 @@
             gestureMove           : gestureMove,
             pointerUp             : pointerUp,
             pointerDown           : pointerDown,
+            pointerMove           : pointerMove,
             pointerHover          : pointerHover,
             events                : events,
             globalEvents          : globalEvents,
