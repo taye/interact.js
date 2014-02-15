@@ -1417,6 +1417,8 @@
             leaveDropTarget;
 
         if (!dragging) {
+            setPrevXY(downEvent);
+
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
             dragging = true;
 
@@ -1478,6 +1480,8 @@
         var resizeEvent;
 
         if (!resizing) {
+            setPrevXY(downEvent);
+
             resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
             target.fire(resizeEvent);
 
@@ -1503,6 +1507,7 @@
         var gestureEvent;
 
         if (!gesturing) {
+            setPrevXY(downEvent);
 
             var gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
             gestureEvent.ds = 0;
