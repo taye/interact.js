@@ -24,5 +24,9 @@
         "autoscroll",
         "SVG"
     ],
+    "devDependencies" : {
+        "mocha": "1.17.*",
+        "chai": "1.9.*"
+    },
     "license"    : "MIT"
 }

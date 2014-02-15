@@ -9,6 +9,10 @@
         "url"  : "http://taye.me"
     }],
     "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
+    "devDependencies" : {
+        "mocha": "1.17.*",
+        "chai": "1.9.*"
+    },
     "keywords"   : [
         "interact",
         "draggable",
