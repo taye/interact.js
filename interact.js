@@ -1699,7 +1699,6 @@
         }
         else if (gesturing) {
             endEvent = new InteractEvent(event, 'gesture', 'end');
-            endEvent.ds = endEvent.scale;
             target.fire(endEvent);
         }
         else if ((event.type === 'mouseup' || event.type === 'touchend') && target && pointerIsDown && !pointerWasMoved) {
@@ -2955,18 +2954,20 @@
             dragging              : dragging,
             resizing              : resizing,
             gesturing             : gesturing,
+            prepared              : prepared,
             prevX                 : prevX,
             prevY                 : prevY,
             x0                    : x0,
             y0                    : y0,
+
             Interactable          : Interactable,
             IOptions              : IOptions,
             interactables         : interactables,
             dropzones             : dropzones,
             pointerIsDown         : pointerIsDown,
-            supportsTouch         : supportsTouch,
             defaultOptions        : defaultOptions,
-            defaultActionChecker  : Interactable.prototype.getAction,
+
+            actions               : actions,
             dragMove              : dragMove,
             resizeMove            : resizeMove,
             gestureMove           : gestureMove,
@@ -2974,8 +2975,15 @@
             pointerDown           : pointerDown,
             pointerMove           : pointerMove,
             pointerHover          : pointerHover,
+
             events                : events,
             globalEvents          : globalEvents,
+
+            touchAverage          : touchAverage,
+            touchAngle            : touchAngle,
+            getTouchBBox          : getTouchBBox,
+            touchDistance         : touchDistance,
+
             log: function () {
                 console.log('target         :  ' + target);
                 console.log('prevX, prevY   :  ' + prevX, prevY);
