@@ -1,19 +1,15 @@
 {
-    "name"       : "interactjs",
-    "main"       : "interact.js",
-    "version"    : "1.0.5",
-    "homepage"   : "http://interactjs.io",
-    "authors"    : [{
+    "name": "interact",
+    "version": "1.0.5",
+    "main": "interact.js",
+    "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
+    "homepage": "http://interactjs.io",
+    "authors": [{
         "name" : "Taye Adeyemi",
         "email": "dev@taye.me",
         "url"  : "http://taye.me"
     }],
-    "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
-    "devDependencies" : {
-        "mocha": "1.17.*",
-        "chai": "1.9.*"
-    },
-    "keywords"   : [
+    "keywords": [
         "interact",
         "draggable",
         "droppable",
@@ -28,13 +24,16 @@
         "autoscroll",
         "SVG"
     ],
-    "license"    : "MIT",
-    "ignore"     : [
+    "devDependencies": {
+        "mocha": "*",
+        "chai": "*"
+    },
+    "license": "MIT",
+    "ignore": [
         ".*",
         "test",
         "demo",
         "img",
-        "docs",
-        "package.json"
+        "docs"
     ]
 }

@@ -1,5 +1,4 @@
 .git*
-bower.json
 demo/
 docs/
 img/
