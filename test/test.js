@@ -1,834 +1,399 @@
-var eventTypes = {
-        click: 'MouseEvents',
-        dbclick: 'MouseEvents',
-        mousedown: 'MouseEvents',
-        mousemove: 'MouseEvents',
-        mouseover: 'MouseEvents',
-        mouseout: 'MouseEvents',
-        mouseleave: 'MouseEvents',
-        mouseenter: 'MouseEvents',
-        mouseup: 'MouseEvents',
-    
-        touchstart: 'TouchEvents',
-        touchmove: 'TouchEvents',
-        touchend: 'TouchEvents',
-    
-        keydown: 'KeyboardEvents',
-        keyup: 'KeyboardEvents',
-        keypress: 'KeyboardEvents',
-    
-        change: 'Events',
-        focus: 'Events',
-        focusin: 'Events',
-        focusout: 'Events',
-        select: 'Events'
-    },
-    div0 = document.createElement('div'),
-    div1 = document.createElement('div'),
-    div2 = document.createElement('div');
-    
-    div0.id = 'div0';
-    div0.style.cssText = [
-            'position: absolute;',
-            'top: 0;',
-            'left: 0;',
-            'width: 50px;',
-            'height: 50px;',
-            'margin: 0;',
-            'padding: 0;',
-            'border: none;'
-        ].join('\n');
+var expect = chai.expect,
+    should = chai.should(),
+    debug = interact.debug();
 
-// Dispatch event to this element
-function simulate(eventType, eventProps) {
-    var event;
-    
-    if (!eventProps) {
-        eventProps = {};
-    }
-    
-    if (eventTypes[eventType] === 'MouseEvents') {
-        event = document.createEvent('MouseEvents');
-        event.initMouseEvent(eventType, true, false, window, 0,
-            eventProps.screenX || 0,
-            eventProps.screenY || 0,
-            eventProps.clientX || 0,
-            eventProps.clientY || 0,
-            eventProps.ctrlKey || false,
-            eventProps.altKey  || false,
-            eventProps.shiftKey|| false,
-            eventProps.metaKey || false,
-            eventProps.button  || 0,
-            this);
+function blank () {}
 
-    } else if (eventTypes[eventType] === 'KeyboardEvents') {
-        event.initKeyboardEvent(eventType, eventProps.canBubble, eventProps.cancelable, window,
-            eventProps.charArg, eventProps.keyArg, eventProps.locationArg, eventProps.modifiersList,
-            eventProps.repeat, eventProps.localeArg);
-    } else {
-        event = document.createEvent(eventTypes[eventType]);
-        event.initEvent(eventProps.type, eventProps.canBubble, eventProps.cancelable);
-    }
-    
-    return this.dispatchEvent(event);
+function mockEvent (options) {
+    'use strict';
+
+    return {
+        target: options.target,
+        currentTarget: options.current || options.target,
+        type: options.type,
+        pageX: options.x,
+        pageY: options.y,
+        clientX: options.x - (options.scrollX|0),
+        clientY: options.y - (options.scrollY|0),
+        touches: options.touches && options.touches.map(mockEvent),
+        changedTouches: options.changed && options.changed.map(mockEvent),
+
+        preventDefault: blank,
+        stopPropagation: blank,
+        stopImmediatePropagation: blank
+    };
 }
 
-document.simulate = div0.simulate = simulate;
+describe('interact', function () {
+    'use strict';
 
-test('Interactable', function () {
-    var interactable,
-        expectedDrag = true,
-        expectedResize = true,
-        expectedGesture = true,
-        expectedAutoScroll = false,
-        interactables,
-        expectedActionChecker = interact.debug().defaultActionChecker;
-    
-    interact(div0).set({
-            draggable: expectedDrag,
-            resizeable: expectedResize,
-            gestureable: expectedGesture,
-            autoScroll: expectedAutoScroll
+    describe('when called as a function', function () {
+        var validSelector = 'svg .draggable, body button';
+
+        it('should return an Interactable when given an Element', function () {
+            var bod = interact(document.body);
+
+            expect(bod).to.be.an.instanceof(debug.Interactable);
+
+            bod.element().should.equal(document.body);
         });
-    interactables = interact.debug().interactables;
-    interactable = interact(div0);
-    
-    equal(interactable, interactables[0], 'interact(element) returns correct object');
-    equal(interactable.element(), div0);
-    equal(interactable.draggable(), expectedDrag, 'Drag option');
-    equal(interactable.resizeable(), expectedResize, 'Resize option');
-    equal(interactable.gestureable(), expectedGesture, 'Gesture option');
-    equal(interactable.autoScroll(), expectedAutoScroll, 'AutoScroll option');
-    equal(interactable.actionChecker(), expectedActionChecker, 'Action checker');
-    
-    interact(div0).unset()(div0);
-    interactables = interact.debug().interactables;
-    interactable = interact(div0);
 
-    // enable autoSCroll by default
-    interact.autoScroll(true);
-    
-    equal(interactables.length, 1, 'interactable reset - number of interactables does not change');
-    equal(interactable.draggable(), expectedDrag = false, 'Drag option set to default');
-    equal(interactable.resizeable(), expectedResize = false, 'Resize option set to default');
-    equal(interactable.gestureable(), expectedGesture = false, 'Gesture option set to default');
-    equal(interactable.autoScroll(), expectedAutoScroll = interact.debug().defaultOptions.autoScroll, 'AutoScroll option set to default');
-    equal(interactable.actionChecker(), expectedActionChecker, 'Gesture option set to default');
-    
-    interact(div1);
-    interactables = interact.debug().interactables;
-    equal(interactables.length, 2, 'Second interactable added correctly');
-    
-    interact.stop();
-});
+        it('should return an Interactable when given a valid CSS selector string', function () {
+            var interactable = interact(validSelector);
 
-test('interact.unset', function () {
-    interact(div0).set();
-    interact(div1).set();
-    interact(div2).set();
-    interact(div0).unset();
-    
-    interactables = interact.debug().interactables;
-    
-    equal(interactables.length, 2, 'Element is removed from list');
-    equal(interactables[0].element(), div1, 'interactable is spliced from array correctly');
-    equal(interact.isSet(div0), false, 'unset element no longer recognised as an interactable');
-});
-
-//test('defaultActionChecker', function () {
-
-module('interact drag');
-
-test('drag start', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    },
-    pointerUpEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'dragstart', 'Event type');
-        equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target, div0, 'Event is targeting the element correctly');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            draggable: true,
-            actionChecker: function () {
-                return 'drag';
-            }
+            expect(interactable).to.be.an.instanceof(debug.Interactable);
         });
-    
-    expect(9);
-    
-    interact(div0).on('dragstart', listener);
-    interact(div0).on('dragmove', listener);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.dragMove.call(div0, moveEvent);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('dragstart', listener);
-    interact(div0).off('dragmove', listener);
 
-    interact.stop();
-});
-
-test('drag move', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    },
-    pointerUpEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'dragmove', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            draggable: true,
-            actionChecker: function () {
-                return 'drag';
-            }
+        it('should throw an error when given a string that is not a valid selector', function () {
+            expect(function () {
+                interact('<< invalid selector >>');
+            }).to.throw(Error);
         });
-    
-    interact(div0).on('dragmove', listener);
-    
-    expect(8);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.dragMove.call(div0, pointerDownEvent);
-    debug.dragMove.call(div0, moveEvent);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('dragmove', listener);
 
-    interact.stop();
-});
+        it('should return the same value from a given parameter unless returned Interactable is unset', function () { var iBody = interact(document.body),
+                iSelector = interact(validSelector);
 
-test('drag end', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent0 = {
-        preventDefault: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent1 = {
-        preventDefault: function () {},
-        pageX: expectedDx / 3,
-        pageY: expectedDy * 2
-    },
-    moveEvent2 = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    },
-    pointerUpEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'dragend', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            draggable: true,
-            actionChecker: function () {
-                return 'drag';
-            }
+            interact(document.body).should.equal(iBody);
+            interact(validSelector).should.equal(iSelector);
+
+            iBody.unset();
+            iSelector.unset();
+
+            interact(document.body).should.not.equal(iBody);
+            interact(validSelector).should.not.equal(iSelector);
         });
-    
-    interact(div0).on('dragend', listener);
-    
-    expect(8);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.dragMove.call(div0, moveEvent0);
-    debug.dragMove.call(div0, moveEvent1);
-    debug.dragMove.call(div0, moveEvent2);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('dragend', listener);
+    });
 
-    interact.stop();
+    describe('gobal options', function () {
+
+    });
 });
 
+describe('Interactable', function () {
+    'use strict';
 
-module('interact resize');
-
-test('resize start', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: expectedX0,
-        pageY: expectedY0
-    },
-    moveEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedX0 + expectedDx,
-        pageY: expectedY0 + expectedDy
-    },
-    pointerUpEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        pageX: expectedX0 + expectedDx,
-        pageY: expectedY0 + expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'resizestart', 'Event type');
-        equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            resizeable: true,
-            actionChecker: function () {
-                return 'resize';
-            }
-        });
-    
-    expect(9);
-    
-    interact(div0).on('resizestart', listener);
-    interact(div0).on('resizemove', listener);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.resizeMove.call(div0, moveEvent);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('resizestart', listener);
-    interact(div0).off('resizemove', listener);
-
-    interact.stop();
-});
-
-test('resize move', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    },
-    pointerUpEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'resizemove', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            resizeable: true,
-            actionChecker: function () {
-                return 'resize';
-            }
-        });
-    
-    interact(div0).on('resizemove', listener);
-    
-    expect(8);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.resizeMove.call(div0, pointerDownEvent);
-    debug.resizeMove.call(div0, moveEvent);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('resizemove', listener);
-
-    interact.stop();
-});
-
-test('resize end', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    pointerDownEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent0 = {
-        preventDefault: function () {},
-        pageX: 0,
-        pageY: 0
-    },
-    moveEvent1 = {
-        preventDefault: function () {},
-        pageX: expectedDx / 3,
-        pageY: expectedDy * 2
-    },
-    moveEvent2 = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    },
-    pointerUpEvent = {
-        preventDefault: function () {},
-        pageX: expectedDx,
-        pageY: expectedDy
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'resizeend', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in x-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            resizeable: true,
-            actionChecker: function () {
-                return 'resize';
-            }
-        });
-    
-    interact(div0).on('resizeend', listener);
-    
-    expect(8);
-    
-    debug.pointerDown.call(div0, pointerDownEvent);
-    debug.resizeMove.call(div0, moveEvent0);
-    debug.resizeMove.call(div0, moveEvent1);
-    debug.resizeMove.call(div0, moveEvent2);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('resizeend', listener);
-
-    interact.stop();
-});
-
-
-module('interact gesture');
-
-test('gesture start', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 50,
-    expectedDy = 100,
-    touchStartEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        touches: [
-            {
-                pageX: expectedX0 + 10,
-                pageY: expectedY0 + 10
-            },
-            {
-                pageX: expectedX0 - 10,
-                pageY: expectedY0 - 10
-            }
-        ]
-    },
-    moveEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: 0,
-                pageY: 0
-            },
-            {
-                pageX: expectedDx * 2,
-                pageY: expectedDy * 2
-            }
-        ]
-    },
-    pointerUpEvent = moveEvent;
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'gesturestart', 'Event type');
-        equal(interact.debug().target.element(), div0, 'interact\'s target element');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            gestureable: true,
-            actionChecker: function () {
-                return 'gesture';
-            }
-        });
-    
-    expect(9);
-    
-    interact(div0).on('gesturestart', listener);
-    interact(div0).on('gesturemove', listener);
-    
-    debug.pointerDown.call(div0, touchStartEvent);
-    debug.gestureMove.call(div0, moveEvent);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('gesturestart', listener);
-    interact(div0).off('gesturemove', listener);
-
-    interact.stop();
-});
-
-test('gesture move', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 300,
-    expectedDy = 400,
-    
-    // offset from average
-    offset = [20, -20, -10, 10],
-    
-    d1 = offset[0] - offset[1],
-    d2 = offset[2] - offset[3],
-    
-    startDistance = Math.sqrt(2 * d1 * d1),
-    expectedDistance = Math.sqrt(2 * d2 * d2),
-    startAngle = -Math.atan(d1 / d1),
-    expectedAngle = -Math.atan(d2 / d2),
-    expectedRotation = expectedAngle - startAngle,
-    touchStartEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        touches: [
-            {
-                pageX: expectedX0 + offset[0],
-                pageY: expectedX0 + offset[0]
-            },
-            {
-                pageX: expectedY0 + offset[1],
-                pageY: expectedY0 + offset[1]
-            }
-        ]
-    },
-    moveEvent0 = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: expectedX0 + offset[0],
-                pageY: expectedY0 + offset[0]
-            },
-            {
-                pageX: expectedX0 + offset[1],
-                pageY: expectedY0 + offset[1]
-            }
-        ]
-    },
-    moveEvent1 = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: expectedDx + offset[2],
-                pageY: expectedDy + offset[2]
-            },
-            {
-                pageX: expectedDx + offset[3],
-                pageY: expectedDy + offset[3]
-            }
-        ]
-    },
-    pointerUpEvent = moveEvent1;
-
-    if (expectedRotation > Math.PI) {
-        expectedRotation -= 2 * Math.PI;
-    }else if (expectedRotation < -Math.PI) {
-        expectedRotation += 2 * Math.PI;
-    }
-    // Convert to degrees from radians
-    expectedAngle = 180 * expectedAngle / Math.PI;
-    expectedRotation = 180 * expectedRotation / Math.PI;
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'gesturemove', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-        equal(event.distance, expectedDistance, 'Gesture distance');
-        equal(event.angle, expectedAngle, 'Gesture angle');
-        equal(event.rotation, expectedRotation, 'Gesture rotation');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            gestureable: true,
-            actionChecker: function () {
-                return 'gesture';
-            }
-        });
-    
-    interact(div0).on('gesturemove', listener);
-    
-    debug.pointerDown.call(div0, touchStartEvent);
-    debug.gestureMove.call(div0, moveEvent0);
-    debug.gestureMove.call(div0, moveEvent1);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('gesturemove', listener);
-
-    interact.stop();
-});
-
-test('gesture end', function() {
-var debug = interact.debug(),
-    expectedX0 = 0,
-    expectedY0 = 0,
-    expectedDx = 89,
-    expectedDy = 63,
-    touchStartEvent = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        stopPropagation: function () {},
-        touches: [
-            {
-                pageX: 0,
-                pageY: 0
-            },
-            {
-                pageX: 0,
-                pageY: 0
-            }
-        ]
-    },
-    moveEvent0 = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: 102,
-                pageY: 564
-            },
-            {
-                pageX: 41,
-                pageY: 2
-            }
-        ]
-    },
-    moveEvent1 = {
-        target: div0,
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: expectedDx,
-                pageY: expectedDy
-            },
-            {
-                pageX: expectedDx,
-                pageY: expectedDy
-            }
-        ]
-    },
-    pointerUpEvent = {
-        target: div0,
-        type: 'touchend',
-        currentTarget: document,
-        preventDefault: function () {},
-        touches: [
-            {
-                pageX: expectedDx,
-                pageY: expectedDy
-            }
+    var defaults = debug.defaultOptions,
+        iable = interact(document.createElement('div')),
+        simpleOptions = {
+            draggable    : 'draggable',
+            dropzone     : 'dropzone',
+            resizeable   : 'resizeable',
+            squareResize : 'squareResize',
+            gestureable  : 'gestureable',
+            styleCursor  : 'styleCursor',
+            restrict     : 'restrictions', 
+            origin       : 'origin',
+            deltaSource  : 'deltaSource'
+        },
+        enableOptions = [
+            'snap',
+            'autoScroll'
         ],
-        changedTouches: [
-            {
-                pageX: expectedDx,
-                pageY: expectedDy
+        checkerOptions = {
+            actionChecker: 'getAction',
+            rectChecker  : 'getRect'
+        };
+
+    describe('options', function () {
+        it('should return the default setting if they were never previously set', function () {
+            var option, i;
+
+            for (option in simpleOptions) {
+                iable[option]().should.equal(defaults[simpleOptions[option]]);
             }
-        ]
-    };
-    
-    var listener = function (event) {
-        var debug = interact.debug();
-        
-        equal(event.type, 'gestureend', 'Event type');
-        equal(event.target, div0, 'Event target element');
-        equal(debug.x0, expectedX0);
-        equal(debug.y0, expectedY0);
-        equal(event.x0, expectedX0, 'Starting x coordinate of event');
-        equal(event.y0, expectedY0, 'Starting y coordinate of event');
-        equal(event.dx, expectedDx, 'Distance moved in x-axis of event');
-        equal(event.dy, expectedDy, 'Distance moved in y-axis of event');
-    };
-    
-    document.body.appendChild(div0);
-    interact(div0).set({
-            gestureable: true,
-            actionChecker: function () {
-                return 'gesture';
+
+            for (i = 0; option = enableOptions[i], i < enableOptions.length; i++) {
+                if (iable[option]()) {
+                    iable[option]().should.equal(defaults[option]);
+                }
+                else {
+                    iable[option]().should.equal(defaults[option + 'Enabled']);
+                }
+            }
+
+            for (option in checkerOptions) {
+                iable[option]().should.equal(debug.Interactable.prototype[checkerOptions[option]]);
             }
         });
-    
-    interact(div0).on('gestureend', listener);
+    });
 
-    expect(8);
-    
-    debug.pointerDown.call(div0, touchStartEvent);
-    debug.gestureMove.call(div0, moveEvent0);
-    debug.gestureMove.call(div0, moveEvent1);
-    debug.pointerUp.call(div0, pointerUpEvent);
-    
-    interact(div0).off('gestureend', listener);
+    describe('#element', function () {
+        it('should return the element if this is not a selector Interactable', function () {
+            var p = document.createElement('p');
 
-    interact.stop();
+            interact(p).element().should.equal(p);
+        });
+    });
+
+    describe('#actionChecker', function () {
+        var div = document.createElement('div'),
+            iDiv = interact(div)
+                .draggable(true)
+                .resizeable(true)
+                .gestureable(true),
+            i,
+            action,
+            actions = ['drag', 'resizexy', 'resizex', 'resizey', 'gesture'],
+            returnActionI = function alwaysResize () { return actions[i]; };
+
+        it('should set set the function used to determine actions on pointer down events', function () {
+            iDiv.actionChecker(returnActionI);
+            iDiv.getAction.should.equal(returnActionI);
+
+            for (i = 0; action = actions[i], i < actions.length; i++) {
+                debug.pointerDown.call(div, mockEvent({
+                    target: div,
+                    x: -123,
+                    y: 209
+                }));
+
+                interact.debug().prepared.should.equal(action);
+
+                interact.stop();
+            }
+        });
+    });
 });
 
+describe('Events', function () {
+    'use strict';
+
+    interact.stop();
+
+    var dragElement = document.createElement('div'),
+        draggable = interact(dragElement),
+        events = [],
+        mockEvents = data.downMove2Up.map(mockEvent),
+        pushEvent = function (event) {
+            events.push(event);
+        };
+
+    describe('drag sequence', function () {
+        draggable.draggable({
+                onstart: pushEvent,
+                onmove: pushEvent,
+                onend: pushEvent
+        }).actionChecker(function () {
+            return 'drag';
+        });
+
+        debug.pointerDown.call(dragElement, mockEvents[0]);
+        debug.pointerMove.call(dragElement, mockEvents[1]);
+        debug.pointerMove.call(dragElement, mockEvents[2]);
+        debug.pointerUp  .call(dragElement, mockEvents[3]);
+
+        it('should be triggered by mousedown -> mousemove -> mouseup sequence', function () {
+            events.length.should.equal(4);
+            
+            events[0].type.should.equal('dragstart');
+            events[1].type.should.equal('dragmove');
+            events[2].type.should.equal('dragmove');
+            events[3].type.should.equal('dragend');
+        });
+
+        it('should have the same coordinates as the original events', function () {
+            var event, mock, i;
+
+            for (i = 0; event = events[i], mock = mockEvents[i], i < events.length; i++) {
+                event.pageX.should.equal(mock.pageX);
+                event.pageY.should.equal(mock.pageY);
+                event.clientX.should.equal(mock.clientX);
+                event.clientY.should.equal(mock.clientY);
+            }
+        });
+
+        it('should have the same x0/y0 and clientX0/Y0 as the start event of the sequence', function () {
+            var startEvent = mockEvents[0],
+                event, i;
+
+            for (i = 0; event = events[i], i < events.length; i++) {
+                event.x0.should.equal(startEvent.pageX);
+                event.y0.should.equal(startEvent.pageY);
+                event.clientX0.should.equal(startEvent.clientX);
+                event.clientY0.should.equal(startEvent.clientY);
+            }
+        });
+
+        it('should keep the same target', function () {
+            var event, i;
+
+            for (i = 0; event = events[i], i < events.length; i++) {
+                event.target.should.equal(dragElement);
+            }
+        });
+
+        describe('dragstart', function () {
+            var downEvent = mockEvents[0],
+                startEvent = events[0];
+
+            it('should have dy/dx of 0', function () {
+                startEvent.dx.should.equal(0);
+                startEvent.dy.should.equal(0);
+            });
+        });
+
+        describe('dragmove', function () {
+
+            it('should have dy/dx of this event\'s coordinates - the previous event\'s', function () {
+                events[1].dx.should.equal(events[1].pageX - events[0].pageX);
+                events[1].dy.should.equal(events[1].pageY - events[0].pageY);
+
+                events[2].dx.should.equal(events[2].pageX - events[1].pageX);
+                events[2].dy.should.equal(events[2].pageY - events[1].pageY);
+            });
+        });
+
+        describe('dragend', function () {
+            it('should have dy/dx of the end event\'s coordinates - the start event\'s', function () {
+                events[3].dx.should.equal(events[2].pageX - events[0].pageX);
+                events[3].dy.should.equal(events[2].pageY - events[0].pageY);
+            });
+        });
+    });
+
+    describe('Gesture sequence', function () {
+        interact.stop();
+
+        var pushEvent = function (event) {
+                gestureEvents.push(event);
+            },
+            element = document.createElement('button'),
+            iElement = interact(element).gestureable({
+                onstart: pushEvent,
+                onmove: pushEvent,
+                onend: pushEvent
+            }).actionChecker(function () { return 'gesture'; }),
+            mockEvents = data.touch2Move2End2.map(mockEvent),
+            gestureEvents = [],
+            eventMap = [1, 2, 3, 4];
+
+        debug.pointerDown.call(element, mockEvents[0]);
+        debug.pointerDown.call(element, mockEvents[1]);
+        debug.pointerMove.call(element, mockEvents[2]);
+        debug.pointerMove.call(element, mockEvents[3]);
+        debug.pointerUp.call(element, mockEvents[4]);
+        debug.pointerUp.call(element, mockEvents[5]);
+
+        it('should be started by 2 touches starting and moving and end when there are fewer than two active touches', function () {
+            gestureEvents.length.should.equal(4);
+
+            gestureEvents[0].type.should.equal('gesturestart');
+            gestureEvents[1].type.should.equal('gesturemove');
+            gestureEvents[2].type.should.equal('gesturemove');
+            gestureEvents[3].type.should.equal('gestureend');
+        });
+
+        describe('touches', function () {
+
+            it('should be the original list of touches in the correspoinding touch event', function () {
+                for (var i = 0, gEvent, mEvent;
+                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                     i++) {
+                         gEvent.touches.should.equal(mEvent.touches);
+                     }
+            });
+        });
+
+        describe('coordinates', function () {
+            it('should be the averages of touches', function () {
+                for (var i = 0, gEvent, mEvent;
+                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                     i++) {
+
+                    var average = debug.touchAverage(mEvent);
+
+                    gEvent.pageX.should.equal(average.pageX);
+                    gEvent.pageY.should.equal(average.pageY);
+                    gEvent.clientX.should.equal(average.clientX);
+                    gEvent.clientY.should.equal(average.clientY);
+                }
+            });
+        });
+
+        describe('angle', function () {
+            it('should be the angle of the line joining the first two touches of the correspoinding touch event', function () {
+                for (var i = 0, gEvent, mEvent;
+                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                     i++) {
+
+                    gEvent.angle.should.equal(debug.touchAngle(mEvent));
+                }
+            });
+        });
+
+        describe('da', function () {
+            describe('in a gesturestart', function () {
+                it('should be 0', function () {
+                    gestureEvents[0].da.should.equal(0);
+                });
+            });
+
+            describe('in a gesturemove', function () {
+                it('should be (thisEvent.angle - previousEvent.angle)', function () {
+                    gestureEvents[1].da.should.equal(gestureEvents[1].angle - gestureEvents[0].angle);
+                    gestureEvents[2].da.should.equal(gestureEvents[2].angle - gestureEvents[1].angle);
+                });
+            });
+
+            describe('in a gestureend', function () {
+                it('should be (lastMoveEvent.angle - startEvent.angle)', function () {
+                    gestureEvents[3].da.should.equal(gestureEvents[2].angle - gestureEvents[0].angle);
+                });
+            });
+        });
+
+        describe('distance', function () {
+            it('should be the distance between the first two touches of the correspoinding touch event', function () {
+                for (var i = 0, gEvent, mEvent;
+                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                     i++) {
+
+                    gEvent.distance.should.equal(debug.touchDistance(mEvent));
+                    gEvent.distance.should.equal(debug.touchDistance(mEvent));
+                }
+            });
+        });
+
+        describe('scale', function () {
+            describe('in a gesturestart', function () {
+                it('should be 1', function () {
+                    gestureEvents[0].scale.should.equal(1);
+                });
+            });
+
+            describe('in a gesturemove', function () {
+                it('should be the (thisevent.distance / startevent.distance)', function () {
+                    gestureEvents[1].scale.should.equal(gestureEvents[1].distance / gestureEvents[0].distance);
+                    gestureEvents[2].scale.should.equal(gestureEvents[2].distance / gestureEvents[0].distance);
+                });
+            });
+
+            describe('in a gestureend', function () {
+                it('should be the scale of the last gesturemove event', function () {
+                    gestureEvents[3].scale.should.equal(gestureEvents[2].scale);
+                });
+            });
+        });
+
+        describe('ds', function () {
+            describe('in a gesturestart', function () {
+                it('should be 0', function () {
+                    gestureEvents[0].ds.should.equal(0);
+                });
+            });
+
+            describe('in a gesturemove', function () {
+                it('should be the difference between this event\'s scale and that of the previous event', function () {
+                    gestureEvents[1].ds.should.equal(gestureEvents[1].scale - gestureEvents[0].scale);
+                    gestureEvents[2].ds.should.equal(gestureEvents[2].scale - gestureEvents[1].scale);
+                });
+            });
+
+            describe('in a gestureend', function () {
+                it('should be (lastMoveEvent.scale - startEvent.scale)', function () {
+                    gestureEvents[3].ds.should.equal(gestureEvents[2].scale - gestureEvents[0].scale);
+                });
+            });
+        });
+    });
+});
