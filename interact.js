@@ -538,7 +538,7 @@
         };
     }
 
-    function getTouchBBox (event) {
+    function touchBBox (event) {
         if (!event.touches.length) {
             return;
         }
@@ -966,7 +966,7 @@
         else if (action === 'gesture') {
             this.touches  = event.touches;
             this.distance = touchDistance(event);
-            this.box      = getTouchBBox(event);
+            this.box      = touchBBox(event);
 
             if (phase === 'start') {
                 this.scale = 1;
@@ -2981,7 +2981,7 @@
 
             touchAverage          : touchAverage,
             touchAngle            : touchAngle,
-            getTouchBBox          : getTouchBBox,
+            touchBBox             : touchBBox,
             touchDistance         : touchDistance,
 
             log: function () {
