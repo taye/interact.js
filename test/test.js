@@ -300,7 +300,7 @@ describe('Events', function () {
                      mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
                      i++) {
 
-                    var average = debug.touchAverage(mEvent);
+                    var average = interact.touchAverage(mEvent);
 
                     gEvent.pageX.should.equal(average.pageX);
                     gEvent.pageY.should.equal(average.pageY);
@@ -316,7 +316,7 @@ describe('Events', function () {
                      mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
                      i++) {
 
-                    gEvent.angle.should.equal(debug.touchAngle(mEvent));
+                    gEvent.angle.should.equal(interact.touchAngle(mEvent));
                 }
             });
         });
@@ -348,8 +348,8 @@ describe('Events', function () {
                      mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
                      i++) {
 
-                    gEvent.distance.should.equal(debug.touchDistance(mEvent));
-                    gEvent.distance.should.equal(debug.touchDistance(mEvent));
+                    gEvent.distance.should.equal(interact.touchDistance(mEvent));
+                    gEvent.distance.should.equal(interact.touchDistance(mEvent));
                 }
             });
         });

@@ -2979,11 +2979,6 @@
             events                : events,
             globalEvents          : globalEvents,
 
-            touchAverage          : touchAverage,
-            touchAngle            : touchAngle,
-            touchBBox             : touchBBox,
-            touchDistance         : touchDistance,
-
             log: function () {
                 console.log('target         :  ' + target);
                 console.log('prevX, prevY   :  ' + prevX, prevY);
@@ -2994,6 +2989,12 @@
             }
         };
     };
+
+    // expose the functions used to caluclate multi-touch properties
+    interact.touchAverage  = touchAverage;
+    interact.touchBBox     = touchBBox;
+    interact.touchDistance = touchDistance;
+    interact.touchAngle    = touchAngle;
 
     /*\
      * interact.margin
