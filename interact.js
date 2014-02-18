@@ -28,7 +28,8 @@
         clientY0 = 0,
 
         downTime  = 0,         // the timeStamp of the starting event
-        downEvent = null,
+        downEvent = null,      // mousedown/touchstart event
+        prevEvent = null,      // previous action event
 
         gesture = {
             start: { x: 0, y: 0 },
@@ -462,6 +463,8 @@
 
         prevClientX = event.clientX;
         prevClientY = event.clientY;
+
+        prevEvent = event;
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
@@ -914,7 +917,7 @@
         this.metaKey   = event.metaKey;
         this.button    = event.button;
         this.target    = element;
-        this.timeStamp = phase === 'start'? downTime: new Date().getTime();
+        this.t0        = downTime;
         this.type      = action + (phase || '');
 
         if (related) {
@@ -989,6 +992,26 @@
                     this.ds = this.scale - gesture.prevScale;
                 }
             }
+        }
+
+        if (phase === 'start') {
+            this.timeStamp = downTime;
+            this.dt        = 0;
+            this.duration  = 0;
+            this.speed     = 0;
+        }
+        else {
+            this.timeStamp = new Date().getTime();
+            this.dt        = this.timeStamp - prevEvent.timeStamp;
+            this.duration  = this.timeStamp - downTime;
+
+            // change in time in seconds
+            // use event sequence duration for end events
+            // => average speed of the event sequence
+            var dt = (phase === 'end'? this.duration: this.dt) / 1000;
+
+            // speed in pixels per second
+            this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy) / dt;
         }
     }
 
@@ -2957,10 +2980,15 @@
             resizing              : resizing,
             gesturing             : gesturing,
             prepared              : prepared,
+
             prevX                 : prevX,
             prevY                 : prevY,
             x0                    : x0,
             y0                    : y0,
+
+            downTime              : downTime,
+            downEvent             : downEvent,
+            prevEvent             : prevEvent,
 
             Interactable          : Interactable,
             IOptions              : IOptions,
@@ -3202,7 +3230,7 @@
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
-        prepared = downEvent = null;
+        prepared = downEvent = prevEvent = null;
 
         return interact;
     };
