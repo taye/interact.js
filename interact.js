@@ -27,6 +27,7 @@
         clientX0 = 0,
         clientY0 = 0,
 
+        downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,
 
         gesture = {
@@ -913,7 +914,7 @@
         this.metaKey   = event.metaKey;
         this.button    = event.button;
         this.target    = element;
-        this.timeStamp = new Date().getTime();
+        this.timeStamp = phase === 'start'? downTime: new Date().getTime();
         this.type      = action + (phase || '');
 
         if (related) {
@@ -1137,6 +1138,7 @@
             snapStatus.y = null;
 
             event.preventDefault();
+            downTime = new Date().getTime();
             downEvent = event;
         }
     }
