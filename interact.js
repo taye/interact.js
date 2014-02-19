@@ -51,6 +51,7 @@
         selectors       = {},   // all css selector interactables
         selectorDZs     = [],   // all dropzone selector interactables
         matches         = [],   // all selectors that are matched by target element
+        delegatedEvents = {},   // { type: { selector: [listener1, listener2] } }
 
         target          = null, // current interactable being interacted with
         dropTarget      = null, // the dropzone a drag target might be dropped into
@@ -1739,8 +1740,57 @@
         }
 
         interact.stop();
+    }
 
-        return event;
+    // bound to document when a listener is added to a selector interactable
+    function delegateListener (event, useCapture) {
+        var fakeEvent = {},
+            selectors = delegatedEvents[event.type],
+            selector,
+            element = event.target,
+            i;
+
+        useCapture = useCapture? true: false;
+
+        // duplicate the event so that currentTarget can be changed
+        for (var prop in event) {
+            fakeEvent[prop] = event[prop];
+        }
+
+        fakeEvent.preventDefault = function () {
+            event.preventDefault();
+        };
+
+        // climb up document tree looking for selector matches
+        while (element !== document) {
+            for (selector in selectors) {
+                if (element[matchesSelector](selector)) {
+                    var listeners = selectors[selector];
+
+                    fakeEvent.currentTarget = element;
+
+                    for (i = 0; i < listeners.length; i++) {
+                        if (listeners[i][1] !== useCapture) { continue; }
+
+                        try {
+                            listeners[i][0](fakeEvent);
+                        }
+                        catch (error) {
+                            console.error('Error thrown from delegated listener: ' +
+                                          '"' + selector + '" ' + event.type + ' ' +
+                                          (listeners[i][0].name? listeners[i][0].name: ''));
+                            console.log(error);
+                        }
+                    }
+                }
+            }
+
+            element = element.parentNode;
+        }
+    }
+
+    function delegateUseCapture (event) {
+        return delegateListener.call(this, event, true);
     }
 
     interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element) {
@@ -2669,7 +2719,10 @@
          * Interactable.on
          [ method ]
          *
-         * Binds a listener for an InteractEvent or DOM event
+         * Binds a listener for an InteractEvent or DOM event. If this is a
+         * selector Interactable, the event's currentTarget will always be
+         * `document`. `delegateTarget` holds the element that matches the
+         * selector.
          *
          - eventType  (string)   The type of event to listen for
          - listener   (function) The function to be called on that event
@@ -2691,12 +2744,26 @@
                     this._iEvents[eventType].push(listener);
                 }
             }
+            // delegated event for selector
             else if (this.selector) {
-                var elements = document.querySelectorAll(this.selector);
-
-                for (var i = 0, len = elements.length; i < len; i++) {
-                    events.addToElement(elements[i], eventType, listener, useCapture);
+                if (!delegatedEvents[eventType]) {
+                    delegatedEvents[eventType] = {};
                 }
+
+                var delegated = delegatedEvents[eventType];
+
+                if (!delegated[this.selector]) {
+                    delegated[this.selector] = [];
+                }
+
+                // keep listener and useCapture flag
+                delegated[this.selector].push([listener, useCapture? true: false]);
+
+                // add appropriate delegate listener
+                events.add(docTarget,
+                           eventType,
+                           useCapture? delegateUseCapture: delegateListener,
+                           useCapture);
             }
             else {
                 events.add(this, eventType, listener, useCapture);
@@ -2717,25 +2784,44 @@
          = (object) This Interactable
         \*/
         off: function (eventType, listener, useCapture) {
+            var eventList,
+                index = -1;
+
+            // convert to boolean
+            useCapture = useCapture? true: false;
+
             if (eventType === 'wheel') {
                 eventType = wheelEvent;
             }
 
+            // if it is an action event type
             if (eventTypes.indexOf(eventType) !== -1) {
-                var eventArray = this._iEvents[eventType],
-                    index;
+                eventList = this._iEvents[eventType];
 
-                if (eventArray && (index = eventArray.indexOf(listener)) !== -1) {
+                if (eventList && (index = eventList.indexOf(listener)) !== -1) {
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
+            // delegated event
             else if (this.selector) {
-                var elements = document.querySelectorAll(this.selector);
+                var delegated = delegatedEvents[eventType];
 
-                for (var i = 0, len = elements.length; i < len; i++) {
-                    events.removeFromElement(elements[i], eventType, listener, useCapture);
+                if (delegated && (eventList = delegated[this.selector])) {
+
+                    // look for listener with matching useCapture flag
+                    for (index = 0; index < eventList.length; index++) {
+                        if (eventList[index][1] === useCapture) {
+                            break;
+                        }
+                    }
+
+                    // remove found listener from delegated list
+                    if (index < eventList.length) {
+                        eventList.splice(index, 1);
+                    }
                 }
             }
+            // remove listener from this Interatable's element
             else {
                 events.remove(this._element, listener, useCapture);
             }
@@ -3022,6 +3108,7 @@
 
             events                : events,
             globalEvents          : globalEvents,
+            delegatedEvents       : delegatedEvents,
 
             log: function () {
                 console.log('target         :  ' + target);
