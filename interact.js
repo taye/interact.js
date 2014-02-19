@@ -2814,10 +2814,12 @@
      * interact.on
      [ method ]
      *
-     * Adds a global listener for an InteractEvent
+     * Adds a global listener for an InteractEvent or adds a DOM event to
+     * `document`
      *
-     - eventType  (string)   The type of event to listen for
+     - type       (string)   The type of event to listen for
      - listener   (function) The function to be called on that event
+     - useCapture (boolean) #optional useCapture flag for addEventListener
      = (object) interact
     \*/
     interact.on = function (type, listener, useCapture) {
@@ -2846,10 +2848,11 @@
      * interact.off
      [ method ]
      *
-     * Removes a global InteractEvent listener
+     * Removes a global InteractEvent listener or DOM event from `document`
      *
-     - eventType  (string)   The type of event that was listened for
+     - type       (string)   The type of event that was listened for
      - listener   (function) The listener function to be removed
+     - useCapture (boolean) #optional useCapture flag for removeEventListener
      = (object) interact
     \*/
     interact.off = function (type, listener, useCapture) {
