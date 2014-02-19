@@ -2820,20 +2820,25 @@
      - listener   (function) The function to be called on that event
      = (object) interact
     \*/
-    interact.on = function (iEventType, listener) {
-        // The event must be an InteractEvent type
-        if (eventTypes.indexOf(iEventType) !== -1) {
-            // if this type of event was never bound to this Interactable
-            if (!globalEvents[iEventType]) {
-                globalEvents[iEventType] = [listener];
+    interact.on = function (type, listener, useCapture) {
+        // if it is an InteractEvent type, add listener to globalEvents
+        if (eventTypes.indexOf(type) !== -1) {
+            // if this type of event was never bound
+            if (!globalEvents[type]) {
+                globalEvents[type] = [listener];
             }
 
             // if the event listener is not already bound for this type
-            else if (globalEvents[iEventType].indexOf(listener) === -1) {
+            else if (globalEvents[type].indexOf(listener) === -1) {
 
-                globalEvents[iEventType].push(listener);
+                globalEvents[type].push(listener);
             }
         }
+        // If non InteratEvent type, addEventListener to document
+        else {
+            events.add(docTarget, type, listener, useCapture);
+        }
+
         return interact;
     };
 
@@ -2847,12 +2852,19 @@
      - listener   (function) The listener function to be removed
      = (object) interact
     \*/
-    interact.off = function (iEventType, listener) {
-        var index = globalEvents[iEventType].indexOf(listener);
-
-        if (index !== -1) {
-            globalEvents[iEventType].splice(index, 1);
+    interact.off = function (type, listener, useCapture) {
+        if (eventTypes.indexOf(type) === -1) {
+            events.remove(docTarget, type, listener, useCapture);
         }
+        else {
+            var index;
+
+            if (type in globalEvents
+                && (index = globalEvents[type].indexOf(listener)) !== -1) {
+                globalEvents[type].splice(index, 1);
+            }
+        }
+
         return interact;
     };
 
