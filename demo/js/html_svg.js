@@ -68,7 +68,7 @@
         this.element.style.width  = '200px';
         this.element.style.height = '200px';
 
-        this.element.text = this.element.appendChild(document.createElement('p'));
+        this.element.text = this.element.appendChild(document.createElement('pre'));
         this.element.appendChild(document.createElement('br'));
         this.element.style.left = Math.random()*((window.innerWidth || 800) - 200) + 'px';
         this.element.style.top = Math.random()*((window.innerHeight || 800) - 200) + 'px';
@@ -87,25 +87,21 @@
             target = e.target,
             nl;
 
-        if (window.SVGElement && target instanceof window.SVGElement) {
-            textProp = 'textContent';
-            nl = '\n';
-        } else {
-            textProp = 'innerHTML';
-            nl = '<br> ';
-        }
+        textProp = 'textContent';
+        nl = '\n';
 
         if ( target.demo && interact.eventTypes.indexOf(e.type) !== -1 ) {
             target.text[textProp] = nl + e.type;
-            target.text[textProp] += nl + ' x0, y0        :    (' + e.x0 + ', ' + e.y0 + ')';
-            target.text[textProp] += nl + ' dx, dy        :    (' + e.dx + ', ' + e.dy + ')';
-            target.text[textProp] += nl + ' pageX, pageY  :    (' + e.pageX + ', ' + e.pageY + ')';
+            target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
+            target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
+            target.text[textProp] += nl + ' pageX, pageY: (' + e.pageX + ', ' + e.pageY + ')';
+            target.text[textProp] += nl + ' speed       :  ' + e.speed;
 
             if (e.type.indexOf('gesture') !== -1) {
-                target.text[textProp] += nl + ' distance  :     ' + e.distance;
-                target.text[textProp] += nl + ' scale     :     ' + e.scale;
-                target.text[textProp] += nl + ' angle     :     ' + e.angle;
-                target.text[textProp] += nl + ' rotation  :     ' + e.rotation;
+                target.text[textProp] += nl + ' distance: ' + e.distance;
+                target.text[textProp] += nl + ' scale   : ' + e.scale;
+                target.text[textProp] += nl + ' angle   : ' + e.angle;
+                target.text[textProp] += nl + ' rotation: ' + e.rotation;
             }
         }
     }
