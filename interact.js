@@ -3021,10 +3021,10 @@
     };
 
     // expose the functions used to caluclate multi-touch properties
-    interact.touchAverage  = touchAverage;
-    interact.touchBBox     = touchBBox;
-    interact.touchDistance = touchDistance;
-    interact.touchAngle    = touchAngle;
+    interact.getTouchAverage  = touchAverage;
+    interact.getTouchBBox     = touchBBox;
+    interact.getTouchDistance = touchDistance;
+    interact.getTouchAngle    = touchAngle;
 
     /*\
      * interact.margin
