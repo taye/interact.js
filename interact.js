@@ -258,8 +258,8 @@
         globalEvents = {},
 
         fireStates = {
-            onevent   : 0,
-            directBind: 1,
+            directBind: 0,
+            onevent   : 1,
             globalBind: 2
         },
 
@@ -2616,13 +2616,6 @@
             while (fireState < 3) {
                 try {
                     switch (fireState) {
-                        // interactable.onevent listener
-                        case fireStates.onevent:
-                            if (typeof this[onEvent] === 'function') {
-                            this[onEvent](iEvent);
-                        }
-                        break;
-
                         // Interactable#on() listeners
                         case fireStates.directBind:
                             if (iEvent.type in this._iEvents) {
@@ -2636,10 +2629,16 @@
 
                         break;
 
+                        // interactable.onevent listener
+                        case fireStates.onevent:
+                            if (typeof this[onEvent] === 'function') {
+                            this[onEvent](iEvent);
+                        }
+                        break;
+
                         // interact.on() listeners
                         case fireStates.globalBind:
                             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
-                            listeners = globalEvents[iEvent.type];
 
                             for (len = listeners.length; i < len && !imPropStopped; i++) {
                                 listeners[i](iEvent);
