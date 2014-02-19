@@ -51,7 +51,7 @@
         selectors       = {},   // all css selector interactables
         selectorDZs     = [],   // all dropzone selector interactables
         matches         = [],   // all selectors that are matched by target element
-        delegatedEvents = {},   // { type: { selector: [listener1, listener2] } }
+        delegatedEvents = {},   // { type: { selector: [[listener, useCapture]} }
 
         target          = null, // current interactable being interacted with
         dropTarget      = null, // the dropzone a drag target might be dropped into
