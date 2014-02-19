@@ -1727,15 +1727,15 @@
             target.fire(endEvent);
         }
         else if ((event.type === 'mouseup' || event.type === 'touchend') && target && pointerIsDown && !pointerWasMoved) {
-            var click = {};
+            var tap = {};
 
             for (var prop in event) {
-                if (event.hasOwnProperty(prop)) {
-                    click[prop] = event[prop];
-                }
+                    tap[prop] = event[prop];
             }
-            click.type = 'tap';
-            target.fire(click);
+
+            tap.currentTarget = target._element
+            tap.type = 'tap';
+            target.fire(tap);
         }
 
         interact.stop();
