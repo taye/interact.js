@@ -2719,10 +2719,7 @@
          * Interactable.on
          [ method ]
          *
-         * Binds a listener for an InteractEvent or DOM event. If this is a
-         * selector Interactable, the event's currentTarget will always be
-         * `document`. `delegateTarget` holds the element that matches the
-         * selector.
+         * Binds a listener for an InteractEvent or DOM event.
          *
          - eventType  (string)   The type of event to listen for
          - listener   (function) The function to be called on that event
