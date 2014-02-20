@@ -1066,7 +1066,7 @@
                 : event.target),
                 elements;
 
-            while (element !== document.documentElement && !action) {
+            while (element !== document && !action) {
                 matches = [];
 
                 for (selector in selectors) {
@@ -1535,7 +1535,7 @@
         if (!gesturing) {
             setPrevXY(downEvent);
 
-            var gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
+            gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
             gestureEvent.ds = 0;
 
             gesture.startDistance = gesture.prevDistance = gestureEvent.distance;
@@ -1734,7 +1734,7 @@
                     tap[prop] = event[prop];
             }
 
-            tap.currentTarget = target._element
+            tap.currentTarget = target._element;
             tap.type = 'tap';
             target.fire(tap);
         }
