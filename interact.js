@@ -1901,9 +1901,9 @@
 
     Interactable.prototype = {
         setOnEvents: function (action, phases) {
-            var start = phases.onstart || phases.onStart,
-                move  = phases.onmove  || phases.onMove,
-                end   = phases.onend   || phases.onEnd;
+            var start = phases.onstart || phases.onStart || phases.start,
+                move  = phases.onmove  || phases.onMove  || phases.move,
+                end   = phases.onend   || phases.onEnd   || phases.end;
 
             action = 'on' + action;
 
