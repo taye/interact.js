@@ -45,9 +45,16 @@ describe('interact', function () {
         });
 
         it('should throw an error when given a string that is not a valid selector', function () {
-            expect(function () {
+            var error = 0;
+
+            try {
                 interact('<< invalid selector >>');
-            }).to.throw(Error);
+            }
+            catch (e) {
+                error = e;
+            }
+
+            error.should.be.instanceof(DOMException);
         });
 
         it('should return the same value from a given parameter unless returned Interactable is unset', function () { var iBody = interact(document.body),
