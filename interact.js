@@ -299,7 +299,6 @@
 
         // Events wrapper
         events = (function () {
-            /* jshint -W001 */ // ignore warning about setting IE8 Event#hasOwnProperty
             var Event = window.Event,
                 useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
                 addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
@@ -307,7 +306,13 @@
                 on = useAttachEvent? 'on': '',
 
                 elements = [],
-                targets  = [];
+                targets  = [],
+
+                attachedListeners = {
+                    supplied: [],
+                    wrapped:  [],
+                    useCount: []
+                };
 
             if (!('indexOf' in Array.prototype)) {
                 Array.prototype.indexOf = function(elt /*, from*/)   {
@@ -346,6 +351,7 @@
                 };
             }
             if (!('hasOwnProperty' in Event.prototype)) {
+                /* jshint -W001 */ // ignore warning about setting IE8 Event#hasOwnProperty
                 Event.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
             }
 
@@ -362,7 +368,7 @@
                     targets.push(target);
                 }
 
-                if (!(type in target.events)) {
+                if (!target.events[type]) {
                     target.events[type] = [];
                     target.typeCount++;
                 }
@@ -371,7 +377,9 @@
                     var ret;
 
                     if (useAttachEvent) {
-                        ret = element[addEvent](on + type, function (event) {
+                        var index = attachedListeners.supplied.indexOf(listener),
+
+                        wrapped = attachedListeners.wrapped[index] || function (event) {
                             if (!event.immediatePropagationStopped) {
                                 event.target = event.srcElement;
                                 event.currentTarget = element;
@@ -383,7 +391,18 @@
 
                                 listener(event);
                             }
-                        }, listener, useCapture || false);
+                        };
+
+                        ret = element[addEvent](on + type, wrapped, Boolean(useCapture));
+
+                        if (index === -1) {
+                            attachedListeners.supplied.push(listener);
+                            attachedListeners.wrapped.push(wrapped);
+                            attachedListeners.useCount.push(1);
+                        }
+                        else {
+                            attachedListeners.useCount[index]++;
+                        }
                     }
                     else {
                         ret = element[addEvent](type, listener, useCapture || false);
@@ -396,7 +415,9 @@
 
             function remove (element, type, listener, useCapture) {
                 var i,
-                target = targets[elements.indexOf(element)];
+                    target = targets[elements.indexOf(element)],
+                    index = attachedListeners.supplied.indexOf(listener),
+                    wrapped = attachedListeners.wrapped[index] || listener;
 
                 if (!target || !target.events) {
                     return;
@@ -416,21 +437,28 @@
 
                     if (listener === 'all') {
                         for (i = 0; i < len; i++) {
-                            element[removeEvent](on + type, target.events[type][i], useCapture || false);
+                            remove(element, type, target.events[type][i], useCapture);
                         }
-                        target.events[type] = null;
-                        target.typeCount--;
                     } else {
                         for (i = 0; i < len; i++) {
                             if (target.events[type][i] === listener) {
-
-                                element[removeEvent](on + type, target.events[type][i], useCapture || false);
+                                element[removeEvent](on + type, wrapped, useCapture || false);
                                 target.events[type].splice(i, 1);
+
+                                if (index !== -1) {
+                                    attachedListeners.useCount[index]--;
+                                    if (attachedListeners.useCount[index] === 0) {
+                                        attachedListeners.supplied.splice(index, 1);
+                                        attachedListeners.wrapped.splice(index, 1);
+                                        attachedListeners.useCount.splice(index, 1);
+                                    }
+                                }
 
                                 break;
                             }
                         }
                     }
+
                     if (target.events[type] && target.events[type].length === 0) {
                         target.events[type] = null;
                         target.typeCount--;
