@@ -1127,9 +1127,7 @@
         if ((event.touches && event.touches.length < 2 && !target)
             || !pointerIsDown) {
 
-            var getFrom = events.useAttachEvent? event.currentTarget: this;
-
-            target = interactables.get(getFrom);
+            target = interactables.get(event.currentTarget);
         }
 
         var options = target && target.options;
@@ -3433,17 +3431,29 @@
         return this;
     };
 
+    if (window.PointerEvent || window.MSPointerEvent) {
+        events.add(docTarget, 'pointerdown'  , selectorDown);
+        events.add(docTarget, 'pointermove'  , pointerMove );
+        events.add(docTarget, 'pointerup'    , pointerUp   );
+        events.add(docTarget, 'pointerover'  , pointerOver );
+        events.add(docTarget, 'pointerout'   , pointerOut  );
+    }
+    else {
+        events.add(docTarget, 'mousedown'    , selectorDown);
+        events.add(docTarget, 'mousemove'    , pointerMove );
+        events.add(docTarget, 'mouseup'      , pointerUp   );
+        events.add(docTarget, 'mouseover'    , pointerOver );
+        events.add(docTarget, 'mouseout'     , pointerOut  );
+    }
 
-    events.add(docTarget   , 'mousedown'    , selectorDown);
-    events.add(docTarget   , 'touchstart'   , selectorDown);
-    events.add(docTarget   , 'mousemove'    , pointerMove );
-    events.add(docTarget   , 'touchmove'    , pointerMove );
-    events.add(docTarget   , 'mouseover'    , pointerOver );
-    events.add(docTarget   , 'mouseout'     , pointerOut  );
-    events.add(docTarget   , 'mouseup'      , pointerUp   );
-    events.add(docTarget   , 'touchend'     , pointerUp   );
-    events.add(docTarget   , 'touchcancel'  , pointerUp   );
-    events.add(windowTarget, 'blur'         , pointerUp   );
+    if (window.TouchEvent) {
+        events.add(docTarget, 'touchstart'   , selectorDown);
+        events.add(docTarget, 'touchmove'    , pointerMove );
+        events.add(docTarget, 'touchend'     , pointerUp   );
+        events.add(docTarget, 'touchcancel'  , pointerUp   );
+    }
+
+    events.add(windowTarget, 'blur', pointerUp);
 
     try {
         if (window.frameElement) {
@@ -3452,6 +3462,7 @@
             events.add(parentDocTarget   , 'mouseup'      , pointerUp);
             events.add(parentDocTarget   , 'touchend'     , pointerUp);
             events.add(parentDocTarget   , 'touchcancel'  , pointerUp);
+            events.add(parentDocTarget   , 'pointerup'    , pointerUp);
             events.add(parentWindowTarget, 'blur'         , pointerUp);
         }
     }
