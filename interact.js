@@ -1627,12 +1627,16 @@
         }
 
         var elementInteractable = interactables.get(eventTarget),
-            action = elementInteractable
+            elementAction = elementInteractable
                      && validateAction(
-                         elementInteractable.getAction(event, elementInteractable),
+                         elementInteractable.getAction(event),
                          elementInteractable);
 
-        if (!elementInteractable || !validateAction(elementInteractable.getAction(event), elementInteractable)) {
+        if (elementAction) {
+            target = elementInteractable;
+            matches = [];
+        }
+        else {
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
