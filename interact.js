@@ -305,14 +305,9 @@
                 removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
                 on = useAttachEvent? 'on': '',
 
-                elements = [],
-                targets  = [],
-
-                attachedListeners = {
-                    supplied: [],
-                    wrapped:  [],
-                    useCount: []
-                };
+                elements          = [],
+                targets           = [],
+                attachedListeners = [];
 
             if (!('indexOf' in Array.prototype)) {
                 Array.prototype.indexOf = function(elt /*, from*/)   {
@@ -356,7 +351,8 @@
             }
 
             function add (element, type, listener, useCapture) {
-                var target = targets[elements.indexOf(element)];
+                var elementIndex = elements.indexOf(element),
+                    target = targets[elementIndex];
 
                 if (!target) {
                     target = {
@@ -364,8 +360,14 @@
                         typeCount: 0
                     };
 
-                    elements.push(element);
+                    elementIndex = elements.push(element) - 1;
                     targets.push(target);
+
+                    attachedListeners.push((useAttachEvent ? {
+                            supplied: [],
+                            wrapped:  [],
+                            useCount: []
+                        } : null));
                 }
 
                 if (!target.events[type]) {
@@ -377,9 +379,10 @@
                     var ret;
 
                     if (useAttachEvent) {
-                        var index = attachedListeners.supplied.indexOf(listener),
+                        var listeners = attachedListeners[elementIndex],
+                            listenerIndex = listeners.supplied.indexOf(listener);
 
-                        wrapped = attachedListeners.wrapped[index] || function (event) {
+                        var wrapped = listeners.wrapped[listenerIndex] || function (event) {
                             if (!event.immediatePropagationStopped) {
                                 event.target = event.srcElement;
                                 event.currentTarget = element;
@@ -395,13 +398,13 @@
 
                         ret = element[addEvent](on + type, wrapped, Boolean(useCapture));
 
-                        if (index === -1) {
-                            attachedListeners.supplied.push(listener);
-                            attachedListeners.wrapped.push(wrapped);
-                            attachedListeners.useCount.push(1);
+                        if (listenerIndex === -1) {
+                            listeners.supplied.push(listener);
+                            listeners.wrapped.push(wrapped);
+                            listeners.useCount.push(1);
                         }
                         else {
-                            attachedListeners.useCount[index]++;
+                            listeners.useCount[listenerIndex]++;
                         }
                     }
                     else {
@@ -415,12 +418,20 @@
 
             function remove (element, type, listener, useCapture) {
                 var i,
-                    target = targets[elements.indexOf(element)],
-                    index = attachedListeners.supplied.indexOf(listener),
-                    wrapped = attachedListeners.wrapped[index] || listener;
+                    elementIndex = elements.indexOf(element),
+                    target = targets[elementIndex],
+                    listeners,
+                    listenerIndex,
+                    wrapped = listener;
 
                 if (!target || !target.events) {
                     return;
+                }
+
+                if (useAttachEvent) {
+                    listeners = attachedListeners[elementIndex];
+                    listenerIndex = listeners.supplied.indexOf(listener);
+                    wrapped = listeners.wrapped[listenerIndex];
                 }
 
                 if (type === 'all') {
@@ -437,7 +448,7 @@
 
                     if (listener === 'all') {
                         for (i = 0; i < len; i++) {
-                            remove(element, type, target.events[type][i], useCapture);
+                            remove(element, type, target.events[type][i], Boolean(useCapture));
                         }
                     } else {
                         for (i = 0; i < len; i++) {
@@ -445,12 +456,12 @@
                                 element[removeEvent](on + type, wrapped, useCapture || false);
                                 target.events[type].splice(i, 1);
 
-                                if (index !== -1) {
-                                    attachedListeners.useCount[index]--;
-                                    if (attachedListeners.useCount[index] === 0) {
-                                        attachedListeners.supplied.splice(index, 1);
-                                        attachedListeners.wrapped.splice(index, 1);
-                                        attachedListeners.useCount.splice(index, 1);
+                                if (useAttachEvent && listeners) {
+                                    listeners.useCount[listenerIndex]--;
+                                    if (listeners.useCount[listenerIndex] === 0) {
+                                        listeners.supplied.splice(listenerIndex, 1);
+                                        listeners.wrapped.splice(listenerIndex, 1);
+                                        listeners.useCount.splice(listenerIndex, 1);
                                     }
                                 }
 
@@ -466,8 +477,9 @@
                 }
 
                 if (!target.typeCount) {
-                    targets.splice(targets.indexOf(target), 1);
-                    elements.splice(elements.indexOf(element), 1);
+                    targets.splice(elementIndex);
+                    elements.splice(elementIndex);
+                    attachedListeners.splice(elementIndex);
                 }
             }
 
