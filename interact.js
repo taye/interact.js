@@ -15,6 +15,10 @@
         SVGElementInstance = window.SVGElementInstance || blank,
         HTMLElement        = window.HTMLElement        || window.Element,
 
+        PointerEvent = window.PointerEvent || window.MSPointerEvent,
+        GestureEvent = window.GestureEvent || window.MSGestureEvent,
+        Gesture      = window.Gesture      || window.MSGesture,
+
         // Previous interact move event pointer position
         prevX       = 0,
         prevY       = 0,
@@ -52,6 +56,7 @@
         selectorDZs     = [],   // all dropzone selector interactables
         matches         = [],   // all selectors that are matched by target element
         delegatedEvents = {},   // { type: { selector: [[listener, useCapture]} }
+        selectorGesture = null, // MSGesture object for selector PointerEvents
 
         target          = null, // current interactable being interacted with
         dropTarget      = null, // the dropzone a drag target might be dropped into
@@ -535,16 +540,28 @@
     }
 
     function getPageXY (event) {
+        var page;
+
         // Opera Mobile handles the viewport and scrolling oddly
         if (isOperaMobile) {
-            var page = getXY('screen', event);
+            page = getXY('screen', event);
 
             page.x += window.scrollX;
             page.y += window.scrollY;
+        }
+        else if (/gesture|inertia/i.test(event.type)) {
+            page = getXY('client', event);
+
+            page.x += document.documentElement.scrollLeft;
+            page.y += document.documentElement.scrollTop;
 
             return page;
         }
-        return getXY('page', event);
+        else {
+            page = getXY('page', event);
+        }
+
+        return page;
     }
 
     function getClientXY (event) {
@@ -1096,7 +1113,7 @@
             return;
         }
 
-        if (matches.length && event.type === 'mousedown') {
+        if (matches.length && /mousedown|pointerdown/i.test(event.type)) {
             action = validateSelector(event, matches);
         }
         else {
@@ -1150,6 +1167,20 @@
                 page,
                 client,
                 origin = getOriginXY(target);
+
+            if (PointerEvent && event instanceof PointerEvent) {
+                if (target.selector) {
+                    selectorGesture.addPointer(event.pointerId);
+                }
+                else {
+                    // Dom modification seems to reset the gesture target
+                    if (!target._gesture.target) {
+                        target._gesture.target = target._element;
+                    }
+
+                    target._gesture.addPointer(event.pointerId);
+                }
+            }
 
             if (event.touches) {
                 average = touchAverage(event);
@@ -1225,6 +1256,7 @@
                         distY,
                         distance,
                         i, len;
+
 
                     snapStatus.realX = page.x;
                     snapStatus.realY = page.y;
@@ -1769,7 +1801,7 @@
             endEvent = new InteractEvent(event, 'gesture', 'end');
             target.fire(endEvent);
         }
-        else if ((event.type === 'mouseup' || event.type === 'touchend') && target && pointerIsDown && !pointerWasMoved) {
+        else if (/mouseup|touchend|pointerup/i.test(event.type) && target && pointerIsDown && !pointerWasMoved) {
             var tap = {};
 
             for (var prop in event) {
@@ -1860,7 +1892,7 @@
     };
 
     function clearTargets () {
-        if (!target.selector) {
+        if (target && !target.selector) {
             target = null;
         }
 
@@ -1927,10 +1959,19 @@
         }
         else {
             if(element instanceof Element) {
-                events.add(this, 'mousemove' , pointerHover);
-                events.add(this, 'mousedown' , pointerDown );
-                events.add(this, 'touchmove' , pointerHover);
-                events.add(this, 'touchstart', pointerDown );
+                if (PointerEvent) {
+                    events.add(this, 'pointerdown', pointerDown );
+                    events.add(this, 'pointermove', pointerHover);
+
+                    this._gesture = new Gesture();
+                    this._gesture.target = element;
+                }
+                else {
+                    events.add(this, 'mousedown' , pointerDown );
+                    events.add(this, 'mousemove' , pointerHover);
+                    events.add(this, 'touchstart', pointerDown );
+                    events.add(this, 'touchmove' , pointerHover);
+                }
             }
 
             elements.push(this);
@@ -2912,10 +2953,15 @@
                 if (this.options.styleCursor) {
                     this._element.style.cursor = '';
                 }
+
+                if (this._gesture) {
+                    this._gesture.target = null;
+                }
+
                 elements.splice(elements.indexOf(this.element()));
             }
 
-            this.dropzone   (false);
+            this.dropzone(false);
 
             interactables.splice(interactables.indexOf(this), 1);
 
@@ -3356,6 +3402,12 @@
             if (target.options.styleCursor) {
                 document.documentElement.style.cursor = '';
             }
+
+            if (target._gesture) {
+                target._gesture.stop();
+                selectorGesture.stop();
+            }
+
             clearTargets();
 
             for (var i = 0; i < selectorDZs.length; i++) {
@@ -3447,26 +3499,29 @@
         return this;
     };
 
-    if (window.PointerEvent || window.MSPointerEvent) {
-        events.add(docTarget, 'pointerdown'  , selectorDown);
-        events.add(docTarget, 'pointermove'  , pointerMove );
-        events.add(docTarget, 'pointerup'    , pointerUp   );
-        events.add(docTarget, 'pointerover'  , pointerOver );
-        events.add(docTarget, 'pointerout'   , pointerOut  );
+    if (PointerEvent) {
+        events.add(docTarget, 'pointerdown'    , selectorDown);
+        events.add(docTarget, 'pointercancel'  , pointerUp   );
+        events.add(docTarget, 'MSGestureChange', pointerMove );
+        events.add(docTarget, 'MSGestureEnd'   , pointerUp   );
+        events.add(docTarget, 'MSInertiaStart' , pointerUp   );
+        events.add(docTarget, 'pointerover'    , pointerOver );
+        events.add(docTarget, 'pointerout'     , pointerOut  );
+
+        selectorGesture = new Gesture();
+        selectorGesture.target = document.documentElement;
     }
     else {
-        events.add(docTarget, 'mousedown'    , selectorDown);
-        events.add(docTarget, 'mousemove'    , pointerMove );
-        events.add(docTarget, 'mouseup'      , pointerUp   );
-        events.add(docTarget, 'mouseover'    , pointerOver );
-        events.add(docTarget, 'mouseout'     , pointerOut  );
-    }
+        events.add(docTarget, 'mousedown', selectorDown);
+        events.add(docTarget, 'mousemove', pointerMove );
+        events.add(docTarget, 'mouseup'  , pointerUp   );
+        events.add(docTarget, 'mouseover', pointerOver );
+        events.add(docTarget, 'mouseout' , pointerOut  );
 
-    if (window.TouchEvent) {
-        events.add(docTarget, 'touchstart'   , selectorDown);
-        events.add(docTarget, 'touchmove'    , pointerMove );
-        events.add(docTarget, 'touchend'     , pointerUp   );
-        events.add(docTarget, 'touchcancel'  , pointerUp   );
+        events.add(docTarget, 'touchstart' , selectorDown);
+        events.add(docTarget, 'touchmove'  , pointerMove );
+        events.add(docTarget, 'touchend'   , pointerUp   );
+        events.add(docTarget, 'touchcancel', pointerUp   );
     }
 
     events.add(windowTarget, 'blur', pointerUp);
