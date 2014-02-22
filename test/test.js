@@ -4,8 +4,11 @@ var expect = chai.expect,
 
 function blank () {}
 
-function mockEvent (options) {
+function mockEvent (options, target, currentTarget) {
     'use strict';
+
+    options.target = options.target || target;
+    options.currentTarget = options.currentTarget || currentTarget;
 
     return {
         target: options.target,
@@ -170,7 +173,9 @@ describe('Events', function () {
     var dragElement = document.createElement('div'),
         draggable = interact(dragElement),
         events = [],
-        mockEvents = data.downMove2Up.map(mockEvent),
+        mockEvents = data.downMove2Up.map(function (e) {
+            return mockEvent(e, dragElement);
+        }),
         pushEvent = function (event) {
             events.push(event);
         };
@@ -184,10 +189,10 @@ describe('Events', function () {
             return 'drag';
         });
 
-        debug.pointerDown.call(dragElement, mockEvents[0]);
-        debug.pointerMove.call(dragElement, mockEvents[1]);
-        debug.pointerMove.call(dragElement, mockEvents[2]);
-        debug.pointerUp  .call(dragElement, mockEvents[3]);
+        debug.pointerDown(mockEvents[0]);
+        debug.pointerMove(mockEvents[1]);
+        debug.pointerMove(mockEvents[2]);
+        debug.pointerUp  (mockEvents[3]);
 
         it('should be triggered by mousedown -> mousemove -> mouseup sequence', function () {
             events.length.should.equal(4);
@@ -270,16 +275,18 @@ describe('Events', function () {
                 onmove: pushEvent,
                 onend: pushEvent
             }).actionChecker(function () { return 'gesture'; }),
-            mockEvents = data.touch2Move2End2.map(mockEvent),
+            mockEvents = data.touch2Move2End2.map(function (e) {
+                return mockEvent(e, element);
+            }),
             gestureEvents = [],
             eventMap = [1, 2, 3, 4];
 
-        debug.pointerDown.call(element, mockEvents[0]);
-        debug.pointerDown.call(element, mockEvents[1]);
-        debug.pointerMove.call(element, mockEvents[2]);
-        debug.pointerMove.call(element, mockEvents[3]);
-        debug.pointerUp.call(element, mockEvents[4]);
-        debug.pointerUp.call(element, mockEvents[5]);
+        debug.pointerDown(mockEvents[0]);
+        debug.pointerDown(mockEvents[1]);
+        debug.pointerMove(mockEvents[2]);
+        debug.pointerMove(mockEvents[3]);
+        debug.pointerUp(mockEvents[4]);
+        debug.pointerUp(mockEvents[5]);
 
         it('should be started by 2 touches starting and moving and end when there are fewer than two active touches', function () {
             gestureEvents.length.should.equal(4);
