@@ -4,10 +4,6 @@
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
 
-/**
- * @namespace interact.js module
- * @name interact
- */
 (function(interact) {
     'use strict';
 
