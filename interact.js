@@ -1984,15 +1984,28 @@
 
     Interactable.prototype = {
         setOnEvents: function (action, phases) {
-            var start = phases.onstart || phases.onStart || phases.start,
-                move  = phases.onmove  || phases.onMove  || phases.move,
-                end   = phases.onend   || phases.onEnd   || phases.end;
+            if (action === 'drop') {
+                var drop      = phases.ondrop      || phases.onDrop      || phases.drop,
+                    dragenter = phases.ondragenter || phases.onDropEnter || phases.dragenter,
+                    dragleave = phases.ondragleave || phases.onDropLeave || phases.dragleave;
 
-            action = 'on' + action;
+                if (typeof drop      === 'function') { this.ondrop      = drop     ; }
+                if (typeof dragenter === 'function') { this.ondragenter = dragenter; }
+                if (typeof dragleave === 'function') { this.ondragleave = dragleave; }
+            }
+            else {
+                var start     = phases.onstart     || phases.onStart     || phases.start,
+                    move      = phases.onmove      || phases.onMove      || phases.move,
+                    end       = phases.onend       || phases.onEnd       || phases.end,
 
-            if (typeof start === 'function') { this[action + 'start'] = start; }
-            if (typeof move  === 'function') { this[action + 'move' ] = move ; }
-            if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
+                action = 'on' + action;
+
+                if (typeof start === 'function') { this[action + 'start'] = start; }
+                if (typeof move  === 'function') { this[action + 'move' ] = move ; }
+                if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
+            }
+
+            return this;
         },
 
         /*\
@@ -2048,10 +2061,9 @@
         \*/
         dropzone: function (options) {
             if (options instanceof Object) {
-                var ondrop = options.ondrop || options.onDrop;
-                if (typeof ondrop === 'function') { this.ondrop = ondrop; }
-
                 this.options.dropzone = true;
+                this.setOnEvents('drop', options);
+
                 (this.selector? selectorDZs: dropzones).push(this);
 
                 if (!dynamicDrop && !this.selector) {
