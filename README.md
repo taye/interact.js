@@ -1,4 +1,4 @@
-![interact.js](http://interactjs.io/repo/img/ijs-anim.svg)
+<img alt="interact.js" src="http://interactjs.io/repo/img/ijs-anim.svg" height="131px" width="100%">
 
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
