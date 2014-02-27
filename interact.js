@@ -1531,10 +1531,12 @@
         }
 
         var draggableElement = target._element,
-            dropzoneElement  = dropTarget? dropTarget._element: null;
+            prevDropzoneElement  = prevDropTarget && prevDropTarget._element;
 
         dragEvent  = new InteractEvent(event, 'drag', 'move');
         dropTarget = getDrop(event, target);
+
+        var dropzoneElement = dropTarget? dropTarget._element: null;
 
         // Make sure that the target selector draggable's element is
         // restored after dropChecks
@@ -1543,7 +1545,7 @@
         if (dropTarget !== prevDropTarget) {
             // if there was a prevDropTarget, create a dragleave event
             if (prevDropTarget) {
-                dragLeaveEvent      = new InteractEvent(event, 'drag', 'leave', dropzoneElement, draggableElement);
+                dragLeaveEvent      = new InteractEvent(event, 'drag', 'leave', prevDropzoneElement, draggableElement);
 
                 dragEvent.dragLeave = prevDropTarget._element;
                 leaveDropTarget     = prevDropTarget;
