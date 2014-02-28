@@ -65,6 +65,7 @@
         defaultOptions = {
             draggable   : false,
             dropzone    : false,
+            accept      : null,
             resizeable  : false,
             squareResize: false,
             gestureable : false,
@@ -802,9 +803,23 @@
 
             // collect all element dropzones that qualify for a drop
             for (i = 0; i < dropzones.length; i++) {
-                if (dropzones[i].dropCheck(event)) {
-                    drops.push(dropzones[i]);
-                    elements.push(dropzones[i]._element);
+                var current = dropzones[i];
+
+                // if the dropzone has an accept option, test against it
+                if (current.options.accept instanceof Element) {
+                    if (current.options.accept !== draggable._element) {
+                        continue;
+                    }
+                }
+                else if (typeof current.options.accept === 'string') {
+                    if (!draggable._element[matchesSelector](current.options.accept)) {
+                        continue;
+                    }
+                }
+
+                if (draggable._element !== current._element && current.dropCheck(event)) {
+                    drops.push(current);
+                    elements.push(current._element);
                 }
             }
 
@@ -822,6 +837,18 @@
                     for (var j = 0, len = nodeList.length; j < len; j++) {
                         selector._element = nodeList[j];
                         selector.rect = selector.getRect();
+
+                        // if the dropzone has an accept option, test against it
+                        if (selector.options.accept instanceof Element) {
+                            if (selector.options.accept !== draggableElement) {
+                                continue;
+                            }
+                        }
+                        else if (typeof selector.options.accept === 'string') {
+                            if (!draggable._element[matchesSelector](selector.options.accept)) {
+                                continue;
+                            }
+                        }
 
                         if (selector._element !== draggableElement
                             && elements.indexOf(selector._element) === -1
@@ -2065,6 +2092,7 @@
             if (options instanceof Object) {
                 this.options.dropzone = true;
                 this.setOnEvents('drop', options);
+                this.accept(options.accept);
 
                 (this.selector? selectorDZs: dropzones).push(this);
 
@@ -2150,6 +2178,44 @@
                 return this;
             }
             return this.dropCheck;
+        },
+
+        /*\
+         * Interactable.accept
+         [ method ]
+         *
+         * Gets or sets the Element or CSS selector match that this
+         * Interactable accepts if it is a dropzone.
+         *
+         - newValue (Element | string | null) #optional
+         * If it is an Element, then only that element can be dropped into this dropzone.
+         * If it is a string, the element being dragged must match it as a selector.
+         * If it is null, the accept options is cleared - it accepts any element.
+         *
+         = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
+        \*/
+        accept: function (newValue) {
+            if (newValue instanceof Element) {
+                this.options.accept = newValue;
+
+                return this;
+            }
+
+            if (typeof newValue === 'string') {
+                // test if it is a valid CSS selector
+                document.querySelector(newValue);
+                this.options.accept = newValue;
+
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.accept;
+
+                return this;
+            }
+
+            return this.options.accept;
         },
 
         /*\
