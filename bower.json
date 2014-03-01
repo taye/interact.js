@@ -1,6 +1,6 @@
 {
     "name": "interact",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "main": "interact.js",
     "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
     "homepage": "http://interactjs.io",
