@@ -87,9 +87,9 @@ describe('Interactable', function () {
         simpleOptions = {
             draggable    : 'draggable',
             dropzone     : 'dropzone',
-            resizeable   : 'resizeable',
+            resizable   : 'resizable',
             squareResize : 'squareResize',
-            gestureable  : 'gestureable',
+            gesturable  : 'gesturable',
             styleCursor  : 'styleCursor',
             restrict     : 'restrictions', 
             origin       : 'origin',
@@ -139,8 +139,8 @@ describe('Interactable', function () {
         var div = document.createElement('div'),
             iDiv = interact(div)
                 .draggable(true)
-                .resizeable(true)
-                .gestureable(true),
+                .resizable(true)
+                .gesturable(true),
             i,
             action,
             actions = ['drag', 'resizexy', 'resizex', 'resizey', 'gesture'],
@@ -270,7 +270,7 @@ describe('Events', function () {
                 gestureEvents.push(event);
             },
             element = document.createElement('button'),
-            iElement = interact(element).gestureable({
+            iElement = interact(element).gesturable({
                 onstart: pushEvent,
                 onmove: pushEvent,
                 onend: pushEvent

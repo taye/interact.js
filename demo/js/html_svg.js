@@ -51,7 +51,7 @@
             interact(this.ellipse).set({
                 draggable: true,
                 dropzone: true,
-                resizeable: true
+                resizable: true
             });
            */
     }
@@ -72,8 +72,8 @@
         /*interact(this.element).set({
             draggable: true,
             dropzone: true,
-            resizeable: true,
-            gestureable: true
+            resizable: true,
+            gesturable: true
         });*/
         window[id] = this.element;
     }
@@ -218,13 +218,13 @@
 
         interact('div.demo-node')
             .draggable(true)
-            .resizeable(true)
-            .gestureable(true)
+            .resizable(true)
+            .gesturable(true)
             .dropzone(true);
 
         interact('.demo-node ellipse')
             .draggable(true)
-            .resizeable(true)
+            .resizable(true)
             .dropzone(true);
     }
 

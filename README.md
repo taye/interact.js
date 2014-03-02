@@ -98,7 +98,7 @@ Usage
 -----
 Pass the element you want to interact with or a CSS selector string to
 `interact`. That returns an object with methods, notably `draggable`,
-`resizeable`, `gestureable`, `dropzone` which let you allow or disallow the
+`resizable`, `gesturable`, `dropzone` which let you allow or disallow the
 related actions and `on` which let's you add event listeners for
 InteractEvents and any DOM event.  The `InteractEvent` types are
 {`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', ' `dragenter`, `dragleave`
@@ -113,20 +113,20 @@ returns an `Interactable` object which has several methods and properties to
 configure how it behaves and what it can do. These methods have a fluent
 interface so method calls can be chained nicely.
 
-For example, to make a DOM element dragagble and resizeable you can call the
+For example, to make a DOM element dragagble and resizable you can call the
 `Interactable#set` with an object with the properties you want to set
 ```javascript
 interact(document.getElementById('anElement'))
     .set({
         draggable: true,
-        resizeable: true
+        resizable: true
     });
 ```
 or you can call each {action}able method with the options for each.
 ```jacascript
 interact(document.getElementById('anElement'))
         .draggable (true)
-        .resizeable(true);
+        .resizable(true);
 ```
 
 ### Acting
