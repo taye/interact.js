@@ -68,9 +68,9 @@
             draggable   : false,
             dropzone    : false,
             accept      : null,
-            resizeable  : false,
+            resizable  : false,
             squareResize: false,
-            gestureable : false,
+            gesturable : false,
 
             styleCursor : true,
 
@@ -1124,9 +1124,9 @@
         var actionType = action.indexOf('resize') !== -1? 'resize': action,
             options = (interactable || target).options;
 
-        if ((  (actionType  === 'resize'   && options.resizeable )
+        if ((  (actionType  === 'resize'   && options.resizable )
             || (action      === 'drag'     && options.draggable  )
-            || (action      === 'gesture'  && options.gestureable))
+            || (action      === 'gesture'  && options.gesturable))
             && actionIsEnabled[actionType]) {
 
             if (action === 'resize' || action === 'resizeyx') {
@@ -1968,7 +1968,7 @@
      |
      | var rectables = interact('rect');
      | rectables
-     |     .gestureable(true)
+     |     .gesturable(true)
      |     .on('gesturemove', function (event) {
      |         // something cool...
      |     })
@@ -2164,7 +2164,7 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event) {
+        dropCheck: function (event, draggableElement) {
             var page = getPageXY(event),
                 horizontal,
                 vertical;
@@ -2240,37 +2240,40 @@
         },
 
         /*\
-         * Interactable.resizeable
+         * Interactable.resizable
          [ method ]
          *
          * Gets or sets whether resize actions can be performed on the
          * Interactable
          *
          = (boolean) Indicates if this can be the target of resize elements
-         | var isResizeable = interact('input[type=text]').resizeable();
+         | var isResizeable = interact('input[type=text]').resizable();
          * or
-         - options (boolean | object) #optional true/false or An object with event listeners to be fired on resize events (object makes the Interactable resizeable)
+         - options (boolean | object) #optional true/false or An object with event listeners to be fired on resize events (object makes the Interactable resizable)
          = (object) This Interactable
-         | interact(element).resizeable({
+         | interact(element).resizable({
          |     onstart: function (event) {},
          |     onmove : function (event) {},
          |     onend  : function (event) {}
          | });
         \*/
-        resizeable: function (options) {
+        resizable: function (options) {
             if (options instanceof Object) {
-                this.options.resizeable = true;
+                this.options.resizable = true;
                 this.setOnEvents('resize', options);
 
                 return this;
             }
             if (typeof options === 'boolean') {
-                this.options.resizeable = options;
+                this.options.resizable = options;
 
                 return this;
             }
-            return this.options.resizeable;
+            return this.options.resizable;
         },
+
+        // misspelled alias
+        resizeable: blank,
 
         /*\
          * Interactable.squareResize
@@ -2302,43 +2305,46 @@
         },
 
         /*\
-         * Interactable.gestureable
+         * Interactable.gesturable
          [ method ]
          *
          * Gets or sets whether multitouch gestures can be performed on the
          * Interactable's element
          *
          = (boolean) Indicates if this can be the target of gesture events
-         | var isGestureable = interact(element).gestureable();
+         | var isGestureable = interact(element).gesturable();
          * or
-         - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gestureable)
+         - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
          = (object) this Interactable
-         | interact(element).gestureable({
+         | interact(element).gesturable({
          |     onmove: function (event) {}
          | });
         \*/
-        gestureable: function (options) {
+        gesturable: function (options) {
             if (options instanceof Object) {
-                this.options.gestureable = true;
+                this.options.gesturable = true;
                 this.setOnEvents('gesture', options);
 
                 return this;
             }
 
             if (typeof options === 'boolean') {
-                this.options.gestureable = options;
+                this.options.gesturable = options;
 
                 return this;
             }
 
             if (options === null) {
-                delete this.options.gestureable;
+                delete this.options.gesturable;
 
                 return this;
             }
 
-            return this.options.gestureable;
+            return this.options.gesturable;
         },
+
+        // misspelled alias
+        gestureable: blank,
 
         /*\
          * Interactable.autoScroll
@@ -2516,7 +2522,7 @@
                 page = getPageXY(event),
                 options = this.options;
 
-            if (actionIsEnabled.resize && options.resizeable) {
+            if (actionIsEnabled.resize && options.resizable) {
                 right  = page.x > (rect.right  - margin);
                 bottom = page.y > (rect.bottom - margin);
             }
@@ -3026,8 +3032,8 @@
 
             this.draggable  ('draggable'   in options? options.draggable  : this.options.draggable  );
             this.dropzone   ('dropzone'    in options? options.dropzone   : this.options.dropzone   );
-            this.resizeable ('resizeable'  in options? options.resizeable : this.options.resizeable );
-            this.gestureable('gestureable' in options? options.gestureable: this.options.gestureable);
+            this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
+            this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
             if ('autoScroll'  in options) { this.autoScroll (options.autoScroll ); }
 
@@ -3069,6 +3075,9 @@
             return interact;
         }
     };
+
+    Interactable.prototype.gestureable = Interactable.prototype.gesturable;
+    Interactable.prototype.resizeable = Interactable.prototype.resizable;
 
     /*\
      * interact.isSet
