@@ -545,6 +545,13 @@
     function getPageXY (event) {
         var page;
 
+        if (event instanceof InteractEvent) {
+            return {
+                x: event.pageX,
+                y: event.pageY
+            };
+        }
+
         // Opera Mobile handles the viewport and scrolling oddly
         if (isOperaMobile) {
             page = getXY('screen', event);
@@ -568,6 +575,13 @@
     }
 
     function getClientXY (event) {
+        if (event instanceof InteractEvent) {
+            return {
+                x: event.clientX,
+                y: event.clientY
+            };
+        }
+
         // Opera Mobile handles the viewport and scrolling oddly
         return getXY(isOperaMobile? 'screen': 'client', event);
     }
@@ -1563,8 +1577,10 @@
             setPrevXY(dragEvent);
         }
 
+        dragEvent  = new InteractEvent(event, 'drag', 'move');
+
         var draggableElement = target._element,
-            drop = getDrop(event, draggableElement);
+            drop = getDrop(dragEvent, draggableElement);
 
         if (drop) {
             dropTarget = drop.dropzone;
@@ -1577,8 +1593,6 @@
         // Make sure that the target selector draggable's element is
         // restored after dropChecks
         target._element = draggableElement;
-
-        dragEvent  = new InteractEvent(event, 'drag', 'move');
 
         if (dropElement !== prevDropElement) {
             // if there was a prevDropTarget, create a dragleave event
@@ -1805,7 +1819,7 @@
 
             var dropEvent,
                 draggableElement = target._element,
-                drop = getDrop(event, draggableElement);
+                drop = getDrop(endEvent, draggableElement);
 
             if (drop) {
                 dropTarget = drop.dropzone;
