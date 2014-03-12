@@ -593,6 +593,22 @@
         };
     }
 
+    function getElementRect (element) {
+        var scroll = getScrollXY(),
+            clientRect = (element instanceof SVGElement)?
+                element.getBoundingClientRect():
+                element.getClientRects()[0];
+
+        return {
+            left  : clientRect.left   + scroll.x,
+            right : clientRect.right  + scroll.x,
+            top   : clientRect.top    + scroll.y,
+            bottom: clientRect.bottom + scroll.y,
+            width : clientRect.width || clientRect.right - clientRect.left,
+            height: clientRect.heigh || clientRect.bottom - clientRect.top
+        };
+    }
+
     function touchAverage (event) {
         var i,
             touches = event.touches,
@@ -2606,19 +2622,7 @@
                 this._element = document.querySelector(this.selector);
             }
 
-            var scroll = getScrollXY(),
-                clientRect = (this._element instanceof SVGElement)?
-                    this._element.getBoundingClientRect():
-                    this._element.getClientRects()[0];
-
-            return {
-                left  : clientRect.left   + scroll.x,
-                right : clientRect.right  + scroll.x,
-                top   : clientRect.top    + scroll.y,
-                bottom: clientRect.bottom + scroll.y,
-                width : clientRect.width || clientRect.right - clientRect.left,
-                height: clientRect.heigh || clientRect.bottom - clientRect.top
-            };
+            return getElementRect(this._element);
         },
 
         /*\
@@ -3335,6 +3339,8 @@
     interact.getTouchBBox     = touchBBox;
     interact.getTouchDistance = touchDistance;
     interact.getTouchAngle    = touchAngle;
+
+    interact.getElementRect   = getElementRect;
 
     /*\
      * interact.margin
