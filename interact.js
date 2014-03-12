@@ -19,6 +19,8 @@
         GestureEvent = window.GestureEvent || window.MSGestureEvent,
         Gesture      = window.Gesture      || window.MSGesture,
 
+        hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
+
         // Previous interact move event pointer position
         prevX       = 0,
         prevY       = 0,
@@ -678,7 +680,7 @@
             dy -= event.touches[1][sourceY];
         }
 
-        return Math.sqrt(dx * dx + dy * dy);
+        return hypot(dx, dy);
     }
 
     function touchAngle (event, prevAngle) {
@@ -1132,7 +1134,7 @@
             var dt = (phase === 'end'? this.duration: this.dt) / 1000;
 
             // speed in pixels per second
-            this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy) / dt;
+            this.speed = hypot(this.dx, this.dy) / dt;
         }
     }
 
@@ -1346,7 +1348,7 @@
 
                             distX = anchor.x - page.x;
                             distY = anchor.y - page.y;
-                            distance = Math.sqrt(distX * distX + distY * distY);
+                            distance = hypot(distX, distY);
 
                             inRange = distance < range;
 
@@ -1400,7 +1402,7 @@
                         distX = newX - page.x;
                         distY = newY - page.y;
 
-                        distance = Math.sqrt(distX * distX + distY * distY);
+                        distance = hypot(distX, distY);
 
                         inRange = distance < snap.range;
                         snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
