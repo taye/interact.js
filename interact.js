@@ -1122,6 +1122,8 @@
             this.dt        = 0;
             this.duration  = 0;
             this.speed     = 0;
+            this.velocityX = 0;
+            this.velocityY = 0;
         }
         else {
             this.timeStamp = new Date().getTime();
@@ -1133,8 +1135,10 @@
             // => average speed of the event sequence
             var dt = (phase === 'end'? this.duration: this.dt) / 1000;
 
-            // speed in pixels per second
+            // speed and velocity in pixels per second
             this.speed = hypot(this.dx, this.dy) / dt;
+            this.velocityX = this.dx / dt;
+            this.velocityY = this.dy / dt;
         }
     }
 
