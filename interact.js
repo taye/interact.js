@@ -925,8 +925,6 @@
         var client,
             page,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
-            sourceY = deltaSource + 'Y',
             options = target? target.options: defaultOptions,
             origin = getOriginXY(target);
 
@@ -1023,6 +1021,11 @@
 
             client.x += restrictDx;
             client.y += restrictDy;
+
+            this.restrict = {
+                dx: restrictDx,
+                dy: restrictDy
+            };
         }
 
 
@@ -1133,12 +1136,43 @@
             // change in time in seconds
             // use event sequence duration for end events
             // => average speed of the event sequence
-            var dt = (phase === 'end'? this.duration: this.dt) / 1000;
+            var dt = (phase === 'end'? this.duration: this.dt) / 1000,
+                dx, dy;
+
+            // Use natural event coordinates (without snapping/restricions)
+
+            if (this.snap) {
+                dx = this.snap.realX;
+                dy = this.snap.realY;
+            }
+            else {
+                dx = this.pageX;
+                dy = this.pageY;
+            }
+
+            if (this.restrict) {
+                dx -= this.restrict.dx;
+                dy -= this.restrict.dy;
+            }
+
+            if (prevEvent.snap) {
+                dx -= prevEvent.snap.realX;
+                dy -= prevEvent.snap.realY;
+            }
+            else {
+                dx -= prevEvent.pageX;
+                dy -= prevEvent.pageY;
+            }
+
+            if (prevEvent.restrict) {
+                dx += prevEvent.restrict.dx;
+                dy += prevEvent.restrict.dy;
+            }
 
             // speed and velocity in pixels per second
-            this.speed = hypot(this.dx, this.dy) / dt;
-            this.velocityX = this.dx / dt;
-            this.velocityY = this.dy / dt;
+            this.speed = hypot(dx, dy) / dt;
+            this.velocityX = dx / dt;
+            this.velocityY = dy / dt;
         }
     }
 
