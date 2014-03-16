@@ -289,6 +289,10 @@
         // will be polyfill function if browser is IE8
         IE8MatchesSelector,
 
+        // native requestAnimationFrame or polyfill
+        reqFrame,
+        cancelFrame,
+
         // used for adding event listeners to window and document
         windowTarget = {
             _element: window,
@@ -3735,6 +3739,34 @@
             return false;
         };
     }
+
+    // requestAnimationFrame polyfill
+    (function() {
+        var lastTime = 0,
+            vendors = ['ms', 'moz', 'webkit', 'o'];
+
+        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            reqFrame = window[vendors[x]+'RequestAnimationFrame'];
+            cancelFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+        }
+
+        if (!reqFrame) {
+            reqFrame = function(callback) {
+                var currTime = new Date().getTime(),
+                    timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+                    id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                  timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
+
+        if (!cancelFrame) {
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+        }
+    }());
 
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
     if (typeof exports !== 'undefined') {
