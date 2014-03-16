@@ -3762,7 +3762,7 @@
         }
 
         if (!cancelFrame) {
-            window.cancelAnimationFrame = function(id) {
+            cancelFrame = function(id) {
                 clearTimeout(id);
             };
         }
