@@ -37,6 +37,25 @@
         downEvent = null,      // mousedown/touchstart event
         prevEvent = null,      // previous action event
 
+        inertiaStatus = {
+            active       : false,
+            target       : null,
+            targetElement: null,
+
+            startEvent: null,
+            pointerUp : null,
+
+            targetX : 0,
+            targetY : 0,
+            duration: 0,
+
+            t0 : 0,
+            vx0: 0,
+            vys: 0,
+
+            i  : null
+        },
+
         gesture = {
             start: { x: 0, y: 0 },
 
@@ -105,6 +124,13 @@
                 numberTypes : /^range$|^interval$|^distance$/
             },
             autoScrollEnabled: false,
+
+            inertia: {
+                resistance : 10,    // the lambda in exponential decay
+                minSpeed   : 100,   // target speed must be above this for inertia to start
+                endSpeed   : 10     // the speed at which inertia is slow enough to stop
+            },
+            inertiaEnabled: false,
 
             origin      : { x: 0, y: 0 },
             deltaSource : 'page'
@@ -552,14 +578,21 @@
         var page;
 
         if (event instanceof InteractEvent) {
-            return {
-                x: event.pageX,
-                y: event.pageY
-            };
-        }
+            if (/inertiastart/.test(event.type)) {
+                page = getXY('page', inertiaStatus.pointerUp);
 
+                page.x += inertiaStatus.sx;
+                page.y += inertiaStatus.sy;
+            }
+            else {
+                page = {
+                    x: event.pageX,
+                    y: event.pageY
+                };
+            }
+        }
         // Opera Mobile handles the viewport and scrolling oddly
-        if (isOperaMobile) {
+        else if (isOperaMobile) {
             page = getXY('screen', event);
 
             page.x += window.scrollX;
@@ -582,10 +615,20 @@
 
     function getClientXY (event) {
         if (event instanceof InteractEvent) {
-            return {
-                x: event.clientX,
-                y: event.clientY
-            };
+            if (/inertiastart/.test(event.type)) {
+                var client = getXY('client', inertiaStatus.pointerUp);
+
+                client.x += inertiaStatus.sx;
+                client.y += inertiaStatus.sy;
+
+                return client;
+            }
+            else {
+                return {
+                    x: event.pageX,
+                    y: event.pageY
+                };
+            }
         }
 
         // Opera Mobile handles the viewport and scrolling oddly
@@ -749,6 +792,23 @@
     function calcRects (interactableList) {
         for (var i = 0, len = interactableList.length; i < len; i++) {
             interactableList[i].rect = interactableList[i].getRect();
+        }
+    }
+
+    function inertiaFrame () {
+        var lambda = inertiaStatus.target.options.inertia.resistance;
+
+        inertiaStatus.elapsed = new Date().getTime() / 1000 - inertiaStatus.t0;
+        inertiaStatus.sx = (inertiaStatus.vx0 * (1 - Math.exp(-lambda * inertiaStatus.elapsed))) / lambda;
+        inertiaStatus.sy = (inertiaStatus.vy0 * (1 - Math.exp(-lambda * inertiaStatus.elapsed))) / lambda;
+
+        pointerMove(inertiaStatus.startEvent);
+
+        if (inertiaStatus.elapsed <= inertiaStatus.duration) {
+            inertiaStatus.i = reqFrame(inertiaFrame);
+        }
+        else {
+            pointerUp(inertiaStatus.startEvent);
         }
     }
 
@@ -1065,6 +1125,11 @@
                 this.dy = page.y - y0;
             }
         }
+        // copy properties from previousmove if starting inertia
+        else if (phase === 'inertiastart') {
+            this.dx = prevEvent.dx;
+            this.dy = prevEvent.dy;
+        }
         else {
             if (deltaSource === 'client') {
                 this.dx = client.x - prevClientX;
@@ -1109,6 +1174,11 @@
                 this.angle = touchAngle(event);
                 this.da = 0;
             }
+            else if (phase === 'inertiastart') {
+                this.scale = prevEvent.scale;
+                this.ds = prevEvent.ds;
+                this.da = prevEvent.da;
+            }
             else {
                 this.scale = this.distance / gesture.startDistance;
                 this.angle = touchAngle(event, gesture.prevAngle);
@@ -1131,6 +1201,14 @@
             this.speed     = 0;
             this.velocityX = 0;
             this.velocityY = 0;
+        }
+        else if (phase === 'inertiastart') {
+            this.timeStamp = new Date().getTime();
+            this.dt        = prevEvent.dt;
+            this.duration  = prevEvent.duration;
+            this.speed     = prevEvent.speed;
+            this.velocityX = prevEvent.velocityX;
+            this.velocityY = prevEvent.velocityY;
         }
         else {
             this.timeStamp = new Date().getTime();
@@ -1177,6 +1255,11 @@
             this.speed = hypot(dx, dy) / dt;
             this.velocityX = dx / dt;
             this.velocityY = dy / dt;
+        }
+
+        if (phase === 'inertiastart') {
+            this.targetX = this.pageX + inertiaStatus.targetX;
+            this.targetY = this.pageY + inertiaStatus.targetY;
         }
     }
 
@@ -1344,7 +1427,10 @@
     }
 
     function pointerMove (event) {
-        if (pointerIsDown) {
+        if (pointerIsDown
+            // ignore movement while inertia is active
+            && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
+
             if (x0 === prevX && y0 === prevY) {
                 pointerWasMoved = true;
             }
@@ -1866,11 +1952,46 @@
         }
     }
 
-    // End interact move events and stop auto-scroll
+    // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
-        var endEvent;
-
         if (event.touches && event.touches.length >= 2) {
+            return;
+        }
+
+        var endEvent,
+            inertiaOptions = target && target.options.inertia;
+
+        if ((dragging || resizing || gesturing)
+            && target
+            && target.options.inertiaEnabled
+            && !inertiaStatus.active
+            && event.timeStamp - prevEvent.timeStamp < 50
+            && (dragging || resizing || gesturing)
+            && prevEvent.speed > inertiaOptions.minSpeed
+            && prevEvent.speed > inertiaOptions.endSpeed) {
+
+            var lambda = inertiaOptions.resistance,
+                inertiaDur = -Math.log(inertiaOptions.endSpeed / prevEvent.speed) / lambda;
+
+            inertiaStatus.active        = true;
+            inertiaStatus.target        = target;
+            inertiaStatus.targetElement = target._element;
+
+            inertiaStatus.startEvent = new InteractEvent(event, 'drag', 'inertiastart');
+            inertiaStatus.pointerUp  = event;
+
+            inertiaStatus.targetX  = (prevEvent.velocityX - inertiaDur) / lambda;
+            inertiaStatus.targetY  = (prevEvent.velocityY - inertiaDur) / lambda;
+            inertiaStatus.duration = inertiaDur;
+
+            inertiaStatus.t0       = inertiaStatus.startEvent.timeStamp / 1000;
+            inertiaStatus.vx0      = prevEvent.velocityX;
+            inertiaStatus.vy0      = prevEvent.velocityY;
+
+            inertiaStatus.i = reqFrame(inertiaFrame);
+
+            target.fire(inertiaStatus.startEvent);
+
             return;
         }
 
@@ -3343,6 +3464,8 @@
             x0                    : x0,
             y0                    : y0,
 
+            inertia               : inertiaStatus,
+
             downTime              : downTime,
             downEvent             : downEvent,
             prevEvent             : prevEvent,
@@ -3594,7 +3717,7 @@
             }
         }
 
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = snapStatus.locked = inertiaStatus.active = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = downEvent = prevEvent = null;
 
