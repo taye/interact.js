@@ -3742,8 +3742,7 @@
      * interact.inertia
      [ method ]
      *
-     * Returns or sets inertia settings;
-     * collection of coordinates.
+     * Returns or sets inertia settings.
      *
      * See @Interactable.inertia
      *
