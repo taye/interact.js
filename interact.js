@@ -1166,33 +1166,31 @@
         }
         else if (action === 'gesture') {
             this.touches  = event.touches;
-            this.distance = touchDistance(event);
-            this.box      = touchBBox(event);
 
             if (phase === 'start') {
-                this.scale = 1;
-                this.ds = 0;
-
-                this.angle = touchAngle(event);
-                this.da = 0;
+                this.distance = touchDistance(event);
+                this.box      = touchBBox(event);
+                this.scale    = 1;
+                this.ds       = 0;
+                this.angle    = touchAngle(event);
+                this.da       = 0;
             }
-            else if (phase === 'inertiastart') {
-                this.scale = prevEvent.scale;
-                this.ds = prevEvent.ds;
-                this.da = prevEvent.da;
+            else if (phase === 'end' || event instanceof InteractEvent) {
+                this.distance = prevEvent.distance;
+                this.box      = prevEvent.box;
+                this.scale    = prevEvent.scale;
+                this.ds       = this.scale - 1;
+                this.angle    = prevEvent.angle;
+                this.da       = this.angle - gesture.startAngle;
             }
             else {
-                this.scale = this.distance / gesture.startDistance;
-                this.angle = touchAngle(event, gesture.prevAngle);
+                this.distance = touchDistance(event);
+                this.box      = touchBBox(event);
+                this.scale    = this.distance / gesture.startDistance;
+                this.angle    = touchAngle(event, gesture.prevAngle);
 
-                if (phase === 'end') {
-                    this.da = this.angle - gesture.startAngle;
-                    this.ds = this.scale - 1;
-                }
-                else {
-                    this.da = this.angle - gesture.prevAngle;
-                    this.ds = this.scale - gesture.prevScale;
-                }
+                this.ds = this.scale - gesture.prevScale;
+                this.da = this.angle - gesture.prevAngle;
             }
         }
 
