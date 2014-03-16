@@ -128,7 +128,9 @@
             inertia: {
                 resistance : 10,    // the lambda in exponential decay
                 minSpeed   : 100,   // target speed must be above this for inertia to start
-                endSpeed   : 10     // the speed at which inertia is slow enough to stop
+                endSpeed   : 10,    // the speed at which inertia is slow enough to stop
+
+                numberTypes : /^resistance|^minSpeed|^endSpeed/
             },
             inertiaEnabled: false,
 
@@ -2699,6 +2701,80 @@
         },
 
         /*\
+         * Interactable.inertia
+         [ method ]
+         **
+         * Returns or sets if and how events continue to run after the pointer is released
+         **
+         = (boolean | object) `false` if inertia is disabled; `object` with inertia properties if inertia is enabled
+         **
+         * or
+         **
+         - options (object | boolean | null) #optional
+         = (Interactable) this Interactable
+         > Usage
+         | // enable and use default settings
+         | interact(element).inertia(true);
+         |
+         | // enable and use custom settings
+         | interact(element).inertia({
+         |     // value greater than 0
+         |     // high values slow the object down more quickly
+         |     resistance  : 16,
+         |
+         |     // the minimum launch speed that results in inertiastart
+         |     minSpeed    : 200,
+         |
+         |     // inertia will stop when the object slows down to this speed
+         |     endSpeed    : 20
+         | });
+         |
+         | // reset custom settings and use all defaults
+         | interact(element).inertia(null);
+        \*/
+        inertia: function (options) {
+            var defaults = defaultOptions.inertia;
+
+            if (options instanceof Object) {
+                var inertia = this.options.inertia;
+
+                if (inertia === defaults) {
+                   inertia = this.options.inertia = {
+                       resistance: defaults.resistance,
+                       minSpeed  : defaults.minSpeed,
+                       endSpeed  : defaults.endSpeed
+                   };
+                }
+
+                inertia.resistance = this.validateSetting('inertia', 'resistance', options.resistance);
+                inertia.minSpeed   = this.validateSetting('inertia', 'minSpeed'  , options.minSpeed);
+                inertia.endSpeed   = this.validateSetting('inertia', 'endSpeed'  , options.endSpeed);
+
+                this.options.inertiaEnabled = true;
+                this.options.inertia = inertia;
+
+                return this;
+            }
+
+            if (typeof options === 'boolean') {
+                this.options.inertiaEnabled = options;
+
+                return this;
+            }
+
+            if (options === null) {
+                delete this.options.inertiaEnabled;
+                delete this.options.inertia;
+
+                return this;
+            }
+
+            return (this.options.inertiaEnabled
+                ? this.options.inertia
+                : false);
+        },
+
+        /*\
          * Interactable.getAction
          [ method ]
          *
@@ -3659,6 +3735,46 @@
             realY     : snapStatus.realY,
             dx        : snapStatus.dx,
             dy        : snapStatus.dy
+        };
+    };
+
+    /*\
+     * interact.inertia
+     [ method ]
+     *
+     * Returns or sets inertia settings;
+     * collection of coordinates.
+     *
+     * See @Interactable.inertia
+     *
+     - options (boolean | object) #optional New settings
+     * `true` or `false` to simply enable or disable
+     * or an object of inertia options
+     = (object | interact) The default inertia settings object or interact
+    \*/
+    interact.inertia = function (options) {
+        var inertia = defaultOptions.inertia;
+
+        if (options instanceof Object) {
+            defaultOptions.inertiaEnabled = true;
+
+            if (typeof options.resistance === 'number') { inertia.resistance = options.resistance;}
+            if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
+            if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
+
+            return interact;
+        }
+        if (typeof options === 'boolean') {
+            defaultOptions.inertiaEnabled = options;
+
+            return interact;
+        }
+
+        return {
+            enabled: defaultOptions.inertiaEnabled,
+            resistance: inertia.resistance,
+            minSpeed: inertia.minSpeed,
+            endSpeed: inertia.endSpeed
         };
     };
 
