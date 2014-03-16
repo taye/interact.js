@@ -248,6 +248,11 @@
                     {x: 250, y: 250}
                 ]
             })
+            .inertia({
+                resisitance: 10,
+                minSpeed: 100,
+                endSpeed: 10
+            })
             .draggable(true);
 
         guidesCanvas = document.getElementById('grid');
