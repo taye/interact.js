@@ -96,13 +96,11 @@
             restrictions: {},
 
             autoScroll: {
-                container   : window,  // the item that is scrolled
+                container   : window,  // the item that is scrolled (Window or HTMLElement)
                 margin      : 60,
-                interval    : 20,      // pause in ms between each scroll pulse
-                distance    : 10,      // the distance in x and y that the page is scrolled
+                speed       : 300,      // the scroll speed in pixels per second
 
-                elementTypes: /^container$/,
-                numberTypes : /^range$|^interval$|^distance$/
+                numberTypes : /^margin$|^speed$/
             },
             autoScrollEnabled: false,
 
@@ -124,24 +122,36 @@
 
         // Things related to autoScroll
         autoScroll = {
-            margin   : 60,      // page margin in which pointer triggers autoScroll
-            interval : 20,      // pause in ms between each scroll pulse
-            i        : null,    // the handle returned by window.setInterval
-            distance : 10,      // the distance in x and y that the page is scrolled
-
-            x: 0,               // Direction each pulse is to scroll in
+            target: null,
+            i: null,    // the handle returned by window.setInterval
+            x: 0,       // Direction each pulse is to scroll in
             y: 0,
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var container = target.options.autoScroll.container;
+                var options = autoScroll.target.options.autoScroll,
+                    container = options.container,
+                    now = new Date().getTime(),
+                    // change in time in seconds
+                    dt = (now - autoScroll.prevTime) / 1000,
+                    // displacement
+                    s = options.speed * dt;
 
-                if (container === window) {
-                    window.scrollBy(autoScroll.x, autoScroll.y);
+                if (s >= 1) {
+                    if (container instanceof window.Window) {
+                        container.scrollBy(autoScroll.x * s, autoScroll.y * s);
+                    }
+                    else if (container) {
+                        container.scrollLeft += autoScroll.x * s;
+                        container.scrollTop  += autoScroll.y * s;
+                    }
+
+                    autoScroll.prevTime = now;
                 }
-                else if (container) {
-                    container.scrollLeft += autoScroll.x;
-                    container.scrollTop  += autoScroll.y;
+
+                if (autoScroll.isScrolling) {
+                    cancelFrame(autoScroll.i);
+                    autoScroll.i = reqFrame(autoScroll.scroll);
                 }
             },
 
@@ -153,14 +163,14 @@
                         left,
                         options = target.options.autoScroll;
 
-                    if (options.container === window) {
+                    if (options.container instanceof window.Window) {
                         left   = event.clientX < autoScroll.margin;
                         top    = event.clientY < autoScroll.margin;
-                        right  = event.clientX > window.innerWidth  - autoScroll.margin;
-                        bottom = event.clientY > window.innerHeight - autoScroll.margin;
+                        right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
+                        bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
                     }
                     else {
-                        var rect = interact(options.container).getRect();
+                        var rect = getElementRect(options.container);
 
                         left   = event.clientX < rect.left   + autoScroll.margin;
                         top    = event.clientY < rect.top    + autoScroll.margin;
@@ -168,31 +178,34 @@
                         bottom = event.clientY > rect.bottom - autoScroll.margin;
                     }
 
-                    autoScroll.x = autoScroll.distance * (right ? 1: left? -1: 0);
-                    autoScroll.y = autoScroll.distance * (bottom? 1:  top? -1: 0);
+                    autoScroll.x = (right ? 1: left? -1: 0);
+                    autoScroll.y = (bottom? 1:  top? -1: 0);
 
                     if (!autoScroll.isScrolling) {
                         // set the autoScroll properties to those of the target
-                        autoScroll.margin   = options.margin;
-                        autoScroll.distance = options.distance;
-                        autoScroll.interval = options.interval;
+                        autoScroll.margin = options.margin;
+                        autoScroll.speed  = options.speed;
 
-                        autoScroll.start();
+                        autoScroll.start(target);
                     }
                 }
             },
 
             isScrolling: false,
+            prevTime: 0,
 
-            start: function () {
+            start: function (target) {
                 autoScroll.isScrolling = true;
-                window.clearInterval(autoScroll.i);
-                autoScroll.i = window.setInterval(autoScroll.scroll, autoScroll.interval);
+                cancelFrame(autoScroll.i);
+
+                autoScroll.target = target;
+                autoScroll.prevTime = new Date().getTime();
+                autoScroll.i = reqFrame(autoScroll.scroll);
             },
 
             stop: function () {
-                window.clearInterval(autoScroll.i);
                 autoScroll.isScrolling = false;
+                cancelFrame(autoScroll.i);
             }
         },
 
@@ -2455,10 +2468,14 @@
                    };
                 }
 
-                autoScroll.margin    = this.validateSetting('autoScroll', 'margin'   , options.margin);
-                autoScroll.distance  = this.validateSetting('autoScroll', 'distance' , options.distance);
-                autoScroll.interval  = this.validateSetting('autoScroll', 'interval' , options.interval);
-                autoScroll.container = this.validateSetting('autoScroll', 'container', options.container);
+                autoScroll.margin = this.validateSetting('autoScroll', 'margin', options.margin);
+                autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
+
+                autoScroll.container =
+                    (options.container instanceof Element || options.container instanceof window.Window
+                     ? options.container
+                     : defaults.container);
+
 
                 this.options.autoScrollEnabled = true;
                 this.options.autoScroll = autoScroll;
@@ -3443,13 +3460,13 @@
         if (options instanceof Object) {
             defaultOptions.autoScrollEnabled = true;
 
-            if (typeof (options.margin)   === 'number') { defaults.margin    = options.margin   ; }
-            if (typeof (options.distance) === 'number') { defaults.distance  = options.distance ; }
-            if (typeof (options.interval) === 'number') { defaults.interval  = options.interval ; }
+            if (typeof (options.margin) === 'number') { defaults.margin = options.margin;}
+            if (typeof (options.speed)  === 'number') { defaults.speed  = options.speed ;}
 
-            defaults.container = options.container instanceof Element?
-                options.container:
-                defaults.container;
+            defaults.container =
+                (options.container instanceof Element || options.container instanceof window.Window
+                 ? options.container
+                 : defaults.container);
 
             return interact;
         }
