@@ -79,6 +79,7 @@
             // aww snap
             snap: {
                 mode        : 'grid',
+                endOnly     : false,
                 actions     : ['drag'],
                 range       : Infinity,
                 grid        : { x: 100, y: 100 },
@@ -89,7 +90,8 @@
                 arrayTypes  : /^anchors$|^paths$|^actions$/,
                 objectTypes : /^grid$|^gridOffset$/,
                 stringTypes : /^mode$/,
-                numberTypes : /^range$/
+                numberTypes : /^range$/,
+                boolTypes   :  /^endOnly$/
             },
             snapEnabled : false,
 
@@ -964,7 +966,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (target.options.snapEnabled && target.options.snap.actions.indexOf(action) !== -1) {
+            if (options.snapEnabled && options.snap.actions.indexOf(action) !== -1) {
                 var snap = options.snap;
 
                 this.snap = {
@@ -1356,7 +1358,7 @@
         }
     }
 
-    function pointerMove (event) {
+    function pointerMove (event, preEnd) {
         if (pointerIsDown) {
             if (x0 === prevX && y0 === prevY) {
                 pointerWasMoved = true;
@@ -1364,7 +1366,10 @@
 
             if (prepared && target) {
 
-                if (target.options.snapEnabled && target.options.snap.actions.indexOf(prepared) !== -1) {
+                if (target.options.snapEnabled
+                    && target.options.snap.actions.indexOf(prepared) !== -1
+                    && (!target.options.snap.endOnly || preEnd)) {
+
                     var snap = target.options.snap,
                         page = getPageXY(event),
                         origin = getOriginXY(target),
@@ -1885,6 +1890,12 @@
 
         if (event.touches && event.touches.length >= 2) {
             return;
+        }
+
+        // if the target has the snap endOnly setting
+        if ((dragging || resizing || gesturing) && target.options.snap.endOnly) {
+            // fire a move event at the snapped coordinates
+            pointerMove(event, true);
         }
 
         if (dragging) {
@@ -2553,16 +2564,11 @@
                 var snap = this.options.snap;
 
                 if (snap === defaults) {
-                   snap = this.options.snap = {
-                       mode      : defaults.mode,
-                       range     : defaults.range,
-                       grid      : defaults.grid,
-                       gridOffset: defaults.gridOffset,
-                       anchors   : defaults.anchors
-                   };
+                   snap = {};
                 }
 
                 snap.mode       = this.validateSetting('snap', 'mode'      , options.mode);
+                snap.endOnly    = this.validateSetting('snap', 'endOnly'   , options.endOnly);
                 snap.actions    = this.validateSetting('snap', 'actions'   , options.actions);
                 snap.range      = this.validateSetting('snap', 'range'     , options.range);
                 snap.paths      = this.validateSetting('snap', 'paths'     , options.paths);
@@ -2878,6 +2884,15 @@
                     if (typeof value === 'number') { return value; }
                     else {
                         return (option in current && typeof current[option] === 'number'
+                            ? current[option]
+                            : defaults[option]);
+                    }
+                }
+
+                if ('boolTypes' in defaults && defaults.boolTypes.test(option)) {
+                    if (typeof value === 'boolean') { return value; }
+                    else {
+                        return (option in current && typeof current[option] === 'boolean'
                             ? current[option]
                             : defaults[option]);
                     }
@@ -3522,8 +3537,9 @@
         if (options instanceof Object) {
             defaultOptions.snapEnabled = true;
 
-            if (typeof options.mode  === 'string') { snap.mode  = options.mode;  }
-            if (typeof options.range === 'number') { snap.range = options.range; }
+            if (typeof options.mode    === 'string' ) { snap.mode    = options.mode;    }
+            if (typeof options.endOnly === 'boolean') { snap.endOnly = options.endOnly; }
+            if (typeof options.range   === 'number' ) { snap.range   = options.range;   }
             if (options.actions    instanceof Array ) { snap.actions    = options.actions;    }
             if (options.anchors    instanceof Array ) { snap.anchors    = options.anchors;    }
             if (options.grid       instanceof Object) { snap.grid       = options.grid;       }
