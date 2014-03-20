@@ -1337,7 +1337,7 @@
         }
     }
 
-    function setSnapping (event) {
+    function setSnapping (event, status) {
         var snap = target.options.snap,
             page = getPageXY(event),
             origin = getOriginXY(target),
@@ -1350,9 +1350,10 @@
             distance,
             i, len;
 
+        status = status || snapStatus;
 
-        snapStatus.realX = page.x;
-        snapStatus.realY = page.y;
+        status.realX = page.x;
+        status.realY = page.y;
 
         page.x -= origin.x;
         page.y -= origin.y;
@@ -1407,18 +1408,18 @@
                     closest.distX = distX;
                     closest.distY = distY;
 
-                    snapStatus.range = range;
+                    status.range = range;
                 }
             }
 
             inRange = closest.inRange;
-            snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
+            snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
 
-            snapStatus.x = closest.anchor.x;
-            snapStatus.y = closest.anchor.y;
-            snapStatus.dx = closest.distX;
-            snapStatus.dy = closest.distY;
-            target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
+            status.x = closest.anchor.x;
+            status.y = closest.anchor.y;
+            status.dx = closest.distX;
+            status.dy = closest.distY;
+            target.options.snap.anchors.closest = status.anchors.closest = closest.anchor;
         }
         else if (snap.mode === 'grid') {
             var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
@@ -1433,14 +1434,14 @@
             distance = hypot(distX, distY);
 
             inRange = distance < snap.range;
-            snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
+            snapChanged = (newX !== status.x || newY !== status.y);
 
-            snapStatus.x = newX;
-            snapStatus.y = newY;
-            snapStatus.dx = distX;
-            snapStatus.dy = distY;
+            status.x = newX;
+            status.y = newY;
+            status.dx = distX;
+            status.dy = distY;
 
-            snapStatus.range = snap.range;
+            status.range = snap.range;
         }
         if (snap.mode === 'path' && snap.paths.length) {
             closest = {
@@ -1511,7 +1512,7 @@
                     closest.xInRange = xInRange;
                     closest.range    = range;
 
-                    snapStatus.range = range;
+                    status.range = range;
                 }
 
                 // Infinite paths count as being out of range
@@ -1538,32 +1539,34 @@
                     closest.yInRange = yInRange;
                     closest.range    = range;
 
-                    snapStatus.range = range;
+                    status.range = range;
                 }
             }
 
             inRange = closest.xInRange || closest.yInRange;
 
-            if (closest.xInRange && closest.yInRange && (!snapStatus.xInRange || !snapStatus.yInRange)) {
+            if (closest.xInRange && closest.yInRange && (!status.xInRange || !status.yInRange)) {
                 snapChanged = true;
             }
             else {
-                snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== snapStatus.x || closest.path.y !== snapStatus.y);
+                snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== status.x || closest.path.y !== status.y);
             }
 
-            snapStatus.x = closest.path.x;
-            snapStatus.y = closest.path.y;
-            snapStatus.dx = closest.distX;
-            snapStatus.dy = closest.distY;
+            status.x = closest.path.x;
+            status.y = closest.path.y;
+            status.dx = closest.distX;
+            status.dy = closest.distY;
 
-            snapStatus.xInRange = closest.xInRange;
-            snapStatus.yInRange = closest.yInRange;
+            status.xInRange = closest.xInRange;
+            status.yInRange = closest.yInRange;
 
-            target.options.snap.paths.closest = snapStatus.paths.closest = closest.path;
+            target.options.snap.paths.closest = status.paths.closest = closest.path;
         }
 
-        snapStatus.changed = snapChanged;
-        snapStatus.inRange = inRange;
+        status.changed = snapChanged;
+        status.inRange = inRange;
+
+        return status;
     }
 
     function setRestriction (event) {
