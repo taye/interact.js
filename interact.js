@@ -95,7 +95,12 @@
             },
             snapEnabled : false,
 
-            restrictions: {},
+            restrict: {
+                drag: null,
+                resize: null,
+                gesture: null,
+                endOnly: false
+            },
 
             autoScroll: {
                 container   : window,  // the item that is scrolled (Window or HTMLElement)
@@ -120,6 +125,12 @@
             realY  : 0,
             anchors: [],
             paths  : []
+        },
+
+        restrictStatus = {
+            dx: 0,
+            dy: 0,
+            restricted: false
         },
 
         // Things related to autoScroll
@@ -1003,47 +1014,15 @@
             }
         }
 
-        if (target.options.restrictions[action]) {
-            var restriction = target.options.restrictions[action],
-                rect,
-                originalPageX = page.x,
-                originalPageY = page.y;
-
-            if (restriction instanceof Element) {
-                rect = interact(restriction).getRect();
-            }
-            else {
-                if (typeof restriction === 'function') {
-                    restriction = restriction(page.x, page.y, target._element);
-                }
-
-                rect = restriction;
-
-                // object is assumed to have
-                // x, y, width, height or
-                // left, top, right, bottom
-                if ('x' in restriction && 'y' in restriction) {
-                    rect = {
-                        left  : restriction.x,
-                        top   : restriction.y,
-                        right : restriction.x + restriction.width,
-                        bottom: restriction.y + restriction.height
-                    };
-                }
-            }
-
-            page.x = Math.max(Math.min(rect.right , page.x), rect.left);
-            page.y = Math.max(Math.min(rect.bottom, page.y), rect.top );
-
-            var restrictDx = page.x - originalPageX,
-                restrictDy = page.y - originalPageY;
-
-            client.x += restrictDx;
-            client.y += restrictDy;
+        if (target.options.restrict[action] && restrictStatus.restricted) {
+            page.x += restrictStatus.dx;
+            page.y += restrictStatus.dy;
+            client.x += restrictStatus.dx;
+            client.y += restrictStatus.dy;
 
             this.restrict = {
-                dx: restrictDx,
-                dy: restrictDy
+                dx: restrictStatus.dx,
+                dy: restrictStatus.dy
             };
         }
 
@@ -1358,6 +1337,286 @@
         }
     }
 
+    function setSnapping (event) {
+        var snap = target.options.snap,
+            page = getPageXY(event),
+            origin = getOriginXY(target),
+            closest,
+            range,
+            inRange,
+            snapChanged,
+            distX,
+            distY,
+            distance,
+            i, len;
+
+
+        snapStatus.realX = page.x;
+        snapStatus.realY = page.y;
+
+        page.x -= origin.x;
+        page.y -= origin.y;
+
+        // change to infinite range when range is negative
+        if (snap.range < 0) { snap.range = Infinity; }
+
+        if (snap.mode === 'anchor' && snap.anchors.length) {
+            closest = {
+                anchor: null,
+                distance: 0,
+                range: 0,
+                distX: 0,
+                distY: 0
+            };
+
+            for (i = 0, len = snap.anchors.length; i < len; i++) {
+                var anchor = snap.anchors[i];
+
+                range = typeof anchor.range === 'number'? anchor.range: snap.range;
+
+                distX = anchor.x - page.x;
+                distY = anchor.y - page.y;
+                distance = hypot(distX, distY);
+
+                inRange = distance < range;
+
+                // Infinite anchors count as being out of range
+                // compared to non infinite ones that are in range
+                if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                    inRange = false;
+                }
+
+                if (!closest.anchor || (inRange?
+                    // is the closest anchor in range?
+                    (closest.inRange && range !== Infinity)?
+                        // the pointer is relatively deeper in this anchor
+                        distance / range < closest.distance / closest.range:
+                        //the pointer is closer to this anchor
+                        distance < closest.distance:
+                    // The other is not in range and the pointer is closer to this anchor
+                    (!closest.inRange && distance < closest.distance))) {
+
+                    if (range === Infinity) {
+                        inRange = true;
+                    }
+
+                    closest.anchor = anchor;
+                    closest.distance = distance;
+                    closest.range = range;
+                    closest.inRange = inRange;
+                    closest.distX = distX;
+                    closest.distY = distY;
+
+                    snapStatus.range = range;
+                }
+            }
+
+            inRange = closest.inRange;
+            snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
+
+            snapStatus.x = closest.anchor.x;
+            snapStatus.y = closest.anchor.y;
+            snapStatus.dx = closest.distX;
+            snapStatus.dy = closest.distY;
+            target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
+        }
+        else if (snap.mode === 'grid') {
+            var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
+                gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
+
+                newX = gridx * snap.grid.x + snap.gridOffset.x,
+                newY = gridy * snap.grid.y + snap.gridOffset.y;
+
+            distX = newX - page.x;
+            distY = newY - page.y;
+
+            distance = hypot(distX, distY);
+
+            inRange = distance < snap.range;
+            snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
+
+            snapStatus.x = newX;
+            snapStatus.y = newY;
+            snapStatus.dx = distX;
+            snapStatus.dy = distY;
+
+            snapStatus.range = snap.range;
+        }
+        if (snap.mode === 'path' && snap.paths.length) {
+            closest = {
+                path: {},
+                distX: 0,
+                distY: 0,
+                range: 0
+            };
+
+            for (i = 0, len = snap.paths.length; i < len; i++) {
+                var path = snap.paths[i],
+                    snapToX = false,
+                    snapToY = false,
+                    pathXY = path,
+                    pathX,
+                    pathY;
+
+                if (typeof path === 'function') {
+                    pathXY = path(page.x, page.y);
+                }
+
+                if (typeof pathXY.x === 'number') {
+                    pathX = pathXY.x;
+                    snapToX = true;
+                }
+                else {
+                    pathX = page.x;
+                }
+
+                if (typeof pathXY.y === 'number') {
+                    pathY = pathXY.y;
+                    snapToY = true;
+                }
+                else {
+                    pathY = page.y;
+                }
+
+                range = typeof pathXY.range === 'number'? pathXY.range: snap.range;
+
+                distX = pathX - page.x;
+                distY = pathY - page.y;
+
+                var xInRange = Math.abs(distX) < range && snapToX,
+                    yInRange = Math.abs(distY) < range && snapToY;
+
+                // Infinite paths count as being out of range
+                // compared to non infinite ones that are in range
+                if (range === Infinity && closest.xInRange && closest.range !== Infinity) {
+                    xInRange = false;
+                }
+
+                if (!('x' in closest.path) || (xInRange
+                    // is the closest path in range?
+                    ? (closest.xInRange && range !== Infinity)
+                        // the pointer is relatively deeper in this path
+                        ? distance / range < closest.distX / closest.range
+                        //the pointer is closer to this path
+                        : Math.abs(distX) < Math.abs(closest.distX)
+                    // The other is not in range and the pointer is closer to this path
+                    : (!closest.xInRange && Math.abs(distX) < Math.abs(closest.distX)))) {
+
+                    if (range === Infinity) {
+                        xInRange = true;
+                    }
+
+                    closest.path.x   = pathX;
+                    closest.distX    = distX;
+                    closest.xInRange = xInRange;
+                    closest.range    = range;
+
+                    snapStatus.range = range;
+                }
+
+                // Infinite paths count as being out of range
+                // compared to non infinite ones that are in range
+                if (range === Infinity && closest.yInRange && closest.range !== Infinity) {
+                    yInRange = false;
+                }
+                if (!('y' in closest.path) || (yInRange
+                    // is the closest path in range?
+                    ? (closest.yInRange && range !== Infinity)
+                        // the pointer is relatively deeper in this path
+                        ? distance / range < closest.distY / closest.range
+                        //the pointer is closer to this path
+                        : Math.abs(distY) < Math.abs(closest.distY)
+                    // The other is not in range and the pointer is closer to this path
+                    : (!closest.yInRange && Math.abs(distY) < Math.abs(closest.distY)))) {
+
+                    if (range === Infinity) {
+                        yInRange = true;
+                    }
+
+                    closest.path.y   = pathY;
+                    closest.distY    = distY;
+                    closest.yInRange = yInRange;
+                    closest.range    = range;
+
+                    snapStatus.range = range;
+                }
+            }
+
+            inRange = closest.xInRange || closest.yInRange;
+
+            if (closest.xInRange && closest.yInRange && (!snapStatus.xInRange || !snapStatus.yInRange)) {
+                snapChanged = true;
+            }
+            else {
+                snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== snapStatus.x || closest.path.y !== snapStatus.y);
+            }
+
+            snapStatus.x = closest.path.x;
+            snapStatus.y = closest.path.y;
+            snapStatus.dx = closest.distX;
+            snapStatus.dy = closest.distY;
+
+            snapStatus.xInRange = closest.xInRange;
+            snapStatus.yInRange = closest.yInRange;
+
+            target.options.snap.paths.closest = snapStatus.paths.closest = closest.path;
+        }
+
+        snapStatus.changed = snapChanged;
+        snapStatus.inRange = inRange;
+    }
+
+    function setRestriction (event) {
+        var action = interact.currentAction() || prepared,
+            restriction = target && target.options.restrict[action];
+
+        if (!action || !restriction) {
+            restrictStatus.dx = 0;
+            restrictStatus.dy = 0;
+            restrictStatus.restricted = false;
+
+            return;
+        }
+
+        var rect,
+            page = getPageXY(event);
+
+        if (snapStatus.locked) {
+            page.x += snapStatus.xInRange || snapStatus.mode !== 'path'? snapStatus.dx: 0;
+            page.y += snapStatus.yInRange || snapStatus.mode !== 'path'? snapStatus.dy: 0;
+        }
+
+        var originalPageX = page.x,
+            originalPageY = page.y;
+
+        if (restriction instanceof Element) {
+            rect = interact(restriction).getRect();
+        }
+        else {
+            if (typeof restriction === 'function') {
+                restriction = restriction(page.x, page.y, target._element);
+            }
+
+            rect = restriction;
+
+            // object is assumed to have
+            // x, y, width, height or
+            // left, top, right, bottom
+            if ('x' in restriction && 'y' in restriction) {
+                rect = {
+                    left  : restriction.x,
+                    top   : restriction.y,
+                    right : restriction.x + restriction.width,
+                    bottom: restriction.y + restriction.height
+                };
+            }
+        }
+
+        restrictStatus.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
+        restrictStatus.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
+        restrictStatus.restricted = true;
+    }
+
     function pointerMove (event, preEnd) {
         if (pointerIsDown) {
             if (x0 === prevX && y0 === prevY) {
@@ -1370,231 +1629,11 @@
                     && target.options.snap.actions.indexOf(prepared) !== -1
                     && (!target.options.snap.endOnly || preEnd)) {
 
-                    var snap = target.options.snap,
-                        page = getPageXY(event),
-                        origin = getOriginXY(target),
-                        closest,
-                        range,
-                        inRange,
-                        snapChanged,
-                        distX,
-                        distY,
-                        distance,
-                        i, len;
+                    var origin = getOriginXY(target);
 
+                    setSnapping(event);
 
-                    snapStatus.realX = page.x;
-                    snapStatus.realY = page.y;
-
-                    page.x -= origin.x;
-                    page.y -= origin.y;
-
-                    // change to infinite range when range is negative
-                    if (snap.range < 0) { snap.range = Infinity; }
-
-                    if (snap.mode === 'anchor' && snap.anchors.length) {
-                        closest = {
-                            anchor: null,
-                            distance: 0,
-                            range: 0,
-                            distX: 0,
-                            distY: 0
-                        };
-
-                        for (i = 0, len = snap.anchors.length; i < len; i++) {
-                            var anchor = snap.anchors[i];
-
-                            range = typeof anchor.range === 'number'? anchor.range: snap.range;
-
-                            distX = anchor.x - page.x;
-                            distY = anchor.y - page.y;
-                            distance = hypot(distX, distY);
-
-                            inRange = distance < range;
-
-                            // Infinite anchors count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                                inRange = false;
-                            }
-
-                            if (!closest.anchor || (inRange?
-                                // is the closest anchor in range?
-                                (closest.inRange && range !== Infinity)?
-                                    // the pointer is relatively deeper in this anchor
-                                    distance / range < closest.distance / closest.range:
-                                    //the pointer is closer to this anchor
-                                    distance < closest.distance:
-                                // The other is not in range and the pointer is closer to this anchor
-                                (!closest.inRange && distance < closest.distance))) {
-
-                                if (range === Infinity) {
-                                    inRange = true;
-                                }
-
-                                closest.anchor = anchor;
-                                closest.distance = distance;
-                                closest.range = range;
-                                closest.inRange = inRange;
-                                closest.distX = distX;
-                                closest.distY = distY;
-
-                                snapStatus.range = range;
-                            }
-                        }
-
-                        inRange = closest.inRange;
-                        snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
-
-                        snapStatus.x = closest.anchor.x;
-                        snapStatus.y = closest.anchor.y;
-                        snapStatus.dx = closest.distX;
-                        snapStatus.dy = closest.distY;
-                        target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
-                    }
-                    else if (snap.mode === 'grid') {
-                        var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
-                            gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
-
-                            newX = gridx * snap.grid.x + snap.gridOffset.x,
-                            newY = gridy * snap.grid.y + snap.gridOffset.y;
-
-                        distX = newX - page.x;
-                        distY = newY - page.y;
-
-                        distance = hypot(distX, distY);
-
-                        inRange = distance < snap.range;
-                        snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
-
-                        snapStatus.x = newX;
-                        snapStatus.y = newY;
-                        snapStatus.dx = distX;
-                        snapStatus.dy = distY;
-
-                        snapStatus.range = snap.range;
-                    }
-                    if (snap.mode === 'path' && snap.paths.length) {
-                        closest = {
-                            path: {},
-                            distX: 0,
-                            distY: 0,
-                            range: 0
-                        };
-
-                        for (i = 0, len = snap.paths.length; i < len; i++) {
-                            var path = snap.paths[i],
-                                snapToX = false,
-                                snapToY = false,
-                                pathXY = path,
-                                pathX,
-                                pathY;
-
-                            if (typeof path === 'function') {
-                                pathXY = path(page.x, page.y);
-                            }
-
-                            if (typeof pathXY.x === 'number') {
-                                pathX = pathXY.x;
-                                snapToX = true;
-                            }
-                            else {
-                                pathX = page.x;
-                            }
-
-                            if (typeof pathXY.y === 'number') {
-                                pathY = pathXY.y;
-                                snapToY = true;
-                            }
-                            else {
-                                pathY = page.y;
-                            }
-
-                            range = typeof pathXY.range === 'number'? pathXY.range: snap.range;
-
-                            distX = pathX - page.x;
-                            distY = pathY - page.y;
-
-                            var xInRange = Math.abs(distX) < range && snapToX,
-                                yInRange = Math.abs(distY) < range && snapToY;
-
-                            // Infinite paths count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.xInRange && closest.range !== Infinity) {
-                                xInRange = false;
-                            }
-
-                            if (!('x' in closest.path) || (xInRange
-                                // is the closest path in range?
-                                ? (closest.xInRange && range !== Infinity)
-                                    // the pointer is relatively deeper in this path
-                                    ? distance / range < closest.distX / closest.range
-                                    //the pointer is closer to this path
-                                    : Math.abs(distX) < Math.abs(closest.distX)
-                                // The other is not in range and the pointer is closer to this path
-                                : (!closest.xInRange && Math.abs(distX) < Math.abs(closest.distX)))) {
-
-                                if (range === Infinity) {
-                                    xInRange = true;
-                                }
-
-                                closest.path.x   = pathX;
-                                closest.distX    = distX;
-                                closest.xInRange = xInRange;
-                                closest.range    = range;
-
-                                snapStatus.range = range;
-                            }
-
-                            // Infinite paths count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.yInRange && closest.range !== Infinity) {
-                                yInRange = false;
-                            }
-                            if (!('y' in closest.path) || (yInRange
-                                // is the closest path in range?
-                                ? (closest.yInRange && range !== Infinity)
-                                    // the pointer is relatively deeper in this path
-                                    ? distance / range < closest.distY / closest.range
-                                    //the pointer is closer to this path
-                                    : Math.abs(distY) < Math.abs(closest.distY)
-                                // The other is not in range and the pointer is closer to this path
-                                : (!closest.yInRange && Math.abs(distY) < Math.abs(closest.distY)))) {
-
-                                if (range === Infinity) {
-                                    yInRange = true;
-                                }
-
-                                closest.path.y   = pathY;
-                                closest.distY    = distY;
-                                closest.yInRange = yInRange;
-                                closest.range    = range;
-
-                                snapStatus.range = range;
-                            }
-                        }
-
-                        inRange = closest.xInRange || closest.yInRange;
-
-                        if (closest.xInRange && closest.yInRange && (!snapStatus.xInRange || !snapStatus.yInRange)) {
-                            snapChanged = true;
-                        }
-                        else {
-                            snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== snapStatus.x || closest.path.y !== snapStatus.y);
-                        }
-
-                        snapStatus.x = closest.path.x;
-                        snapStatus.y = closest.path.y;
-                        snapStatus.dx = closest.distX;
-                        snapStatus.dy = closest.distY;
-
-                        snapStatus.xInRange = closest.xInRange;
-                        snapStatus.yInRange = closest.yInRange;
-
-                        target.options.snap.paths.closest = snapStatus.paths.closest = closest.path;
-                    }
-
-                    if ((snapChanged || !snapStatus.locked) && inRange)  {
+                    if ((snapStatus.changed || !snapStatus.locked) && snapStatus.inRange)  {
                         snapStatus.locked = true;
 
                         // if snap is locked at the start of an action
@@ -1610,14 +1649,20 @@
                             clientY0 = c.y - origin.y + snapStatus.dy;
                         }
 
+                        setRestriction(event);
                         actions[prepared].moveListener(event);
                     }
-                    else if (snapChanged || !inRange) {
+                    else if (snapStatus.snapChanged || !snapStatus.inRange) {
                         snapStatus.locked = false;
+
+
+                        setRestriction(event);
                         actions[prepared].moveListener(event);
                     }
                 }
                 else {
+                    setRestriction(event);
+
                     actions[prepared].moveListener(event);
                 }
             }
@@ -2820,15 +2865,27 @@
         \*/
         restrict: function (newValue) {
             if (newValue === undefined) {
-                return this.options.restrictions;
+                return this.options.restrict;
             }
 
             if (newValue instanceof Object) {
-                this.options.restrictions = newValue;
+                var newRestrictions = {};
+
+                if (newValue.drag instanceof Object) {
+                    newRestrictions.drag = newValue.drag;
+                }
+                if (newValue.resize instanceof Object) {
+                    newRestrictions.resize = newValue.resize;
+                }
+                if (newValue.gesture instanceof Object) {
+                    newRestrictions.gesture = newValue.gesture;
+                }
+
+                this.options.restrict = newRestrictions;
             }
 
             else if (newValue === null) {
-               delete this.options.restrictions;
+               delete this.options.restrict;
             }
 
             return this;
@@ -3690,17 +3747,32 @@
      - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
      = (object) The current restrictions object or interact
     \*/
-    interact.restrict = function (newValue, noArray) {
+    interact.restrict = function (newValue) {
+        var defaults = defaultOptions.restrict;
+
         if (newValue === undefined) {
-            return defaultOptions.restrictions;
+            return defaultOptions.restrict;
         }
 
         if (newValue instanceof Object) {
-            defaultOptions.restrictions = newValue;
+            if (newValue.drag instanceof Object) {
+                defaults.drag = newValue.drag;
+            }
+            if (newValue.resize instanceof Object) {
+                defaults.resize = newValue.resize;
+            }
+            if (newValue.gesture instanceof Object) {
+                defaults.gesture = newValue.gesture;
+            }
+
+            if (typeof newValue.endOnly === 'boolean') {
+                defaults.endOnly = newValue.endOnly;
+            }
         }
 
         else if (newValue === null) {
-           defaultOptions.restrictions = {};
+           defaults.drag = defaults.resize = defaults.gesture = null;
+           defaults.endOnly = false;
         }
 
         return this;
