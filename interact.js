@@ -98,6 +98,7 @@
             // aww snap
             snap: {
                 mode        : 'grid',
+                endOnly     : false,
                 actions     : ['drag'],
                 range       : Infinity,
                 grid        : { x: 100, y: 100 },
@@ -108,20 +109,24 @@
                 arrayTypes  : /^anchors$|^paths$|^actions$/,
                 objectTypes : /^grid$|^gridOffset$/,
                 stringTypes : /^mode$/,
-                numberTypes : /^range$/
+                numberTypes : /^range$/,
+                boolTypes   :  /^endOnly$/
             },
             snapEnabled : false,
 
-            restrictions: {},
+            restrict: {
+                drag: null,
+                resize: null,
+                gesture: null,
+                endOnly: false
+            },
 
             autoScroll: {
-                container   : window,  // the item that is scrolled
+                container   : window,  // the item that is scrolled (Window or HTMLElement)
                 margin      : 60,
-                interval    : 20,      // pause in ms between each scroll pulse
-                distance    : 10,      // the distance in x and y that the page is scrolled
+                speed       : 300,      // the scroll speed in pixels per second
 
-                elementTypes: /^container$/,
-                numberTypes : /^range$|^interval$|^distance$/
+                numberTypes : /^margin$|^speed$/
             },
             autoScrollEnabled: false,
 
@@ -150,26 +155,44 @@
             paths  : []
         },
 
+        restrictStatus = {
+            dx: 0,
+            dy: 0,
+            restricted: false
+        },
+
         // Things related to autoScroll
         autoScroll = {
-            margin   : 60,      // page margin in which pointer triggers autoScroll
-            interval : 20,      // pause in ms between each scroll pulse
-            i        : null,    // the handle returned by window.setInterval
-            distance : 10,      // the distance in x and y that the page is scrolled
-
-            x: 0,               // Direction each pulse is to scroll in
+            target: null,
+            i: null,    // the handle returned by window.setInterval
+            x: 0,       // Direction each pulse is to scroll in
             y: 0,
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var container = target.options.autoScroll.container;
+                var options = autoScroll.target.options.autoScroll,
+                    container = options.container,
+                    now = new Date().getTime(),
+                    // change in time in seconds
+                    dt = (now - autoScroll.prevTime) / 1000,
+                    // displacement
+                    s = options.speed * dt;
 
-                if (container === window) {
-                    window.scrollBy(autoScroll.x, autoScroll.y);
+                if (s >= 1) {
+                    if (container instanceof window.Window) {
+                        container.scrollBy(autoScroll.x * s, autoScroll.y * s);
+                    }
+                    else if (container) {
+                        container.scrollLeft += autoScroll.x * s;
+                        container.scrollTop  += autoScroll.y * s;
+                    }
+
+                    autoScroll.prevTime = now;
                 }
-                else if (container) {
-                    container.scrollLeft += autoScroll.x;
-                    container.scrollTop  += autoScroll.y;
+
+                if (autoScroll.isScrolling) {
+                    cancelFrame(autoScroll.i);
+                    autoScroll.i = reqFrame(autoScroll.scroll);
                 }
             },
 
@@ -181,14 +204,14 @@
                         left,
                         options = target.options.autoScroll;
 
-                    if (options.container === window) {
+                    if (options.container instanceof window.Window) {
                         left   = event.clientX < autoScroll.margin;
                         top    = event.clientY < autoScroll.margin;
-                        right  = event.clientX > window.innerWidth  - autoScroll.margin;
-                        bottom = event.clientY > window.innerHeight - autoScroll.margin;
+                        right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
+                        bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
                     }
                     else {
-                        var rect = interact(options.container).getRect();
+                        var rect = getElementRect(options.container);
 
                         left   = event.clientX < rect.left   + autoScroll.margin;
                         top    = event.clientY < rect.top    + autoScroll.margin;
@@ -196,31 +219,34 @@
                         bottom = event.clientY > rect.bottom - autoScroll.margin;
                     }
 
-                    autoScroll.x = autoScroll.distance * (right ? 1: left? -1: 0);
-                    autoScroll.y = autoScroll.distance * (bottom? 1:  top? -1: 0);
+                    autoScroll.x = (right ? 1: left? -1: 0);
+                    autoScroll.y = (bottom? 1:  top? -1: 0);
 
                     if (!autoScroll.isScrolling) {
                         // set the autoScroll properties to those of the target
-                        autoScroll.margin   = options.margin;
-                        autoScroll.distance = options.distance;
-                        autoScroll.interval = options.interval;
+                        autoScroll.margin = options.margin;
+                        autoScroll.speed  = options.speed;
 
-                        autoScroll.start();
+                        autoScroll.start(target);
                     }
                 }
             },
 
             isScrolling: false,
+            prevTime: 0,
 
-            start: function () {
+            start: function (target) {
                 autoScroll.isScrolling = true;
-                window.clearInterval(autoScroll.i);
-                autoScroll.i = window.setInterval(autoScroll.scroll, autoScroll.interval);
+                cancelFrame(autoScroll.i);
+
+                autoScroll.target = target;
+                autoScroll.prevTime = new Date().getTime();
+                autoScroll.i = reqFrame(autoScroll.scroll);
             },
 
             stop: function () {
-                window.clearInterval(autoScroll.i);
                 autoScroll.isScrolling = false;
+                cancelFrame(autoScroll.i);
             }
         },
 
@@ -1013,7 +1039,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (target.options.snapEnabled && target.options.snap.actions.indexOf(action) !== -1) {
+            if (options.snapEnabled && options.snap.actions.indexOf(action) !== -1) {
                 var snap = options.snap;
 
                 this.snap = {
@@ -1030,67 +1056,23 @@
                 };
 
                 if (snapStatus.locked) {
-                    if (snap.mode === 'path') {
-                        if (snapStatus.xInRange) {
-                            page.x += snapStatus.dx;
-                            client.x += snapStatus.dx;
-                        }
-                        if (snapStatus.yInRange) {
-                            page.y += snapStatus.dy;
-                            client.y += snapStatus.dy;
-                        }
-                    }
-                    else {
-                        page.x += snapStatus.dx;
-                        page.y += snapStatus.dy;
-                        client.x += snapStatus.dx;
-                        client.y += snapStatus.dy;
-                    }
+                    page.x += snapStatus.dx;
+                    page.y += snapStatus.dy;
+                    client.x += snapStatus.dx;
+                    client.y += snapStatus.dy;
                 }
             }
         }
 
-        if (target.options.restrictions[action]) {
-            var restriction = target.options.restrictions[action],
-                rect,
-                originalPageX = page.x,
-                originalPageY = page.y;
-
-            if (restriction instanceof Element) {
-                rect = interact(restriction).getRect();
-            }
-            else {
-                if (typeof restriction === 'function') {
-                    restriction = restriction(page.x, page.y, target._element);
-                }
-
-                rect = restriction;
-
-                // object is assumed to have
-                // x, y, width, height or
-                // left, top, right, bottom
-                if ('x' in restriction && 'y' in restriction) {
-                    rect = {
-                        left  : restriction.x,
-                        top   : restriction.y,
-                        right : restriction.x + restriction.width,
-                        bottom: restriction.y + restriction.height
-                    };
-                }
-            }
-
-            page.x = Math.max(Math.min(rect.right , page.x), rect.left);
-            page.y = Math.max(Math.min(rect.bottom, page.y), rect.top );
-
-            var restrictDx = page.x - originalPageX,
-                restrictDy = page.y - originalPageY;
-
-            client.x += restrictDx;
-            client.y += restrictDy;
+        if (target.options.restrict[action] && restrictStatus.restricted) {
+            page.x += restrictStatus.dx;
+            page.y += restrictStatus.dy;
+            client.x += restrictStatus.dx;
+            client.y += restrictStatus.dy;
 
             this.restrict = {
-                dx: restrictDx,
-                dy: restrictDy
+                dx: restrictStatus.dx,
+                dy: restrictStatus.dy
             };
         }
 
@@ -1223,7 +1205,7 @@
 
             // Use natural event coordinates (without snapping/restricions)
 
-            if (this.snap) {
+            if (this.snap && this.snap.locked) {
                 dx = this.snap.realX;
                 dy = this.snap.realY;
             }
@@ -1426,7 +1408,191 @@
         }
     }
 
-    function pointerMove (event) {
+    function setSnapping (event, status) {
+        var snap = target.options.snap,
+            anchors = snap.anchors,
+            page = getPageXY(event),
+            origin = getOriginXY(target),
+            closest,
+            range,
+            inRange,
+            snapChanged,
+            dx,
+            dy,
+            distance,
+            i, len;
+
+        status = status || snapStatus;
+
+        status.realX = page.x;
+        status.realY = page.y;
+
+        page.x -= origin.x;
+        page.y -= origin.y;
+
+        // change to infinite range when range is negative
+        if (snap.range < 0) { snap.range = Infinity; }
+
+        // create an anchor representative for each path's returned point
+        if (snap.mode === 'path') {
+            anchors = [];
+
+            for (i = 0, len = snap.paths.length; i < len; i++) {
+                var path = snap.paths[i];
+
+                if (typeof path === 'function') {
+                    path = path(page.x, page.y);
+                }
+
+                anchors.push({
+                    x: typeof path.x === 'number' ? path.x : page.x,
+                    y: typeof path.y === 'number' ? path.y : page.y,
+
+                    range: typeof path.range === 'number'? path.range: snap.range
+                });
+            }
+        }
+
+        if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
+            closest = {
+                anchor: null,
+                distance: 0,
+                range: 0,
+                dx: 0,
+                dy: 0
+            };
+
+            for (i = 0, len = anchors.length; i < len; i++) {
+                var anchor = anchors[i];
+
+                range = typeof anchor.range === 'number'? anchor.range: snap.range;
+
+                dx = anchor.x - page.x;
+                dy = anchor.y - page.y;
+                distance = hypot(dx, dy);
+
+                inRange = distance < range;
+
+                // Infinite anchors count as being out of range
+                // compared to non infinite ones that are in range
+                if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                    inRange = false;
+                }
+
+                if (!closest.anchor || (inRange?
+                    // is the closest anchor in range?
+                    (closest.inRange && range !== Infinity)?
+                        // the pointer is relatively deeper in this anchor
+                        distance / range < closest.distance / closest.range:
+                        //the pointer is closer to this anchor
+                        distance < closest.distance:
+                    // The other is not in range and the pointer is closer to this anchor
+                    (!closest.inRange && distance < closest.distance))) {
+
+                    if (range === Infinity) {
+                        inRange = true;
+                    }
+
+                    closest.anchor = anchor;
+                    closest.distance = distance;
+                    closest.range = range;
+                    closest.inRange = inRange;
+                    closest.dx = dx;
+                    closest.dy = dy;
+
+                    status.range = range;
+                }
+            }
+
+            inRange = closest.inRange;
+            snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
+
+            status.x = closest.anchor.x;
+            status.y = closest.anchor.y;
+            status.dx = closest.dx;
+            status.dy = closest.dy;
+        }
+        else if (snap.mode === 'grid') {
+            var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
+                gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
+
+                newX = gridx * snap.grid.x + snap.gridOffset.x,
+                newY = gridy * snap.grid.y + snap.gridOffset.y;
+
+            dx = newX - page.x;
+            dy = newY - page.y;
+
+            distance = hypot(dx, dy);
+
+            inRange = distance < snap.range;
+            snapChanged = (newX !== status.x || newY !== status.y);
+
+            status.x = newX;
+            status.y = newY;
+            status.dx = dx;
+            status.dy = dy;
+
+            status.range = snap.range;
+        }
+
+        status.changed = snapChanged;
+        status.inRange = inRange;
+
+        return status;
+    }
+
+    function setRestriction (event) {
+        var action = interact.currentAction() || prepared,
+            restriction = target && target.options.restrict[action];
+
+        if (!action || !restriction) {
+            restrictStatus.dx = 0;
+            restrictStatus.dy = 0;
+            restrictStatus.restricted = false;
+
+            return;
+        }
+
+        var rect,
+            page = getPageXY(event);
+
+        if (snapStatus.locked) {
+            page.x += snapStatus.xInRange || snapStatus.mode !== 'path'? snapStatus.dx: 0;
+            page.y += snapStatus.yInRange || snapStatus.mode !== 'path'? snapStatus.dy: 0;
+        }
+
+        var originalPageX = page.x,
+            originalPageY = page.y;
+
+        if (restriction instanceof Element) {
+            rect = interact(restriction).getRect();
+        }
+        else {
+            if (typeof restriction === 'function') {
+                restriction = restriction(page.x, page.y, target._element);
+            }
+
+            rect = restriction;
+
+            // object is assumed to have
+            // x, y, width, height or
+            // left, top, right, bottom
+            if ('x' in restriction && 'y' in restriction) {
+                rect = {
+                    left  : restriction.x,
+                    top   : restriction.y,
+                    right : restriction.x + restriction.width,
+                    bottom: restriction.y + restriction.height
+                };
+            }
+        }
+
+        restrictStatus.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
+        restrictStatus.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
+        restrictStatus.restricted = true;
+    }
+
+    function pointerMove (event, preEnd) {
         if (pointerIsDown
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
@@ -1437,232 +1603,15 @@
 
             if (prepared && target) {
 
-                if (target.options.snapEnabled && target.options.snap.actions.indexOf(prepared) !== -1) {
-                    var snap = target.options.snap,
-                        page = getPageXY(event),
-                        origin = getOriginXY(target),
-                        closest,
-                        range,
-                        inRange,
-                        snapChanged,
-                        distX,
-                        distY,
-                        distance,
-                        i, len;
+                if (target.options.snapEnabled
+                    && target.options.snap.actions.indexOf(prepared) !== -1
+                    && (!target.options.snap.endOnly || preEnd)) {
 
+                    var origin = getOriginXY(target);
 
-                    snapStatus.realX = page.x;
-                    snapStatus.realY = page.y;
+                    setSnapping(event);
 
-                    page.x -= origin.x;
-                    page.y -= origin.y;
-
-                    // change to infinite range when range is negative
-                    if (snap.range < 0) { snap.range = Infinity; }
-
-                    if (snap.mode === 'anchor' && snap.anchors.length) {
-                        closest = {
-                            anchor: null,
-                            distance: 0,
-                            range: 0,
-                            distX: 0,
-                            distY: 0
-                        };
-
-                        for (i = 0, len = snap.anchors.length; i < len; i++) {
-                            var anchor = snap.anchors[i];
-
-                            range = typeof anchor.range === 'number'? anchor.range: snap.range;
-
-                            distX = anchor.x - page.x;
-                            distY = anchor.y - page.y;
-                            distance = hypot(distX, distY);
-
-                            inRange = distance < range;
-
-                            // Infinite anchors count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                                inRange = false;
-                            }
-
-                            if (!closest.anchor || (inRange?
-                                // is the closest anchor in range?
-                                (closest.inRange && range !== Infinity)?
-                                    // the pointer is relatively deeper in this anchor
-                                    distance / range < closest.distance / closest.range:
-                                    //the pointer is closer to this anchor
-                                    distance < closest.distance:
-                                // The other is not in range and the pointer is closer to this anchor
-                                (!closest.inRange && distance < closest.distance))) {
-
-                                if (range === Infinity) {
-                                    inRange = true;
-                                }
-
-                                closest.anchor = anchor;
-                                closest.distance = distance;
-                                closest.range = range;
-                                closest.inRange = inRange;
-                                closest.distX = distX;
-                                closest.distY = distY;
-
-                                snapStatus.range = range;
-                            }
-                        }
-
-                        inRange = closest.inRange;
-                        snapChanged = (closest.anchor.x !== snapStatus.x || closest.anchor.y !== snapStatus.y);
-
-                        snapStatus.x = closest.anchor.x;
-                        snapStatus.y = closest.anchor.y;
-                        snapStatus.dx = closest.distX;
-                        snapStatus.dy = closest.distY;
-                        target.options.snap.anchors.closest = snapStatus.anchors.closest = closest.anchor;
-                    }
-                    else if (snap.mode === 'grid') {
-                        var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
-                            gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
-
-                            newX = gridx * snap.grid.x + snap.gridOffset.x,
-                            newY = gridy * snap.grid.y + snap.gridOffset.y;
-
-                        distX = newX - page.x;
-                        distY = newY - page.y;
-
-                        distance = hypot(distX, distY);
-
-                        inRange = distance < snap.range;
-                        snapChanged = (newX !== snapStatus.x || newY !== snapStatus.y);
-
-                        snapStatus.x = newX;
-                        snapStatus.y = newY;
-                        snapStatus.dx = distX;
-                        snapStatus.dy = distY;
-
-                        snapStatus.range = snap.range;
-                    }
-                    if (snap.mode === 'path' && snap.paths.length) {
-                        closest = {
-                            path: {},
-                            distX: 0,
-                            distY: 0,
-                            range: 0
-                        };
-
-                        for (i = 0, len = snap.paths.length; i < len; i++) {
-                            var path = snap.paths[i],
-                                snapToX = false,
-                                snapToY = false,
-                                pathXY = path,
-                                pathX,
-                                pathY;
-
-                            if (typeof path === 'function') {
-                                pathXY = path(page.x, page.y);
-                            }
-
-                            if (typeof pathXY.x === 'number') {
-                                pathX = pathXY.x;
-                                snapToX = true;
-                            }
-                            else {
-                                pathX = page.x;
-                            }
-
-                            if (typeof pathXY.y === 'number') {
-                                pathY = pathXY.y;
-                                snapToY = true;
-                            }
-                            else {
-                                pathY = page.y;
-                            }
-
-                            range = typeof pathXY.range === 'number'? pathXY.range: snap.range;
-
-                            distX = pathX - page.x;
-                            distY = pathY - page.y;
-
-                            var xInRange = Math.abs(distX) < range && snapToX,
-                                yInRange = Math.abs(distY) < range && snapToY;
-
-                            // Infinite paths count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.xInRange && closest.range !== Infinity) {
-                                xInRange = false;
-                            }
-
-                            if (!('x' in closest.path) || (xInRange
-                                // is the closest path in range?
-                                ? (closest.xInRange && range !== Infinity)
-                                    // the pointer is relatively deeper in this path
-                                    ? distance / range < closest.distX / closest.range
-                                    //the pointer is closer to this path
-                                    : Math.abs(distX) < Math.abs(closest.distX)
-                                // The other is not in range and the pointer is closer to this path
-                                : (!closest.xInRange && Math.abs(distX) < Math.abs(closest.distX)))) {
-
-                                if (range === Infinity) {
-                                    xInRange = true;
-                                }
-
-                                closest.path.x   = pathX;
-                                closest.distX    = distX;
-                                closest.xInRange = xInRange;
-                                closest.range    = range;
-
-                                snapStatus.range = range;
-                            }
-
-                            // Infinite paths count as being out of range
-                            // compared to non infinite ones that are in range
-                            if (range === Infinity && closest.yInRange && closest.range !== Infinity) {
-                                yInRange = false;
-                            }
-                            if (!('y' in closest.path) || (yInRange
-                                // is the closest path in range?
-                                ? (closest.yInRange && range !== Infinity)
-                                    // the pointer is relatively deeper in this path
-                                    ? distance / range < closest.distY / closest.range
-                                    //the pointer is closer to this path
-                                    : Math.abs(distY) < Math.abs(closest.distY)
-                                // The other is not in range and the pointer is closer to this path
-                                : (!closest.yInRange && Math.abs(distY) < Math.abs(closest.distY)))) {
-
-                                if (range === Infinity) {
-                                    yInRange = true;
-                                }
-
-                                closest.path.y   = pathY;
-                                closest.distY    = distY;
-                                closest.yInRange = yInRange;
-                                closest.range    = range;
-
-                                snapStatus.range = range;
-                            }
-                        }
-
-                        inRange = closest.xInRange || closest.yInRange;
-
-                        if (closest.xInRange && closest.yInRange && (!snapStatus.xInRange || !snapStatus.yInRange)) {
-                            snapChanged = true;
-                        }
-                        else {
-                            snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== snapStatus.x || closest.path.y !== snapStatus.y);
-                        }
-
-                        snapStatus.x = closest.path.x;
-                        snapStatus.y = closest.path.y;
-                        snapStatus.dx = closest.distX;
-                        snapStatus.dy = closest.distY;
-
-                        snapStatus.xInRange = closest.xInRange;
-                        snapStatus.yInRange = closest.yInRange;
-
-                        target.options.snap.paths.closest = snapStatus.paths.closest = closest.path;
-                    }
-
-                    if ((snapChanged || !snapStatus.locked) && inRange)  {
+                    if ((snapStatus.changed || !snapStatus.locked) && snapStatus.inRange)  {
                         snapStatus.locked = true;
 
                         // if snap is locked at the start of an action
@@ -1678,14 +1627,20 @@
                             clientY0 = c.y - origin.y + snapStatus.dy;
                         }
 
+                        setRestriction(event);
                         actions[prepared].moveListener(event);
                     }
-                    else if (snapChanged || !inRange) {
+                    else if (snapStatus.snapChanged || !snapStatus.inRange) {
                         snapStatus.locked = false;
+
+
+                        setRestriction(event);
                         actions[prepared].moveListener(event);
                     }
                 }
                 else {
+                    setRestriction(event);
+
                     actions[prepared].moveListener(event);
                 }
             }
@@ -1961,38 +1916,43 @@
         var endEvent,
             inertiaOptions = target && target.options.inertia;
 
-        if ((dragging || resizing || gesturing)
-            && target
-            && target.options.inertiaEnabled
-            && !inertiaStatus.active
-            && event.timeStamp - prevEvent.timeStamp < 50
-            && (dragging || resizing || gesturing)
-            && prevEvent.speed > inertiaOptions.minSpeed
-            && prevEvent.speed > inertiaOptions.endSpeed) {
+        if (dragging || resizing || gesturing) {
+            if (target
+                && target.options.inertiaEnabled
+                && !inertiaStatus.active
+                && event.timeStamp - prevEvent.timeStamp < 50
+                && (dragging || resizing || gesturing)
+                && prevEvent.speed > inertiaOptions.minSpeed
+                && prevEvent.speed > inertiaOptions.endSpeed) {
 
-            var lambda = inertiaOptions.resistance,
-                inertiaDur = -Math.log(inertiaOptions.endSpeed / prevEvent.speed) / lambda;
+                var lambda = inertiaOptions.resistance,
+                    inertiaDur = -Math.log(inertiaOptions.endSpeed / prevEvent.speed) / lambda;
 
-            inertiaStatus.active        = true;
-            inertiaStatus.target        = target;
-            inertiaStatus.targetElement = target._element;
+                inertiaStatus.active        = true;
+                inertiaStatus.target        = target;
+                inertiaStatus.targetElement = target._element;
 
-            inertiaStatus.startEvent = new InteractEvent(event, 'drag', 'inertiastart');
-            inertiaStatus.pointerUp  = event;
+                inertiaStatus.startEvent = new InteractEvent(event, 'drag', 'inertiastart');
+                inertiaStatus.pointerUp  = event;
 
-            inertiaStatus.targetX  = (prevEvent.velocityX - inertiaDur) / lambda;
-            inertiaStatus.targetY  = (prevEvent.velocityY - inertiaDur) / lambda;
-            inertiaStatus.duration = inertiaDur;
+                inertiaStatus.targetX  = (prevEvent.velocityX - inertiaDur) / lambda;
+                inertiaStatus.targetY  = (prevEvent.velocityY - inertiaDur) / lambda;
+                inertiaStatus.duration = inertiaDur;
 
-            inertiaStatus.t0       = inertiaStatus.startEvent.timeStamp / 1000;
-            inertiaStatus.vx0      = prevEvent.velocityX;
-            inertiaStatus.vy0      = prevEvent.velocityY;
+                inertiaStatus.t0       = inertiaStatus.startEvent.timeStamp / 1000;
+                inertiaStatus.vx0      = prevEvent.velocityX;
+                inertiaStatus.vy0      = prevEvent.velocityY;
 
-            inertiaStatus.i = reqFrame(inertiaFrame);
+                inertiaStatus.i = reqFrame(inertiaFrame);
 
-            target.fire(inertiaStatus.startEvent);
+                target.fire(inertiaStatus.startEvent);
 
-            return;
+                return;
+            }
+            if (target.options.snapEnabled && target.options.snap.endOnly) {
+                // fire a move event at the snapped coordinates
+                pointerMove(event, true);
+            }
         }
 
         if (dragging) {
@@ -2576,10 +2536,14 @@
                    };
                 }
 
-                autoScroll.margin    = this.validateSetting('autoScroll', 'margin'   , options.margin);
-                autoScroll.distance  = this.validateSetting('autoScroll', 'distance' , options.distance);
-                autoScroll.interval  = this.validateSetting('autoScroll', 'interval' , options.interval);
-                autoScroll.container = this.validateSetting('autoScroll', 'container', options.container);
+                autoScroll.margin = this.validateSetting('autoScroll', 'margin', options.margin);
+                autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
+
+                autoScroll.container =
+                    (options.container instanceof Element || options.container instanceof window.Window
+                     ? options.container
+                     : defaults.container);
+
 
                 this.options.autoScrollEnabled = true;
                 this.options.autoScroll = autoScroll;
@@ -2657,16 +2621,11 @@
                 var snap = this.options.snap;
 
                 if (snap === defaults) {
-                   snap = this.options.snap = {
-                       mode      : defaults.mode,
-                       range     : defaults.range,
-                       grid      : defaults.grid,
-                       gridOffset: defaults.gridOffset,
-                       anchors   : defaults.anchors
-                   };
+                   snap = {};
                 }
 
                 snap.mode       = this.validateSetting('snap', 'mode'      , options.mode);
+                snap.endOnly    = this.validateSetting('snap', 'endOnly'   , options.endOnly);
                 snap.actions    = this.validateSetting('snap', 'actions'   , options.actions);
                 snap.range      = this.validateSetting('snap', 'range'     , options.range);
                 snap.paths      = this.validateSetting('snap', 'paths'     , options.paths);
@@ -2992,15 +2951,27 @@
         \*/
         restrict: function (newValue) {
             if (newValue === undefined) {
-                return this.options.restrictions;
+                return this.options.restrict;
             }
 
             if (newValue instanceof Object) {
-                this.options.restrictions = newValue;
+                var newRestrictions = {};
+
+                if (newValue.drag instanceof Object) {
+                    newRestrictions.drag = newValue.drag;
+                }
+                if (newValue.resize instanceof Object) {
+                    newRestrictions.resize = newValue.resize;
+                }
+                if (newValue.gesture instanceof Object) {
+                    newRestrictions.gesture = newValue.gesture;
+                }
+
+                this.options.restrict = newRestrictions;
             }
 
             else if (newValue === null) {
-               delete this.options.restrictions;
+               delete this.options.restrict;
             }
 
             return this;
@@ -3056,6 +3027,15 @@
                     if (typeof value === 'number') { return value; }
                     else {
                         return (option in current && typeof current[option] === 'number'
+                            ? current[option]
+                            : defaults[option]);
+                    }
+                }
+
+                if ('boolTypes' in defaults && defaults.boolTypes.test(option)) {
+                    if (typeof value === 'boolean') { return value; }
+                    else {
+                        return (option in current && typeof current[option] === 'boolean'
                             ? current[option]
                             : defaults[option]);
                     }
@@ -3640,13 +3620,13 @@
         if (options instanceof Object) {
             defaultOptions.autoScrollEnabled = true;
 
-            if (typeof (options.margin)   === 'number') { defaults.margin    = options.margin   ; }
-            if (typeof (options.distance) === 'number') { defaults.distance  = options.distance ; }
-            if (typeof (options.interval) === 'number') { defaults.interval  = options.interval ; }
+            if (typeof (options.margin) === 'number') { defaults.margin = options.margin;}
+            if (typeof (options.speed)  === 'number') { defaults.speed  = options.speed ;}
 
-            defaults.container = options.container instanceof Element?
-                options.container:
-                defaults.container;
+            defaults.container =
+                (options.container instanceof Element || options.container instanceof window.Window
+                 ? options.container
+                 : defaults.container);
 
             return interact;
         }
@@ -3702,8 +3682,9 @@
         if (options instanceof Object) {
             defaultOptions.snapEnabled = true;
 
-            if (typeof options.mode  === 'string') { snap.mode  = options.mode;  }
-            if (typeof options.range === 'number') { snap.range = options.range; }
+            if (typeof options.mode    === 'string' ) { snap.mode    = options.mode;    }
+            if (typeof options.endOnly === 'boolean') { snap.endOnly = options.endOnly; }
+            if (typeof options.range   === 'number' ) { snap.range   = options.range;   }
             if (options.actions    instanceof Array ) { snap.actions    = options.actions;    }
             if (options.anchors    instanceof Array ) { snap.anchors    = options.anchors;    }
             if (options.grid       instanceof Object) { snap.grid       = options.grid;       }
@@ -3893,17 +3874,32 @@
      - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
      = (object) The current restrictions object or interact
     \*/
-    interact.restrict = function (newValue, noArray) {
+    interact.restrict = function (newValue) {
+        var defaults = defaultOptions.restrict;
+
         if (newValue === undefined) {
-            return defaultOptions.restrictions;
+            return defaultOptions.restrict;
         }
 
         if (newValue instanceof Object) {
-            defaultOptions.restrictions = newValue;
+            if (newValue.drag instanceof Object) {
+                defaults.drag = newValue.drag;
+            }
+            if (newValue.resize instanceof Object) {
+                defaults.resize = newValue.resize;
+            }
+            if (newValue.gesture instanceof Object) {
+                defaults.gesture = newValue.gesture;
+            }
+
+            if (typeof newValue.endOnly === 'boolean') {
+                defaults.endOnly = newValue.endOnly;
+            }
         }
 
         else if (newValue === null) {
-           defaultOptions.restrictions = {};
+           defaults.drag = defaults.resize = defaults.gesture = null;
+           defaults.endOnly = false;
         }
 
         return this;
@@ -3998,7 +3994,7 @@
         }
 
         if (!cancelFrame) {
-            window.cancelAnimationFrame = function(id) {
+            cancelFrame = function(id) {
                 clearTimeout(id);
             };
         }
