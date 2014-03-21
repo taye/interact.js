@@ -828,11 +828,9 @@
 
     function inertiaFrame () {
         var options = inertiaStatus.target.options.inertia,
-            snap = inertiaStatus.target.options.snap,
             lambda = options.resistance,
             ve = options.endSpeed,
             v0 = inertiaStatus.v0,
-            startEvent = inertiaStatus.startEvent,
             t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
             inertiaStatus.elapsed = t;
@@ -841,31 +839,28 @@
 
             var progress =  1 - (Math.exp(-lambda * t) - lambda / inertiaStatus.v0) / (1 - ve / v0);
 
-            if (inertiaStatus.modifiedXe === null) {
+            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye ) {
                 inertiaStatus.sx = inertiaStatus.xe * progress;
                 inertiaStatus.sy = inertiaStatus.ye * progress;
-
-                pointerMove(inertiaStatus.startEvent);
             }
             else {
-                var quadPoint = getQuadraticCurvePoint(0, 0, inertiaStatus.xe, inertiaStatus.ye, inertiaStatus.modifiedXe, inertiaStatus.modifiedYe, progress);
+                var quadPoint = getQuadraticCurvePoint(
+                        0, 0,
+                        inertiaStatus.xe, inertiaStatus.ye,
+                        inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
+                        progress);
 
                 inertiaStatus.sx = quadPoint.x;
                 inertiaStatus.sy = quadPoint.y;
-                pointerMove(inertiaStatus.startEvent);
             }
+
+            pointerMove(inertiaStatus.startEvent);
 
             inertiaStatus.i = reqFrame(inertiaFrame);
         }
         else {
-            if (inertiaStatus.modifiedXe === null) {
-                inertiaStatus.sx = inertiaStatus.xe;
-                inertiaStatus.sy = inertiaStatus.ye;
-            }
-            else {
-                inertiaStatus.sx = inertiaStatus.modifiedXe;
-                inertiaStatus.sy = inertiaStatus.modifiedYe;
-            }
+            inertiaStatus.sx = inertiaStatus.modifiedXe;
+            inertiaStatus.sy = inertiaStatus.modifiedYe;
 
             pointerMove(inertiaStatus.startEvent);
             pointerUp(inertiaStatus.startEvent);
@@ -1457,7 +1452,7 @@
     function setSnapping (event, status) {
         var snap = target.options.snap,
             anchors = snap.anchors,
-            origin = getOriginXY(target),
+            page,
             closest,
             range,
             inRange,
@@ -1469,15 +1464,20 @@
 
         status = status || snapStatus;
 
-        var page = status.useStatusXY
-                ? { x: status.x, y: status.y }
-                : getPageXY(event);
+        if (status.useStatusXY) {
+            page = { x: status.x, y: status.y };
+        }
+        else {
+            var origin = getOriginXY(target);
+
+            page = getPageXY(event);
+
+            page.x -= origin.x;
+            page.y -= origin.y;
+        }
 
         status.realX = page.x;
         status.realY = page.y;
-
-        page.x -= origin.x;
-        page.y -= origin.y;
 
         // change to infinite range when range is negative
         if (snap.range < 0) { snap.range = Infinity; }
@@ -1991,33 +1991,52 @@
 
                 inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
                 inertiaStatus.v0 = prevEvent.speed;
+                inertiaStatus.x0 = prevEvent.pageX;
+                inertiaStatus.y0 = prevEvent.pageY;
                 inertiaStatus.vx0 = prevEvent.velocityX;
                 inertiaStatus.vy0 = prevEvent.velocityY;
 
-                inertiaStatus.modifiedXe = inertiaStatus.modifiedYe = null;
+                inertiaStatus.modifiedXe = inertiaStatus.xe;
+                inertiaStatus.modifiedYe = inertiaStatus.ye;
+
+                var startX,
+                    startY,
+                    statusObject;
+
+                if (startEvent.snap && startEvent.snap.locked) {
+                    startX = startEvent.snap.realX;
+                    startY = startEvent.snap.realY;
+                }
+                else {
+                    startX = startEvent.pageX;
+                    startY = startEvent.pageY;
+                }
+
+                if (startEvent.restrict) {
+                    startX -= startEvent.restrict.dx;
+                    startY -= startEvent.restrict.dy;
+                }
+
+                statusObject = {
+                    useStatusXY: true,
+                    x: startX + inertiaStatus.xe,
+                    y: startY + inertiaStatus.ye
+                };
 
                 if (target.options.snapEnabled && target.options.snap.endOnly) {
-                    var startX, startY;
-
-                    if (startEvent.snap && startEvent.snap.locked) {
-                        startX = startEvent.snap.realX;
-                        startY = startEvent.snap.realY;
-                    }
-                    else {
-                        startX = startEvent.pageX;
-                        startY = startEvent.pageY;
-                    }
-
-                    var snap = setSnapping(event, {
-                        useStatusXY: true,
-                        x: startX + inertiaStatus.xe,
-                        y: startY + inertiaStatus.ye
-                    });
+                    var snap = setSnapping(event, statusObject);
 
                     if (snap.inRange) {
-                        inertiaStatus.modifiedXe = inertiaStatus.xe + snap.dx;
-                        inertiaStatus.modifiedYe = inertiaStatus.ye + snap.dy;
+                        inertiaStatus.modifiedXe += snap.dx;
+                        inertiaStatus.modifiedYe += snap.dy;
                     }
+                }
+
+                if (target.options.restrictEnabled && target.options.restrict.endOnly) {
+                    var restrict = setRestriction(event, statusObject);
+
+                    inertiaStatus.modifiedXe += restrict.dx;
+                    inertiaStatus.modifiedYe += restrict.dy;
                 }
 
                 cancelFrame(inertiaStatus.i);
