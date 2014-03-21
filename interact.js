@@ -994,22 +994,10 @@
                 };
 
                 if (snapStatus.locked) {
-                    if (snap.mode === 'path') {
-                        if (snapStatus.xInRange) {
-                            page.x += snapStatus.dx;
-                            client.x += snapStatus.dx;
-                        }
-                        if (snapStatus.yInRange) {
-                            page.y += snapStatus.dy;
-                            client.y += snapStatus.dy;
-                        }
-                    }
-                    else {
-                        page.x += snapStatus.dx;
-                        page.y += snapStatus.dy;
-                        client.x += snapStatus.dx;
-                        client.y += snapStatus.dy;
-                    }
+                    page.x += snapStatus.dx;
+                    page.y += snapStatus.dy;
+                    client.x += snapStatus.dx;
+                    client.y += snapStatus.dy;
                 }
             }
         }
@@ -1153,7 +1141,7 @@
                 dy -= this.restrict.dy;
             }
 
-            if (prevEvent.snap) {
+            if (prevEvent.snap && prevEvent.snap.locked) {
                 dx -= prevEvent.snap.realX;
                 dy -= prevEvent.snap.realY;
             }
@@ -1339,14 +1327,15 @@
 
     function setSnapping (event, status) {
         var snap = target.options.snap,
+            anchors = snap.anchors,
             page = getPageXY(event),
             origin = getOriginXY(target),
             closest,
             range,
             inRange,
             snapChanged,
-            distX,
-            distY,
+            dx,
+            dy,
             distance,
             i, len;
 
@@ -1361,23 +1350,43 @@
         // change to infinite range when range is negative
         if (snap.range < 0) { snap.range = Infinity; }
 
-        if (snap.mode === 'anchor' && snap.anchors.length) {
+        // create an anchor representative for each path's returned point
+        if (snap.mode === 'path') {
+            anchors = [];
+
+            for (i = 0, len = snap.paths.length; i < len; i++) {
+                var path = snap.paths[i];
+
+                if (typeof path === 'function') {
+                    path = path(page.x, page.y);
+                }
+
+                anchors.push({
+                    x: typeof path.x === 'number' ? path.x : page.x,
+                    y: typeof path.y === 'number' ? path.y : page.y,
+
+                    range: typeof path.range === 'number'? path.range: snap.range
+                });
+            }
+        }
+
+        if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
             closest = {
                 anchor: null,
                 distance: 0,
                 range: 0,
-                distX: 0,
-                distY: 0
+                dx: 0,
+                dy: 0
             };
 
-            for (i = 0, len = snap.anchors.length; i < len; i++) {
-                var anchor = snap.anchors[i];
+            for (i = 0, len = anchors.length; i < len; i++) {
+                var anchor = anchors[i];
 
                 range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
-                distX = anchor.x - page.x;
-                distY = anchor.y - page.y;
-                distance = hypot(distX, distY);
+                dx = anchor.x - page.x;
+                dy = anchor.y - page.y;
+                distance = hypot(dx, dy);
 
                 inRange = distance < range;
 
@@ -1405,8 +1414,8 @@
                     closest.distance = distance;
                     closest.range = range;
                     closest.inRange = inRange;
-                    closest.distX = distX;
-                    closest.distY = distY;
+                    closest.dx = dx;
+                    closest.dy = dy;
 
                     status.range = range;
                 }
@@ -1417,9 +1426,8 @@
 
             status.x = closest.anchor.x;
             status.y = closest.anchor.y;
-            status.dx = closest.distX;
-            status.dy = closest.distY;
-            target.options.snap.anchors.closest = status.anchors.closest = closest.anchor;
+            status.dx = closest.dx;
+            status.dy = closest.dy;
         }
         else if (snap.mode === 'grid') {
             var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
@@ -1428,139 +1436,20 @@
                 newX = gridx * snap.grid.x + snap.gridOffset.x,
                 newY = gridy * snap.grid.y + snap.gridOffset.y;
 
-            distX = newX - page.x;
-            distY = newY - page.y;
+            dx = newX - page.x;
+            dy = newY - page.y;
 
-            distance = hypot(distX, distY);
+            distance = hypot(dx, dy);
 
             inRange = distance < snap.range;
             snapChanged = (newX !== status.x || newY !== status.y);
 
             status.x = newX;
             status.y = newY;
-            status.dx = distX;
-            status.dy = distY;
+            status.dx = dx;
+            status.dy = dy;
 
             status.range = snap.range;
-        }
-        if (snap.mode === 'path' && snap.paths.length) {
-            closest = {
-                path: {},
-                distX: 0,
-                distY: 0,
-                range: 0
-            };
-
-            for (i = 0, len = snap.paths.length; i < len; i++) {
-                var path = snap.paths[i],
-                    snapToX = false,
-                    snapToY = false,
-                    pathXY = path,
-                    pathX,
-                    pathY;
-
-                if (typeof path === 'function') {
-                    pathXY = path(page.x, page.y);
-                }
-
-                if (typeof pathXY.x === 'number') {
-                    pathX = pathXY.x;
-                    snapToX = true;
-                }
-                else {
-                    pathX = page.x;
-                }
-
-                if (typeof pathXY.y === 'number') {
-                    pathY = pathXY.y;
-                    snapToY = true;
-                }
-                else {
-                    pathY = page.y;
-                }
-
-                range = typeof pathXY.range === 'number'? pathXY.range: snap.range;
-
-                distX = pathX - page.x;
-                distY = pathY - page.y;
-
-                var xInRange = Math.abs(distX) < range && snapToX,
-                    yInRange = Math.abs(distY) < range && snapToY;
-
-                // Infinite paths count as being out of range
-                // compared to non infinite ones that are in range
-                if (range === Infinity && closest.xInRange && closest.range !== Infinity) {
-                    xInRange = false;
-                }
-
-                if (!('x' in closest.path) || (xInRange
-                    // is the closest path in range?
-                    ? (closest.xInRange && range !== Infinity)
-                        // the pointer is relatively deeper in this path
-                        ? distance / range < closest.distX / closest.range
-                        //the pointer is closer to this path
-                        : Math.abs(distX) < Math.abs(closest.distX)
-                    // The other is not in range and the pointer is closer to this path
-                    : (!closest.xInRange && Math.abs(distX) < Math.abs(closest.distX)))) {
-
-                    if (range === Infinity) {
-                        xInRange = true;
-                    }
-
-                    closest.path.x   = pathX;
-                    closest.distX    = distX;
-                    closest.xInRange = xInRange;
-                    closest.range    = range;
-
-                    status.range = range;
-                }
-
-                // Infinite paths count as being out of range
-                // compared to non infinite ones that are in range
-                if (range === Infinity && closest.yInRange && closest.range !== Infinity) {
-                    yInRange = false;
-                }
-                if (!('y' in closest.path) || (yInRange
-                    // is the closest path in range?
-                    ? (closest.yInRange && range !== Infinity)
-                        // the pointer is relatively deeper in this path
-                        ? distance / range < closest.distY / closest.range
-                        //the pointer is closer to this path
-                        : Math.abs(distY) < Math.abs(closest.distY)
-                    // The other is not in range and the pointer is closer to this path
-                    : (!closest.yInRange && Math.abs(distY) < Math.abs(closest.distY)))) {
-
-                    if (range === Infinity) {
-                        yInRange = true;
-                    }
-
-                    closest.path.y   = pathY;
-                    closest.distY    = distY;
-                    closest.yInRange = yInRange;
-                    closest.range    = range;
-
-                    status.range = range;
-                }
-            }
-
-            inRange = closest.xInRange || closest.yInRange;
-
-            if (closest.xInRange && closest.yInRange && (!status.xInRange || !status.yInRange)) {
-                snapChanged = true;
-            }
-            else {
-                snapChanged = (!closest.xInRange || !closest.yInRange || closest.path.x !== status.x || closest.path.y !== status.y);
-            }
-
-            status.x = closest.path.x;
-            status.y = closest.path.y;
-            status.dx = closest.distX;
-            status.dy = closest.distY;
-
-            status.xInRange = closest.xInRange;
-            status.yInRange = closest.yInRange;
-
-            target.options.snap.paths.closest = status.paths.closest = closest.path;
         }
 
         status.changed = snapChanged;
