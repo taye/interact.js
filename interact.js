@@ -317,8 +317,8 @@
         IE8MatchesSelector,
 
         // native requestAnimationFrame or polyfill
-        reqFrame,
-        cancelFrame,
+        reqFrame = window.requestAnimationFrame,
+        cancelFrame = window.cancelAnimationFrame,
 
         // used for adding event listeners to window and document
         windowTarget = {
