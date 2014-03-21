@@ -1591,22 +1591,35 @@
         return status;
     }
 
-    function setRestriction (event) {
+    function setRestriction (event, status) {
         var action = interact.currentAction() || prepared,
-            restriction = target && target.options.restrict[action];
+            restriction = target && target.options.restrict[action],
+            page;
 
-        restrictStatus.dx = 0;
-        restrictStatus.dy = 0;
-        restrictStatus.restricted = false;
+        status = status || restrictStatus;
+
+        if (status.useStatusXY) {
+            page = { x: status.x, y: status.y };
+        }
+        else {
+            var origin = getOriginXY(target);
+
+            page = getPageXY(event);
+
+            page.x -= origin.x;
+            page.y -= origin.y;
+        }
+
+        status.dx = 0;
+        status.dy = 0;
+        status.restricted = false;
 
         if (!action || !restriction) {
             return;
         }
 
         var rect,
-            page = getPageXY(event);
-
-        var originalPageX = page.x,
+            originalPageX = page.x,
             originalPageY = page.y;
 
         if (restriction instanceof Element) {
@@ -1632,9 +1645,11 @@
             }
         }
 
-        restrictStatus.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
-        restrictStatus.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
-        restrictStatus.restricted = true;
+        status.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
+        status.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
+        status.restricted = true;
+
+        return status;
     }
 
     function pointerMove (event, preEnd) {
@@ -2053,7 +2068,10 @@
 
                 return;
             }
-            if (target.options.snapEnabled && target.options.snap.endOnly) {
+
+            if (!inertiaStatus.active
+                && ((target.options.snapEnabled && target.options.snap.endOnly)
+                || (target.options.snapEnabled && target.options.restrict.endOnly))) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
