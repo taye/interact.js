@@ -120,6 +120,7 @@
                 gesture: null,
                 endOnly: false
             },
+            restrictEnabled: true,
 
             autoScroll: {
                 container   : window,  // the item that is scrolled (Window or HTMLElement)
@@ -347,8 +348,8 @@
         IE8MatchesSelector,
 
         // native requestAnimationFrame or polyfill
-        reqFrame,
-        cancelFrame,
+        reqFrame = window.requestAnimationFrame,
+        cancelFrame = window.cancelAnimationFrame,
 
         // used for adding event listeners to window and document
         windowTarget = {
@@ -1594,21 +1595,16 @@
         var action = interact.currentAction() || prepared,
             restriction = target && target.options.restrict[action];
 
-        if (!action || !restriction) {
-            restrictStatus.dx = 0;
-            restrictStatus.dy = 0;
-            restrictStatus.restricted = false;
+        restrictStatus.dx = 0;
+        restrictStatus.dy = 0;
+        restrictStatus.restricted = false;
 
+        if (!action || !restriction) {
             return;
         }
 
         var rect,
             page = getPageXY(event);
-
-        if (snapStatus.locked) {
-            page.x += snapStatus.xInRange || snapStatus.mode !== 'path'? snapStatus.dx: 0;
-            page.y += snapStatus.yInRange || snapStatus.mode !== 'path'? snapStatus.dy: 0;
-        }
 
         var originalPageX = page.x,
             originalPageY = page.y;
@@ -1651,6 +1647,11 @@
             }
 
             if (prepared && target) {
+                var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd);
+
+                if (!shouldRestrict) {
+                    restrictStatus.restricted = false;
+                }
 
                 if (target.options.snapEnabled
                     && target.options.snap.actions.indexOf(prepared) !== -1
@@ -1676,19 +1677,25 @@
                             clientY0 = c.y - origin.y + snapStatus.dy;
                         }
 
-                        setRestriction(event);
+                        if (shouldRestrict) {
+                            setRestriction(event);
+                        }
                         actions[prepared].moveListener(event);
                     }
                     else if (snapStatus.snapChanged || !snapStatus.inRange) {
                         snapStatus.locked = false;
 
 
-                        setRestriction(event);
+                        if (shouldRestrict) {
+                            setRestriction(event);
+                        }
                         actions[prepared].moveListener(event);
                     }
                 }
                 else {
-                    setRestriction(event);
+                    if (shouldRestrict) {
+                        setRestriction(event);
+                    }
 
                     actions[prepared].moveListener(event);
                 }
@@ -3068,11 +3075,17 @@
                     newRestrictions.gesture = newValue.gesture;
                 }
 
+                if (typeof newValue.endOnly === 'boolean') {
+                    newRestrictions.endOnly = newValue.endOnly;
+                }
+
+                this.options.restrictEnabled = true;
                 this.options.restrict = newRestrictions;
             }
 
             else if (newValue === null) {
                delete this.options.restrict;
+               delete this.options.restrictEnabled;
             }
 
             return this;
