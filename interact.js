@@ -45,8 +45,8 @@
             startEvent: null,
             pointerUp : null,
 
-            targetX : 0,
-            targetY : 0,
+            xe : 0,
+            ye : 0,
             duration: 0,
 
             t0 : 0,
@@ -304,17 +304,20 @@
         wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
 
         eventTypes = [
-            'resizestart',
-            'resizemove',
-            'resizeend',
             'dragstart',
             'dragmove',
+            'draginertiastart',
             'dragend',
             'dragenter',
             'dragleave',
             'drop',
+            'resizestart',
+            'resizemove',
+            'resizeinertiastart',
+            'resizeend',
             'gesturestart',
             'gesturemove',
+            'gestureinertiastart',
             'gestureend',
 
             'tap'
@@ -824,18 +827,30 @@
     }
 
     function inertiaFrame () {
-        var lambda = inertiaStatus.target.options.inertia.resistance;
+        var options = inertiaStatus.target.options.inertia,
+            lambda = options.resistance,
+            ve = options.endSpeed,
+            v0 = inertiaStatus.v0,
+            t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
-        inertiaStatus.elapsed = new Date().getTime() / 1000 - inertiaStatus.t0;
-        inertiaStatus.sx = (inertiaStatus.vx0 * (1 - Math.exp(-lambda * inertiaStatus.elapsed))) / lambda;
-        inertiaStatus.sy = (inertiaStatus.vy0 * (1 - Math.exp(-lambda * inertiaStatus.elapsed))) / lambda;
+            inertiaStatus.elapsed = t;
 
-        pointerMove(inertiaStatus.startEvent);
+        if (inertiaStatus.elapsed < inertiaStatus.te) {
 
-        if (inertiaStatus.elapsed <= inertiaStatus.duration) {
+            var progress =  1 - (Math.exp(-lambda * t) - lambda / inertiaStatus.v0) / (1 - ve / v0);
+
+            inertiaStatus.sx = inertiaStatus.xe * progress;
+            inertiaStatus.sy = inertiaStatus.ye * progress;
+
+            pointerMove(inertiaStatus.startEvent);
+
             inertiaStatus.i = reqFrame(inertiaFrame);
         }
         else {
+            inertiaStatus.sx = inertiaStatus.xe;
+            inertiaStatus.sy = inertiaStatus.ye;
+
+            pointerMove(inertiaStatus.startEvent);
             pointerUp(inertiaStatus.startEvent);
         }
     }
@@ -1219,7 +1234,7 @@
                 dy -= this.restrict.dy;
             }
 
-            if (prevEvent.snap) {
+            if (prevEvent.snap && prevEvent.snap.locked) {
                 dx -= prevEvent.snap.realX;
                 dy -= prevEvent.snap.realY;
             }
@@ -1240,8 +1255,10 @@
         }
 
         if (phase === 'inertiastart') {
-            this.targetX = this.pageX + inertiaStatus.targetX;
-            this.targetY = this.pageY + inertiaStatus.targetY;
+            this.targetPageX   = this.pageX   + inertiaStatus.xe;
+            this.targetPageY   = this.pageY   + inertiaStatus.ye;
+            this.targetClientX = this.clientX + inertiaStatus.xe;
+            this.targetClientY = this.clientY + inertiaStatus.ye;
         }
     }
 
@@ -1928,21 +1945,23 @@
                 var lambda = inertiaOptions.resistance,
                     inertiaDur = -Math.log(inertiaOptions.endSpeed / prevEvent.speed) / lambda;
 
-                inertiaStatus.active        = true;
-                inertiaStatus.target        = target;
+                inertiaStatus.active = true;
+                inertiaStatus.target = target;
                 inertiaStatus.targetElement = target._element;
 
                 inertiaStatus.startEvent = new InteractEvent(event, 'drag', 'inertiastart');
-                inertiaStatus.pointerUp  = event;
+                inertiaStatus.pointerUp = event;
 
-                inertiaStatus.targetX  = (prevEvent.velocityX - inertiaDur) / lambda;
-                inertiaStatus.targetY  = (prevEvent.velocityY - inertiaDur) / lambda;
-                inertiaStatus.duration = inertiaDur;
+                inertiaStatus.xe = (prevEvent.velocityX - inertiaDur) / lambda;
+                inertiaStatus.ye = (prevEvent.velocityY - inertiaDur) / lambda;
+                inertiaStatus.te = inertiaDur;
 
-                inertiaStatus.t0       = inertiaStatus.startEvent.timeStamp / 1000;
-                inertiaStatus.vx0      = prevEvent.velocityX;
-                inertiaStatus.vy0      = prevEvent.velocityY;
+                inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
+                inertiaStatus.v0 = prevEvent.speed;
+                inertiaStatus.vx0 = prevEvent.velocityX;
+                inertiaStatus.vy0 = prevEvent.velocityY;
 
+                cancelFrame(inertiaStatus.i);
                 inertiaStatus.i = reqFrame(inertiaFrame);
 
                 target.fire(inertiaStatus.startEvent);
@@ -2203,11 +2222,15 @@
                     move      = phases.onmove      || phases.onMove      || phases.move,
                     end       = phases.onend       || phases.onEnd       || phases.end,
 
+                    inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart,
+
                 action = 'on' + action;
 
                 if (typeof start === 'function') { this[action + 'start'] = start; }
                 if (typeof move  === 'function') { this[action + 'move' ] = move ; }
                 if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
+
+                if (typeof inertiastart === 'function') { this[action + 'inertiastart'  ] = inertiastart  ; }
             }
 
             return this;
