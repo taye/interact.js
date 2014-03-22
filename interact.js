@@ -570,6 +570,13 @@
 
     function blank () {}
 
+    function isElement (o) {
+        return !!o && (
+            typeof Element === "object" ? o instanceof Element : //DOM2
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+        );
+    }
+
     function setPrevXY (event) {
         prevX = event.pageX;
         prevY = event.pageY;
@@ -808,7 +815,7 @@
                 ? interactable.options.origin
                 : defaultOptions.origin;
 
-        if (origin instanceof Element)  {
+        if (isElement(origin))  {
             origin = interact(origin).getRect();
 
             origin.x = origin.left;
@@ -975,7 +982,7 @@
                 var current = dropzones[i];
 
                 // if the dropzone has an accept option, test against it
-                if (current.options.accept instanceof Element) {
+                if (isElement(current.options.accept)) {
                     if (current.options.accept !== element) {
                         continue;
                     }
@@ -1006,7 +1013,7 @@
                         selector.rect = selector.getRect();
 
                         // if the dropzone has an accept option, test against it
-                        if (selector.options.accept instanceof Element) {
+                        if (isElement(selector.options.accept)) {
                             if (selector.options.accept !== element) {
                                 continue;
                             }
@@ -1289,7 +1296,7 @@
 
     InteractEvent.prototype = {
         preventDefault: blank,
-        stopImmediatePropagation: function (event) {
+        stopImmediatePropagation: function () {
             imPropStopped = true;
         },
         stopPropagation: blank
@@ -1622,7 +1629,7 @@
             originalPageX = page.x,
             originalPageY = page.y;
 
-        if (restriction instanceof Element) {
+        if (isElement(restriction)) {
             rect = interact(restriction).getRect();
         }
         else {
@@ -2291,7 +2298,7 @@
             this.selector = element;
         }
         else {
-            if(element instanceof Element) {
+            if(isElement(element)) {
                 if (PointerEvent) {
                     events.add(this, 'pointerdown', pointerDown );
                     events.add(this, 'pointermove', pointerHover);
@@ -2329,7 +2336,7 @@
             else {
                 var start     = phases.onstart     || phases.onStart     || phases.start,
                     move      = phases.onmove      || phases.onMove      || phases.move,
-                    end       = phases.onend       || phases.onEnd       || phases.end,
+                    end       = phases.onend       || phases.onEnd       || phases.end;
 
                     inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart,
 
@@ -2503,7 +2510,7 @@
          = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
         \*/
         accept: function (newValue) {
-            if (newValue instanceof Element) {
+            if (isElement(newValue)) {
                 this.options.accept = newValue;
 
                 return this;
@@ -2672,7 +2679,7 @@
                 autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
 
                 autoScroll.container =
-                    (options.container instanceof Element || options.container instanceof window.Window
+                    (isElement(options.container) || options.container instanceof window.Window
                      ? options.container
                      : defaults.container);
 
@@ -2948,7 +2955,7 @@
          o }
         \*/
         getRect: function rectCheck () {
-            if (this.selector && !(this._element instanceof Element)) {
+            if (this.selector && !(isElement(this._element))) {
                 this._element = document.querySelector(this.selector);
             }
 
@@ -3180,9 +3187,9 @@
                 }
 
                 if ('elementTypes' in defaults && defaults.elementTypes.test(option)) {
-                    if (value instanceof Element) { return value; }
+                    if (isElement(value)) { return value; }
                     else {
-                        return (option in current && current[option] instanceof Element
+                        return (option in current && isElement(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
@@ -3762,7 +3769,7 @@
             if (typeof (options.speed)  === 'number') { defaults.speed  = options.speed ;}
 
             defaults.container =
-                (options.container instanceof Element || options.container instanceof window.Window
+                (isElement(options.container) || options.container instanceof window.Window
                  ? options.container
                  : defaults.container);
 
@@ -4098,7 +4105,7 @@
             // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
             // modified for better performance
             elems = elems || this.parentNode.querySelectorAll(selector);
-            count = elems.length;
+            var count = elems.length;
 
             for (var i = 0; i < count; i++) {
                 if (elems[i] === this) {
@@ -4139,6 +4146,7 @@
     }());
 
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
+    /* global exports: true, module */
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = interact;
