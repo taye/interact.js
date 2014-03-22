@@ -182,7 +182,7 @@
 
         if (status.anchorDrag.checked) {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = true;
-            status.modes.classList.add('disabled');
+            status.modes.className += ' disabled';
 
             interact(canvas)
                 .off('dragstart', dragMove)
@@ -194,7 +194,7 @@
         }
         else {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
-            status.modes.classList.remove('disabled');
+            status.modes.className = status.modes.className.replace(/ *\<disabled\>/g, '');
 
             interact(canvas)
                 .on('dragstart', dragMove)
