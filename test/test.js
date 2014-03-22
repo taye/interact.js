@@ -91,13 +91,13 @@ describe('Interactable', function () {
             squareResize : 'squareResize',
             gesturable  : 'gesturable',
             styleCursor  : 'styleCursor',
-            restrict     : 'restrictions', 
             origin       : 'origin',
             deltaSource  : 'deltaSource'
         },
         enableOptions = [
             'snap',
-            'autoScroll'
+            'autoScroll',
+            'restrict'
         ],
         checkerOptions = {
             actionChecker: 'getAction',
