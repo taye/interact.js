@@ -870,6 +870,8 @@
             inertiaStatus.sx = inertiaStatus.modifiedXe;
             inertiaStatus.sy = inertiaStatus.modifiedYe;
 
+            inertiaStatus.active = false;
+
             pointerMove(inertiaStatus.startEvent);
             pointerUp(inertiaStatus.startEvent);
         }
@@ -1279,6 +1281,9 @@
                 dx += prevEvent.restrict.dx;
                 dy += prevEvent.restrict.dy;
             }
+
+            // Avoid infinite speed by using min dt of 1ms
+            if (dt <= 0) { dt = 0.001; }
 
             // speed and velocity in pixels per second
             this.speed = hypot(dx, dy) / dt;
@@ -2001,11 +2006,12 @@
             inertiaOptions = target && target.options.inertia;
 
         if (dragging || resizing || gesturing) {
-            if (target
-                && target.options.inertiaEnabled
+
+            // check if inertia should be started
+            if (target.options.inertiaEnabled
                 && !inertiaStatus.active
+                && event !== inertiaStatus.startEvent
                 && (new Date().getTime()) - prevEvent.timeStamp < 50
-                && (dragging || resizing || gesturing)
                 && prevEvent.speed > inertiaOptions.minSpeed
                 && prevEvent.speed > inertiaOptions.endSpeed) {
 
@@ -2153,7 +2159,9 @@
             target.fire(tap);
         }
 
-        interact.stop();
+        if (!inertiaStatus.active) {
+            interact.stop();
+        }
     }
 
     // bound to document when a listener is added to a selector interactable
@@ -3956,7 +3964,7 @@
             }
         }
 
-        pointerIsDown = snapStatus.locked = inertiaStatus.active = dragging = resizing = gesturing = false;
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         pointerWasMoved = true;
         prepared = downEvent = prevEvent = null;
 
