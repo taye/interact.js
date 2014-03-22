@@ -1165,7 +1165,7 @@
 
     InteractEvent.prototype = {
         preventDefault: blank,
-        stopImmediatePropagation: function (event) {
+        stopImmediatePropagation: function () {
             imPropStopped = true;
         },
         stopPropagation: blank
@@ -2088,7 +2088,7 @@
             else {
                 var start     = phases.onstart     || phases.onStart     || phases.start,
                     move      = phases.onmove      || phases.onMove      || phases.move,
-                    end       = phases.onend       || phases.onEnd       || phases.end,
+                    end       = phases.onend       || phases.onEnd       || phases.end;
 
                 action = 'on' + action;
 
@@ -3738,7 +3738,7 @@
             // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
             // modified for better performance
             elems = elems || this.parentNode.querySelectorAll(selector);
-            count = elems.length;
+            var count = elems.length;
 
             for (var i = 0; i < count; i++) {
                 if (elems[i] === this) {
@@ -3779,6 +3779,7 @@
     }());
 
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
+    /* global exports: true, module */
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = interact;
