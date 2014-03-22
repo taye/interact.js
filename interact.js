@@ -611,7 +611,7 @@
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                page = getXY('page', inertiaStatus.pointerUp);
+                page = getPageXY(inertiaStatus.pointerUp);
 
                 page.x += inertiaStatus.sx;
                 page.y += inertiaStatus.sy;
@@ -648,7 +648,7 @@
     function getClientXY (event) {
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                var client = getXY('client', inertiaStatus.pointerUp);
+                var client = getClientXY(inertiaStatus.pointerUp);
 
                 client.x += inertiaStatus.sx;
                 client.y += inertiaStatus.sy;
@@ -1981,6 +1981,12 @@
     // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
         if (event.touches && event.touches.length >= 2) {
+            return;
+        }
+
+        // Stop native GestureEvent inertia
+        if (GestureEvent && (event instanceof GestureEvent) && /inertiastart/i.test(event.type)) {
+            event.gestureObject.stop();
             return;
         }
 
