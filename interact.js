@@ -1332,7 +1332,30 @@
     }
 
     function selectorDown (event, forceAction) {
-        var action;
+        var element = (event.target instanceof SVGElementInstance
+            ? event.target.correspondingUseElement
+            : event.target),
+            action;
+
+        // Check if the down event hits the current inertia target
+        if (inertiaStatus.active && target.selector) {
+            // climb up the DOM tree from the event target
+            while (element !== document) {
+
+                // if this element is the current inertia target element
+                if (element === inertiaStatus.targetElement
+                    // and the prospective action is the same as the ongoing one
+                    && validateAction(target.getAction(event)) === prepared) {
+
+                    // stop inertia so that the next move will be a normal one
+                    cancelFrame(inertiaStatus.i);
+                    inertiaStatus.active = false;
+
+                    return;
+                }
+                element = element.parentNode;
+            }
+        }
 
         // do nothing if interacting
         if (dragging || resizing || gesturing) {
@@ -1344,9 +1367,6 @@
         }
         else {
             var selector,
-                element = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target),
                 elements;
 
             while (element !== document && !action) {
@@ -1459,6 +1479,15 @@
             event.preventDefault();
             downTime = new Date().getTime();
             downEvent = event;
+        }
+        // if inertia is active try to resume action
+        else if (inertiaStatus.active
+            && event.currentTarget === inertiaStatus.targetElement
+            && target === inertiaStatus.target
+            && validateAction(target.getAction(event)) === prepared) {
+
+            cancelFrame(inertiaStatus.i);
+            inertiaStatus.active = false;
         }
     }
 
@@ -1948,6 +1977,8 @@
     }
 
     function pointerOut (event) {
+        if (pointerIsDown || dragging || resizing || gesturing) { return; }
+
         // Remove temporary event listeners for selector Interactables
         var eventTarget = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
@@ -2007,9 +2038,10 @@
 
         if (dragging || resizing || gesturing) {
 
+            if (inertiaStatus.active) { return; }
+
             // check if inertia should be started
             if (target.options.inertiaEnabled
-                && !inertiaStatus.active
                 && event !== inertiaStatus.startEvent
                 && (new Date().getTime()) - prevEvent.timeStamp < 50
                 && prevEvent.speed > inertiaOptions.minSpeed
@@ -2088,9 +2120,8 @@
                 return;
             }
 
-            if (!inertiaStatus.active
-                && ((target.options.snapEnabled && target.options.snap.endOnly)
-                || (target.options.snapEnabled && target.options.restrict.endOnly))) {
+            if ((target.options.snapEnabled && target.options.snap.endOnly)
+                || (target.options.snapEnabled && target.options.restrict.endOnly)) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
@@ -2159,9 +2190,7 @@
             target.fire(tap);
         }
 
-        if (!inertiaStatus.active) {
-            interact.stop();
-        }
+        interact.stop();
     }
 
     // bound to document when a listener is added to a selector interactable
