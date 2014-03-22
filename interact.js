@@ -1997,7 +1997,7 @@
             if (target
                 && target.options.inertiaEnabled
                 && !inertiaStatus.active
-                && event.timeStamp - prevEvent.timeStamp < 50
+                && (new Date().getTime()) - prevEvent.timeStamp < 50
                 && (dragging || resizing || gesturing)
                 && prevEvent.speed > inertiaOptions.minSpeed
                 && prevEvent.speed > inertiaOptions.endSpeed) {
