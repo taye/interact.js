@@ -539,6 +539,13 @@
 
     function blank () {}
 
+    function isElement (o) {
+        return !!o && (
+            typeof Element === "object" ? o instanceof Element : //DOM2
+            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+        );
+    }
+
     function setPrevXY (event) {
         prevX = event.pageX;
         prevY = event.pageY;
@@ -760,7 +767,7 @@
                 ? interactable.options.origin
                 : defaultOptions.origin;
 
-        if (origin instanceof Element)  {
+        if (isElement(origin))  {
             origin = interact(origin).getRect();
 
             origin.x = origin.left;
@@ -874,7 +881,7 @@
                 var current = dropzones[i];
 
                 // if the dropzone has an accept option, test against it
-                if (current.options.accept instanceof Element) {
+                if (isElement(current.options.accept)) {
                     if (current.options.accept !== element) {
                         continue;
                     }
@@ -905,7 +912,7 @@
                         selector.rect = selector.getRect();
 
                         // if the dropzone has an accept option, test against it
-                        if (selector.options.accept instanceof Element) {
+                        if (isElement(selector.options.accept)) {
                             if (selector.options.accept !== element) {
                                 continue;
                             }
@@ -1477,7 +1484,7 @@
         var originalPageX = page.x,
             originalPageY = page.y;
 
-        if (restriction instanceof Element) {
+        if (isElement(restriction)) {
             rect = interact(restriction).getRect();
         }
         else {
@@ -2050,7 +2057,7 @@
             this.selector = element;
         }
         else {
-            if(element instanceof Element) {
+            if(isElement(element)) {
                 if (PointerEvent) {
                     events.add(this, 'pointerdown', pointerDown );
                     events.add(this, 'pointermove', pointerHover);
@@ -2258,7 +2265,7 @@
          = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
         \*/
         accept: function (newValue) {
-            if (newValue instanceof Element) {
+            if (isElement(newValue)) {
                 this.options.accept = newValue;
 
                 return this;
@@ -2427,7 +2434,7 @@
                 autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
 
                 autoScroll.container =
-                    (options.container instanceof Element || options.container instanceof window.Window
+                    (isElement(options.container) || options.container instanceof window.Window
                      ? options.container
                      : defaults.container);
 
@@ -2629,7 +2636,7 @@
          o }
         \*/
         getRect: function rectCheck () {
-            if (this.selector && !(this._element instanceof Element)) {
+            if (this.selector && !(isElement(this._element))) {
                 this._element = document.querySelector(this.selector);
             }
 
@@ -2861,9 +2868,9 @@
                 }
 
                 if ('elementTypes' in defaults && defaults.elementTypes.test(option)) {
-                    if (value instanceof Element) { return value; }
+                    if (isElement(value)) { return value; }
                     else {
-                        return (option in current && current[option] instanceof Element
+                        return (option in current && isElement(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
@@ -3441,7 +3448,7 @@
             if (typeof (options.speed)  === 'number') { defaults.speed  = options.speed ;}
 
             defaults.container =
-                (options.container instanceof Element || options.container instanceof window.Window
+                (isElement(options.container) || options.container instanceof window.Window
                  ? options.container
                  : defaults.container);
 
