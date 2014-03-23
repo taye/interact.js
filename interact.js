@@ -67,6 +67,8 @@
             vx0: 0,
             vys: 0,
 
+            lambda_v: 0,
+            one_ve_v0: 0,
             i  : null
         },
 
@@ -853,17 +855,13 @@
     function inertiaFrame () {
         var options = inertiaStatus.target.options.inertia,
             lambda = options.resistance,
-            ve = options.endSpeed,
-            v0 = inertiaStatus.v0,
             t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
-            inertiaStatus.elapsed = t;
+        if (t < inertiaStatus.te) {
 
-        if (inertiaStatus.elapsed < inertiaStatus.te) {
+            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v) / inertiaStatus.one_ve_v0;
 
-            var progress =  1 - (Math.exp(-lambda * t) - lambda / inertiaStatus.v0) / (1 - ve / v0);
-
-            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye ) {
+            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
                 inertiaStatus.sx = inertiaStatus.xe * progress;
                 inertiaStatus.sy = inertiaStatus.ye * progress;
             }
@@ -2082,6 +2080,9 @@
                 inertiaStatus.y0 = prevEvent.pageY;
                 inertiaStatus.vx0 = prevEvent.velocityX;
                 inertiaStatus.vy0 = prevEvent.velocityY;
+
+                inertiaStatus.lambda_v = lambda / inertiaStatus.v0;
+                inertiaStatus.one_ve_v0 = 1 - inertiaOptions.endSpeed / inertiaStatus.v0;
 
                 inertiaStatus.modifiedXe = inertiaStatus.xe;
                 inertiaStatus.modifiedYe = inertiaStatus.ye;
