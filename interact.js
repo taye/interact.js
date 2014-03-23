@@ -51,6 +51,8 @@
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
 
+        tmpXY = {},     // reduce object creation in getXY()
+
         gesture = {
             start: { x: 0, y: 0 },
 
@@ -560,24 +562,25 @@
         );
     }
 
-    function setEventXY (target, source) {
-        var page = getPageXY(source),
-            client = getClientXY(source);
+    function setEventXY (targetObj, source) {
+        getPageXY(source, tmpXY);
+        targetObj.pageX = tmpXY.x;
+        targetObj.pageY = tmpXY.y;
 
-        target.pageX = page.x;
-        target.pageY = page.y;
-        target.clientX = client.x;
-        target.clientY = client.y;
+        getClientXY(source, tmpXY);
+        targetObj.clientX = tmpXY.x;
+        targetObj.clientY = tmpXY.y;
 
-        target.timeStamp = new Date().getTime();
+        targetObj.timeStamp = new Date().getTime();
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
-    function getXY (type, event) {
+    function getXY (type, event, xy) {
         var touch,
             x,
             y;
 
+        xy = xy || {};
         type = type || 'page';
 
         if (event.touches) {
@@ -592,54 +595,53 @@
             y = event[type + 'Y'];
         }
 
-        return {
-            x: x,
-            y: y
-        };
+        xy.x = x;
+        xy.y = y;
+
+        return xy;
     }
 
-    function getPageXY (event) {
-        var page;
+    function getPageXY (event, page) {
+        page = page || {};
 
         if (event instanceof InteractEvent) {
-            return {
-                x: event.pageX,
-                y: event.pageY
-            };
+            page.x = event.pageX;
+            page.y = event.pageY;
         }
-
         // Opera Mobile handles the viewport and scrolling oddly
-        if (isOperaMobile) {
-            page = getXY('screen', event);
+        else if (isOperaMobile) {
+            getXY('screen', event, page);
 
             page.x += window.scrollX;
             page.y += window.scrollY;
         }
+        // MSGesture events don't have pageX/Y
         else if (/gesture|inertia/i.test(event.type)) {
-            page = getXY('client', event);
+            getXY('client', event, page);
 
             page.x += document.documentElement.scrollLeft;
             page.y += document.documentElement.scrollTop;
-
-            return page;
         }
         else {
-            page = getXY('page', event);
+            getXY('page', event, page);
         }
 
         return page;
     }
 
-    function getClientXY (event) {
+    function getClientXY (event, client) {
+        client = client || {};
+
         if (event instanceof InteractEvent) {
-            return {
-                x: event.clientX,
-                y: event.clientY
-            };
+            client.x = event.clientX;
+            client.y = event.clientY;
+        }
+        else {
+            // Opera Mobile handles the viewport and scrolling oddly
+            getXY(isOperaMobile? 'screen': 'client', event, client);
         }
 
-        // Opera Mobile handles the viewport and scrolling oddly
-        return getXY(isOperaMobile? 'screen': 'client', event);
+        return client;
     }
 
     function getScrollXY () {
