@@ -1317,13 +1317,6 @@
                 this.velocityY = dy / dt;
             }
         }
-
-        if (phase === 'inertiastart') {
-            this.targetPageX   = this.pageX   + inertiaStatus.xe;
-            this.targetPageY   = this.pageY   + inertiaStatus.ye;
-            this.targetClientX = this.clientX + inertiaStatus.xe;
-            this.targetClientY = this.clientY + inertiaStatus.ye;
-        }
     }
 
     InteractEvent.prototype = {
