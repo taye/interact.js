@@ -26,7 +26,16 @@
             pageX: 0,
             pageY: 0,
             clientX: 0,
-            clientY: 0
+            clientY: 0,
+            timeStamp: 0
+        },
+        // current native pointer move event coordinates
+        curCoords = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0
         },
 
         // Starting InteractEvent pointer coordinates
@@ -34,7 +43,8 @@
             pageX: 0,
             pageY: 0,
             clientX: 0,
-            clientY: 0
+            clientY: 0,
+            timeStamp: 0
         },
 
         downTime  = 0,         // the timeStamp of the starting event
@@ -550,11 +560,13 @@
         );
     }
 
-    function setPrevXY (event) {
-        prevCoords.pageX = event.pageX;
-        prevCoords.pageY = event.pageY;
-        prevCoords.clientX = event.clientX;
-        prevCoords.clientY = event.clientY;
+    function setEventXY (target, source) {
+        target.pageX = source.pageX;
+        target.pageY = source.pageY;
+        target.clientX = source.clientX;
+        target.clientY = source.clientY;
+
+        target.timeStamp = new Date().getTime();
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
@@ -964,6 +976,8 @@
         var client,
             page,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
+            sourceX = deltaSource + 'X',
+            sourceY = deltaSource + 'Y',
             options = target? target.options: defaultOptions,
             origin = getOriginXY(target);
 
@@ -1025,11 +1039,8 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        if (phase === 'start' && event === downEvent) {
-            startCoords.pageX    = this.pageX;
-            startCoords.pageY    = this.pageY;
-            startCoords.clientX  = this.clientX;
-            startCoords.clientY  = this.clientY;
+        if (phase === 'start' && !(event instanceof InteractEvent)) {
+            setEventXY(startCoords, this);
         }
 
         this.x0        = startCoords.pageX;
@@ -1132,46 +1143,57 @@
             this.dt        = this.timeStamp - prevEvent.timeStamp;
             this.duration  = this.timeStamp - downTime;
 
-            // change in time in seconds
-            // use event sequence duration for end events
-            // => average speed of the event sequence
-            var dt = (phase === 'end'? this.duration: this.dt) / 1000,
-                dx, dy;
+            var dx, dy, dt;
 
             // Use natural event coordinates (without snapping/restricions)
+            // subtract modifications from previous event if event given is
+            // not a native event
+            if (phase === 'end' || event instanceof InteractEvent) {
+                // change in time in seconds
+                // use event sequence duration for end events
+                // => average speed of the event sequence
+                // (minimum dt of 1ms)
+                dt = Math.max((phase === 'end'? this.duration: this.dt) / 1000, 0.001);
+                dx = this[sourceX] - prevEvent[sourceX];
+                dy = this[sourceY] - prevEvent[sourceY];
 
-            if (this.snap) {
-                dx = this.snap.realX;
-                dy = this.snap.realY;
+                if (this.snap && this.snap.locked) {
+                    dx -= this.snap.dx;
+                    dy -= this.snap.dy;
+                }
+
+                if (this.restrict) {
+                    dx -= this.restrict.dx;
+                    dy -= this.restrict.dy;
+                }
+
+                if (prevEvent.snap && prevEvent.snap.locked) {
+                    dx -= (prevEvent[sourceX] - prevEvent.snap.dx);
+                    dy -= (prevEvent[sourceY] - prevEvent.snap.dy);
+                }
+
+                if (prevEvent.restrict) {
+                    dx += prevEvent.restrict.dx;
+                    dy += prevEvent.restrict.dy;
+                }
+
+                // speed and velocity in pixels per second
+                this.speed = hypot(dx, dy) / dt;
+                this.velocityX = dx / dt;
+                this.velocityY = dy / dt;
             }
+            // if normal move event, use previous user event coords
             else {
-                dx = this.pageX;
-                dy = this.pageY;
-            }
+                dx = curCoords[sourceX] - prevCoords[sourceX];
+                dy = curCoords[sourceY] - prevCoords[sourceY];
+                // force minimum dt of 1ms
+                dt = Math.max((curCoords.timeStamp - prevCoords.timeStamp) / 1000, 0.001);
 
-            if (this.restrict) {
-                dx -= this.restrict.dx;
-                dy -= this.restrict.dy;
+                // speed and velocity in pixels per second
+                this.speed = hypot(dx, dy) / dt;
+                this.velocityX = dx / dt;
+                this.velocityY = dy / dt;
             }
-
-            if (prevEvent.snap && prevEvent.snap.locked) {
-                dx -= prevEvent.snap.realX;
-                dy -= prevEvent.snap.realY;
-            }
-            else {
-                dx -= prevEvent.pageX;
-                dy -= prevEvent.pageY;
-            }
-
-            if (prevEvent.restrict) {
-                dx += prevEvent.restrict.dx;
-                dy += prevEvent.restrict.dy;
-            }
-
-            // speed and velocity in pixels per second
-            this.speed = hypot(dx, dy) / dt;
-            this.velocityX = dx / dt;
-            this.velocityY = dy / dt;
         }
     }
 
@@ -1512,6 +1534,10 @@
     }
 
     function pointerMove (event, preEnd) {
+        if (!(event instanceof InteractEvent)) {
+            setEventXY(curCoords, event);
+        }
+
         if (pointerIsDown) {
             pointerWasMoved = true;
 
@@ -1556,8 +1582,8 @@
             }
         }
 
-        if (!event instanceof InteractEvent) {
-            setPrevXY(event);
+        if (!(event instanceof InteractEvent)) {
+            setEventXY(prevCoords, event);
         }
 
         if (dragging || resizing) {
