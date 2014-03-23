@@ -561,10 +561,13 @@
     }
 
     function setEventXY (target, source) {
-        target.pageX = source.pageX;
-        target.pageY = source.pageY;
-        target.clientX = source.clientX;
-        target.clientY = source.clientY;
+        var page = getPageXY(source),
+            client = getClientXY(source);
+
+        target.pageX = page.x;
+        target.pageY = page.y;
+        target.clientX = client.x;
+        target.clientY = client.y;
 
         target.timeStamp = new Date().getTime();
     }
@@ -3708,6 +3711,16 @@
         events.add(docTarget, 'MSInertiaStart' , pointerUp   );
         events.add(docTarget, 'pointerover'    , pointerOver );
         events.add(docTarget, 'pointerout'     , pointerOut  );
+
+        // set prev move coords even when native gesture is happening
+        // and doesn't call "pointerMove"
+        events.add(docTarget, 'pointermove', function (event) {
+            var time = new Date().getTime();
+
+            if (time > prevCoords.timeStamp) {
+                setEventXY(prevCoords, event);
+            }
+        });
 
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
