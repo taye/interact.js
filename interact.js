@@ -21,20 +21,34 @@
 
         hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
 
-        // Previous interact move event pointer position
-        prevX       = 0,
-        prevY       = 0,
-        prevClientX = 0,
-        prevClientY = 0,
+        // Previous native pointer move event coordinates
+        prevCoords = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0
+        },
+        // current native pointer move event coordinates
+        curCoords = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0
+        },
 
-        // Previous interact start event pointer position
-        x0       = 0,
-        y0       = 0,
-        clientX0 = 0,
-        clientY0 = 0,
+        // Starting InteractEvent pointer coordinates
+        startCoords = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0
+        },
 
         downTime  = 0,         // the timeStamp of the starting event
-        downEvent = null,      // mousedown/touchstart event
+        downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
 
         inertiaStatus = {
@@ -577,14 +591,16 @@
         );
     }
 
-    function setPrevXY (event) {
-        prevX = event.pageX;
-        prevY = event.pageY;
+    function setEventXY (target, source) {
+        var page = getPageXY(source),
+            client = getClientXY(source);
 
-        prevClientX = event.clientX;
-        prevClientY = event.clientY;
+        target.pageX = page.x;
+        target.pageY = page.y;
+        target.clientX = client.x;
+        target.clientY = client.y;
 
-        prevEvent = event;
+        target.timeStamp = new Date().getTime();
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
@@ -1066,6 +1082,8 @@
         var client,
             page,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
+            sourceX = deltaSource + 'X',
+            sourceY = deltaSource + 'Y',
             options = target? target.options: defaultOptions,
             origin = getOriginXY(target);
 
@@ -1089,11 +1107,8 @@
             client.y -= origin.y;
 
             if (options.snapEnabled && options.snap.actions.indexOf(action) !== -1) {
-                var snap = options.snap;
 
                 this.snap = {
-                    mode   : snap.mode,
-                    anchors: snapStatus.anchors,
                     range  : snapStatus.range,
                     locked : snapStatus.locked,
                     x      : snapStatus.x,
@@ -1125,15 +1140,19 @@
             };
         }
 
-
-        this.x0        = x0;
-        this.y0        = y0;
-        this.clientX0  = clientX0;
-        this.clientY0  = clientY0;
         this.pageX     = page.x;
         this.pageY     = page.y;
         this.clientX   = client.x;
         this.clientY   = client.y;
+
+        if (phase === 'start' && !(event instanceof InteractEvent)) {
+            setEventXY(startCoords, this);
+        }
+
+        this.x0        = startCoords.pageX;
+        this.y0        = startCoords.pageY;
+        this.clientX0  = startCoords.clientX;
+        this.clientY0  = startCoords.clientY;
         this.ctrlKey   = event.ctrlKey;
         this.altKey    = event.altKey;
         this.shiftKey  = event.shiftKey;
@@ -1150,12 +1169,12 @@
         // end event dx, dy is difference between start and end points
         if (phase === 'end' || action === 'drop') {
             if (deltaSource === 'client') {
-                this.dx = client.x - x0;
-                this.dy = client.y - y0;
+                this.dx = client.x - startCoords.clientX;
+                this.dy = client.y - startCoords.clientY;
             }
             else {
-                this.dx = page.x - x0;
-                this.dy = page.y - y0;
+                this.dx = page.x - startCoords.pageX;
+                this.dy = page.y - startCoords.pageY;
             }
         }
         // copy properties from previousmove if starting inertia
@@ -1165,12 +1184,12 @@
         }
         else {
             if (deltaSource === 'client') {
-                this.dx = client.x - prevClientX;
-                this.dy = client.y - prevClientY;
+                this.dx = client.x - prevEvent.clientX;
+                this.dy = client.y - prevEvent.clientY;
             }
             else {
-                this.dx = page.x - prevX;
-                this.dy = page.y - prevY;
+                this.dx = page.x - prevEvent.pageX;
+                this.dy = page.y - prevEvent.pageY;
             }
         }
 
@@ -1246,49 +1265,57 @@
             this.dt        = this.timeStamp - prevEvent.timeStamp;
             this.duration  = this.timeStamp - downTime;
 
-            // change in time in seconds
-            // use event sequence duration for end events
-            // => average speed of the event sequence
-            var dt = (phase === 'end'? this.duration: this.dt) / 1000,
-                dx, dy;
+            var dx, dy, dt;
 
             // Use natural event coordinates (without snapping/restricions)
+            // subtract modifications from previous event if event given is
+            // not a native event
+            if (phase === 'end' || event instanceof InteractEvent) {
+                // change in time in seconds
+                // use event sequence duration for end events
+                // => average speed of the event sequence
+                // (minimum dt of 1ms)
+                dt = Math.max((phase === 'end'? this.duration: this.dt) / 1000, 0.001);
+                dx = this[sourceX] - prevEvent[sourceX];
+                dy = this[sourceY] - prevEvent[sourceY];
 
-            if (this.snap && this.snap.locked) {
-                dx = this.snap.realX;
-                dy = this.snap.realY;
+                if (this.snap && this.snap.locked) {
+                    dx -= this.snap.dx;
+                    dy -= this.snap.dy;
+                }
+
+                if (this.restrict) {
+                    dx -= this.restrict.dx;
+                    dy -= this.restrict.dy;
+                }
+
+                if (prevEvent.snap && prevEvent.snap.locked) {
+                    dx -= (prevEvent[sourceX] - prevEvent.snap.dx);
+                    dy -= (prevEvent[sourceY] - prevEvent.snap.dy);
+                }
+
+                if (prevEvent.restrict) {
+                    dx += prevEvent.restrict.dx;
+                    dy += prevEvent.restrict.dy;
+                }
+
+                // speed and velocity in pixels per second
+                this.speed = hypot(dx, dy) / dt;
+                this.velocityX = dx / dt;
+                this.velocityY = dy / dt;
             }
+            // if normal move event, use previous user event coords
             else {
-                dx = this.pageX;
-                dy = this.pageY;
-            }
+                dx = curCoords[sourceX] - prevCoords[sourceX];
+                dy = curCoords[sourceY] - prevCoords[sourceY];
+                // force minimum dt of 1ms
+                dt = Math.max((curCoords.timeStamp - prevCoords.timeStamp) / 1000, 0.001);
 
-            if (this.restrict) {
-                dx -= this.restrict.dx;
-                dy -= this.restrict.dy;
+                // speed and velocity in pixels per second
+                this.speed = hypot(dx, dy) / dt;
+                this.velocityX = dx / dt;
+                this.velocityY = dy / dt;
             }
-
-            if (prevEvent.snap && prevEvent.snap.locked) {
-                dx -= prevEvent.snap.realX;
-                dy -= prevEvent.snap.realY;
-            }
-            else {
-                dx -= prevEvent.pageX;
-                dy -= prevEvent.pageY;
-            }
-
-            if (prevEvent.restrict) {
-                dx += prevEvent.restrict.dx;
-                dy += prevEvent.restrict.dy;
-            }
-
-            // Avoid infinite speed by using min dt of 1ms
-            if (dt <= 0) { dt = 0.001; }
-
-            // speed and velocity in pixels per second
-            this.speed = hypot(dx, dy) / dt;
-            this.velocityX = dx / dt;
-            this.velocityY = dy / dt;
         }
 
         if (phase === 'inertiastart') {
@@ -1411,8 +1438,7 @@
             var action = validateAction(forceAction || target.getAction(event)),
                 average,
                 page,
-                client,
-                origin = getOriginXY(target);
+                client;
 
             if (PointerEvent && event instanceof PointerEvent) {
                 if (target.selector) {
@@ -1467,11 +1493,6 @@
                             '';
 
             prepared = action;
-
-            x0 = page.x - origin.x;
-            y0 = page.y - origin.y;
-            clientX0 = client.x - origin.x;
-            clientY0 = client.y - origin.y;
 
             snapStatus.x = null;
             snapStatus.y = null;
@@ -1626,8 +1647,8 @@
             status.range = snap.range;
         }
 
-        status.changed = snapChanged;
-        status.inRange = inRange;
+        status.changed = (snapChanged || (inRange && !status.locked));
+        status.locked = inRange;
 
         return status;
     }
@@ -1694,60 +1715,47 @@
     }
 
     function pointerMove (event, preEnd) {
+        if (!(event instanceof InteractEvent)) {
+            setEventXY(curCoords, event);
+        }
+
+        pointerWasMoved = true;
+
         if (pointerIsDown
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
-            if (x0 === prevX && y0 === prevY) {
-                pointerWasMoved = true;
-            }
-
             if (prepared && target) {
-                var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd);
+                var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd),
+                    starting = !(dragging || resizing || gesturing),
+                    snapEvent = starting? downEvent: event;
+
+                if (starting) {
+                    prevEvent = downEvent;
+                }
 
                 if (!shouldRestrict) {
                     restrictStatus.restricted = false;
                 }
 
+                // check for snap
                 if (target.options.snapEnabled
                     && target.options.snap.actions.indexOf(prepared) !== -1
                     && (!target.options.snap.endOnly || preEnd)) {
 
-                    var origin = getOriginXY(target);
+                    setSnapping(snapEvent);
 
-                    setSnapping(event);
-
-                    if ((snapStatus.changed || !snapStatus.locked) && snapStatus.inRange)  {
-                        snapStatus.locked = true;
-
-                        // if snap is locked at the start of an action
-                        if (!(dragging || resizing || gesturing)) {
-                            // set the starting point to be the snap coorinates
-                            var p = getPageXY(event),
-                                c = getClientXY(event);
-
-                            x0 = p.x - origin.x + snapStatus.dx;
-                            y0 = p.y - origin.y + snapStatus.dy;
-
-                            clientX0 = c.x - origin.x + snapStatus.dx;
-                            clientY0 = c.y - origin.y + snapStatus.dy;
-                        }
+                    // move if snapping doesn't prevent it
+                    if (snapStatus.changed || !snapStatus.locked) {
 
                         if (shouldRestrict) {
                             setRestriction(event);
                         }
-                        actions[prepared].moveListener(event);
-                    }
-                    else if (snapStatus.snapChanged || !snapStatus.inRange) {
-                        snapStatus.locked = false;
 
-
-                        if (shouldRestrict) {
-                            setRestriction(event);
-                        }
                         actions[prepared].moveListener(event);
                     }
                 }
+                // if no snap, always move
                 else {
                     if (shouldRestrict) {
                         setRestriction(event);
@@ -1756,6 +1764,10 @@
                     actions[prepared].moveListener(event);
                 }
             }
+        }
+
+        if (!(event instanceof InteractEvent)) {
+            setEventXY(prevCoords, event);
         }
 
         if (dragging || resizing) {
@@ -1773,8 +1785,6 @@
             leaveDropTarget;
 
         if (!dragging) {
-            setPrevXY(downEvent);
-
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
             dragging = true;
 
@@ -1787,7 +1797,12 @@
                 }
             }
 
-            setPrevXY(dragEvent);
+            prevEvent = dragEvent;
+
+            // set snapping for the next move event
+            if (target.options.snapEnabled && !target.options.snap.endOnly) {
+                setSnapping(event);
+            }
         }
 
         dragEvent  = new InteractEvent(event, 'drag', 'move');
@@ -1835,7 +1850,7 @@
             dropTarget.fire(dragEnterEvent);
         }
 
-        setPrevXY(dragEvent);
+        prevEvent = dragEvent;
     }
 
     function resizeMove (event) {
@@ -1844,21 +1859,24 @@
         var resizeEvent;
 
         if (!resizing) {
-            setPrevXY(downEvent);
-
             resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
             target.fire(resizeEvent);
 
             target.fire(resizeEvent);
             resizing = true;
 
-            setPrevXY(resizeEvent);
+            prevEvent = resizeEvent;
+
+            // set snapping for the next move event
+            if (target.options.snapEnabled && !target.options.snap.endOnly) {
+                setSnapping(event);
+            }
         }
 
         resizeEvent = new InteractEvent(event, 'resize', 'move');
         target.fire(resizeEvent);
 
-        setPrevXY(resizeEvent);
+        prevEvent = resizeEvent;
     }
 
     function gestureMove (event) {
@@ -1871,8 +1889,6 @@
         var gestureEvent;
 
         if (!gesturing) {
-            setPrevXY(downEvent);
-
             gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
             gestureEvent.ds = 0;
 
@@ -1884,7 +1900,12 @@
 
             target.fire(gestureEvent);
 
-            setPrevXY(gestureEvent);
+            prevEvent = gestureEvent;
+
+            // set snapping for the next move event
+            if (target.options.snapEnabled && !target.options.snap.endOnly) {
+                setSnapping(event);
+            }
         }
 
         gestureEvent = new InteractEvent(event, 'gesture', 'move');
@@ -1892,7 +1913,7 @@
 
         target.fire(gestureEvent);
 
-        setPrevXY(gestureEvent);
+        prevEvent = gestureEvent;
 
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
@@ -2099,7 +2120,7 @@
                 if (target.options.snapEnabled && target.options.snap.endOnly) {
                     var snap = setSnapping(event, statusObject);
 
-                    if (snap.inRange) {
+                    if (snap.locked) {
                         inertiaStatus.modifiedXe += snap.dx;
                         inertiaStatus.modifiedYe += snap.dy;
                     }
@@ -2375,7 +2396,7 @@
                     move      = phases.onmove      || phases.onMove      || phases.move,
                     end       = phases.onend       || phases.onEnd       || phases.end;
 
-                    inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart,
+                var inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart;
 
                 action = 'on' + action;
 
@@ -3695,10 +3716,8 @@
             gesturing             : gesturing,
             prepared              : prepared,
 
-            prevX                 : prevX,
-            prevY                 : prevY,
-            x0                    : x0,
-            y0                    : y0,
+            prevCoords            : prevCoords,
+            downCoords            : startCoords,
 
             inertia               : inertiaStatus,
 
@@ -3724,16 +3743,7 @@
 
             events                : events,
             globalEvents          : globalEvents,
-            delegatedEvents       : delegatedEvents,
-
-            log: function () {
-                console.log('target         :  ' + target);
-                console.log('prevX, prevY   :  ' + prevX, prevY);
-                console.log('x0, y0         :  ' + x0, y0);
-                console.log('supportsTouch  :  ' + supportsTouch);
-                console.log('pointerIsDown  :  ' + pointerIsDown);
-                console.log('currentAction  :  ' + interact.currentAction());
-            }
+            delegatedEvents       : delegatedEvents
         };
     };
 
@@ -4095,6 +4105,16 @@
         events.add(docTarget, 'MSInertiaStart' , pointerUp   );
         events.add(docTarget, 'pointerover'    , pointerOver );
         events.add(docTarget, 'pointerout'     , pointerOut  );
+
+        // set prev move coords even when native gesture is happening
+        // and doesn't call "pointerMove"
+        events.add(docTarget, 'pointermove', function (event) {
+            var time = new Date().getTime();
+
+            if (time > prevCoords.timeStamp) {
+                setEventXY(prevCoords, event);
+            }
+        });
 
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
