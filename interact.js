@@ -47,6 +47,17 @@
             timeStamp: 0
         },
 
+        // Change in coordinates and time of the pointer
+        pointerDelta = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0,
+            pageSpeed: 0,
+            clientSpeed: 0
+        },
+
         downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
@@ -69,7 +80,7 @@
             vx0: 0,
             vys: 0,
 
-            lambda_v: 0,
+            lambda_v0: 0,
             one_ve_v0: 0,
             i  : null
         },
@@ -860,7 +871,7 @@
 
         if (t < inertiaStatus.te) {
 
-            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v) / inertiaStatus.one_ve_v0;
+            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
 
             if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
                 inertiaStatus.sx = inertiaStatus.xe * progress;
@@ -1305,15 +1316,9 @@
             }
             // if normal move event, use previous user event coords
             else {
-                dx = curCoords[sourceX] - prevCoords[sourceX];
-                dy = curCoords[sourceY] - prevCoords[sourceY];
-                // force minimum dt of 1ms
-                dt = Math.max((curCoords.timeStamp - prevCoords.timeStamp) / 1000, 0.001);
-
-                // speed and velocity in pixels per second
-                this.speed = hypot(dx, dy) / dt;
-                this.velocityX = dx / dt;
-                this.velocityY = dy / dt;
+                this.speed = pointerDelta[deltaSource + 'Speed'];
+                this.velocityX = pointerDelta[deltaSource + 'VX'];
+                this.velocityY = pointerDelta[deltaSource + 'VY'];
             }
         }
     }
@@ -1707,7 +1712,7 @@
     }
 
     function pointerMove (event, preEnd) {
-        if (!(event instanceof InteractEvent)) {
+        if (!(event instanceof InteractEvent) && pointerIsDown) {
             setEventXY(curCoords, event);
         }
 
@@ -1758,7 +1763,24 @@
             }
         }
 
-        if (!(event instanceof InteractEvent)) {
+        if (!(event instanceof InteractEvent) && pointerIsDown) {
+            // set pointer changes
+            pointerDelta.pageX     = curCoords.pageX      - prevCoords.pageX;
+            pointerDelta.pageY     = curCoords.pageY      - prevCoords.pageY;
+            pointerDelta.clientX   = curCoords.clientX    - prevCoords.clientX;
+            pointerDelta.clientY   = curCoords.clientY    - prevCoords.clientY;
+            pointerDelta.timeStamp = new Date().getTime() - prevCoords.timeStamp;
+
+            // set pointer velocity
+            var dt = Math.max(pointerDelta.timeStamp / 1000, 0.001);
+            pointerDelta.pageSpeed   = hypot(pointerDelta.pageX, pointerDelta.pageY) / dt;
+            pointerDelta.pageVX      = pointerDelta.pageX / dt;
+            pointerDelta.pageVY      = pointerDelta.pageY / dt;
+
+            pointerDelta.clientSpeed = hypot(pointerDelta.clientX, pointerDelta.pageY) / dt;
+            pointerDelta.clientVX      = pointerDelta.clientX / dt;
+            pointerDelta.clientVY      = pointerDelta.clientY / dt;
+
             setEventXY(prevCoords, event);
         }
 
@@ -2053,52 +2075,49 @@
 
             if (inertiaStatus.active) { return; }
 
+            var deltaSource =target.options.deltaSource,
+                pointerSpeed = pointerDelta[deltaSource + 'Speed'];
+
             // check if inertia should be started
             if (target.options.inertiaEnabled
                 && event !== inertiaStatus.startEvent
-                && (new Date().getTime()) - prevEvent.timeStamp < 50
-                && prevEvent.speed > inertiaOptions.minSpeed
-                && prevEvent.speed > inertiaOptions.endSpeed) {
+                && (new Date().getTime() - curCoords.timeStamp) < 50
+                && pointerSpeed > inertiaOptions.minSpeed
+                && pointerSpeed > inertiaOptions.endSpeed) {
+
 
                 var lambda = inertiaOptions.resistance,
-                    inertiaDur = -Math.log(inertiaOptions.endSpeed / prevEvent.speed) / lambda,
+                    inertiaDur = -Math.log(inertiaOptions.endSpeed / pointerSpeed) / lambda,
                     startEvent;
 
                 inertiaStatus.active = true;
                 inertiaStatus.target = target;
                 inertiaStatus.targetElement = target._element;
-
-                inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
                 inertiaStatus.pointerUp = event;
+                inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
 
-                inertiaStatus.xe = (prevEvent.velocityX - inertiaDur) / lambda;
-                inertiaStatus.ye = (prevEvent.velocityY - inertiaDur) / lambda;
-                inertiaStatus.te = inertiaDur;
-
-                inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
-                inertiaStatus.v0 = prevEvent.speed;
+                inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
+                inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
+                inertiaStatus.v0 = pointerSpeed;
                 inertiaStatus.x0 = prevEvent.pageX;
                 inertiaStatus.y0 = prevEvent.pageY;
-                inertiaStatus.vx0 = prevEvent.velocityX;
-                inertiaStatus.vy0 = prevEvent.velocityY;
+                inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
+                inertiaStatus.sx = inertiaStatus.sy = 0;
 
-                inertiaStatus.lambda_v = lambda / inertiaStatus.v0;
+                inertiaStatus.modifiedXe = inertiaStatus.xe = (inertiaStatus.vx0 - inertiaDur) / lambda;
+                inertiaStatus.modifiedYe = inertiaStatus.ye = (inertiaStatus.vy0 - inertiaDur) / lambda;
+                inertiaStatus.te = inertiaDur;
+
+                inertiaStatus.lambda_v0 = lambda / inertiaStatus.v0;
                 inertiaStatus.one_ve_v0 = 1 - inertiaOptions.endSpeed / inertiaStatus.v0;
 
-                inertiaStatus.modifiedXe = inertiaStatus.xe;
-                inertiaStatus.modifiedYe = inertiaStatus.ye;
-
-                var startX,
-                    startY,
+                var startX = startEvent.pageX,
+                    startY = startEvent.pageY,
                     statusObject;
 
                 if (startEvent.snap && startEvent.snap.locked) {
-                    startX = startEvent.snap.realX;
-                    startY = startEvent.snap.realY;
-                }
-                else {
-                    startX = startEvent.pageX;
-                    startY = startEvent.pageY;
+                    startX -= startEvent.snap.dx;
+                    startY -= startEvent.snap.dy;
                 }
 
                 if (startEvent.restrict) {
