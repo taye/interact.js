@@ -70,7 +70,7 @@
             targetElement: null,
 
             startEvent: null,
-            pointerUp : null,
+            pointerUp : {},
 
             xe : 0,
             ye : 0,
@@ -2093,7 +2093,20 @@
                 inertiaStatus.active = true;
                 inertiaStatus.target = target;
                 inertiaStatus.targetElement = target._element;
-                inertiaStatus.pointerUp = event;
+
+                if (events.useAttachEvent) {
+                    // make a copy of the pointerdown event because IE8
+                    // http://stackoverflow.com/a/3533725/2280888
+                    for (var prop in event) {
+                        if (event.hasOwnProperty(prop)) {
+                            inertiaStatus.pointerUp[prop] = event[prop];
+                        }
+                    }
+                }
+                else {
+                    inertiaStatus.pointerUp = event;
+                }
+
                 inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
 
                 inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
