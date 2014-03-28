@@ -1712,7 +1712,10 @@
     }
 
     function pointerMove (event, preEnd) {
-        if (!(event instanceof InteractEvent) && pointerIsDown) {
+        if (!(event instanceof InteractEvent)
+            && pointerIsDown
+            // Ignore browser's simulated mousemove events from touchmove
+            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
             setEventXY(curCoords, event);
         }
 
@@ -1763,7 +1766,10 @@
             }
         }
 
-        if (!(event instanceof InteractEvent) && pointerIsDown) {
+        if (!(event instanceof InteractEvent)
+            && pointerIsDown
+            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+
             // set pointer changes
             pointerDelta.pageX     = curCoords.pageX      - prevCoords.pageX;
             pointerDelta.pageY     = curCoords.pageY      - prevCoords.pageY;
