@@ -1375,6 +1375,11 @@
                     cancelFrame(inertiaStatus.i);
                     inertiaStatus.active = false;
 
+                    if (PointerEvent) {
+                        // add the pointer to the gesture object
+                        selectorGesture.addPointer(event.pointerId);
+                    }
+
                     return;
                 }
                 element = element.parentNode;
@@ -1506,6 +1511,14 @@
 
             cancelFrame(inertiaStatus.i);
             inertiaStatus.active = false;
+
+            if (PointerEvent) {
+                if (!target._gesture.target) {
+                    target._gesture.target = target._element;
+                }
+                // add the pointer to the gesture object
+                target._gesture.addPointer(event.pointerId);
+            }
         }
     }
 
