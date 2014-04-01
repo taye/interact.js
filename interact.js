@@ -652,7 +652,9 @@
     }
 
     function getElementRect (element) {
-        var scroll = getScrollXY(),
+        var scroll = /ipad|iphone|ipod/i.test(navigator.userAgent)
+                ? { x: 0, y: 0 }
+                : getScrollXY(),
             clientRect = (element instanceof SVGElement)?
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
