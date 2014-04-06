@@ -1,5 +1,5 @@
 /**
- * interact.js v1.0.9
+ * interact.js v1.0.10
  *
  * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -712,7 +712,9 @@
     }
 
     function getElementRect (element) {
-        var scroll = getScrollXY(),
+        var scroll = /ipad|iphone|ipod/i.test(navigator.userAgent)
+                ? { x: 0, y: 0 }
+                : getScrollXY(),
             clientRect = (element instanceof SVGElement)?
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
@@ -1021,7 +1023,7 @@
                     }
                 }
 
-                if (element !== current._element && current.dropCheck(event)) {
+                if (element !== current._element && current.dropCheck(event, target)) {
                     drops.push(current);
                     elements.push(current._element);
                 }
@@ -1055,7 +1057,7 @@
                         if (selector._element !== element
                             && elements.indexOf(selector._element) === -1
                             && selectorElements.indexOf(selector._element === -1)
-                            && selector.dropCheck(event)) {
+                            && selector.dropCheck(event, target)) {
 
                             selectorDrops.push(selector);
                             selectorElements.push(selector._element);
@@ -2562,14 +2564,19 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggableElement) {
+        dropCheck: function (event, draggable) {
             var page = getPageXY(event),
+                origin = getOriginXY(draggable),
                 horizontal,
                 vertical;
+
+            page.x += origin.x;
+            page.y += origin.y;
 
             if (dynamicDrop) {
                 this.rect = this.getRect();
             }
+
             horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
             vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
 
