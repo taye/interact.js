@@ -719,7 +719,7 @@
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
 
-        return {
+        return clientRect && {
             left  : clientRect.left   + scroll.x,
             right : clientRect.right  + scroll.x,
             top   : clientRect.top    + scroll.y,
@@ -2576,6 +2576,10 @@
 
             if (dynamicDrop) {
                 this.rect = this.getRect();
+            }
+
+            if (!this.rect) {
+                return false;
             }
 
             horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
