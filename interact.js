@@ -2937,11 +2937,14 @@
          |     // high values slow the object down more quickly
          |     resistance  : 16,
          |
-         |     // the minimum launch speed that results in inertiastart
+         |     // the minimum launch speed (pixels per second) that results in inertiastart
          |     minSpeed    : 200,
          |
          |     // inertia will stop when the object slows down to this speed
-         |     endSpeed    : 20
+         |     endSpeed    : 20,
+         |
+         |     // an array of action types that can have inertia (no gesture)
+         |     actions     : ['drag', 'resize']
          | });
          |
          | // reset custom settings and use all defaults
