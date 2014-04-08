@@ -2101,6 +2101,7 @@
 
             // check if inertia should be started
             if (target.options.inertiaEnabled
+                && prepared !== 'gesture'
                 && event !== inertiaStatus.startEvent
                 && (new Date().getTime() - curCoords.timeStamp) < 50
                 && pointerSpeed > inertiaOptions.minSpeed
