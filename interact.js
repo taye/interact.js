@@ -164,8 +164,10 @@
                 resistance : 10,    // the lambda in exponential decay
                 minSpeed   : 100,   // target speed must be above this for inertia to start
                 endSpeed   : 10,    // the speed at which inertia is slow enough to stop
+                actions    : ['drag', 'resize'],
 
-                numberTypes : /^resistance|^minSpeed|^endSpeed/
+                numberTypes: /^resistance$|^minSpeed$|^endSpeed$/,
+                arrayTypes : /^actions$/
             },
             inertiaEnabled: false,
 
@@ -2102,6 +2104,7 @@
             // check if inertia should be started
             if (target.options.inertiaEnabled
                 && prepared !== 'gesture'
+                && inertiaOptions.actions.indexOf(prepared) !== -1
                 && event !== inertiaStatus.startEvent
                 && (new Date().getTime() - curCoords.timeStamp) < 50
                 && pointerSpeed > inertiaOptions.minSpeed
@@ -2961,6 +2964,7 @@
                 inertia.resistance = this.validateSetting('inertia', 'resistance', options.resistance);
                 inertia.minSpeed   = this.validateSetting('inertia', 'minSpeed'  , options.minSpeed);
                 inertia.endSpeed   = this.validateSetting('inertia', 'endSpeed'  , options.endSpeed);
+                inertia.actions    = this.validateSetting('inertia', 'actions'   , options.actions);
 
                 this.options.inertiaEnabled = true;
                 this.options.inertia = inertia;
@@ -3990,6 +3994,8 @@
             if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
             if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
 
+            if (options.actions instanceof Array) { inertia.actions = options.actions; }
+
             return interact;
         }
         if (typeof options === 'boolean') {
@@ -4002,7 +4008,8 @@
             enabled: defaultOptions.inertiaEnabled,
             resistance: inertia.resistance,
             minSpeed: inertia.minSpeed,
-            endSpeed: inertia.endSpeed
+            endSpeed: inertia.endSpeed,
+            actions: inertia.actions
         };
     };
 
