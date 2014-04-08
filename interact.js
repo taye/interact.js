@@ -2514,28 +2514,29 @@
          = (Interactable) this Interactable
          > Usage
          | interact('.handle').snap({
-         |     mode        : 'grid',
-         |     range       : Infinity,
-         |     grid        : { x: 100, y: 100 },
-         |     gridOffset  : { x:   0, y:   0 },
+         |     mode        : 'grid',                // event coords should snap to the corners of a grid
+         |     range       : Infinity,              // the effective distance of snap ponts
+         |     grid        : { x: 100, y: 100 },    // the x and y spacing of the grid points
+         |     gridOffset  : { x:   0, y:   0 },    // the offset of the grid points
          | });
          |
          | interact('.handle').snap({
-         |     mode        : 'anchor',
+         |     mode        : 'anchor',              // snap to specified points
          |     anchors     : [
-         |         { x: 100, y: 100, range: 25 },
-         |         { x: 200, y: 200 }
+         |         { x: 100, y: 100, range: 25 },   // a point with x, y and a specific range
+         |         { x: 200, y: 200 }               // a point with x and y. it uses the default range
          |     ]
          | });
          |
          | interact(document.querySelector('#thing')).snap({
          |     mode : 'path',
          |     paths: [
-         |         {
+         |         {            // snap to points on these x and y axes
          |             x: 100,
          |             y: 100,
          |             range: 25
          |         },
+         |         // give this function the x and y page coords and snap to the object returned
          |         function (x, y) {
          |             return {
          |                 x: x,
@@ -2544,6 +2545,13 @@
          |             };
          |         }]
          | })
+         |
+         | interact(element).snap({
+         |     // do not snap during normal movement.
+         |     // Instead, trigger only one snapped move event
+         |     // immediately before the end event.
+         |     endOnly: true       
+         | });
         \*/
         snap: function (options) {
             var defaults = defaultOptions.snap;
@@ -2805,6 +2813,13 @@
          |     // x and y are relative to the the interactable's origin
          |     resize: { x: 100, y: 100, width: 200, height: 200 }
          | })
+         |
+         | interact(element).restrict({
+         |     // do not restrict during normal movement.
+         |     // Instead, trigger only one restricted move event
+         |     // immediately before the end event.
+         |     endOnly: true       
+         | });
         \*/
         restrict: function (newValue) {
             if (newValue === undefined) {
