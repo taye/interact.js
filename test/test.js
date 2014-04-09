@@ -97,7 +97,8 @@ describe('Interactable', function () {
         enableOptions = [
             'snap',
             'autoScroll',
-            'restrict'
+            'restrict',
+            'inertia'
         ],
         checkerOptions = {
             actionChecker: 'getAction',
