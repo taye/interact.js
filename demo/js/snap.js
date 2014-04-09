@@ -112,7 +112,7 @@
 
         context.clearRect(0, 0, width, height);
 
-        if (snap && snap.range !== Infinity) {
+        if (snap && snap.range !== Infinity && typeof snap.x === 'number' && typeof snap.y === 'number') {
             context.circle(snap.x, snap.y, snap.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
         }
 
@@ -182,7 +182,7 @@
 
         if (status.anchorDrag.checked) {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = true;
-            status.modes.classList.add('disabled');
+            status.modes.className += ' disabled';
 
             interact(canvas)
                 .off('dragstart', dragMove)
@@ -194,7 +194,7 @@
         }
         else {
             status.anchorMode.disabled = status.offMode.disabled = status.gridMode.disabled = false;
-            status.modes.classList.remove('disabled');
+            status.modes.className = status.modes.className.replace(/ *\<disabled\>/g, '');
 
             interact(canvas)
                 .on('dragstart', dragMove)
@@ -205,11 +205,12 @@
                 .off('dragend', anchorDragEnd);
         }
 
-        interact(canvas).snap({
-            mode: status.anchorMode.checked
-                ? 'anchor'
-                : 'grid'
-            });
+        interact(canvas)
+            .snap({
+                mode: status.anchorMode.checked? 'anchor': 'grid',
+                endOnly: status.endOnly.checked
+            })
+            .inertia(status.inertia.checked);
 
         interact(canvas).snap(status.offMode.checked? false: true);
 
@@ -238,6 +239,7 @@
         interact(canvas)
             .snap({
                 mode: 'grid',
+                endOnly: true,
                 grid: {x: 0, y: 0},
                 gridOffset: {x: 0, y: 0},
                 range: Infinity,
@@ -269,7 +271,9 @@
             offMode: document.getElementById('off-mode'),
             gridMode: document.getElementById('grid-mode'),
             anchorMode: document.getElementById('anchor-mode'),
-            anchorDrag: document.getElementById('drag-anchors')
+            anchorDrag: document.getElementById('drag-anchors'),
+            endOnly: document.getElementById('end-only'),
+            inertia: document.getElementById('inertia')
         };
 
         interact(status.sliders)

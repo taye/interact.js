@@ -47,11 +47,43 @@
             timeStamp: 0
         },
 
+        // Change in coordinates and time of the pointer
+        pointerDelta = {
+            pageX: 0,
+            pageY: 0,
+            clientX: 0,
+            clientY: 0,
+            timeStamp: 0,
+            pageSpeed: 0,
+            clientSpeed: 0
+        },
+
         downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
 
         tmpXY = {},     // reduce object creation in getXY()
+
+        inertiaStatus = {
+            active       : false,
+            target       : null,
+            targetElement: null,
+
+            startEvent: null,
+            pointerUp : {},
+
+            xe : 0,
+            ye : 0,
+            duration: 0,
+
+            t0 : 0,
+            vx0: 0,
+            vys: 0,
+
+            lambda_v0: 0,
+            one_ve_v0: 0,
+            i  : null
+        },
 
         gesture = {
             start: { x: 0, y: 0 },
@@ -127,6 +159,17 @@
                 numberTypes : /^margin$|^speed$/
             },
             autoScrollEnabled: false,
+
+            inertia: {
+                resistance : 10,    // the lambda in exponential decay
+                minSpeed   : 100,   // target speed must be above this for inertia to start
+                endSpeed   : 10,    // the speed at which inertia is slow enough to stop
+                actions    : ['drag', 'resize'],
+
+                numberTypes: /^resistance$|^minSpeed$|^endSpeed$/,
+                arrayTypes : /^actions$/
+            },
+            inertiaEnabled: false,
 
             origin      : { x: 0, y: 0 },
             deltaSource : 'page'
@@ -293,17 +336,20 @@
         wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
 
         eventTypes = [
-            'resizestart',
-            'resizemove',
-            'resizeend',
             'dragstart',
             'dragmove',
+            'draginertiastart',
             'dragend',
             'dragenter',
             'dragleave',
             'drop',
+            'resizestart',
+            'resizemove',
+            'resizeinertiastart',
+            'resizeend',
             'gesturestart',
             'gesturemove',
+            'gestureinertiastart',
             'gestureend',
 
             'tap'
@@ -574,6 +620,24 @@
         targetObj.timeStamp = new Date().getTime();
     }
 
+    function setEventDeltas (targetObj, prev, cur) {
+        targetObj.pageX     = cur.pageX      - prev.pageX;
+        targetObj.pageY     = cur.pageY      - prev.pageY;
+        targetObj.clientX   = cur.clientX    - prev.clientX;
+        targetObj.clientY   = cur.clientY    - prev.clientY;
+        targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
+
+        // set pointer velocity
+        var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
+        targetObj.pageSpeed   = hypot(targetObj.pageX, targetObj.pageY) / dt;
+        targetObj.pageVX      = targetObj.pageX / dt;
+        targetObj.pageVY      = targetObj.pageY / dt;
+
+        targetObj.clientSpeed = hypot(targetObj.clientX, targetObj.pageY) / dt;
+        targetObj.clientVX      = targetObj.clientX / dt;
+        targetObj.clientVY      = targetObj.clientY / dt;
+    }
+
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (type, event, xy) {
         var touch,
@@ -605,8 +669,16 @@
         page = page || {};
 
         if (event instanceof InteractEvent) {
-            page.x = event.pageX;
-            page.y = event.pageY;
+            if (/inertiastart/.test(event.type)) {
+                getPageXY(inertiaStatus.pointerUp, page);
+
+                page.x += inertiaStatus.sx;
+                page.y += inertiaStatus.sy;
+            }
+            else {
+                page.x = event.pageX;
+                page.y = event.pageY;
+            }
         }
         // Opera Mobile handles the viewport and scrolling oddly
         else if (isOperaMobile) {
@@ -633,8 +705,16 @@
         client = client || {};
 
         if (event instanceof InteractEvent) {
-            client.x = event.clientX;
-            client.y = event.clientY;
+            if (/inertiastart/.test(event.type)) {
+                getClientXY(inertiaStatus.pointerUp, client);
+
+                client.x += inertiaStatus.sx;
+                client.y += inertiaStatus.sy;
+            }
+            else {
+                client.x = event.clientX;
+                client.y = event.clientY;
+            }
         }
         else {
             // Opera Mobile handles the viewport and scrolling oddly
@@ -804,6 +884,57 @@
         for (var i = 0, len = interactableList.length; i < len; i++) {
             interactableList[i].rect = interactableList[i].getRect();
         }
+    }
+
+    function inertiaFrame () {
+        var options = inertiaStatus.target.options.inertia,
+            lambda = options.resistance,
+            t = new Date().getTime() / 1000 - inertiaStatus.t0;
+
+        if (t < inertiaStatus.te) {
+
+            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
+
+            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
+                inertiaStatus.sx = inertiaStatus.xe * progress;
+                inertiaStatus.sy = inertiaStatus.ye * progress;
+            }
+            else {
+                var quadPoint = getQuadraticCurvePoint(
+                        0, 0,
+                        inertiaStatus.xe, inertiaStatus.ye,
+                        inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
+                        progress);
+
+                inertiaStatus.sx = quadPoint.x;
+                inertiaStatus.sy = quadPoint.y;
+            }
+
+            pointerMove(inertiaStatus.startEvent);
+
+            inertiaStatus.i = reqFrame(inertiaFrame);
+        }
+        else {
+            inertiaStatus.sx = inertiaStatus.modifiedXe;
+            inertiaStatus.sy = inertiaStatus.modifiedYe;
+
+            inertiaStatus.active = false;
+
+            pointerMove(inertiaStatus.startEvent);
+            pointerUp(inertiaStatus.startEvent);
+        }
+    }
+
+    function _getQBezierValue(t, p1, p2, p3) {
+        var iT = 1 - t;
+        return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
+    }
+
+    function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
+        return {
+            x:  _getQBezierValue(position, startX, cpX, endX),
+            y:  _getQBezierValue(position, startY, cpY, endY)
+        };
     }
 
     // Test for the element that's "above" all other qualifiers
@@ -1063,6 +1194,10 @@
         this.t0        = downTime;
         this.type      = action + (phase || '');
 
+        if (inertiaStatus.active) {
+            this.detail = 'inertia';
+        }
+
         if (related) {
             this.relatedTarget = related;
         }
@@ -1077,6 +1212,11 @@
                 this.dx = page.x - startCoords.pageX;
                 this.dy = page.y - startCoords.pageY;
             }
+        }
+        // copy properties from previousmove if starting inertia
+        else if (phase === 'inertiastart') {
+            this.dx = prevEvent.dx;
+            this.dy = prevEvent.dy;
         }
         else {
             if (deltaSource === 'client') {
@@ -1112,28 +1252,31 @@
         }
         else if (action === 'gesture') {
             this.touches  = event.touches;
-            this.distance = touchDistance(event);
-            this.box      = touchBBox(event);
 
             if (phase === 'start') {
-                this.scale = 1;
-                this.ds = 0;
-
-                this.angle = touchAngle(event);
-                this.da = 0;
+                this.distance = touchDistance(event);
+                this.box      = touchBBox(event);
+                this.scale    = 1;
+                this.ds       = 0;
+                this.angle    = touchAngle(event);
+                this.da       = 0;
+            }
+            else if (phase === 'end' || event instanceof InteractEvent) {
+                this.distance = prevEvent.distance;
+                this.box      = prevEvent.box;
+                this.scale    = prevEvent.scale;
+                this.ds       = this.scale - 1;
+                this.angle    = prevEvent.angle;
+                this.da       = this.angle - gesture.startAngle;
             }
             else {
-                this.scale = this.distance / gesture.startDistance;
-                this.angle = touchAngle(event, gesture.prevAngle);
+                this.distance = touchDistance(event);
+                this.box      = touchBBox(event);
+                this.scale    = this.distance / gesture.startDistance;
+                this.angle    = touchAngle(event, gesture.prevAngle);
 
-                if (phase === 'end') {
-                    this.da = this.angle - gesture.startAngle;
-                    this.ds = this.scale - 1;
-                }
-                else {
-                    this.da = this.angle - gesture.prevAngle;
-                    this.ds = this.scale - gesture.prevScale;
-                }
+                this.ds = this.scale - gesture.prevScale;
+                this.da = this.angle - gesture.prevAngle;
             }
         }
 
@@ -1144,6 +1287,14 @@
             this.speed     = 0;
             this.velocityX = 0;
             this.velocityY = 0;
+        }
+        else if (phase === 'inertiastart') {
+            this.timeStamp = new Date().getTime();
+            this.dt        = prevEvent.dt;
+            this.duration  = prevEvent.duration;
+            this.speed     = prevEvent.speed;
+            this.velocityX = prevEvent.velocityX;
+            this.velocityY = prevEvent.velocityY;
         }
         else {
             this.timeStamp = new Date().getTime();
@@ -1191,15 +1342,9 @@
             }
             // if normal move event, use previous user event coords
             else {
-                dx = curCoords[sourceX] - prevCoords[sourceX];
-                dy = curCoords[sourceY] - prevCoords[sourceY];
-                // force minimum dt of 1ms
-                dt = Math.max((curCoords.timeStamp - prevCoords.timeStamp) / 1000, 0.001);
-
-                // speed and velocity in pixels per second
-                this.speed = hypot(dx, dy) / dt;
-                this.velocityX = dx / dt;
-                this.velocityY = dy / dt;
+                this.speed = pointerDelta[deltaSource + 'Speed'];
+                this.velocityX = pointerDelta[deltaSource + 'VX'];
+                this.velocityY = pointerDelta[deltaSource + 'VY'];
             }
         }
     }
@@ -1237,7 +1382,35 @@
     }
 
     function selectorDown (event, forceAction) {
-        var action;
+        var element = (event.target instanceof SVGElementInstance
+            ? event.target.correspondingUseElement
+            : event.target),
+            action;
+
+        // Check if the down event hits the current inertia target
+        if (inertiaStatus.active && target.selector) {
+            // climb up the DOM tree from the event target
+            while (element !== document) {
+
+                // if this element is the current inertia target element
+                if (element === inertiaStatus.targetElement
+                    // and the prospective action is the same as the ongoing one
+                    && validateAction(target.getAction(event)) === prepared) {
+
+                    // stop inertia so that the next move will be a normal one
+                    cancelFrame(inertiaStatus.i);
+                    inertiaStatus.active = false;
+
+                    if (PointerEvent) {
+                        // add the pointer to the gesture object
+                        selectorGesture.addPointer(event.pointerId);
+                    }
+
+                    return;
+                }
+                element = element.parentNode;
+            }
+        }
 
         // do nothing if interacting
         if (dragging || resizing || gesturing) {
@@ -1249,9 +1422,6 @@
         }
         else {
             var selector,
-                element = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target),
                 elements;
 
             while (element !== document && !action) {
@@ -1358,14 +1528,31 @@
             event.preventDefault();
             downTime = new Date().getTime();
             downEvent = event;
+            setEventXY(prevCoords, event);
+        }
+        // if inertia is active try to resume action
+        else if (inertiaStatus.active
+            && event.currentTarget === inertiaStatus.targetElement
+            && target === inertiaStatus.target
+            && validateAction(target.getAction(event)) === prepared) {
+
+            cancelFrame(inertiaStatus.i);
+            inertiaStatus.active = false;
+
+            if (PointerEvent) {
+                if (!target._gesture.target) {
+                    target._gesture.target = target._element;
+                }
+                // add the pointer to the gesture object
+                target._gesture.addPointer(event.pointerId);
+            }
         }
     }
 
     function setSnapping (event, status) {
         var snap = target.options.snap,
             anchors = snap.anchors,
-            page = getPageXY(event),
-            origin = getOriginXY(target),
+            page,
             closest,
             range,
             inRange,
@@ -1377,11 +1564,20 @@
 
         status = status || snapStatus;
 
+        if (status.useStatusXY) {
+            page = { x: status.x, y: status.y };
+        }
+        else {
+            var origin = getOriginXY(target);
+
+            page = getPageXY(event);
+
+            page.x -= origin.x;
+            page.y -= origin.y;
+        }
+
         status.realX = page.x;
         status.realY = page.y;
-
-        page.x -= origin.x;
-        page.y -= origin.y;
 
         // change to infinite range when range is negative
         if (snap.range < 0) { snap.range = Infinity; }
@@ -1494,22 +1690,35 @@
         return status;
     }
 
-    function setRestriction (event) {
+    function setRestriction (event, status) {
         var action = interact.currentAction() || prepared,
-            restriction = target && target.options.restrict[action];
+            restriction = target && target.options.restrict[action],
+            page;
 
-        restrictStatus.dx = 0;
-        restrictStatus.dy = 0;
-        restrictStatus.restricted = false;
+        status = status || restrictStatus;
+
+        if (status.useStatusXY) {
+            page = { x: status.x, y: status.y };
+        }
+        else {
+            var origin = getOriginXY(target);
+
+            page = getPageXY(event);
+
+            page.x -= origin.x;
+            page.y -= origin.y;
+        }
+
+        status.dx = 0;
+        status.dy = 0;
+        status.restricted = false;
 
         if (!action || !restriction) {
             return;
         }
 
         var rect,
-            page = getPageXY(event);
-
-        var originalPageX = page.x,
+            originalPageX = page.x,
             originalPageY = page.y;
 
         if (isElement(restriction)) {
@@ -1535,18 +1744,31 @@
             }
         }
 
-        restrictStatus.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
-        restrictStatus.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
-        restrictStatus.restricted = true;
+        status.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
+        status.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
+        status.restricted = true;
+
+        return status;
     }
 
     function pointerMove (event, preEnd) {
-        if (!(event instanceof InteractEvent)) {
+        if (!(event instanceof InteractEvent)
+            && pointerIsDown
+            // Ignore browser's simulated mousemove events from touchmove
+            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
             setEventXY(curCoords, event);
         }
 
-        if (pointerIsDown) {
-            pointerWasMoved = true;
+        pointerWasMoved = true;
+
+        if (pointerIsDown
+            // ignore movement while inertia is active
+            && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
+
+            // if just starting an action, calculate the pointer speed now
+            if (!(dragging || resizing || gesturing)) {
+                setEventDeltas(pointerDelta, prevCoords, curCoords);
+            }
 
             if (prepared && target) {
                 var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd),
@@ -1589,7 +1811,12 @@
             }
         }
 
-        if (!(event instanceof InteractEvent)) {
+        if (!(event instanceof InteractEvent)
+            && pointerIsDown
+            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(pointerDelta, prevCoords, curCoords);
             setEventXY(prevCoords, event);
         }
 
@@ -1821,6 +2048,8 @@
     }
 
     function pointerOut (event) {
+        if (pointerIsDown || dragging || resizing || gesturing) { return; }
+
         // Remove temporary event listeners for selector Interactables
         var eventTarget = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
@@ -1863,18 +2092,125 @@
         }
     }
 
-    // End interact move events and stop auto-scroll
+    // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
-        var endEvent;
-
         if (event.touches && event.touches.length >= 2) {
             return;
         }
 
-        // if the target has the snap endOnly setting
-        if ((dragging || resizing || gesturing) && target.options.snap.endOnly) {
-            // fire a move event at the snapped coordinates
-            pointerMove(event, true);
+        // Stop native GestureEvent inertia
+        if (GestureEvent && (event instanceof GestureEvent) && /inertiastart/i.test(event.type)) {
+            event.gestureObject.stop();
+            return;
+        }
+
+        var endEvent,
+            inertiaOptions = target && target.options.inertia;
+
+        if (dragging || resizing || gesturing) {
+
+            if (inertiaStatus.active) { return; }
+
+            var deltaSource =target.options.deltaSource,
+                pointerSpeed = pointerDelta[deltaSource + 'Speed'];
+
+            // check if inertia should be started
+            if (target.options.inertiaEnabled
+                && prepared !== 'gesture'
+                && inertiaOptions.actions.indexOf(prepared) !== -1
+                && event !== inertiaStatus.startEvent
+                && (new Date().getTime() - curCoords.timeStamp) < 50
+                && pointerSpeed > inertiaOptions.minSpeed
+                && pointerSpeed > inertiaOptions.endSpeed) {
+
+
+                var lambda = inertiaOptions.resistance,
+                    inertiaDur = -Math.log(inertiaOptions.endSpeed / pointerSpeed) / lambda,
+                    startEvent;
+
+                inertiaStatus.active = true;
+                inertiaStatus.target = target;
+                inertiaStatus.targetElement = target._element;
+
+                if (events.useAttachEvent) {
+                    // make a copy of the pointerdown event because IE8
+                    // http://stackoverflow.com/a/3533725/2280888
+                    for (var prop in event) {
+                        if (event.hasOwnProperty(prop)) {
+                            inertiaStatus.pointerUp[prop] = event[prop];
+                        }
+                    }
+                }
+                else {
+                    inertiaStatus.pointerUp = event;
+                }
+
+                inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
+
+                inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
+                inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
+                inertiaStatus.v0 = pointerSpeed;
+                inertiaStatus.x0 = prevEvent.pageX;
+                inertiaStatus.y0 = prevEvent.pageY;
+                inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
+                inertiaStatus.sx = inertiaStatus.sy = 0;
+
+                inertiaStatus.modifiedXe = inertiaStatus.xe = (inertiaStatus.vx0 - inertiaDur) / lambda;
+                inertiaStatus.modifiedYe = inertiaStatus.ye = (inertiaStatus.vy0 - inertiaDur) / lambda;
+                inertiaStatus.te = inertiaDur;
+
+                inertiaStatus.lambda_v0 = lambda / inertiaStatus.v0;
+                inertiaStatus.one_ve_v0 = 1 - inertiaOptions.endSpeed / inertiaStatus.v0;
+
+                var startX = startEvent.pageX,
+                    startY = startEvent.pageY,
+                    statusObject;
+
+                if (startEvent.snap && startEvent.snap.locked) {
+                    startX -= startEvent.snap.dx;
+                    startY -= startEvent.snap.dy;
+                }
+
+                if (startEvent.restrict) {
+                    startX -= startEvent.restrict.dx;
+                    startY -= startEvent.restrict.dy;
+                }
+
+                statusObject = {
+                    useStatusXY: true,
+                    x: startX + inertiaStatus.xe,
+                    y: startY + inertiaStatus.ye
+                };
+
+                if (target.options.snapEnabled && target.options.snap.endOnly) {
+                    var snap = setSnapping(event, statusObject);
+
+                    if (snap.locked) {
+                        inertiaStatus.modifiedXe += snap.dx;
+                        inertiaStatus.modifiedYe += snap.dy;
+                    }
+                }
+
+                if (target.options.restrictEnabled && target.options.restrict.endOnly) {
+                    var restrict = setRestriction(event, statusObject);
+
+                    inertiaStatus.modifiedXe += restrict.dx;
+                    inertiaStatus.modifiedYe += restrict.dy;
+                }
+
+                cancelFrame(inertiaStatus.i);
+                inertiaStatus.i = reqFrame(inertiaFrame);
+
+                target.fire(inertiaStatus.startEvent);
+
+                return;
+            }
+
+            if ((target.options.snapEnabled && target.options.snap.endOnly)
+                || (target.options.snapEnabled && target.options.restrict.endOnly)) {
+                // fire a move event at the snapped coordinates
+                pointerMove(event, true);
+            }
         }
 
         if (dragging) {
@@ -2125,11 +2461,15 @@
                     move      = phases.onmove      || phases.onMove      || phases.move,
                     end       = phases.onend       || phases.onEnd       || phases.end;
 
+                var inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart;
+
                 action = 'on' + action;
 
                 if (typeof start === 'function') { this[action + 'start'] = start; }
                 if (typeof move  === 'function') { this[action + 'move' ] = move ; }
                 if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
+
+                if (typeof inertiastart === 'function') { this[action + 'inertiastart'  ] = inertiastart  ; }
             }
 
             return this;
@@ -2585,6 +2925,84 @@
 
             return (this.options.snapEnabled
                 ? this.options.snap
+                : false);
+        },
+
+        /*\
+         * Interactable.inertia
+         [ method ]
+         **
+         * Returns or sets if and how events continue to run after the pointer is released
+         **
+         = (boolean | object) `false` if inertia is disabled; `object` with inertia properties if inertia is enabled
+         **
+         * or
+         **
+         - options (object | boolean | null) #optional
+         = (Interactable) this Interactable
+         > Usage
+         | // enable and use default settings
+         | interact(element).inertia(true);
+         |
+         | // enable and use custom settings
+         | interact(element).inertia({
+         |     // value greater than 0
+         |     // high values slow the object down more quickly
+         |     resistance  : 16,
+         |
+         |     // the minimum launch speed (pixels per second) that results in inertiastart
+         |     minSpeed    : 200,
+         |
+         |     // inertia will stop when the object slows down to this speed
+         |     endSpeed    : 20,
+         |
+         |     // an array of action types that can have inertia (no gesture)
+         |     actions     : ['drag', 'resize']
+         | });
+         |
+         | // reset custom settings and use all defaults
+         | interact(element).inertia(null);
+        \*/
+        inertia: function (options) {
+            var defaults = defaultOptions.inertia;
+
+            if (options instanceof Object) {
+                var inertia = this.options.inertia;
+
+                if (inertia === defaults) {
+                   inertia = this.options.inertia = {
+                       resistance: defaults.resistance,
+                       minSpeed  : defaults.minSpeed,
+                       endSpeed  : defaults.endSpeed
+                   };
+                }
+
+                inertia.resistance = this.validateSetting('inertia', 'resistance', options.resistance);
+                inertia.minSpeed   = this.validateSetting('inertia', 'minSpeed'  , options.minSpeed);
+                inertia.endSpeed   = this.validateSetting('inertia', 'endSpeed'  , options.endSpeed);
+                inertia.actions    = this.validateSetting('inertia', 'actions'   , options.actions);
+
+                this.options.inertiaEnabled = true;
+                this.options.inertia = inertia;
+
+                return this;
+            }
+
+            if (typeof options === 'boolean') {
+                this.options.inertiaEnabled = options;
+
+                return this;
+            }
+
+            if (options === null) {
+                delete this.options.inertiaEnabled;
+                delete this.options.inertia;
+
+                return this;
+            }
+
+            return (this.options.inertiaEnabled
+                ? this.options.inertia
                 : false);
         },
 
@@ -3379,6 +3797,8 @@
             prevCoords            : prevCoords,
             downCoords            : startCoords,
 
+            inertia               : inertiaStatus,
+
             downTime              : downTime,
             downEvent             : downEvent,
             prevEvent             : prevEvent,
@@ -3564,6 +3984,48 @@
             realY     : snapStatus.realY,
             dx        : snapStatus.dx,
             dy        : snapStatus.dy
+        };
+    };
+
+    /*\
+     * interact.inertia
+     [ method ]
+     *
+     * Returns or sets inertia settings.
+     *
+     * See @Interactable.inertia
+     *
+     - options (boolean | object) #optional New settings
+     * `true` or `false` to simply enable or disable
+     * or an object of inertia options
+     = (object | interact) The default inertia settings object or interact
+    \*/
+    interact.inertia = function (options) {
+        var inertia = defaultOptions.inertia;
+
+        if (options instanceof Object) {
+            defaultOptions.inertiaEnabled = true;
+
+            if (typeof options.resistance === 'number') { inertia.resistance = options.resistance;}
+            if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
+            if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
+
+            if (options.actions instanceof Array) { inertia.actions = options.actions; }
+
+            return interact;
+        }
+        if (typeof options === 'boolean') {
+            defaultOptions.inertiaEnabled = options;
+
+            return interact;
+        }
+
+        return {
+            enabled: defaultOptions.inertiaEnabled,
+            resistance: inertia.resistance,
+            minSpeed: inertia.minSpeed,
+            endSpeed: inertia.endSpeed,
+            actions: inertia.actions
         };
     };
 

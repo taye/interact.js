@@ -17,15 +17,15 @@
     <div id="controls">
     <section id="sliders">
         <h3> grid spacing </h3>
-        <input id="grid-x" type="range" value="100" min="20" max="500" title="x-axis">
-        <input id="grid-y" type="range" value="100" min="20" max="500" title="x-axis">
+        <input id="grid-x" type="range" value="300" min="20" max="500" title="x-axis">
+        <input id="grid-y" type="range" value="300" min="20" max="500" title="x-axis">
         <br>
         <h3> grid offset </h3>
         <input id="offset-x" type="range" value="50" min="0" max="500" title="x-axis">
         <input id="offset-y" type="range" value="50" min="0" max="500" title="x-axis">
         <br>
         <h3> snap range </h3>
-        <input id="snap-range" type="range" min="-1" value="40" min="10" max="150" title="snap range">
+        <input id="snap-range" type="range" min="-1" value="120" min="10" max="150" title="snap range">
     </section>
         <br>
         <section id="modes">
@@ -41,9 +41,23 @@
             <label for="anchor-mode" class="snap-mode">
                 Anchor Mode 
                 <input id="anchor-mode" type="radio" name="snap-mode">
-            </label> <br>
+            </label>
             <br>
-            <label for="drag-anchors">
+            <br>
+
+            <label for="end-only">
+                Snap at end only
+                <input id="end-only" type="checkbox" checked>
+            </label>
+
+            <label for="inertia">
+                Inertia
+                <input id="inertia" type="checkbox" checked>
+            </label>
+            <br>
+            <br>
+
+            <label for="drag-anchors" style="display: none">
                 Anchor drag mode
                 <input id="drag-anchors" type="checkbox" >
             </label>
