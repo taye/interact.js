@@ -1194,6 +1194,10 @@
         this.t0        = downTime;
         this.type      = action + (phase || '');
 
+        if (inertiaStatus.active) {
+            this.detail = 'inertia';
+        }
+
         if (related) {
             this.relatedTarget = related;
         }
