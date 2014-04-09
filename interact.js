@@ -620,6 +620,24 @@
         targetObj.timeStamp = new Date().getTime();
     }
 
+    function setEventDeltas (targetObj, prev, cur) {
+        targetObj.pageX     = cur.pageX      - prev.pageX;
+        targetObj.pageY     = cur.pageY      - prev.pageY;
+        targetObj.clientX   = cur.clientX    - prev.clientX;
+        targetObj.clientY   = cur.clientY    - prev.clientY;
+        targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
+
+        // set pointer velocity
+        var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
+        targetObj.pageSpeed   = hypot(targetObj.pageX, targetObj.pageY) / dt;
+        targetObj.pageVX      = targetObj.pageX / dt;
+        targetObj.pageVY      = targetObj.pageY / dt;
+
+        targetObj.clientSpeed = hypot(targetObj.clientX, targetObj.pageY) / dt;
+        targetObj.clientVX      = targetObj.clientX / dt;
+        targetObj.clientVY      = targetObj.clientY / dt;
+    }
+
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (type, event, xy) {
         var touch,
@@ -1506,6 +1524,7 @@
             event.preventDefault();
             downTime = new Date().getTime();
             downEvent = event;
+            setEventXY(prevCoords, event);
         }
         // if inertia is active try to resume action
         else if (inertiaStatus.active
@@ -1742,6 +1761,11 @@
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
+            // if just starting an action, calculate the pointer speed now
+            if (!(dragging || resizing || gesturing)) {
+                setEventDeltas(pointerDelta, prevCoords, curCoords);
+            }
+
             if (prepared && target) {
                 var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd),
                     starting = !(dragging || resizing || gesturing),
@@ -1787,23 +1811,8 @@
             && pointerIsDown
             && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
 
-            // set pointer changes
-            pointerDelta.pageX     = curCoords.pageX      - prevCoords.pageX;
-            pointerDelta.pageY     = curCoords.pageY      - prevCoords.pageY;
-            pointerDelta.clientX   = curCoords.clientX    - prevCoords.clientX;
-            pointerDelta.clientY   = curCoords.clientY    - prevCoords.clientY;
-            pointerDelta.timeStamp = new Date().getTime() - prevCoords.timeStamp;
-
-            // set pointer velocity
-            var dt = Math.max(pointerDelta.timeStamp / 1000, 0.001);
-            pointerDelta.pageSpeed   = hypot(pointerDelta.pageX, pointerDelta.pageY) / dt;
-            pointerDelta.pageVX      = pointerDelta.pageX / dt;
-            pointerDelta.pageVY      = pointerDelta.pageY / dt;
-
-            pointerDelta.clientSpeed = hypot(pointerDelta.clientX, pointerDelta.pageY) / dt;
-            pointerDelta.clientVX      = pointerDelta.clientX / dt;
-            pointerDelta.clientVY      = pointerDelta.clientY / dt;
-
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(pointerDelta, prevCoords, curCoords);
             setEventXY(prevCoords, event);
         }
 
