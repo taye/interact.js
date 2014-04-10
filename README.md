@@ -3,6 +3,7 @@
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
 Awesomeness includes:
+ - **inertia**
  - [**snapping**](http://interactjs.io/repo/demo/snap.html) to a grid, custom
    anchors or paths.
  - cross browser and device, supporting {Chrome,Firefox,Opera}' '{**mobile,desktop**}', ' and **Internet Explorer 8+**
@@ -39,20 +40,6 @@ screen device.
 Example
 -------
 ```javascript
-// snap to the corners of the specified grid
-interact.snap({
-    mdoe: 'grid',
-    grid: {
-        x: 100,
-        y: 5
-    },
-    gridOffset: {
-        x: 20,
-        y: 10
-    },
-    range: Infinity // can also use -1 which gets changed to Infinity
-});
-    
 var // x and y to keep the position that's been dragged to
     x = 0,
     y = 0,
@@ -82,7 +69,25 @@ interact(document.body)
         console.log('dragged a distance of ' + 
             Math.sqrt(event.dx*event.dx + event.dy*event.dy) + 
             ' pixels to ' + event.pageX + ', ' + event.pageY);
+    })
+    // allow inertia throwing
+    .inertia({
+        resistance: 15;
     });
+    // snap to the corners of the specified grid
+    .snap({
+        mdoe: 'grid',
+        grid: {
+            x: 100,
+            y: 5
+        },
+        gridOffset: {
+            x: 20,
+            y: 10
+        },
+        range: Infinity // can also use -1 which gets changed to Infinity
+    });
+    
 
 // or you could listen to InteractEvents for every Interactable
 interact.on('dragstart', function (event) {
