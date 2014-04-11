@@ -1493,17 +1493,12 @@
             var action = validateAction(forceAction || target.getAction(event));
 
             if (PointerEvent && event instanceof PointerEvent) {
-                if (target.selector) {
-                    addPointer(event, selectorGesture);
+                // Dom modification seems to reset the gesture target
+                if (!target._gesture.target) {
+                    target._gesture.target = target._element;
                 }
-                else {
-                    // Dom modification seems to reset the gesture target
-                    if (!target._gesture.target) {
-                        target._gesture.target = target._element;
-                    }
 
-                    addPointer(event, target._gesture);
-                }
+                addPointer(event, target._gesture);
             }
 
             if (!action) {
@@ -1883,7 +1878,7 @@
             // End the gesture InteractEvent if there are
             // fewer than 2 active pointers
             if (gesturing && pointerIds.length < 2) {
-                (target._gesture || selectorGesture).stop();
+                target._gesture.stop();
             }
         }
     }
@@ -2482,6 +2477,7 @@
             document.querySelector(element);
             selectors[element] = this;
             this.selector = element;
+            this._gesture = selectorGesture;
         }
         else {
             if(isElement(element)) {
@@ -4147,7 +4143,6 @@
 
             if (target._gesture) {
                 target._gesture.stop();
-                selectorGesture.stop();
             }
 
             clearTargets();
