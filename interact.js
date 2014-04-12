@@ -1775,8 +1775,8 @@
 
                     setSnapping(snapEvent);
 
-                    // move if snapping doesn't prevent it
-                    if (snapStatus.changed || !snapStatus.locked) {
+                    // move if snapping doesn't prevent it or a restriction is in place
+                    if ((snapStatus.changed || !snapStatus.locked) || shouldRestrict) {
 
                         if (shouldRestrict) {
                             setRestriction(event);
@@ -2241,7 +2241,7 @@
             }
 
             if ((target.options.snapEnabled && target.options.snap.endOnly)
-                || (target.options.snapEnabled && target.options.restrict.endOnly)) {
+                || (target.options.restrictEnabled && target.options.restrict.endOnly)) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
