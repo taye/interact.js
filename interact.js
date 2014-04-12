@@ -853,21 +853,27 @@
         return  angle;
     }
 
-    function getOriginXY (interactable) {
+    function getOriginXY (interactable, element) {
         interactable = interactable || target;
 
         var origin = interactable
                 ? interactable.options.origin
                 : defaultOptions.origin;
 
+        element = element || interactable._element;
+
+        if (origin === 'parent') {
+            origin = element.parentNode;
+        }
+
         if (isElement(origin))  {
-            origin = interact(origin).getRect();
+            origin = getElementRect(origin);
 
             origin.x = origin.left;
             origin.y = origin.top;
         }
         else if (typeof origin === 'function') {
-            origin = origin(interactable && interactable._element);
+            origin = origin(interactable && element);
         }
 
         return origin;
@@ -1036,7 +1042,7 @@
                     }
                 }
 
-                if (element !== current._element && current.dropCheck(event, target)) {
+                if (element !== current._element && current.dropCheck(event, target, element)) {
                     drops.push(current);
                     elements.push(current._element);
                 }
@@ -1110,7 +1116,7 @@
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             options = target? target.options: defaultOptions,
-            origin = getOriginXY(target);
+            origin = getOriginXY(target, element);
 
         element = element || target._element;
 
@@ -2620,9 +2626,9 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable) {
+        dropCheck: function (event, draggable, element) {
             var page = getPageXY(event),
-                origin = getOriginXY(draggable),
+                origin = getOriginXY(draggable, element),
                 horizontal,
                 vertical;
 
@@ -3212,7 +3218,7 @@
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
-            if (newValue instanceof Object) {
+            if (newValue instanceof Object || newValue === 'parent') {
                 this.options.origin = newValue;
 
                 return this;
