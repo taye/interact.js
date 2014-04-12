@@ -753,6 +753,31 @@
         };
     }
 
+    function getTouchPair (event) {
+        var touches = [];
+
+        if (event instanceof Array) {
+            touches[0] = event[0];
+            touches[1] = event[1];
+        }
+        else if (PointerEvent) {
+            touches[0] = pointerMoves[0];
+            touches[1] = pointerMoves[1];
+        }
+        else {
+            touches[0] = event.touches[0];
+
+            if (event.type === 'touchend' && event.touches.length === 1) {
+                touches[1] = event.changedTouches[0];
+            }
+            else {
+                touches[1] = event.touches[1];
+            }
+        }
+
+        return touches;
+    }
+
     function touchAverage (event) {
         var i,
             touches = event.touches,
