@@ -58,6 +58,7 @@
             clientSpeed: 0
         },
 
+        // keep track of added PointerEvents if browser supports them
         pointerIds   = PointerEvent? []: null,
         pointerMoves = PointerEvent? []: null,
 
@@ -650,7 +651,7 @@
         xy = xy || {};
         type = type || 'page';
 
-        if (event.touches) {
+        if (/touch/.test(event.type) && event.touches) {
             touch = (event.touches.length)?
                 event.touches[0]:
                 event.changedTouches[0];
@@ -811,7 +812,11 @@
             sourceY = deltaSource + 'Y',
             touch0, touch1;
 
-        if (PointerEvent) {
+        if (event instanceof Array) {
+            touch0 = event[0];
+            touch1 = event[1];
+        }
+        else if (PointerEvent) {
             touch0 = pointerMoves[0];
             touch1 = pointerMoves[1];
         }
@@ -1270,7 +1275,9 @@
             }
         }
         else if (action === 'gesture') {
-            this.touches  = event.touches;
+            this.touches = (PointerEvent
+                            ? [pointerMoves[0], pointerMoves[1]]
+                            : event.touches);
 
             if (phase === 'start') {
                 this.distance = touchDistance(event);
@@ -3871,6 +3878,10 @@
             prevCoords            : prevCoords,
             downCoords            : startCoords,
 
+            addPointer            : addPointer,
+            removePointer         : removePointer,
+            recordPointers        : recordPointers,
+
             inertia               : inertiaStatus,
 
             downTime              : downTime,
@@ -4155,6 +4166,11 @@
             if (event && typeof event.preventDefault === 'function') {
                event.preventDefault();
             }
+        }
+
+        if (pointerIds && pointerIds.length) {
+            pointerIds.splice(0);
+            pointerMoves.splice(0);
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
