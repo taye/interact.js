@@ -3847,6 +3847,8 @@
             prevCoords            : prevCoords,
             downCoords            : startCoords,
 
+            pointerIds            : pointerIds,
+            pointerMoves          : pointerMoves,
             addPointer            : addPointer,
             removePointer         : removePointer,
             recordPointers        : recordPointers,
