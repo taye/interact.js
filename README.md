@@ -64,7 +64,7 @@ interact(document.body)
             document.body.style[transformProp] = 'translate(' + x + 'px, ' + y + 'px)';
         }
     })
-    // but you should really add listeners like this which lets you add multiple listeners
+    // you should really add listeners like this if you want to add multiple listeners
     .on('dragend', function (event) {
         console.log('dragged a distance of ' + 
             Math.sqrt(event.dx*event.dx + event.dy*event.dy) + 
@@ -89,7 +89,7 @@ interact(document.body)
     });
     
 
-// or you could listen to InteractEvents for every Interactable
+// you can also listen to InteractEvents for every Interactable
 interact.on('dragstart', function (event) {
     console.log('starting drag from ' + event.x0 + ', ' + event.y0);
 });
