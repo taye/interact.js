@@ -58,6 +58,10 @@
             clientSpeed: 0
         },
 
+        // keep track of added PointerEvents if browser supports them
+        pointerIds   = PointerEvent? []: null,
+        pointerMoves = PointerEvent? []: null,
+
         downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
@@ -647,7 +651,7 @@
         xy = xy || {};
         type = type || 'page';
 
-        if (event.touches) {
+        if (/touch/.test(event.type) && event.touches) {
             touch = (event.touches.length)?
                 event.touches[0]:
                 event.changedTouches[0];
@@ -749,52 +753,56 @@
         };
     }
 
-    function touchAverage (event) {
-        var i,
-            touches = event.touches,
-            pageX = 0,
-            pageY = 0,
-            clientX = 0,
-            clientY = 0;
+    function getTouchPair (event) {
+        var touches = [];
 
-        for (i = 0; i < touches.length; i++) {
-            pageX += touches[i].pageX / touches.length;
-            pageY += touches[i].pageY / touches.length;
+        if (event instanceof Array) {
+            touches[0] = event[0];
+            touches[1] = event[1];
+        }
+        else if (PointerEvent) {
+            touches[0] = pointerMoves[0];
+            touches[1] = pointerMoves[1];
+        }
+        else {
+            touches[0] = event.touches[0];
 
-            clientX += touches[i].clientX / touches.length;
-            clientY += touches[i].clientY / touches.length;
+            if (event.type === 'touchend' && event.touches.length === 1) {
+                touches[1] = event.changedTouches[0];
+            }
+            else {
+                touches[1] = event.touches[1];
+            }
         }
 
+        return touches;
+    }
+
+    function touchAverage (event) {
+        var touches = getTouchPair(event);
+
         return {
-            pageX: pageX,
-            pageY: pageY,
-            clientX: clientX,
-            clientY: clientY
+            pageX: (touches[0].pageX + touches[1].pageY) / 2,
+            pageY: (touches[0].pageX + touches[1].pageY) / 2,
+            clientX: (touches[0].clientX + touches[1].clientY) / 2,
+            clientY: (touches[0].clientX + touches[1].clientY) / 2,
         };
     }
 
     function touchBBox (event) {
-        if (!event.touches.length) {
+        if (!(event.touches && event.touches.length) && !(PointerEvent && pointerMoves.length)) {
             return;
         }
 
-        var i,
-            touches = event.touches,
-            minX = event.touches[0].pageX,
-            minY = event.touches[0].pageY,
-            maxX = minX,
-            maxY = minY;
-
-        for (i = 1; i < touches.length; i++) {
-            minX = minX > event.touches[i].pageX?
-                minX:
-                event.touches[i].pageX;
-            minY = minX > event.touches[i].pageX?
-                minY:
-                event.touches[i].pageY;
-        }
+        var touches = getTouchPair(event),
+            minX = Math.min(touches[0].pageX, touches[1].pageX),
+            minY = Math.min(touches[0].pageY, touches[1].pageY),
+            maxX = Math.max(touches[0].pageX, touches[1].pageX),
+            maxY = Math.max(touches[0].pageY, touches[1].pageY);
 
         return {
+            x: minX,
+            y: minY,
             left: minX,
             top: minY,
             width: maxX - minX,
@@ -806,17 +814,11 @@
         var deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            dx = event.touches[0][sourceX],
-            dy = event.touches[0][sourceY];
+            touches = getTouchPair(event);
 
-        if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0][sourceX];
-            dy -= event.changedTouches[0][sourceY];
-        }
-        else {
-            dx -= event.touches[1][sourceX];
-            dy -= event.touches[1][sourceY];
-        }
+
+        var dx = touches[0][sourceX] - touches[1][sourceX],
+            dy = touches[0][sourceY] - touches[1][sourceY];
 
         return hypot(dx, dy);
     }
@@ -825,19 +827,10 @@
         var deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            dx = event.touches[0][sourceX],
-            dy = event.touches[0][sourceY];
-
-        if (event.type === 'touchend' && event.touches.length === 1) {
-            dx -= event.changedTouches[0][sourceX];
-            dy -= event.changedTouches[0][sourceY];
-        }
-        else {
-            dx -= event.touches[1][sourceX];
-            dy -= event.touches[1][sourceY];
-        }
-
-        var angle = 180 * Math.atan(dy / dx) / Math.PI;
+            touches = getTouchPair(event),
+            dx = touches[0][sourceX] - touches[1][sourceX],
+            dy = touches[0][sourceY] - touches[1][sourceY],
+            angle = 180 * Math.atan(dy / dx) / Math.PI;
 
         if (typeof prevAngle === 'number') {
             var dr = angle - prevAngle,
@@ -1121,7 +1114,7 @@
 
         element = element || target._element;
 
-        if (action === 'gesture') {
+        if (action === 'gesture' && !PointerEvent) {
             var average = touchAverage(event);
 
             page   = { x: (average.pageX   - origin.x), y: (average.pageY   - origin.y) };
@@ -1251,7 +1244,9 @@
             }
         }
         else if (action === 'gesture') {
-            this.touches  = event.touches;
+            this.touches = (PointerEvent
+                            ? [pointerMoves[0], pointerMoves[1]]
+                            : event.touches);
 
             if (phase === 'start') {
                 this.distance = touchDistance(event);
@@ -1387,6 +1382,10 @@
             : event.target),
             action;
 
+        if (PointerEvent) {
+            addPointer(event);
+        }
+
         // Check if the down event hits the current inertia target
         if (inertiaStatus.active && target.selector) {
             // climb up the DOM tree from the event target
@@ -1403,7 +1402,7 @@
 
                     if (PointerEvent) {
                         // add the pointer to the gesture object
-                        selectorGesture.addPointer(event.pointerId);
+                        addPointer(event, selectorGesture);
                     }
 
                     return;
@@ -1451,10 +1450,14 @@
     // Determine action to be performed on next pointerMove and add appropriate
     // style and event Liseners
     function pointerDown (event, forceAction) {
+        if (PointerEvent) {
+            addPointer(event);
+        }
+
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
         // Otherwise, set the target if the pointer is not down
-        if ((event.touches && event.touches.length < 2 && !target)
+        if ((((event.touches && event.touches.length < 2) || (pointerIds && pointerIds.length < 2)) && !target)
             || !pointerIsDown) {
 
             target = interactables.get(event.currentTarget);
@@ -1463,39 +1466,15 @@
         var options = target && target.options;
 
         if (target && !(dragging || resizing || gesturing)) {
-            var action = validateAction(forceAction || target.getAction(event)),
-                average,
-                page,
-                client;
+            var action = validateAction(forceAction || target.getAction(event));
 
             if (PointerEvent && event instanceof PointerEvent) {
-                if (target.selector) {
-                    selectorGesture.addPointer(event.pointerId);
+                // Dom modification seems to reset the gesture target
+                if (!target._gesture.target) {
+                    target._gesture.target = target._element;
                 }
-                else {
-                    // Dom modification seems to reset the gesture target
-                    if (!target._gesture.target) {
-                        target._gesture.target = target._element;
-                    }
 
-                    target._gesture.addPointer(event.pointerId);
-                }
-            }
-
-            if (event.touches) {
-                average = touchAverage(event);
-                page = {
-                    x: average.pageX,
-                    y: average.pageY
-                };
-                client = {
-                    x: average.clientX,
-                    y: average.clientY
-                };
-            }
-            else {
-                page = getPageXY(event);
-                client = getClientXY(event);
+                addPointer(event, target._gesture);
             }
 
             if (!action) {
@@ -1519,6 +1498,12 @@
                         action === 'resizey'?
                             'y':
                             '';
+
+            if (action === 'gesture'
+                && ((event.touches && event.touches.length < 2)
+                    || PointerEvent && pointerIds.length < 2)) {
+                        action = null;
+            }
 
             prepared = action;
 
@@ -1544,7 +1529,7 @@
                     target._gesture.target = target._element;
                 }
                 // add the pointer to the gesture object
-                target._gesture.addPointer(event.pointerId);
+                addPointer(event, target._gesture);
             }
         }
     }
@@ -1825,6 +1810,55 @@
         }
     }
 
+    function addPointer (event, gesture) {
+        // dont add the event if it's not the same pointer type as the previous event
+        if (pointerMoves.length && pointerMoves[0].pointerType !== event.pointerType) {
+            return;
+        }
+
+        if (gesture) {
+            gesture.addPointer(event.pointerId);
+        }
+
+        var index = pointerIds.indexOf(event.pointerId);
+
+        if (index === -1) {
+            pointerIds.push(event.pointerId);
+            pointerMoves.push(event);
+        }
+        else {
+            pointerMoves[index] = event;
+        }
+    }
+
+    function removePointer (event) {
+        var index = pointerIds.indexOf(event.pointerId);
+
+        if (index === -1) { return; }
+
+        pointerIds.splice(index, 1);
+        pointerMoves.splice(index, 1);
+    }
+
+    function recordPointers (event) {
+        var index = pointerIds.indexOf(event.pointerId);
+
+        if (index === -1) { return; }
+
+        if (/move/i.test(event.type)) {
+            pointerMoves[index] = event;
+        }
+        else if (/up|cancel/i.test(event.type)) {
+            removePointer(event);
+
+            // End the gesture InteractEvent if there are
+            // fewer than 2 active pointers
+            if (gesturing && pointerIds.length < 2) {
+                target._gesture.stop();
+            }
+        }
+    }
+
     function dragMove (event) {
         event.preventDefault();
 
@@ -1930,7 +1964,7 @@
     }
 
     function gestureMove (event) {
-        if (!event.touches || event.touches.length < 2) {
+        if ((!event.touches || event.touches.length < 2) && !PointerEvent) {
             return;
         }
 
@@ -2419,6 +2453,7 @@
             document.querySelector(element);
             selectors[element] = this;
             this.selector = element;
+            this._gesture = selectorGesture;
         }
         else {
             if(isElement(element)) {
@@ -3038,18 +3073,18 @@
                 bottom = page.y > (rect.bottom - margin);
             }
 
-            if (actionIsEnabled.gesture &&
-                    event.touches && event.touches.length >= 2 &&
+            resizeAxes = (right?'x': '') + (bottom?'y': '');
+            action = (resizeAxes)?
+                'resize' + resizeAxes:
+                actionIsEnabled.drag && options.draggable?
+                    'drag':
+                    null;
+
+            if (actionIsEnabled.gesture
+                && ((event.touches && event.touches.length >= 2)
+                    || (PointerEvent && pointerIds.length >=2)) &&
                     !(dragging || resizing)) {
                 action = 'gesture';
-            }
-            else {
-                resizeAxes = (right?'x': '') + (bottom?'y': '');
-                action = (resizeAxes)?
-                    'resize' + resizeAxes:
-                    actionIsEnabled.drag && options.draggable?
-                        'drag':
-                        null;
             }
 
             return action;
@@ -3812,6 +3847,12 @@
             prevCoords            : prevCoords,
             downCoords            : startCoords,
 
+            pointerIds            : pointerIds,
+            pointerMoves          : pointerMoves,
+            addPointer            : addPointer,
+            removePointer         : removePointer,
+            recordPointers        : recordPointers,
+
             inertia               : inertiaStatus,
 
             downTime              : downTime,
@@ -4084,7 +4125,6 @@
 
             if (target._gesture) {
                 target._gesture.stop();
-                selectorGesture.stop();
             }
 
             clearTargets();
@@ -4097,6 +4137,11 @@
             if (event && typeof event.preventDefault === 'function') {
                event.preventDefault();
             }
+        }
+
+        if (pointerIds && pointerIds.length) {
+            pointerIds.splice(0);
+            pointerMoves.splice(0);
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
@@ -4202,15 +4247,9 @@
         events.add(docTarget, 'pointerover'    , pointerOver );
         events.add(docTarget, 'pointerout'     , pointerOut  );
 
-        // set prev move coords even when native gesture is happening
-        // and doesn't call "pointerMove"
-        events.add(docTarget, 'pointermove', function (event) {
-            var time = new Date().getTime();
-
-            if (time > prevCoords.timeStamp) {
-                setEventXY(prevCoords, event);
-            }
-        });
+        events.add(docTarget, 'pointermove'  , recordPointers);
+        events.add(docTarget, 'pointerup'    , recordPointers);
+        events.add(docTarget, 'pointercancel', recordPointers);
 
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;

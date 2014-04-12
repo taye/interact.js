@@ -1,6 +1,7 @@
 var expect = chai.expect,
     should = chai.should(),
-    debug = interact.debug();
+    debug = interact.debug(),
+    PointerEvent = window.PointerEvent || window.MSPointerEvent;
 
 function blank () {}
 
@@ -20,6 +21,7 @@ function mockEvent (options, target, currentTarget) {
         clientY: options.y - (options.scrollY|0),
         touches: options.touches && options.touches.map(mockEvent),
         changedTouches: options.changed && options.changed.map(mockEvent),
+        pointerId: options.pointerId || 0,
 
         preventDefault: blank,
         stopPropagation: blank,
@@ -154,9 +156,15 @@ describe('Interactable', function () {
             for (i = 0; action = actions[i], i < actions.length; i++) {
                 debug.pointerDown.call(div, mockEvent({
                     target: div,
-                    x: -123,
-                    y: 209
+                    pointerId: 1
                 }));
+
+                if (PointerEvent && action === 'gesture') {
+                    debug.pointerDown.call(div, mockEvent({
+                        target: div,
+                        pointerId: 2
+                    }));
+                }
 
                 interact.debug().prepared.should.equal(action);
 
@@ -282,10 +290,19 @@ describe('Events', function () {
             gestureEvents = [],
             eventMap = [1, 2, 3, 4];
 
+        // The pointers must be recorded here since event listeners
+        // don't call the related functions. The recorded pointermove events
+        // are used to calculate gesture angle, scale, etc.
+
         debug.pointerDown(mockEvents[0]);
         debug.pointerDown(mockEvents[1]);
+
+        PointerEvent && debug.recordPointers(mockEvents[2]);
         debug.pointerMove(mockEvents[2]);
+
+        PointerEvent && debug.recordPointers(mockEvents[3]);
         debug.pointerMove(mockEvents[3]);
+
         debug.pointerUp(mockEvents[4]);
         debug.pointerUp(mockEvents[5]);
 
@@ -301,11 +318,21 @@ describe('Events', function () {
         describe('touches', function () {
 
             it('should be the original list of touches in the correspoinding touch event', function () {
-                for (var i = 0, gEvent, mEvent;
-                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
-                     i++) {
-                         gEvent.touches.should.equal(mEvent.touches);
-                     }
+
+                if (PointerEvent) {
+                    gestureEvents[0].touches.should.eql([mockEvents[2], mockEvents[1]]);
+                    gestureEvents[1].touches.should.eql([mockEvents[2], mockEvents[1]]);
+                    gestureEvents[2].touches.should.eql([mockEvents[2], mockEvents[3]]);
+                    gestureEvents[3].touches.should.eql([mockEvents[2], mockEvents[3]]);
+                }
+                else {
+                    for (var i = 0, gEvent, mEvent;
+                         mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                         i++) {
+
+                        gEvent.touches.should.eql(mEvent.touches);
+                    }
+                }
             });
         });
 
@@ -315,23 +342,31 @@ describe('Events', function () {
                      mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
                      i++) {
 
-                    var average = interact.getTouchAverage(mEvent);
-
-                    gEvent.pageX.should.equal(average.pageX);
-                    gEvent.pageY.should.equal(average.pageY);
-                    gEvent.clientX.should.equal(average.clientX);
-                    gEvent.clientY.should.equal(average.clientY);
+                    var average = PointerEvent? mEvent: interact.getTouchAverage(mEvent),
+                        coords = ['pageX', 'pageY', 'clientX', 'clientY'];
+                   
+                        coords.forEach(function (coord) {
+                            gEvent[coord].should.equal(average[coord]);
+                        });
                 }
             });
         });
 
         describe('angle', function () {
             it('should be the angle of the line joining the first two touches of the correspoinding touch event', function () {
-                for (var i = 0, gEvent, mEvent;
-                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
-                     i++) {
+                if (PointerEvent) {
+                    gestureEvents[0].angle.should.eql(interact.getTouchAngle([mockEvents[2], mockEvents[1]]));
+                    gestureEvents[1].angle.should.eql(interact.getTouchAngle([mockEvents[2], mockEvents[1]]));
+                    gestureEvents[2].angle.should.eql(interact.getTouchAngle([mockEvents[2], mockEvents[3]]));
+                    gestureEvents[3].angle.should.eql(interact.getTouchAngle([mockEvents[2], mockEvents[3]]));
+                }
+                else {
+                    for (var i = 0, gEvent, mEvent;
+                         mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                         i++) {
 
-                    gEvent.angle.should.equal(interact.getTouchAngle(mEvent));
+                        gEvent.angle.should.equal(interact.getTouchAngle(mEvent));
+                    }
                 }
             });
         });
@@ -359,12 +394,20 @@ describe('Events', function () {
 
         describe('distance', function () {
             it('should be the distance between the first two touches of the correspoinding touch event', function () {
-                for (var i = 0, gEvent, mEvent;
-                     mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
-                     i++) {
+                if (PointerEvent) {
+                    gestureEvents[0].distance.should.eql(interact.getTouchDistance([mockEvents[2], mockEvents[1]]));
+                    gestureEvents[1].distance.should.eql(interact.getTouchDistance([mockEvents[2], mockEvents[1]]));
+                    gestureEvents[2].distance.should.eql(interact.getTouchDistance([mockEvents[2], mockEvents[3]]));
+                    gestureEvents[3].distance.should.eql(interact.getTouchDistance([mockEvents[2], mockEvents[3]]));
+                }
+                else {
+                    for (var i = 0, gEvent, mEvent;
+                         mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
+                         i++) {
 
-                    gEvent.distance.should.equal(interact.getTouchDistance(mEvent));
-                    gEvent.distance.should.equal(interact.getTouchDistance(mEvent));
+                        gEvent.distance.should.equal(interact.getTouchDistance(mEvent));
+                        gEvent.distance.should.equal(interact.getTouchDistance(mEvent));
+                    }
                 }
             });
         });
