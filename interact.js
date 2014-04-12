@@ -1845,10 +1845,10 @@
 
         if (index === -1) { return; }
 
-        if (/move/.test(event.type)) {
+        if (/move/i.test(event.type)) {
             pointerMoves[index] = event;
         }
-        else if (/up|cancel/.test(event.type)) {
+        else if (/up|cancel/i.test(event.type)) {
             removePointer(event);
 
             // End the gesture InteractEvent if there are
