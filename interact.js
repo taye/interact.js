@@ -779,26 +779,13 @@
     }
 
     function touchAverage (event) {
-        var i,
-            touches = event.touches,
-            pageX = 0,
-            pageY = 0,
-            clientX = 0,
-            clientY = 0;
-
-        for (i = 0; i < touches.length; i++) {
-            pageX += touches[i].pageX / touches.length;
-            pageY += touches[i].pageY / touches.length;
-
-            clientX += touches[i].clientX / touches.length;
-            clientY += touches[i].clientY / touches.length;
-        }
+        var touches = getTouchPair(event);
 
         return {
-            pageX: pageX,
-            pageY: pageY,
-            clientX: clientX,
-            clientY: clientY
+            pageX: (touches[0].pageX + touches[1].pageY) / 2,
+            pageY: (touches[0].pageX + touches[1].pageY) / 2,
+            clientX: (touches[0].clientX + touches[1].clientY) / 2,
+            clientY: (touches[0].clientX + touches[1].clientY) / 2,
         };
     }
 
@@ -807,23 +794,15 @@
             return;
         }
 
-        var i,
-            touches = (PointerEvent? pointerMoves: event.touches),
-            minX = touches[0].pageX,
-            minY = touches[0].pageY,
-            maxX = minX,
-            maxY = minY;
-
-        for (i = 1; i < touches.length; i++) {
-            minX = minX > touches[i].pageX
-                ? minX
-                : touches[i].pageX;
-            minY = minX > touches[i].pageX
-                ? minY
-                : touches[i].pageY;
-        }
+        var touches = getTouchPair(event),
+            minX = Math.min(touches[0].pageX, touches[1].pageX),
+            minY = Math.min(touches[0].pageY, touches[1].pageY),
+            maxX = Math.max(touches[0].pageX, touches[1].pageX),
+            maxY = Math.max(touches[0].pageY, touches[1].pageY);
 
         return {
+            x: minX,
+            y: minY,
             left: minX,
             top: minY,
             width: maxX - minX,
@@ -835,29 +814,11 @@
         var deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touch0, touch1;
+            touches = getTouchPair(event);
 
-        if (event instanceof Array) {
-            touch0 = event[0];
-            touch1 = event[1];
-        }
-        else if (PointerEvent) {
-            touch0 = pointerMoves[0];
-            touch1 = pointerMoves[1];
-        }
-        else {
-            touch0 = event.touches[0];
 
-            if (event.type === 'touchend' && event.touches.length === 1) {
-                touch1 = event.changedTouches[0];
-            }
-            else {
-                touch1 = event.touches[1];
-            }
-        }
-
-        var dx = touch0[sourceX] - touch1[sourceX],
-            dy = touch0[sourceY] - touch1[sourceY];
+        var dx = touches[0][sourceX] - touches[1][sourceX],
+            dy = touches[0][sourceY] - touches[1][sourceY];
 
         return hypot(dx, dy);
     }
@@ -866,27 +827,10 @@
         var deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touch0, touch1;
-
-        if (PointerEvent) {
-            touch0 = pointerMoves[0];
-            touch1 = pointerMoves[1];
-        }
-        else {
-            touch0 = event.touches[0];
-
-            if (event.type === 'touchend' && event.touches.length === 1) {
-                touch1 = event.changedTouches[0];
-            }
-            else {
-                touch1 = event.touches[1];
-            }
-        }
-
-        var dx = touch0[sourceX] - touch1[sourceX],
-            dy = touch0[sourceY] - touch1[sourceY];
-
-        var angle = 180 * Math.atan(dy / dx) / Math.PI;
+            touches = getTouchPair(event),
+            dx = touches[0][sourceX] - touches[1][sourceX],
+            dy = touches[0][sourceY] - touches[1][sourceY],
+            angle = 180 * Math.atan(dy / dx) / Math.PI;
 
         if (typeof prevAngle === 'number') {
             var dr = angle - prevAngle,
