@@ -1510,7 +1510,10 @@
             snapStatus.x = null;
             snapStatus.y = null;
 
-            event.preventDefault();
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
+
             downTime = new Date().getTime();
             downEvent = event;
             setEventXY(prevCoords, event);
