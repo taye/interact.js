@@ -1706,8 +1706,12 @@
             originalPageX = page.x,
             originalPageY = page.y;
 
+        if (restriction === 'parent') {
+            restriction = target._element.parentNode;
+        }
+
         if (isElement(restriction)) {
-            rect = interact(restriction).getRect();
+            rect = getElementRect(restriction);
         }
         else {
             if (typeof restriction === 'function') {
@@ -3260,14 +3264,17 @@
          = (object) The current restrictions object or this Interactable
          **
          | interact(element).restrict({
-         |     // the rect will be `interactable(element.parentNode).getRect()`
+         |     // the rect will be `interact.getElementRect(element.parentNode)`
          |     drag: element.parentNode,
          |
          |     // x and y are relative to the the interactable's origin
          |     resize: { x: 100, y: 100, width: 200, height: 200 }
          | })
          |
-         | interact(element).restrict({
+         | interact('.draggable').restrict({
+         |     // the rect will be the selected element's parent
+         |     drag: 'parent',
+         |
          |     // do not restrict during normal movement.
          |     // Instead, trigger only one restricted move event
          |     // immediately before the end event.
@@ -3282,13 +3289,13 @@
             if (newValue instanceof Object) {
                 var newRestrictions = {};
 
-                if (newValue.drag instanceof Object) {
+                if (newValue.drag instanceof Object || newValue.drag === 'parent') {
                     newRestrictions.drag = newValue.drag;
                 }
-                if (newValue.resize instanceof Object) {
+                if (newValue.resize instanceof Object || newValue.resize === 'parent') {
                     newRestrictions.resize = newValue.resize;
                 }
-                if (newValue.gesture instanceof Object) {
+                if (newValue.gesture instanceof Object || newValue.gesture === 'parent') {
                     newRestrictions.gesture = newValue.gesture;
                 }
 
@@ -4215,13 +4222,13 @@
         }
 
         if (newValue instanceof Object) {
-            if (newValue.drag instanceof Object) {
+            if (newValue.drag instanceof Object || newValue.drag === 'parent') {
                 defaults.drag = newValue.drag;
             }
-            if (newValue.resize instanceof Object) {
+            if (newValue.resize instanceof Objec || newValue.resize === 'parent') {
                 defaults.resize = newValue.resize;
             }
-            if (newValue.gesture instanceof Object) {
+            if (newValue.gesture instanceof Object || newValue.gesture === 'parent') {
                 defaults.gesture = newValue.gesture;
             }
 
