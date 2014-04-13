@@ -16,6 +16,9 @@ Awesomeness includes:
 
 ## Demos
 
+ - http://interactjs.io has some demos showing drag and drop, gestures,
+   ienrtia, snap and some other things.
+
  - The [html & svg demo](http://interactjs.io/demos/html_svg.html "drag, drop,
    resize and gesture demo") shows div elements which can be dragged and
    dropped onto each other and resized by dragging the botom and right edges. The
