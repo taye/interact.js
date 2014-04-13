@@ -65,6 +65,8 @@
         downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
+        tapTime   = 0,         // time of the most recent tap event
+        tapType   = '',        // originalEvent.type of previous tap
 
         tmpXY = {},     // reduce object creation in getXY()
 
@@ -356,7 +358,8 @@
             'gestureinertiastart',
             'gestureend',
 
-            'tap'
+            'tap',
+            'doubletap'
         ],
 
         globalEvents = {},
@@ -2182,7 +2185,8 @@
         }
 
         var endEvent,
-            inertiaOptions = target && target.options.inertia;
+            inertiaOptions = target && target.options.inertia,
+            prop;
 
         if (dragging || resizing || gesturing) {
 
@@ -2212,7 +2216,7 @@
                 if (events.useAttachEvent) {
                     // make a copy of the pointerdown event because IE8
                     // http://stackoverflow.com/a/3533725/2280888
-                    for (var prop in event) {
+                    for (prop in event) {
                         if (event.hasOwnProperty(prop)) {
                             inertiaStatus.pointerUp[prop] = event[prop];
                         }
@@ -2341,16 +2345,46 @@
             endEvent = new InteractEvent(event, 'gesture', 'end');
             target.fire(endEvent);
         }
-        else if (/mouseup|touchend|pointerup/i.test(event.type) && target && pointerIsDown && !pointerWasMoved) {
+        else if (/mouseup|touchend|pointerup/i.test(event.type)
+                 && target && pointerIsDown && !pointerWasMoved
+                 // Ignore browser's simulated mouseup events from touchend
+                 && (!tapType || event.type === tapType)) {
+
             var tap = {};
 
-            for (var prop in event) {
-                    tap[prop] = event[prop];
+            for (prop in event) {
+                tap[prop] = event[prop];
             }
 
             tap.currentTarget = target._element;
+            tap.originalEvent = event;
+            tap.timeStamp = new Date().getTime();
+
+            var tapInterval = tap.timeStamp - tapTime;
+
             tap.type = 'tap';
+            tap.dt = tap.timeStamp - downTime;
+
+            tapTime = tap.timeStamp;
+            tapType = event.type;
+
             target.fire(tap);
+
+            if (tapInterval < 500) {
+                var doubletap = {};
+
+                for (prop in tap) {
+                    doubletap[prop] = tap[prop];
+                }
+
+                doubletap.type = 'doubletap';
+                doubletap.dt = tapInterval;
+
+                tapTime = 0;
+                tapType = '';
+
+                target.fire(doubletap);
+            }
         }
 
         interact.stop();
