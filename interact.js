@@ -1477,6 +1477,8 @@
         if (target && !(dragging || resizing || gesturing)) {
             var action = validateAction(forceAction || target.getAction(event));
 
+            setEventXY(startCoords, event);
+
             if (PointerEvent && event instanceof PointerEvent) {
                 // Dom modification seems to reset the gesture target
                 if (!target._gesture.target) {
@@ -1763,9 +1765,18 @@
             setEventXY(curCoords, event);
         }
 
-        pointerWasMoved = true;
+        // require movement of at least one pixel
+        if (!pointerWasMoved) {
+            var dx = startCoords.clientX - prevCoords.clientX,
+                dy = startCoords.clientY - prevCoords.clientY;
 
-        if (pointerIsDown
+            pointerWasMoved = hypot(dx, dy) > 1;
+        }
+        else {
+            pointerWasMoved = true;
+        }
+
+        if (pointerIsDown && pointerWasMoved
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
