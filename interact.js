@@ -4240,7 +4240,7 @@
             if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
                 defaults.drag = newValue.drag;
             }
-            if (newValue.resize instanceof Objec || /^parent$|^self$/.test(newValue.resize)) {
+            if (newValue.resize instanceof Object || /^parent$|^self$/.test(newValue.resize)) {
                 defaults.resize = newValue.resize;
             }
             if (newValue.gesture instanceof Object || /^parent$|^self$/.test(newValue.gesture)) {
