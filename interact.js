@@ -2387,6 +2387,7 @@
             target.fire(endEvent);
         }
         else if (/mouseup|touchend|pointerup/i.test(event.type)
+                 && !PointerEvent
                  && target && pointerIsDown && !pointerWasMoved
                  // Ignore browser's simulated mouseup events from touchend
                  && (!tapType || event.type === tapType)) {
@@ -4336,6 +4337,8 @@
         events.add(docTarget, 'pointermove'  , recordPointers);
         events.add(docTarget, 'pointerup'    , recordPointers);
         events.add(docTarget, 'pointercancel', recordPointers);
+
+        events.add(docTarget, 'MSGestureTap', fireTap);
 
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
