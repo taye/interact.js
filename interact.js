@@ -865,6 +865,9 @@
         if (origin === 'parent') {
             origin = element.parentNode;
         }
+        else if (origin === 'self') {
+            origin = element;
+        }
 
         if (isElement(origin))  {
             origin = getElementRect(origin);
@@ -1714,6 +1717,9 @@
 
         if (restriction === 'parent') {
             restriction = target._element.parentNode;
+        }
+        else if (restriction === 'self') {
+            restriction = target._element;
         }
 
         if (isElement(restriction)) {
@@ -3218,7 +3224,7 @@
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
-            if (newValue instanceof Object || newValue === 'parent') {
+            if (newValue instanceof Object || /^parent$|^self$/.test(newValue)) {
                 this.options.origin = newValue;
 
                 return this;
@@ -3295,13 +3301,13 @@
             if (newValue instanceof Object) {
                 var newRestrictions = {};
 
-                if (newValue.drag instanceof Object || newValue.drag === 'parent') {
+                if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
                     newRestrictions.drag = newValue.drag;
                 }
-                if (newValue.resize instanceof Object || newValue.resize === 'parent') {
+                if (newValue.resize instanceof Object || /^parent$|^self$/.test(newValue.resize)) {
                     newRestrictions.resize = newValue.resize;
                 }
-                if (newValue.gesture instanceof Object || newValue.gesture === 'parent') {
+                if (newValue.gesture instanceof Object || /^parent$|^self$/.test(newValue.gesture)) {
                     newRestrictions.gesture = newValue.gesture;
                 }
 
@@ -4228,13 +4234,13 @@
         }
 
         if (newValue instanceof Object) {
-            if (newValue.drag instanceof Object || newValue.drag === 'parent') {
+            if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
                 defaults.drag = newValue.drag;
             }
-            if (newValue.resize instanceof Objec || newValue.resize === 'parent') {
+            if (newValue.resize instanceof Objec || /^parent$|^self$/.test(newValue.resize)) {
                 defaults.resize = newValue.resize;
             }
-            if (newValue.gesture instanceof Object || newValue.gesture === 'parent') {
+            if (newValue.gesture instanceof Object || /^parent$|^self$/.test(newValue.gesture)) {
                 defaults.gesture = newValue.gesture;
             }
 

@@ -250,6 +250,7 @@
                     {x: 250, y: 250}
                 ]
             })
+            .restrict({drag: 'self'})
             .draggable(true);
 
         guidesCanvas = document.getElementById('grid');
