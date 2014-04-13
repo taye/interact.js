@@ -1364,6 +1364,47 @@
         stopPropagation: blank
     };
 
+    function fireTap (event, interactable, element) {
+        var tap = {},
+            prop;
+
+        interactable = interactable || target;
+        element = element || interactable.element;
+
+        for (prop in event) {
+            tap[prop] = event[prop];
+        }
+
+        tap.timeStamp = new Date().getTime();
+        tap.currentTarget = target._element;
+        tap.originalEvent = event;
+        tap.dt = tap.timeStamp - downTime;
+        tap.type = 'tap';
+
+        var interval = tap.timeStamp - tapTime;
+
+        tapTime = tap.timeStamp;
+        tapType = event.type;
+
+        interactable.fire(tap);
+
+        if (interval < 500) {
+            var doubleTap = {};
+
+            for (prop in tap) {
+                doubleTap[prop] = tap[prop];
+            }
+
+            doubleTap.dt = interval;
+            doubleTap.type = 'doubletap';
+
+            tapTime = 0;
+            tapType = '';
+
+            interactable.fire(doubleTap);
+        }
+    }
+
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action, interactable) {
@@ -2350,41 +2391,7 @@
                  // Ignore browser's simulated mouseup events from touchend
                  && (!tapType || event.type === tapType)) {
 
-            var tap = {};
-
-            for (prop in event) {
-                tap[prop] = event[prop];
-            }
-
-            tap.currentTarget = target._element;
-            tap.originalEvent = event;
-            tap.timeStamp = new Date().getTime();
-
-            var tapInterval = tap.timeStamp - tapTime;
-
-            tap.type = 'tap';
-            tap.dt = tap.timeStamp - downTime;
-
-            tapTime = tap.timeStamp;
-            tapType = event.type;
-
-            target.fire(tap);
-
-            if (tapInterval < 500) {
-                var doubletap = {};
-
-                for (prop in tap) {
-                    doubletap[prop] = tap[prop];
-                }
-
-                doubletap.type = 'doubletap';
-                doubletap.dt = tapInterval;
-
-                tapTime = 0;
-                tapType = '';
-
-                target.fire(doubletap);
-            }
+            fireTap(event);
         }
 
         interact.stop();
