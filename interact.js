@@ -1386,6 +1386,8 @@
     }
 
     function selectorDown (event, forceAction) {
+        if (pointerIsDown && downEvent && event.type !== downEvent.type) { return; }
+
         var element = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
@@ -1459,6 +1461,8 @@
     // Determine action to be performed on next pointerMove and add appropriate
     // style and event Liseners
     function pointerDown (event, forceAction) {
+        if (pointerIsDown && downEvent && event.type !== downEvent.type) { return; }
+
         if (PointerEvent) {
             addPointer(event);
         }
@@ -1758,10 +1762,15 @@
     }
 
     function pointerMove (event, preEnd) {
-        if (!(event instanceof InteractEvent)
-            && pointerIsDown
-            // Ignore browser's simulated mousemove events from touchmove
-            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+        // do nothing if the pointer is not being held down
+        if (!pointerIsDown
+            // or this is a mousemove event but the down event was a touch
+            || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+
+            return;
+        }
+
+        if (!(event instanceof InteractEvent)) {
             setEventXY(curCoords, event);
         }
 
@@ -1776,7 +1785,7 @@
             pointerWasMoved = true;
         }
 
-        if (pointerIsDown && pointerWasMoved
+        if (pointerWasMoved
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
@@ -1826,10 +1835,7 @@
             }
         }
 
-        if (!(event instanceof InteractEvent)
-            && pointerIsDown
-            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
-
+        if (!(event instanceof InteractEvent)) {
             // set pointer coordinate, time changes and speeds
             setEventDeltas(pointerDelta, prevCoords, curCoords);
             setEventXY(prevCoords, event);
@@ -2158,6 +2164,13 @@
 
     // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
+        if (!PointerEvent
+            && pointerIsDown && downEvent
+            && !(event instanceof downEvent.constructor)) {
+
+            return;
+        }
+
         if (event.touches && event.touches.length >= 2) {
             return;
         }
@@ -4273,7 +4286,6 @@
 
     if (PointerEvent) {
         events.add(docTarget, 'pointerdown'    , selectorDown);
-        events.add(docTarget, 'pointercancel'  , pointerUp   );
         events.add(docTarget, 'MSGestureChange', pointerMove );
         events.add(docTarget, 'MSGestureEnd'   , pointerUp   );
         events.add(docTarget, 'MSInertiaStart' , pointerUp   );
