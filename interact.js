@@ -2208,7 +2208,9 @@
 
     // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
-        if (!PointerEvent
+        // don't return if the event is an InteractEvent (in the case of inertia end)
+        // or if the browser uses PointerEvents (event would always be a gestureend)
+        if (!(event instanceof InteractEvent || PointerEvent)
             && pointerIsDown && downEvent
             && !(event instanceof downEvent.constructor)) {
 
