@@ -1364,31 +1364,31 @@
         stopPropagation: blank
     };
 
-    function fireTap (event, interactable, element) {
+    function fireTaps (event, targets, elements) {
         var tap = {},
-            prop;
-
-        interactable = interactable || target;
-        element = element || interactable.element;
+            prop, i;
 
         for (prop in event) {
             tap[prop] = event[prop];
         }
 
         tap.timeStamp = new Date().getTime();
-        tap.currentTarget = target._element;
         tap.originalEvent = event;
         tap.dt = tap.timeStamp - downTime;
         tap.type = 'tap';
 
-        var interval = tap.timeStamp - tapTime;
+        var interval = tap.timeStamp - tapTime,
+            dbl = interval < 500;
 
         tapTime = tap.timeStamp;
         tapType = event.type;
 
-        interactable.fire(tap);
+        for (i = 0; i < targets.length; i++) {
+            tap.currentTarget = elements[i];
+            targets[i].fire(tap);
+        }
 
-        if (interval < 500) {
+        if (dbl) {
             var doubleTap = {};
 
             for (prop in tap) {
@@ -1401,8 +1401,43 @@
             tapTime = 0;
             tapType = '';
 
-            interactable.fire(doubleTap);
+            for (i = 0; i < targets.length; i++) {
+                doubleTap.currentTarget = elements[i];
+                targets[i].fire(doubleTap);
+            }
+
         }
+    }
+
+    function collectTaps (event) {
+        if (pointerWasMoved) { return; }
+
+        var tapTargets = [],
+            tapElements = [];
+
+        var element = event.target;
+
+        while (element) {
+            if (interact.isSet(element)) {
+                tapTargets.push(interact(element));
+                tapElements.push(element);
+            }
+
+            for (var selector in selectors) {
+                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? document.querySelectorAll(selector)
+                        : undefined;
+
+                if (element !== document && element[matchesSelector](selector, elements)) {
+                    tapTargets.push(selectors[selector]);
+                    tapElements.push(element);
+                }
+            }
+
+            element = element.parentNode;
+        }
+
+        fireTaps(event, tapTargets, tapElements);
     }
 
     // Check if action is enabled globally and the current target supports it
@@ -2384,14 +2419,6 @@
         else if (gesturing) {
             endEvent = new InteractEvent(event, 'gesture', 'end');
             target.fire(endEvent);
-        }
-        else if (/mouseup|touchend|pointerup/i.test(event.type)
-                 && !PointerEvent
-                 && target && pointerIsDown && !pointerWasMoved
-                 // Ignore browser's simulated mouseup events from touchend
-                 && (!tapType || event.type === tapType)) {
-
-            fireTap(event);
         }
 
         interact.stop();
@@ -4326,6 +4353,8 @@
     };
 
     if (PointerEvent) {
+        events.add(docTarget, 'pointerup', collectTaps);
+
         events.add(docTarget, 'pointerdown'    , selectorDown);
         events.add(docTarget, 'MSGestureChange', pointerMove );
         events.add(docTarget, 'MSGestureEnd'   , pointerUp   );
@@ -4337,12 +4366,13 @@
         events.add(docTarget, 'pointerup'    , recordPointers);
         events.add(docTarget, 'pointercancel', recordPointers);
 
-        events.add(docTarget, 'MSGestureTap', fireTap);
-
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
     }
     else {
+        events.add(docTarget, 'mouseup' , collectTaps);
+        events.add(docTarget, 'touchend', collectTaps);
+
         events.add(docTarget, 'mousedown', selectorDown);
         events.add(docTarget, 'mousemove', pointerMove );
         events.add(docTarget, 'mouseup'  , pointerUp   );
