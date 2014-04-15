@@ -1818,15 +1818,12 @@
             setEventXY(curCoords, event);
         }
 
-        // require movement of at least one pixel
+        // require movement of more than 1 pixel
         if (!pointerWasMoved) {
-            var dx = startCoords.clientX - prevCoords.clientX,
-                dy = startCoords.clientY - prevCoords.clientY;
+            var dx = startCoords.clientX - curCoords.clientX,
+                dy = startCoords.clientY - curCoords.clientY;
 
             pointerWasMoved = hypot(dx, dy) > 1;
-        }
-        else {
-            pointerWasMoved = true;
         }
 
         if (pointerWasMoved
