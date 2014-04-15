@@ -1464,8 +1464,8 @@
         return null;
     }
 
-    function selectorDown (event, forceAction) {
-        if (pointerIsDown && downEvent && event.type !== downEvent.type) { return; }
+    function selectorDown (event) {
+        if (prepared && downEvent && event.type !== downEvent.type) { return; }
 
         var element = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
@@ -1475,6 +1475,9 @@
         if (PointerEvent) {
             addPointer(event);
         }
+
+        downEvent = downEvent || event;
+        pointerWasMoved = false;
 
         // Check if the down event hits the current inertia target
         if (inertiaStatus.active && target.selector) {
@@ -1533,6 +1536,7 @@
 
         if (action) {
             pointerIsDown = true;
+            prepared = action;
             return pointerDown(event, action);
         }
     }
@@ -1542,15 +1546,17 @@
     function pointerDown (event, forceAction) {
         if (pointerIsDown && downEvent && event.type !== downEvent.type) { return; }
 
+        pointerIsDown = true;
+
         if (PointerEvent) {
             addPointer(event);
         }
 
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
-        // Otherwise, set the target if the pointer is not down
+        // Otherwise, set the target if there is no action prepared
         if ((((event.touches && event.touches.length < 2) || (pointerIds && pointerIds.length < 2)) && !target)
-            || !pointerIsDown) {
+            || !prepared) {
 
             target = interactables.get(event.currentTarget);
         }
@@ -1575,10 +1581,6 @@
                 return event;
             }
 
-            // Register that the pointer is down after succesfully validating
-            // action. This way, a new target can be gotten in the next
-            // downEvent propagation
-            pointerIsDown = true;
             pointerWasMoved = false;
 
             if (options.styleCursor) {
@@ -1841,8 +1843,16 @@
     }
 
     function pointerMove (event, preEnd) {
-        // do nothing if the pointer is not being held down
-        if (!pointerIsDown
+        // require movement of more than 1 pixel
+        if (!pointerWasMoved) {
+            var dx = startCoords.clientX - curCoords.clientX,
+                dy = startCoords.clientY - curCoords.clientY;
+
+            pointerWasMoved = hypot(dx, dy) > 1;
+        }
+
+        // do nothing if there is no prepared action
+        if (!prepared
             // or this is a mousemove event but the down event was a touch
             || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
 
@@ -1851,14 +1861,6 @@
 
         if (!(event instanceof InteractEvent)) {
             setEventXY(curCoords, event);
-        }
-
-        // require movement of more than 1 pixel
-        if (!pointerWasMoved) {
-            var dx = startCoords.clientX - curCoords.clientX,
-                dy = startCoords.clientY - curCoords.clientY;
-
-            pointerWasMoved = hypot(dx, dy) > 1;
         }
 
         if (pointerWasMoved
@@ -4259,7 +4261,6 @@
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        pointerWasMoved = true;
         prepared = downEvent = prevEvent = null;
 
         return interact;
