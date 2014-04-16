@@ -1471,7 +1471,12 @@
     }
 
     function selectorDown (event) {
-        if (prepared && downEvent && event.type !== downEvent.type) { return; }
+        if (prepared && downEvent && event.type !== downEvent.type) {
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
+            return;
+        }
 
         // try to ignore browser simulated mouse after touch
         if (downEvent
@@ -1562,7 +1567,12 @@
     // Determine action to be performed on next pointerMove and add appropriate
     // style and event Liseners
     function pointerDown (event, forceAction) {
-        if (pointerIsDown && downEvent && event.type !== downEvent.type) { return; }
+        if (!forceAction && pointerIsDown && downEvent && event.type !== downEvent.type) {
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
+            return;
+        }
 
         pointerIsDown = true;
 
