@@ -65,6 +65,8 @@
         downTime  = 0,         // the timeStamp of the starting event
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
+        tapTime   = 0,         // time of the most recent tap event
+        prevTap   = null,
 
         tmpXY = {},     // reduce object creation in getXY()
 
@@ -294,7 +296,6 @@
 
         pointerIsDown   = false,
         pointerWasMoved = false,
-        imPropStopped   = false,
         gesturing       = false,
         dragging        = false,
         dynamicDrop     = false,
@@ -356,7 +357,8 @@
             'gestureinertiastart',
             'gestureend',
 
-            'tap'
+            'tap',
+            'doubletap'
         ],
 
         globalEvents = {},
@@ -1356,10 +1358,110 @@
     InteractEvent.prototype = {
         preventDefault: blank,
         stopImmediatePropagation: function () {
-            imPropStopped = true;
+            this.immediatePropagationStopped = this.propagationStopped = true;
         },
-        stopPropagation: blank
+        stopPropagation: function () {
+            this.propagationStopped = true;
+        }
     };
+
+    function fireTaps (event, targets, elements) {
+        var tap = {},
+            prop, i;
+
+        for (prop in event) {
+            tap[prop] = event[prop];
+        }
+
+        tap.preventDefault = function () {
+            this.originalEvent.preventdefault();
+        };
+        tap.stopPropagation = InteractEvent.prototype.stopPropagation;
+        tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+
+        tap.timeStamp = new Date().getTime();
+        tap.originalEvent = event;
+        tap.dt = tap.timeStamp - downTime;
+        tap.type = 'tap';
+
+        var interval = tap.timeStamp - tapTime,
+            dbl = (prevTap && prevTap.type !== 'dubletap'
+                   && prevTap.target === tap.target
+                   && interval < 500);
+
+        tapTime = tap.timeStamp;
+
+        for (i = 0; i < targets.length; i++) {
+            tap.currentTarget = elements[i];
+            targets[i].fire(tap);
+
+            if (tap.immediatePropagationStopped
+                ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
+                break;
+            }
+        }
+
+        if (dbl) {
+            var doubleTap = {};
+
+            for (prop in tap) {
+                doubleTap[prop] = tap[prop];
+            }
+
+            doubleTap.dt = interval;
+            doubleTap.type = 'doubletap';
+
+            for (i = 0; i < targets.length; i++) {
+                doubleTap.currentTarget = elements[i];
+                targets[i].fire(doubleTap);
+
+                if (doubleTap.immediatePropagationStopped
+                    ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
+                    break;
+                }
+            }
+
+            prevTap = doubleTap;
+        }
+        else {
+            prevTap = tap;
+        }
+    }
+
+    function collectTaps (event) {
+        if (pointerWasMoved
+            || !(event instanceof downEvent.constructor)
+            || downEvent.target !== event.target) {
+            return;
+        }
+
+        var tapTargets = [],
+            tapElements = [];
+
+        var element = event.target;
+
+        while (element) {
+            if (interact.isSet(element)) {
+                tapTargets.push(interact(element));
+                tapElements.push(element);
+            }
+
+            for (var selector in selectors) {
+                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? document.querySelectorAll(selector)
+                        : undefined;
+
+                if (element !== document && element[matchesSelector](selector, elements)) {
+                    tapTargets.push(selectors[selector]);
+                    tapElements.push(element);
+                }
+            }
+
+            element = element.parentNode;
+        }
+
+        fireTaps(event, tapTargets, tapElements);
+    }
 
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
@@ -1385,7 +1487,21 @@
         return null;
     }
 
-    function selectorDown (event, forceAction) {
+    function selectorDown (event) {
+        if (prepared && downEvent && event.type !== downEvent.type) {
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
+            return;
+        }
+
+        // try to ignore browser simulated mouse after touch
+        if (downEvent
+            && event.type === 'mousedown' && downEvent.type === 'touchstart'
+            && event.timeStamp - downEvent.timeStamp < 300) {
+            return;
+        }
+
         var element = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
@@ -1452,22 +1568,40 @@
 
         if (action) {
             pointerIsDown = true;
+            prepared = action;
+
             return pointerDown(event, action);
+        }
+        else {
+            // do these now since pointerDown isn't being called from here
+            downTime = new Date().getTime();
+            downEvent = event;
+            setEventXY(prevCoords, event);
+            pointerWasMoved = false;
         }
     }
 
     // Determine action to be performed on next pointerMove and add appropriate
     // style and event Liseners
     function pointerDown (event, forceAction) {
+        if (!forceAction && pointerIsDown && downEvent && event.type !== downEvent.type) {
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
+            return;
+        }
+
+        pointerIsDown = true;
+
         if (PointerEvent) {
             addPointer(event);
         }
 
         // If it is the second touch of a multi-touch gesture, keep the target
         // the same if a target was set by the first touch
-        // Otherwise, set the target if the pointer is not down
+        // Otherwise, set the target if there is no action prepared
         if ((((event.touches && event.touches.length < 2) || (pointerIds && pointerIds.length < 2)) && !target)
-            || !pointerIsDown) {
+            || !prepared) {
 
             target = interactables.get(event.currentTarget);
         }
@@ -1476,6 +1610,8 @@
 
         if (target && !(dragging || resizing || gesturing)) {
             var action = validateAction(forceAction || target.getAction(event));
+
+            setEventXY(startCoords, event);
 
             if (PointerEvent && event instanceof PointerEvent) {
                 // Dom modification seems to reset the gesture target
@@ -1490,10 +1626,6 @@
                 return event;
             }
 
-            // Register that the pointer is down after succesfully validating
-            // action. This way, a new target can be gotten in the next
-            // downEvent propagation
-            pointerIsDown = true;
             pointerWasMoved = false;
 
             if (options.styleCursor) {
@@ -1519,13 +1651,14 @@
             snapStatus.x = null;
             snapStatus.y = null;
 
-            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
-                event.preventDefault();
-            }
-
             downTime = new Date().getTime();
             downEvent = event;
             setEventXY(prevCoords, event);
+            pointerWasMoved = false;
+
+            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
+                event.preventDefault();
+            }
         }
         // if inertia is active try to resume action
         else if (inertiaStatus.active
@@ -1756,16 +1889,29 @@
     }
 
     function pointerMove (event, preEnd) {
-        if (!(event instanceof InteractEvent)
-            && pointerIsDown
-            // Ignore browser's simulated mousemove events from touchmove
-            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+        if (!pointerIsDown) { return; }
+
+        if (!(event instanceof InteractEvent)) {
             setEventXY(curCoords, event);
         }
 
-        pointerWasMoved = true;
+        // register movement of more than 1 pixel
+        if (!pointerWasMoved) {
+            var dx = curCoords.clientX - prevCoords.clientX,
+                dy = curCoords.clientY - prevCoords.clientY;
 
-        if (pointerIsDown
+            pointerWasMoved = hypot(dx, dy) > 1;
+        }
+
+        // return if there is no prepared action
+        if (!prepared
+            // or this is a mousemove event but the down event was a touch
+            || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+
+            return;
+        }
+
+        if (pointerWasMoved
             // ignore movement while inertia is active
             && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
@@ -1815,10 +1961,7 @@
             }
         }
 
-        if (!(event instanceof InteractEvent)
-            && pointerIsDown
-            && !(event.type === 'mousemove' && downEvent.type === 'touchstart')) {
-
+        if (!(event instanceof InteractEvent)) {
             // set pointer coordinate, time changes and speeds
             setEventDeltas(pointerDelta, prevCoords, curCoords);
             setEventXY(prevCoords, event);
@@ -2147,6 +2290,15 @@
 
     // End interact move events and stop auto-scroll unless inertia is enabled
     function pointerUp (event) {
+        // don't return if the event is an InteractEvent (in the case of inertia end)
+        // or if the browser uses PointerEvents (event would always be a gestureend)
+        if (!(event instanceof InteractEvent || PointerEvent)
+            && pointerIsDown && downEvent
+            && !(event instanceof downEvent.constructor)) {
+
+            return;
+        }
+
         if (event.touches && event.touches.length >= 2) {
             return;
         }
@@ -2158,7 +2310,8 @@
         }
 
         var endEvent,
-            inertiaOptions = target && target.options.inertia;
+            inertiaOptions = target && target.options.inertia,
+            prop;
 
         if (dragging || resizing || gesturing) {
 
@@ -2188,7 +2341,7 @@
                 if (events.useAttachEvent) {
                     // make a copy of the pointerdown event because IE8
                     // http://stackoverflow.com/a/3533725/2280888
-                    for (var prop in event) {
+                    for (prop in event) {
                         if (event.hasOwnProperty(prop)) {
                             inertiaStatus.pointerUp[prop] = event[prop];
                         }
@@ -2316,17 +2469,6 @@
         else if (gesturing) {
             endEvent = new InteractEvent(event, 'gesture', 'end');
             target.fire(endEvent);
-        }
-        else if (/mouseup|touchend|pointerup/i.test(event.type) && target && pointerIsDown && !pointerWasMoved) {
-            var tap = {};
-
-            for (var prop in event) {
-                    tap[prop] = event[prop];
-            }
-
-            tap.currentTarget = target._element;
-            tap.type = 'tap';
-            target.fire(tap);
         }
 
         interact.stop();
@@ -3451,7 +3593,7 @@
                             if (iEvent.type in this._iEvents) {
                             listeners = this._iEvents[iEvent.type];
 
-                            for (len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
                                 listeners[i](iEvent);
                             }
                             break;
@@ -3470,10 +3612,14 @@
                         case fireStates.globalBind:
                             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
 
-                            for (len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
                                 listeners[i](iEvent);
                             }
                         }
+                    }
+
+                    if (iEvent.propagationStopped) {
+                        break;
                     }
 
                     i = 0;
@@ -3489,8 +3635,6 @@
                     }
                 }
             }
-
-            imPropStopped = false;
 
             return this;
         },
@@ -4167,8 +4311,9 @@
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        pointerWasMoved = true;
-        prepared = downEvent = prevEvent = null;
+        prepared = prevEvent = null;
+        // do not clear the downEvent so that it can be used to
+        // test for browser-simulated mouse events after touch
 
         return interact;
     };
@@ -4261,8 +4406,9 @@
     };
 
     if (PointerEvent) {
+        events.add(docTarget, 'pointerup', collectTaps);
+
         events.add(docTarget, 'pointerdown'    , selectorDown);
-        events.add(docTarget, 'pointercancel'  , pointerUp   );
         events.add(docTarget, 'MSGestureChange', pointerMove );
         events.add(docTarget, 'MSGestureEnd'   , pointerUp   );
         events.add(docTarget, 'MSInertiaStart' , pointerUp   );
@@ -4273,10 +4419,20 @@
         events.add(docTarget, 'pointerup'    , recordPointers);
         events.add(docTarget, 'pointercancel', recordPointers);
 
+        // fix problems of wrong targets in IE
+        events.add(docTarget, 'pointerup', function () {
+            if (!(dragging || resizing || gesturing)) {
+                pointerIsDown = false;
+            }
+        });
+
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
     }
     else {
+        events.add(docTarget, 'mouseup' , collectTaps);
+        events.add(docTarget, 'touchend', collectTaps);
+
         events.add(docTarget, 'mousedown', selectorDown);
         events.add(docTarget, 'mousemove', pointerMove );
         events.add(docTarget, 'mouseup'  , pointerUp   );
