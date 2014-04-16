@@ -1467,6 +1467,13 @@
     function selectorDown (event) {
         if (prepared && downEvent && event.type !== downEvent.type) { return; }
 
+        // try to ignore browser simulated mouse after touch
+        if (downEvent
+            && event.type === 'mousedown' && downEvent.type === 'touchstart'
+            && event.timeStamp - downEvent.timeStamp < 300) {
+            return;
+        }
+
         var element = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
@@ -1475,9 +1482,6 @@
         if (PointerEvent) {
             addPointer(event);
         }
-
-        downEvent = downEvent || event;
-        pointerWasMoved = false;
 
         // Check if the down event hits the current inertia target
         if (inertiaStatus.active && target.selector) {
@@ -1534,9 +1538,16 @@
             }
         }
 
+
+        downTime = new Date().getTime();
+        downEvent = event;
+        setEventXY(prevCoords, event);
+        pointerWasMoved = false;
+
         if (action) {
             pointerIsDown = true;
             prepared = action;
+
             return pointerDown(event, action);
         }
     }
@@ -1609,10 +1620,6 @@
             if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
                 event.preventDefault();
             }
-
-            downTime = new Date().getTime();
-            downEvent = event;
-            setEventXY(prevCoords, event);
         }
         // if inertia is active try to resume action
         else if (inertiaStatus.active
@@ -1843,24 +1850,26 @@
     }
 
     function pointerMove (event, preEnd) {
-        // require movement of more than 1 pixel
+        if (!pointerIsDown) { return; }
+
+        if (!(event instanceof InteractEvent)) {
+            setEventXY(curCoords, event);
+        }
+
+        // register movement of more than 1 pixel
         if (!pointerWasMoved) {
-            var dx = startCoords.clientX - curCoords.clientX,
-                dy = startCoords.clientY - curCoords.clientY;
+            var dx = curCoords.clientX - prevCoords.clientX,
+                dy = curCoords.clientY - prevCoords.clientY;
 
             pointerWasMoved = hypot(dx, dy) > 1;
         }
 
-        // do nothing if there is no prepared action
+        // return if there is no prepared action
         if (!prepared
             // or this is a mousemove event but the down event was a touch
             || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
 
             return;
-        }
-
-        if (!(event instanceof InteractEvent)) {
-            setEventXY(curCoords, event);
         }
 
         if (pointerWasMoved
@@ -4261,7 +4270,9 @@
         }
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        prepared = downEvent = prevEvent = null;
+        prepared = prevEvent = null;
+        // do not clear the downEvent so that it can be used to
+        // test for browser-simulated mouse events after touch
 
         return interact;
     };
