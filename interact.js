@@ -1373,6 +1373,10 @@
             tap[prop] = event[prop];
         }
 
+        tap.preventDefault = blank;
+        tap.stopPropagation = InteractEvent.prototype.stopPropagation;
+        tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+
         tap.timeStamp = new Date().getTime();
         tap.originalEvent = event;
         tap.dt = tap.timeStamp - downTime;
@@ -1388,6 +1392,11 @@
         for (i = 0; i < targets.length; i++) {
             tap.currentTarget = elements[i];
             targets[i].fire(tap);
+
+            if (tap.immediatePropagationStopped
+                ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
+                break;
+            }
         }
 
         if (dbl) {
@@ -1403,6 +1412,11 @@
             for (i = 0; i < targets.length; i++) {
                 doubleTap.currentTarget = elements[i];
                 targets[i].fire(doubleTap);
+
+                if (doubleTap.immediatePropagationStopped
+                    ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
+                    break;
+                }
             }
 
             prevTap = doubleTap;
