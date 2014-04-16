@@ -1544,17 +1544,18 @@
             }
         }
 
-
-        downTime = new Date().getTime();
-        downEvent = event;
-        setEventXY(prevCoords, event);
-        pointerWasMoved = false;
-
         if (action) {
             pointerIsDown = true;
             prepared = action;
 
             return pointerDown(event, action);
+        }
+        else {
+            // do these now since pointerDown isn't being called from here
+            downTime = new Date().getTime();
+            downEvent = event;
+            setEventXY(prevCoords, event);
+            pointerWasMoved = false;
         }
     }
 
@@ -1622,6 +1623,11 @@
 
             snapStatus.x = null;
             snapStatus.y = null;
+
+            downTime = new Date().getTime();
+            downEvent = event;
+            setEventXY(prevCoords, event);
+            pointerWasMoved = false;
 
             if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
                 event.preventDefault();
