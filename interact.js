@@ -66,7 +66,7 @@
         downEvent = null,      // gesturestart/mousedown/touchstart event
         prevEvent = null,      // previous action event
         tapTime   = 0,         // time of the most recent tap event
-        tapType   = '',        // originalEvent.type of previous tap
+        prevTap   = null,
 
         tmpXY = {},     // reduce object creation in getXY()
 
@@ -1378,10 +1378,11 @@
         tap.type = 'tap';
 
         var interval = tap.timeStamp - tapTime,
-            dbl = interval < 500;
+            dbl = (prevTap && prevTap.type !== 'dubletap'
+                   && prevTap.target === tap.target
+                   && interval < 500);
 
         tapTime = tap.timeStamp;
-        tapType = event.type;
 
         for (i = 0; i < targets.length; i++) {
             tap.currentTarget = elements[i];
@@ -1398,19 +1399,24 @@
             doubleTap.dt = interval;
             doubleTap.type = 'doubletap';
 
-            tapTime = 0;
-            tapType = '';
-
             for (i = 0; i < targets.length; i++) {
                 doubleTap.currentTarget = elements[i];
                 targets[i].fire(doubleTap);
             }
 
+            prevTap = doubleTap;
+        }
+        else {
+            prevTap = tap;
         }
     }
 
     function collectTaps (event) {
-        if (pointerWasMoved) { return; }
+        if (pointerWasMoved
+            || !(event instanceof downEvent.constructor)
+            || downEvent.target !== event.target) {
+            return;
+        }
 
         var tapTargets = [],
             tapElements = [];
