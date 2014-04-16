@@ -4390,6 +4390,13 @@
         events.add(docTarget, 'pointerup'    , recordPointers);
         events.add(docTarget, 'pointercancel', recordPointers);
 
+        // fix problems of wrong targets in IE
+        events.add(docTarget, 'pointerup', function () {
+            if (!(dragging || resizing || gesturing)) {
+                pointerIsDown = false;
+            }
+        });
+
         selectorGesture = new Gesture();
         selectorGesture.target = document.documentElement;
     }
