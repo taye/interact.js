@@ -296,7 +296,6 @@
 
         pointerIsDown   = false,
         pointerWasMoved = false,
-        imPropStopped   = false,
         gesturing       = false,
         dragging        = false,
         dynamicDrop     = false,
@@ -1359,9 +1358,11 @@
     InteractEvent.prototype = {
         preventDefault: blank,
         stopImmediatePropagation: function () {
-            imPropStopped = true;
+            this.immediatePropagationStopped = this.propagationStopped = true;
         },
-        stopPropagation: blank
+        stopPropagation: function () {
+            this.propagationStopped = true;
+        }
     };
 
     function fireTaps (event, targets, elements) {
@@ -3576,7 +3577,7 @@
                             if (iEvent.type in this._iEvents) {
                             listeners = this._iEvents[iEvent.type];
 
-                            for (len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
                                 listeners[i](iEvent);
                             }
                             break;
@@ -3595,10 +3596,14 @@
                         case fireStates.globalBind:
                             if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
 
-                            for (len = listeners.length; i < len && !imPropStopped; i++) {
+                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
                                 listeners[i](iEvent);
                             }
                         }
+                    }
+
+                    if (iEvent.propagationStopped) {
+                        break;
                     }
 
                     i = 0;
@@ -3614,8 +3619,6 @@
                     }
                 }
             }
-
-            imPropStopped = false;
 
             return this;
         },
