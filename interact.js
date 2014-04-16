@@ -782,10 +782,10 @@
         var touches = getTouchPair(event);
 
         return {
-            pageX: (touches[0].pageX + touches[1].pageY) / 2,
-            pageY: (touches[0].pageX + touches[1].pageY) / 2,
-            clientX: (touches[0].clientX + touches[1].clientY) / 2,
-            clientY: (touches[0].clientX + touches[1].clientY) / 2,
+            pageX: (touches[0].pageX + touches[1].pageX) / 2,
+            pageY: (touches[0].pageY + touches[1].pageY) / 2,
+            clientX: (touches[0].clientX + touches[1].clientX) / 2,
+            clientY: (touches[0].clientY + touches[1].clientY) / 2,
         };
     }
 
