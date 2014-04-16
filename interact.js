@@ -1373,7 +1373,9 @@
             tap[prop] = event[prop];
         }
 
-        tap.preventDefault = blank;
+        tap.preventDefault = function () {
+            this.originalEvent.preventdefault();
+        };
         tap.stopPropagation = InteractEvent.prototype.stopPropagation;
         tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
 
