@@ -1374,7 +1374,7 @@
         }
 
         tap.preventDefault = function () {
-            this.originalEvent.preventdefault();
+            this.originalEvent.preventDefault();
         };
         tap.stopPropagation = InteractEvent.prototype.stopPropagation;
         tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
