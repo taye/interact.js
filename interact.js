@@ -1514,7 +1514,7 @@
         // Check if the down event hits the current inertia target
         if (inertiaStatus.active && target.selector) {
             // climb up the DOM tree from the event target
-            while (element !== document) {
+            while (element && element !== document) {
 
                 // if this element is the current inertia target element
                 if (element === inertiaStatus.targetElement
