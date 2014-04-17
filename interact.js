@@ -1548,7 +1548,7 @@
             var selector,
                 elements;
 
-            while (element !== document && !action) {
+            while (element && element !== document && !action) {
                 matches = [];
 
                 for (selector in selectors) {
@@ -2494,7 +2494,7 @@
         };
 
         // climb up document tree looking for selector matches
-        while (element !== document) {
+        while (element && element !== document) {
             for (selector in selectors) {
                 if (element[matchesSelector](selector)) {
                     var listeners = selectors[selector];
