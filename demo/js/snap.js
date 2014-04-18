@@ -251,6 +251,7 @@
                 ]
             })
             .restrict({drag: 'self'})
+            .origin('self')
             .draggable(true);
 
         guidesCanvas = document.getElementById('grid');
