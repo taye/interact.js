@@ -2292,7 +2292,7 @@
                 }
             }
         }
-        else {
+        else if (prepared) {
             event.preventDefault();
         }
     }
