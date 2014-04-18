@@ -1365,24 +1365,28 @@
         }
     };
 
+    function preventOriginalDefault () {
+        this.originalEvent.preventDefault();
+    }
+
     function fireTaps (event, targets, elements) {
         var tap = {},
             prop, i;
 
         for (prop in event) {
-            tap[prop] = event[prop];
+            if (event.hasOwnProperty(prop)) {
+                tap[prop] = event[prop];
+            }
         }
 
-        tap.preventDefault = function () {
-            this.originalEvent.preventDefault();
-        };
-        tap.stopPropagation = InteractEvent.prototype.stopPropagation;
+        tap.preventDefault           = preventOriginalDefault;
+        tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
         tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
 
-        tap.timeStamp = new Date().getTime();
+        tap.timeStamp     = new Date().getTime();
         tap.originalEvent = event;
-        tap.dt = tap.timeStamp - downTime;
-        tap.type = 'tap';
+        tap.dt            = tap.timeStamp - downTime;
+        tap.type          = 'tap';
 
         var interval = tap.timeStamp - tapTime,
             dbl = (prevTap && prevTap.type !== 'dubletap'
@@ -1408,7 +1412,7 @@
                 doubleTap[prop] = tap[prop];
             }
 
-            doubleTap.dt = interval;
+            doubleTap.dt   = interval;
             doubleTap.type = 'doubletap';
 
             for (i = 0; i < targets.length; i++) {
