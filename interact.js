@@ -196,6 +196,7 @@
         restrictStatus = {
             dx: 0,
             dy: 0,
+            snap: snapStatus,
             restricted: false
         },
 
@@ -1840,16 +1841,13 @@
 
         status = status || restrictStatus;
 
-        if (status.useStatusXY) {
-            page = { x: status.x, y: status.y };
-        }
-        else {
-            var origin = getOriginXY(target);
+        page = status.useStatusXY
+                ? page = { x: status.x, y: status.y }
+                : page = getPageXY(event);
 
-            page = getPageXY(event);
-
-            page.x -= origin.x;
-            page.y -= origin.y;
+        if (status.snap && status.snap.locked) {
+            page.x += status.snap.dx || 0;
+            page.y += status.snap.dy || 0;
         }
 
         status.dx = 0;
@@ -1860,9 +1858,7 @@
             return;
         }
 
-        var rect,
-            originalPageX = page.x,
-            originalPageY = page.y;
+        var rect;
 
         if (restriction === 'parent') {
             restriction = target._element.parentNode;
@@ -1894,8 +1890,8 @@
             }
         }
 
-        status.dx = Math.max(Math.min(rect.right , page.x), rect.left) - originalPageX;
-        status.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - originalPageY;
+        status.dx = Math.max(Math.min(rect.right , page.x), rect.left) - page.x;
+        status.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - page.y;
         status.restricted = true;
 
         return status;
@@ -2398,8 +2394,13 @@
                 statusObject = {
                     useStatusXY: true,
                     x: startX + inertiaStatus.xe,
-                    y: startY + inertiaStatus.ye
+                    y: startY + inertiaStatus.ye,
+                    dx: 0,
+                    dy: 0,
+                    snap: null
                 };
+
+                statusObject.snap = statusObject;
 
                 if (target.options.snapEnabled && target.options.snap.endOnly) {
                     var snap = setSnapping(event, statusObject);
