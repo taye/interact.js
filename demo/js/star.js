@@ -68,5 +68,10 @@ document.addEventListener('DOMContentLoaded', function () {
             anchors: originalPoints,
             range: 10
         })
+        .restrict({ drag: document.rootElement })
         .styleCursor(false);
+
+    document.addEventListener('dragstart', function (event) {
+        event.preventDefault();
+    });
 });
