@@ -1855,7 +1855,7 @@
         status.restricted = false;
 
         if (!action || !restriction) {
-            return;
+            return status;
         }
 
         var rect;
