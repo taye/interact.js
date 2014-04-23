@@ -1429,10 +1429,12 @@
     }
 
     function collectTaps (event) {
-        if (pointerWasMoved
-            || !(event instanceof downEvent.constructor)
-            || downEvent.target !== event.target) {
-            return;
+        if(downEvent) {
+            if (pointerWasMoved
+                || !(event instanceof downEvent.constructor)
+                || downEvent.target !== event.target) {
+                return;
+            }    
         }
 
         var tapTargets = [],
