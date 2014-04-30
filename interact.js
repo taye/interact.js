@@ -167,13 +167,15 @@
             autoScrollEnabled: false,
 
             inertia: {
-                resistance : 10,    // the lambda in exponential decay
-                minSpeed   : 100,   // target speed must be above this for inertia to start
-                endSpeed   : 10,    // the speed at which inertia is slow enough to stop
-                actions    : ['drag', 'resize'],
+                resistance     : 10,    // the lambda in exponential decay
+                minSpeed       : 100,   // target speed must be above this for inertia to start
+                endSpeed       : 10,    // the speed at which inertia is slow enough to stop
+                actions        : ['drag', 'resize'],
+                zeroResumeDelta: false,
 
                 numberTypes: /^resistance$|^minSpeed$|^endSpeed$/,
-                arrayTypes : /^actions$/
+                arrayTypes : /^actions$/,
+                boolTypes: /^zeroResumeDelta$/
             },
             inertiaEnabled: false,
 
@@ -1207,8 +1209,12 @@
             this.relatedTarget = related;
         }
 
+        if (prevEvent && prevEvent.detail === 'inertia'
+            && !inertiaStatus.active && options.inertia.zeroResumeDelta) {
+            this.dx = this.dy = 0;
+        }
         // end event dx, dy is difference between start and end points
-        if (phase === 'end' || action === 'drop') {
+        else if (phase === 'end' || action === 'drop') {
             if (deltaSource === 'client') {
                 this.dx = client.x - startCoords.clientX;
                 this.dy = client.y - startCoords.clientY;
@@ -3189,16 +3195,19 @@
 
                 if (inertia === defaults) {
                    inertia = this.options.inertia = {
-                       resistance: defaults.resistance,
-                       minSpeed  : defaults.minSpeed,
-                       endSpeed  : defaults.endSpeed
+                       resistance     : defaults.resistance,
+                       minSpeed       : defaults.minSpeed,
+                       endSpeed       : defaults.endSpeed,
+                       actions        : defaults.actions,
+                       zeroResumeDelta: defaults.zeroResumeDelta
                    };
                 }
 
-                inertia.resistance = this.validateSetting('inertia', 'resistance', options.resistance);
-                inertia.minSpeed   = this.validateSetting('inertia', 'minSpeed'  , options.minSpeed);
-                inertia.endSpeed   = this.validateSetting('inertia', 'endSpeed'  , options.endSpeed);
-                inertia.actions    = this.validateSetting('inertia', 'actions'   , options.actions);
+                inertia.resistance      = this.validateSetting('inertia', 'resistance'     , options.resistance);
+                inertia.minSpeed        = this.validateSetting('inertia', 'minSpeed'       , options.minSpeed);
+                inertia.endSpeed        = this.validateSetting('inertia', 'endSpeed'       , options.endSpeed);
+                inertia.actions         = this.validateSetting('inertia', 'actions'        , options.actions);
+                inertia.zeroResumeDelta = this.validateSetting('inertia', 'zeroResumeDelta', options.zeroResumeDelta);
 
                 this.options.inertiaEnabled = true;
                 this.options.inertia = inertia;
@@ -4246,6 +4255,8 @@
             if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
             if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
 
+            if (typeof options.zeroResumeDelta === 'boolean') { inertia.zeroResumeDelta = options.zeroResumeDelta  ;}
+
             if (options.actions instanceof Array) { inertia.actions = options.actions; }
 
             return interact;
@@ -4261,7 +4272,8 @@
             resistance: inertia.resistance,
             minSpeed: inertia.minSpeed,
             endSpeed: inertia.endSpeed,
-            actions: inertia.actions
+            actions: inertia.actions,
+            zeroResumeDelta: inertia.zeroResumeDelta
         };
     };
 
