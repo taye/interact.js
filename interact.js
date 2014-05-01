@@ -3172,16 +3172,19 @@
          | interact(element).inertia({
          |     // value greater than 0
          |     // high values slow the object down more quickly
-         |     resistance  : 16,
+         |     resistance     : 16,
          |
          |     // the minimum launch speed (pixels per second) that results in inertiastart
-         |     minSpeed    : 200,
+         |     minSpeed       : 200,
          |
          |     // inertia will stop when the object slows down to this speed
-         |     endSpeed    : 20,
+         |     endSpeed       : 20,
          |
          |     // an array of action types that can have inertia (no gesture)
-         |     actions     : ['drag', 'resize']
+         |     actions        : ['drag', 'resize'],
+         |
+         |     // boolean; should the jump when resuming from inertia be ignored in event.dx/dy
+         |     zeroResumeDelta: false
          | });
          |
          | // reset custom settings and use all defaults
