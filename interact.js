@@ -1128,7 +1128,7 @@
 
         element = element || target._element;
 
-        if (action === 'gesture' && !PointerEvent) {
+        if (action === 'gesture') {
             var average = touchAverage(event);
 
             page   = { x: (average.pageX   - origin.x), y: (average.pageY   - origin.y) };
@@ -1991,7 +1991,7 @@
 
     function addPointer (event, gesture) {
         // dont add the event if it's not the same pointer type as the previous event
-        if (pointerMoves.length && pointerMoves[0].pointerType !== event.pointerType) {
+        if (pointerIds.length && pointerMoves[0].pointerType !== event.pointerType) {
             return;
         }
 
@@ -2003,7 +2003,10 @@
 
         if (index === -1) {
             pointerIds.push(event.pointerId);
-            pointerMoves.push(event);
+
+            // move events are kept so that multi-touch properties can still be
+            // calculated at the end of a gesture; use pointerIds index
+            pointerMoves[pointerIds.length - 1] = event;
         }
         else {
             pointerMoves[index] = event;
@@ -2016,7 +2019,10 @@
         if (index === -1) { return; }
 
         pointerIds.splice(index, 1);
-        pointerMoves.splice(index, 1);
+
+        // move events are kept so that multi-touch properties can still be
+        // calculated at the end of a GestureEvnt sequence
+        //pointerMoves.splice(index, 1);
     }
 
     function recordPointers (event) {
