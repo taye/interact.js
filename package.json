@@ -2,7 +2,7 @@
     "name": "interact",
     "version": "1.0.14",
     "main": "interact.js",
-    "description": "Powerful, flexible, snappable drag and drop, resizing and multi-touch gestures for modern browsers (and also IE8+)",
+    "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
     "homepage": "http://interactjs.io",
     "authors": [{
         "name" : "Taye Adeyemi",
@@ -20,6 +20,7 @@
         "multi-touch",
         "gesture",
         "snap",
+        "inertia",
         "grid",
         "autoscroll",
         "SVG"
