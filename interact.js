@@ -15,9 +15,10 @@
         SVGElementInstance = window.SVGElementInstance || blank,
         HTMLElement        = window.HTMLElement        || window.Element,
 
-        PointerEvent = window.PointerEvent || window.MSPointerEvent,
-        GestureEvent = window.GestureEvent || window.MSGestureEvent,
-        Gesture      = window.Gesture      || window.MSGesture,
+        // Use PointerEvents only if the Gesture API is also available
+        Gesture      = window.Gesture || window.MSGesture,
+        PointerEvent = Gesture && (window.PointerEvent || window.MSPointerEvent),
+        GestureEvent = Gesture && (window.GestureEvent || window.MSGestureEvent),
 
         hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
 
