@@ -125,8 +125,9 @@
             draggable   : false,
             dropzone    : false,
             accept      : null,
-            resizable  : false,
+            resizable   : false,
             squareResize: false,
+            resizeAxis  : 'xy',
             gesturable : false,
 
             styleCursor : true,
@@ -2905,13 +2906,22 @@
          | interact(element).resizable({
          |     onstart: function (event) {},
          |     onmove : function (event) {},
-         |     onend  : function (event) {}
+         |     onend  : function (event) {},
+         |
+         |     axis   : 'x' || 'y' || 'xy' // default is 'xy'
          | });
         \*/
         resizable: function (options) {
             if (options instanceof Object) {
                 this.options.resizable = true;
                 this.setOnEvents('resize', options);
+
+                if (/^x$|^y$|^xy$/.test(options.axis)) {
+                    this.options.resizeAxis = options.axis;
+                }
+                else if (options.axis === null) {
+                    this.options.resizeAxis = defaultOptions.resizeAxis;
+                }
 
                 return this;
             }
@@ -3265,11 +3275,12 @@
                 options = this.options;
 
             if (actionIsEnabled.resize && options.resizable) {
-                right  = page.x > (rect.right  - margin);
-                bottom = page.y > (rect.bottom - margin);
+                right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
+                bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
             }
 
             resizeAxes = (right?'x': '') + (bottom?'y': '');
+
             action = (resizeAxes)?
                 'resize' + resizeAxes:
                 actionIsEnabled.drag && options.draggable?
