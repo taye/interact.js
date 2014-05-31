@@ -1916,8 +1916,9 @@
 
         // register movement of more than 1 pixel
         if (!pointerWasMoved) {
-            var dx = curCoords.clientX - prevCoords.clientX,
-                dy = curCoords.clientY - prevCoords.clientY;
+            var startClient = getClientXY(downEvent, tmpXY),
+                dx = curCoords.clientX - startClient.x,
+                dy = curCoords.clientY - startClient.y;
 
             pointerWasMoved = hypot(dx, dy) > 1;
         }
