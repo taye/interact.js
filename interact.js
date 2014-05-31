@@ -1383,9 +1383,7 @@
             prop, i;
 
         for (prop in event) {
-            if (event.hasOwnProperty(prop)) {
-                tap[prop] = event[prop];
-            }
+            tap[prop] = event[prop];
         }
 
         tap.preventDefault           = preventOriginalDefault;
@@ -2368,9 +2366,7 @@
                     // make a copy of the pointerdown event because IE8
                     // http://stackoverflow.com/a/3533725/2280888
                     for (prop in event) {
-                        if (event.hasOwnProperty(prop)) {
-                            inertiaStatus.pointerUp[prop] = event[prop];
-                        }
+                        inertiaStatus.pointerUp[prop] = event[prop];
                     }
                 }
                 else {
@@ -3958,9 +3954,7 @@
 
         if (pointerEvent) {
             for (prop in pointerEvent) {
-                if (pointerEvent.hasOwnProperty(prop)) {
-                    event[prop] = pointerEvent[prop];
-                }
+                event[prop] = pointerEvent[prop];
             }
         }
         else {
