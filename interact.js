@@ -1398,7 +1398,7 @@
         tap.type          = 'tap';
 
         var interval = tap.timeStamp - tapTime,
-            dbl = (prevTap && prevTap.type !== 'dubletap'
+            dbl = (prevTap && prevTap.type !== 'doubletap'
                    && prevTap.target === tap.target
                    && interval < 500);
 
