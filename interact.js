@@ -2679,8 +2679,8 @@
      |     })
      |     .autoScroll(true);
     \*/
-    function interact (element) {
-        return interactables.get(element) || new Interactable(element);
+    function interact (element, options) {
+        return interactables.get(element, options) || new Interactable(element, options);
     }
 
     // A class for easy inheritance and setting of an Interactable's options
