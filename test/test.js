@@ -103,7 +103,7 @@ describe('Interactable', function () {
             'inertia'
         ],
         checkerOptions = {
-            actionChecker: 'getAction',
+            actionChecker: 'defaultActionChecker',
             rectChecker  : 'getRect'
         };
 
@@ -147,11 +147,10 @@ describe('Interactable', function () {
             i,
             action,
             actions = ['drag', 'resizexy', 'resizex', 'resizey', 'gesture'],
-            returnActionI = function alwaysResize () { return actions[i]; };
+            returnActionI = function () { return actions[i]; };
 
         it('should set set the function used to determine actions on pointer down events', function () {
             iDiv.actionChecker(returnActionI);
-            iDiv.getAction.should.equal(returnActionI);
 
             for (i = 0; action = actions[i], i < actions.length; i++) {
                 debug.pointerDown.call(div, mockEvent({
