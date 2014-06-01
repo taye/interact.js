@@ -3869,7 +3869,8 @@
             this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
-            if ('autoScroll'  in options) { this.autoScroll (options.autoScroll ); }
+            if ('autoScroll'  in options) { this.autoScroll (options.autoScroll); }
+            if ('context'     in options) { this.context    (options.context   ); }
 
             return this;
         },
