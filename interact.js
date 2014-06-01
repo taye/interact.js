@@ -1511,6 +1511,39 @@
         }
     }
 
+    function defaultActionChecker (event) {
+        var rect = this.getRect(),
+            right,
+            bottom,
+            action = null,
+            page = getPageXY(event),
+            options = this.options;
+
+        if (!rect) { return null; }
+
+        if (actionIsEnabled.resize && options.resizable) {
+            right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
+            bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
+        }
+
+        resizeAxes = (right?'x': '') + (bottom?'y': '');
+
+        action = (resizeAxes)?
+            'resize' + resizeAxes:
+            actionIsEnabled.drag && options.draggable?
+                'drag':
+                null;
+
+        if (actionIsEnabled.gesture
+            && ((event.touches && event.touches.length >= 2)
+                || (PointerEvent && pointerIds.length >=2)) &&
+                !(dragging || resizing)) {
+            action = 'gesture';
+        }
+
+        return action;
+    }
+
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action, interactable) {
@@ -3299,36 +3332,7 @@
             return action;
         },
 
-        defaultActionChecker: function defaultActionChecker (event) {
-            var rect = this.getRect(),
-                right,
-                bottom,
-                action,
-                page = getPageXY(event),
-                options = this.options;
-
-            if (actionIsEnabled.resize && options.resizable) {
-                right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
-                bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
-            }
-
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-
-            action = (resizeAxes)?
-                'resize' + resizeAxes:
-                actionIsEnabled.drag && options.draggable?
-                    'drag':
-                    null;
-
-            if (actionIsEnabled.gesture
-                && ((event.touches && event.touches.length >= 2)
-                    || (PointerEvent && pointerIds.length >=2)) &&
-                    !(dragging || resizing)) {
-                action = 'gesture';
-            }
-
-            return action;
-        },
+        defaultActionChecker: defaultActionChecker,
 
         /*\
          * Interactable.actionChecker
@@ -4125,6 +4129,7 @@
             dropzones             : dropzones,
             pointerIsDown         : pointerIsDown,
             defaultOptions        : defaultOptions,
+            defaultActionChecker  : defaultActionChecker,
 
             actions               : actions,
             dragMove              : dragMove,
