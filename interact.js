@@ -3583,6 +3583,20 @@
             return this;
         },
 
+        /*\
+         * Interactable.context
+         [ method ]
+         *
+         * If this is a selector Interactable, the query will be called on the
+         * specified Node. The default node is `window.document`.
+         *
+         - newValue (Node | null) #optional a queryable Node or null to use the document
+         = (string | Element | object) The current context Node or this Interactable
+         **
+         | interact('ul.list > li', { context: element })
+         | // or
+         | interact('ul.list > li').context(element);
+        \*/
         context: function (newValue) {
             if (newValue instanceof Node) {
                 this.options.context = newValue;
@@ -3596,6 +3610,21 @@
             return this.options.context;
         },
 
+        /*\
+         * Interactable.ignoreFrom
+         [ method ]
+         *
+         * If the target of the `mousedown`, `pointerdown` or `touchstart`
+         * event or any of it's parents match the given CSS selector or
+         * Element, no action is performed.
+         *
+         - newValue (string | Element) #optional a CSS selector string, an Element or `null` to not ignore any elements
+         = (string | Element | object) The current ignoreFrom value or this Interactable
+         **
+         | interact(element, { ignoreFrom: document.getElementById('no-action') });
+         | // or
+         | interact(element).ignoreFrom('input, textarea, a');
+        \*/
         ignoreFrom: function (newValue) {
             if (typeof newValue === 'string'            // CSS selector to match event.target
                 || newValue instanceof Element) {       // or a specific element
