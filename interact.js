@@ -182,7 +182,9 @@
             inertiaEnabled: false,
 
             origin      : { x: 0, y: 0 },
-            deltaSource : 'page'
+            deltaSource : 'page',
+
+            context     : document      // the Node on which querySelector will be called
         },
 
         snapStatus = {
@@ -946,6 +948,22 @@
         };
     }
 
+    function nodeContains (parent, child) {
+        while ((child = child.parentNode)) {
+
+            if (child === parent) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function inContext (interactable, element) {
+        return interactable.options.context === document
+                || nodeContains(interactable.options.context, element);
+    }
+
     // Test for the element that's "above" all other qualifiers
     function resolveDrops (elements) {
         if (elements.length) {
@@ -1065,7 +1083,8 @@
             if (selectorDZs.length) {
                 for (i = 0; i < selectorDZs.length; i++) {
                     var selector = selectorDZs[i],
-                        nodeList = document.querySelectorAll(selector.selector);
+                        context = selector.options.context,
+                        nodeList = context.querySelectorAll(selector.selector);
 
                     for (var j = 0, len = nodeList.length; j < len; j++) {
                         selector._element = nodeList[j];
@@ -1467,12 +1486,17 @@
             }
 
             for (var selector in selectors) {
-                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
-                        ? document.querySelectorAll(selector)
+                var interactable = selectors[selector],
+                    context = interactable.options.context,
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? context.querySelectorAll(selector)
                         : undefined;
 
-                if (element !== document && element[matchesSelector](selector, elements)) {
-                    tapTargets.push(selectors[selector]);
+                if (element !== document
+                    && inContext(interactable, element)
+                    && element[matchesSelector](selector, elements)) {
+
+                    tapTargets.push(interactable);
                     tapElements.push(element);
                 }
             }
@@ -1574,12 +1598,18 @@
                 matches = [];
 
                 for (selector in selectors) {
-                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector?
-                        document.querySelectorAll(selector): undefined;
+                    var interactable = selectors[selector],
+                        context = interactable.options.context;
 
-                    if (element[matchesSelector](selector, elements)) {
-                        selectors[selector]._element = element;
-                        matches.push(selectors[selector]);
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? context.querySelectorAll(selector)
+                        : undefined;
+
+                    if (inContext(interactable, element)
+                        && element[matchesSelector](selector, elements)) {
+
+                        interactable._element = element;
+                        matches.push(interactable);
                     }
                 }
 
@@ -2063,7 +2093,10 @@
             if (!dynamicDrop) {
                 calcRects(dropzones);
                 for (var i = 0; i < selectorDZs.length; i++) {
-                    selectorDZs[i]._elements = document.querySelectorAll(selectorDZs[i].selector);
+                    var interactable = selectorDZs[i],
+                        context = interactable.options.context;
+
+                    interactable._elements = context.querySelectorAll(interactable.selector);
                 }
             }
 
@@ -2220,8 +2253,10 @@
                 : event.target);
 
         for (var selector in selectors) {
-            if (selectors.hasOwnProperty(selector)
-                && selectors[selector]
+            var interactable = selectors[selector];
+
+            if (interactable
+                && inContext(interactable, event.target)
                 && eventTarget[matchesSelector](selector)) {
 
                 selectors[selector]._element = eventTarget;
@@ -3339,7 +3374,7 @@
         \*/
         getRect: function rectCheck () {
             if (this.selector && !(isElement(this._element))) {
-                this._element = document.querySelector(this.selector);
+                this._element = this.options.context.querySelector(this.selector);
             }
 
             return getElementRect(this._element);
@@ -3513,6 +3548,19 @@
             }
 
             return this;
+        },
+
+        context: function (newValue) {
+            if (newValue instanceof Node) {
+                this.options.context = newValue;
+                return this;
+            }
+            else if (newValue === null) {
+                delete this.options.context;
+                return this;
+            }
+
+            return this.options.context;
         },
 
         /*\
