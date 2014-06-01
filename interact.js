@@ -3912,9 +3912,19 @@
             this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
-            if ('autoScroll'  in options) { this.autoScroll (options.autoScroll); }
-            if ('context'     in options) { this.context    (options.context   ); }
-            if ('ignoreFrom'  in options) { this.ignoreFrom (options.ignoreFrom); }
+            var settings = [
+                    'accept', 'actionChecker', 'autoScroll', 'context',
+                    'dropChecker', 'ignoreFrom', 'inertia', 'origin',
+                    'rectChecker', 'restrict', 'snap'
+                ];
+
+            for (var i = 0, len = settings.length; i < len; i++) {
+                var setting = settings[i];
+
+                if (setting in options) {
+                    this[setting](options[setting]);
+                }
+            }
 
             return this;
         },
