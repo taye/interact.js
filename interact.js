@@ -130,6 +130,8 @@
             resizeAxis  : 'xy',
             gesturable : false,
 
+            actionChecker: null,
+
             styleCursor : true,
 
             // aww snap
@@ -182,7 +184,9 @@
             inertiaEnabled: false,
 
             origin      : { x: 0, y: 0 },
-            deltaSource : 'page'
+            deltaSource : 'page',
+
+            context     : document      // the Node on which querySelector will be called
         },
 
         snapStatus = {
@@ -946,6 +950,37 @@
         };
     }
 
+    function nodeContains (parent, child) {
+        while ((child = child.parentNode)) {
+
+            if (child === parent) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function inContext (interactable, element) {
+        return interactable.options.context === document
+                || nodeContains(interactable.options.context, element);
+    }
+
+    function testIgnore (interactable, element) {
+        var ignoreFrom = interactable.options.ignoreFrom;
+
+        if (!element || !(element instanceof Element)) { return false; }
+
+        if (typeof ignoreFrom === 'string') {
+            return element[matchesSelector](ignoreFrom) || testIgnore(interactable, element.parentNode);
+        }
+        else if (ignoreFrom instanceof Element) {
+            return element === ignoreFrom || nodeContains(ignoreFrom, element);
+        }
+
+        return false;
+    }
+
     // Test for the element that's "above" all other qualifiers
     function resolveDrops (elements) {
         if (elements.length) {
@@ -1065,7 +1100,8 @@
             if (selectorDZs.length) {
                 for (i = 0; i < selectorDZs.length; i++) {
                     var selector = selectorDZs[i],
-                        nodeList = document.querySelectorAll(selector.selector);
+                        context = selector.options.context,
+                        nodeList = context.querySelectorAll(selector.selector);
 
                     for (var j = 0, len = nodeList.length; j < len; j++) {
                         selector._element = nodeList[j];
@@ -1458,7 +1494,10 @@
         var tapTargets = [],
             tapElements = [];
 
-        var element = event.target;
+        var eventTarget = (event.target instanceof SVGElementInstance
+                ? event.target.correspondingUseElement
+                : event.target),
+            element = eventTarget;
 
         while (element) {
             if (interact.isSet(element)) {
@@ -1467,12 +1506,18 @@
             }
 
             for (var selector in selectors) {
-                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
-                        ? document.querySelectorAll(selector)
+                var interactable = selectors[selector],
+                    context = interactable.options.context,
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? context.querySelectorAll(selector)
                         : undefined;
 
-                if (element !== document && element[matchesSelector](selector, elements)) {
-                    tapTargets.push(selectors[selector]);
+                if (element !== document
+                    && inContext(interactable, element)
+                    && !testIgnore(interactable, eventTarget)
+                    && element[matchesSelector](selector, elements)) {
+
+                    tapTargets.push(interactable);
                     tapElements.push(element);
                 }
             }
@@ -1483,6 +1528,39 @@
         if (tapTargets.length) {
             fireTaps(event, tapTargets, tapElements);
         }
+    }
+
+    function defaultActionChecker (event) {
+        var rect = this.getRect(),
+            right,
+            bottom,
+            action = null,
+            page = getPageXY(event),
+            options = this.options;
+
+        if (!rect) { return null; }
+
+        if (actionIsEnabled.resize && options.resizable) {
+            right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
+            bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
+        }
+
+        resizeAxes = (right?'x': '') + (bottom?'y': '');
+
+        action = (resizeAxes)?
+            'resize' + resizeAxes:
+            actionIsEnabled.drag && options.draggable?
+                'drag':
+                null;
+
+        if (actionIsEnabled.gesture
+            && ((event.touches && event.touches.length >= 2)
+                || (PointerEvent && pointerIds.length >=2)) &&
+                !(dragging || resizing)) {
+            action = 'gesture';
+        }
+
+        return action;
     }
 
     // Check if action is enabled globally and the current target supports it
@@ -1524,9 +1602,10 @@
             return;
         }
 
-        var element = (event.target instanceof SVGElementInstance
+        var eventTarget = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
+            element = eventTarget,
             action;
 
         if (PointerEvent) {
@@ -1574,12 +1653,19 @@
                 matches = [];
 
                 for (selector in selectors) {
-                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector?
-                        document.querySelectorAll(selector): undefined;
+                    var interactable = selectors[selector],
+                        context = interactable.options.context;
 
-                    if (element[matchesSelector](selector, elements)) {
-                        selectors[selector]._element = element;
-                        matches.push(selectors[selector]);
+                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                        ? context.querySelectorAll(selector)
+                        : undefined;
+
+                    if (inContext(interactable, element)
+                        && !testIgnore(interactable, eventTarget)
+                        && element[matchesSelector](selector, elements)) {
+
+                        interactable._element = element;
+                        matches.push(interactable);
                     }
                 }
 
@@ -2063,7 +2149,10 @@
             if (!dynamicDrop) {
                 calcRects(dropzones);
                 for (var i = 0; i < selectorDZs.length; i++) {
-                    selectorDZs[i]._elements = document.querySelectorAll(selectorDZs[i].selector);
+                    var interactable = selectorDZs[i],
+                        context = interactable.options.context;
+
+                    interactable._elements = context.querySelectorAll(interactable.selector);
                 }
             }
 
@@ -2219,18 +2308,14 @@
                 ? event.target.correspondingUseElement
                 : event.target);
 
-        for (var selector in selectors) {
-            if (selectors.hasOwnProperty(selector)
-                && selectors[selector]
-                && eventTarget[matchesSelector](selector)) {
-
-                selectors[selector]._element = eventTarget;
-                curMatches.push(selectors[selector]);
-            }
+        if (target && testIgnore(target, eventTarget)) {
+            // if the eventTarget should be ignored clear the previous target
+            target = null;
+            matches = [];
         }
 
         var elementInteractable = interactables.get(eventTarget),
-            elementAction = elementInteractable
+            elementAction = elementInteractable && !testIgnore(elementInteractable, eventTarget)
                      && validateAction(
                          elementInteractable.getAction(event),
                          elementInteractable);
@@ -2240,6 +2325,19 @@
             matches = [];
         }
         else {
+            for (var selector in selectors) {
+                var interactable = selectors[selector];
+
+                if (interactable
+                    && inContext(interactable, eventTarget)
+                    && !testIgnore(interactable, eventTarget)
+                    && eventTarget[matchesSelector](selector)) {
+
+                    interactable._element = eventTarget;
+                    curMatches.push(interactable);
+                }
+            }
+
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
@@ -2609,8 +2707,8 @@
      |     })
      |     .autoScroll(true);
     \*/
-    function interact (element) {
-        return interactables.get(element) || new Interactable(element);
+    function interact (element, options) {
+        return interactables.get(element, options) || new Interactable(element, options);
     }
 
     // A class for easy inheritance and setting of an Interactable's options
@@ -3252,47 +3350,17 @@
                 : false);
         },
 
-        /*\
-         * Interactable.getAction
-         [ method ]
-         *
-         * The default function to get the action resulting from a pointer
-         * event. overridden using @Interactable.actionChecker
-         *
-         - event (object) The mouse/touch event
-         *
-         = (string | null) The action (drag/resize[axes]/gesture) or null if none can be performed
-        \*/
-        getAction: function actionCheck (event) {
-            var rect = this.getRect(),
-                right,
-                bottom,
-                action,
-                page = getPageXY(event),
-                options = this.options;
+        getAction: function (event) {
+            var action = this.defaultActionChecker(event);
 
-            if (actionIsEnabled.resize && options.resizable) {
-                right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
-                bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
-            }
-
-            resizeAxes = (right?'x': '') + (bottom?'y': '');
-
-            action = (resizeAxes)?
-                'resize' + resizeAxes:
-                actionIsEnabled.drag && options.draggable?
-                    'drag':
-                    null;
-
-            if (actionIsEnabled.gesture
-                && ((event.touches && event.touches.length >= 2)
-                    || (PointerEvent && pointerIds.length >=2)) &&
-                    !(dragging || resizing)) {
-                action = 'gesture';
+            if (this.options.actionChecker) {
+                action = this.options.actionChecker(event, action, this);
             }
 
             return action;
         },
+
+        defaultActionChecker: defaultActionChecker,
 
         /*\
          * Interactable.actionChecker
@@ -3301,23 +3369,23 @@
          * Gets or sets the function used to check action to be performed on
          * pointerDown
          *
-         - checker (function) #optional A function which takes a mouse or touch event event as a parameter and returns 'drag' 'resize' or 'gesture' or null
+         - checker (function | null) #optional A function which takes a pointer event, defaultAction string and an interactable as parameters and returns 'drag' 'resize[axes]' or 'gesture' or null.
          = (Function | Interactable) The checker function or this Interactable
         \*/
         actionChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.getAction = newValue;
+                this.options.actionChecker = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.getAction;
+                delete this.options.actionChecker;
 
                 return this;
             }
 
-            return this.getAction;
+            return this.options.actionChecker;
         },
 
         /*\
@@ -3339,7 +3407,7 @@
         \*/
         getRect: function rectCheck () {
             if (this.selector && !(isElement(this._element))) {
-                this._element = document.querySelector(this.selector);
+                this._element = this.options.context.querySelector(this.selector);
             }
 
             return getElementRect(this._element);
@@ -3513,6 +3581,36 @@
             }
 
             return this;
+        },
+
+        context: function (newValue) {
+            if (newValue instanceof Node) {
+                this.options.context = newValue;
+                return this;
+            }
+            else if (newValue === null) {
+                delete this.options.context;
+                return this;
+            }
+
+            return this.options.context;
+        },
+
+        ignoreFrom: function (newValue) {
+            if (typeof newValue === 'string'            // CSS selector to match event.target
+                || newValue instanceof Element) {       // or a specific element
+
+                this.options.ignoreFrom = newValue;
+
+                return this;
+            }
+            else if (newValue === null) {
+                delete this.options.ignoreFrom;
+
+                return this;
+            }
+
+            return this.options.ignoreFrom;
         },
 
         /*\
@@ -3812,7 +3910,19 @@
             this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
-            if ('autoScroll'  in options) { this.autoScroll (options.autoScroll ); }
+            var settings = [
+                    'accept', 'actionChecker', 'autoScroll', 'context',
+                    'dropChecker', 'ignoreFrom', 'inertia', 'origin',
+                    'rectChecker', 'restrict', 'snap'
+                ];
+
+            for (var i = 0, len = settings.length; i < len; i++) {
+                var setting = settings[i];
+
+                if (setting in options) {
+                    this[setting](options[setting]);
+                }
+            }
 
             return this;
         },
@@ -4072,6 +4182,7 @@
             dropzones             : dropzones,
             pointerIsDown         : pointerIsDown,
             defaultOptions        : defaultOptions,
+            defaultActionChecker  : defaultActionChecker,
 
             actions               : actions,
             dragMove              : dragMove,
@@ -4559,13 +4670,20 @@
         }
     }());
 
+    /* global exports: true, module, define */
+
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
-    /* global exports: true, module */
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = interact;
         }
         exports.interact = interact;
+    }
+    // AMD
+    else if (typeof define === 'function' && define.amd) {
+        define('interact', function() {
+            return interact;
+        });
     }
     else {
         window.interact = interact;
