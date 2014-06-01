@@ -966,6 +966,19 @@
                 || nodeContains(interactable.options.context, element);
     }
 
+    function testIgnore (interactable, element) {
+        var ignoreFrom = interactable.options.ignoreFrom;
+
+        if (typeof ignoreFrom === 'string') {
+            return element[matchesSelector](ignoreFrom);
+        }
+        else if (ignoreFrom instanceof Element) {
+            return element === ignoreFrom;
+        }
+
+        return false;
+    }
+
     // Test for the element that's "above" all other qualifiers
     function resolveDrops (elements) {
         if (elements.length) {
@@ -1479,7 +1492,10 @@
         var tapTargets = [],
             tapElements = [];
 
-        var element = event.target;
+        var eventTarget = (event.target instanceof SVGElementInstance
+                ? event.target.correspondingUseElement
+                : event.target),
+            element = eventTarget;
 
         while (element) {
             if (interact.isSet(element)) {
@@ -1496,6 +1512,7 @@
 
                 if (element !== document
                     && inContext(interactable, element)
+                    && !testIgnore(interactable, eventTarget)
                     && element[matchesSelector](selector, elements)) {
 
                     tapTargets.push(interactable);
@@ -1583,9 +1600,10 @@
             return;
         }
 
-        var element = (event.target instanceof SVGElementInstance
+        var eventTarget = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
+            element = eventTarget,
             action;
 
         if (PointerEvent) {
@@ -1641,6 +1659,7 @@
                         : undefined;
 
                     if (inContext(interactable, element)
+                        && !testIgnore(interactable, eventTarget)
                         && element[matchesSelector](selector, elements)) {
 
                         interactable._element = element;
@@ -2287,20 +2306,14 @@
                 ? event.target.correspondingUseElement
                 : event.target);
 
-        for (var selector in selectors) {
-            var interactable = selectors[selector];
-
-            if (interactable
-                && inContext(interactable, event.target)
-                && eventTarget[matchesSelector](selector)) {
-
-                selectors[selector]._element = eventTarget;
-                curMatches.push(selectors[selector]);
-            }
+        if (target && testIgnore(target, eventTarget)) {
+            // if the eventTarget should be ignored clear the previous target
+            target = null;
+            matches = [];
         }
 
         var elementInteractable = interactables.get(eventTarget),
-            elementAction = elementInteractable
+            elementAction = elementInteractable && !testIgnore(elementInteractable, eventTarget)
                      && validateAction(
                          elementInteractable.getAction(event),
                          elementInteractable);
@@ -2310,6 +2323,19 @@
             matches = [];
         }
         else {
+            for (var selector in selectors) {
+                var interactable = selectors[selector];
+
+                if (interactable
+                    && inContext(interactable, eventTarget)
+                    && !testIgnore(interactable, eventTarget)
+                    && eventTarget[matchesSelector](selector)) {
+
+                    interactable._element = eventTarget;
+                    curMatches.push(interactable);
+                }
+            }
+
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
 
@@ -3572,6 +3598,23 @@
             return this.options.context;
         },
 
+        ignoreFrom: function (newValue) {
+            if (typeof newValue === 'string'            // CSS selector to match event.target
+                || newValue instanceof Element) {       // or a specific element
+
+                this.options.ignoreFrom = newValue;
+
+                return this;
+            }
+            else if (newValue === null) {
+                delete this.options.ignoreFrom;
+
+                return this;
+            }
+
+            return this.options.ignoreFrom;
+        },
+
         /*\
          * Interactable.validateSetting
          [ method ]
@@ -3871,6 +3914,7 @@
 
             if ('autoScroll'  in options) { this.autoScroll (options.autoScroll); }
             if ('context'     in options) { this.context    (options.context   ); }
+            if ('ignoreFrom'  in options) { this.ignoreFrom (options.ignoreFrom); }
 
             return this;
         },
