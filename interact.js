@@ -3383,11 +3383,7 @@
                 return this;
             }
 
-            // return the default checker if there is none
-            // for backwards compatibility
-            return this.options.actionChecker
-                    ? this.options.actionChecker
-                    : this.defaultActionChecker;
+            return this.options.actionChecker;
         },
 
         /*\
