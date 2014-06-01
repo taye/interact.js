@@ -4670,13 +4670,20 @@
         }
     }());
 
+    /* global exports: true, module, define */
+
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
-    /* global exports: true, module */
     if (typeof exports !== 'undefined') {
         if (typeof module !== 'undefined' && module.exports) {
             exports = module.exports = interact;
         }
         exports.interact = interact;
+    }
+    // AMD
+    else if (typeof define === 'function' && define.amd) {
+        define('interact', function() {
+            return interact;
+        });
     }
     else {
         window.interact = interact;
