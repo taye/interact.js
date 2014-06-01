@@ -130,6 +130,8 @@
             resizeAxis  : 'xy',
             gesturable : false,
 
+            actionChecker: null,
+
             styleCursor : true,
 
             // aww snap
@@ -3287,18 +3289,17 @@
                 : false);
         },
 
-        /*\
-         * Interactable.getAction
-         [ method ]
-         *
-         * The default function to get the action resulting from a pointer
-         * event. overridden using @Interactable.actionChecker
-         *
-         - event (object) The mouse/touch event
-         *
-         = (string | null) The action (drag/resize[axes]/gesture) or null if none can be performed
-        \*/
-        getAction: function actionCheck (event) {
+        getAction: function (event) {
+            var action = this.defaultActionChecker(event);
+
+            if (this.options.actionChecker) {
+                action = this.options.actionChecker(event, action, this);
+            }
+
+            return action;
+        },
+
+        defaultActionChecker: function defaultActionChecker (event) {
             var rect = this.getRect(),
                 right,
                 bottom,
@@ -3336,23 +3337,27 @@
          * Gets or sets the function used to check action to be performed on
          * pointerDown
          *
-         - checker (function) #optional A function which takes a mouse or touch event event as a parameter and returns 'drag' 'resize' or 'gesture' or null
+         - checker (function | null) #optional A function which takes a pointer event, defaultAction string and an interactable as parameters and returns 'drag' 'resize[axes]' or 'gesture' or null.
          = (Function | Interactable) The checker function or this Interactable
         \*/
         actionChecker: function (newValue) {
             if (typeof newValue === 'function') {
-                this.getAction = newValue;
+                this.options.actionChecker = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.getAction;
+                delete this.options.actionChecker;
 
                 return this;
             }
 
-            return this.getAction;
+            // return the default checker if there is none
+            // for backwards compatibility
+            return this.options.actionChecker
+                    ? this.options.actionChecker
+                    : this.defaultActionChecker;
         },
 
         /*\
