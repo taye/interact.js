@@ -969,11 +969,13 @@
     function testIgnore (interactable, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
+        if (!element || !(element instanceof Element)) { return false; }
+
         if (typeof ignoreFrom === 'string') {
-            return element[matchesSelector](ignoreFrom);
+            return element[matchesSelector](ignoreFrom) || testIgnore(interactable, element.parentNode);
         }
         else if (ignoreFrom instanceof Element) {
-            return element === ignoreFrom;
+            return element === ignoreFrom || nodeContains(ignoreFrom, element);
         }
 
         return false;
