@@ -107,9 +107,7 @@
 
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
-        elements        = [],   // all elements that have been made interactable
 
-        selectors       = {},   // all css selector interactables
         selectorDZs     = [],   // all dropzone selector interactables
         matches         = [],   // all selectors that are matched by target element
         delegatedEvents = {},   // { type: { selector: [[listener, useCapture]} }
@@ -962,8 +960,8 @@
     }
 
     function inContext (interactable, element) {
-        return interactable.options.context === document
-                || nodeContains(interactable.options.context, element);
+        return interactable._context === document
+                || nodeContains(interactable._context, element);
     }
 
     function testIgnore (interactable, element) {
@@ -1100,7 +1098,7 @@
             if (selectorDZs.length) {
                 for (i = 0; i < selectorDZs.length; i++) {
                     var selector = selectorDZs[i],
-                        context = selector.options.context,
+                        context = selector._context,
                         nodeList = context.querySelectorAll(selector.selector);
 
                     for (var j = 0, len = nodeList.length; j < len; j++) {
@@ -1499,28 +1497,28 @@
                 : event.target),
             element = eventTarget;
 
+        function collectSelectorTaps (interactable, selector, context) {
+            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                    ? context.querySelectorAll(selector)
+                    : undefined;
+
+            if (element !== document
+                && inContext(interactable, element)
+                && !testIgnore(interactable, eventTarget)
+                && element[matchesSelector](selector, elements)) {
+
+                tapTargets.push(interactable);
+                tapElements.push(element);
+            }
+        }
+
         while (element) {
             if (interact.isSet(element)) {
                 tapTargets.push(interact(element));
                 tapElements.push(element);
             }
 
-            for (var selector in selectors) {
-                var interactable = selectors[selector],
-                    context = interactable.options.context,
-                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
-                        ? context.querySelectorAll(selector)
-                        : undefined;
-
-                if (element !== document
-                    && inContext(interactable, element)
-                    && !testIgnore(interactable, eventTarget)
-                    && element[matchesSelector](selector, elements)) {
-
-                    tapTargets.push(interactable);
-                    tapElements.push(element);
-                }
-            }
+            interactables.forEachSelector(collectSelectorTaps);
 
             element = element.parentNode;
         }
@@ -1642,32 +1640,28 @@
             return;
         }
 
+        function pushMatches (interactable, selector, context) {
+            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                ? context.querySelectorAll(selector)
+                : undefined;
+
+            if (inContext(interactable, element)
+                && !testIgnore(interactable, eventTarget)
+                && element[matchesSelector](selector, elements)) {
+
+                interactable._element = element;
+                matches.push(interactable);
+            }
+        }
+
         if (matches.length && /mousedown|pointerdown/i.test(event.type)) {
             action = validateSelector(event, matches);
         }
         else {
-            var selector,
-                elements;
-
             while (element && element !== document && !action) {
                 matches = [];
 
-                for (selector in selectors) {
-                    var interactable = selectors[selector],
-                        context = interactable.options.context;
-
-                    elements = Element.prototype[matchesSelector] === IE8MatchesSelector
-                        ? context.querySelectorAll(selector)
-                        : undefined;
-
-                    if (inContext(interactable, element)
-                        && !testIgnore(interactable, eventTarget)
-                        && element[matchesSelector](selector, elements)) {
-
-                        interactable._element = element;
-                        matches.push(interactable);
-                    }
-                }
+                interactables.forEachSelector(pushMatches);
 
                 action = validateSelector(event, matches);
                 element = element.parentNode;
@@ -2149,7 +2143,7 @@
                 calcRects(dropzones);
                 for (var i = 0; i < selectorDZs.length; i++) {
                     var interactable = selectorDZs[i],
-                        context = interactable.options.context;
+                        context = interactable._context;
 
                     interactable._elements = context.querySelectorAll(interactable.selector);
                 }
@@ -2319,23 +2313,23 @@
                          elementInteractable.getAction(event),
                          elementInteractable);
 
+        function pushCurMatches (interactable, selector) {
+            if (interactable
+                && inContext(interactable, eventTarget)
+                && !testIgnore(interactable, eventTarget)
+                && eventTarget[matchesSelector](selector)) {
+
+                interactable._element = eventTarget;
+                curMatches.push(interactable);
+            }
+        }
+
         if (elementAction) {
             target = elementInteractable;
             matches = [];
         }
         else {
-            for (var selector in selectors) {
-                var interactable = selectors[selector];
-
-                if (interactable
-                    && inContext(interactable, eventTarget)
-                    && !testIgnore(interactable, eventTarget)
-                    && eventTarget[matchesSelector](selector)) {
-
-                    interactable._element = eventTarget;
-                    curMatches.push(interactable);
-                }
-            }
+            interactables.forEachSelector(pushCurMatches);
 
             if (validateSelector(event, curMatches)) {
                 matches = curMatches;
@@ -2649,28 +2643,38 @@
         return delegateListener.call(this, event, true);
     }
 
-    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element) {
+    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element, context) {
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
-            if (interactable.selector === element
+            if ((interactable.selector === element
+                && (interactable._context === (context || document)))
+
                 || (!interactable.selector && interactable._element === element)) {
+
                 return i;
             }
         }
         return -1;
     };
 
-    interactables.get = function interactableGet (element) {
-        if (typeof element === 'string') {
-            return selectors[element];
-        }
-
-        return this[this.indexOfElement(element)];
+    interactables.get = dropzones.get = function interactableGet (element, options) {
+        return this[this.indexOfElement(element, options && options.context)];
     };
 
-    dropzones.get = function dropzoneGet (element) {
-        return this[this.indexOfElement(element)];
+    interactables.forEachSelector = function (callback) {
+        for (var i = 0; i < this.length; i++) {
+            var interactable = this[i];
+
+            if (!interactable.selector) {
+                continue;
+            }
+
+            if (callback(interactable, interactable.selector, interactable._context, i, this)
+                    === false) {
+                return;
+            }
+        }
     };
 
     function clearTargets () {
@@ -2736,28 +2740,28 @@
             // if the selector is invalid,
             // an exception will be raised
             document.querySelector(element);
-            selectors[element] = this;
+
             this.selector = element;
             this._gesture = selectorGesture;
-        }
-        else {
-            if(isElement(element)) {
-                if (PointerEvent) {
-                    events.add(this, 'pointerdown', pointerDown );
-                    events.add(this, 'pointermove', pointerHover);
 
-                    this._gesture = new Gesture();
-                    this._gesture.target = element;
-                }
-                else {
-                    events.add(this, 'mousedown' , pointerDown );
-                    events.add(this, 'mousemove' , pointerHover);
-                    events.add(this, 'touchstart', pointerDown );
-                    events.add(this, 'touchmove' , pointerHover);
-                }
+            if (options && options.context instanceof Node) {
+                this._context = options.context;
             }
+        }
+        else if (isElement(element)) {
+            if (PointerEvent) {
+                events.add(this, 'pointerdown', pointerDown );
+                events.add(this, 'pointermove', pointerHover);
 
-            elements.push(this);
+                this._gesture = new Gesture();
+                this._gesture.target = element;
+            }
+            else {
+                events.add(this, 'mousedown' , pointerDown );
+                events.add(this, 'mousemove' , pointerHover);
+                events.add(this, 'touchstart', pointerDown );
+                events.add(this, 'touchmove' , pointerHover);
+            }
         }
 
         interactables.push(this);
@@ -3406,7 +3410,7 @@
         \*/
         getRect: function rectCheck () {
             if (this.selector && !(isElement(this._element))) {
-                this._element = this.options.context.querySelector(this.selector);
+                this._element = this._context.querySelector(this.selector);
             }
 
             return getElementRect(this._element);
@@ -3582,32 +3586,20 @@
             return this;
         },
 
-        /*\
+        /* 
          * Interactable.context
          [ method ]
          *
-         * If this is a selector Interactable, the query will be called on the
-         * specified Node. The default node is `window.document`.
+         * Get's the selector context Node of the Interactable. The default Node is `window.document`.
          *
-         - newValue (Node | null) #optional a queryable Node or null to use the document
-         = (string | Element | object) The current context Node or this Interactable
+         = (Node) The context Node of this Interactable
          **
-         | interact('ul.list > li', { context: element })
-         | // or
-         | interact('ul.list > li').context(element);
         \*/
-        context: function (newValue) {
-            if (newValue instanceof Node) {
-                this.options.context = newValue;
-                return this;
-            }
-            else if (newValue === null) {
-                delete this.options.context;
-                return this;
-            }
-
-            return this.options.context;
+        context: function () {
+            return this._context;
         },
+
+        _context: document,
 
         /*\
          * Interactable.ignoreFrom
@@ -3939,7 +3931,7 @@
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
             var settings = [
-                    'accept', 'actionChecker', 'autoScroll', 'context',
+                    'accept', 'actionChecker', 'autoScroll',
                     'dropChecker', 'ignoreFrom', 'inertia', 'origin',
                     'rectChecker', 'restrict', 'snap'
                 ];
@@ -3967,10 +3959,7 @@
         unset: function () {
             events.remove(this, 'all');
 
-            if (typeof this.selector === 'string') {
-                delete selectors[this.selector];
-            }
-            else {
+            if (typeof this.selector !== 'string') {
                 events.remove(this, 'all');
                 if (this.options.styleCursor) {
                     this._element.style.cursor = '';
@@ -3979,8 +3968,6 @@
                 if (this._gesture) {
                     this._gesture.target = null;
                 }
-
-                elements.splice(elements.indexOf(this.element()));
             }
 
             this.dropzone(false);
@@ -4002,8 +3989,8 @@
      - element (Element) The Element being searched for
      = (boolean) Indicates if the element or CSS selector was previously passed to interact
     \*/
-    interact.isSet = function(element) {
-        return interactables.indexOfElement(element) !== -1;
+    interact.isSet = function(element, options) {
+        return interactables.indexOfElement(element, options && options.context) !== -1;
     };
 
     /*\
