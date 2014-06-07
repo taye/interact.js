@@ -25,5 +25,14 @@
         "autoscroll",
         "SVG"
     ],
-    "license"    : "MIT"
+    "license"    : "MIT",
+    "spm": {
+        "main": "interact.js",
+        "ignore": [
+            "test",
+            "demo",
+            "img",
+            "docs"
+        ]
+    }
 }
