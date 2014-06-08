@@ -110,8 +110,16 @@
 
         selectorDZs     = [],   // all dropzone selector interactables
         matches         = [],   // all selectors that are matched by target element
-        delegatedEvents = {},   // { type: { selector: [[listener, useCapture]} }
         selectorGesture = null, // MSGesture object for selector PointerEvents
+
+        // {
+        //      type: {
+        //          selectors: ['selector', ...],
+        //          contexts : [document, ...],
+        //          listeners: [[listener, useCapture], ...]
+        //      }
+        //  }
+        delegatedEvents = {},
 
         target          = null, // current interactable being interacted with
         dropTarget      = null, // the dropzone a drag target might be dropped into
@@ -2592,13 +2600,12 @@
         interact.stop();
     }
 
-    // bound to document when a listener is added to a selector interactable
+    // bound to the interactable context when a DOM event
+    // listener is added to a selector interactable
     function delegateListener (event, useCapture) {
         var fakeEvent = {},
-            selectors = delegatedEvents[event.type],
-            selector,
-            element = event.target,
-            i;
+            delegated = delegatedEvents[event.type],
+            element = event.target;
 
         useCapture = useCapture? true: false;
 
@@ -2607,28 +2614,33 @@
             fakeEvent[prop] = event[prop];
         }
 
-        fakeEvent.preventDefault = function () {
-            event.preventDefault();
-        };
+        fakeEvent.originalEvent = event;
+        fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
         while (element && element !== document) {
-            for (selector in selectors) {
-                if (element[matchesSelector](selector)) {
-                    var listeners = selectors[selector];
+            for (var i = 0; i < delegated.selectors.length; i++) {
+                var selector = delegated.selectors[i],
+                    context = delegated.contexts[i];
+
+                if (element[matchesSelector](selector)
+                    && context === event.currentTarget
+                    && nodeContains(context, element)) {
+
+                    var listeners = delegated.listeners[i];
 
                     fakeEvent.currentTarget = element;
 
-                    for (i = 0; i < listeners.length; i++) {
-                        if (listeners[i][1] !== useCapture) { continue; }
+                    for (var j = 0; j < listeners.length; j++) {
+                        if (listeners[j][1] !== useCapture) { continue; }
 
                         try {
-                            listeners[i][0](fakeEvent);
+                            listeners[j][0](fakeEvent);
                         }
                         catch (error) {
                             console.error('Error thrown from delegated listener: ' +
                                           '"' + selector + '" ' + event.type + ' ' +
-                                          (listeners[i][0].name? listeners[i][0].name: ''));
+                                          (listeners[j][0].name? listeners[j][0].name: ''));
                             console.log(error);
                         }
                     }
@@ -3816,6 +3828,9 @@
                 eventType = wheelEvent;
             }
 
+            // convert to boolean
+            useCapture = useCapture? true: false;
+
             if (eventTypes.indexOf(eventType) !== -1) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
@@ -3829,23 +3844,37 @@
             // delegated event for selector
             else if (this.selector) {
                 if (!delegatedEvents[eventType]) {
-                    delegatedEvents[eventType] = {};
+                    delegatedEvents[eventType] = {
+                        selectors: [],
+                        contexts : [],
+                        listeners: []
+                    };
+
+                    // add delegate listener functions
+                    events.addToElement(this._context, eventType, delegateListener);
+                    events.addToElement(this._context, eventType, delegateUseCapture, true);
                 }
 
-                var delegated = delegatedEvents[eventType];
+                var delegated = delegatedEvents[eventType],
+                    index;
 
-                if (!delegated[this.selector]) {
-                    delegated[this.selector] = [];
+                for (index = delegated.selectors.length - 1; index >= 0; index--) {
+                    if (delegated.selectors[index] === this.selector
+                        && delegated.contexts[index] === this._context) {
+                        break;
+                    }
+                }
+
+                if (index === -1) {
+                    index = delegated.selectors.length;
+
+                    delegated.selectors.push(this.selector);
+                    delegated.contexts .push(this._context);
+                    delegated.listeners.push([]);
                 }
 
                 // keep listener and useCapture flag
-                delegated[this.selector].push([listener, useCapture? true: false]);
-
-                // add appropriate delegate listener
-                events.add(docTarget,
-                           eventType,
-                           useCapture? delegateUseCapture: delegateListener,
-                           useCapture);
+                delegated.listeners[index].push([listener, useCapture]);
             }
             else {
                 events.add(this, eventType, listener, useCapture);
@@ -3886,26 +3915,59 @@
             }
             // delegated event
             else if (this.selector) {
-                var delegated = delegatedEvents[eventType];
+                var delegated = delegatedEvents[eventType],
+                    matchFound = false;
 
-                if (delegated && (eventList = delegated[this.selector])) {
+                if (!delegated) { return this; }
 
-                    // look for listener with matching useCapture flag
-                    for (index = 0; index < eventList.length; index++) {
-                        if (eventList[index][1] === useCapture) {
-                            break;
+                // count from last index of delegated to 0
+                for (index = delegated.selectors.length - 1; index >= 0; index--) {
+                    // look for matching selector and context Node
+                    if (delegated.selectors[index] === this.selector
+                        && delegated.contexts[index] === this._context) {
+
+                        var listeners = delegated.listeners[index];
+
+                        // each item of the listeners array is an array: [function, useCaptureFlag]
+                        for (var i = listeners.length - 1; i >= 0; i--) {
+                            var fn = listeners[i][0],
+                                useCap = listeners[i][1];
+
+                            // check if the listener functions and useCapture flags match
+                            if (fn === listener && useCap === useCapture) {
+                                // remove the listener from the array of listeners
+                                listeners.splice(i, 1);
+
+                                // if all listeners for this interactable have been removed
+                                // remove the interactable from the delegated arrays
+                                if (!listeners.length) {
+                                    delegated.selectors.splice(index, 1);
+                                    delegated.contexts .splice(index, 1);
+                                    delegated.listeners.splice(index, 1);
+
+                                    // remove delegate function from context
+                                    events.removeFromElement(this._context, eventType, delegateListener);
+                                    events.removeFromElement(this._context, eventType, delegateUseCapture, true);
+
+                                    // remove the arrays if they are empty
+                                    if (!delegated.selectors.length) {
+                                        delegatedEvents[eventType] = null;
+                                    }
+                                }
+
+                                // only remove one listener
+                                matchFound = true;
+                                break;
+                            }
                         }
-                    }
 
-                    // remove found listener from delegated list
-                    if (index < eventList.length) {
-                        eventList.splice(index, 1);
+                        if (matchFound) { break; }
                     }
                 }
             }
             // remove listener from this Interatable's element
             else {
-                events.remove(this._element, listener, useCapture);
+                events.remove(this, listener, useCapture);
             }
 
             return this;
@@ -3967,6 +4029,32 @@
 
                 if (this._gesture) {
                     this._gesture.target = null;
+                }
+            }
+            else {
+                // remove delegated events
+                for (var type in delegatedEvents) {
+                    var delegated = delegatedEvents[type];
+
+                    for (var i = 0; i < delegated.selectors.length; i++) {
+                        if (delegated.selectors[i] === this.selector
+                            && delegated.contexts[i] === this._context) {
+
+                            delegated.selectors.splice(i, 1);
+                            delegated.contexts .splice(i, 1);
+                            delegated.listeners.splice(i, 1);
+
+                            // remove the arrays if they are empty
+                            if (!delegated.selectors.length) {
+                                delegatedEvents[type] = null;
+                            }
+                        }
+
+                        events.removeFromElement(this._context, type, delegateListener);
+                        events.removeFromElement(this._context, type, delegateUseCapture, true);
+
+                        break;
+                    }
                 }
             }
 
