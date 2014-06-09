@@ -1713,7 +1713,11 @@
         if ((((event.touches && event.touches.length < 2) || (pointerIds && pointerIds.length < 2)) && !target)
             || !prepared) {
 
-            target = interactables.get(event.currentTarget);
+            var interactable = interactables.get(event.currentTarget);
+
+            if (!testIgnore(interactable, event.target)) {
+                target = interactable;
+            }
         }
 
         var options = target && target.options;
