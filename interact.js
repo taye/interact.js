@@ -997,6 +997,17 @@
             for (i = 1; i < elements.length; i++) {
                 dropzone = elements[i];
 
+                // check if the deepest or current are document.documentElement or document.rootElement
+                // - if deepest is, update with the current dropzone and continue to next
+                if (deepestZone.parentNode === document) {
+                    deepestZone = dropzone;
+                    continue;
+                }
+                // - if the current dropzone is, do nothing and continue
+                else if (dropzone.parentNode === document) {
+                    continue;
+                }
+
                 if (!deepestZoneParents.length) {
                     parent = deepestZone;
                     while (parent.parentNode !== document) {
@@ -1121,7 +1132,7 @@
 
                         if (selector._element !== element
                             && elements.indexOf(selector._element) === -1
-                            && selectorElements.indexOf(selector._element === -1)
+                            && selectorElements.indexOf(selector._element) === -1
                             && selector.dropCheck(event, target)) {
 
                             selectorDrops.push(selector);
