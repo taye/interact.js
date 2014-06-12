@@ -975,12 +975,12 @@
     function testIgnore (interactable, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!element || !(element instanceof Element)) { return false; }
+        if (!element || !isElement(element)) { return false; }
 
         if (typeof ignoreFrom === 'string') {
             return element[matchesSelector](ignoreFrom) || testIgnore(interactable, element.parentNode);
         }
-        else if (ignoreFrom instanceof Element) {
+        else if (isElement(ignoreFrom)) {
             return element === ignoreFrom || nodeContains(ignoreFrom, element);
         }
 
@@ -2760,7 +2760,10 @@
             this.selector = element;
             this._gesture = selectorGesture;
 
-            if (options && options.context instanceof Node) {
+            if (options && options.context
+                && (window.Node
+                    ? options.context instanceof window.Node
+                    : (isElement(options.context) || options.context === document))) {
                 this._context = options.context;
             }
         }
@@ -3634,7 +3637,7 @@
         \*/
         ignoreFrom: function (newValue) {
             if (typeof newValue === 'string'            // CSS selector to match event.target
-                || newValue instanceof Element) {       // or a specific element
+                || isElement(newValue)) {       // or a specific element
 
                 this.options.ignoreFrom = newValue;
 
