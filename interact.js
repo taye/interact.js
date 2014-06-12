@@ -3605,11 +3605,11 @@
             return this;
         },
 
-        /* 
+        /*\
          * Interactable.context
          [ method ]
          *
-         * Get's the selector context Node of the Interactable. The default Node is `window.document`.
+         * Get's the selector context Node of the Interactable. The default is `window.document`.
          *
          = (Node) The context Node of this Interactable
          **
