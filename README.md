@@ -79,7 +79,7 @@ interact(document.body)
     });
     // snap to the corners of the specified grid
     .snap({
-        mdoe: 'grid',
+        mode: 'grid',
         grid: {
             x: 100,
             y: 5
