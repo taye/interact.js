@@ -1419,7 +1419,7 @@
         if ((phase === 'end' || phase === 'inertiastart')
             && prevEvent.speed > 600 && this.timeStamp - prevEvent.timeStamp < 150) {
 
-            var angle = 180 * Math.atan2(this.dy, this.dx) / Math.PI,
+            var angle = 180 * Math.atan2(prevEvent.velocityY, prevEvent.velocityX) / Math.PI,
                 overlap = 22.5;
 
             if (angle < 0) {
