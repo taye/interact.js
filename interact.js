@@ -1017,6 +1017,14 @@
         }
     }
 
+    function checkAxis (axis, interactable) {
+        if (!interactable) { return false; }
+
+        var thisAxis = interactable.options.dragAxis;
+
+        return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
+    }
+
     // Test for the element that's "above" all other qualifiers
     function resolveDrops (elements) {
         if (elements.length) {
@@ -2066,15 +2074,77 @@
             if (!(dragging || resizing || gesturing)) {
                 setEventDeltas(pointerDelta, prevCoords, curCoords);
 
+                // check if a drag is in the correct axis
                 if (prepared === 'drag') {
-                    var axis = target.options.dragAxis;
+                    var absX = Math.abs(dx),
+                        absY = Math.abs(dy),
+                        targetAxis = target.options.dragAxis,
+                        axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
                    
-                    if ((axis === 'x' && Math.abs(dy) > Math.abs(dx))
-                       || (axis === 'y' && Math.abs(dx) > Math.abs(dy))) {
-
+                    // if the movement isn't in the axis of the interactable
+                    if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+                        // cancel the prepared action
                         prepared = null;
 
-                        return;
+                        // then try to get a drag from another ineractable
+
+                        var eventTarget = (event.target instanceof SVGElementInstance
+                                ? event.target.correspondingUseElement
+                                : event.target),
+                            element = eventTarget;
+
+                        // check element interactables
+                        while (element && element !== document) {
+                            var elementInteractable = interactables.get(element);
+
+                            if (elementInteractable
+                                && elementInteractable !== target
+                                && elementInteractable.getAction(downEvent) === 'drag'
+                                && checkAxis(axis, elementInteractable)) {
+                                prepared = 'drag';
+                                target = elementInteractable;
+                                break;
+                            }
+
+                            element = element.parentNode;
+                        }
+
+                        // if there's no drag from element interactables,
+                        // check the selector interactables
+                        if (!prepared) {
+                            var getDraggable = function (interactable, selector, context) {
+                                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                                    ? context.querySelectorAll(selector)
+                                    : undefined;
+
+                                if (interactable === target) { return; }
+
+                                interactable._element = element;
+
+                                if (inContext(interactable, eventTarget)
+                                    && !testIgnore(interactable, eventTarget)
+                                    && element[matchesSelector](selector, elements)
+                                    && interactable.getAction(downEvent) === 'drag'
+                                    && checkAxis(axis, interactable)) {
+
+                                    return interactable;
+                                }
+                            };
+
+                            element = eventTarget;
+
+                            while (element && element !== document) {
+                                var selectorInteractable = interactables.forEachSelector(getDraggable);
+
+                                if (selectorInteractable) {
+                                    prepared = 'drag';
+                                    target = selectorInteractable;
+                                    break;
+                                }
+
+                                element = element.parentNode;
+                            }
+                        }
                     }
                 }
             }
@@ -2736,9 +2806,10 @@
                 continue;
             }
 
-            if (callback(interactable, interactable.selector, interactable._context, i, this)
-                    === false) {
-                return;
+            var ret = callback(interactable, interactable.selector, interactable._context, i, this);
+
+            if (ret !== undefined) {
+                return ret;
             }
         }
     };
@@ -4362,6 +4433,7 @@
             resizing              : resizing,
             gesturing             : gesturing,
             prepared              : prepared,
+            matches               : matches,
 
             prevCoords            : prevCoords,
             downCoords            : startCoords,
