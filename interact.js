@@ -2517,7 +2517,8 @@
                     inertiaStatus.pointerUp = event;
                 }
 
-                inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
+                inertiaStatus.startEvent = startEvent = new InteractEvent(event, prepared, 'inertiastart');
+                target.fire(inertiaStatus.startEvent);
 
                 inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
                 inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
@@ -2577,8 +2578,6 @@
 
                 cancelFrame(inertiaStatus.i);
                 inertiaStatus.i = reqFrame(inertiaFrame);
-
-                target.fire(inertiaStatus.startEvent);
 
                 return;
             }
