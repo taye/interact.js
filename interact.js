@@ -129,16 +129,18 @@
 
         defaultOptions = {
             draggable   : false,
+            dragAxis    : 'xy',
             dropzone    : false,
             accept      : null,
             resizable   : false,
             squareResize: false,
             resizeAxis  : 'xy',
-            gesturable : false,
+            gesturable  : false,
 
             actionChecker: null,
 
-            styleCursor : true,
+            styleCursor: true,
+            preventDefault: 'auto',
 
             // aww snap
             snap: {
@@ -157,7 +159,7 @@
                 numberTypes : /^range$/,
                 boolTypes   :  /^endOnly$/
             },
-            snapEnabled : false,
+            snapEnabled: false,
 
             restrict: {
                 drag: null,
@@ -987,6 +989,42 @@
         return false;
     }
 
+    function checkAndPreventDefault (event, interactable) {
+        if (!interactable) { return; }
+
+        var options = interactable.options,
+            prevent = options.preventDefault;
+
+        if (prevent === 'auto' && !/^input$|^textarea$/i.test(target._element.nodeName)) {
+            // do not preventDefault on pointerdown if the prepared action is a drag
+            // and dragging can only start from a certain direction - this allows
+            // a touch to pan the viewport if a drag isn't in the right direction
+            if (/down|start/.test(event.type)
+                && prepared === 'drag' && options.dragAxis !== 'xy') {
+
+                return;
+            }
+
+            event.preventDefault();
+            return;
+        }
+
+        if (prevent === true
+            || (event.type === 'selectstart' && /mouse/.test(prevent))) {
+
+            event.preventDefault();
+            return;
+        }
+    }
+
+    function checkAxis (axis, interactable) {
+        if (!interactable) { return false; }
+
+        var thisAxis = interactable.options.dragAxis;
+
+        return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
+    }
+
     // Test for the element that's "above" all other qualifiers
     function resolveDrops (elements) {
         if (elements.length) {
@@ -1606,9 +1644,7 @@
 
     function selectorDown (event) {
         if (prepared && downEvent && event.type !== downEvent.type) {
-            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
-                event.preventDefault();
-            }
+            checkAndPreventDefault(event, target);
             return;
         }
 
@@ -1706,9 +1742,8 @@
     // style and event Liseners
     function pointerDown (event, forceAction) {
         if (!forceAction && pointerIsDown && downEvent && event.type !== downEvent.type) {
-            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
-                event.preventDefault();
-            }
+            checkAndPreventDefault(event, target);
+
             return;
         }
 
@@ -1781,9 +1816,7 @@
             setEventXY(prevCoords, event);
             pointerWasMoved = false;
 
-            if (!(/^input$|^textarea$/i.test(target._element.nodeName))) {
-                event.preventDefault();
-            }
+            checkAndPreventDefault(event, target);
         }
         // if inertia is active try to resume action
         else if (inertiaStatus.active
@@ -2015,20 +2048,22 @@
             setEventXY(curCoords, event);
         }
 
-        // register movement of more than 1 pixel
-        if (!pointerWasMoved) {
-            var dx = curCoords.clientX - startCoords.clientX,
-                dy = curCoords.clientY - startCoords.clientY;
-
-            pointerWasMoved = hypot(dx, dy) > 1;
-        }
-
         // return if there is no prepared action
         if (!prepared
             // or this is a mousemove event but the down event was a touch
             || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
 
             return;
+        }
+
+        var dx, dy;
+
+        // register movement of more than 1 pixel
+        if (!pointerWasMoved) {
+            dx = curCoords.clientX - startCoords.clientX;
+            dy = curCoords.clientY - startCoords.clientY;
+
+            pointerWasMoved = hypot(dx, dy) > 1;
         }
 
         if (pointerWasMoved
@@ -2038,6 +2073,80 @@
             // if just starting an action, calculate the pointer speed now
             if (!(dragging || resizing || gesturing)) {
                 setEventDeltas(pointerDelta, prevCoords, curCoords);
+
+                // check if a drag is in the correct axis
+                if (prepared === 'drag') {
+                    var absX = Math.abs(dx),
+                        absY = Math.abs(dy),
+                        targetAxis = target.options.dragAxis,
+                        axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+                   
+                    // if the movement isn't in the axis of the interactable
+                    if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+                        // cancel the prepared action
+                        prepared = null;
+
+                        // then try to get a drag from another ineractable
+
+                        var eventTarget = (event.target instanceof SVGElementInstance
+                                ? event.target.correspondingUseElement
+                                : event.target),
+                            element = eventTarget;
+
+                        // check element interactables
+                        while (element && element !== document) {
+                            var elementInteractable = interactables.get(element);
+
+                            if (elementInteractable
+                                && elementInteractable !== target
+                                && elementInteractable.getAction(downEvent) === 'drag'
+                                && checkAxis(axis, elementInteractable)) {
+                                prepared = 'drag';
+                                target = elementInteractable;
+                                break;
+                            }
+
+                            element = element.parentNode;
+                        }
+
+                        // if there's no drag from element interactables,
+                        // check the selector interactables
+                        if (!prepared) {
+                            var getDraggable = function (interactable, selector, context) {
+                                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                                    ? context.querySelectorAll(selector)
+                                    : undefined;
+
+                                if (interactable === target) { return; }
+
+                                interactable._element = element;
+
+                                if (inContext(interactable, eventTarget)
+                                    && !testIgnore(interactable, eventTarget)
+                                    && element[matchesSelector](selector, elements)
+                                    && interactable.getAction(downEvent) === 'drag'
+                                    && checkAxis(axis, interactable)) {
+
+                                    return interactable;
+                                }
+                            };
+
+                            element = eventTarget;
+
+                            while (element && element !== document) {
+                                var selectorInteractable = interactables.forEachSelector(getDraggable);
+
+                                if (selectorInteractable) {
+                                    prepared = 'drag';
+                                    target = selectorInteractable;
+                                    break;
+                                }
+
+                                element = element.parentNode;
+                            }
+                        }
+                    }
+                }
             }
 
             if (prepared && target) {
@@ -2148,7 +2257,7 @@
     }
 
     function dragMove (event) {
-        event.preventDefault();
+        checkAndPreventDefault(event, target);
 
         var dragEvent,
             dragEnterEvent,
@@ -2229,7 +2338,7 @@
     }
 
     function resizeMove (event) {
-        event.preventDefault();
+        checkAndPreventDefault(event, target);
 
         var resizeEvent;
 
@@ -2259,7 +2368,7 @@
             return;
         }
 
-        event.preventDefault();
+        checkAndPreventDefault(event, target);
 
         var gestureEvent;
 
@@ -2422,7 +2531,7 @@
             }
         }
         else if (prepared) {
-            event.preventDefault();
+            checkAndPreventDefault(event, target);
         }
     }
 
@@ -2697,9 +2806,10 @@
                 continue;
             }
 
-            if (callback(interactable, interactable.selector, interactable._context, i, this)
-                    === false) {
-                return;
+            var ret = callback(interactable, interactable.selector, interactable._context, i, this);
+
+            if (ret !== undefined) {
+                return ret;
             }
         }
     };
@@ -2844,13 +2954,25 @@
          | interact(element).draggable({
          |     onstart: function (event) {},
          |     onmove : function (event) {},
-         |     onend  : function (event) {}
+         |     onend  : function (event) {},
+         |
+         |     // the axis in which the first movement must be
+         |     // for the drag sequence to start
+         |     // 'xy' by default - any direction
+         |     axis: 'x' || 'y' || 'xy'
          | });
         \*/
         draggable: function (options) {
             if (options instanceof Object) {
                 this.options.draggable = true;
                 this.setOnEvents('drag', options);
+
+                if (/^x$|^y$|^xy$/.test(options.axis)) {
+                    this.options.dragAxis = options.axis;
+                }
+                else if (options.axis === null) {
+                    delete this.options.dragAxis;
+                }
 
                 return this;
             }
@@ -3480,11 +3602,41 @@
          * mouse on the element are checked on `mousemove` so that the cursor
          * may be styled appropriately
          *
-         - newValue (function) #optional
-         = (Function | Interactable) The current setting or this Interactable
+         - newValue (boolean) #optional
+         = (boolean | Interactable) The current setting or this Interactable
         \*/
         styleCursor: function (newValue) {
             if (typeof newValue === 'boolean') {
+                this.options.styleCursor = newValue;
+
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.styleCursor;
+
+                return this;
+            }
+
+            return this.options.styleCursor;
+        },
+
+        /*\
+         * Interactable.preventDefault
+         [ method ]
+         *
+         * Returns or sets whether to prevent the browser's default behaviour
+         * in response to pointer events. Can be set to
+         *  - `true` to always prevent
+         *  - `false` to never prevent
+         *  - `'auto'` to allow interact.js to try to guess what would be best
+         *  - `null` to set to the default ('auto')
+         *
+         - newValue (boolean | string | null) #optional `true`, `false` or `'auto'`
+         = (boolean | string | Interactable) The current setting or this Interactable
+        \*/
+        preventDefault: function (newValue) {
+            if (typeof newValue === 'boolean' || newValue === 'auto') {
                 this.options.styleCursor = newValue;
 
                 return this;
@@ -4281,6 +4433,7 @@
             resizing              : resizing,
             gesturing             : gesturing,
             prepared              : prepared,
+            matches               : matches,
 
             prevCoords            : prevCoords,
             downCoords            : startCoords,
@@ -4569,16 +4722,16 @@
                 target._gesture.stop();
             }
 
-            clearTargets();
-
             for (var i = 0; i < selectorDZs.length; i++) {
                 selectorDZs._elements = [];
             }
 
             // prevent Default only if were previously interacting
             if (event && typeof event.preventDefault === 'function') {
-               event.preventDefault();
+                checkAndPreventDefault(event, target);
             }
+
+            clearTargets();
         }
 
         if (pointerIds && pointerIds.length) {
@@ -4739,9 +4892,9 @@
     }
 
     // For IE's lack of Event#preventDefault
-    events.add(docTarget,    'selectstart', function (e) {
+    events.add(docTarget, 'selectstart', function (event) {
         if (dragging || resizing || gesturing) {
-            e.preventDefault();
+            checkAndPreventDefault(event, target);
         }
     });
 
