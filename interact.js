@@ -1453,6 +1453,36 @@
                 this.velocityY = pointerDelta[deltaSource + 'VY'];
             }
         }
+
+        if ((phase === 'end' || phase === 'inertiastart')
+            && prevEvent.speed > 600 && this.timeStamp - prevEvent.timeStamp < 150) {
+
+            var angle = 180 * Math.atan2(prevEvent.velocityY, prevEvent.velocityX) / Math.PI,
+                overlap = 22.5;
+
+            if (angle < 0) {
+                angle += 360;
+            }
+
+            var left = 135 - overlap <= angle && angle < 225 + overlap,
+                up   = 225 - overlap <= angle && angle < 315 + overlap,
+
+                right = !left && (315 - overlap <= angle || angle <  45 + overlap),
+                down  = !up   &&   45 - overlap <= angle && angle < 135 + overlap;
+
+            this.swipe = {
+                up   : up,
+                down : down,
+                left : left,
+                right: right,
+                angle: angle,
+                speed: prevEvent.speed,
+                velocity: {
+                    x: prevEvent.velocityX,
+                    y: prevEvent.velocityY
+                }
+            };
+        }
     }
 
     InteractEvent.prototype = {
@@ -2596,7 +2626,8 @@
                     inertiaStatus.pointerUp = event;
                 }
 
-                inertiaStatus.startEvent = startEvent = new InteractEvent(event, 'drag', 'inertiastart');
+                inertiaStatus.startEvent = startEvent = new InteractEvent(event, prepared, 'inertiastart');
+                target.fire(inertiaStatus.startEvent);
 
                 inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
                 inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
@@ -2656,8 +2687,6 @@
 
                 cancelFrame(inertiaStatus.i);
                 inertiaStatus.i = reqFrame(inertiaFrame);
-
-                target.fire(inertiaStatus.startEvent);
 
                 return;
             }
