@@ -19,6 +19,8 @@
         Gesture      = window.Gesture || window.MSGesture,
         PointerEvent = Gesture && (window.PointerEvent || window.MSPointerEvent),
         GestureEvent = Gesture && (window.GestureEvent || window.MSGestureEvent),
+        pEventTypes,
+        gEventTypes,
 
         hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
 
@@ -999,7 +1001,7 @@
             // do not preventDefault on pointerdown if the prepared action is a drag
             // and dragging can only start from a certain direction - this allows
             // a touch to pan the viewport if a drag isn't in the right direction
-            if (/down|start/.test(event.type)
+            if (/down|start/i.test(event.type)
                 && prepared === 'drag' && options.dragAxis !== 'xy') {
 
                 return;
@@ -2919,8 +2921,8 @@
         }
         else if (isElement(element)) {
             if (PointerEvent) {
-                events.add(this, 'pointerdown', pointerDown );
-                events.add(this, 'pointermove', pointerHover);
+                events.add(this, pEventTypes.down, pointerDown );
+                events.add(this, pEventTypes.move, pointerHover);
 
                 this._gesture = new Gesture();
                 this._gesture.target = element;
@@ -4864,21 +4866,42 @@
     };
 
     if (PointerEvent) {
-        events.add(docTarget, 'pointerup', collectTaps);
+        if (PointerEvent === window.MSPointerEvent) {
+            pEventTypes = {
+                up: 'MSPointerUp', down: 'MSPointerDown', over: 'MSPointerOver',
+                out: 'MSPointerOut', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+        }
+        else {
+            pEventTypes = {
+                up: 'pointerup', down: 'pointerdown', over: 'pointerover',
+                out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
+        }
 
-        events.add(docTarget, 'pointerdown'    , selectorDown);
-        events.add(docTarget, 'MSGestureChange', pointerMove );
-        events.add(docTarget, 'MSGestureEnd'   , pointerUp   );
-        events.add(docTarget, 'MSInertiaStart' , pointerUp   );
-        events.add(docTarget, 'pointerover'    , pointerOver );
-        events.add(docTarget, 'pointerout'     , pointerOut  );
+        if (GestureEvent === window.MSGestureEvent) {
+            gEventTypes = {
+                start: 'MSGestureStart', change: 'MSGestureChange', inertia: 'MSInertiaStart', end: 'MSGestureEnd' };
+        }
+        else {
+            gEventTypes = {
+                start: 'gesturestart', change: 'gesturechange', inertia: 'inertiastart', end: 'gestureend' };
+        }
 
-        events.add(docTarget, 'pointermove'  , recordPointers);
-        events.add(docTarget, 'pointerup'    , recordPointers);
-        events.add(docTarget, 'pointercancel', recordPointers);
+
+        events.add(docTarget, pEventTypes.up, collectTaps);
+
+        events.add(docTarget, pEventTypes.down   , selectorDown);
+        events.add(docTarget, gEventTypes.change , pointerMove );
+        events.add(docTarget, gEventTypes.end    , pointerUp   );
+        events.add(docTarget, gEventTypes.inertia, pointerUp   );
+        events.add(docTarget, pEventTypes.over   , pointerOver );
+        events.add(docTarget, pEventTypes.out    , pointerOut  );
+
+        events.add(docTarget, pEventTypes.move  , recordPointers);
+        events.add(docTarget, pEventTypes.up    , recordPointers);
+        events.add(docTarget, pEventTypes.cancel, recordPointers);
 
         // fix problems of wrong targets in IE
-        events.add(docTarget, 'pointerup', function () {
+        events.add(docTarget, pEventTypes.up, function () {
             if (!(dragging || resizing || gesturing)) {
                 pointerIsDown = false;
             }
@@ -4913,6 +4936,7 @@
             events.add(parentDocTarget   , 'touchend'     , pointerUp);
             events.add(parentDocTarget   , 'touchcancel'  , pointerUp);
             events.add(parentDocTarget   , 'pointerup'    , pointerUp);
+            events.add(parentDocTarget   , 'MSPointerUp'  , pointerUp);
             events.add(parentWindowTarget, 'blur'         , pointerUp);
         }
     }
