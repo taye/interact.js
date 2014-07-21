@@ -1294,6 +1294,8 @@
         this.t0        = downTime;
         this.type      = action + (phase || '');
 
+        this.interactbale = target;
+
         if (inertiaStatus.active) {
             this.detail = 'inertia';
         }
