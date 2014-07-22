@@ -394,14 +394,14 @@
             navigator.userAgent.match('Presto'),
 
         // prefix matchesSelector
-        matchesSelector = 'matchesSelector' in Element.prototype?
+        prefixedMatchesSelector = 'matchesSelector' in Element.prototype?
                 'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
                     'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
                         'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                             'oMatchesSelector': 'msMatchesSelector',
 
         // will be polyfill function if browser is IE8
-        IE8MatchesSelector,
+        ie8MatchesSelector,
 
         // native requestAnimationFrame or polyfill
         reqFrame = window.requestAnimationFrame,
@@ -969,7 +969,7 @@
         if (!element || !isElement(element)) { return false; }
 
         if (typeof ignoreFrom === 'string') {
-            return element[matchesSelector](ignoreFrom) || testIgnore(interactable, element.parentNode);
+            return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
         }
         else if (isElement(ignoreFrom)) {
             return element === ignoreFrom || nodeContains(ignoreFrom, element);
@@ -1126,7 +1126,7 @@
                     }
                 }
                 else if (typeof current.options.accept === 'string') {
-                    if (!element[matchesSelector](current.options.accept)) {
+                    if (!matchesSelector(element, current.options.accept)) {
                         continue;
                     }
                 }
@@ -1158,7 +1158,7 @@
                             }
                         }
                         else if (typeof selector.options.accept === 'string') {
-                            if (!element[matchesSelector](selector.options.accept)) {
+                            if (!matchesSelector(element, selector.options.accept)) {
                                 continue;
                             }
                         }
@@ -1576,14 +1576,14 @@
             element = eventTarget;
 
         function collectSelectorTaps (interactable, selector, context) {
-            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+            var elements = ie8MatchesSelector
                     ? context.querySelectorAll(selector)
                     : undefined;
 
             if (element !== document
                 && inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
-                && element[matchesSelector](selector, elements)) {
+                && matchesSelector(element, selector, elements)) {
 
                 tapTargets.push(interactable);
                 tapElements.push(element);
@@ -1717,13 +1717,13 @@
         }
 
         function pushMatches (interactable, selector, context) {
-            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+            var elements = ie8MatchesSelector
                 ? context.querySelectorAll(selector)
                 : undefined;
 
             if (inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
-                && element[matchesSelector](selector, elements)) {
+                && matchesSelector(element, selector, elements)) {
 
                 interactable._element = element;
                 matches.push(interactable);
@@ -2134,7 +2134,7 @@
                         // check the selector interactables
                         if (!prepared) {
                             var getDraggable = function (interactable, selector, context) {
-                                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                                var elements = ie8MatchesSelector
                                     ? context.querySelectorAll(selector)
                                     : undefined;
 
@@ -2144,7 +2144,7 @@
 
                                 if (inContext(interactable, eventTarget)
                                     && !testIgnore(interactable, eventTarget)
-                                    && element[matchesSelector](selector, elements)
+                                    && matchesSelector(element, selector, elements)
                                     && interactable.getAction(downEvent) === 'drag'
                                     && checkAxis(axis, interactable)) {
 
@@ -2470,7 +2470,7 @@
             if (interactable
                 && inContext(interactable, eventTarget)
                 && !testIgnore(interactable, eventTarget)
-                && eventTarget[matchesSelector](selector)) {
+                && matchesSelector(eventTarget, selector)) {
 
                 interactable._element = eventTarget;
                 curMatches.push(interactable);
@@ -2767,7 +2767,7 @@
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
 
-                if (element[matchesSelector](selector)
+                if (matchesSelector(element, selector)
                     && context === event.currentTarget
                     && nodeContains(context, element)) {
 
@@ -4950,16 +4950,22 @@
         }
     });
 
-    // For IE8's lack of an Element#matchesSelector
-    if (!(matchesSelector in Element.prototype) || typeof (Element.prototype[matchesSelector]) !== 'function') {
-        Element.prototype[matchesSelector] = IE8MatchesSelector = function (selector, elems) {
-            // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
-            // modified for better performance
-            elems = elems || this.parentNode.querySelectorAll(selector);
-            var count = elems.length;
+    function matchesSelector (element, selector, nodeList) {
+        if (ie8MatchesSelector) {
+            return ie8MatchesSelector(element, selector, nodeList);
+        }
 
-            for (var i = 0; i < count; i++) {
-                if (elems[i] === this) {
+        return element[prefixedMatchesSelector](selector);
+    }
+
+    // For IE8's lack of an Element#matchesSelector
+    // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
+    if (!(prefixedMatchesSelector in Element.prototype) || typeof (Element.prototype[prefixedMatchesSelector]) !== 'function') {
+        ie8MatchesSelector = function (element, selector, elems) {
+            elems = elems || element.parentNode.querySelectorAll(selector);
+
+            for (var i = 0, len = elems.length; i < len; i++) {
+                if (elems[i] === element) {
                     return true;
                 }
             }
