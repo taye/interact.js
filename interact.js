@@ -89,6 +89,9 @@
             vx0: 0,
             vys: 0,
 
+            resumeDx: 0,
+            resumeDy: 0,
+
             lambda_v0: 0,
             one_ve_v0: 0,
             i  : null
@@ -1306,12 +1309,8 @@
             this.relatedTarget = related;
         }
 
-        if (prevEvent && prevEvent.detail === 'inertia'
-            && !inertiaStatus.active && options.inertia.zeroResumeDelta) {
-            this.dx = this.dy = 0;
-        }
         // end event dx, dy is difference between start and end points
-        else if (phase === 'end' || action === 'drop') {
+        if (phase === 'end' || action === 'drop') {
             if (deltaSource === 'client') {
                 this.dx = client.x - startCoords.clientX;
                 this.dy = client.y - startCoords.clientY;
@@ -1335,6 +1334,14 @@
                 this.dx = page.x - prevEvent.pageX;
                 this.dy = page.y - prevEvent.pageY;
             }
+        }
+        if (prevEvent && prevEvent.detail === 'inertia'
+            && !inertiaStatus.active && options.inertia.zeroResumeDelta) {
+
+            inertiaStatus.resumeDx += this.dx;
+            inertiaStatus.resumeDy += this.dy;
+
+            this.dx = this.dy = 0;
         }
 
         if (action === 'resize') {
@@ -1712,6 +1719,7 @@
                     // stop inertia so that the next move will be a normal one
                     cancelFrame(inertiaStatus.i);
                     inertiaStatus.active = false;
+                    inertiaStatus.resumeDx = inertiaStatus.resumeDy = 0;
 
                     if (PointerEvent) {
                         // add the pointer to the gesture object
@@ -1898,6 +1906,9 @@
             page.y -= origin.y;
         }
 
+        page.x -= inertiaStatus.resumeDx;
+        page.y -= inertiaStatus.resumeDy;
+
         status.realX = page.x;
         status.realY = page.y;
 
@@ -2027,6 +2038,9 @@
             page.x += status.snap.dx || 0;
             page.y += status.snap.dy || 0;
         }
+
+        page.x -= inertiaStatus.resumeDx;
+        page.y -= inertiaStatus.resumeDy;
 
         status.dx = 0;
         status.dy = 0;
