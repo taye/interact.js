@@ -941,9 +941,9 @@
             inertiaStatus.sx = inertiaStatus.modifiedXe;
             inertiaStatus.sy = inertiaStatus.modifiedYe;
 
-            inertiaStatus.active = false;
-
             pointerMove(inertiaStatus.startEvent);
+
+            inertiaStatus.active = false;
             pointerUp(inertiaStatus.startEvent);
         }
     }
