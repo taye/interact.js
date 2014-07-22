@@ -4477,6 +4477,8 @@
             removePointer         : removePointer,
             recordPointers        : recordPointers,
 
+            snap                  : snapStatus,
+            restrict              : restrictStatus,
             inertia               : inertiaStatus,
 
             downTime              : downTime,
