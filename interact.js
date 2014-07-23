@@ -614,9 +614,9 @@
     function blank () {}
 
     function isElement (o) {
-        return !!o && (
+        return (typeof o === 'object') && (
             typeof Element === "object" ? o instanceof Element : //DOM2
-            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+            o && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
         );
     }
 
