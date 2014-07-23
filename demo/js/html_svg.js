@@ -86,14 +86,14 @@
         textProp = 'textContent';
         nl = '\n';
 
-        if ( target.demo && interact.eventTypes.indexOf(e.type) !== -1 ) {
+        if ( target.demo && indexOf(interact.eventTypes, e.type) !== -1 ) {
             target.text[textProp] = nl + e.type;
             target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
             target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
             target.text[textProp] += nl + ' pageX, pageY: (' + e.pageX + ', ' + e.pageY + ')';
             target.text[textProp] += nl + ' speed       :  ' + e.speed;
 
-            if (e.type.indexOf('gesture') !== -1) {
+            if (indexOf(e.type, 'gesture') !== -1) {
                 target.text[textProp] += nl + ' distance: ' + e.distance;
                 target.text[textProp] += nl + ' scale   : ' + e.scale;
                 target.text[textProp] += nl + ' angle   : ' + e.angle;
@@ -226,6 +226,16 @@
             .draggable(true)
             .resizable(true)
             .dropzone(true);
+    }
+
+    function indexOf (array, target) {
+        for (var i = 0, len = array.length; i < len; i++) {
+            if (array[i] === target) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     interact(window).on('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);

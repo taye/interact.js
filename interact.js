@@ -394,14 +394,14 @@
             navigator.userAgent.match('Presto'),
 
         // prefix matchesSelector
-        matchesSelector = 'matchesSelector' in Element.prototype?
+        prefixedMatchesSelector = 'matchesSelector' in Element.prototype?
                 'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
                     'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
                         'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                             'oMatchesSelector': 'msMatchesSelector',
 
         // will be polyfill function if browser is IE8
-        IE8MatchesSelector,
+        ie8MatchesSelector,
 
         // native requestAnimationFrame or polyfill
         reqFrame = window.requestAnimationFrame,
@@ -427,8 +427,7 @@
 
         // Events wrapper
         events = (function () {
-            var Event = window.Event,
-                useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
+            var useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
                 addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
                 removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
                 on = useAttachEvent? 'on': '',
@@ -437,49 +436,8 @@
                 targets           = [],
                 attachedListeners = [];
 
-            if (!('indexOf' in Array.prototype)) {
-                Array.prototype.indexOf = function(elt /*, from*/)   {
-                var len = this.length >>> 0;
-
-                var from = Number(arguments[1]) || 0;
-                from = (from < 0)?
-                    Math.ceil(from):
-                    Math.floor(from);
-
-                if (from < 0) {
-                    from += len;
-                }
-
-                for (; from < len; from++) {
-                    if (from in this && this[from] === elt) {
-                        return from;
-                    }
-                }
-
-                return -1;
-                };
-            }
-            if (!('stopPropagation' in Event.prototype)) {
-                Event.prototype.stopPropagation = function () {
-                    this.cancelBubble = true;
-                };
-                Event.prototype.stopImmediatePropagation = function () {
-                    this.cancelBubble = true;
-                    this.immediatePropagationStopped = true;
-                };
-            }
-            if (!('preventDefault' in Event.prototype)) {
-                Event.prototype.preventDefault = function () {
-                    this.returnValue = false;
-                };
-            }
-            if (!('hasOwnProperty' in Event.prototype)) {
-                /* jshint -W001 */ // ignore warning about setting IE8 Event#hasOwnProperty
-                Event.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
-            }
-
             function add (element, type, listener, useCapture) {
-                var elementIndex = elements.indexOf(element),
+                var elementIndex = indexOf(elements, element),
                     target = targets[elementIndex];
 
                 if (!target) {
@@ -493,7 +451,7 @@
 
                     attachedListeners.push((useAttachEvent ? {
                             supplied: [],
-                            wrapped:  [],
+                            wrapped : [],
                             useCount: []
                         } : null));
                 }
@@ -503,17 +461,21 @@
                     target.typeCount++;
                 }
 
-                if (target.events[type].indexOf(listener) === -1) {
+                if (indexOf(target.events[type], listener) === -1) {
                     var ret;
 
                     if (useAttachEvent) {
                         var listeners = attachedListeners[elementIndex],
-                            listenerIndex = listeners.supplied.indexOf(listener);
+                            listenerIndex = indexOf(listeners.supplied, listener);
 
                         var wrapped = listeners.wrapped[listenerIndex] || function (event) {
                             if (!event.immediatePropagationStopped) {
                                 event.target = event.srcElement;
                                 event.currentTarget = element;
+
+                                event.preventDefault = event.preventDefault || preventDef;
+                                event.stopPropagation = event.stopPropagation || stopProp;
+                                event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
                                 if (/mouse|click/.test(event.type)) {
                                     event.pageX = event.clientX + document.documentElement.scrollLeft;
@@ -546,7 +508,7 @@
 
             function remove (element, type, listener, useCapture) {
                 var i,
-                    elementIndex = elements.indexOf(element),
+                    elementIndex = indexOf(elements, element),
                     target = targets[elementIndex],
                     listeners,
                     listenerIndex,
@@ -558,7 +520,7 @@
 
                 if (useAttachEvent) {
                     listeners = attachedListeners[elementIndex];
-                    listenerIndex = listeners.supplied.indexOf(listener);
+                    listenerIndex = indexOf(listeners.supplied, listener);
                     wrapped = listeners.wrapped[listenerIndex];
                 }
 
@@ -611,6 +573,29 @@
                 }
             }
 
+            function indexOf (array, target) {
+                for (var i = 0, len = array.length; i < len; i++) {
+                    if (array[i] === target) {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+
+            function preventDef () {
+                this.returnValue = false;
+            }
+
+            function stopProp () {
+                this.cancelBubble = true;
+            }
+
+            function stopImmProp () {
+                this.cancelBubble = true;
+                this.immediatePropagationStopped = true;
+            }
+
             return {
                 add: function (target, type, listener, useCapture) {
                     add(target._element, type, listener, useCapture);
@@ -620,16 +605,18 @@
                 },
                 addToElement: add,
                 removeFromElement: remove,
-                useAttachEvent: useAttachEvent
+                useAttachEvent: useAttachEvent,
+
+                indexOf: indexOf
             };
         }());
 
     function blank () {}
 
     function isElement (o) {
-        return !!o && (
+        return (typeof o === 'object') && (
             typeof Element === "object" ? o instanceof Element : //DOM2
-            o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+            o && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
         );
     }
 
@@ -982,7 +969,7 @@
         if (!element || !isElement(element)) { return false; }
 
         if (typeof ignoreFrom === 'string') {
-            return element[matchesSelector](ignoreFrom) || testIgnore(interactable, element.parentNode);
+            return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
         }
         else if (isElement(ignoreFrom)) {
             return element === ignoreFrom || nodeContains(ignoreFrom, element);
@@ -1111,7 +1098,7 @@
             }
             return {
                 element: deepestZone,
-                index: elements.indexOf(deepestZone)
+                index: indexOf(elements, deepestZone)
             };
         }
     }
@@ -1139,7 +1126,7 @@
                     }
                 }
                 else if (typeof current.options.accept === 'string') {
-                    if (!element[matchesSelector](current.options.accept)) {
+                    if (!matchesSelector(element, current.options.accept)) {
                         continue;
                     }
                 }
@@ -1171,14 +1158,14 @@
                             }
                         }
                         else if (typeof selector.options.accept === 'string') {
-                            if (!element[matchesSelector](selector.options.accept)) {
+                            if (!matchesSelector(element, selector.options.accept)) {
                                 continue;
                             }
                         }
 
                         if (selector._element !== element
-                            && elements.indexOf(selector._element) === -1
-                            && selectorElements.indexOf(selector._element) === -1
+                            && indexOf(elements, selector._element) === -1
+                            && indexOf(selectorElements, selector._element) === -1
                             && selector.dropCheck(event, target)) {
 
                             selectorDrops.push(selector);
@@ -1240,7 +1227,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (options.snapEnabled && options.snap.actions.indexOf(action) !== -1) {
+            if (options.snapEnabled && indexOf(options.snap.actions, action) !== -1) {
 
                 this.snap = {
                     range  : snapStatus.range,
@@ -1589,14 +1576,14 @@
             element = eventTarget;
 
         function collectSelectorTaps (interactable, selector, context) {
-            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+            var elements = ie8MatchesSelector
                     ? context.querySelectorAll(selector)
                     : undefined;
 
             if (element !== document
                 && inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
-                && element[matchesSelector](selector, elements)) {
+                && matchesSelector(element, selector, elements)) {
 
                 tapTargets.push(interactable);
                 tapElements.push(element);
@@ -1659,7 +1646,7 @@
 
         interactable = interactable || target;
 
-        var actionType = action.indexOf('resize') !== -1? 'resize': action,
+        var actionType = action.search('resize') !== -1? 'resize': action,
             options = (interactable || target).options;
 
         if ((  (actionType  === 'resize'   && options.resizable )
@@ -1730,13 +1717,13 @@
         }
 
         function pushMatches (interactable, selector, context) {
-            var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+            var elements = ie8MatchesSelector
                 ? context.querySelectorAll(selector)
                 : undefined;
 
             if (inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
-                && element[matchesSelector](selector, elements)) {
+                && matchesSelector(element, selector, elements)) {
 
                 interactable._element = element;
                 matches.push(interactable);
@@ -2147,7 +2134,7 @@
                         // check the selector interactables
                         if (!prepared) {
                             var getDraggable = function (interactable, selector, context) {
-                                var elements = Element.prototype[matchesSelector] === IE8MatchesSelector
+                                var elements = ie8MatchesSelector
                                     ? context.querySelectorAll(selector)
                                     : undefined;
 
@@ -2157,7 +2144,7 @@
 
                                 if (inContext(interactable, eventTarget)
                                     && !testIgnore(interactable, eventTarget)
-                                    && element[matchesSelector](selector, elements)
+                                    && matchesSelector(element, selector, elements)
                                     && interactable.getAction(downEvent) === 'drag'
                                     && checkAxis(axis, interactable)) {
 
@@ -2198,7 +2185,7 @@
 
                 // check for snap
                 if (target.options.snapEnabled
-                    && target.options.snap.actions.indexOf(prepared) !== -1
+                    && indexOf(target.options.snap.actions, prepared) !== -1
                     && (!target.options.snap.endOnly || preEnd)) {
 
                     setSnapping(snapEvent);
@@ -2245,7 +2232,7 @@
             gesture.addPointer(event.pointerId);
         }
 
-        var index = pointerIds.indexOf(event.pointerId);
+        var index = indexOf(pointerIds, event.pointerId);
 
         if (index === -1) {
             pointerIds.push(event.pointerId);
@@ -2260,7 +2247,7 @@
     }
 
     function removePointer (event) {
-        var index = pointerIds.indexOf(event.pointerId);
+        var index = indexOf(pointerIds, event.pointerId);
 
         if (index === -1) { return; }
 
@@ -2272,7 +2259,7 @@
     }
 
     function recordPointers (event) {
-        var index = pointerIds.indexOf(event.pointerId);
+        var index = indexOf(pointerIds, event.pointerId);
 
         if (index === -1) { return; }
 
@@ -2483,7 +2470,7 @@
             if (interactable
                 && inContext(interactable, eventTarget)
                 && !testIgnore(interactable, eventTarget)
-                && eventTarget[matchesSelector](selector)) {
+                && matchesSelector(eventTarget, selector)) {
 
                 interactable._element = eventTarget;
                 curMatches.push(interactable);
@@ -2506,7 +2493,7 @@
             else if (target) {
                 var prevTargetChildren = prevTargetElement.querySelectorAll('*');
 
-                if (Array.prototype.indexOf.call(prevTargetChildren, eventTarget) !== -1) {
+                if (indexOf(prevTargetChildren, eventTarget) !== -1) {
 
                     // reset the elements of the matches to the old target
                     for (var i = 0; i < matches.length; i++) {
@@ -2604,7 +2591,7 @@
             // check if inertia should be started
             if (target.options.inertiaEnabled
                 && prepared !== 'gesture'
-                && inertiaOptions.actions.indexOf(prepared) !== -1
+                && indexOf(inertiaOptions.actions, prepared) !== -1
                 && event !== inertiaStatus.startEvent
                 && (new Date().getTime() - curCoords.timeStamp) < 50
                 && pointerSpeed > inertiaOptions.minSpeed
@@ -2780,7 +2767,7 @@
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
 
-                if (element[matchesSelector](selector)
+                if (matchesSelector(element, selector)
                     && context === event.currentTarget
                     && nodeContains(context, element)) {
 
@@ -3059,7 +3046,7 @@
                 }
                 else {
                     var array = this.selector? selectorDZs: dropzones,
-                        index = array.indexOf(this);
+                        index = indexOf(array, this);
                     if (index !== -1) {
                         array.splice(index, 1);
                     }
@@ -3949,7 +3936,7 @@
          = (Interactable) this Interactable
         \*/
         fire: function (iEvent) {
-            if (!(iEvent && iEvent.type) || eventTypes.indexOf(iEvent.type) === -1) {
+            if (!(iEvent && iEvent.type) || indexOf(eventTypes, iEvent.type) === -1) {
                 return this;
             }
 
@@ -4034,13 +4021,13 @@
             // convert to boolean
             useCapture = useCapture? true: false;
 
-            if (eventTypes.indexOf(eventType) !== -1) {
+            if (indexOf(eventTypes, eventType) !== -1) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
                     this._iEvents[eventType] = [listener];
                 }
                 // if the event listener is not already bound for this type
-                else if (this._iEvents[eventType].indexOf(listener) === -1) {
+                else if (indexOf(this._iEvents[eventType], listener) === -1) {
                     this._iEvents[eventType].push(listener);
                 }
             }
@@ -4109,10 +4096,10 @@
             }
 
             // if it is an action event type
-            if (eventTypes.indexOf(eventType) !== -1) {
+            if (indexOf(eventTypes, eventType) !== -1) {
                 eventList = this._iEvents[eventType];
 
-                if (eventList && (index = eventList.indexOf(listener)) !== -1) {
+                if (eventList && (index = indexOf(eventList, listener)) !== -1) {
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
@@ -4263,7 +4250,7 @@
 
             this.dropzone(false);
 
-            interactables.splice(interactables.indexOf(this), 1);
+            interactables.splice(indexOf(interactables, this), 1);
 
             return interact;
         }
@@ -4281,7 +4268,7 @@
      = (boolean) Indicates if the element or CSS selector was previously passed to interact
     \*/
     interact.isSet = function(element, options) {
-        return interactables.indexOfElement(element, options && options.context) !== -1;
+        return indexOf(interactables, element, options && options.context) !== -1;
     };
 
     /*\
@@ -4298,14 +4285,14 @@
     \*/
     interact.on = function (type, listener, useCapture) {
         // if it is an InteractEvent type, add listener to globalEvents
-        if (eventTypes.indexOf(type) !== -1) {
+        if (indexOf(eventTypes, type) !== -1) {
             // if this type of event was never bound
             if (!globalEvents[type]) {
                 globalEvents[type] = [listener];
             }
 
             // if the event listener is not already bound for this type
-            else if (globalEvents[type].indexOf(listener) === -1) {
+            else if (indexOf(globalEvents[type], listener) === -1) {
 
                 globalEvents[type].push(listener);
             }
@@ -4330,14 +4317,14 @@
      = (object) interact
     \*/
     interact.off = function (type, listener, useCapture) {
-        if (eventTypes.indexOf(type) === -1) {
+        if (indexOf(eventTypes, type) === -1) {
             events.remove(docTarget, type, listener, useCapture);
         }
         else {
             var index;
 
             if (type in globalEvents
-                && (index = globalEvents[type].indexOf(listener)) !== -1) {
+                && (index = indexOf(globalEvents[type], listener)) !== -1) {
                 globalEvents[type].splice(index, 1);
             }
         }
@@ -4946,6 +4933,16 @@
         interact.windowParentError = error;
     }
 
+    function indexOf (array, target) {
+        for (var i = 0, len = array.length; i < len; i++) {
+            if (array[i] === target) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     // For IE's lack of Event#preventDefault
     events.add(docTarget, 'selectstart', function (event) {
         if (dragging || resizing || gesturing) {
@@ -4953,16 +4950,22 @@
         }
     });
 
-    // For IE8's lack of an Element#matchesSelector
-    if (!(matchesSelector in Element.prototype) || typeof (Element.prototype[matchesSelector]) !== 'function') {
-        Element.prototype[matchesSelector] = IE8MatchesSelector = function (selector, elems) {
-            // http://tanalin.com/en/blog/2012/12/matches-selector-ie8/
-            // modified for better performance
-            elems = elems || this.parentNode.querySelectorAll(selector);
-            var count = elems.length;
+    function matchesSelector (element, selector, nodeList) {
+        if (ie8MatchesSelector) {
+            return ie8MatchesSelector(element, selector, nodeList);
+        }
 
-            for (var i = 0; i < count; i++) {
-                if (elems[i] === this) {
+        return element[prefixedMatchesSelector](selector);
+    }
+
+    // For IE8's lack of an Element#matchesSelector
+    // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
+    if (!(prefixedMatchesSelector in Element.prototype) || typeof (Element.prototype[prefixedMatchesSelector]) !== 'function') {
+        ie8MatchesSelector = function (element, selector, elems) {
+            elems = elems || element.parentNode.querySelectorAll(selector);
+
+            for (var i = 0, len = elems.length; i < len; i++) {
+                if (elems[i] === element) {
                     return true;
                 }
             }
