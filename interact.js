@@ -614,10 +614,10 @@
     function blank () {}
 
     function isElement (o) {
-        return (typeof o === 'object') && (
-            typeof Element === "object" ? o instanceof Element : //DOM2
-            o && o !== null && o.nodeType === 1 && typeof o.nodeName === "string"
-        );
+        return !!o && (typeof o === 'object') && (
+            /object|function/.test(typeof Element)
+                ? o instanceof Element //DOM2
+                : o.nodeType === 1 && typeof o.nodeName === "string");
     }
 
     function setEventXY (targetObj, source) {
