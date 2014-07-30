@@ -27,7 +27,7 @@ window.data = {
             x: -23,
             y: -78,
             touches: [
-                { x: -23, y: -78 }
+                { x: -23, y: -78, identifier: 1 }
             ]
         },
         {
@@ -36,8 +36,8 @@ window.data = {
             x: -100,
             y: -100,
             touches: [
-                { x: -100, y: -100 },
-                { x:  100, y:  100 }
+                { x:  -23, y:  -78, identifier: 1 },
+                { x:  100, y:  100, identifier: 2 }
             ]
         },
         {
@@ -46,8 +46,8 @@ window.data = {
             x: -50,
             y: -50,
             touches: [
-                { x:  50, y: -50 },
-                { x: 100, y: 100 }
+                { x:  50, y: -50, identifier: 1 },
+                { x: 100, y: 100, identifier: 2 }
             ]
         },
         {
@@ -56,8 +56,8 @@ window.data = {
             x: 50,
             y: -50,
             touches: [
-                { x:  50, y: -50 },
-                { x: -50, y:  50 }
+                { x:  50, y: -50, identifier: 1 },
+                { x: -50, y:  50, identifier: 2 }
             ]
         },
         {
@@ -66,10 +66,10 @@ window.data = {
             x: -50,
             y:  50,
             touches: [
-                { x: -50, y:  50 }
+                { x: -50, y:  50, identifier: 2 }
             ],
             changed: [
-                { x:  50, y: -50 }
+                { x:  50, y: -50, identifier: 1 }
             ]
         },
         {
@@ -79,7 +79,7 @@ window.data = {
             y:  50,
             touches: [],
             changed: [
-                { x: -50, y:  50 }
+                { x: -50, y:  50, identifier: 2 }
             ]
         }
     ]

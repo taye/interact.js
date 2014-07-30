@@ -22,6 +22,7 @@ function mockEvent (options, target, currentTarget) {
         touches: options.touches && options.touches.map(mockEvent),
         changedTouches: options.changed && options.changed.map(mockEvent),
         pointerId: options.pointerId || 0,
+        identifier: options.identifier || 0,
 
         preventDefault: blank,
         stopPropagation: blank,
@@ -296,10 +297,10 @@ describe('Events', function () {
         debug.pointerDown(mockEvents[0]);
         debug.pointerDown(mockEvents[1]);
 
-        PointerEvent && debug.recordPointers(mockEvents[2]);
+        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[2]);
         debug.pointerMove(mockEvents[2]);
 
-        PointerEvent && debug.recordPointers(mockEvents[3]);
+        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[3]);
         debug.pointerMove(mockEvents[3]);
 
         debug.pointerUp(mockEvents[4]);
