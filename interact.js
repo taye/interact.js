@@ -304,7 +304,7 @@
         },
 
         // Does the browser support touch input?
-        supportsTouch = 'createTouch' in document,
+        supportsTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch),
 
         // Less Precision with touch input
         margin = supportsTouch? 20: 10,
