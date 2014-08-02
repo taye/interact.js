@@ -1562,7 +1562,7 @@
                 || !(event instanceof downEvent.constructor)
                 || downEvent.target !== event.target) {
                 return;
-            }    
+            }
         }
 
         var tapTargets = [],
@@ -2098,7 +2098,7 @@
                         absY = Math.abs(dy),
                         targetAxis = target.options.dragAxis,
                         axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
-                   
+
                     // if the movement isn't in the axis of the interactable
                     if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
                         // cancel the prepared action
@@ -3210,7 +3210,7 @@
          * Gets or sets whether resizing is forced 1:1 aspect
          *
          = (boolean) Current setting
-         * 
+         *
          * or
          *
          - newValue (boolean) #optional
@@ -3392,7 +3392,7 @@
          |     // do not snap during normal movement.
          |     // Instead, trigger only one snapped move event
          |     // immediately before the end event.
-         |     endOnly: true       
+         |     endOnly: true
          | });
         \*/
         snap: function (options) {
@@ -3570,7 +3570,7 @@
          = (object) The object's bounding rectangle. The properties are numbers with no units.
          o {
          o     top: -,
-         o     left: -, 
+         o     left: -,
          o     bottom: -,
          o     right: -,
          o     width: -,
@@ -3748,7 +3748,7 @@
          |     // do not restrict during normal movement.
          |     // Instead, trigger only one restricted move event
          |     // immediately before the end event.
-         |     endOnly: true       
+         |     endOnly: true
          | });
         \*/
         restrict: function (newValue) {
