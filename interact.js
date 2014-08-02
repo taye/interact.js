@@ -1674,6 +1674,8 @@
             return;
         }
 
+        pointerIsDown = true;
+
         var eventTarget = (event.target instanceof SVGElementInstance
             ? event.target.correspondingUseElement
             : event.target),
@@ -1743,7 +1745,6 @@
         }
 
         if (action) {
-            pointerIsDown = true;
             prepared = action;
 
             return pointerDown(event, action);
@@ -1804,8 +1805,6 @@
             if (!action) {
                 return event;
             }
-
-            pointerWasMoved = false;
 
             if (options.styleCursor) {
                 document.documentElement.style.cursor = actions[action].cursor;
@@ -2067,14 +2066,6 @@
             setEventXY(curCoords, event);
         }
 
-        // return if there is no prepared action
-        if (!prepared
-            // or this is a mousemove event but the down event was a touch
-            || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
-
-            return;
-        }
-
         var dx, dy;
 
         // register movement of more than 1 pixel
@@ -2083,6 +2074,14 @@
             dy = curCoords.clientY - startCoords.clientY;
 
             pointerWasMoved = hypot(dx, dy) > 1;
+        }
+
+        // return if there is no prepared action
+        if (!prepared
+            // or this is a mousemove event but the down event was a touch
+            || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
+
+            return;
         }
 
         if (pointerWasMoved
@@ -2444,7 +2443,7 @@
     }
 
     function pointerOver (event) {
-        if (pointerIsDown || dragging || resizing || gesturing) { return; }
+        if (prepared) { return; }
 
         var curMatches = [],
             prevTargetElement = target && target._element,
@@ -2510,7 +2509,7 @@
     }
 
     function pointerOut (event) {
-        if (pointerIsDown || dragging || resizing || gesturing) { return; }
+        if (prepared) { return; }
 
         // Remove temporary event listeners for selector Interactables
         var eventTarget = (event.target instanceof SVGElementInstance
@@ -2529,7 +2528,7 @@
     // Check what action would be performed on pointerMove target if a mouse
     // button were pressed and change the cursor accordingly
     function pointerHover (event, matches) {
-        if (!(pointerIsDown || dragging || resizing || gesturing)) {
+        if (!prepared) {
 
             var action;
 
