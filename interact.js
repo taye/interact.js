@@ -1032,6 +1032,11 @@
             for (i = 1; i < elements.length; i++) {
                 dropzone = elements[i];
 
+                // an element might belong to multiple selector dropzones
+                if (dropzone === deepestZone) {
+                    continue;
+                }
+
                 // check if the deepest or current are document.documentElement or document.rootElement
                 // - if deepest is, update with the current dropzone and continue to next
                 if (deepestZone.parentNode === document) {
@@ -1110,8 +1115,6 @@
             var i,
                 drops = [],
                 elements = [],
-                selectorDrops = [],
-                selectorElements = [],
                 drop,
                 dropzone;
 
@@ -1139,58 +1142,43 @@
                 }
             }
 
-            // get the most apprpriate dropzone based on DOM depth and order
-            drop = resolveDrops(elements);
-            dropzone = drop? drops[drop.index]: null;
 
-            if (selectorDZs.length) {
-                for (i = 0; i < selectorDZs.length; i++) {
-                    var selector = selectorDZs[i],
-                        context = selector._context,
-                        nodeList = context.querySelectorAll(selector.selector);
+            for (i = 0; i < selectorDZs.length; i++) {
+                var selector = selectorDZs[i],
+                    context = selector._context,
+                    nodeList = context.querySelectorAll(selector.selector);
 
-                    for (var j = 0, len = nodeList.length; j < len; j++) {
-                        selector._element = nodeList[j];
-                        selector.rect = selector.getRect();
+                for (var j = 0, len = nodeList.length; j < len; j++) {
+                    selector._element = nodeList[j];
+                    selector.rect = selector.getRect();
 
-                        // if the dropzone has an accept option, test against it
-                        if (isElement(selector.options.accept)) {
-                            if (selector.options.accept !== element) {
-                                continue;
-                            }
+                    // if the dropzone has an accept option, test against it
+                    if (isElement(selector.options.accept)) {
+                        if (selector.options.accept !== element) {
+                            continue;
                         }
-                        else if (typeof selector.options.accept === 'string') {
-                            if (!matchesSelector(element, selector.options.accept)) {
-                                continue;
-                            }
+                    }
+                    else if (typeof selector.options.accept === 'string') {
+                        if (!matchesSelector(element, selector.options.accept)) {
+                            continue;
                         }
+                    }
 
-                        if (selector._element !== element
-                            && indexOf(elements, selector._element) === -1
-                            && indexOf(selectorElements, selector._element) === -1
-                            && selector.dropCheck(event, target)) {
-
-                            selectorDrops.push(selector);
-                            selectorElements.push(selector._element);
-                        }
+                    if (selector._element !== element && selector.dropCheck(event, target)) {
+                        drops.push(selector);
+                        elements.push(selector._element);
                     }
                 }
+            }
 
-                if (selectorElements.length) {
-                    if (dropzone) {
-                        selectorDrops.push(dropzone);
-                        selectorElements.push(dropzone._element);
-                    }
+            // get the most apprpriate dropzone based on DOM depth and order
+            drop = resolveDrops(elements);
 
-                    drop = resolveDrops(selectorElements);
+            if (drop) {
+                dropzone = drops[drop.index];
 
-                    if (drop) {
-                        dropzone = selectorDrops[drop.index];
-
-                        if (dropzone.selector) {
-                            dropzone._element = selectorElements[drop.index];
-                        }
-                    }
+                if (dropzone.selector) {
+                    dropzone._element = elements[drop.index];
                 }
             }
 
@@ -2359,16 +2347,16 @@
                 dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, draggableElement);
 
                 dragEvent.dragLeave = prevDropElement;
-                leaveDropTarget = prevDropTarget;
-                prevDropTarget = prevDropElement = null;
+                leaveDropTarget     = prevDropTarget;
+                prevDropTarget      = prevDropElement = null;
             }
             // if the dropTarget is not null, create a dragenter event
             if (dropTarget) {
-                dragEnterEvent      = new InteractEvent(event, 'drag', 'enter', dropElement, draggableElement);
+                dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropElement, draggableElement);
 
-                dragEvent.dragEnter = dropTarget._element;
+                dragEvent.dragEnter = dropElement;
                 prevDropTarget      = dropTarget;
-                prevDropElement     = prevDropTarget._element;
+                prevDropElement     = dropElement;
             }
         }
 
