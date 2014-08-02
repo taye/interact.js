@@ -102,11 +102,7 @@ describe('Interactable', function () {
             'autoScroll',
             'restrict',
             'inertia'
-        ],
-        checkerOptions = {
-            actionChecker: 'defaultActionChecker',
-            rectChecker  : 'getRect'
-        };
+        ];
 
     describe('options', function () {
         it('should return the default setting if they were never previously set', function () {
@@ -125,9 +121,8 @@ describe('Interactable', function () {
                 }
             }
 
-            for (option in checkerOptions) {
-                iable[option]().should.equal(debug.Interactable.prototype[checkerOptions[option]]);
-            }
+            iable.rectChecker().should.equal(debug.Interactable.prototype.getRect);
+            expect(iable.actionChecker()).to.equal(null);
         });
     });
 
