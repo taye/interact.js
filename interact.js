@@ -998,9 +998,7 @@
             return;
         }
 
-        if (prevent === true
-            || (event.type === 'selectstart' && /mouse/.test(prevent))) {
-
+        if (prevent === true) {
             event.preventDefault();
             return;
         }
@@ -3657,18 +3655,18 @@
         \*/
         preventDefault: function (newValue) {
             if (typeof newValue === 'boolean' || newValue === 'auto') {
-                this.options.styleCursor = newValue;
+                this.options.preventDefault = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.styleCursor;
+                delete this.options.preventDefault;
 
                 return this;
             }
 
-            return this.options.styleCursor;
+            return this.options.preventDefault;
         },
 
         /*\
