@@ -4265,7 +4265,7 @@
      = (boolean) Indicates if the element or CSS selector was previously passed to interact
     \*/
     interact.isSet = function(element, options) {
-        return indexOf(interactables, element, options && options.context) !== -1;
+        return interactables.indexOfElement(element, options && options.context) !== -1;
     };
 
     /*\
