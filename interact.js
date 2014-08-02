@@ -3579,22 +3579,25 @@
          * The default function to get an Interactables bounding rect. Can be
          * overridden using @Interactable.rectChecker.
          *
-         = (object) The object's bounding rectangle. The properties are numbers with no units.
+         - element (Element) #optional The element to measure. Meant to be used for selector Interactables which don't have a specific element.
+         = (object) The object's bounding rectangle.
          o {
-         o     top: -,
-         o     left: -,
-         o     bottom: -,
-         o     right: -,
-         o     width: -,
-         o     height: -
+         o     top   : 0,
+         o     left  : 0,
+         o     bottom: 0,
+         o     right : 0,
+         o     width : 0,
+         o     height: 0
          o }
         \*/
-        getRect: function rectCheck () {
+        getRect: function rectCheck (element) {
+            element = element || this._element;
+
             if (this.selector && !(isElement(this._element))) {
-                this._element = this._context.querySelector(this.selector);
+                element = this._context.querySelector(this.selector);
             }
 
-            return getElementRect(this._element);
+            return getElementRect(element);
         },
 
         /*\
