@@ -110,7 +110,12 @@
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
 
-        selectorDZs     = [],   // all dropzone selector interactables
+        activeDropzones = {
+            dropzones: [],      // the dropzones that are mentioned below
+            elements : [],      // elements of dropzones that accept the target draggable
+            rects    : []       // the rects of the elements mentioned above
+        },
+
         matches         = [],   // all selectors that are matched by target element
         selectorGesture = null, // MSGesture object for selector PointerEvents
 
@@ -1025,51 +1030,43 @@
 
         // collect all element dropzones that qualify for a drop
         for (i = 0; i < dropzones.length; i++) {
-            var current = dropzones[i];
+            var current = dropzones[i],
+                nodeList;
 
-            // if the dropzone has an accept option, test against it
-            if (isElement(current.options.accept)) {
-                if (current.options.accept !== element) {
-                    continue;
-                }
+            if (!current.selector) {
+                nodeList = [dropzones[i]._element];
             }
-            else if (typeof current.options.accept === 'string') {
-                if (!matchesSelector(element, current.options.accept)) {
-                    continue;
-                }
+            else {
+                nodeList = current._context.querySelectorAll(current.selector);
             }
 
-            if (element !== current._element && current.dropCheck(event, target, element)) {
-                drops.push(current);
-                elements.push(current._element);
-            }
-        }
-
-
-        for (i = 0; i < selectorDZs.length; i++) {
-            var selector = selectorDZs[i],
-                context = selector._context,
-                nodeList = context.querySelectorAll(selector.selector);
+            current._dropElements = [];
 
             for (var j = 0, len = nodeList.length; j < len; j++) {
-                selector._element = nodeList[j];
-                selector.rect = selector.getRect();
+                var currentElement = nodeList[j];
+                current.rect = current.getRect();
 
                 // if the dropzone has an accept option, test against it
-                if (isElement(selector.options.accept)) {
-                    if (selector.options.accept !== element) {
-                        continue;
-                    }
+                if (isElement(current.options.accept)
+                    && current.options.accept !== element) {
+                    continue;
                 }
-                else if (typeof selector.options.accept === 'string') {
-                    if (!matchesSelector(element, selector.options.accept)) {
-                        continue;
-                    }
+                else if (typeof current.options.accept === 'string'
+                    && !matchesSelector(element, current.options.accept)) {
+                    continue;
                 }
 
-                if (selector._element !== element && selector.dropCheck(event, target)) {
-                    drops.push(selector);
-                    elements.push(selector._element);
+                if (currentElement !== element) {
+                    current._dropElements.push(currentElement);
+
+                    activeDropzones.dropzones.push(current);
+                    activeDropzones.elements.push(currentElement);
+                    activeDropzones.rects.push(current.getRect(currentElement));
+
+                    if (current.dropCheck(event, target)) {
+                        drops.push(current);
+                        elements.push(currentElement);
+                    }
                 }
             }
         }
@@ -2314,13 +2311,9 @@
 
             if (!dynamicDrop) {
                 calcRects(dropzones);
-                for (var i = 0; i < selectorDZs.length; i++) {
-                    var interactable = selectorDZs[i],
-                        context = interactable._context;
-
-                    interactable._elements = context.querySelectorAll(interactable.selector);
-                }
             }
+
+            collectDrops(event, draggableElement);
 
             prevEvent = dragEvent;
 
@@ -3037,27 +3030,30 @@
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
-                (this.selector? selectorDZs: dropzones).push(this);
+                this._dropElements = [];
+                dropzones.push(this);
 
-                if (!dynamicDrop && !this.selector) {
+                //if (!dynamicDrop && !this.selector) {
                     this.rect = this.getRect();
-                }
+                //}
+
                 return this;
             }
 
             if (typeof options === 'boolean') {
                 if (options) {
-                    (this.selector? selectorDZs: dropzones).push(this);
+                    this._dropElements = [];
+                    dropzones.push(this);
 
-                    if (!dynamicDrop && !this.selector) {
+                    //if (!dynamicDrop && !this.selector) {
                         this.rect = this.getRect();
-                    }
+                    //}
                 }
                 else {
-                    var array = this.selector? selectorDZs: dropzones,
-                        index = indexOf(array, this);
+                    var index = indexOf(dropzones, this);
+
                     if (index !== -1) {
-                        array.splice(index, 1);
+                        dropzones.splice(index, 1);
                     }
                 }
 
@@ -3095,9 +3091,9 @@
             page.x += origin.x;
             page.y += origin.y;
 
-            if (dynamicDrop) {
+            //if (dynamicDrop) {
                 this.rect = this.getRect();
-            }
+            //}
 
             if (!this.rect) {
                 return false;
@@ -4755,10 +4751,6 @@
                 target._gesture.stop();
             }
 
-            for (var i = 0; i < selectorDZs.length; i++) {
-                selectorDZs._elements = [];
-            }
-
             // prevent Default only if were previously interacting
             if (event && typeof event.preventDefault === 'function') {
                 checkAndPreventDefault(event, target);
@@ -4791,9 +4783,9 @@
     \*/
     interact.dynamicDrop = function (newValue) {
         if (typeof newValue === 'boolean') {
-            if (dragging && dynamicDrop !== newValue && !newValue) {
-                calcRects(dropzones);
-            }
+            //if (dragging && dynamicDrop !== newValue && !newValue) {
+                //calcRects(dropzones);
+            //}
 
             dynamicDrop = newValue;
 
