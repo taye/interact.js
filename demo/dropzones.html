@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Highlight dropzones with interajct.js</title>
+    <script type="text/javascript" src="../interact.js"></script>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; }
+
+        .dropzone-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .dropzone {
+            overflow: hidden;
+            margin: .5em;
+            padding: 1em;
+            color: #666;
+            text-align: center;
+            background: #ccc;
+            line-height: 4em;
+            border: 4px dashed transparent;
+            transition: background .15s linear, border-color .15s linear;
+        }
+
+        .dropzone.-drop-possible { border-color: #666; }
+
+        .dropzone.-drop-over {
+            background: #666;
+            color: #fff;
+        }
+
+        .draggable {
+            position: relative;
+            z-index: 10;
+            width: 200px;
+            margin: .25em;
+            padding: 1em 2em;
+            background-color: #29e;
+            color: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="drag1" class="draggable js-drag">Drag me…</div>
+<div id="drag2" class="draggable js-drag">Drag me…</div>
+<div id="drag3" class="draggable js-drag">Drag me…</div>
+
+<div class="dropzone-wrapper">
+    <div id="drop1" class="dropzone js-drop">Dropzone</div>
+    <div id="drop2" class="dropzone js-drop">Dropzone</div>
+    <div id="drop3" class="dropzone">Dropzone</div>
+</div>
+
+<script type="text/javascript">
+(function (interact) {
+
+    'use strict';
+
+    var position = {};
+
+    interact('.js-drag')
+            .draggable(true)
+            .on('dragstart', function (event) {
+                position.x = parseInt(event.target.dataset.x, 10) || 0;
+                position.y = parseInt(event.target.dataset.y, 10) || 0;
+            })
+            .on('dragmove', function (event) {
+                position.x += event.dx;
+                position.y += event.dy;
+
+                event.target.dataset.x = position.x;
+                event.target.dataset.y = position.y;
+                event.target.style.webkitTransform = event.target.style.transform = 'translate(' + position.x + 'px, ' + position.y + 'px)';
+            });
+
+    interact('.js-drop')
+            .dropzone({
+                accept: '.js-drag',
+                ondropactivate: function() {
+                    console.log('ondropactivate callback');
+                },
+                ondropdeactivate: function() {
+                    console.log('ondropdeactivate callback');
+                }
+            })
+            .on('dropactivate', function (event) {
+                console.log('activate', event);
+                event.target.classList.add('-drop-possible');
+                event.target.textContent = 'Drop me here!';
+
+            })
+            .on('dropdeactivate', function (event) {
+                console.log('deactivate', event);
+                event.target.classList.remove('-drop-possible');
+                event.target.textContent = 'Dropzone';
+            })
+            .on('dragenter', function (event) {
+                event.target.classList.add('-drop-over');
+                event.relatedTarget.textContent = 'I\'m in';
+            })
+            .on('dragleave', function (event) {
+                event.target.classList.remove('-drop-over');
+                event.relatedTarget.textContent = 'Drag me…';
+            })
+            .on('drop', function (event) {
+                event.target.classList.remove('-drop-over');
+                event.relatedTarget.textContent = 'Dropped';
+            });
+}(window.interact));
+</script>
+
+</body>
+</html>

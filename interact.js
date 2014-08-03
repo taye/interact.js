@@ -366,6 +366,8 @@
             'dragend',
             'dragenter',
             'dragleave',
+            'dropactivate',
+            'dropdeactivate',
             'drop',
             'resizestart',
             'resizemove',
@@ -1100,6 +1102,79 @@
                 element: deepestZone,
                 index: indexOf(elements, deepestZone)
             };
+        }
+    }
+
+    // TODO: getDropTargets and getDrop use nearly the same logic besides the return value and the dropCheck, maybe this should be refactored.
+    function getDropTargets (element) {
+        if (dropzones.length || selectorDZs.length) {
+            var i,
+                drops = [],
+                elements = [],
+                selectorDrops = [],
+                selectorElements = [];
+
+            element = element || target._element;
+
+            // collect all element dropzones that qualify for a drop
+            for (i = 0; i < dropzones.length; i++) {
+                var current = dropzones[i];
+
+                // if the dropzone has an accept option, test against it
+                if (isElement(current.options.accept)) {
+                    if (current.options.accept !== element) {
+                        continue;
+                    }
+                }
+                else if (typeof current.options.accept === 'string') {
+                    if (!matchesSelector(element, current.options.accept)) {
+                        continue;
+                    }
+                }
+
+                if (element !== current._element) {
+                    drops.push(current);
+                    elements.push(current._element);
+                }
+            }
+
+            if (selectorDZs.length) {
+                for (i = 0; i < selectorDZs.length; i++) {
+                    var selector = selectorDZs[i],
+                        context = selector._context,
+                        nodeList = context.querySelectorAll(selector.selector);
+
+                    for (var j = 0, len = nodeList.length; j < len; j++) {
+                        selector._element = nodeList[j];
+                        selector.rect = selector.getRect();
+
+                        // if the dropzone has an accept option, test against it
+                        if (isElement(selector.options.accept)) {
+                            if (selector.options.accept !== element) {
+                                continue;
+                            }
+                        }
+                        else if (typeof selector.options.accept === 'string') {
+                            if (!matchesSelector(element, selector.options.accept)) {
+                                continue;
+                            }
+                        }
+
+                        if (selector._element !== element) {
+                            selectorDrops.push(selector);
+                            selectorElements.push(selector._element);
+                        }
+                    }
+                }
+
+                drops = drops.concat(selectorDrops);
+                elements = elements.concat(selectorElements);
+            }
+
+            return drops.length? {
+                dropzones: drops,
+                elements: elements
+            }: null;
         }
     }
 
@@ -2284,7 +2359,8 @@
             dragEnterEvent,
             dragLeaveEvent,
             dropTarget,
-            leaveDropTarget;
+            leaveDropTarget,
+            draggableElement = target._element;
 
         if (!dragging) {
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
@@ -2308,12 +2384,24 @@
             if (target.options.snapEnabled && !target.options.snap.endOnly) {
                 setSnapping(event);
             }
+
+            var dropActivateEvent,
+                possibleDropTargets = getDropTargets(draggableElement);
+
+            // if the possibleDropTargets array is not null, create and trigger a dropactivate event on these targets
+            if (possibleDropTargets) {
+                for (var i = 0; i < possibleDropTargets.dropzones.length; i++) {
+                    dropTarget = possibleDropTargets.dropzones[i];
+
+                    dropActivateEvent = new InteractEvent(event, 'drop', 'activate', possibleDropTargets.elements[i], draggableElement);
+                    dropTarget.fire(dropActivateEvent);
+                }
+            }
         }
 
         dragEvent  = new InteractEvent(event, 'drag', 'move');
 
-        var draggableElement = target._element,
-            drop = getDrop(dragEvent, draggableElement);
+        var drop = getDrop(dragEvent, draggableElement);
 
         if (drop) {
             dropTarget = drop.dropzone;
@@ -2693,7 +2781,9 @@
             endEvent = new InteractEvent(event, 'drag', 'end');
 
             var dropEvent,
+                dropDectivateEvent,
                 draggableElement = target._element,
+                possibleDropTargets = getDropTargets(draggableElement),
                 drop = getDrop(endEvent, draggableElement);
 
             if (drop) {
@@ -2730,6 +2820,16 @@
 
             if (dropEvent) {
                 dropTarget.fire(dropEvent);
+            }
+
+            // if the possibleDropTargets array is not null, create and trigger a dropdeactivate event on these targets
+            if (possibleDropTargets) {
+                for (var i = 0; i < possibleDropTargets.dropzones.length; i++) {
+                    dropTarget = possibleDropTargets.dropzones[i];
+
+                    dropDectivateEvent = new InteractEvent(event, 'drop', 'deactivate', possibleDropTargets.elements[i], draggableElement);
+                    dropTarget.fire(dropDectivateEvent);
+                }
             }
         }
         else if (resizing) {
@@ -2933,10 +3033,14 @@
         setOnEvents: function (action, phases) {
             if (action === 'drop') {
                 var drop      = phases.ondrop      || phases.onDrop      || phases.drop,
+                    dropactivate = phases.ondropactivate || phases.onDropActivate || phases.dropactivate,
+                    dropdeactivate = phases.ondropdeactivate || phases.onDropDeactivate || phases.dropdeactivate,
                     dragenter = phases.ondragenter || phases.onDropEnter || phases.dragenter,
                     dragleave = phases.ondragleave || phases.onDropLeave || phases.dragleave;
 
                 if (typeof drop      === 'function') { this.ondrop      = drop     ; }
+                if (typeof dropactivate === 'function') { this.ondropactivate = dropactivate; }
+                if (typeof dropdeactivate === 'function') { this.ondropdeactivate = dropdeactivate; }
                 if (typeof dragenter === 'function') { this.ondragenter = dragenter; }
                 if (typeof dragleave === 'function') { this.ondragleave = dragleave; }
             }
