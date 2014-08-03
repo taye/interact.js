@@ -113,8 +113,7 @@
         activeDrops     = {
             dropzones: [],      // the dropzones that are mentioned below
             elements : [],      // elements of dropzones that accept the target draggable
-            rects    : [],      // the rects of the elements mentioned above
-            set      : false    // have the drop elements and rects have been collected?
+            rects    : []       // the rects of the elements mentioned above
         },
 
         matches         = [],   // all selectors that are matched by target element
@@ -1016,7 +1015,7 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     }
 
-    function collectDrops (event, element, setActive) {
+    function collectDrops (event, element) {
         var drops = [],
             elements = [],
             i;
@@ -1168,9 +1167,9 @@
             currentElement,
             rect;
 
-        // if setActive is true, the collected drops will be
-        // saved in activeDrops
-        setActive = setActive || (!dynamicDrop && !activeDrops.set);
+        // if setActive is true a new set of possible drops will be collected
+        // and saved in activeDrops
+        setActive = setActive || dynamicDrop;
 
         if (setActive) {
             // get dropzones and their elements that could recieve the draggable
@@ -1187,8 +1186,6 @@
 
                 activeDrops.rects[i] = rect;
             }
-
-            activeDrops.set = true;
         }
 
         // collect all dropzones and their elements which qualify for a drop
@@ -1205,7 +1202,7 @@
         var // get the most apprpriate dropzone based on DOM depth and order
             dropIndex = indexOfDeepestElement(validDrops),
             dropzone  = activeDrops.dropzones[dropIndex] || null,
-            element   = activeDrops.elements[dropIndex]  || null;
+            element   = activeDrops.elements [dropIndex] || null;
 
         if (dropzone && dropzone.selector) {
             dropzone._element = element;
@@ -4771,7 +4768,6 @@
 
             if (dragging) {
                 activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
-                activeDrops.set = false;
 
                 for (var i = 0; i < dropzones.length; i++) {
                     if (dropzones[i].selector) {
