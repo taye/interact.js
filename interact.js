@@ -3608,7 +3608,7 @@
         getRect: function rectCheck (element) {
             element = element || this._element;
 
-            if (this.selector && !(isElement(this._element))) {
+            if (this.selector && !(isElement(element))) {
                 element = this._context.querySelector(this.selector);
             }
 
