@@ -110,7 +110,7 @@
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
 
-        activeDropzones = {
+        activeDrops     = {
             dropzones: [],      // the dropzones that are mentioned below
             elements : [],      // elements of dropzones that accept the target draggable
             rects    : [],      // the rects of the elements mentioned above
@@ -1022,51 +1022,34 @@
             i;
 
         element = element || target._element;
-        setActive = setActive || (!dynamicDrop && !activeDropzones.set);
 
         // collect all dropzones and their elements which qualify for a drop
         for (i = 0; i < dropzones.length; i++) {
             var current = dropzones[i];
 
+            // test the draggable element against the dropzone's accept setting
+            if ((isElement(current.options.accept) && current.options.accept !== element)
+                || (typeof current.options.accept === 'string'
+                    && !matchesSelector(element, current.options.accept))) {
+
+                continue;
+            }
+
             // query for new elements if necessary
-            if (current.selector && (setActive || dynamicDrop)) {
+            if (current.selector) {
                 current._dropElements = current._context.querySelectorAll(current.selector);
             }
 
             for (var j = 0, len = current._dropElements.length; j < len; j++) {
-                var currentElement = current._dropElements[j],
-                    rect;
+                var currentElement = current._dropElements[j];
 
                 if (currentElement === element) {
                     continue;
                 }
 
-                if (current.selector) { current._element = currentElement; }
-
-                if (setActive) {
-                    // if the dropzone has an accept option, test against it
-                    if ((isElement(current.options.accept) && current.options.accept !== element)
-                        || (typeof current.options.accept === 'string'
-                            && !matchesSelector(element, current.options.accept))) {
-                        continue;
-                    }
-
-                    rect = current.getRect(currentElement);
-
-                    activeDropzones.dropzones.push(current);
-                    activeDropzones.elements.push(currentElement);
-                    activeDropzones.rects.push(rect);
-                }
-
-                if (current.dropCheck(event, target, element, rect)) {
-                    drops.push(current);
-                    elements.push(currentElement);
-                }
+                drops.push(current);
+                elements.push(currentElement);
             }
-        }
-
-        if (setActive) {
-            activeDropzones.set = true;
         }
 
         return {
@@ -1091,7 +1074,13 @@
             dropzone = elements[i];
 
             // an element might belong to multiple selector dropzones
-            if (dropzone === deepestZone) {
+            if (!dropzone || dropzone === deepestZone) {
+                continue;
+            }
+
+            if (!deepestZone) {
+                deepestZone = dropzone;
+                index = i;
                 continue;
             }
 
@@ -1173,12 +1162,50 @@
     }
 
     function getDrop (event, dragElement, setActive) {
-        var // get all possible drop targets
-            drops = collectDrops(event, dragElement, setActive),
-            // get the most apprpriate dropzone based on DOM depth and order
-            dropIndex = indexOfDeepestElement(drops.elements),
-            dropzone = drops.dropzones[dropIndex] || null,
-            element = drops.elements[dropIndex] || null;
+        var possibleDrops,
+            validDrops = [],
+            current,
+            currentElement,
+            rect;
+
+        // if setActive is true, the collected drops will be
+        // saved in activeDrops
+        setActive = setActive || (!dynamicDrop && !activeDrops.set);
+
+        if (setActive) {
+            // get dropzones and their elements that could recieve the draggable
+            possibleDrops = collectDrops(event, dragElement, setActive);
+
+            activeDrops.dropzones = possibleDrops.dropzones;
+            activeDrops.elements  = possibleDrops.elements;
+            activeDrops.rects     = [];
+
+            for (var i = 0; i < activeDrops.dropzones.length; i++) {
+                current        = activeDrops.dropzones[i];
+                currentElement = activeDrops.elements[i];
+                rect = current.getRect(currentElement);
+
+                activeDrops.rects[i] = rect;
+            }
+
+            activeDrops.set = true;
+        }
+
+        // collect all dropzones and their elements which qualify for a drop
+        for (var j = 0; j < activeDrops.dropzones.length; j++) {
+            current        = activeDrops.dropzones[j];
+            currentElement = activeDrops.elements [j];
+            rect           = activeDrops.rects    [j];
+
+            var valid = current.dropCheck(event, target, element, rect);
+
+            validDrops.push(valid? currentElement: null);
+        }
+
+        var // get the most apprpriate dropzone based on DOM depth and order
+            dropIndex = indexOfDeepestElement(validDrops),
+            dropzone  = activeDrops.dropzones[dropIndex] || null,
+            element   = activeDrops.elements[dropIndex]  || null;
 
         if (dropzone && dropzone.selector) {
             dropzone._element = element;
@@ -2309,9 +2336,9 @@
             target.fire(dragEvent);
 
             // reset active dropzones
-            activeDropzones.dropzones = [];
-            activeDropzones.elements  = [];
-            activeDropzones.rects     = [];
+            activeDrops.dropzones = [];
+            activeDrops.elements  = [];
+            activeDrops.rects     = [];
 
             prevEvent = dragEvent;
 
@@ -3072,13 +3099,13 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, element, rect) {
+        dropCheck: function (event, draggable, draggableElement, rect) {
             if (!(rect = rect || this.getRect())) {
                 return false;
             }
 
             var page = getPageXY(event),
-                origin = getOriginXY(draggable, element),
+                origin = getOriginXY(draggable, draggableElement),
                 horizontal,
                 vertical;
 
@@ -4742,16 +4769,25 @@
                 checkAndPreventDefault(event, target);
             }
 
+            if (dragging) {
+                activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
+                activeDrops.set = false;
+
+                for (var i = 0; i < dropzones.length; i++) {
+                    if (dropzones[i].selector) {
+                        dropzones[i]._dropElements = null;
+                    }
+                }
+            }
+
             clearTargets();
         }
 
         pointerIds.splice(0);
         pointerMoves.splice(0);
 
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = activeDropzones.set = false;
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         prepared = prevEvent = null;
-        // do not clear the downEvent so that it can be used to
-        // test for browser-simulated mouse events after touch
 
         return interact;
     };
