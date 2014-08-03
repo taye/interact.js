@@ -1214,6 +1214,35 @@
         };
     }
 
+    function getDropEvents (dragEvent) {
+        var dragLeaveEvent = null,
+            dragEnterEvent = null,
+            dropEvent = null;
+
+        if (dropElement !== prevDropElement) {
+            // if there was a prevDropTarget, create a dragleave event
+            if (prevDropTarget) {
+                dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, dragEvent.target);
+                dragEvent.dragLeave = prevDropElement;
+            }
+            // if the dropTarget is not null, create a dragenter event
+            if (dropTarget) {
+                dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropElement, dragEvent.target);
+                dragEvent.dragEnter = dropElement;
+            }
+        }
+
+        if (dragEvent.type === 'dragend' && dropTarget) {
+            dropEvent = new InteractEvent(event, 'drop', null, dropElement, dragEvent.target);
+        }
+
+        return {
+            leave: dragLeaveEvent,
+            enter: dragEnterEvent,
+            drop : dropEvent
+        };
+    }
+
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
@@ -2320,11 +2349,7 @@
         checkAndPreventDefault(event, target);
 
         var starting = !dragging,
-            dragEvent,
-            dragEnterEvent,
-            dragLeaveEvent,
-            dropTarget,
-            leaveDropTarget;
+            dragEvent;
 
         if (starting) {
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
@@ -2357,33 +2382,15 @@
         // restored after dropChecks
         target._element = draggableElement;
 
-        if (dropElement !== prevDropElement) {
-            // if there was a prevDropTarget, create a dragleave event
-            if (prevDropTarget) {
-                dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, draggableElement);
-
-                dragEvent.dragLeave = prevDropElement;
-                leaveDropTarget     = prevDropTarget;
-                prevDropTarget      = prevDropElement = null;
-            }
-            // if the dropTarget is not null, create a dragenter event
-            if (dropTarget) {
-                dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropElement, draggableElement);
-
-                dragEvent.dragEnter = dropElement;
-                prevDropTarget      = dropTarget;
-                prevDropElement     = dropElement;
-            }
-        }
+        var dropEvents = getDropEvents(dragEvent);
 
         target.fire(dragEvent);
 
-        if (dragLeaveEvent) {
-            leaveDropTarget.fire(dragLeaveEvent);
-        }
-        if (dragEnterEvent) {
-            dropTarget.fire(dragEnterEvent);
-        }
+        if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+        if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+
+        prevDropTarget  = dropTarget;
+        prevDropElement = dropElement;
 
         prevEvent = dragEvent;
     }
@@ -2750,11 +2757,13 @@
                 endEvent.dragLeave = prevDropElement;
             }
 
+            var dropEvents = getDropEvents(endEvent);
+
             target.fire(endEvent);
 
-            if (dropEvent) {
-                dropTarget.fire(dropEvent);
-            }
+            if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+            if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+            if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
         }
         else if (resizing) {
             endEvent = new InteractEvent(event, 'resize', 'end');
