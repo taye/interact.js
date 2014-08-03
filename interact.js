@@ -113,7 +113,8 @@
         activeDropzones = {
             dropzones: [],      // the dropzones that are mentioned below
             elements : [],      // elements of dropzones that accept the target draggable
-            rects    : []       // the rects of the elements mentioned above
+            rects    : [],      // the rects of the elements mentioned above
+            set      : false    // have the drop elements and rects have been collected?
         },
 
         matches         = [],   // all selectors that are matched by target element
@@ -899,12 +900,6 @@
         return origin;
     }
 
-    function calcRects (interactableList) {
-        for (var i = 0, len = interactableList.length; i < len; i++) {
-            interactableList[i].rect = interactableList[i].getRect();
-        }
-    }
-
     function inertiaFrame () {
         var options = inertiaStatus.target.options.inertia,
             lambda = options.resistance,
@@ -1021,54 +1016,57 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     }
 
-    function collectDrops (event, element) {
+    function collectDrops (event, element, setActive) {
         var drops = [],
             elements = [],
             i;
 
         element = element || target._element;
+        setActive = setActive || (!dynamicDrop && !activeDropzones.set);
 
-        // collect all element dropzones that qualify for a drop
+        // collect all dropzones and their elements which qualify for a drop
         for (i = 0; i < dropzones.length; i++) {
-            var current = dropzones[i],
-                nodeList;
+            var current = dropzones[i];
 
-            if (!current.selector) {
-                nodeList = [dropzones[i]._element];
-            }
-            else {
-                nodeList = current._context.querySelectorAll(current.selector);
+            // query for new elements if necessary
+            if (current.selector && (setActive || dynamicDrop)) {
+                current._dropElements = current._context.querySelectorAll(current.selector);
             }
 
-            current._dropElements = [];
+            for (var j = 0, len = current._dropElements.length; j < len; j++) {
+                var currentElement = current._dropElements[j],
+                    rect;
 
-            for (var j = 0, len = nodeList.length; j < len; j++) {
-                var currentElement = nodeList[j];
-                current.rect = current.getRect();
-
-                // if the dropzone has an accept option, test against it
-                if (isElement(current.options.accept)
-                    && current.options.accept !== element) {
-                    continue;
-                }
-                else if (typeof current.options.accept === 'string'
-                    && !matchesSelector(element, current.options.accept)) {
+                if (currentElement === element) {
                     continue;
                 }
 
-                if (currentElement !== element) {
-                    current._dropElements.push(currentElement);
+                if (current.selector) { current._element = currentElement; }
+
+                if (setActive) {
+                    // if the dropzone has an accept option, test against it
+                    if ((isElement(current.options.accept) && current.options.accept !== element)
+                        || (typeof current.options.accept === 'string'
+                            && !matchesSelector(element, current.options.accept))) {
+                        continue;
+                    }
+
+                    rect = current.getRect(currentElement);
 
                     activeDropzones.dropzones.push(current);
                     activeDropzones.elements.push(currentElement);
-                    activeDropzones.rects.push(current.getRect(currentElement));
+                    activeDropzones.rects.push(rect);
+                }
 
-                    if (current.dropCheck(event, target)) {
-                        drops.push(current);
-                        elements.push(currentElement);
-                    }
+                if (current.dropCheck(event, target, element, rect)) {
+                    drops.push(current);
+                    elements.push(currentElement);
                 }
             }
+        }
+
+        if (setActive) {
+            activeDropzones.set = true;
         }
 
         return {
@@ -1174,9 +1172,9 @@
         return index;
     }
 
-    function getDrop (event, dragElement) {
+    function getDrop (event, dragElement, setActive) {
         var // get all possible drop targets
-            drops = collectDrops(event, dragElement),
+            drops = collectDrops(event, dragElement, setActive),
             // get the most apprpriate dropzone based on DOM depth and order
             dropIndex = indexOfDeepestElement(drops.elements),
             dropzone = drops.dropzones[dropIndex] || null,
@@ -2297,23 +2295,23 @@
     function dragMove (event) {
         checkAndPreventDefault(event, target);
 
-        var dragEvent,
+        var starting = !dragging,
+            dragEvent,
             dragEnterEvent,
             dragLeaveEvent,
             dropTarget,
             leaveDropTarget;
 
-        if (!dragging) {
+        if (starting) {
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
             dragging = true;
 
             target.fire(dragEvent);
 
-            if (!dynamicDrop) {
-                calcRects(dropzones);
-            }
-
-            collectDrops(event, draggableElement);
+            // reset active dropzones
+            activeDropzones.dropzones = [];
+            activeDropzones.elements  = [];
+            activeDropzones.rects     = [];
 
             prevEvent = dragEvent;
 
@@ -2326,7 +2324,7 @@
         dragEvent  = new InteractEvent(event, 'drag', 'move');
 
         var draggableElement = target._element,
-            drop = getDrop(dragEvent, draggableElement);
+            drop = getDrop(dragEvent, draggableElement, starting);
 
         dropTarget = drop.dropzone;
         dropElement = drop.element;
@@ -3030,24 +3028,16 @@
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
-                this._dropElements = [];
+                this._dropElements = this.selector? null: [this._element];
                 dropzones.push(this);
-
-                //if (!dynamicDrop && !this.selector) {
-                    this.rect = this.getRect();
-                //}
 
                 return this;
             }
 
             if (typeof options === 'boolean') {
                 if (options) {
-                    this._dropElements = [];
+                    this._dropElements = this.selector? null: [this._element];
                     dropzones.push(this);
-
-                    //if (!dynamicDrop && !this.selector) {
-                        this.rect = this.getRect();
-                    //}
                 }
                 else {
                     var index = indexOf(dropzones, this);
@@ -3082,7 +3072,11 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, element) {
+        dropCheck: function (event, draggable, element, rect) {
+            if (!(rect = rect || this.getRect())) {
+                return false;
+            }
+
             var page = getPageXY(event),
                 origin = getOriginXY(draggable, element),
                 horizontal,
@@ -3091,16 +3085,8 @@
             page.x += origin.x;
             page.y += origin.y;
 
-            //if (dynamicDrop) {
-                this.rect = this.getRect();
-            //}
-
-            if (!this.rect) {
-                return false;
-            }
-
-            horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-            vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
+            horizontal = (page.x > rect.left) && (page.x < rect.right);
+            vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
 
             return horizontal && vertical;
         },
@@ -4762,7 +4748,7 @@
         pointerIds.splice(0);
         pointerMoves.splice(0);
 
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
+        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = activeDropzones.set = false;
         prepared = prevEvent = null;
         // do not clear the downEvent so that it can be used to
         // test for browser-simulated mouse events after touch
