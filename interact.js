@@ -1161,46 +1161,37 @@
     }
 
     function getDrop (event, dragElement, setActive) {
-        var possibleDrops,
-            validDrops = [],
-            current,
-            currentElement,
-            rect;
+        var validDrops = [];
 
-        // if setActive is true a new set of possible drops will be collected
-        // and saved in activeDrops
-        setActive = setActive || dynamicDrop;
-
-        if (setActive) {
+        // If setActive is true a new set of possible drops will be
+        // collected and saved in activeDrops. setActive should always be
+        // true when a drag has just started or dynamicDrop is true
+        if ((setActive = setActive || dynamicDrop)) {
             // get dropzones and their elements that could recieve the draggable
-            possibleDrops = collectDrops(event, dragElement, setActive);
+            var possibleDrops = collectDrops(event, dragElement, setActive);
 
             activeDrops.dropzones = possibleDrops.dropzones;
             activeDrops.elements  = possibleDrops.elements;
             activeDrops.rects     = [];
 
             for (var i = 0; i < activeDrops.dropzones.length; i++) {
-                current        = activeDrops.dropzones[i];
-                currentElement = activeDrops.elements[i];
-                rect = current.getRect(currentElement);
-
-                activeDrops.rects[i] = rect;
+                activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
             }
         }
 
         // collect all dropzones and their elements which qualify for a drop
         for (var j = 0; j < activeDrops.dropzones.length; j++) {
-            current        = activeDrops.dropzones[j];
-            currentElement = activeDrops.elements [j];
-            rect           = activeDrops.rects    [j];
+            var current        = activeDrops.dropzones[j],
+                currentElement = activeDrops.elements [j],
+                rect           = activeDrops.rects    [j];
 
-            var valid = current.dropCheck(event, target, element, rect);
-
-            validDrops.push(valid? currentElement: null);
+            validDrops.push(current.dropCheck(event, target, element, rect)
+                            ? currentElement
+                            : null);
         }
 
-        var // get the most apprpriate dropzone based on DOM depth and order
-            dropIndex = indexOfDeepestElement(validDrops),
+        // get the most apprpriate dropzone based on DOM depth and order
+        var dropIndex = indexOfDeepestElement(validDrops),
             dropzone  = activeDrops.dropzones[dropIndex] || null,
             element   = activeDrops.elements [dropIndex] || null;
 
