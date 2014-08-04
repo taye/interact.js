@@ -22,6 +22,7 @@ function mockEvent (options, target, currentTarget) {
         touches: options.touches && options.touches.map(mockEvent),
         changedTouches: options.changed && options.changed.map(mockEvent),
         pointerId: options.pointerId || 0,
+        identifier: options.identifier || 0,
 
         preventDefault: blank,
         stopPropagation: blank,
@@ -101,11 +102,7 @@ describe('Interactable', function () {
             'autoScroll',
             'restrict',
             'inertia'
-        ],
-        checkerOptions = {
-            actionChecker: 'defaultActionChecker',
-            rectChecker  : 'getRect'
-        };
+        ];
 
     describe('options', function () {
         it('should return the default setting if they were never previously set', function () {
@@ -124,9 +121,8 @@ describe('Interactable', function () {
                 }
             }
 
-            for (option in checkerOptions) {
-                iable[option]().should.equal(debug.Interactable.prototype[checkerOptions[option]]);
-            }
+            iable.rectChecker().should.equal(debug.Interactable.prototype.getRect);
+            expect(iable.actionChecker()).to.equal(null);
         });
     });
 
@@ -296,10 +292,10 @@ describe('Events', function () {
         debug.pointerDown(mockEvents[0]);
         debug.pointerDown(mockEvents[1]);
 
-        PointerEvent && debug.recordPointers(mockEvents[2]);
+        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[2]);
         debug.pointerMove(mockEvents[2]);
 
-        PointerEvent && debug.recordPointers(mockEvents[3]);
+        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[3]);
         debug.pointerMove(mockEvents[3]);
 
         debug.pointerUp(mockEvents[4]);
