@@ -110,7 +110,12 @@
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
 
-        selectorDZs     = [],   // all dropzone selector interactables
+        activeDrops     = {
+            dropzones: [],      // the dropzones that are mentioned below
+            elements : [],      // elements of dropzones that accept the target draggable
+            rects    : []       // the rects of the elements mentioned above
+        },
+
         matches         = [],   // all selectors that are matched by target element
         selectorGesture = null, // MSGesture object for selector PointerEvents
 
@@ -896,12 +901,6 @@
         return origin;
     }
 
-    function calcRects (interactableList) {
-        for (var i = 0, len = interactableList.length; i < len; i++) {
-            interactableList[i].rect = interactableList[i].getRect();
-        }
-    }
-
     function inertiaFrame () {
         var options = inertiaStatus.target.options.inertia,
             lambda = options.resistance,
@@ -1018,189 +1017,223 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     }
 
-    // Test for the element that's "above" all other qualifiers
-    function resolveDrops (elements) {
-        if (elements.length) {
+    function collectDrops (event, element) {
+        var drops = [],
+            elements = [],
+            i;
 
-            var dropzone,
-                deepestZone = elements[0],
-                parent,
-                deepestZoneParents = [],
-                dropzoneParents = [],
-                child,
-                i,
-                n;
+        element = element || target._element;
 
-            for (i = 1; i < elements.length; i++) {
-                dropzone = elements[i];
+        // collect all dropzones and their elements which qualify for a drop
+        for (i = 0; i < dropzones.length; i++) {
+            var current = dropzones[i];
 
-                // check if the deepest or current are document.documentElement or document.rootElement
-                // - if deepest is, update with the current dropzone and continue to next
-                if (deepestZone.parentNode === document) {
-                    deepestZone = dropzone;
-                    continue;
-                }
-                // - if the current dropzone is, do nothing and continue
-                else if (dropzone.parentNode === document) {
-                    continue;
-                }
+            // test the draggable element against the dropzone's accept setting
+            if ((isElement(current.options.accept) && current.options.accept !== element)
+                || (typeof current.options.accept === 'string'
+                    && !matchesSelector(element, current.options.accept))) {
 
-                if (!deepestZoneParents.length) {
-                    parent = deepestZone;
-                    while (parent.parentNode !== document) {
-                        deepestZoneParents.unshift(parent);
-                        parent = parent.parentNode;
-                    }
-                }
-
-                // if this element is an svg element and the current deepest is
-                // an HTMLElement
-                if (deepestZone instanceof HTMLElement &&
-                        dropzone instanceof SVGElement &&
-                        !(dropzone instanceof SVGSVGElement)) {
-
-                    if (dropzone ===
-                            deepestZone.parentNode) {
-                        continue;
-                    }
-                    parent = dropzone.ownerSVGElement;
-                }
-                else {
-                    parent = dropzone;
-                }
-                dropzoneParents = [];
-                while (parent.parentNode !== document) {
-                    dropzoneParents.unshift(parent);
-                    parent = parent.parentNode;
-                }
-
-                // get (position of last common ancestor) + 1
-                n = 0;
-                while(dropzoneParents[n] &&
-                        dropzoneParents[n] === deepestZoneParents[n]) {
-                    n++;
-                }
-
-                var parents = [
-                    dropzoneParents[n - 1],
-                    dropzoneParents[n],
-                    deepestZoneParents[n]
-                ];
-                child = parents[0].lastChild;
-
-                while (child) {
-                    if (child === parents[1]) {
-                        deepestZone = dropzone;
-                        deepestZoneParents = [];
-                        break;
-                    }
-                    else if (child === parents[2]) {
-                        break;
-                    }
-                    child = child.previousSibling;
-                }
+                continue;
             }
-            return {
-                element: deepestZone,
-                index: indexOf(elements, deepestZone)
-            };
+
+            // query for new elements if necessary
+            if (current.selector) {
+                current._dropElements = current._context.querySelectorAll(current.selector);
+            }
+
+            for (var j = 0, len = current._dropElements.length; j < len; j++) {
+                var currentElement = current._dropElements[j];
+
+                if (currentElement === element) {
+                    continue;
+                }
+
+                drops.push(current);
+                elements.push(currentElement);
+            }
         }
+
+        return {
+            dropzones: drops,
+            elements: elements
+        };
     }
 
-    function getDrop (event, element) {
-        if (dropzones.length || selectorDZs.length) {
-            var i,
-                drops = [],
-                elements = [],
-                selectorDrops = [],
-                selectorElements = [],
-                drop,
-                dropzone;
+    // Test for the element that's "above" all other qualifiers
+    function indexOfDeepestElement (elements) {
+        var dropzone,
+            deepestZone = elements[0],
+            index = deepestZone? 0: -1,
+            parent,
+            deepestZoneParents = [],
+            dropzoneParents = [],
+            child,
+            i,
+            n;
 
-            element = element || target._element;
+        for (i = 1; i < elements.length; i++) {
+            dropzone = elements[i];
 
-            // collect all element dropzones that qualify for a drop
-            for (i = 0; i < dropzones.length; i++) {
-                var current = dropzones[i];
+            // an element might belong to multiple selector dropzones
+            if (!dropzone || dropzone === deepestZone) {
+                continue;
+            }
 
-                // if the dropzone has an accept option, test against it
-                if (isElement(current.options.accept)) {
-                    if (current.options.accept !== element) {
-                        continue;
-                    }
-                }
-                else if (typeof current.options.accept === 'string') {
-                    if (!matchesSelector(element, current.options.accept)) {
-                        continue;
-                    }
-                }
+            if (!deepestZone) {
+                deepestZone = dropzone;
+                index = i;
+                continue;
+            }
 
-                if (element !== current._element && current.dropCheck(event, target, element)) {
-                    drops.push(current);
-                    elements.push(current._element);
+            // check if the deepest or current are document.documentElement or document.rootElement
+            // - if the current dropzone is, do nothing and continue
+            if (dropzone.parentNode === document) {
+                continue;
+            }
+            // - if deepest is, update with the current dropzone and continue to next
+            else if (deepestZone.parentNode === document) {
+                deepestZone = dropzone;
+                index = i;
+                continue;
+            }
+
+            if (!deepestZoneParents.length) {
+                parent = deepestZone;
+                while (parent.parentNode && parent.parentNode !== document) {
+                    deepestZoneParents.unshift(parent);
+                    parent = parent.parentNode;
                 }
             }
 
-            // get the most apprpriate dropzone based on DOM depth and order
-            drop = resolveDrops(elements);
-            dropzone = drop? drops[drop.index]: null;
+            // if this element is an svg element and the current deepest is
+            // an HTMLElement
+            if (deepestZone instanceof HTMLElement
+                && dropzone instanceof SVGElement
+                && !(dropzone instanceof SVGSVGElement)) {
 
-            if (selectorDZs.length) {
-                for (i = 0; i < selectorDZs.length; i++) {
-                    var selector = selectorDZs[i],
-                        context = selector._context,
-                        nodeList = context.querySelectorAll(selector.selector);
-
-                    for (var j = 0, len = nodeList.length; j < len; j++) {
-                        selector._element = nodeList[j];
-                        selector.rect = selector.getRect();
-
-                        // if the dropzone has an accept option, test against it
-                        if (isElement(selector.options.accept)) {
-                            if (selector.options.accept !== element) {
-                                continue;
-                            }
-                        }
-                        else if (typeof selector.options.accept === 'string') {
-                            if (!matchesSelector(element, selector.options.accept)) {
-                                continue;
-                            }
-                        }
-
-                        if (selector._element !== element
-                            && indexOf(elements, selector._element) === -1
-                            && indexOf(selectorElements, selector._element) === -1
-                            && selector.dropCheck(event, target)) {
-
-                            selectorDrops.push(selector);
-                            selectorElements.push(selector._element);
-                        }
-                    }
+                if (dropzone === deepestZone.parentNode) {
+                    continue;
                 }
 
-                if (selectorElements.length) {
-                    if (dropzone) {
-                        selectorDrops.push(dropzone);
-                        selectorElements.push(dropzone._element);
-                    }
-
-                    drop = resolveDrops(selectorElements);
-
-                    if (drop) {
-                        dropzone = selectorDrops[drop.index];
-
-                        if (dropzone.selector) {
-                            dropzone._element = selectorElements[drop.index];
-                        }
-                    }
-                }
+                parent = dropzone.ownerSVGElement;
+            }
+            else {
+                parent = dropzone;
             }
 
-            return dropzone? {
-                dropzone: dropzone,
-                element: dropzone._element
-            }: null;
+            dropzoneParents = [];
+
+            while (parent.parentNode !== document) {
+                dropzoneParents.unshift(parent);
+                parent = parent.parentNode;
+            }
+
+            n = 0;
+
+            // get (position of last common ancestor) + 1
+            while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
+                n++;
+            }
+
+            var parents = [
+                dropzoneParents[n - 1],
+                dropzoneParents[n],
+                deepestZoneParents[n]
+            ];
+
+            child = parents[0].lastChild;
+
+            while (child) {
+                if (child === parents[1]) {
+                    deepestZone = dropzone;
+                    index = i;
+                    deepestZoneParents = [];
+
+                    break;
+                }
+                else if (child === parents[2]) {
+                    break;
+                }
+
+                child = child.previousSibling;
+            }
         }
+
+        return index;
+    }
+
+    function getDrop (event, dragElement, setActive) {
+        var validDrops = [];
+
+        // If setActive is true a new set of possible drops will be
+        // collected and saved in activeDrops. setActive should always be
+        // true when a drag has just started or dynamicDrop is true
+        if ((setActive = setActive || dynamicDrop)) {
+            // get dropzones and their elements that could recieve the draggable
+            var possibleDrops = collectDrops(event, dragElement, setActive);
+
+            activeDrops.dropzones = possibleDrops.dropzones;
+            activeDrops.elements  = possibleDrops.elements;
+            activeDrops.rects     = [];
+
+            for (var i = 0; i < activeDrops.dropzones.length; i++) {
+                activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
+            }
+        }
+
+        // collect all dropzones and their elements which qualify for a drop
+        for (var j = 0; j < activeDrops.dropzones.length; j++) {
+            var current        = activeDrops.dropzones[j],
+                currentElement = activeDrops.elements [j],
+                rect           = activeDrops.rects    [j];
+
+            validDrops.push(current.dropCheck(event, target, element, rect)
+                            ? currentElement
+                            : null);
+        }
+
+        // get the most apprpriate dropzone based on DOM depth and order
+        var dropIndex = indexOfDeepestElement(validDrops),
+            dropzone  = activeDrops.dropzones[dropIndex] || null,
+            element   = activeDrops.elements [dropIndex] || null;
+
+        if (dropzone && dropzone.selector) {
+            dropzone._element = element;
+        }
+
+        return {
+            dropzone: dropzone,
+            element: element
+        };
+    }
+
+    function getDropEvents (dragEvent) {
+        var dragLeaveEvent = null,
+            dragEnterEvent = null,
+            dropEvent = null;
+
+        if (dropElement !== prevDropElement) {
+            // if there was a prevDropTarget, create a dragleave event
+            if (prevDropTarget) {
+                dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, dragEvent.target);
+                dragEvent.dragLeave = prevDropElement;
+            }
+            // if the dropTarget is not null, create a dragenter event
+            if (dropTarget) {
+                dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropElement, dragEvent.target);
+                dragEvent.dragEnter = dropElement;
+            }
+        }
+
+        if (dragEvent.type === 'dragend' && dropTarget) {
+            dropEvent = new InteractEvent(event, 'drop', null, dropElement, dragEvent.target);
+        }
+
+        return {
+            leave: dragLeaveEvent,
+            enter: dragEnterEvent,
+            drop : dropEvent
+        };
     }
 
     function InteractEvent (event, action, phase, element, related) {
@@ -2308,28 +2341,19 @@
     function dragMove (event) {
         checkAndPreventDefault(event, target);
 
-        var dragEvent,
-            dragEnterEvent,
-            dragLeaveEvent,
-            dropTarget,
-            leaveDropTarget,
-            draggableElement = target._element;
+        var starting = !dragging,
+            dragEvent;
 
-        if (!dragging) {
+        if (starting) {
             dragEvent = new InteractEvent(downEvent, 'drag', 'start');
             dragging = true;
 
             target.fire(dragEvent);
 
-            if (!dynamicDrop) {
-                calcRects(dropzones);
-                for (var i = 0; i < selectorDZs.length; i++) {
-                    var interactable = selectorDZs[i],
-                        context = interactable._context;
-
-                    interactable._elements = context.querySelectorAll(interactable.selector);
-                }
-            }
+            // reset active dropzones
+            activeDrops.dropzones = [];
+            activeDrops.elements  = [];
+            activeDrops.rects     = [];
 
             prevEvent = dragEvent;
 
@@ -2341,47 +2365,25 @@
 
         dragEvent  = new InteractEvent(event, 'drag', 'move');
 
-        var drop = getDrop(dragEvent, draggableElement);
+        var draggableElement = target._element,
+            drop = getDrop(dragEvent, draggableElement);
 
-        if (drop) {
-            dropTarget = drop.dropzone;
-            dropElement = drop.element;
-        }
-        else {
-            dropTarget = dropElement = null;
-        }
+        dropTarget = drop.dropzone;
+        dropElement = drop.element;
 
         // Make sure that the target selector draggable's element is
         // restored after dropChecks
         target._element = draggableElement;
 
-        if (dropElement !== prevDropElement) {
-            // if there was a prevDropTarget, create a dragleave event
-            if (prevDropTarget) {
-                dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, draggableElement);
-
-                dragEvent.dragLeave = prevDropElement;
-                leaveDropTarget = prevDropTarget;
-                prevDropTarget = prevDropElement = null;
-            }
-            // if the dropTarget is not null, create a dragenter event
-            if (dropTarget) {
-                dragEnterEvent      = new InteractEvent(event, 'drag', 'enter', dropElement, draggableElement);
-
-                dragEvent.dragEnter = dropTarget._element;
-                prevDropTarget      = dropTarget;
-                prevDropElement     = prevDropTarget._element;
-            }
-        }
+        var dropEvents = getDropEvents(dragEvent);
 
         target.fire(dragEvent);
 
-        if (dragLeaveEvent) {
-            leaveDropTarget.fire(dragLeaveEvent);
-        }
-        if (dragEnterEvent) {
-            dropTarget.fire(dragEnterEvent);
-        }
+        if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+        if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+
+        prevDropTarget  = dropTarget;
+        prevDropElement = dropElement;
 
         prevEvent = dragEvent;
     }
@@ -2724,14 +2726,8 @@
                 draggableElement = target._element,
                 drop = getDrop(endEvent, draggableElement);
 
-            if (drop) {
-                dropTarget = drop.dropzone;
-                dropElement = drop.element;
-            }
-            else {
-                dropTarget = null;
-                dropElement = null;
-            }
+            dropTarget = drop.dropzone;
+            dropElement = drop.element;
 
             // getDrop changes target._element
             target._element = draggableElement;
@@ -2754,11 +2750,13 @@
                 endEvent.dragLeave = prevDropElement;
             }
 
+            var dropEvents = getDropEvents(endEvent);
+
             target.fire(endEvent);
 
-            if (dropEvent) {
-                dropTarget.fire(dropEvent);
-            }
+            if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+            if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+            if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
         }
         else if (resizing) {
             endEvent = new InteractEvent(event, 'resize', 'end');
@@ -3060,27 +3058,22 @@
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
-                (this.selector? selectorDZs: dropzones).push(this);
+                this._dropElements = this.selector? null: [this._element];
+                dropzones.push(this);
 
-                if (!dynamicDrop && !this.selector) {
-                    this.rect = this.getRect();
-                }
                 return this;
             }
 
             if (typeof options === 'boolean') {
                 if (options) {
-                    (this.selector? selectorDZs: dropzones).push(this);
-
-                    if (!dynamicDrop && !this.selector) {
-                        this.rect = this.getRect();
-                    }
+                    this._dropElements = this.selector? null: [this._element];
+                    dropzones.push(this);
                 }
                 else {
-                    var array = this.selector? selectorDZs: dropzones,
-                        index = indexOf(array, this);
+                    var index = indexOf(dropzones, this);
+
                     if (index !== -1) {
-                        array.splice(index, 1);
+                        dropzones.splice(index, 1);
                     }
                 }
 
@@ -3109,25 +3102,21 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, element) {
+        dropCheck: function (event, draggable, draggableElement, rect) {
+            if (!(rect = rect || this.getRect())) {
+                return false;
+            }
+
             var page = getPageXY(event),
-                origin = getOriginXY(draggable, element),
+                origin = getOriginXY(draggable, draggableElement),
                 horizontal,
                 vertical;
 
             page.x += origin.x;
             page.y += origin.y;
 
-            if (dynamicDrop) {
-                this.rect = this.getRect();
-            }
-
-            if (!this.rect) {
-                return false;
-            }
-
-            horizontal = (page.x > this.rect.left) && (page.x < this.rect.right);
-            vertical   = (page.y > this.rect.top ) && (page.y < this.rect.bottom);
+            horizontal = (page.x > rect.left) && (page.x < rect.right);
+            vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
 
             return horizontal && vertical;
         },
@@ -3602,22 +3591,25 @@
          * The default function to get an Interactables bounding rect. Can be
          * overridden using @Interactable.rectChecker.
          *
-         = (object) The object's bounding rectangle. The properties are numbers with no units.
+         - element (Element) #optional The element to measure. Meant to be used for selector Interactables which don't have a specific element.
+         = (object) The object's bounding rectangle.
          o {
-         o     top: -,
-         o     left: -,
-         o     bottom: -,
-         o     right: -,
-         o     width: -,
-         o     height: -
+         o     top   : 0,
+         o     left  : 0,
+         o     bottom: 0,
+         o     right : 0,
+         o     width : 0,
+         o     height: 0
          o }
         \*/
-        getRect: function rectCheck () {
-            if (this.selector && !(isElement(this._element))) {
-                this._element = this._context.querySelector(this.selector);
+        getRect: function rectCheck (element) {
+            element = element || this._element;
+
+            if (this.selector && !(isElement(element))) {
+                element = this._context.querySelector(this.selector);
             }
 
-            return getElementRect(this._element);
+            return getElementRect(element);
         },
 
         /*\
@@ -4775,13 +4767,19 @@
                 target._gesture.stop();
             }
 
-            for (var i = 0; i < selectorDZs.length; i++) {
-                selectorDZs._elements = [];
-            }
-
             // prevent Default only if were previously interacting
             if (event && typeof event.preventDefault === 'function') {
                 checkAndPreventDefault(event, target);
+            }
+
+            if (dragging) {
+                activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
+
+                for (var i = 0; i < dropzones.length; i++) {
+                    if (dropzones[i].selector) {
+                        dropzones[i]._dropElements = null;
+                    }
+                }
             }
 
             clearTargets();
@@ -4792,8 +4790,6 @@
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         prepared = prevEvent = null;
-        // do not clear the downEvent so that it can be used to
-        // test for browser-simulated mouse events after touch
 
         return interact;
     };
@@ -4811,9 +4807,9 @@
     \*/
     interact.dynamicDrop = function (newValue) {
         if (typeof newValue === 'boolean') {
-            if (dragging && dynamicDrop !== newValue && !newValue) {
-                calcRects(dropzones);
-            }
+            //if (dragging && dynamicDrop !== newValue && !newValue) {
+                //calcRects(dropzones);
+            //}
 
             dynamicDrop = newValue;
 
