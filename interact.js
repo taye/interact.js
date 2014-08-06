@@ -1185,7 +1185,7 @@
                 currentElement = activeDrops.elements [j],
                 rect           = activeDrops.rects    [j];
 
-            validDrops.push(current.dropCheck(event, target, element, rect)
+            validDrops.push(current.dropCheck(event, target, dragElement, rect)
                             ? currentElement
                             : null);
         }
