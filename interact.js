@@ -1185,7 +1185,7 @@
                 currentElement = activeDrops.elements [j],
                 rect           = activeDrops.rects    [j];
 
-            validDrops.push(current.dropCheck(event, target, element, rect)
+            validDrops.push(current.dropCheck(event, target, dragElement, rect)
                             ? currentElement
                             : null);
         }
@@ -4612,9 +4612,9 @@
      o {
      o     mode   : 'grid', 'anchor' or 'path',
      o     range  : the distance within which snapping to a point occurs,
+     o     actions: ['drag', 'resizex', 'resizey', 'resizexy'], an array of action types that can snapped (['drag'] by default) (no gesture)
      o     grid   : {
-     o         x: the distance between x-axis snap points,
-     o         y: the distance between y-axis snap points
+     o         x, y: the distances between the grid lines,
      o     },
      o     gridOffset: {
      o             x, y: the x/y-axis values of the grid origin
