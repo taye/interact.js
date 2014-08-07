@@ -107,10 +107,10 @@ Usage
 Pass the element you want to interact with or a CSS selector string to
 `interact`. That returns an object with methods, notably `draggable`,
 `resizable`, `gesturable`, `dropzone` which let you allow or disallow the
-related actions and `on` which let's you add event listeners for
-InteractEvents and any DOM event.  The `InteractEvent` types are
-{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', ' `dragenter`, `dragleave`
-and `drop` when dragging over dropzones.
+related actions and `on` which let's you add event listeners for InteractEvents
+and any DOM event.  The `InteractEvent` types are `tap`, `doubletap`,
+{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', '
+`dragenter`, `dragleave`, `drop`, `dropactivate`, and `dropactivate`.
 
 Details
 -------
@@ -154,9 +154,9 @@ InteractEvents either to each Interactable or globally for all Interacables and
 style the element according to event data.
 
 ### Listening
-The `InteractEvent` types are
-{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`, `dragleave` and
-`drop` when dragging over dropzones.
+The `InteractEvent` types are `tap`, `doubletap`,
+{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`,
+`dragleave`, `drop`, `dropactivate` and `dropactivate`.
 
 To respond to an InteractEvent, you must add a listener for its event type
 either directly to an interactable
