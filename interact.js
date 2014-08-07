@@ -1059,6 +1059,27 @@
         };
     }
 
+    function fireActiveDrops(event) {
+        var i,
+            current,
+            currentElement,
+            prevElement;
+
+        // loop through all active dropzones and trigger event
+        for (i = 0; i < activeDrops.dropzones.length; i++) {
+            current = activeDrops.dropzones[i];
+            currentElement = activeDrops.elements [i];
+
+            // prevent trigger of duplicate events on same element
+            if (currentElement !== prevElement) {
+                // set current element as event target
+                event.target = currentElement;
+                current.fire(event);
+            }
+            prevElement = currentElement;
+        }
+    }
+
     // Test for the element that's "above" all other qualifiers
     function indexOfDeepestElement (elements) {
         var dropzone,
@@ -1207,9 +1228,11 @@
         };
     }
 
-    function getDropEvents (dragEvent) {
+    function getDropEvents (dragEvent, starting) {
         var dragLeaveEvent = null,
             dragEnterEvent = null,
+            dropActivateEvent = null,
+            dropDectivateEvent = null,
             dropEvent = null;
 
         if (dropElement !== prevDropElement) {
@@ -1228,11 +1251,19 @@
         if (dragEvent.type === 'dragend' && dropTarget) {
             dropEvent = new InteractEvent(event, 'drop', null, dropElement, dragEvent.target);
         }
+        if (dragEvent.type === 'dragmove' && starting) {
+            dropActivateEvent = new InteractEvent(event, 'drop', 'activate', null, dragEvent.target);
+        }
+        if (dragEvent.type === 'dragend' && !starting) {
+            dropDectivateEvent = new InteractEvent(event, 'drop', 'deactivate', null, dragEvent.target);
+        }
 
         return {
-            leave: dragLeaveEvent,
-            enter: dragEnterEvent,
-            drop : dropEvent
+            leave       : dragLeaveEvent,
+            enter       : dragEnterEvent,
+            activate    : dropActivateEvent,
+            deactivate  : dropDectivateEvent,
+            drop        : dropEvent
         };
     }
 
@@ -2366,7 +2397,7 @@
         dragEvent  = new InteractEvent(event, 'drag', 'move');
 
         var draggableElement = target._element,
-            drop = getDrop(dragEvent, draggableElement);
+            drop = getDrop(dragEvent, draggableElement, starting);
 
         dropTarget = drop.dropzone;
         dropElement = drop.element;
@@ -2375,12 +2406,15 @@
         // restored after dropChecks
         target._element = draggableElement;
 
-        var dropEvents = getDropEvents(dragEvent);
+        var dropEvents = getDropEvents(dragEvent, starting);
 
         target.fire(dragEvent);
 
         if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
         if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+        if (dropEvents.activate) {
+            fireActiveDrops(dropEvents.activate); 
+        }
 
         prevDropTarget  = dropTarget;
         prevDropElement = dropElement;
@@ -2757,6 +2791,9 @@
             if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
             if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
             if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
+            if (dropEvents.deactivate) {
+                fireActiveDrops(dropEvents.deactivate);
+            }
         }
         else if (resizing) {
             endEvent = new InteractEvent(event, 'resize', 'end');
