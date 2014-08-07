@@ -1208,7 +1208,7 @@
                 currentElement = activeDrops.elements [j],
                 rect           = activeDrops.rects    [j];
 
-            validDrops.push(current.dropCheck(event, target, element, rect)
+            validDrops.push(current.dropCheck(event, target, dragElement, rect)
                             ? currentElement
                             : null);
         }
@@ -1228,7 +1228,7 @@
         };
     }
 
-    function getDropEvents (dragEvent, starting) {
+    function getDropEvents (pointerEvent, dragEvent, starting) {
         var dragLeaveEvent = null,
             dragEnterEvent = null,
             dropActivateEvent = null,
@@ -1238,24 +1238,24 @@
         if (dropElement !== prevDropElement) {
             // if there was a prevDropTarget, create a dragleave event
             if (prevDropTarget) {
-                dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', prevDropElement, dragEvent.target);
+                dragLeaveEvent = new InteractEvent(pointerEvent, 'drag', 'leave', prevDropElement, dragEvent.target);
                 dragEvent.dragLeave = prevDropElement;
             }
             // if the dropTarget is not null, create a dragenter event
             if (dropTarget) {
-                dragEnterEvent = new InteractEvent(event, 'drag', 'enter', dropElement, dragEvent.target);
+                dragEnterEvent = new InteractEvent(pointerEvent, 'drag', 'enter', dropElement, dragEvent.target);
                 dragEvent.dragEnter = dropElement;
             }
         }
 
         if (dragEvent.type === 'dragend' && dropTarget) {
-            dropEvent = new InteractEvent(event, 'drop', null, dropElement, dragEvent.target);
+            dropEvent = new InteractEvent(pointerEvent, 'drop', null, dropElement, dragEvent.target);
         }
         if (dragEvent.type === 'dragmove' && starting) {
-            dropActivateEvent = new InteractEvent(event, 'drop', 'activate', null, dragEvent.target);
+            dropActivateEvent = new InteractEvent(pointerEvent, 'drop', 'activate', null, dragEvent.target);
         }
         if (dragEvent.type === 'dragend' && !starting) {
-            dropDectivateEvent = new InteractEvent(event, 'drop', 'deactivate', null, dragEvent.target);
+            dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
         }
 
         return {
@@ -2406,7 +2406,7 @@
         // restored after dropChecks
         target._element = draggableElement;
 
-        var dropEvents = getDropEvents(dragEvent, starting);
+        var dropEvents = getDropEvents(event, dragEvent, starting);
 
         target.fire(dragEvent);
 
@@ -2784,7 +2784,7 @@
                 endEvent.dragLeave = prevDropElement;
             }
 
-            var dropEvents = getDropEvents(endEvent);
+            var dropEvents = getDropEvents(event, endEvent);
 
             target.fire(endEvent);
 
