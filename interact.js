@@ -809,7 +809,7 @@
     }
 
     function touchBBox (event) {
-        if (!(event.touches && event.touches.length) && !(PointerEvent && pointerMoves.length)) {
+        if (!(event.touches && event.touches.length) && !(pointerMoves.length)) {
             return;
         }
 
