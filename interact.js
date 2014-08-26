@@ -144,6 +144,8 @@
             resizeAxis  : 'xy',
             gesturable  : false,
 
+            pointerMoveTolerance: 1,
+
             actionChecker: null,
 
             styleCursor: true,
@@ -2137,7 +2139,7 @@
             dx = curCoords.clientX - startCoords.clientX;
             dy = curCoords.clientY - startCoords.clientY;
 
-            pointerWasMoved = hypot(dx, dy) > 1;
+            pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
         }
 
         // return if there is no prepared action
@@ -4916,6 +4918,25 @@
         }
 
         return this;
+    };
+
+    /*\
+     * interact.pointerMoveTolerance
+     [ method ]
+     * Returns or sets the distance the pointer must be moved before an action
+     * sequence occurs. This also affects tolerance for tap events.
+     *
+     - newValue (number) #optional The movement from the start position must be greater than this value
+     = (number | Interactable) The current setting or interact
+    \*/
+    interact.pointerMoveTolerance = function (newValue) {
+        if (typeof newValue === 'number') {
+            defaultOptions.pointerMoveTolerance = newValue;
+
+            return this;
+        }
+
+        return defaultOptions.pointerMoveTolerance;
     };
 
     if (PointerEvent) {
