@@ -2410,11 +2410,11 @@
 
         target.fire(dragEvent);
 
-        if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
-        if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
         if (dropEvents.activate) {
             fireActiveDrops(dropEvents.activate); 
         }
+        if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+        if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
 
         prevDropTarget  = dropTarget;
         prevDropElement = dropElement;
