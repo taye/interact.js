@@ -4310,9 +4310,9 @@
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
             var settings = [
-                    'accept', 'actionChecker', 'allowFrom', 'autoScroll',
-                    'dropChecker', 'ignoreFrom', 'inertia', 'origin',
-                    'rectChecker', 'restrict', 'snap'
+                    'accept', 'actionChecker', 'allowFrom', 'autoScroll', 'deltaSource',
+                    'dropChecker', 'ignoreFrom', 'inertia', 'origin', 'preventDefault',
+                    'rectChecker', 'restrict', 'snap', 'styleCursor'
                 ];
 
             for (var i = 0, len = settings.length; i < len; i++) {
