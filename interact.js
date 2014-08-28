@@ -973,7 +973,7 @@
     function testIgnore (interactable, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!element || !isElement(element)) { return false; }
+        if (!isElement(element)) { return false; }
 
         if (typeof ignoreFrom === 'string') {
             return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
@@ -3872,9 +3872,9 @@
          *
          * If the target of the `mousedown`, `pointerdown` or `touchstart`
          * event or any of it's parents match the given CSS selector or
-         * Element, no action is performed.
+         * Element, no drag/resize/gesture is started.
          *
-         - newValue (string | Element) #optional a CSS selector string, an Element or `null` to not ignore any elements
+         - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
          = (string | Element | object) The current ignoreFrom value or this Interactable
          **
          | interact(element, { ignoreFrom: document.getElementById('no-action') });
@@ -3882,20 +3882,23 @@
          | interact(element).ignoreFrom('input, textarea, a');
         \*/
         ignoreFrom: function (newValue) {
-            if (typeof newValue === 'string'            // CSS selector to match event.target
-                || isElement(newValue)) {       // or a specific element
-
+            if (typeof newValue === 'string') {     // CSS selector to match event.target
+                document.querySelector(newValue);   // test the selector
                 this.options.ignoreFrom = newValue;
-
                 return this;
             }
-            else if (newValue === null) {
+
+            if (isElement(newValue)) {              // specific element
+                this.options.ignoreFrom = newValue;
+                return this;
+            }
+
+            if (newValue === null) {
                 delete this.options.ignoreFrom;
-
                 return this;
             }
 
-            return this.options.ignoreFrom;
+            return this.options.allowFrom;
         },
 
         /*\
