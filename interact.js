@@ -4304,8 +4304,8 @@
             }
             this.options = new IOptions(options);
 
-            this.draggable  ('draggable'   in options? options.draggable  : this.options.draggable  );
-            this.dropzone   ('dropzone'    in options? options.dropzone   : this.options.dropzone   );
+            this.draggable ('draggable'  in options? options.draggable : this.options.draggable );
+            this.dropzone  ('dropzone'   in options? options.dropzone  : this.options.dropzone  );
             this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
