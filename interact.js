@@ -985,6 +985,23 @@
         return false;
     }
 
+    function testAllow (interactable, element) {
+        var allowFrom = interactable.options.allowFrom;
+
+        if (!allowFrom) { return true; }
+
+        if (!isElement(element)) { return false; }
+
+        if (typeof allowFrom === 'string') {
+            return matchesSelector(element, allowFrom) || testAllow(interactable, element.parentNode);
+        }
+        else if (isElement(allowFrom)) {
+            return element === allowFrom || nodeContains(allowFrom, element);
+        }
+
+        return false;
+    }
+
     function checkAndPreventDefault (event, interactable) {
         if (!interactable) { return; }
 
@@ -1653,6 +1670,7 @@
             if (element !== document
                 && inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
+                && testAllow(interactable, eventTarget)
                 && matchesSelector(element, selector, elements)) {
 
                 tapTargets.push(interactable);
@@ -1791,6 +1809,7 @@
 
             if (inContext(interactable, element)
                 && !testIgnore(interactable, eventTarget)
+                && testAllow(interactable, eventTarget)
                 && matchesSelector(element, selector, elements)) {
 
                 interactable._element = element;
@@ -1847,7 +1866,8 @@
 
             var interactable = interactables.get(event.currentTarget);
 
-            if (!testIgnore(interactable, event.target)) {
+            if (!testIgnore(interactable, event.target)
+                && testAllow(interactable, event.target)) {
                 target = interactable;
             }
         }
@@ -2207,6 +2227,7 @@
 
                                 if (inContext(interactable, eventTarget)
                                     && !testIgnore(interactable, eventTarget)
+                                    && testAllow(interactable, eventTarget)
                                     && matchesSelector(element, selector, elements)
                                     && interactable.getAction(downEvent) === 'drag'
                                     && checkAxis(axis, interactable)) {
@@ -2520,22 +2541,27 @@
                 ? event.target.correspondingUseElement
                 : event.target);
 
-        if (target && testIgnore(target, eventTarget)) {
-            // if the eventTarget should be ignored clear the previous target
+        if (target
+            && (testIgnore(target, eventTarget) || !testAllow(target, eventTarget))) {
+            // if the eventTarget should be ignored or shouldn't be allowed
+            // clear the previous target
             target = null;
             matches = [];
         }
 
         var elementInteractable = interactables.get(eventTarget),
-            elementAction = elementInteractable && !testIgnore(elementInteractable, eventTarget)
-                     && validateAction(
-                         elementInteractable.getAction(event),
-                         elementInteractable);
+            elementAction = (elementInteractable
+                             && !testIgnore(elementInteractable, eventTarget)
+                             && testAllow(elementInteractable, eventTarget)
+                             && validateAction(
+                                 elementInteractable.getAction(event),
+                                 elementInteractable));
 
         function pushCurMatches (interactable, selector) {
             if (interactable
                 && inContext(interactable, eventTarget)
                 && !testIgnore(interactable, eventTarget)
+                && testAllow(interactable, eventTarget)
                 && matchesSelector(eventTarget, selector)) {
 
                 interactable._element = eventTarget;
@@ -3902,6 +3928,41 @@
         },
 
         /*\
+         * Interactable.allowFrom
+         [ method ]
+         *
+         * A drag/resize/gesture is started only If the target of the
+         * `mousedown`, `pointerdown` or `touchstart` event or any of it's
+         * parents match the given CSS selector or Element.
+         *
+         - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
+         = (string | Element | object) The current allowFrom value or this Interactable
+         **
+         | interact(element, { allowFrom: document.getElementById('drag-handle') });
+         | // or
+         | interact(element).allowFrom('.handle');
+        \*/
+        allowFrom: function (newValue) {
+            if (typeof newValue === 'string') {     // CSS selector to match event.target
+                document.querySelector(newValue);   // test the selector
+                this.options.allowFrom = newValue;
+                return this;
+            }
+
+            if (isElement(newValue)) {              // specific element
+                this.options.allowFrom = newValue;
+                return this;
+            }
+
+            if (newValue === null) {
+                delete this.options.allowFrom;
+                return this;
+            }
+
+            return this.options.allowFrom;
+        },
+
+        /*\
          * Interactable.validateSetting
          [ method ]
          *
@@ -4249,7 +4310,7 @@
             this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
 
             var settings = [
-                    'accept', 'actionChecker', 'autoScroll',
+                    'accept', 'actionChecker', 'allowFrom', 'autoScroll',
                     'dropChecker', 'ignoreFrom', 'inertia', 'origin',
                     'rectChecker', 'restrict', 'snap'
                 ];
