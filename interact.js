@@ -903,6 +903,24 @@
         return origin;
     }
 
+    function calcInertia (status) {
+        var inertiaOptions = status.target.options.inertia,
+            lambda = inertiaOptions.resistance,
+            inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
+
+        status.x0 = prevEvent.pageX;
+        status.y0 = prevEvent.pageY;
+        status.t0 = status.startEvent.timeStamp / 1000;
+        status.sx = status.sy = 0;
+
+        status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+        status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+        status.te = inertiaDur;
+
+        status.lambda_v0 = lambda / status.v0;
+        status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+    }
+
     function inertiaFrame () {
         var options = inertiaStatus.target.options.inertia,
             lambda = options.resistance,
@@ -2670,7 +2688,8 @@
         }
 
         var endEvent,
-            inertiaOptions = target && target.options.inertia,
+            options = target && target.options,
+            inertiaOptions = options && options.inertia,
             prop;
 
         if (dragging || resizing || gesturing) {
@@ -2678,21 +2697,21 @@
             if (inertiaStatus.active) { return; }
 
             var deltaSource =target.options.deltaSource,
-                pointerSpeed = pointerDelta[deltaSource + 'Speed'];
+                pointerSpeed = pointerDelta[deltaSource + 'Speed'],
+                inertia = false;
 
             // check if inertia should be started
-            if (target.options.inertiaEnabled
+            inertia = (target.options.inertiaEnabled
                 && prepared !== 'gesture'
                 && indexOf(inertiaOptions.actions, prepared) !== -1
                 && event !== inertiaStatus.startEvent
                 && (new Date().getTime() - curCoords.timeStamp) < 50
                 && pointerSpeed > inertiaOptions.minSpeed
-                && pointerSpeed > inertiaOptions.endSpeed) {
+                && pointerSpeed > inertiaOptions.endSpeed);
 
-
-                var lambda = inertiaOptions.resistance,
-                    inertiaDur = -Math.log(inertiaOptions.endSpeed / pointerSpeed) / lambda,
-                    startEvent;
+            // check if inertia should be started
+            if (inertia) {
+                var startEvent;
 
                 inertiaStatus.active = true;
                 inertiaStatus.target = target;
@@ -2715,21 +2734,14 @@
                 inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
                 inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
                 inertiaStatus.v0 = pointerSpeed;
-                inertiaStatus.x0 = prevEvent.pageX;
-                inertiaStatus.y0 = prevEvent.pageY;
-                inertiaStatus.t0 = inertiaStatus.startEvent.timeStamp / 1000;
-                inertiaStatus.sx = inertiaStatus.sy = 0;
 
-                inertiaStatus.modifiedXe = inertiaStatus.xe = (inertiaStatus.vx0 - inertiaDur) / lambda;
-                inertiaStatus.modifiedYe = inertiaStatus.ye = (inertiaStatus.vy0 - inertiaDur) / lambda;
-                inertiaStatus.te = inertiaDur;
-
-                inertiaStatus.lambda_v0 = lambda / inertiaStatus.v0;
-                inertiaStatus.one_ve_v0 = 1 - inertiaOptions.endSpeed / inertiaStatus.v0;
+                calcInertia(inertiaStatus);
 
                 var startX = startEvent.pageX,
                     startY = startEvent.pageY,
-                    statusObject;
+                    statusObject,
+                    dx = 0,
+                    dy = 0;
 
                 if (startEvent.snap && startEvent.snap.locked) {
                     startX -= startEvent.snap.dx;
@@ -2756,17 +2768,20 @@
                     var snap = setSnapping(event, statusObject);
 
                     if (snap.locked) {
-                        inertiaStatus.modifiedXe += snap.dx;
-                        inertiaStatus.modifiedYe += snap.dy;
+                        dx += snap.dx;
+                        dy += snap.dy;
                     }
                 }
 
                 if (target.options.restrictEnabled && target.options.restrict.endOnly) {
                     var restrict = setRestriction(event, statusObject);
 
-                    inertiaStatus.modifiedXe += restrict.dx;
-                    inertiaStatus.modifiedYe += restrict.dy;
+                    dx += restrict.dx;
+                    dy += restrict.dy;
                 }
+
+                inertiaStatus.modifiedXe += dx;
+                inertiaStatus.modifiedYe += dy;
 
                 cancelFrame(inertiaStatus.i);
                 inertiaStatus.i = reqFrame(inertiaFrame);
