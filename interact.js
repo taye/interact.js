@@ -2748,7 +2748,8 @@
                        && pointerSpeed > inertiaOptions.endSpeed);
 
             if (inertiaPossible && !inertia
-                && ((options.snapEnabled && options.snap.endOnly)
+                && ((options.snapEnabled && options.snap.endOnly
+                    && indexOf(options.snap.actions, prepared) !== -1)
                     || (options.restrictEnabled && options.restrict.endOnly))) {
 
                 var snapRestrict = {};
@@ -2818,7 +2819,9 @@
 
                     dx = dy = 0;
 
-                    if (target.options.snapEnabled && target.options.snap.endOnly) {
+                    if (target.options.snapEnabled && target.options.snap.endOnly
+                        && indexOf(target.options.snap.actions, prepared) !== -1) {
+
                         var snap = setSnapping(event, statusObject);
 
                         if (snap.locked) {
