@@ -3924,7 +3924,7 @@
                 return this;
             }
 
-            return this.options.allowFrom;
+            return this.options.ignoreFrom;
         },
 
         /*\
