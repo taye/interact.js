@@ -1367,8 +1367,8 @@
                 this.snap = {
                     range  : snapStatus.range,
                     locked : snapStatus.locked,
-                    x      : snapStatus.x,
-                    y      : snapStatus.y,
+                    x      : snapStatus.snappedX,
+                    y      : snapStatus.snappedY,
                     realX  : snapStatus.realX,
                     realY  : snapStatus.realY,
                     dx     : snapStatus.dx,
@@ -1960,8 +1960,8 @@
 
             prepared = action;
 
-            snapStatus.x = null;
-            snapStatus.y = null;
+            snapStatus.snappedX = null;
+            snapStatus.snappedY = null;
 
             downTime = new Date().getTime();
             downEvent = event;
@@ -2096,8 +2096,8 @@
             inRange = closest.inRange;
             snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
 
-            status.x = closest.anchor.x;
-            status.y = closest.anchor.y;
+            status.snappedX = closest.anchor.x;
+            status.snappedY = closest.anchor.y;
             status.dx = closest.dx;
             status.dy = closest.dy;
         }
@@ -2116,8 +2116,8 @@
             inRange = distance < snap.range;
             snapChanged = (newX !== status.x || newY !== status.y);
 
-            status.x = newX;
-            status.y = newY;
+            status.snappedX = newX;
+            status.snappedY = newY;
             status.dx = dx;
             status.dy = dy;
 
@@ -4862,8 +4862,8 @@
             paths     : snap.paths,
             range     : snap.range,
             locked    : snapStatus.locked,
-            x         : snapStatus.x,
-            y         : snapStatus.y,
+            x         : snapStatus.snappedX,
+            y         : snapStatus.snappedY,
             realX     : snapStatus.realX,
             realY     : snapStatus.realY,
             dx        : snapStatus.dx,
