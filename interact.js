@@ -2756,12 +2756,16 @@
                 snapRestrict.snap = snapRestrict.restrict = snapRestrict;
 
                 setSnapping(event, snapRestrict);
-                dx += snapRestrict.dx;
-                dy += snapRestrict.dy;
+                if (snapRestrict.locked) {
+                    dx += snapRestrict.dx;
+                    dy += snapRestrict.dy;
+                }
 
                 setRestriction(event, snapRestrict);
-                dx += snapRestrict.dx;
-                dy += snapRestrict.dy;
+                if (snapRestrict.restricted) {
+                    dx += snapRestrict.dx;
+                    dy += snapRestrict.dy;
+                }
 
                 if ((snapRestrict.locked || snapRestrict.restricted) && (dx || dy)) {
                     smoothEnd = true;
@@ -2785,63 +2789,53 @@
 
                 inertiaStatus.target = target;
                 inertiaStatus.targetElement = target._element;
-            }
-
-            if (inertia) {
-                inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
-                inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
-                inertiaStatus.v0 = pointerSpeed;
-
-                calcInertia(inertiaStatus);
-            }
-
-            if (inertia || smoothEnd) {
-                var startX = startEvent.pageX,
-                    startY = startEvent.pageY,
-                    statusObject;
-
-                if (startEvent.snap && startEvent.snap.locked) {
-                    startX -= startEvent.snap.dx;
-                    startY -= startEvent.snap.dy;
-                }
-
-                if (startEvent.restrict) {
-                    startX -= startEvent.restrict.dx;
-                    startY -= startEvent.restrict.dy;
-                }
-
-                statusObject = {
-                    useStatusXY: true,
-                    x: inertia? startX + inertiaStatus.xe: startX,
-                    y: inertia? startY + inertiaStatus.ye: startY,
-                    dx: 0,
-                    dy: 0,
-                    snap: null
-                };
-
-                statusObject.snap = statusObject;
-
-                dx = dy = 0;
-
-                if (target.options.snapEnabled && target.options.snap.endOnly) {
-                    var snap = setSnapping(event, statusObject);
-
-                    if (snap.locked) {
-                        dx += snap.dx;
-                        dy += snap.dy;
-                    }
-                }
-
-                if (target.options.restrictEnabled && target.options.restrict.endOnly) {
-                    var restrict = setRestriction(event, statusObject);
-
-                    if (restrict.restricted) {
-                        dx += restrict.dx;
-                        dy += restrict.dy;
-                    }
-                }
+                inertiaStatus.t0 = now;
 
                 if (inertia) {
+                    inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
+                    inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
+                    inertiaStatus.v0 = pointerSpeed;
+
+                    calcInertia(inertiaStatus);
+
+                    var page = getPageXY(event),
+                        origin = getOriginXY(target, target._element),
+                        statusObject;
+
+                    page.x = page.x + (inertia? inertiaStatus.xe: 0) - origin.x;
+                    page.y = page.y + (inertia? inertiaStatus.ye: 0) - origin.y;
+
+                    statusObject = {
+                        useStatusXY: true,
+                        x: page.x,
+                        y: page.y,
+                        dx: 0,
+                        dy: 0,
+                        snap: null
+                    };
+
+                    statusObject.snap = statusObject;
+
+                    dx = dy = 0;
+
+                    if (target.options.snapEnabled && target.options.snap.endOnly) {
+                        var snap = setSnapping(event, statusObject);
+
+                        if (snap.locked) {
+                            dx += snap.dx;
+                            dy += snap.dy;
+                        }
+                    }
+
+                    if (target.options.restrictEnabled && target.options.restrict.endOnly) {
+                        var restrict = setRestriction(event, statusObject);
+
+                        if (restrict.restricted) {
+                            dx += restrict.dx;
+                            dy += restrict.dy;
+                        }
+                    }
+
                     inertiaStatus.modifiedXe += dx;
                     inertiaStatus.modifiedYe += dy;
 
@@ -2849,7 +2843,6 @@
                 }
                 else {
                     inertiaStatus.smoothEnd = true;
-                    inertiaStatus.t0 = now;
                     inertiaStatus.xe = dx;
                     inertiaStatus.ye = dy;
 
