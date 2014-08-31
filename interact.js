@@ -75,17 +75,20 @@
 
         inertiaStatus = {
             active       : false,
+            smoothEnd    : false,
             target       : null,
             targetElement: null,
 
             startEvent: null,
             pointerUp : {},
 
-            xe : 0,
-            ye : 0,
+            xe: 0,
+            ye: 0,
+            sx: 0,
+            sy: 0,
             duration: 0,
 
-            t0 : 0,
+            t0: 0,
             vx0: 0,
             vys: 0,
 
@@ -960,6 +963,27 @@
         }
     }
 
+    function smoothEndFrame () {
+        var t = new Date().getTime() - inertiaStatus.t0,
+            duration = 500;
+
+        if (t < duration) {
+            inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
+            inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
+
+            pointerMove(inertiaStatus.startEvent);
+
+            inertiaStatus.i = reqFrame(smoothEndFrame);
+        }
+        else {
+            inertiaStatus.active = false;
+            inertiaStatus.smoothEnd = false;
+
+            pointerMove(inertiaStatus.startEvent);
+            pointerUp(inertiaStatus.startEvent);
+        }
+    }
+
     function _getQBezierValue(t, p1, p2, p3) {
         var iT = 1 - t;
         return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
@@ -970,6 +994,12 @@
             x:  _getQBezierValue(position, startX, cpX, endX),
             y:  _getQBezierValue(position, startY, cpY, endY)
         };
+    }
+
+    // http://gizma.com/easing/
+    function easeOutQuad (t, b, c, d) {
+        t /= d;
+        return -c * t*(t-2) + b;
     }
 
     function nodeContains (parent, child) {
@@ -2698,25 +2728,47 @@
 
             var deltaSource =target.options.deltaSource,
                 pointerSpeed = pointerDelta[deltaSource + 'Speed'],
-                inertia = false;
+                now = new Date().getTime(),
+                inertiaPossible = false,
+                inertia = false,
+                smoothEnd = false,
+                dx = 0,
+                dy = 0,
+                startEvent;
 
             // check if inertia should be started
-            inertia = (target.options.inertiaEnabled
-                && prepared !== 'gesture'
-                && indexOf(inertiaOptions.actions, prepared) !== -1
-                && event !== inertiaStatus.startEvent
-                && (new Date().getTime() - curCoords.timeStamp) < 50
-                && pointerSpeed > inertiaOptions.minSpeed
-                && pointerSpeed > inertiaOptions.endSpeed);
+            inertiaPossible = (target.options.inertiaEnabled
+                               && prepared !== 'gesture'
+                               && indexOf(inertiaOptions.actions, prepared) !== -1
+                               && event !== inertiaStatus.startEvent);
 
-            // check if inertia should be started
-            if (inertia) {
-                var startEvent;
+            inertia = (inertiaPossible
+                       && (now - curCoords.timeStamp) < 50
+                       && pointerSpeed > inertiaOptions.minSpeed
+                       && pointerSpeed > inertiaOptions.endSpeed);
 
-                inertiaStatus.active = true;
-                inertiaStatus.target = target;
-                inertiaStatus.targetElement = target._element;
+            if (inertiaPossible && !inertia
+                && ((options.snapEnabled && options.snap.endOnly)
+                    || (options.restrictEnabled && options.restrict.endOnly))) {
 
+                var snapRestrict = {};
+
+                snapRestrict.snap = snapRestrict.restrict = snapRestrict;
+
+                setSnapping(event, snapRestrict);
+                dx += snapRestrict.dx;
+                dy += snapRestrict.dy;
+
+                setRestriction(event, snapRestrict);
+                dx += snapRestrict.dx;
+                dy += snapRestrict.dy;
+
+                if ((snapRestrict.locked || snapRestrict.restricted) && (dx || dy)) {
+                    smoothEnd = true;
+                }
+            }
+
+            if (inertia || smoothEnd) {
                 if (events.useAttachEvent) {
                     // make a copy of the pointerdown event because IE8
                     // http://stackoverflow.com/a/3533725/2280888
@@ -2731,17 +2783,22 @@
                 inertiaStatus.startEvent = startEvent = new InteractEvent(event, prepared, 'inertiastart');
                 target.fire(inertiaStatus.startEvent);
 
+                inertiaStatus.target = target;
+                inertiaStatus.targetElement = target._element;
+            }
+
+            if (inertia) {
                 inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
                 inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
                 inertiaStatus.v0 = pointerSpeed;
 
                 calcInertia(inertiaStatus);
+            }
 
+            if (inertia || smoothEnd) {
                 var startX = startEvent.pageX,
                     startY = startEvent.pageY,
-                    statusObject,
-                    dx = 0,
-                    dy = 0;
+                    statusObject;
 
                 if (startEvent.snap && startEvent.snap.locked) {
                     startX -= startEvent.snap.dx;
@@ -2755,14 +2812,16 @@
 
                 statusObject = {
                     useStatusXY: true,
-                    x: startX + inertiaStatus.xe,
-                    y: startY + inertiaStatus.ye,
+                    x: inertia? startX + inertiaStatus.xe: startX,
+                    y: inertia? startY + inertiaStatus.ye: startY,
                     dx: 0,
                     dy: 0,
                     snap: null
                 };
 
                 statusObject.snap = statusObject;
+
+                dx = dy = 0;
 
                 if (target.options.snapEnabled && target.options.snap.endOnly) {
                     var snap = setSnapping(event, statusObject);
@@ -2776,16 +2835,30 @@
                 if (target.options.restrictEnabled && target.options.restrict.endOnly) {
                     var restrict = setRestriction(event, statusObject);
 
-                    dx += restrict.dx;
-                    dy += restrict.dy;
+                    if (restrict.restricted) {
+                        dx += restrict.dx;
+                        dy += restrict.dy;
+                    }
                 }
 
-                inertiaStatus.modifiedXe += dx;
-                inertiaStatus.modifiedYe += dy;
+                if (inertia) {
+                    inertiaStatus.modifiedXe += dx;
+                    inertiaStatus.modifiedYe += dy;
 
-                cancelFrame(inertiaStatus.i);
-                inertiaStatus.i = reqFrame(inertiaFrame);
+                    inertiaStatus.i = reqFrame(inertiaFrame);
+                }
+                else {
+                    inertiaStatus.smoothEnd = true;
+                    inertiaStatus.t0 = now;
+                    inertiaStatus.xe = dx;
+                    inertiaStatus.ye = dy;
 
+                    inertiaStatus.sx = inertiaStatus.sy = 0;
+
+                    inertiaStatus.i = reqFrame(smoothEndFrame);
+                }
+
+                inertiaStatus.active = true;
                 return;
             }
 
