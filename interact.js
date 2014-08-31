@@ -196,8 +196,9 @@
                 endSpeed       : 10,    // the speed at which inertia is slow enough to stop
                 actions        : ['drag', 'resize'],
                 zeroResumeDelta: false,
+                smoothEndDuration: 300,
 
-                numberTypes: /^resistance$|^minSpeed$|^endSpeed$/,
+                numberTypes: /^resistance$|^minSpeed$|^endSpeed$|^smoothEndDuration$/,
                 arrayTypes : /^actions$/,
                 boolTypes: /^zeroResumeDelta$/
             },
@@ -965,7 +966,7 @@
 
     function smoothEndFrame () {
         var t = new Date().getTime() - inertiaStatus.t0,
-            duration = 500;
+            duration = inertiaStatus.target.options.inertia.smoothEndDuration;
 
         if (t < duration) {
             inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
@@ -3661,7 +3662,8 @@
                        minSpeed       : defaults.minSpeed,
                        endSpeed       : defaults.endSpeed,
                        actions        : defaults.actions,
-                       zeroResumeDelta: defaults.zeroResumeDelta
+                       zeroResumeDelta: defaults.zeroResumeDelta,
+                       smoothEndDuration: defaults.smoothEndDuration
                    };
                 }
 
@@ -3670,6 +3672,7 @@
                 inertia.endSpeed        = this.validateSetting('inertia', 'endSpeed'       , options.endSpeed);
                 inertia.actions         = this.validateSetting('inertia', 'actions'        , options.actions);
                 inertia.zeroResumeDelta = this.validateSetting('inertia', 'zeroResumeDelta', options.zeroResumeDelta);
+                inertia.smoothEndDuration = this.validateSetting('inertia', 'smoothEndDuration', options.smoothEndDuration);
 
                 this.options.inertiaEnabled = true;
                 this.options.inertia = inertia;
@@ -4889,6 +4892,7 @@
             if (typeof options.resistance === 'number') { inertia.resistance = options.resistance;}
             if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
             if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
+            if (typeof options.smoothEndDuration   === 'number') { inertia.smoothEndDuration   = options.smoothEndDuration  ;}
 
             if (typeof options.zeroResumeDelta === 'boolean') { inertia.zeroResumeDelta = options.zeroResumeDelta  ;}
 
