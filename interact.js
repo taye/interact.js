@@ -2726,7 +2726,7 @@
 
             if (inertiaStatus.active) { return; }
 
-            var deltaSource =target.options.deltaSource,
+            var deltaSource = options.deltaSource,
                 pointerSpeed = pointerDelta[deltaSource + 'Speed'],
                 now = new Date().getTime(),
                 inertiaPossible = false,
@@ -2737,7 +2737,7 @@
                 startEvent;
 
             // check if inertia should be started
-            inertiaPossible = (target.options.inertiaEnabled
+            inertiaPossible = (options.inertiaEnabled
                                && prepared !== 'gesture'
                                && indexOf(inertiaOptions.actions, prepared) !== -1
                                && event !== inertiaStatus.startEvent);
@@ -2819,8 +2819,8 @@
 
                     dx = dy = 0;
 
-                    if (target.options.snapEnabled && target.options.snap.endOnly
-                        && indexOf(target.options.snap.actions, prepared) !== -1) {
+                    if (options.snapEnabled && options.snap.endOnly
+                        && indexOf(options.snap.actions, prepared) !== -1) {
 
                         var snap = setSnapping(event, statusObject);
 
@@ -2830,7 +2830,7 @@
                         }
                     }
 
-                    if (target.options.restrictEnabled && target.options.restrict.endOnly) {
+                    if (options.restrictEnabled && options.restrict.endOnly) {
                         var restrict = setRestriction(event, statusObject);
 
                         if (restrict.restricted) {
@@ -2858,8 +2858,8 @@
                 return;
             }
 
-            if ((target.options.snapEnabled && target.options.snap.endOnly)
-                || (target.options.restrictEnabled && target.options.restrict.endOnly)) {
+            if ((options.snapEnabled && options.snap.endOnly)
+                || (options.restrictEnabled && options.restrict.endOnly)) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
