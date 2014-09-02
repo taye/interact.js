@@ -3041,14 +3041,14 @@
                     dropdeactivate  = phases.ondropdeactivate   || phases.onDropDeactivate  || phases.dropdeactivate,
                     dragenter       = phases.ondragenter        || phases.onDropEnter       || phases.dragenter,
                     dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave,
-                    dragmove        = phases.ondragmove         || phases.onDropMove        || phases.dragmove;
+                    dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove;
 
                 if (typeof drop             === 'function') { this.ondrop           = drop; }
                 if (typeof dropactivate     === 'function') { this.ondropactivate   = dropactivate; }
                 if (typeof dropdeactivate   === 'function') { this.ondropdeactivate = dropdeactivate; }
                 if (typeof dragenter        === 'function') { this.ondragenter      = dragenter; }
                 if (typeof dragleave        === 'function') { this.ondragleave      = dragleave; }
-                if (typeof dragmove         === 'function') { this.ondragmove       = dragmove; }
+                if (typeof dropmove         === 'function') { this.ondropmove       = dropmove; }
             }
             else {
                 var start     = phases.onstart     || phases.onStart     || phases.start,
