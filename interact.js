@@ -71,6 +71,8 @@
         tapTime   = 0,         // time of the most recent tap event
         prevTap   = null,
 
+        startOffset = { left: 0, right: 0, top: 0, bottom: 0 },
+
         tmpXY = {},     // reduce object creation in getXY()
 
         inertiaStatus = {
@@ -162,8 +164,10 @@
                 anchors     : [],
                 paths       : [],
 
+                elementOrigin: { x: 0, y: 0 },
+
                 arrayTypes  : /^anchors$|^paths$|^actions$/,
-                objectTypes : /^grid$|^gridOffset$/,
+                objectTypes : /^grid$|^gridOffset$|^elementOrigin$/,
                 stringTypes : /^mode$/,
                 numberTypes : /^range$/,
                 boolTypes   :  /^endOnly$/
@@ -1041,6 +1045,22 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     }
 
+    function checkSnap (interactable, action) {
+        var options = interactable.options;
+
+        action = action || prepared;
+
+        return (options.snapEnabled && indexOf(options.snap.actions, action) !== -1);
+    }
+
+    function checkRestrict (interactable, action) {
+        var options = interactable.options;
+
+        action = action || prepared;
+
+        return options.restrictEnabled && options.restrict[action];
+    }
+
     function collectDrops (event, element) {
         var drops = [],
             elements = [],
@@ -1323,7 +1343,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (options.snapEnabled && indexOf(options.snap.actions, action) !== -1) {
+            if (checkSnap(target) && !(phase === 'start' && options.snap.elementOrigin)) {
 
                 this.snap = {
                     range  : snapStatus.range,
@@ -1345,7 +1365,7 @@
             }
         }
 
-        if (target.options.restrict[action] && restrictStatus.restricted) {
+        if (checkRestrict(target) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -1980,6 +2000,16 @@
         status.realX = page.x;
         status.realY = page.y;
 
+        var elementOffsetX = 0,
+            elementOffsetY = 0;
+
+        if (snap.elementOrigin) {
+            var rect = target.getRect();
+
+            elementOffsetX = startOffset.left + (rect.width  * snap.elementOrigin.x);
+            elementOffsetY = startOffset.top  + (rect.height * snap.elementOrigin.y);
+        }
+
         // change to infinite range when range is negative
         if (snap.range < 0) { snap.range = Infinity; }
 
@@ -2017,8 +2047,8 @@
 
                 range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
-                dx = anchor.x - page.x;
-                dy = anchor.y - page.y;
+                dx = anchor.x - page.x + elementOffsetX;
+                dy = anchor.y - page.y + elementOffsetY;
                 distance = hypot(dx, dy);
 
                 inRange = distance < range;
@@ -2063,11 +2093,11 @@
             status.dy = closest.dy;
         }
         else if (snap.mode === 'grid') {
-            var gridx = Math.round((page.x - snap.gridOffset.x) / snap.grid.x),
-                gridy = Math.round((page.y - snap.gridOffset.y) / snap.grid.y),
+            var gridx = Math.round((page.x - snap.gridOffset.x - elementOffsetX) / snap.grid.x),
+                gridy = Math.round((page.y - snap.gridOffset.y - elementOffsetY) / snap.grid.y),
 
-                newX = gridx * snap.grid.x + snap.gridOffset.x,
-                newY = gridy * snap.grid.y + snap.gridOffset.y;
+                newX = gridx * snap.grid.x + snap.gridOffset.x + elementOffsetX,
+                newY = gridy * snap.grid.y + snap.gridOffset.y + elementOffsetY;
 
             dx = newX - page.x;
             dy = newY - page.y;
@@ -2092,9 +2122,13 @@
     }
 
     function setRestriction (event, status) {
-        var action = interact.currentAction() || prepared,
-            restriction = target && target.options.restrict[action],
+        var restrict = target && target.options.restrict,
+            restriction = restrict && restrict[prepared],
             page;
+
+        if (!restriction) {
+            return status;
+        }
 
         status = status || restrictStatus;
 
@@ -2111,8 +2145,16 @@
         status.dy = 0;
         status.restricted = false;
 
-        if (!action || !restriction) {
-            return status;
+        var elementOffset = {};
+
+        if (restrict.elementRect) {
+            var elementRect = target.getRect();
+
+            elementOffset.left = startOffset.left - (elementRect.width  * restrict.elementRect.left);
+            elementOffset.top  = startOffset.top  - (elementRect.height * restrict.elementRect.top);
+
+            elementOffset.right  = startOffset.right  - (elementRect.width  * (1 - restrict.elementRect.right));
+            elementOffset.bottom = startOffset.bottom - (elementRect.height * (1 - restrict.elementRect.bottom));
         }
 
         var rect;
@@ -2147,8 +2189,8 @@
             }
         }
 
-        status.dx = Math.max(Math.min(rect.right , page.x), rect.left) - page.x;
-        status.dy = Math.max(Math.min(rect.bottom, page.y), rect.top ) - page.y;
+        status.dx = Math.max(Math.min(rect.right  - elementOffset.right , page.x), rect.left + elementOffset.left) - page.x;
+        status.dy = Math.max(Math.min(rect.bottom - elementOffset.bottom, page.y), rect.top  + elementOffset.top ) - page.y;
         status.restricted = true;
 
         return status;
@@ -2264,12 +2306,20 @@
             }
 
             if (prepared && target) {
-                var shouldRestrict = target.options.restrictEnabled && (!target.options.restrict.endOnly || preEnd),
+                var shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
                     starting = !(dragging || resizing || gesturing),
                     snapEvent = starting? downEvent: event;
 
                 if (starting) {
                     prevEvent = downEvent;
+
+                    var rect = target.getRect() || { left: 0, right: 0, top: 0, bottom: 0 };
+
+                    startOffset.left = startCoords.pageX - rect.left;
+                    startOffset.top  = startCoords.pageY - rect.top;
+
+                    startOffset.right = rect.right - startCoords.pageX;
+                    startOffset.bottom = rect.bottom - startCoords.pageY;
                 }
 
                 if (!shouldRestrict) {
@@ -2277,9 +2327,7 @@
                 }
 
                 // check for snap
-                if (target.options.snapEnabled
-                    && indexOf(target.options.snap.actions, prepared) !== -1
-                    && (!target.options.snap.endOnly || preEnd)) {
+                if (checkSnap(target) && (!target.options.snap.endOnly || preEnd)) {
 
                     setSnapping(snapEvent);
 
@@ -2775,7 +2823,7 @@
                     }
                 }
 
-                if (target.options.restrictEnabled && target.options.restrict.endOnly) {
+                if (checkRestrict(target) && target.options.restrict.endOnly) {
                     var restrict = setRestriction(event, statusObject);
 
                     inertiaStatus.modifiedXe += restrict.dx;
@@ -2788,8 +2836,8 @@
                 return;
             }
 
-            if ((target.options.snapEnabled && target.options.snap.endOnly)
-                || (target.options.restrictEnabled && target.options.restrict.endOnly)) {
+            if ((checkSnap(target) && target.options.snap.endOnly)
+                || (checkRestrict(target) && target.options.restrict.endOnly)) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
@@ -3516,6 +3564,7 @@
                 snap.grid       = this.validateSetting('snap', 'grid'      , options.grid);
                 snap.gridOffset = this.validateSetting('snap', 'gridOffset', options.gridOffset);
                 snap.anchors    = this.validateSetting('snap', 'anchors'   , options.anchors);
+                snap.elementOrigin    = this.validateSetting('snap', 'elementOrigin'   , options.elementOrigin);
 
                 this.options.snapEnabled = true;
                 this.options.snap = snap;
@@ -3877,6 +3926,10 @@
 
                 if (typeof newValue.endOnly === 'boolean') {
                     newRestrictions.endOnly = newValue.endOnly;
+                }
+
+                if (newValue.elementRect instanceof Object) {
+                    newRestrictions.elementRect = newValue.elementRect;
                 }
 
                 this.options.restrictEnabled = true;
@@ -4769,6 +4822,7 @@
             if (options.anchors    instanceof Array ) { snap.anchors    = options.anchors;    }
             if (options.grid       instanceof Object) { snap.grid       = options.grid;       }
             if (options.gridOffset instanceof Object) { snap.gridOffset = options.gridOffset; }
+            if (options.elementOrigin instanceof Object) { snap.elementOrigin = options.elementOrigin; }
 
             return interact;
         }
@@ -4987,6 +5041,10 @@
 
             if (typeof newValue.endOnly === 'boolean') {
                 defaults.endOnly = newValue.endOnly;
+            }
+
+            if (newValue.elementRect instanceof Object) {
+                defaults.elementRect = newValue.elementRect;
             }
         }
 
