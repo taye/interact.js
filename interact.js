@@ -2291,10 +2291,15 @@
                         }
 
                         if (starting) {
-                            actions[prepared].start(event);
+                            prevEvent = actions[prepared].start(downEvent);
+
+                            // set snapping for the next move event
+                            if (target.options.snapEnabled && !target.options.snap.endOnly) {
+                                setSnapping(event);
+                            }
                         }
 
-                        actions[prepared].move(event);
+                        prevEvent = actions[prepared].move(event);
                     }
                 }
                 // if no snap, always move
@@ -2304,10 +2309,15 @@
                     }
 
                     if (starting) {
-                        actions[prepared].start(event);
+                        prevEvent = actions[prepared].start(downEvent);
+
+                        // set snapping for the next move event
+                        if (target.options.snapEnabled && !target.options.snap.endOnly) {
+                            setSnapping(event);
+                        }
                     }
 
-                    actions[prepared].move(event);
+                    prevEvent = actions[prepared].move(event);
                 }
             }
         }
@@ -2409,7 +2419,7 @@
     }
 
     function dragStart (event) {
-        var dragEvent = new InteractEvent(downEvent, 'drag', 'start');
+        var dragEvent = new InteractEvent(event, 'drag', 'start');
 
         dragging = true;
 
@@ -2420,16 +2430,11 @@
         activeDrops.elements  = [];
         activeDrops.rects     = [];
 
-        prevEvent = dragEvent;
-
         if (!dynamicDrop) {
             setActiveDrops(target._element);
         }
 
-        // set snapping for the next move event
-        if (target.options.snapEnabled && !target.options.snap.endOnly) {
-            setSnapping(event);
-        }
+        return dragEvent;
     }
 
     function dragMove (event) {
@@ -2459,23 +2464,18 @@
         prevDropTarget  = dropTarget;
         prevDropElement = dropElement;
 
-        prevEvent = dragEvent;
+        return dragEvent;
     }
 
     function resizeStart (event) {
-        var resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
+        var resizeEvent = new InteractEvent(event, 'resize', 'start');
 
         target.fire(resizeEvent);
 
         target.fire(resizeEvent);
         resizing = true;
 
-        prevEvent = resizeEvent;
-
-        // set snapping for the next move event
-        if (target.options.snapEnabled && !target.options.snap.endOnly) {
-            setSnapping(event);
-        }
+        return resizeEvent;
     }
 
     function resizeMove (event) {
@@ -2486,11 +2486,11 @@
         resizeEvent = new InteractEvent(event, 'resize', 'move');
         target.fire(resizeEvent);
 
-        prevEvent = resizeEvent;
+        return resizeEvent;
     }
 
     function gestureStart (event) {
-        var gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
+        var gestureEvent = new InteractEvent(event, 'gesture', 'start');
 
         gestureEvent.ds = 0;
 
@@ -2502,12 +2502,7 @@
 
         target.fire(gestureEvent);
 
-        prevEvent = gestureEvent;
-
-        // set snapping for the next move event
-        if (target.options.snapEnabled && !target.options.snap.endOnly) {
-            setSnapping(event);
-        }
+        return gestureEvent;
     }
 
     function gestureMove (event) {
@@ -2524,8 +2519,6 @@
 
         target.fire(gestureEvent);
 
-        prevEvent = gestureEvent;
-
         gesture.prevAngle = gestureEvent.angle;
         gesture.prevDistance = gestureEvent.distance;
 
@@ -2536,6 +2529,8 @@
 
             gesture.scale = gestureEvent.scale;
         }
+
+        return gestureEvent;
     }
 
     function validateSelector (event, matches) {
