@@ -1365,7 +1365,7 @@
             }
         }
 
-        if (checkRestrict(target) && restrictStatus.restricted) {
+        if (checkRestrict(target) && !(phase === 'start' && options.restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
