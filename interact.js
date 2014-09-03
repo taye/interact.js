@@ -1719,7 +1719,6 @@
                     // stop inertia so that the next move will be a normal one
                     cancelFrame(inertiaStatus.i);
                     inertiaStatus.active = false;
-                    inertiaStatus.resumeDx = inertiaStatus.resumeDy = 0;
 
                     if (PointerEvent) {
                         // add the pointer to the gesture object
@@ -4790,6 +4789,7 @@
 
         pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
         prepared = prevEvent = null;
+        inertiaStatus.resumeDx = inertiaStatus.resumeDy = 0;
         // do not clear the downEvent so that it can be used to
         // test for browser-simulated mouse events after touch
 
