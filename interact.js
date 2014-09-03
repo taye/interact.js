@@ -1052,6 +1052,10 @@
 
         action = action || prepared;
 
+        if (/^resize/.test(action)) {
+            action = 'resize';
+        }
+
         return (options.snapEnabled && indexOf(options.snap.actions, action) !== -1);
     }
 
@@ -1059,6 +1063,10 @@
         var options = interactable.options;
 
         action = action || prepared;
+
+        if (/^resize/.test(action)) {
+            action = 'resize';
+        }
 
         return options.restrictEnabled && options.restrict[action];
     }
