@@ -180,7 +180,7 @@
                 gesture: null,
                 endOnly: false
             },
-            restrictEnabled: true,
+            restrictEnabled: false,
 
             autoScroll: {
                 container   : window,  // the item that is scrolled (Window or HTMLElement)
@@ -3911,7 +3911,10 @@
                 return this.options.restrict;
             }
 
-            if (newValue instanceof Object) {
+            if (typeof newValue === 'boolean') {
+                defaultOptions.restrictEnabled = newValue;
+            }
+            else if (newValue instanceof Object) {
                 var newRestrictions = {};
 
                 if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
@@ -3935,7 +3938,6 @@
                 this.options.restrictEnabled = true;
                 this.options.restrict = newRestrictions;
             }
-
             else if (newValue === null) {
                delete this.options.restrict;
                delete this.options.restrictEnabled;
@@ -5028,7 +5030,10 @@
             return defaultOptions.restrict;
         }
 
-        if (newValue instanceof Object) {
+        if (typeof newValue === 'boolean') {
+            defaultOptions.restrictEnabled = newValue;
+        }
+        else if (newValue instanceof Object) {
             if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
                 defaults.drag = newValue.drag;
             }
@@ -5046,8 +5051,9 @@
             if (newValue.elementRect instanceof Object) {
                 defaults.elementRect = newValue.elementRect;
             }
-        }
 
+            defaultOptions.restrictEnabled = true;
+        }
         else if (newValue === null) {
            defaults.drag = defaults.resize = defaults.gesture = null;
            defaults.endOnly = false;
