@@ -71,7 +71,9 @@
         tapTime   = 0,         // time of the most recent tap event
         prevTap   = null,
 
-        startOffset = { left: 0, right: 0, top: 0, bottom: 0 },
+        startOffset    = { left: 0, right: 0, top: 0, bottom: 0 },
+        restrictOffset = { left: 0, right: 0, top: 0, bottom: 0 },
+        snapOffset     = { x: 0, y: 0},
 
         tmpXY = {},     // reduce object creation in getXY()
 
@@ -2000,16 +2002,6 @@
         status.realX = page.x;
         status.realY = page.y;
 
-        var elementOffsetX = 0,
-            elementOffsetY = 0;
-
-        if (snap.elementOrigin) {
-            var rect = target.getRect();
-
-            elementOffsetX = startOffset.left + (rect.width  * snap.elementOrigin.x);
-            elementOffsetY = startOffset.top  + (rect.height * snap.elementOrigin.y);
-        }
-
         // change to infinite range when range is negative
         if (snap.range < 0) { snap.range = Infinity; }
 
@@ -2047,8 +2039,8 @@
 
                 range = typeof anchor.range === 'number'? anchor.range: snap.range;
 
-                dx = anchor.x - page.x + elementOffsetX;
-                dy = anchor.y - page.y + elementOffsetY;
+                dx = anchor.x - page.x + snapOffset.x;
+                dy = anchor.y - page.y + snapOffset.y;
                 distance = hypot(dx, dy);
 
                 inRange = distance < range;
@@ -2093,11 +2085,11 @@
             status.dy = closest.dy;
         }
         else if (snap.mode === 'grid') {
-            var gridx = Math.round((page.x - snap.gridOffset.x - elementOffsetX) / snap.grid.x),
-                gridy = Math.round((page.y - snap.gridOffset.y - elementOffsetY) / snap.grid.y),
+            var gridx = Math.round((page.x - snap.gridOffset.x - snapOffset.x) / snap.grid.x),
+                gridy = Math.round((page.y - snap.gridOffset.y - snapOffset.y) / snap.grid.y),
 
-                newX = gridx * snap.grid.x + snap.gridOffset.x + elementOffsetX,
-                newY = gridy * snap.grid.y + snap.gridOffset.y + elementOffsetY;
+                newX = gridx * snap.grid.x + snap.gridOffset.x + snapOffset.x,
+                newY = gridy * snap.grid.y + snap.gridOffset.y + snapOffset.y;
 
             dx = newX - page.x;
             dy = newY - page.y;
@@ -2145,18 +2137,6 @@
         status.dy = 0;
         status.restricted = false;
 
-        var elementOffset = { top: 0, left: 0, bottom: 0, right: 0};
-
-        if (restrict.elementRect) {
-            var elementRect = target.getRect();
-
-            elementOffset.left = startOffset.left - (elementRect.width  * restrict.elementRect.left);
-            elementOffset.top  = startOffset.top  - (elementRect.height * restrict.elementRect.top);
-
-            elementOffset.right  = startOffset.right  - (elementRect.width  * (1 - restrict.elementRect.right));
-            elementOffset.bottom = startOffset.bottom - (elementRect.height * (1 - restrict.elementRect.bottom));
-        }
-
         var rect;
 
         if (restriction === 'parent') {
@@ -2189,8 +2169,8 @@
             }
         }
 
-        status.dx = Math.max(Math.min(rect.right  - elementOffset.right , page.x), rect.left + elementOffset.left) - page.x;
-        status.dy = Math.max(Math.min(rect.bottom - elementOffset.bottom, page.y), rect.top  + elementOffset.top ) - page.y;
+        status.dx = Math.max(Math.min(rect.right  - restrictOffset.right , page.x), rect.left + restrictOffset.left) - page.x;
+        status.dy = Math.max(Math.min(rect.bottom - restrictOffset.bottom, page.y), rect.top  + restrictOffset.top ) - page.y;
         status.restricted = true;
 
         return status;
@@ -2313,13 +2293,39 @@
                 if (starting) {
                     prevEvent = downEvent;
 
-                    var rect = target.getRect() || { left: 0, right: 0, top: 0, bottom: 0 };
+                    var rect = target.getRect(),
+                        snap = target.options.snap,
+                        restrict = target.options.restrict;
 
-                    startOffset.left = startCoords.pageX - rect.left;
-                    startOffset.top  = startCoords.pageY - rect.top;
+                    if (rect) {
+                        startOffset.left = startCoords.pageX - rect.left;
+                        startOffset.top  = startCoords.pageY - rect.top;
 
-                    startOffset.right = rect.right - startCoords.pageX;
-                    startOffset.bottom = rect.bottom - startCoords.pageY;
+                        startOffset.right  = rect.right  - startCoords.pageX;
+                        startOffset.bottom = rect.bottom - startCoords.pageY;
+                    }
+                    else {
+                        startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
+                    }
+
+                    if (rect && snap.elementOrigin) {
+                        snapOffset.x = startOffset.left + (rect.width  * snap.elementOrigin.x);
+                        snapOffset.y = startOffset.top  + (rect.height * snap.elementOrigin.y);
+                    }
+                    else {
+                        snapOffset.x = snapOffset.y = 0;
+                    }
+
+                    if (rect && restrict.elementRect) {
+                        restrictOffset.left = startOffset.left - (rect.width  * restrict.elementRect.left);
+                        restrictOffset.top  = startOffset.top  - (rect.height * restrict.elementRect.top);
+
+                        restrictOffset.right  = startOffset.right  - (rect.width  * (1 - restrict.elementRect.right));
+                        restrictOffset.bottom = startOffset.bottom - (rect.height * (1 - restrict.elementRect.bottom));
+                    }
+                    else {
+                        restrictOffset.left = restrictOffset.top = restrictOffset.right = restrictOffset.bottom = 0;
+                    }
                 }
 
                 if (!shouldRestrict) {
