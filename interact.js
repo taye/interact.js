@@ -334,23 +334,28 @@
         actions = {
             drag: {
                 cursor      : 'move',
-                moveListener: dragMove
+                start: dragStart,
+                move: dragMove
             },
             resizex: {
                 cursor      : 'e-resize',
-                moveListener: resizeMove
+                start: resizeStart,
+                move: resizeMove
             },
             resizey: {
                 cursor      : 's-resize',
-                moveListener: resizeMove
+                start: resizeStart,
+                move: resizeMove
             },
             resizexy: {
                 cursor      : 'se-resize',
-                moveListener: resizeMove
+                start: resizeStart,
+                move: resizeMove
             },
             gesture: {
                 cursor      : '',
-                moveListener: gestureMove
+                start: gestureStart,
+                move: gestureMove
             }
         },
 
@@ -1202,23 +1207,27 @@
         return index;
     }
 
-    function getDrop (event, dragElement, setActive) {
+    // Collect a new set of possible drops and save them in activeDrops.
+    // setActiveDrops should always be called when a drag has just started or a
+    // drag event happens while dynamicDrop is true
+    function setActiveDrops (dragElement) {
+        // get dropzones and their elements that could recieve the draggable
+        var possibleDrops = collectDrops(event, dragElement, true);
+
+        activeDrops.dropzones = possibleDrops.dropzones;
+        activeDrops.elements  = possibleDrops.elements;
+        activeDrops.rects     = [];
+
+        for (var i = 0; i < activeDrops.dropzones.length; i++) {
+            activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
+        }
+    }
+
+    function getDrop (event, dragElement) {
         var validDrops = [];
 
-        // If setActive is true a new set of possible drops will be
-        // collected and saved in activeDrops. setActive should always be
-        // true when a drag has just started or dynamicDrop is true
-        if ((setActive = setActive || dynamicDrop)) {
-            // get dropzones and their elements that could recieve the draggable
-            var possibleDrops = collectDrops(event, dragElement, setActive);
-
-            activeDrops.dropzones = possibleDrops.dropzones;
-            activeDrops.elements  = possibleDrops.elements;
-            activeDrops.rects     = [];
-
-            for (var i = 0; i < activeDrops.dropzones.length; i++) {
-                activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
-            }
+        if (dynamicDrop) {
+            setActiveDrops(dragElement);
         }
 
         // collect all dropzones and their elements which qualify for a drop
@@ -2281,7 +2290,11 @@
                             setRestriction(event);
                         }
 
-                        actions[prepared].moveListener(event);
+                        if (starting) {
+                            actions[prepared].start(event);
+                        }
+
+                        actions[prepared].move(event);
                     }
                 }
                 // if no snap, always move
@@ -2290,7 +2303,11 @@
                         setRestriction(event);
                     }
 
-                    actions[prepared].moveListener(event);
+                    if (starting) {
+                        actions[prepared].start(event);
+                    }
+
+                    actions[prepared].move(event);
                 }
             }
         }
@@ -2391,36 +2408,36 @@
         return;
     }
 
+    function dragStart (event) {
+        var dragEvent = new InteractEvent(downEvent, 'drag', 'start');
+
+        dragging = true;
+
+        target.fire(dragEvent);
+
+        // reset active dropzones
+        activeDrops.dropzones = [];
+        activeDrops.elements  = [];
+        activeDrops.rects     = [];
+
+        prevEvent = dragEvent;
+
+        if (!dynamicDrop) {
+            setActiveDrops(target._element);
+        }
+
+        // set snapping for the next move event
+        if (target.options.snapEnabled && !target.options.snap.endOnly) {
+            setSnapping(event);
+        }
+    }
 
     function dragMove (event) {
         checkAndPreventDefault(event, target);
 
-        var starting = !dragging,
-            dragEvent;
-
-        if (starting) {
-            dragEvent = new InteractEvent(downEvent, 'drag', 'start');
-            dragging = true;
-
-            target.fire(dragEvent);
-
-            // reset active dropzones
-            activeDrops.dropzones = [];
-            activeDrops.elements  = [];
-            activeDrops.rects     = [];
-
-            prevEvent = dragEvent;
-
-            // set snapping for the next move event
-            if (target.options.snapEnabled && !target.options.snap.endOnly) {
-                setSnapping(event);
-            }
-        }
-
-        dragEvent  = new InteractEvent(event, 'drag', 'move');
-
-        var draggableElement = target._element,
-            drop = getDrop(dragEvent, draggableElement, starting);
+        var dragEvent  = new InteractEvent(event, 'drag', 'move'),
+            draggableElement = target._element,
+            drop = getDrop(dragEvent, draggableElement);
 
         dropTarget = drop.dropzone;
         dropElement = drop.element;
@@ -2429,7 +2446,7 @@
         // restored after dropChecks
         target._element = draggableElement;
 
-        var dropEvents = getDropEvents(event, dragEvent, starting);
+        var dropEvents = getDropEvents(event, dragEvent);
 
         target.fire(dragEvent);
 
@@ -2445,30 +2462,52 @@
         prevEvent = dragEvent;
     }
 
+    function resizeStart (event) {
+        var resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
+
+        target.fire(resizeEvent);
+
+        target.fire(resizeEvent);
+        resizing = true;
+
+        prevEvent = resizeEvent;
+
+        // set snapping for the next move event
+        if (target.options.snapEnabled && !target.options.snap.endOnly) {
+            setSnapping(event);
+        }
+    }
+
     function resizeMove (event) {
         checkAndPreventDefault(event, target);
 
         var resizeEvent;
 
-        if (!resizing) {
-            resizeEvent = new InteractEvent(downEvent, 'resize', 'start');
-            target.fire(resizeEvent);
-
-            target.fire(resizeEvent);
-            resizing = true;
-
-            prevEvent = resizeEvent;
-
-            // set snapping for the next move event
-            if (target.options.snapEnabled && !target.options.snap.endOnly) {
-                setSnapping(event);
-            }
-        }
-
         resizeEvent = new InteractEvent(event, 'resize', 'move');
         target.fire(resizeEvent);
 
         prevEvent = resizeEvent;
+    }
+
+    function gestureStart (event) {
+        var gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
+
+        gestureEvent.ds = 0;
+
+        gesture.startDistance = gesture.prevDistance = gestureEvent.distance;
+        gesture.startAngle = gesture.prevAngle = gestureEvent.angle;
+        gesture.scale = 1;
+
+        gesturing = true;
+
+        target.fire(gestureEvent);
+
+        prevEvent = gestureEvent;
+
+        // set snapping for the next move event
+        if (target.options.snapEnabled && !target.options.snap.endOnly) {
+            setSnapping(event);
+        }
     }
 
     function gestureMove (event) {
@@ -2479,26 +2518,6 @@
         checkAndPreventDefault(event, target);
 
         var gestureEvent;
-
-        if (!gesturing) {
-            gestureEvent = new InteractEvent(downEvent, 'gesture', 'start');
-            gestureEvent.ds = 0;
-
-            gesture.startDistance = gesture.prevDistance = gestureEvent.distance;
-            gesture.startAngle = gesture.prevAngle = gestureEvent.angle;
-            gesture.scale = 1;
-
-            gesturing = true;
-
-            target.fire(gestureEvent);
-
-            prevEvent = gestureEvent;
-
-            // set snapping for the next move event
-            if (target.options.snapEnabled && !target.options.snap.endOnly) {
-                setSnapping(event);
-            }
-        }
 
         gestureEvent = new InteractEvent(event, 'gesture', 'move');
         gestureEvent.ds = gestureEvent.scale - gesture.scale;
