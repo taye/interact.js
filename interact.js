@@ -164,7 +164,7 @@
                 anchors     : [],
                 paths       : [],
 
-                elementOrigin: { x: 0, y: 0 },
+                elementOrigin: null,
 
                 arrayTypes  : /^anchors$|^paths$|^actions$/,
                 objectTypes : /^grid$|^gridOffset$|^elementOrigin$/,
@@ -2145,7 +2145,7 @@
         status.dy = 0;
         status.restricted = false;
 
-        var elementOffset = {};
+        var elementOffset = { top: 0, left: 0, bottom: 0, right: 0};
 
         if (restrict.elementRect) {
             var elementRect = target.getRect();
