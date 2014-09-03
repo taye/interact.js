@@ -1210,7 +1210,7 @@
     // Collect a new set of possible drops and save them in activeDrops.
     // setActiveDrops should always be called when a drag has just started or a
     // drag event happens while dynamicDrop is true
-    function setActiveDrops (dragElement) {
+    function setActiveDrops (event, dragElement) {
         // get dropzones and their elements that could recieve the draggable
         var possibleDrops = collectDrops(event, dragElement, true);
 
@@ -1227,7 +1227,7 @@
         var validDrops = [];
 
         if (dynamicDrop) {
-            setActiveDrops(dragElement);
+            setActiveDrops(event, dragElement);
         }
 
         // collect all dropzones and their elements which qualify for a drop
@@ -2431,7 +2431,7 @@
         activeDrops.rects     = [];
 
         if (!dynamicDrop) {
-            setActiveDrops(target._element);
+            setActiveDrops(event, target._element);
         }
 
         return dragEvent;
