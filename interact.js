@@ -1094,7 +1094,7 @@
         return options.restrictEnabled && options.restrict[action];
     }
 
-    function collectDrops (event, element) {
+    function collectDrops (element) {
         var drops = [],
             elements = [],
             i;
@@ -1265,7 +1265,7 @@
     // drag event happens while dynamicDrop is true
     function setActiveDrops (dragElement) {
         // get dropzones and their elements that could recieve the draggable
-        var possibleDrops = collectDrops(event, dragElement, true);
+        var possibleDrops = collectDrops(dragElement, true);
 
         activeDrops.dropzones = possibleDrops.dropzones;
         activeDrops.elements  = possibleDrops.elements;
