@@ -469,7 +469,7 @@
                     target.typeCount++;
                 }
 
-                if (indexOf(target.events[type], listener) === -1) {
+                if (!contains(target.events[type], listener)) {
                     var ret;
 
                     if (useAttachEvent) {
@@ -589,6 +589,10 @@
                 }
 
                 return -1;
+            }
+
+            function contains (array, target) {
+                return indexOf(array, target) !== -1;
             }
 
             function preventDef () {
@@ -1089,7 +1093,7 @@
             action = 'resize';
         }
 
-        return (options.snapEnabled && indexOf(options.snap.actions, action) !== -1);
+        return (options.snapEnabled && contains(options.snap.actions, action));
     }
 
     function checkRestrict (interactable, action) {
@@ -2718,7 +2722,7 @@
             else if (target) {
                 var prevTargetChildren = prevTargetElement.querySelectorAll('*');
 
-                if (indexOf(prevTargetChildren, eventTarget) !== -1) {
+                if (contains(prevTargetChildren, eventTarget)) {
 
                     // reset the elements of the matches to the old target
                     for (var i = 0; i < matches.length; i++) {
@@ -2824,7 +2828,7 @@
             // check if inertia should be started
             inertiaPossible = (options.inertiaEnabled
                                && prepared !== 'gesture'
-                               && indexOf(inertiaOptions.actions, prepared) !== -1
+                               && contains(inertiaOptions.actions, prepared)
                                && event !== inertiaStatus.startEvent);
 
             inertia = (inertiaPossible
@@ -2834,7 +2838,7 @@
 
             if (inertiaPossible && !inertia
                 && ((options.snapEnabled && options.snap.endOnly
-                    && indexOf(options.snap.actions, prepared) !== -1)
+                    && contains(options.snap.actions, prepared))
                     || (options.restrictEnabled && options.restrict.endOnly))) {
 
                 var snapRestrict = {};
@@ -2905,7 +2909,7 @@
                     dx = dy = 0;
 
                     if (options.snapEnabled && options.snap.endOnly
-                        && indexOf(options.snap.actions, prepared) !== -1) {
+                        && contains(options.snap.actions, prepared)) {
 
                         var snap = setSnapping(event, statusObject);
 
@@ -4248,7 +4252,7 @@
          = (Interactable) this Interactable
         \*/
         fire: function (iEvent) {
-            if (!(iEvent && iEvent.type) || indexOf(eventTypes, iEvent.type) === -1) {
+            if (!(iEvent && iEvent.type) || !contains(eventTypes, iEvent.type)) {
                 return this;
             }
 
@@ -4333,13 +4337,13 @@
             // convert to boolean
             useCapture = useCapture? true: false;
 
-            if (indexOf(eventTypes, eventType) !== -1) {
+            if (contains(eventTypes, eventType)) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
                     this._iEvents[eventType] = [listener];
                 }
                 // if the event listener is not already bound for this type
-                else if (indexOf(this._iEvents[eventType], listener) === -1) {
+                else if (!contains(this._iEvents[eventType], listener)) {
                     this._iEvents[eventType].push(listener);
                 }
             }
@@ -4408,7 +4412,7 @@
             }
 
             // if it is an action event type
-            if (indexOf(eventTypes, eventType) !== -1) {
+            if (contains(eventTypes, eventType)) {
                 eventList = this._iEvents[eventType];
 
                 if (eventList && (index = indexOf(eventList, listener)) !== -1) {
@@ -4597,14 +4601,14 @@
     \*/
     interact.on = function (type, listener, useCapture) {
         // if it is an InteractEvent type, add listener to globalEvents
-        if (indexOf(eventTypes, type) !== -1) {
+        if (contains(eventTypes, type)) {
             // if this type of event was never bound
             if (!globalEvents[type]) {
                 globalEvents[type] = [listener];
             }
 
             // if the event listener is not already bound for this type
-            else if (indexOf(globalEvents[type], listener) === -1) {
+            else if (!contains(globalEvents[type], listener)) {
 
                 globalEvents[type].push(listener);
             }
@@ -4629,7 +4633,7 @@
      = (object) interact
     \*/
     interact.off = function (type, listener, useCapture) {
-        if (indexOf(eventTypes, type) === -1) {
+        if (!contains(eventTypes, type)) {
             events.remove(docTarget, type, listener, useCapture);
         }
         else {
@@ -5291,6 +5295,10 @@
         }
 
         return -1;
+    }
+
+    function contains (array, target) {
+        return indexOf(array, target) !== -1;
     }
 
     // For IE's lack of Event#preventDefault
