@@ -3665,15 +3665,15 @@
                    snap = {};
                 }
 
-                snap.mode       = this.validateSetting('snap', 'mode'      , options.mode);
-                snap.endOnly    = this.validateSetting('snap', 'endOnly'   , options.endOnly);
-                snap.actions    = this.validateSetting('snap', 'actions'   , options.actions);
-                snap.range      = this.validateSetting('snap', 'range'     , options.range);
-                snap.paths      = this.validateSetting('snap', 'paths'     , options.paths);
-                snap.grid       = this.validateSetting('snap', 'grid'      , options.grid);
-                snap.gridOffset = this.validateSetting('snap', 'gridOffset', options.gridOffset);
-                snap.anchors    = this.validateSetting('snap', 'anchors'   , options.anchors);
-                snap.elementOrigin    = this.validateSetting('snap', 'elementOrigin'   , options.elementOrigin);
+                snap.mode          = this.validateSetting('snap', 'mode'         , options.mode);
+                snap.endOnly       = this.validateSetting('snap', 'endOnly'      , options.endOnly);
+                snap.actions       = this.validateSetting('snap', 'actions'      , options.actions);
+                snap.range         = this.validateSetting('snap', 'range'        , options.range);
+                snap.paths         = this.validateSetting('snap', 'paths'        , options.paths);
+                snap.grid          = this.validateSetting('snap', 'grid'         , options.grid);
+                snap.gridOffset    = this.validateSetting('snap', 'gridOffset'   , options.gridOffset);
+                snap.anchors       = this.validateSetting('snap', 'anchors'      , options.anchors);
+                snap.elementOrigin = this.validateSetting('snap', 'elementOrigin', options.elementOrigin);
 
                 this.options.snapEnabled = true;
                 this.options.snap = snap;
@@ -3727,11 +3727,16 @@
          |     // inertia will stop when the object slows down to this speed
          |     endSpeed       : 20,
          |
-         |     // an array of action types that can have inertia (no gesture)
-         |     actions        : ['drag', 'resize'],
-         |
          |     // boolean; should the jump when resuming from inertia be ignored in event.dx/dy
-         |     zeroResumeDelta: false
+         |     zeroResumeDelta: false,
+         |
+         |     // if snap/restrict are set to be endOnly and inertia is enabled, releasing
+         |     // the pointer without triggering inertia will animate from the release
+         |     // point to the snaped/restricted point in the given amount of time (ms)
+         |     smoothEndDuration: 300,
+         |
+         |     // an array of action types that can have inertia (no gesture)
+         |     actions        : ['drag', 'resize']
          | });
          |
          | // reset custom settings and use all defaults
@@ -3745,20 +3750,20 @@
 
                 if (inertia === defaults) {
                    inertia = this.options.inertia = {
-                       resistance     : defaults.resistance,
-                       minSpeed       : defaults.minSpeed,
-                       endSpeed       : defaults.endSpeed,
-                       actions        : defaults.actions,
-                       zeroResumeDelta: defaults.zeroResumeDelta,
+                       resistance       : defaults.resistance,
+                       minSpeed         : defaults.minSpeed,
+                       endSpeed         : defaults.endSpeed,
+                       actions          : defaults.actions,
+                       zeroResumeDelta  : defaults.zeroResumeDelta,
                        smoothEndDuration: defaults.smoothEndDuration
                    };
                 }
 
-                inertia.resistance      = this.validateSetting('inertia', 'resistance'     , options.resistance);
-                inertia.minSpeed        = this.validateSetting('inertia', 'minSpeed'       , options.minSpeed);
-                inertia.endSpeed        = this.validateSetting('inertia', 'endSpeed'       , options.endSpeed);
-                inertia.actions         = this.validateSetting('inertia', 'actions'        , options.actions);
-                inertia.zeroResumeDelta = this.validateSetting('inertia', 'zeroResumeDelta', options.zeroResumeDelta);
+                inertia.resistance        = this.validateSetting('inertia', 'resistance'       , options.resistance);
+                inertia.minSpeed          = this.validateSetting('inertia', 'minSpeed'         , options.minSpeed);
+                inertia.endSpeed          = this.validateSetting('inertia', 'endSpeed'         , options.endSpeed);
+                inertia.actions           = this.validateSetting('inertia', 'actions'          , options.actions);
+                inertia.zeroResumeDelta   = this.validateSetting('inertia', 'zeroResumeDelta'  , options.zeroResumeDelta);
                 inertia.smoothEndDuration = this.validateSetting('inertia', 'smoothEndDuration', options.smoothEndDuration);
 
                 this.options.inertiaEnabled = true;
@@ -4933,10 +4938,10 @@
             if (typeof options.mode    === 'string' ) { snap.mode    = options.mode;    }
             if (typeof options.endOnly === 'boolean') { snap.endOnly = options.endOnly; }
             if (typeof options.range   === 'number' ) { snap.range   = options.range;   }
-            if (options.actions    instanceof Array ) { snap.actions    = options.actions;    }
-            if (options.anchors    instanceof Array ) { snap.anchors    = options.anchors;    }
-            if (options.grid       instanceof Object) { snap.grid       = options.grid;       }
-            if (options.gridOffset instanceof Object) { snap.gridOffset = options.gridOffset; }
+            if (options.actions       instanceof Array ) { snap.actions       = options.actions;       }
+            if (options.anchors       instanceof Array ) { snap.anchors       = options.anchors;       }
+            if (options.grid          instanceof Object) { snap.grid          = options.grid;          }
+            if (options.gridOffset    instanceof Object) { snap.gridOffset    = options.gridOffset;    }
             if (options.elementOrigin instanceof Object) { snap.elementOrigin = options.elementOrigin; }
 
             return interact;
@@ -4988,9 +4993,8 @@
             if (typeof options.resistance === 'number') { inertia.resistance = options.resistance;}
             if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
             if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
-            if (typeof options.smoothEndDuration   === 'number') { inertia.smoothEndDuration   = options.smoothEndDuration  ;}
-
-            if (typeof options.zeroResumeDelta === 'boolean') { inertia.zeroResumeDelta = options.zeroResumeDelta  ;}
+            if (typeof options.smoothEndDuration === 'number' ) { inertia.smoothEndDuration = options.smoothEndDuration;}
+            if (typeof options.zeroResumeDelta   === 'boolean') { inertia.zeroResumeDelta   = options.zeroResumeDelta  ;}
 
             if (options.actions instanceof Array) { inertia.actions = options.actions; }
 
