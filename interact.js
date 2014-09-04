@@ -1393,10 +1393,12 @@
         var client,
             page,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
-            sourceY = deltaSource + 'Y',
-            options = target? target.options: defaultOptions,
-            origin = getOriginXY(target, element);
+            sourceX     = deltaSource + 'X',
+            sourceY     = deltaSource + 'Y',
+            options     = target? target.options: defaultOptions,
+            origin      = getOriginXY(target, element),
+            starting    = phase === 'start',
+            ending      = phase === 'end';
 
         element = element || target._element;
 
@@ -1417,7 +1419,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (checkSnap(target) && !(phase === 'start' && options.snap.elementOrigin)) {
+            if (checkSnap(target) && !(starting && options.snap.elementOrigin)) {
 
                 this.snap = {
                     range  : snapStatus.range,
@@ -1439,7 +1441,7 @@
             }
         }
 
-        if (checkRestrict(target) && !(phase === 'start' && options.restrict.elementRect) && restrictStatus.restricted) {
+        if (checkRestrict(target) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -1456,7 +1458,7 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        if (phase === 'start' && !(event instanceof InteractEvent)) {
+        if (starting && !(event instanceof InteractEvent)) {
             setEventXY(startCoords, this);
         }
 
@@ -1484,7 +1486,7 @@
         }
 
         // end event dx, dy is difference between start and end points
-        if (phase === 'end' || action === 'drop') {
+        if (ending || action === 'drop') {
             if (deltaSource === 'client') {
                 this.dx = client.x - startCoords.clientX;
                 this.dy = client.y - startCoords.clientY;
@@ -1544,7 +1546,7 @@
                             ? [pointerMoves[0], pointerMoves[1]]
                             : event.touches);
 
-            if (phase === 'start') {
+            if (starting) {
                 this.distance = touchDistance(pointerMoves);
                 this.box      = touchBBox(pointerMoves);
                 this.scale    = 1;
@@ -1552,7 +1554,7 @@
                 this.angle    = touchAngle(pointerMoves);
                 this.da       = 0;
             }
-            else if (phase === 'end' || event instanceof InteractEvent) {
+            else if (ending || event instanceof InteractEvent) {
                 this.distance = prevEvent.distance;
                 this.box      = prevEvent.box;
                 this.scale    = prevEvent.scale;
@@ -1571,7 +1573,7 @@
             }
         }
 
-        if (phase === 'start') {
+        if (starting) {
             this.timeStamp = downTime;
             this.dt        = 0;
             this.duration  = 0;
@@ -1597,12 +1599,12 @@
             // Use natural event coordinates (without snapping/restricions)
             // subtract modifications from previous event if event given is
             // not a native event
-            if (phase === 'end' || event instanceof InteractEvent) {
+            if (ending || event instanceof InteractEvent) {
                 // change in time in seconds
                 // use event sequence duration for end events
                 // => average speed of the event sequence
                 // (minimum dt of 1ms)
-                dt = Math.max((phase === 'end'? this.duration: this.dt) / 1000, 0.001);
+                dt = Math.max((ending? this.duration: this.dt) / 1000, 0.001);
                 dx = this[sourceX] - prevEvent[sourceX];
                 dy = this[sourceY] - prevEvent[sourceY];
 
@@ -1639,7 +1641,7 @@
             }
         }
 
-        if ((phase === 'end' || phase === 'inertiastart')
+        if ((ending || phase === 'inertiastart')
             && prevEvent.speed > 600 && this.timeStamp - prevEvent.timeStamp < 150) {
 
             var angle = 180 * Math.atan2(prevEvent.velocityY, prevEvent.velocityX) / Math.PI,
