@@ -3596,7 +3596,10 @@
          * Interactable.snap
          [ method ]
          **
-         * Returns or sets if and how action coordinates are snapped
+         * Returns or sets if and how action coordinates are snapped. By
+         * default, snapping is relative to the pointer coordinates. You can
+         * change this by setting the
+         * [`elementOrigin`](https://github.com/taye/interact.js/pull/72).
          **
          = (boolean | object) `false` if snap is disabled; object with snap properties if snap is enabled
          **
@@ -3642,7 +3645,10 @@
          |     // do not snap during normal movement.
          |     // Instead, trigger only one snapped move event
          |     // immediately before the end event.
-         |     endOnly: true
+         |     endOnly: true,
+         |
+         |     // https://github.com/taye/interact.js/pull/72#issue-41813493
+         |     elementOrigin: { x: 0, y: 0 }
          | });
         \*/
         snap: function (options) {
@@ -3987,10 +3993,13 @@
         /*\
          * Interactable.restrict
          [ method ]
-         *
+         **
          * Returns or sets the rectangles within which actions on this
-         * interactable (after snap calculations) are restricted.
-         *
+         * interactable (after snap calculations) are restricted. By default,
+         * restricting is relative to the pointer coordinates. You can change
+         * this by setting the
+         * [`elementRect`](https://github.com/taye/interact.js/pull/72).
+         **
          - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
          = (object) The current restrictions object or this Interactable
          **
@@ -4009,7 +4018,10 @@
          |     // do not restrict during normal movement.
          |     // Instead, trigger only one restricted move event
          |     // immediately before the end event.
-         |     endOnly: true
+         |     endOnly: true,
+         |
+         |     // https://github.com/taye/interact.js/pull/72#issue-41813493
+         |     elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
          | });
         \*/
         restrict: function (newValue) {
