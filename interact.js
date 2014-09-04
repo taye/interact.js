@@ -2363,8 +2363,8 @@
                     }
 
                     if (rect && snap.elementOrigin) {
-                        snapOffset.x = startOffset.left + (rect.width  * snap.elementOrigin.x);
-                        snapOffset.y = startOffset.top  + (rect.height * snap.elementOrigin.y);
+                        snapOffset.x = startOffset.left - (rect.width  * snap.elementOrigin.x);
+                        snapOffset.y = startOffset.top  - (rect.height * snap.elementOrigin.y);
                     }
                     else {
                         snapOffset.x = snapOffset.y = 0;
