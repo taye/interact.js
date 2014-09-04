@@ -1007,7 +1007,11 @@
     function testIgnore (interactable, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!isElement(element)) { return false; }
+        if (!ignoreFrom
+            // limit test to the interactable's element and its children
+            || !isElement(element) || element === interactable._element.parentNode) {
+            return false;
+        }
 
         if (typeof ignoreFrom === 'string') {
             return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
@@ -1024,7 +1028,10 @@
 
         if (!allowFrom) { return true; }
 
-        if (!isElement(element)) { return false; }
+        // limit test to the interactable's element and its children
+        if (!isElement(element) || element === interactable._element.parentNode) {
+            return false;
+        }
 
         if (typeof allowFrom === 'string') {
             return matchesSelector(element, allowFrom) || testAllow(interactable, element.parentNode);
