@@ -86,15 +86,12 @@
             startEvent: null,
             pointerUp : {},
 
-            xe: 0,
-            ye: 0,
-            sx: 0,
-            sy: 0,
-            duration: 0,
+            xe: 0, ye: 0,
+            sx: 0, sy: 0,
 
             t0: 0,
-            vx0: 0,
-            vys: 0,
+            vx0: 0, vys: 0,
+            duration: 0,
 
             resumeDx: 0,
             resumeDy: 0,
@@ -200,40 +197,36 @@
             autoScrollEnabled: false,
 
             inertia: {
-                resistance     : 10,    // the lambda in exponential decay
-                minSpeed       : 100,   // target speed must be above this for inertia to start
-                endSpeed       : 10,    // the speed at which inertia is slow enough to stop
-                actions        : ['drag', 'resize'],
-                zeroResumeDelta: false,
-                smoothEndDuration: 300,
+                resistance       : 10,    // the lambda in exponential decay
+                minSpeed         : 100,   // target speed must be above this for inertia to start
+                endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+                zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
+                smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
+                actions          : ['drag', 'resize'],  // allow inertia on these actions. gesture might not work
 
                 numberTypes: /^resistance$|^minSpeed$|^endSpeed$|^smoothEndDuration$/,
                 arrayTypes : /^actions$/,
-                boolTypes: /^zeroResumeDelta$/
+                boolTypes  : /^zeroResumeDelta$/
             },
             inertiaEnabled: false,
 
             origin      : { x: 0, y: 0 },
             deltaSource : 'page',
 
-            context     : document      // the Node on which querySelector will be called
+            context     : document        // the Node on which querySelector will be called
         },
 
         snapStatus = {
             locked : false,
-            x      : 0,
-            y      : 0,
-            dx     : 0,
-            dy     : 0,
-            realX  : 0,
-            realY  : 0,
+            x      : 0, y      : 0,
+            dx     : 0, dy     : 0,
+            realX  : 0, realY  : 0,
             anchors: [],
             paths  : []
         },
 
         restrictStatus = {
-            dx: 0,
-            dy: 0,
+            dx: 0, dy: 0,
             snap: snapStatus,
             restricted: false
         },
@@ -242,8 +235,7 @@
         autoScroll = {
             target: null,
             i: null,    // the handle returned by window.setInterval
-            x: 0,       // Direction each pulse is to scroll in
-            y: 0,
+            x: 0, y: 0, // Direction each pulse is to scroll in
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
@@ -346,29 +338,29 @@
         // is to be added after pointerDown
         actions = {
             drag: {
-                cursor      : 'move',
-                start: dragStart,
-                move: dragMove
+                cursor: 'move',
+                start : dragStart,
+                move  : dragMove
             },
             resizex: {
-                cursor      : 'e-resize',
-                start: resizeStart,
-                move: resizeMove
+                cursor: 'e-resize',
+                start : resizeStart,
+                move  : resizeMove
             },
             resizey: {
-                cursor      : 's-resize',
-                start: resizeStart,
-                move: resizeMove
+                cursor: 's-resize',
+                start : resizeStart,
+                move  : resizeMove
             },
             resizexy: {
-                cursor      : 'se-resize',
-                start: resizeStart,
-                move: resizeMove
+                cursor: 'se-resize',
+                start : resizeStart,
+                move  : resizeMove
             },
             gesture: {
-                cursor      : '',
-                start: gestureStart,
-                move: gestureMove
+                cursor: '',
+                start : gestureStart,
+                move  : gestureMove
             }
         },
 
@@ -379,7 +371,7 @@
         },
 
         // Action that's ready to be fired on next move event
-        prepared    = null,
+        prepared = null,
 
         // because Webkit and Opera still use 'mousewheel' event type
         wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
@@ -436,22 +428,10 @@
         cancelFrame = window.cancelAnimationFrame,
 
         // used for adding event listeners to window and document
-        windowTarget = {
-            _element: window,
-            events  : {}
-        },
-        docTarget = {
-            _element: document,
-            events  : {}
-        },
-        parentWindowTarget = {
-            _element: window.parent,
-            events  : {}
-        },
-        parentDocTarget = {
-            _element: null,
-            events  : {}
-        },
+        windowTarget       = { _element: window       , events  : {} },
+        docTarget          = { _element: document     , events  : {} },
+        parentWindowTarget = { _element: window.parent, events  : {} },
+        parentDocTarget    = { _element: null         , events  : {} },
 
         // Events wrapper
         events = (function () {
@@ -674,8 +654,8 @@
         targetObj.pageVY      = targetObj.pageY / dt;
 
         targetObj.clientSpeed = hypot(targetObj.clientX, targetObj.pageY) / dt;
-        targetObj.clientVX      = targetObj.clientX / dt;
-        targetObj.clientVY      = targetObj.clientY / dt;
+        targetObj.clientVX    = targetObj.clientX / dt;
+        targetObj.clientVY    = targetObj.clientY / dt;
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
