@@ -387,6 +387,7 @@
             'dragleave',
             'dropactivate',
             'dropdeactivate',
+            'dropmove',
             'drop',
             'resizestart',
             'resizemove',
@@ -1313,6 +1314,7 @@
             dragEnterEvent = null,
             dropActivateEvent = null,
             dropDectivateEvent = null,
+            dropMoveEvent = null,
             dropEvent = null;
 
         if (dropElement !== prevDropElement) {
@@ -1337,12 +1339,22 @@
         if (dragEvent.type === 'dragend' && !starting) {
             dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
         }
+        if (dragEvent.type === 'dragmove' && dropTarget) {
+            dropMoveEvent = {
+                target       : dropElement,
+                relatedTarget: dragEvent.target,
+                dragmove     : dragEvent,
+                type         : 'dropmove',
+                timeStamp    : dragEvent.timeStamp
+            };
+        }
 
         return {
-            leave       : dragLeaveEvent,
             enter       : dragEnterEvent,
+            leave       : dragLeaveEvent,
             activate    : dropActivateEvent,
             deactivate  : dropDectivateEvent,
+            move        : dropMoveEvent,
             drop        : dropEvent
         };
     }
@@ -2522,6 +2534,7 @@
         }
         if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
         if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+        if (dropEvents.move ) {     dropTarget.fire(dropEvents.move ); }
 
         prevDropTarget  = dropTarget;
         prevDropElement = dropElement;
@@ -3139,13 +3152,15 @@
                     dropactivate    = phases.ondropactivate     || phases.onDropActivate    || phases.dropactivate,
                     dropdeactivate  = phases.ondropdeactivate   || phases.onDropDeactivate  || phases.dropdeactivate,
                     dragenter       = phases.ondragenter        || phases.onDropEnter       || phases.dragenter,
-                    dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave;
+                    dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave,
+                    dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove;
 
                 if (typeof drop             === 'function') { this.ondrop           = drop; }
                 if (typeof dropactivate     === 'function') { this.ondropactivate   = dropactivate; }
                 if (typeof dropdeactivate   === 'function') { this.ondropdeactivate = dropdeactivate; }
                 if (typeof dragenter        === 'function') { this.ondragenter      = dragenter; }
                 if (typeof dragleave        === 'function') { this.ondragleave      = dragleave; }
+                if (typeof dropmove         === 'function') { this.ondropmove       = dropmove; }
             }
             else {
                 var start     = phases.onstart     || phases.onStart     || phases.start,
