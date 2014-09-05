@@ -26,39 +26,30 @@
 
         // Previous native pointer move event coordinates
         prevCoords = {
-            pageX: 0,
-            pageY: 0,
-            clientX: 0,
-            clientY: 0,
+            pageX    : 0, pageY  : 0,
+            clientX  : 0, clientY: 0,
             timeStamp: 0
         },
         // current native pointer move event coordinates
         curCoords = {
-            pageX: 0,
-            pageY: 0,
-            clientX: 0,
-            clientY: 0,
+            pageX    : 0, pageY  : 0,
+            clientX  : 0, clientY: 0,
             timeStamp: 0
         },
 
         // Starting InteractEvent pointer coordinates
         startCoords = {
-            pageX: 0,
-            pageY: 0,
-            clientX: 0,
-            clientY: 0,
+            pageX    : 0, pageY  : 0,
+            clientX  : 0, clientY: 0,
             timeStamp: 0
         },
 
         // Change in coordinates and time of the pointer
         pointerDelta = {
-            pageX: 0,
-            pageY: 0,
-            clientX: 0,
-            clientY: 0,
-            timeStamp: 0,
-            pageSpeed: 0,
-            clientSpeed: 0
+            pageX    : 0, pageY      : 0,
+            clientX  : 0, clientY    : 0,
+            pageSpeed: 0, clientSpeed: 0,
+            timeStamp: 0
         },
 
         // keep track of added PointerEvents or touches
