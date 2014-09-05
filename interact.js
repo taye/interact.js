@@ -2618,8 +2618,8 @@
     }
 
     function gestureMove (event) {
-        if ((!event.touches || event.touches.length < 2) && !PointerEvent) {
-            return;
+        if (!pointerIds.length) {
+            return prevEvent;
         }
 
         checkAndPreventDefault(event, target);
