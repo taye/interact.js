@@ -615,6 +615,13 @@
     function isBool     (thing) { return typeof thing === 'boolean' ; }
     function isString   (thing) { return typeof thing === 'string'  ; }
 
+    function extend (dest, source) {
+        for (var prop in source) {
+            dest[prop] = source[prop];
+        }
+        return dest;
+    }
+
     function setEventXY (targetObj, source) {
         getPageXY(source, tmpXY);
         targetObj.pageX = tmpXY.x;
@@ -1662,11 +1669,9 @@
 
     function fireTaps (event, targets, elements) {
         var tap = {},
-            prop, i;
+            i;
 
-        for (prop in event) {
-            tap[prop] = event[prop];
-        }
+        extend(tap, event);
 
         tap.preventDefault           = preventOriginalDefault;
         tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
@@ -1704,9 +1709,7 @@
         if (dbl) {
             var doubleTap = {};
 
-            for (prop in tap) {
-                doubleTap[prop] = tap[prop];
-            }
+            extend(doubleTap, tap);
 
             doubleTap.dt   = interval;
             doubleTap.type = 'doubletap';
@@ -2797,8 +2800,7 @@
 
         var endEvent,
             options = target && target.options,
-            inertiaOptions = options && options.inertia,
-            prop;
+            inertiaOptions = options && options.inertia;
 
         if (dragging || resizing || gesturing) {
 
@@ -2855,9 +2857,7 @@
                 if (events.useAttachEvent) {
                     // make a copy of the pointerdown event because IE8
                     // http://stackoverflow.com/a/3533725/2280888
-                    for (prop in event) {
-                        inertiaStatus.pointerUp[prop] = event[prop];
-                    }
+                    extend(inertiaStatus.pointerUp, event);
                 }
                 else {
                     inertiaStatus.pointerUp = event;
@@ -4659,7 +4659,6 @@
     \*/
     interact.simulate = function (action, element, pointerEvent) {
         var event = {},
-            prop,
             clientRect;
 
         if (action === 'resize') {
@@ -4671,9 +4670,7 @@
         }
 
         if (pointerEvent) {
-            for (prop in pointerEvent) {
-                event[prop] = pointerEvent[prop];
-            }
+            extend(event, pointerEvent);
         }
         else {
             clientRect = (target._element instanceof SVGElement)?
