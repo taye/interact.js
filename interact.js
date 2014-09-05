@@ -1801,7 +1801,7 @@
                 null;
 
         if (actionIsEnabled.gesture
-            && (PointerEvent && pointerIds.length >=2)
+            && pointerIds.length >=2
             && !(dragging || resizing)) {
             action = 'gesture';
         }
