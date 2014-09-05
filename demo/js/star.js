@@ -66,7 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
         .snap({
             mode: 'anchor',
             anchors: originalPoints,
-            range: 10
+            range: 10,
+            elementOrigin: { x: 0.5, y: 0.5 }
         })
         .restrict({ drag: document.rootElement })
         .styleCursor(false);
