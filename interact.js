@@ -617,6 +617,12 @@
                 ? o instanceof Element //DOM2
                 : o.nodeType === 1 && typeof o.nodeName === "string");
     }
+    function isObject   (thing) { return thing instanceof Object; }
+    function isArray    (thing) { return thing instanceof Array ; }
+    function isFunction (thing) { return typeof thing === 'function'; }
+    function isNumber   (thing) { return typeof thing === 'number'  ; }
+    function isBool     (thing) { return typeof thing === 'boolean' ; }
+    function isString   (thing) { return typeof thing === 'string'  ; }
 
     function setEventXY (targetObj, source) {
         getPageXY(source, tmpXY);
@@ -763,7 +769,7 @@
         var touches = [];
 
         // array of touches is supplied
-        if (event instanceof Array) {
+        if (isArray(event)) {
             touches[0] = event[0];
             touches[1] = event[1];
         }
@@ -842,7 +848,7 @@
             dy = touches[0][sourceY] - touches[1][sourceY],
             angle = 180 * Math.atan(dy / dx) / Math.PI;
 
-        if (typeof prevAngle === 'number') {
+        if (isNumber(prevAngle)) {
             var dr = angle - prevAngle,
                 drClamped = dr % 360;
 
@@ -885,7 +891,7 @@
             origin.x = origin.left;
             origin.y = origin.top;
         }
-        else if (typeof origin === 'function') {
+        else if (isFunction(origin)) {
             origin = origin(interactable && element);
         }
 
@@ -1013,7 +1019,7 @@
             return false;
         }
 
-        if (typeof ignoreFrom === 'string') {
+        if (isString(ignoreFrom)) {
             return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
         }
         else if (isElement(ignoreFrom)) {
@@ -1033,7 +1039,7 @@
             return false;
         }
 
-        if (typeof allowFrom === 'string') {
+        if (isString(allowFrom)) {
             return matchesSelector(element, allowFrom) || testAllow(interactable, element.parentNode);
         }
         else if (isElement(allowFrom)) {
@@ -1114,7 +1120,7 @@
 
             // test the draggable element against the dropzone's accept setting
             if ((isElement(current.options.accept) && current.options.accept !== element)
-                || (typeof current.options.accept === 'string'
+                || (isString(current.options.accept)
                     && !matchesSelector(element, current.options.accept))) {
 
                 continue;
@@ -1804,9 +1810,8 @@
                 null;
 
         if (actionIsEnabled.gesture
-            && ((event.touches && event.touches.length >= 2)
-                || (PointerEvent && pointerIds.length >=2)) &&
-                !(dragging || resizing)) {
+            && (PointerEvent && pointerIds.length >=2)
+            && !(dragging || resizing)) {
             action = 'gesture';
         }
 
@@ -1816,7 +1821,7 @@
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action, interactable) {
-        if (typeof action !== 'string') { return null; }
+        if (!isString(action)) { return null; }
 
         interactable = interactable || target;
 
@@ -2070,15 +2075,15 @@
             for (i = 0, len = snap.paths.length; i < len; i++) {
                 var path = snap.paths[i];
 
-                if (typeof path === 'function') {
+                if (isFunction(path)) {
                     path = path(page.x, page.y);
                 }
 
                 anchors.push({
-                    x: typeof path.x === 'number' ? path.x : page.x,
-                    y: typeof path.y === 'number' ? path.y : page.y,
+                    x: isNumber(path.x) ? path.x : page.x,
+                    y: isNumber(path.y) ? path.y : page.y,
 
-                    range: typeof path.range === 'number'? path.range: snap.range
+                    range: isNumber(path.range)? path.range: snap.range
                 });
             }
         }
@@ -2095,7 +2100,7 @@
             for (i = 0, len = anchors.length; i < len; i++) {
                 var anchor = anchors[i];
 
-                range = typeof anchor.range === 'number'? anchor.range: snap.range;
+                range = isNumber(anchor.range)? anchor.range: snap.range;
 
                 dx = anchor.x - page.x + snapOffset.x;
                 dy = anchor.y - page.y + snapOffset.y;
@@ -2211,7 +2216,7 @@
             rect = getElementRect(restriction);
         }
         else {
-            if (typeof restriction === 'function') {
+            if (isFunction(restriction)) {
                 restriction = restriction(page.x, page.y, target._element);
             }
 
@@ -3150,7 +3155,7 @@
         this._element = element;
         this._iEvents = this._iEvents || {};
 
-        if (typeof element === 'string') {
+        if (isString(element)) {
             // if the selector is invalid,
             // an exception will be raised
             document.querySelector(element);
@@ -3196,27 +3201,25 @@
                     dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave,
                     dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove;
 
-                if (typeof drop             === 'function') { this.ondrop           = drop; }
-                if (typeof dropactivate     === 'function') { this.ondropactivate   = dropactivate; }
-                if (typeof dropdeactivate   === 'function') { this.ondropdeactivate = dropdeactivate; }
-                if (typeof dragenter        === 'function') { this.ondragenter      = dragenter; }
-                if (typeof dragleave        === 'function') { this.ondragleave      = dragleave; }
-                if (typeof dropmove         === 'function') { this.ondropmove       = dropmove; }
+                if (isFunction(drop)          ) { this.ondrop           = drop          ; }
+                if (isFunction(dropactivate)  ) { this.ondropactivate   = dropactivate  ; }
+                if (isFunction(dropdeactivate)) { this.ondropdeactivate = dropdeactivate; }
+                if (isFunction(dragenter)     ) { this.ondragenter      = dragenter     ; }
+                if (isFunction(dragleave)     ) { this.ondragleave      = dragleave     ; }
+                if (isFunction(dropmove)      ) { this.ondropmove       = dropmove      ; }
             }
             else {
-                var start     = phases.onstart     || phases.onStart     || phases.start,
-                    move      = phases.onmove      || phases.onMove      || phases.move,
-                    end       = phases.onend       || phases.onEnd       || phases.end;
-
-                var inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart;
+                var start        = phases.onstart        || phases.onStart        || phases.start,
+                    move         = phases.onmove         || phases.onMove         || phases.move,
+                    end          = phases.onend          || phases.onEnd          || phases.end,
+                    inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart;
 
                 action = 'on' + action;
 
-                if (typeof start === 'function') { this[action + 'start'] = start; }
-                if (typeof move  === 'function') { this[action + 'move' ] = move ; }
-                if (typeof end   === 'function') { this[action + 'end'  ] = end  ; }
-
-                if (typeof inertiastart === 'function') { this[action + 'inertiastart'  ] = inertiastart  ; }
+                if (isFunction(start)       ) { this[action + 'start'         ] = start         ; }
+                if (isFunction(move)        ) { this[action + 'move'          ] = move          ; }
+                if (isFunction(end)         ) { this[action + 'end'           ] = end           ; }
+                if (isFunction(inertiastart)) { this[action + 'inertiastart'  ] = inertiastart  ; }
             }
 
             return this;
@@ -3246,7 +3249,7 @@
          | });
         \*/
         draggable: function (options) {
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 this.options.draggable = true;
                 this.setOnEvents('drag', options);
 
@@ -3260,7 +3263,7 @@
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.draggable = options;
 
                 return this;
@@ -3286,7 +3289,7 @@
          = (boolean | object) The current setting or this Interactable
         \*/
         dropzone: function (options) {
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 this.options.dropzone = true;
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
@@ -3297,7 +3300,7 @@
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 if (options) {
                     this._dropElements = this.selector? null: [this._element];
                     dropzones.push(this);
@@ -3369,7 +3372,7 @@
          = (Function | Interactable) The checker function or this Interactable
         \*/
         dropChecker: function (newValue) {
-            if (typeof newValue === 'function') {
+            if (isFunction(newValue)) {
                 this.dropCheck = newValue;
 
                 return this;
@@ -3398,7 +3401,7 @@
                 return this;
             }
 
-            if (typeof newValue === 'string') {
+            if (isString(newValue)) {
                 // test if it is a valid CSS selector
                 document.querySelector(newValue);
                 this.options.accept = newValue;
@@ -3436,7 +3439,7 @@
          | });
         \*/
         resizable: function (options) {
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 this.options.resizable = true;
                 this.setOnEvents('resize', options);
 
@@ -3449,7 +3452,7 @@
 
                 return this;
             }
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.resizable = options;
 
                 return this;
@@ -3474,7 +3477,7 @@
          = (object) this Interactable
         \*/
         squareResize: function (newValue) {
-            if (typeof newValue === 'boolean') {
+            if (isBool(newValue)) {
                 this.options.squareResize = newValue;
 
                 return this;
@@ -3506,14 +3509,14 @@
          | });
         \*/
         gesturable: function (options) {
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 this.options.gesturable = true;
                 this.setOnEvents('gesture', options);
 
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.gesturable = options;
 
                 return this;
@@ -3554,7 +3557,7 @@
         autoScroll: function (options) {
             var defaults = defaultOptions.autoScroll;
 
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 var autoScroll = this.options.autoScroll;
 
                 if (autoScroll === defaults) {
@@ -3581,7 +3584,7 @@
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.autoScrollEnabled = options;
 
                 return this;
@@ -3661,7 +3664,7 @@
         snap: function (options) {
             var defaults = defaultOptions.snap;
 
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 var snap = this.options.snap;
 
                 if (snap === defaults) {
@@ -3684,7 +3687,7 @@
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.snapEnabled = options;
 
                 return this;
@@ -3748,7 +3751,7 @@
         inertia: function (options) {
             var defaults = defaultOptions.inertia;
 
-            if (options instanceof Object) {
+            if (isObject(options)) {
                 var inertia = this.options.inertia;
 
                 if (inertia === defaults) {
@@ -3775,7 +3778,7 @@
                 return this;
             }
 
-            if (typeof options === 'boolean') {
+            if (isBool(options)) {
                 this.options.inertiaEnabled = options;
 
                 return this;
@@ -3816,7 +3819,7 @@
          = (Function | Interactable) The checker function or this Interactable
         \*/
         actionChecker: function (newValue) {
-            if (typeof newValue === 'function') {
+            if (isFunction(newValue)) {
                 this.options.actionChecker = newValue;
 
                 return this;
@@ -3870,7 +3873,7 @@
          = (function | object) The checker function or this Interactable
         \*/
         rectChecker: function (newValue) {
-            if (typeof newValue === 'function') {
+            if (isFunction(newValue)) {
                 this.getRect = newValue;
 
                 return this;
@@ -3897,7 +3900,7 @@
          = (boolean | Interactable) The current setting or this Interactable
         \*/
         styleCursor: function (newValue) {
-            if (typeof newValue === 'boolean') {
+            if (isBool(newValue)) {
                 this.options.styleCursor = newValue;
 
                 return this;
@@ -3927,7 +3930,7 @@
          = (boolean | string | Interactable) The current setting or this Interactable
         \*/
         preventDefault: function (newValue) {
-            if (typeof newValue === 'boolean' || newValue === 'auto') {
+            if (isBool(newValue) || newValue === 'auto') {
                 this.options.preventDefault = newValue;
 
                 return this;
@@ -3956,7 +3959,7 @@
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
-            if (newValue instanceof Object || /^parent$|^self$/.test(newValue)) {
+            if (isObject(newValue) || /^parent$|^self$/.test(newValue)) {
                 this.options.origin = newValue;
 
                 return this;
@@ -4036,27 +4039,27 @@
                 return this.options.restrict;
             }
 
-            if (typeof newValue === 'boolean') {
+            if (isBool(newValue)) {
                 defaultOptions.restrictEnabled = newValue;
             }
-            else if (newValue instanceof Object) {
+            else if (isObject(newValue)) {
                 var newRestrictions = {};
 
-                if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
+                if (isObject(newValue.drag) || /^parent$|^self$/.test(newValue.drag)) {
                     newRestrictions.drag = newValue.drag;
                 }
-                if (newValue.resize instanceof Object || /^parent$|^self$/.test(newValue.resize)) {
+                if (isObject(newValue.resize) || /^parent$|^self$/.test(newValue.resize)) {
                     newRestrictions.resize = newValue.resize;
                 }
-                if (newValue.gesture instanceof Object || /^parent$|^self$/.test(newValue.gesture)) {
+                if (isObject(newValue.gesture) || /^parent$|^self$/.test(newValue.gesture)) {
                     newRestrictions.gesture = newValue.gesture;
                 }
 
-                if (typeof newValue.endOnly === 'boolean') {
+                if (isBool(newValue.endOnly)) {
                     newRestrictions.endOnly = newValue.endOnly;
                 }
 
-                if (newValue.elementRect instanceof Object) {
+                if (isObject(newValue.elementRect)) {
                     newRestrictions.elementRect = newValue.elementRect;
                 }
 
@@ -4102,7 +4105,7 @@
          | interact(element).ignoreFrom('input, textarea, a');
         \*/
         ignoreFrom: function (newValue) {
-            if (typeof newValue === 'string') {     // CSS selector to match event.target
+            if (isString(newValue)) {     // CSS selector to match event.target
                 document.querySelector(newValue);   // test the selector
                 this.options.ignoreFrom = newValue;
                 return this;
@@ -4137,7 +4140,7 @@
          | interact(element).allowFrom('.handle');
         \*/
         allowFrom: function (newValue) {
-            if (typeof newValue === 'string') {     // CSS selector to match event.target
+            if (isString(newValue)) {     // CSS selector to match event.target
                 document.querySelector(newValue);   // test the selector
                 this.options.allowFrom = newValue;
                 return this;
@@ -4176,45 +4179,45 @@
 
             if (defaults !== undefined && defaults[option] !== undefined) {
                 if ('objectTypes' in defaults && defaults.objectTypes.test(option)) {
-                    if (value instanceof Object) { return value; }
+                    if (isObject(value)) { return value; }
                     else {
-                        return (option in current && current[option] instanceof Object
+                        return (option in current && isObject(current[option])
                             ? current [option]
                             : defaults[option]);
                     }
                 }
 
                 if ('arrayTypes' in defaults && defaults.arrayTypes.test(option)) {
-                    if (value instanceof Array) { return value; }
+                    if (isArray(value)) { return value; }
                     else {
-                        return (option in current && current[option] instanceof Array
+                        return (option in current && isArray(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
                 }
 
                 if ('stringTypes' in defaults && defaults.stringTypes.test(option)) {
-                    if (typeof value === 'string') { return value; }
+                    if (isString(value)) { return value; }
                     else {
-                        return (option in current && typeof current[option] === 'string'
+                        return (option in current && isString(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
                 }
 
                 if ('numberTypes' in defaults && defaults.numberTypes.test(option)) {
-                    if (typeof value === 'number') { return value; }
+                    if (isNumber(value)) { return value; }
                     else {
-                        return (option in current && typeof current[option] === 'number'
+                        return (option in current && isNumber(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
                 }
 
                 if ('boolTypes' in defaults && defaults.boolTypes.test(option)) {
-                    if (typeof value === 'boolean') { return value; }
+                    if (isBool(value)) { return value; }
                     else {
-                        return (option in current && typeof current[option] === 'boolean'
+                        return (option in current && isBool(current[option])
                             ? current[option]
                             : defaults[option]);
                     }
@@ -4287,7 +4290,7 @@
 
                         // interactable.onevent listener
                         case fireStates.onevent:
-                            if (typeof this[onEvent] === 'function') {
+                            if (isFunction(this[onEvent])) {
                             this[onEvent](iEvent);
                         }
                         break;
@@ -4493,7 +4496,7 @@
          = (object) This Interactablw
         \*/
         set: function (options) {
-            if (!options || typeof options !== 'object') {
+            if (!options || !isObject(options)) {
                 options = {};
             }
             this.options = new IOptions(options);
@@ -4532,7 +4535,7 @@
         unset: function () {
             events.remove(this, 'all');
 
-            if (typeof this.selector !== 'string') {
+            if (!isString(this.selector)) {
                 events.remove(this, 'all');
                 if (this.options.styleCursor) {
                     this._element.style.cursor = '';
@@ -4837,7 +4840,7 @@
      = (number | interact) The current margin value or interact
     \*/
     interact.margin = function (newvalue) {
-        if (typeof newvalue === 'number') {
+        if (isNumber(newvalue)) {
             margin = newvalue;
 
             return interact;
@@ -4856,7 +4859,7 @@
      = (boolean | interact) The current setting of interact
     \*/
     interact.styleCursor = function (newValue) {
-        if (typeof newValue === 'boolean') {
+        if (isBool(newValue)) {
             defaultOptions.styleCursor = newValue;
 
             return interact;
@@ -4879,11 +4882,11 @@
     interact.autoScroll = function (options) {
         var defaults = defaultOptions.autoScroll;
 
-        if (options instanceof Object) {
+        if (isObject(options)) {
             defaultOptions.autoScrollEnabled = true;
 
-            if (typeof (options.margin) === 'number') { defaults.margin = options.margin;}
-            if (typeof (options.speed)  === 'number') { defaults.speed  = options.speed ;}
+            if (isNumber(options.margin)) { defaults.margin = options.margin;}
+            if (isNumber(options.speed) ) { defaults.speed  = options.speed ;}
 
             defaults.container =
                 (isElement(options.container) || options.container instanceof window.Window
@@ -4893,7 +4896,7 @@
             return interact;
         }
 
-        if (typeof options === 'boolean') {
+        if (isBool(options)) {
             defaultOptions.autoScrollEnabled = options;
 
             return interact;
@@ -4941,21 +4944,21 @@
     interact.snap = function (options) {
         var snap = defaultOptions.snap;
 
-        if (options instanceof Object) {
+        if (isObject(options)) {
             defaultOptions.snapEnabled = true;
 
-            if (typeof options.mode    === 'string' ) { snap.mode    = options.mode;    }
-            if (typeof options.endOnly === 'boolean') { snap.endOnly = options.endOnly; }
-            if (typeof options.range   === 'number' ) { snap.range   = options.range;   }
-            if (options.actions       instanceof Array ) { snap.actions       = options.actions;       }
-            if (options.anchors       instanceof Array ) { snap.anchors       = options.anchors;       }
-            if (options.grid          instanceof Object) { snap.grid          = options.grid;          }
-            if (options.gridOffset    instanceof Object) { snap.gridOffset    = options.gridOffset;    }
-            if (options.elementOrigin instanceof Object) { snap.elementOrigin = options.elementOrigin; }
+            if (isString(options.mode)         ) { snap.mode          = options.mode;          }
+            if (isBool  (options.endOnly)      ) { snap.endOnly       = options.endOnly;       }
+            if (isNumber(options.range)        ) { snap.range         = options.range;         }
+            if (isArray (options.actions)      ) { snap.actions       = options.actions;       }
+            if (isArray (options.anchors)      ) { snap.anchors       = options.anchors;       }
+            if (isObject(options.grid)         ) { snap.grid          = options.grid;          }
+            if (isObject(options.gridOffset)   ) { snap.gridOffset    = options.gridOffset;    }
+            if (isObject(options.elementOrigin)) { snap.elementOrigin = options.elementOrigin; }
 
             return interact;
         }
-        if (typeof options === 'boolean') {
+        if (isBool(options)) {
             defaultOptions.snapEnabled = options;
 
             return interact;
@@ -4996,20 +4999,19 @@
     interact.inertia = function (options) {
         var inertia = defaultOptions.inertia;
 
-        if (options instanceof Object) {
+        if (isObject(options)) {
             defaultOptions.inertiaEnabled = true;
 
-            if (typeof options.resistance === 'number') { inertia.resistance = options.resistance;}
-            if (typeof options.minSpeed   === 'number') { inertia.minSpeed   = options.minSpeed  ;}
-            if (typeof options.endSpeed   === 'number') { inertia.endSpeed   = options.endSpeed  ;}
-            if (typeof options.smoothEndDuration === 'number' ) { inertia.smoothEndDuration = options.smoothEndDuration;}
-            if (typeof options.zeroResumeDelta   === 'boolean') { inertia.zeroResumeDelta   = options.zeroResumeDelta  ;}
-
-            if (options.actions instanceof Array) { inertia.actions = options.actions; }
+            if (isNumber(options.resistance)       ) { inertia.resistance        = options.resistance       ; }
+            if (isNumber(options.minSpeed)         ) { inertia.minSpeed          = options.minSpeed         ; }
+            if (isNumber(options.endSpeed)         ) { inertia.endSpeed          = options.endSpeed         ; }
+            if (isNumber(options.smoothEndDuration)) { inertia.smoothEndDuration = options.smoothEndDuration; }
+            if (isBool  (options.zeroResumeDelta)  ) { inertia.zeroResumeDelta   = options.zeroResumeDelta  ; }
+            if (isArray (options.actions)          ) { inertia.actions           = options.actions          ; }
 
             return interact;
         }
-        if (typeof options === 'boolean') {
+        if (isBool(options)) {
             defaultOptions.inertiaEnabled = options;
 
             return interact;
@@ -5068,7 +5070,7 @@
             }
 
             // prevent Default only if were previously interacting
-            if (event && typeof event.preventDefault === 'function') {
+            if (event && isFunction(event.preventDefault)) {
                 checkAndPreventDefault(event, target);
             }
 
@@ -5107,7 +5109,7 @@
      = (boolean | interact) The current setting or interact
     \*/
     interact.dynamicDrop = function (newValue) {
-        if (typeof newValue === 'boolean') {
+        if (isBool(newValue)) {
             //if (dragging && dynamicDrop !== newValue && !newValue) {
                 //calcRects(dropzones);
             //}
@@ -5158,25 +5160,25 @@
             return defaultOptions.restrict;
         }
 
-        if (typeof newValue === 'boolean') {
+        if (isBool(newValue)) {
             defaultOptions.restrictEnabled = newValue;
         }
-        else if (newValue instanceof Object) {
-            if (newValue.drag instanceof Object || /^parent$|^self$/.test(newValue.drag)) {
+        else if (isObject(newValue)) {
+            if (isObject(newValue.drag) || /^parent$|^self$/.test(newValue.drag)) {
                 defaults.drag = newValue.drag;
             }
-            if (newValue.resize instanceof Object || /^parent$|^self$/.test(newValue.resize)) {
+            if (isObject(newValue.resize) || /^parent$|^self$/.test(newValue.resize)) {
                 defaults.resize = newValue.resize;
             }
-            if (newValue.gesture instanceof Object || /^parent$|^self$/.test(newValue.gesture)) {
+            if (isObject(newValue.gesture) || /^parent$|^self$/.test(newValue.gesture)) {
                 defaults.gesture = newValue.gesture;
             }
 
-            if (typeof newValue.endOnly === 'boolean') {
+            if (isBool(newValue.endOnly)) {
                 defaults.endOnly = newValue.endOnly;
             }
 
-            if (newValue.elementRect instanceof Object) {
+            if (isObject(newValue.elementRect)) {
                 defaults.elementRect = newValue.elementRect;
             }
 
@@ -5200,7 +5202,7 @@
      = (number | Interactable) The current setting or interact
     \*/
     interact.pointerMoveTolerance = function (newValue) {
-        if (typeof newValue === 'number') {
+        if (isNumber(newValue)) {
             defaultOptions.pointerMoveTolerance = newValue;
 
             return this;
@@ -5323,7 +5325,7 @@
 
     // For IE8's lack of an Element#matchesSelector
     // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-    if (!(prefixedMatchesSelector in Element.prototype) || typeof (Element.prototype[prefixedMatchesSelector]) !== 'function') {
+    if (!(prefixedMatchesSelector in Element.prototype) || !isFunction(Element.prototype[prefixedMatchesSelector])) {
         ie8MatchesSelector = function (element, selector, elems) {
             elems = elems || element.parentNode.querySelectorAll(selector);
 
