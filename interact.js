@@ -435,10 +435,10 @@
 
         // Events wrapper
         events = (function () {
-            var useAttachEvent = 'attachEvent' in window && !('addEventListener' in window),
-                addEvent = !useAttachEvent?  'addEventListener': 'attachEvent',
-                removeEvent = !useAttachEvent?  'removeEventListener': 'detachEvent',
-                on = useAttachEvent? 'on': '',
+            var useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window),
+                addEvent       = useAttachEvent?  'attachEvent': 'addEventListener',
+                removeEvent    = useAttachEvent?  'detachEvent': 'removeEventListener',
+                on             = useAttachEvent? 'on': '',
 
                 elements          = [],
                 targets           = [],
