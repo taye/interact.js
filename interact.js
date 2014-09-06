@@ -1458,10 +1458,6 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        if (starting && !(event instanceof InteractEvent)) {
-            setEventXY(startCoords, this);
-        }
-
         this.x0        = startCoords.pageX;
         this.y0        = startCoords.pageY;
         this.clientX0  = startCoords.clientX;
