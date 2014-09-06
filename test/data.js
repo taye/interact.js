@@ -28,7 +28,8 @@ window.data = {
             y: -78,
             touches: [
                 { x: -23, y: -78, identifier: 1 }
-            ]
+            ],
+            changed: []
         },
         {
             type: types.down,
@@ -38,7 +39,8 @@ window.data = {
             touches: [
                 { x:  -23, y:  -78, identifier: 1 },
                 { x:  100, y:  100, identifier: 2 }
-            ]
+            ],
+            changed: []
         },
         {
             type: types.move,
@@ -48,7 +50,8 @@ window.data = {
             touches: [
                 { x:  50, y: -50, identifier: 1 },
                 { x: 100, y: 100, identifier: 2 }
-            ]
+            ],
+            changed: []
         },
         {
             type: types.move,
@@ -58,7 +61,8 @@ window.data = {
             touches: [
                 { x:  50, y: -50, identifier: 1 },
                 { x: -50, y:  50, identifier: 2 }
-            ]
+            ],
+            changed: []
         },
         {
             type: types.up,
