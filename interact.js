@@ -622,6 +622,25 @@
         return dest;
     }
 
+    function cloneEvent (event) {
+        var clone = extend({}, event),
+            i;
+
+        if (event.touches) {
+            clone.touches = [];
+            clone.changedTouches = [];
+
+            for (i = 0; i < event.touches.length; i++) {
+                clone.touches.push(extend({}, event.touches[i]));
+            }
+            for (i = 0; i < event.touches.length; i++) {
+                clone.changedTouches.push(extend({}, event.changedTouches[i]));
+            }
+        }
+
+        return clone;
+    }
+
     function setEventXY (targetObj, source) {
         getPageXY(source, tmpXY);
         targetObj.pageX = tmpXY.x;
@@ -1924,7 +1943,8 @@
         else {
             // do these now since pointerDown isn't being called from here
             downTime = new Date().getTime();
-            downEvent = event;
+            downEvent = cloneEvent(event);
+
             setEventXY(prevCoords, event);
             pointerWasMoved = false;
         }
@@ -2001,7 +2021,8 @@
             snapStatus.snappedY = null;
 
             downTime = new Date().getTime();
-            downEvent = event;
+            downEvent = cloneEvent(event);
+
             setEventXY(prevCoords, event);
             pointerWasMoved = false;
 
