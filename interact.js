@@ -208,18 +208,22 @@
         },
 
         snapStatus = {
-            locked : false,
-            x      : 0, y      : 0,
-            dx     : 0, dy     : 0,
-            realX  : 0, realY  : 0,
-            anchors: [],
-            paths  : []
+            x       : 0, y       : 0,
+            dx      : 0, dy      : 0,
+            realX   : 0, realY   : 0,
+            snappedX: 0, snappedY: 0,
+            anchors : [],
+            paths   : [],
+            locked  : false,
+            changed : false
         },
 
         restrictStatus = {
-            dx: 0, dy: 0,
-            snap: snapStatus,
-            restricted: false
+            dx         : 0, dy         : 0,
+            restrictedX: 0, restrictedY: 0,
+            snap       : snapStatus,
+            restricted : false,
+            changed    : false
         },
 
         // Things related to autoScroll
@@ -2015,8 +2019,8 @@
 
             prepared = action;
 
-            snapStatus.snappedX = null;
-            snapStatus.snappedY = null;
+            snapStatus.snappedX = snapStatus.snappedY =
+                restrictStatus.restrictedX = restrictStatus.restrictedY = NaN;
 
             downTime = new Date().getTime();
             downEvent = cloneEvent(event);
@@ -2173,7 +2177,7 @@
             distance = hypot(dx, dy);
 
             inRange = distance < snap.range;
-            snapChanged = (newX !== status.x || newY !== status.y);
+            snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
 
             status.snappedX = newX;
             status.snappedY = newY;
@@ -2248,9 +2252,17 @@
             }
         }
 
-        status.dx = Math.max(Math.min(rect.right  - restrictOffset.right , page.x), rect.left + restrictOffset.left) - page.x;
-        status.dy = Math.max(Math.min(rect.bottom - restrictOffset.bottom, page.y), rect.top  + restrictOffset.top ) - page.y;
-        status.restricted = true;
+        var restrictedX = Math.max(Math.min(rect.right  - restrictOffset.right , page.x), rect.left + restrictOffset.left),
+            restrictedY = Math.max(Math.min(rect.bottom - restrictOffset.bottom, page.y), rect.top  + restrictOffset.top );
+
+        status.dx = restrictedX - page.x;
+        status.dy = restrictedY - page.y;
+
+        status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+        status.restricted = !!(status.dx || status.dy);
+
+        status.restrictedX = restrictedX;
+        status.restrictedY = restrictedY;
 
         return status;
     }
@@ -2365,7 +2377,9 @@
             }
 
             if (prepared && target) {
-                var shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
+                var shouldSnap     = checkSnap(target)     && (!target.options.snap.endOnly     || preEnd),
+                    shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
+
                     starting = !(dragging || resizing || gesturing),
                     snapEvent = starting? downEvent: event;
 
@@ -2407,47 +2421,20 @@
                     }
                 }
 
-                if (!shouldRestrict) {
-                    restrictStatus.restricted = false;
-                }
+                if (shouldSnap    ) { setSnapping   (snapEvent); } else { snapStatus    .locked     = false; } 
+                if (shouldRestrict) { setRestriction(snapEvent); } else { restrictStatus.restricted = false; }
 
-                // check for snap
-                if (checkSnap(target) && (!target.options.snap.endOnly || preEnd)) {
+                var shouldMove = (shouldSnap? (snapStatus.changed || !snapStatus.locked): true)
+                                 && (shouldRestrict? (!restrictStatus.restricted || (restrictStatus.restricted && restrictStatus.changed)): true);
 
-                    setSnapping(snapEvent);
-
-                    // move if snapping doesn't prevent it or a restriction is in place
-                    if ((snapStatus.changed || !snapStatus.locked) || shouldRestrict) {
-
-                        if (shouldRestrict) {
-                            setRestriction(event);
-                        }
-
-                        if (starting) {
-                            prevEvent = actions[prepared].start(downEvent);
-
-                            // set snapping for the next move event
-                            if (target.options.snapEnabled && !target.options.snap.endOnly) {
-                                setSnapping(event);
-                            }
-                        }
-
-                        prevEvent = actions[prepared].move(event);
-                    }
-                }
-                // if no snap, always move
-                else {
-                    if (shouldRestrict) {
-                        setRestriction(event);
-                    }
-
+                // move if snapping or restriction doesn't prevent it
+                if (shouldMove) {
                     if (starting) {
                         prevEvent = actions[prepared].start(downEvent);
 
-                        // set snapping for the next move event
-                        if (target.options.snapEnabled && !target.options.snap.endOnly) {
-                            setSnapping(event);
-                        }
+                        // set snapping and restriction for the move event
+                        if (shouldSnap    ) { setSnapping   (event); }
+                        if (shouldRestrict) { setRestriction(event); }
                     }
 
                     prevEvent = actions[prepared].move(event);
