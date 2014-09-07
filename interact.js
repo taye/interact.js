@@ -626,6 +626,8 @@
         var clone = extend({}, event),
             i;
 
+        clone.constructor = event.constructor;
+
         if (event.touches) {
             clone.touches = [];
             clone.changedTouches = [];
