@@ -2818,6 +2818,8 @@
                 inertiaPossible = false,
                 inertia = false,
                 smoothEnd = false,
+                endSnap = checkSnap(target) && options.snap.endOnly,
+                endRestrict = checkRestrict(target) && options.restrict.endOnly,
                 dx = 0,
                 dy = 0,
                 startEvent;
@@ -2833,28 +2835,29 @@
                        && pointerSpeed > inertiaOptions.minSpeed
                        && pointerSpeed > inertiaOptions.endSpeed);
 
-            if (inertiaPossible && !inertia
-                && ((options.snapEnabled && options.snap.endOnly
-                    && contains(options.snap.actions, prepared))
-                    || (options.restrictEnabled && options.restrict.endOnly))) {
+            if (inertiaPossible && !inertia && (endSnap || endRestrict)) {
 
                 var snapRestrict = {};
 
                 snapRestrict.snap = snapRestrict.restrict = snapRestrict;
 
-                setSnapping(event, snapRestrict);
-                if (snapRestrict.locked) {
-                    dx += snapRestrict.dx;
-                    dy += snapRestrict.dy;
+                if (endSnap) {
+                    setSnapping(event, snapRestrict);
+                    if (snapRestrict.locked) {
+                        dx += snapRestrict.dx;
+                        dy += snapRestrict.dy;
+                    }
                 }
 
-                setRestriction(event, snapRestrict);
-                if (snapRestrict.restricted) {
-                    dx += snapRestrict.dx;
-                    dy += snapRestrict.dy;
+                if (endRestrict) {
+                    setRestriction(event, snapRestrict);
+                    if (snapRestrict.restricted) {
+                        dx += snapRestrict.dx;
+                        dy += snapRestrict.dy;
+                    }
                 }
 
-                if ((snapRestrict.locked || snapRestrict.restricted) && (dx || dy)) {
+                if (dx || dy) {
                     smoothEnd = true;
                 }
             }
@@ -2903,9 +2906,7 @@
 
                     dx = dy = 0;
 
-                    if (options.snapEnabled && options.snap.endOnly
-                        && contains(options.snap.actions, prepared)) {
-
+                    if (endSnap) {
                         var snap = setSnapping(event, statusObject);
 
                         if (snap.locked) {
@@ -2914,7 +2915,7 @@
                         }
                     }
 
-                    if (checkRestrict(target) && target.options.restrict.endOnly) {
+                    if (endRestrict) {
                         var restrict = setRestriction(event, statusObject);
 
                         if (restrict.restricted) {
@@ -2942,8 +2943,7 @@
                 return;
             }
 
-            if ((checkSnap(target) && target.options.snap.endOnly)
-                || (checkRestrict(target) && target.options.restrict.endOnly)) {
+            if (endSnap || endRestrict) {
                 // fire a move event at the snapped coordinates
                 pointerMove(event, true);
             }
