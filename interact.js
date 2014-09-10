@@ -1369,10 +1369,10 @@
         if (dragEvent.type === 'dragend' && dropTarget) {
             dropEvent = new InteractEvent(pointerEvent, 'drop', null, dropElement, dragEvent.target);
         }
-        if (dragEvent.type === 'dragmove' && starting) {
+        if (dragEvent.type === 'dragstart') {
             dropActivateEvent = new InteractEvent(pointerEvent, 'drop', 'activate', null, dragEvent.target);
         }
-        if (dragEvent.type === 'dragend' && !starting) {
+        if (dragEvent.type === 'dragend') {
             dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
         }
         if (dragEvent.type === 'dragmove' && dropTarget) {
@@ -2554,6 +2554,12 @@
             setActiveDrops(target._element);
         }
 
+        var dropEvents = getDropEvents(event, dragEvent);
+
+        if (dropEvents.activate) {
+            fireActiveDrops(dropEvents.activate); 
+        }
+
         return dragEvent;
     }
 
@@ -2575,9 +2581,6 @@
 
         target.fire(dragEvent);
 
-        if (dropEvents.activate) {
-            fireActiveDrops(dropEvents.activate); 
-        }
         if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
         if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
         if (dropEvents.move ) {     dropTarget.fire(dropEvents.move ); }
