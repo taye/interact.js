@@ -1,11 +1,11 @@
 /**
- * interact.js v1.0.24
+ * interact.js v1.0.25
  *
  * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function (window) {
+(function () {
     'use strict';
 
     var document           = window.document,
@@ -2421,7 +2421,7 @@
                     }
                 }
 
-                if (shouldSnap    ) { setSnapping   (snapEvent); } else { snapStatus    .locked     = false; } 
+                if (shouldSnap    ) { setSnapping   (snapEvent); } else { snapStatus    .locked     = false; }
                 if (shouldRestrict) { setRestriction(snapEvent); } else { restrictStatus.restricted = false; }
 
                 var shouldMove = (shouldSnap? (snapStatus.changed || !snapStatus.locked): true)
@@ -2557,7 +2557,7 @@
         var dropEvents = getDropEvents(event, dragEvent);
 
         if (dropEvents.activate) {
-            fireActiveDrops(dropEvents.activate); 
+            fireActiveDrops(dropEvents.activate);
         }
 
         return dragEvent;
@@ -5383,4 +5383,4 @@
         window.interact = interact;
     }
 
-} (this));
+} ());
