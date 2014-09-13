@@ -30,6 +30,11 @@
         "mocha": "*",
         "chai": "*"
     },
+    "moduleType": [
+        "amd",
+        "globals",
+        "node"
+    ],
     "license": "MIT",
     "ignore": [
         ".*",
