@@ -1345,7 +1345,7 @@
         };
     }
 
-    function getDropEvents (pointerEvent, dragEvent, starting) {
+    function getDropEvents (pointerEvent, dragEvent) {
         var dragLeaveEvent = null,
             dragEnterEvent = null,
             dropActivateEvent = null,
