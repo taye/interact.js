@@ -1357,32 +1357,42 @@
             // if there was a prevDropTarget, create a dragleave event
             if (prevDropTarget) {
                 dragLeaveEvent = new InteractEvent(pointerEvent, 'drag', 'leave', prevDropElement, dragEvent.target);
+                dragLeaveEvent.draggable = dragEvent.interactable;
                 dragEvent.dragLeave = prevDropElement;
+                dragEvent.prevDropzone = prevDropTarget;
             }
             // if the dropTarget is not null, create a dragenter event
             if (dropTarget) {
                 dragEnterEvent = new InteractEvent(pointerEvent, 'drag', 'enter', dropElement, dragEvent.target);
+                dragEnterEvent.draggable = dragEvent.interactable;
                 dragEvent.dragEnter = dropElement;
+                dragEvent.dropzone = dropTarget;
             }
         }
 
         if (dragEvent.type === 'dragend' && dropTarget) {
             dropEvent = new InteractEvent(pointerEvent, 'drop', null, dropElement, dragEvent.target);
+            dropEvent.draggable = dragEvent.interactable;
+            dragEvent.dropzone = dropTarget;
         }
         if (dragEvent.type === 'dragstart') {
             dropActivateEvent = new InteractEvent(pointerEvent, 'drop', 'activate', null, dragEvent.target);
+            dropActivateEvent.draggable = dragEvent.interactable;
         }
         if (dragEvent.type === 'dragend') {
             dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
+            dropDectivateEvent.draggable = dragEvent.interactable;
         }
         if (dragEvent.type === 'dragmove' && dropTarget) {
             dropMoveEvent = {
                 target       : dropElement,
                 relatedTarget: dragEvent.target,
+                draggable    : dragEvent.interactable,
                 dragmove     : dragEvent,
                 type         : 'dropmove',
                 timeStamp    : dragEvent.timeStamp
             };
+            dragEvent.dropzone = dropTarget;
         }
 
         return {
