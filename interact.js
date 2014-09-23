@@ -137,6 +137,7 @@
             dragAxis    : 'xy',
             dropzone    : false,
             accept      : null,
+            dropOverlap : 'pointer',
             resizable   : false,
             squareResize: false,
             resizeAxis  : 'xy',
@@ -3304,6 +3305,13 @@
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
+                if (/^(pointer|center)$/.test(options.overlap)) {
+                    this.options.dropOverlap = options.overlap;
+                }
+                else if (isNumber(options.overlap)) {
+                    this.options.dropOverlap = Math.max(Math.min(1, options.overlap), 0);
+                }
+
                 this._dropElements = this.selector? null: [this._element];
                 dropzones.push(this);
 
@@ -3353,18 +3361,39 @@
                 return false;
             }
 
-            var page = getPageXY(event),
-                origin = getOriginXY(draggable, draggableElement),
-                horizontal,
-                vertical;
+            var dropOverlap = this.options.dropOverlap;
 
-            page.x += origin.x;
-            page.y += origin.y;
+            if (dropOverlap === 'pointer') {
+                var page = getPageXY(event),
+                    origin = getOriginXY(draggable, draggableElement),
+                    horizontal,
+                    vertical;
 
-            horizontal = (page.x > rect.left) && (page.x < rect.right);
-            vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
+                page.x += origin.x;
+                page.y += origin.y;
 
-            return horizontal && vertical;
+                horizontal = (page.x > rect.left) && (page.x < rect.right);
+                vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
+
+                return horizontal && vertical;
+            }
+
+            var dragRect = draggable.getRect(draggableElement);
+
+            if (dropOverlap === 'center') {
+                var cx = dragRect.left + dragRect.width  / 2,
+                    cy = dragRect.top  + dragRect.height / 2;
+
+                return cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
+            }
+
+            if (isNumber(dropOverlap)) {
+                var overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
+                                  * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top ))),
+                    overlapRatio = overlapArea / (dragRect.width * dragRect.height);
+
+                return overlapRatio >= dropOverlap;
+            }
         },
 
         /*\
