@@ -3296,7 +3296,25 @@
          * Returns or sets whether elements can be dropped onto this
          * Interactable to trigger drop events
          *
+         * Dropzones can recieve the following events:
+         *  - `dragactivate` and `dragdeactivate` when an acceptable drag starts and ends
+         *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+         *  - `drop` when a draggable is dropped into this dropzone
+         *
+         *  Use the `accept` option to allow only elements that match the given CSS selector or element.
+         *
+         *  Use the `overlap` option to set how drops are checked for. The allowed values are:
+         *   - `'pointer'`, the pointer must be over the dropzone (default)
+         *   - `'center'`, the draggable element's center must be over the dropzone
+         *   - a number from 0-1 which is the `(intersetion area) / (draggable area)`.
+         *       e.g. `0.5` for drop to happen when half of the area of the
+         *       draggable is over the dropzone
+         *
          - options (boolean | object | null) #optional The new value to be set.
+         | interact('.drop').dropzone({
+         |   accept: '.can-drop' || document.getElementById('single-drop'),
+         |   overlap: 'pointer' || 'center' || zeroToOne
+         | }
          = (boolean | object) The current setting or this Interactable
         \*/
         dropzone: function (options) {
