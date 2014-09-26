@@ -3206,11 +3206,16 @@
         setOnEvents: function (action, phases) {
             if (action === 'drop') {
                 var drop            = phases.ondrop             || phases.onDrop            || phases.drop,
-                    dropactivate    = phases.ondropactivate     || phases.onDropActivate    || phases.dropactivate,
-                    dropdeactivate  = phases.ondropdeactivate   || phases.onDropDeactivate  || phases.dropdeactivate,
-                    dragenter       = phases.ondragenter        || phases.onDropEnter       || phases.dragenter,
-                    dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave,
-                    dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove;
+                    dropactivate    = phases.ondropactivate     || phases.onDropActivate    || phases.dropactivate
+                                   || phases.onactivate         || phases.onActivate        || phases.activate,
+                    dropdeactivate  = phases.ondropdeactivate   || phases.onDropDeactivate  || phases.dropdeactivate
+                                   || phases.ondeactivate       || phases.onDeactivate      || phases.deactivate,
+                    dragenter       = phases.ondragenter        || phases.onDropEnter       || phases.dragenter
+                                   || phases.onenter            || phases.onEnter           || phases.enter,
+                    dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave
+                                   || phases.onleave            || phases.onLeave           || phases.leave,
+                    dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove
+                                   || phases.onmove             || phases.onMove            || phases.move;
 
                 if (isFunction(drop)          ) { this.ondrop           = drop          ; }
                 if (isFunction(dropactivate)  ) { this.ondropactivate   = dropactivate  ; }
