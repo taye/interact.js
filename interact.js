@@ -84,12 +84,6 @@
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
 
-        activeDrops     = {
-            dropzones: [],      // the dropzones that are mentioned below
-            elements : [],      // elements of dropzones that accept the target draggable
-            rects    : []       // the rects of the elements mentioned above
-        },
-
         matches         = [],   // all selectors that are matched by target element
         selectorGesture = null, // MSGesture object for selector PointerEvents
 
@@ -1181,6 +1175,13 @@
 
         this.boundInertiaFrame = this.inertiaFrame.bind(this);
         this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
+
+        this.activeDrops = {
+            dropzones: [],      // the dropzones that are mentioned below
+            elements : [],      // elements of dropzones that accept the target draggable
+            rects    : []       // the rects of the elements mentioned above
+        };
+
     }
 
     Interaction.prototype = {
@@ -1233,9 +1234,9 @@
                 prevElement;
 
             // loop through all active dropzones and trigger event
-            for (i = 0; i < activeDrops.dropzones.length; i++) {
-                current = activeDrops.dropzones[i];
-                currentElement = activeDrops.elements [i];
+            for (i = 0; i < this.activeDrops.dropzones.length; i++) {
+                current = this.activeDrops.dropzones[i];
+                currentElement = this.activeDrops.elements [i];
 
                 // prevent trigger of duplicate events on same element
                 if (currentElement !== prevElement) {
@@ -1254,12 +1255,12 @@
             // get dropzones and their elements that could recieve the draggable
             var possibleDrops = this.collectDrops(dragElement, true);
 
-            activeDrops.dropzones = possibleDrops.dropzones;
-            activeDrops.elements  = possibleDrops.elements;
-            activeDrops.rects     = [];
+            this.activeDrops.dropzones = possibleDrops.dropzones;
+            this.activeDrops.elements  = possibleDrops.elements;
+            this.activeDrops.rects     = [];
 
-            for (var i = 0; i < activeDrops.dropzones.length; i++) {
-                activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
+            for (var i = 0; i < this.activeDrops.dropzones.length; i++) {
+                this.activeDrops.rects[i] = this.activeDrops.dropzones[i].getRect(this.activeDrops.elements[i]);
             }
         },
 
@@ -1271,10 +1272,10 @@
             }
 
             // collect all dropzones and their elements which qualify for a drop
-            for (var j = 0; j < activeDrops.dropzones.length; j++) {
-                var current        = activeDrops.dropzones[j],
-                    currentElement = activeDrops.elements [j],
-                    rect           = activeDrops.rects    [j];
+            for (var j = 0; j < this.activeDrops.dropzones.length; j++) {
+                var current        = this.activeDrops.dropzones[j],
+                    currentElement = this.activeDrops.elements [j],
+                    rect           = this.activeDrops.rects    [j];
 
                 validDrops.push(current.dropCheck(event, this.target, dragElement, rect)
                                 ? currentElement
@@ -1283,8 +1284,8 @@
 
             // get the most apprpriate dropzone based on DOM depth and order
             var dropIndex = indexOfDeepestElement(validDrops),
-                dropzone  = activeDrops.dropzones[dropIndex] || null,
-                element   = activeDrops.elements [dropIndex] || null;
+                dropzone  = this.activeDrops.dropzones[dropIndex] || null,
+                element   = this.activeDrops.elements [dropIndex] || null;
 
             if (dropzone && dropzone.selector) {
                 dropzone._element = element;
@@ -1385,7 +1386,7 @@
                 }
 
                 if (dragging) {
-                    activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
+                    this.activeDrops.dropzones = this.activeDrops.elements = this.activeDrops.rects = null;
 
                     for (var i = 0; i < dropzones.length; i++) {
                         if (dropzones[i].selector) {
@@ -2628,9 +2629,9 @@
         interaction.target.fire(dragEvent);
 
         // reset active dropzones
-        activeDrops.dropzones = [];
-        activeDrops.elements  = [];
-        activeDrops.rects     = [];
+        interaction.activeDrops.dropzones = [];
+        interaction.activeDrops.elements  = [];
+        interaction.activeDrops.rects     = [];
 
         if (!dynamicDrop) {
             interaction.setActiveDrops(interaction.target._element);
