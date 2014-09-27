@@ -68,30 +68,6 @@
 
         tmpXY = {},     // reduce object creation in getXY()
 
-        inertiaStatus = {
-            active       : false,
-            smoothEnd    : false,
-            target       : null,
-            targetElement: null,
-
-            startEvent: null,
-            pointerUp : {},
-
-            xe: 0, ye: 0,
-            sx: 0, sy: 0,
-
-            t0: 0,
-            vx0: 0, vys: 0,
-            duration: 0,
-
-            resumeDx: 0,
-            resumeDy: 0,
-
-            lambda_v0: 0,
-            one_ve_v0: 0,
-            i  : null
-        },
-
         gesture = {
             start: { x: 0, y: 0 },
 
@@ -706,10 +682,10 @@
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                getPageXY(inertiaStatus.pointerUp, page);
+                getPageXY(interaction.inertiaStatus.pointerUp, page);
 
-                page.x += inertiaStatus.sx;
-                page.y += inertiaStatus.sy;
+                page.x += interaction.inertiaStatus.sx;
+                page.y += interaction.inertiaStatus.sy;
             }
             else {
                 page.x = event.pageX;
@@ -742,10 +718,10 @@
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                getClientXY(inertiaStatus.pointerUp, client);
+                getClientXY(interaction.inertiaStatus.pointerUp, client);
 
-                client.x += inertiaStatus.sx;
-                client.y += inertiaStatus.sy;
+                client.x += interaction.inertiaStatus.sx;
+                client.y += interaction.inertiaStatus.sy;
             }
             else {
                 client.x = event.clientX;
@@ -936,66 +912,6 @@
 
         status.lambda_v0 = lambda / status.v0;
         status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
-    }
-
-    function inertiaFrame () {
-        var options = inertiaStatus.target.options.inertia,
-            lambda = options.resistance,
-            t = new Date().getTime() / 1000 - inertiaStatus.t0;
-
-        if (t < inertiaStatus.te) {
-
-            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
-
-            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
-                inertiaStatus.sx = inertiaStatus.xe * progress;
-                inertiaStatus.sy = inertiaStatus.ye * progress;
-            }
-            else {
-                var quadPoint = getQuadraticCurvePoint(
-                        0, 0,
-                        inertiaStatus.xe, inertiaStatus.ye,
-                        inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
-                        progress);
-
-                inertiaStatus.sx = quadPoint.x;
-                inertiaStatus.sy = quadPoint.y;
-            }
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.i = reqFrame(inertiaFrame);
-        }
-        else {
-            inertiaStatus.sx = inertiaStatus.modifiedXe;
-            inertiaStatus.sy = inertiaStatus.modifiedYe;
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.active = false;
-            pointerUp(inertiaStatus.startEvent);
-        }
-    }
-
-    function smoothEndFrame () {
-        var t = new Date().getTime() - inertiaStatus.t0,
-            duration = inertiaStatus.target.options.inertia.smoothEndDuration;
-
-        if (t < duration) {
-            inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
-            inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.i = reqFrame(smoothEndFrame);
-        }
-        else {
-            inertiaStatus.active = false;
-            inertiaStatus.smoothEnd = false;
-
-            pointerMove(inertiaStatus.startEvent);
-            pointerUp(inertiaStatus.startEvent);
-        }
     }
 
     function _getQBezierValue(t, p1, p2, p3) {
@@ -1239,6 +1155,32 @@
         this.prevDropTarget  = null; // the dropzone that was recently dragged away from
         this.prevDropElement = null; // the element at the time of checking
 
+        this.inertiaStatus = {
+            active       : false,
+            smoothEnd    : false,
+            target       : null,
+            targetElement: null,
+
+            startEvent: null,
+            pointerUp : {},
+
+            xe: 0, ye: 0,
+            sx: 0, sy: 0,
+
+            t0: 0,
+            vx0: 0, vys: 0,
+            duration: 0,
+
+            resumeDx: 0,
+            resumeDy: 0,
+
+            lambda_v0: 0,
+            one_ve_v0: 0,
+            i  : null
+        };
+
+        this.boundInertiaFrame = this.inertiaFrame.bind(this);
+        this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
     }
 
     Interaction.prototype = {
@@ -1420,7 +1362,110 @@
             }
 
             this.dropTarget = this.dropElement = this.prevDropTarget = this.prevDropElement = null;
-        }
+        },
+
+        stop: function (event) {
+            if (dragging || resizing || gesturing) {
+                autoScroll.stop();
+                matches = [];
+
+                var target = interaction.target;
+
+                if (target.options.styleCursor) {
+                    document.documentElement.style.cursor = '';
+                }
+
+                if (target._gesture) {
+                    target._gesture.stop();
+                }
+
+                // prevent Default only if were previously interacting
+                if (event && isFunction(event.preventDefault)) {
+                    checkAndPreventDefault(event, target);
+                }
+
+                if (dragging) {
+                    activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
+
+                    for (var i = 0; i < dropzones.length; i++) {
+                        if (dropzones[i].selector) {
+                            dropzones[i]._dropElements = null;
+                        }
+                    }
+                }
+
+                interaction.clearTargets();
+            }
+
+            pointerIds.splice(0);
+            pointerMoves.splice(0);
+
+            pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
+            prepared = prevEvent = null;
+            interaction.inertiaStatus.resumeDx = interaction.inertiaStatus.resumeDy = 0;
+        },
+
+        inertiaFrame: function () {
+            var inertiaStatus = interaction.inertiaStatus,
+                options = inertiaStatus.target.options.inertia,
+                lambda = options.resistance,
+                t = new Date().getTime() / 1000 - inertiaStatus.t0;
+
+            if (t < inertiaStatus.te) {
+
+                var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
+
+                if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
+                    inertiaStatus.sx = inertiaStatus.xe * progress;
+                    inertiaStatus.sy = inertiaStatus.ye * progress;
+                }
+                else {
+                    var quadPoint = getQuadraticCurvePoint(
+                            0, 0,
+                            inertiaStatus.xe, inertiaStatus.ye,
+                            inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
+                            progress);
+
+                    inertiaStatus.sx = quadPoint.x;
+                    inertiaStatus.sy = quadPoint.y;
+                }
+
+                pointerMove(inertiaStatus.startEvent);
+
+                inertiaStatus.i = reqFrame(this.boundInertiaFrame);
+            }
+            else {
+                inertiaStatus.sx = inertiaStatus.modifiedXe;
+                inertiaStatus.sy = inertiaStatus.modifiedYe;
+
+                pointerMove(inertiaStatus.startEvent);
+
+                inertiaStatus.active = false;
+                pointerUp(inertiaStatus.startEvent);
+            }
+        },
+
+        smoothEndFrame: function () {
+            var inertiaStatus = interaction.inertiaStatus,
+                t = new Date().getTime() - inertiaStatus.t0,
+                duration = inertiaStatus.target.options.inertia.smoothEndDuration;
+
+            if (t < duration) {
+                inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
+                inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
+
+                pointerMove(inertiaStatus.startEvent);
+
+                inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
+            }
+            else {
+                inertiaStatus.active = false;
+                inertiaStatus.smoothEnd = false;
+
+                pointerMove(inertiaStatus.startEvent);
+                pointerUp(inertiaStatus.startEvent);
+            }
+        },
 
     };
 
@@ -1510,6 +1555,8 @@
         this.type      = action + (phase || '');
 
         this.interactable = target;
+
+        var inertiaStatus = interaction.inertiaStatus;
 
         if (inertiaStatus.active) {
             this.detail = 'inertia';
@@ -1913,18 +1960,18 @@
         addPointer(event);
 
         // Check if the down event hits the current inertia target
-        if (inertiaStatus.active && interaction.target.selector) {
+        if (interaction.inertiaStatus.active && interaction.target.selector) {
             // climb up the DOM tree from the event target
             while (element && element !== document) {
 
                 // if this element is the current inertia target element
-                if (element === inertiaStatus.targetElement
+                if (element === interaction.inertiaStatus.targetElement
                     // and the prospective action is the same as the ongoing one
                     && validateAction(interaction.target.getAction(event)) === prepared) {
 
                     // stop inertia so that the next move will be a normal one
-                    cancelFrame(inertiaStatus.i);
-                    inertiaStatus.active = false;
+                    cancelFrame(interaction.inertiaStatus.i);
+                    interaction.inertiaStatus.active = false;
 
                     // add the pointer to the gesture object
                     addPointer(event, selectorGesture);
@@ -2064,13 +2111,13 @@
             checkAndPreventDefault(event, target);
         }
         // if inertia is active try to resume action
-        else if (inertiaStatus.active
-            && event.currentTarget === inertiaStatus.targetElement
-            && target === inertiaStatus.target
+        else if (interaction.inertiaStatus.active
+            && event.currentTarget === interaction.inertiaStatus.targetElement
+            && target === interaction.inertiaStatus.target
             && validateAction(target.getAction(event)) === prepared) {
 
-            cancelFrame(inertiaStatus.i);
-            inertiaStatus.active = false;
+            cancelFrame(interaction.inertiaStatus.i);
+            interaction.inertiaStatus.active = false;
 
             if (PointerEvent) {
                 if (!target._gesture.target) {
@@ -2109,8 +2156,8 @@
             page.y -= origin.y;
         }
 
-        page.x -= inertiaStatus.resumeDx;
-        page.y -= inertiaStatus.resumeDy;
+        page.x -= interaction.inertiaStatus.resumeDx;
+        page.y -= interaction.inertiaStatus.resumeDy;
 
         status.realX = page.x;
         status.realY = page.y;
@@ -2247,8 +2294,8 @@
             page.y += status.snap.dy || 0;
         }
 
-        page.x -= inertiaStatus.resumeDx;
-        page.y -= inertiaStatus.resumeDy;
+        page.x -= interaction.inertiaStatus.resumeDx;
+        page.y -= interaction.inertiaStatus.resumeDy;
 
         status.dx = 0;
         status.dy = 0;
@@ -2328,7 +2375,7 @@
 
         if (pointerWasMoved
             // ignore movement while inertia is active
-            && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
+            && (!interaction.inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
 
             // if just starting an action, calculate the pointer speed now
             if (!(dragging || resizing || gesturing)) {
@@ -2846,11 +2893,12 @@
         var endEvent,
             target = interaction.target,
             options = target && target.options,
-            inertiaOptions = options && options.inertia;
+            inertiaOptions = options && options.inertia,
+            inertiaStatus = interaction.inertiaStatus;
 
         if (dragging || resizing || gesturing) {
 
-            if (inertiaStatus.active) { return; }
+            if (interaction.inertiaStatus.active) { return; }
 
             var deltaSource = options.deltaSource,
                 pointerSpeed = pointerDelta[deltaSource + 'Speed'],
@@ -2967,7 +3015,7 @@
                     inertiaStatus.modifiedXe += dx;
                     inertiaStatus.modifiedYe += dy;
 
-                    inertiaStatus.i = reqFrame(inertiaFrame);
+                    inertiaStatus.i = reqFrame(interaction.boundInertiaFrame);
                 }
                 else {
                     inertiaStatus.smoothEnd = true;
@@ -2976,7 +3024,7 @@
 
                     inertiaStatus.sx = inertiaStatus.sy = 0;
 
-                    inertiaStatus.i = reqFrame(smoothEndFrame);
+                    inertiaStatus.i = reqFrame(interaction.boundSmoothEndFrame);
                 }
 
                 inertiaStatus.active = true;
@@ -4868,7 +4916,7 @@
 
             snap                  : snapStatus,
             restrict              : restrictStatus,
-            inertia               : inertiaStatus,
+            inertia               : interaction.inertiaStatus,
 
             downTime              : downTime,
             downEvent             : downEvent,
@@ -5134,44 +5182,7 @@
      = (object) interact
     \*/
     interact.stop = function (event) {
-        if (dragging || resizing || gesturing) {
-            autoScroll.stop();
-            matches = [];
-
-            var target = interaction.target;
-
-            if (target.options.styleCursor) {
-                document.documentElement.style.cursor = '';
-            }
-
-            if (target._gesture) {
-                target._gesture.stop();
-            }
-
-            // prevent Default only if were previously interacting
-            if (event && isFunction(event.preventDefault)) {
-                checkAndPreventDefault(event, target);
-            }
-
-            if (dragging) {
-                activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
-
-                for (var i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].selector) {
-                        dropzones[i]._dropElements = null;
-                    }
-                }
-            }
-
-            interaction.clearTargets();
-        }
-
-        pointerIds.splice(0);
-        pointerMoves.splice(0);
-
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        prepared = prevEvent = null;
-        inertiaStatus.resumeDx = inertiaStatus.resumeDy = 0;
+        interaction.stop(event);
 
         return interact;
     };
