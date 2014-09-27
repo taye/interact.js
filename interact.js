@@ -31,9 +31,6 @@
 
         dynamicDrop     = false,
 
-        matches         = [],   // all selectors that are matched by target element
-        selectorGesture = null, // MSGesture object for selector PointerEvents
-
         // {
         //      type: {
         //          selectors: ['selector', ...],
@@ -251,9 +248,6 @@
             resize : true,
             gesture: true
         },
-
-        // Action that's ready to be fired on next move event
-        prepared = null,
 
         // because Webkit and Opera still use 'mousewheel' event type
         wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
@@ -912,7 +906,7 @@
             // and dragging can only start from a certain direction - this allows
             // a touch to pan the viewport if a drag isn't in the right direction
             if (/down|start/i.test(event.type)
-                && prepared === 'drag' && options.dragAxis !== 'xy') {
+                && interaction.prepared === 'drag' && options.dragAxis !== 'xy') {
 
                 return;
             }
@@ -938,7 +932,7 @@
     function checkSnap (interactable, action) {
         var options = interactable.options;
 
-        action = action || prepared;
+        action = action || interaction.prepared;
 
         if (/^resize/.test(action)) {
             action = 'resize';
@@ -950,7 +944,7 @@
     function checkRestrict (interactable, action) {
         var options = interactable.options;
 
-        action = action || prepared;
+        action = action || interaction.prepared;
 
         if (/^resize/.test(action)) {
             action = 'resize';
@@ -1069,6 +1063,10 @@
         this.prevDropTarget  = null; // the dropzone that was recently dragged away from
         this.prevDropElement = null; // the element at the time of checking
 
+        this.prepared        = null; // Action that's ready to be fired on next move event
+
+        this.matches         = [];   // all selectors that are matched by target element
+
         this.inertiaStatus = {
             active       : false,
             smoothEnd    : false,
@@ -1185,11 +1183,16 @@
         this.resizing        = false;
         this.resizeAxes      = 'xy';
 
+        // MSGesture object for selector PointerEvents
+        if (PointerEvent) {
+            this.selectorGesture = new Gesture();
+            this.selectorGesture.target = document.documentElement;
+        }
     }
 
     Interaction.prototype = {
         pointerOver: function (event) {
-            if (prepared) { return; }
+            if (this.prepared) { return; }
 
             var curMatches = [],
                 prevTargetElement = this.target && this.target._element,
@@ -1202,7 +1205,7 @@
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
-                matches = [];
+                this.matches = [];
             }
 
             var elementInteractable = interactables.get(eventTarget),
@@ -1227,15 +1230,15 @@
 
             if (elementAction) {
                 this.target = elementInteractable;
-                matches = [];
+                this.matches = [];
             }
             else {
                 interactables.forEachSelector(pushCurMatches);
 
                 if (validateSelector(event, curMatches)) {
-                    matches = curMatches;
+                    this.matches = curMatches;
 
-                    pointerHover(event, matches);
+                    pointerHover(event, this.matches);
                     events.addToElement(eventTarget, 'mousemove', pointerHover);
                 }
                 else if (this.target) {
@@ -1244,16 +1247,16 @@
                     if (contains(prevTargetChildren, eventTarget)) {
 
                         // reset the elements of the matches to the old target
-                        for (var i = 0; i < matches.length; i++) {
-                            matches[i]._element = prevTargetElement;
+                        for (var i = 0; i < this.matches.length; i++) {
+                            this.matches[i]._element = prevTargetElement;
                         }
 
-                        pointerHover(event, matches);
+                        pointerHover(event, this.matches);
                         events.addToElement(this.target._element, 'mousemove', pointerHover);
                     }
                     else {
                         this.target = null;
-                        matches = [];
+                        this.matches = [];
                     }
                 }
             }
@@ -1262,7 +1265,7 @@
         pointerHover: function (event, matches) {
             var target = this.target;
 
-            if (!prepared) {
+            if (!this.prepared) {
 
                 var action;
 
@@ -1282,13 +1285,13 @@
                     }
                 }
             }
-            else if (prepared) {
+            else if (this.prepared) {
                 checkAndPreventDefault(event, target);
             }
         },
 
         pointerOut: function (event) {
-            if (prepared) { return; }
+            if (this.prepared) { return; }
 
             // Remove temporary event listeners for selector Interactables
             var eventTarget = (event.target instanceof SVGElementInstance
@@ -1305,7 +1308,7 @@
         },
 
         selectorDown: function (event) {
-            if (prepared && this.downEvent && event.type !== this.downEvent.type) {
+            if (this.prepared && this.downEvent && event.type !== this.downEvent.type) {
                 checkAndPreventDefault(event, this.target);
                 return;
             }
@@ -1335,14 +1338,14 @@
                     // if this element is the current inertia target element
                     if (element === this.inertiaStatus.targetElement
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(event)) === prepared) {
+                        && validateAction(this.target.getAction(event)) === this.prepared) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
                         this.inertiaStatus.active = false;
 
                         // add the pointer to the gesture object
-                        addPointer(event, selectorGesture);
+                        addPointer(event, this.selectorGesture);
 
                         return;
                     }
@@ -1355,6 +1358,8 @@
                 return;
             }
 
+            var that = this;
+
             function pushMatches (interactable, selector, context) {
                 var elements = ie8MatchesSelector
                     ? context.querySelectorAll(selector)
@@ -1366,26 +1371,26 @@
                     && matchesSelector(element, selector, elements)) {
 
                     interactable._element = element;
-                    matches.push(interactable);
+                    that.matches.push(interactable);
                 }
             }
 
-            if (matches.length && /mousedown|pointerdown/i.test(event.type)) {
-                action = validateSelector(event, matches);
+            if (this.matches.length && /mousedown|pointerdown/i.test(event.type)) {
+                action = validateSelector(event, this.matches);
             }
             else {
                 while (element && element !== document && !action) {
-                    matches = [];
+                    this.matches = [];
 
                     interactables.forEachSelector(pushMatches);
 
-                    action = validateSelector(event, matches);
+                    action = validateSelector(event, this.matches);
                     element = element.parentNode;
                 }
             }
 
             if (action) {
-                prepared = action;
+                this.prepared = action;
 
                 return pointerDown(event, action);
             }
@@ -1414,7 +1419,7 @@
             // the same if a target was set by the first touch
             // Otherwise, set the target if there is no action prepared
             if ((((event.touches && event.touches.length < 2) || (this.pointerIds && this.pointerIds.length < 2)) && !this.target)
-                || !prepared) {
+                || !this.prepared) {
 
                 var interactable = interactables.get(event.currentTarget);
 
@@ -1463,7 +1468,7 @@
                             action = null;
                 }
 
-                prepared = action;
+                this.prepared = action;
 
                 this.snapStatus.snappedX = this.snapStatus.snappedY =
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
@@ -1480,7 +1485,7 @@
             else if (this.inertiaStatus.active
                 && event.currentTarget === this.inertiaStatus.targetElement
                 && target === this.inertiaStatus.target
-                && validateAction(target.getAction(event)) === prepared) {
+                && validateAction(target.getAction(event)) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1513,7 +1518,7 @@
             }
 
             // return if there is no prepared action
-            if (!prepared
+            if (!this.prepared
                 // or this is a mousemove event but the down event was a touch
                 || (event.type === 'mousemove' && this.downEvent.type === 'touchstart')) {
 
@@ -1529,7 +1534,7 @@
                     setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
                     // check if a drag is in the correct axis
-                    if (prepared === 'drag') {
+                    if (this.prepared === 'drag') {
                         var absX = Math.abs(dx),
                             absY = Math.abs(dy),
                             targetAxis = this.target.options.dragAxis,
@@ -1538,7 +1543,7 @@
                         // if the movement isn't in the axis of the interactable
                         if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
                             // cancel the prepared action
-                            prepared = null;
+                            this.prepared = null;
 
                             // then try to get a drag from another ineractable
 
@@ -1555,7 +1560,7 @@
                                     && elementInteractable !== this.target
                                     && elementInteractable.getAction(this.downEvent) === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
-                                    prepared = 'drag';
+                                    this.prepared = 'drag';
                                     this.target = elementInteractable;
                                     break;
                                 }
@@ -1565,7 +1570,7 @@
 
                             // if there's no drag from element interactables,
                             // check the selector interactables
-                            if (!prepared) {
+                            if (!this.prepared) {
                                 var getDraggable = function (interactable, selector, context) {
                                     var elements = ie8MatchesSelector
                                         ? context.querySelectorAll(selector)
@@ -1592,7 +1597,7 @@
                                     var selectorInteractable = interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
-                                        prepared = 'drag';
+                                        this.prepared = 'drag';
                                         this.target = selectorInteractable;
                                         break;
                                     }
@@ -1604,7 +1609,7 @@
                     }
                 }
 
-                if (prepared && this.target) {
+                if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldSnap     = checkSnap(target)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
@@ -1659,14 +1664,14 @@
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
                         if (starting) {
-                            this.prevEvent = actions[prepared].start(this.downEvent);
+                            this.prevEvent = actions[this.prepared].start(this.downEvent);
 
                             // set snapping and restriction for the move event
                             if (shouldSnap    ) { setSnapping   (event); }
                             if (shouldRestrict) { setRestriction(event); }
                         }
 
-                        this.prevEvent = actions[prepared].move(event);
+                        this.prevEvent = actions[this.prepared].move(event);
                     }
                 }
             }
@@ -1844,8 +1849,8 @@
 
                 // check if inertia should be started
                 inertiaPossible = (options.inertiaEnabled
-                                   && prepared !== 'gesture'
-                                   && contains(inertiaOptions.actions, prepared)
+                                   && this.prepared !== 'gesture'
+                                   && contains(inertiaOptions.actions, this.prepared)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -1890,7 +1895,7 @@
                         inertiaStatus.pointerUp = event;
                     }
 
-                    inertiaStatus.startEvent = startEvent = new InteractEvent(event, prepared, 'inertiastart');
+                    inertiaStatus.startEvent = startEvent = new InteractEvent(event, this.prepared, 'inertiastart');
                     target.fire(inertiaStatus.startEvent);
 
                     inertiaStatus.target = target;
@@ -2208,7 +2213,7 @@
         stop: function (event) {
             if (this.dragging || this.resizing || this.gesturing) {
                 autoScroll.stop();
-                matches = [];
+                this.matches = [];
 
                 var target = this.target;
 
@@ -2242,7 +2247,7 @@
             this.pointerMoves.splice(0);
 
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
-            prepared = this.prevEvent = null;
+            this.prepared = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
         },
 
@@ -2381,6 +2386,118 @@
             }
         },
 
+        fireTaps: function (event, targets, elements) {
+            var tap = {},
+                i;
+
+            extend(tap, event);
+
+            tap.preventDefault           = preventOriginalDefault;
+            tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
+            tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+
+            tap.timeStamp     = new Date().getTime();
+            tap.originalEvent = event;
+            tap.dt            = tap.timeStamp - interaction.downTime;
+            tap.type          = 'tap';
+
+            var interval = tap.timeStamp - interaction.tapTime,
+                dbl = (interaction.prevTap && interaction.prevTap.type !== 'doubletap'
+                       && interaction.prevTap.target === tap.target
+                       && interval < 500);
+
+            interaction.tapTime = tap.timeStamp;
+
+            for (i = 0; i < targets.length; i++) {
+                var origin = getOriginXY(targets[i], elements[i]);
+
+                tap.pageX -= origin.x;
+                tap.pageY -= origin.y;
+                tap.clientX -= origin.x;
+                tap.clientY -= origin.y;
+
+                tap.currentTarget = elements[i];
+                targets[i].fire(tap);
+
+                if (tap.immediatePropagationStopped
+                    ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
+                    break;
+                }
+            }
+
+            if (dbl) {
+                var doubleTap = {};
+
+                extend(doubleTap, tap);
+
+                doubleTap.dt   = interval;
+                doubleTap.type = 'doubletap';
+
+                for (i = 0; i < targets.length; i++) {
+                    doubleTap.currentTarget = elements[i];
+                    targets[i].fire(doubleTap);
+
+                    if (doubleTap.immediatePropagationStopped
+                        ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
+                        break;
+                    }
+                }
+
+                interaction.prevTap = doubleTap;
+            }
+            else {
+                interaction.prevTap = tap;
+            }
+        },
+
+        collectTaps: function (event) {
+            if(interaction.downEvent) {
+                if (interaction.pointerWasMoved
+                    || !(event instanceof interaction.downEvent.constructor)
+                    || interaction.downEvent.target !== event.target) {
+                    return;
+                }
+            }
+
+            var tapTargets = [],
+                tapElements = [];
+
+            var eventTarget = (event.target instanceof SVGElementInstance
+                    ? event.target.correspondingUseElement
+                    : event.target),
+                element = eventTarget;
+
+            function collectSelectorTaps (interactable, selector, context) {
+                var elements = ie8MatchesSelector
+                        ? context.querySelectorAll(selector)
+                        : undefined;
+
+                if (element !== document
+                    && inContext(interactable, element)
+                    && !testIgnore(interactable, eventTarget)
+                    && testAllow(interactable, eventTarget)
+                    && matchesSelector(element, selector, elements)) {
+
+                    tapTargets.push(interactable);
+                    tapElements.push(element);
+                }
+            }
+
+            while (element) {
+                if (interact.isSet(element)) {
+                    tapTargets.push(interact(element));
+                    tapElements.push(element);
+                }
+
+                interactables.forEachSelector(collectSelectorTaps);
+
+                element = element.parentNode;
+            }
+
+            if (tapTargets.length) {
+                fireTaps(event, tapTargets, tapElements);
+            }
+        }
     };
 
     var interaction = new Interaction();
@@ -2685,116 +2802,11 @@
     }
 
     function fireTaps (event, targets, elements) {
-        var tap = {},
-            i;
-
-        extend(tap, event);
-
-        tap.preventDefault           = preventOriginalDefault;
-        tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
-        tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
-
-        tap.timeStamp     = new Date().getTime();
-        tap.originalEvent = event;
-        tap.dt            = tap.timeStamp - interaction.downTime;
-        tap.type          = 'tap';
-
-        var interval = tap.timeStamp - interaction.tapTime,
-            dbl = (interaction.prevTap && interaction.prevTap.type !== 'doubletap'
-                   && interaction.prevTap.target === tap.target
-                   && interval < 500);
-
-        interaction.tapTime = tap.timeStamp;
-
-        for (i = 0; i < targets.length; i++) {
-            var origin = getOriginXY(targets[i], elements[i]);
-
-            tap.pageX -= origin.x;
-            tap.pageY -= origin.y;
-            tap.clientX -= origin.x;
-            tap.clientY -= origin.y;
-
-            tap.currentTarget = elements[i];
-            targets[i].fire(tap);
-
-            if (tap.immediatePropagationStopped
-                ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
-                break;
-            }
-        }
-
-        if (dbl) {
-            var doubleTap = {};
-
-            extend(doubleTap, tap);
-
-            doubleTap.dt   = interval;
-            doubleTap.type = 'doubletap';
-
-            for (i = 0; i < targets.length; i++) {
-                doubleTap.currentTarget = elements[i];
-                targets[i].fire(doubleTap);
-
-                if (doubleTap.immediatePropagationStopped
-                    ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
-                    break;
-                }
-            }
-
-            interaction.prevTap = doubleTap;
-        }
-        else {
-            interaction.prevTap = tap;
-        }
+        return interaction.fireTaps(event, targets, elements);
     }
 
     function collectTaps (event) {
-        if(interaction.downEvent) {
-            if (interaction.pointerWasMoved
-                || !(event instanceof interaction.downEvent.constructor)
-                || interaction.downEvent.target !== event.target) {
-                return;
-            }
-        }
-
-        var tapTargets = [],
-            tapElements = [];
-
-        var eventTarget = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target),
-            element = eventTarget;
-
-        function collectSelectorTaps (interactable, selector, context) {
-            var elements = ie8MatchesSelector
-                    ? context.querySelectorAll(selector)
-                    : undefined;
-
-            if (element !== document
-                && inContext(interactable, element)
-                && !testIgnore(interactable, eventTarget)
-                && testAllow(interactable, eventTarget)
-                && matchesSelector(element, selector, elements)) {
-
-                tapTargets.push(interactable);
-                tapElements.push(element);
-            }
-        }
-
-        while (element) {
-            if (interact.isSet(element)) {
-                tapTargets.push(interact(element));
-                tapElements.push(element);
-            }
-
-            interactables.forEachSelector(collectSelectorTaps);
-
-            element = element.parentNode;
-        }
-
-        if (tapTargets.length) {
-            fireTaps(event, tapTargets, tapElements);
-        }
+        return interaction.collectTaps(event);
     }
 
     function defaultActionChecker (event) {
@@ -3010,7 +3022,7 @@
     function setRestriction (event, status) {
         var target = interaction.target,
             restrict = target && target.options.restrict,
-            restriction = restrict && restrict[prepared],
+            restriction = restrict && restrict[interaction.prepared],
             page;
 
         if (!restriction) {
@@ -3313,7 +3325,7 @@
             document.querySelector(element);
 
             this.selector = element;
-            this._gesture = selectorGesture;
+            this._gesture = interaction.selectorGesture;
 
             if (options && options.context
                 && (window.Node
@@ -4976,8 +4988,8 @@
             dragging              : interaction.dragging,
             resizing              : interaction.resizing,
             gesturing             : interaction.gesturing,
-            prepared              : prepared,
-            matches               : matches,
+            prepared              : interaction.prepared,
+            matches               : interaction.matches,
 
             prevCoords            : interaction.prevCoords,
             downCoords            : interaction.startCoords,
@@ -5418,9 +5430,6 @@
                 interaction.pointerIsDown = false;
             }
         });
-
-        selectorGesture = new Gesture();
-        selectorGesture.target = document.documentElement;
     }
     else {
         events.add(docTarget, 'mouseup' , collectTaps);
