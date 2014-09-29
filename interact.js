@@ -996,6 +996,7 @@
         this.eventTarget     = eventTarget;
 
         this.target          = null; // current interactable being interacted with
+        this.element         = null; // the target element of the interactable
         this.dropTarget      = null; // the dropzone a drag target might be dropped into
         this.dropElement     = null; // the element at the time of checking
         this.prevDropTarget  = null; // the dropzone that was recently dragged away from
@@ -1135,7 +1136,7 @@
             if (this.prepared) { return; }
 
             var curMatches = [],
-                prevTargetElement = this.target && this.target._element,
+                prevTargetElement = this.target && this.element,
                 eventTarget = (event.target instanceof SVGElementInstance
                     ? event.target.correspondingUseElement
                     : event.target);
@@ -1145,6 +1146,7 @@
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
+                this.element = null;
                 this.matches = [];
             }
 
@@ -1170,6 +1172,7 @@
 
             if (elementAction) {
                 this.target = elementInteractable;
+                this.element = elementInteractable._element;
                 this.matches = [];
             }
             else {
@@ -1192,10 +1195,11 @@
                         }
 
                         this.pointerHover(event, this.matches);
-                        events.addToElement(this.target._element, 'mousemove', listeners.pointerHover);
+                        events.addToElement(this.element, 'mousemove', listeners.pointerHover);
                     }
                     else {
                         this.target = null;
+                        this.element = null;
                         this.matches = [];
                     }
                 }
@@ -1370,6 +1374,7 @@
                 if (!testIgnore(interactable, event.target)
                     && testAllow(interactable, event.target)) {
                     this.target = interactable;
+                    this.element = interactable._element;
                 }
             }
 
@@ -1384,7 +1389,7 @@
                 if (PointerEvent && event instanceof PointerEvent) {
                     // Dom modification seems to reset the gesture target
                     if (!target._gesture.target) {
-                        target._gesture.target = target._element;
+                        target._gesture.target = this.element;
                     }
 
                     this.addPointer(event, target._gesture);
@@ -1436,7 +1441,7 @@
 
                 if (PointerEvent) {
                     if (!target._gesture.target) {
-                        target._gesture.target = target._element;
+                        target._gesture.target = this.element;
                     }
                     // add the pointer to the gesture object
                     this.addPointer(event, target._gesture);
@@ -1506,6 +1511,7 @@
                                     && checkAxis(axis, elementInteractable)) {
                                     this.prepared = 'drag';
                                     this.target = elementInteractable;
+                                    this.element = elementInteractable._element;
                                     break;
                                 }
 
@@ -1543,6 +1549,7 @@
                                     if (selectorInteractable) {
                                         this.prepared = 'drag';
                                         this.target = selectorInteractable;
+                                        this.element = selectorInteractable._element;
                                         break;
                                     }
 
@@ -1645,7 +1652,7 @@
             this.activeDrops.rects     = [];
 
             if (!this.dynamicDrop) {
-                this.setActiveDrops(this.target._element);
+                this.setActiveDrops(this.element);
             }
 
             var dropEvents = this.getDropEvents(event, dragEvent);
@@ -1662,7 +1669,7 @@
 
             var target = this.target,
                 dragEvent  = new InteractEvent(event, 'drag', 'move'),
-                draggableElement = target._element,
+                draggableElement = this.element,
                 drop = this.getDrop(dragEvent, draggableElement);
 
             this.dropTarget = drop.dropzone;
@@ -1845,7 +1852,7 @@
                     target.fire(inertiaStatus.startEvent);
 
                     inertiaStatus.target = target;
-                    inertiaStatus.targetElement = target._element;
+                    inertiaStatus.targetElement = this.element;
                     inertiaStatus.t0 = now;
 
                     if (inertia) {
@@ -1856,7 +1863,7 @@
                         this.calcInertia(inertiaStatus);
 
                         var page = getPageXY(event),
-                            origin = getOriginXY(target, target._element),
+                            origin = getOriginXY(target, this.element),
                             statusObject;
 
                         page.x = page.x + (inertia? inertiaStatus.xe: 0) - origin.x;
@@ -1922,7 +1929,7 @@
                 endEvent = new InteractEvent(event, 'drag', 'end');
 
                 var dropEvent,
-                    draggableElement = target._element,
+                    draggableElement = this.element,
                     drop = this.getDrop(endEvent, draggableElement);
 
                 this.dropTarget = drop.dropzone;
@@ -1977,7 +1984,7 @@
                 elements = [],
                 i;
 
-            element = element || this.target._element;
+            element = element || this.element;
 
             // collect all dropzones and their elements which qualify for a drop
             for (i = 0; i < dropzones.length; i++) {
@@ -2150,7 +2157,7 @@
 
         clearTargets: function () {
             if (this.target && !this.target.selector) {
-                this.target = null;
+                this.target = this.element = null;
             }
 
             this.dropTarget = this.dropElement = this.prevDropTarget = this.prevDropElement = null;
@@ -2471,6 +2478,7 @@
 
                 if (action) {
                     this.target = match;
+                    this.element = match._element;
 
                     return action;
                 }
@@ -2652,10 +2660,10 @@
             var rect;
 
             if (restriction === 'parent') {
-                restriction = target._element.parentNode;
+                restriction = this.element.parentNode;
             }
             else if (restriction === 'self') {
-                restriction = target._element;
+                restriction = this.element;
             }
 
             if (isElement(restriction)) {
@@ -2663,7 +2671,7 @@
             }
             else {
                 if (isFunction(restriction)) {
-                    restriction = restriction(page.x, page.y, target._element);
+                    restriction = restriction(page.x, page.y, this.element);
                 }
 
                 rect = restriction;
@@ -2758,7 +2766,7 @@
             starting    = phase === 'start',
             ending      = phase === 'end';
 
-        element = element || target._element;
+        element = element || interaction.element;
 
         if (action === 'gesture') {
             var average = touchAverage(pointerMoves);
