@@ -210,8 +210,11 @@
         // Does the browser support touch input?
         supportsTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch),
 
+        // Does the browser support PointerEvents
+        supportsPointerEvent = !!PointerEvent,
+
         // Less Precision with touch input
-        margin = supportsTouch? 20: 10,
+        margin = supportsTouch || supportsPointerEvent? 20: 10,
 
         actionCursors = {
             drag    : 'move',
@@ -1387,6 +1390,10 @@
                 setEventXY(this.startCoords, event);
 
                 if (PointerEvent && event instanceof PointerEvent) {
+                    if (target.selector) {
+                        target._gesture = this.selectorGesture;
+                    }
+
                     // Dom modification seems to reset the gesture target
                     if (!target._gesture.target) {
                         target._gesture.target = this.element;
@@ -5207,6 +5214,16 @@
     \*/
     interact.supportsTouch = function () {
         return supportsTouch;
+    };
+
+    /*\
+     * interact.supportsPointerEvent
+     [ method ]
+     *
+     = (boolean) Whether or not the browser supports PointerEvents
+    \*/
+    interact.supportsPointerEvent = function () {
+        return supportsPointerEvent;
     };
 
     /*\
