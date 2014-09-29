@@ -996,8 +996,6 @@
     }
 
     function Interaction (eventTarget) {
-        this.eventTarget     = eventTarget;
-
         this.target          = null; // current interactable being interacted with
         this.element         = null; // the target element of the interactable
         this.dropTarget      = null; // the dropzone a drag target might be dropped into
@@ -1130,6 +1128,9 @@
             this.selectorGesture = new Gesture();
             this.selectorGesture.target = document.documentElement;
         }
+
+        this.eventTarget = eventTarget || null;
+        this.mouse = false;
 
         interactions.push(this);
     }
@@ -1684,6 +1685,7 @@
 
             // Make sure that the target selector draggable's element is
             // restored after dropChecks
+            //***~~~
             target._element = draggableElement;
 
             var dropEvents = this.getDropEvents(event, dragEvent);
@@ -3217,11 +3219,25 @@
     };
 
     function getInteractionFromEvent (event) {
-        if (/mouse/.test(event.pointerType || event.type)) {
-            return interactions[0] || new Interaction(event.target);
-        }
-
         var i, len = interactions.length;
+
+        // if it's a mouse interaction
+        if (!(supportsTouch || supportsPointerEvent)
+            || /mouse/.test(event.pointerType || event.type)) {
+
+            // find the interaction specifically for mouse
+            for (i = 0; i < len; i++) {
+                if (interactions[i].mouse) {
+                    return interactions[i];
+                }
+            }
+            
+            // or create a new interaction for mouse
+            var interaction = new Interaction (event.target);
+            interaction.mouse = true;
+
+            return interaction;
+        }
 
         // using "inertiastart" InteractEvent
         if (event instanceof InteractEvent && /inertiastart/.test(event.type)) {
