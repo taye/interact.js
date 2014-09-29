@@ -2460,7 +2460,7 @@
             }
 
             if (tapTargets.length) {
-                fireTaps(event, tapTargets, tapElements);
+                this.fireTaps(event, tapTargets, tapElements);
             }
         },
 
@@ -3043,14 +3043,6 @@
         this.originalEvent.preventDefault();
     }
 
-    function fireTaps (event, targets, elements) {
-        return getInteractionFromEvent(event).fireTaps(event, targets, elements);
-    }
-
-    function collectTaps (event) {
-        return getInteractionFromEvent(event).collectTaps(event);
-    }
-
     function defaultActionChecker (event) {
         var interaction = getInteractionFromEvent(event),
             rect = this.getRect(),
@@ -3110,7 +3102,7 @@
         interactionListeners = [
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
             'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
-            'addPointer', 'removePointer', 'recordPointers', 'recordTouches'
+            'addPointer', 'removePointer', 'recordPointers', 'recordTouches', 'collectTaps', 'fireTaps'
         ];
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -5378,7 +5370,7 @@
         }
 
 
-        events.add(docTarget, pEventTypes.up, collectTaps);
+        events.add(docTarget, pEventTypes.up, listeners.collectTaps);
 
         events.add(docTarget, pEventTypes.down   , listeners.selectorDown);
         events.add(docTarget, gEventTypes.change , listeners.pointerMove );
