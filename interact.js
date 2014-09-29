@@ -28,6 +28,7 @@
 
         interactables   = [],   // all set interactables
         dropzones       = [],   // all dropzone element interactables
+        interactions    = [],
 
         dynamicDrop     = false,
 
@@ -151,7 +152,7 @@
             },
 
             edgeMove: function (event) {
-                var target = interaction.target;
+                var target = getInteractionFromEvent(event).target;
 
                 if (target && target.options.autoScrollEnabled && (this.dragging || this.resizing)) {
                     var top,
@@ -212,35 +213,12 @@
         // Less Precision with touch input
         margin = supportsTouch? 20: 10,
 
-        // What to do depending on action returned by getAction() of interactable
-        // Dictates what styles should be used and what pointerMove event Listner
-        // is to be added after pointerDown
-        actions = {
-            drag: {
-                cursor: 'move',
-                start : dragStart,
-                move  : dragMove
-            },
-            resizex: {
-                cursor: 'e-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            resizey: {
-                cursor: 's-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            resizexy: {
-                cursor: 'se-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            gesture: {
-                cursor: '',
-                start : gestureStart,
-                move  : gestureMove
-            }
+        actionCursors = {
+            drag    : 'move',
+            resizex : 'e-resize',
+            resizey : 's-resize',
+            resizexy: 'se-resize',
+            gesture : ''
         },
 
         actionIsEnabled = {
@@ -590,6 +568,8 @@
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
+                var interaction = getInteractionFromEvent(event);
+
                 getPageXY(interaction.inertiaStatus.pointerUp, page);
 
                 page.x += interaction.inertiaStatus.sx;
@@ -626,6 +606,8 @@
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
+                var interaction = getInteractionFromEvent(event);
+
                 getClientXY(interaction.inertiaStatus.pointerUp, client);
 
                 client.x += interaction.inertiaStatus.sx;
@@ -710,6 +692,8 @@
     }
 
     function touchBBox (event) {
+        var interaction = getInteractionFromEvent(event);
+
         if (!(event.touches && event.touches.length) && !(interaction.pointerMoves.length)) {
             return;
         }
@@ -731,7 +715,8 @@
     }
 
     function touchDistance (event) {
-        var target = interaction.target,
+        var interaction = getInteractionFromEvent(event),
+            target = interaction.target,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
@@ -745,7 +730,8 @@
     }
 
     function touchAngle (event, prevAngle) {
-        var target = interaction.target,
+        var interaction = getInteractionFromEvent(event),
+            target = interaction.target,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
@@ -776,8 +762,6 @@
     }
 
     function getOriginXY (interactable, element) {
-        interactable = interactable || interaction.target;
-
         var origin = interactable
                 ? interactable.options.origin
                 : defaultOptions.origin;
@@ -802,24 +786,6 @@
         }
 
         return origin;
-    }
-
-    function calcInertia (status) {
-        var inertiaOptions = status.target.options.inertia,
-            lambda = inertiaOptions.resistance,
-            inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
-
-        status.x0 = interaction.prevEvent.pageX;
-        status.y0 = interaction.prevEvent.pageY;
-        status.t0 = status.startEvent.timeStamp / 1000;
-        status.sx = status.sy = 0;
-
-        status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-        status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-        status.te = inertiaDur;
-
-        status.lambda_v0 = lambda / status.v0;
-        status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
     }
 
     function _getQBezierValue(t, p1, p2, p3) {
@@ -895,32 +861,6 @@
         return false;
     }
 
-    function checkAndPreventDefault (event, interactable) {
-        if (!interactable) { return; }
-
-        var options = interactable.options,
-            prevent = options.preventDefault;
-
-        if (prevent === 'auto' && !/^input$|^textarea$/i.test(interaction.target._element.nodeName)) {
-            // do not preventDefault on pointerdown if the prepared action is a drag
-            // and dragging can only start from a certain direction - this allows
-            // a touch to pan the viewport if a drag isn't in the right direction
-            if (/down|start/i.test(event.type)
-                && interaction.prepared === 'drag' && options.dragAxis !== 'xy') {
-
-                return;
-            }
-
-            event.preventDefault();
-            return;
-        }
-
-        if (prevent === true) {
-            event.preventDefault();
-            return;
-        }
-    }
-
     function checkAxis (axis, interactable) {
         if (!interactable) { return false; }
 
@@ -932,8 +872,6 @@
     function checkSnap (interactable, action) {
         var options = interactable.options;
 
-        action = action || interaction.prepared;
-
         if (/^resize/.test(action)) {
             action = 'resize';
         }
@@ -943,8 +881,6 @@
 
     function checkRestrict (interactable, action) {
         var options = interactable.options;
-
-        action = action || interaction.prepared;
 
         if (/^resize/.test(action)) {
             action = 'resize';
@@ -1056,7 +992,9 @@
         return index;
     }
 
-    function Interaction () {
+    function Interaction (eventTarget) {
+        this.eventTarget     = eventTarget;
+
         this.target          = null; // current interactable being interacted with
         this.dropTarget      = null; // the dropzone a drag target might be dropped into
         this.dropElement     = null; // the element at the time of checking
@@ -1188,6 +1126,8 @@
             this.selectorGesture = new Gesture();
             this.selectorGesture.target = document.documentElement;
         }
+
+        interactions.push(this);
     }
 
     Interaction.prototype = {
@@ -1235,11 +1175,11 @@
             else {
                 interactables.forEachSelector(pushCurMatches);
 
-                if (validateSelector(event, curMatches)) {
+                if (this.validateSelector(event, curMatches)) {
                     this.matches = curMatches;
 
-                    pointerHover(event, this.matches);
-                    events.addToElement(eventTarget, 'mousemove', pointerHover);
+                    this.pointerHover(event, this.matches);
+                    events.addToElement(eventTarget, 'mousemove', listeners.pointerHover);
                 }
                 else if (this.target) {
                     var prevTargetChildren = prevTargetElement.querySelectorAll('*');
@@ -1251,8 +1191,8 @@
                             this.matches[i]._element = prevTargetElement;
                         }
 
-                        pointerHover(event, this.matches);
-                        events.addToElement(this.target._element, 'mousemove', pointerHover);
+                        this.pointerHover(event, this.matches);
+                        events.addToElement(this.target._element, 'mousemove', listeners.pointerHover);
                     }
                     else {
                         this.target = null;
@@ -1262,6 +1202,8 @@
             }
         },
 
+        // Check what action would be performed on pointerMove target if a mouse
+        // button were pressed and change the cursor accordingly
         pointerHover: function (event, matches) {
             var target = this.target;
 
@@ -1270,15 +1212,15 @@
                 var action;
 
                 if (matches) {
-                    action = validateSelector(event, matches);
+                    action = this.validateSelector(event, matches);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(event));
+                    action = validateAction(target.getAction(event), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        document.documentElement.style.cursor = actions[action].cursor;
+                        document.documentElement.style.cursor = actionCursors[action];
                     }
                     else {
                         document.documentElement.style.cursor = '';
@@ -1286,7 +1228,7 @@
                 }
             }
             else if (this.prepared) {
-                checkAndPreventDefault(event, target);
+                this.checkAndPreventDefault(event, target);
             }
         },
 
@@ -1299,7 +1241,7 @@
                 : event.target);
 
             if (!interactables.get(eventTarget)) {
-                events.removeFromElement(eventTarget, pointerHover);
+                events.removeFromElement(eventTarget, listeners.pointerHover);
             }
 
             if (this.target && this.target.options.styleCursor && !(this.dragging || this.resizing || this.gesturing)) {
@@ -1309,7 +1251,7 @@
 
         selectorDown: function (event) {
             if (this.prepared && this.downEvent && event.type !== this.downEvent.type) {
-                checkAndPreventDefault(event, this.target);
+                this.checkAndPreventDefault(event, this.target);
                 return;
             }
 
@@ -1328,7 +1270,7 @@
                 element = eventTarget,
                 action;
 
-            addPointer(event);
+            this.addPointer(event);
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1338,14 +1280,14 @@
                     // if this element is the current inertia target element
                     if (element === this.inertiaStatus.targetElement
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(event)) === this.prepared) {
+                        && validateAction(this.target.getAction(event), this.target) === this.prepared) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
                         this.inertiaStatus.active = false;
 
                         // add the pointer to the gesture object
-                        addPointer(event, this.selectorGesture);
+                        this.addPointer(event, this.selectorGesture);
 
                         return;
                     }
@@ -1376,7 +1318,7 @@
             }
 
             if (this.matches.length && /mousedown|pointerdown/i.test(event.type)) {
-                action = validateSelector(event, this.matches);
+                action = this.validateSelector(event, this.matches);
             }
             else {
                 while (element && element !== document && !action) {
@@ -1384,7 +1326,7 @@
 
                     interactables.forEachSelector(pushMatches);
 
-                    action = validateSelector(event, this.matches);
+                    action = this.validateSelector(event, this.matches);
                     element = element.parentNode;
                 }
             }
@@ -1392,7 +1334,7 @@
             if (action) {
                 this.prepared = action;
 
-                return pointerDown(event, action);
+                return this.pointerDown(event, action);
             }
             else {
                 // do these now since pointerDown isn't being called from here
@@ -1404,16 +1346,18 @@
             }
         },
 
+        // Determine action to be performed on next pointerMove and add appropriate
+        // style and event Liseners
         pointerDown: function (event, forceAction) {
             if (!forceAction && this.pointerIsDown && this.downEvent && event.type !== this.downEvent.type) {
-                checkAndPreventDefault(event, this.target);
+                this.checkAndPreventDefault(event, this.target);
 
                 return;
             }
 
             this.pointerIsDown = true;
 
-            addPointer(event);
+            this.addPointer(event);
 
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
@@ -1430,10 +1374,10 @@
             }
 
             var target = this.target,
-                options = this.target && this.target.options;
+                options = target && target.options;
 
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
-                var action = validateAction(forceAction || target.getAction(event));
+                var action = validateAction(forceAction || target.getAction(event), target);
 
                 setEventXY(this.startCoords, event);
 
@@ -1443,7 +1387,7 @@
                         target._gesture.target = target._element;
                     }
 
-                    addPointer(event, target._gesture);
+                    this.addPointer(event, target._gesture);
                 }
 
                 if (!action) {
@@ -1451,7 +1395,7 @@
                 }
 
                 if (options.styleCursor) {
-                    document.documentElement.style.cursor = actions[action].cursor;
+                    document.documentElement.style.cursor = actionCursors[action];
                 }
 
                 this.resizeAxes = action === 'resizexy'?
@@ -1479,13 +1423,13 @@
                 setEventXY(this.prevCoords, event);
                 this.pointerWasMoved = false;
 
-                checkAndPreventDefault(event, target);
+                this.checkAndPreventDefault(event, target);
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && event.currentTarget === this.inertiaStatus.targetElement
                 && target === this.inertiaStatus.target
-                && validateAction(target.getAction(event)) === this.prepared) {
+                && validateAction(target.getAction(event), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1495,7 +1439,7 @@
                         target._gesture.target = target._element;
                     }
                     // add the pointer to the gesture object
-                    addPointer(event, target._gesture);
+                    this.addPointer(event, target._gesture);
                 }
             }
         },
@@ -1611,8 +1555,8 @@
 
                 if (this.prepared && this.target) {
                     var target         = this.target,
-                        shouldSnap     = checkSnap(target)     && (!target.options.snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
+                        shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
+                        shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
                         starting = !(this.dragging || this.resizing || this.gesturing),
                         snapEvent = starting? this.downEvent: event;
@@ -1655,23 +1599,24 @@
                         }
                     }
 
-                    if (shouldSnap    ) { setSnapping   (snapEvent); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { setRestriction(snapEvent); } else { this.restrictStatus.restricted = false; }
+                    if (shouldSnap    ) { this.setSnapping   (snapEvent); } else { this.snapStatus    .locked     = false; }
+                    if (shouldRestrict) { this.setRestriction(snapEvent); } else { this.restrictStatus.restricted = false; }
 
                     var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
                                      && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
 
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
+                        var action = /resize/.test(this.prepared)? 'resize': this.prepared;
                         if (starting) {
-                            this.prevEvent = actions[this.prepared].start(this.downEvent);
+                            this.prevEvent = this[action + 'Start'](this.downEvent);
 
                             // set snapping and restriction for the move event
-                            if (shouldSnap    ) { setSnapping   (event); }
-                            if (shouldRestrict) { setRestriction(event); }
+                            if (shouldSnap    ) { this.setSnapping   (event); }
+                            if (shouldRestrict) { this.setRestriction(event); }
                         }
 
-                        this.prevEvent = actions[this.prepared].move(event);
+                        this.prevEvent = this[action + 'Move'](event);
                     }
                 }
             }
@@ -1713,7 +1658,7 @@
         },
 
         dragMove: function (event) {
-            checkAndPreventDefault(event, this.target);
+            this.checkAndPreventDefault(event, this.target);
 
             var target = this.target,
                 dragEvent  = new InteractEvent(event, 'drag', 'move'),
@@ -1752,7 +1697,7 @@
         },
 
         resizeMove: function (event) {
-            checkAndPreventDefault(event, this.target);
+            this.checkAndPreventDefault(event, this.target);
 
             var resizeEvent = new InteractEvent(event, 'resize', 'move');
 
@@ -1782,7 +1727,7 @@
                 return this.prevEvent;
             }
 
-            checkAndPreventDefault(event, this.target);
+            this.checkAndPreventDefault(event, this.target);
 
             var gestureEvent;
 
@@ -1805,6 +1750,7 @@
             return gestureEvent;
         },
 
+        // End interact move events and stop auto-scroll unless inertia is enabled
         pointerUp: function (event) {
             // don't return if the event is an InteractEvent (in the case of inertia end)
             // or if the browser uses PointerEvents (event would always be a gestureend)
@@ -1841,8 +1787,8 @@
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
-                    endSnap = checkSnap(target) && options.snap.endOnly,
-                    endRestrict = checkRestrict(target) && options.restrict.endOnly,
+                    endSnap = checkSnap(target, this.prepared) && options.snap.endOnly,
+                    endRestrict = checkRestrict(target, this.prepared) && options.restrict.endOnly,
                     dx = 0,
                     dy = 0,
                     startEvent;
@@ -1865,7 +1811,7 @@
                     snapRestrict.snap = snapRestrict.restrict = snapRestrict;
 
                     if (endSnap) {
-                        setSnapping(event, snapRestrict);
+                        this.setSnapping(event, snapRestrict);
                         if (snapRestrict.locked) {
                             dx += snapRestrict.dx;
                             dy += snapRestrict.dy;
@@ -1873,7 +1819,7 @@
                     }
 
                     if (endRestrict) {
-                        setRestriction(event, snapRestrict);
+                        this.setRestriction(event, snapRestrict);
                         if (snapRestrict.restricted) {
                             dx += snapRestrict.dx;
                             dy += snapRestrict.dy;
@@ -1907,7 +1853,7 @@
                         inertiaStatus.vy0 = this.pointerDelta[deltaSource + 'VY'];
                         inertiaStatus.v0 = pointerSpeed;
 
-                        calcInertia(inertiaStatus);
+                        this.calcInertia(inertiaStatus);
 
                         var page = getPageXY(event),
                             origin = getOriginXY(target, target._element),
@@ -1930,7 +1876,7 @@
                         dx = dy = 0;
 
                         if (endSnap) {
-                            var snap = setSnapping(event, statusObject);
+                            var snap = this.setSnapping(event, statusObject);
 
                             if (snap.locked) {
                                 dx += snap.dx;
@@ -1939,7 +1885,7 @@
                         }
 
                         if (endRestrict) {
-                            var restrict = setRestriction(event, statusObject);
+                            var restrict = this.setRestriction(event, statusObject);
 
                             if (restrict.restricted) {
                                 dx += restrict.dx;
@@ -1968,7 +1914,7 @@
 
                 if (endSnap || endRestrict) {
                     // fire a move event at the snapped coordinates
-                    pointerMove(event, true);
+                    this.pointerMove(event, true);
                 }
             }
 
@@ -2227,7 +2173,7 @@
 
                 // prevent Default only if were previously interacting
                 if (event && isFunction(event.preventDefault)) {
-                    checkAndPreventDefault(event, target);
+                    this.checkAndPreventDefault(event, target);
                 }
 
                 if (this.dragging) {
@@ -2249,6 +2195,13 @@
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
             this.prepared = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
+
+            // delete interaction if it's not the first
+            var index = indexOf(interactions, this);
+
+            if (index > 0) {
+                interactions.splice(index, 1);
+            }
         },
 
         inertiaFrame: function () {
@@ -2276,7 +2229,7 @@
                     inertiaStatus.sy = quadPoint.y;
                 }
 
-                pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent);
 
                 inertiaStatus.i = reqFrame(this.boundInertiaFrame);
             }
@@ -2284,10 +2237,10 @@
                 inertiaStatus.sx = inertiaStatus.modifiedXe;
                 inertiaStatus.sy = inertiaStatus.modifiedYe;
 
-                pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent);
 
                 inertiaStatus.active = false;
-                pointerUp(inertiaStatus.startEvent);
+                this.pointerUp(inertiaStatus.startEvent);
             }
         },
 
@@ -2300,7 +2253,7 @@
                 inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
                 inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
 
-                pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent);
 
                 inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
             }
@@ -2308,8 +2261,8 @@
                 inertiaStatus.active = false;
                 inertiaStatus.smoothEnd = false;
 
-                pointerMove(inertiaStatus.startEvent);
-                pointerUp(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent);
+                this.pointerUp(inertiaStatus.startEvent);
             }
         },
 
@@ -2322,7 +2275,7 @@
                                : event.touches);
 
                 for (var i = 0; i < touches.length; i++) {
-                    addPointer(touches[i], gesture, type);
+                    this.addPointer(touches[i], gesture, type);
                 }
 
                 return;
@@ -2376,7 +2329,7 @@
                 this.pointerMoves[index] = event;
             }
             else if (/up|end|cancel/i.test(type)) {
-                removePointer(event);
+                this.removePointer(event);
 
                 // End the gesture InteractEvent if there are
                 // fewer than 2 active pointers
@@ -2384,6 +2337,18 @@
                     this.target._gesture.stop();
                 }
             }
+        },
+
+        recordTouches: function (event) {
+            var touches = (/cancel|touchend/.test(event.type)
+                           ? event.changedTouches
+                           : event.touches);
+
+            for (var i = 0; i < touches.length; i++) {
+                this.recordPointers(touches[i], event.type);
+            }
+
+            return;
         },
 
         fireTaps: function (event, targets, elements) {
@@ -2398,15 +2363,15 @@
 
             tap.timeStamp     = new Date().getTime();
             tap.originalEvent = event;
-            tap.dt            = tap.timeStamp - interaction.downTime;
+            tap.dt            = tap.timeStamp - this.downTime;
             tap.type          = 'tap';
 
-            var interval = tap.timeStamp - interaction.tapTime,
-                dbl = (interaction.prevTap && interaction.prevTap.type !== 'doubletap'
-                       && interaction.prevTap.target === tap.target
+            var interval = tap.timeStamp - this.tapTime,
+                dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
+                       && this.prevTap.target === tap.target
                        && interval < 500);
 
-            interaction.tapTime = tap.timeStamp;
+            this.tapTime = tap.timeStamp;
 
             for (i = 0; i < targets.length; i++) {
                 var origin = getOriginXY(targets[i], elements[i]);
@@ -2443,18 +2408,18 @@
                     }
                 }
 
-                interaction.prevTap = doubleTap;
+                this.prevTap = doubleTap;
             }
             else {
-                interaction.prevTap = tap;
+                this.prevTap = tap;
             }
         },
 
         collectTaps: function (event) {
-            if(interaction.downEvent) {
-                if (interaction.pointerWasMoved
-                    || !(event instanceof interaction.downEvent.constructor)
-                    || interaction.downEvent.target !== event.target) {
+            if(this.downEvent) {
+                if (this.pointerWasMoved
+                    || !(event instanceof this.downEvent.constructor)
+                    || this.downEvent.target !== event.target) {
                     return;
                 }
             }
@@ -2497,14 +2462,290 @@
             if (tapTargets.length) {
                 fireTaps(event, tapTargets, tapElements);
             }
-        }
-    };
+        },
 
-    var interaction = new Interaction();
+        validateSelector: function (event, matches) {
+            for (var i = 0, len = matches.length; i < len; i++) {
+                var match = matches[i],
+                    action = validateAction(match.getAction(event, match), match);
+
+                if (action) {
+                    this.target = match;
+
+                    return action;
+                }
+            }
+        },
+
+        setSnapping: function (event, status) {
+            var snap = this.target.options.snap,
+                anchors = snap.anchors,
+                page,
+                closest,
+                range,
+                inRange,
+                snapChanged,
+                dx,
+                dy,
+                distance,
+                i, len;
+
+            status = status || this.snapStatus;
+
+            if (status.useStatusXY) {
+                page = { x: status.x, y: status.y };
+            }
+            else {
+                var origin = getOriginXY(this.target);
+
+                page = getPageXY(event);
+
+                page.x -= origin.x;
+                page.y -= origin.y;
+            }
+
+            page.x -= this.inertiaStatus.resumeDx;
+            page.y -= this.inertiaStatus.resumeDy;
+
+            status.realX = page.x;
+            status.realY = page.y;
+
+            // change to infinite range when range is negative
+            if (snap.range < 0) { snap.range = Infinity; }
+
+            // create an anchor representative for each path's returned point
+            if (snap.mode === 'path') {
+                anchors = [];
+
+                for (i = 0, len = snap.paths.length; i < len; i++) {
+                    var path = snap.paths[i];
+
+                    if (isFunction(path)) {
+                        path = path(page.x, page.y);
+                    }
+
+                    anchors.push({
+                        x: isNumber(path.x) ? path.x : page.x,
+                        y: isNumber(path.y) ? path.y : page.y,
+
+                        range: isNumber(path.range)? path.range: snap.range
+                    });
+                }
+            }
+
+            if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
+                closest = {
+                    anchor: null,
+                    distance: 0,
+                    range: 0,
+                    dx: 0,
+                    dy: 0
+                };
+
+                for (i = 0, len = anchors.length; i < len; i++) {
+                    var anchor = anchors[i];
+
+                    range = isNumber(anchor.range)? anchor.range: snap.range;
+
+                    dx = anchor.x - page.x + this.snapOffset.x;
+                    dy = anchor.y - page.y + this.snapOffset.y;
+                    distance = hypot(dx, dy);
+
+                    inRange = distance < range;
+
+                    // Infinite anchors count as being out of range
+                    // compared to non infinite ones that are in range
+                    if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                        inRange = false;
+                    }
+
+                    if (!closest.anchor || (inRange?
+                        // is the closest anchor in range?
+                        (closest.inRange && range !== Infinity)?
+                            // the pointer is relatively deeper in this anchor
+                            distance / range < closest.distance / closest.range:
+                            //the pointer is closer to this anchor
+                            distance < closest.distance:
+                        // The other is not in range and the pointer is closer to this anchor
+                        (!closest.inRange && distance < closest.distance))) {
+
+                        if (range === Infinity) {
+                            inRange = true;
+                        }
+
+                        closest.anchor = anchor;
+                        closest.distance = distance;
+                        closest.range = range;
+                        closest.inRange = inRange;
+                        closest.dx = dx;
+                        closest.dy = dy;
+
+                        status.range = range;
+                    }
+                }
+
+                inRange = closest.inRange;
+                snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
+
+                status.snappedX = closest.anchor.x;
+                status.snappedY = closest.anchor.y;
+                status.dx = closest.dx;
+                status.dy = closest.dy;
+            }
+            else if (snap.mode === 'grid') {
+                var gridx = Math.round((page.x - snap.gridOffset.x - this.snapOffset.x) / snap.grid.x),
+                    gridy = Math.round((page.y - snap.gridOffset.y - this.snapOffset.y) / snap.grid.y),
+
+                    newX = gridx * snap.grid.x + snap.gridOffset.x + this.snapOffset.x,
+                    newY = gridy * snap.grid.y + snap.gridOffset.y + this.snapOffset.y;
+
+                dx = newX - page.x;
+                dy = newY - page.y;
+
+                distance = hypot(dx, dy);
+
+                inRange = distance < snap.range;
+                snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
+
+                status.snappedX = newX;
+                status.snappedY = newY;
+                status.dx = dx;
+                status.dy = dy;
+
+                status.range = snap.range;
+            }
+
+            status.changed = (snapChanged || (inRange && !status.locked));
+            status.locked = inRange;
+
+            return status;
+        },
+
+        setRestriction: function (event, status) {
+            var target = this.target,
+                restrict = target && target.options.restrict,
+                restriction = restrict && restrict[this.prepared],
+                page;
+
+            if (!restriction) {
+                return status;
+            }
+
+            status = status || this.restrictStatus;
+
+            page = status.useStatusXY
+                    ? page = { x: status.x, y: status.y }
+                    : page = getPageXY(event);
+
+            if (status.snap && status.snap.locked) {
+                page.x += status.snap.dx || 0;
+                page.y += status.snap.dy || 0;
+            }
+
+            page.x -= this.inertiaStatus.resumeDx;
+            page.y -= this.inertiaStatus.resumeDy;
+
+            status.dx = 0;
+            status.dy = 0;
+            status.restricted = false;
+
+            var rect;
+
+            if (restriction === 'parent') {
+                restriction = target._element.parentNode;
+            }
+            else if (restriction === 'self') {
+                restriction = target._element;
+            }
+
+            if (isElement(restriction)) {
+                rect = getElementRect(restriction);
+            }
+            else {
+                if (isFunction(restriction)) {
+                    restriction = restriction(page.x, page.y, target._element);
+                }
+
+                rect = restriction;
+
+                // object is assumed to have
+                // x, y, width, height or
+                // left, top, right, bottom
+                if ('x' in restriction && 'y' in restriction) {
+                    rect = {
+                        left  : restriction.x,
+                        top   : restriction.y,
+                        right : restriction.x + restriction.width,
+                        bottom: restriction.y + restriction.height
+                    };
+                }
+            }
+
+            var restrictedX = Math.max(Math.min(rect.right  - this.restrictOffset.right , page.x), rect.left + this.restrictOffset.left),
+                restrictedY = Math.max(Math.min(rect.bottom - this.restrictOffset.bottom, page.y), rect.top  + this.restrictOffset.top );
+
+            status.dx = restrictedX - page.x;
+            status.dy = restrictedY - page.y;
+
+            status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+            status.restricted = !!(status.dx || status.dy);
+
+            status.restrictedX = restrictedX;
+            status.restrictedY = restrictedY;
+
+            return status;
+        },
+
+        checkAndPreventDefault: function (event, interactable) {
+            if (!(interactable = interactable || this.target)) { return; }
+
+            var options = interactable.options,
+                prevent = options.preventDefault;
+
+            if (prevent === 'auto' && !/^input$|^textarea$/i.test(interactable._element.nodeName)) {
+                // do not preventDefault on pointerdown if the prepared action is a drag
+                // and dragging can only start from a certain direction - this allows
+                // a touch to pan the viewport if a drag isn't in the right direction
+                if (/down|start/i.test(event.type)
+                    && this.prepared === 'drag' && options.dragAxis !== 'xy') {
+
+                    return;
+                }
+
+                event.preventDefault();
+                return;
+            }
+
+            if (prevent === true) {
+                event.preventDefault();
+                return;
+            }
+        },
+
+        calcInertia: function (status) {
+            var inertiaOptions = status.target.options.inertia,
+                lambda = inertiaOptions.resistance,
+                inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
+
+            status.x0 = this.prevEvent.pageX;
+            status.y0 = this.prevEvent.pageY;
+            status.t0 = status.startEvent.timeStamp / 1000;
+            status.sx = status.sy = 0;
+
+            status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+            status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+            status.te = inertiaDur;
+
+            status.lambda_v0 = lambda / status.v0;
+            status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+        }
+
+    };
 
     function InteractEvent (event, action, phase, element, related) {
         var client,
             page,
+            interaction = getInteractionFromEvent(event),
             target      = interaction.target,
             snapStatus  = interaction.snapStatus,
             restrictStatus  = interaction.restrictStatus,
@@ -2536,7 +2777,7 @@
             client.x -= origin.x;
             client.y -= origin.y;
 
-            if (checkSnap(target) && !(starting && options.snap.elementOrigin)) {
+            if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
 
                 this.snap = {
                     range  : snapStatus.range,
@@ -2558,7 +2799,7 @@
             }
         }
 
-        if (checkRestrict(target) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
+        if (checkRestrict(target, action) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -2588,6 +2829,7 @@
         this.t0        = interaction.downTime;
         this.type      = action + (phase || '');
 
+        this.interaction = interaction;
         this.interactable = target;
 
         var inertiaStatus = interaction.inertiaStatus;
@@ -2802,15 +3044,16 @@
     }
 
     function fireTaps (event, targets, elements) {
-        return interaction.fireTaps(event, targets, elements);
+        return getInteractionFromEvent(event).fireTaps(event, targets, elements);
     }
 
     function collectTaps (event) {
-        return interaction.collectTaps(event);
+        return getInteractionFromEvent(event).collectTaps(event);
     }
 
     function defaultActionChecker (event) {
-        var rect = this.getRect(),
+        var interaction = getInteractionFromEvent(event),
+            rect = this.getRect(),
             right,
             bottom,
             action = null,
@@ -2846,10 +3089,8 @@
     function validateAction (action, interactable) {
         if (!isString(action)) { return null; }
 
-        interactable = interactable || interaction.target;
-
         var actionType = action.search('resize') !== -1? 'resize': action,
-            options = (interactable || interaction.target).options;
+            options = interactable;
 
         if ((  (actionType  === 'resize'   && options.resizable )
             || (action      === 'drag'     && options.draggable  )
@@ -2865,317 +3106,17 @@
         return null;
     }
 
-    function selectorDown (event) {
-        return interaction.selectorDown(event);
-    }
-
-    // Determine action to be performed on next pointerMove and add appropriate
-    // style and event Liseners
-    function pointerDown (event, forceAction) {
-        return interaction.pointerDown(event, forceAction);
-    }
-
-    function setSnapping (event, status) {
-        var snap = interaction.target.options.snap,
-            anchors = snap.anchors,
-            page,
-            closest,
-            range,
-            inRange,
-            snapChanged,
-            dx,
-            dy,
-            distance,
-            i, len;
-
-        status = status || interaction.snapStatus;
-
-        if (status.useStatusXY) {
-            page = { x: status.x, y: status.y };
-        }
-        else {
-            var origin = getOriginXY(interaction.target);
-
-            page = getPageXY(event);
-
-            page.x -= origin.x;
-            page.y -= origin.y;
-        }
-
-        page.x -= interaction.inertiaStatus.resumeDx;
-        page.y -= interaction.inertiaStatus.resumeDy;
-
-        status.realX = page.x;
-        status.realY = page.y;
-
-        // change to infinite range when range is negative
-        if (snap.range < 0) { snap.range = Infinity; }
-
-        // create an anchor representative for each path's returned point
-        if (snap.mode === 'path') {
-            anchors = [];
-
-            for (i = 0, len = snap.paths.length; i < len; i++) {
-                var path = snap.paths[i];
-
-                if (isFunction(path)) {
-                    path = path(page.x, page.y);
-                }
-
-                anchors.push({
-                    x: isNumber(path.x) ? path.x : page.x,
-                    y: isNumber(path.y) ? path.y : page.y,
-
-                    range: isNumber(path.range)? path.range: snap.range
-                });
-            }
-        }
-
-        if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
-            closest = {
-                anchor: null,
-                distance: 0,
-                range: 0,
-                dx: 0,
-                dy: 0
-            };
-
-            for (i = 0, len = anchors.length; i < len; i++) {
-                var anchor = anchors[i];
-
-                range = isNumber(anchor.range)? anchor.range: snap.range;
-
-                dx = anchor.x - page.x + interaction.snapOffset.x;
-                dy = anchor.y - page.y + interaction.snapOffset.y;
-                distance = hypot(dx, dy);
-
-                inRange = distance < range;
-
-                // Infinite anchors count as being out of range
-                // compared to non infinite ones that are in range
-                if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                    inRange = false;
-                }
-
-                if (!closest.anchor || (inRange?
-                    // is the closest anchor in range?
-                    (closest.inRange && range !== Infinity)?
-                        // the pointer is relatively deeper in this anchor
-                        distance / range < closest.distance / closest.range:
-                        //the pointer is closer to this anchor
-                        distance < closest.distance:
-                    // The other is not in range and the pointer is closer to this anchor
-                    (!closest.inRange && distance < closest.distance))) {
-
-                    if (range === Infinity) {
-                        inRange = true;
-                    }
-
-                    closest.anchor = anchor;
-                    closest.distance = distance;
-                    closest.range = range;
-                    closest.inRange = inRange;
-                    closest.dx = dx;
-                    closest.dy = dy;
-
-                    status.range = range;
-                }
-            }
-
-            inRange = closest.inRange;
-            snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
-
-            status.snappedX = closest.anchor.x;
-            status.snappedY = closest.anchor.y;
-            status.dx = closest.dx;
-            status.dy = closest.dy;
-        }
-        else if (snap.mode === 'grid') {
-            var gridx = Math.round((page.x - snap.gridOffset.x - interaction.snapOffset.x) / snap.grid.x),
-                gridy = Math.round((page.y - snap.gridOffset.y - interaction.snapOffset.y) / snap.grid.y),
-
-                newX = gridx * snap.grid.x + snap.gridOffset.x + interaction.snapOffset.x,
-                newY = gridy * snap.grid.y + snap.gridOffset.y + interaction.snapOffset.y;
-
-            dx = newX - page.x;
-            dy = newY - page.y;
-
-            distance = hypot(dx, dy);
-
-            inRange = distance < snap.range;
-            snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
-
-            status.snappedX = newX;
-            status.snappedY = newY;
-            status.dx = dx;
-            status.dy = dy;
-
-            status.range = snap.range;
-        }
-
-        status.changed = (snapChanged || (inRange && !status.locked));
-        status.locked = inRange;
-
-        return status;
-    }
-
-    function setRestriction (event, status) {
-        var target = interaction.target,
-            restrict = target && target.options.restrict,
-            restriction = restrict && restrict[interaction.prepared],
-            page;
-
-        if (!restriction) {
-            return status;
-        }
-
-        status = status || interaction.restrictStatus;
-
-        page = status.useStatusXY
-                ? page = { x: status.x, y: status.y }
-                : page = getPageXY(event);
-
-        if (status.snap && status.snap.locked) {
-            page.x += status.snap.dx || 0;
-            page.y += status.snap.dy || 0;
-        }
-
-        page.x -= interaction.inertiaStatus.resumeDx;
-        page.y -= interaction.inertiaStatus.resumeDy;
-
-        status.dx = 0;
-        status.dy = 0;
-        status.restricted = false;
-
-        var rect;
-
-        if (restriction === 'parent') {
-            restriction = target._element.parentNode;
-        }
-        else if (restriction === 'self') {
-            restriction = target._element;
-        }
-
-        if (isElement(restriction)) {
-            rect = getElementRect(restriction);
-        }
-        else {
-            if (isFunction(restriction)) {
-                restriction = restriction(page.x, page.y, target._element);
-            }
-
-            rect = restriction;
-
-            // object is assumed to have
-            // x, y, width, height or
-            // left, top, right, bottom
-            if ('x' in restriction && 'y' in restriction) {
-                rect = {
-                    left  : restriction.x,
-                    top   : restriction.y,
-                    right : restriction.x + restriction.width,
-                    bottom: restriction.y + restriction.height
-                };
-            }
-        }
-
-        var restrictedX = Math.max(Math.min(rect.right  - interaction.restrictOffset.right , page.x), rect.left + interaction.restrictOffset.left),
-            restrictedY = Math.max(Math.min(rect.bottom - interaction.restrictOffset.bottom, page.y), rect.top  + interaction.restrictOffset.top );
-
-        status.dx = restrictedX - page.x;
-        status.dy = restrictedY - page.y;
-
-        status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
-        status.restricted = !!(status.dx || status.dy);
-
-        status.restrictedX = restrictedX;
-        status.restrictedY = restrictedY;
-
-        return status;
-    }
-
-    function pointerMove (event, preEnd) {
-        return interaction.pointerMove(event, preEnd);
-    }
-
-    function addPointer (event, gesture, type) {
-        return interaction.addPointer(event, gesture, type);
-    }
-
-    function removePointer (event) {
-        return interaction.removePointer(event);
-    }
-
-    function recordPointers (event, type) {
-        return interaction.recordPointers(event, type);
-    }
-
-    function recordTouches (event) {
-        var touches = (/cancel|touchend/.test(event.type)
-                       ? event.changedTouches
-                       : event.touches);
-
-        for (var i = 0; i < touches.length; i++) {
-            recordPointers(touches[i], event.type);
-        }
-
-        return;
-    }
-
-    function dragStart (event) {
-        return interaction.dragStart(event);
-    }
-
-    function dragMove (event) {
-        return interaction.dragMove(event);
-    }
-
-    function resizeStart (event) {
-        return interaction.resizeStart(event);
-    }
-
-    function resizeMove (event) {
-        return interaction.resizeMove(event);
-    }
-
-    function gestureStart (event) {
-        return interaction.gestureStart(event);
-    }
-
-    function gestureMove (event) {
-        return interaction.gestureMove(event);
-    }
-
-    function validateSelector (event, matches) {
-        for (var i = 0, len = matches.length; i < len; i++) {
-            var match = matches[i],
-                action = validateAction(match.getAction(event, match), match);
-
-            if (action) {
-                interaction.target = match;
-
-                return action;
-            }
-        }
-    }
-
-    function pointerOver (event) {
-        return interaction.pointerOver(event);
-    }
-
-    function pointerOut (event) {
-        return interaction.pointerOut(event);
-    }
-
-    // Check what action would be performed on pointerMove target if a mouse
-    // button were pressed and change the cursor accordingly
-    function pointerHover (event, matches) {
-        return interaction.pointerHover(event, matches);
-    }
-
-    // End interact move events and stop auto-scroll unless inertia is enabled
-    function pointerUp (event) {
-        return interaction.pointerUp(event);
+    var listeners = {},
+        interactionListeners = [
+            'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
+            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
+            'addPointer', 'removePointer', 'recordPointers', 'recordTouches'
+        ];
+
+    for (var i = 0, len = interactionListeners.length; i < len; i++) {
+        var name = interactionListeners[i];
+
+        listeners[name] = doOnInteraction(name);
     }
 
     // bound to the interactable context when a DOM event
@@ -3268,6 +3209,39 @@
         }
     };
 
+    function getInteractionFromEvent (event) {
+        if (/mouse/.test(event.pointerType || event.type)) {
+            return interactions[0] || new Interaction(event.target);
+        }
+
+        var i, len = interactions.length;
+
+        // using "inertiastart" InteractEvent
+        if (event instanceof InteractEvent && /inertiastart/.test(event.type)) {
+            for (i = 0; i < len; i++) {
+                if (interactions[i].inertiaStatus.startEvent === event) {
+                    return interactions[i];
+                }
+            }
+        }
+
+        for (i = 0; i < len; i++) {
+            if (event.target === interactions[i].eventTarget) {
+                return interactions[i];
+            }
+        }
+
+        return new Interaction(event.target);
+    }
+
+    function doOnInteraction (method) {
+        return (function (event) {
+            var interaction = getInteractionFromEvent(event);
+
+            return interaction[method].apply(interaction, arguments);
+        });
+    }
+
     /*\
      * interact
      [ method ]
@@ -3325,7 +3299,6 @@
             document.querySelector(element);
 
             this.selector = element;
-            this._gesture = interaction.selectorGesture;
 
             if (options && options.context
                 && (window.Node
@@ -3336,17 +3309,17 @@
         }
         else if (isElement(element)) {
             if (PointerEvent) {
-                events.add(this, pEventTypes.down, pointerDown );
-                events.add(this, pEventTypes.move, pointerHover);
+                events.add(this, pEventTypes.down, listeners.pointerDown );
+                events.add(this, pEventTypes.move, listeners.pointerHover);
 
                 this._gesture = new Gesture();
                 this._gesture.target = element;
             }
             else {
-                events.add(this, 'mousedown' , pointerDown );
-                events.add(this, 'mousemove' , pointerHover);
-                events.add(this, 'touchstart', pointerDown );
-                events.add(this, 'touchmove' , pointerHover);
+                events.add(this, 'mousedown' , listeners.pointerDown );
+                events.add(this, 'mousemove' , listeners.pointerHover);
+                events.add(this, 'touchstart', listeners.pointerDown );
+                events.add(this, 'touchmove' , listeners.pointerHover);
             }
         }
 
@@ -4889,7 +4862,7 @@
             action = 'resizexy';
         }
         // return if the action is not recognised
-        if (!(action in actions)) {
+        if (!/^(drag|resizexy|resizex|resizey)$/.test(action)) {
             return interact;
         }
 
@@ -4897,9 +4870,9 @@
             extend(event, pointerEvent);
         }
         else {
-            clientRect = (interaction.target._element instanceof SVGElement)?
-                element.getBoundingClientRect():
-                clientRect = element.getClientRects()[0];
+            clientRect = (element instanceof SVGElement)
+                ? element.getBoundingClientRect()
+                : clientRect = element.getClientRects()[0];
 
             if (action === 'drag') {
                 event.pageX = clientRect.left + clientRect.width / 2;
@@ -4914,7 +4887,7 @@
         event.target = event.currentTarget = element;
         event.preventDefault = event.stopPropagation = blank;
 
-        pointerDown(event, action);
+        listeners.pointerDown(event, action);
 
         return interact;
     };
@@ -4983,7 +4956,10 @@
      = (object) An object with properties that outline the current state and expose internal functions and variables
     \*/
     interact.debug = function () {
+        var interaction = interactions[0] || new Interaction();
+
         return {
+            interactions          : interactions,
             target                : interaction.target,
             dragging              : interaction.dragging,
             resizing              : interaction.resizing,
@@ -4996,10 +4972,10 @@
 
             pointerIds            : interaction.pointerIds,
             pointerMoves          : interaction.pointerMoves,
-            addPointer            : addPointer,
-            removePointer         : removePointer,
-            recordPointers        : recordPointers,
-            recordTouches         : recordTouches,
+            addPointer            : listeners.addPointer,
+            removePointer         : listeners.removePointer,
+            recordPointers        : listeners.recordPointers,
+            recordTouches         : listeners.recordTouches,
 
             snap                  : interaction.snapStatus,
             restrict              : interaction.restrictStatus,
@@ -5017,14 +4993,14 @@
             defaultOptions        : defaultOptions,
             defaultActionChecker  : defaultActionChecker,
 
-            actions               : actions,
-            dragMove              : dragMove,
-            resizeMove            : resizeMove,
-            gestureMove           : gestureMove,
-            pointerUp             : pointerUp,
-            pointerDown           : pointerDown,
-            pointerMove           : pointerMove,
-            pointerHover          : pointerHover,
+            actionCursors         : actionCursors,
+            dragMove              : listeners.dragMove,
+            resizeMove            : listeners.resizeMove,
+            gestureMove           : listeners.gestureMove,
+            pointerUp             : listeners.pointerUp,
+            pointerDown           : listeners.pointerDown,
+            pointerMove           : listeners.pointerMove,
+            pointerHover          : listeners.pointerHover,
 
             events                : events,
             globalEvents          : globalEvents,
@@ -5154,8 +5130,7 @@
      = (object | interact) The default snap settings object or interact
     \*/
     interact.snap = function (options) {
-        var snap = defaultOptions.snap,
-            snapStatus = interaction.snapStatus;
+        var snap = defaultOptions.snap;
 
         if (isObject(options)) {
             defaultOptions.snapEnabled = true;
@@ -5177,23 +5152,7 @@
             return interact;
         }
 
-        return {
-            enabled   : defaultOptions.snapEnabled,
-            mode      : snap.mode,
-            actions   : snap.actions,
-            grid      : snap.grid,
-            gridOffset: snap.gridOffset,
-            anchors   : snap.anchors,
-            paths     : snap.paths,
-            range     : snap.range,
-            locked    : snapStatus.locked,
-            x         : snapStatus.snappedX,
-            y         : snapStatus.snappedY,
-            realX     : snapStatus.realX,
-            realY     : snapStatus.realY,
-            dx        : snapStatus.dx,
-            dy        : snapStatus.dy
-        };
+        return defaultOptions.snapEnabled;
     };
 
     /*\
@@ -5257,7 +5216,13 @@
      = (string) What action is currently being performed
     \*/
     interact.currentAction = function () {
-        return interaction.currentAction();
+        for (var i = 0, len = interactions.length; i < len; i++) {
+            var action = interactions[i].currentAction();
+
+            if (action) { return action; }
+        }
+
+        return null;
     };
 
     /*\
@@ -5270,7 +5235,9 @@
      = (object) interact
     \*/
     interact.stop = function (event) {
-        interaction.stop(event);
+        for (var i = 0; i < interactions.length; i++) {
+            interactions[i].stop(event);
+        }
 
         return interact;
     };
@@ -5413,56 +5380,58 @@
 
         events.add(docTarget, pEventTypes.up, collectTaps);
 
-        events.add(docTarget, pEventTypes.down   , selectorDown);
-        events.add(docTarget, gEventTypes.change , pointerMove );
-        events.add(docTarget, gEventTypes.end    , pointerUp   );
-        events.add(docTarget, gEventTypes.inertia, pointerUp   );
-        events.add(docTarget, pEventTypes.over   , pointerOver );
-        events.add(docTarget, pEventTypes.out    , pointerOut  );
+        events.add(docTarget, pEventTypes.down   , listeners.selectorDown);
+        events.add(docTarget, gEventTypes.change , listeners.pointerMove );
+        events.add(docTarget, gEventTypes.end    , listeners.pointerUp   );
+        events.add(docTarget, gEventTypes.inertia, listeners.pointerUp   );
+        events.add(docTarget, pEventTypes.over   , listeners.pointerOver );
+        events.add(docTarget, pEventTypes.out    , listeners.pointerOut  );
 
-        events.add(docTarget, pEventTypes.move  , recordPointers);
-        events.add(docTarget, pEventTypes.up    , recordPointers);
-        events.add(docTarget, pEventTypes.cancel, recordPointers);
+        events.add(docTarget, pEventTypes.move  , listeners.recordPointers);
+        events.add(docTarget, pEventTypes.up    , listeners.recordPointers);
+        events.add(docTarget, pEventTypes.cancel, listeners.recordPointers);
 
         // fix problems of wrong targets in IE
-        events.add(docTarget, pEventTypes.up, function () {
+        events.add(docTarget, pEventTypes.up, function (event) {
+            var interaction = getInteractionFromEvent(event);
+
             if (!interaction.currentAction()) {
                 interaction.pointerIsDown = false;
             }
         });
     }
     else {
-        events.add(docTarget, 'mouseup' , collectTaps);
-        events.add(docTarget, 'touchend', collectTaps);
+        events.add(docTarget, 'mouseup' , listeners.collectTaps);
+        events.add(docTarget, 'touchend', listeners.collectTaps);
 
-        events.add(docTarget, 'mousedown', selectorDown);
-        events.add(docTarget, 'mousemove', pointerMove );
-        events.add(docTarget, 'mouseup'  , pointerUp   );
-        events.add(docTarget, 'mouseover', pointerOver );
-        events.add(docTarget, 'mouseout' , pointerOut  );
+        events.add(docTarget, 'mousedown', listeners.selectorDown);
+        events.add(docTarget, 'mousemove', listeners.pointerMove );
+        events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
+        events.add(docTarget, 'mouseover', listeners.pointerOver );
+        events.add(docTarget, 'mouseout' , listeners.pointerOut  );
 
-        events.add(docTarget, 'touchmove'  , recordTouches);
-        events.add(docTarget, 'touchend'   , recordTouches);
-        events.add(docTarget, 'touchcancel', recordTouches);
+        events.add(docTarget, 'touchmove'  , listeners.recordTouches);
+        events.add(docTarget, 'touchend'   , listeners.recordTouches);
+        events.add(docTarget, 'touchcancel', listeners.recordTouches);
 
-        events.add(docTarget, 'touchstart' , selectorDown);
-        events.add(docTarget, 'touchmove'  , pointerMove );
-        events.add(docTarget, 'touchend'   , pointerUp   );
-        events.add(docTarget, 'touchcancel', pointerUp   );
+        events.add(docTarget, 'touchstart' , listeners.selectorDown);
+        events.add(docTarget, 'touchmove'  , listeners.pointerMove );
+        events.add(docTarget, 'touchend'   , listeners.pointerUp   );
+        events.add(docTarget, 'touchcancel', listeners.pointerUp   );
     }
 
-    events.add(windowTarget, 'blur', pointerUp);
+    events.add(windowTarget, 'blur', listeners.pointerUp);
 
     try {
         if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
-            events.add(parentDocTarget   , 'mouseup'      , pointerUp);
-            events.add(parentDocTarget   , 'touchend'     , pointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , pointerUp);
-            events.add(parentDocTarget   , 'pointerup'    , pointerUp);
-            events.add(parentDocTarget   , 'MSPointerUp'  , pointerUp);
-            events.add(parentWindowTarget, 'blur'         , pointerUp);
+            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerUp);
+            events.add(parentDocTarget   , 'touchend'     , listeners.pointerUp);
+            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
+            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
+            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
+            events.add(parentWindowTarget, 'blur'         , listeners.pointerUp);
         }
     }
     catch (error) {
@@ -5484,11 +5453,15 @@
     }
 
     // For IE's lack of Event#preventDefault
-    events.add(docTarget, 'selectstart', function (event) {
-        if (interaction.currentAction()) {
-            checkAndPreventDefault(event, interaction.target);
-        }
-    });
+    if (events.useAttachEvent) {
+        events.add(docTarget, 'selectstart', function (event) {
+            var interaction = interactions[0];
+
+            if (interaction.currentAction()) {
+                interaction.checkAndPreventDefault(event);
+            }
+        });
+    }
 
     function matchesSelector (element, selector, nodeList) {
         if (ie8MatchesSelector) {
