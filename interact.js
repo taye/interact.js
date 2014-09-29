@@ -15,12 +15,8 @@
         SVGElementInstance = window.SVGElementInstance || blank,
         HTMLElement        = window.HTMLElement        || window.Element,
 
-        // Use PointerEvents only if the Gesture API is also available
-        Gesture      = window.Gesture || window.MSGesture,
-        PointerEvent = Gesture && (window.PointerEvent || window.MSPointerEvent),
-        GestureEvent = Gesture && (window.GestureEvent || window.MSGestureEvent),
+        PointerEvent = (window.PointerEvent || window.MSPointerEvent),
         pEventTypes,
-        gEventTypes,
 
         hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
 
@@ -590,13 +586,6 @@
             page.x += window.scrollX;
             page.y += window.scrollY;
         }
-        // MSGesture events don't have pageX/Y
-        else if (/gesture|inertia/i.test(event.type)) {
-            getXY('client', event, page);
-
-            page.x += document.documentElement.scrollLeft;
-            page.y += document.documentElement.scrollTop;
-        }
         else {
             getXY('page', event, page);
         }
@@ -1073,7 +1062,7 @@
         };
 
         this.downTime  = 0;         // the timeStamp of the starting event
-        this.downEvent = null;      // gesturestart/mousedown/touchstart event
+        this.downEvent = null;      // pointerdown/mousedown/touchstart event
         this.prevEvent = null;      // previous action event
         this.tapTime   = 0;         // time of the most recent tap event
         this.prevTap   = null;
@@ -1123,11 +1112,6 @@
         this.resizing        = false;
         this.resizeAxes      = 'xy';
 
-        // MSGesture object for selector PointerEvents
-        if (PointerEvent) {
-            this.selectorGesture = new Gesture();
-            this.selectorGesture.target = document.documentElement;
-        }
 
         this.eventTarget = eventTarget || null;
         this.mouse = false;
@@ -1294,9 +1278,6 @@
                         cancelFrame(this.inertiaStatus.i);
                         this.inertiaStatus.active = false;
 
-                        // add the pointer to the gesture object
-                        this.addPointer(event, this.selectorGesture);
-
                         return;
                     }
                     element = element.parentNode;
@@ -1370,8 +1351,7 @@
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
             // Otherwise, set the target if there is no action prepared
-            if ((((event.touches && event.touches.length < 2) || (this.pointerIds && this.pointerIds.length < 2)) && !this.target)
-                || !this.prepared) {
+            if ((this.pointerIds.length < 2 && !this.target) || !this.prepared) {
 
                 var interactable = interactables.get(event.currentTarget);
 
@@ -1390,19 +1370,6 @@
 
                 setEventXY(this.startCoords, event);
 
-                if (PointerEvent && event instanceof PointerEvent) {
-                    if (target.selector) {
-                        target._gesture = this.selectorGesture;
-                    }
-
-                    // Dom modification seems to reset the gesture target
-                    if (!target._gesture.target) {
-                        target._gesture.target = this.element;
-                    }
-
-                    this.addPointer(event, target._gesture);
-                }
-
                 if (!action) {
                     return event;
                 }
@@ -1419,10 +1386,8 @@
                                 'y':
                                 '';
 
-                if (action === 'gesture'
-                    && ((event.touches && event.touches.length < 2)
-                        || PointerEvent && this.pointerIds.length < 2)) {
-                            action = null;
+                if (action === 'gesture' && this.pointerIds.length < 2) {
+                    action = null;
                 }
 
                 this.prepared = action;
@@ -1446,14 +1411,6 @@
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
-
-                if (PointerEvent) {
-                    if (!target._gesture.target) {
-                        target._gesture.target = this.element;
-                    }
-                    // add the pointer to the gesture object
-                    this.addPointer(event, target._gesture);
-                }
             }
         },
 
@@ -1769,8 +1726,7 @@
         // End interact move events and stop auto-scroll unless inertia is enabled
         pointerUp: function (event) {
             // don't return if the event is an InteractEvent (in the case of inertia end)
-            // or if the browser uses PointerEvents (event would always be a gestureend)
-            if (!(event instanceof InteractEvent || PointerEvent)
+            if (!(event instanceof InteractEvent)
                 && this.pointerIsDown && this.downEvent
                 && !(event instanceof this.downEvent.constructor)) {
 
@@ -1778,12 +1734,6 @@
             }
 
             if (event.touches && event.touches.length >= 2) {
-                return;
-            }
-
-            // Stop native GestureEvent inertia
-            if (GestureEvent && (event instanceof GestureEvent) && /inertiastart/i.test(event.type)) {
-                event.gestureObject.stop();
                 return;
             }
 
@@ -2183,10 +2133,6 @@
                     document.documentElement.style.cursor = '';
                 }
 
-                if (target._gesture) {
-                    target._gesture.stop();
-                }
-
                 // prevent Default only if were previously interacting
                 if (event && isFunction(event.preventDefault)) {
                     this.checkAndPreventDefault(event, target);
@@ -2282,7 +2228,7 @@
             }
         },
 
-        addPointer: function (event, gesture, type) {
+        addPointer: function (event, type) {
             type = type || event.type;
 
             if (/touch/.test(event.type)) {
@@ -2291,7 +2237,7 @@
                                : event.touches);
 
                 for (var i = 0; i < touches.length; i++) {
-                    this.addPointer(touches[i], gesture, type);
+                    this.addPointer(touches[i], type);
                 }
 
                 return;
@@ -2303,10 +2249,6 @@
             }
 
             var id = event.pointerId || event.identifier || 0;
-
-            if (gesture) {
-                gesture.addPointer(id);
-            }
 
             var index = indexOf(this.pointerIds, id);
 
@@ -2346,12 +2288,6 @@
             }
             else if (/up|end|cancel/i.test(type)) {
                 this.removePointer(event);
-
-                // End the gesture InteractEvent if there are
-                // fewer than 2 active pointers
-                if (this.gesturing && this.target._gesture && this.pointerIds.length < 2) {
-                    this.target._gesture.stop();
-                }
             }
         },
 
@@ -3334,9 +3270,6 @@
             if (PointerEvent) {
                 events.add(this, pEventTypes.down, listeners.pointerDown );
                 events.add(this, pEventTypes.move, listeners.pointerHover);
-
-                this._gesture = new Gesture();
-                this._gesture.target = element;
             }
             else {
                 events.add(this, 'mousedown' , listeners.pointerDown );
@@ -4751,10 +4684,6 @@
                 if (this.options.styleCursor) {
                     this._element.style.cursor = '';
                 }
-
-                if (this._gesture) {
-                    this._gesture.target = null;
-                }
             }
             else {
                 // remove delegated events
@@ -5401,24 +5330,13 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        if (GestureEvent === window.MSGestureEvent) {
-            gEventTypes = {
-                start: 'MSGestureStart', change: 'MSGestureChange', inertia: 'MSInertiaStart', end: 'MSGestureEnd' };
-        }
-        else {
-            gEventTypes = {
-                start: 'gesturestart', change: 'gesturechange', inertia: 'inertiastart', end: 'gestureend' };
-        }
-
-
         events.add(docTarget, pEventTypes.up, listeners.collectTaps);
 
-        events.add(docTarget, pEventTypes.down   , listeners.selectorDown);
-        events.add(docTarget, gEventTypes.change , listeners.pointerMove );
-        events.add(docTarget, gEventTypes.end    , listeners.pointerUp   );
-        events.add(docTarget, gEventTypes.inertia, listeners.pointerUp   );
-        events.add(docTarget, pEventTypes.over   , listeners.pointerOver );
-        events.add(docTarget, pEventTypes.out    , listeners.pointerOut  );
+        events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
+        events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
+        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
+        events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
+        events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
 
         events.add(docTarget, pEventTypes.move  , listeners.recordPointers);
         events.add(docTarget, pEventTypes.up    , listeners.recordPointers);

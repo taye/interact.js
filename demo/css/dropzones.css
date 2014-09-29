@@ -35,6 +35,9 @@ body { font-family: Helvetica, Arial, sans-serif; }
     background-color: #29e;
     color: #fff;
     text-align: center;
+
+    -ms-touch-action: none;
+        touch-action: none;
 }
 
 .draggable.-drop-possible { background-color: #42bd41; }
