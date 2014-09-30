@@ -26,6 +26,8 @@
         dropzones       = [],   // all dropzone element interactables
         interactions    = [],
 
+        claimedPointers = [],
+
         dynamicDrop     = false,
 
         // {
@@ -625,6 +627,10 @@
         };
     }
 
+    function getPointerId (pointer) {
+        return isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    }
+
     function getElementRect (element) {
         var scroll = /ipad|iphone|ipod/i.test(navigator.userAgent)
                 ? { x: 0, y: 0 }
@@ -684,9 +690,7 @@
     }
 
     function touchBBox (event) {
-        var interaction = getInteractionFromEvent(event);
-
-        if (!(event.touches && event.touches.length) && !(interaction.pointerMoves.length)) {
+        if (!event.length && !(event.touches && event.touches.length > 1)) {
             return;
         }
 
@@ -1733,10 +1737,6 @@
                 return;
             }
 
-            if (event.touches && event.touches.length >= 2) {
-                return;
-            }
-
             var endEvent,
                 target = this.target,
                 options = target && target.options,
@@ -1935,7 +1935,7 @@
                 target.fire(endEvent);
             }
 
-            interact.stop();
+            this.stop();
         },
 
         collectDrops: function (element) {
@@ -2151,18 +2151,25 @@
                 this.clearTargets();
             }
 
-            this.pointerIds.splice(0);
-            this.pointerMoves.splice(0);
-
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
             this.prepared = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
-            // delete interaction if it's not the first
-            var index = indexOf(interactions, this);
+            // unclaim owned pointers
+            for (var j = 0; j < this.pointerIds.length; j++) {
+                var claimedPointerIndex = indexOf(claimedPointers, this.pointerIds[j]);
 
-            if (index > 0) {
-                interactions.splice(index, 1);
+                if (claimedPointerIndex !== -1) {
+                    claimedPointers.splice(claimedPointerIndex, 1);
+                }
+            }
+
+            this.pointerIds.splice(0);
+            this.pointerMoves.splice(0);
+
+            // delete interaction if it's not the only one
+            if (interactions.length > 1) {
+                interactions.splice(indexOf(interactions, this), 1);
             }
         },
 
@@ -2232,9 +2239,7 @@
             type = type || event.type;
 
             if (/touch/.test(event.type)) {
-                var touches = (/cancel|touchend/.test(type)
-                               ? event.changedTouches
-                               : event.touches);
+                var touches = event.changedTouches;
 
                 for (var i = 0; i < touches.length; i++) {
                     this.addPointer(touches[i], type);
@@ -2248,16 +2253,23 @@
                 return;
             }
 
-            var id = event.pointerId || event.identifier || 0;
+            var id = getPointerId(event),
+                index = indexOf(this.pointerIds, id);
 
-            var index = indexOf(this.pointerIds, id);
+            // don't add if the pointer is owned by another interaction
+            if (index === -1 && contains(claimedPointers, id)) {
+                return;
+            }
 
             if (index === -1) {
+                claimedPointers.push(id);
+
+                index = this.pointerIds.length;
                 this.pointerIds.push(id);
 
                 // move events are kept so that multi-touch properties can still be
                 // calculated at the end of a gesture; use pointerIds index
-                this.pointerMoves[this.pointerIds.length - 1] = event;
+                this.pointerMoves[index] = event;
             }
             else {
                 this.pointerMoves[index] = event;
@@ -2265,11 +2277,13 @@
         },
 
         removePointer: function (event) {
-            var index = indexOf(this.pointerIds, event.pointerId || event.identifier || 0);
+            var id = getPointerId(event),
+                index = indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
 
             this.pointerIds.splice(index, 1);
+            claimedPointers.splice(indexOf(claimedPointers, id));
 
             // move events are kept so that multi-touch properties can still be
             // calculated at the end of a GestureEvnt sequence
@@ -2277,7 +2291,7 @@
         },
 
         recordPointers: function (event, type) {
-            var index = indexOf(this.pointerIds, event.pointerId || event.identifier || 0);
+            var index = indexOf(this.pointerIds, getPointerId(event));
 
             if (index === -1) { return; }
 
@@ -2292,9 +2306,7 @@
         },
 
         recordTouches: function (event) {
-            var touches = (/cancel|touchend/.test(event.type)
-                           ? event.changedTouches
-                           : event.touches);
+            var touches = event.changedTouches;
 
             for (var i = 0; i < touches.length; i++) {
                 this.recordPointers(touches[i], event.type);
@@ -2694,6 +2706,75 @@
         }
 
     };
+
+    function getInteractionFromEvent (event) {
+        var i = 0, len = interactions.length,
+            type = event.pointerType || event.type,
+            mouseEvent = /mouse/.test(type);
+
+        // if it's a mouse interaction
+        if (!(supportsTouch || supportsPointerEvent)
+            || mouseEvent) {
+
+            // find the interaction specifically for mouse
+            for (i = 0; i < len; i++) {
+                if (interactions[i].mouse) {
+                    return interactions[i];
+                }
+            }
+
+            // or create a new interaction for mouse
+            var interaction = new Interaction (event.target);
+            interaction.mouse = true;
+
+            return interaction;
+        }
+
+        // using "inertiastart" InteractEvent
+        if (event instanceof InteractEvent && /inertiastart/.test(type)) {
+            for (i = 0; i < len; i++) {
+                if (interactions[i].inertiaStatus.startEvent === event) {
+                    return interactions[i];
+                }
+            }
+        }
+
+        var pointers = supportsPointerEvent? [event] : event.changedTouches;
+
+        if (pointers) {
+            // try to get most appropriate interaction basted on event target
+            for (i = 0; i < len; i++) {
+                //if (event.target === interactions[i].eventTarget) { return interactions[i]; }
+
+                for (var j = 0; j < pointers.length; j++) {
+                    var id = getPointerId(pointers[j]);
+
+                    if (contains(interactions[i].pointerIds, id)) {
+                        return interactions[i];
+                    }
+                }
+            }
+        }
+
+        // get first idle interaction
+        for (i = 0; i < len; i++) {
+            if (!interactions[i].pointerIsDown && !(!mouseEvent && interactions[i].mouse)) {
+                return interactions[i];
+            }
+        }
+
+        return new Interaction(event.target);
+    }
+
+    function doOnInteraction (method) {
+        return (function (event) {
+            //if (/mouse/.test(event.pointerType || event.type) && now() - prevTouchTime < 300) { return; }
+
+            var interaction = getInteractionFromEvent(event);
+
+            return interaction[method].apply(interaction, arguments);
+        });
+    }
 
     function InteractEvent (interaction, event, action, phase, element, related) {
         var client,
@@ -3152,53 +3233,6 @@
             }
         }
     };
-
-    function getInteractionFromEvent (event) {
-        var i, len = interactions.length;
-
-        // if it's a mouse interaction
-        if (!(supportsTouch || supportsPointerEvent)
-            || /mouse/.test(event.pointerType || event.type)) {
-
-            // find the interaction specifically for mouse
-            for (i = 0; i < len; i++) {
-                if (interactions[i].mouse) {
-                    return interactions[i];
-                }
-            }
-            
-            // or create a new interaction for mouse
-            var interaction = new Interaction (event.target);
-            interaction.mouse = true;
-
-            return interaction;
-        }
-
-        // using "inertiastart" InteractEvent
-        if (event instanceof InteractEvent && /inertiastart/.test(event.type)) {
-            for (i = 0; i < len; i++) {
-                if (interactions[i].inertiaStatus.startEvent === event) {
-                    return interactions[i];
-                }
-            }
-        }
-
-        for (i = 0; i < len; i++) {
-            if (event.target === interactions[i].eventTarget) {
-                return interactions[i];
-            }
-        }
-
-        return new Interaction(event.target);
-    }
-
-    function doOnInteraction (method) {
-        return (function (event) {
-            var interaction = getInteractionFromEvent(event);
-
-            return interaction[method].apply(interaction, arguments);
-        });
-    }
 
     /*\
      * interact
@@ -5361,13 +5395,15 @@
         events.add(docTarget, 'mouseout' , listeners.pointerOut  );
 
         events.add(docTarget, 'touchmove'  , listeners.recordTouches);
-        events.add(docTarget, 'touchend'   , listeners.recordTouches);
         events.add(docTarget, 'touchcancel', listeners.recordTouches);
 
         events.add(docTarget, 'touchstart' , listeners.selectorDown);
         events.add(docTarget, 'touchmove'  , listeners.pointerMove );
         events.add(docTarget, 'touchend'   , listeners.pointerUp   );
         events.add(docTarget, 'touchcancel', listeners.pointerUp   );
+
+        // remove touches after ending actinos in pointerUp
+        events.add(docTarget, 'touchend'   , listeners.recordTouches);
     }
 
     events.add(windowTarget, 'blur', listeners.pointerUp);
