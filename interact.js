@@ -1605,7 +1605,7 @@
         },
 
         dragStart: function (event) {
-            var dragEvent = new InteractEvent(event, 'drag', 'start');
+            var dragEvent = new InteractEvent(this, event, 'drag', 'start');
 
             this.dragging = true;
 
@@ -1633,7 +1633,7 @@
             this.checkAndPreventDefault(event, this.target);
 
             var target = this.target,
-                dragEvent  = new InteractEvent(event, 'drag', 'move'),
+                dragEvent  = new InteractEvent(this, event, 'drag', 'move'),
                 draggableElement = this.element,
                 drop = this.getDrop(dragEvent, draggableElement);
 
@@ -1660,7 +1660,7 @@
         },
 
         resizeStart: function (event) {
-            var resizeEvent = new InteractEvent(event, 'resize', 'start');
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'start');
 
             this.target.fire(resizeEvent);
 
@@ -1672,7 +1672,7 @@
         resizeMove: function (event) {
             this.checkAndPreventDefault(event, this.target);
 
-            var resizeEvent = new InteractEvent(event, 'resize', 'move');
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'move');
 
             this.target.fire(resizeEvent);
 
@@ -1680,7 +1680,7 @@
         },
 
         gestureStart: function (event) {
-            var gestureEvent = new InteractEvent(event, 'gesture', 'start');
+            var gestureEvent = new InteractEvent(this, event, 'gesture', 'start');
 
             gestureEvent.ds = 0;
 
@@ -1704,7 +1704,7 @@
 
             var gestureEvent;
 
-            gestureEvent = new InteractEvent(event, 'gesture', 'move');
+            gestureEvent = new InteractEvent(this, event, 'gesture', 'move');
             gestureEvent.ds = gestureEvent.scale - this.gesture.scale;
 
             this.target.fire(gestureEvent);
@@ -1807,7 +1807,7 @@
                         inertiaStatus.pointerUp = event;
                     }
 
-                    inertiaStatus.startEvent = startEvent = new InteractEvent(event, this.prepared, 'inertiastart');
+                    inertiaStatus.startEvent = startEvent = new InteractEvent(this, event, this.prepared, 'inertiastart');
                     target.fire(inertiaStatus.startEvent);
 
                     inertiaStatus.target = target;
@@ -1885,7 +1885,7 @@
             }
 
             if (this.dragging) {
-                endEvent = new InteractEvent(event, 'drag', 'end');
+                endEvent = new InteractEvent(this, event, 'drag', 'end');
 
                 var dropEvent,
                     draggableElement = this.element,
@@ -1899,7 +1899,7 @@
 
                 // get the most apprpriate dropzone based on DOM depth and order
                 if (this.dropTarget) {
-                    dropEvent = new InteractEvent(event, 'drop', null, this.dropElement, draggableElement);
+                    dropEvent = new InteractEvent(this, event, 'drop', null, this.dropElement, draggableElement);
 
                     endEvent.dropzone = this.dropElement;
                 }
@@ -1908,7 +1908,7 @@
                 // dragend happens without the mouse moving of the previous drop
                 // target)
                 else if (this.prevDropTarget) {
-                    var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', this.dropElement, draggableElement);
+                    var dragLeaveEvent = new InteractEvent(this, event, 'drag', 'leave', this.dropElement, draggableElement);
 
                     this.prevDropTarget.fire(dragLeaveEvent, draggableElement);
 
@@ -1927,11 +1927,11 @@
                 }
             }
             else if (this.resizing) {
-                endEvent = new InteractEvent(event, 'resize', 'end');
+                endEvent = new InteractEvent(this, event, 'resize', 'end');
                 target.fire(endEvent);
             }
             else if (this.gesturing) {
-                endEvent = new InteractEvent(event, 'gesture', 'end');
+                endEvent = new InteractEvent(this, event, 'gesture', 'end');
                 target.fire(endEvent);
             }
 
@@ -2061,14 +2061,14 @@
             if (this.dropElement !== this.prevDropElement) {
                 // if there was a prevDropTarget, create a dragleave event
                 if (this.prevDropTarget) {
-                    dragLeaveEvent = new InteractEvent(pointerEvent, 'drag', 'leave', this.prevDropElement, dragEvent.target);
+                    dragLeaveEvent = new InteractEvent(this, pointerEvent, 'drag', 'leave', this.prevDropElement, dragEvent.target);
                     dragLeaveEvent.draggable = dragEvent.interactable;
                     dragEvent.dragLeave = this.prevDropElement;
                     dragEvent.prevDropzone = this.prevDropTarget;
                 }
                 // if the dropTarget is not null, create a dragenter event
                 if (this.dropTarget) {
-                    dragEnterEvent = new InteractEvent(pointerEvent, 'drag', 'enter', this.dropElement, dragEvent.target);
+                    dragEnterEvent = new InteractEvent(this, pointerEvent, 'drag', 'enter', this.dropElement, dragEvent.target);
                     dragEnterEvent.draggable = dragEvent.interactable;
                     dragEvent.dragEnter = this.dropElement;
                     dragEvent.dropzone = this.dropTarget;
@@ -2076,16 +2076,16 @@
             }
 
             if (dragEvent.type === 'dragend' && this.dropTarget) {
-                dropEvent = new InteractEvent(pointerEvent, 'drop', null, this.dropElement, dragEvent.target);
+                dropEvent = new InteractEvent(this, pointerEvent, 'drop', null, this.dropElement, dragEvent.target);
                 dropEvent.draggable = dragEvent.interactable;
                 dragEvent.dropzone = this.dropTarget;
             }
             if (dragEvent.type === 'dragstart') {
-                dropActivateEvent = new InteractEvent(pointerEvent, 'drop', 'activate', null, dragEvent.target);
+                dropActivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'activate', null, dragEvent.target);
                 dropActivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragend') {
-                dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
+                dropDectivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
                 dropDectivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragmove' && this.dropTarget) {
@@ -2695,10 +2695,9 @@
 
     };
 
-    function InteractEvent (event, action, phase, element, related) {
+    function InteractEvent (interaction, event, action, phase, element, related) {
         var client,
             page,
-            interaction = getInteractionFromEvent(event),
             target      = interaction.target,
             snapStatus  = interaction.snapStatus,
             restrictStatus  = interaction.restrictStatus,
