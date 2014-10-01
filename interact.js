@@ -2802,9 +2802,10 @@
             client = { x: (average.clientX - origin.x), y: (average.clientY - origin.y) };
         }
         else {
+            var pointer = (event instanceof InteractEvent)? event : pointerMoves[0];
 
-            page   = getPageXY(interaction.pointerMoves[0]);
-            client = getClientXY(interaction.pointerMoves[0]);
+            page   = getPageXY(pointer);
+            client = getClientXY(pointer);
 
             page.x -= origin.x;
             page.y -= origin.y;
