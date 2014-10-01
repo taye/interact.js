@@ -1125,13 +1125,15 @@
 
     Interaction.prototype = {
         pointerOver: function (event) {
-            if (this.prepared) { return; }
+            if (this.prepared || !this.mouse) { return; }
 
             var curMatches = [],
                 prevTargetElement = this.target && this.element,
                 eventTarget = (event.target instanceof SVGElementInstance
                     ? event.target.correspondingUseElement
                     : event.target);
+
+            this.addPointer(event);
 
             if (this.target
                 && (testIgnore(this.target, eventTarget) || !testAllow(this.target, eventTarget))) {
@@ -1203,7 +1205,7 @@
         pointerHover: function (event, matches) {
             var target = this.target;
 
-            if (!this.prepared) {
+            if (!this.prepared && this.mouse) {
 
                 var action;
 
@@ -1211,7 +1213,7 @@
                     action = this.validateSelector(event, matches);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(event), this.target);
+                    action = validateAction(target.getAction(this.pointerMoves[0]), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
@@ -1334,7 +1336,7 @@
                 this.downTime = new Date().getTime();
                 this.downEvent = cloneEvent(event);
 
-                setEventXY(this.prevCoords, event);
+                setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
             }
         },
@@ -1372,7 +1374,7 @@
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
                 var action = validateAction(forceAction || target.getAction(event), target);
 
-                setEventXY(this.startCoords, event);
+                setEventXY(this.startCoords, this.pointerMoves[0]);
 
                 if (!action) {
                     return event;
@@ -1402,7 +1404,7 @@
                 this.downTime = new Date().getTime();
                 this.downEvent = cloneEvent(event);
 
-                setEventXY(this.prevCoords, event);
+                setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
 
                 this.checkAndPreventDefault(event, target);
@@ -1422,7 +1424,7 @@
             if (!this.pointerIsDown) { return; }
 
             if (!(event instanceof InteractEvent)) {
-                setEventXY(this.curCoords, event);
+                setEventXY(this.curCoords, this.pointerMoves[0]);
             }
 
             var dx, dy;
@@ -1600,7 +1602,7 @@
             if (!(event instanceof InteractEvent)) {
                 // set pointer coordinate, time changes and speeds
                 setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-                setEventXY(this.prevCoords, event);
+                setEventXY(this.prevCoords, this.pointerMoves[0]);
             }
 
             if (this.dragging || this.resizing) {
@@ -1821,7 +1823,7 @@
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = getPageXY(event),
+                        var page = getPageXY(this.pointerMoves[0]),
                             origin = getOriginXY(target, this.element),
                             statusObject;
 
@@ -2165,7 +2167,8 @@
             }
 
             this.pointerIds.splice(0);
-            this.pointerMoves.splice(0);
+            // pointerMoves should be retained
+            //this.pointerMoves.splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2463,7 +2466,7 @@
             else {
                 var origin = getOriginXY(this.target);
 
-                page = getPageXY(event);
+                page = getPageXY(this.pointerMoves[0]);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2600,7 +2603,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = getPageXY(event);
+                    : page = getPageXY(this.pointerMoves[0]);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2768,8 +2771,6 @@
 
     function doOnInteraction (method) {
         return (function (event) {
-            //if (/mouse/.test(event.pointerType || event.type) && now() - prevTouchTime < 300) { return; }
-
             var interaction = getInteractionFromEvent(event);
 
             return interaction[method].apply(interaction, arguments);
@@ -2801,8 +2802,8 @@
         }
         else {
 
-            page   = getPageXY(event);
-            client = getClientXY(event);
+            page   = getPageXY(interaction.pointerMoves[0]);
+            client = getClientXY(interaction.pointerMoves[0]);
 
             page.x -= origin.x;
             page.y -= origin.y;
@@ -3082,7 +3083,7 @@
             right,
             bottom,
             action = null,
-            page = getPageXY(event),
+            page = getPageXY(interaction.pointerMoves[0]),
             options = this.options;
 
         if (!rect) { return null; }
@@ -5387,6 +5388,8 @@
     else {
         events.add(docTarget, 'mouseup' , listeners.collectTaps);
         events.add(docTarget, 'touchend', listeners.collectTaps);
+
+        events.add(docTarget, 'mousemove', listeners.recordPointers);
 
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
