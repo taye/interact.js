@@ -8,16 +8,16 @@
     interact('.js-drag')
         .draggable(true)
         .on('dragstart', function (event) {
-            position.x = parseInt(event.target.dataset.x, 10) || 0;
-            position.y = parseInt(event.target.dataset.y, 10) || 0;
+            event.interaction.x = parseInt(event.target.dataset.x, 10) || 0;
+            event.interaction.y = parseInt(event.target.dataset.y, 10) || 0;
         })
         .on('dragmove', function (event) {
-            position.x += event.dx;
-            position.y += event.dy;
+            event.interaction.x += event.dx;
+            event.interaction.y += event.dy;
 
-            event.target.dataset.x = position.x;
-            event.target.dataset.y = position.y;
-            event.target.style.webkitTransform = event.target.style.transform = 'translate(' + position.x + 'px, ' + position.y + 'px)';
+            event.target.dataset.x = event.interaction.x;
+            event.target.dataset.y = event.interaction.y;
+            event.target.style.webkitTransform = event.target.style.transform = 'translate(' + event.interaction.x + 'px, ' + event.interaction.y + 'px)';
         });
 
     // setup drop areas.
