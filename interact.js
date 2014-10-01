@@ -1734,7 +1734,8 @@
             // don't return if the event is an InteractEvent (in the case of inertia end)
             if (!(event instanceof InteractEvent)
                 && this.pointerIsDown && this.downEvent
-                && !(event instanceof this.downEvent.constructor)) {
+                && !(event instanceof this.downEvent.constructor)
+                && event.type !== 'blur') {
 
                 return;
             }
@@ -5225,13 +5226,13 @@
      * interact.stop
      [ method ]
      *
-     * Ends the current interaction
+     * Cancels the current interaction
      *
      - event (Event) An event on which to call preventDefault()
      = (object) interact
     \*/
     interact.stop = function (event) {
-        for (var i = 0; i < interactions.length; i++) {
+        for (var i = interactions.length - 1; i > 0; i--) {
             interactions[i].stop(event);
         }
 
@@ -5352,6 +5353,12 @@
         return defaultOptions.pointerMoveTolerance;
     };
 
+    function endAllInteractions (event) {
+        for (var i = 0; i < interactions.length; i++) {
+            interactions[i].pointerUp(event);
+        }
+    }
+
     if (PointerEvent) {
         if (PointerEvent === window.MSPointerEvent) {
             pEventTypes = {
@@ -5409,7 +5416,7 @@
         events.add(docTarget, 'touchend'   , listeners.recordTouches);
     }
 
-    events.add(windowTarget, 'blur', listeners.pointerUp);
+    events.add(windowTarget, 'blur', endAllInteractions);
 
     try {
         if (window.frameElement) {
@@ -5420,7 +5427,7 @@
             events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
             events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
             events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
-            events.add(parentWindowTarget, 'blur'         , listeners.pointerUp);
+            events.add(parentWindowTarget, 'blur'         , endAllInteractions );
         }
     }
     catch (error) {
