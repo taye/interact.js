@@ -27,6 +27,7 @@
         interactions    = [],
 
         claimedPointers = [],
+        claimedElements = [],
 
         dynamicDrop     = false,
 
@@ -1133,6 +1134,9 @@
                     ? event.target.correspondingUseElement
                     : event.target);
 
+            // do nothing if the element is already in an interaction
+            if (contains(claimedElements, eventTarget)) { return; }
+
             this.addPointer(event);
 
             if (this.target
@@ -1531,15 +1535,24 @@
                     }
                 }
 
+                var starting = !!this.prepared && !(this.dragging || this.resizing || this.gesturing);
+
+                if (starting && contains(claimedElements, this.element)) {
+                    this.stop();
+                    return;
+                }
+
                 if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
-                        starting = !(this.dragging || this.resizing || this.gesturing),
                         snapEvent = starting? this.downEvent: event;
 
                     if (starting) {
+                        // claim this element
+                        claimedElements.push(this.element);
+
                         this.prevEvent = this.downEvent;
 
                         var rect = target.getRect(),
@@ -2150,6 +2163,9 @@
                         }
                     }
                 }
+
+                // unclaim owned element if this had been interacting
+                claimedElements.splice(claimedElements.indexOf(this.element), 1);
 
                 this.clearTargets();
             }
