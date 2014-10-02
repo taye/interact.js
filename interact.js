@@ -151,7 +151,7 @@
             },
 
             edgeMove: function (event) {
-                var target = getInteractionFromEvent(event).target;
+                var target = interactions[0] && interactions[0].target;
 
                 if (target && target.options.autoScrollEnabled && (this.dragging || this.resizing)) {
                     var top,
@@ -508,12 +508,12 @@
         return clone;
     }
 
-    function setEventXY (targetObj, source) {
-        getPageXY(source, tmpXY);
+    function setEventXY (targetObj, source, interaction) {
+        getPageXY(source, tmpXY, interaction);
         targetObj.pageX = tmpXY.x;
         targetObj.pageY = tmpXY.y;
 
-        getClientXY(source, tmpXY);
+        getClientXY(source, tmpXY, interaction);
         targetObj.clientX = tmpXY.x;
         targetObj.clientY = tmpXY.y;
 
@@ -565,13 +565,11 @@
         return xy;
     }
 
-    function getPageXY (event, page) {
+    function getPageXY (event, page, interaction) {
         page = page || {};
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                var interaction = getInteractionFromEvent(event);
-
                 getPageXY(interaction.inertiaStatus.pointerUp, page);
 
                 page.x += interaction.inertiaStatus.sx;
@@ -596,13 +594,11 @@
         return page;
     }
 
-    function getClientXY (event, client) {
+    function getClientXY (event, client, interaction) {
         client = client || {};
 
         if (event instanceof InteractEvent) {
             if (/inertiastart/.test(event.type)) {
-                var interaction = getInteractionFromEvent(event);
-
                 getClientXY(interaction.inertiaStatus.pointerUp, client);
 
                 client.x += interaction.inertiaStatus.sx;
@@ -711,11 +707,10 @@
         };
     }
 
-    function touchDistance (event) {
-        var interaction = getInteractionFromEvent(event),
-            target = interaction.target,
-            deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
+    function touchDistance (event, deltaSource) {
+        deltaSource = deltaSource || defaultOptions.deltaSource;
+
+        var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             touches = getTouchPair(event);
 
@@ -726,11 +721,10 @@
         return hypot(dx, dy);
     }
 
-    function touchAngle (event, prevAngle) {
-        var interaction = getInteractionFromEvent(event),
-            target = interaction.target,
-            deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
+    function touchAngle (event, prevAngle, deltaSource) {
+        deltaSource = deltaSource || defaultOptions.deltaSource;
+
+        var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             touches = getTouchPair(event),
             dx = touches[0][sourceX] - touches[1][sourceX],
@@ -1122,9 +1116,15 @@
         this.mouse = false;
 
         interactions.push(this);
+
+        console.log('new Interaction');
     }
 
     Interaction.prototype = {
+        getPageXY  : function (event, xy) { return   getPageXY(event, xy, this); },
+        getClientXY: function (event, xy) { return getClientXY(event, xy, this); },
+        setEventXY : function (trgt, src) { return  setEventXY(trgt, src, this); },
+
         pointerOver: function (event) {
             if (this.prepared || !this.mouse) { return; }
 
@@ -1153,7 +1153,7 @@
                                  && !testIgnore(elementInteractable, eventTarget)
                                  && testAllow(elementInteractable, eventTarget)
                                  && validateAction(
-                                     elementInteractable.getAction(event),
+                                     elementInteractable.getAction(event, this),
                                      elementInteractable));
 
             function pushCurMatches (interactable, selector) {
@@ -1217,7 +1217,7 @@
                     action = this.validateSelector(event, matches);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(this.pointerMoves[0]), this.target);
+                    action = validateAction(target.getAction(this.pointerMoves[0], this), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
@@ -1282,7 +1282,7 @@
                     // if this element is the current inertia target element
                     if (element === this.inertiaStatus.targetElement
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(event), this.target) === this.prepared) {
+                        && validateAction(this.target.getAction(event, this), this.target) === this.prepared) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1340,7 +1340,7 @@
                 this.downTime = new Date().getTime();
                 this.downEvent = cloneEvent(event);
 
-                setEventXY(this.prevCoords, this.pointerMoves[0]);
+                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
             }
         },
@@ -1376,9 +1376,9 @@
                 options = target && target.options;
 
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
-                var action = validateAction(forceAction || target.getAction(event), target);
+                var action = validateAction(forceAction || target.getAction(event, this), target);
 
-                setEventXY(this.startCoords, this.pointerMoves[0]);
+                this.setEventXY(this.startCoords, this.pointerMoves[0]);
 
                 if (!action) {
                     return event;
@@ -1408,7 +1408,7 @@
                 this.downTime = new Date().getTime();
                 this.downEvent = cloneEvent(event);
 
-                setEventXY(this.prevCoords, this.pointerMoves[0]);
+                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
 
                 this.checkAndPreventDefault(event, target);
@@ -1417,7 +1417,7 @@
             else if (this.inertiaStatus.active
                 && event.currentTarget === this.inertiaStatus.targetElement
                 && target === this.inertiaStatus.target
-                && validateAction(target.getAction(event), target) === this.prepared) {
+                && validateAction(target.getAction(event, this), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1428,7 +1428,7 @@
             if (!this.pointerIsDown) { return; }
 
             if (!(event instanceof InteractEvent)) {
-                setEventXY(this.curCoords, this.pointerMoves[0]);
+                this.setEventXY(this.curCoords, this.pointerMoves[0]);
             }
 
             var dx, dy;
@@ -1482,7 +1482,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
-                                    && elementInteractable.getAction(this.downEvent) === 'drag'
+                                    && elementInteractable.getAction(this.downEvent, this) === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
                                     this.prepared = 'drag';
                                     this.target = elementInteractable;
@@ -1509,7 +1509,7 @@
                                         && !testIgnore(interactable, eventTarget)
                                         && testAllow(interactable, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downEvent) === 'drag'
+                                        && interactable.getAction(this.downEvent, this) === 'drag'
                                         && checkAxis(axis, interactable)) {
 
                                         return interactable;
@@ -1615,7 +1615,7 @@
             if (!(event instanceof InteractEvent)) {
                 // set pointer coordinate, time changes and speeds
                 setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-                setEventXY(this.prevCoords, this.pointerMoves[0]);
+                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
             }
 
             if (this.dragging || this.resizing) {
@@ -1837,7 +1837,7 @@
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = getPageXY(this.pointerMoves[0]),
+                        var page = this.getPageXY(this.pointerMoves[0]),
                             origin = getOriginXY(target, this.element),
                             statusObject;
 
@@ -2451,7 +2451,7 @@
         validateSelector: function (event, matches) {
             for (var i = 0, len = matches.length; i < len; i++) {
                 var match = matches[i],
-                    action = validateAction(match.getAction(event, match), match);
+                    action = validateAction(match.getAction(event, this), match);
 
                 if (action) {
                     this.target = match;
@@ -2483,7 +2483,7 @@
             else {
                 var origin = getOriginXY(this.target);
 
-                page = getPageXY(this.pointerMoves[0]);
+                page = this.getPageXY(this.pointerMoves[0]);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2620,7 +2620,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = getPageXY(this.pointerMoves[0]);
+                    : page = this.getPageXY(this.pointerMoves[0]);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2820,8 +2820,8 @@
         else {
             var pointer = (event instanceof InteractEvent)? event : pointerMoves[0];
 
-            page   = getPageXY(pointer);
-            client = getClientXY(pointer);
+            page   = interaction.getPageXY(pointer);
+            client = interaction.getClientXY(pointer);
 
             page.x -= origin.x;
             page.y -= origin.y;
@@ -2956,11 +2956,11 @@
                             : event.touches);
 
             if (starting) {
-                this.distance = touchDistance(pointerMoves);
+                this.distance = touchDistance(pointerMoves, deltaSource);
                 this.box      = touchBBox(pointerMoves);
                 this.scale    = 1;
                 this.ds       = 0;
-                this.angle    = touchAngle(pointerMoves);
+                this.angle    = touchAngle(pointerMoves, undefined, deltaSource);
                 this.da       = 0;
             }
             else if (ending || event instanceof InteractEvent) {
@@ -2972,10 +2972,10 @@
                 this.da       = this.angle - interaction.gesture.startAngle;
             }
             else {
-                this.distance = touchDistance(pointerMoves);
+                this.distance = touchDistance(pointerMoves, deltaSource);
                 this.box      = touchBBox(pointerMoves);
                 this.scale    = this.distance / interaction.gesture.startDistance;
-                this.angle    = touchAngle(pointerMoves, interaction.gesture.prevAngle);
+                this.angle    = touchAngle(pointerMoves, interaction.gesture.prevAngle, deltaSource);
 
                 this.ds = this.scale - interaction.gesture.prevScale;
                 this.da = this.angle - interaction.gesture.prevAngle;
@@ -3095,9 +3095,8 @@
         this.originalEvent.preventDefault();
     }
 
-    function defaultActionChecker (event) {
-        var interaction = getInteractionFromEvent(event),
-            rect = this.getRect(),
+    function defaultActionChecker (event, interaction) {
+        var rect = this.getRect(),
             right,
             bottom,
             action = null,
@@ -3992,11 +3991,11 @@
                 : false);
         },
 
-        getAction: function (event) {
-            var action = this.defaultActionChecker(event);
+        getAction: function (event, interaction) {
+            var action = this.defaultActionChecker(event, interaction);
 
             if (this.options.actionChecker) {
-                action = this.options.actionChecker(event, action, this);
+                action = this.options.actionChecker(event, action, interaction, this);
             }
 
             return action;
