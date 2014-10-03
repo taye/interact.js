@@ -540,17 +540,15 @@
 
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (type, event, xy) {
-        var touch,
-            x,
+        var x,
             y;
 
         xy = xy || {};
         type = type || 'page';
 
-        if (/touch/.test(event.type) && event.touches) {
-            touch = (event.touches.length)?
-                event.touches[0]:
-                event.changedTouches[0];
+        if (/touch/.test(event.type) && event.changedTouches) {
+            var touch = event.changedTouches[0];
+
             x = touch[type + 'X'];
             y = touch[type + 'Y'];
         }
@@ -983,7 +981,7 @@
         return index;
     }
 
-    function Interaction (eventTarget) {
+    function Interaction () {
         this.target          = null; // current interactable being interacted with
         this.element         = null; // the target element of the interactable
         this.dropTarget      = null; // the dropzone a drag target might be dropped into
@@ -1111,8 +1109,6 @@
         this.resizing        = false;
         this.resizeAxes      = 'xy';
 
-
-        this.eventTarget = eventTarget || null;
         this.mouse = false;
 
         interactions.push(this);
@@ -1252,18 +1248,6 @@
         },
 
         selectorDown: function (event) {
-            if (this.prepared && this.downEvent && event.type !== this.downEvent.type) {
-                this.checkAndPreventDefault(event, this.target);
-                return;
-            }
-
-            // try to ignore browser simulated mouse after touch
-            if (this.downEvent
-                && event.type === 'mousedown' && this.downEvent.type === 'touchstart'
-                && event.timeStamp - this.downEvent.timeStamp < 300) {
-                return;
-            }
-
             this.pointerIsDown = true;
 
             var eventTarget = (event.target instanceof SVGElementInstance
@@ -1348,7 +1332,7 @@
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Liseners
         pointerDown: function (event, forceAction) {
-            if (!forceAction && this.pointerIsDown && this.downEvent && event.type !== this.downEvent.type) {
+            if (!forceAction && this.pointerIsDown) {
                 this.checkAndPreventDefault(event, this.target);
 
                 return;
@@ -1441,13 +1425,7 @@
                 this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
             }
 
-            // return if there is no prepared action
-            if (!this.prepared
-                // or this is a mousemove event but the down event was a touch
-                || (event.type === 'mousemove' && this.downEvent.type === 'touchstart')) {
-
-                return;
-            }
+            if (!this.prepared) { return; }
 
             if (this.pointerWasMoved
                 // ignore movement while inertia is active
@@ -1744,15 +1722,6 @@
 
         // End interact move events and stop auto-scroll unless inertia is enabled
         pointerUp: function (event) {
-            // don't return if the event is an InteractEvent (in the case of inertia end)
-            if (!(event instanceof InteractEvent)
-                && this.pointerIsDown && this.downEvent
-                && !(event instanceof this.downEvent.constructor)
-                && event.type !== 'blur') {
-
-                return;
-            }
-
             var endEvent,
                 target = this.target,
                 options = target && target.options,
@@ -1951,7 +1920,7 @@
                 target.fire(endEvent);
             }
 
-            this.stop();
+            this.stop(event);
         },
 
         collectDrops: function (element) {
@@ -2187,8 +2156,8 @@
             // pointerMoves should be retained
             //this.pointerMoves.splice(0);
 
-            // delete interaction if it's not the only one
-            if (interactions.length > 1) {
+            // delete interaction if it's not the only one and is not a mouse interaction
+            if (interactions.length > 1 && !this.mouse) {
                 interactions.splice(indexOf(interactions, this), 1);
             }
         },
@@ -2276,13 +2245,13 @@
             var id = getPointerId(event),
                 index = indexOf(this.pointerIds, id);
 
-            // don't add if the pointer is owned by another interaction
-            if (index === -1 && contains(claimedPointers, id)) {
-                return;
-            }
-
             if (index === -1) {
-                claimedPointers.push(id);
+                var claimedPointerIndex = indexOf(claimedPointers, id);
+
+                // don't add if the pointer is owned by another interaction
+                if (claimedPointerIndex !== -1) {
+                    return;
+                }
 
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
@@ -2292,6 +2261,10 @@
                 this.pointerMoves[index] = event;
             }
             else {
+                if (!contains(claimedPointers, id)) {
+                    claimedPointers.push(id);
+                }
+
                 this.pointerMoves[index] = event;
             }
         },
@@ -2402,7 +2375,6 @@
         collectTaps: function (event) {
             if(this.downEvent) {
                 if (this.pointerWasMoved
-                    || !(event instanceof this.downEvent.constructor)
                     || this.downEvent.target !== event.target) {
                     return;
                 }
@@ -2727,10 +2699,10 @@
 
     };
 
-    function getInteractionFromEvent (event) {
+    function getInteractionFromEvent (pointer) {
         var i = 0, len = interactions.length,
-            type = event.pointerType || event.type,
-            mouseEvent = /mouse/.test(type);
+            mouseEvent = /mouse/.test(pointer.type),
+            interaction;
 
         // if it's a mouse interaction
         if (!(supportsTouch || supportsPointerEvent)
@@ -2744,53 +2716,78 @@
             }
 
             // or create a new interaction for mouse
-            var interaction = new Interaction (event.target);
+            interaction = new Interaction();
             interaction.mouse = true;
 
             return interaction;
         }
 
         // using "inertiastart" InteractEvent
-        if (event instanceof InteractEvent && /inertiastart/.test(type)) {
+        if (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)) {
             for (i = 0; i < len; i++) {
-                if (interactions[i].inertiaStatus.startEvent === event) {
+                if (interactions[i].inertiaStatus.startEvent === pointer) {
                     return interactions[i];
                 }
             }
         }
 
-        var pointers = supportsPointerEvent? [event] : event.changedTouches;
+        var id = getPointerId(pointer);
 
-        if (pointers) {
-            // try to get most appropriate interaction basted on event target
-            for (i = 0; i < len; i++) {
-                //if (event.target === interactions[i].eventTarget) { return interactions[i]; }
-
-                for (var j = 0; j < pointers.length; j++) {
-                    var id = getPointerId(pointers[j]);
-
-                    if (contains(interactions[i].pointerIds, id)) {
-                        return interactions[i];
-                    }
-                }
-            }
-        }
-
-        // get first idle interaction
+        // get interaction that has this pointer
         for (i = 0; i < len; i++) {
-            if (!interactions[i].pointerIsDown && !(!mouseEvent && interactions[i].mouse)) {
+            if (contains(interactions[i].pointerIds, id)) {
                 return interactions[i];
             }
         }
 
-        return new Interaction(event.target);
+        // at this stage, a pointerUp should not return an interaction
+        if (/up|end|out/i.test(pointer.type)) {
+            return null;
+        }
+
+        // should get interaction whose target is in the event path
+
+        // get first idle interaction
+        for (i = 0; i < len; i++) {
+            interaction = interactions[i];
+
+            if (!interaction.pointerIsDown && !(!mouseEvent && interaction.mouse)) {
+                var pointerIndex = interaction.pointerIds.length;
+
+                interaction.pointerIds.push(id);
+
+                interaction.pointerMoves[pointerIndex] = pointer;
+
+
+                return interaction;
+            }
+        }
+
+        return new Interaction();
     }
 
     function doOnInteraction (method) {
         return (function (event) {
-            var interaction = getInteractionFromEvent(event);
+            var interaction;
 
-            return interaction[method].apply(interaction, arguments);
+            if (supportsTouch && /touch/.test(event.type)) {
+                for (var i = 0; i < event.changedTouches.length; i++) {
+                    var pointer = event.changedTouches[i];
+
+                    interaction = getInteractionFromEvent(pointer);
+
+                    if (!interaction) { continue; }
+
+                    interaction[method].apply(interaction, arguments);
+                }
+            }
+            else {
+                interaction = getInteractionFromEvent(event);
+
+                if (!interaction) { return; }
+
+                interaction[method].apply(interaction, arguments);
+            }
         });
     }
 
@@ -5387,7 +5384,9 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.up, listeners.collectTaps);
+        events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
+
+        events.add(docTarget, pEventTypes.move  , listeners.recordPointers);
 
         events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
         events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
@@ -5395,33 +5394,24 @@
         events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
         events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
 
-        events.add(docTarget, pEventTypes.move  , listeners.recordPointers);
+        // remove pointers after ending actinos in pointerUp
         events.add(docTarget, pEventTypes.up    , listeners.recordPointers);
         events.add(docTarget, pEventTypes.cancel, listeners.recordPointers);
-
-        // fix problems of wrong targets in IE
-        events.add(docTarget, pEventTypes.up, function (event) {
-            var interaction = getInteractionFromEvent(event);
-
-            if (!interaction.currentAction()) {
-                interaction.pointerIsDown = false;
-            }
-        });
     }
     else {
         events.add(docTarget, 'mouseup' , listeners.collectTaps);
         events.add(docTarget, 'touchend', listeners.collectTaps);
 
-        events.add(docTarget, 'mousemove', listeners.recordPointers);
+        events.add(docTarget, 'mousemove'  , listeners.recordPointers);
+        events.add(docTarget, 'touchmove'  , listeners.recordTouches );
+        events.add(docTarget, 'touchcancel', listeners.recordTouches );
+
 
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
         events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
         events.add(docTarget, 'mouseover', listeners.pointerOver );
         events.add(docTarget, 'mouseout' , listeners.pointerOut  );
-
-        events.add(docTarget, 'touchmove'  , listeners.recordTouches);
-        events.add(docTarget, 'touchcancel', listeners.recordTouches);
 
         events.add(docTarget, 'touchstart' , listeners.selectorDown);
         events.add(docTarget, 'touchmove'  , listeners.pointerMove );
