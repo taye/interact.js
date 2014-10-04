@@ -4959,6 +4959,9 @@
         var interaction = interactions[0] || new Interaction();
 
         return {
+            claimedPointers       : claimedPointers,
+            claimedElements       : claimedElements,
+
             interactions          : interactions,
             target                : interaction.target,
             dragging              : interaction.dragging,
