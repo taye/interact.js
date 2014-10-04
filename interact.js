@@ -5397,7 +5397,7 @@
         events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
         events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
 
-        // remove pointers after ending actinos in pointerUp
+        // remove pointers after ending actions in pointerUp
         events.add(docTarget, pEventTypes.up    , listeners.recordPointers);
         events.add(docTarget, pEventTypes.cancel, listeners.recordPointers);
     }
@@ -5407,8 +5407,6 @@
 
         events.add(docTarget, 'mousemove'  , listeners.recordPointers);
         events.add(docTarget, 'touchmove'  , listeners.recordTouches );
-        events.add(docTarget, 'touchcancel', listeners.recordTouches );
-
 
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
@@ -5421,8 +5419,9 @@
         events.add(docTarget, 'touchend'   , listeners.pointerUp   );
         events.add(docTarget, 'touchcancel', listeners.pointerUp   );
 
-        // remove touches after ending actinos in pointerUp
+        // remove touches after ending actions in pointerUp
         events.add(docTarget, 'touchend'   , listeners.recordTouches);
+        events.add(docTarget, 'touchcancel', listeners.recordTouches );
     }
 
     events.add(windowTarget, 'blur', endAllInteractions);
