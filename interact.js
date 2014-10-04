@@ -1112,8 +1112,6 @@
         this.mouse = false;
 
         interactions.push(this);
-
-        console.log('new Interaction');
     }
 
     Interaction.prototype = {
