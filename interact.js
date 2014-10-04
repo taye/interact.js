@@ -3004,9 +3004,12 @@
                                 listeners[j][0](fakeEvent);
                             }
                             catch (error) {
-                                console.error('Error thrown from delegated listener: ' +
-                                              '"' + selector + '" ' + event.type + ' ' +
-                                              (listeners[j][0].name? listeners[j][0].name: ''));
+                                var funcName = (funcName = listeners[j][0].name)? ', "' + funcName + '",': '';
+
+                                console.error('Error thrown from delegated "' + event.type + '" listener' + funcName + ' on "' + selector + '" element'
+                                              + ':\n' + error.message);
+
+                                if (error.stack) { console.log(error.stack); }
                                 console.log(error);
                             }
                         }
@@ -4280,7 +4283,8 @@
                 i = 0,
                 len,
                 onEvent = 'on' + iEvent.type,
-                that = this;
+                that = this,
+                funcName = '';
 
             function callListeners () {
                 switch (fireState) {
@@ -4290,6 +4294,7 @@
                         listeners = that._iEvents[iEvent.type];
 
                         for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            funcName = listeners[i].name;
                             listeners[i](iEvent);
                         }
                         break;
@@ -4300,6 +4305,7 @@
                     // interactable.onevent listener
                     case fireStates.onevent:
                         if (isFunction(that[onEvent])) {
+                        funcName = that[onEvent].name;
                         that[onEvent](iEvent);
                     }
                     break;
@@ -4309,6 +4315,7 @@
                         if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
 
                         for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            funcName = listeners[i].name;
                             listeners[i](iEvent);
                         }
                     }
@@ -4326,8 +4333,10 @@
                         callListeners();
                     }
                     catch (error) {
-                        console.error('Error thrown from ' + iEvent.type + ' listener');
-                        console.error(error);
+                        funcName = funcName? ', "' + funcName + '"' : '';
+                        console.error('Error thrown from "' + iEvent.type + '" listener' + funcName + ':\n' + error.message);
+                        console.log(error.stack);
+                        console.log(error);
                         i++;
 
                         if (fireState === fireStates.onevent) {
