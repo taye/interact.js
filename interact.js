@@ -399,6 +399,8 @@
             globalBind: 2
         },
 
+        tryCatchEventListeners = true,
+
         // Opera Mobile must be handled differently
         isOperaMobile = navigator.appName == 'Opera' &&
             supportsTouch &&
@@ -2997,14 +2999,19 @@
                     for (var j = 0; j < listeners.length; j++) {
                         if (listeners[j][1] !== useCapture) { continue; }
 
-                        try {
-                            listeners[j][0](fakeEvent);
+                        if (tryCatchEventListeners) {
+                            try {
+                                listeners[j][0](fakeEvent);
+                            }
+                            catch (error) {
+                                console.error('Error thrown from delegated listener: ' +
+                                              '"' + selector + '" ' + event.type + ' ' +
+                                              (listeners[j][0].name? listeners[j][0].name: ''));
+                                console.log(error);
+                            }
                         }
-                        catch (error) {
-                            console.error('Error thrown from delegated listener: ' +
-                                          '"' + selector + '" ' + event.type + ' ' +
-                                          (listeners[j][0].name? listeners[j][0].name: ''));
-                            console.log(error);
+                        else {
+                            listeners[j][0](fakeEvent);
                         }
                     }
                 }
@@ -4272,58 +4279,66 @@
                 fireState = 0,
                 i = 0,
                 len,
-                onEvent = 'on' + iEvent.type;
+                onEvent = 'on' + iEvent.type,
+                that = this;
 
-            // Try-catch and loop so an exception thrown from a listener
-            // doesn't ruin everything for everyone
-            while (fireState < 3) {
-                try {
-                    switch (fireState) {
-                        // Interactable#on() listeners
-                        case fireStates.directBind:
-                            if (iEvent.type in this._iEvents) {
-                            listeners = this._iEvents[iEvent.type];
+            function callListeners () {
+                switch (fireState) {
+                    // Interactable#on() listeners
+                    case fireStates.directBind:
+                        if (iEvent.type in that._iEvents) {
+                        listeners = that._iEvents[iEvent.type];
 
-                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-                                listeners[i](iEvent);
-                            }
-                            break;
+                        for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            listeners[i](iEvent);
                         }
-
-                        break;
-
-                        // interactable.onevent listener
-                        case fireStates.onevent:
-                            if (isFunction(this[onEvent])) {
-                            this[onEvent](iEvent);
-                        }
-                        break;
-
-                        // interact.on() listeners
-                        case fireStates.globalBind:
-                            if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
-
-                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-                                listeners[i](iEvent);
-                            }
-                        }
-                    }
-
-                    if (iEvent.propagationStopped) {
                         break;
                     }
 
-                    i = 0;
-                    fireState++;
+                    break;
+
+                    // interactable.onevent listener
+                    case fireStates.onevent:
+                        if (isFunction(that[onEvent])) {
+                        that[onEvent](iEvent);
+                    }
+                    break;
+
+                    // interact.on() listeners
+                    case fireStates.globalBind:
+                        if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
+
+                        for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            listeners[i](iEvent);
+                        }
+                    }
                 }
-                catch (error) {
-                    console.error('Error thrown from ' + iEvent.type + ' listener');
-                    console.error(error);
-                    i++;
 
-                    if (fireState === fireStates.onevent) {
-                        fireState++;
+                i = 0;
+                fireState++;
+            }
+
+            if (tryCatchEventListeners) {
+                // Try-catch and loop so an exception thrown from a listener
+                // doesn't ruin everything for everyone
+                while (fireState < 3 && !iEvent.propagationStopped) {
+                    try {
+                        callListeners();
                     }
+                    catch (error) {
+                        console.error('Error thrown from ' + iEvent.type + ' listener');
+                        console.error(error);
+                        i++;
+
+                        if (fireState === fireStates.onevent) {
+                            fireState++;
+                        }
+                    }
+                }
+            }
+            else {
+                while (fireState < 3 && !iEvent.propagationStopped) {
+                    callListeners();
                 }
             }
 
@@ -5202,6 +5217,26 @@
         }
 
         return defaultOptions.pointerMoveTolerance;
+    };
+
+    /*\
+     * interact.tryCatchEventListeners
+     [ method ]
+     * Returns or sets whether errors thrown in InteractEvent listeners and
+     * delegated event listeners should be caught and logged safely or should
+     * be allowed to propagate and disrupt the event firing process.
+     *
+     - newValue (boolean) #optional `true` to handle errors internally (default). `false` to allow errors to propagate (useful for debugging).
+     = (boolean | Interactable) The current setting or interact
+    \*/
+    interact.tryCatchEventListeners = function (newValue) {
+        if (isBool(newValue)) {
+            tryCatchEventListeners = newValue;
+
+            return this;
+        }
+
+        return tryCatchEventListeners;
     };
 
     if (PointerEvent) {
