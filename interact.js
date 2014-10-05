@@ -626,6 +626,12 @@
         return isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
     }
 
+    function getActualElement (element) {
+        return (element instanceof SVGElementInstance
+            ? element.correspondingUseElement
+            : element);
+    }
+
     function getElementRect (element) {
         var scroll = /ipad|iphone|ipod/i.test(navigator.userAgent)
                 ? { x: 0, y: 0 }
@@ -1124,9 +1130,7 @@
 
             var curMatches = [],
                 prevTargetElement = this.target && this.element,
-                eventTarget = (event.target instanceof SVGElementInstance
-                    ? event.target.correspondingUseElement
-                    : event.target);
+                eventTarget = getActualElement(event.target);
 
             // do nothing if the element is already in an interaction
             if (contains(claimedElements, eventTarget)) { return; }
@@ -1232,9 +1236,7 @@
             if (this.prepared) { return; }
 
             // Remove temporary event listeners for selector Interactables
-            var eventTarget = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target);
+            var eventTarget = getActualElement(event.target);
 
             if (!interactables.get(eventTarget)) {
                 events.removeFromElement(eventTarget, listeners.pointerHover);
@@ -1248,9 +1250,7 @@
         selectorDown: function (event) {
             this.pointerIsDown = true;
 
-            var eventTarget = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target),
+            var eventTarget = getActualElement(event.target),
                 element = eventTarget,
                 action;
 
@@ -1447,9 +1447,7 @@
 
                             // then try to get a drag from another ineractable
 
-                            var eventTarget = (event.target instanceof SVGElementInstance
-                                    ? event.target.correspondingUseElement
-                                    : event.target),
+                            var eventTarget = getActualElement(event.target),
                                 element = eventTarget;
 
                             // check element interactables
@@ -2381,9 +2379,7 @@
             var tapTargets = [],
                 tapElements = [];
 
-            var eventTarget = (event.target instanceof SVGElementInstance
-                    ? event.target.correspondingUseElement
-                    : event.target),
+            var eventTarget = getActualElement(event.target),
                 element = eventTarget;
 
             function collectSelectorTaps (interactable, selector, context) {
