@@ -2364,7 +2364,7 @@
                 if (starting) {
                     prevEvent = downEvent;
 
-                    var rect = target.getRect(),
+                    var rect = target.getRect(target._element),
                         snap = target.options.snap,
                         restrict = target.options.restrict;
 
@@ -2627,7 +2627,7 @@
     function validateSelector (event, matches) {
         for (var i = 0, len = matches.length; i < len; i++) {
             var match = matches[i],
-                action = validateAction(match.getAction(event, match), match);
+                action = validateAction(match.getAction(event, match._element), match);
 
             if (action) {
                 target = match;
@@ -3333,7 +3333,7 @@
          = (boolean) whether the pointer was over this Interactable
         \*/
         dropCheck: function (event, draggable, draggableElement, rect) {
-            if (!(rect = rect || this.getRect())) {
+            if (!(rect = rect || this.getRect(this._element))) {
                 return false;
             }
 
