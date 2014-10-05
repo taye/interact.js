@@ -1330,7 +1330,7 @@
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Liseners
         pointerDown: function (event, forceAction) {
-            if (!forceAction && this.pointerIsDown) {
+            if (!forceAction && !this.inertiaStatus.active && this.pointerIsDown) {
                 this.checkAndPreventDefault(event, this.target);
 
                 return;
@@ -1788,7 +1788,9 @@
                         inertiaStatus.pointerUp = event;
                     }
 
-                    inertiaStatus.startEvent = startEvent = new InteractEvent(this, event, this.prepared, 'inertiastart');
+                    this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
+                        new InteractEvent(this, event, this.prepared, 'inertiastart');
+
                     target.fire(inertiaStatus.startEvent);
 
                     inertiaStatus.target = target;
@@ -2212,10 +2214,14 @@
                 inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
             }
             else {
+                inertiaStatus.sx = inertiaStatus.xe;
+                inertiaStatus.sy = inertiaStatus.ye;
+
+                this.pointerMove(inertiaStatus.startEvent);
+
                 inertiaStatus.active = false;
                 inertiaStatus.smoothEnd = false;
 
-                this.pointerMove(inertiaStatus.startEvent);
                 this.pointerUp(inertiaStatus.startEvent);
             }
         },
@@ -2280,6 +2286,10 @@
         },
 
         recordPointers: function (event, type) {
+            // Do not update pointers while inertia is active.
+            // The inertiastart event should be the first pointerMove element.
+            if (this.inertiaStatus.active) { return; }
+
             var index = indexOf(this.pointerIds, getPointerId(event));
 
             if (index === -1) { return; }
@@ -2693,9 +2703,9 @@
 
     };
 
-    function getInteractionFromEvent (pointer) {
+    function getInteractionFromEvent (pointer, eventType, eventTarget) {
         var i = 0, len = interactions.length,
-            mouseEvent = /mouse/.test(pointer.type),
+            mouseEvent = /mouse/.test(eventType),
             interaction;
 
         // if it's a mouse interaction
@@ -2717,7 +2727,7 @@
         }
 
         // using "inertiastart" InteractEvent
-        if (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)) {
+        if (pointer instanceof InteractEvent && /inertiastart/.test(eventType)) {
             for (i = 0; i < len; i++) {
                 if (interactions[i].inertiaStatus.startEvent === pointer) {
                     return interactions[i];
@@ -2734,12 +2744,33 @@
             }
         }
 
-        // at this stage, a pointerUp should not return an interaction
-        if (/up|end|out/i.test(pointer.type)) {
-            return null;
+        // try to resume inertia with a new pointer
+        if (/down|start/i.test(eventType)) {
+            eventTarget = getActualElement(eventTarget);
+
+            for (i = 0; i < len; i++) {
+                interaction = interactions[i];
+
+                if (interaction.inertiaStatus.active && !interaction.mouse) {
+                    while (eventTarget) {
+                        // if the element is the interaction element
+                        if (eventTarget === interaction.element) {
+                            // update the interaction's pointer
+                            interaction.removePointer(interaction.pointerMoves[0]);
+                            interaction.addPointer(pointer);
+
+                            return interaction;
+                        }
+                        eventTarget = eventTarget.parentNode;
+                    }
+                }
+            }
         }
 
-        // should get interaction whose target is in the event path
+        // at this stage, a pointerUp should not return an interaction
+        if (/up|end|out/i.test(eventType)) {
+            return null;
+        }
 
         // get first idle interaction
         for (i = 0; i < len; i++) {
@@ -2768,7 +2799,7 @@
                 for (var i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
 
-                    interaction = getInteractionFromEvent(pointer);
+                    interaction = getInteractionFromEvent(pointer, event.type, event.target);
 
                     if (!interaction) { continue; }
 
@@ -2776,7 +2807,7 @@
                 }
             }
             else {
-                interaction = getInteractionFromEvent(event);
+                interaction = getInteractionFromEvent(event, event.type, event.target);
 
                 if (!interaction) { return; }
 
@@ -3091,7 +3122,7 @@
             right,
             bottom,
             action = null,
-            page = getPageXY(interaction.pointerMoves[0]),
+            page = interaction.getPageXY(interaction.pointerMoves[0]),
             options = this.options;
 
         if (!rect) { return null; }
