@@ -1800,8 +1800,8 @@
         }
     }
 
-    function defaultActionChecker (event) {
-        var rect = this.getRect(),
+    function defaultActionChecker (event, element) {
+        var rect = this.getRect(element),
             right,
             bottom,
             action = null,
@@ -1887,7 +1887,7 @@
                 // if this element is the current inertia target element
                 if (element === inertiaStatus.targetElement
                     // and the prospective action is the same as the ongoing one
-                    && validateAction(target.getAction(event)) === prepared) {
+                    && validateAction(target.getAction(event, element)) === prepared) {
 
                     // stop inertia so that the next move will be a normal one
                     cancelFrame(inertiaStatus.i);
@@ -1978,7 +1978,7 @@
         var options = target && target.options;
 
         if (target && !(dragging || resizing || gesturing)) {
-            var action = validateAction(forceAction || target.getAction(event));
+            var action = validateAction(forceAction || target.getAction(event, target._element));
 
             setEventXY(startCoords, event);
 
@@ -2019,7 +2019,7 @@
         else if (inertiaStatus.active
             && event.currentTarget === inertiaStatus.targetElement
             && target === inertiaStatus.target
-            && validateAction(target.getAction(event)) === prepared) {
+            && validateAction(target.getAction(event, target._element)) === prepared) {
 
             cancelFrame(inertiaStatus.i);
             inertiaStatus.active = false;
@@ -2303,7 +2303,7 @@
 
                             if (elementInteractable
                                 && elementInteractable !== target
-                                && elementInteractable.getAction(downEvent) === 'drag'
+                                && elementInteractable.getAction(downEvent, element) === 'drag'
                                 && checkAxis(axis, elementInteractable)) {
                                 prepared = 'drag';
                                 target = elementInteractable;
@@ -2329,7 +2329,7 @@
                                     && !testIgnore(interactable, eventTarget)
                                     && testAllow(interactable, eventTarget)
                                     && matchesSelector(element, selector, elements)
-                                    && interactable.getAction(downEvent) === 'drag'
+                                    && interactable.getAction(downEvent, eventTarget) === 'drag'
                                     && checkAxis(axis, interactable)) {
 
                                     return interactable;
@@ -2659,7 +2659,7 @@
                              && !testIgnore(elementInteractable, eventTarget)
                              && testAllow(elementInteractable, eventTarget)
                              && validateAction(
-                                 elementInteractable.getAction(event),
+                                 elementInteractable.getAction(event, eventTarget),
                                  elementInteractable));
 
         function pushCurMatches (interactable, selector) {
@@ -2736,7 +2736,7 @@
                 action = validateSelector(event, matches);
             }
             else if (target) {
-                action = validateAction(target.getAction(event));
+                action = validateAction(target.getAction(event, target._element));
             }
 
             if (target && target.options.styleCursor) {
@@ -3811,7 +3811,7 @@
                 : false);
         },
 
-        getAction: function (event) {
+        getAction: function (event, element) {
             var action = this.defaultActionChecker(event);
 
             if (this.options.actionChecker) {
