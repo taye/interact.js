@@ -399,7 +399,7 @@
             globalBind: 2
         },
 
-        tryCatchEventListeners = true,
+        tryCatchEventListeners = false,
 
         // Opera Mobile must be handled differently
         isOperaMobile = navigator.appName == 'Opera' &&
@@ -5236,7 +5236,7 @@
      * delegated event listeners should be caught and logged safely or should
      * be allowed to propagate and disrupt the event firing process.
      *
-     - newValue (boolean) #optional `true` to handle errors internally (default). `false` to allow errors to propagate (useful for debugging).
+     - newValue (boolean) #optional `false` to allow errors to propagate (default). `true` to handle errors internally.
      = (boolean | Interactable) The current setting or interact
     \*/
     interact.tryCatchEventListeners = function (newValue) {
