@@ -2703,7 +2703,7 @@
 
     };
 
-    function getInteractionFromEvent (pointer, eventType, eventTarget) {
+    function getInteractionFromPointer (pointer, eventType, eventTarget) {
         var i = 0, len = interactions.length,
             mouseEvent = /mouse/.test(eventType),
             interaction;
@@ -2799,7 +2799,7 @@
                 for (var i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
 
-                    interaction = getInteractionFromEvent(pointer, event.type, event.target);
+                    interaction = getInteractionFromPointer(pointer, event.type, event.target);
 
                     if (!interaction) { continue; }
 
@@ -2807,7 +2807,7 @@
                 }
             }
             else {
-                interaction = getInteractionFromEvent(event, event.type, event.target);
+                interaction = getInteractionFromPointer(event, event.type, event.target);
 
                 if (!interaction) { return; }
 
