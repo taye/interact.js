@@ -2171,7 +2171,7 @@
     }
 
     function setRestriction (event, status) {
-        var action = /resize/.test(prepared)? 'resize' : 'action',
+        var action = /resize/.test(prepared)? 'resize' : prepared,
             restrict = target && target.options.restrict,
             restriction = restrict && restrict[action],
             page;
