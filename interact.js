@@ -3812,7 +3812,7 @@
         },
 
         getAction: function (event, element) {
-            var action = this.defaultActionChecker(event);
+            var action = this.defaultActionChecker(event, element);
 
             if (this.options.actionChecker) {
                 action = this.options.actionChecker(event, action, this);
