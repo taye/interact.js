@@ -264,6 +264,8 @@
             globalBind: 2
         },
 
+        tryCatchEventListeners = false,
+
         // Opera Mobile must be handled differently
         isOperaMobile = navigator.appName == 'Opera' &&
             supportsTouch &&
@@ -998,6 +1000,7 @@
         this.prepared        = null; // Action that's ready to be fired on next move event
 
         this.matches         = [];   // all selectors that are matched by target element
+        this.matchElements   = [];   // corresponding elements
 
         this.inertiaStatus = {
             active       : false,
@@ -1129,6 +1132,7 @@
             if (this.prepared || !this.mouse) { return; }
 
             var curMatches = [],
+                curMatchElements = [],
                 prevTargetElement = this.target && this.element,
                 eventTarget = getActualElement(event.target);
 
@@ -1144,6 +1148,7 @@
                 this.target = null;
                 this.element = null;
                 this.matches = [];
+                this.matchElements = [];
             }
 
             var elementInteractable = interactables.get(eventTarget),
@@ -1151,7 +1156,7 @@
                                  && !testIgnore(elementInteractable, eventTarget)
                                  && testAllow(elementInteractable, eventTarget)
                                  && validateAction(
-                                     elementInteractable.getAction(event, this),
+                                     elementInteractable.getAction(event, this, eventTarget),
                                      elementInteractable));
 
             function pushCurMatches (interactable, selector) {
@@ -1161,8 +1166,8 @@
                     && testAllow(interactable, eventTarget)
                     && matchesSelector(eventTarget, selector)) {
 
-                    interactable._element = eventTarget;
                     curMatches.push(interactable);
+                    curMatchElements.push(eventTarget);
                 }
             }
 
@@ -1170,33 +1175,28 @@
                 this.target = elementInteractable;
                 this.element = elementInteractable._element;
                 this.matches = [];
+                this.matchElements = [];
             }
             else {
                 interactables.forEachSelector(pushCurMatches);
 
-                if (this.validateSelector(event, curMatches)) {
+                if (this.validateSelector(event, curMatches, curMatchElements)) {
                     this.matches = curMatches;
+                    this.matchElements = curMatchElements;
 
-                    this.pointerHover(event, this.matches);
+                    this.pointerHover(event, this.matches, this.matchElements);
                     events.addToElement(eventTarget, 'mousemove', listeners.pointerHover);
                 }
                 else if (this.target) {
-                    var prevTargetChildren = prevTargetElement.querySelectorAll('*');
-
-                    if (contains(prevTargetChildren, eventTarget)) {
-
-                        // reset the elements of the matches to the old target
-                        for (var i = 0; i < this.matches.length; i++) {
-                            this.matches[i]._element = prevTargetElement;
-                        }
-
-                        this.pointerHover(event, this.matches);
+                    if (nodeContains(prevTargetElement, eventTarget)) {
+                        this.pointerHover(event, this.matches, this.matchElements);
                         events.addToElement(this.element, 'mousemove', listeners.pointerHover);
                     }
                     else {
                         this.target = null;
                         this.element = null;
                         this.matches = [];
+                        this.matchElements = [];
                     }
                 }
             }
@@ -1204,7 +1204,7 @@
 
         // Check what action would be performed on pointerMove target if a mouse
         // button were pressed and change the cursor accordingly
-        pointerHover: function (event, matches) {
+        pointerHover: function (event, matches, matchElements) {
             var target = this.target;
 
             if (!this.prepared && this.mouse) {
@@ -1215,7 +1215,7 @@
                     action = this.validateSelector(event, matches);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(this.pointerMoves[0], this), this.target);
+                    action = validateAction(target.getAction(this.pointerMoves[0], this, this.element), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
@@ -1264,7 +1264,7 @@
                     // if this element is the current inertia target element
                     if (element === this.inertiaStatus.targetElement
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(event, this), this.target) === this.prepared) {
+                        && validateAction(this.target.getAction(event, this, this.element), this.target) === this.prepared) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1293,21 +1293,22 @@
                     && testAllow(interactable, eventTarget)
                     && matchesSelector(element, selector, elements)) {
 
-                    interactable._element = element;
                     that.matches.push(interactable);
+                    that.matchElements.push(element);
                 }
             }
 
             if (this.matches.length && /mousedown|pointerdown/i.test(event.type)) {
-                action = this.validateSelector(event, this.matches);
+                action = this.validateSelector(event, this.matches, this.matchElements);
             }
             else {
                 while (element && element !== document && !action) {
                     this.matches = [];
+                    this.matchElements = [];
 
                     interactables.forEachSelector(pushMatches);
 
-                    action = this.validateSelector(event, this.matches);
+                    action = this.validateSelector(event, this.matches, this.matchElements);
                     element = element.parentNode;
                 }
             }
@@ -1358,7 +1359,7 @@
                 options = target && target.options;
 
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
-                var action = validateAction(forceAction || target.getAction(event, this), target);
+                var action = validateAction(forceAction || target.getAction(event, this), target, this.element);
 
                 this.setEventXY(this.startCoords, this.pointerMoves[0]);
 
@@ -1399,7 +1400,7 @@
             else if (this.inertiaStatus.active
                 && event.currentTarget === this.inertiaStatus.targetElement
                 && target === this.inertiaStatus.target
-                && validateAction(target.getAction(event, this), target) === this.prepared) {
+                && validateAction(target.getAction(event, this, element), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1456,7 +1457,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
-                                    && elementInteractable.getAction(this.downEvent, this) === 'drag'
+                                    && elementInteractable.getAction(this.downEvent, this, element) === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
                                     this.prepared = 'drag';
                                     this.target = elementInteractable;
@@ -1483,7 +1484,7 @@
                                         && !testIgnore(interactable, eventTarget)
                                         && testAllow(interactable, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downEvent, this) === 'drag'
+                                        && interactable.getAction(this.downEvent, this, eventTarget) === 'drag'
                                         && checkAxis(axis, interactable)) {
 
                                         return interactable;
@@ -1529,7 +1530,7 @@
 
                         this.prevEvent = this.downEvent;
 
-                        var rect = target.getRect(),
+                        var rect = target.getRect(this.element),
                             snap = target.options.snap,
                             restrict = target.options.restrict;
 
@@ -1632,11 +1633,6 @@
 
             this.dropTarget = drop.dropzone;
             this.dropElement = drop.element;
-
-            // Make sure that the target selector draggable's element is
-            // restored after dropChecks
-            //***~~~
-            target._element = draggableElement;
 
             var dropEvents = this.getDropEvents(event, dragEvent);
 
@@ -1877,9 +1873,6 @@
                 this.dropTarget = drop.dropzone;
                 this.dropElement = drop.element;
 
-                // getDrop changes target._element
-                target._element = draggableElement;
-
                 // get the most apprpriate dropzone based on DOM depth and order
                 if (this.dropTarget) {
                     dropEvent = new InteractEvent(this, event, 'drop', null, this.dropElement, draggableElement);
@@ -2023,10 +2016,6 @@
                 dropzone  = this.activeDrops.dropzones[dropIndex] || null,
                 element   = this.activeDrops.elements [dropIndex] || null;
 
-            if (dropzone && dropzone.selector) {
-                dropzone._element = element;
-            }
-
             return {
                 dropzone: dropzone,
                 element: element
@@ -2109,6 +2098,7 @@
             if (this.dragging || this.resizing || this.gesturing) {
                 autoScroll.stop();
                 this.matches = [];
+                this.matchElements = [];
 
                 var target = this.target;
 
@@ -2424,14 +2414,15 @@
             }
         },
 
-        validateSelector: function (event, matches) {
+        validateSelector: function (event, matches, matchElements) {
             for (var i = 0, len = matches.length; i < len; i++) {
                 var match = matches[i],
-                    action = validateAction(match.getAction(event, this), match);
+                    matchElement = matchElements[i],
+                    action = validateAction(match.getAction(event, this, matchElement), match);
 
                 if (action) {
                     this.target = match;
-                    this.element = match._element;
+                    this.element = matchElement;
 
                     return action;
                 }
@@ -2584,8 +2575,9 @@
 
         setRestriction: function (event, status) {
             var target = this.target,
+                action = /resize/.test(this.prepared)? 'resize' : this.prepared,
                 restrict = target && target.options.restrict,
-                restriction = restrict && restrict[this.prepared],
+                restriction = restrict && restrict[action],
                 page;
 
             if (!restriction) {
@@ -3117,8 +3109,8 @@
         this.originalEvent.preventDefault();
     }
 
-    function defaultActionChecker (event, interaction) {
-        var rect = this.getRect(),
+    function defaultActionChecker (event, interaction, element) {
+        var rect = this.getRect(element),
             right,
             bottom,
             action = null,
@@ -3218,14 +3210,22 @@
                     for (var j = 0; j < listeners.length; j++) {
                         if (listeners[j][1] !== useCapture) { continue; }
 
-                        try {
-                            listeners[j][0](fakeEvent);
+                        if (tryCatchEventListeners) {
+                            try {
+                                listeners[j][0](fakeEvent);
+                            }
+                            catch (error) {
+                                var funcName = (funcName = listeners[j][0].name)? ', "' + funcName + '",': '';
+
+                                console.error('Error thrown from delegated "' + event.type + '" listener' + funcName + ' on "' + selector + '" element'
+                                              + ':\n' + error.message);
+
+                                if (error.stack) { console.log(error.stack); }
+                                console.log(error);
+                            }
                         }
-                        catch (error) {
-                            console.error('Error thrown from delegated listener: ' +
-                                          '"' + selector + '" ' + event.type + ' ' +
-                                          (listeners[j][0].name? listeners[j][0].name: ''));
-                            console.log(error);
+                        else {
+                            listeners[j][0](fakeEvent);
                         }
                     }
                 }
@@ -3535,7 +3535,7 @@
          = (boolean) whether the pointer was over this Interactable
         \*/
         dropCheck: function (event, draggable, draggableElement, rect) {
-            if (!(rect = rect || this.getRect())) {
+            if (!(rect = rect || this.getRect(this._element))) {
                 return false;
             }
 
@@ -4013,11 +4013,11 @@
                 : false);
         },
 
-        getAction: function (event, interaction) {
-            var action = this.defaultActionChecker(event, interaction);
+        getAction: function (event, interaction, element) {
+            var action = this.defaultActionChecker(event, interaction, element);
 
             if (this.options.actionChecker) {
-                action = this.options.actionChecker(event, action, interaction, this);
+                action = this.options.actionChecker(event, action, this, element, interaction);
             }
 
             return action;
@@ -4485,58 +4485,72 @@
                 fireState = 0,
                 i = 0,
                 len,
-                onEvent = 'on' + iEvent.type;
+                onEvent = 'on' + iEvent.type,
+                that = this,
+                funcName = '';
 
-            // Try-catch and loop so an exception thrown from a listener
-            // doesn't ruin everything for everyone
-            while (fireState < 3) {
-                try {
-                    switch (fireState) {
-                        // Interactable#on() listeners
-                        case fireStates.directBind:
-                            if (iEvent.type in this._iEvents) {
-                            listeners = this._iEvents[iEvent.type];
+            function callListeners () {
+                switch (fireState) {
+                    // Interactable#on() listeners
+                    case fireStates.directBind:
+                        if (iEvent.type in that._iEvents) {
+                        listeners = that._iEvents[iEvent.type];
 
-                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-                                listeners[i](iEvent);
-                            }
-                            break;
+                        for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            funcName = listeners[i].name;
+                            listeners[i](iEvent);
                         }
-
-                        break;
-
-                        // interactable.onevent listener
-                        case fireStates.onevent:
-                            if (isFunction(this[onEvent])) {
-                            this[onEvent](iEvent);
-                        }
-                        break;
-
-                        // interact.on() listeners
-                        case fireStates.globalBind:
-                            if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
-
-                            for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-                                listeners[i](iEvent);
-                            }
-                        }
-                    }
-
-                    if (iEvent.propagationStopped) {
                         break;
                     }
 
-                    i = 0;
-                    fireState++;
+                    break;
+
+                    // interactable.onevent listener
+                    case fireStates.onevent:
+                        if (isFunction(that[onEvent])) {
+                        funcName = that[onEvent].name;
+                        that[onEvent](iEvent);
+                    }
+                    break;
+
+                    // interact.on() listeners
+                    case fireStates.globalBind:
+                        if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
+
+                        for (len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+                            funcName = listeners[i].name;
+                            listeners[i](iEvent);
+                        }
+                    }
                 }
-                catch (error) {
-                    console.error('Error thrown from ' + iEvent.type + ' listener');
-                    console.error(error);
-                    i++;
 
-                    if (fireState === fireStates.onevent) {
-                        fireState++;
+                i = 0;
+                fireState++;
+            }
+
+            if (tryCatchEventListeners) {
+                // Try-catch and loop so an exception thrown from a listener
+                // doesn't ruin everything for everyone
+                while (fireState < 3 && !iEvent.propagationStopped) {
+                    try {
+                        callListeners();
                     }
+                    catch (error) {
+                        funcName = funcName? ', "' + funcName + '"' : '';
+                        console.error('Error thrown from "' + iEvent.type + '" listener' + funcName + ':\n' + error.message);
+                        console.log(error.stack);
+                        console.log(error);
+                        i++;
+
+                        if (fireState === fireStates.onevent) {
+                            fireState++;
+                        }
+                    }
+                }
+            }
+            else {
+                while (fireState < 3 && !iEvent.propagationStopped) {
+                    callListeners();
                 }
             }
 
@@ -4994,6 +5008,7 @@
             gesturing             : interaction.gesturing,
             prepared              : interaction.prepared,
             matches               : interaction.matches,
+            matchElements         : interaction.matchElements,
 
             prevCoords            : interaction.prevCoords,
             downCoords            : interaction.startCoords,
@@ -5392,6 +5407,26 @@
         }
 
         return defaultOptions.pointerMoveTolerance;
+    };
+
+    /*\
+     * interact.tryCatchEventListeners
+     [ method ]
+     * Returns or sets whether errors thrown in InteractEvent listeners and
+     * delegated event listeners should be caught and logged safely or should
+     * be allowed to propagate and disrupt the event firing process.
+     *
+     - newValue (boolean) #optional `false` to allow errors to propagate (default). `true` to handle errors internally.
+     = (boolean | Interactable) The current setting or interact
+    \*/
+    interact.tryCatchEventListeners = function (newValue) {
+        if (isBool(newValue)) {
+            tryCatchEventListeners = newValue;
+
+            return this;
+        }
+
+        return tryCatchEventListeners;
     };
 
     function endAllInteractions (event) {
