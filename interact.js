@@ -2695,7 +2695,7 @@
 
     function getInteractionFromPointer (pointer, eventType, eventTarget) {
         var i = 0, len = interactions.length,
-            mouseEvent = /mouse/.test(eventType),
+            mouseEvent = /mouse/.test(pointer.pointerType || eventType),
             interaction;
 
         // if it's a mouse interaction
