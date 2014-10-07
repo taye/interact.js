@@ -819,12 +819,12 @@
                 || nodeContains(interactable._context, element);
     }
 
-    function testIgnore (interactable, element) {
+    function testIgnore (interactable, interactableElement, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
         if (!ignoreFrom
             // limit test to the interactable's element and its children
-            || !isElement(element) || element === interactable._element.parentNode) {
+            || !isElement(element) || element === interactableElement.parentNode) {
             return false;
         }
 
@@ -838,13 +838,13 @@
         return false;
     }
 
-    function testAllow (interactable, element) {
+    function testAllow (interactable, interactableElement, element) {
         var allowFrom = interactable.options.allowFrom;
 
         if (!allowFrom) { return true; }
 
         // limit test to the interactable's element and its children
-        if (!isElement(element) || element === interactable._element.parentNode) {
+        if (!isElement(element) || element === interactableElement.parentNode) {
             return false;
         }
 
@@ -1142,7 +1142,7 @@
             this.addPointer(event);
 
             if (this.target
-                && (testIgnore(this.target, eventTarget) || !testAllow(this.target, eventTarget))) {
+                && (testIgnore(this.target, this.element, eventTarget) || !testAllow(this.target, this.element, eventTarget))) {
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
@@ -1153,8 +1153,8 @@
 
             var elementInteractable = interactables.get(eventTarget),
                 elementAction = (elementInteractable
-                                 && !testIgnore(elementInteractable, eventTarget)
-                                 && testAllow(elementInteractable, eventTarget)
+                                 && !testIgnore(elementInteractable, eventTarget, eventTarget)
+                                 && testAllow(elementInteractable, eventTarget, eventTarget)
                                  && validateAction(
                                      elementInteractable.getAction(event, this, eventTarget),
                                      elementInteractable));
@@ -1162,8 +1162,8 @@
             function pushCurMatches (interactable, selector) {
                 if (interactable
                     && inContext(interactable, eventTarget)
-                    && !testIgnore(interactable, eventTarget)
-                    && testAllow(interactable, eventTarget)
+                    && !testIgnore(interactable, eventTarget, eventTarget)
+                    && testAllow(interactable, eventTarget, eventTarget)
                     && matchesSelector(eventTarget, selector)) {
 
                     curMatches.push(interactable);
@@ -1173,7 +1173,7 @@
 
             if (elementAction) {
                 this.target = elementInteractable;
-                this.element = elementInteractable._element;
+                this.element = eventTarget;
                 this.matches = [];
                 this.matchElements = [];
             }
@@ -1212,7 +1212,7 @@
                 var action;
 
                 if (matches) {
-                    action = this.validateSelector(event, matches);
+                    action = this.validateSelector(event, matches, matchElements);
                 }
                 else if (target) {
                     action = validateAction(target.getAction(this.pointerMoves[0], this, this.element), this.target);
@@ -1228,7 +1228,7 @@
                 }
             }
             else if (this.prepared) {
-                this.checkAndPreventDefault(event, target);
+                this.checkAndPreventDefault(event, target, this.element);
             }
         },
 
@@ -1289,8 +1289,8 @@
                     : undefined;
 
                 if (inContext(interactable, element)
-                    && !testIgnore(interactable, eventTarget)
-                    && testAllow(interactable, eventTarget)
+                    && !testIgnore(interactable, element, eventTarget)
+                    && testAllow(interactable, element, eventTarget)
                     && matchesSelector(element, selector, elements)) {
 
                     that.matches.push(interactable);
@@ -1332,7 +1332,7 @@
         // style and event Liseners
         pointerDown: function (event, forceAction) {
             if (!forceAction && !this.inertiaStatus.active && this.pointerIsDown) {
-                this.checkAndPreventDefault(event, this.target);
+                this.checkAndPreventDefault(event, this.target, this.element);
 
                 return;
             }
@@ -1341,17 +1341,20 @@
 
             this.addPointer(event);
 
+            var curEventTarget = getActualElement(event.currentTarget),
+                eventTarget = getActualElement(event.target);
+
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
             // Otherwise, set the target if there is no action prepared
             if ((this.pointerIds.length < 2 && !this.target) || !this.prepared) {
 
-                var interactable = interactables.get(event.currentTarget);
+                var interactable = interactables.get(curEventTarget);
 
-                if (!testIgnore(interactable, event.target)
-                    && testAllow(interactable, event.target)) {
+                if (!testIgnore(interactable, curEventTarget, eventTarget)
+                    && testAllow(interactable, curEventTarget, eventTarget)) {
                     this.target = interactable;
-                    this.element = interactable._element;
+                    this.element = curEventTarget;
                 }
             }
 
@@ -1394,13 +1397,13 @@
                 this.setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
 
-                this.checkAndPreventDefault(event, target);
+                this.checkAndPreventDefault(event, target, this.element);
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
-                && event.currentTarget === this.inertiaStatus.targetElement
+                && curEventTarget === this.inertiaStatus.targetElement
                 && target === this.inertiaStatus.target
-                && validateAction(target.getAction(event, this, element), target) === this.prepared) {
+                && validateAction(target.getAction(event, this, this.element), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1459,9 +1462,10 @@
                                     && elementInteractable !== this.target
                                     && elementInteractable.getAction(this.downEvent, this, element) === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
+
                                     this.prepared = 'drag';
                                     this.target = elementInteractable;
-                                    this.element = elementInteractable._element;
+                                    this.element = element;
                                     break;
                                 }
 
@@ -1478,13 +1482,11 @@
 
                                     if (interactable === this.target) { return; }
 
-                                    interactable._element = element;
-
                                     if (inContext(interactable, eventTarget)
-                                        && !testIgnore(interactable, eventTarget)
-                                        && testAllow(interactable, eventTarget)
+                                        && !testIgnore(interactable, element, eventTarget)
+                                        && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downEvent, this, eventTarget) === 'drag'
+                                        && interactable.getAction(this.downEvent, this, element) === 'drag'
                                         && checkAxis(axis, interactable)) {
 
                                         return interactable;
@@ -1499,7 +1501,7 @@
                                     if (selectorInteractable) {
                                         this.prepared = 'drag';
                                         this.target = selectorInteractable;
-                                        this.element = selectorInteractable._element;
+                                        this.element = element;
                                         break;
                                     }
 
@@ -1585,7 +1587,7 @@
                         this.prevEvent = this[action + 'Move'](event);
                     }
 
-                    this.checkAndPreventDefault(event, this.target);
+                    this.checkAndPreventDefault(event, this.target, this.element);
                 }
             }
 
@@ -2002,7 +2004,7 @@
                     currentElement = this.activeDrops.elements [j],
                     rect           = this.activeDrops.rects    [j];
 
-                validDrops.push(current.dropCheck(event, this.target, dragElement, rect)
+                validDrops.push(current.dropCheck(event, this.target, dragElement, currentElement, rect)
                                 ? currentElement
                                 : null);
             }
@@ -2104,7 +2106,7 @@
 
                 // prevent Default only if were previously interacting
                 if (event && isFunction(event.preventDefault)) {
-                    this.checkAndPreventDefault(event, target);
+                    this.checkAndPreventDefault(event, target, this.element);
                 }
 
                 if (this.dragging) {
@@ -2385,8 +2387,8 @@
 
                 if (element !== document
                     && inContext(interactable, element)
-                    && !testIgnore(interactable, eventTarget)
-                    && testAllow(interactable, eventTarget)
+                    && !testIgnore(interactable, element, eventTarget)
+                    && testAllow(interactable, element, eventTarget)
                     && matchesSelector(element, selector, elements)) {
 
                     tapTargets.push(interactable);
@@ -2444,7 +2446,7 @@
                 page = { x: status.x, y: status.y };
             }
             else {
-                var origin = getOriginXY(this.target);
+                var origin = getOriginXY(this.target, this.element);
 
                 page = this.getPageXY(this.pointerMoves[0]);
 
@@ -2645,13 +2647,13 @@
             return status;
         },
 
-        checkAndPreventDefault: function (event, interactable) {
+        checkAndPreventDefault: function (event, interactable, element) {
             if (!(interactable = interactable || this.target)) { return; }
 
             var options = interactable.options,
                 prevent = options.preventDefault;
 
-            if (prevent === 'auto' && !/^input$|^textarea$/i.test(interactable._element.nodeName)) {
+            if (prevent === 'auto' && element && !/^input$|^textarea$/i.test(element.nodeName)) {
                 // do not preventDefault on pointerdown if the prepared action is a drag
                 // and dragging can only start from a certain direction - this allows
                 // a touch to pan the viewport if a drag isn't in the right direction
@@ -3530,8 +3532,8 @@
          - event (MouseEvent | TouchEvent) The event that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, draggableElement, rect) {
-            if (!(rect = rect || this.getRect(this._element))) {
+        dropCheck: function (event, draggable, draggableElement, dropElement, rect) {
+            if (!(rect = rect || this.getRect(dropElement))) {
                 return false;
             }
 
