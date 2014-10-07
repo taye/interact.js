@@ -1584,6 +1584,8 @@
 
                         this.prevEvent = this[action + 'Move'](event);
                     }
+
+                    this.checkAndPreventDefault(event, this.target);
                 }
             }
 
@@ -1624,8 +1626,6 @@
         },
 
         dragMove: function (event) {
-            this.checkAndPreventDefault(event, this.target);
-
             var target = this.target,
                 dragEvent  = new InteractEvent(this, event, 'drag', 'move'),
                 draggableElement = this.element,
@@ -1659,8 +1659,6 @@
         },
 
         resizeMove: function (event) {
-            this.checkAndPreventDefault(event, this.target);
-
             var resizeEvent = new InteractEvent(this, event, 'resize', 'move');
 
             this.target.fire(resizeEvent);
@@ -1688,8 +1686,6 @@
             if (!this.pointerIds.length) {
                 return this.prevEvent;
             }
-
-            this.checkAndPreventDefault(event, this.target);
 
             var gestureEvent;
 
