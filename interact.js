@@ -512,32 +512,32 @@
 
     function setEventXY (targetObj, source, interaction) {
         getPageXY(source, tmpXY, interaction);
-        targetObj.pageX = tmpXY.x;
-        targetObj.pageY = tmpXY.y;
+        targetObj.page.x = tmpXY.x;
+        targetObj.page.y = tmpXY.y;
 
         getClientXY(source, tmpXY, interaction);
-        targetObj.clientX = tmpXY.x;
-        targetObj.clientY = tmpXY.y;
+        targetObj.client.x = tmpXY.x;
+        targetObj.client.y = tmpXY.y;
 
         targetObj.timeStamp = new Date().getTime();
     }
 
     function setEventDeltas (targetObj, prev, cur) {
-        targetObj.pageX     = cur.pageX      - prev.pageX;
-        targetObj.pageY     = cur.pageY      - prev.pageY;
-        targetObj.clientX   = cur.clientX    - prev.clientX;
-        targetObj.clientY   = cur.clientY    - prev.clientY;
+        targetObj.page.x     = cur.page.x      - prev.page.x;
+        targetObj.page.y     = cur.page.y      - prev.page.y;
+        targetObj.client.x   = cur.client.x    - prev.client.x;
+        targetObj.client.y   = cur.client.y    - prev.client.y;
         targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
 
         // set pointer velocity
         var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-        targetObj.pageSpeed   = hypot(targetObj.pageX, targetObj.pageY) / dt;
-        targetObj.pageVX      = targetObj.pageX / dt;
-        targetObj.pageVY      = targetObj.pageY / dt;
+        targetObj.page.speed   = hypot(targetObj.page.x, targetObj.page.y) / dt;
+        targetObj.page.vx      = targetObj.page.x / dt;
+        targetObj.page.vy      = targetObj.page.y / dt;
 
-        targetObj.clientSpeed = hypot(targetObj.clientX, targetObj.pageY) / dt;
-        targetObj.clientVX    = targetObj.clientX / dt;
-        targetObj.clientVY    = targetObj.clientY / dt;
+        targetObj.clientSpeed = hypot(targetObj.client.x, targetObj.page.y) / dt;
+        targetObj.client.vx    = targetObj.client.x / dt;
+        targetObj.client.vy    = targetObj.client.y / dt;
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
@@ -1041,29 +1041,28 @@
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
             timeStamp: 0
         };
         // current native pointer move event coordinates
         this.curCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
             timeStamp: 0
         };
 
         // Starting InteractEvent pointer coordinates
         this.startCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
             timeStamp: 0
         };
 
         // Change in coordinates and time of the pointer
         this.pointerDelta = {
-            pageX    : 0, pageY      : 0,
-            clientX  : 0, clientY    : 0,
-            pageSpeed: 0, clientSpeed: 0,
+            page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+            client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
             timeStamp: 0
         };
 
@@ -1421,8 +1420,8 @@
 
             // register movement of more than 1 pixel
             if (!this.pointerWasMoved) {
-                dx = this.curCoords.clientX - this.startCoords.clientX;
-                dy = this.curCoords.clientY - this.startCoords.clientY;
+                dx = this.curCoords.client.x - this.startCoords.client.x;
+                dy = this.curCoords.client.y - this.startCoords.client.y;
 
                 this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
             }
@@ -1537,11 +1536,11 @@
                             restrict = target.options.restrict;
 
                         if (rect) {
-                            this.startOffset.left = this.startCoords.pageX - rect.left;
-                            this.startOffset.top  = this.startCoords.pageY - rect.top;
+                            this.startOffset.left = this.startCoords.page.x - rect.left;
+                            this.startOffset.top  = this.startCoords.page.y - rect.top;
 
-                            this.startOffset.right  = rect.right  - this.startCoords.pageX;
-                            this.startOffset.bottom = rect.bottom - this.startCoords.pageY;
+                            this.startOffset.right  = rect.right  - this.startCoords.page.x;
+                            this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
                         }
                         else {
                             this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
@@ -1594,7 +1593,7 @@
             if (!(event instanceof InteractEvent)) {
                 // set pointer coordinate, time changes and speeds
                 setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
+                extend(this.prevCoords, this.curCoords);
             }
 
             if (this.dragging || this.resizing) {
@@ -1723,7 +1722,7 @@
                 if (this.inertiaStatus.active) { return; }
 
                 var deltaSource = options.deltaSource,
-                    pointerSpeed = this.pointerDelta[deltaSource + 'Speed'],
+                    pointerSpeed = this.pointerDelta[deltaSource].speed,
                     now = new Date().getTime(),
                     inertiaPossible = false,
                     inertia = false,
@@ -1792,13 +1791,13 @@
                     inertiaStatus.t0 = now;
 
                     if (inertia) {
-                        inertiaStatus.vx0 = this.pointerDelta[deltaSource + 'VX'];
-                        inertiaStatus.vy0 = this.pointerDelta[deltaSource + 'VY'];
+                        inertiaStatus.vx0 = this.pointerDelta[deltaSource].vx;
+                        inertiaStatus.vy0 = this.pointerDelta[deltaSource].vy;
                         inertiaStatus.v0 = pointerSpeed;
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = this.getPageXY(this.pointerMoves[0]),
+                        var page = extend({}, this.curCoords),
                             origin = getOriginXY(target, this.element),
                             statusObject;
 
@@ -2448,7 +2447,7 @@
             else {
                 var origin = getOriginXY(this.target, this.element);
 
-                page = this.getPageXY(this.pointerMoves[0]);
+                page = extend({}, this.curCoords);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2586,7 +2585,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = this.getPageXY(this.pointerMoves[0]);
+                    : page = extend({}, this.curCoords);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2880,10 +2879,10 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        this.x0        = interaction.startCoords.pageX;
-        this.y0        = interaction.startCoords.pageY;
-        this.clientX0  = interaction.startCoords.clientX;
-        this.clientY0  = interaction.startCoords.clientY;
+        this.x0        = interaction.startCoords.page.x;
+        this.y0        = interaction.startCoords.page.y;
+        this.clientX0  = interaction.startCoords.client.x;
+        this.clientY0  = interaction.startCoords.client.y;
         this.ctrlKey   = event.ctrlKey;
         this.altKey    = event.altKey;
         this.shiftKey  = event.shiftKey;
@@ -2909,12 +2908,12 @@
         // end event dx, dy is difference between start and end points
         if (ending || action === 'drop') {
             if (deltaSource === 'client') {
-                this.dx = client.x - interaction.startCoords.clientX;
-                this.dy = client.y - interaction.startCoords.clientY;
+                this.dx = client.x - interaction.startCoords.client.x;
+                this.dy = client.y - interaction.startCoords.client.y;
             }
             else {
-                this.dx = page.x - interaction.startCoords.pageX;
-                this.dy = page.y - interaction.startCoords.pageY;
+                this.dx = page.x - interaction.startCoords.page.x;
+                this.dy = page.y - interaction.startCoords.page.y;
             }
         }
         // copy properties from previousmove if starting inertia
@@ -3056,9 +3055,9 @@
             }
             // if normal move event, use previous user event coords
             else {
-                this.speed = interaction.pointerDelta[deltaSource + 'Speed'];
-                this.velocityX = interaction.pointerDelta[deltaSource + 'VX'];
-                this.velocityY = interaction.pointerDelta[deltaSource + 'VY'];
+                this.speed = interaction.pointerDelta[deltaSource].speed;
+                this.velocityX = interaction.pointerDelta[deltaSource].vx;
+                this.velocityY = interaction.pointerDelta[deltaSource].vy;
             }
         }
 
