@@ -535,7 +535,7 @@
         targetObj.page.vx      = targetObj.page.x / dt;
         targetObj.page.vy      = targetObj.page.y / dt;
 
-        targetObj.clientSpeed = hypot(targetObj.client.x, targetObj.page.y) / dt;
+        targetObj.client.speed = hypot(targetObj.client.x, targetObj.page.y) / dt;
         targetObj.client.vx    = targetObj.client.x / dt;
         targetObj.client.vy    = targetObj.client.y / dt;
     }
@@ -1412,9 +1412,9 @@
         pointerMove: function (event, preEnd) {
             if (!this.pointerIsDown) { return; }
 
-            if (!(event instanceof InteractEvent)) {
-                this.setEventXY(this.curCoords, this.pointerMoves[0]);
-            }
+            this.setEventXY(this.curCoords, (event instanceof InteractEvent)
+                                                ? this.inertiaStatus.startEvent
+                                                : this.pointerMoves[0]);
 
             var dx, dy;
 
@@ -1590,11 +1590,12 @@
                 }
             }
 
-            if (!(event instanceof InteractEvent)) {
-                // set pointer coordinate, time changes and speeds
-                setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-                extend(this.prevCoords, this.curCoords);
-            }
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+
+            extend(this.prevCoords.page  , this.curCoords.page);
+            extend(this.prevCoords.client, this.curCoords.client);
+            this.prevCoords.timeStamp = this.curCoords.timeStamp;
 
             if (this.dragging || this.resizing) {
                 autoScroll.edgeMove(event);
@@ -1797,12 +1798,12 @@
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = extend({}, this.curCoords),
+                        var page = extend({}, this.curCoords.page),
                             origin = getOriginXY(target, this.element),
                             statusObject;
 
-                        page.x = page.x + (inertia? inertiaStatus.xe: 0) - origin.x;
-                        page.y = page.y + (inertia? inertiaStatus.ye: 0) - origin.y;
+                        page.x = page.x + inertiaStatus.xe - origin.x;
+                        page.y = page.y + inertiaStatus.ye - origin.y;
 
                         statusObject = {
                             useStatusXY: true,
@@ -2447,7 +2448,7 @@
             else {
                 var origin = getOriginXY(this.target, this.element);
 
-                page = extend({}, this.curCoords);
+                page = extend({}, this.curCoords.page);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2585,7 +2586,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = extend({}, this.curCoords);
+                    : page = extend({}, this.curCoords.page);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2829,10 +2830,8 @@
             client = { x: (average.clientX - origin.x), y: (average.clientY - origin.y) };
         }
         else {
-            var pointer = (event instanceof InteractEvent)? event : pointerMoves[0];
-
-            page   = interaction.getPageXY(pointer);
-            client = interaction.getClientXY(pointer);
+            page   = extend({}, interaction.curCoords.page);
+            client = extend({}, interaction.curCoords.client);
 
             page.x -= origin.x;
             page.y -= origin.y;
@@ -3539,7 +3538,7 @@
             var dropOverlap = this.options.dropOverlap;
 
             if (dropOverlap === 'pointer') {
-                var page = getPageXY(event),
+                var page = getPageXY(pointer),
                     origin = getOriginXY(draggable, draggableElement),
                     horizontal,
                     vertical;
