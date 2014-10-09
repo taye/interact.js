@@ -510,12 +510,24 @@
         return clone;
     }
 
-    function setEventXY (targetObj, source, interaction) {
-        getPageXY(source, tmpXY, interaction);
+    function copyCoords (dest, src) {
+        dest.page = dest.page || {};
+        dest.page.x = src.page.x;
+        dest.page.y = src.page.y;
+
+        dest.client = dest.client || {};
+        dest.client.x = src.client.x;
+        dest.client.y = src.client.y;
+
+        dest.timeStamp = src.timeStamp;
+    }
+
+    function setEventXY (targetObj, pointer, interaction) {
+        getPageXY(pointer, tmpXY, interaction);
         targetObj.page.x = tmpXY.x;
         targetObj.page.y = tmpXY.y;
 
-        getClientXY(source, tmpXY, interaction);
+        getClientXY(pointer, tmpXY, interaction);
         targetObj.client.x = tmpXY.x;
         targetObj.client.y = tmpXY.y;
 
@@ -541,22 +553,22 @@
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
-    function getXY (type, event, xy) {
+    function getXY (type, pointer, xy) {
         var x,
             y;
 
         xy = xy || {};
         type = type || 'page';
 
-        if (/touch/.test(event.type) && event.changedTouches) {
-            var touch = event.changedTouches[0];
+        if (/touch/.test(pointer.type) && pointer.changedTouches) {
+            var touch = pointer.changedTouches[0];
 
             x = touch[type + 'X'];
             y = touch[type + 'Y'];
         }
         else {
-            x = event[type + 'X'];
-            y = event[type + 'Y'];
+            x = pointer[type + 'X'];
+            y = pointer[type + 'Y'];
         }
 
         xy.x = x;
@@ -565,53 +577,53 @@
         return xy;
     }
 
-    function getPageXY (event, page, interaction) {
+    function getPageXY (pointer, page, interaction) {
         page = page || {};
 
-        if (event instanceof InteractEvent) {
-            if (/inertiastart/.test(event.type)) {
-                getPageXY(interaction.inertiaStatus.pointerUp, page);
+        if (pointer instanceof InteractEvent) {
+            if (/inertiastart/.test(pointer.type)) {
+                extend(page, interaction.inertiaStatus.upCoords.page);
 
                 page.x += interaction.inertiaStatus.sx;
                 page.y += interaction.inertiaStatus.sy;
             }
             else {
-                page.x = event.pageX;
-                page.y = event.pageY;
+                page.x = pointer.pageX;
+                page.y = pointer.pageY;
             }
         }
         // Opera Mobile handles the viewport and scrolling oddly
         else if (isOperaMobile) {
-            getXY('screen', event, page);
+            getXY('screen', pointer, page);
 
             page.x += window.scrollX;
             page.y += window.scrollY;
         }
         else {
-            getXY('page', event, page);
+            getXY('page', pointer, page);
         }
 
         return page;
     }
 
-    function getClientXY (event, client, interaction) {
+    function getClientXY (pointer, client, interaction) {
         client = client || {};
 
-        if (event instanceof InteractEvent) {
-            if (/inertiastart/.test(event.type)) {
-                getClientXY(interaction.inertiaStatus.pointerUp, client);
+        if (pointer instanceof InteractEvent) {
+            if (/inertiastart/.test(pointer.type)) {
+                extend(client, interaction.inertiaStatus.upCoords.client);
 
                 client.x += interaction.inertiaStatus.sx;
                 client.y += interaction.inertiaStatus.sy;
             }
             else {
-                client.x = event.clientX;
-                client.y = event.clientY;
+                client.x = pointer.clientX;
+                client.y = pointer.clientY;
             }
         }
         else {
             // Opera Mobile handles the viewport and scrolling oddly
-            getXY(isOperaMobile? 'screen': 'client', event, client);
+            getXY(isOperaMobile? 'screen': 'client', pointer, client);
         }
 
         return client;
@@ -1007,7 +1019,7 @@
             smoothEnd    : false,
 
             startEvent: null,
-            pointerUp : {},
+            upCoords: {},
 
             xe: 0, ye: 0,
             sx: 0, sy: 0,
@@ -1121,9 +1133,9 @@
     }
 
     Interaction.prototype = {
-        getPageXY  : function (event, xy) { return   getPageXY(event, xy, this); },
-        getClientXY: function (event, xy) { return getClientXY(event, xy, this); },
-        setEventXY : function (trgt, src) { return  setEventXY(trgt, src, this); },
+        getPageXY  : function (pointer, xy) { return   getPageXY(pointer, xy, this); },
+        getClientXY: function (pointer, xy) { return getClientXY(pointer, xy, this); },
+        setEventXY : function (target, ptr) { return  setEventXY(target, ptr, this); },
 
         pointerOver: function (event) {
             if (this.prepared || !this.mouse) { return; }
@@ -1589,10 +1601,7 @@
 
             // set pointer coordinate, time changes and speeds
             setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-
-            extend(this.prevCoords.page  , this.curCoords.page);
-            extend(this.prevCoords.client, this.curCoords.client);
-            this.prevCoords.timeStamp = this.curCoords.timeStamp;
+            copyCoords(this.prevCoords, this.curCoords);
 
             if (this.dragging || this.resizing) {
                 autoScroll.edgeMove(event);
@@ -1770,14 +1779,7 @@
                 }
 
                 if (inertia || smoothEnd) {
-                    if (events.useAttachEvent) {
-                        // make a copy of the pointerdown event because IE8
-                        // http://stackoverflow.com/a/3533725/2280888
-                        extend(inertiaStatus.pointerUp, event);
-                    }
-                    else {
-                        inertiaStatus.pointerUp = event;
-                    }
+                    copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
                         new InteractEvent(this, event, this.prepared, 'inertiastart');
@@ -3105,7 +3107,7 @@
             right,
             bottom,
             action = null,
-            page = interaction.getPageXY(interaction.pointerMoves[0]),
+            page = extend({}, interaction.curCoords.page),
             options = this.options;
 
         if (!rect) { return null; }
