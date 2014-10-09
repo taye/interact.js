@@ -1005,8 +1005,6 @@
         this.inertiaStatus = {
             active       : false,
             smoothEnd    : false,
-            target       : null,
-            targetElement: null,
 
             startEvent: null,
             pointerUp : {},
@@ -1261,7 +1259,7 @@
                 while (element && element !== document) {
 
                     // if this element is the current inertia target element
-                    if (element === this.inertiaStatus.targetElement
+                    if (element === this.element
                         // and the prospective action is the same as the ongoing one
                         && validateAction(this.target.getAction(event, this, this.element), this.target) === this.prepared) {
 
@@ -1400,8 +1398,7 @@
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
-                && curEventTarget === this.inertiaStatus.targetElement
-                && target === this.inertiaStatus.target
+                && curEventTarget === this.element
                 && validateAction(target.getAction(event, this, this.element), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
@@ -1720,7 +1717,7 @@
 
             if (this.dragging || this.resizing || this.gesturing) {
 
-                if (this.inertiaStatus.active) { return; }
+                if (inertiaStatus.active) { return; }
 
                 var deltaSource = options.deltaSource,
                     pointerSpeed = this.pointerDelta[deltaSource].speed,
@@ -1785,11 +1782,9 @@
                     this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
                         new InteractEvent(this, event, this.prepared, 'inertiastart');
 
-                    target.fire(inertiaStatus.startEvent);
-
-                    inertiaStatus.target = target;
-                    inertiaStatus.targetElement = this.element;
                     inertiaStatus.t0 = now;
+
+                    target.fire(inertiaStatus.startEvent);
 
                     if (inertia) {
                         inertiaStatus.vx0 = this.pointerDelta[deltaSource].vx;
@@ -2150,7 +2145,7 @@
 
         inertiaFrame: function () {
             var inertiaStatus = this.inertiaStatus,
-                options = inertiaStatus.target.options.inertia,
+                options = this.target.options.inertia,
                 lambda = options.resistance,
                 t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
@@ -2191,7 +2186,7 @@
         smoothEndFrame: function () {
             var inertiaStatus = this.inertiaStatus,
                 t = new Date().getTime() - inertiaStatus.t0,
-                duration = inertiaStatus.target.options.inertia.smoothEndDuration;
+                duration = this.target.options.inertia.smoothEndDuration;
 
             if (t < duration) {
                 inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
@@ -2674,7 +2669,7 @@
         },
 
         calcInertia: function (status) {
-            var inertiaOptions = status.target.options.inertia,
+            var inertiaOptions = this.target.options.inertia,
                 lambda = inertiaOptions.resistance,
                 inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
 
