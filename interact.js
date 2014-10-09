@@ -2776,7 +2776,7 @@
         return new Interaction();
     }
 
-    function doOnInteraction (method) {
+    function doOnInteractions (method) {
         return (function (event) {
             var interaction;
 
@@ -3164,7 +3164,7 @@
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
         var name = interactionListeners[i];
 
-        listeners[name] = doOnInteraction(name);
+        listeners[name] = doOnInteractions(name);
     }
 
     // bound to the interactable context when a DOM event
