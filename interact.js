@@ -489,27 +489,6 @@
         return dest;
     }
 
-    function cloneEvent (event) {
-        var clone = extend({}, event),
-            i;
-
-        clone.constructor = event.constructor;
-
-        if (event.touches) {
-            clone.touches = [];
-            clone.changedTouches = [];
-
-            for (i = 0; i < event.touches.length; i++) {
-                clone.touches.push(extend({}, event.touches[i]));
-            }
-            for (i = 0; i < event.touches.length; i++) {
-                clone.changedTouches.push(extend({}, event.changedTouches[i]));
-            }
-        }
-
-        return clone;
-    }
-
     function copyCoords (dest, src) {
         dest.page = dest.page || {};
         dest.page.x = src.page.x;
@@ -560,16 +539,8 @@
         xy = xy || {};
         type = type || 'page';
 
-        if (/touch/.test(pointer.type) && pointer.changedTouches) {
-            var touch = pointer.changedTouches[0];
-
-            x = touch[type + 'X'];
-            y = touch[type + 'Y'];
-        }
-        else {
-            x = pointer[type + 'X'];
-            y = pointer[type + 'Y'];
-        }
+        x = pointer[type + 'X'];
+        y = pointer[type + 'Y'];
 
         xy.x = x;
         xy.y = y;
@@ -1076,8 +1047,11 @@
             timeStamp: 0
         };
 
-        this.downTime  = 0;         // the timeStamp of the starting event
-        this.downEvent = null;      // pointerdown/mousedown/touchstart event
+        this.downTime    = 0;       // the timeStamp of the starting event
+        this.downEvent   = null;    // pointerdown/mousedown/touchstart event
+        this.downPointer = {};
+        this.downTarget  = null;
+
         this.prevEvent = null;      // previous action event
         this.tapTime   = 0;         // time of the most recent tap event
         this.prevTap   = null;
@@ -1137,18 +1111,17 @@
         getClientXY: function (pointer, xy) { return getClientXY(pointer, xy, this); },
         setEventXY : function (target, ptr) { return  setEventXY(target, ptr, this); },
 
-        pointerOver: function (event) {
+        pointerOver: function (pointer, event, eventTarget) {
             if (this.prepared || !this.mouse) { return; }
 
             var curMatches = [],
                 curMatchElements = [],
-                prevTargetElement = this.target && this.element,
-                eventTarget = getActualElement(event.target);
+                prevTargetElement = this.element;
 
             // do nothing if the element is already in an interaction
             if (contains(claimedElements, eventTarget)) { return; }
 
-            this.addPointer(event);
+            this.addPointer(pointer);
 
             if (this.target
                 && (testIgnore(this.target, this.element, eventTarget) || !testAllow(this.target, this.element, eventTarget))) {
@@ -1165,7 +1138,7 @@
                                  && !testIgnore(elementInteractable, eventTarget, eventTarget)
                                  && testAllow(elementInteractable, eventTarget, eventTarget)
                                  && validateAction(
-                                     elementInteractable.getAction(event, this, eventTarget),
+                                     elementInteractable.getAction(pointer, this, eventTarget),
                                      elementInteractable));
 
             function pushCurMatches (interactable, selector) {
@@ -1189,16 +1162,16 @@
             else {
                 interactables.forEachSelector(pushCurMatches);
 
-                if (this.validateSelector(event, curMatches, curMatchElements)) {
+                if (this.validateSelector(pointer, curMatches, curMatchElements)) {
                     this.matches = curMatches;
                     this.matchElements = curMatchElements;
 
-                    this.pointerHover(event, this.matches, this.matchElements);
+                    this.pointerHover(pointer, event, this.matches, this.matchElements);
                     events.addToElement(eventTarget, 'mousemove', listeners.pointerHover);
                 }
                 else if (this.target) {
                     if (nodeContains(prevTargetElement, eventTarget)) {
-                        this.pointerHover(event, this.matches, this.matchElements);
+                        this.pointerHover(pointer, event, this.matches, this.matchElements);
                         events.addToElement(this.element, 'mousemove', listeners.pointerHover);
                     }
                     else {
@@ -1213,7 +1186,7 @@
 
         // Check what action would be performed on pointerMove target if a mouse
         // button were pressed and change the cursor accordingly
-        pointerHover: function (event, matches, matchElements) {
+        pointerHover: function (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
             var target = this.target;
 
             if (!this.prepared && this.mouse) {
@@ -1221,7 +1194,7 @@
                 var action;
 
                 if (matches) {
-                    action = this.validateSelector(event, matches, matchElements);
+                    action = this.validateSelector(pointer, matches, matchElements);
                 }
                 else if (target) {
                     action = validateAction(target.getAction(this.pointerMoves[0], this, this.element), this.target);
@@ -1241,12 +1214,10 @@
             }
         },
 
-        pointerOut: function (event) {
+        pointerOut: function (pointer, event, eventTarget) {
             if (this.prepared) { return; }
 
             // Remove temporary event listeners for selector Interactables
-            var eventTarget = getActualElement(event.target);
-
             if (!interactables.get(eventTarget)) {
                 events.removeFromElement(eventTarget, listeners.pointerHover);
             }
@@ -1256,14 +1227,13 @@
             }
         },
 
-        selectorDown: function (event) {
+        selectorDown: function (pointer, event, eventTarget, curEventTarget) {
             this.pointerIsDown = true;
 
-            var eventTarget = getActualElement(event.target),
-                element = eventTarget,
+            var element = eventTarget,
                 action;
 
-            this.addPointer(event);
+            this.addPointer(pointer);
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1273,7 +1243,7 @@
                     // if this element is the current inertia target element
                     if (element === this.element
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(event, this, this.element), this.target) === this.prepared) {
+                        && validateAction(this.target.getAction(pointer, this, this.element), this.target) === this.prepared) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1307,8 +1277,8 @@
                 }
             }
 
-            if (this.matches.length && /mousedown|pointerdown/i.test(event.type)) {
-                action = this.validateSelector(event, this.matches, this.matchElements);
+            if (this.matches.length && this.mouse) {
+                action = this.validateSelector(pointer, this.matches, this.matchElements);
             }
             else {
                 while (element && element !== document && !action) {
@@ -1317,7 +1287,7 @@
 
                     interactables.forEachSelector(pushMatches);
 
-                    action = this.validateSelector(event, this.matches, this.matchElements);
+                    action = this.validateSelector(pointer, this.matches, this.matchElements);
                     element = element.parentNode;
                 }
             }
@@ -1325,12 +1295,14 @@
             if (action) {
                 this.prepared = action;
 
-                return this.pointerDown(event, action);
+                return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
             }
             else {
                 // do these now since pointerDown isn't being called from here
                 this.downTime = new Date().getTime();
-                this.downEvent = cloneEvent(event);
+                this.downTarget = eventTarget;
+                this.downEvent = event;
+                extend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
@@ -1339,7 +1311,7 @@
 
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Liseners
-        pointerDown: function (event, forceAction) {
+        pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
             if (!forceAction && !this.inertiaStatus.active && this.pointerIsDown) {
                 this.checkAndPreventDefault(event, this.target, this.element);
 
@@ -1348,10 +1320,7 @@
 
             this.pointerIsDown = true;
 
-            this.addPointer(event);
-
-            var curEventTarget = getActualElement(event.currentTarget),
-                eventTarget = getActualElement(event.target);
+            this.addPointer(pointer);
 
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
@@ -1371,13 +1340,11 @@
                 options = target && target.options;
 
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
-                var action = validateAction(forceAction || target.getAction(event, this), target, this.element);
+                var action = validateAction(forceAction || target.getAction(pointer, this), target, this.element);
 
                 this.setEventXY(this.startCoords, this.pointerMoves[0]);
 
-                if (!action) {
-                    return event;
-                }
+                if (!action) { return; }
 
                 if (options.styleCursor) {
                     document.documentElement.style.cursor = actionCursors[action];
@@ -1401,7 +1368,9 @@
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
 
                 this.downTime = new Date().getTime();
-                this.downEvent = cloneEvent(event);
+                this.downTarget = eventTarget;
+                this.downEvent = event;
+                extend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords, this.pointerMoves[0]);
                 this.pointerWasMoved = false;
@@ -1411,17 +1380,17 @@
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && curEventTarget === this.element
-                && validateAction(target.getAction(event, this, this.element), target) === this.prepared) {
+                && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
             }
         },
 
-        pointerMove: function (event, preEnd) {
+        pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
             if (!this.pointerIsDown) { return; }
 
-            this.setEventXY(this.curCoords, (event instanceof InteractEvent)
+            this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
                                                 ? this.inertiaStatus.startEvent
                                                 : this.pointerMoves[0]);
 
@@ -1439,7 +1408,7 @@
 
             if (this.pointerWasMoved
                 // ignore movement while inertia is active
-                && (!this.inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
+                && (!this.inertiaStatus.active || (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)))) {
 
                 // if just starting an action, calculate the pointer speed now
                 if (!(this.dragging || this.resizing || this.gesturing)) {
@@ -1459,8 +1428,7 @@
 
                             // then try to get a drag from another ineractable
 
-                            var eventTarget = getActualElement(event.target),
-                                element = eventTarget;
+                            var element = eventTarget;
 
                             // check element interactables
                             while (element && element !== document) {
@@ -1468,7 +1436,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
-                                    && elementInteractable.getAction(this.downEvent, this, element) === 'drag'
+                                    && elementInteractable.getAction(this.downPointer, this, element) === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
                                     this.prepared = 'drag';
@@ -1494,7 +1462,7 @@
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downEvent, this, element) === 'drag'
+                                        && interactable.getAction(this.downPointer, this, element) === 'drag'
                                         && checkAxis(axis, interactable)) {
 
                                         return interactable;
@@ -1532,7 +1500,7 @@
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
-                        snapEvent = starting? this.downEvent: event;
+                        snapPointer = starting? this.downPointer: pointer;
 
                     if (starting) {
                         // claim this element
@@ -1573,8 +1541,8 @@
                         }
                     }
 
-                    if (shouldSnap    ) { this.setSnapping   (snapEvent); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { this.setRestriction(snapEvent); } else { this.restrictStatus.restricted = false; }
+                    if (shouldSnap    ) { this.setSnapping   (snapPointer); } else { this.snapStatus    .locked     = false; }
+                    if (shouldRestrict) { this.setRestriction(snapPointer); } else { this.restrictStatus.restricted = false; }
 
                     var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
                                      && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
@@ -1603,8 +1571,8 @@
                             }
 
                             // set snapping and restriction for the move event
-                            if (shouldSnap    ) { this.setSnapping   (event); }
-                            if (shouldRestrict) { this.setRestriction(event); }
+                            if (shouldSnap    ) { this.setSnapping   (pointer); }
+                            if (shouldRestrict) { this.setRestriction(pointer); }
                         }
 
                         this.prevEvent = this[action + 'Move'](event);
@@ -1716,7 +1684,7 @@
         },
 
         // End interact move events and stop auto-scroll unless inertia is enabled
-        pointerUp: function (event) {
+        pointerUp: function (pointer, event, eventTarget, curEventTarget) {
             var endEvent,
                 target = this.target,
                 options = target && target.options,
@@ -1853,7 +1821,7 @@
 
                 if (endSnap || endRestrict) {
                     // fire a move event at the snapped coordinates
-                    this.pointerMove(event, true);
+                    this.pointerMove(pointer, event, eventTarget, curEventTarget, true);
                 }
             }
 
@@ -2000,7 +1968,7 @@
                     currentElement = this.activeDrops.elements [j],
                     rect           = this.activeDrops.rects    [j];
 
-                validDrops.push(current.dropCheck(event, this.target, dragElement, currentElement, rect)
+                validDrops.push(current.dropCheck(this.pointerMoves[0], this.target, dragElement, currentElement, rect)
                                 ? currentElement
                                 : null);
             }
@@ -2169,7 +2137,7 @@
                     inertiaStatus.sy = quadPoint.y;
                 }
 
-                this.pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.i = reqFrame(this.boundInertiaFrame);
             }
@@ -2177,10 +2145,10 @@
                 inertiaStatus.sx = inertiaStatus.modifiedXe;
                 inertiaStatus.sy = inertiaStatus.modifiedYe;
 
-                this.pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.active = false;
-                this.pointerUp(inertiaStatus.startEvent);
+                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
@@ -2193,7 +2161,7 @@
                 inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
                 inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
 
-                this.pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
             }
@@ -2201,34 +2169,17 @@
                 inertiaStatus.sx = inertiaStatus.xe;
                 inertiaStatus.sy = inertiaStatus.ye;
 
-                this.pointerMove(inertiaStatus.startEvent);
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.active = false;
                 inertiaStatus.smoothEnd = false;
 
-                this.pointerUp(inertiaStatus.startEvent);
+                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
-        addPointer: function (event, type) {
-            type = type || event.type;
-
-            if (/touch/.test(event.type)) {
-                var touches = event.changedTouches;
-
-                for (var i = 0; i < touches.length; i++) {
-                    this.addPointer(touches[i], type);
-                }
-
-                return;
-            }
-
-            // dont add the event if it's not the same pointer type as the previous event
-            if (this.pointerIds.length && this.pointerMoves[0].pointerType !== event.pointerType) {
-                return;
-            }
-
-            var id = getPointerId(event),
+        addPointer: function (pointer) {
+            var id = getPointerId(pointer),
                 index = indexOf(this.pointerIds, id);
 
             if (index === -1) {
@@ -2244,19 +2195,19 @@
 
                 // move events are kept so that multi-touch properties can still be
                 // calculated at the end of a gesture; use pointerIds index
-                this.pointerMoves[index] = event;
+                this.pointerMoves[index] = pointer;
             }
             else {
                 if (!contains(claimedPointers, id)) {
                     claimedPointers.push(id);
                 }
 
-                this.pointerMoves[index] = event;
+                this.pointerMoves[index] = pointer;
             }
         },
 
-        removePointer: function (event) {
-            var id = getPointerId(event),
+        removePointer: function (pointer) {
+            var id = getPointerId(pointer),
                 index = indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
@@ -2269,40 +2220,24 @@
             //this.pointerMoves.splice(index, 1);
         },
 
-        recordPointers: function (event, type) {
+        recordPointer: function (pointer) {
             // Do not update pointers while inertia is active.
-            // The inertiastart event should be the first pointerMove element.
+            // The inertiastart event should be this.pointerMoves[0]
             if (this.inertiaStatus.active) { return; }
 
-            var index = indexOf(this.pointerIds, getPointerId(event));
+            var index = indexOf(this.pointerIds, getPointerId(pointer));
 
             if (index === -1) { return; }
 
-            type = type || event.type;
-
-            if (/move/i.test(type)) {
-                this.pointerMoves[index] = event;
-            }
-            else if (/up|end|cancel/i.test(type)) {
-                this.removePointer(event);
-            }
+            this.pointerMoves[index] = pointer;
         },
 
-        recordTouches: function (event) {
-            var touches = event.changedTouches;
-
-            for (var i = 0; i < touches.length; i++) {
-                this.recordPointers(touches[i], event.type);
-            }
-
-            return;
-        },
-
-        fireTaps: function (event, targets, elements) {
+        fireTaps: function (pointer, event, targets, elements) {
             var tap = {},
                 i;
 
             extend(tap, event);
+            extend(tap, pointer);
 
             tap.preventDefault           = preventOriginalDefault;
             tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
@@ -2362,19 +2297,15 @@
             }
         },
 
-        collectTaps: function (event) {
-            if(this.downEvent) {
-                if (this.pointerWasMoved
-                    || this.downEvent.target !== event.target) {
-                    return;
-                }
+        collectTaps: function (pointer, event, eventTarget) {
+            if(this.pointerWasMoved || !(this.downTarget && this.downTarget === eventTarget)) {
+                return;
             }
 
             var tapTargets = [],
                 tapElements = [];
 
-            var eventTarget = getActualElement(event.target),
-                element = eventTarget;
+            var element = eventTarget;
 
             function collectSelectorTaps (interactable, selector, context) {
                 var elements = ie8MatchesSelector
@@ -2404,15 +2335,15 @@
             }
 
             if (tapTargets.length) {
-                this.fireTaps(event, tapTargets, tapElements);
+                this.fireTaps(pointer, event, tapTargets, tapElements);
             }
         },
 
-        validateSelector: function (event, matches, matchElements) {
+        validateSelector: function (pointer, matches, matchElements) {
             for (var i = 0, len = matches.length; i < len; i++) {
                 var match = matches[i],
                     matchElement = matchElements[i],
-                    action = validateAction(match.getAction(event, this, matchElement), match);
+                    action = validateAction(match.getAction(pointer, this, matchElement), match);
 
                 if (action) {
                     this.target = match;
@@ -2423,7 +2354,7 @@
             }
         },
 
-        setSnapping: function (event, status) {
+        setSnapping: function (pointer, status) {
             var snap = this.target.options.snap,
                 anchors = snap.anchors,
                 page,
@@ -2567,7 +2498,7 @@
             return status;
         },
 
-        setRestriction: function (event, status) {
+        setRestriction: function (pointer, status) {
             var target = this.target,
                 action = /resize/.test(this.prepared)? 'resize' : this.prepared,
                 restrict = target && target.options.restrict,
@@ -2732,8 +2663,6 @@
 
         // try to resume inertia with a new pointer
         if (/down|start/i.test(eventType)) {
-            eventTarget = getActualElement(eventTarget);
-
             for (i = 0; i < len; i++) {
                 interaction = interactions[i];
 
@@ -2779,25 +2708,27 @@
 
     function doOnInteractions (method) {
         return (function (event) {
-            var interaction;
+            var interaction,
+                eventTarget = getActualElement(event.target),
+                curEventTarget = getActualElement(event.currentTarget);
 
             if (supportsTouch && /touch/.test(event.type)) {
                 for (var i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
 
-                    interaction = getInteractionFromPointer(pointer, event.type, event.target);
+                    interaction = getInteractionFromPointer(pointer, event.type, eventTarget);
 
                     if (!interaction) { continue; }
 
-                    interaction[method].apply(interaction, arguments);
+                    interaction[method](pointer, event, eventTarget, curEventTarget);
                 }
             }
             else {
-                interaction = getInteractionFromPointer(event, event.type, event.target);
+                interaction = getInteractionFromPointer(event, event.type, eventTarget);
 
                 if (!interaction) { return; }
 
-                interaction[method].apply(interaction, arguments);
+                interaction[method](event, event, eventTarget, curEventTarget);
             }
         });
     }
@@ -2961,9 +2892,7 @@
             }
         }
         else if (action === 'gesture') {
-            this.touches = (PointerEvent
-                            ? [pointerMoves[0], pointerMoves[1]]
-                            : event.touches);
+            this.touches = [pointerMoves[0], pointerMoves[1]];
 
             if (starting) {
                 this.distance = touchDistance(pointerMoves, deltaSource);
@@ -3105,7 +3034,7 @@
         this.originalEvent.preventDefault();
     }
 
-    function defaultActionChecker (event, interaction, element) {
+    function defaultActionChecker (pointer, interaction, element) {
         var rect = this.getRect(element),
             right,
             bottom,
@@ -3163,7 +3092,7 @@
         interactionListeners = [
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
             'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
-            'addPointer', 'removePointer', 'recordPointers', 'recordTouches', 'collectTaps', 'fireTaps'
+            'addPointer', 'removePointer', 'recordPointer', 'collectTaps'
         ];
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -3527,10 +3456,10 @@
          * this Interactable's element. Can be overridden using
          * @Interactable.dropChecker.
          *
-         - event (MouseEvent | TouchEvent) The event that ends a drag
+         - pointer (MouseEvent | PointerEvent | Touch) The event or touch that ends a drag
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, draggableElement, dropElement, rect) {
+        dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
             if (!(rect = rect || this.getRect(dropElement))) {
                 return false;
             }
@@ -4009,11 +3938,11 @@
                 : false);
         },
 
-        getAction: function (event, interaction, element) {
-            var action = this.defaultActionChecker(event, interaction, element);
+        getAction: function (pointer, interaction, element) {
+            var action = this.defaultActionChecker(pointer, interaction, element);
 
             if (this.options.actionChecker) {
-                action = this.options.actionChecker(event, action, this, element, interaction);
+                action = this.options.actionChecker(pointer, action, this, element, interaction);
             }
 
             return action;
@@ -5007,14 +4936,13 @@
             matchElements         : interaction.matchElements,
 
             prevCoords            : interaction.prevCoords,
-            downCoords            : interaction.startCoords,
+            startCoords           : interaction.startCoords,
 
             pointerIds            : interaction.pointerIds,
             pointerMoves          : interaction.pointerMoves,
             addPointer            : listeners.addPointer,
             removePointer         : listeners.removePointer,
-            recordPointers        : listeners.recordPointers,
-            recordTouches         : listeners.recordTouches,
+            recordPointer        : listeners.recordPointer,
 
             snap                  : interaction.snapStatus,
             restrict              : interaction.restrictStatus,
@@ -5022,6 +4950,7 @@
 
             downTime              : interaction.downTime,
             downEvent             : interaction.downEvent,
+            downPointer           : interaction.downPointer,
             prevEvent             : interaction.prevEvent,
 
             Interactable          : Interactable,
@@ -5445,7 +5374,7 @@
 
         events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
 
-        events.add(docTarget, pEventTypes.move  , listeners.recordPointers);
+        events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
 
         events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
         events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
@@ -5454,15 +5383,15 @@
         events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
 
         // remove pointers after ending actions in pointerUp
-        events.add(docTarget, pEventTypes.up    , listeners.recordPointers);
-        events.add(docTarget, pEventTypes.cancel, listeners.recordPointers);
+        events.add(docTarget, pEventTypes.up    , listeners.removePointer);
+        events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
     }
     else {
         events.add(docTarget, 'mouseup' , listeners.collectTaps);
         events.add(docTarget, 'touchend', listeners.collectTaps);
 
-        events.add(docTarget, 'mousemove'  , listeners.recordPointers);
-        events.add(docTarget, 'touchmove'  , listeners.recordTouches );
+        events.add(docTarget, 'mousemove'  , listeners.recordPointer);
+        events.add(docTarget, 'touchmove'  , listeners.recordPointer);
 
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
@@ -5476,8 +5405,8 @@
         events.add(docTarget, 'touchcancel', listeners.pointerUp   );
 
         // remove touches after ending actions in pointerUp
-        events.add(docTarget, 'touchend'   , listeners.recordTouches);
-        events.add(docTarget, 'touchcancel', listeners.recordTouches );
+        events.add(docTarget, 'touchend'   , listeners.removePointer);
+        events.add(docTarget, 'touchcancel', listeners.removePointer);
     }
 
     events.add(windowTarget, 'blur', endAllInteractions);
