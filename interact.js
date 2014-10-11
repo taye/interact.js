@@ -1538,8 +1538,6 @@
                         // claim this element
                         claimedElements.push(this.element);
 
-                        this.prevEvent = this.downEvent;
-
                         var rect = target.getRect(this.element),
                             snap = target.options.snap,
                             restrict = target.options.restrict;
@@ -1585,7 +1583,24 @@
                     if (shouldMove) {
                         var action = /resize/.test(this.prepared)? 'resize': this.prepared;
                         if (starting) {
-                            this.prevEvent = this[action + 'Start'](this.downEvent);
+                            var dragStartEvent = this[action + 'Start'](this.downEvent);
+
+                            this.prevEvent = dragStartEvent;
+
+                            // reset active dropzones
+                            this.activeDrops.dropzones = [];
+                            this.activeDrops.elements  = [];
+                            this.activeDrops.rects     = [];
+
+                            if (!this.dynamicDrop) {
+                                this.setActiveDrops(this.element);
+                            }
+
+                            var dropEvents = this.getDropEvents(event, dragStartEvent);
+
+                            if (dropEvents.activate) {
+                                this.fireActiveDrops(dropEvents.activate);
+                            }
 
                             // set snapping and restriction for the move event
                             if (shouldSnap    ) { this.setSnapping   (event); }
@@ -1612,23 +1627,7 @@
             var dragEvent = new InteractEvent(this, event, 'drag', 'start');
 
             this.dragging = true;
-
             this.target.fire(dragEvent);
-
-            // reset active dropzones
-            this.activeDrops.dropzones = [];
-            this.activeDrops.elements  = [];
-            this.activeDrops.rects     = [];
-
-            if (!this.dynamicDrop) {
-                this.setActiveDrops(this.element);
-            }
-
-            var dropEvents = this.getDropEvents(event, dragEvent);
-
-            if (dropEvents.activate) {
-                this.fireActiveDrops(dropEvents.activate);
-            }
 
             return dragEvent;
         },
@@ -2911,6 +2910,10 @@
                 this.dx = page.x - interaction.startCoords.page.x;
                 this.dy = page.y - interaction.startCoords.page.y;
             }
+        }
+        else if (starting) {
+            this.dx = 0;
+            this.dy = 0;
         }
         // copy properties from previousmove if starting inertia
         else if (phase === 'inertiastart') {
