@@ -553,6 +553,8 @@
 
         if (pointer instanceof InteractEvent) {
             if (/inertiastart/.test(pointer.type)) {
+                interaction = interaction || pointer.interaction;
+
                 extend(page, interaction.inertiaStatus.upCoords.page);
 
                 page.x += interaction.inertiaStatus.sx;
@@ -1007,8 +1009,16 @@
             i  : null
         };
 
-        this.boundInertiaFrame = this.inertiaFrame.bind(this);
-        this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
+        if (isFunction(Function.prototype.bind)) {
+            this.boundInertiaFrame = this.inertiaFrame.bind(this);
+            this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
+        }
+        else {
+            var that = this;
+
+            this.boundInertiaFrame = function () { return that.inertiaFrame(); };
+            this.boundSmoothEndFrame = function () { return that.smoothEndFrame(); };
+        }
 
         this.activeDrops = {
             dropzones: [],      // the dropzones that are mentioned below
@@ -2084,7 +2094,7 @@
                 }
 
                 // unclaim owned element if this had been interacting
-                claimedElements.splice(claimedElements.indexOf(this.element), 1);
+                claimedElements.splice(indexOf(claimedElements, this.element), 1);
 
                 this.clearTargets();
             }
