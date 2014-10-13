@@ -748,8 +748,6 @@
                 ? interactable.options.origin
                 : defaultOptions.origin;
 
-        element = element || interactable._element;
-
         if (origin === 'parent') {
             origin = element.parentNode;
         }
