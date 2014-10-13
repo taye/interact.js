@@ -1600,7 +1600,7 @@
         },
 
         dragStart: function (event) {
-            var dragEvent = new InteractEvent(this, event, 'drag', 'start');
+            var dragEvent = new InteractEvent(this, event, 'drag', 'start', this.element);
 
             this.dragging = true;
             this.target.fire(dragEvent);
@@ -1610,7 +1610,7 @@
 
         dragMove: function (event) {
             var target = this.target,
-                dragEvent  = new InteractEvent(this, event, 'drag', 'move'),
+                dragEvent  = new InteractEvent(this, event, 'drag', 'move', this.element),
                 draggableElement = this.element,
                 drop = this.getDrop(dragEvent, draggableElement);
 
@@ -1632,7 +1632,7 @@
         },
 
         resizeStart: function (event) {
-            var resizeEvent = new InteractEvent(this, event, 'resize', 'start');
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'start', this.element);
 
             this.target.fire(resizeEvent);
 
@@ -1642,7 +1642,7 @@
         },
 
         resizeMove: function (event) {
-            var resizeEvent = new InteractEvent(this, event, 'resize', 'move');
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'move', this.element);
 
             this.target.fire(resizeEvent);
 
@@ -1650,7 +1650,7 @@
         },
 
         gestureStart: function (event) {
-            var gestureEvent = new InteractEvent(this, event, 'gesture', 'start');
+            var gestureEvent = new InteractEvent(this, event, 'gesture', 'start', this.element);
 
             gestureEvent.ds = 0;
 
@@ -1672,7 +1672,7 @@
 
             var gestureEvent;
 
-            gestureEvent = new InteractEvent(this, event, 'gesture', 'move');
+            gestureEvent = new InteractEvent(this, event, 'gesture', 'move', this.element);
             gestureEvent.ds = gestureEvent.scale - this.gesture.scale;
 
             this.target.fire(gestureEvent);
@@ -1757,7 +1757,7 @@
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
-                        new InteractEvent(this, event, this.prepared, 'inertiastart');
+                        new InteractEvent(this, event, this.prepared, 'inertiastart', this.element);
 
                     inertiaStatus.t0 = now;
 
@@ -1834,7 +1834,7 @@
             }
 
             if (this.dragging) {
-                endEvent = new InteractEvent(this, event, 'drag', 'end');
+                endEvent = new InteractEvent(this, event, 'drag', 'end', this.element);
 
                 var dropEvent,
                     draggableElement = this.element,
@@ -1873,11 +1873,11 @@
                 }
             }
             else if (this.resizing) {
-                endEvent = new InteractEvent(this, event, 'resize', 'end');
+                endEvent = new InteractEvent(this, event, 'resize', 'end', this.element);
                 target.fire(endEvent);
             }
             else if (this.gesturing) {
-                endEvent = new InteractEvent(this, event, 'gesture', 'end');
+                endEvent = new InteractEvent(this, event, 'gesture', 'end', this.element);
                 target.fire(endEvent);
             }
 
@@ -2023,11 +2023,11 @@
                 dragEvent.dropzone = this.dropTarget;
             }
             if (dragEvent.type === 'dragstart') {
-                dropActivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'activate', null, dragEvent.target);
+                dropActivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'activate', this.element, dragEvent.target);
                 dropActivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragend') {
-                dropDectivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
+                dropDectivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', this.element, dragEvent.target);
                 dropDectivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragmove' && this.dropTarget) {
