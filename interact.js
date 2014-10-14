@@ -2197,6 +2197,9 @@
                 if (claimedPointerIndex !== -1) {
                     return;
                 }
+                else {
+                    claimedPointers.push(id);
+                }
 
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
@@ -2221,7 +2224,12 @@
             if (index === -1) { return; }
 
             this.pointerIds.splice(index, 1);
-            claimedPointers.splice(indexOf(claimedPointers, id));
+
+            var claimedPointerIndex = indexOf(claimedPointers, id);
+
+            if (claimedPointerIndex !== -1) {
+                claimedPointers.splice();
+            }
 
             // move events are kept so that multi-touch properties can still be
             // calculated at the end of a GestureEvnt sequence
