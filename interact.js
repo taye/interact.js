@@ -1548,12 +1548,18 @@
                     }
                 }
 
+                var starting = !!this.prepared && !(this.dragging || this.resizing || this.gesturing);
+
+                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared)) {
+                    this.stop();
+                    return;
+                }
+
                 if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
-                        starting = !(this.dragging || this.resizing || this.gesturing),
                         snapPointer = starting? this.downPointer: pointer;
 
                     if (starting) {
