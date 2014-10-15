@@ -2651,18 +2651,51 @@
             mouseEvent = /mouse/.test(pointer.pointerType || eventType),
             interaction;
 
-        // if it's a mouse interaction
-        if (!(supportsTouch || supportsPointerEvent)
-            || mouseEvent) {
-
-            // find the interaction specifically for mouse
+        // try to resume inertia with a new pointer
+        if ((mouseEvent || !contains(claimedPointers, id)) && /down|start/i.test(eventType)) {
             for (i = 0; i < len; i++) {
-                if (interactions[i].mouse) {
+                interaction = interactions[i];
+
+                var element = eventTarget;
+
+                if (interaction.inertiaStatus.active && (interaction.mouse === mouseEvent)) {
+                    while (element) {
+                        // if the element is the interaction element
+                        if (element === interaction.element) {
+                            // update the interaction's pointer
+                            interaction.removePointer(interaction.pointerMoves[0]);
+                            interaction.addPointer(pointer);
+
+                            return interaction;
+                        }
+                        element = element.parentNode;
+                    }
+                }
+            }
+        }
+
+        // if it's a mouse interaction
+        if (mouseEvent || !(supportsTouch || supportsPointerEvent)) {
+
+            // find a mouse interaction that's not in inertia phase
+            for (i = 0; i < len; i++) {
+                if (!interactions[i].inertiaStatus.active) {
                     return interactions[i];
                 }
             }
 
-            // or create a new interaction for mouse
+            // find any interaction specifically for mouse.
+            // if the eventType is a mousedown, and inertia is active
+            // ignore the interaction
+            for (i = 0; i < len; i++) {
+                interaction = interactions[i];
+
+                if (interaction.mouse && !(/down/.test(eventType) && interaction.inertiaStatus.active)) {
+                    return interaction;
+                }
+            }
+
+            // create a new interaction for mouse
             interaction = new Interaction();
             interaction.mouse = true;
 
@@ -2684,27 +2717,6 @@
         for (i = 0; i < len; i++) {
             if (contains(interactions[i].pointerIds, id)) {
                 return interactions[i];
-            }
-        }
-
-        // try to resume inertia with a new pointer
-        if (/down|start/i.test(eventType)) {
-            for (i = 0; i < len; i++) {
-                interaction = interactions[i];
-
-                if (interaction.inertiaStatus.active && !interaction.mouse) {
-                    while (eventTarget) {
-                        // if the element is the interaction element
-                        if (eventTarget === interaction.element) {
-                            // update the interaction's pointer
-                            interaction.removePointer(interaction.pointerMoves[0]);
-                            interaction.addPointer(pointer);
-
-                            return interaction;
-                        }
-                        eventTarget = eventTarget.parentNode;
-                    }
-                }
             }
         }
 
