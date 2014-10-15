@@ -27,7 +27,6 @@
         interactions    = [],
 
         claimedPointers = [],
-        claimedElements = [],
 
         dynamicDrop     = false,
 
@@ -1126,9 +1125,6 @@
                 curMatchElements = [],
                 prevTargetElement = this.element;
 
-            // do nothing if the element is already in an interaction
-            if (contains(claimedElements, eventTarget)) { return; }
-
             this.addPointer(pointer);
 
             if (this.target
@@ -1496,24 +1492,15 @@
                     }
                 }
 
-                var starting = !!this.prepared && !(this.dragging || this.resizing || this.gesturing);
-
-                if (starting && contains(claimedElements, this.element)) {
-                    this.stop();
-                    return;
-                }
-
                 if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
+                        starting = !(this.dragging || this.resizing || this.gesturing),
                         snapPointer = starting? this.downPointer: pointer;
 
                     if (starting) {
-                        // claim this element
-                        claimedElements.push(this.element);
-
                         var rect = target.getRect(this.element),
                             snap = target.options.snap,
                             restrict = target.options.restrict;
@@ -2098,9 +2085,6 @@
                         }
                     }
                 }
-
-                // unclaim owned element if this had been interacting
-                claimedElements.splice(indexOf(claimedElements, this.element), 1);
 
                 this.clearTargets();
             }
@@ -4962,7 +4946,6 @@
 
         return {
             claimedPointers       : claimedPointers,
-            claimedElements       : claimedElements,
 
             interactions          : interactions,
             target                : interaction.target,
