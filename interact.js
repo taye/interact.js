@@ -50,6 +50,12 @@
             resizeAxis  : 'xy',
             gesturable  : false,
 
+            // no more than this number of Interactions can target the Interactable
+            maxInteractions: 1,
+            // no more than this number of Interactions can target the same
+            // element of this Interactable simultaneously
+            maxIPerElement : 1,
+
             pointerMoveTolerance: 1,
 
             actionChecker: null,
@@ -868,6 +874,35 @@
         return options.restrictEnabled && options.restrict[action];
     }
 
+    function withinInteractionLimit (interactable, element) {
+        var options = interactable.options,
+            interactionCount = 0,
+            iOnElementCount = 0;
+
+        for (var i = 0, len = interactions.length; i < len; i++) {
+            var interaction = interactions[i];
+
+            if (interaction.target === interactable
+               && (interaction.dragging || interaction.resizing || interaction.gesturing)) {
+                interactionCount++;
+
+                if (interactionCount >= options.maxInteractions) {
+                    return false;
+                }
+
+                if (interaction.element === element) {
+                    iOnElementCount++;
+
+                    if (iOnElementCount >= options.maxIPerElement) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
     // Test for the element that's "above" all other qualifiers
     function indexOfDeepestElement (elements) {
         var dropzone,
@@ -1128,7 +1163,9 @@
             this.addPointer(pointer);
 
             if (this.target
-                && (testIgnore(this.target, this.element, eventTarget) || !testAllow(this.target, this.element, eventTarget))) {
+                && (testIgnore(this.target, this.element, eventTarget)
+                    || !testAllow(this.target, this.element, eventTarget)
+                    || !withinInteractionLimit(this.target, this.element))) {
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
@@ -1141,6 +1178,7 @@
                 elementAction = (elementInteractable
                                  && !testIgnore(elementInteractable, eventTarget, eventTarget)
                                  && testAllow(elementInteractable, eventTarget, eventTarget)
+                                 && withinInteractionLimit(interactable, eventTarget)
                                  && validateAction(
                                      elementInteractable.getAction(pointer, this, eventTarget),
                                      elementInteractable));
@@ -1150,7 +1188,8 @@
                     && inContext(interactable, eventTarget)
                     && !testIgnore(interactable, eventTarget, eventTarget)
                     && testAllow(interactable, eventTarget, eventTarget)
-                    && matchesSelector(eventTarget, selector)) {
+                    && matchesSelector(eventTarget, selector)
+                    && withinInteractionLimit(interactable, eventTarget)) {
 
                     curMatches.push(interactable);
                     curMatchElements.push(eventTarget);
@@ -1274,7 +1313,8 @@
                 if (inContext(interactable, element)
                     && !testIgnore(interactable, element, eventTarget)
                     && testAllow(interactable, element, eventTarget)
-                    && matchesSelector(element, selector, elements)) {
+                    && matchesSelector(element, selector, elements)
+                    && withinInteractionLimit(interactable, element)) {
 
                     that.matches.push(interactable);
                     that.matchElements.push(element);
@@ -1334,7 +1374,8 @@
                 var interactable = interactables.get(curEventTarget);
 
                 if (!testIgnore(interactable, curEventTarget, eventTarget)
-                    && testAllow(interactable, curEventTarget, eventTarget)) {
+                    && testAllow(interactable, curEventTarget, eventTarget)
+                    && withinInteractionLimit(interactable, curEventTarget)) {
                     this.target = interactable;
                     this.element = curEventTarget;
                 }
@@ -1467,7 +1508,8 @@
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
                                         && interactable.getAction(this.downPointer, this, element) === 'drag'
-                                        && checkAxis(axis, interactable)) {
+                                        && checkAxis(axis, interactable)
+                                        && withinInteractionLimit(interactable, element)) {
 
                                         return interactable;
                                     }
@@ -4288,6 +4330,24 @@
             return this.options.ignoreFrom;
         },
 
+        maxInteractions: function (newValue) {
+            if (isNumber(newValue)) {
+                this.options.maxInteractions = newValue;
+                return this;
+            }
+
+            return this.options.maxInteractions;
+        },
+
+        maxIPerElement: function (newValue) {
+            if (isNumber(newValue)) {
+                this.options.maxIPerElement = newValue;
+                return this;
+            }
+
+            return this.options.maxIPerElement;
+        },
+
         /*\
          * Interactable.allowFrom
          [ method ]
@@ -4686,8 +4746,8 @@
 
             var settings = [
                     'accept', 'actionChecker', 'allowFrom', 'autoScroll', 'deltaSource',
-                    'dropChecker', 'ignoreFrom', 'inertia', 'origin', 'preventDefault',
-                    'rectChecker', 'restrict', 'snap', 'styleCursor'
+                    'dropChecker', 'ignoreFrom', 'inertia', 'maxInteractions', 'maxIPerElement',
+                    'origin', 'preventDefault', 'rectChecker', 'restrict', 'snap', 'styleCursor'
                 ];
 
             for (var i = 0, len = settings.length; i < len; i++) {
