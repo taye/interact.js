@@ -2193,12 +2193,14 @@
             if (index === -1) {
                 var claimedPointerIndex = indexOf(claimedPointers, id);
 
-                // don't add if the pointer is owned by another interaction
-                if (claimedPointerIndex !== -1) {
-                    return;
-                }
-                else {
-                    claimedPointers.push(id);
+                if (!this.mouse) {
+                    // don't add if the pointer is owned by another interaction
+                    if (claimedPointerIndex !== -1) {
+                        return;
+                    }
+                    else {
+                        claimedPointers.push(id);
+                    }
                 }
 
                 index = this.pointerIds.length;
@@ -2209,7 +2211,7 @@
                 this.pointerMoves[index] = pointer;
             }
             else {
-                if (!contains(claimedPointers, id)) {
+                if (!contains(claimedPointers, id) && !this.mouse) {
                     claimedPointers.push(id);
                 }
 
