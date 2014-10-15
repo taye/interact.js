@@ -1754,6 +1754,14 @@
                 }
 
                 if (inertia || smoothEnd) {
+                    var claimedPointerIndex = indexOf(claimedPointers, getPointerId(this.pointerMoves[0]));
+
+                    // unclaim the pointer so that it may be used for another interaction
+                    // (Webkit reuses Touch IDs)
+                    if (claimedPointerIndex !== -1) {
+                        claimedPointers.splice(claimedPointerIndex, 1);
+                    }
+
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
