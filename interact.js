@@ -598,7 +598,9 @@
                 removeFromElement: remove,
                 useAttachEvent: useAttachEvent,
 
-                indexOf: indexOf
+                _elements: elements,
+                _targets: targets,
+                _attachedListeners: attachedListeners
             };
         }());
 
