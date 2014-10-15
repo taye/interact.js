@@ -2122,8 +2122,8 @@
             // pointerMoves should be retained
             //this.pointerMoves.splice(0);
 
-            // delete interaction if it's not the only one and is not a mouse interaction
-            if (interactions.length > 1 && !this.mouse) {
+            // delete interaction if it's not the only one
+            if (interactions.length > 1) {
                 interactions.splice(indexOf(interactions, this), 1);
             }
         },
