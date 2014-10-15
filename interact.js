@@ -5394,7 +5394,7 @@
 
     function endAllInteractions (event) {
         for (var i = 0; i < interactions.length; i++) {
-            interactions[i].pointerUp(event);
+            interactions[i].pointerUp(event, event);
         }
     }
 
