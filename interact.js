@@ -225,6 +225,9 @@
         // Less Precision with touch input
         margin = supportsTouch || supportsPointerEvent? 20: 10,
 
+        // Allow this many interactions to happen simultaneously
+        maxInteractions = 1,
+
         actionCursors = {
             drag    : 'move',
             resizex : 'e-resize',
@@ -885,24 +888,31 @@
         var options = interactable.options,
             maxActions = options[action + 'Max'],
             maxPerElement = options[action + 'MaxPerElement'],
-            interactionCount = 0,
-            iOnElementCount = 0;
+            activeInteractions = 0,
+            targetCount = 0,
+            targetElementCount = 0;
 
         for (var i = 0, len = interactions.length; i < len; i++) {
-            var interaction = interactions[i];
+            var interaction = interactions[i],
+                active = interaction.dragging || interaction.resizing || interaction.gesturing;
 
-            if (interaction.target === interactable
-               && (interaction.dragging || interaction.resizing || interaction.gesturing)) {
-                interactionCount++;
+            activeInteractions += active|0;
 
-                if (interactionCount >= maxActions) {
+            if (activeInteractions >= maxInteractions) {
+                return false;
+            }
+
+            if (interaction.target === interactable && active) {
+                targetCount++;
+
+                if (targetCount >= maxActions) {
                     return false;
                 }
 
                 if (interaction.element === element) {
-                    iOnElementCount++;
+                    targetElementCount++;
 
-                    if (iOnElementCount >= maxPerElement) {
+                    if (targetElementCount >= maxPerElement) {
                         return false;
                     }
                 }
@@ -5456,6 +5466,16 @@
         }
 
         return tryCatchEventListeners;
+    };
+
+    interact.maxInteractions = function (newValue) {
+        if (isNumber(newValue)) {
+            maxInteractions = newValue;
+
+            return this;
+        }
+
+        return maxInteractions;
     };
 
     function endAllInteractions (event) {
