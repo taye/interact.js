@@ -1257,6 +1257,9 @@
 
                 var action;
 
+                // update pointer coords for defaultActionChecker to use
+                this.setEventXY(this.curCoords, pointer);
+
                 if (matches) {
                     action = this.validateSelector(pointer, matches, matchElements);
                 }
