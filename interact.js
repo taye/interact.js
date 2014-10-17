@@ -2774,15 +2774,6 @@
             return interaction;
         }
 
-        // using "inertiastart" InteractEvent
-        if (pointer instanceof InteractEvent && /inertiastart/.test(eventType)) {
-            for (i = 0; i < len; i++) {
-                if (interactions[i].inertiaStatus.startEvent === pointer) {
-                    return interactions[i];
-                }
-            }
-        }
-
         // get interaction that has this pointer
         for (i = 0; i < len; i++) {
             if (contains(interactions[i].pointerIds, id)) {
