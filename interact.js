@@ -2724,7 +2724,7 @@
         var id = getPointerId(pointer);
 
         // try to resume inertia with a new pointer
-        if ((mouseEvent || !contains(claimedPointers, id)) && /down|start/i.test(eventType)) {
+        if (/down|start/i.test(eventType)) {
             for (i = 0; i < len; i++) {
                 interaction = interactions[i];
 
