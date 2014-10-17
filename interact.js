@@ -1231,12 +1231,16 @@
                     this.matchElements = curMatchElements;
 
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
-                    events.addToElement(eventTarget, 'mousemove', listeners.pointerHover);
+                    events.addToElement(eventTarget,
+                                        PointerEvent? pEventTypes.move : 'mousemove',
+                                        listeners.pointerHover);
                 }
                 else if (this.target) {
                     if (nodeContains(prevTargetElement, eventTarget)) {
                         this.pointerHover(pointer, event, this.matches, this.matchElements);
-                        events.addToElement(this.element, 'mousemove', listeners.pointerHover);
+                        events.addToElement(this.element,
+                                            PointerEvent? pEventTypes.move : 'mousemove',
+                                            listeners.pointerHover);
                     }
                     else {
                         this.target = null;
@@ -1286,7 +1290,9 @@
 
             // Remove temporary event listeners for selector Interactables
             if (!interactables.get(eventTarget)) {
-                events.removeFromElement(eventTarget, listeners.pointerHover);
+                events.removeFromElement(eventTarget,
+                                       PointerEvent? pEventTypes.move : 'mousemove',
+                                       listeners.pointerHover);
             }
 
             if (this.target && this.target.options.styleCursor && !(this.dragging || this.resizing || this.gesturing)) {
@@ -2258,7 +2264,7 @@
 
         addPointer: function (pointer) {
             var id = getPointerId(pointer),
-                index = indexOf(this.pointerIds, id);
+                index = this.mouse? 0 : indexOf(this.pointerIds, id);
 
             if (index === -1) {
                 var claimedPointerIndex = indexOf(claimedPointers, id);
@@ -2291,7 +2297,7 @@
 
         removePointer: function (pointer) {
             var id = getPointerId(pointer),
-                index = indexOf(this.pointerIds, id);
+                index = this.mouse? 0 : indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
 
@@ -2313,7 +2319,7 @@
             // The inertiastart event should be this.pointerMoves[0]
             if (this.inertiaStatus.active) { return; }
 
-            var index = indexOf(this.pointerIds, getPointerId(pointer));
+            var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
 
             if (index === -1) { return; }
 
@@ -2710,8 +2716,12 @@
 
     function getInteractionFromPointer (pointer, eventType, eventTarget) {
         var i = 0, len = interactions.length,
-            mouseEvent = /mouse/.test(pointer.pointerType || eventType),
+            mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
+                          // MSPointerEvent.MSPOINTER_TYPE_MOUSE
+                          || pointer.pointerType === 4),
             interaction;
+
+        var id = getPointerId(pointer);
 
         // try to resume inertia with a new pointer
         if ((mouseEvent || !contains(claimedPointers, id)) && /down|start/i.test(eventType)) {
@@ -2772,8 +2782,6 @@
                 }
             }
         }
-
-        var id = getPointerId(pointer);
 
         // get interaction that has this pointer
         for (i = 0; i < len; i++) {
@@ -5493,8 +5501,8 @@
     if (PointerEvent) {
         if (PointerEvent === window.MSPointerEvent) {
             pEventTypes = {
-                up: 'MSPointerUp', down: 'MSPointerDown', over: 'MSPointerOver',
-                out: 'MSPointerOut', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+                up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+                out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
         }
         else {
             pEventTypes = {
