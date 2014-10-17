@@ -1344,6 +1344,9 @@
                 }
             }
 
+            // update pointer coords for defaultActionChecker to use
+            this.setEventXY(this.curCoords, pointer);
+
             if (this.matches.length && this.mouse) {
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
             }
