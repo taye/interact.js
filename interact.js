@@ -2754,7 +2754,7 @@
 
             // find a mouse interaction that's not in inertia phase
             for (i = 0; i < len; i++) {
-                if (!interactions[i].inertiaStatus.active) {
+                if (interactions[i].mouse && !interactions[i].inertiaStatus.active) {
                     return interactions[i];
                 }
             }
@@ -2763,9 +2763,7 @@
             // if the eventType is a mousedown, and inertia is active
             // ignore the interaction
             for (i = 0; i < len; i++) {
-                interaction = interactions[i];
-
-                if (interaction.mouse && !(/down/.test(eventType) && interaction.inertiaStatus.active)) {
+                if (interactions[i].mouse && !(/down/.test(eventType) && interactions[i].inertiaStatus.active)) {
                     return interaction;
                 }
             }
@@ -2810,10 +2808,11 @@
         return (function (event) {
             var interaction,
                 eventTarget = getActualElement(event.target),
-                curEventTarget = getActualElement(event.currentTarget);
+                curEventTarget = getActualElement(event.currentTarget),
+                i;
 
             if (supportsTouch && /touch/.test(event.type)) {
-                for (var i = 0; i < event.changedTouches.length; i++) {
+                for (i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
 
                     interaction = getInteractionFromPointer(pointer, event.type, eventTarget);
@@ -2824,6 +2823,15 @@
                 }
             }
             else {
+                // ignore mouse events while touch interactions are active
+                if (!supportsPointerEvent && /mouse/.test(event.type)) {
+                    for (i = 0; i < interactions.length; i++) {
+                        if (!interactions[i].mouse && interactions[i].pointerIsDown) {
+                            return;
+                        }
+                    }
+                }
+
                 interaction = getInteractionFromPointer(event, event.type, eventTarget);
 
                 if (!interaction) { return; }
