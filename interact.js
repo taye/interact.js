@@ -26,8 +26,6 @@
         dropzones       = [],   // all dropzone element interactables
         interactions    = [],
 
-        claimedPointers = [],
-
         dynamicDrop     = false,
 
         // {
@@ -1831,14 +1829,6 @@
                 }
 
                 if (inertia || smoothEnd) {
-                    var claimedPointerIndex = indexOf(claimedPointers, getPointerId(this.pointerMoves[0]));
-
-                    // unclaim the pointer so that it may be used for another interaction
-                    // (Webkit reuses Touch IDs)
-                    if (claimedPointerIndex !== -1) {
-                        claimedPointers.splice(claimedPointerIndex, 1);
-                    }
-
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
@@ -2183,15 +2173,6 @@
             this.prepared = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
-            // unclaim owned pointers
-            for (var j = 0; j < this.pointerIds.length; j++) {
-                var claimedPointerIndex = indexOf(claimedPointers, this.pointerIds[j]);
-
-                if (claimedPointerIndex !== -1) {
-                    claimedPointers.splice(claimedPointerIndex, 1);
-                }
-            }
-
             this.pointerIds.splice(0);
             // pointerMoves should be retained
             //this.pointerMoves.splice(0);
@@ -2273,18 +2254,6 @@
                 index = this.mouse? 0 : indexOf(this.pointerIds, id);
 
             if (index === -1) {
-                var claimedPointerIndex = indexOf(claimedPointers, id);
-
-                if (!this.mouse) {
-                    // don't add if the pointer is owned by another interaction
-                    if (claimedPointerIndex !== -1) {
-                        return;
-                    }
-                    else {
-                        claimedPointers.push(id);
-                    }
-                }
-
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
 
@@ -2293,10 +2262,6 @@
                 this.pointerMoves[index] = pointer;
             }
             else {
-                if (!contains(claimedPointers, id) && !this.mouse) {
-                    claimedPointers.push(id);
-                }
-
                 this.pointerMoves[index] = pointer;
             }
         },
@@ -2308,12 +2273,6 @@
             if (index === -1) { return; }
 
             this.pointerIds.splice(index, 1);
-
-            var claimedPointerIndex = indexOf(claimedPointers, id);
-
-            if (claimedPointerIndex !== -1) {
-                claimedPointers.splice(claimedPointerIndex, 1);
-            }
 
             // move events are kept so that multi-touch properties can still be
             // calculated at the end of a GestureEvnt sequence
@@ -5047,8 +5006,6 @@
         var interaction = interactions[0] || new Interaction();
 
         return {
-            claimedPointers       : claimedPointers,
-
             interactions          : interactions,
             target                : interaction.target,
             dragging              : interaction.dragging,
