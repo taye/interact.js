@@ -1394,7 +1394,7 @@
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Liseners
         pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
-            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved) {
+            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared) {
                 this.checkAndPreventDefault(event, this.target, this.element);
 
                 return;
