@@ -216,15 +216,10 @@
             new DemoNode('node' + i);
         }
 
-        interact('div.demo-node')
-            .draggable(true)
-            .resizable(true)
-            .gesturable(true)
-            .dropzone(true);
-
-        interact('.demo-node ellipse')
-            .draggable(true)
-            .resizable(true)
+        interact('div.demo-node, .demo-node ellipse')
+            .draggable({ max: 2 })
+            .gesturable({ max: 1 })
+            .resizable({ max: 2 })
             .dropzone(true);
     }
 
@@ -237,6 +232,8 @@
 
         return -1;
     }
+
+    interact.maxInteractions(Infinity);
 
     interact(window).on('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
 
