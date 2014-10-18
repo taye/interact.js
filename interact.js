@@ -2306,7 +2306,7 @@
             var claimedPointerIndex = indexOf(claimedPointers, id);
 
             if (claimedPointerIndex !== -1) {
-                claimedPointers.splice();
+                claimedPointers.splice(claimedPointerIndex, 1);
             }
 
             // move events are kept so that multi-touch properties can still be
