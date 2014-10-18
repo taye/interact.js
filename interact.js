@@ -2777,8 +2777,7 @@
 
             if (inertiaStatus.active) { return; }
 
-            var deltaSource = options.deltaSource,
-                pointerSpeed = pointerDelta[deltaSource + 'Speed'],
+            var pointerSpeed = pointerDelta.clientSpeed,
                 now = new Date().getTime(),
                 inertiaPossible = false,
                 inertia = false,
@@ -2845,8 +2844,8 @@
                 inertiaStatus.t0 = now;
 
                 if (inertia) {
-                    inertiaStatus.vx0 = pointerDelta[deltaSource + 'VX'];
-                    inertiaStatus.vy0 = pointerDelta[deltaSource + 'VY'];
+                    inertiaStatus.vx0 = pointerDelta.clientVX;
+                    inertiaStatus.vy0 = pointerDelta.clientVY;
                     inertiaStatus.v0 = pointerSpeed;
 
                     calcInertia(inertiaStatus);
