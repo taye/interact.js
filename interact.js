@@ -2947,14 +2947,14 @@
 
             var dropEvents = getDropEvents(event, endEvent);
 
-            target.fire(endEvent);
-
             if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
             if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
             if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
             if (dropEvents.deactivate) {
                 fireActiveDrops(dropEvents.deactivate);
             }
+
+            target.fire(endEvent);
         }
         else if (resizing) {
             endEvent = new InteractEvent(event, 'resize', 'end');
