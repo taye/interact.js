@@ -2793,7 +2793,7 @@
         for (i = 0; i < len; i++) {
             interaction = interactions[i];
 
-            if ((!interaction.prepared || (interaction.target.gestureable()))
+            if ((!interaction.prepared || (interaction.target.gesturable()))
                 && !(interaction.dragging || interaction.resizing || interaction.gesturing)
                 && !(!mouseEvent && interaction.mouse)) {
 
