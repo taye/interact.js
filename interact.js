@@ -1397,7 +1397,7 @@
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Liseners
         pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
-            if (!forceAction && !this.inertiaStatus.active && this.pointerIsDown) {
+            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved) {
                 this.checkAndPreventDefault(event, this.target, this.element);
 
                 return;
@@ -1419,7 +1419,7 @@
                 if (interactable
                     && !testIgnore(interactable, curEventTarget, eventTarget)
                     && testAllow(interactable, curEventTarget, eventTarget)
-                    && (action = validateAction(forceAction || target.getAction(pointer, this), target, this.element))
+                    && (action = validateAction(forceAction || interactable.getAction(pointer, this), interactable, eventTarget))
                     && withinInteractionLimit(interactable, curEventTarget, action)) {
                     this.target = interactable;
                     this.element = curEventTarget;
@@ -2799,7 +2799,7 @@
         for (i = 0; i < len; i++) {
             interaction = interactions[i];
 
-            if ((!interaction.pointerIsDown || (interaction.target && interaction.target.gestureable()))
+            if ((!interaction.prepared || (interaction.target.gestureable()))
                 && !(interaction.dragging || interaction.resizing || interaction.gesturing)
                 && !(!mouseEvent && interaction.mouse)) {
 
