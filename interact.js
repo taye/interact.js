@@ -897,27 +897,30 @@
 
         for (var i = 0, len = interactions.length; i < len; i++) {
             var interaction = interactions[i],
+                otherAction = /resize/.test(interaction.prepared)? 'resize': interaction.prepared,
                 active = interaction.dragging || interaction.resizing || interaction.gesturing;
 
-            activeInteractions += active|0;
+            if (!active) { continue; }
+
+            activeInteractions++;
 
             if (activeInteractions >= maxInteractions) {
                 return false;
             }
 
-            if (interaction.target === interactable && active) {
-                targetCount++;
+            if (interaction.target !== interactable) { continue; }
 
-                if (targetCount >= maxActions) {
+            targetCount++;
+
+            if (targetCount >= maxActions) {
+                return false;
+            }
+
+            if (interaction.element === element) {
+                targetElementCount++;
+
+                if (otherAction !== action || targetElementCount >= maxPerElement) {
                     return false;
-                }
-
-                if (interaction.element === element) {
-                    targetElementCount++;
-
-                    if (targetElementCount >= maxPerElement) {
-                        return false;
-                    }
                 }
             }
         }
