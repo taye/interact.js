@@ -1588,7 +1588,7 @@
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
 
-                        snapPointer = starting? this.downPointer: pointer;
+                        coords = starting? this.startCoords.page : this.curCoords.page;
 
                     if (starting) {
                         var rect = target.getRect(this.element),
@@ -1626,8 +1626,8 @@
                         }
                     }
 
-                    if (shouldSnap    ) { this.setSnapping   (snapPointer); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { this.setRestriction(snapPointer); } else { this.restrictStatus.restricted = false; }
+                    if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
+                    if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
 
                     var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
                                      && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
@@ -1656,8 +1656,8 @@
                             }
 
                             // set snapping and restriction for the move event
-                            if (shouldSnap    ) { this.setSnapping   (pointer); }
-                            if (shouldRestrict) { this.setRestriction(pointer); }
+                            if (shouldSnap    ) { this.setSnapping   (coords); }
+                            if (shouldRestrict) { this.setRestriction(coords); }
                         }
 
                         this.prevEvent = this[action + 'Move'](event);
@@ -1810,7 +1810,7 @@
                     snapRestrict.snap = snapRestrict.restrict = snapRestrict;
 
                     if (endSnap) {
-                        this.setSnapping(event, snapRestrict);
+                        this.setSnapping(this.curCoords.page, snapRestrict);
                         if (snapRestrict.locked) {
                             dx += snapRestrict.dx;
                             dy += snapRestrict.dy;
@@ -1818,7 +1818,7 @@
                     }
 
                     if (endRestrict) {
-                        this.setRestriction(event, snapRestrict);
+                        this.setRestriction(this.curCoords.page, snapRestrict);
                         if (snapRestrict.restricted) {
                             dx += snapRestrict.dx;
                             dy += snapRestrict.dy;
@@ -1876,7 +1876,7 @@
                         dx = dy = 0;
 
                         if (endSnap) {
-                            var snap = this.setSnapping(event, statusObject);
+                            var snap = this.setSnapping(this.curCoords.page, statusObject);
 
                             if (snap.locked) {
                                 dx += snap.dx;
@@ -1885,7 +1885,7 @@
                         }
 
                         if (endRestrict) {
-                            var restrict = this.setRestriction(event, statusObject);
+                            var restrict = this.setRestriction(this.curCoords.page, statusObject);
 
                             if (restrict.restricted) {
                                 dx += restrict.dx;
@@ -2454,7 +2454,7 @@
             }
         },
 
-        setSnapping: function (pointer, status) {
+        setSnapping: function (pageCoords, status) {
             var snap = this.target.options.snap,
                 anchors = snap.anchors,
                 page,
@@ -2475,7 +2475,7 @@
             else {
                 var origin = getOriginXY(this.target, this.element);
 
-                page = extend({}, this.curCoords.page);
+                page = extend({}, pageCoords);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2598,7 +2598,7 @@
             return status;
         },
 
-        setRestriction: function (pointer, status) {
+        setRestriction: function (pageCoords, status) {
             var target = this.target,
                 action = /resize/.test(this.prepared)? 'resize' : this.prepared,
                 restrict = target && target.options.restrict,
@@ -2613,7 +2613,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = extend({}, this.curCoords.page);
+                    : page = extend({}, pageCoords);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2857,12 +2857,13 @@
             options     = target? target.options: defaultOptions,
             origin      = getOriginXY(target, element),
             starting    = phase === 'start',
-            ending      = phase === 'end';
+            ending      = phase === 'end',
+            coords      = starting? interaction.startCoords : interaction.curCoords;
 
         element = element || interaction.element;
 
-        page   = extend({}, interaction.curCoords.page);
-        client = extend({}, interaction.curCoords.client);
+        page   = extend({}, coords.page);
+        client = extend({}, coords.client);
 
         page.x -= origin.x;
         page.y -= origin.y;
