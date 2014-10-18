@@ -872,7 +872,7 @@
             action = 'resize';
         }
 
-        return (options.snapEnabled && contains(options.snap.actions, action));
+        return action !== 'gesture' && options.snapEnabled && contains(options.snap.actions, action);
     }
 
     function checkRestrict (interactable, action) {
