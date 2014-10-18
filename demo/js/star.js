@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
             onend: function (event) {
                 root.setAttribute('class', '');
             },
+            max: Infinity
         })
         .snap({
             mode: 'anchor',
@@ -71,6 +72,8 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .restrict({ drag: document.rootElement })
         .styleCursor(false);
+
+    interact.maxInteractions(Infinity);
 
     document.addEventListener('dragstart', function (event) {
         event.preventDefault();
