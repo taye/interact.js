@@ -515,6 +515,15 @@
     }
 
     function setEventXY (targetObj, pointer, interaction) {
+        if (!pointer) {
+            if (interaction.pointerIds.length > 1) {
+                pointer = touchAverage(interaction.pointerMoves);
+            }
+            else {
+                pointer = interaction.pointerMoves[0];
+            }
+        }
+
         getPageXY(pointer, tmpXY, interaction);
         targetObj.page.x = tmpXY.x;
         targetObj.page.y = tmpXY.y;
@@ -1380,7 +1389,7 @@
                 this.downEvent = event;
                 extend(this.downPointer, pointer);
 
-                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
+                copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
             }
         },
@@ -1423,7 +1432,7 @@
             if (target && !(this.dragging || this.resizing || this.gesturing)) {
                 action = action || validateAction(forceAction || target.getAction(pointer, this), target, this.element);
 
-                this.setEventXY(this.startCoords, this.pointerMoves[0]);
+                this.setEventXY(this.startCoords);
 
                 if (!action) { return; }
 
@@ -1453,7 +1462,7 @@
                 this.downEvent = event;
                 extend(this.downPointer, pointer);
 
-                this.setEventXY(this.prevCoords, this.pointerMoves[0]);
+                this.setEventXY(this.prevCoords);
                 this.pointerWasMoved = false;
 
                 this.checkAndPreventDefault(event, target, this.element);
@@ -1473,7 +1482,7 @@
 
             this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
                                                 ? this.inertiaStatus.startEvent
-                                                : this.pointerMoves[0]);
+                                                : undefined);
 
             var dx, dy;
 
