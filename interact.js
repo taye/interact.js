@@ -902,7 +902,7 @@
 
             if (!active) { continue; }
 
-            activeInteractions++;
+            activeInteractions += (otherAction === action)|0;
 
             if (activeInteractions >= maxInteractions) {
                 return false;
@@ -910,7 +910,7 @@
 
             if (interaction.target !== interactable) { continue; }
 
-            targetCount++;
+            targetCount += (otherAction === action)|0;
 
             if (targetCount >= maxActions) {
                 return false;
