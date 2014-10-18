@@ -2850,22 +2850,16 @@
 
         element = element || interaction.element;
 
-        if (action === 'gesture') {
-            var average = touchAverage(pointerMoves);
+        page   = extend({}, interaction.curCoords.page);
+        client = extend({}, interaction.curCoords.client);
 
-            page   = { x: (average.pageX   - origin.x), y: (average.pageY   - origin.y) };
-            client = { x: (average.clientX - origin.x), y: (average.clientY - origin.y) };
-        }
-        else {
-            page   = extend({}, interaction.curCoords.page);
-            client = extend({}, interaction.curCoords.client);
+        page.x -= origin.x;
+        page.y -= origin.y;
 
-            page.x -= origin.x;
-            page.y -= origin.y;
+        client.x -= origin.x;
+        client.y -= origin.y;
 
-            client.x -= origin.x;
-            client.y -= origin.y;
-
+        if (action !== 'gesture') {
             if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
 
                 this.snap = {
