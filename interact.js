@@ -2871,26 +2871,23 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        if (action !== 'gesture') {
-            if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
+        if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
+            this.snap = {
+                range  : snapStatus.range,
+                locked : snapStatus.locked,
+                x      : snapStatus.snappedX,
+                y      : snapStatus.snappedY,
+                realX  : snapStatus.realX,
+                realY  : snapStatus.realY,
+                dx     : snapStatus.dx,
+                dy     : snapStatus.dy
+            };
 
-                this.snap = {
-                    range  : snapStatus.range,
-                    locked : snapStatus.locked,
-                    x      : snapStatus.snappedX,
-                    y      : snapStatus.snappedY,
-                    realX  : snapStatus.realX,
-                    realY  : snapStatus.realY,
-                    dx     : snapStatus.dx,
-                    dy     : snapStatus.dy
-                };
-
-                if (snapStatus.locked) {
-                    page.x += snapStatus.dx;
-                    page.y += snapStatus.dy;
-                    client.x += snapStatus.dx;
-                    client.y += snapStatus.dy;
-                }
+            if (snapStatus.locked) {
+                page.x += snapStatus.dx;
+                page.y += snapStatus.dy;
+                client.x += snapStatus.dx;
+                client.y += snapStatus.dy;
             }
         }
 
