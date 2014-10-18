@@ -555,17 +555,11 @@
 
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (type, pointer, xy) {
-        var x,
-            y;
-
         xy = xy || {};
         type = type || 'page';
 
-        x = pointer[type + 'X'];
-        y = pointer[type + 'Y'];
-
-        xy.x = x;
-        xy.y = y;
+        xy.x = pointer[type + 'X'];
+        xy.y = pointer[type + 'Y'];
 
         return xy;
     }
