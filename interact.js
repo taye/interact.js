@@ -2790,13 +2790,11 @@
         for (i = 0; i < len; i++) {
             interaction = interactions[i];
 
-            if (!interaction.pointerIsDown && !(!mouseEvent && interaction.mouse)) {
-                var pointerIndex = interaction.pointerIds.length;
+            if ((!interaction.pointerIsDown || (interaction.target && interaction.target.gestureable()))
+                && !(interaction.dragging || interaction.resizing || interaction.gesturing)
+                && !(!mouseEvent && interaction.mouse)) {
 
-                interaction.pointerIds.push(id);
-
-                interaction.pointerMoves[pointerIndex] = pointer;
-
+                interaction.addPointer(pointer);
 
                 return interaction;
             }
