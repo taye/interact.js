@@ -4,9 +4,11 @@
 
     var transformProp;
 
+    interact.maxInteractions(Infinity);
+
     // setup draggable elements.
     interact('.js-drag')
-        .draggable(true)
+        .draggable({ max: Infinity })
         .on('dragstart', function (event) {
             event.interaction.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
             event.interaction.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
