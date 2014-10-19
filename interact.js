@@ -2777,7 +2777,7 @@
 
             if (inertiaStatus.active) { return; }
 
-            var pointerSpeed = pointerDelta.clientSpeed,
+            var pointerSpeed,
                 now = new Date().getTime(),
                 inertiaPossible = false,
                 inertia = false,
@@ -2787,6 +2787,10 @@
                 dx = 0,
                 dy = 0,
                 startEvent;
+
+            if (dragging && options.dragAxis === 'x' ) { pointerSpeed = Math.abs(pointerDelta.clientVX); }
+            if (dragging && options.dragAxis === 'y' ) { pointerSpeed = Math.abs(pointerDelta.clientVY); }
+            if (dragging && options.dragAxis === 'xy') { pointerSpeed = pointerDelta.clientSpeed; }
 
             // check if inertia should be started
             inertiaPossible = (options.inertiaEnabled
