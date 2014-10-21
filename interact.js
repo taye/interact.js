@@ -2252,6 +2252,17 @@
 
         if (!(event instanceof InteractEvent)) {
             setEventXY(curCoords, event);
+            if (curCoords.pageX === prevCoords.pageX
+                && curCoords.pageY === prevCoords.pageY
+                && curCoords.screenX === prevCoords.screenX
+                && curCoords.screenY === prevCoords.screenY) {
+
+                checkAndPreventDefault(event, target);
+                return;
+            }
+
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(pointerDelta, prevCoords, curCoords);
         }
 
         var dx, dy;
@@ -2423,8 +2434,6 @@
         }
 
         if (!(event instanceof InteractEvent)) {
-            // set pointer coordinate, time changes and speeds
-            setEventDeltas(pointerDelta, prevCoords, curCoords);
             setEventXY(prevCoords, event);
         }
 
