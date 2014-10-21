@@ -1602,7 +1602,7 @@
             // Use natural event coordinates (without snapping/restricions)
             // subtract modifications from previous event if event given is
             // not a native event
-            if (ending || event instanceof InteractEvent) {
+            if (event instanceof InteractEvent) {
                 // change in time in seconds
                 // use event sequence duration for end events
                 // => average speed of the event sequence
