@@ -923,7 +923,7 @@
             }
         }
 
-        return true;
+        return maxInteractions > 0;
     }
 
     // Test for the element that's "above" all other qualifiers
