@@ -1144,12 +1144,10 @@
             }
 
             // query for new elements if necessary
-            if (current.selector) {
-                current._dropElements = current._context.querySelectorAll(current.selector);
-            }
+            var dropElements = current.selector? current._context.querySelectorAll(current.selector) : [current._element];
 
-            for (var j = 0, len = current._dropElements.length; j < len; j++) {
-                var currentElement = current._dropElements[j];
+            for (var j = 0, len = dropElements.length; j < len; j++) {
+                var currentElement = dropElements[j];
 
                 if (currentElement === element) {
                     continue;
@@ -3303,16 +3301,10 @@
                     this.options.dropOverlap = Math.max(Math.min(1, options.overlap), 0);
                 }
 
-                this._dropElements = this.selector? null: [this._element];
-
                 return this;
             }
 
             if (isBool(options)) {
-                if (options) {
-                    this._dropElements = this.selector? null: [this._element];
-                }
-
                 this.options.dropzone = options;
 
                 return this;
@@ -5099,12 +5091,6 @@
 
             if (dragging) {
                 activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
-
-                for (var i = 0; i < interactables.length; i++) {
-                    if (interactables[i].dropzone && interactables[i].selector) {
-                        interactables[i]._dropElements = null;
-                    }
-                }
             }
 
             clearTargets();
