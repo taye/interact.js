@@ -102,7 +102,6 @@
         },
 
         interactables   = [],   // all set interactables
-        dropzones       = [],   // all dropzone element interactables
 
         activeDrops     = {
             dropzones: [],      // the dropzones that are mentioned below
@@ -1131,8 +1130,10 @@
         element = element || target._element;
 
         // collect all dropzones and their elements which qualify for a drop
-        for (i = 0; i < dropzones.length; i++) {
-            var current = dropzones[i];
+        for (i = 0; i < interactables.length; i++) {
+            if (!interactables[i].options.dropzone) { continue; }
+
+            var current = interactables[i];
 
             // test the draggable element against the dropzone's accept setting
             if ((isElement(current.options.accept) && current.options.accept !== element)
@@ -3043,7 +3044,7 @@
         return delegateListener.call(this, event, true);
     }
 
-    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element, context) {
+    interactables.indexOfElement = function indexOfElement (element, context) {
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
@@ -3058,7 +3059,7 @@
         return -1;
     };
 
-    interactables.get = dropzones.get = function interactableGet (element, options) {
+    interactables.get = function interactableGet (element, options) {
         return this[this.indexOfElement(element, options && options.context)];
     };
 
@@ -3303,7 +3304,6 @@
                 }
 
                 this._dropElements = this.selector? null: [this._element];
-                dropzones.push(this);
 
                 return this;
             }
@@ -3311,14 +3311,6 @@
             if (isBool(options)) {
                 if (options) {
                     this._dropElements = this.selector? null: [this._element];
-                    dropzones.push(this);
-                }
-                else {
-                    var index = indexOf(dropzones, this);
-
-                    if (index !== -1) {
-                        dropzones.splice(index, 1);
-                    }
                 }
 
                 this.options.dropzone = options;
@@ -4836,7 +4828,6 @@
             Interactable          : Interactable,
             IOptions              : IOptions,
             interactables         : interactables,
-            dropzones             : dropzones,
             pointerIsDown         : pointerIsDown,
             defaultOptions        : defaultOptions,
             defaultActionChecker  : defaultActionChecker,
@@ -5109,9 +5100,9 @@
             if (dragging) {
                 activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
 
-                for (var i = 0; i < dropzones.length; i++) {
-                    if (dropzones[i].selector) {
-                        dropzones[i]._dropElements = null;
+                for (var i = 0; i < interactables.length; i++) {
+                    if (interactables[i].dropzone && interactables[i].selector) {
+                        interactables[i]._dropElements = null;
                     }
                 }
             }
