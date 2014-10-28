@@ -900,7 +900,7 @@
 
             if (!active) { continue; }
 
-            activeInteractions += (otherAction === action)|0;
+            activeInteractions++;
 
             if (activeInteractions >= maxInteractions) {
                 return false;
