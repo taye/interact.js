@@ -1,5 +1,5 @@
 /**
- * interact.js v1.0.26
+ * interact.js v1.0.27
  *
  * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -23,7 +23,6 @@
         tmpXY = {},     // reduce object creation in getXY()
 
         interactables   = [],   // all set interactables
-        dropzones       = [],   // all dropzone element interactables
         interactions    = [],
 
         dynamicDrop     = false,
@@ -474,7 +473,9 @@
                 removeFromElement: remove,
                 useAttachEvent: useAttachEvent,
 
-                indexOf: indexOf
+                _elements: elements,
+                _targets: targets,
+                _attachedListeners: attachedListeners
             };
         }());
 
@@ -1479,6 +1480,19 @@
                                                 ? this.inertiaStatus.startEvent
                                                 : undefined);
 
+            if (this.pointerWasMoved
+                && this.curCoords.page.x === this.prevCoords.page.x
+                && this.curCoords.page.y === this.prevCoords.page.y
+                && this.curCoords.client.x === this.prevCoords.client.x
+                && this.curCoords.client.y === this.prevCoords.client.y) {
+
+                this.checkAndPreventDefault(event, this.target, this.element);
+                return;
+            }
+
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+
             var dx, dy;
 
             // register movement of more than 1 pixel
@@ -1665,8 +1679,6 @@
                 }
             }
 
-            // set pointer coordinate, time changes and speeds
-            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
             copyCoords(this.prevCoords, this.curCoords);
 
             if (this.dragging || this.resizing) {
@@ -1778,8 +1790,7 @@
 
                 if (inertiaStatus.active) { return; }
 
-                var deltaSource = options.deltaSource,
-                    pointerSpeed = this.pointerDelta[deltaSource].speed,
+                var pointerSpeed,
                     now = new Date().getTime(),
                     inertiaPossible = false,
                     inertia = false,
@@ -1789,6 +1800,12 @@
                     dx = 0,
                     dy = 0,
                     startEvent;
+
+                if (this.dragging) {
+                    if      (options.dragAxis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
+                    else if (options.dragAxis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
+                    else   /*options.dragAxis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
+                }
 
                 // check if inertia should be started
                 inertiaPossible = (options.inertiaEnabled
@@ -1839,8 +1856,8 @@
                     target.fire(inertiaStatus.startEvent);
 
                     if (inertia) {
-                        inertiaStatus.vx0 = this.pointerDelta[deltaSource].vx;
-                        inertiaStatus.vy0 = this.pointerDelta[deltaSource].vy;
+                        inertiaStatus.vx0 = this.pointerDelta.client.vx;
+                        inertiaStatus.vy0 = this.pointerDelta.client.vy;
                         inertiaStatus.v0 = pointerSpeed;
 
                         this.calcInertia(inertiaStatus);
@@ -1938,14 +1955,14 @@
 
                 var dropEvents = this.getDropEvents(event, endEvent);
 
-                target.fire(endEvent);
-
                 if (dropEvents.leave) { this.prevDropTarget.fire(dropEvents.leave); }
                 if (dropEvents.enter) {     this.dropTarget.fire(dropEvents.enter); }
                 if (dropEvents.drop ) {     this.dropTarget.fire(dropEvents.drop ); }
                 if (dropEvents.deactivate) {
                     this.fireActiveDrops(dropEvents.deactivate);
                 }
+
+                target.fire(endEvent);
             }
             else if (this.resizing) {
                 endEvent = new InteractEvent(this, event, 'resize', 'end', this.element);
@@ -1967,8 +1984,10 @@
             element = element || this.element;
 
             // collect all dropzones and their elements which qualify for a drop
-            for (i = 0; i < dropzones.length; i++) {
-                var current = dropzones[i];
+            for (i = 0; i < interactables.length; i++) {
+                if (!interactables[i].options.dropzone) { continue; }
+
+                var current = interactables[i];
 
                 // test the draggable element against the dropzone's accept setting
                 if ((isElement(current.options.accept) && current.options.accept !== element)
@@ -1979,12 +1998,10 @@
                 }
 
                 // query for new elements if necessary
-                if (current.selector) {
-                    current._dropElements = current._context.querySelectorAll(current.selector);
-                }
+                var dropElements = current.selector? current._context.querySelectorAll(current.selector) : [current._element];
 
-                for (var j = 0, len = current._dropElements.length; j < len; j++) {
-                    var currentElement = current._dropElements[j];
+                for (var j = 0, len = dropElements.length; j < len; j++) {
+                    var currentElement = dropElements[j];
 
                     if (currentElement === element) {
                         continue;
@@ -2158,12 +2175,6 @@
 
                 if (this.dragging) {
                     this.activeDrops.dropzones = this.activeDrops.elements = this.activeDrops.rects = null;
-
-                    for (var i = 0; i < dropzones.length; i++) {
-                        if (dropzones[i].selector) {
-                            dropzones[i]._dropElements = null;
-                        }
-                    }
                 }
 
                 this.clearTargets();
@@ -3009,7 +3020,7 @@
             // Use natural event coordinates (without snapping/restricions)
             // subtract modifications from previous event if event given is
             // not a native event
-            if (ending || event instanceof InteractEvent) {
+            if (event instanceof InteractEvent) {
                 // change in time in seconds
                 // use event sequence duration for end events
                 // => average speed of the event sequence
@@ -3226,7 +3237,7 @@
         return delegateListener.call(this, event, true);
     }
 
-    interactables.indexOfElement = dropzones.indexOfElement = function indexOfElement (element, context) {
+    interactables.indexOfElement = function indexOfElement (element, context) {
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
@@ -3241,7 +3252,7 @@
         return -1;
     };
 
-    interactables.get = dropzones.get = function interactableGet (element, options) {
+    interactables.get = function interactableGet (element, options) {
         return this[this.indexOfElement(element, options && options.context)];
     };
 
@@ -3484,25 +3495,10 @@
                     this.options.dropOverlap = Math.max(Math.min(1, options.overlap), 0);
                 }
 
-                this._dropElements = this.selector? null: [this._element];
-                dropzones.push(this);
-
                 return this;
             }
 
             if (isBool(options)) {
-                if (options) {
-                    this._dropElements = this.selector? null: [this._element];
-                    dropzones.push(this);
-                }
-                else {
-                    var index = indexOf(dropzones, this);
-
-                    if (index !== -1) {
-                        dropzones.splice(index, 1);
-                    }
-                }
-
                 this.options.dropzone = options;
 
                 return this;
@@ -5036,7 +5032,6 @@
             Interactable          : Interactable,
             IOptions              : IOptions,
             interactables         : interactables,
-            dropzones             : dropzones,
             pointerIsDown         : interaction.pointerIsDown,
             defaultOptions        : defaultOptions,
             defaultActionChecker  : defaultActionChecker,
