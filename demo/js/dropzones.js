@@ -57,13 +57,27 @@
                 }
             })
             .on('dropactivate', function (event) {
-                addClass(event.target, '-drop-possible');
-                event.target.textContent = 'Drop me here!';
+                var active = event.target.getAttribute('active')|0;
 
+                // change style if it was previously not active
+                if (active === 0) {
+                    addClass(event.target, '-drop-possible');
+                    event.target.textContent = 'Drop me here!';
+                }
+
+                event.target.setAttribute('active', active + 1);
             })
             .on('dropdeactivate', function (event) {
-                removeClass(event.target, '-drop-possible');
-                event.target.textContent = 'Dropzone';
+                var active = event.target.getAttribute('active')|0;
+
+                // change style if it was previously active
+                // but will no longer be active
+                if (active === 1) {
+                    removeClass(event.target, '-drop-possible');
+                    event.target.textContent = 'Dropzone';
+                }
+
+                event.target.setAttribute('active', active - 1);
             })
             .on('dragenter', function (event) {
                 addClass(event.target, '-drop-over');
