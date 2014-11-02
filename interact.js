@@ -516,10 +516,10 @@
     function setEventXY (targetObj, pointer, interaction) {
         if (!pointer) {
             if (interaction.pointerIds.length > 1) {
-                pointer = touchAverage(interaction.pointerMoves);
+                pointer = touchAverage(interaction.pointers);
             }
             else {
-                pointer = interaction.pointerMoves[0];
+                pointer = interaction.pointers[0];
             }
         }
 
@@ -1083,8 +1083,8 @@
         };
 
         // keep track of added pointers
+        this.pointers = [];
         this.pointerIds   = [];
-        this.pointerMoves = [];
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -1273,7 +1273,7 @@
                     action = this.validateSelector(pointer, matches, matchElements);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(this.pointerMoves[0], this, this.element), this.target);
+                    action = validateAction(target.getAction(this.pointers[0], this, this.element), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
@@ -1848,7 +1848,7 @@
                 if (inertia || smoothEnd) {
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
-                    this.pointerMoves[0] = inertiaStatus.startEvent = startEvent =
+                    this.pointers[0] = inertiaStatus.startEvent = startEvent =
                         new InteractEvent(this, event, this.prepared, 'inertiastart', this.element);
 
                     inertiaStatus.t0 = now;
@@ -2068,7 +2068,7 @@
                     currentElement = this.activeDrops.elements [j],
                     rect           = this.activeDrops.rects    [j];
 
-                validDrops.push(current.dropCheck(this.pointerMoves[0], this.target, dragElement, currentElement, rect)
+                validDrops.push(current.dropCheck(this.pointers[0], this.target, dragElement, currentElement, rect)
                                 ? currentElement
                                 : null);
             }
@@ -2185,8 +2185,8 @@
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
             this.pointerIds.splice(0);
-            // pointerMoves should be retained
-            //this.pointerMoves.splice(0);
+            // pointers should be retained
+            //this.pointers.splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2270,10 +2270,10 @@
 
                 // move events are kept so that multi-touch properties can still be
                 // calculated at the end of a gesture; use pointerIds index
-                this.pointerMoves[index] = pointer;
+                this.pointers[index] = pointer;
             }
             else {
-                this.pointerMoves[index] = pointer;
+                this.pointers[index] = pointer;
             }
         },
 
@@ -2287,19 +2287,19 @@
 
             // move events are kept so that multi-touch properties can still be
             // calculated at the end of a GestureEvnt sequence
-            //this.pointerMoves.splice(index, 1);
+            //this.pointers.splice(index, 1);
         },
 
         recordPointer: function (pointer) {
             // Do not update pointers while inertia is active.
-            // The inertiastart event should be this.pointerMoves[0]
+            // The inertiastart event should be this.pointers[0]
             if (this.inertiaStatus.active) { return; }
 
             var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
 
             if (index === -1) { return; }
 
-            this.pointerMoves[index] = pointer;
+            this.pointers[index] = pointer;
         },
 
         fireTaps: function (pointer, event, targets, elements) {
@@ -2711,7 +2711,7 @@
                         // if the element is the interaction element
                         if (element === interaction.element) {
                             // update the interaction's pointer
-                            interaction.removePointer(interaction.pointerMoves[0]);
+                            interaction.removePointer(interaction.pointers[0]);
                             interaction.addPointer(pointer);
 
                             return interaction;
@@ -2820,7 +2820,7 @@
             target      = interaction.target,
             snapStatus  = interaction.snapStatus,
             restrictStatus  = interaction.restrictStatus,
-            pointerMoves= interaction.pointerMoves,
+            pointers    = interaction.pointers,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX     = deltaSource + 'X',
             sourceY     = deltaSource + 'Y',
@@ -2965,14 +2965,14 @@
             }
         }
         else if (action === 'gesture') {
-            this.touches = [pointerMoves[0], pointerMoves[1]];
+            this.touches = [pointers[0], pointers[1]];
 
             if (starting) {
-                this.distance = touchDistance(pointerMoves, deltaSource);
-                this.box      = touchBBox(pointerMoves);
+                this.distance = touchDistance(pointers, deltaSource);
+                this.box      = touchBBox(pointers);
                 this.scale    = 1;
                 this.ds       = 0;
-                this.angle    = touchAngle(pointerMoves, undefined, deltaSource);
+                this.angle    = touchAngle(pointers, undefined, deltaSource);
                 this.da       = 0;
             }
             else if (ending || event instanceof InteractEvent) {
@@ -2984,10 +2984,10 @@
                 this.da       = this.angle - interaction.gesture.startAngle;
             }
             else {
-                this.distance = touchDistance(pointerMoves, deltaSource);
-                this.box      = touchBBox(pointerMoves);
+                this.distance = touchDistance(pointers, deltaSource);
+                this.box      = touchBBox(pointers);
                 this.scale    = this.distance / interaction.gesture.startDistance;
-                this.angle    = touchAngle(pointerMoves, interaction.gesture.prevAngle, deltaSource);
+                this.angle    = touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
                 this.ds = this.scale - interaction.gesture.prevScale;
                 this.da = this.angle - interaction.gesture.prevAngle;
@@ -5015,7 +5015,7 @@
             startCoords           : interaction.startCoords,
 
             pointerIds            : interaction.pointerIds,
-            pointerMoves          : interaction.pointerMoves,
+            pointers              : interaction.pointers,
             addPointer            : listeners.addPointer,
             removePointer         : listeners.removePointer,
             recordPointer        : listeners.recordPointer,
