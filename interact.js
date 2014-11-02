@@ -23,7 +23,7 @@
         tmpXY = {},     // reduce object creation in getXY()
 
         interactables   = [],   // all set interactables
-        interactions    = [],
+        interactions    = [],   // all interactions
 
         dynamicDrop     = false,
 
@@ -783,6 +783,7 @@
         return origin;
     }
 
+    // http://stackoverflow.com/a/5634528/2280888
     function _getQBezierValue(t, p1, p2, p3) {
         var iT = 1 - t;
         return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
@@ -1083,8 +1084,8 @@
         };
 
         // keep track of added pointers
-        this.pointers = [];
-        this.pointerIds   = [];
+        this.pointers   = [];
+        this.pointerIds = [];
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -3414,7 +3415,15 @@
          |     // the axis in which the first movement must be
          |     // for the drag sequence to start
          |     // 'xy' by default - any direction
-         |     axis: 'x' || 'y' || 'xy'
+         |     axis: 'x' || 'y' || 'xy',
+         |
+         |     // max number of drags that can happen concurrently
+         |     // with elements of this Interactable. 1 by default
+         |     max: Infinity,
+         |
+         |     // max number of drags that can target the same element
+         |     // 1 by default
+         |     maxPerElement: 2
          | });
         \*/
         draggable: function (options) {
@@ -3521,7 +3530,11 @@
          * this Interactable's element. Can be overridden using
          * @Interactable.dropChecker.
          *
-         - pointer (MouseEvent | PointerEvent | Touch) The event or touch that ends a drag
+         - pointer (MouseEvent | PointerEvent | Touch) The event that ends a drag
+         - draggable (Interactable) The Interactable being dragged
+         - draggableElement (ELement) The actual element that's being dragged
+         - dropElement (Element) The dropzone element
+         - rect (object) #optional The rect of dropElement
          = (boolean) whether the pointer was over this Interactable
         \*/
         dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
@@ -3578,9 +3591,9 @@
          *
          = (Function | Interactable) The checker function or this Interactable
         \*/
-        dropChecker: function (newValue) {
-            if (isFunction(newValue)) {
-                this.dropCheck = newValue;
+        dropChecker: function (checker) {
+            if (isFunction(checker)) {
+                this.dropCheck = checker;
 
                 return this;
             }
@@ -3642,7 +3655,12 @@
          |     onmove : function (event) {},
          |     onend  : function (event) {},
          |
-         |     axis   : 'x' || 'y' || 'xy' // default is 'xy'
+         |     axis   : 'x' || 'y' || 'xy' // default is 'xy',
+         |
+         |     // limit multiple resizes.
+         |     // See the explanation in @Interactable.draggable example
+         |     max: 1,
+         |     maxPerElement: 1,
          | });
         \*/
         resizable: function (options) {
@@ -3719,7 +3737,14 @@
          - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
          = (object) this Interactable
          | interact(element).gesturable({
-         |     onmove: function (event) {}
+         |     onstart: function (event) {},
+         |     onmove : function (event) {},
+         |     onend  : function (event) {},
+         |
+         |     // limit multiple gestures.
+         |     // See the explanation in @Interactable.draggable example
+         |     max: 1,
+         |     maxPerElement: 1,
          | });
         \*/
         gesturable: function (options) {
@@ -4093,14 +4118,14 @@
          - checker (function) #optional A function which returns this Interactable's bounding rectangle. See @Interactable.getRect
          = (function | object) The checker function or this Interactable
         \*/
-        rectChecker: function (newValue) {
-            if (isFunction(newValue)) {
-                this.getRect = newValue;
+        rectChecker: function (checker) {
+            if (isFunction(checker)) {
+                this.getRect = checker;
 
                 return this;
             }
 
-            if (newValue === null) {
+            if (checker === null) {
                 delete this.options.getRect;
 
                 return this;
@@ -4202,7 +4227,7 @@
          * Returns or sets the mouse coordinate types used to calculate the
          * movement of the pointer.
          *
-         - source (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
+         - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
          = (string | object) The current deltaSource or this Interactable
         \*/
         deltaSource: function (newValue) {
@@ -5429,6 +5454,18 @@
         return tryCatchEventListeners;
     };
 
+    /*\
+     * interact.maxInteractions
+     [ method ]
+     **
+     * Returns or sets the maximum number of concurrent interactions allowed.
+     * By default only 1 interaction is allowed at a time (for backwards
+     * compatibility). To allow multiple interactions on the same Interactables
+     * and elements, you need to enable it in the draggable, resizable and
+     * gesturable `'max'` and `'maxPerElement'` options.
+     **
+     - newValue (number) #optional Any number. newValue <= 0 means no interactions.
+    \*/
     interact.maxInteractions = function (newValue) {
         if (isNumber(newValue)) {
             maxInteractions = newValue;
