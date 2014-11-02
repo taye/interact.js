@@ -158,40 +158,51 @@
             },
 
             edgeMove: function (event) {
-                var target = interactions[0] && interactions[0].target;
+                var target,
+                    doAutoscroll = false;
 
-                if (target && target.options.autoScrollEnabled && (this.dragging || this.resizing)) {
-                    var top,
-                        right,
-                        bottom,
-                        left,
-                        options = target.options.autoScroll;
+                for (var i = 0; i < interactions.length; i++) {
+                    var interaction = interactions[i];
+                    target = interaction.target;
 
-                    if (options.container instanceof window.Window) {
-                        left   = event.clientX < autoScroll.margin;
-                        top    = event.clientY < autoScroll.margin;
-                        right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
-                        bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                    if (target && target.options.autoScrollEnabled && (interaction.dragging || interaction.resizing)) {
+                        doAutoscroll = true;
+                        break;
                     }
-                    else {
-                        var rect = getElementRect(options.container);
+                }
 
-                        left   = event.clientX < rect.left   + autoScroll.margin;
-                        top    = event.clientY < rect.top    + autoScroll.margin;
-                        right  = event.clientX > rect.right  - autoScroll.margin;
-                        bottom = event.clientY > rect.bottom - autoScroll.margin;
-                    }
+                if (!doAutoscroll) { return; }
 
-                    autoScroll.x = (right ? 1: left? -1: 0);
-                    autoScroll.y = (bottom? 1:  top? -1: 0);
+                var top,
+                    right,
+                    bottom,
+                    left,
+                    options = target.options.autoScroll;
 
-                    if (!autoScroll.isScrolling) {
-                        // set the autoScroll properties to those of the target
-                        autoScroll.margin = options.margin;
-                        autoScroll.speed  = options.speed;
+                if (options.container instanceof window.Window) {
+                    left   = event.clientX < autoScroll.margin;
+                    top    = event.clientY < autoScroll.margin;
+                    right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
+                    bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                }
+                else {
+                    var rect = getElementRect(options.container);
 
-                        autoScroll.start(target);
-                    }
+                    left   = event.clientX < rect.left   + autoScroll.margin;
+                    top    = event.clientY < rect.top    + autoScroll.margin;
+                    right  = event.clientX > rect.right  - autoScroll.margin;
+                    bottom = event.clientY > rect.bottom - autoScroll.margin;
+                }
+
+                autoScroll.x = (right ? 1: left? -1: 0);
+                autoScroll.y = (bottom? 1:  top? -1: 0);
+
+                if (!autoScroll.isScrolling) {
+                    // set the autoScroll properties to those of the target
+                    autoScroll.margin = options.margin;
+                    autoScroll.speed  = options.speed;
+
+                    autoScroll.start(target);
                 }
             },
 
@@ -5511,6 +5522,9 @@
         // remove pointers after ending actions in pointerUp
         events.add(docTarget, pEventTypes.up    , listeners.removePointer);
         events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
+
+        // autoscroll
+        events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
     }
     else {
         events.add(docTarget, 'mouseup' , listeners.collectTaps);
@@ -5533,6 +5547,10 @@
         // remove touches after ending actions in pointerUp
         events.add(docTarget, 'touchend'   , listeners.removePointer);
         events.add(docTarget, 'touchcancel', listeners.removePointer);
+
+        // autoscroll
+        events.add(docTarget, 'mousemove', autoScroll.edgeMove);
+        events.add(docTarget, 'touchmove', autoScroll.edgeMove);
     }
 
     events.add(windowTarget, 'blur', endAllInteractions);
