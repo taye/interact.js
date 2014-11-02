@@ -898,7 +898,7 @@
         for (var i = 0, len = interactions.length; i < len; i++) {
             var interaction = interactions[i],
                 otherAction = /resize/.test(interaction.prepared)? 'resize': interaction.prepared,
-                active = interaction.dragging || interaction.resizing || interaction.gesturing;
+                active = interaction.interacting();
 
             if (!active) { continue; }
 
@@ -1301,7 +1301,7 @@
                                        listeners.pointerHover);
             }
 
-            if (this.target && this.target.options.styleCursor && !(this.dragging || this.resizing || this.gesturing)) {
+            if (this.target && this.target.options.styleCursor && !this.interacting()) {
                 document.documentElement.style.cursor = '';
             }
         },
@@ -1335,7 +1335,7 @@
             }
 
             // do nothing if interacting
-            if (this.dragging || this.resizing || this.gesturing) {
+            if (this.interacting()) {
                 return;
             }
 
@@ -1426,7 +1426,7 @@
             var target = this.target,
                 options = target && target.options;
 
-            if (target && !(this.dragging || this.resizing || this.gesturing)) {
+            if (target && !this.interacting()) {
                 action = action || validateAction(forceAction || target.getAction(pointer, this), target, this.element);
 
                 this.setEventXY(this.startCoords);
@@ -1511,7 +1511,7 @@
                 && (!this.inertiaStatus.active || (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)))) {
 
                 // if just starting an action, calculate the pointer speed now
-                if (!(this.dragging || this.resizing || this.gesturing)) {
+                if (!this.interacting()) {
                     setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
                     // check if a drag is in the correct axis
@@ -1589,7 +1589,7 @@
                     }
                 }
 
-                var starting = !!this.prepared && !(this.dragging || this.resizing || this.gesturing);
+                var starting = !!this.prepared && !this.interacting();
 
                 if (starting && !withinInteractionLimit(this.target, this.element, this.prepared)) {
                     this.stop();
@@ -1787,7 +1787,7 @@
                 inertiaOptions = options && options.inertia,
                 inertiaStatus = this.inertiaStatus;
 
-            if (this.dragging || this.resizing || this.gesturing) {
+            if (this.interacting()) {
 
                 if (inertiaStatus.active) { return; }
 
@@ -2149,6 +2149,10 @@
             return (this.dragging && 'drag') || (this.resizing && 'resize') || (this.gesturing && 'gesture') || null;
         },
 
+        interacting: function () {
+            return this.dragging || this.resizing || this.gesturing;
+        },
+
         clearTargets: function () {
             if (this.target && !this.target.selector) {
                 this.target = this.element = null;
@@ -2158,7 +2162,7 @@
         },
 
         stop: function (event) {
-            if (this.dragging || this.resizing || this.gesturing) {
+            if (this.interacting()) {
                 autoScroll.stop();
                 this.matches = [];
                 this.matchElements = [];
@@ -2766,7 +2770,7 @@
             interaction = interactions[i];
 
             if ((!interaction.prepared || (interaction.target.gesturable()))
-                && !(interaction.dragging || interaction.resizing || interaction.gesturing)
+                && !interaction.interacting()
                 && !(!mouseEvent && interaction.mouse)) {
 
                 interaction.addPointer(pointer);
