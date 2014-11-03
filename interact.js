@@ -20,96 +20,12 @@
 
         hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
 
-        // Previous native pointer move event coordinates
-        prevCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
-            timeStamp: 0
-        },
-        // current native pointer move event coordinates
-        curCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
-            timeStamp: 0
-        },
-
-        // Starting InteractEvent pointer coordinates
-        startCoords = {
-            pageX    : 0, pageY  : 0,
-            clientX  : 0, clientY: 0,
-            timeStamp: 0
-        },
-
-        // Change in coordinates and time of the pointer
-        pointerDelta = {
-            pageX    : 0, pageY      : 0,
-            clientX  : 0, clientY    : 0,
-            pageSpeed: 0, clientSpeed: 0,
-            timeStamp: 0
-        },
-
-        // keep track of added PointerEvents or touches
-        pointerIds   = [],
-        pointerMoves = [],
-
-        downTime  = 0,         // the timeStamp of the starting event
-        downEvent = null,      // pointerdown/mousedown/touchstart event
-        prevEvent = null,      // previous action event
-        tapTime   = 0,         // time of the most recent tap event
-        prevTap   = null,
-
-        startOffset    = { left: 0, right: 0, top: 0, bottom: 0 },
-        restrictOffset = { left: 0, right: 0, top: 0, bottom: 0 },
-        snapOffset     = { x: 0, y: 0},
-
         tmpXY = {},     // reduce object creation in getXY()
 
-        inertiaStatus = {
-            active       : false,
-            smoothEnd    : false,
-            target       : null,
-            targetElement: null,
-
-            startEvent: null,
-            pointerUp : {},
-
-            xe: 0, ye: 0,
-            sx: 0, sy: 0,
-
-            t0: 0,
-            vx0: 0, vys: 0,
-            duration: 0,
-
-            resumeDx: 0,
-            resumeDy: 0,
-
-            lambda_v0: 0,
-            one_ve_v0: 0,
-            i  : null
-        },
-
-        gesture = {
-            start: { x: 0, y: 0 },
-
-            startDistance: 0,   // distance between two touches of touchStart
-            prevDistance : 0,
-            distance     : 0,
-
-            scale: 1,           // gesture.distance / gesture.startDistance
-
-            startAngle: 0,      // angle of line joining two touches
-            prevAngle : 0       // angle of the previous gesture event
-        },
-
         interactables   = [],   // all set interactables
+        interactions    = [],   // all interactions
 
-        activeDrops     = {
-            dropzones: [],      // the dropzones that are mentioned below
-            elements : [],      // elements of dropzones that accept the target draggable
-            rects    : []       // the rects of the elements mentioned above
-        },
-
-        matches         = [],   // all selectors that are matched by target element
+        dynamicDrop     = false,
 
         // {
         //      type: {
@@ -119,12 +35,6 @@
         //      }
         //  }
         delegatedEvents = {},
-
-        target          = null, // current interactable being interacted with
-        dropTarget      = null, // the dropzone a drag target might be dropped into
-        dropElement     = null, // the element at the time of checking
-        prevDropTarget  = null, // the dropzone that was recently dragged away from
-        prevDropElement = null, // the element at the time of checking
 
         defaultOptions = {
             draggable   : false,
@@ -136,6 +46,17 @@
             squareResize: false,
             resizeAxis  : 'xy',
             gesturable  : false,
+
+            // no more than this number of actions can target the Interactable
+            dragMax   : 1,
+            resizeMax : 1,
+            gestureMax: 1,
+
+            // no more than this number of actions can target the same
+            // element of this Interactable simultaneously
+            dragMaxPerElement   : 1,
+            resizeMaxPerElement : 1,
+            gestureMaxPerElement: 1,
 
             pointerMoveTolerance: 1,
 
@@ -202,25 +123,6 @@
             context     : document        // the Node on which querySelector will be called
         },
 
-        snapStatus = {
-            x       : 0, y       : 0,
-            dx      : 0, dy      : 0,
-            realX   : 0, realY   : 0,
-            snappedX: 0, snappedY: 0,
-            anchors : [],
-            paths   : [],
-            locked  : false,
-            changed : false
-        },
-
-        restrictStatus = {
-            dx         : 0, dy         : 0,
-            restrictedX: 0, restrictedY: 0,
-            snap       : snapStatus,
-            restricted : false,
-            changed    : false
-        },
-
         // Things related to autoScroll
         autoScroll = {
             target: null,
@@ -256,38 +158,51 @@
             },
 
             edgeMove: function (event) {
-                if (target && target.options.autoScrollEnabled && (dragging || resizing)) {
-                    var top,
-                        right,
-                        bottom,
-                        left,
-                        options = target.options.autoScroll;
+                var target,
+                    doAutoscroll = false;
 
-                    if (options.container instanceof window.Window) {
-                        left   = event.clientX < autoScroll.margin;
-                        top    = event.clientY < autoScroll.margin;
-                        right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
-                        bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                for (var i = 0; i < interactions.length; i++) {
+                    var interaction = interactions[i];
+                    target = interaction.target;
+
+                    if (target && target.options.autoScrollEnabled && (interaction.dragging || interaction.resizing)) {
+                        doAutoscroll = true;
+                        break;
                     }
-                    else {
-                        var rect = getElementRect(options.container);
+                }
 
-                        left   = event.clientX < rect.left   + autoScroll.margin;
-                        top    = event.clientY < rect.top    + autoScroll.margin;
-                        right  = event.clientX > rect.right  - autoScroll.margin;
-                        bottom = event.clientY > rect.bottom - autoScroll.margin;
-                    }
+                if (!doAutoscroll) { return; }
 
-                    autoScroll.x = (right ? 1: left? -1: 0);
-                    autoScroll.y = (bottom? 1:  top? -1: 0);
+                var top,
+                    right,
+                    bottom,
+                    left,
+                    options = target.options.autoScroll;
 
-                    if (!autoScroll.isScrolling) {
-                        // set the autoScroll properties to those of the target
-                        autoScroll.margin = options.margin;
-                        autoScroll.speed  = options.speed;
+                if (options.container instanceof window.Window) {
+                    left   = event.clientX < autoScroll.margin;
+                    top    = event.clientY < autoScroll.margin;
+                    right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
+                    bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                }
+                else {
+                    var rect = getElementRect(options.container);
 
-                        autoScroll.start(target);
-                    }
+                    left   = event.clientX < rect.left   + autoScroll.margin;
+                    top    = event.clientY < rect.top    + autoScroll.margin;
+                    right  = event.clientX > rect.right  - autoScroll.margin;
+                    bottom = event.clientY > rect.bottom - autoScroll.margin;
+                }
+
+                autoScroll.x = (right ? 1: left? -1: 0);
+                autoScroll.y = (bottom? 1:  top? -1: 0);
+
+                if (!autoScroll.isScrolling) {
+                    // set the autoScroll properties to those of the target
+                    autoScroll.margin = options.margin;
+                    autoScroll.speed  = options.speed;
+
+                    autoScroll.start(target);
                 }
             },
 
@@ -312,46 +227,21 @@
         // Does the browser support touch input?
         supportsTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch),
 
+        // Does the browser support PointerEvents
+        supportsPointerEvent = !!PointerEvent,
+
         // Less Precision with touch input
-        margin = supportsTouch? 20: 10,
+        margin = supportsTouch || supportsPointerEvent? 20: 10,
 
-        pointerIsDown   = false,
-        pointerWasMoved = false,
-        gesturing       = false,
-        dragging        = false,
-        dynamicDrop     = false,
-        resizing        = false,
-        resizeAxes      = 'xy',
+        // Allow this many interactions to happen simultaneously
+        maxInteractions = 1,
 
-        // What to do depending on action returned by getAction() of interactable
-        // Dictates what styles should be used and what pointerMove event Listner
-        // is to be added after pointerDown
-        actions = {
-            drag: {
-                cursor: 'move',
-                start : dragStart,
-                move  : dragMove
-            },
-            resizex: {
-                cursor: 'e-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            resizey: {
-                cursor: 's-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            resizexy: {
-                cursor: 'se-resize',
-                start : resizeStart,
-                move  : resizeMove
-            },
-            gesture: {
-                cursor: '',
-                start : gestureStart,
-                move  : gestureMove
-            }
+        actionCursors = {
+            drag    : 'move',
+            resizex : 'e-resize',
+            resizey : 's-resize',
+            resizexy: 'se-resize',
+            gesture : ''
         },
 
         actionIsEnabled = {
@@ -359,9 +249,6 @@
             resize : true,
             gesture: true
         },
-
-        // Action that's ready to be fired on next move event
-        prepared = null,
 
         // because Webkit and Opera still use 'mousewheel' event type
         wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
@@ -625,131 +512,117 @@
         return dest;
     }
 
-    function cloneEvent (event) {
-        var clone = extend({}, event),
-            i;
+    function copyCoords (dest, src) {
+        dest.page = dest.page || {};
+        dest.page.x = src.page.x;
+        dest.page.y = src.page.y;
 
-        clone.constructor = event.constructor;
+        dest.client = dest.client || {};
+        dest.client.x = src.client.x;
+        dest.client.y = src.client.y;
 
-        if (event.touches) {
-            clone.touches = [];
-            clone.changedTouches = [];
+        dest.timeStamp = src.timeStamp;
+    }
 
-            for (i = 0; i < event.touches.length; i++) {
-                clone.touches.push(extend({}, event.touches[i]));
+    function setEventXY (targetObj, pointer, interaction) {
+        if (!pointer) {
+            if (interaction.pointerIds.length > 1) {
+                pointer = touchAverage(interaction.pointers);
             }
-            for (i = 0; i < event.touches.length; i++) {
-                clone.changedTouches.push(extend({}, event.changedTouches[i]));
+            else {
+                pointer = interaction.pointers[0];
             }
         }
 
-        return clone;
-    }
+        getPageXY(pointer, tmpXY, interaction);
+        targetObj.page.x = tmpXY.x;
+        targetObj.page.y = tmpXY.y;
 
-    function setEventXY (targetObj, source) {
-        getPageXY(source, tmpXY);
-        targetObj.pageX = tmpXY.x;
-        targetObj.pageY = tmpXY.y;
-
-        getClientXY(source, tmpXY);
-        targetObj.clientX = tmpXY.x;
-        targetObj.clientY = tmpXY.y;
+        getClientXY(pointer, tmpXY, interaction);
+        targetObj.client.x = tmpXY.x;
+        targetObj.client.y = tmpXY.y;
 
         targetObj.timeStamp = new Date().getTime();
     }
 
     function setEventDeltas (targetObj, prev, cur) {
-        targetObj.pageX     = cur.pageX      - prev.pageX;
-        targetObj.pageY     = cur.pageY      - prev.pageY;
-        targetObj.clientX   = cur.clientX    - prev.clientX;
-        targetObj.clientY   = cur.clientY    - prev.clientY;
+        targetObj.page.x     = cur.page.x      - prev.page.x;
+        targetObj.page.y     = cur.page.y      - prev.page.y;
+        targetObj.client.x   = cur.client.x    - prev.client.x;
+        targetObj.client.y   = cur.client.y    - prev.client.y;
         targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
 
         // set pointer velocity
         var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-        targetObj.pageSpeed   = hypot(targetObj.pageX, targetObj.pageY) / dt;
-        targetObj.pageVX      = targetObj.pageX / dt;
-        targetObj.pageVY      = targetObj.pageY / dt;
+        targetObj.page.speed   = hypot(targetObj.page.x, targetObj.page.y) / dt;
+        targetObj.page.vx      = targetObj.page.x / dt;
+        targetObj.page.vy      = targetObj.page.y / dt;
 
-        targetObj.clientSpeed = hypot(targetObj.clientX, targetObj.pageY) / dt;
-        targetObj.clientVX    = targetObj.clientX / dt;
-        targetObj.clientVY    = targetObj.clientY / dt;
+        targetObj.client.speed = hypot(targetObj.client.x, targetObj.page.y) / dt;
+        targetObj.client.vx    = targetObj.client.x / dt;
+        targetObj.client.vy    = targetObj.client.y / dt;
     }
 
     // Get specified X/Y coords for mouse or event.touches[0]
-    function getXY (type, event, xy) {
-        var touch,
-            x,
-            y;
-
+    function getXY (type, pointer, xy) {
         xy = xy || {};
         type = type || 'page';
 
-        if (/touch/.test(event.type) && event.touches) {
-            touch = (event.touches.length)?
-                event.touches[0]:
-                event.changedTouches[0];
-            x = touch[type + 'X'];
-            y = touch[type + 'Y'];
-        }
-        else {
-            x = event[type + 'X'];
-            y = event[type + 'Y'];
-        }
-
-        xy.x = x;
-        xy.y = y;
+        xy.x = pointer[type + 'X'];
+        xy.y = pointer[type + 'Y'];
 
         return xy;
     }
 
-    function getPageXY (event, page) {
+    function getPageXY (pointer, page, interaction) {
         page = page || {};
 
-        if (event instanceof InteractEvent) {
-            if (/inertiastart/.test(event.type)) {
-                getPageXY(inertiaStatus.pointerUp, page);
+        if (pointer instanceof InteractEvent) {
+            if (/inertiastart/.test(pointer.type)) {
+                interaction = interaction || pointer.interaction;
 
-                page.x += inertiaStatus.sx;
-                page.y += inertiaStatus.sy;
+                extend(page, interaction.inertiaStatus.upCoords.page);
+
+                page.x += interaction.inertiaStatus.sx;
+                page.y += interaction.inertiaStatus.sy;
             }
             else {
-                page.x = event.pageX;
-                page.y = event.pageY;
+                page.x = pointer.pageX;
+                page.y = pointer.pageY;
             }
         }
         // Opera Mobile handles the viewport and scrolling oddly
         else if (isOperaMobile) {
-            getXY('screen', event, page);
+            getXY('screen', pointer, page);
 
             page.x += window.scrollX;
             page.y += window.scrollY;
         }
         else {
-            getXY('page', event, page);
+            getXY('page', pointer, page);
         }
 
         return page;
     }
 
-    function getClientXY (event, client) {
+    function getClientXY (pointer, client, interaction) {
         client = client || {};
 
-        if (event instanceof InteractEvent) {
-            if (/inertiastart/.test(event.type)) {
-                getClientXY(inertiaStatus.pointerUp, client);
+        if (pointer instanceof InteractEvent) {
+            if (/inertiastart/.test(pointer.type)) {
+                extend(client, interaction.inertiaStatus.upCoords.client);
 
-                client.x += inertiaStatus.sx;
-                client.y += inertiaStatus.sy;
+                client.x += interaction.inertiaStatus.sx;
+                client.y += interaction.inertiaStatus.sy;
             }
             else {
-                client.x = event.clientX;
-                client.y = event.clientY;
+                client.x = pointer.clientX;
+                client.y = pointer.clientY;
             }
         }
         else {
             // Opera Mobile handles the viewport and scrolling oddly
-            getXY(isOperaMobile? 'screen': 'client', event, client);
+            getXY(isOperaMobile? 'screen': 'client', pointer, client);
         }
 
         return client;
@@ -760,6 +633,16 @@
             x: window.scrollX || document.documentElement.scrollLeft,
             y: window.scrollY || document.documentElement.scrollTop
         };
+    }
+
+    function getPointerId (pointer) {
+        return isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    }
+
+    function getActualElement (element) {
+        return (element instanceof SVGElementInstance
+            ? element.correspondingUseElement
+            : element);
     }
 
     function getElementRect (element) {
@@ -821,7 +704,7 @@
     }
 
     function touchBBox (event) {
-        if (!(event.touches && event.touches.length) && !(pointerMoves.length)) {
+        if (!event.length && !(event.touches && event.touches.length > 1)) {
             return;
         }
 
@@ -841,9 +724,10 @@
         };
     }
 
-    function touchDistance (event) {
-        var deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
+    function touchDistance (event, deltaSource) {
+        deltaSource = deltaSource || defaultOptions.deltaSource;
+
+        var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             touches = getTouchPair(event);
 
@@ -854,9 +738,10 @@
         return hypot(dx, dy);
     }
 
-    function touchAngle (event, prevAngle) {
-        var deltaSource = (target && target.options || defaultOptions).deltaSource,
-            sourceX = deltaSource + 'X',
+    function touchAngle (event, prevAngle, deltaSource) {
+        deltaSource = deltaSource || defaultOptions.deltaSource;
+
+        var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
             touches = getTouchPair(event),
             dx = touches[0][sourceX] - touches[1][sourceX],
@@ -885,13 +770,9 @@
     }
 
     function getOriginXY (interactable, element) {
-        interactable = interactable || target;
-
         var origin = interactable
                 ? interactable.options.origin
                 : defaultOptions.origin;
-
-        element = element || interactable._element;
 
         if (origin === 'parent') {
             origin = element.parentNode;
@@ -913,84 +794,7 @@
         return origin;
     }
 
-    function calcInertia (status) {
-        var inertiaOptions = status.target.options.inertia,
-            lambda = inertiaOptions.resistance,
-            inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
-
-        status.x0 = prevEvent.pageX;
-        status.y0 = prevEvent.pageY;
-        status.t0 = status.startEvent.timeStamp / 1000;
-        status.sx = status.sy = 0;
-
-        status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-        status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-        status.te = inertiaDur;
-
-        status.lambda_v0 = lambda / status.v0;
-        status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
-    }
-
-    function inertiaFrame () {
-        var options = inertiaStatus.target.options.inertia,
-            lambda = options.resistance,
-            t = new Date().getTime() / 1000 - inertiaStatus.t0;
-
-        if (t < inertiaStatus.te) {
-
-            var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
-
-            if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
-                inertiaStatus.sx = inertiaStatus.xe * progress;
-                inertiaStatus.sy = inertiaStatus.ye * progress;
-            }
-            else {
-                var quadPoint = getQuadraticCurvePoint(
-                        0, 0,
-                        inertiaStatus.xe, inertiaStatus.ye,
-                        inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
-                        progress);
-
-                inertiaStatus.sx = quadPoint.x;
-                inertiaStatus.sy = quadPoint.y;
-            }
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.i = reqFrame(inertiaFrame);
-        }
-        else {
-            inertiaStatus.sx = inertiaStatus.modifiedXe;
-            inertiaStatus.sy = inertiaStatus.modifiedYe;
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.active = false;
-            pointerUp(inertiaStatus.startEvent);
-        }
-    }
-
-    function smoothEndFrame () {
-        var t = new Date().getTime() - inertiaStatus.t0,
-            duration = inertiaStatus.target.options.inertia.smoothEndDuration;
-
-        if (t < duration) {
-            inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
-            inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
-
-            pointerMove(inertiaStatus.startEvent);
-
-            inertiaStatus.i = reqFrame(smoothEndFrame);
-        }
-        else {
-            inertiaStatus.active = false;
-            inertiaStatus.smoothEnd = false;
-
-            pointerMove(inertiaStatus.startEvent);
-            pointerUp(inertiaStatus.startEvent);
-        }
-    }
-
+    // http://stackoverflow.com/a/5634528/2280888
     function _getQBezierValue(t, p1, p2, p3) {
         var iT = 1 - t;
         return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
@@ -1025,12 +829,12 @@
                 || nodeContains(interactable._context, element);
     }
 
-    function testIgnore (interactable, element) {
+    function testIgnore (interactable, interactableElement, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
         if (!ignoreFrom
             // limit test to the interactable's element and its children
-            || !isElement(element) || element === interactable._element.parentNode) {
+            || !isElement(element) || element === interactableElement.parentNode) {
             return false;
         }
 
@@ -1044,13 +848,13 @@
         return false;
     }
 
-    function testAllow (interactable, element) {
+    function testAllow (interactable, interactableElement, element) {
         var allowFrom = interactable.options.allowFrom;
 
         if (!allowFrom) { return true; }
 
         // limit test to the interactable's element and its children
-        if (!isElement(element) || element === interactable._element.parentNode) {
+        if (!isElement(element) || element === interactableElement.parentNode) {
             return false;
         }
 
@@ -1064,32 +868,6 @@
         return false;
     }
 
-    function checkAndPreventDefault (event, interactable) {
-        if (!interactable) { return; }
-
-        var options = interactable.options,
-            prevent = options.preventDefault;
-
-        if (prevent === 'auto' && !/^input$|^textarea$/i.test(target._element.nodeName)) {
-            // do not preventDefault on pointerdown if the prepared action is a drag
-            // and dragging can only start from a certain direction - this allows
-            // a touch to pan the viewport if a drag isn't in the right direction
-            if (/down|start/i.test(event.type)
-                && prepared === 'drag' && options.dragAxis !== 'xy') {
-
-                return;
-            }
-
-            event.preventDefault();
-            return;
-        }
-
-        if (prevent === true) {
-            event.preventDefault();
-            return;
-        }
-    }
-
     function checkAxis (axis, interactable) {
         if (!interactable) { return false; }
 
@@ -1101,19 +879,15 @@
     function checkSnap (interactable, action) {
         var options = interactable.options;
 
-        action = action || prepared;
-
         if (/^resize/.test(action)) {
             action = 'resize';
         }
 
-        return (options.snapEnabled && contains(options.snap.actions, action));
+        return action !== 'gesture' && options.snapEnabled && contains(options.snap.actions, action);
     }
 
     function checkRestrict (interactable, action) {
         var options = interactable.options;
-
-        action = action || prepared;
 
         if (/^resize/.test(action)) {
             action = 'resize';
@@ -1122,67 +896,47 @@
         return options.restrictEnabled && options.restrict[action];
     }
 
-    function collectDrops (element) {
-        var drops = [],
-            elements = [],
-            i;
+    function withinInteractionLimit (interactable, element, action) {
+        action = /resize/.test(action)? 'resize': action;
 
-        element = element || target._element;
+        var options = interactable.options,
+            maxActions = options[action + 'Max'],
+            maxPerElement = options[action + 'MaxPerElement'],
+            activeInteractions = 0,
+            targetCount = 0,
+            targetElementCount = 0;
 
-        // collect all dropzones and their elements which qualify for a drop
-        for (i = 0; i < interactables.length; i++) {
-            if (!interactables[i].options.dropzone) { continue; }
+        for (var i = 0, len = interactions.length; i < len; i++) {
+            var interaction = interactions[i],
+                otherAction = /resize/.test(interaction.prepared)? 'resize': interaction.prepared,
+                active = interaction.interacting();
 
-            var current = interactables[i];
+            if (!active) { continue; }
 
-            // test the draggable element against the dropzone's accept setting
-            if ((isElement(current.options.accept) && current.options.accept !== element)
-                || (isString(current.options.accept)
-                    && !matchesSelector(element, current.options.accept))) {
+            activeInteractions++;
 
-                continue;
+            if (activeInteractions >= maxInteractions) {
+                return false;
             }
 
-            // query for new elements if necessary
-            var dropElements = current.selector? current._context.querySelectorAll(current.selector) : [current._element];
+            if (interaction.target !== interactable) { continue; }
 
-            for (var j = 0, len = dropElements.length; j < len; j++) {
-                var currentElement = dropElements[j];
+            targetCount += (otherAction === action)|0;
 
-                if (currentElement === element) {
-                    continue;
+            if (targetCount >= maxActions) {
+                return false;
+            }
+
+            if (interaction.element === element) {
+                targetElementCount++;
+
+                if (otherAction !== action || targetElementCount >= maxPerElement) {
+                    return false;
                 }
-
-                drops.push(current);
-                elements.push(currentElement);
             }
         }
 
-        return {
-            dropzones: drops,
-            elements: elements
-        };
-    }
-
-    function fireActiveDrops(event) {
-        var i,
-            current,
-            currentElement,
-            prevElement;
-
-        // loop through all active dropzones and trigger event
-        for (i = 0; i < activeDrops.dropzones.length; i++) {
-            current = activeDrops.dropzones[i];
-            currentElement = activeDrops.elements [i];
-
-            // prevent trigger of duplicate events on same element
-            if (currentElement !== prevElement) {
-                // set current element as event target
-                event.target = currentElement;
-                current.fire(event);
-            }
-            prevElement = currentElement;
-        }
+        return maxInteractions > 0;
     }
 
     // Test for the element that's "above" all other qualifiers
@@ -1288,168 +1042,1842 @@
         return index;
     }
 
-    // Collect a new set of possible drops and save them in activeDrops.
-    // setActiveDrops should always be called when a drag has just started or a
-    // drag event happens while dynamicDrop is true
-    function setActiveDrops (dragElement) {
-        // get dropzones and their elements that could recieve the draggable
-        var possibleDrops = collectDrops(dragElement, true);
+    function Interaction () {
+        this.target          = null; // current interactable being interacted with
+        this.element         = null; // the target element of the interactable
+        this.dropTarget      = null; // the dropzone a drag target might be dropped into
+        this.dropElement     = null; // the element at the time of checking
+        this.prevDropTarget  = null; // the dropzone that was recently dragged away from
+        this.prevDropElement = null; // the element at the time of checking
 
-        activeDrops.dropzones = possibleDrops.dropzones;
-        activeDrops.elements  = possibleDrops.elements;
-        activeDrops.rects     = [];
+        this.prepared        = null; // Action that's ready to be fired on next move event
 
-        for (var i = 0; i < activeDrops.dropzones.length; i++) {
-            activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
-        }
-    }
+        this.matches         = [];   // all selectors that are matched by target element
+        this.matchElements   = [];   // corresponding elements
 
-    function getDrop (event, dragElement) {
-        var validDrops = [];
+        this.inertiaStatus = {
+            active       : false,
+            smoothEnd    : false,
 
-        if (dynamicDrop) {
-            setActiveDrops(dragElement);
-        }
+            startEvent: null,
+            upCoords: {},
 
-        // collect all dropzones and their elements which qualify for a drop
-        for (var j = 0; j < activeDrops.dropzones.length; j++) {
-            var current        = activeDrops.dropzones[j],
-                currentElement = activeDrops.elements [j],
-                rect           = activeDrops.rects    [j];
+            xe: 0, ye: 0,
+            sx: 0, sy: 0,
 
-            validDrops.push(current.dropCheck(event, target, dragElement, rect)
-                            ? currentElement
-                            : null);
-        }
+            t0: 0,
+            vx0: 0, vys: 0,
+            duration: 0,
 
-        // get the most apprpriate dropzone based on DOM depth and order
-        var dropIndex = indexOfDeepestElement(validDrops),
-            dropzone  = activeDrops.dropzones[dropIndex] || null,
-            element   = activeDrops.elements [dropIndex] || null;
+            resumeDx: 0,
+            resumeDy: 0,
 
-        if (dropzone && dropzone.selector) {
-            dropzone._element = element;
-        }
-
-        return {
-            dropzone: dropzone,
-            element: element
+            lambda_v0: 0,
+            one_ve_v0: 0,
+            i  : null
         };
+
+        if (isFunction(Function.prototype.bind)) {
+            this.boundInertiaFrame = this.inertiaFrame.bind(this);
+            this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
+        }
+        else {
+            var that = this;
+
+            this.boundInertiaFrame = function () { return that.inertiaFrame(); };
+            this.boundSmoothEndFrame = function () { return that.smoothEndFrame(); };
+        }
+
+        this.activeDrops = {
+            dropzones: [],      // the dropzones that are mentioned below
+            elements : [],      // elements of dropzones that accept the target draggable
+            rects    : []       // the rects of the elements mentioned above
+        };
+
+        // keep track of added pointers
+        this.pointers   = [];
+        this.pointerIds = [];
+
+        // Previous native pointer move event coordinates
+        this.prevCoords = {
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
+            timeStamp: 0
+        };
+        // current native pointer move event coordinates
+        this.curCoords = {
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
+            timeStamp: 0
+        };
+
+        // Starting InteractEvent pointer coordinates
+        this.startCoords = {
+            page     : { x: 0, y: 0 },
+            client   : { x: 0, y: 0 },
+            timeStamp: 0
+        };
+
+        // Change in coordinates and time of the pointer
+        this.pointerDelta = {
+            page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+            client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+            timeStamp: 0
+        };
+
+        this.downTime    = 0;       // the timeStamp of the starting event
+        this.downEvent   = null;    // pointerdown/mousedown/touchstart event
+        this.downPointer = {};
+        this.downTarget  = null;
+
+        this.prevEvent = null;      // previous action event
+        this.tapTime   = 0;         // time of the most recent tap event
+        this.prevTap   = null;
+
+        this.startOffset    = { left: 0, right: 0, top: 0, bottom: 0 };
+        this.restrictOffset = { left: 0, right: 0, top: 0, bottom: 0 };
+        this.snapOffset     = { x: 0, y: 0};
+
+        this.gesture = {
+            start: { x: 0, y: 0 },
+
+            startDistance: 0,   // distance between two touches of touchStart
+            prevDistance : 0,
+            distance     : 0,
+
+            scale: 1,           // gesture.distance / gesture.startDistance
+
+            startAngle: 0,      // angle of line joining two touches
+            prevAngle : 0       // angle of the previous gesture event
+        };
+
+        this.snapStatus = {
+            x       : 0, y       : 0,
+            dx      : 0, dy      : 0,
+            realX   : 0, realY   : 0,
+            snappedX: 0, snappedY: 0,
+            anchors : [],
+            paths   : [],
+            locked  : false,
+            changed : false
+        };
+
+        this.restrictStatus = {
+            dx         : 0, dy         : 0,
+            restrictedX: 0, restrictedY: 0,
+            snap       : null,
+            restricted : false,
+            changed    : false
+        };
+
+        this.restrictStatus.snap = this.snapStatus;
+
+        this.pointerIsDown   = false;
+        this.pointerWasMoved = false;
+        this.gesturing       = false;
+        this.dragging        = false;
+        this.resizing        = false;
+        this.resizeAxes      = 'xy';
+
+        this.mouse = false;
+
+        interactions.push(this);
     }
 
-    function getDropEvents (pointerEvent, dragEvent) {
-        var dragLeaveEvent = null,
-            dragEnterEvent = null,
-            dropActivateEvent = null,
-            dropDectivateEvent = null,
-            dropMoveEvent = null,
-            dropEvent = null;
+    Interaction.prototype = {
+        getPageXY  : function (pointer, xy) { return   getPageXY(pointer, xy, this); },
+        getClientXY: function (pointer, xy) { return getClientXY(pointer, xy, this); },
+        setEventXY : function (target, ptr) { return  setEventXY(target, ptr, this); },
 
-        if (dropElement !== prevDropElement) {
-            // if there was a prevDropTarget, create a dragleave event
-            if (prevDropTarget) {
-                dragLeaveEvent = new InteractEvent(pointerEvent, 'drag', 'leave', prevDropElement, dragEvent.target);
-                dragLeaveEvent.draggable = dragEvent.interactable;
-                dragEvent.dragLeave = prevDropElement;
-                dragEvent.prevDropzone = prevDropTarget;
-            }
-            // if the dropTarget is not null, create a dragenter event
-            if (dropTarget) {
-                dragEnterEvent = new InteractEvent(pointerEvent, 'drag', 'enter', dropElement, dragEvent.target);
-                dragEnterEvent.draggable = dragEvent.interactable;
-                dragEvent.dragEnter = dropElement;
-                dragEvent.dropzone = dropTarget;
-            }
-        }
+        pointerOver: function (pointer, event, eventTarget) {
+            if (this.prepared || !this.mouse) { return; }
 
-        if (dragEvent.type === 'dragend' && dropTarget) {
-            dropEvent = new InteractEvent(pointerEvent, 'drop', null, dropElement, dragEvent.target);
-            dropEvent.draggable = dragEvent.interactable;
-            dragEvent.dropzone = dropTarget;
-        }
-        if (dragEvent.type === 'dragstart') {
-            dropActivateEvent = new InteractEvent(pointerEvent, 'drop', 'activate', null, dragEvent.target);
-            dropActivateEvent.draggable = dragEvent.interactable;
-        }
-        if (dragEvent.type === 'dragend') {
-            dropDectivateEvent = new InteractEvent(pointerEvent, 'drop', 'deactivate', null, dragEvent.target);
-            dropDectivateEvent.draggable = dragEvent.interactable;
-        }
-        if (dragEvent.type === 'dragmove' && dropTarget) {
-            dropMoveEvent = {
-                target       : dropElement,
-                relatedTarget: dragEvent.target,
-                draggable    : dragEvent.interactable,
-                dragmove     : dragEvent,
-                type         : 'dropmove',
-                timeStamp    : dragEvent.timeStamp
+            var curMatches = [],
+                curMatchElements = [],
+                prevTargetElement = this.element;
+
+            this.addPointer(pointer);
+
+            if (this.target
+                && (testIgnore(this.target, this.element, eventTarget)
+                    || !testAllow(this.target, this.element, eventTarget)
+                    || !withinInteractionLimit(this.target, this.element, this.prepared))) {
+                // if the eventTarget should be ignored or shouldn't be allowed
+                // clear the previous target
+                this.target = null;
+                this.element = null;
+                this.matches = [];
+                this.matchElements = [];
+            }
+
+            var elementInteractable = interactables.get(eventTarget),
+                elementAction = (elementInteractable
+                                 && !testIgnore(elementInteractable, eventTarget, eventTarget)
+                                 && testAllow(elementInteractable, eventTarget, eventTarget)
+                                 && validateAction(
+                                     elementInteractable.getAction(pointer, this, eventTarget),
+                                     elementInteractable));
+
+             elementAction = elementInteractable && withinInteractionLimit(elementInteractable, eventTarget, elementAction)
+                 ? elementAction
+                 : null;
+
+            function pushCurMatches (interactable, selector) {
+                if (interactable
+                    && inContext(interactable, eventTarget)
+                    && !testIgnore(interactable, eventTarget, eventTarget)
+                    && testAllow(interactable, eventTarget, eventTarget)
+                    && matchesSelector(eventTarget, selector)) {
+
+                    curMatches.push(interactable);
+                    curMatchElements.push(eventTarget);
+                }
+            }
+
+            if (elementAction) {
+                this.target = elementInteractable;
+                this.element = eventTarget;
+                this.matches = [];
+                this.matchElements = [];
+            }
+            else {
+                interactables.forEachSelector(pushCurMatches);
+
+                if (this.validateSelector(pointer, curMatches, curMatchElements)) {
+                    this.matches = curMatches;
+                    this.matchElements = curMatchElements;
+
+                    this.pointerHover(pointer, event, this.matches, this.matchElements);
+                    events.addToElement(eventTarget,
+                                        PointerEvent? pEventTypes.move : 'mousemove',
+                                        listeners.pointerHover);
+                }
+                else if (this.target) {
+                    if (nodeContains(prevTargetElement, eventTarget)) {
+                        this.pointerHover(pointer, event, this.matches, this.matchElements);
+                        events.addToElement(this.element,
+                                            PointerEvent? pEventTypes.move : 'mousemove',
+                                            listeners.pointerHover);
+                    }
+                    else {
+                        this.target = null;
+                        this.element = null;
+                        this.matches = [];
+                        this.matchElements = [];
+                    }
+                }
+            }
+        },
+
+        // Check what action would be performed on pointerMove target if a mouse
+        // button were pressed and change the cursor accordingly
+        pointerHover: function (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
+            var target = this.target;
+
+            if (!this.prepared && this.mouse) {
+
+                var action;
+
+                // update pointer coords for defaultActionChecker to use
+                this.setEventXY(this.curCoords, pointer);
+
+                if (matches) {
+                    action = this.validateSelector(pointer, matches, matchElements);
+                }
+                else if (target) {
+                    action = validateAction(target.getAction(this.pointers[0], this, this.element), this.target);
+                }
+
+                if (target && target.options.styleCursor) {
+                    if (action) {
+                        document.documentElement.style.cursor = actionCursors[action];
+                    }
+                    else {
+                        document.documentElement.style.cursor = '';
+                    }
+                }
+            }
+            else if (this.prepared) {
+                this.checkAndPreventDefault(event, target, this.element);
+            }
+        },
+
+        pointerOut: function (pointer, event, eventTarget) {
+            if (this.prepared) { return; }
+
+            // Remove temporary event listeners for selector Interactables
+            if (!interactables.get(eventTarget)) {
+                events.removeFromElement(eventTarget,
+                                       PointerEvent? pEventTypes.move : 'mousemove',
+                                       listeners.pointerHover);
+            }
+
+            if (this.target && this.target.options.styleCursor && !this.interacting()) {
+                document.documentElement.style.cursor = '';
+            }
+        },
+
+        selectorDown: function (pointer, event, eventTarget, curEventTarget) {
+            this.pointerIsDown = true;
+
+            var element = eventTarget,
+                action;
+
+            this.addPointer(pointer);
+
+            // Check if the down event hits the current inertia target
+            if (this.inertiaStatus.active && this.target.selector) {
+                // climb up the DOM tree from the event target
+                while (element && element !== document) {
+
+                    // if this element is the current inertia target element
+                    if (element === this.element
+                        // and the prospective action is the same as the ongoing one
+                        && validateAction(this.target.getAction(pointer, this, this.element), this.target) === this.prepared) {
+
+                        // stop inertia so that the next move will be a normal one
+                        cancelFrame(this.inertiaStatus.i);
+                        this.inertiaStatus.active = false;
+
+                        return;
+                    }
+                    element = element.parentNode;
+                }
+            }
+
+            // do nothing if interacting
+            if (this.interacting()) {
+                return;
+            }
+
+            var that = this;
+
+            function pushMatches (interactable, selector, context) {
+                var elements = ie8MatchesSelector
+                    ? context.querySelectorAll(selector)
+                    : undefined;
+
+                if (inContext(interactable, element)
+                    && !testIgnore(interactable, element, eventTarget)
+                    && testAllow(interactable, element, eventTarget)
+                    && matchesSelector(element, selector, elements)) {
+
+                    that.matches.push(interactable);
+                    that.matchElements.push(element);
+                }
+            }
+
+            // update pointer coords for defaultActionChecker to use
+            this.setEventXY(this.curCoords, pointer);
+
+            if (this.matches.length && this.mouse) {
+                action = this.validateSelector(pointer, this.matches, this.matchElements);
+            }
+            else {
+                while (element && element !== document && !action) {
+                    this.matches = [];
+                    this.matchElements = [];
+
+                    interactables.forEachSelector(pushMatches);
+
+                    action = this.validateSelector(pointer, this.matches, this.matchElements);
+                    element = element.parentNode;
+                }
+            }
+
+            if (action) {
+                this.prepared = action;
+
+                return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
+            }
+            else {
+                // do these now since pointerDown isn't being called from here
+                this.downTime = new Date().getTime();
+                this.downTarget = eventTarget;
+                this.downEvent = event;
+                extend(this.downPointer, pointer);
+
+                copyCoords(this.prevCoords, this.curCoords);
+                this.pointerWasMoved = false;
+            }
+        },
+
+        // Determine action to be performed on next pointerMove and add appropriate
+        // style and event Liseners
+        pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
+            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared) {
+                this.checkAndPreventDefault(event, this.target, this.element);
+
+                return;
+            }
+
+            this.pointerIsDown = true;
+
+            this.addPointer(pointer);
+
+            var action;
+
+            // If it is the second touch of a multi-touch gesture, keep the target
+            // the same if a target was set by the first touch
+            // Otherwise, set the target if there is no action prepared
+            if ((this.pointerIds.length < 2 && !this.target) || !this.prepared) {
+
+                var interactable = interactables.get(curEventTarget);
+
+                if (interactable
+                    && !testIgnore(interactable, curEventTarget, eventTarget)
+                    && testAllow(interactable, curEventTarget, eventTarget)
+                    && (action = validateAction(forceAction || interactable.getAction(pointer, this), interactable, eventTarget))
+                    && withinInteractionLimit(interactable, curEventTarget, action)) {
+                    this.target = interactable;
+                    this.element = curEventTarget;
+                }
+            }
+
+            var target = this.target,
+                options = target && target.options;
+
+            if (target && !this.interacting()) {
+                action = action || validateAction(forceAction || target.getAction(pointer, this), target, this.element);
+
+                this.setEventXY(this.startCoords);
+
+                if (!action) { return; }
+
+                if (options.styleCursor) {
+                    document.documentElement.style.cursor = actionCursors[action];
+                }
+
+                this.resizeAxes = action === 'resizexy'?
+                        'xy':
+                        action === 'resizex'?
+                            'x':
+                            action === 'resizey'?
+                                'y':
+                                '';
+
+                if (action === 'gesture' && this.pointerIds.length < 2) {
+                    action = null;
+                }
+
+                this.prepared = action;
+
+                this.snapStatus.snappedX = this.snapStatus.snappedY =
+                    this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
+
+                this.downTime = new Date().getTime();
+                this.downTarget = eventTarget;
+                this.downEvent = event;
+                extend(this.downPointer, pointer);
+
+                this.setEventXY(this.prevCoords);
+                this.pointerWasMoved = false;
+
+                this.checkAndPreventDefault(event, target, this.element);
+            }
+            // if inertia is active try to resume action
+            else if (this.inertiaStatus.active
+                && curEventTarget === this.element
+                && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
+
+                cancelFrame(this.inertiaStatus.i);
+                this.inertiaStatus.active = false;
+            }
+        },
+
+        pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
+            if (!this.pointerIsDown) { return; }
+
+            this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
+                                                ? this.inertiaStatus.startEvent
+                                                : undefined);
+
+            if (this.pointerWasMoved
+                && this.curCoords.page.x === this.prevCoords.page.x
+                && this.curCoords.page.y === this.prevCoords.page.y
+                && this.curCoords.client.x === this.prevCoords.client.x
+                && this.curCoords.client.y === this.prevCoords.client.y) {
+
+                this.checkAndPreventDefault(event, this.target, this.element);
+                return;
+            }
+
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+
+            var dx, dy;
+
+            // register movement of more than 1 pixel
+            if (!this.pointerWasMoved) {
+                dx = this.curCoords.client.x - this.startCoords.client.x;
+                dy = this.curCoords.client.y - this.startCoords.client.y;
+
+                this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
+            }
+
+            if (!this.prepared) { return; }
+
+            if (this.pointerWasMoved
+                // ignore movement while inertia is active
+                && (!this.inertiaStatus.active || (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)))) {
+
+                // if just starting an action, calculate the pointer speed now
+                if (!this.interacting()) {
+                    setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+
+                    // check if a drag is in the correct axis
+                    if (this.prepared === 'drag') {
+                        var absX = Math.abs(dx),
+                            absY = Math.abs(dy),
+                            targetAxis = this.target.options.dragAxis,
+                            axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+
+                        // if the movement isn't in the axis of the interactable
+                        if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+                            // cancel the prepared action
+                            this.prepared = null;
+
+                            // then try to get a drag from another ineractable
+
+                            var element = eventTarget;
+
+                            // check element interactables
+                            while (element && element !== document) {
+                                var elementInteractable = interactables.get(element);
+
+                                if (elementInteractable
+                                    && elementInteractable !== this.target
+                                    && elementInteractable.getAction(this.downPointer, this, element) === 'drag'
+                                    && checkAxis(axis, elementInteractable)) {
+
+                                    this.prepared = 'drag';
+                                    this.target = elementInteractable;
+                                    this.element = element;
+                                    break;
+                                }
+
+                                element = element.parentNode;
+                            }
+
+                            // if there's no drag from element interactables,
+                            // check the selector interactables
+                            if (!this.prepared) {
+                                var getDraggable = function (interactable, selector, context) {
+                                    var elements = ie8MatchesSelector
+                                        ? context.querySelectorAll(selector)
+                                        : undefined;
+
+                                    if (interactable === this.target) { return; }
+
+                                    if (inContext(interactable, eventTarget)
+                                        && !testIgnore(interactable, element, eventTarget)
+                                        && testAllow(interactable, element, eventTarget)
+                                        && matchesSelector(element, selector, elements)
+                                        && interactable.getAction(this.downPointer, this, element) === 'drag'
+                                        && checkAxis(axis, interactable)
+                                        && withinInteractionLimit(interactable, element, 'drag')) {
+
+                                        return interactable;
+                                    }
+                                };
+
+                                element = eventTarget;
+
+                                while (element && element !== document) {
+                                    var selectorInteractable = interactables.forEachSelector(getDraggable);
+
+                                    if (selectorInteractable) {
+                                        this.prepared = 'drag';
+                                        this.target = selectorInteractable;
+                                        this.element = element;
+                                        break;
+                                    }
+
+                                    element = element.parentNode;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                var starting = !!this.prepared && !this.interacting();
+
+                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared)) {
+                    this.stop();
+                    return;
+                }
+
+                if (this.prepared && this.target) {
+                    var target         = this.target,
+                        shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
+                        shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
+
+                        coords = starting? this.startCoords.page : this.curCoords.page;
+
+                    if (starting) {
+                        var rect = target.getRect(this.element),
+                            snap = target.options.snap,
+                            restrict = target.options.restrict;
+
+                        if (rect) {
+                            this.startOffset.left = this.startCoords.page.x - rect.left;
+                            this.startOffset.top  = this.startCoords.page.y - rect.top;
+
+                            this.startOffset.right  = rect.right  - this.startCoords.page.x;
+                            this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
+                        }
+                        else {
+                            this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
+                        }
+
+                        if (rect && snap.elementOrigin) {
+                            this.snapOffset.x = this.startOffset.left - (rect.width  * snap.elementOrigin.x);
+                            this.snapOffset.y = this.startOffset.top  - (rect.height * snap.elementOrigin.y);
+                        }
+                        else {
+                            this.snapOffset.x = this.snapOffset.y = 0;
+                        }
+
+                        if (rect && restrict.elementRect) {
+                            this.restrictOffset.left = this.startOffset.left - (rect.width  * restrict.elementRect.left);
+                            this.restrictOffset.top  = this.startOffset.top  - (rect.height * restrict.elementRect.top);
+
+                            this.restrictOffset.right  = this.startOffset.right  - (rect.width  * (1 - restrict.elementRect.right));
+                            this.restrictOffset.bottom = this.startOffset.bottom - (rect.height * (1 - restrict.elementRect.bottom));
+                        }
+                        else {
+                            this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
+                        }
+                    }
+
+                    if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
+                    if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
+
+                    var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
+                                     && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
+
+                    // move if snapping or restriction doesn't prevent it
+                    if (shouldMove) {
+                        var action = /resize/.test(this.prepared)? 'resize': this.prepared;
+                        if (starting) {
+                            var dragStartEvent = this[action + 'Start'](this.downEvent);
+
+                            this.prevEvent = dragStartEvent;
+
+                            // reset active dropzones
+                            this.activeDrops.dropzones = [];
+                            this.activeDrops.elements  = [];
+                            this.activeDrops.rects     = [];
+
+                            if (!this.dynamicDrop) {
+                                this.setActiveDrops(this.element);
+                            }
+
+                            var dropEvents = this.getDropEvents(event, dragStartEvent);
+
+                            if (dropEvents.activate) {
+                                this.fireActiveDrops(dropEvents.activate);
+                            }
+
+                            // set snapping and restriction for the move event
+                            if (shouldSnap    ) { this.setSnapping   (coords); }
+                            if (shouldRestrict) { this.setRestriction(coords); }
+                        }
+
+                        this.prevEvent = this[action + 'Move'](event);
+                    }
+
+                    this.checkAndPreventDefault(event, this.target, this.element);
+                }
+            }
+
+            copyCoords(this.prevCoords, this.curCoords);
+
+            if (this.dragging || this.resizing) {
+                autoScroll.edgeMove(event);
+            }
+        },
+
+        dragStart: function (event) {
+            var dragEvent = new InteractEvent(this, event, 'drag', 'start', this.element);
+
+            this.dragging = true;
+            this.target.fire(dragEvent);
+
+            return dragEvent;
+        },
+
+        dragMove: function (event) {
+            var target = this.target,
+                dragEvent  = new InteractEvent(this, event, 'drag', 'move', this.element),
+                draggableElement = this.element,
+                drop = this.getDrop(dragEvent, draggableElement);
+
+            this.dropTarget = drop.dropzone;
+            this.dropElement = drop.element;
+
+            var dropEvents = this.getDropEvents(event, dragEvent);
+
+            target.fire(dragEvent);
+
+            if (dropEvents.leave) { this.prevDropTarget.fire(dropEvents.leave); }
+            if (dropEvents.enter) {     this.dropTarget.fire(dropEvents.enter); }
+            if (dropEvents.move ) {     this.dropTarget.fire(dropEvents.move ); }
+
+            this.prevDropTarget  = this.dropTarget;
+            this.prevDropElement = this.dropElement;
+
+            return dragEvent;
+        },
+
+        resizeStart: function (event) {
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'start', this.element);
+
+            this.target.fire(resizeEvent);
+
+            this.resizing = true;
+
+            return resizeEvent;
+        },
+
+        resizeMove: function (event) {
+            var resizeEvent = new InteractEvent(this, event, 'resize', 'move', this.element);
+
+            this.target.fire(resizeEvent);
+
+            return resizeEvent;
+        },
+
+        gestureStart: function (event) {
+            var gestureEvent = new InteractEvent(this, event, 'gesture', 'start', this.element);
+
+            gestureEvent.ds = 0;
+
+            this.gesture.startDistance = this.gesture.prevDistance = gestureEvent.distance;
+            this.gesture.startAngle = this.gesture.prevAngle = gestureEvent.angle;
+            this.gesture.scale = 1;
+
+            this.gesturing = true;
+
+            this.target.fire(gestureEvent);
+
+            return gestureEvent;
+        },
+
+        gestureMove: function (event) {
+            if (!this.pointerIds.length) {
+                return this.prevEvent;
+            }
+
+            var gestureEvent;
+
+            gestureEvent = new InteractEvent(this, event, 'gesture', 'move', this.element);
+            gestureEvent.ds = gestureEvent.scale - this.gesture.scale;
+
+            this.target.fire(gestureEvent);
+
+            this.gesture.prevAngle = gestureEvent.angle;
+            this.gesture.prevDistance = gestureEvent.distance;
+
+            if (gestureEvent.scale !== Infinity &&
+                gestureEvent.scale !== null &&
+                gestureEvent.scale !== undefined  &&
+                !isNaN(gestureEvent.scale)) {
+
+                this.gesture.scale = gestureEvent.scale;
+            }
+
+            return gestureEvent;
+        },
+
+        // End interact move events and stop auto-scroll unless inertia is enabled
+        pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+            var endEvent,
+                target = this.target,
+                options = target && target.options,
+                inertiaOptions = options && options.inertia,
+                inertiaStatus = this.inertiaStatus;
+
+            if (this.interacting()) {
+
+                if (inertiaStatus.active) { return; }
+
+                var pointerSpeed,
+                    now = new Date().getTime(),
+                    inertiaPossible = false,
+                    inertia = false,
+                    smoothEnd = false,
+                    endSnap = checkSnap(target, this.prepared) && options.snap.endOnly,
+                    endRestrict = checkRestrict(target, this.prepared) && options.restrict.endOnly,
+                    dx = 0,
+                    dy = 0,
+                    startEvent;
+
+                if (this.dragging) {
+                    if      (options.dragAxis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
+                    else if (options.dragAxis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
+                    else   /*options.dragAxis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
+                }
+
+                // check if inertia should be started
+                inertiaPossible = (options.inertiaEnabled
+                                   && this.prepared !== 'gesture'
+                                   && contains(inertiaOptions.actions, this.prepared)
+                                   && event !== inertiaStatus.startEvent);
+
+                inertia = (inertiaPossible
+                           && (now - this.curCoords.timeStamp) < 50
+                           && pointerSpeed > inertiaOptions.minSpeed
+                           && pointerSpeed > inertiaOptions.endSpeed);
+
+                if (inertiaPossible && !inertia && (endSnap || endRestrict)) {
+
+                    var snapRestrict = {};
+
+                    snapRestrict.snap = snapRestrict.restrict = snapRestrict;
+
+                    if (endSnap) {
+                        this.setSnapping(this.curCoords.page, snapRestrict);
+                        if (snapRestrict.locked) {
+                            dx += snapRestrict.dx;
+                            dy += snapRestrict.dy;
+                        }
+                    }
+
+                    if (endRestrict) {
+                        this.setRestriction(this.curCoords.page, snapRestrict);
+                        if (snapRestrict.restricted) {
+                            dx += snapRestrict.dx;
+                            dy += snapRestrict.dy;
+                        }
+                    }
+
+                    if (dx || dy) {
+                        smoothEnd = true;
+                    }
+                }
+
+                if (inertia || smoothEnd) {
+                    copyCoords(inertiaStatus.upCoords, this.curCoords);
+
+                    this.pointers[0] = inertiaStatus.startEvent = startEvent =
+                        new InteractEvent(this, event, this.prepared, 'inertiastart', this.element);
+
+                    inertiaStatus.t0 = now;
+
+                    target.fire(inertiaStatus.startEvent);
+
+                    if (inertia) {
+                        inertiaStatus.vx0 = this.pointerDelta.client.vx;
+                        inertiaStatus.vy0 = this.pointerDelta.client.vy;
+                        inertiaStatus.v0 = pointerSpeed;
+
+                        this.calcInertia(inertiaStatus);
+
+                        var page = extend({}, this.curCoords.page),
+                            origin = getOriginXY(target, this.element),
+                            statusObject;
+
+                        page.x = page.x + inertiaStatus.xe - origin.x;
+                        page.y = page.y + inertiaStatus.ye - origin.y;
+
+                        statusObject = {
+                            useStatusXY: true,
+                            x: page.x,
+                            y: page.y,
+                            dx: 0,
+                            dy: 0,
+                            snap: null
+                        };
+
+                        statusObject.snap = statusObject;
+
+                        dx = dy = 0;
+
+                        if (endSnap) {
+                            var snap = this.setSnapping(this.curCoords.page, statusObject);
+
+                            if (snap.locked) {
+                                dx += snap.dx;
+                                dy += snap.dy;
+                            }
+                        }
+
+                        if (endRestrict) {
+                            var restrict = this.setRestriction(this.curCoords.page, statusObject);
+
+                            if (restrict.restricted) {
+                                dx += restrict.dx;
+                                dy += restrict.dy;
+                            }
+                        }
+
+                        inertiaStatus.modifiedXe += dx;
+                        inertiaStatus.modifiedYe += dy;
+
+                        inertiaStatus.i = reqFrame(this.boundInertiaFrame);
+                    }
+                    else {
+                        inertiaStatus.smoothEnd = true;
+                        inertiaStatus.xe = dx;
+                        inertiaStatus.ye = dy;
+
+                        inertiaStatus.sx = inertiaStatus.sy = 0;
+
+                        inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
+                    }
+
+                    inertiaStatus.active = true;
+                    return;
+                }
+
+                if (endSnap || endRestrict) {
+                    // fire a move event at the snapped coordinates
+                    this.pointerMove(pointer, event, eventTarget, curEventTarget, true);
+                }
+            }
+
+            if (this.dragging) {
+                endEvent = new InteractEvent(this, event, 'drag', 'end', this.element);
+
+                var dropEvent,
+                    draggableElement = this.element,
+                    drop = this.getDrop(endEvent, draggableElement);
+
+                this.dropTarget = drop.dropzone;
+                this.dropElement = drop.element;
+
+                // get the most apprpriate dropzone based on DOM depth and order
+                if (this.dropTarget) {
+                    dropEvent = new InteractEvent(this, event, 'drop', null, this.dropElement, draggableElement);
+
+                    endEvent.dropzone = this.dropElement;
+                }
+
+                // if there was a prevDropTarget (perhaps if for some reason this
+                // dragend happens without the mouse moving of the previous drop
+                // target)
+                else if (this.prevDropTarget) {
+                    var dragLeaveEvent = new InteractEvent(this, event, 'drag', 'leave', this.dropElement, draggableElement);
+
+                    this.prevDropTarget.fire(dragLeaveEvent, draggableElement);
+
+                    endEvent.dragLeave = this.prevDropElement;
+                }
+
+                var dropEvents = this.getDropEvents(event, endEvent);
+
+                if (dropEvents.leave) { this.prevDropTarget.fire(dropEvents.leave); }
+                if (dropEvents.enter) {     this.dropTarget.fire(dropEvents.enter); }
+                if (dropEvents.drop ) {     this.dropTarget.fire(dropEvents.drop ); }
+                if (dropEvents.deactivate) {
+                    this.fireActiveDrops(dropEvents.deactivate);
+                }
+
+                target.fire(endEvent);
+            }
+            else if (this.resizing) {
+                endEvent = new InteractEvent(this, event, 'resize', 'end', this.element);
+                target.fire(endEvent);
+            }
+            else if (this.gesturing) {
+                endEvent = new InteractEvent(this, event, 'gesture', 'end', this.element);
+                target.fire(endEvent);
+            }
+
+            this.stop(event);
+        },
+
+        collectDrops: function (element) {
+            var drops = [],
+                elements = [],
+                i;
+
+            element = element || this.element;
+
+            // collect all dropzones and their elements which qualify for a drop
+            for (i = 0; i < interactables.length; i++) {
+                if (!interactables[i].options.dropzone) { continue; }
+
+                var current = interactables[i];
+
+                // test the draggable element against the dropzone's accept setting
+                if ((isElement(current.options.accept) && current.options.accept !== element)
+                    || (isString(current.options.accept)
+                        && !matchesSelector(element, current.options.accept))) {
+
+                    continue;
+                }
+
+                // query for new elements if necessary
+                var dropElements = current.selector? current._context.querySelectorAll(current.selector) : [current._element];
+
+                for (var j = 0, len = dropElements.length; j < len; j++) {
+                    var currentElement = dropElements[j];
+
+                    if (currentElement === element) {
+                        continue;
+                    }
+
+                    drops.push(current);
+                    elements.push(currentElement);
+                }
+            }
+
+            return {
+                dropzones: drops,
+                elements: elements
             };
-            dragEvent.dropzone = dropTarget;
+        },
+
+        fireActiveDrops: function (event) {
+            var i,
+                current,
+                currentElement,
+                prevElement;
+
+            // loop through all active dropzones and trigger event
+            for (i = 0; i < this.activeDrops.dropzones.length; i++) {
+                current = this.activeDrops.dropzones[i];
+                currentElement = this.activeDrops.elements [i];
+
+                // prevent trigger of duplicate events on same element
+                if (currentElement !== prevElement) {
+                    // set current element as event target
+                    event.target = currentElement;
+                    current.fire(event);
+                }
+                prevElement = currentElement;
+            }
+        },
+
+        // Collect a new set of possible drops and save them in activeDrops.
+        // setActiveDrops should always be called when a drag has just started or a
+        // drag event happens while dynamicDrop is true
+        setActiveDrops: function (dragElement) {
+            // get dropzones and their elements that could recieve the draggable
+            var possibleDrops = this.collectDrops(dragElement, true);
+
+            this.activeDrops.dropzones = possibleDrops.dropzones;
+            this.activeDrops.elements  = possibleDrops.elements;
+            this.activeDrops.rects     = [];
+
+            for (var i = 0; i < this.activeDrops.dropzones.length; i++) {
+                this.activeDrops.rects[i] = this.activeDrops.dropzones[i].getRect(this.activeDrops.elements[i]);
+            }
+        },
+
+        getDrop: function (event, dragElement) {
+            var validDrops = [];
+
+            if (dynamicDrop) {
+                this.setActiveDrops(dragElement);
+            }
+
+            // collect all dropzones and their elements which qualify for a drop
+            for (var j = 0; j < this.activeDrops.dropzones.length; j++) {
+                var current        = this.activeDrops.dropzones[j],
+                    currentElement = this.activeDrops.elements [j],
+                    rect           = this.activeDrops.rects    [j];
+
+                validDrops.push(current.dropCheck(this.pointers[0], this.target, dragElement, currentElement, rect)
+                                ? currentElement
+                                : null);
+            }
+
+            // get the most apprpriate dropzone based on DOM depth and order
+            var dropIndex = indexOfDeepestElement(validDrops),
+                dropzone  = this.activeDrops.dropzones[dropIndex] || null,
+                element   = this.activeDrops.elements [dropIndex] || null;
+
+            return {
+                dropzone: dropzone,
+                element: element
+            };
+        },
+
+        getDropEvents: function (pointerEvent, dragEvent) {
+            var dragLeaveEvent = null,
+                dragEnterEvent = null,
+                dropActivateEvent = null,
+                dropDectivateEvent = null,
+                dropMoveEvent = null,
+                dropEvent = null;
+
+            if (this.dropElement !== this.prevDropElement) {
+                // if there was a prevDropTarget, create a dragleave event
+                if (this.prevDropTarget) {
+                    dragLeaveEvent = new InteractEvent(this, pointerEvent, 'drag', 'leave', this.prevDropElement, dragEvent.target);
+                    dragLeaveEvent.draggable = dragEvent.interactable;
+                    dragEvent.dragLeave = this.prevDropElement;
+                    dragEvent.prevDropzone = this.prevDropTarget;
+                }
+                // if the dropTarget is not null, create a dragenter event
+                if (this.dropTarget) {
+                    dragEnterEvent = new InteractEvent(this, pointerEvent, 'drag', 'enter', this.dropElement, dragEvent.target);
+                    dragEnterEvent.draggable = dragEvent.interactable;
+                    dragEvent.dragEnter = this.dropElement;
+                    dragEvent.dropzone = this.dropTarget;
+                }
+            }
+
+            if (dragEvent.type === 'dragend' && this.dropTarget) {
+                dropEvent = new InteractEvent(this, pointerEvent, 'drop', null, this.dropElement, dragEvent.target);
+                dropEvent.draggable = dragEvent.interactable;
+                dragEvent.dropzone = this.dropTarget;
+            }
+            if (dragEvent.type === 'dragstart') {
+                dropActivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'activate', this.element, dragEvent.target);
+                dropActivateEvent.draggable = dragEvent.interactable;
+            }
+            if (dragEvent.type === 'dragend') {
+                dropDectivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', this.element, dragEvent.target);
+                dropDectivateEvent.draggable = dragEvent.interactable;
+            }
+            if (dragEvent.type === 'dragmove' && this.dropTarget) {
+                dropMoveEvent = {
+                    target       : this.dropElement,
+                    relatedTarget: dragEvent.target,
+                    draggable    : dragEvent.interactable,
+                    dragmove     : dragEvent,
+                    type         : 'dropmove',
+                    timeStamp    : dragEvent.timeStamp
+                };
+                dragEvent.dropzone = this.dropTarget;
+            }
+
+            return {
+                enter       : dragEnterEvent,
+                leave       : dragLeaveEvent,
+                activate    : dropActivateEvent,
+                deactivate  : dropDectivateEvent,
+                move        : dropMoveEvent,
+                drop        : dropEvent
+            };
+        },
+
+        currentAction: function () {
+            return (this.dragging && 'drag') || (this.resizing && 'resize') || (this.gesturing && 'gesture') || null;
+        },
+
+        interacting: function () {
+            return this.dragging || this.resizing || this.gesturing;
+        },
+
+        clearTargets: function () {
+            if (this.target && !this.target.selector) {
+                this.target = this.element = null;
+            }
+
+            this.dropTarget = this.dropElement = this.prevDropTarget = this.prevDropElement = null;
+        },
+
+        stop: function (event) {
+            if (this.interacting()) {
+                autoScroll.stop();
+                this.matches = [];
+                this.matchElements = [];
+
+                var target = this.target;
+
+                if (target.options.styleCursor) {
+                    document.documentElement.style.cursor = '';
+                }
+
+                // prevent Default only if were previously interacting
+                if (event && isFunction(event.preventDefault)) {
+                    this.checkAndPreventDefault(event, target, this.element);
+                }
+
+                if (this.dragging) {
+                    this.activeDrops.dropzones = this.activeDrops.elements = this.activeDrops.rects = null;
+                }
+
+                this.clearTargets();
+            }
+
+            this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
+            this.prepared = this.prevEvent = null;
+            this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
+
+            this.pointerIds.splice(0);
+            // pointers should be retained
+            //this.pointers.splice(0);
+
+            // delete interaction if it's not the only one
+            if (interactions.length > 1) {
+                interactions.splice(indexOf(interactions, this), 1);
+            }
+        },
+
+        inertiaFrame: function () {
+            var inertiaStatus = this.inertiaStatus,
+                options = this.target.options.inertia,
+                lambda = options.resistance,
+                t = new Date().getTime() / 1000 - inertiaStatus.t0;
+
+            if (t < inertiaStatus.te) {
+
+                var progress =  1 - (Math.exp(-lambda * t) - inertiaStatus.lambda_v0) / inertiaStatus.one_ve_v0;
+
+                if (inertiaStatus.modifiedXe === inertiaStatus.xe && inertiaStatus.modifiedYe === inertiaStatus.ye) {
+                    inertiaStatus.sx = inertiaStatus.xe * progress;
+                    inertiaStatus.sy = inertiaStatus.ye * progress;
+                }
+                else {
+                    var quadPoint = getQuadraticCurvePoint(
+                            0, 0,
+                            inertiaStatus.xe, inertiaStatus.ye,
+                            inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
+                            progress);
+
+                    inertiaStatus.sx = quadPoint.x;
+                    inertiaStatus.sy = quadPoint.y;
+                }
+
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.i = reqFrame(this.boundInertiaFrame);
+            }
+            else {
+                inertiaStatus.sx = inertiaStatus.modifiedXe;
+                inertiaStatus.sy = inertiaStatus.modifiedYe;
+
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.active = false;
+                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+            }
+        },
+
+        smoothEndFrame: function () {
+            var inertiaStatus = this.inertiaStatus,
+                t = new Date().getTime() - inertiaStatus.t0,
+                duration = this.target.options.inertia.smoothEndDuration;
+
+            if (t < duration) {
+                inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
+                inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
+
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
+            }
+            else {
+                inertiaStatus.sx = inertiaStatus.xe;
+                inertiaStatus.sy = inertiaStatus.ye;
+
+                this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.active = false;
+                inertiaStatus.smoothEnd = false;
+
+                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+            }
+        },
+
+        addPointer: function (pointer) {
+            var id = getPointerId(pointer),
+                index = this.mouse? 0 : indexOf(this.pointerIds, id);
+
+            if (index === -1) {
+                index = this.pointerIds.length;
+                this.pointerIds.push(id);
+
+                // move events are kept so that multi-touch properties can still be
+                // calculated at the end of a gesture; use pointerIds index
+                this.pointers[index] = pointer;
+            }
+            else {
+                this.pointers[index] = pointer;
+            }
+        },
+
+        removePointer: function (pointer) {
+            var id = getPointerId(pointer),
+                index = this.mouse? 0 : indexOf(this.pointerIds, id);
+
+            if (index === -1) { return; }
+
+            this.pointerIds.splice(index, 1);
+
+            // move events are kept so that multi-touch properties can still be
+            // calculated at the end of a GestureEvnt sequence
+            //this.pointers.splice(index, 1);
+        },
+
+        recordPointer: function (pointer) {
+            // Do not update pointers while inertia is active.
+            // The inertiastart event should be this.pointers[0]
+            if (this.inertiaStatus.active) { return; }
+
+            var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
+
+            if (index === -1) { return; }
+
+            this.pointers[index] = pointer;
+        },
+
+        fireTaps: function (pointer, event, targets, elements) {
+            var tap = {},
+                i;
+
+            extend(tap, event);
+            extend(tap, pointer);
+
+            tap.preventDefault           = preventOriginalDefault;
+            tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
+            tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+
+            tap.timeStamp     = new Date().getTime();
+            tap.originalEvent = event;
+            tap.dt            = tap.timeStamp - this.downTime;
+            tap.type          = 'tap';
+
+            var interval = tap.timeStamp - this.tapTime,
+                dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
+                       && this.prevTap.target === tap.target
+                       && interval < 500);
+
+            this.tapTime = tap.timeStamp;
+
+            for (i = 0; i < targets.length; i++) {
+                var origin = getOriginXY(targets[i], elements[i]);
+
+                tap.pageX -= origin.x;
+                tap.pageY -= origin.y;
+                tap.clientX -= origin.x;
+                tap.clientY -= origin.y;
+
+                tap.currentTarget = elements[i];
+                targets[i].fire(tap);
+
+                if (tap.immediatePropagationStopped
+                    ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
+                    break;
+                }
+            }
+
+            if (dbl) {
+                var doubleTap = {};
+
+                extend(doubleTap, tap);
+
+                doubleTap.dt   = interval;
+                doubleTap.type = 'doubletap';
+
+                for (i = 0; i < targets.length; i++) {
+                    doubleTap.currentTarget = elements[i];
+                    targets[i].fire(doubleTap);
+
+                    if (doubleTap.immediatePropagationStopped
+                        ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
+                        break;
+                    }
+                }
+
+                this.prevTap = doubleTap;
+            }
+            else {
+                this.prevTap = tap;
+            }
+        },
+
+        collectTaps: function (pointer, event, eventTarget) {
+            if(this.pointerWasMoved || !(this.downTarget && this.downTarget === eventTarget)) {
+                return;
+            }
+
+            var tapTargets = [],
+                tapElements = [];
+
+            var element = eventTarget;
+
+            function collectSelectorTaps (interactable, selector, context) {
+                var elements = ie8MatchesSelector
+                        ? context.querySelectorAll(selector)
+                        : undefined;
+
+                if (element !== document
+                    && inContext(interactable, element)
+                    && !testIgnore(interactable, element, eventTarget)
+                    && testAllow(interactable, element, eventTarget)
+                    && matchesSelector(element, selector, elements)) {
+
+                    tapTargets.push(interactable);
+                    tapElements.push(element);
+                }
+            }
+
+            while (element) {
+                if (interact.isSet(element)) {
+                    tapTargets.push(interact(element));
+                    tapElements.push(element);
+                }
+
+                interactables.forEachSelector(collectSelectorTaps);
+
+                element = element.parentNode;
+            }
+
+            if (tapTargets.length) {
+                this.fireTaps(pointer, event, tapTargets, tapElements);
+            }
+        },
+
+        validateSelector: function (pointer, matches, matchElements) {
+            for (var i = 0, len = matches.length; i < len; i++) {
+                var match = matches[i],
+                    matchElement = matchElements[i],
+                    action = validateAction(match.getAction(pointer, this, matchElement), match);
+
+                if (action && withinInteractionLimit(match, matchElement, action)) {
+                    this.target = match;
+                    this.element = matchElement;
+
+                    return action;
+                }
+            }
+        },
+
+        setSnapping: function (pageCoords, status) {
+            var snap = this.target.options.snap,
+                anchors = snap.anchors,
+                page,
+                closest,
+                range,
+                inRange,
+                snapChanged,
+                dx,
+                dy,
+                distance,
+                i, len;
+
+            status = status || this.snapStatus;
+
+            if (status.useStatusXY) {
+                page = { x: status.x, y: status.y };
+            }
+            else {
+                var origin = getOriginXY(this.target, this.element);
+
+                page = extend({}, pageCoords);
+
+                page.x -= origin.x;
+                page.y -= origin.y;
+            }
+
+            page.x -= this.inertiaStatus.resumeDx;
+            page.y -= this.inertiaStatus.resumeDy;
+
+            status.realX = page.x;
+            status.realY = page.y;
+
+            // change to infinite range when range is negative
+            if (snap.range < 0) { snap.range = Infinity; }
+
+            // create an anchor representative for each path's returned point
+            if (snap.mode === 'path') {
+                anchors = [];
+
+                for (i = 0, len = snap.paths.length; i < len; i++) {
+                    var path = snap.paths[i];
+
+                    if (isFunction(path)) {
+                        path = path(page.x, page.y);
+                    }
+
+                    anchors.push({
+                        x: isNumber(path.x) ? path.x : page.x,
+                        y: isNumber(path.y) ? path.y : page.y,
+
+                        range: isNumber(path.range)? path.range: snap.range
+                    });
+                }
+            }
+
+            if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
+                closest = {
+                    anchor: null,
+                    distance: 0,
+                    range: 0,
+                    dx: 0,
+                    dy: 0
+                };
+
+                for (i = 0, len = anchors.length; i < len; i++) {
+                    var anchor = anchors[i];
+
+                    range = isNumber(anchor.range)? anchor.range: snap.range;
+
+                    dx = anchor.x - page.x + this.snapOffset.x;
+                    dy = anchor.y - page.y + this.snapOffset.y;
+                    distance = hypot(dx, dy);
+
+                    inRange = distance < range;
+
+                    // Infinite anchors count as being out of range
+                    // compared to non infinite ones that are in range
+                    if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                        inRange = false;
+                    }
+
+                    if (!closest.anchor || (inRange?
+                        // is the closest anchor in range?
+                        (closest.inRange && range !== Infinity)?
+                            // the pointer is relatively deeper in this anchor
+                            distance / range < closest.distance / closest.range:
+                            //the pointer is closer to this anchor
+                            distance < closest.distance:
+                        // The other is not in range and the pointer is closer to this anchor
+                        (!closest.inRange && distance < closest.distance))) {
+
+                        if (range === Infinity) {
+                            inRange = true;
+                        }
+
+                        closest.anchor = anchor;
+                        closest.distance = distance;
+                        closest.range = range;
+                        closest.inRange = inRange;
+                        closest.dx = dx;
+                        closest.dy = dy;
+
+                        status.range = range;
+                    }
+                }
+
+                inRange = closest.inRange;
+                snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
+
+                status.snappedX = closest.anchor.x;
+                status.snappedY = closest.anchor.y;
+                status.dx = closest.dx;
+                status.dy = closest.dy;
+            }
+            else if (snap.mode === 'grid') {
+                var gridx = Math.round((page.x - snap.gridOffset.x - this.snapOffset.x) / snap.grid.x),
+                    gridy = Math.round((page.y - snap.gridOffset.y - this.snapOffset.y) / snap.grid.y),
+
+                    newX = gridx * snap.grid.x + snap.gridOffset.x + this.snapOffset.x,
+                    newY = gridy * snap.grid.y + snap.gridOffset.y + this.snapOffset.y;
+
+                dx = newX - page.x;
+                dy = newY - page.y;
+
+                distance = hypot(dx, dy);
+
+                inRange = distance < snap.range;
+                snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
+
+                status.snappedX = newX;
+                status.snappedY = newY;
+                status.dx = dx;
+                status.dy = dy;
+
+                status.range = snap.range;
+            }
+
+            status.changed = (snapChanged || (inRange && !status.locked));
+            status.locked = inRange;
+
+            return status;
+        },
+
+        setRestriction: function (pageCoords, status) {
+            var target = this.target,
+                action = /resize/.test(this.prepared)? 'resize' : this.prepared,
+                restrict = target && target.options.restrict,
+                restriction = restrict && restrict[action],
+                page;
+
+            if (!restriction) {
+                return status;
+            }
+
+            status = status || this.restrictStatus;
+
+            page = status.useStatusXY
+                    ? page = { x: status.x, y: status.y }
+                    : page = extend({}, pageCoords);
+
+            if (status.snap && status.snap.locked) {
+                page.x += status.snap.dx || 0;
+                page.y += status.snap.dy || 0;
+            }
+
+            page.x -= this.inertiaStatus.resumeDx;
+            page.y -= this.inertiaStatus.resumeDy;
+
+            status.dx = 0;
+            status.dy = 0;
+            status.restricted = false;
+
+            var rect;
+
+            if (restriction === 'parent') {
+                restriction = this.element.parentNode;
+            }
+            else if (restriction === 'self') {
+                restriction = this.element;
+            }
+
+            if (isElement(restriction)) {
+                rect = getElementRect(restriction);
+            }
+            else {
+                if (isFunction(restriction)) {
+                    restriction = restriction(page.x, page.y, this.element);
+                }
+
+                rect = restriction;
+
+                // object is assumed to have
+                // x, y, width, height or
+                // left, top, right, bottom
+                if ('x' in restriction && 'y' in restriction) {
+                    rect = {
+                        left  : restriction.x,
+                        top   : restriction.y,
+                        right : restriction.x + restriction.width,
+                        bottom: restriction.y + restriction.height
+                    };
+                }
+            }
+
+            var restrictedX = Math.max(Math.min(rect.right  - this.restrictOffset.right , page.x), rect.left + this.restrictOffset.left),
+                restrictedY = Math.max(Math.min(rect.bottom - this.restrictOffset.bottom, page.y), rect.top  + this.restrictOffset.top );
+
+            status.dx = restrictedX - page.x;
+            status.dy = restrictedY - page.y;
+
+            status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+            status.restricted = !!(status.dx || status.dy);
+
+            status.restrictedX = restrictedX;
+            status.restrictedY = restrictedY;
+
+            return status;
+        },
+
+        checkAndPreventDefault: function (event, interactable, element) {
+            if (!(interactable = interactable || this.target)) { return; }
+
+            var options = interactable.options,
+                prevent = options.preventDefault;
+
+            if (prevent === 'auto' && element && !/^input$|^textarea$/i.test(element.nodeName)) {
+                // do not preventDefault on pointerdown if the prepared action is a drag
+                // and dragging can only start from a certain direction - this allows
+                // a touch to pan the viewport if a drag isn't in the right direction
+                if (/down|start/i.test(event.type)
+                    && this.prepared === 'drag' && options.dragAxis !== 'xy') {
+
+                    return;
+                }
+
+                event.preventDefault();
+                return;
+            }
+
+            if (prevent === true) {
+                event.preventDefault();
+                return;
+            }
+        },
+
+        calcInertia: function (status) {
+            var inertiaOptions = this.target.options.inertia,
+                lambda = inertiaOptions.resistance,
+                inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
+
+            status.x0 = this.prevEvent.pageX;
+            status.y0 = this.prevEvent.pageY;
+            status.t0 = status.startEvent.timeStamp / 1000;
+            status.sx = status.sy = 0;
+
+            status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+            status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+            status.te = inertiaDur;
+
+            status.lambda_v0 = lambda / status.v0;
+            status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
         }
 
-        return {
-            enter       : dragEnterEvent,
-            leave       : dragLeaveEvent,
-            activate    : dropActivateEvent,
-            deactivate  : dropDectivateEvent,
-            move        : dropMoveEvent,
-            drop        : dropEvent
-        };
+    };
+
+    function getInteractionFromPointer (pointer, eventType, eventTarget) {
+        var i = 0, len = interactions.length,
+            mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
+                          // MSPointerEvent.MSPOINTER_TYPE_MOUSE
+                          || pointer.pointerType === 4),
+            interaction;
+
+        var id = getPointerId(pointer);
+
+        // try to resume inertia with a new pointer
+        if (/down|start/i.test(eventType)) {
+            for (i = 0; i < len; i++) {
+                interaction = interactions[i];
+
+                var element = eventTarget;
+
+                if (interaction.inertiaStatus.active && (interaction.mouse === mouseEvent)) {
+                    while (element) {
+                        // if the element is the interaction element
+                        if (element === interaction.element) {
+                            // update the interaction's pointer
+                            interaction.removePointer(interaction.pointers[0]);
+                            interaction.addPointer(pointer);
+
+                            return interaction;
+                        }
+                        element = element.parentNode;
+                    }
+                }
+            }
+        }
+
+        // if it's a mouse interaction
+        if (mouseEvent || !(supportsTouch || supportsPointerEvent)) {
+
+            // find a mouse interaction that's not in inertia phase
+            for (i = 0; i < len; i++) {
+                if (interactions[i].mouse && !interactions[i].inertiaStatus.active) {
+                    return interactions[i];
+                }
+            }
+
+            // find any interaction specifically for mouse.
+            // if the eventType is a mousedown, and inertia is active
+            // ignore the interaction
+            for (i = 0; i < len; i++) {
+                if (interactions[i].mouse && !(/down/.test(eventType) && interactions[i].inertiaStatus.active)) {
+                    return interaction;
+                }
+            }
+
+            // create a new interaction for mouse
+            interaction = new Interaction();
+            interaction.mouse = true;
+
+            return interaction;
+        }
+
+        // get interaction that has this pointer
+        for (i = 0; i < len; i++) {
+            if (contains(interactions[i].pointerIds, id)) {
+                return interactions[i];
+            }
+        }
+
+        // at this stage, a pointerUp should not return an interaction
+        if (/up|end|out/i.test(eventType)) {
+            return null;
+        }
+
+        // get first idle interaction
+        for (i = 0; i < len; i++) {
+            interaction = interactions[i];
+
+            if ((!interaction.prepared || (interaction.target.gesturable()))
+                && !interaction.interacting()
+                && !(!mouseEvent && interaction.mouse)) {
+
+                interaction.addPointer(pointer);
+
+                return interaction;
+            }
+        }
+
+        return new Interaction();
     }
 
-    function InteractEvent (event, action, phase, element, related) {
+    function doOnInteractions (method) {
+        return (function (event) {
+            var interaction,
+                eventTarget = getActualElement(event.target),
+                curEventTarget = getActualElement(event.currentTarget),
+                i;
+
+            if (supportsTouch && /touch/.test(event.type)) {
+                for (i = 0; i < event.changedTouches.length; i++) {
+                    var pointer = event.changedTouches[i];
+
+                    interaction = getInteractionFromPointer(pointer, event.type, eventTarget);
+
+                    if (!interaction) { continue; }
+
+                    interaction[method](pointer, event, eventTarget, curEventTarget);
+                }
+            }
+            else {
+                // ignore mouse events while touch interactions are active
+                if (!supportsPointerEvent && /mouse/.test(event.type)) {
+                    for (i = 0; i < interactions.length; i++) {
+                        if (!interactions[i].mouse && interactions[i].pointerIsDown) {
+                            return;
+                        }
+                    }
+                }
+
+                interaction = getInteractionFromPointer(event, event.type, eventTarget);
+
+                if (!interaction) { return; }
+
+                interaction[method](event, event, eventTarget, curEventTarget);
+            }
+        });
+    }
+
+    function InteractEvent (interaction, event, action, phase, element, related) {
         var client,
             page,
+            target      = interaction.target,
+            snapStatus  = interaction.snapStatus,
+            restrictStatus  = interaction.restrictStatus,
+            pointers    = interaction.pointers,
             deltaSource = (target && target.options || defaultOptions).deltaSource,
             sourceX     = deltaSource + 'X',
             sourceY     = deltaSource + 'Y',
             options     = target? target.options: defaultOptions,
             origin      = getOriginXY(target, element),
             starting    = phase === 'start',
-            ending      = phase === 'end';
+            ending      = phase === 'end',
+            coords      = starting? interaction.startCoords : interaction.curCoords;
 
-        element = element || target._element;
+        element = element || interaction.element;
 
-        if (action === 'gesture') {
-            var average = touchAverage(pointerMoves);
+        page   = extend({}, coords.page);
+        client = extend({}, coords.client);
 
-            page   = { x: (average.pageX   - origin.x), y: (average.pageY   - origin.y) };
-            client = { x: (average.clientX - origin.x), y: (average.clientY - origin.y) };
-        }
-        else {
+        page.x -= origin.x;
+        page.y -= origin.y;
 
-            page   = getPageXY(event);
-            client = getClientXY(event);
+        client.x -= origin.x;
+        client.y -= origin.y;
 
-            page.x -= origin.x;
-            page.y -= origin.y;
+        if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
+            this.snap = {
+                range  : snapStatus.range,
+                locked : snapStatus.locked,
+                x      : snapStatus.snappedX,
+                y      : snapStatus.snappedY,
+                realX  : snapStatus.realX,
+                realY  : snapStatus.realY,
+                dx     : snapStatus.dx,
+                dy     : snapStatus.dy
+            };
 
-            client.x -= origin.x;
-            client.y -= origin.y;
-
-            if (checkSnap(target) && !(starting && options.snap.elementOrigin)) {
-
-                this.snap = {
-                    range  : snapStatus.range,
-                    locked : snapStatus.locked,
-                    x      : snapStatus.snappedX,
-                    y      : snapStatus.snappedY,
-                    realX  : snapStatus.realX,
-                    realY  : snapStatus.realY,
-                    dx     : snapStatus.dx,
-                    dy     : snapStatus.dy
-                };
-
-                if (snapStatus.locked) {
-                    page.x += snapStatus.dx;
-                    page.y += snapStatus.dy;
-                    client.x += snapStatus.dx;
-                    client.y += snapStatus.dy;
-                }
+            if (snapStatus.locked) {
+                page.x += snapStatus.dx;
+                page.y += snapStatus.dy;
+                client.x += snapStatus.dx;
+                client.y += snapStatus.dy;
             }
         }
 
-        if (checkRestrict(target) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
+        if (checkRestrict(target, action) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -1466,20 +2894,23 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        this.x0        = startCoords.pageX;
-        this.y0        = startCoords.pageY;
-        this.clientX0  = startCoords.clientX;
-        this.clientY0  = startCoords.clientY;
+        this.x0        = interaction.startCoords.page.x;
+        this.y0        = interaction.startCoords.page.y;
+        this.clientX0  = interaction.startCoords.client.x;
+        this.clientY0  = interaction.startCoords.client.y;
         this.ctrlKey   = event.ctrlKey;
         this.altKey    = event.altKey;
         this.shiftKey  = event.shiftKey;
         this.metaKey   = event.metaKey;
         this.button    = event.button;
         this.target    = element;
-        this.t0        = downTime;
+        this.t0        = interaction.downTime;
         this.type      = action + (phase || '');
 
+        this.interaction = interaction;
         this.interactable = target;
+
+        var inertiaStatus = interaction.inertiaStatus;
 
         if (inertiaStatus.active) {
             this.detail = 'inertia';
@@ -1492,30 +2923,34 @@
         // end event dx, dy is difference between start and end points
         if (ending || action === 'drop') {
             if (deltaSource === 'client') {
-                this.dx = client.x - startCoords.clientX;
-                this.dy = client.y - startCoords.clientY;
+                this.dx = client.x - interaction.startCoords.client.x;
+                this.dy = client.y - interaction.startCoords.client.y;
             }
             else {
-                this.dx = page.x - startCoords.pageX;
-                this.dy = page.y - startCoords.pageY;
+                this.dx = page.x - interaction.startCoords.page.x;
+                this.dy = page.y - interaction.startCoords.page.y;
             }
+        }
+        else if (starting) {
+            this.dx = 0;
+            this.dy = 0;
         }
         // copy properties from previousmove if starting inertia
         else if (phase === 'inertiastart') {
-            this.dx = prevEvent.dx;
-            this.dy = prevEvent.dy;
+            this.dx = interaction.prevEvent.dx;
+            this.dy = interaction.prevEvent.dy;
         }
         else {
             if (deltaSource === 'client') {
-                this.dx = client.x - prevEvent.clientX;
-                this.dy = client.y - prevEvent.clientY;
+                this.dx = client.x - interaction.prevEvent.clientX;
+                this.dy = client.y - interaction.prevEvent.clientY;
             }
             else {
-                this.dx = page.x - prevEvent.pageX;
-                this.dy = page.y - prevEvent.pageY;
+                this.dx = page.x - interaction.prevEvent.pageX;
+                this.dy = page.y - interaction.prevEvent.pageY;
             }
         }
-        if (prevEvent && prevEvent.detail === 'inertia'
+        if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
             && !inertiaStatus.active && options.inertia.zeroResumeDelta) {
 
             inertiaStatus.resumeDx += this.dx;
@@ -1526,7 +2961,7 @@
 
         if (action === 'resize') {
             if (options.squareResize || event.shiftKey) {
-                if (resizeAxes === 'y') {
+                if (interaction.resizeAxes === 'y') {
                     this.dx = this.dy;
                 }
                 else {
@@ -1535,48 +2970,48 @@
                 this.axes = 'xy';
             }
             else {
-                this.axes = resizeAxes;
+                this.axes = interaction.resizeAxes;
 
-                if (resizeAxes === 'x') {
+                if (interaction.resizeAxes === 'x') {
                     this.dy = 0;
                 }
-                else if (resizeAxes === 'y') {
+                else if (interaction.resizeAxes === 'y') {
                     this.dx = 0;
                 }
             }
         }
         else if (action === 'gesture') {
-            this.touches = [pointerMoves[0], pointerMoves[1]];
+            this.touches = [pointers[0], pointers[1]];
 
             if (starting) {
-                this.distance = touchDistance(pointerMoves);
-                this.box      = touchBBox(pointerMoves);
+                this.distance = touchDistance(pointers, deltaSource);
+                this.box      = touchBBox(pointers);
                 this.scale    = 1;
                 this.ds       = 0;
-                this.angle    = touchAngle(pointerMoves);
+                this.angle    = touchAngle(pointers, undefined, deltaSource);
                 this.da       = 0;
             }
             else if (ending || event instanceof InteractEvent) {
-                this.distance = prevEvent.distance;
-                this.box      = prevEvent.box;
-                this.scale    = prevEvent.scale;
+                this.distance = interaction.prevEvent.distance;
+                this.box      = interaction.prevEvent.box;
+                this.scale    = interaction.prevEvent.scale;
                 this.ds       = this.scale - 1;
-                this.angle    = prevEvent.angle;
-                this.da       = this.angle - gesture.startAngle;
+                this.angle    = interaction.prevEvent.angle;
+                this.da       = this.angle - interaction.gesture.startAngle;
             }
             else {
-                this.distance = touchDistance(pointerMoves);
-                this.box      = touchBBox(pointerMoves);
-                this.scale    = this.distance / gesture.startDistance;
-                this.angle    = touchAngle(pointerMoves, gesture.prevAngle);
+                this.distance = touchDistance(pointers, deltaSource);
+                this.box      = touchBBox(pointers);
+                this.scale    = this.distance / interaction.gesture.startDistance;
+                this.angle    = touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
-                this.ds = this.scale - gesture.prevScale;
-                this.da = this.angle - gesture.prevAngle;
+                this.ds = this.scale - interaction.gesture.prevScale;
+                this.da = this.angle - interaction.gesture.prevAngle;
             }
         }
 
         if (starting) {
-            this.timeStamp = downTime;
+            this.timeStamp = interaction.downTime;
             this.dt        = 0;
             this.duration  = 0;
             this.speed     = 0;
@@ -1585,16 +3020,16 @@
         }
         else if (phase === 'inertiastart') {
             this.timeStamp = new Date().getTime();
-            this.dt        = prevEvent.dt;
-            this.duration  = prevEvent.duration;
-            this.speed     = prevEvent.speed;
-            this.velocityX = prevEvent.velocityX;
-            this.velocityY = prevEvent.velocityY;
+            this.dt        = interaction.prevEvent.dt;
+            this.duration  = interaction.prevEvent.duration;
+            this.speed     = interaction.prevEvent.speed;
+            this.velocityX = interaction.prevEvent.velocityX;
+            this.velocityY = interaction.prevEvent.velocityY;
         }
         else {
             this.timeStamp = new Date().getTime();
-            this.dt        = this.timeStamp - prevEvent.timeStamp;
-            this.duration  = this.timeStamp - downTime;
+            this.dt        = this.timeStamp - interaction.prevEvent.timeStamp;
+            this.duration  = this.timeStamp - interaction.downTime;
 
             var dx, dy, dt;
 
@@ -1607,8 +3042,8 @@
                 // => average speed of the event sequence
                 // (minimum dt of 1ms)
                 dt = Math.max((ending? this.duration: this.dt) / 1000, 0.001);
-                dx = this[sourceX] - prevEvent[sourceX];
-                dy = this[sourceY] - prevEvent[sourceY];
+                dx = this[sourceX] - interaction.prevEvent[sourceX];
+                dy = this[sourceY] - interaction.prevEvent[sourceY];
 
                 if (this.snap && this.snap.locked) {
                     dx -= this.snap.dx;
@@ -1620,14 +3055,14 @@
                     dy -= this.restrict.dy;
                 }
 
-                if (prevEvent.snap && prevEvent.snap.locked) {
-                    dx -= (prevEvent[sourceX] - prevEvent.snap.dx);
-                    dy -= (prevEvent[sourceY] - prevEvent.snap.dy);
+                if (interaction.prevEvent.snap && interaction.prevEvent.snap.locked) {
+                    dx -= (interaction.prevEvent[sourceX] - interaction.prevEvent.snap.dx);
+                    dy -= (interaction.prevEvent[sourceY] - interaction.prevEvent.snap.dy);
                 }
 
-                if (prevEvent.restrict) {
-                    dx += prevEvent.restrict.dx;
-                    dy += prevEvent.restrict.dy;
+                if (interaction.prevEvent.restrict) {
+                    dx += interaction.prevEvent.restrict.dx;
+                    dy += interaction.prevEvent.restrict.dy;
                 }
 
                 // speed and velocity in pixels per second
@@ -1637,16 +3072,16 @@
             }
             // if normal move event, use previous user event coords
             else {
-                this.speed = pointerDelta[deltaSource + 'Speed'];
-                this.velocityX = pointerDelta[deltaSource + 'VX'];
-                this.velocityY = pointerDelta[deltaSource + 'VY'];
+                this.speed = interaction.pointerDelta[deltaSource].speed;
+                this.velocityX = interaction.pointerDelta[deltaSource].vx;
+                this.velocityY = interaction.pointerDelta[deltaSource].vy;
             }
         }
 
         if ((ending || phase === 'inertiastart')
-            && prevEvent.speed > 600 && this.timeStamp - prevEvent.timeStamp < 150) {
+            && interaction.prevEvent.speed > 600 && this.timeStamp - interaction.prevEvent.timeStamp < 150) {
 
-            var angle = 180 * Math.atan2(prevEvent.velocityY, prevEvent.velocityX) / Math.PI,
+            var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI,
                 overlap = 22.5;
 
             if (angle < 0) {
@@ -1665,10 +3100,10 @@
                 left : left,
                 right: right,
                 angle: angle,
-                speed: prevEvent.speed,
+                speed: interaction.prevEvent.speed,
                 velocity: {
-                    x: prevEvent.velocityX,
-                    y: prevEvent.velocityY
+                    x: interaction.prevEvent.velocityX,
+                    y: interaction.prevEvent.velocityY
                 }
             };
         }
@@ -1688,125 +3123,12 @@
         this.originalEvent.preventDefault();
     }
 
-    function fireTaps (event, targets, elements) {
-        var tap = {},
-            i;
-
-        extend(tap, event);
-
-        tap.preventDefault           = preventOriginalDefault;
-        tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
-        tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
-
-        tap.timeStamp     = new Date().getTime();
-        tap.originalEvent = event;
-        tap.dt            = tap.timeStamp - downTime;
-        tap.type          = 'tap';
-
-        var interval = tap.timeStamp - tapTime,
-            dbl = (prevTap && prevTap.type !== 'doubletap'
-                   && prevTap.target === tap.target
-                   && interval < 500);
-
-        tapTime = tap.timeStamp;
-
-        for (i = 0; i < targets.length; i++) {
-            var origin = getOriginXY(targets[i], elements[i]);
-
-            tap.pageX -= origin.x;
-            tap.pageY -= origin.y;
-            tap.clientX -= origin.x;
-            tap.clientY -= origin.y;
-
-            tap.currentTarget = elements[i];
-            targets[i].fire(tap);
-
-            if (tap.immediatePropagationStopped
-                ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
-                break;
-            }
-        }
-
-        if (dbl) {
-            var doubleTap = {};
-
-            extend(doubleTap, tap);
-
-            doubleTap.dt   = interval;
-            doubleTap.type = 'doubletap';
-
-            for (i = 0; i < targets.length; i++) {
-                doubleTap.currentTarget = elements[i];
-                targets[i].fire(doubleTap);
-
-                if (doubleTap.immediatePropagationStopped
-                    ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
-                    break;
-                }
-            }
-
-            prevTap = doubleTap;
-        }
-        else {
-            prevTap = tap;
-        }
-    }
-
-    function collectTaps (event) {
-        if(downEvent) {
-            if (pointerWasMoved
-                || !(event instanceof downEvent.constructor)
-                || downEvent.target !== event.target) {
-                return;
-            }
-        }
-
-        var tapTargets = [],
-            tapElements = [];
-
-        var eventTarget = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target),
-            element = eventTarget;
-
-        function collectSelectorTaps (interactable, selector, context) {
-            var elements = ie8MatchesSelector
-                    ? context.querySelectorAll(selector)
-                    : undefined;
-
-            if (element !== document
-                && inContext(interactable, element)
-                && !testIgnore(interactable, eventTarget)
-                && testAllow(interactable, eventTarget)
-                && matchesSelector(element, selector, elements)) {
-
-                tapTargets.push(interactable);
-                tapElements.push(element);
-            }
-        }
-
-        while (element) {
-            if (interact.isSet(element)) {
-                tapTargets.push(interact(element));
-                tapElements.push(element);
-            }
-
-            interactables.forEachSelector(collectSelectorTaps);
-
-            element = element.parentNode;
-        }
-
-        if (tapTargets.length) {
-            fireTaps(event, tapTargets, tapElements);
-        }
-    }
-
-    function defaultActionChecker (event, element) {
+    function defaultActionChecker (pointer, interaction, element) {
         var rect = this.getRect(element),
             right,
             bottom,
             action = null,
-            page = getPageXY(event),
+            page = extend({}, interaction.curCoords.page),
             options = this.options;
 
         if (!rect) { return null; }
@@ -1816,17 +3138,17 @@
             bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
         }
 
-        resizeAxes = (right?'x': '') + (bottom?'y': '');
+        interaction.resizeAxes = (right?'x': '') + (bottom?'y': '');
 
-        action = (resizeAxes)?
-            'resize' + resizeAxes:
+        action = (interaction.resizeAxes)?
+            'resize' + interaction.resizeAxes:
             actionIsEnabled.drag && options.draggable?
                 'drag':
                 null;
 
         if (actionIsEnabled.gesture
-            && pointerIds.length >=2
-            && !(dragging || resizing)) {
+            && interaction.pointerIds.length >=2
+            && !(interaction.dragging || interaction.resizing)) {
             action = 'gesture';
         }
 
@@ -1838,10 +3160,8 @@
     function validateAction (action, interactable) {
         if (!isString(action)) { return null; }
 
-        interactable = interactable || target;
-
         var actionType = action.search('resize') !== -1? 'resize': action,
-            options = (interactable || target).options;
+            options = interactable;
 
         if ((  (actionType  === 'resize'   && options.resizable )
             || (action      === 'drag'     && options.draggable  )
@@ -1857,1126 +3177,17 @@
         return null;
     }
 
-    function selectorDown (event) {
-        if (prepared && downEvent && event.type !== downEvent.type) {
-            checkAndPreventDefault(event, target);
-            return;
-        }
-
-        // try to ignore browser simulated mouse after touch
-        if (downEvent
-            && event.type === 'mousedown' && downEvent.type === 'touchstart'
-            && event.timeStamp - downEvent.timeStamp < 300) {
-            return;
-        }
-
-        pointerIsDown = true;
-
-        var eventTarget = (event.target instanceof SVGElementInstance
-            ? event.target.correspondingUseElement
-            : event.target),
-            element = eventTarget,
-            action;
-
-        addPointer(event);
-
-        // Check if the down event hits the current inertia target
-        if (inertiaStatus.active && target.selector) {
-            // climb up the DOM tree from the event target
-            while (element && element !== document) {
-
-                // if this element is the current inertia target element
-                if (element === inertiaStatus.targetElement
-                    // and the prospective action is the same as the ongoing one
-                    && validateAction(target.getAction(event, element)) === prepared) {
-
-                    // stop inertia so that the next move will be a normal one
-                    cancelFrame(inertiaStatus.i);
-                    inertiaStatus.active = false;
-
-                    return;
-                }
-                element = element.parentNode;
-            }
-        }
-
-        // do nothing if interacting
-        if (dragging || resizing || gesturing) {
-            return;
-        }
-
-        function pushMatches (interactable, selector, context) {
-            var elements = ie8MatchesSelector
-                ? context.querySelectorAll(selector)
-                : undefined;
-
-            if (inContext(interactable, element)
-                && !testIgnore(interactable, eventTarget)
-                && testAllow(interactable, eventTarget)
-                && matchesSelector(element, selector, elements)) {
-
-                interactable._element = element;
-                matches.push(interactable);
-            }
-        }
-
-        if (matches.length && /mousedown|pointerdown/i.test(event.type)) {
-            action = validateSelector(event, matches);
-        }
-        else {
-            while (element && element !== document && !action) {
-                matches = [];
-
-                interactables.forEachSelector(pushMatches);
-
-                action = validateSelector(event, matches);
-                element = element.parentNode;
-            }
-        }
-
-        if (action) {
-            prepared = action;
-
-            return pointerDown(event, action);
-        }
-        else {
-            // do these now since pointerDown isn't being called from here
-            downTime = new Date().getTime();
-            downEvent = cloneEvent(event);
-
-            setEventXY(prevCoords, event);
-            pointerWasMoved = false;
-        }
-    }
-
-    // Determine action to be performed on next pointerMove and add appropriate
-    // style and event Liseners
-    function pointerDown (event, forceAction) {
-        if (!forceAction && pointerIsDown && downEvent && event.type !== downEvent.type) {
-            checkAndPreventDefault(event, target);
-
-            return;
-        }
-
-        pointerIsDown = true;
-
-        addPointer(event);
-
-        // If it is the second touch of a multi-touch gesture, keep the target
-        // the same if a target was set by the first touch
-        // Otherwise, set the target if there is no action prepared
-        if ((((event.touches && event.touches.length < 2) || (pointerIds && pointerIds.length < 2)) && !target)
-            || !prepared) {
-
-            var interactable = interactables.get(event.currentTarget);
-
-            if (!testIgnore(interactable, event.target)
-                && testAllow(interactable, event.target)) {
-                target = interactable;
-            }
-        }
-
-        var options = target && target.options;
-
-        if (target && !(dragging || resizing || gesturing)) {
-            var action = validateAction(forceAction || target.getAction(event, target._element));
-
-            setEventXY(startCoords, event);
-
-            if (!action) {
-                return event;
-            }
-
-            if (options.styleCursor) {
-                document.documentElement.style.cursor = actions[action].cursor;
-            }
-
-            resizeAxes = action === 'resizexy'?
-                    'xy':
-                    action === 'resizex'?
-                        'x':
-                        action === 'resizey'?
-                            'y':
-                            '';
-
-            if (action === 'gesture' && pointerIds.length < 2) {
-                action = null;
-            }
-
-            prepared = action;
-
-            snapStatus.snappedX = snapStatus.snappedY =
-                restrictStatus.restrictedX = restrictStatus.restrictedY = NaN;
-
-            downTime = new Date().getTime();
-            downEvent = cloneEvent(event);
-
-            setEventXY(prevCoords, event);
-            pointerWasMoved = false;
-
-            checkAndPreventDefault(event, target);
-        }
-        // if inertia is active try to resume action
-        else if (inertiaStatus.active
-            && event.currentTarget === inertiaStatus.targetElement
-            && target === inertiaStatus.target
-            && validateAction(target.getAction(event, target._element)) === prepared) {
-
-            cancelFrame(inertiaStatus.i);
-            inertiaStatus.active = false;
-        }
-    }
-
-    function setSnapping (event, status) {
-        var snap = target.options.snap,
-            anchors = snap.anchors,
-            page,
-            closest,
-            range,
-            inRange,
-            snapChanged,
-            dx,
-            dy,
-            distance,
-            i, len;
-
-        status = status || snapStatus;
-
-        if (status.useStatusXY) {
-            page = { x: status.x, y: status.y };
-        }
-        else {
-            var origin = getOriginXY(target);
-
-            page = getPageXY(event);
-
-            page.x -= origin.x;
-            page.y -= origin.y;
-        }
-
-        page.x -= inertiaStatus.resumeDx;
-        page.y -= inertiaStatus.resumeDy;
-
-        status.realX = page.x;
-        status.realY = page.y;
-
-        // change to infinite range when range is negative
-        if (snap.range < 0) { snap.range = Infinity; }
-
-        // create an anchor representative for each path's returned point
-        if (snap.mode === 'path') {
-            anchors = [];
-
-            for (i = 0, len = snap.paths.length; i < len; i++) {
-                var path = snap.paths[i];
-
-                if (isFunction(path)) {
-                    path = path(page.x, page.y);
-                }
-
-                anchors.push({
-                    x: isNumber(path.x) ? path.x : page.x,
-                    y: isNumber(path.y) ? path.y : page.y,
-
-                    range: isNumber(path.range)? path.range: snap.range
-                });
-            }
-        }
-
-        if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
-            closest = {
-                anchor: null,
-                distance: 0,
-                range: 0,
-                dx: 0,
-                dy: 0
-            };
-
-            for (i = 0, len = anchors.length; i < len; i++) {
-                var anchor = anchors[i];
-
-                range = isNumber(anchor.range)? anchor.range: snap.range;
-
-                dx = anchor.x - page.x + snapOffset.x;
-                dy = anchor.y - page.y + snapOffset.y;
-                distance = hypot(dx, dy);
-
-                inRange = distance < range;
-
-                // Infinite anchors count as being out of range
-                // compared to non infinite ones that are in range
-                if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                    inRange = false;
-                }
-
-                if (!closest.anchor || (inRange?
-                    // is the closest anchor in range?
-                    (closest.inRange && range !== Infinity)?
-                        // the pointer is relatively deeper in this anchor
-                        distance / range < closest.distance / closest.range:
-                        //the pointer is closer to this anchor
-                        distance < closest.distance:
-                    // The other is not in range and the pointer is closer to this anchor
-                    (!closest.inRange && distance < closest.distance))) {
-
-                    if (range === Infinity) {
-                        inRange = true;
-                    }
-
-                    closest.anchor = anchor;
-                    closest.distance = distance;
-                    closest.range = range;
-                    closest.inRange = inRange;
-                    closest.dx = dx;
-                    closest.dy = dy;
-
-                    status.range = range;
-                }
-            }
-
-            inRange = closest.inRange;
-            snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
-
-            status.snappedX = closest.anchor.x;
-            status.snappedY = closest.anchor.y;
-            status.dx = closest.dx;
-            status.dy = closest.dy;
-        }
-        else if (snap.mode === 'grid') {
-            var gridx = Math.round((page.x - snap.gridOffset.x - snapOffset.x) / snap.grid.x),
-                gridy = Math.round((page.y - snap.gridOffset.y - snapOffset.y) / snap.grid.y),
-
-                newX = gridx * snap.grid.x + snap.gridOffset.x + snapOffset.x,
-                newY = gridy * snap.grid.y + snap.gridOffset.y + snapOffset.y;
-
-            dx = newX - page.x;
-            dy = newY - page.y;
-
-            distance = hypot(dx, dy);
-
-            inRange = distance < snap.range;
-            snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
-
-            status.snappedX = newX;
-            status.snappedY = newY;
-            status.dx = dx;
-            status.dy = dy;
-
-            status.range = snap.range;
-        }
-
-        status.changed = (snapChanged || (inRange && !status.locked));
-        status.locked = inRange;
-
-        return status;
-    }
-
-    function setRestriction (event, status) {
-        var action = /resize/.test(prepared)? 'resize' : prepared,
-            restrict = target && target.options.restrict,
-            restriction = restrict && restrict[action],
-            page;
-
-        if (!restriction) {
-            return status;
-        }
-
-        status = status || restrictStatus;
-
-        page = status.useStatusXY
-                ? page = { x: status.x, y: status.y }
-                : page = getPageXY(event);
-
-        if (status.snap && status.snap.locked) {
-            page.x += status.snap.dx || 0;
-            page.y += status.snap.dy || 0;
-        }
-
-        page.x -= inertiaStatus.resumeDx;
-        page.y -= inertiaStatus.resumeDy;
-
-        status.dx = 0;
-        status.dy = 0;
-        status.restricted = false;
-
-        var rect;
-
-        if (restriction === 'parent') {
-            restriction = target._element.parentNode;
-        }
-        else if (restriction === 'self') {
-            restriction = target._element;
-        }
-
-        if (isElement(restriction)) {
-            rect = getElementRect(restriction);
-        }
-        else {
-            if (isFunction(restriction)) {
-                restriction = restriction(page.x, page.y, target._element);
-            }
-
-            rect = restriction;
-
-            // object is assumed to have
-            // x, y, width, height or
-            // left, top, right, bottom
-            if ('x' in restriction && 'y' in restriction) {
-                rect = {
-                    left  : restriction.x,
-                    top   : restriction.y,
-                    right : restriction.x + restriction.width,
-                    bottom: restriction.y + restriction.height
-                };
-            }
-        }
-
-        var restrictedX = Math.max(Math.min(rect.right  - restrictOffset.right , page.x), rect.left + restrictOffset.left),
-            restrictedY = Math.max(Math.min(rect.bottom - restrictOffset.bottom, page.y), rect.top  + restrictOffset.top );
-
-        status.dx = restrictedX - page.x;
-        status.dy = restrictedY - page.y;
-
-        status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
-        status.restricted = !!(status.dx || status.dy);
-
-        status.restrictedX = restrictedX;
-        status.restrictedY = restrictedY;
-
-        return status;
-    }
-
-    function pointerMove (event, preEnd) {
-        if (!pointerIsDown) { return; }
-
-        if (!(event instanceof InteractEvent)) {
-            setEventXY(curCoords, event);
-            if (curCoords.pageX === prevCoords.pageX
-                && curCoords.pageY === prevCoords.pageY
-                && curCoords.screenX === prevCoords.screenX
-                && curCoords.screenY === prevCoords.screenY) {
-
-                checkAndPreventDefault(event, target);
-                return;
-            }
-
-            // set pointer coordinate, time changes and speeds
-            setEventDeltas(pointerDelta, prevCoords, curCoords);
-        }
-
-        var dx, dy;
-
-        // register movement of more than 1 pixel
-        if (!pointerWasMoved) {
-            dx = curCoords.clientX - startCoords.clientX;
-            dy = curCoords.clientY - startCoords.clientY;
-
-            pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
-        }
-
-        // return if there is no prepared action
-        if (!prepared
-            // or this is a mousemove event but the down event was a touch
-            || (event.type === 'mousemove' && downEvent.type === 'touchstart')) {
-
-            return;
-        }
-
-        if (pointerWasMoved
-            // ignore movement while inertia is active
-            && (!inertiaStatus.active || (event instanceof InteractEvent && /inertiastart/.test(event.type)))) {
-
-            // if just starting an action, calculate the pointer speed now
-            if (!(dragging || resizing || gesturing)) {
-                setEventDeltas(pointerDelta, prevCoords, curCoords);
-
-                // check if a drag is in the correct axis
-                if (prepared === 'drag') {
-                    var absX = Math.abs(dx),
-                        absY = Math.abs(dy),
-                        targetAxis = target.options.dragAxis,
-                        axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
-
-                    // if the movement isn't in the axis of the interactable
-                    if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
-                        // cancel the prepared action
-                        prepared = null;
-
-                        // then try to get a drag from another ineractable
-
-                        var eventTarget = (event.target instanceof SVGElementInstance
-                                ? event.target.correspondingUseElement
-                                : event.target),
-                            element = eventTarget;
-
-                        // check element interactables
-                        while (element && element !== document) {
-                            var elementInteractable = interactables.get(element);
-
-                            if (elementInteractable
-                                && elementInteractable !== target
-                                && elementInteractable.getAction(downEvent, element) === 'drag'
-                                && checkAxis(axis, elementInteractable)) {
-                                prepared = 'drag';
-                                target = elementInteractable;
-                                break;
-                            }
-
-                            element = element.parentNode;
-                        }
-
-                        // if there's no drag from element interactables,
-                        // check the selector interactables
-                        if (!prepared) {
-                            var getDraggable = function (interactable, selector, context) {
-                                var elements = ie8MatchesSelector
-                                    ? context.querySelectorAll(selector)
-                                    : undefined;
-
-                                if (interactable === target) { return; }
-
-                                interactable._element = element;
-
-                                if (inContext(interactable, eventTarget)
-                                    && !testIgnore(interactable, eventTarget)
-                                    && testAllow(interactable, eventTarget)
-                                    && matchesSelector(element, selector, elements)
-                                    && interactable.getAction(downEvent, eventTarget) === 'drag'
-                                    && checkAxis(axis, interactable)) {
-
-                                    return interactable;
-                                }
-                            };
-
-                            element = eventTarget;
-
-                            while (element && element !== document) {
-                                var selectorInteractable = interactables.forEachSelector(getDraggable);
-
-                                if (selectorInteractable) {
-                                    prepared = 'drag';
-                                    target = selectorInteractable;
-                                    break;
-                                }
-
-                                element = element.parentNode;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (prepared && target) {
-                var shouldSnap     = checkSnap(target)     && (!target.options.snap.endOnly     || preEnd),
-                    shouldRestrict = checkRestrict(target) && (!target.options.restrict.endOnly || preEnd),
-
-                    starting = !(dragging || resizing || gesturing),
-                    snapEvent = starting? downEvent: event;
-
-                if (starting) {
-                    prevEvent = downEvent;
-
-                    var rect = target.getRect(target._element),
-                        snap = target.options.snap,
-                        restrict = target.options.restrict;
-
-                    if (rect) {
-                        startOffset.left = startCoords.pageX - rect.left;
-                        startOffset.top  = startCoords.pageY - rect.top;
-
-                        startOffset.right  = rect.right  - startCoords.pageX;
-                        startOffset.bottom = rect.bottom - startCoords.pageY;
-                    }
-                    else {
-                        startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
-                    }
-
-                    if (rect && snap.elementOrigin) {
-                        snapOffset.x = startOffset.left - (rect.width  * snap.elementOrigin.x);
-                        snapOffset.y = startOffset.top  - (rect.height * snap.elementOrigin.y);
-                    }
-                    else {
-                        snapOffset.x = snapOffset.y = 0;
-                    }
-
-                    if (rect && restrict.elementRect) {
-                        restrictOffset.left = startOffset.left - (rect.width  * restrict.elementRect.left);
-                        restrictOffset.top  = startOffset.top  - (rect.height * restrict.elementRect.top);
-
-                        restrictOffset.right  = startOffset.right  - (rect.width  * (1 - restrict.elementRect.right));
-                        restrictOffset.bottom = startOffset.bottom - (rect.height * (1 - restrict.elementRect.bottom));
-                    }
-                    else {
-                        restrictOffset.left = restrictOffset.top = restrictOffset.right = restrictOffset.bottom = 0;
-                    }
-                }
-
-                if (shouldSnap    ) { setSnapping   (snapEvent); } else { snapStatus    .locked     = false; }
-                if (shouldRestrict) { setRestriction(snapEvent); } else { restrictStatus.restricted = false; }
-
-                var shouldMove = (shouldSnap? (snapStatus.changed || !snapStatus.locked): true)
-                                 && (shouldRestrict? (!restrictStatus.restricted || (restrictStatus.restricted && restrictStatus.changed)): true);
-
-                // move if snapping or restriction doesn't prevent it
-                if (shouldMove) {
-                    if (starting) {
-                        prevEvent = actions[prepared].start(downEvent);
-
-                        // set snapping and restriction for the move event
-                        if (shouldSnap    ) { setSnapping   (event); }
-                        if (shouldRestrict) { setRestriction(event); }
-                    }
-
-                    prevEvent = actions[prepared].move(event);
-                }
-            }
-        }
-
-        if (!(event instanceof InteractEvent)) {
-            setEventXY(prevCoords, event);
-        }
-
-        if (dragging || resizing) {
-            autoScroll.edgeMove(event);
-        }
-    }
-
-    function addPointer (event, type) {
-        type = type || event.type;
-
-        if (/touch/.test(event.type)) {
-            var touches = (/cancel|touchend/.test(type)
-                           ? event.changedTouches
-                           : event.touches);
-
-            for (var i = 0; i < touches.length; i++) {
-                addPointer(touches[i], type);
-            }
-
-            return;
-        }
-
-        // dont add the event if it's not the same pointer type as the previous event
-        if (pointerIds.length && pointerMoves[0].pointerType !== event.pointerType) {
-            return;
-        }
-
-        var id = event.pointerId || event.identifier || 0,
-            index = indexOf(pointerIds, id);
-
-        if (index === -1) {
-            pointerIds.push(id);
-
-            // move events are kept so that multi-touch properties can still be
-            // calculated at the end of a gesture; use pointerIds index
-            pointerMoves[pointerIds.length - 1] = event;
-        }
-        else {
-            pointerMoves[index] = event;
-        }
-    }
-
-    function removePointer (event) {
-        var index = indexOf(pointerIds, event.pointerId || event.identifier || 0);
-
-        if (index === -1) { return; }
-
-        pointerIds.splice(index, 1);
-
-        // move events are kept so that multi-touch properties can still be
-        // calculated at the end of a GestureEvnt sequence
-        //pointerMoves.splice(index, 1);
-    }
-
-    function recordPointers (event, type) {
-        var index = indexOf(pointerIds, event.pointerId || event.identifier || 0);
-
-        if (index === -1) { return; }
-
-        type = type || event.type;
-
-        if (/move/i.test(type)) {
-            pointerMoves[index] = event;
-        }
-        else if (/up|end|cancel/i.test(type)) {
-            removePointer(event);
-        }
-    }
-
-    function recordTouches (event) {
-        var touches = (/cancel|touchend/.test(event.type)
-                       ? event.changedTouches
-                       : event.touches);
-
-        for (var i = 0; i < touches.length; i++) {
-            recordPointers(touches[i], event.type);
-        }
-
-        return;
-    }
-
-    function dragStart (event) {
-        var dragEvent = new InteractEvent(event, 'drag', 'start');
-
-        dragging = true;
-
-        target.fire(dragEvent);
-
-        // reset active dropzones
-        activeDrops.dropzones = [];
-        activeDrops.elements  = [];
-        activeDrops.rects     = [];
-
-        if (!dynamicDrop) {
-            setActiveDrops(target._element);
-        }
-
-        var dropEvents = getDropEvents(event, dragEvent);
-
-        if (dropEvents.activate) {
-            fireActiveDrops(dropEvents.activate);
-        }
-
-        return dragEvent;
-    }
-
-    function dragMove (event) {
-        checkAndPreventDefault(event, target);
-
-        var dragEvent  = new InteractEvent(event, 'drag', 'move'),
-            draggableElement = target._element,
-            drop = getDrop(dragEvent, draggableElement);
-
-        dropTarget = drop.dropzone;
-        dropElement = drop.element;
-
-        // Make sure that the target selector draggable's element is
-        // restored after dropChecks
-        target._element = draggableElement;
-
-        var dropEvents = getDropEvents(event, dragEvent);
-
-        target.fire(dragEvent);
-
-        if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
-        if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
-        if (dropEvents.move ) {     dropTarget.fire(dropEvents.move ); }
-
-        prevDropTarget  = dropTarget;
-        prevDropElement = dropElement;
-
-        return dragEvent;
-    }
-
-    function resizeStart (event) {
-        var resizeEvent = new InteractEvent(event, 'resize', 'start');
-
-        target.fire(resizeEvent);
-
-        target.fire(resizeEvent);
-        resizing = true;
-
-        return resizeEvent;
-    }
-
-    function resizeMove (event) {
-        checkAndPreventDefault(event, target);
-
-        var resizeEvent;
-
-        resizeEvent = new InteractEvent(event, 'resize', 'move');
-        target.fire(resizeEvent);
-
-        return resizeEvent;
-    }
-
-    function gestureStart (event) {
-        var gestureEvent = new InteractEvent(event, 'gesture', 'start');
-
-        gestureEvent.ds = 0;
-
-        gesture.startDistance = gesture.prevDistance = gestureEvent.distance;
-        gesture.startAngle = gesture.prevAngle = gestureEvent.angle;
-        gesture.scale = 1;
-
-        gesturing = true;
-
-        target.fire(gestureEvent);
-
-        return gestureEvent;
-    }
-
-    function gestureMove (event) {
-        if (!pointerIds.length) {
-            return prevEvent;
-        }
-
-        checkAndPreventDefault(event, target);
-
-        var gestureEvent;
-
-        gestureEvent = new InteractEvent(event, 'gesture', 'move');
-        gestureEvent.ds = gestureEvent.scale - gesture.scale;
-
-        target.fire(gestureEvent);
-
-        gesture.prevAngle = gestureEvent.angle;
-        gesture.prevDistance = gestureEvent.distance;
-
-        if (gestureEvent.scale !== Infinity &&
-            gestureEvent.scale !== null &&
-            gestureEvent.scale !== undefined  &&
-            !isNaN(gestureEvent.scale)) {
-
-            gesture.scale = gestureEvent.scale;
-        }
-
-        return gestureEvent;
-    }
-
-    function validateSelector (event, matches) {
-        for (var i = 0, len = matches.length; i < len; i++) {
-            var match = matches[i],
-                action = validateAction(match.getAction(event, match._element), match);
-
-            if (action) {
-                target = match;
-
-                return action;
-            }
-        }
-    }
-
-    function pointerOver (event) {
-        if (prepared) { return; }
-
-        var curMatches = [],
-            prevTargetElement = target && target._element,
-            eventTarget = (event.target instanceof SVGElementInstance
-                ? event.target.correspondingUseElement
-                : event.target);
-
-        if (target
-            && (testIgnore(target, eventTarget) || !testAllow(target, eventTarget))) {
-            // if the eventTarget should be ignored or shouldn't be allowed
-            // clear the previous target
-            target = null;
-            matches = [];
-        }
-
-        var elementInteractable = interactables.get(eventTarget),
-            elementAction = (elementInteractable
-                             && !testIgnore(elementInteractable, eventTarget)
-                             && testAllow(elementInteractable, eventTarget)
-                             && validateAction(
-                                 elementInteractable.getAction(event, eventTarget),
-                                 elementInteractable));
-
-        function pushCurMatches (interactable, selector) {
-            if (interactable
-                && inContext(interactable, eventTarget)
-                && !testIgnore(interactable, eventTarget)
-                && testAllow(interactable, eventTarget)
-                && matchesSelector(eventTarget, selector)) {
-
-                interactable._element = eventTarget;
-                curMatches.push(interactable);
-            }
-        }
-
-        if (elementAction) {
-            target = elementInteractable;
-            matches = [];
-        }
-        else {
-            interactables.forEachSelector(pushCurMatches);
-
-            if (validateSelector(event, curMatches)) {
-                matches = curMatches;
-
-                pointerHover(event, matches);
-                events.addToElement(eventTarget, 'mousemove', pointerHover);
-            }
-            else if (target) {
-                var prevTargetChildren = prevTargetElement.querySelectorAll('*');
-
-                if (contains(prevTargetChildren, eventTarget)) {
-
-                    // reset the elements of the matches to the old target
-                    for (var i = 0; i < matches.length; i++) {
-                        matches[i]._element = prevTargetElement;
-                    }
-
-                    pointerHover(event, matches);
-                    events.addToElement(target._element, 'mousemove', pointerHover);
-                }
-                else {
-                    target = null;
-                    matches = [];
-                }
-            }
-        }
-    }
-
-    function pointerOut (event) {
-        if (prepared) { return; }
-
-        // Remove temporary event listeners for selector Interactables
-        var eventTarget = (event.target instanceof SVGElementInstance
-            ? event.target.correspondingUseElement
-            : event.target);
-
-        if (!interactables.get(eventTarget)) {
-            events.removeFromElement(eventTarget, pointerHover);
-        }
-
-        if (target && target.options.styleCursor && !(dragging || resizing || gesturing)) {
-            document.documentElement.style.cursor = '';
-        }
-    }
-
-    // Check what action would be performed on pointerMove target if a mouse
-    // button were pressed and change the cursor accordingly
-    function pointerHover (event, matches) {
-        if (!prepared) {
-
-            var action;
-
-            if (matches) {
-                action = validateSelector(event, matches);
-            }
-            else if (target) {
-                action = validateAction(target.getAction(event, target._element));
-            }
-
-            if (target && target.options.styleCursor) {
-                if (action) {
-                    document.documentElement.style.cursor = actions[action].cursor;
-                }
-                else {
-                    document.documentElement.style.cursor = '';
-                }
-            }
-        }
-        else if (prepared) {
-            checkAndPreventDefault(event, target);
-        }
-    }
-
-    // End interact move events and stop auto-scroll unless inertia is enabled
-    function pointerUp (event) {
-        // don't return if the event is an InteractEvent (in the case of inertia end)
-        if (!(event instanceof InteractEvent)
-            && pointerIsDown && downEvent
-            && !(event instanceof downEvent.constructor)) {
-
-            return;
-        }
-
-        if (event.touches && event.touches.length >= 2) {
-            return;
-        }
-
-        var endEvent,
-            options = target && target.options,
-            inertiaOptions = options && options.inertia;
-
-        if (dragging || resizing || gesturing) {
-
-            if (inertiaStatus.active) { return; }
-
-            var pointerSpeed,
-                now = new Date().getTime(),
-                inertiaPossible = false,
-                inertia = false,
-                smoothEnd = false,
-                endSnap = checkSnap(target) && options.snap.endOnly,
-                endRestrict = checkRestrict(target) && options.restrict.endOnly,
-                dx = 0,
-                dy = 0,
-                startEvent;
-
-            if (dragging && options.dragAxis === 'x' ) { pointerSpeed = Math.abs(pointerDelta.clientVX); }
-            if (dragging && options.dragAxis === 'y' ) { pointerSpeed = Math.abs(pointerDelta.clientVY); }
-            if (dragging && options.dragAxis === 'xy') { pointerSpeed = pointerDelta.clientSpeed; }
-
-            // check if inertia should be started
-            inertiaPossible = (options.inertiaEnabled
-                               && prepared !== 'gesture'
-                               && contains(inertiaOptions.actions, prepared)
-                               && event !== inertiaStatus.startEvent);
-
-            inertia = (inertiaPossible
-                       && (now - curCoords.timeStamp) < 50
-                       && pointerSpeed > inertiaOptions.minSpeed
-                       && pointerSpeed > inertiaOptions.endSpeed);
-
-            if (inertiaPossible && !inertia && (endSnap || endRestrict)) {
-
-                var snapRestrict = {};
-
-                snapRestrict.snap = snapRestrict.restrict = snapRestrict;
-
-                if (endSnap) {
-                    setSnapping(event, snapRestrict);
-                    if (snapRestrict.locked) {
-                        dx += snapRestrict.dx;
-                        dy += snapRestrict.dy;
-                    }
-                }
-
-                if (endRestrict) {
-                    setRestriction(event, snapRestrict);
-                    if (snapRestrict.restricted) {
-                        dx += snapRestrict.dx;
-                        dy += snapRestrict.dy;
-                    }
-                }
-
-                if (dx || dy) {
-                    smoothEnd = true;
-                }
-            }
-
-            if (inertia || smoothEnd) {
-                if (events.useAttachEvent) {
-                    // make a copy of the pointerdown event because IE8
-                    // http://stackoverflow.com/a/3533725/2280888
-                    extend(inertiaStatus.pointerUp, event);
-                }
-                else {
-                    inertiaStatus.pointerUp = event;
-                }
-
-                inertiaStatus.startEvent = startEvent = new InteractEvent(event, prepared, 'inertiastart');
-                target.fire(inertiaStatus.startEvent);
-
-                inertiaStatus.target = target;
-                inertiaStatus.targetElement = target._element;
-                inertiaStatus.t0 = now;
-
-                if (inertia) {
-                    inertiaStatus.vx0 = pointerDelta.clientVX;
-                    inertiaStatus.vy0 = pointerDelta.clientVY;
-                    inertiaStatus.v0 = pointerSpeed;
-
-                    calcInertia(inertiaStatus);
-
-                    var page = getPageXY(event),
-                        origin = getOriginXY(target, target._element),
-                        statusObject;
-
-                    page.x = page.x + (inertia? inertiaStatus.xe: 0) - origin.x;
-                    page.y = page.y + (inertia? inertiaStatus.ye: 0) - origin.y;
-
-                    statusObject = {
-                        useStatusXY: true,
-                        x: page.x,
-                        y: page.y,
-                        dx: 0,
-                        dy: 0,
-                        snap: null
-                    };
-
-                    statusObject.snap = statusObject;
-
-                    dx = dy = 0;
-
-                    if (endSnap) {
-                        var snap = setSnapping(event, statusObject);
-
-                        if (snap.locked) {
-                            dx += snap.dx;
-                            dy += snap.dy;
-                        }
-                    }
-
-                    if (endRestrict) {
-                        var restrict = setRestriction(event, statusObject);
-
-                        if (restrict.restricted) {
-                            dx += restrict.dx;
-                            dy += restrict.dy;
-                        }
-                    }
-
-                    inertiaStatus.modifiedXe += dx;
-                    inertiaStatus.modifiedYe += dy;
-
-                    inertiaStatus.i = reqFrame(inertiaFrame);
-                }
-                else {
-                    inertiaStatus.smoothEnd = true;
-                    inertiaStatus.xe = dx;
-                    inertiaStatus.ye = dy;
-
-                    inertiaStatus.sx = inertiaStatus.sy = 0;
-
-                    inertiaStatus.i = reqFrame(smoothEndFrame);
-                }
-
-                inertiaStatus.active = true;
-                return;
-            }
-
-            if (endSnap || endRestrict) {
-                // fire a move event at the snapped coordinates
-                pointerMove(event, true);
-            }
-        }
-
-        if (dragging) {
-            endEvent = new InteractEvent(event, 'drag', 'end');
-
-            var dropEvent,
-                draggableElement = target._element,
-                drop = getDrop(endEvent, draggableElement);
-
-            dropTarget = drop.dropzone;
-            dropElement = drop.element;
-
-            // getDrop changes target._element
-            target._element = draggableElement;
-
-            // get the most apprpriate dropzone based on DOM depth and order
-            if (dropTarget) {
-                dropEvent = new InteractEvent(event, 'drop', null, dropElement, draggableElement);
-
-                endEvent.dropzone = dropElement;
-            }
-
-            // if there was a prevDropTarget (perhaps if for some reason this
-            // dragend happens without the mouse moving of the previous drop
-            // target)
-            else if (prevDropTarget) {
-                var dragLeaveEvent = new InteractEvent(event, 'drag', 'leave', dropElement, draggableElement);
-
-                prevDropTarget.fire(dragLeaveEvent, draggableElement);
-
-                endEvent.dragLeave = prevDropElement;
-            }
-
-            var dropEvents = getDropEvents(event, endEvent);
-
-            if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
-            if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
-            if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
-            if (dropEvents.deactivate) {
-                fireActiveDrops(dropEvents.deactivate);
-            }
-
-            target.fire(endEvent);
-        }
-        else if (resizing) {
-            endEvent = new InteractEvent(event, 'resize', 'end');
-            target.fire(endEvent);
-        }
-        else if (gesturing) {
-            endEvent = new InteractEvent(event, 'gesture', 'end');
-            target.fire(endEvent);
-        }
-
-        interact.stop();
+    var listeners = {},
+        interactionListeners = [
+            'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
+            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
+            'addPointer', 'removePointer', 'recordPointer', 'collectTaps'
+        ];
+
+    for (var i = 0, len = interactionListeners.length; i < len; i++) {
+        var name = interactionListeners[i];
+
+        listeners[name] = doOnInteractions(name);
     }
 
     // bound to the interactable context when a DOM event
@@ -3077,14 +3288,6 @@
         }
     };
 
-    function clearTargets () {
-        if (target && !target.selector) {
-            target = null;
-        }
-
-        dropTarget = dropElement = prevDropTarget = prevDropElement = null;
-    }
-
     /*\
      * interact
      [ method ]
@@ -3152,14 +3355,14 @@
         }
         else if (isElement(element)) {
             if (PointerEvent) {
-                events.add(this, pEventTypes.down, pointerDown );
-                events.add(this, pEventTypes.move, pointerHover);
+                events.add(this, pEventTypes.down, listeners.pointerDown );
+                events.add(this, pEventTypes.move, listeners.pointerHover);
             }
             else {
-                events.add(this, 'mousedown' , pointerDown );
-                events.add(this, 'mousemove' , pointerHover);
-                events.add(this, 'touchstart', pointerDown );
-                events.add(this, 'touchmove' , pointerHover);
+                events.add(this, 'mousedown' , listeners.pointerDown );
+                events.add(this, 'mousemove' , listeners.pointerHover);
+                events.add(this, 'touchstart', listeners.pointerDown );
+                events.add(this, 'touchmove' , listeners.pointerHover);
             }
         }
 
@@ -3227,13 +3430,28 @@
          |     // the axis in which the first movement must be
          |     // for the drag sequence to start
          |     // 'xy' by default - any direction
-         |     axis: 'x' || 'y' || 'xy'
+         |     axis: 'x' || 'y' || 'xy',
+         |
+         |     // max number of drags that can happen concurrently
+         |     // with elements of this Interactable. 1 by default
+         |     max: Infinity,
+         |
+         |     // max number of drags that can target the same element
+         |     // 1 by default
+         |     maxPerElement: 2
          | });
         \*/
         draggable: function (options) {
             if (isObject(options)) {
                 this.options.draggable = true;
                 this.setOnEvents('drag', options);
+
+                if (isNumber(options.max)) {
+                    this.options.dragMax = options.max;
+                }
+                if (isNumber(options.maxPerElement)) {
+                    this.options.dragMaxPerElement = options.maxPerElement;
+                }
 
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
                     this.options.dragAxis = options.axis;
@@ -3327,18 +3545,22 @@
          * this Interactable's element. Can be overridden using
          * @Interactable.dropChecker.
          *
-         - event (MouseEvent | TouchEvent) The event that ends a drag
+         - pointer (MouseEvent | PointerEvent | Touch) The event that ends a drag
+         - draggable (Interactable) The Interactable being dragged
+         - draggableElement (ELement) The actual element that's being dragged
+         - dropElement (Element) The dropzone element
+         - rect (object) #optional The rect of dropElement
          = (boolean) whether the pointer was over this Interactable
         \*/
-        dropCheck: function (event, draggable, draggableElement, rect) {
-            if (!(rect = rect || this.getRect(this._element))) {
+        dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
+            if (!(rect = rect || this.getRect(dropElement))) {
                 return false;
             }
 
             var dropOverlap = this.options.dropOverlap;
 
             if (dropOverlap === 'pointer') {
-                var page = getPageXY(event),
+                var page = getPageXY(pointer),
                     origin = getOriginXY(draggable, draggableElement),
                     horizontal,
                     vertical;
@@ -3384,9 +3606,9 @@
          *
          = (Function | Interactable) The checker function or this Interactable
         \*/
-        dropChecker: function (newValue) {
-            if (isFunction(newValue)) {
-                this.dropCheck = newValue;
+        dropChecker: function (checker) {
+            if (isFunction(checker)) {
+                this.dropCheck = checker;
 
                 return this;
             }
@@ -3448,13 +3670,25 @@
          |     onmove : function (event) {},
          |     onend  : function (event) {},
          |
-         |     axis   : 'x' || 'y' || 'xy' // default is 'xy'
+         |     axis   : 'x' || 'y' || 'xy' // default is 'xy',
+         |
+         |     // limit multiple resizes.
+         |     // See the explanation in @Interactable.draggable example
+         |     max: 1,
+         |     maxPerElement: 1,
          | });
         \*/
         resizable: function (options) {
             if (isObject(options)) {
                 this.options.resizable = true;
                 this.setOnEvents('resize', options);
+
+                if (isNumber(options.max)) {
+                    this.options.resizeMax = options.max;
+                }
+                if (isNumber(options.maxPerElement)) {
+                    this.options.resizeMaxPerElement = options.maxPerElement;
+                }
 
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
                     this.options.resizeAxis = options.axis;
@@ -3518,13 +3752,27 @@
          - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
          = (object) this Interactable
          | interact(element).gesturable({
-         |     onmove: function (event) {}
+         |     onstart: function (event) {},
+         |     onmove : function (event) {},
+         |     onend  : function (event) {},
+         |
+         |     // limit multiple gestures.
+         |     // See the explanation in @Interactable.draggable example
+         |     max: 1,
+         |     maxPerElement: 1,
          | });
         \*/
         gesturable: function (options) {
             if (isObject(options)) {
                 this.options.gesturable = true;
                 this.setOnEvents('gesture', options);
+
+                if (isNumber(options.max)) {
+                    this.options.gestureMax = options.max;
+                }
+                if (isNumber(options.maxPerElement)) {
+                    this.options.gestureMaxPerElement = options.maxPerElement;
+                }
 
                 return this;
             }
@@ -3809,11 +4057,11 @@
                 : false);
         },
 
-        getAction: function (event, element) {
-            var action = this.defaultActionChecker(event, element);
+        getAction: function (pointer, interaction, element) {
+            var action = this.defaultActionChecker(pointer, interaction, element);
 
             if (this.options.actionChecker) {
-                action = this.options.actionChecker(event, action, this);
+                action = this.options.actionChecker(pointer, action, this, element, interaction);
             }
 
             return action;
@@ -3885,14 +4133,14 @@
          - checker (function) #optional A function which returns this Interactable's bounding rectangle. See @Interactable.getRect
          = (function | object) The checker function or this Interactable
         \*/
-        rectChecker: function (newValue) {
-            if (isFunction(newValue)) {
-                this.getRect = newValue;
+        rectChecker: function (checker) {
+            if (isFunction(checker)) {
+                this.getRect = checker;
 
                 return this;
             }
 
-            if (newValue === null) {
+            if (checker === null) {
                 delete this.options.getRect;
 
                 return this;
@@ -3994,7 +4242,7 @@
          * Returns or sets the mouse coordinate types used to calculate the
          * movement of the pointer.
          *
-         - source (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
+         - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
          = (string | object) The current deltaSource or this Interactable
         \*/
         deltaSource: function (newValue) {
@@ -4697,7 +4945,7 @@
             action = 'resizexy';
         }
         // return if the action is not recognised
-        if (!(action in actions)) {
+        if (!/^(drag|resizexy|resizex|resizey)$/.test(action)) {
             return interact;
         }
 
@@ -4705,9 +4953,9 @@
             extend(event, pointerEvent);
         }
         else {
-            clientRect = (target._element instanceof SVGElement)?
-                element.getBoundingClientRect():
-                clientRect = element.getClientRects()[0];
+            clientRect = (element instanceof SVGElement)
+                ? element.getBoundingClientRect()
+                : clientRect = element.getClientRects()[0];
 
             if (action === 'drag') {
                 event.pageX = clientRect.left + clientRect.width / 2;
@@ -4722,7 +4970,7 @@
         event.target = event.currentTarget = element;
         event.preventDefault = event.stopPropagation = blank;
 
-        pointerDown(event, action);
+        listeners.pointerDown(event, action);
 
         return interact;
     };
@@ -4791,47 +5039,51 @@
      = (object) An object with properties that outline the current state and expose internal functions and variables
     \*/
     interact.debug = function () {
+        var interaction = interactions[0] || new Interaction();
+
         return {
-            target                : target,
-            dragging              : dragging,
-            resizing              : resizing,
-            gesturing             : gesturing,
-            prepared              : prepared,
-            matches               : matches,
+            interactions          : interactions,
+            target                : interaction.target,
+            dragging              : interaction.dragging,
+            resizing              : interaction.resizing,
+            gesturing             : interaction.gesturing,
+            prepared              : interaction.prepared,
+            matches               : interaction.matches,
+            matchElements         : interaction.matchElements,
 
-            prevCoords            : prevCoords,
-            downCoords            : startCoords,
+            prevCoords            : interaction.prevCoords,
+            startCoords           : interaction.startCoords,
 
-            pointerIds            : pointerIds,
-            pointerMoves          : pointerMoves,
-            addPointer            : addPointer,
-            removePointer         : removePointer,
-            recordPointers        : recordPointers,
-            recordTouches         : recordTouches,
+            pointerIds            : interaction.pointerIds,
+            pointers              : interaction.pointers,
+            addPointer            : listeners.addPointer,
+            removePointer         : listeners.removePointer,
+            recordPointer        : listeners.recordPointer,
 
-            snap                  : snapStatus,
-            restrict              : restrictStatus,
-            inertia               : inertiaStatus,
+            snap                  : interaction.snapStatus,
+            restrict              : interaction.restrictStatus,
+            inertia               : interaction.inertiaStatus,
 
-            downTime              : downTime,
-            downEvent             : downEvent,
-            prevEvent             : prevEvent,
+            downTime              : interaction.downTime,
+            downEvent             : interaction.downEvent,
+            downPointer           : interaction.downPointer,
+            prevEvent             : interaction.prevEvent,
 
             Interactable          : Interactable,
             IOptions              : IOptions,
             interactables         : interactables,
-            pointerIsDown         : pointerIsDown,
+            pointerIsDown         : interaction.pointerIsDown,
             defaultOptions        : defaultOptions,
             defaultActionChecker  : defaultActionChecker,
 
-            actions               : actions,
-            dragMove              : dragMove,
-            resizeMove            : resizeMove,
-            gestureMove           : gestureMove,
-            pointerUp             : pointerUp,
-            pointerDown           : pointerDown,
-            pointerMove           : pointerMove,
-            pointerHover          : pointerHover,
+            actionCursors         : actionCursors,
+            dragMove              : listeners.dragMove,
+            resizeMove            : listeners.resizeMove,
+            gestureMove           : listeners.gestureMove,
+            pointerUp             : listeners.pointerUp,
+            pointerDown           : listeners.pointerDown,
+            pointerMove           : listeners.pointerMove,
+            pointerHover          : listeners.pointerHover,
 
             events                : events,
             globalEvents          : globalEvents,
@@ -4983,23 +5235,7 @@
             return interact;
         }
 
-        return {
-            enabled   : defaultOptions.snapEnabled,
-            mode      : snap.mode,
-            actions   : snap.actions,
-            grid      : snap.grid,
-            gridOffset: snap.gridOffset,
-            anchors   : snap.anchors,
-            paths     : snap.paths,
-            range     : snap.range,
-            locked    : snapStatus.locked,
-            x         : snapStatus.snappedX,
-            y         : snapStatus.snappedY,
-            realX     : snapStatus.realX,
-            realY     : snapStatus.realY,
-            dx        : snapStatus.dx,
-            dy        : snapStatus.dy
-        };
+        return defaultOptions.snapEnabled;
     };
 
     /*\
@@ -5057,51 +5293,44 @@
     };
 
     /*\
+     * interact.supportsPointerEvent
+     [ method ]
+     *
+     = (boolean) Whether or not the browser supports PointerEvents
+    \*/
+    interact.supportsPointerEvent = function () {
+        return supportsPointerEvent;
+    };
+
+    /*\
      * interact.currentAction
      [ method ]
      *
      = (string) What action is currently being performed
     \*/
     interact.currentAction = function () {
-        return (dragging && 'drag') || (resizing && 'resize') || (gesturing && 'gesture') || null;
+        for (var i = 0, len = interactions.length; i < len; i++) {
+            var action = interactions[i].currentAction();
+
+            if (action) { return action; }
+        }
+
+        return null;
     };
 
     /*\
      * interact.stop
      [ method ]
      *
-     * Ends the current interaction
+     * Cancels the current interaction
      *
      - event (Event) An event on which to call preventDefault()
      = (object) interact
     \*/
     interact.stop = function (event) {
-        if (dragging || resizing || gesturing) {
-            autoScroll.stop();
-            matches = [];
-
-            if (target.options.styleCursor) {
-                document.documentElement.style.cursor = '';
-            }
-
-            // prevent Default only if were previously interacting
-            if (event && isFunction(event.preventDefault)) {
-                checkAndPreventDefault(event, target);
-            }
-
-            if (dragging) {
-                activeDrops.dropzones = activeDrops.elements = activeDrops.rects = null;
-            }
-
-            clearTargets();
+        for (var i = interactions.length - 1; i > 0; i--) {
+            interactions[i].stop(event);
         }
-
-        pointerIds.splice(0);
-        pointerMoves.splice(0);
-
-        pointerIsDown = snapStatus.locked = dragging = resizing = gesturing = false;
-        prepared = prevEvent = null;
-        inertiaStatus.resumeDx = inertiaStatus.resumeDy = 0;
 
         return interact;
     };
@@ -5240,11 +5469,39 @@
         return tryCatchEventListeners;
     };
 
+    /*\
+     * interact.maxInteractions
+     [ method ]
+     **
+     * Returns or sets the maximum number of concurrent interactions allowed.
+     * By default only 1 interaction is allowed at a time (for backwards
+     * compatibility). To allow multiple interactions on the same Interactables
+     * and elements, you need to enable it in the draggable, resizable and
+     * gesturable `'max'` and `'maxPerElement'` options.
+     **
+     - newValue (number) #optional Any number. newValue <= 0 means no interactions.
+    \*/
+    interact.maxInteractions = function (newValue) {
+        if (isNumber(newValue)) {
+            maxInteractions = newValue;
+
+            return this;
+        }
+
+        return maxInteractions;
+    };
+
+    function endAllInteractions (event) {
+        for (var i = 0; i < interactions.length; i++) {
+            interactions[i].pointerUp(event, event);
+        }
+    }
+
     if (PointerEvent) {
         if (PointerEvent === window.MSPointerEvent) {
             pEventTypes = {
-                up: 'MSPointerUp', down: 'MSPointerDown', over: 'MSPointerOver',
-                out: 'MSPointerOut', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+                up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+                out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
         }
         else {
             pEventTypes = {
@@ -5252,58 +5509,62 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.up, collectTaps);
+        events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
 
-        events.add(docTarget, pEventTypes.down   , selectorDown);
-        events.add(docTarget, pEventTypes.move   , pointerMove );
-        events.add(docTarget, pEventTypes.up     , pointerUp   );
-        events.add(docTarget, pEventTypes.over   , pointerOver );
-        events.add(docTarget, pEventTypes.out    , pointerOut  );
+        events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
 
-        events.add(docTarget, pEventTypes.move  , recordPointers);
-        events.add(docTarget, pEventTypes.up    , recordPointers);
-        events.add(docTarget, pEventTypes.cancel, recordPointers);
+        events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
+        events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
+        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
+        events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
+        events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
 
-        // fix problems of wrong targets in IE
-        events.add(docTarget, pEventTypes.up, function () {
-            if (!(dragging || resizing || gesturing)) {
-                pointerIsDown = false;
-            }
-        });
+        // remove pointers after ending actions in pointerUp
+        events.add(docTarget, pEventTypes.up    , listeners.removePointer);
+        events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
 
+        // autoscroll
+        events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
     }
     else {
-        events.add(docTarget, 'mouseup' , collectTaps);
-        events.add(docTarget, 'touchend', collectTaps);
+        events.add(docTarget, 'mouseup' , listeners.collectTaps);
+        events.add(docTarget, 'touchend', listeners.collectTaps);
 
-        events.add(docTarget, 'mousedown', selectorDown);
-        events.add(docTarget, 'mousemove', pointerMove );
-        events.add(docTarget, 'mouseup'  , pointerUp   );
-        events.add(docTarget, 'mouseover', pointerOver );
-        events.add(docTarget, 'mouseout' , pointerOut  );
+        events.add(docTarget, 'mousemove'  , listeners.recordPointer);
+        events.add(docTarget, 'touchmove'  , listeners.recordPointer);
 
-        events.add(docTarget, 'touchmove'  , recordTouches);
-        events.add(docTarget, 'touchend'   , recordTouches);
-        events.add(docTarget, 'touchcancel', recordTouches);
+        events.add(docTarget, 'mousedown', listeners.selectorDown);
+        events.add(docTarget, 'mousemove', listeners.pointerMove );
+        events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
+        events.add(docTarget, 'mouseover', listeners.pointerOver );
+        events.add(docTarget, 'mouseout' , listeners.pointerOut  );
 
-        events.add(docTarget, 'touchstart' , selectorDown);
-        events.add(docTarget, 'touchmove'  , pointerMove );
-        events.add(docTarget, 'touchend'   , pointerUp   );
-        events.add(docTarget, 'touchcancel', pointerUp   );
+        events.add(docTarget, 'touchstart' , listeners.selectorDown);
+        events.add(docTarget, 'touchmove'  , listeners.pointerMove );
+        events.add(docTarget, 'touchend'   , listeners.pointerUp   );
+        events.add(docTarget, 'touchcancel', listeners.pointerUp   );
+
+        // remove touches after ending actions in pointerUp
+        events.add(docTarget, 'touchend'   , listeners.removePointer);
+        events.add(docTarget, 'touchcancel', listeners.removePointer);
+
+        // autoscroll
+        events.add(docTarget, 'mousemove', autoScroll.edgeMove);
+        events.add(docTarget, 'touchmove', autoScroll.edgeMove);
     }
 
-    events.add(windowTarget, 'blur', pointerUp);
+    events.add(windowTarget, 'blur', endAllInteractions);
 
     try {
         if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
-            events.add(parentDocTarget   , 'mouseup'      , pointerUp);
-            events.add(parentDocTarget   , 'touchend'     , pointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , pointerUp);
-            events.add(parentDocTarget   , 'pointerup'    , pointerUp);
-            events.add(parentDocTarget   , 'MSPointerUp'  , pointerUp);
-            events.add(parentWindowTarget, 'blur'         , pointerUp);
+            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerUp);
+            events.add(parentDocTarget   , 'touchend'     , listeners.pointerUp);
+            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
+            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
+            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
+            events.add(parentWindowTarget, 'blur'         , endAllInteractions );
         }
     }
     catch (error) {
@@ -5325,11 +5586,15 @@
     }
 
     // For IE's lack of Event#preventDefault
-    events.add(docTarget, 'selectstart', function (event) {
-        if (dragging || resizing || gesturing) {
-            checkAndPreventDefault(event, target);
-        }
-    });
+    if (events.useAttachEvent) {
+        events.add(docTarget, 'selectstart', function (event) {
+            var interaction = interactions[0];
+
+            if (interaction.currentAction()) {
+                interaction.checkAndPreventDefault(event);
+            }
+        });
+    }
 
     function matchesSelector (element, selector, nodeList) {
         if (ie8MatchesSelector) {

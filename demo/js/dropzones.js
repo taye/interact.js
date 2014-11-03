@@ -2,22 +2,33 @@
 
     'use strict';
 
-    var position = {};
+    var transformProp;
+
+    interact.maxInteractions(Infinity);
 
     // setup draggable elements.
     interact('.js-drag')
-        .draggable(true)
+        .draggable({ max: Infinity })
         .on('dragstart', function (event) {
-            position.x = parseInt(event.target.dataset.x, 10) || 0;
-            position.y = parseInt(event.target.dataset.y, 10) || 0;
+            event.interaction.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
+            event.interaction.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
         })
         .on('dragmove', function (event) {
-            position.x += event.dx;
-            position.y += event.dy;
+            event.interaction.x += event.dx;
+            event.interaction.y += event.dy;
 
-            event.target.dataset.x = position.x;
-            event.target.dataset.y = position.y;
-            event.target.style.webkitTransform = event.target.style.transform = 'translate(' + position.x + 'px, ' + position.y + 'px)';
+            if (transformProp) {
+                event.target.style[transformProp] =
+                    'translate(' + event.interaction.x + 'px, ' + event.interaction.y + 'px)';
+            }
+            else {
+                event.target.style.left = event.interaction.x + 'px';
+                event.target.style.top  = event.interaction.y + 'px';
+            }
+        })
+        .on('dragend', function (event) {
+            event.target.setAttribute('data-x', event.interaction.x);
+            event.target.setAttribute('data-y', event.interaction.y);
         });
 
     // setup drop areas.
@@ -39,35 +50,74 @@
             .dropzone({
                 accept: accept,
                 ondropactivate: function (event) {
-                    event.relatedTarget.classList.add('-drop-possible');
+                    addClass(event.relatedTarget, '-drop-possible');
                 },
                 ondropdeactivate: function (event) {
-                    event.relatedTarget.classList.remove('-drop-possible');
+                    removeClass(event.relatedTarget, '-drop-possible');
                 }
             })
             .on('dropactivate', function (event) {
-                console.log('activate', event);
-                event.target.classList.add('-drop-possible');
-                event.target.textContent = 'Drop me here!';
+                var active = event.target.getAttribute('active')|0;
 
+                // change style if it was previously not active
+                if (active === 0) {
+                    addClass(event.target, '-drop-possible');
+                    event.target.textContent = 'Drop me here!';
+                }
+
+                event.target.setAttribute('active', active + 1);
             })
             .on('dropdeactivate', function (event) {
-                console.log('deactivate', event);
-                event.target.classList.remove('-drop-possible');
-                event.target.textContent = 'Dropzone';
+                var active = event.target.getAttribute('active')|0;
+
+                // change style if it was previously active
+                // but will no longer be active
+                if (active === 1) {
+                    removeClass(event.target, '-drop-possible');
+                    event.target.textContent = 'Dropzone';
+                }
+
+                event.target.setAttribute('active', active - 1);
             })
             .on('dragenter', function (event) {
-                event.target.classList.add('-drop-over');
+                addClass(event.target, '-drop-over');
                 event.relatedTarget.textContent = 'I\'m in';
             })
             .on('dragleave', function (event) {
-                event.target.classList.remove('-drop-over');
+                removeClass(event.target, '-drop-over');
                 event.relatedTarget.textContent = 'Drag me…';
             })
             .on('drop', function (event) {
-                event.target.classList.remove('-drop-over');
+                removeClass(event.target, '-drop-over');
                 event.relatedTarget.textContent = 'Dropped';
             });
     }
+
+    function addClass (element, className) {
+        if (element.classList) {
+            return element.classList.add(className);
+        }
+        else {
+            element.className += ' ' + className;
+        }
+    }
+
+    function removeClass (element, className) {
+        if (element.classList) {
+            return element.classList.remove(className);
+        }
+        else {
+            element.className = element.className.replace(new RegExp(className + ' *', 'g'), '');
+        }
+    }
+
+    interact(document).on('ready', function () {
+        transformProp = 'transform' in document.body.style
+            ? 'transform': 'webkitTransform' in document.body.style
+            ? 'webkitTransform': 'mozTransform' in document.body.style
+            ? 'mozTransform': 'oTransform' in document.body.style
+            ? 'oTransform': 'msTransform' in document.body.style
+            ? 'msTransform': null;
+    });
 
 }(window.interact));
