@@ -505,6 +505,14 @@
     function isBool     (thing) { return typeof thing === 'boolean' ; }
     function isString   (thing) { return typeof thing === 'string'  ; }
 
+    function trySelector (value) {
+        if (!isString(value)) { return false; }
+
+        // an exception will be raised if it is invalid
+        document.querySelector(value);
+        return true;
+    }
+
     function extend (dest, source) {
         for (var prop in source) {
             dest[prop] = source[prop];
@@ -3320,11 +3328,7 @@
         this._element = element;
         this._iEvents = this._iEvents || {};
 
-        if (isString(element)) {
-            // if the selector is invalid,
-            // an exception will be raised
-            document.querySelector(element);
-
+        if (trySelector(element)) {
             this.selector = element;
 
             if (options && options.context
@@ -3617,9 +3621,8 @@
                 return this;
             }
 
-            if (isString(newValue)) {
-                // test if it is a valid CSS selector
-                document.querySelector(newValue);
+            // test if it is a valid CSS selector
+            if (trySelector(newValue)) {
                 this.options.accept = newValue;
 
                 return this;
@@ -4287,13 +4290,13 @@
             else if (isObject(newValue)) {
                 var newRestrictions = {};
 
-                if (isObject(newValue.drag) || /^parent$|^self$/.test(newValue.drag)) {
+                if (isObject(newValue.drag) || trySelector(newValue.drag)) {
                     newRestrictions.drag = newValue.drag;
                 }
-                if (isObject(newValue.resize) || /^parent$|^self$/.test(newValue.resize)) {
+                if (isObject(newValue.resize) || trySelector(newValue.resize)) {
                     newRestrictions.resize = newValue.resize;
                 }
-                if (isObject(newValue.gesture) || /^parent$|^self$/.test(newValue.gesture)) {
+                if (isObject(newValue.gesture) || trySelector(newValue.gesture)) {
                     newRestrictions.gesture = newValue.gesture;
                 }
 
@@ -4347,8 +4350,7 @@
          | interact(element).ignoreFrom('input, textarea, a');
         \*/
         ignoreFrom: function (newValue) {
-            if (isString(newValue)) {     // CSS selector to match event.target
-                document.querySelector(newValue);   // test the selector
+            if (trySelector(newValue)) {            // CSS selector to match event.target
                 this.options.ignoreFrom = newValue;
                 return this;
             }
@@ -4382,8 +4384,7 @@
          | interact(element).allowFrom('.handle');
         \*/
         allowFrom: function (newValue) {
-            if (isString(newValue)) {     // CSS selector to match event.target
-                document.querySelector(newValue);   // test the selector
+            if (trySelector(newValue)) {            // CSS selector to match event.target
                 this.options.allowFrom = newValue;
                 return this;
             }
