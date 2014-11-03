@@ -788,6 +788,9 @@
         else if (origin === 'self') {
             origin = element;
         }
+        else if (trySelector(origin)) {
+            origin = matchingParent(element, origin) || { x: 0, y: 0 };
+        }
 
         if (isElement(origin))  {
             origin = getElementRect(origin);
@@ -830,6 +833,18 @@
         }
 
         return false;
+    }
+
+    function matchingParent (child, selector) {
+        var parent = child.parentNode;
+
+        while (isElement(parent)) {
+            if (matchesSelector(parent, selector)) { return parent; }
+
+            parent = parent.parentNode;
+        }
+
+        return null;
     }
 
     function inContext (interactable, element) {
@@ -2604,11 +2619,18 @@
 
             var rect;
 
-            if (restriction === 'parent') {
-                restriction = this.element.parentNode;
-            }
-            else if (restriction === 'self') {
-                restriction = this.element;
+            if (isString(restriction)) {
+                if (restriction === 'parent') {
+                    restriction = this.element.parentNode;
+                }
+                else if (restriction === 'self') {
+                    restriction = this.element;
+                }
+                else {
+                    restriction = matchingParent(this.element, restriction);
+                }
+
+                if (!restriction) { return status; }
             }
 
             if (isElement(restriction)) {
@@ -4197,16 +4219,19 @@
          * Gets or sets the origin of the Interactable's element.  The x and y
          * of the origin will be subtracted from action event coordinates.
          *
-         - origin (object) #optional An object with x and y properties which are numbers
+         - origin (object | string) #optional An object eg. { x: 0, y: 0 } or string 'parent', 'self' or any CSS selector
          * OR
          - origin (Element) #optional An HTML or SVG Element whose rect will be used
          **
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
-            if (isObject(newValue) || /^parent$|^self$/.test(newValue)) {
+            if (trySelector(newValue)) {
                 this.options.origin = newValue;
-
+                return this;
+            }
+            else if (isObject(newValue)) {
+                this.options.origin = newValue;
                 return this;
             }
 
@@ -4255,7 +4280,7 @@
          * this by setting the
          * [`elementRect`](https://github.com/taye/interact.js/pull/72).
          **
-         - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
+         - newValue (object) #optional an object with keys drag, resize, and/or gesture whose values are rects, Elements, CSS selectors, or 'parent' or 'self'
          = (object) The current restrictions object or this Interactable
          **
          | interact(element).restrict({
