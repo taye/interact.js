@@ -45,7 +45,7 @@
                       {{~it.out :item:index}}
                       <article id="{{=item[0].title}}">
                           <header>
-                              <h3 class="{{=item[0].clas}}">{{=item[0].name}}<a href="#{{=item[0].title}}" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line {{=item[0].line}} in the source" href="https://github.com/taye/interact.js/blob/v1.0.27/interact.js#L{{=item[0].line}}">&#x27ad;</a></h3>
+                              <h3 class="{{=item[0].clas}}">{{=item[0].name}}<a href="#{{=item[0].title}}" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line {{=item[0].line}} in the source" href="https://github.com/taye/interact.js/blob/v1.1.0/interact.js#L{{=item[0].line}}">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="{{=item[0].title}}-extra"></div>
