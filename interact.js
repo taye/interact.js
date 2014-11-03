@@ -1940,30 +1940,11 @@
             if (this.dragging) {
                 endEvent = new InteractEvent(this, event, 'drag', 'end', this.element);
 
-                var dropEvent,
-                    draggableElement = this.element,
+                var draggableElement = this.element,
                     drop = this.getDrop(endEvent, draggableElement);
 
                 this.dropTarget = drop.dropzone;
                 this.dropElement = drop.element;
-
-                // get the most apprpriate dropzone based on DOM depth and order
-                if (this.dropTarget) {
-                    dropEvent = new InteractEvent(this, event, 'drop', null, this.dropElement, draggableElement);
-
-                    endEvent.dropzone = this.dropElement;
-                }
-
-                // if there was a prevDropTarget (perhaps if for some reason this
-                // dragend happens without the mouse moving of the previous drop
-                // target)
-                else if (this.prevDropTarget) {
-                    var dragLeaveEvent = new InteractEvent(this, event, 'drag', 'leave', this.dropElement, draggableElement);
-
-                    this.prevDropTarget.fire(dragLeaveEvent, draggableElement);
-
-                    endEvent.dragLeave = this.prevDropElement;
-                }
 
                 var dropEvents = this.getDropEvents(event, endEvent);
 
