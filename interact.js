@@ -3021,7 +3021,7 @@
             this.velocityY = 0;
         }
         else if (phase === 'inertiastart') {
-            this.timeStamp = new Date().getTime();
+            this.timeStamp = interaction.prevEvent.timeStamp;
             this.dt        = interaction.prevEvent.dt;
             this.duration  = interaction.prevEvent.duration;
             this.speed     = interaction.prevEvent.speed;
@@ -3033,47 +3033,18 @@
             this.dt        = this.timeStamp - interaction.prevEvent.timeStamp;
             this.duration  = this.timeStamp - interaction.downTime;
 
-            var dx, dy, dt;
-
-            // Use natural event coordinates (without snapping/restricions)
-            // subtract modifications from previous event if event given is
-            // not a native event
             if (event instanceof InteractEvent) {
-                // change in time in seconds
-                // use event sequence duration for end events
-                // => average speed of the event sequence
-                // (minimum dt of 1ms)
-                dt = Math.max((ending? this.duration: this.dt) / 1000, 0.001);
-                dx = this[sourceX] - interaction.prevEvent[sourceX];
-                dy = this[sourceY] - interaction.prevEvent[sourceY];
+                var dx = this[sourceX] - interaction.prevEvent[sourceX],
+                    dy = this[sourceY] - interaction.prevEvent[sourceY],
+                    dt = this.dt / 1000;
 
-                if (this.snap && this.snap.locked) {
-                    dx -= this.snap.dx;
-                    dy -= this.snap.dy;
-                }
-
-                if (this.restrict) {
-                    dx -= this.restrict.dx;
-                    dy -= this.restrict.dy;
-                }
-
-                if (interaction.prevEvent.snap && interaction.prevEvent.snap.locked) {
-                    dx -= (interaction.prevEvent[sourceX] - interaction.prevEvent.snap.dx);
-                    dy -= (interaction.prevEvent[sourceY] - interaction.prevEvent.snap.dy);
-                }
-
-                if (interaction.prevEvent.restrict) {
-                    dx += interaction.prevEvent.restrict.dx;
-                    dy += interaction.prevEvent.restrict.dy;
-                }
-
-                // speed and velocity in pixels per second
                 this.speed = hypot(dx, dy) / dt;
                 this.velocityX = dx / dt;
                 this.velocityY = dy / dt;
             }
-            // if normal move event, use previous user event coords
+            // if normal move or end event, use previous user event coords
             else {
+                // speed and velocity in pixels per second
                 this.speed = interaction.pointerDelta[deltaSource].speed;
                 this.velocityX = interaction.pointerDelta[deltaSource].vx;
                 this.velocityY = interaction.pointerDelta[deltaSource].vy;
