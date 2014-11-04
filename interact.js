@@ -106,13 +106,14 @@
                 resistance       : 10,    // the lambda in exponential decay
                 minSpeed         : 100,   // target speed must be above this for inertia to start
                 endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+                allowResume      : true,  // allow resuming an action in inertia phase
                 zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
                 smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
                 actions          : ['drag', 'resize'],  // allow inertia on these actions. gesture might not work
 
                 numberTypes: /^resistance$|^minSpeed$|^endSpeed$|^smoothEndDuration$/,
                 arrayTypes : /^actions$/,
-                boolTypes  : /^zeroResumeDelta$/
+                boolTypes  : /^(allowResume|zeroResumeDelta)$/
             },
             inertiaEnabled: false,
 
@@ -1491,6 +1492,7 @@
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
+                && this.target.options.inertia.allowResume
                 && curEventTarget === this.element
                 && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
 
@@ -3946,6 +3948,9 @@
          |     // inertia will stop when the object slows down to this speed
          |     endSpeed       : 20,
          |
+         |     // boolean; should actions be resumed when the pointer goes down during inertia
+         |     allowResume    : true,
+         |
          |     // boolean; should the jump when resuming from inertia be ignored in event.dx/dy
          |     zeroResumeDelta: false,
          |
@@ -3973,6 +3978,7 @@
                        minSpeed         : defaults.minSpeed,
                        endSpeed         : defaults.endSpeed,
                        actions          : defaults.actions,
+                       allowResume      : defaults.allowResume,
                        zeroResumeDelta  : defaults.zeroResumeDelta,
                        smoothEndDuration: defaults.smoothEndDuration
                    };
@@ -3982,6 +3988,7 @@
                 inertia.minSpeed          = this.validateSetting('inertia', 'minSpeed'         , options.minSpeed);
                 inertia.endSpeed          = this.validateSetting('inertia', 'endSpeed'         , options.endSpeed);
                 inertia.actions           = this.validateSetting('inertia', 'actions'          , options.actions);
+                inertia.allowResume       = this.validateSetting('inertia', 'allowResume'      , options.allowResume);
                 inertia.zeroResumeDelta   = this.validateSetting('inertia', 'zeroResumeDelta'  , options.zeroResumeDelta);
                 inertia.smoothEndDuration = this.validateSetting('inertia', 'smoothEndDuration', options.smoothEndDuration);
 
@@ -5172,6 +5179,7 @@
             if (isNumber(options.minSpeed)         ) { inertia.minSpeed          = options.minSpeed         ; }
             if (isNumber(options.endSpeed)         ) { inertia.endSpeed          = options.endSpeed         ; }
             if (isNumber(options.smoothEndDuration)) { inertia.smoothEndDuration = options.smoothEndDuration; }
+            if (isBool  (options.allowResume)      ) { inertia.allowResume       = options.allowResume      ; }
             if (isBool  (options.zeroResumeDelta)  ) { inertia.zeroResumeDelta   = options.zeroResumeDelta  ; }
             if (isArray (options.actions)          ) { inertia.actions           = options.actions          ; }
 
@@ -5189,6 +5197,7 @@
             minSpeed: inertia.minSpeed,
             endSpeed: inertia.endSpeed,
             actions: inertia.actions,
+            allowResume: inertia.allowResume,
             zeroResumeDelta: inertia.zeroResumeDelta
         };
     };
