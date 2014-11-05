@@ -5018,6 +5018,7 @@
     interact.getTouchAngle    = touchAngle;
 
     interact.getElementRect   = getElementRect;
+    interact.matchesSelector  = matchesSelector;
 
     /*\
      * interact.margin
