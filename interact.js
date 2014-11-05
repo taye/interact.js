@@ -1626,9 +1626,7 @@
                 if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd),
-
-                        coords = starting? this.startCoords.page : this.curCoords.page;
+                        shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd);
 
                     if (starting) {
                         var rect = target.getRect(this.element),
@@ -1666,8 +1664,10 @@
                         }
                     }
 
-                    if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
+                    var snapCoords = starting? this.startCoords.page : this.curCoords.page;
+
+                    if (shouldSnap    ) { this.setSnapping   (snapCoords); } else { this.snapStatus    .locked     = false; }
+                    if (shouldRestrict) { this.setRestriction(snapCoords); } else { this.restrictStatus.restricted = false; }
 
                     var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
                                      && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
@@ -1695,9 +1695,11 @@
                                 this.fireActiveDrops(dropEvents.activate);
                             }
 
+                            snapCoords = this.curCoords.page;
+
                             // set snapping and restriction for the move event
-                            if (shouldSnap    ) { this.setSnapping   (coords); }
-                            if (shouldRestrict) { this.setRestriction(coords); }
+                            if (shouldSnap    ) { this.setSnapping   (snapCoords); }
+                            if (shouldRestrict) { this.setRestriction(snapCoords); }
                         }
 
                         this.prevEvent = this[action + 'Move'](event);
