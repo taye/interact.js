@@ -1508,7 +1508,7 @@
                                                 ? this.inertiaStatus.startEvent
                                                 : undefined);
 
-            if (this.pointerWasMoved
+            if (this.pointerWasMoved && !preEnd
                 && this.curCoords.page.x === this.prevCoords.page.x
                 && this.curCoords.page.y === this.prevCoords.page.y
                 && this.curCoords.client.x === this.prevCoords.client.x
