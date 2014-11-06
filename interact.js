@@ -778,7 +778,9 @@
             origin = element.parentNode;
         }
         else if (origin === 'self') {
-            origin = element;
+            origin = interactable.getRect(element);
+            origin.x = origin.left;
+            origin.y = origin.top;
         }
         else if (trySelector(origin)) {
             origin = matchingParent(element, origin) || { x: 0, y: 0 };
@@ -2619,7 +2621,7 @@
                     restriction = this.element.parentNode;
                 }
                 else if (restriction === 'self') {
-                    restriction = this.element;
+                    restriction = target.getRect(this.element);
                 }
                 else {
                     restriction = matchingParent(this.element, restriction);
