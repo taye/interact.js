@@ -1499,6 +1499,8 @@
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
+
+                this.checkAndPreventDefault(event, target, this.element);
             }
         },
 
