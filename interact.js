@@ -779,22 +779,21 @@
         }
         else if (origin === 'self') {
             origin = interactable.getRect(element);
-            origin.x = origin.left;
-            origin.y = origin.top;
         }
         else if (trySelector(origin)) {
             origin = matchingParent(element, origin) || { x: 0, y: 0 };
         }
 
-        if (isElement(origin))  {
-            origin = getElementRect(origin);
-
-            origin.x = origin.left;
-            origin.y = origin.top;
-        }
-        else if (isFunction(origin)) {
+        if (isFunction(origin)) {
             origin = origin(interactable && element);
         }
+
+        if (isElement(origin))  {
+            origin = getElementRect(origin);
+        }
+
+        origin.x = ('x' in origin)? origin.x : origin.left;
+        origin.y = ('y' in origin)? origin.y : origin.top;
 
         return origin;
     }
@@ -1633,7 +1632,8 @@
                     if (starting) {
                         var rect = target.getRect(this.element),
                             snap = target.options.snap,
-                            restrict = target.options.restrict;
+                            restrict = target.options.restrict,
+                            width, height;
 
                         if (rect) {
                             this.startOffset.left = this.startCoords.page.x - rect.left;
@@ -1641,25 +1641,30 @@
 
                             this.startOffset.right  = rect.right  - this.startCoords.page.x;
                             this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
+
+                            if ('width' in rect) { width = rect.width; }
+                            else { width = rect.right - rect.left; }
+                            if ('height' in rect) { height = rect.height; }
+                            else { height = rect.bottom - rect.top; }
                         }
                         else {
                             this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
                         }
 
                         if (rect && snap.elementOrigin) {
-                            this.snapOffset.x = this.startOffset.left - (rect.width  * snap.elementOrigin.x);
-                            this.snapOffset.y = this.startOffset.top  - (rect.height * snap.elementOrigin.y);
+                            this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
+                            this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
                         }
                         else {
                             this.snapOffset.x = this.snapOffset.y = 0;
                         }
 
                         if (rect && restrict.elementRect) {
-                            this.restrictOffset.left = this.startOffset.left - (rect.width  * restrict.elementRect.left);
-                            this.restrictOffset.top  = this.startOffset.top  - (rect.height * restrict.elementRect.top);
+                            this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
+                            this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
 
-                            this.restrictOffset.right  = this.startOffset.right  - (rect.width  * (1 - restrict.elementRect.right));
-                            this.restrictOffset.bottom = this.startOffset.bottom - (rect.height * (1 - restrict.elementRect.bottom));
+                            this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
+                            this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
                         }
                         else {
                             this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
@@ -2614,7 +2619,7 @@
             status.dy = 0;
             status.restricted = false;
 
-            var rect;
+            var rect, restrictedX, restrictedY;
 
             if (isString(restriction)) {
                 if (restriction === 'parent') {
@@ -2630,31 +2635,27 @@
                 if (!restriction) { return status; }
             }
 
+            if (isFunction(restriction)) {
+                restriction = restriction(page.x, page.y, this.element);
+            }
+
             if (isElement(restriction)) {
-                rect = getElementRect(restriction);
+                restriction = getElementRect(restriction);
+            }
+
+            rect = restriction;
+
+            // object is assumed to have
+            // x, y, width, height or
+            // left, top, right, bottom
+            if ('x' in restriction && 'y' in restriction) {
+                restrictedX = Math.max(Math.min(rect.x + rect.width  - this.restrictOffset.right , page.x), rect.x + this.restrictOffset.left);
+                restrictedY = Math.max(Math.min(rect.y + rect.height - this.restrictOffset.bottom, page.y), rect.y + this.restrictOffset.top );
             }
             else {
-                if (isFunction(restriction)) {
-                    restriction = restriction(page.x, page.y, this.element);
-                }
-
-                rect = restriction;
-
-                // object is assumed to have
-                // x, y, width, height or
-                // left, top, right, bottom
-                if ('x' in restriction && 'y' in restriction) {
-                    rect = {
-                        left  : restriction.x,
-                        top   : restriction.y,
-                        right : restriction.x + restriction.width,
-                        bottom: restriction.y + restriction.height
-                    };
-                }
-            }
-
-            var restrictedX = Math.max(Math.min(rect.right  - this.restrictOffset.right , page.x), rect.left + this.restrictOffset.left),
+                restrictedX = Math.max(Math.min(rect.right  - this.restrictOffset.right , page.x), rect.left + this.restrictOffset.left);
                 restrictedY = Math.max(Math.min(rect.bottom - this.restrictOffset.bottom, page.y), rect.top  + this.restrictOffset.top );
+            }
 
             status.dx = restrictedX - page.x;
             status.dy = restrictedY - page.y;
