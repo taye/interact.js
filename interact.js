@@ -284,6 +284,11 @@
             supportsTouch &&
             navigator.userAgent.match('Presto'),
 
+        // scrolling doesn't change the result of
+        // getBoundingClientRect/getClientRects on iOS <=7 but it does on iOS 8
+        isIOS7orLower = (/iP(hone|od|ad)/.test(navigator.platform)
+                            && /OS [1-7][^\d]/.test(navigator.appVersion)),
+
         // prefix matchesSelector
         prefixedMatchesSelector = 'matchesSelector' in Element.prototype?
                 'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
@@ -646,7 +651,7 @@
     }
 
     function getElementRect (element) {
-        var scroll = /ipad|iphone|ipod/i.test(navigator.userAgent)
+        var scroll = isIOS7orLower
                 ? { x: 0, y: 0 }
                 : getScrollXY(),
             clientRect = (element instanceof SVGElement)?
