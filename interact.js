@@ -303,12 +303,6 @@
         reqFrame = window.requestAnimationFrame,
         cancelFrame = window.cancelAnimationFrame,
 
-        // used for adding event listeners to window and document
-        windowTarget       = { _element: window       , events  : {} },
-        docTarget          = { _element: document     , events  : {} },
-        parentWindowTarget = { _element: window.parent, events  : {} },
-        parentDocTarget    = { _element: null         , events  : {} },
-
         // Events wrapper
         events = (function () {
             var useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window),
@@ -471,14 +465,8 @@
             }
 
             return {
-                add: function (target, type, listener, useCapture) {
-                    add(target._element, type, listener, useCapture);
-                },
-                remove: function (target, type, listener, useCapture) {
-                    remove(target._element, type, listener, useCapture);
-                },
-                addToElement: add,
-                removeFromElement: remove,
+                add: add,
+                remove: remove,
                 useAttachEvent: useAttachEvent,
 
                 _elements: elements,
@@ -1269,14 +1257,14 @@
                     this.matchElements = curMatchElements;
 
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
-                    events.addToElement(eventTarget,
+                    events.add(eventTarget,
                                         PointerEvent? pEventTypes.move : 'mousemove',
                                         listeners.pointerHover);
                 }
                 else if (this.target) {
                     if (nodeContains(prevTargetElement, eventTarget)) {
                         this.pointerHover(pointer, event, this.matches, this.matchElements);
-                        events.addToElement(this.element,
+                        events.add(this.element,
                                             PointerEvent? pEventTypes.move : 'mousemove',
                                             listeners.pointerHover);
                     }
@@ -1328,7 +1316,7 @@
 
             // Remove temporary event listeners for selector Interactables
             if (!interactables.get(eventTarget)) {
-                events.removeFromElement(eventTarget,
+                events.remove(eventTarget,
                                        PointerEvent? pEventTypes.move : 'mousemove',
                                        listeners.pointerHover);
             }
@@ -3322,14 +3310,14 @@
         }
         else if (isElement(element)) {
             if (PointerEvent) {
-                events.add(this, pEventTypes.down, listeners.pointerDown );
-                events.add(this, pEventTypes.move, listeners.pointerHover);
+                events.add(this._element, pEventTypes.down, listeners.pointerDown );
+                events.add(this._element, pEventTypes.move, listeners.pointerHover);
             }
             else {
-                events.add(this, 'mousedown' , listeners.pointerDown );
-                events.add(this, 'mousemove' , listeners.pointerHover);
-                events.add(this, 'touchstart', listeners.pointerDown );
-                events.add(this, 'touchmove' , listeners.pointerHover);
+                events.add(this._element, 'mousedown' , listeners.pointerDown );
+                events.add(this._element, 'mousemove' , listeners.pointerHover);
+                events.add(this._element, 'touchstart', listeners.pointerDown );
+                events.add(this._element, 'touchmove' , listeners.pointerHover);
             }
         }
 
@@ -4570,8 +4558,8 @@
                     };
 
                     // add delegate listener functions
-                    events.addToElement(this._context, eventType, delegateListener);
-                    events.addToElement(this._context, eventType, delegateUseCapture, true);
+                    events.add(this._context, eventType, delegateListener);
+                    events.add(this._context, eventType, delegateUseCapture, true);
                 }
 
                 var delegated = delegatedEvents[eventType],
@@ -4596,7 +4584,7 @@
                 delegated.listeners[index].push([listener, useCapture]);
             }
             else {
-                events.add(this, eventType, listener, useCapture);
+                events.add(this._element, eventType, listener, useCapture);
             }
 
             return this;
@@ -4665,8 +4653,8 @@
                                     delegated.listeners.splice(index, 1);
 
                                     // remove delegate function from context
-                                    events.removeFromElement(this._context, eventType, delegateListener);
-                                    events.removeFromElement(this._context, eventType, delegateUseCapture, true);
+                                    events.remove(this._context, eventType, delegateListener);
+                                    events.remove(this._context, eventType, delegateUseCapture, true);
 
                                     // remove the arrays if they are empty
                                     if (!delegated.selectors.length) {
@@ -4765,8 +4753,8 @@
                             }
                         }
 
-                        events.removeFromElement(this._context, type, delegateListener);
-                        events.removeFromElement(this._context, type, delegateUseCapture, true);
+                        events.remove(this._context, type, delegateListener);
+                        events.remove(this._context, type, delegateUseCapture, true);
 
                         break;
                     }
@@ -4824,7 +4812,7 @@
         }
         // If non InteratEvent type, addEventListener to document
         else {
-            events.add(docTarget, type, listener, useCapture);
+            events.add(document, type, listener, useCapture);
         }
 
         return interact;
@@ -4843,7 +4831,7 @@
     \*/
     interact.off = function (type, listener, useCapture) {
         if (!contains(eventTypes, type)) {
-            events.remove(docTarget, type, listener, useCapture);
+            events.remove(document, type, listener, useCapture);
         }
         else {
             var index;
@@ -5422,62 +5410,63 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
+        events.add(document, pEventTypes.up    , listeners.collectTaps);
 
-        events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
+        events.add(document, pEventTypes.move  , listeners.recordPointer);
 
-        events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
-        events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
-        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
-        events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
-        events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
+        events.add(document, pEventTypes.down  , listeners.selectorDown);
+        events.add(document, pEventTypes.move  , listeners.pointerMove );
+        events.add(document, pEventTypes.up    , listeners.pointerUp   );
+        events.add(document, pEventTypes.over  , listeners.pointerOver );
+        events.add(document, pEventTypes.out   , listeners.pointerOut  );
 
         // remove pointers after ending actions in pointerUp
-        events.add(docTarget, pEventTypes.up    , listeners.removePointer);
-        events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
+        events.add(document, pEventTypes.up    , listeners.removePointer);
+        events.add(document, pEventTypes.cancel, listeners.removePointer);
 
         // autoscroll
-        events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
+        events.add(document, pEventTypes.move  , autoScroll.edgeMove);
     }
     else {
-        events.add(docTarget, 'mouseup' , listeners.collectTaps);
-        events.add(docTarget, 'touchend', listeners.collectTaps);
+        events.add(document, 'mouseup' , listeners.collectTaps);
+        events.add(document, 'touchend', listeners.collectTaps);
 
-        events.add(docTarget, 'mousemove'  , listeners.recordPointer);
-        events.add(docTarget, 'touchmove'  , listeners.recordPointer);
+        events.add(document, 'mousemove', listeners.recordPointer);
+        events.add(document, 'touchmove', listeners.recordPointer);
 
-        events.add(docTarget, 'mousedown', listeners.selectorDown);
-        events.add(docTarget, 'mousemove', listeners.pointerMove );
-        events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
-        events.add(docTarget, 'mouseover', listeners.pointerOver );
-        events.add(docTarget, 'mouseout' , listeners.pointerOut  );
+        events.add(document, 'mousedown', listeners.selectorDown);
+        events.add(document, 'mousemove', listeners.pointerMove );
+        events.add(document, 'mouseup'  , listeners.pointerUp   );
+        events.add(document, 'mouseover', listeners.pointerOver );
+        events.add(document, 'mouseout' , listeners.pointerOut  );
 
-        events.add(docTarget, 'touchstart' , listeners.selectorDown);
-        events.add(docTarget, 'touchmove'  , listeners.pointerMove );
-        events.add(docTarget, 'touchend'   , listeners.pointerUp   );
-        events.add(docTarget, 'touchcancel', listeners.pointerUp   );
+        events.add(document, 'touchstart' , listeners.selectorDown);
+        events.add(document, 'touchmove'  , listeners.pointerMove );
+        events.add(document, 'touchend'   , listeners.pointerUp   );
+        events.add(document, 'touchcancel', listeners.pointerUp   );
 
         // remove touches after ending actions in pointerUp
-        events.add(docTarget, 'touchend'   , listeners.removePointer);
-        events.add(docTarget, 'touchcancel', listeners.removePointer);
+        events.add(document, 'touchend'   , listeners.removePointer);
+        events.add(document, 'touchcancel', listeners.removePointer);
 
         // autoscroll
-        events.add(docTarget, 'mousemove', autoScroll.edgeMove);
-        events.add(docTarget, 'touchmove', autoScroll.edgeMove);
+        events.add(document, 'mousemove', autoScroll.edgeMove);
+        events.add(document, 'touchmove', autoScroll.edgeMove);
     }
 
-    events.add(windowTarget, 'blur', endAllInteractions);
+    events.add(window, 'blur', endAllInteractions);
 
     try {
         if (window.frameElement) {
-            parentDocTarget._element = window.frameElement.ownerDocument;
+            var parentDoc = window.frameElement.ownerDocument,
+                parentWindow = parentDoc.defaultView;
 
-            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchend'     , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
-            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
-            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
-            events.add(parentWindowTarget, 'blur'         , endAllInteractions );
+            events.add(parentDoc   , 'mouseup'    , listeners.pointerUp);
+            events.add(parentDoc   , 'touchend'   , listeners.pointerUp);
+            events.add(parentDoc   , 'touchcancel', listeners.pointerUp);
+            events.add(parentDoc   , 'pointerup'  , listeners.pointerUp);
+            events.add(parentDoc   , 'MSPointerUp', listeners.pointerUp);
+            events.add(parentWindow, 'blur'       , endAllInteractions );
         }
     }
     catch (error) {
@@ -5500,7 +5489,7 @@
 
     // For IE's lack of Event#preventDefault
     if (events.useAttachEvent) {
-        events.add(docTarget, 'selectstart', function (event) {
+        events.add(document, 'selectstart', function (event) {
             var interaction = interactions[0];
 
             if (interaction.currentAction()) {
