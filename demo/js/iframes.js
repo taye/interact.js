@@ -2,6 +2,7 @@ function setInteractables () {
   'use strict';
 
   interact('.draggable', { context: document })
+  .autoScroll(true)
   .draggable({
     onmove: onMove,
   })
