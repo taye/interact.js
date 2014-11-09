@@ -21,6 +21,8 @@
 
         tmpXY = {},     // reduce object creation in getXY()
 
+        documents       = [],   // all documents being listened to
+
         interactables   = [],   // all set interactables
         interactions    = [],   // all interactions
 
@@ -478,13 +480,20 @@
     function blank () {}
 
     function isElement (o) {
-        return !!o && (typeof o === 'object') && (
-            /object|function/.test(typeof Element)
-                ? o instanceof Element //DOM2
-                : o.nodeType === 1 && typeof o.nodeName === "string");
+        if (!o || (typeof o !== 'object')) { return false; }
+
+        var _window = getWindow(o) || window;
+
+        return (/object|function/.test(typeof _window.Element)
+            ? o instanceof _window.Element //DOM2
+            : o.nodeType === 1 && typeof o.nodeName === "string");
     }
-    function isObject   (thing) { return thing instanceof Object; }
-    function isArray    (thing) { return thing instanceof Array ; }
+    function isArray (thing) {
+        return isObject(thing)
+                && (typeof thing.length !== undefined)
+                && isFunction(thing.splice);
+    }
+    function isObject   (thing) { return !!thing && (typeof thing === 'object'); }
     function isFunction (thing) { return typeof thing === 'function'; }
     function isNumber   (thing) { return typeof thing === 'number'  ; }
     function isBool     (thing) { return typeof thing === 'boolean' ; }
@@ -636,6 +645,19 @@
         return (element instanceof SVGElementInstance
             ? element.correspondingUseElement
             : element);
+    }
+
+    function getWindow (node) {
+        // if argument is a Window object
+        if (node.window === node) {
+            return node;
+        }
+
+        var rootNode = (node.ownerDocument
+                        || node.rootDocument
+                        || node);
+
+        return rootNode.defaultView || rootNode.parentWindow;
     }
 
     function getElementRect (element) {
@@ -3298,27 +3320,44 @@
         this._element = element;
         this._iEvents = this._iEvents || {};
 
+        var _window;
+
         if (trySelector(element)) {
             this.selector = element;
 
-            if (options && options.context
-                && (window.Node
-                    ? options.context instanceof window.Node
-                    : (isElement(options.context) || options.context === document))) {
-                this._context = options.context;
+            var context = options && options.context;
+
+            _window = context? getWindow(context) : window;
+
+            if (context && (_window.Node
+                    ? context instanceof _window.Node
+                    : (isElement(context) || context === _window.document))) {
+
+                this._context = context;
             }
         }
-        else if (isElement(element)) {
-            if (PointerEvent) {
-                events.add(this._element, pEventTypes.down, listeners.pointerDown );
-                events.add(this._element, pEventTypes.move, listeners.pointerHover);
+        else {
+            _window = getWindow(element);
+
+            if (isElement(element, _window)) {
+
+                if (PointerEvent) {
+                    events.add(this._element, pEventTypes.down, listeners.pointerDown );
+                    events.add(this._element, pEventTypes.move, listeners.pointerHover);
+                }
+                else {
+                    events.add(this._element, 'mousedown' , listeners.pointerDown );
+                    events.add(this._element, 'mousemove' , listeners.pointerHover);
+                    events.add(this._element, 'touchstart', listeners.pointerDown );
+                    events.add(this._element, 'touchmove' , listeners.pointerHover);
+                }
             }
-            else {
-                events.add(this._element, 'mousedown' , listeners.pointerDown );
-                events.add(this._element, 'mousemove' , listeners.pointerHover);
-                events.add(this._element, 'touchstart', listeners.pointerDown );
-                events.add(this._element, 'touchmove' , listeners.pointerHover);
-            }
+        }
+
+        this._doc = _window.document;
+
+        if (!contains(documents, this._doc)) {
+            listenToDocument(this._doc);
         }
 
         interactables.push(this);
@@ -5398,80 +5437,90 @@
         }
     }
 
-    if (PointerEvent) {
-        if (PointerEvent === window.MSPointerEvent) {
-            pEventTypes = {
-                up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-                out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+    function listenToDocument (doc) {
+        if (contains(documents, doc)) { return; }
+
+        var win = doc.defaultView || doc.parentWindow;
+
+        if (PointerEvent) {
+            if (PointerEvent === win.MSPointerEvent) {
+                pEventTypes = {
+                    up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+                    out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+            }
+            else {
+                pEventTypes = {
+                    up: 'pointerup', down: 'pointerdown', over: 'pointerover',
+                    out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
+            }
+
+            events.add(doc, pEventTypes.up    , listeners.collectTaps);
+
+            events.add(doc, pEventTypes.move  , listeners.recordPointer);
+
+            events.add(doc, pEventTypes.down  , listeners.selectorDown);
+            events.add(doc, pEventTypes.move  , listeners.pointerMove );
+            events.add(doc, pEventTypes.up    , listeners.pointerUp   );
+            events.add(doc, pEventTypes.over  , listeners.pointerOver );
+            events.add(doc, pEventTypes.out   , listeners.pointerOut  );
+
+            // remove pointers after ending actions in pointerUp
+            events.add(doc, pEventTypes.up    , listeners.removePointer);
+            events.add(doc, pEventTypes.cancel, listeners.removePointer);
+
+            // autoscroll
+            events.add(doc, pEventTypes.move  , autoScroll.edgeMove);
         }
         else {
-            pEventTypes = {
-                up: 'pointerup', down: 'pointerdown', over: 'pointerover',
-                out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
+            events.add(doc, 'mouseup' , listeners.collectTaps);
+            events.add(doc, 'touchend', listeners.collectTaps);
+
+            events.add(doc, 'mousemove', listeners.recordPointer);
+            events.add(doc, 'touchmove', listeners.recordPointer);
+
+            events.add(doc, 'mousedown', listeners.selectorDown);
+            events.add(doc, 'mousemove', listeners.pointerMove );
+            events.add(doc, 'mouseup'  , listeners.pointerUp   );
+            events.add(doc, 'mouseover', listeners.pointerOver );
+            events.add(doc, 'mouseout' , listeners.pointerOut  );
+
+            events.add(doc, 'touchstart' , listeners.selectorDown);
+            events.add(doc, 'touchmove'  , listeners.pointerMove );
+            events.add(doc, 'touchend'   , listeners.pointerUp   );
+            events.add(doc, 'touchcancel', listeners.pointerUp   );
+
+            // remove touches after ending actions in pointerUp
+            events.add(doc, 'touchend'   , listeners.removePointer);
+            events.add(doc, 'touchcancel', listeners.removePointer);
+
+            // autoscroll
+            events.add(doc, 'mousemove', autoScroll.edgeMove);
+            events.add(doc, 'touchmove', autoScroll.edgeMove);
         }
 
-        events.add(document, pEventTypes.up    , listeners.collectTaps);
+        events.add(win, 'blur', endAllInteractions);
 
-        events.add(document, pEventTypes.move  , listeners.recordPointer);
+        try {
+            if (win.frameElement) {
+                var parentDoc = win.frameElement.ownerDocument,
+                    parentWindow = parentDoc.defaultView;
 
-        events.add(document, pEventTypes.down  , listeners.selectorDown);
-        events.add(document, pEventTypes.move  , listeners.pointerMove );
-        events.add(document, pEventTypes.up    , listeners.pointerUp   );
-        events.add(document, pEventTypes.over  , listeners.pointerOver );
-        events.add(document, pEventTypes.out   , listeners.pointerOut  );
-
-        // remove pointers after ending actions in pointerUp
-        events.add(document, pEventTypes.up    , listeners.removePointer);
-        events.add(document, pEventTypes.cancel, listeners.removePointer);
-
-        // autoscroll
-        events.add(document, pEventTypes.move  , autoScroll.edgeMove);
-    }
-    else {
-        events.add(document, 'mouseup' , listeners.collectTaps);
-        events.add(document, 'touchend', listeners.collectTaps);
-
-        events.add(document, 'mousemove', listeners.recordPointer);
-        events.add(document, 'touchmove', listeners.recordPointer);
-
-        events.add(document, 'mousedown', listeners.selectorDown);
-        events.add(document, 'mousemove', listeners.pointerMove );
-        events.add(document, 'mouseup'  , listeners.pointerUp   );
-        events.add(document, 'mouseover', listeners.pointerOver );
-        events.add(document, 'mouseout' , listeners.pointerOut  );
-
-        events.add(document, 'touchstart' , listeners.selectorDown);
-        events.add(document, 'touchmove'  , listeners.pointerMove );
-        events.add(document, 'touchend'   , listeners.pointerUp   );
-        events.add(document, 'touchcancel', listeners.pointerUp   );
-
-        // remove touches after ending actions in pointerUp
-        events.add(document, 'touchend'   , listeners.removePointer);
-        events.add(document, 'touchcancel', listeners.removePointer);
-
-        // autoscroll
-        events.add(document, 'mousemove', autoScroll.edgeMove);
-        events.add(document, 'touchmove', autoScroll.edgeMove);
-    }
-
-    events.add(window, 'blur', endAllInteractions);
-
-    try {
-        if (window.frameElement) {
-            var parentDoc = window.frameElement.ownerDocument,
-                parentWindow = parentDoc.defaultView;
-
-            events.add(parentDoc   , 'mouseup'    , listeners.pointerUp);
-            events.add(parentDoc   , 'touchend'   , listeners.pointerUp);
-            events.add(parentDoc   , 'touchcancel', listeners.pointerUp);
-            events.add(parentDoc   , 'pointerup'  , listeners.pointerUp);
-            events.add(parentDoc   , 'MSPointerUp', listeners.pointerUp);
-            events.add(parentWindow, 'blur'       , endAllInteractions );
+                events.add(parentDoc   , 'mouseup'    , listeners.pointerUp);
+                events.add(parentDoc   , 'touchend'   , listeners.pointerUp);
+                events.add(parentDoc   , 'touchcancel', listeners.pointerUp);
+                events.add(parentDoc   , 'pointerup'  , listeners.pointerUp);
+                events.add(parentDoc   , 'MSPointerUp', listeners.pointerUp);
+                events.add(parentWindow, 'blur'       , endAllInteractions );
+            }
         }
+        catch (error) {
+            interact.windowParentError = error;
+        }
+
+        documents.push(doc);
     }
-    catch (error) {
-        interact.windowParentError = error;
-    }
+
+    listenToDocument(document);
 
     function indexOf (array, target) {
         for (var i = 0, len = array.length; i < len; i++) {
