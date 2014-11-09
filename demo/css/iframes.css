@@ -1,0 +1,22 @@
+body {
+    padding: 2em 5%;
+    font-family: sans-serif;
+}
+
+#drag-me {
+    width: 25%;
+    margin: 5vmin;
+
+    background-color: #29e;
+    color: white;
+
+    border: solid 0.4em #666;
+    border-radius: 0.75em;
+    padding: 3%;
+}
+
+iframe {
+    width: 100%;
+    height: 50vmin;
+}
+

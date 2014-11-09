@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<link href="css/iframes.css" rel="stylesheet" type="text/css"/>
+
+<iframe src="iframes-middle.html" style="border: solid 2px black"></iframe>
+
+<script src="js/iframes.js"></script>
+<script>
+document.querySelector('iframe').onload = function (event) {
+    window.interact = frames[0].interact;
+
+    setInteractables();
+};
+</script>
+
+
+<div id="drag-me" class="draggable">
+    <p>An element in the TOP frame</p>
+</div>
+
