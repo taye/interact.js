@@ -96,7 +96,7 @@
             restrictEnabled: false,
 
             autoScroll: {
-                container   : window,  // the item that is scrolled (Window or HTMLElement)
+                container   : null,     // the item that is scrolled (Window or HTMLElement)
                 margin      : 60,
                 speed       : 300,      // the scroll speed in pixels per second
 
@@ -125,14 +125,14 @@
 
         // Things related to autoScroll
         autoScroll = {
-            target: null,
+            interaction: null,
             i: null,    // the handle returned by window.setInterval
             x: 0, y: 0, // Direction each pulse is to scroll in
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var options = autoScroll.target.options.autoScroll,
-                    container = options.container,
+                var options = autoScroll.interaction.target.options.autoScroll,
+                    container = options.container || getWindow(autoScroll.interaction.element),
                     now = new Date().getTime(),
                     // change in time in seconds
                     dt = (now - autoScroll.prevTime) / 1000,
@@ -140,7 +140,7 @@
                     s = options.speed * dt;
 
                 if (s >= 1) {
-                    if (container instanceof window.Window) {
+                    if (isWindow(container)) {
                         container.scrollBy(autoScroll.x * s, autoScroll.y * s);
                     }
                     else if (container) {
@@ -158,14 +158,17 @@
             },
 
             edgeMove: function (event) {
-                var target,
+                var interaction,
+                    target,
                     doAutoscroll = false;
 
                 for (var i = 0; i < interactions.length; i++) {
-                    var interaction = interactions[i];
+                    interaction = interactions[i];
+
                     target = interaction.target;
 
-                    if (target && target.options.autoScrollEnabled && (interaction.dragging || interaction.resizing)) {
+                    if (target && target.options.autoScrollEnabled
+                        && (interaction.dragging || interaction.resizing)) {
                         doAutoscroll = true;
                         break;
                     }
@@ -177,16 +180,17 @@
                     right,
                     bottom,
                     left,
-                    options = target.options.autoScroll;
+                    options = target.options.autoScroll,
+                    container = options.container || getWindow(interaction.element);
 
-                if (options.container instanceof window.Window) {
+                if (isWindow(container)) {
                     left   = event.clientX < autoScroll.margin;
                     top    = event.clientY < autoScroll.margin;
-                    right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
-                    bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                    right  = event.clientX > container.innerWidth  - autoScroll.margin;
+                    bottom = event.clientY > container.innerHeight - autoScroll.margin;
                 }
                 else {
-                    var rect = getElementRect(options.container);
+                    var rect = getElementRect(container);
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -202,18 +206,18 @@
                     autoScroll.margin = options.margin;
                     autoScroll.speed  = options.speed;
 
-                    autoScroll.start(target);
+                    autoScroll.start(interaction);
                 }
             },
 
             isScrolling: false,
             prevTime: 0,
 
-            start: function (target) {
+            start: function (interaction) {
                 autoScroll.isScrolling = true;
                 cancelFrame(autoScroll.i);
 
-                autoScroll.target = target;
+                autoScroll.interaction = interaction;
                 autoScroll.prevTime = new Date().getTime();
                 autoScroll.i = reqFrame(autoScroll.scroll);
             },
@@ -486,6 +490,7 @@
             ? o instanceof _window.Element //DOM2
             : o.nodeType === 1 && typeof o.nodeName === "string");
     }
+    function isWindow (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); }
     function isArray (thing) {
         return isObject(thing)
                 && (typeof thing.length !== undefined)
@@ -647,14 +652,11 @@
     }
 
     function getWindow (node) {
-        // if argument is a Window object
-        if (node.window === node) {
+        if (isWindow(node)) {
             return node;
         }
 
-        var rootNode = (node.ownerDocument
-                        || node.rootDocument
-                        || node);
+        var rootNode = (node.ownerDocument || node);
 
         return rootNode.defaultView || rootNode.parentWindow;
     }
@@ -3827,7 +3829,7 @@
                 autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
 
                 autoScroll.container =
-                    (isElement(options.container) || options.container instanceof window.Window
+                    (isElement(options.container) || isWindow(options.container)
                      ? options.container
                      : defaults.container);
 
@@ -5118,7 +5120,7 @@
             if (isNumber(options.speed) ) { defaults.speed  = options.speed ;}
 
             defaults.container =
-                (isElement(options.container) || options.container instanceof window.Window
+                (isElement(options.container) || isWindow(options.container)
                  ? options.container
                  : defaults.container);
 
