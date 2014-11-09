@@ -5517,6 +5517,17 @@
             interact.windowParentError = error;
         }
 
+        // For IE's lack of Event#preventDefault
+        if (events.useAttachEvent) {
+            events.add(doc, 'selectstart', function (event) {
+                var interaction = interactions[0];
+
+                if (interaction.currentAction()) {
+                    interaction.checkAndPreventDefault(event);
+                }
+            });
+        }
+
         documents.push(doc);
     }
 
@@ -5534,17 +5545,6 @@
 
     function contains (array, target) {
         return indexOf(array, target) !== -1;
-    }
-
-    // For IE's lack of Event#preventDefault
-    if (events.useAttachEvent) {
-        events.add(document, 'selectstart', function (event) {
-            var interaction = interactions[0];
-
-            if (interaction.currentAction()) {
-                interaction.checkAndPreventDefault(event);
-            }
-        });
     }
 
     function matchesSelector (element, selector, nodeList) {
