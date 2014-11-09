@@ -358,8 +358,8 @@
                                 event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
                                 if (/mouse|click/.test(event.type)) {
-                                    event.pageX = event.clientX + document.documentElement.scrollLeft;
-                                    event.pageY = event.clientY + document.documentElement.scrollTop;
+                                    event.pageX = event.clientX + element.ownerDdocument.documentElement.scrollLeft;
+                                    event.pageY = event.clientY + element.ownerDdocument.documentElement.scrollTop;
                                 }
 
                                 listener(event);
@@ -630,10 +630,11 @@
         return client;
     }
 
-    function getScrollXY () {
+    function getScrollXY (win) {
+        win = win || window;
         return {
-            x: window.scrollX || document.documentElement.scrollLeft,
-            y: window.scrollY || document.documentElement.scrollTop
+            x: win.scrollX || win.document.documentElement.scrollLeft,
+            y: win.scrollY || win.document.documentElement.scrollTop
         };
     }
 
@@ -663,7 +664,7 @@
     function getElementRect (element) {
         var scroll = isIOS7orLower
                 ? { x: 0, y: 0 }
-                : getScrollXY(),
+                : getScrollXY(getWindow(element)),
             clientRect = (element instanceof SVGElement)?
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
@@ -856,7 +857,7 @@
     }
 
     function inContext (interactable, element) {
-        return interactable._context === document
+        return interactable._context === element.ownerDocument
                 || nodeContains(interactable._context, element);
     }
 
@@ -998,11 +999,11 @@
 
             // check if the deepest or current are document.documentElement or document.rootElement
             // - if the current dropzone is, do nothing and continue
-            if (dropzone.parentNode === document) {
+            if (dropzone.parentNode === dropzone.ownerDocument) {
                 continue;
             }
             // - if deepest is, update with the current dropzone and continue to next
-            else if (deepestZone.parentNode === document) {
+            else if (deepestZone.parentNode === dropzone.ownerDocument) {
                 deepestZone = dropzone;
                 index = i;
                 continue;
@@ -1010,7 +1011,7 @@
 
             if (!deepestZoneParents.length) {
                 parent = deepestZone;
-                while (parent.parentNode && parent.parentNode !== document) {
+                while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
                     deepestZoneParents.unshift(parent);
                     parent = parent.parentNode;
                 }
@@ -1034,7 +1035,7 @@
 
             dropzoneParents = [];
 
-            while (parent.parentNode !== document) {
+            while (parent.parentNode !== parent.ownerDocument) {
                 dropzoneParents.unshift(parent);
                 parent = parent.parentNode;
             }
@@ -1321,10 +1322,10 @@
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        document.documentElement.style.cursor = actionCursors[action];
+                        target._doc.documentElement.style.cursor = actionCursors[action];
                     }
                     else {
-                        document.documentElement.style.cursor = '';
+                        target._doc.documentElement.style.cursor = '';
                     }
                 }
             }
@@ -1344,7 +1345,7 @@
             }
 
             if (this.target && this.target.options.styleCursor && !this.interacting()) {
-                document.documentElement.style.cursor = '';
+                this.target._doc.documentElement.style.cursor = '';
             }
         },
 
@@ -1359,7 +1360,7 @@
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
                 // climb up the DOM tree from the event target
-                while (element && element !== document) {
+                while (element && element !== element.ownerDocument) {
 
                     // if this element is the current inertia target element
                     if (element === this.element
@@ -1405,7 +1406,7 @@
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
             }
             else {
-                while (element && element !== document && !action) {
+                while (element && element !== element.ownerDocument && !action) {
                     this.matches = [];
                     this.matchElements = [];
 
@@ -1476,7 +1477,7 @@
                 if (!action) { return; }
 
                 if (options.styleCursor) {
-                    document.documentElement.style.cursor = actionCursors[action];
+                    target._doc.documentElement.style.cursor = actionCursors[action];
                 }
 
                 this.resizeAxes = action === 'resizexy'?
@@ -1576,7 +1577,7 @@
                             var element = eventTarget;
 
                             // check element interactables
-                            while (element && element !== document) {
+                            while (element && element !== element.ownerDocument) {
                                 var elementInteractable = interactables.get(element);
 
                                 if (elementInteractable
@@ -1617,7 +1618,7 @@
 
                                 element = eventTarget;
 
-                                while (element && element !== document) {
+                                while (element && element !== element.ownerDocument) {
                                     var selectorInteractable = interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
@@ -2204,7 +2205,7 @@
                 var target = this.target;
 
                 if (target.options.styleCursor) {
-                    document.documentElement.style.cursor = '';
+                    target._doc.documentElement.style.cursor = '';
                 }
 
                 // prevent Default only if were previously interacting
@@ -2421,7 +2422,7 @@
                         ? context.querySelectorAll(selector)
                         : undefined;
 
-                if (element !== document
+                if (element !== element.ownerDocument
                     && inContext(interactable, element)
                     && !testIgnore(interactable, element, eventTarget)
                     && testAllow(interactable, element, eventTarget)
@@ -3205,7 +3206,7 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (element && element !== document) {
+        while (element && element !== element.ownerDocument) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
@@ -3235,12 +3236,13 @@
     }
 
     interactables.indexOfElement = function indexOfElement (element, context) {
+        context = context || document;
+
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
             if ((interactable.selector === element
-                && (interactable._context === (context || document)))
-
+                && (interactable._context === context))
                 || (!interactable.selector && interactable._element === element)) {
 
                 return i;
@@ -4849,7 +4851,7 @@
                 globalEvents[type].push(listener);
             }
         }
-        // If non InteratEvent type, addEventListener to document
+        // If non InteractEvent type, addEventListener to document
         else {
             events.add(document, type, listener, useCapture);
         }
