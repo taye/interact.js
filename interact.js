@@ -121,8 +121,6 @@
 
             origin      : { x: 0, y: 0 },
             deltaSource : 'page',
-
-            context     : document        // the Node on which querySelector will be called
         },
 
         // Things related to autoScroll
