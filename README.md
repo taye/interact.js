@@ -30,14 +30,12 @@ Awesomeness includes:
    snapping](http://taye.me/blog/interact-js/snap/2013/09/29/interactjs-path-snapping.html)
    demonstrates and graphs some interesting path snapping functions.
 
-interact.js began as a Google Summer of Code 2012 project for
-[Biographer](https://code.google.com/p/biographer "Biographer on Google Code"),
-a biological network layout and visualization tool. It uses interact.js to
-modify SVG elements and to pan and zoom the viewport using a mouse or touch
-screen device.
+interact.js began as a [Google Summer of Code 2012 project]("http://www.google-melange.com/gsoc/project/details/google/gsoc2012/taye/5668600916475904") for
+[Biographer](https://code.google.com/p/biographer "Biographer on Google Code").
 
 Example
 -------
+
 ```javascript
 var // x and y to keep the position that's been dragged to
     x = 0,
@@ -71,7 +69,8 @@ interact(document.body)
     })
     // allow inertia throwing
     .inertia({
-        resistance: 15;
+        resistance: 15,
+        zeroResumeDelta: true
     });
     // snap to the corners of the specified grid
     .snap({
@@ -104,29 +103,20 @@ Pass the element you want to interact with or a CSS selector string to
 `interact`. That returns an object with methods, notably `draggable`,
 `resizable`, `gesturable`, `dropzone` which let you allow or disallow the
 related actions and `on` which let's you add event listeners for InteractEvents
-and any DOM event.  The `InteractEvent` types are `tap`, `doubletap`,
-{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}', '
-`dragenter`, `dragleave`, `drop`, `dropactivate`, and `dropactivate`.
+and any DOM event.
 
 Details
 -------
 
 ### Interactables
-The `interact` function adds mouse or touch event listeners to the object and
-returns an `Interactable` object which has several methods and properties to
-configure how it behaves and what it can do. These methods have a fluent
-interface so method calls can be chained nicely.
+The `interact` function takes an Element or CSS selector and an optional
+`options` object.  This returns an `Interactable` object which has several
+methods and properties to configure what events it can fire and to modify the
+reported coordinates. These methods have a fluent interface so method calls can
+be chained nicely.
 
-For example, to make a DOM element dragagble and resizable you can call the
-`Interactable#set` with an object with the properties you want to set
-```javascript
-interact(document.getElementById('anElement'))
-    .set({
-        draggable: true,
-        resizable: true
-    });
-```
-or you can call each {action}able method with the options for each.
+For example, to make a DOM element fire drag and resize events you can do:
+
 ```jacascript
 interact(document.getElementById('anElement'))
         .draggable (true)
@@ -137,7 +127,7 @@ interact(document.getElementById('anElement'))
 Now that the element has been made interactable, when it is clicked on or
 touched and then dragged, an action is determined depending on the input type
 and position of the event over the element. InteractEvents are then fired as
-the mouse/touch moves around the page until it is finally released or the
+the pointer moves around the page until it is finally released or the
 window loses focus.
 
 When a sequence of user actions results in an InteractEvent, that event type is
@@ -150,15 +140,33 @@ InteractEvents either to each Interactable or globally for all Interacables and
 style the element according to event data.
 
 ### Listening
-The `InteractEvent` types are `tap`, `doubletap`,
-{`drag`,`resize`,`gesture`}{`start`,`move`,`end`}, `dragenter`,
-`dragleave`, `drop`, `dropactivate` and `dropactivate`.
+  The `InteractEvent` types are:
+
+ - Draggable: `dragstart`, `dragmove`, `draginertiastart`, `dragend`
+ - Dropzone: `dropactivate`, `dropdeactivate`, `dragenter`, `dragleave`,
+   `dropmove`, `drop`
+ - Resizable: `resizestart`, `resizemove`, `resizeinertiastart`, `resizeend`
+ - Gesturable: `gesturestart`, `gesturemove`, `gestureinertiastart`,
+   `gestureend`
+
+There are also the `tap` and `doubletap` events which are equivalent to `click`
+and `doubleclik`.
 
 To respond to an InteractEvent, you must add a listener for its event type
 either directly to an interactable
-`Interactable#on(eventType, listenerFunction)` or globally for all events of
-that type `interact.on('resizemove', resizeElement)`. The InteractEvent object
-that was created is passed to these functions as the first parameter.
+
+``` javascript
+Interactable#on(eventType, listenerFunction)
+```
+
+or globally for all events of that type
+
+```javascript
+interact.on('resizemove', resizeElement)`.
+```
+
+The `InteractEvent` object that was created is passed to these functions as the
+first parameter.
 
 InteractEvent properties include the usual properties of mouse/touch events
 such as pageX/Y, clientX/Y, modifier keys etc. but also some properties
@@ -168,12 +176,15 @@ The table below displays all of these events.
 #### InteractEvent properties
 | Common                  |                                                   |
 | ----------------------- | --------------------------------------------------|
+| target                  | The element that is being interacted with         |
 | `x0`, `y0`              | Page x and y coordinates of the starting event    |
 | `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
-| `dx`, `dy`              | Change in coordinates of the mouse/touch *        |
-| target                  | The element that is being interacted with         |
+| `dx`, `dy`              | Change in coordinates of the mouse/touch          |
+| `velocityX`, `velocityY`| The Velocity of the pointer                       |
+| `speed`                 | The speed of the pointer                          |
+| `timeStamp`             | The time of creation of the event object          |
 
-| Drag                    |                                                   |
+| Draggables              |                                                   |
 | ----------------------- | --------------------------------------------------|
 | **dragmove**            |                                                   |
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
@@ -181,9 +192,11 @@ The table below displays all of these events.
 | **dragenter, dragLeave**|                                                   |
 | `draggable`             | The draggable that's over this dropzone           |
 
-| Drop                    |                                                   |
+| Dropzones               |                                                   |
 | ----------------------- | --------------------------------------------------|
-| `draggable`             | The dragagble that was dropped into this dropzone |
+| **drop(de)activate**, **dropmove**, **drag(enter\|leave)**, **drop** |      |
+| `draggable`             | The dragagble element that was dropped into this dropzone |
+|                         |                                                   |
 
 | Resize                  |                                                   |
 | ----------------------- | --------------------------------------------------|
@@ -199,33 +212,47 @@ The table below displays all of these events.
 | `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
 
-\* In interact move events, these are the changes since the previous
-InteractEvent. However, in end events, these are the changes from the position
-of the start event to the end event. In gesture events, coordinates are the
-averages of touch coordinates.
+In gesture events, page and client coordinates are the averages of touch
+coordinates. Velocity is calculated from these averages.
 
+Tap and doubletap event coordinates are copied directly from the source
+mouseup/touchend/pointerup event and are not modified – no snapping,
+restriction or origin for tap and doubletap.
+
+The [dropmove](https://github.com/taye/interact.js/issues/67) event is a plain
+object created like this:
+
+``` javascript
+dropMoveEvent = {
+    target       : dropElement,
+    relatedTarget: dragEvent.target,
+    dragmove     : dragEvent,
+    type         : 'dropmove',
+    timeStamp    : dragEvent.timeStamp
+};
+```
 
 ### Interacting
-To move an element in response to a dragmove, a listener can be bound that
-transforms the element accoding to `dy` and `dx` of the InteractEvent. It can
-also be done by having the element positioned `absolute`, `fixed` or `relative`
-and adding the change in coordinates to the `top` and `left` position of the
-element.
+One way to move an element in response to a dragmove is to add a listener that
+transforms the element accoding to `dy` and `dx` of the InteractEvent.
 
 ```javascript
-
 // Set element and listen for dragmove events
-interact(element)
+interact('.drag-element')
     .draggable({
         onmove: function(event) {
-            var elementStyle = event.target.style;
+            var target = event.target,
+                // use data-x, data-y to record the drag position
+                x = (parseFloat(target.dataset.x) || 0) + event.dx,
+                y = (parseFloat(target.dataset.y) || 0) + event.dy;
 
-            // Add the change in mouse/touch coordinates to the element's current position
-            elementStyle.left =
-                parseInt(elementStyle.left) + event.dx + "px";
+            // update the CSS transform
+            target.style.transform =
+                'translate(' + x + 'px, ' + y + 'px)';
 
-            elementStyle.top =
-                parseInt(elementStyle.top) + event.dy + "px";
+            // save the newly dragged position
+            target.dataset.x = x;
+            target.dataset.y = y;
         });
 ```
 
