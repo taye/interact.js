@@ -3,14 +3,14 @@
 Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
 
 Awesomeness includes:
+
  - **inertia**
  - [**snapping**](http://interactjs.io/repo/demo/snap.html) to a grid, custom
    anchors or paths.
- - cross browser and device, supporting {Chrome,Firefox,Opera}' '{**mobile,desktop**}', ' and **Internet Explorer 8+**
+ - cross browser and device, supporting the **desktop and mobile** versions of
+   Chrome, Firefox and Opera as well as **Internet Explorer 8+**
  - interaction with [**SVG**](http://interactjs.io/repo/demo/star.svg) elements
- - being **standalone** (not _yet another_ jQuery plugin)
- - introducing **0 additional DOM elements**
- - having(a). **fluent** ().interface
+ - being **lightweight and standalone** (not _yet another_ jQuery plugin)
  - **not modifying anything** it doesn't own (except to support IE8 and to
    change the cursor (but you can disable that))
 
