@@ -14,7 +14,8 @@ Awesomeness includes:
  - **not modifying anything** it doesn't own (except to support IE8 and to
    change the cursor (but you can disable that))
 
-## Demos
+Demos
+-----
 
  - http://interactjs.io has some demos showing drag and drop, gestures,
    ienrtia, snap and some other things.
@@ -258,4 +259,5 @@ interact('.drag-element')
 
 License
 -------
+
 interact.js is released under the [MIT License](http://taye.mit-license.org).
