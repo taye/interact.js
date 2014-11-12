@@ -233,6 +233,9 @@
         // Less Precision with touch input
         margin = supportsTouch || supportsPointerEvent? 20: 10,
 
+        // for ignoring taps from browser's simulated mouse events
+        prevTouchTapTime = 0,
+
         // Allow this many interactions to happen simultaneously
         maxInteractions = 1,
 
@@ -2354,6 +2357,10 @@
 
             this.tapTime = tap.timeStamp;
 
+            if (!this.mouse) {
+                prevTouchTapTime = this.tapTime;
+            }
+
             for (i = 0; i < targets.length; i++) {
                 var origin = getOriginXY(targets[i], elements[i]);
 
@@ -2397,7 +2404,9 @@
         },
 
         collectTaps: function (pointer, event, eventTarget) {
-            if(this.pointerWasMoved || !(this.downTarget && this.downTarget === eventTarget)) {
+            if(this.pointerWasMoved
+               || !(this.downTarget && this.downTarget === eventTarget)
+               || (this.mouse && (new Date().getTime() - prevTouchTapTime) < 300)) {
                 return;
             }
 
