@@ -2358,13 +2358,6 @@
             this.tapTime = tap.timeStamp;
 
             for (i = 0; i < targets.length; i++) {
-                var origin = getOriginXY(targets[i], elements[i]);
-
-                tap.pageX -= origin.x;
-                tap.pageY -= origin.y;
-                tap.clientX -= origin.x;
-                tap.clientY -= origin.y;
-
                 tap.currentTarget = elements[i];
                 targets[i].fire(tap);
 
