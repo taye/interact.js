@@ -233,8 +233,8 @@
         // Less Precision with touch input
         margin = supportsTouch || supportsPointerEvent? 20: 10,
 
-        // for ignoring taps from browser's simulated mouse events
-        prevTouchTapTime = 0,
+        // for ignoring browser's simulated mouse events
+        prevTouchTime = 0,
 
         // Allow this many interactions to happen simultaneously
         maxInteractions = 1,
@@ -2357,10 +2357,6 @@
 
             this.tapTime = tap.timeStamp;
 
-            if (!this.mouse) {
-                prevTouchTapTime = this.tapTime;
-            }
-
             for (i = 0; i < targets.length; i++) {
                 var origin = getOriginXY(targets[i], elements[i]);
 
@@ -2405,8 +2401,7 @@
 
         collectTaps: function (pointer, event, eventTarget) {
             if(this.pointerWasMoved
-               || !(this.downTarget && this.downTarget === eventTarget)
-               || (this.mouse && (new Date().getTime() - prevTouchTapTime) < 300)) {
+               || !(this.downTarget && this.downTarget === eventTarget)) {
                 return;
             }
 
@@ -2826,6 +2821,8 @@
                 i;
 
             if (supportsTouch && /touch/.test(event.type)) {
+                prevTouchTime = new Date().getTime();
+
                 for (i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
 
@@ -2837,12 +2834,18 @@
                 }
             }
             else {
-                // ignore mouse events while touch interactions are active
                 if (!supportsPointerEvent && /mouse/.test(event.type)) {
+                    // ignore mouse events while touch interactions are active
                     for (i = 0; i < interactions.length; i++) {
                         if (!interactions[i].mouse && interactions[i].pointerIsDown) {
                             return;
                         }
+                    }
+
+                    // try to ignore mouse events that are simulated by the browser
+                    // after a touch event
+                    if (new Date().getTime() - prevTouchTime < 500) {
+                        return;
                     }
                 }
 
