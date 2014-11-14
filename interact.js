@@ -2347,70 +2347,9 @@
             this.pointers[index] = pointer;
         },
 
-        fireTaps: function (pointer, event, targets, elements) {
-            var tap = {},
-                i;
-
-            extend(tap, event);
-
-            if (event !== pointer) {
-                extend(tap, pointer);
-            }
-
-            tap.preventDefault           = preventOriginalDefault;
-            tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
-            tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
-
-            tap.timeStamp     = new Date().getTime();
-            tap.originalEvent = event;
-            tap.dt            = tap.timeStamp - this.downTime;
-            tap.type          = 'tap';
-
-            var interval = tap.timeStamp - this.tapTime,
-                dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
-                       && this.prevTap.target === tap.target
-                       && interval < 500);
-
-            this.tapTime = tap.timeStamp;
-
-            for (i = 0; i < targets.length; i++) {
-                tap.currentTarget = elements[i];
-                targets[i].fire(tap);
-
-                if (tap.immediatePropagationStopped
-                    ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
-                    break;
-                }
-            }
-
-            if (dbl) {
-                var doubleTap = {};
-
-                extend(doubleTap, tap);
-
-                doubleTap.dt   = interval;
-                doubleTap.type = 'doubletap';
-
-                for (i = 0; i < targets.length; i++) {
-                    doubleTap.currentTarget = elements[i];
-                    targets[i].fire(doubleTap);
-
-                    if (doubleTap.immediatePropagationStopped
-                        ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
-                        break;
-                    }
-                }
-
-                this.prevTap = doubleTap;
-            }
-            else {
-                this.prevTap = tap;
-            }
-        },
-
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
             // do not fire a tap event if the pointer was moved before being lifted
-            if(/tap/.test(eventType) && (this.pointerWasMoved
+            if (eventType === 'tap' && (this.pointerWasMoved
                 // or if the pointerup target is different to the pointerdown target
                 || !(this.downTarget && this.downTarget === eventTarget))) {
                 return;
@@ -2448,18 +2387,15 @@
             }
 
             if (targets.length) {
-                if (eventType === 'tap') {
-                    this.fireTaps(pointer, event, targets, elements);
-                }
-                else {
-                    this.firePointers(pointer, event, targets, elements, eventType);
-                }
+                this.firePointers(pointer, event, targets, elements, eventType);
             }
         },
 
         firePointers: function (pointer, event, targets, elements, eventType) {
             var pointerEvent = {},
-                i;
+                i,
+                // for tap events
+                interval, dbl;
 
             extend(pointerEvent, event);
             if (event !== pointer) {
@@ -2474,17 +2410,51 @@
             pointerEvent.originalEvent = event;
             pointerEvent.type          = eventType;
 
+            if (eventType === 'tap') {
+                pointerEvent.dt = pointerEvent.timeStamp - this.downTime;
+
+                interval = pointerEvent.timeStamp - this.tapTime;
+                dbl = (this.prevTap && this.prevTap.type !== 'doublepointerEvent'
+                       && this.prevTap.target === pointerEvent.target
+                       && interval < 500);
+
+                this.tapTime = pointerEvent.timeStamp;
+            }
+
             for (i = 0; i < targets.length; i++) {
                 pointerEvent.currentTarget = elements[i];
                 targets[i].fire(pointerEvent);
 
                 if (pointerEvent.immediatePropagationStopped
-                    ||(pointerEvent.propagationStopped && targets[i + 1] !== pointerEvent.currentTarget)) {
+                    ||(pointerEvent.propagationStopped && elements[i + 1] !== pointerEvent.currentTarget)) {
                     break;
                 }
             }
-        },
 
+            if (dbl) {
+                var doubleTap = {};
+
+                extend(doubleTap, pointerEvent);
+
+                doubleTap.dt   = interval;
+                doubleTap.type = 'doubletap';
+
+                for (i = 0; i < targets.length; i++) {
+                    doubleTap.currentTarget = elements[i];
+                    targets[i].fire(doubleTap);
+
+                    if (doubleTap.immediatePropagationStopped
+                        ||(doubleTap.propagationStopped && elements[i + 1] !== doubleTap.currentTarget)) {
+                        break;
+                    }
+                }
+
+                this.prevTap = doubleTap;
+            }
+            else if (eventType === 'tap') {
+                this.prevTap = pointerEvent;
+            }
+        },
 
         validateSelector: function (pointer, matches, matchElements) {
             for (var i = 0, len = matches.length; i < len; i++) {
