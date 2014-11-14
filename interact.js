@@ -1501,7 +1501,6 @@
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
-                && this.target.options.inertia.allowResume
                 && curEventTarget === this.element
                 && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
 
@@ -2729,7 +2728,8 @@
 
                 var element = eventTarget;
 
-                if (interaction.inertiaStatus.active && (interaction.mouse === mouseEvent)) {
+                if (interaction.inertiaStatus.active && interaction.target.options.inertia.allowResume
+                    && (interaction.mouse === mouseEvent)) {
                     while (element) {
                         // if the element is the interaction element
                         if (element === interaction.element) {
