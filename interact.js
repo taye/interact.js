@@ -276,6 +276,10 @@
             'gestureinertiastart',
             'gestureend',
 
+            'down',
+            'move',
+            'up',
+            'cancel',
             'tap',
             'doubletap'
         ],
@@ -1342,6 +1346,8 @@
         },
 
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
+            this.collectEventTargets(pointer, event, eventTarget, 'down');
+
             this.pointerIsDown = true;
 
             var element = eventTarget,
@@ -1512,18 +1518,20 @@
         },
 
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
-            if (!this.pointerIsDown) { return; }
-
             this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
                                                 ? this.inertiaStatus.startEvent
                                                 : undefined);
 
-            if (this.pointerWasMoved && !preEnd
-                && this.curCoords.page.x === this.prevCoords.page.x
-                && this.curCoords.page.y === this.prevCoords.page.y
-                && this.curCoords.client.x === this.prevCoords.client.x
-                && this.curCoords.client.y === this.prevCoords.client.y) {
+            var duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
+                                 && this.curCoords.page.y === this.prevCoords.page.y
+                                 && this.curCoords.client.x === this.prevCoords.client.x
+                                 && this.curCoords.client.y === this.prevCoords.client.y);
 
+            this.collectEventTargets(pointer, event, eventTarget, 'move');
+
+            if (!this.pointerIsDown) { return; }
+
+            if (duplicateMove && this.pointerWasMoved && !preEnd) {
                 this.checkAndPreventDefault(event, this.target, this.element);
                 return;
             }
@@ -1825,10 +1833,12 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+            this.collectEventTargets(pointer, event, eventTarget, 'up');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
+            this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
         },
 
@@ -2436,13 +2446,47 @@
             }
 
             if (targets.length) {
-                this.fireTaps(pointer, event, targets, elements);
+                if (eventType === 'tap') {
+                    this.fireTaps(pointer, event, targets, elements);
+                }
+                else {
+                    this.firePointers(pointer, event, targets, elements, eventType);
+                }
             }
         },
 
         collectTaps: function (pointer, event, eventTarget) {
             return this.collectEventTargets(pointer, event, eventTarget, 'tap');
         },
+
+        firePointers: function (pointer, event, targets, elements, eventType) {
+            var pointerEvent = {},
+                i;
+
+            extend(pointerEvent, event);
+            if (event !== pointer) {
+                extend(pointerEvent, pointer);
+            }
+
+            pointerEvent.preventDefault           = preventOriginalDefault;
+            pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
+            pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+
+            pointerEvent.timeStamp     = new Date().getTime();
+            pointerEvent.originalEvent = event;
+            pointerEvent.type          = eventType;
+
+            for (i = 0; i < targets.length; i++) {
+                pointerEvent.currentTarget = elements[i];
+                targets[i].fire(pointerEvent);
+
+                if (pointerEvent.immediatePropagationStopped
+                    ||(pointerEvent.propagationStopped && targets[i + 1] !== pointerEvent.currentTarget)) {
+                    break;
+                }
+            }
+        },
+
 
         validateSelector: function (pointer, matches, matchElements) {
             for (var i = 0, len = matches.length; i < len; i++) {
