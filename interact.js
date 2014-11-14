@@ -1833,7 +1833,9 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            this.collectEventTargets(pointer, event, eventTarget, 'up');
+            this.collectEventTargets(pointer, event, eventTarget, 'up' );
+            this.collectEventTargets(pointer, event, eventTarget, 'tap');
+
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
         },
 
@@ -2453,10 +2455,6 @@
                     this.firePointers(pointer, event, targets, elements, eventType);
                 }
             }
-        },
-
-        collectTaps: function (pointer, event, eventTarget) {
-            return this.collectEventTargets(pointer, event, eventTarget, 'tap');
         },
 
         firePointers: function (pointer, event, targets, elements, eventType) {
@@ -3228,7 +3226,7 @@
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
             'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
             'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
-            'addPointer', 'removePointer', 'recordPointer', 'collectTaps'
+            'addPointer', 'removePointer', 'recordPointer',
         ];
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -5482,8 +5480,6 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
-
         events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
 
         events.add(docTarget, pEventTypes.down  , listeners.selectorDown );
@@ -5501,9 +5497,6 @@
         events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
     }
     else {
-        events.add(docTarget, 'mouseup' , listeners.collectTaps);
-        events.add(docTarget, 'touchend', listeners.collectTaps);
-
         events.add(docTarget, 'mousemove'  , listeners.recordPointer);
         events.add(docTarget, 'touchmove'  , listeners.recordPointer);
 
