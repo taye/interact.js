@@ -2332,7 +2332,10 @@
                 i;
 
             extend(tap, event);
-            extend(tap, pointer);
+
+            if (event !== pointer) {
+                extend(tap, pointer);
+            }
 
             tap.preventDefault           = preventOriginalDefault;
             tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
@@ -2385,47 +2388,52 @@
             }
         },
 
-        collectTaps: function (pointer, event, eventTarget) {
-            if(this.pointerWasMoved
-               || !(this.downTarget && this.downTarget === eventTarget)) {
+        collectEventTargets: function (pointer, event, eventTarget, eventType) {
+            // do not fire a tap event if the pointer was moved before being lifted
+            if(/tap/.test(eventType) && (this.pointerWasMoved
+                // or if the pointerup target is different to the pointerdown target
+                || !(this.downTarget && this.downTarget === eventTarget))) {
                 return;
             }
 
-            var tapTargets = [],
-                tapElements = [];
+            var targets = [],
+                elements = [],
+                element = eventTarget;
 
-            var element = eventTarget;
-
-            function collectSelectorTaps (interactable, selector, context) {
-                var elements = ie8MatchesSelector
+            function collectSelectors (interactable, selector, context) {
+                var els = ie8MatchesSelector
                         ? context.querySelectorAll(selector)
                         : undefined;
 
-                if (element !== document
+                if (isElement(element)
                     && inContext(interactable, element)
                     && !testIgnore(interactable, element, eventTarget)
                     && testAllow(interactable, element, eventTarget)
-                    && matchesSelector(element, selector, elements)) {
+                    && matchesSelector(element, selector, els)) {
 
-                    tapTargets.push(interactable);
-                    tapElements.push(element);
+                    targets.push(interactable);
+                    elements.push(element);
                 }
             }
 
             while (element) {
                 if (interact.isSet(element)) {
-                    tapTargets.push(interact(element));
-                    tapElements.push(element);
+                    targets.push(interact(element));
+                    elements.push(element);
                 }
 
-                interactables.forEachSelector(collectSelectorTaps);
+                interactables.forEachSelector(collectSelectors);
 
                 element = element.parentNode;
             }
 
-            if (tapTargets.length) {
-                this.fireTaps(pointer, event, tapTargets, tapElements);
+            if (targets.length) {
+                this.fireTaps(pointer, event, targets, elements);
             }
+        },
+
+        collectTaps: function (pointer, event, eventTarget) {
+            return this.collectEventTargets(pointer, event, eventTarget, 'tap');
         },
 
         validateSelector: function (pointer, matches, matchElements) {
