@@ -1427,7 +1427,7 @@
         },
 
         // Determine action to be performed on next pointerMove and add appropriate
-        // style and event Liseners
+        // style and event Listeners
         pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
             if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared) {
                 this.checkAndPreventDefault(event, this.target, this.element);
@@ -2071,7 +2071,7 @@
         // setActiveDrops should always be called when a drag has just started or a
         // drag event happens while dynamicDrop is true
         setActiveDrops: function (dragElement) {
-            // get dropzones and their elements that could recieve the draggable
+            // get dropzones and their elements that could receive the draggable
             var possibleDrops = this.collectDrops(dragElement, true);
 
             this.activeDrops.dropzones = possibleDrops.dropzones;
@@ -2101,7 +2101,7 @@
                                 : null);
             }
 
-            // get the most apprpriate dropzone based on DOM depth and order
+            // get the most appropriate dropzone based on DOM depth and order
             var dropIndex = indexOfDeepestElement(validDrops),
                 dropzone  = this.activeDrops.dropzones[dropIndex] || null,
                 element   = this.activeDrops.elements [dropIndex] || null;
@@ -2116,7 +2116,7 @@
             var dragLeaveEvent = null,
                 dragEnterEvent = null,
                 dropActivateEvent = null,
-                dropDectivateEvent = null,
+                dropDeactivateEvent = null,
                 dropMoveEvent = null,
                 dropEvent = null;
 
@@ -2147,8 +2147,8 @@
                 dropActivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragend') {
-                dropDectivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', this.element, dragEvent.target);
-                dropDectivateEvent.draggable = dragEvent.interactable;
+                dropDeactivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', this.element, dragEvent.target);
+                dropDeactivateEvent.draggable = dragEvent.interactable;
             }
             if (dragEvent.type === 'dragmove' && this.dropTarget) {
                 dropMoveEvent = {
@@ -2166,7 +2166,7 @@
                 enter       : dragEnterEvent,
                 leave       : dragLeaveEvent,
                 activate    : dropActivateEvent,
-                deactivate  : dropDectivateEvent,
+                deactivate  : dropDeactivateEvent,
                 move        : dropMoveEvent,
                 drop        : dropEvent
             };
@@ -2318,13 +2318,13 @@
             this.pointerIds.splice(index, 1);
 
             // move events are kept so that multi-touch properties can still be
-            // calculated at the end of a GestureEvnt sequence
+            // calculated at the end of a GestureEvent sequence
             //this.pointers.splice(index, 1);
         },
 
         recordPointer: function (pointer) {
             // Do not update pointers while inertia is active.
-            // The inertiastart event should be this.pointers[0]
+            // The inertia start event should be this.pointers[0]
             if (this.inertiaStatus.active) { return; }
 
             var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
@@ -3457,7 +3457,7 @@
          * Returns or sets whether elements can be dropped onto this
          * Interactable to trigger drop events
          *
-         * Dropzones can recieve the following events:
+         * Dropzones can receive the following events:
          *  - `dragactivate` and `dragdeactivate` when an acceptable drag starts and ends
          *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
          *  - `drop` when a draggable is dropped into this dropzone
@@ -3467,7 +3467,7 @@
          *  Use the `overlap` option to set how drops are checked for. The allowed values are:
          *   - `'pointer'`, the pointer must be over the dropzone (default)
          *   - `'center'`, the draggable element's center must be over the dropzone
-         *   - a number from 0-1 which is the `(intersetion area) / (draggable area)`.
+         *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
          *       e.g. `0.5` for drop to happen when half of the area of the
          *       draggable is over the dropzone
          *
@@ -3519,7 +3519,7 @@
          *
          - pointer (MouseEvent | PointerEvent | Touch) The event that ends a drag
          - draggable (Interactable) The Interactable being dragged
-         - draggableElement (ELement) The actual element that's being dragged
+         - draggableElement (Element) The actual element that's being dragged
          - dropElement (Element) The dropzone element
          - rect (object) #optional The rect of dropElement
          = (boolean) whether the pointer was over this Interactable
@@ -3852,7 +3852,7 @@
          > Usage
          | interact('.handle').snap({
          |     mode        : 'grid',                // event coords should snap to the corners of a grid
-         |     range       : Infinity,              // the effective distance of snap ponts
+         |     range       : Infinity,              // the effective distance of snap points
          |     grid        : { x: 100, y: 100 },    // the x and y spacing of the grid points
          |     gridOffset  : { x:   0, y:   0 },    // the offset of the grid points
          | });
@@ -3959,7 +3959,7 @@
          |     // high values slow the object down more quickly
          |     resistance     : 16,
          |
-         |     // the minimum launch speed (pixels per second) that results in inertiastart
+         |     // the minimum launch speed (pixels per second) that results in inertia start
          |     minSpeed       : 200,
          |
          |     // inertia will stop when the object slows down to this speed
@@ -4491,7 +4491,7 @@
          * Interactable.fire
          [ method ]
          *
-         * Calls listeners for the given InteractEvent type bound globablly
+         * Calls listeners for the given InteractEvent type bound globally
          * and directly to this Interactable
          *
          - iEvent (InteractEvent) The InteractEvent object to be fired on this Interactable
@@ -4827,7 +4827,7 @@
                 globalEvents[type].push(listener);
             }
         }
-        // If non InteratEvent type, addEventListener to document
+        // If non InteractEvent type, addEventListener to document
         else {
             events.add(docTarget, type, listener, useCapture);
         }
@@ -5026,7 +5026,7 @@
         };
     };
 
-    // expose the functions used to caluclate multi-touch properties
+    // expose the functions used to calculate multi-touch properties
     interact.getTouchAverage  = touchAverage;
     interact.getTouchBBox     = touchBBox;
     interact.getTouchDistance = touchDistance;
