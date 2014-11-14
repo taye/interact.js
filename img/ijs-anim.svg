@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <!-- Copyright 2013 Taye Adeyemi <dev@taye.me> -->
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-4 -4 520 131" fill="#29e">
-<animate id="colors" attributeName="fill" values="#29e;#29e;#4e4;#4e4;#f40;#f40;#29e;#29e" dur="16s" repeatCount="indefinite"/>
+<animate id="colors" attributeName="fill" values="#29e;#29e;#29e;#4e4;#4e4;#f40;#f40;#29e" dur="16s" repeatCount="indefinite"/>
 <defs>
     <path id="a-delta" d="m 4.170683,-41.333027 -2.225056,3.829978 -36.417557,63.090526 -2.19707,3.829996 4.422107,5e-4 72.835133,0 4.42194,0 L 42.8133,25.587477 6.39572,-37.503049 z M 0.232755,-24.290946 27.826,24.291866 l -55.651,3.88e-4 z" />
 </defs>
