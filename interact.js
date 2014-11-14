@@ -2217,8 +2217,7 @@
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
             this.pointerIds.splice(0);
-            // pointers should be retained
-            //this.pointers.splice(0);
+            this.pointers.splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2300,8 +2299,6 @@
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
 
-                // move events are kept so that multi-touch properties can still be
-                // calculated at the end of a gesture; use pointerIds index
                 this.pointers[index] = pointer;
             }
             else {
@@ -2316,10 +2313,7 @@
             if (index === -1) { return; }
 
             this.pointerIds.splice(index, 1);
-
-            // move events are kept so that multi-touch properties can still be
-            // calculated at the end of a GestureEvnt sequence
-            //this.pointers.splice(index, 1);
+            this.pointers.splice(index, 1);
         },
 
         recordPointer: function (pointer) {
