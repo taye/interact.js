@@ -1,7 +1,8 @@
 (function (interact) {
 'use strict';
 
-var dirs = ['up', 'down', 'left', 'right'];
+var dirs = ['up', 'down', 'left', 'right'],
+    console = window.console;
 
 interact('#swipe')
 .draggable(true)
