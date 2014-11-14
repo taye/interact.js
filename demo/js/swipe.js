@@ -27,10 +27,13 @@ interact('#swipe')
 
         event.target.innerHTML = str;
         console.log(str.replace(/<br>/g, ' '));
-    })
-    .on('tap', function (event) {
-        event.target.innerHTML = 'tap';
-        console.log('tap');
     });
+
+['tap', 'doubletap', 'down', 'move', 'up'].forEach(function (eventType) {
+    interact('#swipe').on(eventType, function (event) {
+        event.target.innerHTML = eventType;
+        console.log(eventType);
+    });
+});
 
 }(window.interact));
