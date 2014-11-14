@@ -1824,8 +1824,12 @@
             return gestureEvent;
         },
 
-        // End interact move events and stop auto-scroll unless inertia is enabled
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+            this.pointerEnd(pointer, event, eventTarget, curEventTarget);
+        },
+
+        // End interact move events and stop auto-scroll unless inertia is enabled
+        pointerEnd: function (pointer, event, eventTarget, curEventTarget) {
             var endEvent,
                 target = this.target,
                 options = target && target.options,
@@ -2260,7 +2264,7 @@
                 this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.active = false;
-                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+                this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
@@ -2286,7 +2290,7 @@
                 inertiaStatus.active = false;
                 inertiaStatus.smoothEnd = false;
 
-                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+                this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
@@ -3174,7 +3178,8 @@
     var listeners = {},
         interactionListeners = [
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
-            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
+            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
+            'pointerDown', 'pointerMove', 'pointerUp', 'pointerEnd',
             'addPointer', 'removePointer', 'recordPointer', 'collectTaps'
         ];
 
@@ -5413,7 +5418,7 @@
 
     function endAllInteractions (event) {
         for (var i = 0; i < interactions.length; i++) {
-            interactions[i].pointerUp(event, event);
+            interactions[i].pointerEnd(event, event);
         }
     }
 
@@ -5435,9 +5440,9 @@
 
         events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
         events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
-        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
         events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
         events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
+        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
 
         // remove pointers after ending actions in pointerUp
         events.add(docTarget, pEventTypes.up    , listeners.removePointer);
@@ -5462,7 +5467,7 @@
         events.add(docTarget, 'touchstart' , listeners.selectorDown);
         events.add(docTarget, 'touchmove'  , listeners.pointerMove );
         events.add(docTarget, 'touchend'   , listeners.pointerUp   );
-        events.add(docTarget, 'touchcancel', listeners.pointerUp   );
+        events.add(docTarget, 'touchcancel', listeners.pointerEnd  );
 
         // remove touches after ending actions in pointerUp
         events.add(docTarget, 'touchend'   , listeners.removePointer);
@@ -5479,11 +5484,11 @@
         if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
-            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchend'     , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
-            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
-            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
+            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'touchend'     , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerEnd);
             events.add(parentWindowTarget, 'blur'         , endAllInteractions );
         }
     }
