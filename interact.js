@@ -1126,6 +1126,7 @@
         // keep track of added pointers
         this.pointers   = [];
         this.pointerIds = [];
+        this.holdTimers = {};
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -1351,7 +1352,7 @@
 
             this.collectEventTargets(pointer, event, eventTarget, 'down');
 
-            this.holdTimerId = window.setTimeout(function () {
+            this.holdTimers[getPointerId(pointer)] = window.setTimeout(function () {
                 that.pointerHold(pointer, event, eventTarget, curEventTarget);
             }, 1000);
 
@@ -1543,7 +1544,7 @@
             }
 
             if (!duplicateMove && this.pointerWasMoved) {
-                window.clearTimeout(this.holdTimerId);
+                window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
 
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
             }
@@ -1846,7 +1847,7 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            window.clearTimeout(this.holdTimerId);
+            window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'up' );
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
@@ -1855,7 +1856,7 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-            window.clearTimeout(this.holdTimerId);
+            window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
