@@ -1387,8 +1387,6 @@
                 return;
             }
 
-            var that = this;
-
             function pushMatches (interactable, selector, context) {
                 var elements = ie8MatchesSelector
                     ? context.querySelectorAll(selector)
@@ -1843,7 +1841,7 @@
             return gestureEvent;
         },
 
-        pointerHold: function (pointer, event, eventTarget, curEventTarget) {
+        pointerHold: function (pointer, event, eventTarget) {
             this.collectEventTargets(pointer, event, eventTarget, 'hold');
         },
 
