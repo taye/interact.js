@@ -2425,6 +2425,7 @@
             pointerEvent.preventDefault           = preventOriginalDefault;
             pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
             pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+            pointerEvent.interaction              = this;
 
             pointerEvent.timeStamp     = new Date().getTime();
             pointerEvent.originalEvent = event;
