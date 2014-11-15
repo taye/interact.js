@@ -6,12 +6,8 @@ var dirs = ['up', 'down', 'left', 'right'],
 
 interact('#swipe')
 .draggable(true)
-    .on('dragstart', function (event) {
-        event.target.innerHTML = 'dragging...';
-    })
     .on('dragend', function (event) {
         if (!event.swipe) {
-            event.target.innerHTML = 'no swipe';
             return;
         }
 
@@ -22,7 +18,7 @@ interact('#swipe')
                 str += ' ' + dir;
             }
         });
-        
+
         str += '<br>' + event.swipe.angle.toFixed(2) + '°'
             + '<br>' + event.swipe.speed.toFixed(2) + 'px/sec';
 
@@ -32,8 +28,21 @@ interact('#swipe')
 
 ['tap', 'doubletap', 'hold', 'down', 'move', 'up'].forEach(function (eventType) {
     interact('#swipe').on(eventType, function (event) {
-        event.target.innerHTML = eventType;
-        console.log(eventType);
+        event.target.innerHTML = event.pointerType;
+
+        if (interact.supportsTouch() || interact.supportsPointerEvent()) {
+            event.target.innerHTML += ' #' + event.pointerId;
+        }
+
+        var interactionIndex = interact.debug().interactions.indexOf(event.interaction);
+
+        event.target.innerHTML += ' ' + event.type
+                                    + '<br>(' + event.pageX + ', ' + event.pageY + ')<br>'
+                                    + 'interaction #' + interactionIndex;
+
+        console.log(event.pointerType, event.pointerId, event.type, event.pageX, event.pageY, interactionIndex);
+
+        event.preventDefault();
     });
 });
 
