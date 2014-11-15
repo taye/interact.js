@@ -2413,6 +2413,11 @@
             pointerEvent.originalEvent = event;
             pointerEvent.type          = eventType;
 
+            pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
+                                                : isString(pointer.pointerType)
+                                                    ? pointer.pointerType
+                                                    : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+
             if (eventType === 'tap') {
                 pointerEvent.dt = pointerEvent.timeStamp - this.downTime;
 
