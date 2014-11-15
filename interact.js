@@ -281,7 +281,8 @@
             'up',
             'cancel',
             'tap',
-            'doubletap'
+            'doubletap',
+            'hold'
         ],
 
         globalEvents = {},
@@ -1346,7 +1347,13 @@
         },
 
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
+            var that = this;
+
             this.collectEventTargets(pointer, event, eventTarget, 'down');
+
+            this.holdTimerId = window.setTimeout(function () {
+                that.pointerHold(pointer, event, eventTarget, curEventTarget);
+            }, 1000);
 
             this.pointerIsDown = true;
 
@@ -1528,6 +1535,8 @@
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
             if (!duplicateMove) {
+                window.clearTimeout(this.holdTimerId);
+
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
             }
 
@@ -1834,7 +1843,13 @@
             return gestureEvent;
         },
 
+        pointerHold: function (pointer, event, eventTarget, curEventTarget) {
+            this.collectEventTargets(pointer, event, eventTarget, 'hold');
+        },
+
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+            window.clearTimeout(this.holdTimerId);
+
             this.collectEventTargets(pointer, event, eventTarget, 'up' );
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
 
@@ -1842,6 +1857,8 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
+            window.clearTimeout(this.holdTimerId);
+
             this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
         },
