@@ -30,7 +30,7 @@ interact('#swipe')
         console.log(str.replace(/<br>/g, ' '));
     });
 
-['tap', 'doubletap', 'down', 'move', 'up'].forEach(function (eventType) {
+['tap', 'doubletap', 'hold', 'down', 'move', 'up'].forEach(function (eventType) {
     interact('#swipe').on(eventType, function (event) {
         event.target.innerHTML = eventType;
         console.log(eventType);

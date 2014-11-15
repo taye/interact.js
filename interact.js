@@ -2429,7 +2429,7 @@
             pointerEvent.timeStamp     = new Date().getTime();
             pointerEvent.originalEvent = event;
             pointerEvent.type          = eventType;
-
+            pointerEvent.pointerId     = getPointerId(pointer);
             pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
                                                 : isString(pointer.pointerType)
                                                     ? pointer.pointerType
