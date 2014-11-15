@@ -1534,7 +1534,17 @@
                                  && this.curCoords.client.x === this.prevCoords.client.x
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
-            if (!duplicateMove) {
+            var dx, dy;
+
+            // register movement greater than pointerMoveTolerance
+            if (!this.pointerWasMoved) {
+                dx = this.curCoords.client.x - this.startCoords.client.x;
+                dy = this.curCoords.client.y - this.startCoords.client.y;
+
+                this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
+            }
+
+            if (!duplicateMove && this.pointerWasMoved) {
                 window.clearTimeout(this.holdTimerId);
 
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
@@ -1549,16 +1559,6 @@
 
             // set pointer coordinate, time changes and speeds
             setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-
-            var dx, dy;
-
-            // register movement of more than 1 pixel
-            if (!this.pointerWasMoved) {
-                dx = this.curCoords.client.x - this.startCoords.client.x;
-                dy = this.curCoords.client.y - this.startCoords.client.y;
-
-                this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
-            }
 
             if (!this.prepared) { return; }
 
