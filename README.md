@@ -18,10 +18,10 @@ Demos
 -----
 
  - http://interactjs.io has some demos showing drag and drop, gestures,
-   ienrtia, snap and some other things.
+   inertia, snap and some other things.
  - The [html & svg demo](http://interactjs.io/repo/demo/html_svg.html "drag, drop,
    resize and gesture demo") shows div elements which can be dragged and
-   dropped onto each other and resized by dragging the botom and right edges. The
+   dropped onto each other and resized by dragging the bottom and right edges. The
    yellow elements are SVG elements (these won't show up on IE8).
  - [star.svg](http://interactjs.io/repo/demo/star.svg "editing an SVG document")
    demonstrates interact.js being used within an SVG document.
@@ -118,7 +118,7 @@ be chained nicely.
 
 For example, to make a DOM element fire drag and resize events you can do:
 
-```jacascript
+```javascript
 interact(document.getElementById('anElement'))
         .draggable (true)
         .resizable(true);
@@ -171,7 +171,7 @@ first parameter.
 
 InteractEvent properties include the usual properties of mouse/touch events
 such as pageX/Y, clientX/Y, modifier keys etc. but also some properties
-providing information about the change in cordinates and event specific data.
+providing information about the change in coordinates and event specific data.
 The table below displays all of these events.
 
 #### InteractEvent properties
@@ -196,7 +196,7 @@ The table below displays all of these events.
 | Dropzones               |                                                   |
 | ----------------------- | --------------------------------------------------|
 | **drop(de)activate**, **dropmove**, **drag(enter\|leave)**, **drop** |      |
-| `draggable`             | The dragagble element that was dropped into this dropzone |
+| `draggable`             | The draggable element that was dropped into this dropzone |
 |                         |                                                   |
 
 | Resize                  |                                                   |
@@ -235,7 +235,7 @@ dropMoveEvent = {
 
 ### Interacting
 One way to move an element in response to a dragmove is to add a listener that
-transforms the element accoding to `dy` and `dx` of the InteractEvent.
+transforms the element according to `dy` and `dx` of the InteractEvent.
 
 ```javascript
 // Set element and listen for dragmove events
