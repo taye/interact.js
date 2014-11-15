@@ -1527,7 +1527,9 @@
                                  && this.curCoords.client.x === this.prevCoords.client.x
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
-            this.collectEventTargets(pointer, event, eventTarget, 'move');
+            if (!duplicateMove) {
+                this.collectEventTargets(pointer, event, eventTarget, 'move');
+            }
 
             if (!this.pointerIsDown) { return; }
 
