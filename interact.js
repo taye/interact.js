@@ -2366,7 +2366,8 @@
                         ? context.querySelectorAll(selector)
                         : undefined;
 
-                if (isElement(element)
+                if (interactable._iEvents[eventType]
+                    && isElement(element)
                     && inContext(interactable, element)
                     && !testIgnore(interactable, element, eventTarget)
                     && testAllow(interactable, element, eventTarget)
@@ -2378,7 +2379,7 @@
             }
 
             while (element) {
-                if (interact.isSet(element)) {
+                if (interact.isSet(element) && interact(element)._iEvents[eventType]) {
                     targets.push(interact(element));
                     elements.push(element);
                 }
