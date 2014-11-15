@@ -2439,7 +2439,7 @@
                 pointerEvent.dt = pointerEvent.timeStamp - this.downTime;
 
                 interval = pointerEvent.timeStamp - this.tapTime;
-                dbl = (this.prevTap && this.prevTap.type !== 'doublepointerEvent'
+                dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
                        && this.prevTap.target === pointerEvent.target
                        && interval < 500);
 
