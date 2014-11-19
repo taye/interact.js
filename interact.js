@@ -1354,7 +1354,7 @@
 
             this.holdTimers[getPointerId(pointer)] = window.setTimeout(function () {
                 that.pointerHold(pointer, event, eventTarget, curEventTarget);
-            }, 1000);
+            }, 600);
 
             this.pointerIsDown = true;
 
