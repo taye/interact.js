@@ -1524,6 +1524,8 @@
         },
 
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
+            this.recordPointer(pointer);
+
             this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
                                                 ? this.inertiaStatus.startEvent
                                                 : undefined);
@@ -1853,6 +1855,8 @@
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
 
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
+
+            this.removePointer(pointer);
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
@@ -5475,8 +5479,6 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
-
         events.add(docTarget, pEventTypes.down  , listeners.selectorDown );
         events.add(docTarget, pEventTypes.move  , listeners.pointerMove  );
         events.add(docTarget, pEventTypes.over  , listeners.pointerOver  );
@@ -5484,17 +5486,10 @@
         events.add(docTarget, pEventTypes.up    , listeners.pointerUp    );
         events.add(docTarget, pEventTypes.cancel, listeners.pointerCancel);
 
-        // remove pointers after ending actions in pointerUp
-        events.add(docTarget, pEventTypes.up    , listeners.removePointer);
-        events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
-
         // autoscroll
         events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
     }
     else {
-        events.add(docTarget, 'mousemove'  , listeners.recordPointer);
-        events.add(docTarget, 'touchmove'  , listeners.recordPointer);
-
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
         events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
@@ -5505,10 +5500,6 @@
         events.add(docTarget, 'touchmove'  , listeners.pointerMove  );
         events.add(docTarget, 'touchend'   , listeners.pointerUp    );
         events.add(docTarget, 'touchcancel', listeners.pointerCancel);
-
-        // remove touches after ending actions in pointerUp
-        events.add(docTarget, 'touchend'   , listeners.removePointer);
-        events.add(docTarget, 'touchcancel', listeners.removePointer);
 
         // autoscroll
         events.add(docTarget, 'mousemove', autoScroll.edgeMove);
