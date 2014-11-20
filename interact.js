@@ -1849,7 +1849,10 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+            var pointerId = getPointerId(pointer);
+
+            window.clearTimeout(this.holdTimers[pointerId]);
+            delete(this.holdTimers[pointerId]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'up' );
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
