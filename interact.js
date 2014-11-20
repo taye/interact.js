@@ -1636,6 +1636,7 @@
 
                 if (this.prepared && this.target) {
                     var target         = this.target,
+                        shouldMove     = true,
                         shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
                         shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd);
 
@@ -1686,8 +1687,12 @@
                     if (shouldSnap    ) { this.setSnapping   (snapCoords); } else { this.snapStatus    .locked     = false; }
                     if (shouldRestrict) { this.setRestriction(snapCoords); } else { this.restrictStatus.restricted = false; }
 
-                    var shouldMove = (shouldSnap? (this.snapStatus.changed || !this.snapStatus.locked): true)
-                                     && (shouldRestrict? (!this.restrictStatus.restricted || (this.restrictStatus.restricted && this.restrictStatus.changed)): true);
+                    if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
+                        shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
+                    }
+                    else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
+                        shouldMove = false;
+                    }
 
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
