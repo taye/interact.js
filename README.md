@@ -95,7 +95,7 @@ interact.on('dragstart', function (event) {
 
 Documentation
 -------------
-http://interactjs.io/docs
+http://interactjs.io/api
 
 Usage
 -----
