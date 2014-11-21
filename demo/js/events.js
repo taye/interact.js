@@ -46,4 +46,12 @@ interact('#swipe')
     });
 });
 
+interact('.tolerance-slider').on('input', function (event) {
+    var value = event.target.value|0;
+
+    interact.pointerMoveTolerance(value);
+
+    document.getElementById('tolerance-display').textContent = value;
+});
+
 }(window.interact));
