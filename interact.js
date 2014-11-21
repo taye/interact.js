@@ -794,7 +794,7 @@
             origin = interactable.getRect(element);
         }
         else if (trySelector(origin)) {
-            origin = matchingParent(element, origin) || { x: 0, y: 0 };
+            origin = closest(element, origin) || { x: 0, y: 0 };
         }
 
         if (isFunction(origin)) {
@@ -841,7 +841,7 @@
         return false;
     }
 
-    function matchingParent (child, selector) {
+    function closest (child, selector) {
         var parent = child.parentNode;
 
         while (isElement(parent)) {
@@ -2695,7 +2695,7 @@
                     restriction = target.getRect(this.element);
                 }
                 else {
-                    restriction = matchingParent(this.element, restriction);
+                    restriction = closest(this.element, restriction);
                 }
 
                 if (!restriction) { return status; }
