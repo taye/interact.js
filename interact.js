@@ -1536,7 +1536,7 @@
             var dx, dy;
 
             // register movement greater than pointerMoveTolerance
-            if (!this.pointerWasMoved) {
+            if (this.pointerIsDown && !this.pointerWasMoved) {
                 dx = this.curCoords.client.x - this.startCoords.client.x;
                 dy = this.curCoords.client.y - this.startCoords.client.y;
 
