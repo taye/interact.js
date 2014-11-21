@@ -5098,6 +5098,7 @@
 
     interact.getElementRect   = getElementRect;
     interact.matchesSelector  = matchesSelector;
+    interact.closest          = closest;
 
     /*\
      * interact.margin
