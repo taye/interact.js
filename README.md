@@ -93,20 +93,30 @@ interact.on('dragstart', function (event) {
 });
 ```
 
-Documentation
--------------
-http://interactjs.io/api
+Installation
+------------
+
+interact.js can be installed for a project using [Bower](http://bower.io/)
+
+    $ bower install interact
+
+or [npm](https://www.npmjs.org/)
+
+    $ npm install taye/interact.js
+
+or by downloading the script from http://interactjs.io/#download and linking to
+the script in a `<script>` tag's `src` attribute.
+
+    <script type="text/javascript" src="/path/to/interact.js" />
+
+`interact` is exposed as an npm module, [AMD
+(RequireJS)](http://requirejs.org) module, or a global object depending on
+what the environment supports.
 
 Usage
 -----
-Pass the element you want to interact with or a CSS selector string to
-`interact`. That returns an object with methods, notably `draggable`,
-`resizable`, `gesturable`, `dropzone` which let you allow or disallow the
-related actions and `on` which let's you add event listeners for InteractEvents
-and any DOM event.
 
-Details
--------
+The API reference for all methods is available at http://interactjs.io/api.
 
 ### Interactables
 The `interact` function takes an Element or CSS selector and an optional
@@ -115,10 +125,11 @@ methods and properties to configure what events it can fire and to modify the
 reported coordinates. These methods have a fluent interface so method calls can
 be chained nicely.
 
-For example, to make a DOM element fire drag and resize events you can do:
+For example, to make a set of DOM elements fire drag and resize events you can
+do:
 
 ```javascript
-interact(document.getElementById('anElement'))
+interact('.drag-resize')
         .draggable (true)
         .resizable(true);
 ```
