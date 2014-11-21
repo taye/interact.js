@@ -2379,7 +2379,7 @@
         },
 
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds(getPointerId(pointer)));
+            var pointerIndex = this.mouse? 0 : indexOf(getPointerId(pointer));
 
             // do not fire a tap event if the pointer was moved before being lifted
             if (eventType === 'tap' && (this.pointerWasMoved
@@ -2426,7 +2426,7 @@
         },
 
         firePointers: function (pointer, event, targets, elements, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds(getPointerId(pointer))),
+            var pointerIndex = this.mouse? 0 : indexOf(getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
