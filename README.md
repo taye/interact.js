@@ -19,6 +19,8 @@ Demos
 
  - http://interactjs.io has some demos showing drag and drop, gestures,
    inertia, snap and some other things.
+ - [This article](https://hacks.mozilla.org/2014/11/interact-js-for-drag-and-drop-resizing-and-multi-touch-gestures/)
+   on the Mozilla Hacks blog features and explains clearly [these 3 demos](http://codepen.io/collection/qwtdB/)
  - The [html & svg demo](http://interactjs.io/repo/demo/html_svg.html "drag, drop,
    resize and gesture demo") shows div elements which can be dragged and
    dropped onto each other and resized by dragging the bottom and right edges. The
@@ -30,9 +32,6 @@ Demos
  - This [blog post on path
    snapping](http://taye.me/blog/interact-js/snap/2013/09/29/interactjs-path-snapping.html)
    demonstrates and graphs some interesting path snapping functions.
-
-interact.js began as a [Google Summer of Code 2012 project]("http://www.google-melange.com/gsoc/project/details/google/gsoc2012/taye/5668600916475904") for
-[Biographer](https://code.google.com/p/biographer "Biographer on Google Code").
 
 Example
 -------
@@ -72,7 +71,7 @@ interact(document.body)
     .inertia({
         resistance: 15,
         zeroResumeDelta: true
-    });
+    })
     // snap to the corners of the specified grid
     .snap({
         mode: 'grid',
@@ -150,26 +149,39 @@ style the element according to event data.
  - Gesturable: `gesturestart`, `gesturemove`, `gestureinertiastart`,
    `gestureend`
 
-There are also the `tap` and `doubletap` events which are equivalent to `click`
-and `doubleclik`.
+There are also the `down`, `move`, `up`, `cancel`, `tap`, `doubletap` and
+`hold` events. I call these `pointerEvents` because they present the events
+roughly as the real `PointerEvent` interface does, specifically:
 
-To respond to an InteractEvent, you must add a listener for its event type
-either directly to an interactable
+ - `event.pointerId` provides the `TouchEvent#identifier` or `PointerEvent#pointerId` or
+   `undefined` for MouseEvents
+ - `event.pointerType` provides the pointer type
+ - There are no simulated mouse events after touch events
+
+Some properties specific to the `PointerEvent` interface will only be provided
+if the browser supports `PointerEvent`s, for Example, a `down` event from a
+`touchstart` will not provide tilt or pressure.
+
+To respond to `InteractEvent`s, you must add listeners for the event types either
+directly on an interactable or globally for all events of those types on the
+`interact` object.
 
 ``` javascript
-Interactable#on(eventType, listenerFunction)
+interact(target).on(interactEventType, listenerFunction)
+// or
+interact.on('resizemove', listenerFunction)`.
 ```
-
-or globally for all events of that type
+ For the `pointerEvents`, the listeners must be added to an Interactable.
+However, you can listen to all such events using the `document` as the target.
 
 ```javascript
-interact.on('resizemove', resizeElement)`.
+interact(document).on(pointerEventType, listenerFunction);
 ```
 
-The `InteractEvent` object that was created is passed to these functions as the
-first parameter.
+The event object that was created is passed to these functions as the first
+parameter.
 
-InteractEvent properties include the usual properties of mouse/touch events
+`InteractEvent` properties include the usual properties of mouse/touch events
 such as pageX/Y, clientX/Y, modifier keys etc. but also some properties
 providing information about the change in coordinates and event specific data.
 The table below displays all of these events.
@@ -216,9 +228,9 @@ The table below displays all of these events.
 In gesture events, page and client coordinates are the averages of touch
 coordinates. Velocity is calculated from these averages.
 
-Tap and doubletap event coordinates are copied directly from the source
-mouseup/touchend/pointerup event and are not modified – no snapping,
-restriction or origin for tap and doubletap.
+`tap` and `doubletap` event coordinates are copied directly from the source event
+and are not modified – no snapping, restriction or origin for tap and
+doubletap. Also, `dt` of tap events is the time between the related `down` and `up` events
 
 The [dropmove](https://github.com/taye/interact.js/issues/67) event is a plain
 object created like this:
@@ -261,3 +273,7 @@ License
 -------
 
 interact.js is released under the [MIT License](http://taye.mit-license.org).
+
+---
+
+interact.js began as a [Google Summer of Code 2012 project]("http://www.google-melange.com/gsoc/project/details/google/gsoc2012/taye/5668600916475904").
