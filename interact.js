@@ -276,8 +276,13 @@
             'gestureinertiastart',
             'gestureend',
 
+            'down',
+            'move',
+            'up',
+            'cancel',
             'tap',
-            'doubletap'
+            'doubletap',
+            'hold'
         ],
 
         globalEvents = {},
@@ -1121,6 +1126,7 @@
         // keep track of added pointers
         this.pointers   = [];
         this.pointerIds = [];
+        this.holdTimers = {};
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -1342,6 +1348,14 @@
         },
 
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
+            var that = this;
+
+            this.collectEventTargets(pointer, event, eventTarget, 'down');
+
+            this.holdTimers[getPointerId(pointer)] = window.setTimeout(function () {
+                that.pointerHold(pointer, event, eventTarget, curEventTarget);
+            }, 600);
+
             this.pointerIsDown = true;
 
             var element = eventTarget,
@@ -1373,8 +1387,6 @@
             if (this.interacting()) {
                 return;
             }
-
-            var that = this;
 
             function pushMatches (interactable, selector, context) {
                 var elements = ie8MatchesSelector
@@ -1501,7 +1513,6 @@
             }
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
-                && this.target.options.inertia.allowResume
                 && curEventTarget === this.element
                 && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
 
@@ -1513,34 +1524,42 @@
         },
 
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
-            if (!this.pointerIsDown) { return; }
+            this.recordPointer(pointer);
 
             this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
                                                 ? this.inertiaStatus.startEvent
                                                 : undefined);
 
-            if (this.pointerWasMoved && !preEnd
-                && this.curCoords.page.x === this.prevCoords.page.x
-                && this.curCoords.page.y === this.prevCoords.page.y
-                && this.curCoords.client.x === this.prevCoords.client.x
-                && this.curCoords.client.y === this.prevCoords.client.y) {
-
-                this.checkAndPreventDefault(event, this.target, this.element);
-                return;
-            }
-
-            // set pointer coordinate, time changes and speeds
-            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+            var duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
+                                 && this.curCoords.page.y === this.prevCoords.page.y
+                                 && this.curCoords.client.x === this.prevCoords.client.x
+                                 && this.curCoords.client.y === this.prevCoords.client.y);
 
             var dx, dy;
 
-            // register movement of more than 1 pixel
+            // register movement greater than pointerMoveTolerance
             if (!this.pointerWasMoved) {
                 dx = this.curCoords.client.x - this.startCoords.client.x;
                 dy = this.curCoords.client.y - this.startCoords.client.y;
 
                 this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
             }
+
+            if (!duplicateMove && this.pointerWasMoved) {
+                window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+
+                this.collectEventTargets(pointer, event, eventTarget, 'move');
+            }
+
+            if (!this.pointerIsDown) { return; }
+
+            if (duplicateMove && this.pointerWasMoved && !preEnd) {
+                this.checkAndPreventDefault(event, this.target, this.element);
+                return;
+            }
+
+            // set pointer coordinate, time changes and speeds
+            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
             if (!this.prepared) { return; }
 
@@ -1830,8 +1849,33 @@
             return gestureEvent;
         },
 
-        // End interact move events and stop auto-scroll unless inertia is enabled
+        pointerHold: function (pointer, event, eventTarget) {
+            this.collectEventTargets(pointer, event, eventTarget, 'hold');
+        },
+
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+            var pointerId = getPointerId(pointer);
+
+            window.clearTimeout(this.holdTimers[pointerId]);
+            delete(this.holdTimers[pointerId]);
+
+            this.collectEventTargets(pointer, event, eventTarget, 'up' );
+            this.collectEventTargets(pointer, event, eventTarget, 'tap');
+
+            this.pointerEnd(pointer, event, eventTarget, curEventTarget);
+
+            this.removePointer(pointer);
+        },
+
+        pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
+            window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+
+            this.collectEventTargets(pointer, event, eventTarget, 'cancel');
+            this.pointerEnd(pointer, event, eventTarget, curEventTarget);
+        },
+
+        // End interact move events and stop auto-scroll unless inertia is enabled
+        pointerEnd: function (pointer, event, eventTarget, curEventTarget) {
             var endEvent,
                 target = this.target,
                 options = target && target.options,
@@ -2222,8 +2266,7 @@
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
             this.pointerIds.splice(0);
-            // pointers should be retained
-            //this.pointers.splice(0);
+            this.pointers.splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2267,7 +2310,7 @@
                 this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
                 inertiaStatus.active = false;
-                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+                this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
@@ -2293,7 +2336,7 @@
                 inertiaStatus.active = false;
                 inertiaStatus.smoothEnd = false;
 
-                this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
+                this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
             }
         },
 
@@ -2305,8 +2348,6 @@
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
 
-                // move events are kept so that multi-touch properties can still be
-                // calculated at the end of a gesture; use pointerIds index
                 this.pointers[index] = pointer;
             }
             else {
@@ -2321,10 +2362,7 @@
             if (index === -1) { return; }
 
             this.pointerIds.splice(index, 1);
-
-            // move events are kept so that multi-touch properties can still be
-            // calculated at the end of a GestureEvent sequence
-            //this.pointers.splice(index, 1);
+            this.pointers.splice(index, 1);
         },
 
         recordPointer: function (pointer) {
@@ -2339,35 +2377,93 @@
             this.pointers[index] = pointer;
         },
 
-        fireTaps: function (pointer, event, targets, elements) {
-            var tap = {},
-                i;
+        collectEventTargets: function (pointer, event, eventTarget, eventType) {
+            // do not fire a tap event if the pointer was moved before being lifted
+            if (eventType === 'tap' && (this.pointerWasMoved
+                // or if the pointerup target is different to the pointerdown target
+                || !(this.downTarget && this.downTarget === eventTarget))) {
+                return;
+            }
 
-            extend(tap, event);
-            extend(tap, pointer);
+            var targets = [],
+                elements = [],
+                element = eventTarget;
 
-            tap.preventDefault           = preventOriginalDefault;
-            tap.stopPropagation          = InteractEvent.prototype.stopPropagation;
-            tap.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+            function collectSelectors (interactable, selector, context) {
+                var els = ie8MatchesSelector
+                        ? context.querySelectorAll(selector)
+                        : undefined;
 
-            tap.timeStamp     = new Date().getTime();
-            tap.originalEvent = event;
-            tap.dt            = tap.timeStamp - this.downTime;
-            tap.type          = 'tap';
+                if (interactable._iEvents[eventType]
+                    && isElement(element)
+                    && inContext(interactable, element)
+                    && !testIgnore(interactable, element, eventTarget)
+                    && testAllow(interactable, element, eventTarget)
+                    && matchesSelector(element, selector, els)) {
 
-            var interval = tap.timeStamp - this.tapTime,
+                    targets.push(interactable);
+                    elements.push(element);
+                }
+            }
+
+            while (element) {
+                if (interact.isSet(element) && interact(element)._iEvents[eventType]) {
+                    targets.push(interact(element));
+                    elements.push(element);
+                }
+
+                interactables.forEachSelector(collectSelectors);
+
+                element = element.parentNode;
+            }
+
+            if (targets.length) {
+                this.firePointers(pointer, event, targets, elements, eventType);
+            }
+        },
+
+        firePointers: function (pointer, event, targets, elements, eventType) {
+            var pointerEvent = {},
+                i,
+                // for tap events
+                interval, dbl;
+
+            extend(pointerEvent, event);
+            if (event !== pointer) {
+                extend(pointerEvent, pointer);
+            }
+
+            pointerEvent.preventDefault           = preventOriginalDefault;
+            pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
+            pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+            pointerEvent.interaction              = this;
+
+            pointerEvent.timeStamp     = new Date().getTime();
+            pointerEvent.originalEvent = event;
+            pointerEvent.type          = eventType;
+            pointerEvent.pointerId     = getPointerId(pointer);
+            pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
+                                                : isString(pointer.pointerType)
+                                                    ? pointer.pointerType
+                                                    : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+
+            if (eventType === 'tap') {
+                pointerEvent.dt = pointerEvent.timeStamp - this.downTime;
+
+                interval = pointerEvent.timeStamp - this.tapTime;
                 dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
-                       && this.prevTap.target === tap.target
+                       && this.prevTap.target === pointerEvent.target
                        && interval < 500);
 
-            this.tapTime = tap.timeStamp;
+                this.tapTime = pointerEvent.timeStamp;
+            }
 
             for (i = 0; i < targets.length; i++) {
-                tap.currentTarget = elements[i];
-                targets[i].fire(tap);
+                pointerEvent.currentTarget = elements[i];
+                targets[i].fire(pointerEvent);
 
-                if (tap.immediatePropagationStopped
-                    ||(tap.propagationStopped && targets[i + 1] !== tap.currentTarget)) {
+                if (pointerEvent.immediatePropagationStopped
+                    ||(pointerEvent.propagationStopped && elements[i + 1] !== pointerEvent.currentTarget)) {
                     break;
                 }
             }
@@ -2375,7 +2471,7 @@
             if (dbl) {
                 var doubleTap = {};
 
-                extend(doubleTap, tap);
+                extend(doubleTap, pointerEvent);
 
                 doubleTap.dt   = interval;
                 doubleTap.type = 'doubletap';
@@ -2385,58 +2481,15 @@
                     targets[i].fire(doubleTap);
 
                     if (doubleTap.immediatePropagationStopped
-                        ||(doubleTap.propagationStopped && targets[i + 1] !== doubleTap.currentTarget)) {
+                        ||(doubleTap.propagationStopped && elements[i + 1] !== doubleTap.currentTarget)) {
                         break;
                     }
                 }
 
                 this.prevTap = doubleTap;
             }
-            else {
-                this.prevTap = tap;
-            }
-        },
-
-        collectTaps: function (pointer, event, eventTarget) {
-            if(this.pointerWasMoved
-               || !(this.downTarget && this.downTarget === eventTarget)) {
-                return;
-            }
-
-            var tapTargets = [],
-                tapElements = [];
-
-            var element = eventTarget;
-
-            function collectSelectorTaps (interactable, selector, context) {
-                var elements = ie8MatchesSelector
-                        ? context.querySelectorAll(selector)
-                        : undefined;
-
-                if (element !== document
-                    && inContext(interactable, element)
-                    && !testIgnore(interactable, element, eventTarget)
-                    && testAllow(interactable, element, eventTarget)
-                    && matchesSelector(element, selector, elements)) {
-
-                    tapTargets.push(interactable);
-                    tapElements.push(element);
-                }
-            }
-
-            while (element) {
-                if (interact.isSet(element)) {
-                    tapTargets.push(interact(element));
-                    tapElements.push(element);
-                }
-
-                interactables.forEachSelector(collectSelectorTaps);
-
-                element = element.parentNode;
-            }
-
-            if (tapTargets.length) {
-                this.fireTaps(pointer, event, tapTargets, tapElements);
+            else if (eventType === 'tap') {
+                this.prevTap = pointerEvent;
             }
         },
 
@@ -2740,7 +2793,8 @@
 
                 var element = eventTarget;
 
-                if (interaction.inertiaStatus.active && (interaction.mouse === mouseEvent)) {
+                if (interaction.inertiaStatus.active && interaction.target.options.inertia.allowResume
+                    && (interaction.mouse === mouseEvent)) {
                     while (element) {
                         // if the element is the interaction element
                         if (element === interaction.element) {
@@ -3177,8 +3231,9 @@
     var listeners = {},
         interactionListeners = [
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
-            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown', 'pointerDown', 'pointerMove', 'pointerUp',
-            'addPointer', 'removePointer', 'recordPointer', 'collectTaps'
+            'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
+            'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
+            'addPointer', 'removePointer', 'recordPointer',
         ];
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -5416,7 +5471,7 @@
 
     function endAllInteractions (event) {
         for (var i = 0; i < interactions.length; i++) {
-            interactions[i].pointerUp(event, event);
+            interactions[i].pointerEnd(event, event);
         }
     }
 
@@ -5432,44 +5487,27 @@
                 out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
         }
 
-        events.add(docTarget, pEventTypes.up    , listeners.collectTaps);
-
-        events.add(docTarget, pEventTypes.move  , listeners.recordPointer);
-
-        events.add(docTarget, pEventTypes.down  , listeners.selectorDown);
-        events.add(docTarget, pEventTypes.move  , listeners.pointerMove );
-        events.add(docTarget, pEventTypes.up    , listeners.pointerUp   );
-        events.add(docTarget, pEventTypes.over  , listeners.pointerOver );
-        events.add(docTarget, pEventTypes.out   , listeners.pointerOut  );
-
-        // remove pointers after ending actions in pointerUp
-        events.add(docTarget, pEventTypes.up    , listeners.removePointer);
-        events.add(docTarget, pEventTypes.cancel, listeners.removePointer);
+        events.add(docTarget, pEventTypes.down  , listeners.selectorDown );
+        events.add(docTarget, pEventTypes.move  , listeners.pointerMove  );
+        events.add(docTarget, pEventTypes.over  , listeners.pointerOver  );
+        events.add(docTarget, pEventTypes.out   , listeners.pointerOut   );
+        events.add(docTarget, pEventTypes.up    , listeners.pointerUp    );
+        events.add(docTarget, pEventTypes.cancel, listeners.pointerCancel);
 
         // autoscroll
         events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
     }
     else {
-        events.add(docTarget, 'mouseup' , listeners.collectTaps);
-        events.add(docTarget, 'touchend', listeners.collectTaps);
-
-        events.add(docTarget, 'mousemove'  , listeners.recordPointer);
-        events.add(docTarget, 'touchmove'  , listeners.recordPointer);
-
         events.add(docTarget, 'mousedown', listeners.selectorDown);
         events.add(docTarget, 'mousemove', listeners.pointerMove );
         events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
         events.add(docTarget, 'mouseover', listeners.pointerOver );
         events.add(docTarget, 'mouseout' , listeners.pointerOut  );
 
-        events.add(docTarget, 'touchstart' , listeners.selectorDown);
-        events.add(docTarget, 'touchmove'  , listeners.pointerMove );
-        events.add(docTarget, 'touchend'   , listeners.pointerUp   );
-        events.add(docTarget, 'touchcancel', listeners.pointerUp   );
-
-        // remove touches after ending actions in pointerUp
-        events.add(docTarget, 'touchend'   , listeners.removePointer);
-        events.add(docTarget, 'touchcancel', listeners.removePointer);
+        events.add(docTarget, 'touchstart' , listeners.selectorDown );
+        events.add(docTarget, 'touchmove'  , listeners.pointerMove  );
+        events.add(docTarget, 'touchend'   , listeners.pointerUp    );
+        events.add(docTarget, 'touchcancel', listeners.pointerCancel);
 
         // autoscroll
         events.add(docTarget, 'mousemove', autoScroll.edgeMove);
@@ -5482,11 +5520,11 @@
         if (window.frameElement) {
             parentDocTarget._element = window.frameElement.ownerDocument;
 
-            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchend'     , listeners.pointerUp);
-            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerUp);
-            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerUp);
-            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerUp);
+            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'touchend'     , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerEnd);
+            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerEnd);
             events.add(parentWindowTarget, 'blur'         , endAllInteractions );
         }
     }
