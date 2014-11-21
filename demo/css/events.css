@@ -1,0 +1,55 @@
+#swipe {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+
+    margin: 0;
+    padding: 10%;
+
+    background-color: #29e;
+    color: #fff;
+
+    font-size: 8em;
+    font-size: 10vmin;
+    font-family: sans-serif;
+
+    cursor: default;
+
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+         -o-user-select: none;
+            user-select: none;
+}
+
+.tolerance-slider {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 80%;
+    height: 5%;
+    margin: 5% 10%;
+}
+
+#tolerance-display {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    margin: 2% 0%;
+
+    font-size: 2em;
+    font-size: 4vmin;
+    text-align: center;
+
+    color: #fff;
+}
+
+#tolerance-display::before {
+    content: "interact.pointerMoveTolerance( ";
+}
+#tolerance-display::after {
+    content: " )";
+}
