@@ -1124,9 +1124,11 @@
         };
 
         // keep track of added pointers
-        this.pointers   = [];
-        this.pointerIds = [];
-        this.holdTimers = {};
+        this.pointers    = [];
+        this.pointerIds  = [];
+        this.downTargets = [];
+        this.downTimes   = [];
+        this.holdTimers  = {};
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -1155,10 +1157,8 @@
             timeStamp: 0
         };
 
-        this.downTime    = 0;       // the timeStamp of the starting event
         this.downEvent   = null;    // pointerdown/mousedown/touchstart event
         this.downPointer = {};
-        this.downTarget  = null;
 
         this.prevEvent = null;      // previous action event
         this.tapTime   = 0;         // time of the most recent tap event
@@ -1359,9 +1359,8 @@
             this.pointerIsDown = true;
 
             var element = eventTarget,
+                pointerIndex = this.addPointer(pointer),
                 action;
-
-            this.addPointer(pointer);
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1428,8 +1427,8 @@
             }
             else {
                 // do these now since pointerDown isn't being called from here
-                this.downTime = new Date().getTime();
-                this.downTarget = eventTarget;
+                this.downTimes[pointerIndex] = new Date().getTime();
+                this.downTargets[pointerIndex] = eventTarget;
                 this.downEvent = event;
                 extend(this.downPointer, pointer);
 
@@ -1449,9 +1448,8 @@
 
             this.pointerIsDown = true;
 
-            this.addPointer(pointer);
-
-            var action;
+            var pointerIndex = this.addPointer(pointer),
+                action;
 
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
@@ -1501,8 +1499,8 @@
                 this.snapStatus.snappedX = this.snapStatus.snappedY =
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
 
-                this.downTime = new Date().getTime();
-                this.downTarget = eventTarget;
+                this.downTimes[pointerIndex] = new Date().getTime();
+                this.downTargets[pointerIndex] = eventTarget;
                 this.downEvent = event;
                 extend(this.downPointer, pointer);
 
@@ -2265,8 +2263,10 @@
             this.prepared = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
-            this.pointerIds.splice(0);
-            this.pointers.splice(0);
+            this.pointerIds .splice(0);
+            this.pointers   .splice(0);
+            this.downTargets.splice(0);
+            this.downTimes  .splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2347,12 +2347,11 @@
             if (index === -1) {
                 index = this.pointerIds.length;
                 this.pointerIds.push(id);
+            }
 
-                this.pointers[index] = pointer;
-            }
-            else {
-                this.pointers[index] = pointer;
-            }
+            this.pointers[index] = pointer;
+
+            return index;
         },
 
         removePointer: function (pointer) {
@@ -2361,8 +2360,10 @@
 
             if (index === -1) { return; }
 
-            this.pointerIds.splice(index, 1);
-            this.pointers.splice(index, 1);
+            this.pointerIds .splice(index, 1);
+            this.pointers   .splice(index, 1);
+            this.downTargets.splice(index, 1);
+            this.downTimes  .splice(index, 1);
         },
 
         recordPointer: function (pointer) {
@@ -2378,10 +2379,12 @@
         },
 
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds(getPointerId(pointer)));
+
             // do not fire a tap event if the pointer was moved before being lifted
             if (eventType === 'tap' && (this.pointerWasMoved
                 // or if the pointerup target is different to the pointerdown target
-                || !(this.downTarget && this.downTarget === eventTarget))) {
+                || !(this.downTargets[pointerIndex] && this.downTargets[pointerIndex] === eventTarget))) {
                 return;
             }
 
@@ -2423,7 +2426,8 @@
         },
 
         firePointers: function (pointer, event, targets, elements, eventType) {
-            var pointerEvent = {},
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds(getPointerId(pointer))),
+                pointerEvent = {},
                 i,
                 // for tap events
                 interval, dbl;
@@ -2448,7 +2452,7 @@
                                                     : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
 
             if (eventType === 'tap') {
-                pointerEvent.dt = pointerEvent.timeStamp - this.downTime;
+                pointerEvent.dt = pointerEvent.timeStamp - this.downTimes[pointerIndex];
 
                 interval = pointerEvent.timeStamp - this.tapTime;
                 dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
@@ -2984,7 +2988,7 @@
         this.metaKey   = event.metaKey;
         this.button    = event.button;
         this.target    = element;
-        this.t0        = interaction.downTime;
+        this.t0        = interaction.downTimes[0];
         this.type      = action + (phase || '');
 
         this.interaction = interaction;
@@ -3091,7 +3095,7 @@
         }
 
         if (starting) {
-            this.timeStamp = interaction.downTime;
+            this.timeStamp = interaction.downTimes[0];
             this.dt        = 0;
             this.duration  = 0;
             this.speed     = 0;
@@ -3109,7 +3113,7 @@
         else {
             this.timeStamp = new Date().getTime();
             this.dt        = this.timeStamp - interaction.prevEvent.timeStamp;
-            this.duration  = this.timeStamp - interaction.downTime;
+            this.duration  = this.timeStamp - interaction.downTimes[0];
 
             if (event instanceof InteractEvent) {
                 var dx = this[sourceX] - interaction.prevEvent[sourceX],
@@ -5059,7 +5063,7 @@
             restrict              : interaction.restrictStatus,
             inertia               : interaction.inertiaStatus,
 
-            downTime              : interaction.downTime,
+            downTime              : interaction.downTimes[0],
             downEvent             : interaction.downEvent,
             downPointer           : interaction.downPointer,
             prevEvent             : interaction.prevEvent,
