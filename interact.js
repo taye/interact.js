@@ -4624,8 +4624,7 @@
                 if (!(eventType in this._iEvents)) {
                     this._iEvents[eventType] = [listener];
                 }
-                // if the event listener is not already bound for this type
-                else if (!contains(this._iEvents[eventType], listener)) {
+                else {
                     this._iEvents[eventType].push(listener);
                 }
             }
@@ -4884,10 +4883,7 @@
             if (!globalEvents[type]) {
                 globalEvents[type] = [listener];
             }
-
-            // if the event listener is not already bound for this type
-            else if (!contains(globalEvents[type], listener)) {
-
+            else {
                 globalEvents[type].push(listener);
             }
         }
