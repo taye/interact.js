@@ -4696,8 +4696,10 @@
          = (object) This Interactable
         \*/
         off: function (eventType, listener, useCapture) {
+            var i;
+
             if (isArray(eventType)) {
-                for (var i = 0; i < eventType.length; i++) {
+                for (i = 0; i < eventType.length; i++) {
                     this.off(eventType[i], listener, useCapture);
                 }
 
@@ -4738,7 +4740,7 @@
                         var listeners = delegated.listeners[index];
 
                         // each item of the listeners array is an array: [function, useCaptureFlag]
-                        for (var i = listeners.length - 1; i >= 0; i--) {
+                        for (i = listeners.length - 1; i >= 0; i--) {
                             var fn = listeners[i][0],
                                 useCap = listeners[i][1];
 
