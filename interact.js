@@ -1543,8 +1543,10 @@
                 this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
             }
 
-            if (!duplicateMove && this.pointerWasMoved) {
-                window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+            if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
+                if (this.pointerIsDown) {
+                    window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+                }
 
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
             }
