@@ -22,6 +22,11 @@
         -ms-user-select: none;
          -o-user-select: none;
             user-select: none;
+
+    -webkit-touch-action: none;
+       -moz-touch-action: none;
+        -ms-touch-action: none;
+            touch-action: none;
 }
 
 .tolerance-slider {
