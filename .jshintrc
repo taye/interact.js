@@ -1,0 +1,14 @@
+{
+    "strict"   : true,
+    "validthis": true,
+    "browser"  : true,
+    "jquery"   : true,
+    "curly"    : true,
+    "laxbreak" : true,
+    "newcap"   : true,
+    "noarg"    : true,
+    "undef"    : true,
+    "unused"   : true,
+    "strict"   : true,
+    "trailing" : true
+}
