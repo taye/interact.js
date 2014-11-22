@@ -21,6 +21,8 @@
 
         tmpXY = {},     // reduce object creation in getXY()
 
+        documents       = [],   // all documents being listened to
+
         interactables   = [],   // all set interactables
         interactions    = [],   // all interactions
 
@@ -94,7 +96,7 @@
             restrictEnabled: false,
 
             autoScroll: {
-                container   : window,  // the item that is scrolled (Window or HTMLElement)
+                container   : null,     // the item that is scrolled (Window or HTMLElement)
                 margin      : 60,
                 speed       : 300,      // the scroll speed in pixels per second
 
@@ -119,20 +121,18 @@
 
             origin      : { x: 0, y: 0 },
             deltaSource : 'page',
-
-            context     : document        // the Node on which querySelector will be called
         },
 
         // Things related to autoScroll
         autoScroll = {
-            target: null,
+            interaction: null,
             i: null,    // the handle returned by window.setInterval
             x: 0, y: 0, // Direction each pulse is to scroll in
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var options = autoScroll.target.options.autoScroll,
-                    container = options.container,
+                var options = autoScroll.interaction.target.options.autoScroll,
+                    container = options.container || getWindow(autoScroll.interaction.element),
                     now = new Date().getTime(),
                     // change in time in seconds
                     dt = (now - autoScroll.prevTime) / 1000,
@@ -140,7 +140,7 @@
                     s = options.speed * dt;
 
                 if (s >= 1) {
-                    if (container instanceof window.Window) {
+                    if (isWindow(container)) {
                         container.scrollBy(autoScroll.x * s, autoScroll.y * s);
                     }
                     else if (container) {
@@ -158,14 +158,17 @@
             },
 
             edgeMove: function (event) {
-                var target,
+                var interaction,
+                    target,
                     doAutoscroll = false;
 
                 for (var i = 0; i < interactions.length; i++) {
-                    var interaction = interactions[i];
+                    interaction = interactions[i];
+
                     target = interaction.target;
 
-                    if (target && target.options.autoScrollEnabled && (interaction.dragging || interaction.resizing)) {
+                    if (target && target.options.autoScrollEnabled
+                        && (interaction.dragging || interaction.resizing)) {
                         doAutoscroll = true;
                         break;
                     }
@@ -177,16 +180,17 @@
                     right,
                     bottom,
                     left,
-                    options = target.options.autoScroll;
+                    options = target.options.autoScroll,
+                    container = options.container || getWindow(interaction.element);
 
-                if (options.container instanceof window.Window) {
+                if (isWindow(container)) {
                     left   = event.clientX < autoScroll.margin;
                     top    = event.clientY < autoScroll.margin;
-                    right  = event.clientX > options.container.innerWidth  - autoScroll.margin;
-                    bottom = event.clientY > options.container.innerHeight - autoScroll.margin;
+                    right  = event.clientX > container.innerWidth  - autoScroll.margin;
+                    bottom = event.clientY > container.innerHeight - autoScroll.margin;
                 }
                 else {
-                    var rect = getElementRect(options.container);
+                    var rect = getElementRect(container);
 
                     left   = event.clientX < rect.left   + autoScroll.margin;
                     top    = event.clientY < rect.top    + autoScroll.margin;
@@ -202,18 +206,18 @@
                     autoScroll.margin = options.margin;
                     autoScroll.speed  = options.speed;
 
-                    autoScroll.start(target);
+                    autoScroll.start(interaction);
                 }
             },
 
             isScrolling: false,
             prevTime: 0,
 
-            start: function (target) {
+            start: function (interaction) {
                 autoScroll.isScrolling = true;
                 cancelFrame(autoScroll.i);
 
-                autoScroll.target = target;
+                autoScroll.interaction = interaction;
                 autoScroll.prevTime = new Date().getTime();
                 autoScroll.i = reqFrame(autoScroll.scroll);
             },
@@ -311,12 +315,6 @@
         reqFrame = window.requestAnimationFrame,
         cancelFrame = window.cancelAnimationFrame,
 
-        // used for adding event listeners to window and document
-        windowTarget       = { _element: window       , events  : {} },
-        docTarget          = { _element: document     , events  : {} },
-        parentWindowTarget = { _element: window.parent, events  : {} },
-        parentDocTarget    = { _element: null         , events  : {} },
-
         // Events wrapper
         events = (function () {
             var useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window),
@@ -370,8 +368,8 @@
                                 event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
                                 if (/mouse|click/.test(event.type)) {
-                                    event.pageX = event.clientX + document.documentElement.scrollLeft;
-                                    event.pageY = event.clientY + document.documentElement.scrollTop;
+                                    event.pageX = event.clientX + element.ownerDdocument.documentElement.scrollLeft;
+                                    event.pageY = event.clientY + element.ownerDdocument.documentElement.scrollTop;
                                 }
 
                                 listener(event);
@@ -479,14 +477,8 @@
             }
 
             return {
-                add: function (target, type, listener, useCapture) {
-                    add(target._element, type, listener, useCapture);
-                },
-                remove: function (target, type, listener, useCapture) {
-                    remove(target._element, type, listener, useCapture);
-                },
-                addToElement: add,
-                removeFromElement: remove,
+                add: add,
+                remove: remove,
                 useAttachEvent: useAttachEvent,
 
                 _elements: elements,
@@ -498,13 +490,21 @@
     function blank () {}
 
     function isElement (o) {
-        return !!o && (typeof o === 'object') && (
-            /object|function/.test(typeof Element)
-                ? o instanceof Element //DOM2
-                : o.nodeType === 1 && typeof o.nodeName === "string");
+        if (!o || (typeof o !== 'object')) { return false; }
+
+        var _window = getWindow(o) || window;
+
+        return (/object|function/.test(typeof _window.Element)
+            ? o instanceof _window.Element //DOM2
+            : o.nodeType === 1 && typeof o.nodeName === "string");
     }
-    function isObject   (thing) { return thing instanceof Object; }
-    function isArray    (thing) { return thing instanceof Array ; }
+    function isWindow (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); }
+    function isArray (thing) {
+        return isObject(thing)
+                && (typeof thing.length !== undefined)
+                && isFunction(thing.splice);
+    }
+    function isObject   (thing) { return !!thing && (typeof thing === 'object'); }
     function isFunction (thing) { return typeof thing === 'function'; }
     function isNumber   (thing) { return typeof thing === 'number'  ; }
     function isBool     (thing) { return typeof thing === 'boolean' ; }
@@ -641,10 +641,11 @@
         return client;
     }
 
-    function getScrollXY () {
+    function getScrollXY (win) {
+        win = win || window;
         return {
-            x: window.scrollX || document.documentElement.scrollLeft,
-            y: window.scrollY || document.documentElement.scrollTop
+            x: win.scrollX || win.document.documentElement.scrollLeft,
+            y: win.scrollY || win.document.documentElement.scrollTop
         };
     }
 
@@ -658,10 +659,20 @@
             : element);
     }
 
+    function getWindow (node) {
+        if (isWindow(node)) {
+            return node;
+        }
+
+        var rootNode = (node.ownerDocument || node);
+
+        return rootNode.defaultView || rootNode.parentWindow;
+    }
+
     function getElementRect (element) {
         var scroll = isIOS7orLower
                 ? { x: 0, y: 0 }
-                : getScrollXY(),
+                : getScrollXY(getWindow(element)),
             clientRect = (element instanceof SVGElement)?
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
@@ -854,7 +865,7 @@
     }
 
     function inContext (interactable, element) {
-        return interactable._context === document
+        return interactable._context === element.ownerDocument
                 || nodeContains(interactable._context, element);
     }
 
@@ -996,11 +1007,11 @@
 
             // check if the deepest or current are document.documentElement or document.rootElement
             // - if the current dropzone is, do nothing and continue
-            if (dropzone.parentNode === document) {
+            if (dropzone.parentNode === dropzone.ownerDocument) {
                 continue;
             }
             // - if deepest is, update with the current dropzone and continue to next
-            else if (deepestZone.parentNode === document) {
+            else if (deepestZone.parentNode === dropzone.ownerDocument) {
                 deepestZone = dropzone;
                 index = i;
                 continue;
@@ -1008,7 +1019,7 @@
 
             if (!deepestZoneParents.length) {
                 parent = deepestZone;
-                while (parent.parentNode && parent.parentNode !== document) {
+                while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
                     deepestZoneParents.unshift(parent);
                     parent = parent.parentNode;
                 }
@@ -1032,7 +1043,7 @@
 
             dropzoneParents = [];
 
-            while (parent.parentNode !== document) {
+            while (parent.parentNode !== parent.ownerDocument) {
                 dropzoneParents.unshift(parent);
                 parent = parent.parentNode;
             }
@@ -1278,14 +1289,14 @@
                     this.matchElements = curMatchElements;
 
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
-                    events.addToElement(eventTarget,
+                    events.add(eventTarget,
                                         PointerEvent? pEventTypes.move : 'mousemove',
                                         listeners.pointerHover);
                 }
                 else if (this.target) {
                     if (nodeContains(prevTargetElement, eventTarget)) {
                         this.pointerHover(pointer, event, this.matches, this.matchElements);
-                        events.addToElement(this.element,
+                        events.add(this.element,
                                             PointerEvent? pEventTypes.move : 'mousemove',
                                             listeners.pointerHover);
                     }
@@ -1320,10 +1331,10 @@
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        document.documentElement.style.cursor = actionCursors[action];
+                        target._doc.documentElement.style.cursor = actionCursors[action];
                     }
                     else {
-                        document.documentElement.style.cursor = '';
+                        target._doc.documentElement.style.cursor = '';
                     }
                 }
             }
@@ -1337,13 +1348,13 @@
 
             // Remove temporary event listeners for selector Interactables
             if (!interactables.get(eventTarget)) {
-                events.removeFromElement(eventTarget,
+                events.remove(eventTarget,
                                        PointerEvent? pEventTypes.move : 'mousemove',
                                        listeners.pointerHover);
             }
 
             if (this.target && this.target.options.styleCursor && !this.interacting()) {
-                document.documentElement.style.cursor = '';
+                this.target._doc.documentElement.style.cursor = '';
             }
         },
 
@@ -1365,7 +1376,7 @@
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
                 // climb up the DOM tree from the event target
-                while (element && element !== document) {
+                while (element && element !== element.ownerDocument) {
 
                     // if this element is the current inertia target element
                     if (element === this.element
@@ -1409,7 +1420,7 @@
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
             }
             else {
-                while (element && element !== document && !action) {
+                while (element && element !== element.ownerDocument && !action) {
                     this.matches = [];
                     this.matchElements = [];
 
@@ -1479,7 +1490,7 @@
                 if (!action) { return; }
 
                 if (options.styleCursor) {
-                    document.documentElement.style.cursor = actionCursors[action];
+                    target._doc.documentElement.style.cursor = actionCursors[action];
                 }
 
                 this.resizeAxes = action === 'resizexy'?
@@ -1589,7 +1600,7 @@
                             var element = eventTarget;
 
                             // check element interactables
-                            while (element && element !== document) {
+                            while (element && element !== element.ownerDocument) {
                                 var elementInteractable = interactables.get(element);
 
                                 if (elementInteractable
@@ -1630,7 +1641,7 @@
 
                                 element = eventTarget;
 
-                                while (element && element !== document) {
+                                while (element && element !== element.ownerDocument) {
                                     var selectorInteractable = interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
@@ -2248,7 +2259,7 @@
                 var target = this.target;
 
                 if (target.options.styleCursor) {
-                    document.documentElement.style.cursor = '';
+                    target._doc.documentElement.style.cursor = '';
                 }
 
                 // prevent Default only if were previously interacting
@@ -3270,7 +3281,7 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (element && element !== document) {
+        while (element && element !== element.ownerDocument) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
@@ -3300,12 +3311,13 @@
     }
 
     interactables.indexOfElement = function indexOfElement (element, context) {
+        context = context || document;
+
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
             if ((interactable.selector === element
-                && (interactable._context === (context || document)))
-
+                && (interactable._context === context))
                 || (!interactable.selector && interactable._element === element)) {
 
                 return i;
@@ -3385,27 +3397,44 @@
         this._element = element;
         this._iEvents = this._iEvents || {};
 
+        var _window;
+
         if (trySelector(element)) {
             this.selector = element;
 
-            if (options && options.context
-                && (window.Node
-                    ? options.context instanceof window.Node
-                    : (isElement(options.context) || options.context === document))) {
-                this._context = options.context;
+            var context = options && options.context;
+
+            _window = context? getWindow(context) : window;
+
+            if (context && (_window.Node
+                    ? context instanceof _window.Node
+                    : (isElement(context) || context === _window.document))) {
+
+                this._context = context;
             }
         }
-        else if (isElement(element)) {
-            if (PointerEvent) {
-                events.add(this, pEventTypes.down, listeners.pointerDown );
-                events.add(this, pEventTypes.move, listeners.pointerHover);
+        else {
+            _window = getWindow(element);
+
+            if (isElement(element, _window)) {
+
+                if (PointerEvent) {
+                    events.add(this._element, pEventTypes.down, listeners.pointerDown );
+                    events.add(this._element, pEventTypes.move, listeners.pointerHover);
+                }
+                else {
+                    events.add(this._element, 'mousedown' , listeners.pointerDown );
+                    events.add(this._element, 'mousemove' , listeners.pointerHover);
+                    events.add(this._element, 'touchstart', listeners.pointerDown );
+                    events.add(this._element, 'touchmove' , listeners.pointerHover);
+                }
             }
-            else {
-                events.add(this, 'mousedown' , listeners.pointerDown );
-                events.add(this, 'mousemove' , listeners.pointerHover);
-                events.add(this, 'touchstart', listeners.pointerDown );
-                events.add(this, 'touchmove' , listeners.pointerHover);
-            }
+        }
+
+        this._doc = _window.document;
+
+        if (!contains(documents, this._doc)) {
+            listenToDocument(this._doc);
         }
 
         interactables.push(this);
@@ -3875,7 +3904,7 @@
                 autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
 
                 autoScroll.container =
-                    (isElement(options.container) || options.container instanceof window.Window
+                    (isElement(options.container) || isWindow(options.container)
                      ? options.container
                      : defaults.container);
 
@@ -4652,8 +4681,8 @@
                     };
 
                     // add delegate listener functions
-                    events.addToElement(this._context, eventType, delegateListener);
-                    events.addToElement(this._context, eventType, delegateUseCapture, true);
+                    events.add(this._context, eventType, delegateListener);
+                    events.add(this._context, eventType, delegateUseCapture, true);
                 }
 
                 var delegated = delegatedEvents[eventType],
@@ -4678,7 +4707,7 @@
                 delegated.listeners[index].push([listener, useCapture]);
             }
             else {
-                events.add(this, eventType, listener, useCapture);
+                events.add(this._element, eventType, listener, useCapture);
             }
 
             return this;
@@ -4757,8 +4786,8 @@
                                     delegated.listeners.splice(index, 1);
 
                                     // remove delegate function from context
-                                    events.removeFromElement(this._context, eventType, delegateListener);
-                                    events.removeFromElement(this._context, eventType, delegateUseCapture, true);
+                                    events.remove(this._context, eventType, delegateListener);
+                                    events.remove(this._context, eventType, delegateUseCapture, true);
 
                                     // remove the arrays if they are empty
                                     if (!delegated.selectors.length) {
@@ -4857,8 +4886,8 @@
                             }
                         }
 
-                        events.removeFromElement(this._context, type, delegateListener);
-                        events.removeFromElement(this._context, type, delegateUseCapture, true);
+                        events.remove(this._context, type, delegateListener);
+                        events.remove(this._context, type, delegateUseCapture, true);
 
                         break;
                     }
@@ -4921,7 +4950,7 @@
         }
         // If non InteractEvent type, addEventListener to document
         else {
-            events.add(docTarget, type, listener, useCapture);
+            events.add(document, type, listener, useCapture);
         }
 
         return interact;
@@ -4948,7 +4977,7 @@
         }
 
         if (!contains(eventTypes, type)) {
-            events.remove(docTarget, type, listener, useCapture);
+            events.remove(document, type, listener, useCapture);
         }
         else {
             var index;
@@ -5197,7 +5226,7 @@
             if (isNumber(options.speed) ) { defaults.speed  = options.speed ;}
 
             defaults.container =
-                (isElement(options.container) || options.container instanceof window.Window
+                (isElement(options.container) || isWindow(options.container)
                  ? options.container
                  : defaults.container);
 
@@ -5516,62 +5545,84 @@
         }
     }
 
-    if (PointerEvent) {
-        if (PointerEvent === window.MSPointerEvent) {
-            pEventTypes = {
-                up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-                out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+    function listenToDocument (doc) {
+        if (contains(documents, doc)) { return; }
+
+        var win = doc.defaultView || doc.parentWindow;
+
+        if (PointerEvent) {
+            if (PointerEvent === win.MSPointerEvent) {
+                pEventTypes = {
+                    up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+                    out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
+            }
+            else {
+                pEventTypes = {
+                    up: 'pointerup', down: 'pointerdown', over: 'pointerover',
+                    out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
+            }
+
+            events.add(doc, pEventTypes.down  , listeners.selectorDown );
+            events.add(doc, pEventTypes.move  , listeners.pointerMove  );
+            events.add(doc, pEventTypes.over  , listeners.pointerOver  );
+            events.add(doc, pEventTypes.out   , listeners.pointerOut   );
+            events.add(doc, pEventTypes.up    , listeners.pointerUp    );
+            events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
+
+            // autoscroll
+            events.add(doc, pEventTypes.move, autoScroll.edgeMove);
         }
         else {
-            pEventTypes = {
-                up: 'pointerup', down: 'pointerdown', over: 'pointerover',
-                out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
+            events.add(doc, 'mousedown', listeners.selectorDown);
+            events.add(doc, 'mousemove', listeners.pointerMove );
+            events.add(doc, 'mouseup'  , listeners.pointerUp   );
+            events.add(doc, 'mouseover', listeners.pointerOver );
+            events.add(doc, 'mouseout' , listeners.pointerOut  );
+
+            events.add(doc, 'touchstart' , listeners.selectorDown );
+            events.add(doc, 'touchmove'  , listeners.pointerMove  );
+            events.add(doc, 'touchend'   , listeners.pointerUp    );
+            events.add(doc, 'touchcancel', listeners.pointerCancel);
+
+            // autoscroll
+            events.add(doc, 'mousemove', autoScroll.edgeMove);
+            events.add(doc, 'touchmove', autoScroll.edgeMove);
         }
 
-        events.add(docTarget, pEventTypes.down  , listeners.selectorDown );
-        events.add(docTarget, pEventTypes.move  , listeners.pointerMove  );
-        events.add(docTarget, pEventTypes.over  , listeners.pointerOver  );
-        events.add(docTarget, pEventTypes.out   , listeners.pointerOut   );
-        events.add(docTarget, pEventTypes.up    , listeners.pointerUp    );
-        events.add(docTarget, pEventTypes.cancel, listeners.pointerCancel);
+        events.add(win, 'blur', endAllInteractions);
 
-        // autoscroll
-        events.add(docTarget, pEventTypes.move, autoScroll.edgeMove);
-    }
-    else {
-        events.add(docTarget, 'mousedown', listeners.selectorDown);
-        events.add(docTarget, 'mousemove', listeners.pointerMove );
-        events.add(docTarget, 'mouseup'  , listeners.pointerUp   );
-        events.add(docTarget, 'mouseover', listeners.pointerOver );
-        events.add(docTarget, 'mouseout' , listeners.pointerOut  );
+        try {
+            if (win.frameElement) {
+                var parentDoc = win.frameElement.ownerDocument,
+                    parentWindow = parentDoc.defaultView;
 
-        events.add(docTarget, 'touchstart' , listeners.selectorDown );
-        events.add(docTarget, 'touchmove'  , listeners.pointerMove  );
-        events.add(docTarget, 'touchend'   , listeners.pointerUp    );
-        events.add(docTarget, 'touchcancel', listeners.pointerCancel);
-
-        // autoscroll
-        events.add(docTarget, 'mousemove', autoScroll.edgeMove);
-        events.add(docTarget, 'touchmove', autoScroll.edgeMove);
-    }
-
-    events.add(windowTarget, 'blur', endAllInteractions);
-
-    try {
-        if (window.frameElement) {
-            parentDocTarget._element = window.frameElement.ownerDocument;
-
-            events.add(parentDocTarget   , 'mouseup'      , listeners.pointerEnd);
-            events.add(parentDocTarget   , 'touchend'     , listeners.pointerEnd);
-            events.add(parentDocTarget   , 'touchcancel'  , listeners.pointerEnd);
-            events.add(parentDocTarget   , 'pointerup'    , listeners.pointerEnd);
-            events.add(parentDocTarget   , 'MSPointerUp'  , listeners.pointerEnd);
-            events.add(parentWindowTarget, 'blur'         , endAllInteractions );
+                events.add(parentDoc   , 'mouseup'      , listeners.pointerEnd);
+                events.add(parentDoc   , 'touchend'     , listeners.pointerEnd);
+                events.add(parentDoc   , 'touchcancel'  , listeners.pointerEnd);
+                events.add(parentDoc   , 'pointerup'    , listeners.pointerEnd);
+                events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerEnd);
+                events.add(parentWindow, 'blur'         , endAllInteractions );
+            }
         }
+        catch (error) {
+            interact.windowParentError = error;
+        }
+
+        // For IE's lack of Event#preventDefault
+        if (events.useAttachEvent) {
+            events.add(doc, 'selectstart', function (event) {
+                var interaction = interactions[0];
+
+                if (interaction.currentAction()) {
+                    interaction.checkAndPreventDefault(event);
+                }
+            });
+        }
+
+        documents.push(doc);
     }
-    catch (error) {
-        interact.windowParentError = error;
-    }
+
+    listenToDocument(document);
 
     function indexOf (array, target) {
         for (var i = 0, len = array.length; i < len; i++) {
@@ -5585,17 +5636,6 @@
 
     function contains (array, target) {
         return indexOf(array, target) !== -1;
-    }
-
-    // For IE's lack of Event#preventDefault
-    if (events.useAttachEvent) {
-        events.add(docTarget, 'selectstart', function (event) {
-            var interaction = interactions[0];
-
-            if (interaction.currentAction()) {
-                interaction.checkAndPreventDefault(event);
-            }
-        });
     }
 
     function matchesSelector (element, selector, nodeList) {
