@@ -46,12 +46,15 @@ interact('#swipe')
     });
 });
 
-interact('.tolerance-slider').on('input', function (event) {
+function changeTolerance (event) {
     var value = event.target.value|0;
 
     interact.pointerMoveTolerance(value);
 
     document.getElementById('tolerance-display').textContent = value;
-});
+}
+
+interact('.tolerance-slider').on('input' , changeTolerance);
+interact('.tolerance-slider').on('change', changeTolerance);
 
 }(window.interact));
