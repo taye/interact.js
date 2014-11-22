@@ -1128,7 +1128,7 @@
         this.pointerIds  = [];
         this.downTargets = [];
         this.downTimes   = [];
-        this.holdTimers  = {};
+        this.holdTimers  = [];
 
         // Previous native pointer move event coordinates
         this.prevCoords = {
@@ -1348,19 +1348,19 @@
         },
 
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
-            var that = this;
+            var that = this,
+                element = eventTarget,
+                pointerIndex = this.addPointer(pointer),
+                action;
 
             this.collectEventTargets(pointer, event, eventTarget, 'down');
 
-            this.holdTimers[getPointerId(pointer)] = window.setTimeout(function () {
+            this.holdTimers[pointerIndex] = window.setTimeout(function () {
                 that.pointerHold(pointer, event, eventTarget, curEventTarget);
             }, 600);
 
             this.pointerIsDown = true;
 
-            var element = eventTarget,
-                pointerIndex = this.addPointer(pointer),
-                action;
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1533,7 +1533,8 @@
                                  && this.curCoords.client.x === this.prevCoords.client.x
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
-            var dx, dy;
+            var dx, dy,
+                pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
 
             // register movement greater than pointerMoveTolerance
             if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -1545,7 +1546,7 @@
 
             if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
                 if (this.pointerIsDown) {
-                    window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+                    window.clearTimeout(this.holdTimers[pointerIndex]);
                 }
 
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
@@ -1854,10 +1855,9 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerId = getPointerId(pointer);
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
 
-            window.clearTimeout(this.holdTimers[pointerId]);
-            delete(this.holdTimers[pointerId]);
+            window.clearTimeout(this.holdTimers[pointerIndex]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'up' );
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
@@ -1868,7 +1868,9 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-            window.clearTimeout(this.holdTimers[getPointerId(pointer)]);
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
+
+            window.clearTimeout(this.holdTimers[pointerIndex]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
@@ -2269,6 +2271,7 @@
             this.pointers   .splice(0);
             this.downTargets.splice(0);
             this.downTimes  .splice(0);
+            this.holdTimers .splice(0);
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2366,6 +2369,7 @@
             this.pointers   .splice(index, 1);
             this.downTargets.splice(index, 1);
             this.downTimes  .splice(index, 1);
+            this.holdTimers .splice(index, 1);
         },
 
         recordPointer: function (pointer) {
