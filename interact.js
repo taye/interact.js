@@ -4606,12 +4606,20 @@
          *
          * Binds a listener for an InteractEvent or DOM event.
          *
-         - eventType  (string)   The type of event to listen for
-         - listener   (function) The function to be called on that event
+         - eventType  (string | array) The type of event or array of types to listen for
+         - listener   (function) The function to be called on the given event(s)
          - useCapture (boolean) #optional useCapture flag for addEventListener
          = (object) This Interactable
         \*/
         on: function (eventType, listener, useCapture) {
+            if (isArray(eventType)) {
+                for (var i = 0; i < eventType.length; i++) {
+                    this.on(eventType[i], listener, useCapture);
+                }
+
+                return this;
+            }
+
             if (eventType === 'wheel') {
                 eventType = wheelEvent;
             }
@@ -4676,12 +4684,20 @@
          *
          * Removes an InteractEvent or DOM event listener
          *
-         - eventType  (string)   The type of event that was listened for
+         - eventType  (string | array) The type of event or array of types that were listened for
          - listener   (function) The listener function to be removed
          - useCapture (boolean) #optional useCapture flag for removeEventListener
          = (object) This Interactable
         \*/
         off: function (eventType, listener, useCapture) {
+            if (isArray(eventType)) {
+                for (var i = 0; i < eventType.length; i++) {
+                    this.off(eventType[i], listener, useCapture);
+                }
+
+                return this;
+            }
+
             var eventList,
                 index = -1;
 
@@ -4871,12 +4887,20 @@
      * Adds a global listener for an InteractEvent or adds a DOM event to
      * `document`
      *
-     - type       (string)   The type of event to listen for
-     - listener   (function) The function to be called on that event
+     - type       (string | array) The type of event or array of types to listen for
+     - listener   (function) The function to be called on the given event(s)
      - useCapture (boolean) #optional useCapture flag for addEventListener
      = (object) interact
     \*/
     interact.on = function (type, listener, useCapture) {
+        if (isArray(type)) {
+            for (var i = 0; i < type.length; i++) {
+                interact.on(type[i], listener, useCapture);
+            }
+
+            return interact;
+        }
+
         // if it is an InteractEvent type, add listener to globalEvents
         if (contains(eventTypes, type)) {
             // if this type of event was never bound
@@ -4901,12 +4925,20 @@
      *
      * Removes a global InteractEvent listener or DOM event from `document`
      *
-     - type       (string)   The type of event that was listened for
+     - type       (string | array) The type of event or array of types that were listened for
      - listener   (function) The listener function to be removed
      - useCapture (boolean) #optional useCapture flag for removeEventListener
      = (object) interact
-    \*/
+     \*/
     interact.off = function (type, listener, useCapture) {
+        if (isArray(type)) {
+            for (var i = 0; i < type.length; i++) {
+                interact.off(type[i], listener, useCapture);
+            }
+
+            return interact;
+        }
+
         if (!contains(eventTypes, type)) {
             events.remove(docTarget, type, listener, useCapture);
         }
