@@ -3281,13 +3281,13 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (element && element !== element.ownerDocument) {
+        while (element && (element.ownerDocument && element !== element.ownerDocument)) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
 
                 if (matchesSelector(element, selector)
-                    && context === event.currentTarget
+                    && nodeContains(context, event.target)
                     && nodeContains(context, element)) {
 
                     var listeners = delegated.listeners[i];
@@ -4647,8 +4647,10 @@
          = (object) This Interactable
         \*/
         on: function (eventType, listener, useCapture) {
+            var i;
+
             if (isArray(eventType)) {
-                for (var i = 0; i < eventType.length; i++) {
+                for (i = 0; i < eventType.length; i++) {
                     this.on(eventType[i], listener, useCapture);
                 }
 
@@ -4681,8 +4683,10 @@
                     };
 
                     // add delegate listener functions
-                    events.add(this._context, eventType, delegateListener);
-                    events.add(this._context, eventType, delegateUseCapture, true);
+                    for (i = 0; i < documents.length; i++) {
+                        events.add(documents[i], eventType, delegateListener);
+                        events.add(documents[i], eventType, delegateUseCapture, true);
+                    }
                 }
 
                 var delegated = delegatedEvents[eventType],
@@ -5549,6 +5553,12 @@
         if (contains(documents, doc)) { return; }
 
         var win = doc.defaultView || doc.parentWindow;
+
+        // add delegate event listener
+        for (var eventType in delegatedEvents) {
+            events.add(doc, eventType, delegateListener);
+            events.add(doc, eventType, delegateUseCapture, true);
+        }
 
         if (PointerEvent) {
             if (PointerEvent === win.MSPointerEvent) {
