@@ -21,7 +21,6 @@ when different contexts have been used.
 
 ### iFrames
 
-Added basic support for using one instance of interact.js in multiplie
-windows/frames. There are still some issues. See
-https://github.com/taye/interact.js/issues/97 and
-https://github.com/taye/interact.js/issues/77
+[Added basic support](https://github.com/taye/interact.js/pull/98) for using
+one instance of interact.js in multiplie windows/frames. There are still some
+issues.
