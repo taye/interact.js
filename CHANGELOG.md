@@ -16,6 +16,9 @@ Windows Phone/RT.
 Fixed a bug that caused the origins of all elements with tap listeners to be
 subtracted successively as a tap event propagated.
 
+[Fixed delegated events](https://github.com/taye/interact.js/commit/e972154)
+when different contexts have been used.
+
 ### iFrames
 
 Added basic support for using one instance of interact.js in multiplie
