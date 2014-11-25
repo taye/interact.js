@@ -2481,6 +2481,7 @@
 
             for (i = 0; i < targets.length; i++) {
                 pointerEvent.currentTarget = elements[i];
+                pointerEvent.interactable = targets[i];
                 targets[i].fire(pointerEvent);
 
                 if (pointerEvent.immediatePropagationStopped
@@ -2499,6 +2500,7 @@
 
                 for (i = 0; i < targets.length; i++) {
                     doubleTap.currentTarget = elements[i];
+                    doubleTap.interactable = targets[i];
                     targets[i].fire(doubleTap);
 
                     if (doubleTap.immediatePropagationStopped
