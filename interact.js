@@ -368,8 +368,8 @@
                                 event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
                                 if (/mouse|click/.test(event.type)) {
-                                    event.pageX = event.clientX + element.ownerDdocument.documentElement.scrollLeft;
-                                    event.pageY = event.clientY + element.ownerDdocument.documentElement.scrollTop;
+                                    event.pageX = event.clientX + getWindow(element).document.documentElement.scrollLeft;
+                                    event.pageY = event.clientY + getWindow(element).document.documentElement.scrollTop;
                                 }
 
                                 listener(event);
