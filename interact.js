@@ -2822,7 +2822,9 @@
                         // if the element is the interaction element
                         if (element === interaction.element) {
                             // update the interaction's pointer
-                            interaction.removePointer(interaction.pointers[0]);
+                            if (interaction.pointers[0]) {
+                                interaction.removePointer(interaction.pointers[0]);
+                            }
                             interaction.addPointer(pointer);
 
                             return interaction;
