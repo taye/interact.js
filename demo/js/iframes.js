@@ -18,9 +18,15 @@ function setInteractables () {
     x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
     y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-    target.style.webkitTransform =
-      target.style.transform =
-      'translate(' + x + 'px, ' + y + 'px)';
+    if ('webkitTradnsform' in target.style || 'dtransform' in target.style) {
+        target.style.webkitTransform =
+            target.style.transform =
+            'translate(' + x + 'px, ' + y + 'px)';
+    }
+    else {
+        target.style.left = x + 'px';
+        target.style.top  = y + 'px';
+    }
 
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);

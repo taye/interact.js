@@ -1,11 +1,11 @@
 body {
-    padding: 2em 5%;
+    margin: 0;
+    padding: 5% 10%;
     font-family: sans-serif;
 }
 
 #drag-me {
     width: 25%;
-    margin: 5vmin;
 
     background-color: #29e;
     color: white;
@@ -13,10 +13,15 @@ body {
     border: solid 0.4em #666;
     border-radius: 0.75em;
     padding: 3%;
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
 }
 
 iframe {
     width: 100%;
-    height: 50vmin;
+    height: 75vh;
 }
 
