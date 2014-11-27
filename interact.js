@@ -5003,6 +5003,8 @@
      * interact.simulate
      [ method ]
      *
+     * Deprecated.
+     *
      * Simulate pointer down to begin to interact with an interactable element
      - action       (string)  The action to be performed - drag, resize, etc.
      - element      (Element) The DOM Element to resize/drag
@@ -5197,6 +5199,8 @@
      * interact.styleCursor
      [ styleCursor ]
      *
+     * Deprecated. Use @Interactable.styleCursor instead.
+     *
      * Returns or sets whether the cursor style of the document is changed
      * depending on what action is being performed
      *
@@ -5215,6 +5219,8 @@
     /*\
      * interact.autoScroll
      [ method ]
+     *
+     * Deprecated. Use @Interactable.autoScroll instead.
      *
      * Returns or sets whether or not actions near the edges of the window or
      * specified container element trigger autoScroll by default
@@ -5255,6 +5261,8 @@
     /*\
      * interact.snap
      [ method ]
+     *
+     * Deprecated. Use @Interactable.snap instead.
      *
      * Returns or sets whether actions are constrained to a grid or a
      * collection of coordinates
@@ -5316,9 +5324,9 @@
      * interact.inertia
      [ method ]
      *
-     * Returns or sets inertia settings.
+     * Deprecated. Use @Interactable.inertia instead.
      *
-     * See @Interactable.inertia
+     * Returns or sets inertia settings.
      *
      - options (boolean | object) #optional New settings
      * `true` or `false` to simply enable or disable
@@ -5382,6 +5390,8 @@
      * interact.currentAction
      [ method ]
      *
+     * Deprecated
+     *
      = (string) What action is currently being performed
     \*/
     interact.currentAction = function () {
@@ -5398,7 +5408,7 @@
      * interact.stop
      [ method ]
      *
-     * Cancels the current interaction
+     * Cancels all interactions (end events are not fired)
      *
      - event (Event) An event on which to call preventDefault()
      = (object) interact
@@ -5438,9 +5448,10 @@
     /*\
      * interact.deltaSource
      [ method ]
-     * Returns or sets weather pageX/Y or clientX/Y is used to calculate dx/dy.
      *
-     * See @Interactable.deltaSource
+     * Deprecated. Use @Interactable.deltaSource instead.
+     *
+     * Returns or sets weather pageX/Y or clientX/Y is used to calculate dx/dy.
      *
      - newValue (string) #optional 'page' or 'client'
      = (string | Interactable) The current setting or interact
@@ -5459,10 +5470,10 @@
      * interact.restrict
      [ method ]
      *
+     * Deprecated. Use @Interactable.restrict instead.
+     *
      * Returns or sets the default rectangles within which actions (after snap
      * calculations) are restricted.
-     *
-     * See @Interactable.restrict
      *
      - newValue (object) #optional an object with keys drag, resize, and/or gesture and rects or Elements as values
      = (object) The current restrictions object or interact
