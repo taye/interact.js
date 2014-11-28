@@ -2437,42 +2437,51 @@
                 element = element.parentNode;
             }
 
-            if (targets.length) {
-                this.firePointers(pointer, event, targets, elements, eventType);
+            // create the tap event even if there are no listeners so that
+            // doubletap can still be created and fired
+            if (targets.length || eventType === 'tap') {
+                this.firePointers(pointer, event, eventTarget, targets, elements, eventType);
             }
         },
 
-        firePointers: function (pointer, event, targets, elements, eventType) {
+        firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
             var pointerIndex = this.mouse? 0 : indexOf(getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
-                interval, dbl;
+                interval, createNewDoubleTap;
 
-            extend(pointerEvent, event);
-            if (event !== pointer) {
-                extend(pointerEvent, pointer);
+            // if it's a doubletap then the event properties would have been
+            // copied from the tap event and provided as the pointer argument
+            if (eventType === 'doubletap') {
+                pointerEvent = pointer;
             }
+            else {
+                extend(pointerEvent, event);
+                if (event !== pointer) {
+                    extend(pointerEvent, pointer);
+                }
 
-            pointerEvent.preventDefault           = preventOriginalDefault;
-            pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
-            pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
-            pointerEvent.interaction              = this;
+                pointerEvent.preventDefault           = preventOriginalDefault;
+                pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
+                pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+                pointerEvent.interaction              = this;
 
-            pointerEvent.timeStamp     = new Date().getTime();
-            pointerEvent.originalEvent = event;
-            pointerEvent.type          = eventType;
-            pointerEvent.pointerId     = getPointerId(pointer);
-            pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
-                                                : isString(pointer.pointerType)
-                                                    ? pointer.pointerType
-                                                    : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+                pointerEvent.timeStamp     = new Date().getTime();
+                pointerEvent.originalEvent = event;
+                pointerEvent.type          = eventType;
+                pointerEvent.pointerId     = getPointerId(pointer);
+                pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
+                                                    : isString(pointer.pointerType)
+                                                        ? pointer.pointerType
+                                                        : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+            }
 
             if (eventType === 'tap') {
                 pointerEvent.dt = pointerEvent.timeStamp - this.downTimes[pointerIndex];
 
                 interval = pointerEvent.timeStamp - this.tapTime;
-                dbl = (this.prevTap && this.prevTap.type !== 'doubletap'
+                createNewDoubleTap = (this.prevTap && this.prevTap.type !== 'doubletap'
                        && this.prevTap.target === pointerEvent.target
                        && interval < 500);
 
@@ -2490,7 +2499,7 @@
                 }
             }
 
-            if (dbl) {
+            if (createNewDoubleTap) {
                 var doubleTap = {};
 
                 extend(doubleTap, pointerEvent);
@@ -2498,16 +2507,7 @@
                 doubleTap.dt   = interval;
                 doubleTap.type = 'doubletap';
 
-                for (i = 0; i < targets.length; i++) {
-                    doubleTap.currentTarget = elements[i];
-                    doubleTap.interactable = targets[i];
-                    targets[i].fire(doubleTap);
-
-                    if (doubleTap.immediatePropagationStopped
-                        ||(doubleTap.propagationStopped && elements[i + 1] !== doubleTap.currentTarget)) {
-                        break;
-                    }
-                }
+                this.collectEventTargets(doubleTap, event, eventTarget, 'doubletap');
 
                 this.prevTap = doubleTap;
             }
