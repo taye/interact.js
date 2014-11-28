@@ -58,7 +58,7 @@
                 maxPerElement: 1,
             },
 
-            dropzone: {
+            drop: {
                 enabled: false,
                 accept: null,
                 overlap: 'pointer'
@@ -2089,10 +2089,10 @@
 
             // collect all dropzones and their elements which qualify for a drop
             for (i = 0; i < interactables.length; i++) {
-                if (!interactables[i].options.dropzone.enabled) { continue; }
+                if (!interactables[i].options.drop.enabled) { continue; }
 
                 var current = interactables[i],
-                    accept = current.options.dropzone.accept;
+                    accept = current.options.drop.accept;
 
                 // test the draggable element against the dropzone's accept setting
                 if ((isElement(accept) && accept !== element)
@@ -3583,27 +3583,27 @@
         \*/
         dropzone: function (options) {
             if (isObject(options)) {
-                this.options.dropzone.enabled = options.enabled === false? false: true;
+                this.options.drop.enabled = options.enabled === false? false: true;
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
                 if (/^(pointer|center)$/.test(options.overlap)) {
-                    this.options.dropzone.overlap = options.overlap;
+                    this.options.drop.overlap = options.overlap;
                 }
                 else if (isNumber(options.overlap)) {
-                    this.options.dropzone.overlap = Math.max(Math.min(1, options.overlap), 0);
+                    this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
                 }
 
                 return this;
             }
 
             if (isBool(options)) {
-                this.options.dropzone.enabled = options;
+                this.options.drop.enabled = options;
 
                 return this;
             }
 
-            return this.options.dropzone;
+            return this.options.drop;
         },
 
         /*\
@@ -3626,7 +3626,7 @@
                 return false;
             }
 
-            var dropOverlap = this.options.dropzone.overlap;
+            var dropOverlap = this.options.drop.overlap;
 
             if (dropOverlap === 'pointer') {
                 var page = getPageXY(pointer),
@@ -3703,25 +3703,25 @@
         \*/
         accept: function (newValue) {
             if (isElement(newValue)) {
-                this.options.dropzone.accept = newValue;
+                this.options.drop.accept = newValue;
 
                 return this;
             }
 
             // test if it is a valid CSS selector
             if (trySelector(newValue)) {
-                this.options.dropzone.accept = newValue;
+                this.options.drop.accept = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.dropzone.accept;
+                delete this.options.drop.accept;
 
                 return this;
             }
 
-            return this.options.dropzone.accept;
+            return this.options.drop.accept;
         },
 
         /*\
@@ -4584,7 +4584,7 @@
             this.options = extend({}, defaultOptions.base);
 
             var i,
-                props = ['drag', 'dropzone', 'resize', 'gesture', 'inertia', 'snap', 'restrict', 'autoScroll'],
+                props = ['drag', 'drop', 'resize', 'gesture', 'inertia', 'snap', 'restrict', 'autoScroll'],
                 methods = ['draggable', 'dropzone', 'resizable', 'gesturable', 'inertia', 'snap', 'restrict', 'autoScroll'];
 
             for (i = 0; i < props.length; i++) {
