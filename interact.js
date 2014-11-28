@@ -86,13 +86,7 @@
                 endOnly     : false,
                 range       : Infinity,
 
-                elementOrigin: null,
-
-                arrayTypes  : /^anchors$|^paths$|^actions$/,
-                objectTypes : /^grid$|^gridOffset$|^elementOrigin$/,
-                stringTypes : /^mode$/,
-                numberTypes : /^range$/,
-                boolTypes   :  /^endOnly$/
+                elementOrigin: null
             },
 
             restrict: {
@@ -107,9 +101,7 @@
                 enabled     : false,
                 container   : null,     // the item that is scrolled (Window or HTMLElement)
                 margin      : 60,
-                speed       : 300,      // the scroll speed in pixels per second
-
-                numberTypes : /^margin$|^speed$/
+                speed       : 300       // the scroll speed in pixels per second
             },
 
             inertia: {
@@ -120,11 +112,7 @@
                 endSpeed         : 10,    // the speed at which inertia is slow enough to stop
                 allowResume      : true,  // allow resuming an action in inertia phase
                 zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
-                smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
-
-                numberTypes: /^resistance$|^minSpeed$|^endSpeed$|^smoothEndDuration$/,
-                arrayTypes : /^actions$/,
-                boolTypes  : /^(allowResume|zeroResumeDelta)$/
+                smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
             }
         },
 
@@ -4334,83 +4322,6 @@
             }
 
             return this.options.allowFrom;
-        },
-
-        /*\
-         * Interactable.validateSetting
-         [ method ]
-         *
-         - context (string) eg. 'snap', 'autoScroll'
-         - option (string) The name of the value being set
-         - value (any type) The value being validated
-         *
-         = (typeof value) A valid value for the give context-option pair
-         * - null if defaultOptions[context][value] is undefined
-         * - value if it is the same type as defaultOptions[context][value],
-         * - this.options[context][value] if it is the same type as defaultOptions[context][value],
-         * - or defaultOptions[context][value]
-        \*/
-        validateSetting: function (context, option, value) {
-            var defaults = defaultOptions[context],
-                current = this.options[context];
-
-            if (defaults !== undefined && defaults[option] !== undefined) {
-                if ('objectTypes' in defaults && defaults.objectTypes.test(option)) {
-                    if (isObject(value)) { return value; }
-                    else {
-                        return (option in current && isObject(current[option])
-                            ? current [option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('arrayTypes' in defaults && defaults.arrayTypes.test(option)) {
-                    if (isArray(value)) { return value; }
-                    else {
-                        return (option in current && isArray(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('stringTypes' in defaults && defaults.stringTypes.test(option)) {
-                    if (isString(value)) { return value; }
-                    else {
-                        return (option in current && isString(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('numberTypes' in defaults && defaults.numberTypes.test(option)) {
-                    if (isNumber(value)) { return value; }
-                    else {
-                        return (option in current && isNumber(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('boolTypes' in defaults && defaults.boolTypes.test(option)) {
-                    if (isBool(value)) { return value; }
-                    else {
-                        return (option in current && isBool(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('elementTypes' in defaults && defaults.elementTypes.test(option)) {
-                    if (isElement(value)) { return value; }
-                    else {
-                        return (option in current && isElement(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-            }
-
-            return null;
         },
 
         /*\
