@@ -21,7 +21,7 @@ interact('#swipe')
         str += '<br>' + event.swipe.angle.toFixed(2) + '°'
             + '<br>' + event.swipe.speed.toFixed(2) + 'px/sec';
 
-        //event.target.innerHTML = str;
+        event.target.innerHTML = str;
         window.console.log(str.replace(/<br>/g, ' '));
     });
 
