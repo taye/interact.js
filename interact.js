@@ -1360,6 +1360,8 @@
 
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
             var that = this,
+                // copy event to be used in timeout for IE8
+                eventCopy = events.useAttachEvent? extend({}, event) : event,
                 element = eventTarget,
                 pointerIndex = this.addPointer(pointer),
                 action;
@@ -1367,7 +1369,7 @@
             this.collectEventTargets(pointer, event, eventTarget, 'down');
 
             this.holdTimers[pointerIndex] = window.setTimeout(function () {
-                that.pointerHold(pointer, event, eventTarget, curEventTarget);
+                that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
             }, 600);
 
             this.pointerIsDown = true;
