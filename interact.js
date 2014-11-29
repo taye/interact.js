@@ -2395,8 +2395,11 @@
 
             if (index === -1) { return; }
 
+            if (!this.interacting()) {
+                this.pointers   .splice(index, 1);
+            }
+
             this.pointerIds .splice(index, 1);
-            this.pointers   .splice(index, 1);
             this.downTargets.splice(index, 1);
             this.downTimes  .splice(index, 1);
             this.holdTimers .splice(index, 1);
