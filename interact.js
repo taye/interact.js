@@ -1887,6 +1887,23 @@
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
         },
 
+        // http://www.quirksmode.org/dom/events/click.html
+        // >Events leading to dblclick
+        //
+        // IE8 doesn't fire down event before dblclick.
+        // This workaround tries to fire a tap and doubletap after dblclick
+        ie8Dblclick: function (pointer, event, eventTarget) {
+            if (this.prevTap
+                && event.clientX === this.prevTap.clientX
+                && event.clientY === this.prevTap.clientY
+                && eventTarget   === this.prevTap.target) {
+
+                this.downTargets[0] = eventTarget;
+                this.downTimes[0] = new Date().getTime();
+                this.collectEventTargets(pointer, event, eventTarget, 'tap');
+            }
+        },
+
         // End interact move events and stop auto-scroll unless inertia is enabled
         pointerEnd: function (pointer, event, eventTarget, curEventTarget) {
             var endEvent,
@@ -5633,8 +5650,8 @@
             interact.windowParentError = error;
         }
 
-        // For IE's lack of Event#preventDefault
         if (events.useAttachEvent) {
+            // For IE's lack of Event#preventDefault
             events.add(doc, 'selectstart', function (event) {
                 var interaction = interactions[0];
 
@@ -5642,6 +5659,9 @@
                     interaction.checkAndPreventDefault(event);
                 }
             });
+
+            // For IE's bad dblclick event sequence
+            events.add(doc, 'dblclick', doOnInteractions('ie8Dblclick'));
         }
 
         documents.push(doc);
