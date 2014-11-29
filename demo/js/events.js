@@ -1,8 +1,7 @@
 (function (interact) {
 'use strict';
 
-var dirs = ['up', 'down', 'left', 'right'],
-    console = window.console;
+var dirs = ['up', 'down', 'left', 'right'];
 
 interact('#swipe')
 .draggable(true)
@@ -13,7 +12,7 @@ interact('#swipe')
 
         var str = 'swipe';
 
-        dirs.forEach(function (dir) {
+        _.forEach(dirs, function (dir) {
             if (event.swipe[dir]) {
                 str += ' ' + dir;
             }
@@ -22,29 +21,39 @@ interact('#swipe')
         str += '<br>' + event.swipe.angle.toFixed(2) + '°'
             + '<br>' + event.swipe.speed.toFixed(2) + 'px/sec';
 
-        event.target.innerHTML = str;
-        console.log(str.replace(/<br>/g, ' '));
+        //event.target.innerHTML = str;
+        window.console.log(str.replace(/<br>/g, ' '));
     });
 
-['tap', 'doubletap', 'hold', 'down', 'move', 'up'].forEach(function (eventType) {
-    interact('#swipe').on(eventType, function (event) {
-        event.target.innerHTML = event.pointerType;
+var pointerEvents = ['tap', 'doubletap', 'hold', 'down', 'move', 'up'];
 
-        if (interact.supportsTouch() || interact.supportsPointerEvent()) {
-            event.target.innerHTML += ' #' + event.pointerId;
-        }
+function logEvent (event) {
+    event.currentTarget.innerHTML = event.pointerType;
 
-        var interactionIndex = interact.debug().interactions.indexOf(event.interaction);
+    if (/tap|up|click|down/.test(event.type) && event.interaction.prevTap) {
+        window.console.log(event.type + ' -- ' + event.dt + ', ' + (new Date().getTime() - event.interaction.prevTap.timeStamp));
+    }
 
-        event.target.innerHTML += ' ' + event.type
-                                    + '<br>(' + event.pageX + ', ' + event.pageY + ')<br>'
-                                    + 'interaction #' + interactionIndex;
+    if (interact.supportsTouch() || interact.supportsPointerEvent()) {
+        event.target.innerHTML += ' #' + event.pointerId;
+    }
 
-        console.log(event.pointerType, event.pointerId, event.type, event.pageX, event.pageY, interactionIndex);
+    var interactionIndex = _.indexOf(interact.debug().interactions, event.interaction);
 
-        event.preventDefault();
-    });
-});
+    event.currentTarget.innerHTML += ' ' + event.type
+                                + '<br>(' + event.pageX + ', ' + event.pageY + ')<br>'
+                                + 'interaction #' + interactionIndex;
+
+    //window.console.log(event.pointerType, event.pointerId, event.type, event.pageX, event.pageY, interactionIndex);
+
+    event.preventDefault();
+}
+
+for (var i = 0; i < pointerEvents.length; i++) {
+    var eventType = pointerEvents[i];
+
+    interact('#swipe').on(eventType, logEvent);
+}
 
 function changeTolerance (event) {
     var value = event.target.value|0;
