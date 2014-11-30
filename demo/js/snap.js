@@ -139,7 +139,7 @@
 
     function anchorDragMove (event) {
         if (draggingAnchor) {
-            var snap = interact(canvas).snap();
+            var snap = interact(canvas).snap().drag;
 
             draggingAnchor.x += event.dx;
             draggingAnchor.y += event.dy;
@@ -149,7 +149,7 @@
     }
 
     function anchorDragEnd (event) {
-        interact(canvas).snap(true);
+        interact(canvas).draggable({ snap: { enabled: true } });
         draggingAnchor = null;
     }
 
@@ -158,23 +158,26 @@
             return;
         }
 
-        interact(canvas).snap({
-            grid: {
-                x: Number(status.gridX.value),
-                y: Number(status.gridY.value)
-            },
-            gridOffset: {
-                x: Number(status.offsetX.value),
-                y: Number(status.offsetY.value)
-            },
-            range: Number(status.range.value)
+        interact(canvas).draggable({
+            snap: {
+                enabled: true,
+                grid: {
+                    x: Number(status.gridX.value),
+                    y: Number(status.gridY.value)
+                },
+                gridOffset: {
+                    x: Number(status.offsetX.value),
+                    y: Number(status.offsetY.value)
+                },
+                range: Number(status.range.value)
+            }
         });
 
-        drawSnap(interact(canvas).snap());
+        drawSnap(interact(canvas).draggable().snap);
     }
 
     function modeChange (event) {
-        var snap = interact(canvas).snap(true).snap();
+        var snap = interact(canvas).draggable().snap;
 
         if (status.anchorDrag.checked && !status.anchorMode.checked) {
             status.anchorMode.checked = true;
@@ -206,15 +209,21 @@
         }
 
         interact(canvas)
-            .snap({
-                mode: status.anchorMode.checked? 'anchor': 'grid',
-                endOnly: status.endOnly.checked
+            .draggable({
+                snap: {
+                    mode: status.anchorMode.checked? 'anchor': 'grid',
+                    endOnly: status.endOnly.checked
+                }
             })
             .inertia(status.inertia.checked);
 
-        interact(canvas).snap(status.offMode.checked? false: true);
+        interact(canvas).draggable({
+            snap: {
+                enabled: !status.offMode.checked
+            }
+        });
 
-        drawSnap(interact(canvas).snap());
+        drawSnap(interact(canvas).draggable().snap);
     }
 
     function sliderInput (event) {
