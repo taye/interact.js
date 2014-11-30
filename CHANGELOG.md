@@ -10,6 +10,10 @@ hold](https://github.com/taye/interact.js/pull/101).
 
 Tap and doubletap with multiple pointers was improved.
 
+Added a workaround for IE8's unusual [dblclick event
+sequence](http://www.quirksmode.org/dom/events/click.html) so that doubletap
+events are fired.
+
 Fixed a [tapping issue](https://github.com/taye/interact.js/issues/104) on
 Windows Phone/RT.
 
