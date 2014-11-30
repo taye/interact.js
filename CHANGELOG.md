@@ -1,3 +1,5 @@
+## 1.1.3
+
 ### Better Events
 
 Adding a function as a listener for an InteractEvent or pointerEvent type
