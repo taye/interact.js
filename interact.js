@@ -53,13 +53,15 @@
 
             drag: {
                 enabled: false,
-                axis: 'xy',
                 max: 1,
                 maxPerElement: 1,
+
                 snap: null,
                 restrict: null,
                 inertia: null,
-                autoScroll: null
+                autoScroll: null,
+
+                axis: 'xy',
             },
 
             drop: {
@@ -71,55 +73,62 @@
 
             resize: {
                 enabled: false,
-                square: false,
-                axis: 'xy',
                 max: 1,
                 maxPerElement: 1,
+
                 snap: null,
                 restrict: null,
                 inertia: null,
-                autoScroll: null
+                autoScroll: null,
+
+                square: false,
+                axis: 'xy'
             },
 
             gesture: {
                 enabled: false,
                 max: 1,
                 maxPerElement: 1,
+
                 restrict: null
             },
 
-            // aww snap
-            snap: {
-                actions     : ['drag'],
-                enabled     : false,
-                mode        : 'grid',
-                endOnly     : false,
-                range       : Infinity,
+            perAction: {
+                max: 1,
+                maxPerElement: 1,
 
-                elementOrigin: null
-            },
+                snap: {
+                    actions     : ['drag'],
+                    enabled     : false,
+                    mode        : 'grid',
+                    endOnly     : false,
+                    range       : Infinity,
 
-            restrict: {
-                enabled: false,
-                endOnly: false
-            },
+                    elementOrigin: null
+                },
 
-            autoScroll: {
-                enabled     : false,
-                container   : null,     // the item that is scrolled (Window or HTMLElement)
-                margin      : 60,
-                speed       : 300       // the scroll speed in pixels per second
-            },
+                restrict: {
+                    enabled: false,
+                    endOnly: false
+                },
 
-            inertia: {
-                actions          : ['drag'],
-                enabled          : false,
-                resistance       : 10,    // the lambda in exponential decay
-                minSpeed         : 100,   // target speed must be above this for inertia to start
-                endSpeed         : 10,    // the speed at which inertia is slow enough to stop
-                allowResume      : true,  // allow resuming an action in inertia phase
-                zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
-                smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
+                autoScroll: {
+                    enabled     : false,
+                    container   : null,     // the item that is scrolled (Window or HTMLElement)
+                    margin      : 60,
+                    speed       : 300       // the scroll speed in pixels per second
+                },
+
+                inertia: {
+                    actions          : ['drag'],
+                    enabled          : false,
+                    resistance       : 10,    // the lambda in exponential decay
+                    minSpeed         : 100,   // target speed must be above this for inertia to start
+                    endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+                    allowResume      : true,  // allow resuming an action in inertia phase
+                    zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
+                    smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
+                }
             }
         },
 
@@ -1950,7 +1959,6 @@
                 // check if inertia should be started
                 inertiaPossible = (options[this.prepared].inertia.enabled
                                    && this.prepared !== 'gesture'
-                                   && contains(inertiaOptions.actions, this.prepared)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -3543,14 +3551,8 @@
         draggable: function (options) {
             if (isObject(options)) {
                 this.options.drag.enabled = options.enabled === false? false: true;
+                this.setPerAction('drag', options);
                 this.setOnEvents('drag', options);
-
-                if (isNumber(options.max)) {
-                    this.options.drag.max = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.drag.maxPerElement = options.maxPerElement;
-                }
 
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
                     this.options.drag.axis = options.axis;
@@ -3569,6 +3571,19 @@
             }
 
             return this.options.drag;
+        },
+
+        setPerAction: function (action, options) {
+            for (var option in defaultOptions.perAction) {
+                if (option in defaultOptions[action]) {
+                    if (isObject(options[option])) {
+                        this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+                    }
+                    else if (options[option] !== undefined) {
+                        this.options[action][option] = options[option];
+                    }
+                }
+            }
         },
 
         /*\
@@ -3770,14 +3785,8 @@
         resizable: function (options) {
             if (isObject(options)) {
                 this.options.resize.enabled = options.enabled === false? false: true;
+                this.setPerAction('resize', options);
                 this.setOnEvents('resize', options);
-
-                if (isNumber(options.max)) {
-                    this.options.resize.Max = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.resize.MaxPerElement = options.maxPerElement;
-                }
 
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
                     this.options.resize.axis = options.axis;
@@ -3854,14 +3863,8 @@
         gesturable: function (options) {
             if (isObject(options)) {
                 this.options.gesture.enabled = options.enabled === false? false: true;
+                this.setPerAction('gesture', options);
                 this.setOnEvents('gesture', options);
-
-                if (isNumber(options.max)) {
-                    this.options.gesture.Max = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.gesture.MaxPerElement = options.maxPerElement;
-                }
 
                 return this;
             }
@@ -4644,20 +4647,14 @@
             var i,
                 actions = ['drag', 'drop', 'resize', 'gesture'],
                 methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
-                perActionOptions = ['inertia', 'snap', 'restrict', 'autoScroll'];
+                perActions = extend(extend({}, defaultOptions.perAction), options[action] || {});
 
             for (i = 0; i < actions.length; i++) {
                 var action = actions[i];
 
                 this.options[action] = extend({}, defaultOptions[action]);
 
-                for (var j = 0; j < perActionOptions.length; j++) {
-                    var option = perActionOptions[j];
-
-                    if (option in defaultOptions[action]) {
-                        this.options[action][option] = extend({}, defaultOptions[option]);
-                    }
-                }
+                this.setPerAction(action, perActions);
 
                 this[methods[i]](options[action]);
             }
@@ -5054,7 +5051,7 @@
      = (boolean | object) `false` if autoscroll is disabled and the default autoScroll settings if it is enabled
     \*/
     interact.autoScroll = function (options) {
-        var defaults = defaultOptions.autoScroll;
+        var defaults = defaultOptions.perAction.autoScroll;
 
         if (isObject(options)) {
             defaultOptions.autoScroll.enabled = true;
@@ -5118,7 +5115,7 @@
      = (object | interact) The default snap settings object or interact
     \*/
     interact.snap = function (options) {
-        var snap = defaultOptions.snap;
+        var snap = defaultOptions.perAction.snap;
 
         if (isObject(options)) {
             defaultOptions.snap.enabled = true;
@@ -5126,7 +5123,6 @@
             if (isString(options.mode)         ) { snap.mode          = options.mode;          }
             if (isBool  (options.endOnly)      ) { snap.endOnly       = options.endOnly;       }
             if (isNumber(options.range)        ) { snap.range         = options.range;         }
-            if (isArray (options.actions)      ) { snap.actions       = options.actions;       }
             if (isArray (options.anchors)      ) { snap.anchors       = options.anchors;       }
             if (isObject(options.grid)         ) { snap.grid          = options.grid;          }
             if (isObject(options.gridOffset)   ) { snap.gridOffset    = options.gridOffset;    }
@@ -5157,7 +5153,7 @@
      = (object | interact) The default inertia settings object or interact
     \*/
     interact.inertia = function (options) {
-        var inertia = defaultOptions.inertia;
+        var inertia = defaultOptions.perAction.inertia;
 
         if (isObject(options)) {
             defaultOptions.inertia.enabled = true;
@@ -5168,7 +5164,6 @@
             if (isNumber(options.smoothEndDuration)) { inertia.smoothEndDuration = options.smoothEndDuration; }
             if (isBool  (options.allowResume)      ) { inertia.allowResume       = options.allowResume      ; }
             if (isBool  (options.zeroResumeDelta)  ) { inertia.zeroResumeDelta   = options.zeroResumeDelta  ; }
-            if (isArray (options.actions)          ) { inertia.actions           = options.actions          ; }
 
             return interact;
         }
@@ -5179,7 +5174,7 @@
         }
 
         return {
-            enabled: defaultOptions.inertia.enabled,
+            enabled: inertia.enabled,
             resistance: inertia.resistance,
             minSpeed: inertia.minSpeed,
             endSpeed: inertia.endSpeed,
@@ -5302,7 +5297,7 @@
      = (object) The current restrictions object or interact
     \*/
     interact.restrict = function (newValue) {
-        var defaults = defaultOptions.restrict;
+        var defaults = defaultOptions.perAction.restrict;
 
         if (newValue === undefined) {
             return defaultOptions.restrict;
