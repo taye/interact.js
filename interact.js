@@ -3574,12 +3574,21 @@
         },
 
         setPerAction: function (action, options) {
+            // for all the default per-action options
             for (var option in defaultOptions.perAction) {
+                // if this option exists for this action
                 if (option in defaultOptions[action]) {
+                    // if the option in the options arg is an object value
                     if (isObject(options[option])) {
+                        // duplicate the object
                         this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+
+                        if ('enabled' in defaultOptions.perAction[option]) {
+                            this.options[action][option].enabled = options[option].enabled === false? false : true;
+                        }
                     }
                     else if (options[option] !== undefined) {
+                        // or if it's not undefined, do a plain assignment
                         this.options[action][option] = options[option];
                     }
                 }
