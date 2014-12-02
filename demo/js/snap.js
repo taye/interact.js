@@ -246,20 +246,12 @@
         context = canvas.getContext('2d');
 
         interact(canvas)
-            .snap({
-                mode: 'grid',
-                endOnly: true,
-                grid: {x: 0, y: 0},
-                gridOffset: {x: 0, y: 0},
-                range: Infinity,
-                anchors: [
-                    {x: 100, y: 100, range: 200},
-                    {x: 600, y: 400},
-                    {x: 500, y: 150},
-                    {x: 250, y: 250}
-                ]
+            .draggable({
+                restrict: {
+                    enabled: true,
+                    restriction: 'self'
+                }
             })
-            .restrict({drag: 'self'})
             .origin('self')
             .draggable(true);
 
