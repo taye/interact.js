@@ -103,6 +103,7 @@
                     mode        : 'grid',
                     endOnly     : false,
                     range       : Infinity,
+                    gridOffset  : { x: 0, y: 0 },
 
                     elementOrigin: null
                 },
