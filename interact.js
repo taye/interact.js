@@ -1241,8 +1241,7 @@
 
             if (this.target
                 && (testIgnore(this.target, this.element, eventTarget)
-                    || !testAllow(this.target, this.element, eventTarget)
-                    || !withinInteractionLimit(this.target, this.element, this.prepared))) {
+                    || !testAllow(this.target, this.element, eventTarget))) {
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
