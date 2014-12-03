@@ -1091,6 +1091,7 @@
         this.prevDropElement = null; // the element at the time of checking
 
         this.prepared        = null; // Action that's ready to be fired on next move event
+        this.action          = null; // general action name (resizex/y changes to resize)
 
         this.matches         = [];   // all selectors that are matched by target element
         this.matchElements   = [];   // corresponding elements
@@ -1434,6 +1435,7 @@
 
             if (action) {
                 this.prepared = action;
+                this.action = /resize/.test(action)? 'resize' : action;
 
                 return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
             }
@@ -1494,19 +1496,20 @@
                     target._doc.documentElement.style.cursor = actionCursors[action];
                 }
 
-                this.resizeAxes = action === 'resizexy'?
-                        'xy':
-                        action === 'resizex'?
-                            'x':
-                            action === 'resizey'?
-                                'y':
-                                '';
+                this.resizeAxes = action === 'resizexy'
+                    ? 'xy'
+                    : action === 'resizex'
+                        ? 'x'
+                        : action === 'resizey'
+                            ?  'y'
+                            : '';
 
                 if (action === 'gesture' && this.pointerIds.length < 2) {
                     action = null;
                 }
 
                 this.prepared = action;
+                this.action = /resize/.test(action)? 'resize' : action;
 
                 this.snapStatus.snappedX = this.snapStatus.snappedY =
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
@@ -1669,8 +1672,8 @@
                 if (this.prepared && this.target) {
                     var target         = this.target,
                         shouldMove     = true,
-                        shouldSnap     = checkSnap(target, this.prepared)     && (!target.options.snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.prepared) && (!target.options.restrict.endOnly || preEnd);
+                        shouldSnap     = checkSnap(target, this.action)     && (!target.options.snap.endOnly     || preEnd),
+                        shouldRestrict = checkRestrict(target, this.action) && (!target.options.restrict.endOnly || preEnd);
 
                     if (starting) {
                         var rect = target.getRect(this.element),
@@ -1728,9 +1731,8 @@
 
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
-                        var action = /resize/.test(this.prepared)? 'resize': this.prepared;
                         if (starting) {
-                            var dragStartEvent = this[action + 'Start'](this.downEvent);
+                            var dragStartEvent = this[this.action + 'Start'](this.downEvent);
 
                             this.prevEvent = dragStartEvent;
 
@@ -1756,7 +1758,7 @@
                             if (shouldRestrict) { this.setRestriction(snapCoords); }
                         }
 
-                        this.prevEvent = this[action + 'Move'](event);
+                        this.prevEvent = this[this.action + 'Move'](event);
                     }
 
                     this.checkAndPreventDefault(event, this.target, this.element);
@@ -1922,8 +1924,8 @@
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
-                    endSnap = checkSnap(target, this.prepared) && options.snap.endOnly,
-                    endRestrict = checkRestrict(target, this.prepared) && options.restrict.endOnly,
+                    endSnap = checkSnap(target, this.action) && options.snap.endOnly,
+                    endRestrict = checkRestrict(target, this.action) && options.restrict.endOnly,
                     dx = 0,
                     dy = 0,
                     startEvent;
@@ -1936,8 +1938,8 @@
 
                 // check if inertia should be started
                 inertiaPossible = (options.inertiaEnabled
-                                   && this.prepared !== 'gesture'
-                                   && contains(inertiaOptions.actions, this.prepared)
+                                   && this.action !== 'gesture'
+                                   && contains(inertiaOptions.actions, this.action)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -1976,7 +1978,7 @@
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointers[0] = inertiaStatus.startEvent = startEvent =
-                        new InteractEvent(this, event, this.prepared, 'inertiastart', this.element);
+                        new InteractEvent(this, event, this.action, 'inertiastart', this.element);
 
                     inertiaStatus.t0 = now;
 
@@ -2293,7 +2295,7 @@
             }
 
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
-            this.prepared = this.prevEvent = null;
+            this.prepared = this.action = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
             this.pointerIds .splice(0);
@@ -2698,9 +2700,8 @@
 
         setRestriction: function (pageCoords, status) {
             var target = this.target,
-                action = /resize/.test(this.prepared)? 'resize' : this.prepared,
                 restrict = target && target.options.restrict,
-                restriction = restrict && restrict[action],
+                restriction = restrict && restrict[this.action],
                 page;
 
             if (!restriction) {
@@ -3257,7 +3258,7 @@
     function validateAction (action, interactable) {
         if (!isString(action)) { return null; }
 
-        var actionType = action.search('resize') !== -1? 'resize': action,
+        var actionType = /resize/.test(action)? 'resize': action,
             options = interactable;
 
         if ((  (actionType  === 'resize'   && options.resizable )
