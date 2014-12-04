@@ -102,7 +102,7 @@ interact.js can be installed for a project using [Bower](http://bower.io/)
 
 or [npm](https://www.npmjs.org/)
 
-    $ npm install taye/interact.js
+    $ npm install interact.js
 
 or by downloading the script from http://interactjs.io/#download and linking to
 the script in a `<script>` tag's `src` attribute.
