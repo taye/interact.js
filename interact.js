@@ -2724,7 +2724,7 @@
         setRestriction: function (pageCoords, status) {
             var target = this.target,
                 restrict = target && target.options[this.action].restrict,
-                restriction = restrict && restrict[this.action],
+                restriction = restrict && restrict.restriction,
                 page;
 
             if (!restriction) {
