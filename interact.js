@@ -1699,8 +1699,8 @@
 
                     if (starting) {
                         var rect = target.getRect(this.element),
-                            snap = target.options[this.prepared].snap,
-                            restrict = target.options[this.prepared].restrict,
+                            snap = target.options[this.action].snap,
+                            restrict = target.options[this.action].restrict,
                             width, height;
 
                         if (rect) {
@@ -1934,7 +1934,7 @@
             var endEvent,
                 target = this.target,
                 options = target && target.options,
-                inertiaOptions = options && this.prepared && options[this.prepared].inertia,
+                inertiaOptions = options && this.prepared && options[this.action].inertia,
                 inertiaStatus = this.inertiaStatus;
 
             if (this.interacting()) {
@@ -2335,7 +2335,7 @@
 
         inertiaFrame: function () {
             var inertiaStatus = this.inertiaStatus,
-                options = this.target.options[this.prepared].inertia,
+                options = this.target.options[this.action].inertia,
                 lambda = options.resistance,
                 t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
@@ -2376,7 +2376,7 @@
         smoothEndFrame: function () {
             var inertiaStatus = this.inertiaStatus,
                 t = new Date().getTime() - inertiaStatus.t0,
-                duration = this.target.options[this.prepared].inertia.smoothEndDuration;
+                duration = this.target.options[this.action].inertia.smoothEndDuration;
 
             if (t < duration) {
                 inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
@@ -2578,7 +2578,7 @@
         },
 
         setSnapping: function (pageCoords, status) {
-            var snap = this.target.options[this.prepared].snap,
+            var snap = this.target.options[this.action].snap,
                 anchors = snap.anchors,
                 page,
                 closest,
@@ -2826,7 +2826,7 @@
         },
 
         calcInertia: function (status) {
-            var inertiaOptions = this.target.options[this.prepared].inertia,
+            var inertiaOptions = this.target.options[this.action].inertia,
                 lambda = inertiaOptions.resistance,
                 inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
 
