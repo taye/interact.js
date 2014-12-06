@@ -98,7 +98,6 @@
                 maxPerElement: 1,
 
                 snap: {
-                    actions     : ['drag'],
                     enabled     : false,
                     mode        : 'grid',
                     endOnly     : false,
@@ -121,7 +120,6 @@
                 },
 
                 inertia: {
-                    actions          : ['drag'],
                     enabled          : false,
                     resistance       : 10,    // the lambda in exponential decay
                     minSpeed         : 100,   // target speed must be above this for inertia to start
@@ -1961,7 +1959,6 @@
                 // check if inertia should be started
                 inertiaPossible = (options[this.action].inertia.enabled
                                    && this.action !== 'gesture'
-                                   && contains(inertiaOptions.actions, this.action)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -5189,7 +5186,6 @@
             resistance: inertia.resistance,
             minSpeed: inertia.minSpeed,
             endSpeed: inertia.endSpeed,
-            actions: inertia.actions,
             allowResume: inertia.allowResume,
             zeroResumeDelta: inertia.zeroResumeDelta
         };
