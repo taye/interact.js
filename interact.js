@@ -3823,6 +3823,8 @@
          * Interactable.squareResize
          [ method ]
          *
+         * Deprecated. Add a `square: true|false` property to @Interactable.resizable instead
+         *
          * Gets or sets whether resizing is forced 1:1 aspect
          *
          = (boolean) Current setting
