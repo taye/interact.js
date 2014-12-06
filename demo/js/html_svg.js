@@ -217,9 +217,15 @@
         }
 
         interact('div.demo-node, .demo-node ellipse')
-            .draggable({ max: 2 })
+            .draggable({
+                max: 2,
+                autoScroll: { enabled: true }
+            })
             .gesturable({ max: 1 })
-            .resizable({ max: 2 })
+            .resizable({
+                max: 2,
+                autoScroll: { enabled: true }
+            })
             .dropzone(true);
     }
 
