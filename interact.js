@@ -1955,6 +1955,9 @@
                     else if (options.drag.axis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
                     else   /*options.drag.axis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
                 }
+                else {
+                    pointerSpeed = this.pointerDelta.client.speed;
+                }
 
                 // check if inertia should be started
                 inertiaPossible = (options[this.action].inertia.enabled
