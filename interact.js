@@ -67,8 +67,7 @@
             drop: {
                 enabled: false,
                 accept: null,
-                overlap: 'pointer',
-                autoScroll: null
+                overlap: 'pointer'
             },
 
             resize: {
@@ -3577,7 +3576,7 @@
 
         setPerAction: function (action, options) {
             // for all the default per-action options
-            for (var option in defaultOptions.perAction) {
+            for (var option in options) {
                 // if this option exists for this action
                 if (option in defaultOptions[action]) {
                     // if the option in the options arg is an object value
