@@ -141,7 +141,7 @@
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared].autoScroll,
+                var options = autoScroll.interaction.target.options[autoScroll.interaction.action].autoScroll,
                     container = options.container || getWindow(autoScroll.interaction.element),
                     now = new Date().getTime(),
                     // change in time in seconds
@@ -176,7 +176,7 @@
                     interaction = interactions[i];
 
                     if (interaction.interacting()
-                        && checkAutoScroll(interaction.target, interaction.prepared)) {
+                        && checkAutoScroll(interaction.target, interaction.action)) {
 
                         target = interaction.target;
                         doAutoscroll = true;
@@ -190,7 +190,7 @@
                     right,
                     bottom,
                     left,
-                    options = target.options[interaction.prepared].autoScroll,
+                    options = target.options[interaction.action].autoScroll,
                     container = options.container || getWindow(interaction.element);
 
                 if (isWindow(container)) {
@@ -2861,7 +2861,7 @@
 
                 var element = eventTarget;
 
-                if (interaction.inertiaStatus.active && interaction.target.options[interaction.prepared].inertia.allowResume
+                if (interaction.inertiaStatus.active && interaction.target.options[interaction.action].inertia.allowResume
                     && (interaction.mouse === mouseEvent)) {
                     while (element) {
                         // if the element is the interaction element
