@@ -219,12 +219,14 @@
         interact('div.demo-node, .demo-node ellipse')
             .draggable({
                 max: 2,
-                autoScroll: { enabled: true }
+                autoScroll: { enabled: true },
+                inertia: { enabled: true }
             })
             .gesturable({ max: 1 })
             .resizable({
                 max: 2,
-                autoScroll: { enabled: true }
+                autoScroll: { enabled: true },
+                inertia: { resistance: 40 }
             })
             .dropzone(true);
     }
