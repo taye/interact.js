@@ -3806,6 +3806,10 @@
                     this.options.resize.axis = defaultOptions.resize.axis;
                 }
 
+                if (isBool(options.square)) {
+                    this.options.resize.square = options.square;
+                }
+
                 return this;
             }
             if (isBool(options)) {
