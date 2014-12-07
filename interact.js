@@ -1745,24 +1745,9 @@
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
                         if (starting) {
-                            var dragStartEvent = this[this.prepared.name + 'Start'](this.downEvent);
+                            var startEvent = this[this.prepared.name + 'Start'](this.downEvent);
 
-                            this.prevEvent = dragStartEvent;
-
-                            // reset active dropzones
-                            this.activeDrops.dropzones = [];
-                            this.activeDrops.elements  = [];
-                            this.activeDrops.rects     = [];
-
-                            if (!this.dynamicDrop) {
-                                this.setActiveDrops(this.element);
-                            }
-
-                            var dropEvents = this.getDropEvents(event, dragStartEvent);
-
-                            if (dropEvents.activate) {
-                                this.fireActiveDrops(dropEvents.activate);
-                            }
+                            this.prevEvent = startEvent;
 
                             snapCoords = this.curCoords.page;
 
@@ -1790,6 +1775,21 @@
 
             this.dragging = true;
             this.target.fire(dragEvent);
+
+            // reset active dropzones
+            this.activeDrops.dropzones = [];
+            this.activeDrops.elements  = [];
+            this.activeDrops.rects     = [];
+
+            if (!this.dynamicDrop) {
+                this.setActiveDrops(this.element);
+            }
+
+            var dropEvents = this.getDropEvents(event, dragEvent);
+
+            if (dropEvents.activate) {
+                this.fireActiveDrops(dropEvents.activate);
+            }
 
             return dragEvent;
         },
