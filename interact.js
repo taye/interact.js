@@ -38,89 +38,96 @@
         delegatedEvents = {},
 
         defaultOptions = {
-            draggable   : false,
-            dragAxis    : 'xy',
-            dropzone    : false,
-            accept      : null,
-            dropOverlap : 'pointer',
-            resizable   : false,
-            squareResize: false,
-            resizeAxis  : 'xy',
-            gesturable  : false,
-
-            // no more than this number of actions can target the Interactable
-            dragMax   : 1,
-            resizeMax : 1,
-            gestureMax: 1,
-
-            // no more than this number of actions can target the same
-            // element of this Interactable simultaneously
-            dragMaxPerElement   : 1,
-            resizeMaxPerElement : 1,
-            gestureMaxPerElement: 1,
-
-            pointerMoveTolerance: 1,
-
-            actionChecker: null,
-
-            styleCursor: true,
-            preventDefault: 'auto',
-
-            // aww snap
-            snap: {
-                mode        : 'grid',
-                endOnly     : false,
-                actions     : ['drag'],
-                range       : Infinity,
-                grid        : { x: 100, y: 100 },
-                gridOffset  : { x:   0, y:   0 },
-                anchors     : [],
-                paths       : [],
-
-                elementOrigin: null,
-
-                arrayTypes  : /^anchors$|^paths$|^actions$/,
-                objectTypes : /^grid$|^gridOffset$|^elementOrigin$/,
-                stringTypes : /^mode$/,
-                numberTypes : /^range$/,
-                boolTypes   :  /^endOnly$/
+            base: {
+                accept        : null,
+                actionChecker : null,
+                styleCursor   : true,
+                preventDefault: 'auto',
+                origin        : { x: 0, y: 0 },
+                deltaSource   : 'page',
+                allowFrom     : null,
+                ignoreFrom    : null,
+                _context      : document,
+                rectChecker   : null
             },
-            snapEnabled: false,
 
-            restrict: {
-                drag: null,
-                resize: null,
-                gesture: null,
-                endOnly: false
+            drag: {
+                enabled: false,
+                max: 1,
+                maxPerElement: 1,
+
+                snap: null,
+                restrict: null,
+                inertia: null,
+                autoScroll: null,
+
+                axis: 'xy',
             },
-            restrictEnabled: false,
 
-            autoScroll: {
-                container   : null,     // the item that is scrolled (Window or HTMLElement)
-                margin      : 60,
-                speed       : 300,      // the scroll speed in pixels per second
-
-                numberTypes : /^margin$|^speed$/
+            drop: {
+                enabled: false,
+                accept: null,
+                overlap: 'pointer'
             },
-            autoScrollEnabled: false,
 
-            inertia: {
-                resistance       : 10,    // the lambda in exponential decay
-                minSpeed         : 100,   // target speed must be above this for inertia to start
-                endSpeed         : 10,    // the speed at which inertia is slow enough to stop
-                allowResume      : true,  // allow resuming an action in inertia phase
-                zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
-                smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
-                actions          : ['drag', 'resize'],  // allow inertia on these actions. gesture might not work
+            resize: {
+                enabled: false,
+                max: 1,
+                maxPerElement: 1,
 
-                numberTypes: /^resistance$|^minSpeed$|^endSpeed$|^smoothEndDuration$/,
-                arrayTypes : /^actions$/,
-                boolTypes  : /^(allowResume|zeroResumeDelta)$/
+                snap: null,
+                restrict: null,
+                inertia: null,
+                autoScroll: null,
+
+                square: false,
+                axis: 'xy'
             },
-            inertiaEnabled: false,
 
-            origin      : { x: 0, y: 0 },
-            deltaSource : 'page',
+            gesture: {
+                enabled: false,
+                max: 1,
+                maxPerElement: 1,
+
+                restrict: null
+            },
+
+            perAction: {
+                max: 1,
+                maxPerElement: 1,
+
+                snap: {
+                    enabled     : false,
+                    mode        : 'grid',
+                    endOnly     : false,
+                    range       : Infinity,
+                    gridOffset  : { x: 0, y: 0 },
+
+                    elementOrigin: null
+                },
+
+                restrict: {
+                    enabled: false,
+                    endOnly: false
+                },
+
+                autoScroll: {
+                    enabled     : false,
+                    container   : null,     // the item that is scrolled (Window or HTMLElement)
+                    margin      : 60,
+                    speed       : 300       // the scroll speed in pixels per second
+                },
+
+                inertia: {
+                    enabled          : false,
+                    resistance       : 10,    // the lambda in exponential decay
+                    minSpeed         : 100,   // target speed must be above this for inertia to start
+                    endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+                    allowResume      : true,  // allow resuming an action in inertia phase
+                    zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
+                    smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
+                }
+            }
         },
 
         // Things related to autoScroll
@@ -131,7 +138,7 @@
 
             // scroll the window by the values in scroll.x/y
             scroll: function () {
-                var options = autoScroll.interaction.target.options.autoScroll,
+                var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll,
                     container = options.container || getWindow(autoScroll.interaction.element),
                     now = new Date().getTime(),
                     // change in time in seconds
@@ -165,10 +172,10 @@
                 for (var i = 0; i < interactions.length; i++) {
                     interaction = interactions[i];
 
-                    target = interaction.target;
+                    if (interaction.interacting()
+                        && checkAutoScroll(interaction.target, interaction.prepared.name)) {
 
-                    if (target && target.options.autoScrollEnabled
-                        && (interaction.dragging || interaction.resizing)) {
+                        target = interaction.target;
                         doAutoscroll = true;
                         break;
                     }
@@ -180,7 +187,7 @@
                     right,
                     bottom,
                     left,
-                    options = target.options.autoScroll,
+                    options = target.options[interaction.prepared.name].autoScroll,
                     container = options.container || getWindow(interaction.element);
 
                 if (isWindow(container)) {
@@ -236,6 +243,8 @@
 
         // Less Precision with touch input
         margin = supportsTouch || supportsPointerEvent? 20: 10,
+
+        pointerMoveTolerance = 1,
 
         // for ignoring browser's simulated mouse events
         prevTouchTime = 0,
@@ -911,7 +920,7 @@
     function checkAxis (axis, interactable) {
         if (!interactable) { return false; }
 
-        var thisAxis = interactable.options.dragAxis;
+        var thisAxis = interactable.options.drag.axis;
 
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     }
@@ -923,7 +932,7 @@
             action = 'resize';
         }
 
-        return action !== 'gesture' && options.snapEnabled && contains(options.snap.actions, action);
+        return options[action].snap && options[action].snap.enabled;
     }
 
     function checkRestrict (interactable, action) {
@@ -933,7 +942,17 @@
             action = 'resize';
         }
 
-        return options.restrictEnabled && options.restrict[action];
+        return  options[action].restrict && options[action].restrict.enabled;
+    }
+
+    function checkAutoScroll (interactable, action) {
+        var options = interactable.options;
+
+        if (/^resize/.test(action)) {
+            action = 'resize';
+        }
+
+        return  options[action].autoScroll && options[action].autoScroll.enabled;
     }
 
     function withinInteractionLimit (interactable, element, action) {
@@ -1383,7 +1402,7 @@
                     // if this element is the current inertia target element
                     if (element === this.element
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(pointer, this, this.element), this.target).action === this.prepared.name) {
+                        && validateAction(this.target.getAction(pointer, this, this.element), this.target).name === this.prepared.name) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1521,7 +1540,7 @@
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && curEventTarget === this.element
-                && validateAction(target.getAction(pointer, this, this.element), target).action === this.prepared.name) {
+                && validateAction(target.getAction(pointer, this, this.element), target).name === this.prepared.name) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1550,7 +1569,7 @@
                 dx = this.curCoords.client.x - this.startCoords.client.x;
                 dy = this.curCoords.client.y - this.startCoords.client.y;
 
-                this.pointerWasMoved = hypot(dx, dy) > defaultOptions.pointerMoveTolerance;
+                this.pointerWasMoved = hypot(dx, dy) > pointerMoveTolerance;
             }
 
             if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
@@ -1585,7 +1604,7 @@
                     if (this.prepared.name === 'drag') {
                         var absX = Math.abs(dx),
                             absY = Math.abs(dy),
-                            targetAxis = this.target.options.dragAxis,
+                            targetAxis = this.target.options.drag.axis,
                             axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
                         // if the movement isn't in the axis of the interactable
@@ -1603,7 +1622,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
-                                    && elementInteractable.getAction(this.downPointer, this, element).action === 'drag'
+                                    && elementInteractable.getAction(this.downPointer, this, element).name === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
                                     this.prepared.name = 'drag';
@@ -1629,7 +1648,7 @@
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downPointer, this, element).action === 'drag'
+                                        && interactable.getAction(this.downPointer, this, element).name === 'drag'
                                         && checkAxis(axis, interactable)
                                         && withinInteractionLimit(interactable, element, 'drag')) {
 
@@ -1666,13 +1685,13 @@
                 if (this.prepared.name && this.target) {
                     var target         = this.target,
                         shouldMove     = true,
-                        shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options.snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options.restrict.endOnly || preEnd);
+                        shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
+                        shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
 
                     if (starting) {
                         var rect = target.getRect(this.element),
-                            snap = target.options.snap,
-                            restrict = target.options.restrict,
+                            snap = target.options[this.prepared.name].snap,
+                            restrict = target.options[this.prepared.name].restrict,
                             width, height;
 
                         if (rect) {
@@ -1906,7 +1925,7 @@
             var endEvent,
                 target = this.target,
                 options = target && target.options,
-                inertiaOptions = options && options.inertia,
+                inertiaOptions = options && this.prepared.name && options[this.prepared.name].inertia,
                 inertiaStatus = this.inertiaStatus;
 
             if (this.interacting()) {
@@ -1918,22 +1937,24 @@
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
-                    endSnap = checkSnap(target, this.prepared.name) && options.snap.endOnly,
-                    endRestrict = checkRestrict(target, this.prepared.name) && options.restrict.endOnly,
+                    endSnap = checkSnap(target, this.prepared.name) && options[this.prepared.name].snap.endOnly,
+                    endRestrict = checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
                     dx = 0,
                     dy = 0,
                     startEvent;
 
                 if (this.dragging) {
-                    if      (options.dragAxis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
-                    else if (options.dragAxis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
-                    else   /*options.dragAxis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
+                    if      (options.drag.axis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
+                    else if (options.drag.axis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
+                    else   /*options.drag.axis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
+                }
+                else {
+                    pointerSpeed = this.pointerDelta.client.speed;
                 }
 
                 // check if inertia should be started
-                inertiaPossible = (options.inertiaEnabled
+                inertiaPossible = (options[this.prepared.name].inertia.enabled
                                    && this.prepared.name !== 'gesture'
-                                   && contains(inertiaOptions.actions, this.prepared.name)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -2089,14 +2110,15 @@
 
             // collect all dropzones and their elements which qualify for a drop
             for (i = 0; i < interactables.length; i++) {
-                if (!interactables[i].options.dropzone) { continue; }
+                if (!interactables[i].options.drop.enabled) { continue; }
 
-                var current = interactables[i];
+                var current = interactables[i],
+                    accept = current.options.drop.accept;
 
                 // test the draggable element against the dropzone's accept setting
-                if ((isElement(current.options.accept) && current.options.accept !== element)
-                    || (isString(current.options.accept)
-                        && !matchesSelector(element, current.options.accept))) {
+                if ((isElement(accept) && accept !== element)
+                    || (isString(accept)
+                        && !matchesSelector(element, accept))) {
 
                     continue;
                 }
@@ -2306,7 +2328,7 @@
 
         inertiaFrame: function () {
             var inertiaStatus = this.inertiaStatus,
-                options = this.target.options.inertia,
+                options = this.target.options[this.prepared.name].inertia,
                 lambda = options.resistance,
                 t = new Date().getTime() / 1000 - inertiaStatus.t0;
 
@@ -2347,7 +2369,7 @@
         smoothEndFrame: function () {
             var inertiaStatus = this.inertiaStatus,
                 t = new Date().getTime() - inertiaStatus.t0,
-                duration = this.target.options.inertia.smoothEndDuration;
+                duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
 
             if (t < duration) {
                 inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
@@ -2549,7 +2571,7 @@
         },
 
         setSnapping: function (pageCoords, status) {
-            var snap = this.target.options.snap,
+            var snap = this.target.options[this.prepared.name].snap,
                 anchors = snap.anchors,
                 page,
                 closest,
@@ -2694,8 +2716,8 @@
 
         setRestriction: function (pageCoords, status) {
             var target = this.target,
-                restrict = target && target.options.restrict,
-                restriction = restrict && restrict[this.prepared.name],
+                restrict = target && target.options[this.prepared.name].restrict,
+                restriction = restrict && restrict.restriction,
                 page;
 
             if (!restriction) {
@@ -2781,7 +2803,7 @@
                 // and dragging can only start from a certain direction - this allows
                 // a touch to pan the viewport if a drag isn't in the right direction
                 if (/down|start/i.test(event.type)
-                    && this.prepared.name === 'drag' && options.dragAxis !== 'xy') {
+                    && this.prepared.name === 'drag' && options.drag.axis !== 'xy') {
 
                     return;
                 }
@@ -2797,7 +2819,7 @@
         },
 
         calcInertia: function (status) {
-            var inertiaOptions = this.target.options.inertia,
+            var inertiaOptions = this.target.options[this.prepared.name].inertia,
                 lambda = inertiaOptions.resistance,
                 inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
 
@@ -2832,7 +2854,7 @@
 
                 var element = eventTarget;
 
-                if (interaction.inertiaStatus.active && interaction.target.options.inertia.allowResume
+                if (interaction.inertiaStatus.active && interaction.target.options[interaction.prepared.name].inertia.allowResume
                     && (interaction.mouse === mouseEvent)) {
                     while (element) {
                         // if the element is the interaction element
@@ -2893,7 +2915,7 @@
         for (i = 0; i < len; i++) {
             interaction = interactions[i];
 
-            if ((!interaction.prepared.name || (interaction.target.gesturable()))
+            if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
                 && !interaction.interacting()
                 && !(!mouseEvent && interaction.mouse)) {
 
@@ -2978,7 +3000,7 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        if (checkSnap(target, action) && !(starting && options.snap.elementOrigin)) {
+        if (checkSnap(target, action) && !(starting && options[action].snap.elementOrigin)) {
             this.snap = {
                 range  : snapStatus.range,
                 locked : snapStatus.locked,
@@ -2998,7 +3020,7 @@
             }
         }
 
-        if (checkRestrict(target, action) && !(starting && options.restrict.elementRect) && restrictStatus.restricted) {
+        if (checkRestrict(target, action) && !(starting && options[action].restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -3072,7 +3094,8 @@
             }
         }
         if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
-            && !inertiaStatus.active && options.inertia.zeroResumeDelta) {
+            && !inertiaStatus.active
+            && options[action].inertia && options[action].inertia.zeroResumeDelta) {
 
             inertiaStatus.resumeDx += this.dx;
             inertiaStatus.resumeDy += this.dy;
@@ -3081,7 +3104,7 @@
         }
 
         if (action === 'resize') {
-            if (options.squareResize || event.shiftKey) {
+            if (options.resize.square || event.shiftKey) {
                 if (interaction.resizeAxes === 'y') {
                     this.dx = this.dy;
                 }
@@ -3226,16 +3249,16 @@
 
         if (!rect) { return null; }
 
-        if (actionIsEnabled.resize && options.resizable) {
-            right  = options.resizeAxis !== 'y' && page.x > (rect.right  - margin);
-            bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
+        if (actionIsEnabled.resize && options.resize.enabled) {
+            right  = options.resize.axis !== 'y' && page.x > (rect.right  - margin);
+            bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - margin);
         }
 
         resizeAxes = (right?'x': '') + (bottom?'y': '');
 
         action = resizeAxes
             ? 'resize'
-            : actionIsEnabled.drag && options.draggable
+            : actionIsEnabled.drag && options.drag.enabled
                 ?  'drag'
                 : null;
 
@@ -3261,12 +3284,16 @@
         if (!isObject(action)) { return null; }
 
         var actionName = action.name,
-            options = interactable;
+            options = interactable.options;
 
-        if ((  (actionName === 'resize'   && options.resizable )
-            || (actionName === 'drag'     && options.draggable  )
-            || (actionName === 'gesture'  && options.gesturable))
+        if ((  (actionName  === 'resize'   && options.resize.enabled )
+            || (actionName      === 'drag'     && options.drag.enabled  )
+            || (actionName      === 'gesture'  && options.gesture.enabled))
             && actionIsEnabled[actionName]) {
+
+            if (actionName === 'resize' || actionName === 'resizeyx') {
+                actionName = 'resizexy';
+            }
 
             return action;
         }
@@ -3399,18 +3426,6 @@
         return interactables.get(element, options) || new Interactable(element, options);
     }
 
-    // A class for easy inheritance and setting of an Interactable's options
-    function IOptions (options) {
-        for (var option in defaultOptions) {
-            if (options.hasOwnProperty(option)
-                && typeof options[option] === typeof defaultOptions[option]) {
-                this[option] = options[option];
-            }
-        }
-    }
-
-    IOptions.prototype = defaultOptions;
-
     /*\
      * Interactable
      [ property ]
@@ -3538,39 +3553,49 @@
         \*/
         draggable: function (options) {
             if (isObject(options)) {
-                this.options.draggable = true;
+                this.options.drag.enabled = options.enabled === false? false: true;
+                this.setPerAction('drag', options);
                 this.setOnEvents('drag', options);
 
-                if (isNumber(options.max)) {
-                    this.options.dragMax = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.dragMaxPerElement = options.maxPerElement;
-                }
-
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
-                    this.options.dragAxis = options.axis;
+                    this.options.drag.axis = options.axis;
                 }
                 else if (options.axis === null) {
-                    delete this.options.dragAxis;
+                    delete this.options.drag.axis;
                 }
 
                 return this;
             }
 
             if (isBool(options)) {
-                this.options.draggable = options;
+                this.options.drag.enabled = options;
 
                 return this;
             }
 
-            if (options === null) {
-                delete this.options.draggable;
+            return this.options.drag;
+        },
 
-                return this;
+        setPerAction: function (action, options) {
+            // for all the default per-action options
+            for (var option in options) {
+                // if this option exists for this action
+                if (option in defaultOptions[action]) {
+                    // if the option in the options arg is an object value
+                    if (isObject(options[option])) {
+                        // duplicate the object
+                        this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+
+                        if ('enabled' in defaultOptions.perAction[option]) {
+                            this.options[action][option].enabled = options[option].enabled === false? false : true;
+                        }
+                    }
+                    else if (options[option] !== undefined) {
+                        // or if it's not undefined, do a plain assignment
+                        this.options[action][option] = options[option];
+                    }
+                }
             }
-
-            return this.options.draggable;
         },
 
         /*\
@@ -3603,33 +3628,27 @@
         \*/
         dropzone: function (options) {
             if (isObject(options)) {
-                this.options.dropzone = true;
+                this.options.drop.enabled = options.enabled === false? false: true;
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
 
                 if (/^(pointer|center)$/.test(options.overlap)) {
-                    this.options.dropOverlap = options.overlap;
+                    this.options.drop.overlap = options.overlap;
                 }
                 else if (isNumber(options.overlap)) {
-                    this.options.dropOverlap = Math.max(Math.min(1, options.overlap), 0);
+                    this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
                 }
 
                 return this;
             }
 
             if (isBool(options)) {
-                this.options.dropzone = options;
+                this.options.drop.enabled = options;
 
                 return this;
             }
 
-            if (options === null) {
-                delete this.options.dropzone;
-
-                return this;
-            }
-
-            return this.options.dropzone;
+            return this.options.drop;
         },
 
         /*\
@@ -3652,7 +3671,7 @@
                 return false;
             }
 
-            var dropOverlap = this.options.dropOverlap;
+            var dropOverlap = this.options.drop.overlap;
 
             if (dropOverlap === 'pointer') {
                 var page = getPageXY(pointer),
@@ -3714,6 +3733,9 @@
          * Interactable.accept
          [ method ]
          *
+         * Deprecated. add an `accept` property to the options object passed to
+         * @Interactable.dropzone instead.
+         *
          * Gets or sets the Element or CSS selector match that this
          * Interactable accepts if it is a dropzone.
          *
@@ -3726,25 +3748,25 @@
         \*/
         accept: function (newValue) {
             if (isElement(newValue)) {
-                this.options.accept = newValue;
+                this.options.drop.accept = newValue;
 
                 return this;
             }
 
             // test if it is a valid CSS selector
             if (trySelector(newValue)) {
-                this.options.accept = newValue;
+                this.options.drop.accept = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.accept;
+                delete this.options.drop.accept;
 
                 return this;
             }
 
-            return this.options.accept;
+            return this.options.drop.accept;
         },
 
         /*\
@@ -3774,31 +3796,29 @@
         \*/
         resizable: function (options) {
             if (isObject(options)) {
-                this.options.resizable = true;
+                this.options.resize.enabled = options.enabled === false? false: true;
+                this.setPerAction('resize', options);
                 this.setOnEvents('resize', options);
 
-                if (isNumber(options.max)) {
-                    this.options.resizeMax = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.resizeMaxPerElement = options.maxPerElement;
-                }
-
                 if (/^x$|^y$|^xy$/.test(options.axis)) {
-                    this.options.resizeAxis = options.axis;
+                    this.options.resize.axis = options.axis;
                 }
                 else if (options.axis === null) {
-                    this.options.resizeAxis = defaultOptions.resizeAxis;
+                    this.options.resize.axis = defaultOptions.resize.axis;
+                }
+
+                if (isBool(options.square)) {
+                    this.options.resize.square = options.square;
                 }
 
                 return this;
             }
             if (isBool(options)) {
-                this.options.resizable = options;
+                this.options.resize.enabled = options;
 
                 return this;
             }
-            return this.options.resizable;
+            return this.options.resize;
         },
 
         // misspelled alias
@@ -3807,6 +3827,8 @@
         /*\
          * Interactable.squareResize
          [ method ]
+         *
+         * Deprecated. Add a `square: true|false` property to @Interactable.resizable instead
          *
          * Gets or sets whether resizing is forced 1:1 aspect
          *
@@ -3819,18 +3841,18 @@
         \*/
         squareResize: function (newValue) {
             if (isBool(newValue)) {
-                this.options.squareResize = newValue;
+                this.options.resize.square = newValue;
 
                 return this;
             }
 
             if (newValue === null) {
-                delete this.options.squareResize;
+                delete this.options.resize.square;
 
                 return this;
             }
 
-            return this.options.squareResize;
+            return this.options.resize.square;
         },
 
         /*\
@@ -3858,32 +3880,20 @@
         \*/
         gesturable: function (options) {
             if (isObject(options)) {
-                this.options.gesturable = true;
+                this.options.gesture.enabled = options.enabled === false? false: true;
+                this.setPerAction('gesture', options);
                 this.setOnEvents('gesture', options);
-
-                if (isNumber(options.max)) {
-                    this.options.gestureMax = options.max;
-                }
-                if (isNumber(options.maxPerElement)) {
-                    this.options.gestureMaxPerElement = options.maxPerElement;
-                }
 
                 return this;
             }
 
             if (isBool(options)) {
-                this.options.gesturable = options;
+                this.options.gesture.enabled = options;
 
                 return this;
             }
 
-            if (options === null) {
-                delete this.options.gesturable;
-
-                return this;
-            }
-
-            return this.options.gesturable;
+            return this.options.gesture;
         },
 
         // misspelled alias
@@ -3910,51 +3920,7 @@
          = (Interactable) this Interactable
         \*/
         autoScroll: function (options) {
-            var defaults = defaultOptions.autoScroll;
-
-            if (isObject(options)) {
-                var autoScroll = this.options.autoScroll;
-
-                if (autoScroll === defaults) {
-                   autoScroll = this.options.autoScroll = {
-                       margin   : defaults.margin,
-                       distance : defaults.distance,
-                       interval : defaults.interval,
-                       container: defaults.container
-                   };
-                }
-
-                autoScroll.margin = this.validateSetting('autoScroll', 'margin', options.margin);
-                autoScroll.speed  = this.validateSetting('autoScroll', 'speed' , options.speed);
-
-                autoScroll.container =
-                    (isElement(options.container) || isWindow(options.container)
-                     ? options.container
-                     : defaults.container);
-
-
-                this.options.autoScrollEnabled = true;
-                this.options.autoScroll = autoScroll;
-
-                return this;
-            }
-
-            if (isBool(options)) {
-                this.options.autoScrollEnabled = options;
-
-                return this;
-            }
-
-            if (options === null) {
-                delete this.options.autoScrollEnabled;
-                delete this.options.autoScroll;
-
-                return this;
-            }
-
-            return (this.options.autoScrollEnabled
-                ? this.options.autoScroll
-                : false);
+            return this.setOptions('autoScroll', options);
         },
 
         /*\
@@ -4017,48 +3983,49 @@
          | });
         \*/
         snap: function (options) {
-            var defaults = defaultOptions.snap;
+            return this.setOptions('snap', options);
+        },
 
-            if (isObject(options)) {
-                var snap = this.options.snap;
+        setOptions: function (option, options) {
+            var actions = options && isArray(options.actions)
+                    ? options.actions
+                    : ['drag'];
 
-                if (snap === defaults) {
-                   snap = {};
+            var i;
+
+            if (isObject(options) || isBool(options)) {
+                for (i = 0; i < actions.length; i++) {
+                    var action = actions[i];
+
+                    if (!isObject(this.options[action])) { continue; }
+
+                    var thisOption = this.options[action][option];
+
+                    if (isObject(options)) {
+                        extend(thisOption, options);
+                        thisOption.enabled = options.enabled === false? false: true;
+                    }
+                    else {
+                        thisOption.enabled = options;
+                    }
+
                 }
 
-                snap.mode          = this.validateSetting('snap', 'mode'         , options.mode);
-                snap.endOnly       = this.validateSetting('snap', 'endOnly'      , options.endOnly);
-                snap.actions       = this.validateSetting('snap', 'actions'      , options.actions);
-                snap.range         = this.validateSetting('snap', 'range'        , options.range);
-                snap.paths         = this.validateSetting('snap', 'paths'        , options.paths);
-                snap.grid          = this.validateSetting('snap', 'grid'         , options.grid);
-                snap.gridOffset    = this.validateSetting('snap', 'gridOffset'   , options.gridOffset);
-                snap.anchors       = this.validateSetting('snap', 'anchors'      , options.anchors);
-                snap.elementOrigin = this.validateSetting('snap', 'elementOrigin', options.elementOrigin);
-
-                this.options.snapEnabled = true;
-                this.options.snap = snap;
-
                 return this;
             }
 
-            if (isBool(options)) {
-                this.options.snapEnabled = options;
+            var ret = {},
+                allActions = ['drag', 'resize', 'gesture'];
 
-                return this;
+            for (i = 0; i < allActions.length; i++) {
+                if (option in defaultOptions[allActions[i]]) {
+                    ret[allActions[i]] = this.options[allActions[i]][option];
+                }
             }
 
-            if (options === null) {
-                delete this.options.snapEnabled;
-                delete this.options.snap;
-
-                return this;
-            }
-
-            return (this.options.snapEnabled
-                ? this.options.snap
-                : false);
+            return ret;
         },
+
 
         /*\
          * Interactable.inertia
@@ -4107,53 +4074,7 @@
          | interact(element).inertia(null);
         \*/
         inertia: function (options) {
-            var defaults = defaultOptions.inertia;
-
-            if (isObject(options)) {
-                var inertia = this.options.inertia;
-
-                if (inertia === defaults) {
-                   inertia = this.options.inertia = {
-                       resistance       : defaults.resistance,
-                       minSpeed         : defaults.minSpeed,
-                       endSpeed         : defaults.endSpeed,
-                       actions          : defaults.actions,
-                       allowResume      : defaults.allowResume,
-                       zeroResumeDelta  : defaults.zeroResumeDelta,
-                       smoothEndDuration: defaults.smoothEndDuration
-                   };
-                }
-
-                inertia.resistance        = this.validateSetting('inertia', 'resistance'       , options.resistance);
-                inertia.minSpeed          = this.validateSetting('inertia', 'minSpeed'         , options.minSpeed);
-                inertia.endSpeed          = this.validateSetting('inertia', 'endSpeed'         , options.endSpeed);
-                inertia.actions           = this.validateSetting('inertia', 'actions'          , options.actions);
-                inertia.allowResume       = this.validateSetting('inertia', 'allowResume'      , options.allowResume);
-                inertia.zeroResumeDelta   = this.validateSetting('inertia', 'zeroResumeDelta'  , options.zeroResumeDelta);
-                inertia.smoothEndDuration = this.validateSetting('inertia', 'smoothEndDuration', options.smoothEndDuration);
-
-                this.options.inertiaEnabled = true;
-                this.options.inertia = inertia;
-
-                return this;
-            }
-
-            if (isBool(options)) {
-                this.options.inertiaEnabled = options;
-
-                return this;
-            }
-
-            if (options === null) {
-                delete this.options.inertiaEnabled;
-                delete this.options.inertia;
-
-                return this;
-            }
-
-            return (this.options.inertiaEnabled
-                ? this.options.inertia
-                : false);
+            return this.setOptions('inertia', options);
         },
 
         getAction: function (pointer, interaction, element) {
@@ -4335,12 +4256,6 @@
                 return this;
             }
 
-            if (newValue === null) {
-                delete this.options.origin;
-
-                return this;
-            }
-
             return this.options.origin;
         },
 
@@ -4361,12 +4276,6 @@
                 return this;
             }
 
-            if (newValue === null) {
-                delete this.options.deltaSource;
-
-                return this;
-            }
-
             return this.options.deltaSource;
         },
 
@@ -4380,7 +4289,7 @@
          * this by setting the
          * [`elementRect`](https://github.com/taye/interact.js/pull/72).
          **
-         - newValue (object) #optional an object with keys drag, resize, and/or gesture whose values are rects, Elements, CSS selectors, or 'parent' or 'self'
+         - options (object) #optional an object with keys drag, resize, and/or gesture whose values are rects, Elements, CSS selectors, or 'parent' or 'self'
          = (object) The current restrictions object or this Interactable
          **
          | interact(element).restrict({
@@ -4404,44 +4313,28 @@
          |     elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
          | });
         \*/
-        restrict: function (newValue) {
-            if (newValue === undefined) {
-                return this.options.restrict;
+        restrict: function (options) {
+            if (!isObject(options)) {
+                return this.setOptions('restrict', options);
             }
 
-            if (isBool(newValue)) {
-                defaultOptions.restrictEnabled = newValue;
-            }
-            else if (isObject(newValue)) {
-                var newRestrictions = {};
+            var actions = ['drag', 'resize', 'gesture'],
+                ret;
 
-                if (isObject(newValue.drag) || trySelector(newValue.drag)) {
-                    newRestrictions.drag = newValue.drag;
-                }
-                if (isObject(newValue.resize) || trySelector(newValue.resize)) {
-                    newRestrictions.resize = newValue.resize;
-                }
-                if (isObject(newValue.gesture) || trySelector(newValue.gesture)) {
-                    newRestrictions.gesture = newValue.gesture;
-                }
+            for (var i = 0; i < actions.length; i++) {
+                var action = actions[i];
 
-                if (isBool(newValue.endOnly)) {
-                    newRestrictions.endOnly = newValue.endOnly;
-                }
+                if (action in options) {
+                    var perAction = extend({
+                            actions: [action],
+                            restriction: options[action]
+                        }, options);
 
-                if (isObject(newValue.elementRect)) {
-                    newRestrictions.elementRect = newValue.elementRect;
+                    ret = this.setOptions('restrict', perAction);
                 }
-
-                this.options.restrictEnabled = true;
-                this.options.restrict = newRestrictions;
-            }
-            else if (newValue === null) {
-               delete this.options.restrict;
-               delete this.options.restrictEnabled;
             }
 
-            return this;
+            return ret;
         },
 
         /*\
@@ -4485,11 +4378,6 @@
                 return this;
             }
 
-            if (newValue === null) {
-                delete this.options.ignoreFrom;
-                return this;
-            }
-
             return this.options.ignoreFrom;
         },
 
@@ -4519,89 +4407,7 @@
                 return this;
             }
 
-            if (newValue === null) {
-                delete this.options.allowFrom;
-                return this;
-            }
-
             return this.options.allowFrom;
-        },
-
-        /*\
-         * Interactable.validateSetting
-         [ method ]
-         *
-         - context (string) eg. 'snap', 'autoScroll'
-         - option (string) The name of the value being set
-         - value (any type) The value being validated
-         *
-         = (typeof value) A valid value for the give context-option pair
-         * - null if defaultOptions[context][value] is undefined
-         * - value if it is the same type as defaultOptions[context][value],
-         * - this.options[context][value] if it is the same type as defaultOptions[context][value],
-         * - or defaultOptions[context][value]
-        \*/
-        validateSetting: function (context, option, value) {
-            var defaults = defaultOptions[context],
-                current = this.options[context];
-
-            if (defaults !== undefined && defaults[option] !== undefined) {
-                if ('objectTypes' in defaults && defaults.objectTypes.test(option)) {
-                    if (isObject(value)) { return value; }
-                    else {
-                        return (option in current && isObject(current[option])
-                            ? current [option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('arrayTypes' in defaults && defaults.arrayTypes.test(option)) {
-                    if (isArray(value)) { return value; }
-                    else {
-                        return (option in current && isArray(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('stringTypes' in defaults && defaults.stringTypes.test(option)) {
-                    if (isString(value)) { return value; }
-                    else {
-                        return (option in current && isString(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('numberTypes' in defaults && defaults.numberTypes.test(option)) {
-                    if (isNumber(value)) { return value; }
-                    else {
-                        return (option in current && isNumber(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('boolTypes' in defaults && defaults.boolTypes.test(option)) {
-                    if (isBool(value)) { return value; }
-                    else {
-                        return (option in current && isBool(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-
-                if ('elementTypes' in defaults && defaults.elementTypes.test(option)) {
-                    if (isElement(value)) { return value; }
-                    else {
-                        return (option in current && isElement(current[option])
-                            ? current[option]
-                            : defaults[option]);
-                    }
-                }
-            }
-
-            return null;
         },
 
         /*\
@@ -4865,24 +4671,37 @@
          = (object) This Interactablw
         \*/
         set: function (options) {
-            if (!options || !isObject(options)) {
+            if (!isObject(options)) {
                 options = {};
             }
-            this.options = new IOptions(options);
 
-            this.draggable ('draggable'  in options? options.draggable : this.options.draggable );
-            this.dropzone  ('dropzone'   in options? options.dropzone  : this.options.dropzone  );
-            this.resizable ('resizable'  in options? options.resizable : this.options.resizable );
-            this.gesturable('gesturable' in options? options.gesturable: this.options.gesturable);
+            this.options = extend({}, defaultOptions.base);
+
+            var i,
+                actions = ['drag', 'drop', 'resize', 'gesture'],
+                methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
+                perActions = extend(extend({}, defaultOptions.perAction), options[action] || {});
+
+            for (i = 0; i < actions.length; i++) {
+                var action = actions[i];
+
+                this.options[action] = extend({}, defaultOptions[action]);
+
+                this.setPerAction(action, perActions);
+
+                this[methods[i]](options[action]);
+            }
 
             var settings = [
-                    'accept', 'actionChecker', 'allowFrom', 'autoScroll', 'deltaSource',
-                    'dropChecker', 'ignoreFrom', 'inertia', 'origin', 'preventDefault',
-                    'rectChecker', 'restrict', 'snap', 'styleCursor'
+                    'accept', 'actionChecker', 'allowFrom', 'deltaSource',
+                    'dropChecker', 'ignoreFrom', 'origin', 'preventDefault',
+                    'rectChecker'
                 ];
 
-            for (var i = 0, len = settings.length; i < len; i++) {
+            for (i = 0, len = settings.length; i < len; i++) {
                 var setting = settings[i];
+
+                this.options[setting] = defaultOptions.base[setting];
 
                 if (setting in options) {
                     this[setting](options[setting]);
@@ -5187,7 +5006,6 @@
             prevEvent             : interaction.prevEvent,
 
             Interactable          : Interactable,
-            IOptions              : IOptions,
             interactables         : interactables,
             pointerIsDown         : interaction.pointerIsDown,
             defaultOptions        : defaultOptions,
@@ -5274,10 +5092,10 @@
      = (boolean | object) `false` if autoscroll is disabled and the default autoScroll settings if it is enabled
     \*/
     interact.autoScroll = function (options) {
-        var defaults = defaultOptions.autoScroll;
+        var defaults = defaultOptions.perAction.autoScroll;
 
         if (isObject(options)) {
-            defaultOptions.autoScrollEnabled = true;
+            defaultOptions.autoScroll.enabled = true;
 
             if (isNumber(options.margin)) { defaults.margin = options.margin;}
             if (isNumber(options.speed) ) { defaults.speed  = options.speed ;}
@@ -5291,14 +5109,14 @@
         }
 
         if (isBool(options)) {
-            defaultOptions.autoScrollEnabled = options;
+            defaultOptions.autoScroll.enabled = options;
 
             return interact;
         }
 
         // return the autoScroll settings if autoScroll is enabled
         // otherwise, return false
-        return defaultOptions.autoScrollEnabled? defaults: false;
+        return defaultOptions.autoScroll.enabled? defaults: false;
     };
 
     /*\
@@ -5338,15 +5156,14 @@
      = (object | interact) The default snap settings object or interact
     \*/
     interact.snap = function (options) {
-        var snap = defaultOptions.snap;
+        var snap = defaultOptions.perAction.snap;
 
         if (isObject(options)) {
-            defaultOptions.snapEnabled = true;
+            defaultOptions.snap.enabled = true;
 
             if (isString(options.mode)         ) { snap.mode          = options.mode;          }
             if (isBool  (options.endOnly)      ) { snap.endOnly       = options.endOnly;       }
             if (isNumber(options.range)        ) { snap.range         = options.range;         }
-            if (isArray (options.actions)      ) { snap.actions       = options.actions;       }
             if (isArray (options.anchors)      ) { snap.anchors       = options.anchors;       }
             if (isObject(options.grid)         ) { snap.grid          = options.grid;          }
             if (isObject(options.gridOffset)   ) { snap.gridOffset    = options.gridOffset;    }
@@ -5355,12 +5172,12 @@
             return interact;
         }
         if (isBool(options)) {
-            defaultOptions.snapEnabled = options;
+            defaultOptions.snap.enabled = options;
 
             return interact;
         }
 
-        return defaultOptions.snapEnabled;
+        return defaultOptions.snap.enabled;
     };
 
     /*\
@@ -5377,10 +5194,10 @@
      = (object | interact) The default inertia settings object or interact
     \*/
     interact.inertia = function (options) {
-        var inertia = defaultOptions.inertia;
+        var inertia = defaultOptions.perAction.inertia;
 
         if (isObject(options)) {
-            defaultOptions.inertiaEnabled = true;
+            defaultOptions.inertia.enabled = true;
 
             if (isNumber(options.resistance)       ) { inertia.resistance        = options.resistance       ; }
             if (isNumber(options.minSpeed)         ) { inertia.minSpeed          = options.minSpeed         ; }
@@ -5388,22 +5205,20 @@
             if (isNumber(options.smoothEndDuration)) { inertia.smoothEndDuration = options.smoothEndDuration; }
             if (isBool  (options.allowResume)      ) { inertia.allowResume       = options.allowResume      ; }
             if (isBool  (options.zeroResumeDelta)  ) { inertia.zeroResumeDelta   = options.zeroResumeDelta  ; }
-            if (isArray (options.actions)          ) { inertia.actions           = options.actions          ; }
 
             return interact;
         }
         if (isBool(options)) {
-            defaultOptions.inertiaEnabled = options;
+            defaultOptions.inertia.enabled = options;
 
             return interact;
         }
 
         return {
-            enabled: defaultOptions.inertiaEnabled,
+            enabled: inertia.enabled,
             resistance: inertia.resistance,
             minSpeed: inertia.minSpeed,
             endSpeed: inertia.endSpeed,
-            actions: inertia.actions,
             allowResume: inertia.allowResume,
             zeroResumeDelta: inertia.zeroResumeDelta
         };
@@ -5522,14 +5337,14 @@
      = (object) The current restrictions object or interact
     \*/
     interact.restrict = function (newValue) {
-        var defaults = defaultOptions.restrict;
+        var defaults = defaultOptions.perAction.restrict;
 
         if (newValue === undefined) {
             return defaultOptions.restrict;
         }
 
         if (isBool(newValue)) {
-            defaultOptions.restrictEnabled = newValue;
+            defaultOptions.restrict.enabled = newValue;
         }
         else if (isObject(newValue)) {
             if (isObject(newValue.drag) || /^parent$|^self$/.test(newValue.drag)) {
@@ -5550,7 +5365,7 @@
                 defaults.elementRect = newValue.elementRect;
             }
 
-            defaultOptions.restrictEnabled = true;
+            defaultOptions.restrict.enabled = true;
         }
         else if (newValue === null) {
            defaults.drag = defaults.resize = defaults.gesture = null;
@@ -5571,12 +5386,12 @@
     \*/
     interact.pointerMoveTolerance = function (newValue) {
         if (isNumber(newValue)) {
-            defaultOptions.pointerMoveTolerance = newValue;
+            pointerMoveTolerance = newValue;
 
             return this;
         }
 
-        return defaultOptions.pointerMoveTolerance;
+        return pointerMoveTolerance;
     };
 
     /*\
