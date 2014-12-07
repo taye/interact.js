@@ -1385,14 +1385,11 @@
                 pointerIndex = this.addPointer(pointer),
                 action;
 
-            this.collectEventTargets(pointer, event, eventTarget, 'down');
-
             this.holdTimers[pointerIndex] = window.setTimeout(function () {
                 that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
             }, 600);
 
             this.pointerIsDown = true;
-
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1408,6 +1405,7 @@
                         cancelFrame(this.inertiaStatus.i);
                         this.inertiaStatus.active = false;
 
+                        this.collectEventTargets(pointer, event, eventTarget, 'down');
                         return;
                     }
                     element = element.parentNode;
@@ -1416,6 +1414,7 @@
 
             // do nothing if interacting
             if (this.interacting()) {
+                this.collectEventTargets(pointer, event, eventTarget, 'down');
                 return;
             }
 
@@ -1456,6 +1455,8 @@
                 this.prepared.name = action.name;
                 this.prepared.axis = action.axis;
 
+                this.collectEventTargets(pointer, event, eventTarget, 'down');
+
                 return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
             }
             else {
@@ -1468,6 +1469,8 @@
                 copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
             }
+
+            this.collectEventTargets(pointer, event, eventTarget, 'down');
         },
 
         // Determine action to be performed on next pointerMove and add appropriate
