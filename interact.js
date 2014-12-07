@@ -1278,9 +1278,9 @@
                                      elementInteractable.getAction(pointer, this, eventTarget),
                                      elementInteractable));
 
-             elementAction = elementInteractable && withinInteractionLimit(elementInteractable, eventTarget, elementAction)
-                 ? elementAction
-                 : null;
+            if (elementAction && !withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
+                 elementAction = null;
+            }
 
             function pushCurMatches (interactable, selector) {
                 if (interactable
@@ -1745,9 +1745,7 @@
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
                         if (starting) {
-                            var startEvent = this[this.prepared.name + 'Start'](this.downEvent);
-
-                            this.prevEvent = startEvent;
+                            this[this.prepared.name + 'Start'](this.downEvent);
 
                             snapCoords = this.curCoords.page;
 
@@ -1775,6 +1773,8 @@
 
             this.dragging = true;
             this.target.fire(dragEvent);
+
+            this.prevEvent = dragEvent;
 
             // reset active dropzones
             this.activeDrops.dropzones = [];
