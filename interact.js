@@ -1549,6 +1549,85 @@
             }
         },
 
+        setModifications: function (coords, preEnd) {
+            var target         = this.target,
+                shouldMove     = true,
+                shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
+                shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
+
+            if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
+            if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
+
+            if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
+                shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
+            }
+            else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
+                shouldMove = false;
+            }
+
+            return shouldMove;
+        },
+
+        setStartOffsets: function (action, interactable, element) {
+            var rect = interactable.getRect(element),
+                snap = interactable.options[this.prepared.name].snap,
+                restrict = interactable.options[this.prepared.name].restrict,
+                width, height;
+
+            if (rect) {
+                this.startOffset.left = this.startCoords.page.x - rect.left;
+                this.startOffset.top  = this.startCoords.page.y - rect.top;
+
+                this.startOffset.right  = rect.right  - this.startCoords.page.x;
+                this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
+
+                if ('width' in rect) { width = rect.width; }
+                else { width = rect.right - rect.left; }
+                if ('height' in rect) { height = rect.height; }
+                else { height = rect.bottom - rect.top; }
+            }
+            else {
+                this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
+            }
+
+            if (rect && snap.elementOrigin) {
+                this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
+                this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
+            }
+            else {
+                this.snapOffset.x = this.snapOffset.y = 0;
+            }
+
+            if (rect && restrict.elementRect) {
+                this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
+                this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
+
+                this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
+                this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
+            }
+            else {
+                this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
+            }
+        },
+
+        start: function (action, interactable, element) {
+            if (this.interacting()
+                || !this.pointerIsDown
+                || this.pointerIds.length < (action.name === 'gesture'? 2 : 1)) {
+                return;
+            }
+
+            this.prepared.name = action.name;
+            this.prepared.axis = action.axis;
+            this.target        = interactable;
+            this.element       = element;
+
+            this.setStartOffsets(action.name, interactable, element);
+            this.setModifications(this.startCoords.page);
+
+            this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
+        },
+
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
             this.recordPointer(pointer);
 
@@ -1677,83 +1756,21 @@
 
                 var starting = !!this.prepared.name && !this.interacting();
 
-                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared.name)) {
+                if (starting
+                    && !withinInteractionLimit(this.target, this.element, this.prepared.name)) {
                     this.stop();
                     return;
                 }
 
                 if (this.prepared.name && this.target) {
-                    var target         = this.target,
-                        shouldMove     = true,
-                        shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
-
                     if (starting) {
-                        var rect = target.getRect(this.element),
-                            snap = target.options[this.prepared.name].snap,
-                            restrict = target.options[this.prepared.name].restrict,
-                            width, height;
-
-                        if (rect) {
-                            this.startOffset.left = this.startCoords.page.x - rect.left;
-                            this.startOffset.top  = this.startCoords.page.y - rect.top;
-
-                            this.startOffset.right  = rect.right  - this.startCoords.page.x;
-                            this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
-
-                            if ('width' in rect) { width = rect.width; }
-                            else { width = rect.right - rect.left; }
-                            if ('height' in rect) { height = rect.height; }
-                            else { height = rect.bottom - rect.top; }
-                        }
-                        else {
-                            this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
-                        }
-
-                        if (rect && snap.elementOrigin) {
-                            this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
-                            this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
-                        }
-                        else {
-                            this.snapOffset.x = this.snapOffset.y = 0;
-                        }
-
-                        if (rect && restrict.elementRect) {
-                            this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
-                            this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
-
-                            this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
-                            this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
-                        }
-                        else {
-                            this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
-                        }
+                        this.start(this.prepared, this.target, this.element);
                     }
 
-                    var snapCoords = starting? this.startCoords.page : this.curCoords.page;
-
-                    if (shouldSnap    ) { this.setSnapping   (snapCoords); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { this.setRestriction(snapCoords); } else { this.restrictStatus.restricted = false; }
-
-                    if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
-                        shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
-                    }
-                    else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
-                        shouldMove = false;
-                    }
+                    var shouldMove = this.setModifications(this.curCoords.page, preEnd);
 
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
-                        if (starting) {
-                            this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
-
-                            snapCoords = this.curCoords.page;
-
-                            // set snapping and restriction for the move event
-                            if (shouldSnap    ) { this.setSnapping   (snapCoords); }
-                            if (shouldRestrict) { this.setRestriction(snapCoords); }
-                        }
-
                         this.prevEvent = this[this.prepared.name + 'Move'](event);
                     }
 
@@ -2429,9 +2446,9 @@
 
             if (index === -1) {
                 index = this.pointerIds.length;
-                this.pointerIds.push(id);
             }
 
+            this.pointerIds[index] = id;
             this.pointers[index] = pointer;
 
             return index;
