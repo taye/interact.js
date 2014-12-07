@@ -937,18 +937,16 @@
     }
 
     function withinInteractionLimit (interactable, element, action) {
-        action = /resize/.test(action)? 'resize': action;
-
         var options = interactable.options,
-            maxActions = options[action + 'Max'],
-            maxPerElement = options[action + 'MaxPerElement'],
+            maxActions = options[action.name + 'Max'],
+            maxPerElement = options[action.name + 'MaxPerElement'],
             activeInteractions = 0,
             targetCount = 0,
             targetElementCount = 0;
 
         for (var i = 0, len = interactions.length; i < len; i++) {
             var interaction = interactions[i],
-                otherAction = /resize/.test(interaction.prepared)? 'resize': interaction.prepared,
+                otherAction = interaction.prepared.name,
                 active = interaction.interacting();
 
             if (!active) { continue; }
@@ -961,7 +959,7 @@
 
             if (interaction.target !== interactable) { continue; }
 
-            targetCount += (otherAction === action)|0;
+            targetCount += (otherAction === action.name)|0;
 
             if (targetCount >= maxActions) {
                 return false;
@@ -970,7 +968,7 @@
             if (interaction.element === element) {
                 targetElementCount++;
 
-                if (otherAction !== action || targetElementCount >= maxPerElement) {
+                if (otherAction !== action.name || targetElementCount >= maxPerElement) {
                     return false;
                 }
             }
@@ -1090,8 +1088,10 @@
         this.prevDropTarget  = null; // the dropzone that was recently dragged away from
         this.prevDropElement = null; // the element at the time of checking
 
-        this.prepared        = null; // Action that's ready to be fired on next move event
-        this.action          = null; // general action name (resizex/y changes to resize)
+        this.prepared        = {     // action that's ready to be fired on next move event
+            name: null,
+            axis: null
+        };
 
         this.matches         = [];   // all selectors that are matched by target element
         this.matchElements   = [];   // corresponding elements
@@ -1232,7 +1232,7 @@
         setEventXY : function (target, ptr) { return  setEventXY(target, ptr, this); },
 
         pointerOver: function (pointer, event, eventTarget) {
-            if (this.prepared || !this.mouse) { return; }
+            if (this.prepared.name || !this.mouse) { return; }
 
             var curMatches = [],
                 curMatchElements = [],
@@ -1315,7 +1315,7 @@
         pointerHover: function (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
             var target = this.target;
 
-            if (!this.prepared && this.mouse) {
+            if (!this.prepared.name && this.mouse) {
 
                 var action;
 
@@ -1331,20 +1331,20 @@
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        target._doc.documentElement.style.cursor = actionCursors[action];
+                        target._doc.documentElement.style.cursor = actionCursors[action.name + (action.axis || '')];
                     }
                     else {
                         target._doc.documentElement.style.cursor = '';
                     }
                 }
             }
-            else if (this.prepared) {
+            else if (this.prepared.name) {
                 this.checkAndPreventDefault(event, target, this.element);
             }
         },
 
         pointerOut: function (pointer, event, eventTarget) {
-            if (this.prepared) { return; }
+            if (this.prepared.name) { return; }
 
             // Remove temporary event listeners for selector Interactables
             if (!interactables.get(eventTarget)) {
@@ -1383,7 +1383,7 @@
                     // if this element is the current inertia target element
                     if (element === this.element
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(pointer, this, this.element), this.target) === this.prepared) {
+                        && validateAction(this.target.getAction(pointer, this, this.element), this.target).action === this.prepared.name) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1434,8 +1434,8 @@
             }
 
             if (action) {
-                this.prepared = action;
-                this.action = /resize/.test(action)? 'resize' : action;
+                this.prepared.name = action.name;
+                this.prepared.axis = action.axis;
 
                 return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
             }
@@ -1454,7 +1454,7 @@
         // Determine action to be performed on next pointerMove and add appropriate
         // style and event Listeners
         pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
-            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared) {
+            if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared.name) {
                 this.checkAndPreventDefault(event, this.target, this.element);
 
                 return;
@@ -1468,7 +1468,7 @@
             // If it is the second touch of a multi-touch gesture, keep the target
             // the same if a target was set by the first touch
             // Otherwise, set the target if there is no action prepared
-            if ((this.pointerIds.length < 2 && !this.target) || !this.prepared) {
+            if ((this.pointerIds.length < 2 && !this.target) || !this.prepared.name) {
 
                 var interactable = interactables.get(curEventTarget);
 
@@ -1496,20 +1496,14 @@
                     target._doc.documentElement.style.cursor = actionCursors[action];
                 }
 
-                this.resizeAxes = action === 'resizexy'
-                    ? 'xy'
-                    : action === 'resizex'
-                        ? 'x'
-                        : action === 'resizey'
-                            ?  'y'
-                            : '';
+                this.resizeAxes = action.name === 'resize'? action.axis : null;
 
                 if (action === 'gesture' && this.pointerIds.length < 2) {
                     action = null;
                 }
 
-                this.prepared = action;
-                this.action = /resize/.test(action)? 'resize' : action;
+                this.prepared.name = action.name;
+                this.prepared.axis = action.axis;
 
                 this.snapStatus.snappedX = this.snapStatus.snappedY =
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
@@ -1527,7 +1521,7 @@
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && curEventTarget === this.element
-                && validateAction(target.getAction(pointer, this, this.element), target) === this.prepared) {
+                && validateAction(target.getAction(pointer, this, this.element), target).action === this.prepared.name) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1577,7 +1571,7 @@
             // set pointer coordinate, time changes and speeds
             setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
-            if (!this.prepared) { return; }
+            if (!this.prepared.name) { return; }
 
             if (this.pointerWasMoved
                 // ignore movement while inertia is active
@@ -1588,7 +1582,7 @@
                     setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
                     // check if a drag is in the correct axis
-                    if (this.prepared === 'drag') {
+                    if (this.prepared.name === 'drag') {
                         var absX = Math.abs(dx),
                             absY = Math.abs(dy),
                             targetAxis = this.target.options.dragAxis,
@@ -1597,7 +1591,7 @@
                         // if the movement isn't in the axis of the interactable
                         if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
                             // cancel the prepared action
-                            this.prepared = null;
+                            this.prepared.name = null;
 
                             // then try to get a drag from another ineractable
 
@@ -1609,10 +1603,10 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
-                                    && elementInteractable.getAction(this.downPointer, this, element) === 'drag'
+                                    && elementInteractable.getAction(this.downPointer, this, element).action === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
-                                    this.prepared = 'drag';
+                                    this.prepared.name = 'drag';
                                     this.target = elementInteractable;
                                     this.element = element;
                                     break;
@@ -1623,7 +1617,7 @@
 
                             // if there's no drag from element interactables,
                             // check the selector interactables
-                            if (!this.prepared) {
+                            if (!this.prepared.name) {
                                 var getDraggable = function (interactable, selector, context) {
                                     var elements = ie8MatchesSelector
                                         ? context.querySelectorAll(selector)
@@ -1635,7 +1629,7 @@
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downPointer, this, element) === 'drag'
+                                        && interactable.getAction(this.downPointer, this, element).action === 'drag'
                                         && checkAxis(axis, interactable)
                                         && withinInteractionLimit(interactable, element, 'drag')) {
 
@@ -1649,7 +1643,7 @@
                                     var selectorInteractable = interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
-                                        this.prepared = 'drag';
+                                        this.prepared.name = 'drag';
                                         this.target = selectorInteractable;
                                         this.element = element;
                                         break;
@@ -1662,18 +1656,18 @@
                     }
                 }
 
-                var starting = !!this.prepared && !this.interacting();
+                var starting = !!this.prepared.name && !this.interacting();
 
-                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared)) {
+                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared.name)) {
                     this.stop();
                     return;
                 }
 
-                if (this.prepared && this.target) {
+                if (this.prepared.name && this.target) {
                     var target         = this.target,
                         shouldMove     = true,
-                        shouldSnap     = checkSnap(target, this.action)     && (!target.options.snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.action) && (!target.options.restrict.endOnly || preEnd);
+                        shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options.snap.endOnly     || preEnd),
+                        shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options.restrict.endOnly || preEnd);
 
                     if (starting) {
                         var rect = target.getRect(this.element),
@@ -1732,7 +1726,7 @@
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
                         if (starting) {
-                            var dragStartEvent = this[this.action + 'Start'](this.downEvent);
+                            var dragStartEvent = this[this.prepared.name + 'Start'](this.downEvent);
 
                             this.prevEvent = dragStartEvent;
 
@@ -1758,7 +1752,7 @@
                             if (shouldRestrict) { this.setRestriction(snapCoords); }
                         }
 
-                        this.prevEvent = this[this.action + 'Move'](event);
+                        this.prevEvent = this[this.prepared.name + 'Move'](event);
                     }
 
                     this.checkAndPreventDefault(event, this.target, this.element);
@@ -1924,8 +1918,8 @@
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
-                    endSnap = checkSnap(target, this.action) && options.snap.endOnly,
-                    endRestrict = checkRestrict(target, this.action) && options.restrict.endOnly,
+                    endSnap = checkSnap(target, this.prepared.name) && options.snap.endOnly,
+                    endRestrict = checkRestrict(target, this.prepared.name) && options.restrict.endOnly,
                     dx = 0,
                     dy = 0,
                     startEvent;
@@ -1938,8 +1932,8 @@
 
                 // check if inertia should be started
                 inertiaPossible = (options.inertiaEnabled
-                                   && this.action !== 'gesture'
-                                   && contains(inertiaOptions.actions, this.action)
+                                   && this.prepared.name !== 'gesture'
+                                   && contains(inertiaOptions.actions, this.prepared.name)
                                    && event !== inertiaStatus.startEvent);
 
                 inertia = (inertiaPossible
@@ -1978,7 +1972,7 @@
                     copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointers[0] = inertiaStatus.startEvent = startEvent =
-                        new InteractEvent(this, event, this.action, 'inertiastart', this.element);
+                        new InteractEvent(this, event, this.prepared.name, 'inertiastart', this.element);
 
                     inertiaStatus.t0 = now;
 
@@ -2295,7 +2289,7 @@
             }
 
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
-            this.prepared = this.action = this.prevEvent = null;
+            this.prepared.name = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
             this.pointerIds .splice(0);
@@ -2701,7 +2695,7 @@
         setRestriction: function (pageCoords, status) {
             var target = this.target,
                 restrict = target && target.options.restrict,
-                restriction = restrict && restrict[this.action],
+                restriction = restrict && restrict[this.prepared.name],
                 page;
 
             if (!restriction) {
@@ -2787,7 +2781,7 @@
                 // and dragging can only start from a certain direction - this allows
                 // a touch to pan the viewport if a drag isn't in the right direction
                 if (/down|start/i.test(event.type)
-                    && this.prepared === 'drag' && options.dragAxis !== 'xy') {
+                    && this.prepared.name === 'drag' && options.dragAxis !== 'xy') {
 
                     return;
                 }
@@ -2899,7 +2893,7 @@
         for (i = 0; i < len; i++) {
             interaction = interactions[i];
 
-            if ((!interaction.prepared || (interaction.target.gesturable()))
+            if ((!interaction.prepared.name || (interaction.target.gesturable()))
                 && !interaction.interacting()
                 && !(!mouseEvent && interaction.mouse)) {
 
@@ -3226,6 +3220,7 @@
             right,
             bottom,
             action = null,
+            resizeAxes = null,
             page = extend({}, interaction.curCoords.page),
             options = this.options;
 
@@ -3236,13 +3231,13 @@
             bottom = options.resizeAxis !== 'x' && page.y > (rect.bottom - margin);
         }
 
-        interaction.resizeAxes = (right?'x': '') + (bottom?'y': '');
+        resizeAxes = (right?'x': '') + (bottom?'y': '');
 
-        action = (interaction.resizeAxes)?
-            'resize' + interaction.resizeAxes:
-            actionIsEnabled.drag && options.draggable?
-                'drag':
-                null;
+        action = resizeAxes
+            ? 'resize'
+            : actionIsEnabled.drag && options.draggable
+                ?  'drag'
+                : null;
 
         if (actionIsEnabled.gesture
             && interaction.pointerIds.length >=2
@@ -3250,25 +3245,28 @@
             action = 'gesture';
         }
 
-        return action;
+        if (action) {
+            return {
+                name: action,
+                axis: resizeAxes
+            };
+        }
+
+        return null;
     }
 
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action, interactable) {
-        if (!isString(action)) { return null; }
+        if (!isObject(action)) { return null; }
 
-        var actionType = /resize/.test(action)? 'resize': action,
+        var actionName = action.name,
             options = interactable;
 
-        if ((  (actionType  === 'resize'   && options.resizable )
-            || (action      === 'drag'     && options.draggable  )
-            || (action      === 'gesture'  && options.gesturable))
-            && actionIsEnabled[actionType]) {
-
-            if (action === 'resize' || action === 'resizeyx') {
-                action = 'resizexy';
-            }
+        if ((  (actionName === 'resize'   && options.resizable )
+            || (actionName === 'drag'     && options.draggable  )
+            || (actionName === 'gesture'  && options.gesturable))
+            && actionIsEnabled[actionName]) {
 
             return action;
         }
@@ -4162,7 +4160,7 @@
             var action = this.defaultActionChecker(pointer, interaction, element);
 
             if (this.options.actionChecker) {
-                action = this.options.actionChecker(pointer, action, this, element, interaction);
+                return this.options.actionChecker(pointer, action, this, element, interaction);
             }
 
             return action;
@@ -4177,17 +4175,24 @@
          * Gets or sets the function used to check action to be performed on
          * pointerDown
          *
-         - checker (function | null) #optional A function which takes a pointer event, defaultAction string and an interactable as parameters and returns 'drag' 'resize[axes]' or 'gesture' or null.
+         - checker (function | null) #optional A function which takes a pointer event, defaultAction string and an interactable as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an axis 'x', 'y', or 'xy'; or null.
          = (Function | Interactable) The checker function or this Interactable
+         *
+         | interact('.resize-horiz').actionChecker(function (defaultAction, interactable) {
+         |   return {
+         |     name: 'resize',
+         |     axis: 'x'
+         |   };
+         | });
         \*/
-        actionChecker: function (newValue) {
-            if (isFunction(newValue)) {
-                this.options.actionChecker = newValue;
+        actionChecker: function (checker) {
+            if (isFunction(checker)) {
+                this.options.actionChecker = checker;
 
                 return this;
             }
 
-            if (newValue === null) {
+            if (checker === null) {
                 delete this.options.actionChecker;
 
                 return this;
