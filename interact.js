@@ -1745,7 +1745,7 @@
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
                         if (starting) {
-                            this[this.prepared.name + 'Start'](this.downEvent);
+                            this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
 
                             snapCoords = this.curCoords.page;
 
@@ -1773,8 +1773,6 @@
 
             this.dragging = true;
             this.target.fire(dragEvent);
-
-            this.prevEvent = dragEvent;
 
             // reset active dropzones
             this.activeDrops.dropzones = [];
@@ -2211,63 +2209,96 @@
         },
 
         getDropEvents: function (pointerEvent, dragEvent) {
-            var dragLeaveEvent = null,
-                dragEnterEvent = null,
-                dropActivateEvent = null,
-                dropDeactivateEvent = null,
-                dropMoveEvent = null,
-                dropEvent = null;
+            var dropEvents = {
+                enter     : null,
+                leave     : null,
+                activate  : null,
+                deactivate: null,
+                move      : null,
+                drop      : null
+            };
 
             if (this.dropElement !== this.prevDropElement) {
                 // if there was a prevDropTarget, create a dragleave event
                 if (this.prevDropTarget) {
-                    dragLeaveEvent = new InteractEvent(this, pointerEvent, 'drag', 'leave', this.prevDropElement, dragEvent.target);
-                    dragLeaveEvent.draggable = dragEvent.interactable;
+                    dropEvents.leave = {
+                        target       : this.prevDropElement,
+                        dropzone     : this.prevDropTarget,
+                        relatedTarget: dragEvent.target,
+                        draggable    : dragEvent.interactable,
+                        dragEvent    : dragEvent,
+                        timeStamp    : dragEvent.timeStamp,
+                        type         : 'dragleave'
+                    };
+
                     dragEvent.dragLeave = this.prevDropElement;
                     dragEvent.prevDropzone = this.prevDropTarget;
                 }
                 // if the dropTarget is not null, create a dragenter event
                 if (this.dropTarget) {
-                    dragEnterEvent = new InteractEvent(this, pointerEvent, 'drag', 'enter', this.dropElement, dragEvent.target);
-                    dragEnterEvent.draggable = dragEvent.interactable;
+                    dropEvents.enter = {
+                        target       : this.dropElement,
+                        dropzone     : this.dropTarget,
+                        relatedTarget: dragEvent.target,
+                        draggable    : dragEvent.interactable,
+                        dragEvent    : dragEvent,
+                        timeStamp    : dragEvent.timeStamp,
+                        type         : 'dragenter'
+                    };
+
                     dragEvent.dragEnter = this.dropElement;
                     dragEvent.dropzone = this.dropTarget;
                 }
             }
 
             if (dragEvent.type === 'dragend' && this.dropTarget) {
-                dropEvent = new InteractEvent(this, pointerEvent, 'drop', null, this.dropElement, dragEvent.target);
-                dropEvent.draggable = dragEvent.interactable;
-                dragEvent.dropzone = this.dropTarget;
-            }
-            if (dragEvent.type === 'dragstart') {
-                dropActivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'activate', this.element, dragEvent.target);
-                dropActivateEvent.draggable = dragEvent.interactable;
-            }
-            if (dragEvent.type === 'dragend') {
-                dropDeactivateEvent = new InteractEvent(this, pointerEvent, 'drop', 'deactivate', this.element, dragEvent.target);
-                dropDeactivateEvent.draggable = dragEvent.interactable;
-            }
-            if (dragEvent.type === 'dragmove' && this.dropTarget) {
-                dropMoveEvent = {
+                dropEvents.drop = {
                     target       : this.dropElement,
+                    dropzone     : this.dropTarget,
                     relatedTarget: dragEvent.target,
                     draggable    : dragEvent.interactable,
+                    dragEvent    : dragEvent,
+                    timeStamp    : dragEvent.timeStamp,
+                    type         : 'drop'
+                };
+            }
+            if (dragEvent.type === 'dragstart') {
+                dropEvents.activate = {
+                    target       : null,
+                    dropzone     : null,
+                    relatedTarget: dragEvent.target,
+                    draggable    : dragEvent.interactable,
+                    dragEvent    : dragEvent,
+                    timeStamp    : dragEvent.timeStamp,
+                    type         : 'dropactivate'
+                };
+            }
+            if (dragEvent.type === 'dragend') {
+                dropEvents.deactivate = {
+                    target       : null,
+                    dropzone     : null,
+                    relatedTarget: dragEvent.target,
+                    draggable    : dragEvent.interactable,
+                    dragEvent    : dragEvent,
+                    timeStamp    : dragEvent.timeStamp,
+                    type         : 'dropdeactivate'
+                };
+            }
+            if (dragEvent.type === 'dragmove' && this.dropTarget) {
+                dropEvents.move = {
+                    target       : this.dropElement,
+                    dropzone     : this.dropTarget,
+                    relatedTarget: dragEvent.target,
+                    draggable    : dragEvent.interactable,
+                    dragEvent    : dragEvent,
                     dragmove     : dragEvent,
-                    type         : 'dropmove',
-                    timeStamp    : dragEvent.timeStamp
+                    timeStamp    : dragEvent.timeStamp,
+                    type         : 'dropmove'
                 };
                 dragEvent.dropzone = this.dropTarget;
             }
 
-            return {
-                enter       : dragEnterEvent,
-                leave       : dragLeaveEvent,
-                activate    : dropActivateEvent,
-                deactivate  : dropDeactivateEvent,
-                move        : dropMoveEvent,
-                drop        : dropEvent
-            };
+            return dropEvents;
         },
 
         currentAction: function () {
