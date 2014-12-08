@@ -1,3 +1,43 @@
+
+### Per-action settings
+
+Snap, restrict, inertia, autoScroll can be different for drag, restrict and
+gesture. See [PR 115](https://github.com/taye/interact.js/pull/115).
+
+### Space-separated string and array event list
+
+```javascript
+function logEventType (event) {
+  console.log(event.type, event.target);
+}
+
+interact(target).on('down tap dragstart gestureend', logEventType);
+
+interact(target).on(['move', 'resizestart'], logEventType);
+```
+
+### Interactable actionChecker
+
+The expected return value from an action checker has changed from a string to
+an object. The object should have a `name` and can also have an `axis`
+property. For example, to resize horizontally:
+
+```javascript
+interact(target).resizeable(true)
+  .actionChecker(function (pointer, defaultAction, interactable, element) {
+    return {
+      name: 'resize',
+      axis: 'x',
+    };
+  });
+```
+
+### Plain drop event objects
+
+All drop-related events are [now plain
+objects](https://github.com/taye/interact.js/issues/122). The related drag
+events are referenced in their `dragEvent` property.
+
 ## 1.1.3
 
 ### Better Events
