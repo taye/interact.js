@@ -53,6 +53,7 @@
 
             drag: {
                 enabled: false,
+                manualStart: true,
                 max: 1,
                 maxPerElement: 1,
 
@@ -72,6 +73,7 @@
 
             resize: {
                 enabled: false,
+                manualStart: false,
                 max: 1,
                 maxPerElement: 1,
 
@@ -85,6 +87,7 @@
             },
 
             gesture: {
+                manualStart: false,
                 enabled: false,
                 max: 1,
                 maxPerElement: 1,
@@ -93,6 +96,7 @@
             },
 
             perAction: {
+                manualStart: false,
                 max: 1,
                 maxPerElement: 1,
 
@@ -1704,6 +1708,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
+                                    && !elementInteractable.options.drag.manualStart
                                     && elementInteractable.getAction(this.downPointer, this, element).name === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
@@ -1727,6 +1732,7 @@
                                     if (interactable === this.target) { return; }
 
                                     if (inContext(interactable, eventTarget)
+                                        && !interactable.options.drag.manualStart
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
@@ -1760,7 +1766,8 @@
                 var starting = !!this.prepared.name && !this.interacting();
 
                 if (starting
-                    && !withinInteractionLimit(this.target, this.element, this.prepared.name)) {
+                    && (this.target.options[this.prepared.name].manualStart
+                        || !withinInteractionLimit(this.target, this.element, this.prepared.name))) {
                     this.stop();
                     return;
                 }
