@@ -101,7 +101,7 @@
                     mode        : 'grid',
                     endOnly     : false,
                     range       : Infinity,
-                    gridOffset  : { x: 0, y: 0 },
+                    targets     : [],
 
                     elementOrigin: null
                 },
@@ -1217,8 +1217,7 @@
             dx      : 0, dy      : 0,
             realX   : 0, realY   : 0,
             snappedX: 0, snappedY: 0,
-            anchors : [],
-            paths   : [],
+            targets : [],
             locked  : false,
             changed : false
         };
@@ -2603,16 +2602,20 @@
 
         setSnapping: function (pageCoords, status) {
             var snap = this.target.options[this.prepared.name].snap,
-                anchors = snap.anchors,
+                len = snap.targets.length;
+
+            if (!len) { return status; }
+
+            var targets = [],
+                target,
                 page,
                 closest,
                 range,
                 inRange,
                 snapChanged,
-                dx,
-                dy,
+                dx, dy,
                 distance,
-                i, len;
+                i;
 
             status = status || this.snapStatus;
 
@@ -2637,107 +2640,78 @@
             // change to infinite range when range is negative
             if (snap.range < 0) { snap.range = Infinity; }
 
-            // create an anchor representative for each path's returned point
-            if (snap.mode === 'path') {
-                anchors = [];
+            for (i = 0; i < len; i++) {
+                target = snap.targets[i];
 
-                for (i = 0, len = snap.paths.length; i < len; i++) {
-                    var path = snap.paths[i];
-
-                    if (isFunction(path)) {
-                        path = path(page.x, page.y);
-                    }
-
-                    anchors.push({
-                        x: isNumber(path.x) ? path.x : page.x,
-                        y: isNumber(path.y) ? path.y : page.y,
-
-                        range: isNumber(path.range)? path.range: snap.range
-                    });
-                }
-            }
-
-            if ((snap.mode === 'anchor' || snap.mode === 'path') && anchors.length) {
-                closest = {
-                    anchor: null,
-                    distance: 0,
-                    range: 0,
-                    dx: 0,
-                    dy: 0
-                };
-
-                for (i = 0, len = anchors.length; i < len; i++) {
-                    var anchor = anchors[i];
-
-                    range = isNumber(anchor.range)? anchor.range: snap.range;
-
-                    dx = anchor.x - page.x + this.snapOffset.x;
-                    dy = anchor.y - page.y + this.snapOffset.y;
-                    distance = hypot(dx, dy);
-
-                    inRange = distance < range;
-
-                    // Infinite anchors count as being out of range
-                    // compared to non infinite ones that are in range
-                    if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                        inRange = false;
-                    }
-
-                    if (!closest.anchor || (inRange?
-                        // is the closest anchor in range?
-                        (closest.inRange && range !== Infinity)?
-                            // the pointer is relatively deeper in this anchor
-                            distance / range < closest.distance / closest.range:
-                            //the pointer is closer to this anchor
-                            distance < closest.distance:
-                        // The other is not in range and the pointer is closer to this anchor
-                        (!closest.inRange && distance < closest.distance))) {
-
-                        if (range === Infinity) {
-                            inRange = true;
-                        }
-
-                        closest.anchor = anchor;
-                        closest.distance = distance;
-                        closest.range = range;
-                        closest.inRange = inRange;
-                        closest.dx = dx;
-                        closest.dy = dy;
-
-                        status.range = range;
-                    }
+                if (isFunction(target)) {
+                    target = target(page.x, page.y);
                 }
 
-                inRange = closest.inRange;
-                snapChanged = (closest.anchor.x !== status.x || closest.anchor.y !== status.y);
+                targets.push({
+                    x: isNumber(target.x) ? target.x : page.x,
+                    y: isNumber(target.y) ? target.y : page.y,
 
-                status.snappedX = closest.anchor.x;
-                status.snappedY = closest.anchor.y;
-                status.dx = closest.dx;
-                status.dy = closest.dy;
+                    range: isNumber(target.range)? target.range: snap.range
+                });
             }
-            else if (snap.mode === 'grid') {
-                var gridx = Math.round((page.x - snap.gridOffset.x - this.snapOffset.x) / snap.grid.x),
-                    gridy = Math.round((page.y - snap.gridOffset.y - this.snapOffset.y) / snap.grid.y),
 
-                    newX = gridx * snap.grid.x + snap.gridOffset.x + this.snapOffset.x,
-                    newY = gridy * snap.grid.y + snap.gridOffset.y + this.snapOffset.y;
+            closest = {
+                target: null,
+                distance: 0,
+                range: 0,
+                dx: 0,
+                dy: 0
+            };
 
-                dx = newX - page.x;
-                dy = newY - page.y;
+            for (i = 0, len = targets.length; i < len; i++) {
+                target = targets[i];
 
+                range = isNumber(target.range)? target.range: snap.range;
+
+                dx = target.x - page.x + this.snapOffset.x;
+                dy = target.y - page.y + this.snapOffset.y;
                 distance = hypot(dx, dy);
 
-                inRange = distance < snap.range;
-                snapChanged = (newX !== status.snappedX || newY !== status.snappedY);
+                inRange = distance < range;
 
-                status.snappedX = newX;
-                status.snappedY = newY;
-                status.dx = dx;
-                status.dy = dy;
+                // Infinite target count as being out of range
+                // compared to non infinite ones that are in range
+                if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+                    inRange = false;
+                }
 
-                status.range = snap.range;
+                if (!closest.target || (inRange?
+                    // is the closest target in range?
+                    (closest.inRange && range !== Infinity)?
+                        // the pointer is relatively deeper in this target
+                        distance / range < closest.distance / closest.range:
+                        //the pointer is closer to this target
+                        distance < closest.distance:
+                    // The other is not in range and the pointer is closer to this target
+                    (!closest.inRange && distance < closest.distance))) {
+
+                    if (range === Infinity) {
+                        inRange = true;
+                    }
+
+                    closest.target = target;
+                    closest.distance = distance;
+                    closest.range = range;
+                    closest.inRange = inRange;
+                    closest.dx = dx;
+                    closest.dy = dy;
+
+                    status.range = range;
+                }
             }
+
+            inRange = closest.inRange;
+            snapChanged = (closest.target.x !== status.x || closest.target.y !== status.y);
+
+            status.snappedX = closest.target.x;
+            status.snappedY = closest.target.y;
+            status.dx = closest.dx;
+            status.dy = closest.dy;
 
             status.changed = (snapChanged || (inRange && !status.locked));
             status.locked = inRange;
@@ -3970,25 +3944,10 @@
          - options (object | boolean | null) #optional
          = (Interactable) this Interactable
          > Usage
-         | interact('.handle').snap({
-         |     mode        : 'grid',                // event coords should snap to the corners of a grid
-         |     range       : Infinity,              // the effective distance of snap points
-         |     grid        : { x: 100, y: 100 },    // the x and y spacing of the grid points
-         |     gridOffset  : { x:   0, y:   0 },    // the offset of the grid points
-         | });
-         |
-         | interact('.handle').snap({
-         |     mode        : 'anchor',              // snap to specified points
-         |     anchors     : [
-         |         { x: 100, y: 100, range: 25 },   // a point with x, y and a specific range
-         |         { x: 200, y: 200 }               // a point with x and y. it uses the default range
-         |     ]
-         | });
-         |
          | interact(document.querySelector('#thing')).snap({
-         |     mode : 'path',
-         |     paths: [
-         |         {            // snap to points on these x and y axes
+         |     targets: [
+         |         // snap to this specific point
+         |         {
          |             x: 100,
          |             y: 100,
          |             range: 25
@@ -4000,10 +3959,15 @@
          |                 y: (75 + 50 * Math.sin(x * 0.04)),
          |                 range: 40
          |             };
-         |         }]
-         | })
-         |
-         | interact(element).snap({
+         |         },
+         |         // create a function that snaps to a grid
+         |         interact.createSnapGrid({
+         |             x: 50,
+         |             y: 50,
+         |             range: 10,              // optional
+         |             offset: { x: 5, y: 10 } // optional
+         |         })
+         |     ],
          |     // do not snap during normal movement.
          |     // Instead, trigger only one snapped move event
          |     // immediately before the end event.
@@ -5162,27 +5126,6 @@
      - options (boolean | object) #optional New settings
      * `true` or `false` to simply enable or disable
      * or an object with some of the following properties
-     o {
-     o     mode   : 'grid', 'anchor' or 'path',
-     o     range  : the distance within which snapping to a point occurs,
-     o     actions: ['drag', 'resizex', 'resizey', 'resizexy'], an array of action types that can snapped (['drag'] by default) (no gesture)
-     o     grid   : {
-     o         x, y: the distances between the grid lines,
-     o     },
-     o     gridOffset: {
-     o             x, y: the x/y-axis values of the grid origin
-     o     },
-     o     anchors: [
-     o         {
-     o             x: x coordinate to snap to,
-     o             y: y coordinate to snap to,
-     o             range: optional range for this anchor
-     o         }
-     o         {
-     o             another anchor
-     o         }
-     o     ]
-     o }
      *
      = (object | interact) The default snap settings object or interact
     \*/
@@ -5195,7 +5138,7 @@
             if (isString(options.mode)         ) { snap.mode          = options.mode;          }
             if (isBool  (options.endOnly)      ) { snap.endOnly       = options.endOnly;       }
             if (isNumber(options.range)        ) { snap.range         = options.range;         }
-            if (isArray (options.anchors)      ) { snap.anchors       = options.anchors;       }
+            if (isArray (options.targets)      ) { snap.targets       = options.targets;       }
             if (isObject(options.grid)         ) { snap.grid          = options.grid;          }
             if (isObject(options.gridOffset)   ) { snap.gridOffset    = options.gridOffset;    }
             if (isObject(options.elementOrigin)) { snap.elementOrigin = options.elementOrigin; }
