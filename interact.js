@@ -2629,9 +2629,6 @@
             status.realX = page.x;
             status.realY = page.y;
 
-            // change to infinite range when range is negative
-            if (snap.range < 0) { snap.range = Infinity; }
-
             for (i = 0; i < len; i++) {
                 target = snap.targets[i];
 
