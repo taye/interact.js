@@ -83,7 +83,7 @@ interact(document.body)
             x: 20,
             y: 10
         },
-        range: Infinity // can also use -1 which gets changed to Infinity
+        range: Infinity
     });
     
 
