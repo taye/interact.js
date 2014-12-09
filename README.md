@@ -59,33 +59,32 @@ interact(document.body)
 
             // translate the document body by the change in pointer position
             document.body.style[transformProp] = 'translate(' + x + 'px, ' + y + 'px)';
+        },
+        // allow inertia throwing
+        inertia: {
+            resistance: 15,
+            zeroResumeDelta: true
+        },
+        // snap to the corners of the specified grid
+        snap: {
+            mode: 'grid',
+            grid: {
+                x: 100,
+                y: 5
+            },
+            gridOffset: {
+                x: 20,
+                y: 10
+            },
+            range: Infinity
         }
     })
-    // you should really add listeners like this if you want to add multiple listeners
+    // you should add listeners like this if you want to add multiple listeners
     .on('dragend', function (event) {
         console.log('dragged a distance of ' + 
             Math.sqrt(event.dx*event.dx + event.dy*event.dy) + 
             ' pixels to ' + event.pageX + ', ' + event.pageY);
-    })
-    // allow inertia throwing
-    .inertia({
-        resistance: 15,
-        zeroResumeDelta: true
-    })
-    // snap to the corners of the specified grid
-    .snap({
-        mode: 'grid',
-        grid: {
-            x: 100,
-            y: 5
-        },
-        gridOffset: {
-            x: 20,
-            y: 10
-        },
-        range: Infinity
     });
-    
 
 // you can also listen to InteractEvents for every Interactable
 interact.on('dragstart', function (event) {
@@ -154,11 +153,12 @@ style the element according to event data.
   The `InteractEvent` types are:
 
  - Draggable: `dragstart`, `dragmove`, `draginertiastart`, `dragend`
- - Dropzone: `dropactivate`, `dropdeactivate`, `dragenter`, `dragleave`,
-   `dropmove`, `drop`
  - Resizable: `resizestart`, `resizemove`, `resizeinertiastart`, `resizeend`
  - Gesturable: `gesturestart`, `gesturemove`, `gestureinertiastart`,
    `gestureend`
+
+Dropzones can receive the following events: `dropactivate`, `dropdeactivate`,
+`dragenter`, `dragleave`, `dropmove`, `drop`.
 
 There are also the `down`, `move`, `up`, `cancel`, `tap`, `doubletap` and
 `hold` events. I call these `pointerEvents` because they present the events
@@ -213,14 +213,6 @@ The table below displays all of these events.
 | **dragmove**            |                                                   |
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
-| **dragenter, dragLeave**|                                                   |
-| `draggable`             | The draggable that's over this dropzone           |
-
-| Dropzones               |                                                   |
-| ----------------------- | --------------------------------------------------|
-| **drop(de)activate**, **dropmove**, **drag(enter\|leave)**, **drop** |      |
-| `draggable`             | The draggable element that was dropped into this dropzone |
-|                         |                                                   |
 
 | Resize                  |                                                   |
 | ----------------------- | --------------------------------------------------|
@@ -239,24 +231,27 @@ The table below displays all of these events.
 In gesture events, page and client coordinates are the averages of touch
 coordinates. Velocity is calculated from these averages.
 
-`tap` and `doubletap` event coordinates are copied directly from the source event
-and are not modified – no snapping, restriction or origin for tap and
-doubletap. Also, `dt` of tap events is the time between the related `down` and `up` events
+`pointerEvent` coordinates are copied directly from the source event and are
+not modified – no snapping, restriction or origin for tap and doubletap. Also,
+`dt` of tap events is the time between the related `down` and `up` events. For
+`doubletap` `dt` is the time between the two previous taps.
 
-The [dropmove](https://github.com/taye/interact.js/issues/67) event is a plain
-object created like this:
+The dropzone events are plain objects created like this:
 
-``` javascript
-dropMoveEvent = {
-    target       : dropElement,
-    relatedTarget: dragEvent.target,
-    dragmove     : dragEvent,
-    type         : 'dropmove',
-    timeStamp    : dragEvent.timeStamp
-};
-```
+| Dropzones events        |                                                   |
+| ----------------------- | --------------------------------------------------|
+| `target`                | The dropzone element                              |
+| `dropzone`              | The dropzone Interactable                         |
+|                         |                                                   |
+| `relatedTarget`         | The element that's being dragged                  |
+| `draggable`             | The Interactable that's being dragged             |
+|                         |                                                   |
+| `dragEvent`             | `The related drag event – drag(start|end|move)    |
+| `timeStamp`             | `Time of the event`                               |
+| `type`                  | `The event type`                                  |
 
 ### Interacting
+
 One way to move an element in response to a dragmove is to add a listener that
 transforms the element according to `dy` and `dx` of the InteractEvent.
 
@@ -284,7 +279,3 @@ License
 -------
 
 interact.js is released under the [MIT License](http://taye.mit-license.org).
-
----
-
-interact.js began as a [Google Summer of Code 2012 project]("http://www.google-melange.com/gsoc/project/details/google/gsoc2012/taye/5668600916475904").
