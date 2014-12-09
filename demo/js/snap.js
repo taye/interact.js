@@ -18,9 +18,23 @@
         prevY = 0,
         blue = '#2299ee',
         lightBlue = '#88ccff',
-        peppermint = '#44ee44',
         tango = '#ff4400',
-        draggingAnchor = null;
+        draggingAnchor = null,
+
+        snapGrid = {
+            x: 10,
+            y: 10,
+            range: 10,
+            offset: { x: 0, y: 0 }
+        },
+        gridFunc = interact.createSnapGrid(snapGrid),
+        anchors = [
+            {x: 100, y: 100, range: 200},
+            {x: 600, y: 400, range: Infinity},
+            {x: 500, y: 150, range: Infinity},
+            {x: 250, y: 250, range: Infinity}
+        ];
+
 
     function drawGrid (grid, gridOffset, range) {
         if (!grid.x || !grid.y) { return; }
@@ -88,13 +102,11 @@
         context.clearRect(0, 0, width, height);
         guidesContext.clearRect(0, 0, width, height);
 
-        if (!status.offMode.checked) {
-            if (snap.mode === 'grid') {
-                drawGrid(snap.grid, snap.gridOffset, snap.range);
-            }
-            else if (snap.mode === 'anchor') {
-                drawAnchors(snap.anchors, snap.range);
-            }
+        if (status.gridMode.checked) {
+            drawGrid(snapGrid, snapGrid.offset, snapGrid.range);
+        }
+        else if (status.anchorMode.checked) {
+            drawAnchors(anchors, snap.range);
         }
     }
 
@@ -144,7 +156,7 @@
             draggingAnchor.x += event.dx;
             draggingAnchor.y += event.dy;
 
-            drawAnchors(snap.anchors, snap.range);
+            drawAnchors(anchors, snap.range);
         }
     }
 
@@ -158,20 +170,12 @@
             return;
         }
 
-        interact(canvas).draggable({
-            snap: {
-                enabled: true,
-                grid: {
-                    x: Number(status.gridX.value),
-                    y: Number(status.gridY.value)
-                },
-                gridOffset: {
-                    x: Number(status.offsetX.value),
-                    y: Number(status.offsetY.value)
-                },
-                range: Number(status.range.value)
-            }
-        });
+        snapGrid.x = Number(status.gridX.value);
+        snapGrid.y = Number(status.gridY.value);
+        snapGrid.range = Number(status.range.value);
+
+        snapGrid.offset.x = Number(status.offsetX.value);
+        snapGrid.offset.y = Number(status.offsetY.value);
 
         drawSnap(interact(canvas).draggable().snap);
     }
@@ -211,17 +215,12 @@
         interact(canvas)
             .draggable({
                 snap: {
-                    mode: status.anchorMode.checked? 'anchor': 'grid',
+                    targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
+                    enabled: !status.offMode.checked,
                     endOnly: status.endOnly.checked
                 }
             })
             .inertia(status.inertia.checked);
-
-        interact(canvas).draggable({
-            snap: {
-                enabled: !status.offMode.checked
-            }
-        });
 
         drawSnap(interact(canvas).draggable().snap);
     }
