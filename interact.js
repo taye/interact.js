@@ -98,7 +98,6 @@
 
                 snap: {
                     enabled     : false,
-                    mode        : 'grid',
                     endOnly     : false,
                     range       : Infinity,
                     targets     : null,
@@ -2654,11 +2653,11 @@
                 };
 
             for (i = 0, len = targets.length; i < len; i++) {
+                target = targets[i];
+
                 var range = target.range,
                     dx, dy,
                     distance;
-
-                target = targets[i];
 
                 dx = target.x - page.x + this.snapOffset.x;
                 dy = target.y - page.y + this.snapOffset.y;
@@ -3979,7 +3978,14 @@
          | });
         \*/
         snap: function (options) {
-            return this.setOptions('snap', options);
+            var ret = this.setOptions('snap', options),
+                actions = options && isArray(options.actions)
+                            ? options.actions
+                            : ['drag'];
+
+            if (ret === this) { return this; }
+
+            return ret[actions[0]];
         },
 
         setOptions: function (option, options) {
@@ -4000,11 +4006,26 @@
                     if (isObject(options)) {
                         extend(thisOption, options);
                         thisOption.enabled = options.enabled === false? false: true;
+
+                        if (option === 'snap') {
+                            if (thisOption.mode === 'grid') {
+                                thisOption.targets = [
+                                    interact.createSnapGrid(extend({
+                                        offset: thisOption.gridOffset || { x: 0, y: 0 }
+                                    }, thisOption.grid || {}))
+                                ];
+                            }
+                            else if (thisOption.mode === 'anchor') {
+                                thisOption.targets = thisOption.anchors;
+                            }
+                            else if (thisOption.mode === 'path') {
+                                thisOption.targets = thisOption.paths;
+                            }
+                        }
                     }
                     else {
                         thisOption.enabled = options;
                     }
-
                 }
 
                 return this;
