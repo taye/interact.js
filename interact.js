@@ -2657,7 +2657,8 @@
 
                 var range = target.range,
                     dx, dy,
-                    distance;
+                    distance,
+                    inRange;
 
                 dx = target.x - page.x + this.snapOffset.x;
                 dy = target.y - page.y + this.snapOffset.y;
@@ -2696,8 +2697,7 @@
                 }
             }
 
-            var inRange,
-                snapChanged;
+            var snapChanged;
 
             if (closest.target) {
                 status.snappedX = closest.target.x;
@@ -2714,7 +2714,7 @@
             status.dy = closest.dy;
 
             status.changed = (snapChanged || (closest.inRange && !status.locked));
-            status.locked = inRange;
+            status.locked = closest.inRange;
 
             return status;
         },
