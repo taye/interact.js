@@ -2601,14 +2601,12 @@
 
         setSnapping: function (pageCoords, status) {
             var snap = this.target.options[this.prepared.name].snap,
-                len = snap.targets? snap.targets.length : 0;
-
-            status = status || this.snapStatus;
-
-            var targets = [],
+                targets = [],
                 target,
                 page,
                 i;
+
+            status = status || this.snapStatus;
 
             if (status.useStatusXY) {
                 page = { x: status.x, y: status.y };
@@ -2622,11 +2620,13 @@
                 page.y -= origin.y;
             }
 
-            page.x -= this.inertiaStatus.resumeDx;
-            page.y -= this.inertiaStatus.resumeDy;
-
             status.realX = page.x;
             status.realY = page.y;
+
+            page.x = page.x - this.inertiaStatus.resumeDx - this.snapOffset.x;
+            page.y = page.y - this.inertiaStatus.resumeDy - this.snapOffset.y;
+
+            var len = snap.targets? snap.targets.length : 0;
 
             for (i = 0; i < len; i++) {
                 target = snap.targets[i];
@@ -2634,6 +2634,8 @@
                 if (isFunction(target)) {
                     target = target(page.x, page.y);
                 }
+
+                if (!target) { continue; }
 
                 targets.push({
                     x: isNumber(target.x) ? target.x : page.x,
@@ -2656,15 +2658,10 @@
                 target = targets[i];
 
                 var range = target.range,
-                    dx, dy,
-                    distance,
-                    inRange;
-
-                dx = target.x - page.x + this.snapOffset.x;
-                dy = target.y - page.y + this.snapOffset.y;
-                distance = hypot(dx, dy);
-
-                inRange = distance < range;
+                    dx = target.x - page.x,
+                    dy = target.y - page.y,
+                    distance = hypot(dx, dy),
+                    inRange = distance < range;
 
                 // Infinite targets count as being out of range
                 // compared to non infinite ones that are in range
@@ -2700,15 +2697,17 @@
             var snapChanged;
 
             if (closest.target) {
+                snapChanged = (status.snappedX !== closest.target.x || status.snappedY !== closest.target.y);
+
                 status.snappedX = closest.target.x;
                 status.snappedY = closest.target.y;
             }
             else {
-                status.snappedX = page.x;
-                status.snappedY = page.y;
-            }
+                snapChanged = true;
 
-            snapChanged = (status.snappedX !== status.realX || status.snappedY !== status.realY);
+                status.snappedX = NaN;
+                status.snappedY = NaN;
+            }
 
             status.dx = closest.dx;
             status.dy = closest.dy;
