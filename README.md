@@ -220,7 +220,6 @@ The table below displays all of these events.
 
 | Gesture                 |                                                   |
 | ----------------------- | --------------------------------------------------|
-| `touches`               | The array of touches that triggered the event     |
 | `distance`              | The distance between the event's first two touches|
 | `angle`                 | The angle of the line made by the two touches     |
 | `da`                    | The change in angle since previous event          |
