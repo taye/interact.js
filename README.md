@@ -33,6 +33,10 @@ Demos
    snapping](http://taye.me/blog/interact-js/snap/2013/09/29/interactjs-path-snapping.html)
    demonstrates and graphs some interesting path snapping functions.
 
+## This README features [changes][upcoming-changes] that are currently in development.
+
+The README of the latest release can be found [here][latest-readme].
+
 Example
 -------
 
@@ -278,3 +282,6 @@ License
 -------
 
 interact.js is released under the [MIT License](http://taye.mit-license.org).
+
+[upcoming-changes]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#upcoming-changes
+[latest-readme]: https://github.com/taye/interact.js/blob/latest/README.md#readme
