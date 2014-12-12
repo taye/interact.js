@@ -2669,15 +2669,17 @@
                     inRange = false;
                 }
 
-                if (!closest.target || (inRange?
+                if (!closest.target || (inRange
                     // is the closest target in range?
-                    (closest.inRange && range !== Infinity)?
+                    ? (closest.inRange && range !== Infinity
                         // the pointer is relatively deeper in this target
-                        distance / range < closest.distance / closest.range:
-                        //the pointer is closer to this target
-                        distance < closest.distance:
+                        ? distance / range < closest.distance / closest.range
+                        // this target has Infinite range and the closest doesn't
+                        : (range === Infinity && closest.range !== Infinity)
+                            // OR this target is closer that the previous closest
+                            || distance < closest.distance)
                     // The other is not in range and the pointer is closer to this target
-                    (!closest.inRange && distance < closest.distance))) {
+                    : (!closest.inRange && distance < closest.distance))) {
 
                     if (range === Infinity) {
                         inRange = true;
