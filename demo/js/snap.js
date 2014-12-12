@@ -177,6 +177,10 @@
         snapGrid.offset.x = Number(status.offsetX.value);
         snapGrid.offset.y = Number(status.offsetY.value);
 
+        if (snapGrid.range < 0) {
+            snapGrid.range = Infinity;
+        }
+
         drawSnap(interact(canvas).draggable().snap);
     }
 
