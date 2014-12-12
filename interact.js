@@ -3637,7 +3637,7 @@
          * Interactable to trigger drop events
          *
          * Dropzones can receive the following events:
-         *  - `dragactivate` and `dragdeactivate` when an acceptable drag starts and ends
+         *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
          *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
          *  - `drop` when a draggable is dropped into this dropzone
          *
