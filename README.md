@@ -21,10 +21,6 @@ Demos
    inertia, snap and some other things.
  - [This article](https://hacks.mozilla.org/2014/11/interact-js-for-drag-and-drop-resizing-and-multi-touch-gestures/)
    on the Mozilla Hacks blog features and explains clearly [these 3 demos](http://codepen.io/collection/qwtdB/)
- - The [html & svg demo](http://interactjs.io/repo/demo/html_svg.html "drag, drop,
-   resize and gesture demo") shows div elements which can be dragged and
-   dropped onto each other and resized by dragging the bottom and right edges. The
-   yellow elements are SVG elements (these won't show up on IE8).
  - [star.svg](http://interactjs.io/repo/demo/star.svg "editing an SVG document")
    demonstrates interact.js being used within an SVG document.
  - The [snapping demo](http://interactjs.io/repo/demo/snap.html "Oh snap!") shows
