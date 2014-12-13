@@ -2824,7 +2824,7 @@
                 return;
             }
 
-            if (prevent === true) {
+            if (prevent === 'always') {
                 event.preventDefault();
                 return;
             }
@@ -4235,25 +4235,22 @@
          [ method ]
          *
          * Returns or sets whether to prevent the browser's default behaviour
-         * in response to pointer events. Can be set to
-         *  - `true` to always prevent
-         *  - `false` to never prevent
-         *  - `'auto'` to allow interact.js to try to guess what would be best
-         *  - `null` to set to the default ('auto')
+         * in response to pointer events. Can be set to:
+         *  - `'always'` to always prevent
+         *  - `'never'` to never prevent
+         *  - `'auto'` to let interact.js try to determine what would be best
          *
-         - newValue (boolean | string | null) #optional `true`, `false` or `'auto'`
-         = (boolean | string | Interactable) The current setting or this Interactable
+         - newValue (string) #optional `true`, `false` or `'auto'`
+         = (string | Interactable) The current setting or this Interactable
         \*/
         preventDefault: function (newValue) {
-            if (isBool(newValue) || newValue === 'auto') {
+            if (/^(always|never|auto)$/.test(newValue)) {
                 this.options.preventDefault = newValue;
-
                 return this;
             }
 
-            if (newValue === null) {
-                delete this.options.preventDefault;
-
+            if (isBool(newValue)) {
+                this.options.preventDefault = newValue? 'always' : 'never';
                 return this;
             }
 
