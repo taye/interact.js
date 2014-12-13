@@ -2667,7 +2667,7 @@
                     dx = target.x - page.x,
                     dy = target.y - page.y,
                     distance = hypot(dx, dy),
-                    inRange = distance < range;
+                    inRange = distance <= range;
 
                 // Infinite targets count as being out of range
                 // compared to non infinite ones that are in range
