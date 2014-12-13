@@ -3596,6 +3596,9 @@
                             this.options[action][option].enabled = options[option].enabled === false? false : true;
                         }
                     }
+                    else if (isBool(options[option]) && isObject(defaultOptions.perAction[option])) {
+                        this.options[action][option].enabled = options[option];
+                    }
                     else if (options[option] !== undefined) {
                         // or if it's not undefined, do a plain assignment
                         this.options[action][option] = options[option];
