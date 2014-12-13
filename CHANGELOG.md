@@ -8,6 +8,10 @@ now holds all the snap objects and functions for snapping.
 `interact.createSnapGrid(gridObject)` returns a function that snaps to the
 dimensions of the given grid.
 
+Snapping now occurs if the distance to the snap target is [less than or
+equal](https://github.com/taye/interact.js/commit/430c28c) to the target's
+range.
+
 ### Per-action settings
 
 Snap, restrict, inertia, autoScroll can be different for drag, restrict and
