@@ -3116,7 +3116,7 @@
         }
 
         if (action === 'resize') {
-            if (options.resize.square || event.shiftKey) {
+            if (options.resize.square) {
                 if (interaction.resizeAxes === 'y') {
                     this.dx = this.dy;
                 }
