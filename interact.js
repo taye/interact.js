@@ -1617,6 +1617,40 @@
             }
         },
 
+        /*\
+         * Interaction.start
+         [ method ]
+         *
+         * Start an action with the given Interactable and Element as tartgets. The
+         * action must be enabled for the target Interactable and an appropriate number
+         * of pointers must be held down – 1 for drag/resize, 2 for gesture.
+         *
+         * Use it with interactable.<action>able({ manualStart: false }) to always
+         * [start actions manually](https://github.com/taye/interact.js/issues/114)
+         *
+         * Simulate pointer down to begin to interact with an interactable element
+         - action       (object)  The action to be performed - drag, resize, etc.
+         - interactable (Interactable) The Interactable to target
+         - element      (Element) The DOM Element to target
+         - pointerEvent (object) #optional Pointer event whose pageX/Y coordinates will be the starting point of the interact drag/resize
+         = (object) interact
+         **
+         | interact(target)
+         |   .draggable({
+         |     // disable the default drag start by down->move
+         |     manualStart: true
+         |   })
+         |   // start dragging after the user holds the pointer down
+         |   .on('hold', function (event) {
+         |     var interaction = event.interaction;
+         |
+         |     if (!interaction.interacting()) {
+         |       interaction.start({ name: 'drag' },
+         |                         event.interactable,
+         |                         event.currentTarget);
+         |     }
+         });
+        \*/
         start: function (action, interactable, element) {
             if (this.interacting()
                 || !this.pointerIsDown
