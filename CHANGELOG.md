@@ -52,6 +52,11 @@ All drop-related events are [now plain
 objects](https://github.com/taye/interact.js/issues/122). The related drag
 events are referenced in their `dragEvent` property.
 
+### Interactable.preventDefault('always' || 'never' || 'auto')
+
+The method takes one of the above string values. It will still accept
+`true`/`false` parameters which are changed to `'always'`/`'never'`.
+
 ## 1.1.3
 
 ### Better Events
