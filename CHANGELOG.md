@@ -1,9 +1,22 @@
 ## Upcoming Changes
 
+### Snapping
+
+Snap modes have been
+[unified](https://github.com/taye/interact.js/pull/127). A `targets` array
+now holds all the snap objects and functions for snapping.
+`interact.createSnapGrid(gridObject)` returns a function that snaps to the
+dimensions of the given grid.
+
 ### Per-action settings
 
 Snap, restrict, inertia, autoScroll can be different for drag, restrict and
 gesture. See [PR 115](https://github.com/taye/interact.js/pull/115).
+
+Methods for these settings on the `interact` object (`interact.snap()`,
+`interact.autoScroll()`, etc.) [have been
+deprecated](https://github.com/taye/interact.js/issues/94). They will be
+removed in the next minor version change.
 
 ### Space-separated string and array event list
 
