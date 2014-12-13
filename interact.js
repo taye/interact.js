@@ -4957,7 +4957,7 @@
      * interact.simulate
      [ method ]
      *
-     * Deprecated.
+     * Deprecated. You probably want @Interactable.fire @Interaction.start
      *
      * Simulate pointer down to begin to interact with an interactable element
      - action       (string)  The action to be performed - drag, resize, etc.
