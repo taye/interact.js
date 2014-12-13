@@ -2225,6 +2225,7 @@
                         relatedTarget: dragEvent.target,
                         draggable    : dragEvent.interactable,
                         dragEvent    : dragEvent,
+                        interaction  : this,
                         timeStamp    : dragEvent.timeStamp,
                         type         : 'dragleave'
                     };
@@ -2240,6 +2241,7 @@
                         relatedTarget: dragEvent.target,
                         draggable    : dragEvent.interactable,
                         dragEvent    : dragEvent,
+                        interaction  : this,
                         timeStamp    : dragEvent.timeStamp,
                         type         : 'dragenter'
                     };
@@ -2256,6 +2258,7 @@
                     relatedTarget: dragEvent.target,
                     draggable    : dragEvent.interactable,
                     dragEvent    : dragEvent,
+                    interaction  : this,
                     timeStamp    : dragEvent.timeStamp,
                     type         : 'drop'
                 };
@@ -2267,6 +2270,7 @@
                     relatedTarget: dragEvent.target,
                     draggable    : dragEvent.interactable,
                     dragEvent    : dragEvent,
+                    interaction  : this,
                     timeStamp    : dragEvent.timeStamp,
                     type         : 'dropactivate'
                 };
@@ -2278,6 +2282,7 @@
                     relatedTarget: dragEvent.target,
                     draggable    : dragEvent.interactable,
                     dragEvent    : dragEvent,
+                    interaction  : this,
                     timeStamp    : dragEvent.timeStamp,
                     type         : 'dropdeactivate'
                 };
@@ -2289,6 +2294,7 @@
                     relatedTarget: dragEvent.target,
                     draggable    : dragEvent.interactable,
                     dragEvent    : dragEvent,
+                    interaction  : this,
                     dragmove     : dragEvent,
                     timeStamp    : dragEvent.timeStamp,
                     type         : 'dropmove'
