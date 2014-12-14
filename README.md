@@ -19,6 +19,21 @@ The README of the latest release can be found [here][latest-readme].
 
 Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the [CHANGELOG](CHANGELOG.md) to stay updated.
 
+Installation
+------------
+
+Install with [Bower](http://bower.io/) or [npm](https://www.npmjs.org/) or download the latest version from http://interactjs.io/#download.
+
+```shell
+    $ bower install interact
+    $ npm install interact.js
+```
+
+Documentation
+-------------
+
+Visit http://interactjs.io/docs for the API documentation.
+
 Example
 -------
 
@@ -72,35 +87,6 @@ interact.maxInteractions(Infinity);
 ```
 
 See the above code in action at http://codepen.io/taye/pen/YPyLxE
-
-Installation
-------------
-
-Install with [Bower](http://bower.io/)
-
-```shell
-    $ bower install interact
-```
-
-or [npm](https://www.npmjs.org/)
-
-```shell
-    $ npm install interact.js
-```
-
-or download the script from http://interactjs.io/#download and add a `<script>` tag in your HTML that links to the file.
-
-```html
-    <script type="text/javascript" src="/path/to/interact.js"></script>
-```
-
-`interact` is exposed as an npm module, an AMD module, or a global object
-depending on what the environment supports.
-
-Documentation
--------------
-
-Visit http://interactjs.io/docs for the API documentation.
 
 License
 -------
