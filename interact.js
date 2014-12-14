@@ -53,6 +53,7 @@
 
             drag: {
                 enabled: false,
+                manualStart: true,
                 max: 1,
                 maxPerElement: 1,
 
@@ -72,6 +73,7 @@
 
             resize: {
                 enabled: false,
+                manualStart: false,
                 max: 1,
                 maxPerElement: 1,
 
@@ -85,6 +87,7 @@
             },
 
             gesture: {
+                manualStart: false,
                 enabled: false,
                 max: 1,
                 maxPerElement: 1,
@@ -93,6 +96,7 @@
             },
 
             perAction: {
+                manualStart: false,
                 max: 1,
                 maxPerElement: 1,
 
@@ -1383,14 +1387,11 @@
                 pointerIndex = this.addPointer(pointer),
                 action;
 
-            this.collectEventTargets(pointer, event, eventTarget, 'down');
-
             this.holdTimers[pointerIndex] = window.setTimeout(function () {
                 that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
             }, 600);
 
             this.pointerIsDown = true;
-
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
@@ -1406,6 +1407,7 @@
                         cancelFrame(this.inertiaStatus.i);
                         this.inertiaStatus.active = false;
 
+                        this.collectEventTargets(pointer, event, eventTarget, 'down');
                         return;
                     }
                     element = element.parentNode;
@@ -1414,6 +1416,7 @@
 
             // do nothing if interacting
             if (this.interacting()) {
+                this.collectEventTargets(pointer, event, eventTarget, 'down');
                 return;
             }
 
@@ -1454,6 +1457,8 @@
                 this.prepared.name = action.name;
                 this.prepared.axis = action.axis;
 
+                this.collectEventTargets(pointer, event, eventTarget, 'down');
+
                 return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
             }
             else {
@@ -1466,6 +1471,8 @@
                 copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
             }
+
+            this.collectEventTargets(pointer, event, eventTarget, 'down');
         },
 
         // Determine action to be performed on next pointerMove and add appropriate
@@ -1547,6 +1554,119 @@
             }
         },
 
+        setModifications: function (coords, preEnd) {
+            var target         = this.target,
+                shouldMove     = true,
+                shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
+                shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
+
+            if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
+            if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
+
+            if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
+                shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
+            }
+            else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
+                shouldMove = false;
+            }
+
+            return shouldMove;
+        },
+
+        setStartOffsets: function (action, interactable, element) {
+            var rect = interactable.getRect(element),
+                snap = interactable.options[this.prepared.name].snap,
+                restrict = interactable.options[this.prepared.name].restrict,
+                width, height;
+
+            if (rect) {
+                this.startOffset.left = this.startCoords.page.x - rect.left;
+                this.startOffset.top  = this.startCoords.page.y - rect.top;
+
+                this.startOffset.right  = rect.right  - this.startCoords.page.x;
+                this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
+
+                if ('width' in rect) { width = rect.width; }
+                else { width = rect.right - rect.left; }
+                if ('height' in rect) { height = rect.height; }
+                else { height = rect.bottom - rect.top; }
+            }
+            else {
+                this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
+            }
+
+            if (rect && snap.elementOrigin) {
+                this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
+                this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
+            }
+            else {
+                this.snapOffset.x = this.snapOffset.y = 0;
+            }
+
+            if (rect && restrict.elementRect) {
+                this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
+                this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
+
+                this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
+                this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
+            }
+            else {
+                this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
+            }
+        },
+
+        /*\
+         * Interaction.start
+         [ method ]
+         *
+         * Start an action with the given Interactable and Element as tartgets. The
+         * action must be enabled for the target Interactable and an appropriate number
+         * of pointers must be held down – 1 for drag/resize, 2 for gesture.
+         *
+         * Use it with interactable.<action>able({ manualStart: false }) to always
+         * [start actions manually](https://github.com/taye/interact.js/issues/114)
+         *
+         * Simulate pointer down to begin to interact with an interactable element
+         - action       (object)  The action to be performed - drag, resize, etc.
+         - interactable (Interactable) The Interactable to target
+         - element      (Element) The DOM Element to target
+         - pointerEvent (object) #optional Pointer event whose pageX/Y coordinates will be the starting point of the interact drag/resize
+         = (object) interact
+         **
+         | interact(target)
+         |   .draggable({
+         |     // disable the default drag start by down->move
+         |     manualStart: true
+         |   })
+         |   // start dragging after the user holds the pointer down
+         |   .on('hold', function (event) {
+         |     var interaction = event.interaction;
+         |
+         |     if (!interaction.interacting()) {
+         |       interaction.start({ name: 'drag' },
+         |                         event.interactable,
+         |                         event.currentTarget);
+         |     }
+         });
+        \*/
+        start: function (action, interactable, element) {
+            if (this.interacting()
+                || !this.pointerIsDown
+                || this.pointerIds.length < (action.name === 'gesture'? 2 : 1)) {
+                return;
+            }
+
+            this.prepared.name = action.name;
+            this.prepared.axis = action.axis;
+            this.target        = interactable;
+            this.element       = element;
+
+            this.setStartOffsets(action.name, interactable, element);
+            this.setModifications(this.startCoords.page);
+
+            this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
+        },
+
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
             this.recordPointer(pointer);
 
@@ -1620,6 +1740,7 @@
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
+                                    && !elementInteractable.options.drag.manualStart
                                     && elementInteractable.getAction(this.downPointer, this, element).name === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
@@ -1643,6 +1764,7 @@
                                     if (interactable === this.target) { return; }
 
                                     if (inContext(interactable, eventTarget)
+                                        && !interactable.options.drag.manualStart
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
@@ -1675,83 +1797,22 @@
 
                 var starting = !!this.prepared.name && !this.interacting();
 
-                if (starting && !withinInteractionLimit(this.target, this.element, this.prepared.name)) {
+                if (starting
+                    && (this.target.options[this.prepared.name].manualStart
+                        || !withinInteractionLimit(this.target, this.element, this.prepared.name))) {
                     this.stop();
                     return;
                 }
 
                 if (this.prepared.name && this.target) {
-                    var target         = this.target,
-                        shouldMove     = true,
-                        shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
-                        shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
-
                     if (starting) {
-                        var rect = target.getRect(this.element),
-                            snap = target.options[this.prepared.name].snap,
-                            restrict = target.options[this.prepared.name].restrict,
-                            width, height;
-
-                        if (rect) {
-                            this.startOffset.left = this.startCoords.page.x - rect.left;
-                            this.startOffset.top  = this.startCoords.page.y - rect.top;
-
-                            this.startOffset.right  = rect.right  - this.startCoords.page.x;
-                            this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
-
-                            if ('width' in rect) { width = rect.width; }
-                            else { width = rect.right - rect.left; }
-                            if ('height' in rect) { height = rect.height; }
-                            else { height = rect.bottom - rect.top; }
-                        }
-                        else {
-                            this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
-                        }
-
-                        if (rect && snap.elementOrigin) {
-                            this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
-                            this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
-                        }
-                        else {
-                            this.snapOffset.x = this.snapOffset.y = 0;
-                        }
-
-                        if (rect && restrict.elementRect) {
-                            this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
-                            this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
-
-                            this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
-                            this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
-                        }
-                        else {
-                            this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
-                        }
+                        this.start(this.prepared, this.target, this.element);
                     }
 
-                    var snapCoords = starting? this.startCoords.page : this.curCoords.page;
-
-                    if (shouldSnap    ) { this.setSnapping   (snapCoords); } else { this.snapStatus    .locked     = false; }
-                    if (shouldRestrict) { this.setRestriction(snapCoords); } else { this.restrictStatus.restricted = false; }
-
-                    if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
-                        shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
-                    }
-                    else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
-                        shouldMove = false;
-                    }
+                    var shouldMove = this.setModifications(this.curCoords.page, preEnd);
 
                     // move if snapping or restriction doesn't prevent it
                     if (shouldMove) {
-                        if (starting) {
-                            this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
-
-                            snapCoords = this.curCoords.page;
-
-                            // set snapping and restriction for the move event
-                            if (shouldSnap    ) { this.setSnapping   (snapCoords); }
-                            if (shouldRestrict) { this.setRestriction(snapCoords); }
-                        }
-
                         this.prevEvent = this[this.prepared.name + 'Move'](event);
                     }
 
@@ -2433,9 +2494,9 @@
 
             if (index === -1) {
                 index = this.pointerIds.length;
-                this.pointerIds.push(id);
             }
 
+            this.pointerIds[index] = id;
             this.pointers[index] = pointer;
 
             return index;
@@ -4889,7 +4950,7 @@
      * interact.simulate
      [ method ]
      *
-     * Deprecated.
+     * Deprecated. You probably want @Interactable.fire @Interaction.start
      *
      * Simulate pointer down to begin to interact with an interactable element
      - action       (string)  The action to be performed - drag, resize, etc.
