@@ -74,22 +74,26 @@ See the above code in action at http://codepen.io/taye/pen/YPyLxE
 Installation
 ------------
 
-interact.js can be installed for a project using [Bower](http://bower.io/)
+Install with [Bower](http://bower.io/)
 
+```shell
     $ bower install interact
+```
 
 or [npm](https://www.npmjs.org/)
 
+```shell
     $ npm install interact.js
+```
 
-or by downloading the script from http://interactjs.io/#download and linking to
-the script in a `<script>` tag's `src` attribute.
+or download the script from http://interactjs.io/#download and add a `<script>` tag in your HTML that links to the file.
 
-    <script type="text/javascript" src="/path/to/interact.js" />
+```html
+    <script type="text/javascript" src="/path/to/interact.js"></script>
+```
 
-`interact` is exposed as an npm module, [AMD
-(RequireJS)](http://requirejs.org) module, or a global object depending on
-what the environment supports.
+`interact` is exposed as an npm module, an AMD module, or a global object
+depending on what the environment supports.
 
 Documentation
 -------------
