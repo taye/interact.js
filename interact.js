@@ -106,7 +106,7 @@
                     range       : Infinity,
                     targets     : null,
 
-                    elementOrigin: null
+                    relativePoints: null
                 },
 
                 restrict: {
@@ -1200,7 +1200,7 @@
 
         this.startOffset    = { left: 0, right: 0, top: 0, bottom: 0 };
         this.restrictOffset = { left: 0, right: 0, top: 0, bottom: 0 };
-        this.snapOffset     = { x: 0, y: 0};
+        this.snapOffsets    = [];
 
         this.gesture = {
             start: { x: 0, y: 0 },
@@ -1595,9 +1595,20 @@
                 this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
             }
 
-            if (rect && snap.elementOrigin) {
-                this.snapOffset.x = this.startOffset.left - (width  * snap.elementOrigin.x);
-                this.snapOffset.y = this.startOffset.top  - (height * snap.elementOrigin.y);
+            if (rect) {
+                this.snapOffsets.splice(0);
+
+                if (snap.relativePoints && snap.relativePoints.length) {
+                    for (var i = 0; i < snap.relativePoints.length; i++) {
+                        this.snapOffsets.push({
+                            x: this.startOffset.left - (width  * snap.relativePoints[i].x),
+                            y: this.startOffset.top  - (height * snap.relativePoints[i].y)
+                        });
+                    }
+                }
+                else {
+                    this.snapOffsets.push({ x: 0, y: 0 });
+                }
             }
             else {
                 this.snapOffset.x = this.snapOffset.y = 0;
@@ -1812,7 +1823,7 @@
                     var shouldMove = this.setModifications(this.curCoords.page, preEnd);
 
                     // move if snapping or restriction doesn't prevent it
-                    if (shouldMove) {
+                    if (shouldMove || starting) {
                         this.prevEvent = this[this.prepared.name + 'Move'](event);
                     }
 
@@ -2690,9 +2701,6 @@
             status.realX = page.x;
             status.realY = page.y;
 
-            page.x = page.x - this.inertiaStatus.resumeDx - this.snapOffset.x;
-            page.y = page.y - this.inertiaStatus.resumeDy - this.snapOffset.y;
-
             var len = snap.targets? snap.targets.length : 0;
 
             for (i = 0; i < len; i++) {
@@ -2704,12 +2712,14 @@
 
                 if (!target) { continue; }
 
-                targets.push({
-                    x: isNumber(target.x) ? target.x : page.x,
-                    y: isNumber(target.y) ? target.y : page.y,
+                for (var relIndex = 0; relIndex < this.snapOffsets.length; relIndex++) {
+                    targets.push({
+                        x: isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : page.x,
+                        y: isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : page.y,
 
-                    range: isNumber(target.range)? target.range: snap.range
-                });
+                        range: isNumber(target.range)? target.range: snap.range
+                    });
+                }
             }
 
             var closest = {
@@ -3073,7 +3083,7 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        if (checkSnap(target, action) && !(starting && options[action].snap.elementOrigin)) {
+        if (checkSnap(target, action) && !(starting && interaction.snapOffsets.length)) {
             this.snap = {
                 range  : snapStatus.range,
                 locked : snapStatus.locked,
@@ -4091,6 +4101,10 @@
                             }
                             else if (thisOption.mode === 'path') {
                                 thisOption.targets = thisOption.paths;
+                            }
+
+                            if ('elementOrigin' in options) {
+                                thisOption.relativePoints = [options.elementOrigin];
                             }
                         }
                     }
