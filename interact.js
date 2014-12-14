@@ -2701,21 +2701,30 @@
             status.realX = page.x;
             status.realY = page.y;
 
+            page.x = page.x - this.inertiaStatus.resumeDx;
+            page.y = page.y - this.inertiaStatus.resumeDy;
+
             var len = snap.targets? snap.targets.length : 0;
 
-            for (i = 0; i < len; i++) {
-                target = snap.targets[i];
+            for (var relIndex = 0; relIndex < this.snapOffsets.length; relIndex++) {
+                var relative = {
+                    x: page.x - this.snapOffsets[relIndex].x,
+                    y: page.y - this.snapOffsets[relIndex].y
+                };
 
-                if (isFunction(target)) {
-                    target = target(page.x, page.y);
-                }
+                for (i = 0; i < len; i++) {
+                    if (isFunction(snap.targets[i])) {
+                        target = snap.targets[i](relative.x, relative.y);
+                    }
+                    else {
+                        target = snap.targets[i];
+                    }
 
-                if (!target) { continue; }
+                    if (!target) { continue; }
 
-                for (var relIndex = 0; relIndex < this.snapOffsets.length; relIndex++) {
                     targets.push({
-                        x: isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : page.x,
-                        y: isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : page.y,
+                        x: isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
+                        y: isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
 
                         range: isNumber(target.range)? target.range: snap.range
                     });
