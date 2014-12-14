@@ -13,14 +13,6 @@ Features include:
  - **not modifying anything** it doesn't own (except to support IE8 and to
    change the cursor (but you can disable that))
 
-Demos
------
-
- - The [project homepage][homepage] has some demos showing drag and
-   drop, gestures, inertia, snap and some other things.
- - [This article][ijs-mozhacks]
-   on the Mozilla Hacks blog features and explains clearly [these 3 demos](http://codepen.io/collection/qwtdB/)
-
 ## This README features [changes][upcoming-changes] that are currently in development.
 
 The README of the latest release can be found [here][latest-readme].
