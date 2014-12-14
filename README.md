@@ -93,7 +93,6 @@ License
 
 interact.js is released under the [MIT License](http://taye.mit-license.org).
 
-[homepage]: http://interactjs.io
-[ijs-mozhacks]: https://hacks.mozilla.org/2014/11/interact-js-for-drag-and-drop-resizing-and-multi-touch-gestures/
+[ijs-twitter]: https://twitter.com/interactjs
 [upcoming-changes]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#upcoming-changes
 [latest-readme]: https://github.com/taye/interact.js/blob/latest/README.md#readme
