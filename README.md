@@ -17,6 +17,8 @@ Features include:
 
 The README of the latest release can be found [here][latest-readme].
 
+Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the [CHANGELOG](CHANGELOG.md) to stay updated.
+
 Example
 -------
 
