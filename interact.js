@@ -257,9 +257,9 @@
 
         actionCursors = {
             drag    : 'move',
-            resizex : 'e-resize',
-            resizey : 's-resize',
-            resizexy: 'se-resize',
+            resizex : 'ew-resize',
+            resizey : 'ns-resize',
+            resizexy: 'nwse-resize',
             gesture : ''
         },
 
