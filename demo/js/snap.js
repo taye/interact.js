@@ -271,7 +271,7 @@
                 }
             })
             .on('move down', function (event) {
-                if (event.type === 'down' || !event.interaction.pointerIsDown && status.relative.checked) {
+                if ((event.type === 'down' || !event.interaction.pointerIsDown) && status.relative.checked) {
                     var rect = interact.getElementRect(canvas);
 
                     snapOffset.x = event.pageX - rect.left;
