@@ -1595,23 +1595,18 @@
                 this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
             }
 
-            if (rect) {
-                this.snapOffsets.splice(0);
+            this.snapOffsets.splice(0);
 
-                if (snap.relativePoints && snap.relativePoints.length) {
-                    for (var i = 0; i < snap.relativePoints.length; i++) {
-                        this.snapOffsets.push({
-                            x: this.startOffset.left - (width  * snap.relativePoints[i].x),
-                            y: this.startOffset.top  - (height * snap.relativePoints[i].y)
-                        });
-                    }
-                }
-                else {
-                    this.snapOffsets.push({ x: 0, y: 0 });
+            if (rect && snap.relativePoints && snap.relativePoints.length) {
+                for (var i = 0; i < snap.relativePoints.length; i++) {
+                    this.snapOffsets.push({
+                        x: this.startOffset.left - (width  * snap.relativePoints[i].x),
+                        y: this.startOffset.top  - (height * snap.relativePoints[i].y)
+                    });
                 }
             }
             else {
-                this.snapOffset.x = this.snapOffset.y = 0;
+                this.snapOffsets.push({ x: 0, y: 0 });
             }
 
             if (rect && restrict.elementRect) {
