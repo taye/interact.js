@@ -255,7 +255,13 @@
         // Allow this many interactions to happen simultaneously
         maxInteractions = 1,
 
-        actionCursors = {
+        actionCursors = (document.all && !document.addEventListener) ? {
+            drag    : 'move',
+            resizex : 'e-resize',
+            resizey : 's-resize',
+            resizexy: 'se-resize',
+            gesture : ''
+        } : {
             drag    : 'move',
             resizex : 'ew-resize',
             resizey : 'ns-resize',
