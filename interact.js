@@ -255,7 +255,8 @@
         // Allow this many interactions to happen simultaneously
         maxInteractions = 1,
 
-        actionCursors = (document.all && !document.addEventListener) ? {
+        // Check if is IE9 or older
+        actionCursors = (document.all && !window.atob) ? {
             drag    : 'move',
             resizex : 'e-resize',
             resizey : 's-resize',
