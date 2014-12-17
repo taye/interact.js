@@ -105,6 +105,7 @@
                     endOnly     : false,
                     range       : Infinity,
                     targets     : null,
+                    offsets     : null,
 
                     relativePoints: null
                 },
@@ -1575,6 +1576,7 @@
 
         setStartOffsets: function (action, interactable, element) {
             var rect = interactable.getRect(element),
+                origin = getOriginXY(interactable, element),
                 snap = interactable.options[this.prepared.name].snap,
                 restrict = interactable.options[this.prepared.name].restrict,
                 width, height;
@@ -1597,16 +1599,23 @@
 
             this.snapOffsets.splice(0);
 
+            var snapOffset = snap.offset === 'startCoords'
+                                ? {
+                                    x: this.startCoords.page.x - origin.x,
+                                    y: this.startCoords.page.y - origin.y
+                                }
+                                : snap.offset || { x: 0, y: 0 };
+
             if (rect && snap.relativePoints && snap.relativePoints.length) {
                 for (var i = 0; i < snap.relativePoints.length; i++) {
                     this.snapOffsets.push({
-                        x: this.startOffset.left - (width  * snap.relativePoints[i].x),
-                        y: this.startOffset.top  - (height * snap.relativePoints[i].y)
+                        x: this.startOffset.left - (width  * snap.relativePoints[i].x) + snapOffset.x,
+                        y: this.startOffset.top  - (height * snap.relativePoints[i].y) + snapOffset.y
                     });
                 }
             }
             else {
-                this.snapOffsets.push({ x: 0, y: 0 });
+                this.snapOffsets.push(snapOffset);
             }
 
             if (rect && restrict.elementRect) {
