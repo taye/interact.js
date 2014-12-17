@@ -1599,14 +1599,10 @@
 
             if (rect && snap.relativePoints && snap.relativePoints.length) {
                 for (var i = 0; i < snap.relativePoints.length; i++) {
-                    var relative = snap.relativePoints[i];
-
-                    this.snapOffsets.push(relative === 'startCoords'
-                        ? this.startCoords.page
-                        : {
-                            x: this.startOffset.left - (width  * relative.x),
-                            y: this.startOffset.top  - (height * relative.y)
-                        });
+                    this.snapOffsets.push({
+                        x: this.startOffset.left - (width  * snap.relativePoints[i].x),
+                        y: this.startOffset.top  - (height * snap.relativePoints[i].y)
+                    });
                 }
             }
             else {
