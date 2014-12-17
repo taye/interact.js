@@ -232,7 +232,7 @@
                     targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
                     enabled: !status.offMode.checked,
                     endOnly: status.endOnly.checked,
-                    relativePoints: status.relative.checked? ['startCoords'] : null
+                    offset: status.relative.checked? 'startCoords' : null
                 }
             })
             .inertia(status.inertia.checked);
