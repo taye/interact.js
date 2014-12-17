@@ -1577,8 +1577,7 @@
             var rect = interactable.getRect(element),
                 snap = interactable.options[this.prepared.name].snap,
                 restrict = interactable.options[this.prepared.name].restrict,
-                width, height,
-                origin = getOriginXY(interactable, element);
+                width, height;
 
             if (rect) {
                 this.startOffset.left = this.startCoords.page.x - rect.left;
@@ -1603,10 +1602,7 @@
                     var relative = snap.relativePoints[i];
 
                     this.snapOffsets.push(relative === 'startCoords'
-                        ? {
-                            x: this.startCoords.page.x - origin.x,
-                            y: this.startCoords.page.y - origin.y
-                        }
+                        ? this.startCoords.page
                         : {
                             x: this.startOffset.left - (width  * relative.x),
                             y: this.startOffset.top  - (height * relative.y)
