@@ -4003,6 +4003,13 @@
          = (Interactable) this Interactable
         \*/
         autoScroll: function (options) {
+            if (isObject(options)) {
+                options = extend({ actions: ['drag', 'resize']}, options);
+            }
+            else if (isBool(options)) {
+                options = { actions: ['drag', 'resize'], enabled: options };
+            }
+
             return this.setOptions('autoScroll', options);
         },
 
@@ -4056,14 +4063,11 @@
          | });
         \*/
         snap: function (options) {
-            var ret = this.setOptions('snap', options),
-                actions = options && isArray(options.actions)
-                            ? options.actions
-                            : ['drag'];
+            var ret = this.setOptions('snap', options);
 
             if (ret === this) { return this; }
 
-            return ret[actions[0]];
+            return ret.drag;
         },
 
         setOptions: function (option, options) {
@@ -4075,7 +4079,7 @@
 
             if (isObject(options) || isBool(options)) {
                 for (i = 0; i < actions.length; i++) {
-                    var action = actions[i];
+                    var action = /resize/.test(actions[i])? 'resize' : actions[i];
 
                     if (!isObject(this.options[action])) { continue; }
 
@@ -4101,7 +4105,7 @@
                             }
                         }
                     }
-                    else {
+                    else if (isBool(options)) {
                         thisOption.enabled = options;
                     }
                 }
@@ -4169,7 +4173,11 @@
          | interact(element).inertia(null);
         \*/
         inertia: function (options) {
-            return this.setOptions('inertia', options);
+            var ret = this.setOptions('inertia', options);
+
+            if (ret === this) { return this; }
+
+            return ret.drag;
         },
 
         getAction: function (pointer, interaction, element) {
