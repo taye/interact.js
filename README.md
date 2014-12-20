@@ -1,6 +1,7 @@
 <a href="http://interactjs.io"><img alt="interact.js" src="https://c4d6f7d727e094887e93-4ea74b676357550bd514a6a5b344c625.ssl.cf2.rackcdn.com/ijs-anim.svg" height="131px" width="100%"></a>
 
-Javascript drag and drop, resizing and gestures for modern desktop and mobile browsers.
+JavaScript drag and drop, resizing and multi-touch gestures with inertia and
+snapping for modern browsers (and also IE8+).
 
 Features include:
 
@@ -10,19 +11,21 @@ Features include:
    Chrome, Firefox and Opera as well as **Internet Explorer 8+**
  - interaction with [**SVG**](http://interactjs.io/repo/demo/star.svg) elements
  - being **lightweight and standalone** (not _yet another_ jQuery plugin)
- - **not modifying anything** it doesn't own (except to support IE8 and to
-   change the cursor (but you can disable that))
+ - **not modifying the DOM** except to support IE8 and to change the cursor
+   (but you can disable that)
 
 ## This README features [changes][upcoming-changes] that are currently in development.
 
 The README of the latest release can be found [here][latest-readme].
 
-Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the [CHANGELOG](CHANGELOG.md) to stay updated.
+Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the
+[CHANGELOG](CHANGELOG.md) to stay updated.
 
 Installation
 ------------
 
-Install with [Bower](http://bower.io/) or [npm](https://www.npmjs.org/) or download the latest version from http://interactjs.io/#download.
+Install with [Bower](http://bower.io/) or [npm](https://www.npmjs.org/) or
+download the latest version from http://interactjs.io/#download.
 
 ```shell
     $ bower install interact
