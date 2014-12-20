@@ -1,5 +1,24 @@
 ## Upcoming Changes
 
+### Multiple interactions
+
+Multiple interactiosn have been enabled by default. For example:
+
+```javascript
+interact('.drag-element').draggable({
+    enabled: true,
+ // max          : Infinity,  // default
+ // maxPerElement: 1,         // default
+});
+```
+
+will allow multiple `.drag-element` to be dragged simultaneously without having
+to explicitly set <code>max:&nbsp;integerGreaterThan1</code>. The default
+`maxPerElement` value is still 1 so only one drag would be able to happen on
+each `.drag-element` unless the `maxPerElement` is changed.
+
+If you don't want multiple interactions, call `interact.maxInteractions(1)`.
+
 ### Snapping
 
 Snap modes have been
