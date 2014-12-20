@@ -21,11 +21,38 @@ If you don't want multiple interactions, call `interact.maxInteractions(1)`.
 
 ### Snapping
 
+#### Unified snap modes
 Snap modes have been
 [unified](https://github.com/taye/interact.js/pull/127). A `targets` array
 now holds all the snap objects and functions for snapping.
 `interact.createSnapGrid(gridObject)` returns a function that snaps to the
 dimensions of the given grid.
+
+#### `relativePoints` and `origin`
+
+```javascript
+interact(target).draggable({
+  snap: {
+    targets: [ {x: 300, y: 300} ],
+    relativePoints: [
+      { x: 0, y: 0 },  // snap relative to the top left of the element
+      { x: 1, y: 1 },  // and also to the bottom right
+    ],  
+
+    // offset the snap target coordinates
+    // can be an object with x/y or 'startCoords'
+    offset: { x: 50, y: 50 }
+  }
+});
+```
+
+The `snap.relativePoints` array succeeds the snap.elementOriign object. But
+backwards compatibility with `elementOrigin` and the old snapping interface is
+maintained.
+
+See [this PR](https://github.com/taye/interact.js/pull/133) for more info.
+
+#### slight change to snap range calculation
 
 Snapping now occurs if the distance to the snap target is [less than or
 equal](https://github.com/taye/interact.js/commit/430c28c) to the target's
