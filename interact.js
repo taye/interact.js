@@ -54,7 +54,7 @@
             drag: {
                 enabled: false,
                 manualStart: true,
-                max: 1,
+                max: Infinity,
                 maxPerElement: 1,
 
                 snap: null,
@@ -74,7 +74,7 @@
             resize: {
                 enabled: false,
                 manualStart: false,
-                max: 1,
+                max: Infinity,
                 maxPerElement: 1,
 
                 snap: null,
@@ -89,7 +89,7 @@
             gesture: {
                 manualStart: false,
                 enabled: false,
-                max: 1,
+                max: Infinity,
                 maxPerElement: 1,
 
                 restrict: null
@@ -97,7 +97,7 @@
 
             perAction: {
                 manualStart: false,
-                max: 1,
+                max: Infinity,
                 maxPerElement: 1,
 
                 snap: {
@@ -253,7 +253,7 @@
         prevTouchTime = 0,
 
         // Allow this many interactions to happen simultaneously
-        maxInteractions = 1,
+        maxInteractions = Infinity,
 
         // Check if is IE9 or older
         actionCursors = (document.all && !window.atob) ? {
