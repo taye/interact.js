@@ -68,7 +68,7 @@ Methods for these settings on the `interact` object (`interact.snap()`,
 deprecated](https://github.com/taye/interact.js/issues/94). They will be
 removed in the next minor version change.
 
-### Space-separated string and array event list
+### Space-separated string and array event list and eventType:listener object
 
 ```javascript
 function logEventType (event) {
@@ -78,6 +78,11 @@ function logEventType (event) {
 interact(target).on('down tap dragstart gestureend', logEventType);
 
 interact(target).on(['move', 'resizestart'], logEventType);
+
+interact(target).on({
+  dragmove: logEvent,
+  keydown : logEvent
+});
 ```
 
 ### Interactable actionChecker
