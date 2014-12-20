@@ -3689,7 +3689,7 @@
                         // duplicate the object
                         this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
 
-                        if ('enabled' in defaultOptions.perAction[option]) {
+                        if (isObject(defaultOptions.perAction[option]) && 'enabled' in defaultOptions.perAction[option]) {
                             this.options[action][option].enabled = options[option].enabled === false? false : true;
                         }
                     }
