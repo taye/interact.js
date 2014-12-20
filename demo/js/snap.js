@@ -21,6 +21,8 @@
         tango = '#ff4400',
         draggingAnchor = null,
 
+        snapOffset = { x: 0, y: 0 },
+
         snapGrid = {
             x: 10,
             y: 10,
@@ -39,7 +41,11 @@
     function drawGrid (grid, gridOffset, range) {
         if (!grid.x || !grid.y) { return; }
 
-        var barLength = 16;
+        var barLength = 16,
+            offset = {
+                x: gridOffset.x + snapOffset.x,
+                y: gridOffset.y + snapOffset.y
+            };
 
         guidesContext.clearRect(0, 0, width, height);
 
@@ -49,20 +55,20 @@
             guidesContext.fillRect(0, 0, width, height);
         }
 
-        for (var i = -(1 + gridOffset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
-            for (var j = -( 1 + gridOffset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
+        for (var i = -(1 + offset.x / grid.x | 0), lenX = width / grid.x + 1; i < lenX; i++) {
+            for (var j = -( 1 + offset.y / grid.y | 0), lenY = height / grid.y + 1; j < lenY; j++) {
                 if (range > 0 && range !== Infinity) {
-                    guidesContext.circle(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y, range, blue).fill();
+                    guidesContext.circle(i * grid.x + offset.x, j * grid.y + offset.y, range, blue).fill();
                 }
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y - barLength / 2);
-                guidesContext.lineTo(i * grid.x + gridOffset.x, j * grid.y + gridOffset.y + barLength / 2);
+                guidesContext.moveTo(i * grid.x + offset.x, j * grid.y + offset.y - barLength / 2);
+                guidesContext.lineTo(i * grid.x + offset.x, j * grid.y + offset.y + barLength / 2);
                 guidesContext.stroke();
 
                 guidesContext.beginPath();
-                guidesContext.moveTo(i * grid.x + gridOffset.x - barLength / 2, j * grid.y + gridOffset.y);
-                guidesContext.lineTo(i * grid.x + gridOffset.x + barLength / 2, j * grid.y + gridOffset.y);
+                guidesContext.moveTo(i * grid.x + offset.x - barLength / 2, j * grid.y + offset.y);
+                guidesContext.lineTo(i * grid.x + offset.x + barLength / 2, j * grid.y + offset.y);
                 guidesContext.stroke();
             }
         }
@@ -79,7 +85,11 @@
         }
 
         for (var i = 0, len = anchors.length; i < len; i++) {
-            var anchor = anchors[i],
+            var anchor = {
+                    x: anchors[i].x + snapOffset.x,
+                    y: anchors[i].y + snapOffset.y,
+                    range: anchors[i].range
+                },
                 range = typeof anchor.range === 'number'? anchor.range: defaultRange;
 
             if (range > 0 && range !== Infinity) {
@@ -221,10 +231,15 @@
                 snap: {
                     targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
                     enabled: !status.offMode.checked,
-                    endOnly: status.endOnly.checked
+                    endOnly: status.endOnly.checked,
+                    offset: status.relative.checked? 'startCoords' : null
                 }
             })
             .inertia(status.inertia.checked);
+
+        if (!status.relative.checked) {
+            snapOffset.x = snapOffset.y = 0;
+        }
 
         drawSnap(interact(canvas).draggable().snap);
     }
@@ -255,6 +270,16 @@
                     restriction: 'self'
                 }
             })
+            .on('move down', function (event) {
+                if ((event.type === 'down' || !event.interaction.pointerIsDown) && status.relative.checked) {
+                    var rect = interact.getElementRect(canvas);
+
+                    snapOffset.x = event.pageX - rect.left;
+                    snapOffset.y = event.pageY - rect.top;
+
+                    drawSnap(interact(canvas).draggable().snap);
+                }
+            })
             .origin('self')
             .draggable(true);
 
@@ -279,7 +304,8 @@
             anchorMode: document.getElementById('anchor-mode'),
             anchorDrag: document.getElementById('drag-anchors'),
             endOnly: document.getElementById('end-only'),
-            inertia: document.getElementById('inertia')
+            inertia: document.getElementById('inertia'),
+            relative: document.getElementById('relative')
         };
 
         interact(status.sliders)
