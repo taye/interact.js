@@ -2,7 +2,7 @@
 
 ### Multiple interactions
 
-Multiple interactiosn have been enabled by default. For example:
+Multiple interactions have been enabled by default. For example:
 
 ```javascript
 interact('.drag-element').draggable({
