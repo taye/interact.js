@@ -3587,37 +3587,20 @@
     Interactable.prototype = {
         setOnEvents: function (action, phases) {
             if (action === 'drop') {
-                var drop            = phases.ondrop             || phases.onDrop            || phases.drop,
-                    dropactivate    = phases.ondropactivate     || phases.onDropActivate    || phases.dropactivate
-                                   || phases.onactivate         || phases.onActivate        || phases.activate,
-                    dropdeactivate  = phases.ondropdeactivate   || phases.onDropDeactivate  || phases.dropdeactivate
-                                   || phases.ondeactivate       || phases.onDeactivate      || phases.deactivate,
-                    dragenter       = phases.ondragenter        || phases.onDropEnter       || phases.dragenter
-                                   || phases.onenter            || phases.onEnter           || phases.enter,
-                    dragleave       = phases.ondragleave        || phases.onDropLeave       || phases.dragleave
-                                   || phases.onleave            || phases.onLeave           || phases.leave,
-                    dropmove        = phases.ondropmove         || phases.onDropMove        || phases.dropmove
-                                   || phases.onmove             || phases.onMove            || phases.move;
-
-                if (isFunction(drop)          ) { this.ondrop           = drop          ; }
-                if (isFunction(dropactivate)  ) { this.ondropactivate   = dropactivate  ; }
-                if (isFunction(dropdeactivate)) { this.ondropdeactivate = dropdeactivate; }
-                if (isFunction(dragenter)     ) { this.ondragenter      = dragenter     ; }
-                if (isFunction(dragleave)     ) { this.ondragleave      = dragleave     ; }
-                if (isFunction(dropmove)      ) { this.ondropmove       = dropmove      ; }
+                if (isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
+                if (isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
+                if (isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
+                if (isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
+                if (isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
+                if (isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
             }
             else {
-                var start        = phases.onstart        || phases.onStart        || phases.start,
-                    move         = phases.onmove         || phases.onMove         || phases.move,
-                    end          = phases.onend          || phases.onEnd          || phases.end,
-                    inertiastart = phases.oninertiastart || phases.onInertiaStart || phases.inertiastart;
-
                 action = 'on' + action;
 
-                if (isFunction(start)       ) { this[action + 'start'         ] = start         ; }
-                if (isFunction(move)        ) { this[action + 'move'          ] = move          ; }
-                if (isFunction(end)         ) { this[action + 'end'           ] = end           ; }
-                if (isFunction(inertiastart)) { this[action + 'inertiastart'  ] = inertiastart  ; }
+                if (isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
+                if (isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
+                if (isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
+                if (isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
             }
 
             return this;
