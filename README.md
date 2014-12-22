@@ -3,6 +3,8 @@
 JavaScript drag and drop, resizing and multi-touch gestures with inertia and
 snapping for modern browsers (and also IE8+).
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js)
+
 Features include:
 
  - **inertia** and **snapping**
