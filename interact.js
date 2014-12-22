@@ -1648,11 +1648,9 @@
          * Use it with interactable.<action>able({ manualStart: false }) to always
          * [start actions manually](https://github.com/taye/interact.js/issues/114)
          *
-         * Simulate pointer down to begin to interact with an interactable element
          - action       (object)  The action to be performed - drag, resize, etc.
          - interactable (Interactable) The Interactable to target
          - element      (Element) The DOM Element to target
-         - pointerEvent (object) #optional Pointer event whose pageX/Y coordinates will be the starting point of the interact drag/resize
          = (object) interact
          **
          | interact(target)
@@ -3629,10 +3627,10 @@
          |     axis: 'x' || 'y' || 'xy',
          |
          |     // max number of drags that can happen concurrently
-         |     // with elements of this Interactable. 1 by default
+         |     // with elements of this Interactable. Infinity by default
          |     max: Infinity,
          |
-         |     // max number of drags that can target the same element
+         |     // max number of drags that can target the same element+Interactable
          |     // 1 by default
          |     maxPerElement: 2
          | });
@@ -3697,6 +3695,7 @@
          * Dropzones can receive the following events:
          *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
          *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+         *  - `dragmove` when a draggable that has entered the dropzone is moved
          *  - `drop` when a draggable is dropped into this dropzone
          *
          *  Use the `accept` option to allow only elements that match the given CSS selector or element.
@@ -3878,8 +3877,8 @@
          |     axis   : 'x' || 'y' || 'xy' // default is 'xy',
          |
          |     // limit multiple resizes.
-         |     // See the explanation in @Interactable.draggable example
-         |     max: 1,
+         |     // See the explanation in the @Interactable.draggable example
+         |     max: Infinity,
          |     maxPerElement: 1,
          | });
         \*/
@@ -3917,7 +3916,7 @@
          * Interactable.squareResize
          [ method ]
          *
-         * Deprecated. Add a `square: true|false` property to @Interactable.resizable instead
+         * Deprecated. Add a `square: true || false` property to @Interactable.resizable instead
          *
          * Gets or sets whether resizing is forced 1:1 aspect
          *
@@ -3963,7 +3962,7 @@
          |
          |     // limit multiple gestures.
          |     // See the explanation in @Interactable.draggable example
-         |     max: 1,
+         |     max: Infinity,
          |     maxPerElement: 1,
          | });
         \*/
@@ -3991,21 +3990,21 @@
         /*\
          * Interactable.autoScroll
          [ method ]
+         **
+         * Deprecated. Add an `autoscroll` property to the options object
+         * passed to @Interactable.draggable or @Interactable.resizable instead.
          *
-         * Returns or sets whether or not any actions near the edges of the
+         * Returns or sets whether dragging and resizing near the edges of the
          * window/container trigger autoScroll for this Interactable
          *
-         = (boolean | object)
-         * `false` if autoScroll is disabled; object with autoScroll properties
-         * if autoScroll is enabled
+         = (object) Object with autoScroll properties
          *
          * or
          *
-         - options (object | boolean | null) #optional
+         - options (object | boolean) #optional
          * options can be:
          * - an object with margin, distance and interval properties,
          * - true or false to enable or disable autoScroll or
-         * - null to use default settings
          = (Interactable) this Interactable
         \*/
         autoScroll: function (options) {
@@ -4023,6 +4022,9 @@
          * Interactable.snap
          [ method ]
          **
+         * Deprecated. Add a `snap` property to the options object passed
+         * to @Interactable.draggable or @Interactable.resizable instead.
+         *
          * Returns or sets if and how action coordinates are snapped. By
          * default, snapping is relative to the pointer coordinates. You can
          * change this by setting the
@@ -4064,8 +4066,15 @@
          |     // immediately before the end event.
          |     endOnly: true,
          |
-         |     // https://github.com/taye/interact.js/pull/72#issue-41813493
-         |     elementOrigin: { x: 0, y: 0 }
+         |     relativePoints: [
+         |         { x: 0, y: 0 },  // snap relative to the top left of the element
+         |         { x: 1, y: 1 },  // and also to the bottom right
+         |     ],  
+         |
+         |     // offset the snap target coordinates
+         |     // can be an object with x/y or 'startCoords'
+         |     offset: { x: 50, y: 50 }
+         |   }
          | });
         \*/
         snap: function (options) {
@@ -4140,6 +4149,9 @@
          * Interactable.inertia
          [ method ]
          **
+         * Deprecated. Add an `inertia` property to the options object passed
+         * to @Interactable.draggable or @Interactable.resizable instead.
+         *
          * Returns or sets if and how events continue to run after the pointer is released
          **
          = (boolean | object) `false` if inertia is disabled; `object` with inertia properties if inertia is enabled
@@ -4242,7 +4254,7 @@
          * The default function to get an Interactables bounding rect. Can be
          * overridden using @Interactable.rectChecker.
          *
-         - element (Element) #optional The element to measure. Meant to be used for selector Interactables which don't have a specific element.
+         - element (Element) #optional The element to measure.
          = (object) The object's bounding rectangle.
          o {
          o     top   : 0,
@@ -4393,6 +4405,9 @@
          * Interactable.restrict
          [ method ]
          **
+         * Deprecated. Add a `restrict` property to the options object passed to
+         * @Interactable.draggable, @Interactable.resizable or @Interactable.gesturable instead.
+         *
          * Returns or sets the rectangles within which actions on this
          * interactable (after snap calculations) are restricted. By default,
          * restricting is relative to the pointer coordinates. You can change
@@ -4451,7 +4466,7 @@
          * Interactable.context
          [ method ]
          *
-         * Get's the selector context Node of the Interactable. The default is `window.document`.
+         * Gets the selector context Node of the Interactable. The default is `window.document`.
          *
          = (Node) The context Node of this Interactable
          **
@@ -5007,7 +5022,7 @@
      * interact.simulate
      [ method ]
      *
-     * Deprecated. You probably want @Interactable.fire @Interaction.start
+     * Deprecated. You probably want @Interactable.fire or @Interaction.start.
      *
      * Simulate pointer down to begin to interact with an interactable element
      - action       (string)  The action to be performed - drag, resize, etc.
