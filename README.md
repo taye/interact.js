@@ -16,6 +16,8 @@ Features include:
 
 ## This README features [changes][upcoming-changes] that are currently in development.
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The README of the latest release can be found [here][latest-readme].
 
 Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the
