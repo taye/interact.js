@@ -5035,55 +5035,61 @@
      * interact.enableDragging
      [ method ]
      *
+     * Deprecated.
+     *
      * Returns or sets whether dragging is enabled for any Interactables
      *
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableDragging = function (newValue) {
+    interact.enableDragging = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             actionIsEnabled.drag = newValue;
 
             return interact;
         }
         return actionIsEnabled.drag;
-    };
+    }, 'interact.enableDragging is deprecated and will soon be removed.');
 
     /*\
      * interact.enableResizing
      [ method ]
+     *
+     * Deprecated.
      *
      * Returns or sets whether resizing is enabled for any Interactables
      *
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableResizing = function (newValue) {
+    interact.enableResizing = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             actionIsEnabled.resize = newValue;
 
             return interact;
         }
         return actionIsEnabled.resize;
-    };
+    }, 'interact.enableResizing is deprecated and will soon be removed.');
 
     /*\
      * interact.enableGesturing
      [ method ]
+     *
+     * Deprecated.
      *
      * Returns or sets whether gesturing is enabled for any Interactables
      *
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableGesturing = function (newValue) {
+    interact.enableGesturing = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             actionIsEnabled.gesture = newValue;
 
             return interact;
         }
         return actionIsEnabled.gesture;
-    };
+    }, 'interact.enableGesturing is deprecated and will soon be removed.');
 
     interact.eventTypes = eventTypes;
 
