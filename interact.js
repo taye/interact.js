@@ -3909,9 +3909,6 @@
             return this.options.resize;
         },
 
-        // misspelled alias
-        resizeable: blank,
-
         /*\
          * Interactable.squareResize
          [ method ]
@@ -3983,9 +3980,6 @@
 
             return this.options.gesture;
         },
-
-        // misspelled alias
-        gestureable: blank,
 
         /*\
          * Interactable.autoScroll
@@ -4905,8 +4899,27 @@
         }
     };
 
-    Interactable.prototype.gestureable = Interactable.prototype.gesturable;
-    Interactable.prototype.resizeable = Interactable.prototype.resizable;
+    function warnOnce (method, message) {
+        var warned = false;
+
+        return function () {
+            if (!warned) {
+                window.console.warn(message);
+                warned = true;
+            }
+
+            return method.apply(this, arguments);
+        };
+    }
+
+    Interactable.prototype.snap = warnOnce(Interactable.prototype.snap,
+         'Interactable#snap is deprecated. See the new documentation for snapping at http://interactjs.io/docs/#snap');
+    Interactable.prototype.restrict = warnOnce(Interactable.prototype.restrict,
+         'Interactable#restrict is deprecated. See the new documentation for resticting at http://interactjs.io/docs/#restrict');
+    Interactable.prototype.inertia = warnOnce(Interactable.prototype.inertia,
+         'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/#inertia');
+    Interactable.prototype.autoScroll = warnOnce(Interactable.prototype.autoScroll,
+         'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
 
     /*\
      * interact.isSet
