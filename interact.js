@@ -2723,7 +2723,7 @@
 
                 for (i = 0; i < len; i++) {
                     if (isFunction(snap.targets[i])) {
-                        target = snap.targets[i](relative.x, relative.y);
+                        target = snap.targets[i](relative.x, relative.y, this);
                     }
                     else {
                         target = snap.targets[i];
