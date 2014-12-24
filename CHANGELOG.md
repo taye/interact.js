@@ -58,6 +58,10 @@ Snapping now occurs if the distance to the snap target is [less than or
 equal](https://github.com/taye/interact.js/commit/430c28c) to the target's
 range.
 
+### Inertia
+
+`inertia.zeroResumeDelta` is now `true` by default.
+
 ### Per-action settings
 
 Snap, restrict, inertia, autoScroll can be different for drag, restrict and
