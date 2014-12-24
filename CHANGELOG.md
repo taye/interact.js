@@ -46,9 +46,28 @@ interact(target).draggable({
 });
 ```
 
+#### snap function interaction arg
+
+The current `Interaction` is now passed as the third parameter to snap functions.
+
+```javascript
+interact(target).draggable({
+  snap: {
+    targets: [ function (x, y, interaction) {
+      if (!interaction.dropTarget) {
+        return { x: 0, y: 0 };
+      }
+    } ]
+  });
+```
+
+#### snap.relativePoints and offset
+
 The `snap.relativePoints` array succeeds the snap.elementOriign object. But
 backwards compatibility with `elementOrigin` and the old snapping interface is
 maintained.
+
+`snap.offset` lets you offset all snap target coords.
 
 See [this PR](https://github.com/taye/interact.js/pull/133) for more info.
 
