@@ -128,7 +128,7 @@
                     minSpeed         : 100,   // target speed must be above this for inertia to start
                     endSpeed         : 10,    // the speed at which inertia is slow enough to stop
                     allowResume      : true,  // allow resuming an action in inertia phase
-                    zeroResumeDelta  : false, // if an action is resumed after launch, set dx/dy to 0
+                    zeroResumeDelta  : true,  // if an action is resumed after launch, set dx/dy to 0
                     smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
                 }
             }
