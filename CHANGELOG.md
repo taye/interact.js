@@ -87,9 +87,7 @@ Snap, restrict, inertia, autoScroll can be different for drag, restrict and
 gesture. See [PR 115](https://github.com/taye/interact.js/pull/115).
 
 Methods for these settings on the `interact` object (`interact.snap()`,
-`interact.autoScroll()`, etc.) [have been
-deprecated](https://github.com/taye/interact.js/issues/94). They will be
-removed in the next minor version change.
+`interact.autoScroll()`, etc.) have been removed.
 
 ### Space-separated string and array event list and eventType:listener object
 
