@@ -16,13 +16,6 @@ Features include:
  - **not modifying the DOM** except to support IE8 and to change the cursor
    (but you can disable that)
 
-## This README features [changes][upcoming-changes] that are currently in development.
-
-The README of the latest release can be found [here][latest-readme].
-
-Follow [@interactjs][ijs-twitter] on twitter and keep an eye on the
-[CHANGELOG](CHANGELOG.md) to stay updated.
-
 Installation
 ------------
 
@@ -100,4 +93,3 @@ interact.js is released under the [MIT License](http://taye.mit-license.org).
 
 [ijs-twitter]: https://twitter.com/interactjs
 [upcoming-changes]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#upcoming-changes
-[latest-readme]: https://github.com/taye/interact.js/blob/latest/README.md#readme
