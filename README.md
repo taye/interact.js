@@ -19,13 +19,10 @@ Features include:
 Installation
 ------------
 
-Install with [Bower](http://bower.io/) or [npm](https://www.npmjs.org/) or
-download the latest version from http://interactjs.io/#download.
-
-```shell
-    $ bower install interact
-    $ npm install interact.js
-```
+* [Bower](http://bower.io/): `bower install interact`
+* [npm](https://www.npmjs.org/): `npm install interact.js`
+* Direct download the latest version: http://interactjs.io/#download
+* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/VERSION/interact.min.js"></script>` (replace `VERSION` with the SemVer you want to use)
 
 Documentation
 -------------
