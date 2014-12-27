@@ -34,9 +34,11 @@ document.addEventListener('DOMContentLoaded', function () {
             return point.matrixTransform(rootMatrix);
         });
 
-        interact('.point-handle').snap({
-            anchors: transformedPoints,
-            range: 20 * Math.max(rootMatrix.a, rootMatrix.d)
+        interact('.point-handle').draggable({
+            snap: {
+                targets: transformedPoints,
+                range: 20 * Math.max(rootMatrix.a, rootMatrix.d)
+            }
         });
     }
 
@@ -62,18 +64,15 @@ document.addEventListener('DOMContentLoaded', function () {
             onend: function (event) {
                 root.setAttribute('class', '');
             },
-            max: Infinity
+            snap: {
+                targets: originalPoints,
+                range: 10,
+                relativePoints: [ { x: 0.5, y: 0.5 } ]
+            },
+            restrict: { restriction: document.rootElement }
         })
-        .snap({
-            mode: 'anchor',
-            anchors: originalPoints,
-            range: 10,
-            elementOrigin: { x: 0.5, y: 0.5 }
-        })
-        .restrict({ drag: document.rootElement })
         .styleCursor(false);
 
-    interact.maxInteractions(Infinity);
 
     document.addEventListener('dragstart', function (event) {
         event.preventDefault();
