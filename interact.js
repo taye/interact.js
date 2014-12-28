@@ -5,10 +5,27 @@
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function () {
+(function (realWindow) {
     'use strict';
 
-    var document           = window.document,
+    var // get wrapped window if using Shadow DOM polyfill
+        window = (function () {
+            // create a TextNode
+            var el = realWindow.document.createTextNode('');
+
+            // check if it's wrapped by a polyfill
+            if (el.ownerDocument !== realWindow.document
+                && typeof realWindow.wrap === 'function'
+                && realWindow.wrap(el) === el) {
+                // return wrapped window
+                return realWindow.wrap(realWindow);
+            }
+
+            // no Shadow DOM polyfil or native implementation
+            return realWindow;
+        }()),
+
+        document           = window.document,
         SVGElement         = window.SVGElement         || blank,
         SVGSVGElement      = window.SVGSVGElement      || blank,
         SVGElementInstance = window.SVGElementInstance || blank,
@@ -332,8 +349,8 @@
         ie8MatchesSelector,
 
         // native requestAnimationFrame or polyfill
-        reqFrame = window.requestAnimationFrame,
-        cancelFrame = window.cancelAnimationFrame,
+        reqFrame = realWindow.requestAnimationFrame,
+        cancelFrame = realWindow.cancelAnimationFrame,
 
         // Events wrapper
         events = (function () {
@@ -686,7 +703,7 @@
 
         var rootNode = (node.ownerDocument || node);
 
-        return rootNode.defaultView || rootNode.parentWindow;
+        return rootNode.defaultView || rootNode.parentWindow || window;
     }
 
     function getElementRect (element) {
@@ -1395,7 +1412,7 @@
                 pointerIndex = this.addPointer(pointer),
                 action;
 
-            this.holdTimers[pointerIndex] = window.setTimeout(function () {
+            this.holdTimers[pointerIndex] = setTimeout(function () {
                 that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
             }, 600);
 
@@ -1712,7 +1729,7 @@
 
             if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
                 if (this.pointerIsDown) {
-                    window.clearTimeout(this.holdTimers[pointerIndex]);
+                    clearTimeout(this.holdTimers[pointerIndex]);
                 }
 
                 this.collectEventTargets(pointer, event, eventTarget, 'move');
@@ -1961,7 +1978,7 @@
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
             var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
 
-            window.clearTimeout(this.holdTimers[pointerIndex]);
+            clearTimeout(this.holdTimers[pointerIndex]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'up' );
             this.collectEventTargets(pointer, event, eventTarget, 'tap');
@@ -1974,7 +1991,7 @@
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
             var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
 
-            window.clearTimeout(this.holdTimers[pointerIndex]);
+            clearTimeout(this.holdTimers[pointerIndex]);
 
             this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
@@ -5445,16 +5462,16 @@
         var lastTime = 0,
             vendors = ['ms', 'moz', 'webkit', 'o'];
 
-        for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-            reqFrame = window[vendors[x]+'RequestAnimationFrame'];
-            cancelFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+        for(var x = 0; x < vendors.length && !realWindow.requestAnimationFrame; ++x) {
+            reqFrame = realWindow[vendors[x]+'RequestAnimationFrame'];
+            cancelFrame = realWindow[vendors[x]+'CancelAnimationFrame'] || realWindow[vendors[x]+'CancelRequestAnimationFrame'];
         }
 
         if (!reqFrame) {
             reqFrame = function(callback) {
                 var currTime = new Date().getTime(),
                     timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-                    id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                    id = setTimeout(function() { callback(currTime + timeToCall); },
                   timeToCall);
                 lastTime = currTime + timeToCall;
                 return id;
@@ -5484,7 +5501,7 @@
         });
     }
     else {
-        window.interact = interact;
+        realWindow.interact = interact;
     }
 
-} ());
+} (window));
