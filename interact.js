@@ -26,6 +26,7 @@
         }()),
 
         document           = window.document,
+        DocumentFragment   = window.DocumentFragment   || blank,
         SVGElement         = window.SVGElement         || blank,
         SVGSVGElement      = window.SVGSVGElement      || blank,
         SVGElementInstance = window.SVGElementInstance || blank,
@@ -536,6 +537,7 @@
             : o.nodeType === 1 && typeof o.nodeName === "string");
     }
     function isWindow (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); }
+    function isDocFrag (thing) { return !!thing && thing instanceof DocumentFragment; }
     function isArray (thing) {
         return isObject(thing)
                 && (typeof thing.length !== undefined)
@@ -836,7 +838,7 @@
                 : defaultOptions.origin;
 
         if (origin === 'parent') {
-            origin = element.parentNode;
+            origin = parentElement(element);
         }
         else if (origin === 'self') {
             origin = interactable.getRect(element);
@@ -890,15 +892,28 @@
     }
 
     function closest (child, selector) {
-        var parent = child.parentNode;
+        var parent = parentElement(child);
 
         while (isElement(parent)) {
             if (matchesSelector(parent, selector)) { return parent; }
 
-            parent = parent.parentNode;
+            parent = parentElement(parent);
         }
 
         return null;
+    }
+
+    function parentElement (node) {
+        var parent = node.parentNode;
+
+        if (isDocFrag(parent)) {
+            // skip past #shado-root fragments
+            while ((parent = parent.host) && isDocFrag(parent)) {}
+
+            return parent;
+        }
+
+        return parent;
     }
 
     function inContext (interactable, element) {
@@ -911,13 +926,15 @@
 
         if (!ignoreFrom
             // limit test to the interactable's element and its children
-            || !isElement(element) || element === interactableElement.parentNode) {
+            || !isElement(element) || element === parentElement(interactableElement)) {
             return false;
         }
 
         if (isString(ignoreFrom)) {
             return (matchesSelector(element, ignoreFrom)
-                    || testIgnore(interactable, interactableElement, element.parentNode));
+                    || testIgnore(interactable,
+                                  interactableElement,
+                                  parentElement(element)));
         }
         else if (isElement(ignoreFrom)) {
             return element === ignoreFrom || nodeContains(ignoreFrom, element);
@@ -932,13 +949,13 @@
         if (!allowFrom) { return true; }
 
         // limit test to the interactable's element and its children
-        if (!isElement(element) || element === interactableElement.parentNode) {
+        if (!isElement(element) || element === parentElement(interactableElement)) {
             return false;
         }
 
         if (isString(allowFrom)) {
             return (matchesSelector(element, allowFrom)
-                    || testAllow(interactable, interactableElement, element.parentNode));
+                    || testAllow(interactable, interactableElement, parentElement(element)));
         }
         else if (isElement(allowFrom)) {
             return element === allowFrom || nodeContains(allowFrom, element);
@@ -1437,7 +1454,7 @@
                         this.collectEventTargets(pointer, event, eventTarget, 'down');
                         return;
                     }
-                    element = element.parentNode;
+                    element = parentElement(element);
                 }
             }
 
@@ -1465,7 +1482,7 @@
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, pointer);
 
-            if (this.matches.length && this.mouse) {
+            if (false && this.matches.length && this.mouse) {
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
             }
             else {
@@ -1476,7 +1493,7 @@
                     interactables.forEachSelector(pushMatches);
 
                     action = this.validateSelector(pointer, this.matches, this.matchElements);
-                    element = element.parentNode;
+                    element = parentElement(element);
                 }
             }
 
@@ -1789,7 +1806,7 @@
                                     break;
                                 }
 
-                                element = element.parentNode;
+                                element = parentElement(element);
                             }
 
                             // if there's no drag from element interactables,
@@ -1827,7 +1844,7 @@
                                         break;
                                     }
 
-                                    element = element.parentNode;
+                                    element = parentElement(element);
                                 }
                             }
                         }
@@ -2608,7 +2625,7 @@
 
                 interactables.forEachSelector(collectSelectors);
 
-                element = element.parentNode;
+                element = parentElement(element);
             }
 
             // create the tap event even if there are no listeners so that
@@ -2866,7 +2883,7 @@
 
             if (isString(restriction)) {
                 if (restriction === 'parent') {
-                    restriction = this.element.parentNode;
+                    restriction = parentElement(this.element);
                 }
                 else if (restriction === 'self') {
                     restriction = target.getRect(this.element);
@@ -2987,7 +3004,7 @@
 
                             return interaction;
                         }
-                        element = element.parentNode;
+                        element = parentElement(element);
                     }
                 }
             }
@@ -3473,7 +3490,7 @@
                 }
             }
 
-            element = element.parentNode;
+            element = parentElement(element);
         }
     }
 
