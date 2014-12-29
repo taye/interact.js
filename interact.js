@@ -339,8 +339,8 @@
                             && /OS [1-7][^\d]/.test(navigator.appVersion)),
 
         // prefix matchesSelector
-        prefixedMatchesSelector = 'matchesSelector' in Element.prototype?
-                'matchesSelector': 'webkitMatchesSelector' in Element.prototype?
+        prefixedMatchesSelector = 'matches' in Element.prototype?
+                'matches': 'webkitMatchesSelector' in Element.prototype?
                     'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
                         'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                             'oMatchesSelector': 'msMatchesSelector',
