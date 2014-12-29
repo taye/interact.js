@@ -3068,7 +3068,9 @@
     function doOnInteractions (method) {
         return (function (event) {
             var interaction,
-                eventTarget = getActualElement(event.target),
+                eventTarget = getActualElement(event.path
+                                               ? event.path[0]
+                                               : event.target),
                 curEventTarget = getActualElement(event.currentTarget),
                 i;
 
@@ -3456,7 +3458,10 @@
     function delegateListener (event, useCapture) {
         var fakeEvent = {},
             delegated = delegatedEvents[event.type],
-            element = event.target;
+            eventTarget = getActualElement(event.path
+                                           ? event.path[0]
+                                           : event.target),
+            element = eventTarget;
 
         useCapture = useCapture? true: false;
 
@@ -3475,7 +3480,7 @@
                     context = delegated.contexts[i];
 
                 if (matchesSelector(element, selector)
-                    && nodeContains(context, event.target)
+                    && nodeContains(context, eventTarget)
                     && nodeContains(context, element)) {
 
                     var listeners = delegated.listeners[i];
