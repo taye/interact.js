@@ -916,7 +916,8 @@
         }
 
         if (isString(ignoreFrom)) {
-            return matchesSelector(element, ignoreFrom) || testIgnore(interactable, element.parentNode);
+            return (matchesSelector(element, ignoreFrom)
+                    || testIgnore(interactable, interactableElement, element.parentNode));
         }
         else if (isElement(ignoreFrom)) {
             return element === ignoreFrom || nodeContains(ignoreFrom, element);
@@ -936,7 +937,8 @@
         }
 
         if (isString(allowFrom)) {
-            return matchesSelector(element, allowFrom) || testAllow(interactable, element.parentNode);
+            return (matchesSelector(element, allowFrom)
+                    || testAllow(interactable, interactableElement, element.parentNode));
         }
         else if (isElement(allowFrom)) {
             return element === allowFrom || nodeContains(allowFrom, element);
