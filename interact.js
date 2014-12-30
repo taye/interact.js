@@ -2869,10 +2869,14 @@
 
             rect = restriction;
 
+            if (!restriction) {
+                restrictedX = page.x;
+                restrictedY = page.y;
+            }
             // object is assumed to have
             // x, y, width, height or
             // left, top, right, bottom
-            if ('x' in restriction && 'y' in restriction) {
+            else if ('x' in restriction && 'y' in restriction) {
                 restrictedX = Math.max(Math.min(rect.x + rect.width  - this.restrictOffset.right , page.x), rect.x + this.restrictOffset.left);
                 restrictedY = Math.max(Math.min(rect.y + rect.height - this.restrictOffset.bottom, page.y), rect.y + this.restrictOffset.top );
             }
