@@ -5462,6 +5462,11 @@
             return ie8MatchesSelector(element, selector, nodeList);
         }
 
+        // remove /deep/ from selectors if shadowDOM polyfill is used
+        if (window !== realWindow) {
+            selector = selector.replace(/\/deep\//g, ' ');
+        }
+
         return element[prefixedMatchesSelector](selector);
     }
 
