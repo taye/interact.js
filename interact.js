@@ -85,14 +85,10 @@
                 square: false,
                 axis: 'xy',
 
-                // object with boolean props
-                // left, right, top, bottom
+                // object with props left, right, top, bottom which are
+                // true/false values to resize when the pointer is over that edge
+                // or CSS selectors to match the handles for each direction
                 edges: null,
-
-                // object with props left, right, top, bottom
-                // which are CSS selectors to match the handles
-                // for each direction
-                edgeSelectors: null
             },
 
             gesture: {
@@ -3411,6 +3407,23 @@
         this.originalEvent.preventDefault();
     }
 
+    function checkResizeEdge (name, value, page, element, rect) {
+        // false, '', undefined, null
+        if (!value) { return false; }
+
+        // true value, use pointer coords and element rect
+        if (value === true) {
+            if (name === 'left'  ) { return page.x < (rect.left   + margin); }
+            if (name === 'top'   ) { return page.y < (rect.top    + margin); }
+
+            if (name === 'right' ) { return page.x > (rect.right  - margin); }
+            if (name === 'bottom') { return page.y > (rect.bottom - margin); }
+        }
+
+        // otherwise check if element matches value as selector
+        return matchesSelector(element, value);
+    }
+
     function defaultActionChecker (pointer, interaction, element) {
         var rect = this.getRect(element),
             shouldResize = false,
@@ -3431,30 +3444,12 @@
 
             // if using resize.edges
             if (isObject(resizeOptions.edges)) {
-                // if resize.edgeSelectors was set
-                if (isObject(resizeOptions.edgeSelectors)) {
-                    // for each edge
-                    for (var edge in resizeEdges) {
-                        var selector = resizeOptions.edgeSelectors[edge];
-
-                        // check the selector
-                        resizeEdges[edge] = (resizeOptions.edges[edge]
-                                             && !!selector
-                                             && matchesSelector(interaction.downTarget, selector));
-                    }
-
-                    // can't have two opposing edges
-                    resizeEdges.left = resizeEdges.right ? false : resizeEdges.left;
-                    resizeEdges.top  = resizeEdges.bottom? false : resizeEdges.top ;
+                for (var edge in resizeEdges) {
+                    resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, element, rect);
                 }
-                // no selectors specified, use pointer position over the element
-                else {
-                    resizeEdges.left   = resizeOptions.edges.left   && page.x < (rect.left   + margin);
-                    resizeEdges.top    = resizeOptions.edges.top    && page.y < (rect.top    + margin);
 
-                    resizeEdges.right  = resizeOptions.edges.right  && page.x > (rect.right  - margin);
-                    resizeEdges.bottom = resizeOptions.edges.bottom && page.y > (rect.bottom - margin);
-                }
+                resizeEdges.left = resizeEdges.left && !resizeEdges.right;
+                resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom;
 
                 shouldResize = resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom;
             }
