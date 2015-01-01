@@ -2011,7 +2011,6 @@
 
                 var pointerSpeed,
                     now = new Date().getTime(),
-                    inertiaOptions = options[this.prepared.name].inertia,
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
