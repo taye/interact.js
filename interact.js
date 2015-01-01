@@ -1606,14 +1606,14 @@
 
             this.snapOffsets.splice(0);
 
-            var snapOffset = snap.offset === 'startCoords'
+            var snapOffset = snap && snap.offset === 'startCoords'
                                 ? {
                                     x: this.startCoords.page.x - origin.x,
                                     y: this.startCoords.page.y - origin.y
                                 }
-                                : snap.offset || { x: 0, y: 0 };
+                                : snap && snap.offset || { x: 0, y: 0 };
 
-            if (rect && snap.relativePoints && snap.relativePoints.length) {
+            if (rect && snap && snap.relativePoints && snap.relativePoints.length) {
                 for (var i = 0; i < snap.relativePoints.length; i++) {
                     this.snapOffsets.push({
                         x: this.startOffset.left - (width  * snap.relativePoints[i].x) + snapOffset.x,
@@ -2011,6 +2011,7 @@
 
                 var pointerSpeed,
                     now = new Date().getTime(),
+                    inertiaOptions = options[this.prepared.name].inertia,
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
@@ -2030,7 +2031,7 @@
                 }
 
                 // check if inertia should be started
-                inertiaPossible = (options[this.prepared.name].inertia.enabled
+                inertiaPossible = (inertiaOptions && inertiaOptions.enabled
                                    && this.prepared.name !== 'gesture'
                                    && event !== inertiaStatus.startEvent);
 
