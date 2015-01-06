@@ -4795,7 +4795,7 @@
             }
             // remove listener from this Interatable's element
             else {
-                events.remove(this, listener, useCapture);
+                events.remove(this._element, eventType, listener, useCapture);
             }
 
             return this;
