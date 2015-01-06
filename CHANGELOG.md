@@ -1,3 +1,9 @@
+## 1.2.2
+
+### Fixed DOM event removal
+
+See [issue 149](https://github.com/taye/interact.js/issues/149).
+
 ## 1.2.1
 
 ### Fixed Gestures
