@@ -45,7 +45,7 @@ interact('.rainbow-pixel-canvas')
           x: pixelSize, y: pixelSize
         }) ]
     },
-    max: Infinity,
+    // allow multiple drags on the same element
     maxPerElement: Infinity
   })
   // draw colored squares on move
@@ -79,8 +79,6 @@ interact('.rainbow-pixel-canvas')
   // interact.js can also add DOM event listeners
   interact(document).on('DOMContentLoaded', resizeCanvases);
   interact(window).on('resize', resizeCanvases);
-
-interact.maxInteractions(Infinity);
 ```
 
 See the above code in action at http://codepen.io/taye/pen/YPyLxE
