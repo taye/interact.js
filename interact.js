@@ -1645,7 +1645,7 @@
          * action must be enabled for the target Interactable and an appropriate number
          * of pointers must be held down – 1 for drag/resize, 2 for gesture.
          *
-         * Use it with interactable.<action>able({ manualStart: false }) to always
+         * Use it with `interactable.<action>able({ manualStart: false })` to always
          * [start actions manually](https://github.com/taye/interact.js/issues/114)
          *
          - action       (object)  The action to be performed - drag, resize, etc.
@@ -1667,7 +1667,7 @@
          |                         event.interactable,
          |                         event.currentTarget);
          |     }
-         });
+         | });
         \*/
         start: function (action, interactable, element) {
             if (this.interacting()
