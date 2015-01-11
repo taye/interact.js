@@ -216,7 +216,7 @@
                   <header id="main-header">
                       <div class="max-width">
                           <hgroup>
-                              <h1><a href="/"><img src="../img/ijs-anim.svg" height="80px" alt="interact.js"></a></h1>
+                              <h1><a href="/"><img src="../img/ijs-anim-short.svg" style="background-color:#dfe2e2;height:80px" alt="interact.js"></a></h1>
                               <p>API Reference</p>
                           </hgroup>
                       </div>
@@ -237,7 +237,7 @@
                                   <p></p><p>Start an action with the given Interactable and Element as tartgets. The
 action must be enabled for the target Interactable and an appropriate number
 of pointers must be held down – 1 for drag/resize, 2 for gesture.
-</p><p>Use it with interactable.&lt;action&gt;able({ manualStart: false }) to always
+</p><p>Use it with <code>interactable.&lt;action&gt;able({ manualStart: false })</code> to always
 <a href="https://github.com/taye/interact.js/issues/114">start actions manually</a>
 </p><p></p>
                                   
@@ -307,7 +307,8 @@ of pointers must be held down – 1 for drag/resize, 2 for gesture.
       interaction.start({ name: 'drag' },
                         event.interactable,
                         event.currentTarget);
-    }</code></pre></section>
+    }
+});</code></pre></section>
                                   
                                   
                                   
