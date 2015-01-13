@@ -1446,19 +1446,14 @@
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, pointer);
 
-            if (this.matches.length && this.mouse) {
+            while (element && element !== element.ownerDocument && !action) {
+                this.matches = [];
+                this.matchElements = [];
+
+                interactables.forEachSelector(pushMatches);
+
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
-            }
-            else {
-                while (element && element !== element.ownerDocument && !action) {
-                    this.matches = [];
-                    this.matchElements = [];
-
-                    interactables.forEachSelector(pushMatches);
-
-                    action = this.validateSelector(pointer, this.matches, this.matchElements);
-                    element = element.parentNode;
-                }
+                element = element.parentNode;
             }
 
             if (action) {
