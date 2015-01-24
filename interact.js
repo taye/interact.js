@@ -2634,9 +2634,11 @@
                 pointerEvent.dt = pointerEvent.timeStamp - this.downTimes[pointerIndex];
 
                 interval = pointerEvent.timeStamp - this.tapTime;
-                createNewDoubleTap = (this.prevTap && this.prevTap.type !== 'doubletap'
+                createNewDoubleTap = !!(this.prevTap && this.prevTap.type !== 'doubletap'
                        && this.prevTap.target === pointerEvent.target
                        && interval < 500);
+
+                pointerEvent.double = createNewDoubleTap;
 
                 this.tapTime = pointerEvent.timeStamp;
             }
