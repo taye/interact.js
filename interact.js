@@ -3429,8 +3429,14 @@
             if (name === 'bottom') { return page.y > (rect.bottom - margin); }
         }
 
-        // otherwise check if element matches value as selector
-        return isElement(element) && matchesSelector(element, value);
+        // the remaining checks require an element
+        if (!isElement(element)) { return false; }
+
+        return isElement(value)
+                    // the value is an element to use as a resize handle
+                    ? value === element
+                    // otherwise check if element matches value as selector
+                    : matchesSelector(element, value);
     }
 
     function defaultActionChecker (pointer, interaction, element) {
