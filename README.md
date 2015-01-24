@@ -22,7 +22,9 @@ Installation
 * [Bower](http://bower.io/): `bower install interact`
 * [npm](https://www.npmjs.org/): `npm install interact.js`
 * Direct download the latest version: http://interactjs.io/#download
-* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/VERSION/interact.min.js"></script>` (replace `VERSION` with the SemVer you want to use)
+* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/VERSION/interact.min.js"></script>`
+* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/VERSION/interact.min.js"></script>` 
+  (replace `VERSION` with the SemVer you want to use)
 
 Documentation
 -------------
@@ -43,7 +45,7 @@ interact('.rainbow-pixel-canvas')
           x: pixelSize, y: pixelSize
         }) ]
     },
-    max: Infinity,
+    // allow multiple drags on the same element
     maxPerElement: Infinity
   })
   // draw colored squares on move
@@ -77,8 +79,6 @@ interact('.rainbow-pixel-canvas')
   // interact.js can also add DOM event listeners
   interact(document).on('DOMContentLoaded', resizeCanvases);
   interact(window).on('resize', resizeCanvases);
-
-interact.maxInteractions(Infinity);
 ```
 
 See the above code in action at http://codepen.io/taye/pen/YPyLxE

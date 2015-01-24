@@ -1,3 +1,22 @@
+## 1.2.2
+
+### Fixed DOM event removal
+
+See [issue 149](https://github.com/taye/interact.js/issues/149).
+
+## 1.2.1
+
+### Fixed Gestures
+
+Gestures were completely [broken in
+v1.2.0](https://github.com/taye/interact.js/issues/146). They're fixed now.
+
+### Restriction
+
+Fixed restriction to an element when the element doesn't have a rect (`display:
+none`, not in DOM, etc.). [Issue
+144](https://github.com/taye/interact.js/issues/144).
+
 ## 1.2.0
 
 ### Multiple interactions

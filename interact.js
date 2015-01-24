@@ -1,7 +1,7 @@
 /**
- * interact.js v1.2.0
+ * interact.js v1.2.2
  *
- * Copyright (c) 2012, 2013, 2014 Taye Adeyemi <dev@taye.me>
+ * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
@@ -1208,6 +1208,9 @@
         this.downEvent   = null;    // pointerdown/mousedown/touchstart event
         this.downPointer = {};
 
+        this._eventTarget    = null;
+        this._curEventTarget = null;
+
         this.prevEvent = null;      // previous action event
         this.tapTime   = 0;         // time of the most recent tap event
         this.prevTap   = null;
@@ -1452,19 +1455,14 @@
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, pointer);
 
-            if (this.matches.length && this.mouse) {
+            while (element && element !== element.ownerDocument && !action) {
+                this.matches = [];
+                this.matchElements = [];
+
+                interactables.forEachSelector(pushMatches);
+
                 action = this.validateSelector(pointer, this.matches, this.matchElements);
-            }
-            else {
-                while (element && element !== element.ownerDocument && !action) {
-                    this.matches = [];
-                    this.matchElements = [];
-
-                    interactables.forEachSelector(pushMatches);
-
-                    action = this.validateSelector(pointer, this.matches, this.matchElements);
-                    element = element.parentNode;
-                }
+                element = element.parentNode;
             }
 
             if (action) {
@@ -1614,14 +1612,14 @@
 
             this.snapOffsets.splice(0);
 
-            var snapOffset = snap.offset === 'startCoords'
+            var snapOffset = snap && snap.offset === 'startCoords'
                                 ? {
                                     x: this.startCoords.page.x - origin.x,
                                     y: this.startCoords.page.y - origin.y
                                 }
-                                : snap.offset || { x: 0, y: 0 };
+                                : snap && snap.offset || { x: 0, y: 0 };
 
-            if (rect && snap.relativePoints && snap.relativePoints.length) {
+            if (rect && snap && snap.relativePoints && snap.relativePoints.length) {
                 for (var i = 0; i < snap.relativePoints.length; i++) {
                     this.snapOffsets.push({
                         x: this.startOffset.left - (width  * snap.relativePoints[i].x) + snapOffset.x,
@@ -1653,7 +1651,7 @@
          * action must be enabled for the target Interactable and an appropriate number
          * of pointers must be held down – 1 for drag/resize, 2 for gesture.
          *
-         * Use it with interactable.<action>able({ manualStart: false }) to always
+         * Use it with `interactable.<action>able({ manualStart: false })` to always
          * [start actions manually](https://github.com/taye/interact.js/issues/114)
          *
          - action       (object)  The action to be performed - drag, resize, etc.
@@ -1675,7 +1673,7 @@
          |                         event.interactable,
          |                         event.currentTarget);
          |     }
-         });
+         | });
         \*/
         start: function (action, interactable, element) {
             if (this.interacting()
@@ -2094,7 +2092,7 @@
                 }
 
                 // check if inertia should be started
-                inertiaPossible = (options[this.prepared.name].inertia.enabled
+                inertiaPossible = (inertiaOptions && inertiaOptions.enabled
                                    && this.prepared.name !== 'gesture'
                                    && event !== inertiaStatus.startEvent);
 
@@ -2700,9 +2698,11 @@
                 pointerEvent.dt = pointerEvent.timeStamp - this.downTimes[pointerIndex];
 
                 interval = pointerEvent.timeStamp - this.tapTime;
-                createNewDoubleTap = (this.prevTap && this.prevTap.type !== 'doubletap'
+                createNewDoubleTap = !!(this.prevTap && this.prevTap.type !== 'doubletap'
                        && this.prevTap.target === pointerEvent.target
                        && interval < 500);
+
+                pointerEvent.double = createNewDoubleTap;
 
                 this.tapTime = pointerEvent.timeStamp;
             }
@@ -3003,6 +3003,11 @@
 
             status.lambda_v0 = lambda / status.v0;
             status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+        },
+
+        _updateEventTargets: function (currentTarget, target) {
+            this._eventTarget    = target;
+            this._curEventTarget = currentTarget;
         }
 
     };
@@ -3114,6 +3119,8 @@
 
                     if (!interaction) { continue; }
 
+                    interaction._updateEventTargets(eventTarget, curEventTarget);
+
                     interaction[method](pointer, event, eventTarget, curEventTarget);
                 }
             }
@@ -3136,6 +3143,8 @@
                 interaction = getInteractionFromPointer(event, event.type, eventTarget);
 
                 if (!interaction) { return; }
+
+                interaction._updateEventTargets(eventTarget, curEventTarget);
 
                 interaction[method](event, event, eventTarget, curEventTarget);
             }
@@ -4897,7 +4906,7 @@
             }
             // remove listener from this Interatable's element
             else {
-                events.remove(this, listener, useCapture);
+                events.remove(this._element, eventType, listener, useCapture);
             }
 
             return this;
@@ -5019,11 +5028,11 @@
     }
 
     Interactable.prototype.snap = warnOnce(Interactable.prototype.snap,
-         'Interactable#snap is deprecated. See the new documentation for snapping at http://interactjs.io/docs/#snap');
+         'Interactable#snap is deprecated. See the new documentation for snapping at http://interactjs.io/docs/snapping');
     Interactable.prototype.restrict = warnOnce(Interactable.prototype.restrict,
-         'Interactable#restrict is deprecated. See the new documentation for resticting at http://interactjs.io/docs/#restrict');
+         'Interactable#restrict is deprecated. See the new documentation for resticting at http://interactjs.io/docs/restriction');
     Interactable.prototype.inertia = warnOnce(Interactable.prototype.inertia,
-         'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/#inertia');
+         'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/inertia');
     Interactable.prototype.autoScroll = warnOnce(Interactable.prototype.autoScroll,
          'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
 
