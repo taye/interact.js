@@ -1512,7 +1512,7 @@
                 if (interactable
                     && !testIgnore(interactable, curEventTarget, eventTarget)
                     && testAllow(interactable, curEventTarget, eventTarget)
-                    && (action = validateAction(forceAction || interactable.getAction(pointer, this), interactable, eventTarget))
+                    && (action = validateAction(forceAction || interactable.getAction(pointer, this, curEventTarget), interactable, eventTarget))
                     && withinInteractionLimit(interactable, curEventTarget, action)) {
                     this.target = interactable;
                     this.element = curEventTarget;
@@ -1523,7 +1523,7 @@
                 options = target && target.options;
 
             if (target && !this.interacting()) {
-                action = action || validateAction(forceAction || target.getAction(pointer, this), target, this.element);
+                action = action || validateAction(forceAction || target.getAction(pointer, this, curEventTarget), target, this.element);
 
                 this.setEventXY(this.startCoords);
 
@@ -3005,7 +3005,7 @@
             status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
         },
 
-        _updateEventTargets: function (currentTarget, target) {
+        _updateEventTargets: function (target, currentTarget) {
             this._eventTarget    = target;
             this._curEventTarget = currentTarget;
         }
@@ -3430,7 +3430,7 @@
         }
 
         // otherwise check if element matches value as selector
-        return matchesSelector(element, value);
+        return isElement(element) && matchesSelector(element, value);
     }
 
     function defaultActionChecker (pointer, interaction, element) {
@@ -3454,7 +3454,11 @@
             // if using resize.edges
             if (isObject(resizeOptions.edges)) {
                 for (var edge in resizeEdges) {
-                    resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, element, rect);
+                    resizeEdges[edge] = checkResizeEdge(edge,
+                                                        resizeOptions.edges[edge],
+                                                        page,
+                                                        interaction._eventTarget,
+                                                        rect);
                 }
 
                 resizeEdges.left = resizeEdges.left && !resizeEdges.right;
