@@ -1202,6 +1202,9 @@
         this.downEvent   = null;    // pointerdown/mousedown/touchstart event
         this.downPointer = {};
 
+        this._eventTarget    = null;
+        this._curEventTarget = null;
+
         this.prevEvent = null;      // previous action event
         this.tapTime   = 0;         // time of the most recent tap event
         this.prevTap   = null;
@@ -2934,6 +2937,11 @@
 
             status.lambda_v0 = lambda / status.v0;
             status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+        },
+
+        _updateEventTargets: function (currentTarget, target) {
+            this._eventTarget    = target;
+            this._curEventTarget = currentTarget;
         }
 
     };
@@ -3045,6 +3053,8 @@
 
                     if (!interaction) { continue; }
 
+                    interaction._updateEventTargets(eventTarget, curEventTarget);
+
                     interaction[method](pointer, event, eventTarget, curEventTarget);
                 }
             }
@@ -3067,6 +3077,8 @@
                 interaction = getInteractionFromPointer(event, event.type, eventTarget);
 
                 if (!interaction) { return; }
+
+                interaction._updateEventTargets(eventTarget, curEventTarget);
 
                 interaction[method](event, event, eventTarget, curEventTarget);
             }
