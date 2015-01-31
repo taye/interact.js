@@ -4663,7 +4663,7 @@
 
             if (isObject(eventType)) {
                 for (var prop in eventType) {
-                    interact.on(prop, eventType[prop], listener);
+                    this.on(prop, eventType[prop], listener);
                 }
 
                 return this;
@@ -4757,7 +4757,7 @@
 
             if (isObject(eventType)) {
                 for (var prop in eventType) {
-                    interact.off(prop, eventType[prop], listener);
+                    this.off(prop, eventType[prop], listener);
                 }
 
                 return this;
