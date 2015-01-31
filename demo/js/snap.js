@@ -255,8 +255,6 @@
         sliderChange(event, true);
     }
 
-    interact.styleCursor(false);
-
     interact(document).on('DOMContentLoaded', function () {
         canvas = document.getElementById('drag');
         canvas.width = width;
