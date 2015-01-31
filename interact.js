@@ -1433,7 +1433,7 @@
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
                 // climb up the DOM tree from the event target
-                while (element && element !== element.ownerDocument) {
+                while (isElement(element)) {
 
                     // if this element is the current inertia target element
                     if (element === this.element
@@ -1475,7 +1475,7 @@
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, pointer);
 
-            while (element && element !== element.ownerDocument && !action) {
+            while (isElement(element) && !action) {
                 this.matches = [];
                 this.matchElements = [];
 
@@ -1779,7 +1779,7 @@
                             var element = eventTarget;
 
                             // check element interactables
-                            while (element && element !== element.ownerDocument) {
+                            while (isElement(element)) {
                                 var elementInteractable = interactables.get(element);
 
                                 if (elementInteractable
@@ -1822,7 +1822,7 @@
 
                                 element = eventTarget;
 
-                                while (element && element !== element.ownerDocument) {
+                                while (isElement(element)) {
                                     var selectorInteractable = interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
@@ -3477,7 +3477,7 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (element && (element.ownerDocument && element !== element.ownerDocument)) {
+        while (isElement(element)) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
