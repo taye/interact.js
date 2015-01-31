@@ -925,20 +925,13 @@
     function testIgnore (interactable, interactableElement, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!ignoreFrom
-            // limit test to the interactable's element and its children
-            || !isElement(element) || element === parentElement(interactableElement)) {
-            return false;
-        }
+        if (!ignoreFrom || !isElement(element)) { return false; }
 
         if (isString(ignoreFrom)) {
-            return (matchesSelector(element, ignoreFrom)
-                    || testIgnore(interactable,
-                                  interactableElement,
-                                  parentElement(element)));
+            return matchesUpTo(element, ignoreFrom, interactableElement);
         }
         else if (isElement(ignoreFrom)) {
-            return element === ignoreFrom || nodeContains(ignoreFrom, element);
+            return nodeContains(ignoreFrom, element);
         }
 
         return false;
@@ -949,17 +942,13 @@
 
         if (!allowFrom) { return true; }
 
-        // limit test to the interactable's element and its children
-        if (!isElement(element) || element === parentElement(interactableElement)) {
-            return false;
-        }
+        if (!isElement(element)) { return false; }
 
         if (isString(allowFrom)) {
-            return (matchesSelector(element, allowFrom)
-                    || testAllow(interactable, interactableElement, parentElement(element)));
+            return matchesUpTo(element, allowFrom, interactableElement);
         }
         else if (isElement(allowFrom)) {
-            return element === allowFrom || nodeContains(allowFrom, element);
+            return nodeContains(allowFrom, element);
         }
 
         return false;
