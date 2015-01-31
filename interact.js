@@ -881,11 +881,12 @@
     }
 
     function nodeContains (parent, child) {
-        while ((child = child.parentNode)) {
-
+        while (child) {
             if (child === parent) {
                 return true;
             }
+
+            child = child.parentNode;
         }
 
         return false;
