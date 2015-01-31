@@ -104,8 +104,9 @@
                 axis: 'xy',
 
                 // object with props left, right, top, bottom which are
-                // true/false values to resize when the pointer is over that edge
-                // or CSS selectors to match the handles for each direction
+                // true/false values to resize when the pointer is over that edge,
+                // CSS selectors to match the handles for each direction
+                // or the Elements for each handle
                 edges: null,
             },
 
@@ -3444,7 +3445,7 @@
         this.originalEvent.preventDefault();
     }
 
-    function checkResizeEdge (name, value, page, element, rect) {
+    function checkResizeEdge (name, value, page, element, interactableElement, rect) {
         // false, '', undefined, null
         if (!value) { return false; }
 
@@ -3464,7 +3465,7 @@
                     // the value is an element to use as a resize handle
                     ? value === element
                     // otherwise check if element matches value as selector
-                    : matchesSelector(element, value);
+                    : matchesUpTo(element, value, interactableElement);
     }
 
     function defaultActionChecker (pointer, interaction, element) {
@@ -3492,6 +3493,7 @@
                                                         resizeOptions.edges[edge],
                                                         page,
                                                         interaction._eventTarget,
+                                                        element,
                                                         rect);
                 }
 
