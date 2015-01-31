@@ -5484,6 +5484,22 @@
         return element[prefixedMatchesSelector](selector);
     }
 
+    function matchesUpTo (element, selector, limit) {
+        while (isElement(element)) {
+            if (matchesSelector(element, selector)) {
+                return true;
+            }
+
+            element = parentElement(element);
+
+            if (element === limit) {
+                return matchesSelector(element, selector);
+            }
+        }
+
+        return false;
+    }
+
     // For IE8's lack of an Element#matchesSelector
     // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
     if (!(prefixedMatchesSelector in Element.prototype) || !isFunction(Element.prototype[prefixedMatchesSelector])) {
