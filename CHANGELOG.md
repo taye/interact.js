@@ -1,3 +1,20 @@
+## 1.2.3
+
+### ShadowDOM
+
+Basic support for ShadowDOM was implemented in [PR
+143](https://github.com/taye/interact.js/pull/143)
+
+### Fixed some issues with events
+
+Fixed Interactable#on({ type: listener }). b8a5e89
+
+Added a `double` property to tap events. `tap.double === true` if the tap will
+be followed by a `doubletap` event. See [issue
+155](https://github.com/taye/interact.js/issues/155#issuecomment-71202352).
+
+Fixed [issue 150](https://github.com/taye/interact.js/issues/150).
+
 ## 1.2.2
 
 ### Fixed DOM event removal
