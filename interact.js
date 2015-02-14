@@ -994,8 +994,8 @@
 
     function withinInteractionLimit (interactable, element, action) {
         var options = interactable.options,
-            maxActions = options[action.name + 'Max'],
-            maxPerElement = options[action.name + 'MaxPerElement'],
+            maxActions = options[action.name].max,
+            maxPerElement = options[action.name].maxPerElement,
             activeInteractions = 0,
             targetCount = 0,
             targetElementCount = 0;
@@ -1843,7 +1843,7 @@
 
                 if (starting
                     && (this.target.options[this.prepared.name].manualStart
-                        || !withinInteractionLimit(this.target, this.element, this.prepared.name))) {
+                        || !withinInteractionLimit(this.target, this.element, this.prepared))) {
                     this.stop();
                     return;
                 }
