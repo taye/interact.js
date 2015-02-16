@@ -2939,6 +2939,12 @@
                     return;
                 }
 
+                // with manualStart, only preventDefault while interacting
+                if (options[this.prepared.name] && options[this.prepared.name].manualStart
+                    && !this.interacting()) {
+                    return;
+                }
+
                 event.preventDefault();
                 return;
             }
