@@ -286,12 +286,32 @@
             resizex : 'e-resize',
             resizey : 's-resize',
             resizexy: 'se-resize',
+
+            resizetop        : 'n-resize',
+            resizeleft       : 'w-resize',
+            resizebottom     : 's-resize',
+            resizeright      : 'e-resize',
+            resizetopleft    : 'se-resize',
+            resizebottomright: 'se-resize',
+            resizetopright   : 'ne-resize',
+            resizebottomleft : 'ne-resize',
+
             gesture : ''
         } : {
             drag    : 'move',
             resizex : 'ew-resize',
             resizey : 'ns-resize',
             resizexy: 'nwse-resize',
+
+            resizetop        : 'ns-resize',
+            resizeleft       : 'ew-resize',
+            resizebottom     : 'ns-resize',
+            resizeright      : 'ew-resize',
+            resizetopleft    : 'nwse-resize',
+            resizebottomright: 'nwse-resize',
+            resizetopright   : 'nesw-resize',
+            resizebottomleft : 'nesw-resize',
+
             gesture : ''
         },
 
@@ -1396,7 +1416,7 @@
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        target._doc.documentElement.style.cursor = actionCursors[action.name + (action.axis || '')];
+                        target._doc.documentElement.style.cursor = getActionCursor(action);
                     }
                     else {
                         target._doc.documentElement.style.cursor = '';
@@ -1557,7 +1577,7 @@
                 if (!action) { return; }
 
                 if (options.styleCursor) {
-                    target._doc.documentElement.style.cursor = actionCursors[action];
+                    target._doc.documentElement.style.cursor = getActionCursor(action);
                 }
 
                 this.resizeAxes = action.name === 'resize'? action.axis : null;
@@ -3443,6 +3463,33 @@
 
     function preventOriginalDefault () {
         this.originalEvent.preventDefault();
+    }
+
+    function getActionCursor (action) {
+        var cursor = '';
+
+        if (action.name === 'drag') {
+            cursor =  actionCursors.drag;
+        }
+        if (action.name === 'resize') {
+            if (action.axis) {
+                cursor =  actionCursors[action.name + action.axis];
+            }
+            else if (action.edges) {
+                var cursorKey = 'resize',
+                    edgeNames = ['top', 'bottom', 'left', 'right'];
+
+                for (var i = 0; i < 4; i++) {
+                    if (action.edges[edgeNames[i]]) {
+                        cursorKey += edgeNames[i];
+                    }
+                }
+
+                cursor = actionCursors[cursorKey];
+            }
+        }
+
+        return cursor;
     }
 
     function checkResizeEdge (name, value, page, element, interactableElement, rect) {
