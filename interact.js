@@ -1,5 +1,5 @@
 /**
- * interact.js v1.2.2
+ * interact.js v1.2.3
  *
  * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -1026,8 +1026,8 @@
 
     function withinInteractionLimit (interactable, element, action) {
         var options = interactable.options,
-            maxActions = options[action.name + 'Max'],
-            maxPerElement = options[action.name + 'MaxPerElement'],
+            maxActions = options[action.name].max,
+            maxPerElement = options[action.name].maxPerElement,
             activeInteractions = 0,
             targetCount = 0,
             targetElementCount = 0;
@@ -1879,7 +1879,7 @@
 
                 if (starting
                     && (this.target.options[this.prepared.name].manualStart
-                        || !withinInteractionLimit(this.target, this.element, this.prepared.name))) {
+                        || !withinInteractionLimit(this.target, this.element, this.prepared))) {
                     this.stop();
                     return;
                 }
@@ -3051,6 +3051,12 @@
                     return;
                 }
 
+                // with manualStart, only preventDefault while interacting
+                if (options[this.prepared.name] && options[this.prepared.name].manualStart
+                    && !this.interacting()) {
+                    return;
+                }
+
                 event.preventDefault();
                 return;
             }
@@ -3254,7 +3260,9 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        if (checkSnap(target, action) && !(starting && interaction.snapOffsets.length)) {
+        var relativePoints = options[action].snap.relativePoints ;
+
+        if (checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
             this.snap = {
                 range  : snapStatus.range,
                 locked : snapStatus.locked,
@@ -4851,7 +4859,7 @@
 
             if (isObject(eventType)) {
                 for (var prop in eventType) {
-                    interact.on(prop, eventType[prop], listener);
+                    this.on(prop, eventType[prop], listener);
                 }
 
                 return this;
@@ -4945,7 +4953,7 @@
 
             if (isObject(eventType)) {
                 for (var prop in eventType) {
-                    interact.off(prop, eventType[prop], listener);
+                    this.off(prop, eventType[prop], listener);
                 }
 
                 return this;
