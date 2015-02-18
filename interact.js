@@ -108,6 +108,12 @@
                 // CSS selectors to match the handles for each direction
                 // or the Elements for each handle
                 edges: null,
+
+                // a value of 'none' will limit the resize rect to a minimum of 0x0
+                // 'negate' will alow the rect to have negative width/height
+                // 'reposition' will keep the width/height positive by swapping
+                // the top and bottom edges and/or swapping the left and right edges
+                invert: 'none'
             },
 
             gesture: {
@@ -1978,7 +1984,9 @@
         resizeMove: function (event) {
             var resizeEvent = new InteractEvent(this, event, 'resize', 'move', this.element);
 
-            var edges = this.prepared.edges;
+            var edges = this.prepared.edges,
+                invert = this.target.options.resize.invert,
+                invertible = invert === 'reposition' || invert === 'negate';
 
             if (edges) {
                 var start      = this.resizeRects.start,
@@ -1987,21 +1995,40 @@
                     delta      = this.resizeRects.delta,
                     previous   = extend({}, restricted);
 
-                if (edges.top) {
-                    current.top += resizeEvent.dy;
-                    restricted.top = Math.min(current.top, start.bottom);
+                // update the 'current' rect without modifications
+                if (edges.top   ) { current.top    += resizeEvent.dy; }
+                if (edges.bottom) { current.bottom += resizeEvent.dy; }
+                if (edges.left  ) { current.left   += resizeEvent.dx; }
+                if (edges.right ) { current.right  += resizeEvent.dx; }
+
+                if (invertible) {
+                    // if invertible, copy the current rect
+                    extend(restricted, current);
+
+                    if (invert === 'reposition') {
+                        // swap edge values if necessary to keep width/height positive
+                        var swap;
+
+                        if (restricted.top > restricted.bottom) {
+                            swap = restricted.top;
+
+                            restricted.top = restricted.bottom;
+                            restricted.bottom = swap;
+                        }
+                        if (restricted.left > restricted.right) {
+                            swap = restricted.left;
+
+                            restricted.left = restricted.right;
+                            restricted.right = swap;
+                        }
+                    }
                 }
-                if (edges.bottom) {
-                    current.bottom += resizeEvent.dy;
+                else {
+                    // if not invertible, restrict to minimum of 0x0 rect
+                    restricted.top    = Math.min(current.top, start.bottom);
                     restricted.bottom = Math.max(current.bottom, start.top);
-                }
-                if (edges.left) {
-                    current.left += resizeEvent.dx;
-                    restricted.left = Math.min(current.left, start.right);
-                }
-                if (edges.right) {
-                    current.right += resizeEvent.dx;
-                    restricted.right = Math.max(current.right, start.left);
+                    restricted.left   = Math.min(current.left, start.right);
+                    restricted.right  = Math.max(current.right, start.left);
                 }
 
                 restricted.width  = restricted.right  - restricted.left;
