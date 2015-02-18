@@ -3148,7 +3148,9 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        if (checkSnap(target, action) && !(starting && interaction.snapOffsets.length)) {
+        var relativePoints = options[action].snap.relativePoints ;
+
+        if (checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
             this.snap = {
                 range  : snapStatus.range,
                 locked : snapStatus.locked,
