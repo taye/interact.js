@@ -66,7 +66,7 @@
                 allowFrom     : null,
                 ignoreFrom    : null,
                 _context      : document,
-                rectChecker   : null
+                dropChecker   : null
             },
 
             drag: {
@@ -3807,8 +3807,14 @@
          = (boolean) whether the pointer was over this Interactable
         \*/
         dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
+            var dropped = false;
+
+            // if the dropzone has no rect (eg. display: none)
+            // call the custom dropChecker or just return false
             if (!(rect = rect || this.getRect(dropElement))) {
-                return false;
+                return (this.options.dropChecker
+                    ? this.options.dropChecker(pointer, dropped, this, dropElement, draggable, draggableElement)
+                    : false);
             }
 
             var dropOverlap = this.options.drop.overlap;
@@ -3825,7 +3831,7 @@
                 horizontal = (page.x > rect.left) && (page.x < rect.right);
                 vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
 
-                return horizontal && vertical;
+                dropped = horizontal && vertical;
             }
 
             var dragRect = draggable.getRect(draggableElement);
@@ -3834,7 +3840,7 @@
                 var cx = dragRect.left + dragRect.width  / 2,
                     cy = dragRect.top  + dragRect.height / 2;
 
-                return cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
+                dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
             }
 
             if (isNumber(dropOverlap)) {
@@ -3842,8 +3848,14 @@
                                   * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top ))),
                     overlapRatio = overlapArea / (dragRect.width * dragRect.height);
 
-                return overlapRatio >= dropOverlap;
+                dropped = overlapRatio >= dropOverlap;
             }
+
+            if (this.options.dropChecker) {
+                dropped = this.options.dropChecker(pointer, dropped, this, dropElement, draggable, draggableElement);
+            }
+
+            return dropped;
         },
 
         /*\
@@ -3862,11 +3874,17 @@
         \*/
         dropChecker: function (checker) {
             if (isFunction(checker)) {
-                this.dropCheck = checker;
+                this.options.dropChecker = checker;
 
                 return this;
             }
-            return this.dropCheck;
+            if (checker === null) {
+                delete this.options.getRect;
+
+                return this;
+            }
+
+            return this.options.dropChecker;
         },
 
         /*\
