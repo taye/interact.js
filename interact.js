@@ -1700,6 +1700,12 @@
                 return;
             }
 
+            // if this interaction had been removed after stopping
+            // add it back
+            if (indexOf(interactions, this) === -1) {
+                interactions.push(this);
+            }
+
             this.prepared.name = action.name;
             this.prepared.axis = action.axis;
             this.target        = interactable;
@@ -2002,6 +2008,8 @@
 
             this.collectEventTargets(pointer, event, eventTarget, 'cancel');
             this.pointerEnd(pointer, event, eventTarget, curEventTarget);
+
+            this.removePointer(pointer);
         },
 
         // http://www.quirksmode.org/dom/events/click.html
@@ -2454,11 +2462,12 @@
             this.prepared.name = this.prevEvent = null;
             this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
-            this.pointerIds .splice(0);
-            this.pointers   .splice(0);
-            this.downTargets.splice(0);
-            this.downTimes  .splice(0);
-            this.holdTimers .splice(0);
+            // remove pointers if their ID isn't in this.pointerIds
+            for (var i = 0; i < this.pointers.length; i++) {
+                if (indexOf(this.pointerIds, getPointerId(this.pointers[i])) === -1) {
+                    this.pointers.splice(i, 1);
+                }
+            }
 
             // delete interaction if it's not the only one
             if (interactions.length > 1) {
@@ -2553,7 +2562,7 @@
             if (index === -1) { return; }
 
             if (!this.interacting()) {
-                this.pointers   .splice(index, 1);
+                this.pointers.splice(index, 1);
             }
 
             this.pointerIds .splice(index, 1);
