@@ -161,7 +161,9 @@
                     zeroResumeDelta  : true,  // if an action is resumed after launch, set dx/dy to 0
                     smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
                 }
-            }
+            },
+
+            _holdDuration: 600
         },
 
         // Things related to autoScroll
@@ -1459,7 +1461,7 @@
 
             this.holdTimers[pointerIndex] = setTimeout(function () {
                 that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
-            }, 600);
+            }, defaultOptions._holdDuration);
 
             this.pointerIsDown = true;
 
