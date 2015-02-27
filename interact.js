@@ -4136,7 +4136,18 @@
          |     onmove : function (event) {},
          |     onend  : function (event) {},
          |
-         |     axis   : 'x' || 'y' || 'xy' // default is 'xy',
+         |     edges: {
+         |       top   : true,       // Use pointer coords to check for resize.
+         |       left  : false,      // Disable resizing from left edge.
+         |       bottom: '.resize-s',// Resize if pointer target matches selector
+         |       right : handleEl    // Resize if pointer target is the given Element
+         |     },
+         |
+         |     // a value of 'none' will limit the resize rect to a minimum of 0x0
+         |     // 'negate' will allow the rect to have negative width/height
+         |     // 'reposition' will keep the width/height positive by swapping
+         |     // the top and bottom edges and/or swapping the left and right edges
+         |     invert: 'none' || 'negate' || 'reposition'
          |
          |     // limit multiple resizes.
          |     // See the explanation in the @Interactable.draggable example
@@ -4477,13 +4488,14 @@
          * Gets or sets the function used to check action to be performed on
          * pointerDown
          *
-         - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an axis 'x', 'y', or 'xy'; or null.
+         - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
          = (Function | Interactable) The checker function or this Interactable
          *
          | interact('.resize-horiz').actionChecker(function (defaultAction, interactable) {
          |   return {
+         |     // resize from the top and right edges
          |     name: 'resize',
-         |     axis: 'x'
+         |     edges: { top: true, right: true }
          |   };
          | });
         \*/
