@@ -101,7 +101,19 @@
                 autoScroll: null,
 
                 square: false,
-                axis: 'xy'
+                axis: 'xy',
+
+                // object with props left, right, top, bottom which are
+                // true/false values to resize when the pointer is over that edge,
+                // CSS selectors to match the handles for each direction
+                // or the Elements for each handle
+                edges: null,
+
+                // a value of 'none' will limit the resize rect to a minimum of 0x0
+                // 'negate' will alow the rect to have negative width/height
+                // 'reposition' will keep the width/height positive by swapping
+                // the top and bottom edges and/or swapping the left and right edges
+                invert: 'none'
             },
 
             gesture: {
@@ -280,12 +292,32 @@
             resizex : 'e-resize',
             resizey : 's-resize',
             resizexy: 'se-resize',
+
+            resizetop        : 'n-resize',
+            resizeleft       : 'w-resize',
+            resizebottom     : 's-resize',
+            resizeright      : 'e-resize',
+            resizetopleft    : 'se-resize',
+            resizebottomright: 'se-resize',
+            resizetopright   : 'ne-resize',
+            resizebottomleft : 'ne-resize',
+
             gesture : ''
         } : {
             drag    : 'move',
             resizex : 'ew-resize',
             resizey : 'ns-resize',
             resizexy: 'nwse-resize',
+
+            resizetop        : 'ns-resize',
+            resizeleft       : 'ew-resize',
+            resizebottom     : 'ns-resize',
+            resizeright      : 'ew-resize',
+            resizetopleft    : 'nwse-resize',
+            resizebottomright: 'nwse-resize',
+            resizetopright   : 'nesw-resize',
+            resizebottomleft : 'nesw-resize',
+
             gesture : ''
         },
 
@@ -1145,8 +1177,9 @@
         this.prevDropElement = null; // the element at the time of checking
 
         this.prepared        = {     // action that's ready to be fired on next move event
-            name: null,
-            axis: null
+            name : null,
+            axis : null,
+            edges: null
         };
 
         this.matches         = [];   // all selectors that are matched by target element
@@ -1389,7 +1422,7 @@
 
                 if (target && target.options.styleCursor) {
                     if (action) {
-                        target._doc.documentElement.style.cursor = actionCursors[action.name + (action.axis || '')];
+                        target._doc.documentElement.style.cursor = getActionCursor(action);
                     }
                     else {
                         target._doc.documentElement.style.cursor = '';
@@ -1486,8 +1519,9 @@
             }
 
             if (action) {
-                this.prepared.name = action.name;
-                this.prepared.axis = action.axis;
+                this.prepared.name  = action.name;
+                this.prepared.axis  = action.axis;
+                this.prepared.edges = action.edges;
 
                 this.collectEventTargets(pointer, event, eventTarget, 'down');
 
@@ -1531,7 +1565,7 @@
                 if (interactable
                     && !testIgnore(interactable, curEventTarget, eventTarget)
                     && testAllow(interactable, curEventTarget, eventTarget)
-                    && (action = validateAction(forceAction || interactable.getAction(pointer, this), interactable, eventTarget))
+                    && (action = validateAction(forceAction || interactable.getAction(pointer, this, curEventTarget), interactable, eventTarget))
                     && withinInteractionLimit(interactable, curEventTarget, action)) {
                     this.target = interactable;
                     this.element = curEventTarget;
@@ -1542,14 +1576,14 @@
                 options = target && target.options;
 
             if (target && !this.interacting()) {
-                action = action || validateAction(forceAction || target.getAction(pointer, this), target, this.element);
+                action = action || validateAction(forceAction || target.getAction(pointer, this, curEventTarget), target, this.element);
 
                 this.setEventXY(this.startCoords);
 
                 if (!action) { return; }
 
                 if (options.styleCursor) {
-                    target._doc.documentElement.style.cursor = actionCursors[action];
+                    target._doc.documentElement.style.cursor = getActionCursor(action);
                 }
 
                 this.resizeAxes = action.name === 'resize'? action.axis : null;
@@ -1558,8 +1592,9 @@
                     action = null;
                 }
 
-                this.prepared.name = action.name;
-                this.prepared.axis = action.axis;
+                this.prepared.name  = action.name;
+                this.prepared.axis  = action.axis;
+                this.prepared.edges = action.edges;
 
                 this.snapStatus.snappedX = this.snapStatus.snappedY =
                     this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
@@ -1706,10 +1741,11 @@
                 interactions.push(this);
             }
 
-            this.prepared.name = action.name;
-            this.prepared.axis = action.axis;
-            this.target        = interactable;
-            this.element       = element;
+            this.prepared.name  = action.name;
+            this.prepared.axis  = action.axis;
+            this.prepared.edges = action.edges;
+            this.target         = interactable;
+            this.element        = element;
 
             this.setStartOffsets(action.name, interactable, element);
             this.setModifications(this.startCoords.page);
@@ -1927,6 +1963,23 @@
         resizeStart: function (event) {
             var resizeEvent = new InteractEvent(this, event, 'resize', 'start', this.element);
 
+            if (this.prepared.edges) {
+                var startRect = this.target.getRect(this.element);
+
+                this.resizeRects = {
+                    start     : startRect,
+                    current   : extend({}, startRect),
+                    restricted: extend({}, startRect),
+                    delta     : {
+                        left: 0, right : 0, width : 0,
+                        top : 0, bottom: 0, height: 0
+                    }
+                };
+
+                resizeEvent.rect = this.resizeRects.restricted;
+                resizeEvent.deltaRect = this.resizeRects.delta;
+            }
+
             this.target.fire(resizeEvent);
 
             this.resizing = true;
@@ -1936,6 +1989,65 @@
 
         resizeMove: function (event) {
             var resizeEvent = new InteractEvent(this, event, 'resize', 'move', this.element);
+
+            var edges = this.prepared.edges,
+                invert = this.target.options.resize.invert,
+                invertible = invert === 'reposition' || invert === 'negate';
+
+            if (edges) {
+                var start      = this.resizeRects.start,
+                    current    = this.resizeRects.current,
+                    restricted = this.resizeRects.restricted,
+                    delta      = this.resizeRects.delta,
+                    previous   = extend({}, restricted);
+
+                // update the 'current' rect without modifications
+                if (edges.top   ) { current.top    += resizeEvent.dy; }
+                if (edges.bottom) { current.bottom += resizeEvent.dy; }
+                if (edges.left  ) { current.left   += resizeEvent.dx; }
+                if (edges.right ) { current.right  += resizeEvent.dx; }
+
+                if (invertible) {
+                    // if invertible, copy the current rect
+                    extend(restricted, current);
+
+                    if (invert === 'reposition') {
+                        // swap edge values if necessary to keep width/height positive
+                        var swap;
+
+                        if (restricted.top > restricted.bottom) {
+                            swap = restricted.top;
+
+                            restricted.top = restricted.bottom;
+                            restricted.bottom = swap;
+                        }
+                        if (restricted.left > restricted.right) {
+                            swap = restricted.left;
+
+                            restricted.left = restricted.right;
+                            restricted.right = swap;
+                        }
+                    }
+                }
+                else {
+                    // if not invertible, restrict to minimum of 0x0 rect
+                    restricted.top    = Math.min(current.top, start.bottom);
+                    restricted.bottom = Math.max(current.bottom, start.top);
+                    restricted.left   = Math.min(current.left, start.right);
+                    restricted.right  = Math.max(current.right, start.left);
+                }
+
+                restricted.width  = restricted.right  - restricted.left;
+                restricted.height = restricted.bottom - restricted.top ;
+
+                for (var edge in restricted) {
+                    delta[edge] = restricted[edge] - previous[edge];
+                }
+
+                resizeEvent.edges = this.prepared.edges;
+                resizeEvent.rect = restricted;
+                resizeEvent.deltaRect = delta;
+            }
 
             this.target.fire(resizeEvent);
 
@@ -2982,7 +3094,7 @@
             status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
         },
 
-        _updateEventTargets: function (currentTarget, target) {
+        _updateEventTargets: function (target, currentTarget) {
             this._eventTarget    = target;
             this._curEventTarget = currentTarget;
         }
@@ -3397,28 +3509,103 @@
         this.originalEvent.preventDefault();
     }
 
+    function getActionCursor (action) {
+        var cursor = '';
+
+        if (action.name === 'drag') {
+            cursor =  actionCursors.drag;
+        }
+        if (action.name === 'resize') {
+            if (action.axis) {
+                cursor =  actionCursors[action.name + action.axis];
+            }
+            else if (action.edges) {
+                var cursorKey = 'resize',
+                    edgeNames = ['top', 'bottom', 'left', 'right'];
+
+                for (var i = 0; i < 4; i++) {
+                    if (action.edges[edgeNames[i]]) {
+                        cursorKey += edgeNames[i];
+                    }
+                }
+
+                cursor = actionCursors[cursorKey];
+            }
+        }
+
+        return cursor;
+    }
+
+    function checkResizeEdge (name, value, page, element, interactableElement, rect) {
+        // false, '', undefined, null
+        if (!value) { return false; }
+
+        // true value, use pointer coords and element rect
+        if (value === true) {
+            if (name === 'left'  ) { return page.x < (rect.left   + margin); }
+            if (name === 'top'   ) { return page.y < (rect.top    + margin); }
+
+            if (name === 'right' ) { return page.x > (rect.right  - margin); }
+            if (name === 'bottom') { return page.y > (rect.bottom - margin); }
+        }
+
+        // the remaining checks require an element
+        if (!isElement(element)) { return false; }
+
+        return isElement(value)
+                    // the value is an element to use as a resize handle
+                    ? value === element
+                    // otherwise check if element matches value as selector
+                    : matchesUpTo(element, value, interactableElement);
+    }
+
     function defaultActionChecker (pointer, interaction, element) {
         var rect = this.getRect(element),
-            right,
-            bottom,
+            shouldResize = false,
             action = null,
             resizeAxes = null,
+            resizeEdges,
             page = extend({}, interaction.curCoords.page),
             options = this.options;
 
         if (!rect) { return null; }
 
         if (actionIsEnabled.resize && options.resize.enabled) {
-            right  = options.resize.axis !== 'y' && page.x > (rect.right  - margin);
-            bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - margin);
+            var resizeOptions = options.resize;
+
+            resizeEdges = {
+                left: false, right: false, top: false, bottom: false
+            };
+
+            // if using resize.edges
+            if (isObject(resizeOptions.edges)) {
+                for (var edge in resizeEdges) {
+                    resizeEdges[edge] = checkResizeEdge(edge,
+                                                        resizeOptions.edges[edge],
+                                                        page,
+                                                        interaction._eventTarget,
+                                                        element,
+                                                        rect);
+                }
+
+                resizeEdges.left = resizeEdges.left && !resizeEdges.right;
+                resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom;
+
+                shouldResize = resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom;
+            }
+            else {
+                var right  = options.resize.axis !== 'y' && page.x > (rect.right  - margin),
+                    bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - margin);
+
+                shouldResize = right || bottom;
+                resizeAxes = (right? 'x' : '') + (bottom? 'y' : '');
+            }
         }
 
-        resizeAxes = (right?'x': '') + (bottom?'y': '');
-
-        action = resizeAxes
+        action = shouldResize
             ? 'resize'
             : actionIsEnabled.drag && options.drag.enabled
-                ?  'drag'
+                ? 'drag'
                 : null;
 
         if (actionIsEnabled.gesture
@@ -3430,7 +3617,8 @@
         if (action) {
             return {
                 name: action,
-                axis: resizeAxes
+                axis: resizeAxes,
+                edges: resizeEdges
             };
         }
 

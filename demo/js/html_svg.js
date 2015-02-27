@@ -144,20 +144,33 @@
         }
     }
 
-    function resizeMove(e) {
-        var target = e.target,
-            rect = target.getClientRects()[0];
+    function resizeMove(event) {
+        var target = event.target;
 
         if ('SVGElement' in window && target instanceof SVGElement) {
-            target.resizeWidth += e.dx;
-            target.resizeHeight += e.dy;
+            target.dragX += (event.edges.left? event.deltaRect.left : event.deltaRect.right ) / 2;
+            target.dragY += (event.edges.top ? event.deltaRect.top  : event.deltaRect.bottom) / 2;
+
+            target.resizeWidth  += event.deltaRect.width  / 2;
+            target.resizeHeight += event.deltaRect.height / 2;
 
             target.setAttribute('rx',  target.resizeWidth);
             target.setAttribute('ry', target.resizeHeight);
+
+            target.parentNode.setAttribute('transform', ['translate(', target.dragX, target.dragY, ')'].join(' '));
         }
         else {
-            target.style.width  = Math.max(parseInt(target.style.width  || 0, 10) + e.dx, 50) + 'px';
-            target.style.height = Math.max(parseInt(target.style.height || 0, 10) + e.dy, 50) + 'px';
+            target.style.left = parseInt(target.style.left || 0, 10) + event.deltaRect.left + 'px';
+            target.style.top  = parseInt(target.style.top  || 0, 10) + event.deltaRect.top  + 'px';
+
+            target.style.width  = Math.max(parseInt(target.style.width  || 0, 10) + event.deltaRect.width , 50) + 'px';
+            target.style.height = Math.max(parseInt(target.style.height || 0, 10) + event.deltaRect.height, 50) + 'px';
+
+            //target.style.left = event.rect.left + 'px';
+            //target.style.top  = event.rect.top  + 'px';
+
+            //target.style.width  = event.rect.width  + 'px';
+            //target.style.height = event.rect.height + 'px';
         }
     }
 
@@ -226,7 +239,8 @@
             .resizable({
                 max: 2,
                 autoScroll: { enabled: true },
-                inertia: { resistance: 40 }
+                inertia: { resistance: 40 },
+                edges: { left: true, right: true, top: true, bottom: true }
             })
             .dropzone(true);
     }
