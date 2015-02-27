@@ -1,3 +1,18 @@
+## Upcoming
+
+### Improved `preventDefault('auto')`
+
+If manuanStart is `true`, default prevention will happen only while
+interacting. Related to [Issue
+138](https://github.com/taye/interact.js/issues/138).
+
+### Fixed inaccurate snapping
+
+This removes a small inaccuracy when snapping with one or more
+`relativeOffsets`.
+
+### Fixed bugs with multiple pointers
+
 ## 1.2.3
 
 ### ShadowDOM
