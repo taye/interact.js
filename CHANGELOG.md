@@ -1,5 +1,18 @@
 ## Upcoming
 
+### Resizing from all edges
+
+With the new [resize edges API](https://github.com/taye/interact.js/pull/145),
+you can resize from the top and left edges of an element in addition to the
+bottom and right. It also allows you to specify CSS selectors, regions or
+elements as the resize handles.
+
+### Better `dropChecker` arguments
+
+The arguments to `dropChecker` functions have been expanded to include the
+value of the default drop check and some other useful objects. See [PR
+161](https://github.com/taye/interact.js/pull/161)
+
 ### Improved `preventDefault('auto')`
 
 If manuanStart is `true`, default prevention will happen only while
