@@ -3988,21 +3988,6 @@
             return this.options.drop;
         },
 
-        /*\
-         * Interactable.dropCheck
-         [ method ]
-         *
-         * The default function to determine if a dragend event occured over
-         * this Interactable's element. Can be overridden using
-         * @Interactable.dropChecker.
-         *
-         - pointer (MouseEvent | PointerEvent | Touch) The event that ends a drag
-         - draggable (Interactable) The Interactable being dragged
-         - draggableElement (Element) The actual element that's being dragged
-         - dropElement (Element) The dropzone element
-         - rect (object) #optional The rect of dropElement
-         = (boolean) whether the pointer was over this Interactable
-        \*/
         dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
             var dropped = false;
 
@@ -4066,6 +4051,16 @@
          * The checker is a function which takes a mouseUp/touchEnd event as a
          * parameter and returns true or false to indicate if the the current
          * draggable can be dropped into this Interactable
+         *
+         - checker (function) The function that will be called when checking for a drop
+         * The checker function takes the following arguments:
+         *
+         - pointer (MouseEvent | PointerEvent | Touch) The pointer/event that ends a drag
+         - dropped (boolean) The value from the default drop check
+         - dropzone (Interactable) The dropzone interactable
+         - dropElement (Element) The dropzone element
+         - draggable (Interactable) The Interactable being dragged
+         - draggableElement (Element) The actual element that's being dragged
          *
          = (Function | Interactable) The checker function or this Interactable
         \*/
