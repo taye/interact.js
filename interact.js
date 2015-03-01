@@ -3576,20 +3576,23 @@
         // true value, use pointer coords and element rect
         if (value === true) {
             // if dimensions are negative, "switch" edges
-            if (rect.width < 0) {
+            var width = isNumber(rect.width)? rect.width : rect.right - rect.left,
+                height = isNumber(rect.height)? rect.height : rect.bottom - rect.top;
+
+            if (width < 0) {
                 if      (name === 'left' ) { name = 'right'; }
                 else if (name === 'right') { name = 'left' ; }
             }
-            if (rect.height < 0) {
+            if (height < 0) {
                 if      (name === 'top'   ) { name = 'bottom'; }
                 else if (name === 'bottom') { name = 'top'   ; }
             }
 
-            if (name === 'left'  ) { return page.x < (rect.left   + margin); }
-            if (name === 'top'   ) { return page.y < (rect.top    + margin); }
+            if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
+            if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
 
-            if (name === 'right' ) { return page.x > (rect.right  - margin); }
-            if (name === 'bottom') { return page.y > (rect.bottom - margin); }
+            if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
+            if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
         }
 
         // the remaining checks require an element
