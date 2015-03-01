@@ -1968,10 +1968,25 @@
             if (this.prepared.edges) {
                 var startRect = this.target.getRect(this.element);
 
+                if (this.target.options.resize.square) {
+                    var squareEdges = extend({}, this.prepared.edges);
+
+                    squareEdges.top    = squareEdges.top    || (squareEdges.left   && !squareEdges.bottom);
+                    squareEdges.left   = squareEdges.left   || (squareEdges.top    && !squareEdges.right );
+                    squareEdges.bottom = squareEdges.bottom || (squareEdges.right  && !squareEdges.top   );
+                    squareEdges.right  = squareEdges.right  || (squareEdges.bottom && !squareEdges.left  );
+
+                    this.prepared._squareEdges = squareEdges;
+                }
+                else {
+                    this.prepared._squareEdges = null;
+                }
+
                 this.resizeRects = {
                     start     : startRect,
                     current   : extend({}, startRect),
                     restricted: extend({}, startRect),
+                    previous  : extend({}, startRect),
                     delta     : {
                         left: 0, right : 0, width : 0,
                         top : 0, bottom: 0, height: 0
@@ -1997,17 +2012,33 @@
                 invertible = invert === 'reposition' || invert === 'negate';
 
             if (edges) {
-                var start      = this.resizeRects.start,
+                var dx = resizeEvent.dx,
+                    dy = resizeEvent.dy,
+
+                    start      = this.resizeRects.start,
                     current    = this.resizeRects.current,
                     restricted = this.resizeRects.restricted,
                     delta      = this.resizeRects.delta,
-                    previous   = extend({}, restricted);
+                    previous   = extend(this.resizeRects.previous, restricted);
+
+                if (this.target.options.resize.square) {
+                    var originalEdges = edges;
+
+                    edges = this.prepared._squareEdges;
+
+                    if ((originalEdges.left && originalEdges.bottom)
+                        || (originalEdges.right && originalEdges.top)) {
+                        dy = -dx;
+                    }
+                    else if (originalEdges.left || originalEdges.right) { dy = dx; }
+                    else if (originalEdges.top || originalEdges.bottom) { dx = dy; }
+                }
 
                 // update the 'current' rect without modifications
-                if (edges.top   ) { current.top    += resizeEvent.dy; }
-                if (edges.bottom) { current.bottom += resizeEvent.dy; }
-                if (edges.left  ) { current.left   += resizeEvent.dx; }
-                if (edges.right ) { current.right  += resizeEvent.dx; }
+                if (edges.top   ) { current.top    += dy; }
+                if (edges.bottom) { current.bottom += dy; }
+                if (edges.left  ) { current.left   += dx; }
+                if (edges.right ) { current.right  += dx; }
 
                 if (invertible) {
                     // if invertible, copy the current rect
@@ -3376,7 +3407,7 @@
             this.dx = this.dy = 0;
         }
 
-        if (action === 'resize') {
+        if (action === 'resize' && interaction.resizeAxes) {
             if (options.resize.square) {
                 if (interaction.resizeAxes === 'y') {
                     this.dx = this.dy;
