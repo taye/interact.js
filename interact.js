@@ -3575,6 +3575,16 @@
 
         // true value, use pointer coords and element rect
         if (value === true) {
+            // if dimensions are negative, "switch" edges
+            if (rect.width < 0) {
+                if      (name === 'left' ) { name = 'right'; }
+                else if (name === 'right') { name = 'left' ; }
+            }
+            if (rect.height < 0) {
+                if      (name === 'top'   ) { name = 'bottom'; }
+                else if (name === 'bottom') { name = 'top'   ; }
+            }
+
             if (name === 'left'  ) { return page.x < (rect.left   + margin); }
             if (name === 'top'   ) { return page.y < (rect.top    + margin); }
 
