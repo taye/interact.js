@@ -3302,7 +3302,7 @@
         client.x -= origin.x;
         client.y -= origin.y;
 
-        var relativePoints = options[action].snap.relativePoints ;
+        var relativePoints = options[action].snap && options[action].snap.relativePoints ;
 
         if (checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
             this.snap = {
