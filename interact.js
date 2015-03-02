@@ -3368,7 +3368,7 @@
         }
 
         // end event dx, dy is difference between start and end points
-        if (ending || action === 'drop') {
+        if (ending) {
             if (deltaSource === 'client') {
                 this.dx = client.x - interaction.startCoords.client.x;
                 this.dy = client.y - interaction.startCoords.client.y;
