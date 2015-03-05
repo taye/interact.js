@@ -1,5 +1,5 @@
 /**
- * interact.js v1.2.3
+ * interact.js v1.2.4
  *
  * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.

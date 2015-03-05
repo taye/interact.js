@@ -1,4 +1,4 @@
-## Upcoming
+## 1.2.4
 
 ### Resizing from all edges
 
