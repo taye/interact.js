@@ -5240,6 +5240,8 @@
          'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/inertia');
     Interactable.prototype.autoScroll = warnOnce(Interactable.prototype.autoScroll,
          'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
+    Interactable.prototype.squareResize = warnOnce(Interactable.prototype.squareResize,
+         'Interactable#squareResize is deprecated. See http://interactjs.io/docs/#resize-square');
 
     /*\
      * interact.isSet
