@@ -3341,10 +3341,10 @@
         this.clientX   = client.x;
         this.clientY   = client.y;
 
-        this.x0        = interaction.startCoords.page.x;
-        this.y0        = interaction.startCoords.page.y;
-        this.clientX0  = interaction.startCoords.client.x;
-        this.clientY0  = interaction.startCoords.client.y;
+        this.x0        = interaction.startCoords.page.x - origin.x;
+        this.y0        = interaction.startCoords.page.y - origin.y;
+        this.clientX0  = interaction.startCoords.client.x - origin.x;
+        this.clientY0  = interaction.startCoords.client.y - origin.y;
         this.ctrlKey   = event.ctrlKey;
         this.altKey    = event.altKey;
         this.shiftKey  = event.shiftKey;
