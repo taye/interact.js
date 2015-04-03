@@ -2614,9 +2614,11 @@
                 }
             }
 
-            // delete interaction if it's not the only one
-            if (interactions.length > 1) {
-                interactions.splice(indexOf(interactions, this), 1);
+            for (i = 0; i < interactions.length; i++) {
+                // remove this interaction if it's not the only one of it's type
+                if (interactions[i] !== this && interactions[i].mouse === this.mouse) {
+                    interactions.splice(indexOf(interactions, this), 1);
+                }
             }
         },
 
