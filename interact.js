@@ -2520,6 +2520,8 @@
                     timeStamp    : dragEvent.timeStamp,
                     type         : 'drop'
                 };
+
+                dragEvent.dropzone = this.dropTarget;
             }
             if (dragEvent.type === 'dragstart') {
                 dropEvents.activate = {
