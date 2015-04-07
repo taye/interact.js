@@ -2574,9 +2574,7 @@
         },
 
         clearTargets: function () {
-            if (this.target && !this.target.selector) {
-                this.target = this.element = null;
-            }
+            this.target = this.element = null;
 
             this.dropTarget = this.dropElement = this.prevDropTarget = this.prevDropElement = null;
         },
