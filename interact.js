@@ -103,6 +103,9 @@
                 square: false,
                 axis: 'xy',
 
+                // use default margin
+                margin: NaN,
+
                 // object with props left, right, top, bottom which are
                 // true/false values to resize when the pointer is over that edge,
                 // CSS selectors to match the handles for each direction
@@ -3571,7 +3574,7 @@
         return cursor;
     }
 
-    function checkResizeEdge (name, value, page, element, interactableElement, rect) {
+    function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
         // false, '', undefined, null
         if (!value) { return false; }
 
@@ -3633,7 +3636,8 @@
                                                         page,
                                                         interaction._eventTarget,
                                                         element,
-                                                        rect);
+                                                        rect,
+                                                        resizeOptions.margin || margin);
                 }
 
                 resizeEdges.left = resizeEdges.left && !resizeEdges.right;
