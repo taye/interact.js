@@ -1580,7 +1580,7 @@
             var target = this.target,
                 options = target && target.options;
 
-            if (target && !this.prepared.name) {
+            if (target && (forceAction || !this.prepared.name)) {
                 action = action || validateAction(forceAction || target.getAction(pointer, this, curEventTarget), target, this.element);
 
                 this.setEventXY(this.startCoords);
