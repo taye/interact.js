@@ -1752,6 +1752,7 @@
             this.target         = interactable;
             this.element        = element;
 
+            this.setEventXY(this.startCoords);
             this.setStartOffsets(action.name, interactable, element);
             this.setModifications(this.startCoords.page);
 
