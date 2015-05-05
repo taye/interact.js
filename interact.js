@@ -505,6 +505,7 @@
                         for (i = 0; i < len; i++) {
                             remove(element, type, target.events[type][i], Boolean(useCapture));
                         }
+                        return;
                     } else {
                         for (i = 0; i < len; i++) {
                             if (target.events[type][i] === listener) {
@@ -532,9 +533,9 @@
                 }
 
                 if (!target.typeCount) {
-                    targets.splice(elementIndex);
-                    elements.splice(elementIndex);
-                    attachedListeners.splice(elementIndex);
+                    targets.splice(elementIndex, 1);
+                    elements.splice(elementIndex, 1);
+                    attachedListeners.splice(elementIndex, 1);
                 }
             }
 
@@ -5183,7 +5184,7 @@
          = (object) @interact
         \*/
         unset: function () {
-            events.remove(this, 'all');
+            events.remove(this._element, 'all');
 
             if (!isString(this.selector)) {
                 events.remove(this, 'all');
