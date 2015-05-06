@@ -5476,6 +5476,8 @@
             pointerMove           : listeners.pointerMove,
             pointerHover          : listeners.pointerHover,
 
+            eventTypes            : eventTypes,
+
             events                : events,
             globalEvents          : globalEvents,
             delegatedEvents       : delegatedEvents
