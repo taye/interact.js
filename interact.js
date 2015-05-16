@@ -8,6 +8,9 @@
 (function (realWindow) {
     'use strict';
 
+    // return early if there's no window to work with (eg. Node.js)
+    if (!realWindow) { return; }
+
     var // get wrapped window if using Shadow DOM polyfill
         window = (function () {
             // create a TextNode
@@ -5840,4 +5843,4 @@
         realWindow.interact = interact;
     }
 
-} (window));
+} (typeof window === 'undefined'? undefined : window));
