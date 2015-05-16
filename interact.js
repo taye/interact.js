@@ -3093,7 +3093,7 @@
             var options = interactable.options,
                 prevent = options.preventDefault;
 
-            if (prevent === 'auto' && element && !/^(input|select|textarea)$/i.test(element.nodeName)) {
+            if (prevent === 'auto' && element && !/^(input|select|textarea)$/i.test(event.target.nodeName)) {
                 // do not preventDefault on pointerdown if the prepared action is a drag
                 // and dragging can only start from a certain direction - this allows
                 // a touch to pan the viewport if a drag isn't in the right direction
