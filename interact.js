@@ -1852,19 +1852,21 @@
                             // if there's no drag from element interactables,
                             // check the selector interactables
                             if (!this.prepared.name) {
+                                var thisInteraction = this;
+
                                 var getDraggable = function (interactable, selector, context) {
                                     var elements = ie8MatchesSelector
                                         ? context.querySelectorAll(selector)
                                         : undefined;
 
-                                    if (interactable === this.target) { return; }
+                                    if (interactable === thisInteraction.target) { return; }
 
                                     if (inContext(interactable, eventTarget)
                                         && !interactable.options.drag.manualStart
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(this.downPointer, this, element).name === 'drag'
+                                        && interactable.getAction(thisInteraction.downPointer, thisInteraction, element).name === 'drag'
                                         && checkAxis(axis, interactable)
                                         && withinInteractionLimit(interactable, element, 'drag')) {
 
