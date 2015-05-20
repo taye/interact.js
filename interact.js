@@ -206,59 +206,6 @@
                 }
             },
 
-            edgeMove: function (event) {
-                var interaction,
-                    target,
-                    doAutoscroll = false;
-
-                for (var i = 0; i < interactions.length; i++) {
-                    interaction = interactions[i];
-
-                    if (interaction.interacting()
-                        && checkAutoScroll(interaction.target, interaction.prepared.name)) {
-
-                        target = interaction.target;
-                        doAutoscroll = true;
-                        break;
-                    }
-                }
-
-                if (!doAutoscroll) { return; }
-
-                var top,
-                    right,
-                    bottom,
-                    left,
-                    options = target.options[interaction.prepared.name].autoScroll,
-                    container = options.container || getWindow(interaction.element);
-
-                if (isWindow(container)) {
-                    left   = event.clientX < autoScroll.margin;
-                    top    = event.clientY < autoScroll.margin;
-                    right  = event.clientX > container.innerWidth  - autoScroll.margin;
-                    bottom = event.clientY > container.innerHeight - autoScroll.margin;
-                }
-                else {
-                    var rect = getElementRect(container);
-
-                    left   = event.clientX < rect.left   + autoScroll.margin;
-                    top    = event.clientY < rect.top    + autoScroll.margin;
-                    right  = event.clientX > rect.right  - autoScroll.margin;
-                    bottom = event.clientY > rect.bottom - autoScroll.margin;
-                }
-
-                autoScroll.x = (right ? 1: left? -1: 0);
-                autoScroll.y = (bottom? 1:  top? -1: 0);
-
-                if (!autoScroll.isScrolling) {
-                    // set the autoScroll properties to those of the target
-                    autoScroll.margin = options.margin;
-                    autoScroll.speed  = options.speed;
-
-                    autoScroll.start(interaction);
-                }
-            },
-
             isScrolling: false,
             prevTime: 0,
 
@@ -1921,7 +1868,7 @@
             copyCoords(this.prevCoords, this.curCoords);
 
             if (this.dragging || this.resizing) {
-                autoScroll.edgeMove(event);
+                this.autoScrollMove(pointer);
             }
         },
 
@@ -3139,6 +3086,51 @@
             status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
         },
 
+        autoScrollMove: function (pointer) {
+            if (!(this.interacting()
+                && checkAutoScroll(this.target, this.prepared.name))) {
+                return;
+            }
+
+            if (this.inertiaStatus.active) {
+                autoScroll.x = autoScroll.y = 0;
+                return;
+            }
+
+            var top,
+                right,
+                bottom,
+                left,
+                options = this.target.options[this.prepared.name].autoScroll,
+                container = options.container || getWindow(this.element);
+
+            if (isWindow(container)) {
+                left   = pointer.clientX < autoScroll.margin;
+                top    = pointer.clientY < autoScroll.margin;
+                right  = pointer.clientX > container.innerWidth  - autoScroll.margin;
+                bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
+            }
+            else {
+                var rect = getElementRect(container);
+
+                left   = pointer.clientX < rect.left   + autoScroll.margin;
+                top    = pointer.clientY < rect.top    + autoScroll.margin;
+                right  = pointer.clientX > rect.right  - autoScroll.margin;
+                bottom = pointer.clientY > rect.bottom - autoScroll.margin;
+            }
+
+            autoScroll.x = (right ? 1: left? -1: 0);
+            autoScroll.y = (bottom? 1:  top? -1: 0);
+
+            if (!autoScroll.isScrolling) {
+                // set the autoScroll properties to those of the target
+                autoScroll.margin = options.margin;
+                autoScroll.speed  = options.speed;
+
+                autoScroll.start(this);
+            }
+        },
+
         _updateEventTargets: function (target, currentTarget) {
             this._eventTarget    = target;
             this._curEventTarget = currentTarget;
@@ -3711,7 +3703,7 @@
             'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
             'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
             'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
-            'addPointer', 'removePointer', 'recordPointer',
+            'addPointer', 'removePointer', 'recordPointer', 'autoScrollMove'
         ];
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -5682,7 +5674,7 @@
             events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
 
             // autoscroll
-            events.add(doc, pEventTypes.move, autoScroll.edgeMove);
+            events.add(doc, pEventTypes.move, listeners.autoScrollMove);
         }
         else {
             events.add(doc, 'mousedown', listeners.selectorDown);
@@ -5697,8 +5689,8 @@
             events.add(doc, 'touchcancel', listeners.pointerCancel);
 
             // autoscroll
-            events.add(doc, 'mousemove', autoScroll.edgeMove);
-            events.add(doc, 'touchmove', autoScroll.edgeMove);
+            events.add(doc, 'mousemove', listeners.autoScrollMove);
+            events.add(doc, 'touchmove', listeners.autoScrollMove);
         }
 
         events.add(win, 'blur', endAllInteractions);
