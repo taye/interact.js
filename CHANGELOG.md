@@ -1,3 +1,42 @@
+## Upcomming Changes
+
+### Added `event` parameters to actionCheckers and dropCheckers
+
+See commits 88dc583df6df3c44bdd63cb8d17e41971594e2ed and 16d74d433fa6275d5bfa13ac8672b4a4aa33216a
+
+### Fixed autoScroll for mobile
+
+See #180
+
+### Merged [#183](https://github.com/taye/interact.js/pull/183) to fix an occasional bug
+
+### Improved auto preventDefault
+
+See commits 1984c805689ec44b9c525a3fc7b6b7253140d583 and 69139592963a15d6b6be910b5969d133418fa6ae
+
+### Fixed Interaction#unset
+
+See [PR #178](https://github.com/taye/interact.js/pull/178)
+
+### Fix coords of start event after manual start
+
+Commit fec73b2a017cabbdc42b381efbc28e658d9a0239
+
+### Added resize.margin
+
+See https://github.com/taye/interact.js/issues/166#issuecomment-91234390
+
+### Fixed a bug with touch and selector interactables
+
+See https://gitter.im/taye/interact.js?at=5523d1d92435c9553cf6d3b4
+
+
+### Fixed a touch doubletap bug
+
+See https://gitter.im/taye/interact.js?at=551e4b2faf9675d135ab346d
+
+Add origin subtract for X0 and Y0 [#167](https://github.com/taye/interact.js/pull/145)
+
 ## 1.2.4
 
 ### Resizing from all edges
