@@ -1303,7 +1303,7 @@
                                  && !testIgnore(elementInteractable, eventTarget, eventTarget)
                                  && testAllow(elementInteractable, eventTarget, eventTarget)
                                  && validateAction(
-                                     elementInteractable.getAction(pointer, this, eventTarget),
+                                     elementInteractable.getAction(pointer, event, this, eventTarget),
                                      elementInteractable));
 
             if (elementAction && !withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
@@ -1331,7 +1331,7 @@
             else {
                 interactables.forEachSelector(pushCurMatches);
 
-                if (this.validateSelector(pointer, curMatches, curMatchElements)) {
+                if (this.validateSelector(pointer, event, curMatches, curMatchElements)) {
                     this.matches = curMatches;
                     this.matchElements = curMatchElements;
 
@@ -1370,10 +1370,10 @@
                 this.setEventXY(this.curCoords, pointer);
 
                 if (matches) {
-                    action = this.validateSelector(pointer, matches, matchElements);
+                    action = this.validateSelector(pointer, event, matches, matchElements);
                 }
                 else if (target) {
-                    action = validateAction(target.getAction(this.pointers[0], this, this.element), this.target);
+                    action = validateAction(target.getAction(this.pointers[0], event, this, this.element), this.target);
                 }
 
                 if (target && target.options.styleCursor) {
@@ -1427,7 +1427,7 @@
                     // if this element is the current inertia target element
                     if (element === this.element
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(pointer, this, this.element), this.target).name === this.prepared.name) {
+                        && validateAction(this.target.getAction(pointer, event, this, this.element), this.target).name === this.prepared.name) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1470,7 +1470,7 @@
 
                 interactables.forEachSelector(pushMatches);
 
-                action = this.validateSelector(pointer, this.matches, this.matchElements);
+                action = this.validateSelector(pointer, event, this.matches, this.matchElements);
                 element = parentElement(element);
             }
 
@@ -1521,7 +1521,7 @@
                 if (interactable
                     && !testIgnore(interactable, curEventTarget, eventTarget)
                     && testAllow(interactable, curEventTarget, eventTarget)
-                    && (action = validateAction(forceAction || interactable.getAction(pointer, this, curEventTarget), interactable, eventTarget))
+                    && (action = validateAction(forceAction || interactable.getAction(pointer, event, this, curEventTarget), interactable, eventTarget))
                     && withinInteractionLimit(interactable, curEventTarget, action)) {
                     this.target = interactable;
                     this.element = curEventTarget;
@@ -1532,7 +1532,7 @@
                 options = target && target.options;
 
             if (target && (forceAction || !this.prepared.name)) {
-                action = action || validateAction(forceAction || target.getAction(pointer, this, curEventTarget), target, this.element);
+                action = action || validateAction(forceAction || target.getAction(pointer, event, this, curEventTarget), target, this.element);
 
                 this.setEventXY(this.startCoords);
 
@@ -1568,7 +1568,7 @@
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && curEventTarget === this.element
-                && validateAction(target.getAction(pointer, this, this.element), target).name === this.prepared.name) {
+                && validateAction(target.getAction(pointer, event, this, this.element), target).name === this.prepared.name) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1784,7 +1784,7 @@
                                 if (elementInteractable
                                     && elementInteractable !== this.target
                                     && !elementInteractable.options.drag.manualStart
-                                    && elementInteractable.getAction(this.downPointer, this, element).name === 'drag'
+                                    && elementInteractable.getAction(this.downPointer, this.downEvent, this, element).name === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
                                     this.prepared.name = 'drag';
@@ -1813,7 +1813,7 @@
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(thisInteraction.downPointer, thisInteraction, element).name === 'drag'
+                                        && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
                                         && checkAxis(axis, interactable)
                                         && withinInteractionLimit(interactable, element, 'drag')) {
 
@@ -2810,11 +2810,11 @@
             }
         },
 
-        validateSelector: function (pointer, matches, matchElements) {
+        validateSelector: function (pointer, event, matches, matchElements) {
             for (var i = 0, len = matches.length; i < len; i++) {
                 var match = matches[i],
                     matchElement = matchElements[i],
-                    action = validateAction(match.getAction(pointer, this, matchElement), match);
+                    action = validateAction(match.getAction(pointer, event, this, matchElement), match);
 
                 if (action && withinInteractionLimit(match, matchElement, action)) {
                     this.target = match;
@@ -4520,11 +4520,11 @@
             return ret.drag;
         },
 
-        getAction: function (pointer, interaction, element) {
+        getAction: function (pointer, event, interaction, element) {
             var action = this.defaultActionChecker(pointer, interaction, element);
 
             if (this.options.actionChecker) {
-                return this.options.actionChecker(pointer, action, this, element, interaction);
+                return this.options.actionChecker(pointer, event, action, this, element, interaction);
             }
 
             return action;
@@ -4542,12 +4542,22 @@
          - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
          = (Function | Interactable) The checker function or this Interactable
          *
-         | interact('.resize-horiz').actionChecker(function (defaultAction, interactable) {
-         |   return {
+         | interact('.resize-drag')
+         |   .resizable(true)
+         |   .draggable(true)
+         |   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+         |
+         |   if (interact.matchesSelector(event.target, '.drag-handle') {
+         |     // force drag with handle target
+         |     action.name = drag;
+         |   }
+         |   else {
          |     // resize from the top and right edges
-         |     name: 'resize',
-         |     edges: { top: true, right: true }
-         |   };
+         |     action.name  = 'resize';
+         |     action.edges = { top: true, right: true };
+         |   }
+         |
+         |   return action;
          | });
         \*/
         actionChecker: function (checker) {
