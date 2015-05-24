@@ -1463,6 +1463,7 @@
 
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, pointer);
+            this.downEvent = event;
 
             while (isElement(element) && !action) {
                 this.matches = [];
@@ -1487,7 +1488,6 @@
                 // do these now since pointerDown isn't being called from here
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                this.downEvent = event;
                 extend(this.downPointer, pointer);
 
                 copyCoords(this.prevCoords, this.curCoords);
@@ -1507,6 +1507,7 @@
             }
 
             this.pointerIsDown = true;
+            this.downEvent = event;
 
             var pointerIndex = this.addPointer(pointer),
                 action;
@@ -1557,7 +1558,6 @@
 
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                this.downEvent = event;
                 extend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords);
