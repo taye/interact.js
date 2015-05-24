@@ -1900,7 +1900,7 @@
             var target = this.target,
                 dragEvent  = new InteractEvent(this, event, 'drag', 'move', this.element),
                 draggableElement = this.element,
-                drop = this.getDrop(dragEvent, draggableElement);
+                drop = this.getDrop(event, draggableElement);
 
             this.dropTarget = drop.dropzone;
             this.dropElement = drop.element;
@@ -2284,7 +2284,7 @@
                 endEvent = new InteractEvent(this, event, 'drag', 'end', this.element);
 
                 var draggableElement = this.element,
-                    drop = this.getDrop(endEvent, draggableElement);
+                    drop = this.getDrop(event, draggableElement);
 
                 this.dropTarget = drop.dropzone;
                 this.dropElement = drop.element;
@@ -2405,7 +2405,7 @@
                     currentElement = this.activeDrops.elements [j],
                     rect           = this.activeDrops.rects    [j];
 
-                validDrops.push(current.dropCheck(this.pointers[0], this.target, dragElement, currentElement, rect)
+                validDrops.push(current.dropCheck(this.pointers[0], event, this.target, dragElement, currentElement, rect)
                                 ? currentElement
                                 : null);
             }
@@ -4039,14 +4039,14 @@
             return this.options.drop;
         },
 
-        dropCheck: function (pointer, draggable, draggableElement, dropElement, rect) {
+        dropCheck: function (pointer, event, draggable, draggableElement, dropElement, rect) {
             var dropped = false;
 
             // if the dropzone has no rect (eg. display: none)
             // call the custom dropChecker or just return false
             if (!(rect = rect || this.getRect(dropElement))) {
                 return (this.options.dropChecker
-                    ? this.options.dropChecker(pointer, dropped, this, dropElement, draggable, draggableElement)
+                    ? this.options.dropChecker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
                     : false);
             }
 
@@ -4096,24 +4096,33 @@
          [ method ]
          *
          * Gets or sets the function used to check if a dragged element is
-         * over this Interactable. See @Interactable.dropCheck.
+         * over this Interactable.
          *
-         - checker (function) #optional
-         * The checker is a function which takes a mouseUp/touchEnd event as a
-         * parameter and returns true or false to indicate if the the current
-         * draggable can be dropped into this Interactable
+         - checker (function) #optional The function that will be called when checking for a drop
+         = (Function | Interactable) The checker function or this Interactable
          *
-         - checker (function) The function that will be called when checking for a drop
          * The checker function takes the following arguments:
          *
-         - pointer (MouseEvent | PointerEvent | Touch) The pointer/event that ends a drag
+         - pointer (Touch | PointerEvent | MouseEvent) The pointer/event that ends a drag
+         - event (TouchEvent | PointerEvent | MouseEvent) The event related to the pointer
          - dropped (boolean) The value from the default drop check
          - dropzone (Interactable) The dropzone interactable
          - dropElement (Element) The dropzone element
          - draggable (Interactable) The Interactable being dragged
          - draggableElement (Element) The actual element that's being dragged
          *
-         = (Function | Interactable) The checker function or this Interactable
+         > Usage:
+         | interact(target)
+         | .dropChecker(function(pointer,           // Touch/PointerEvent/MouseEvent
+         |                       event,             // TouchEvent/PointerEvent/MouseEvent
+         |                       dropped,           // result of the default checker
+         |                       dropzone,          // dropzone Interactable
+         |                       dropElement,       // dropzone elemnt
+         |                       draggable,         // draggable Interactable
+         |                       draggableElement) {// draggable element
+         |
+         |   return dropped && event.target.hasAttribute('allow-drop');
+         | }
         \*/
         dropChecker: function (checker) {
             if (isFunction(checker)) {
