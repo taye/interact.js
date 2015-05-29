@@ -1845,7 +1845,7 @@
                 if (starting
                     && (this.target.options[this.prepared.name].manualStart
                         || !withinInteractionLimit(this.target, this.element, this.prepared))) {
-                    this.stop();
+                    this.stop(event);
                     return;
                 }
 
@@ -2556,9 +2556,9 @@
                 if (this.dragging) {
                     this.activeDrops.dropzones = this.activeDrops.elements = this.activeDrops.rects = null;
                 }
-
-                this.clearTargets();
             }
+
+            this.clearTargets();
 
             this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
             this.prepared.name = this.prevEvent = null;
