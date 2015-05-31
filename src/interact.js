@@ -140,16 +140,6 @@
         // Events wrapper
         events = require('./utils/events');
 
-    scope.isElement = function (o) {
-        if (!o || (typeof o !== 'object')) { return false; }
-
-        var _window = scope.getWindow(o) || scope.window;
-
-        return (/object|function/.test(typeof _window.Element)
-            ? o instanceof _window.Element //DOM2
-            : o.nodeType === 1 && typeof o.nodeName === "string");
-    };
-
     scope.trySelector = function (value) {
         if (!scope.isString(value)) { return false; }
 
@@ -319,7 +309,7 @@
             origin = origin(interactable && element);
         }
 
-        if (scope.isElement(origin))  {
+        if (utils.isElement(origin))  {
             origin = scope.getElementRect(origin);
         }
 
@@ -363,7 +353,7 @@
     scope.closest = function (child, selector) {
         var parent = scope.parentElement(child);
 
-        while (scope.isElement(parent)) {
+        while (utils.isElement(parent)) {
             if (scope.matchesSelector(parent, selector)) { return parent; }
 
             parent = scope.parentElement(parent);
@@ -393,12 +383,12 @@
     scope.testIgnore = function (interactable, interactableElement, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!ignoreFrom || !scope.isElement(element)) { return false; }
+        if (!ignoreFrom || !utils.isElement(element)) { return false; }
 
         if (scope.isString(ignoreFrom)) {
             return scope.matchesUpTo(element, ignoreFrom, interactableElement);
         }
-        else if (scope.isElement(ignoreFrom)) {
+        else if (utils.isElement(ignoreFrom)) {
             return scope.nodeContains(ignoreFrom, element);
         }
 
@@ -410,12 +400,12 @@
 
         if (!allowFrom) { return true; }
 
-        if (!scope.isElement(element)) { return false; }
+        if (!utils.isElement(element)) { return false; }
 
         if (scope.isString(allowFrom)) {
             return scope.matchesUpTo(element, allowFrom, interactableElement);
         }
-        else if (scope.isElement(allowFrom)) {
+        else if (utils.isElement(allowFrom)) {
             return scope.nodeContains(allowFrom, element);
         }
 
@@ -618,7 +608,7 @@
     };
 
     scope.matchesUpTo = function (element, selector, limit) {
-        while (scope.isElement(element)) {
+        while (utils.isElement(element)) {
             if (scope.matchesSelector(element, selector)) {
                 return true;
             }
@@ -947,7 +937,7 @@
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
                 // climb up the DOM tree from the event target
-                while (scope.isElement(element)) {
+                while (utils.isElement(element)) {
 
                     // if this element is the current inertia target element
                     if (element === this.element
@@ -990,7 +980,7 @@
             this.setEventXY(this.curCoords, pointer);
             this.downEvent = event;
 
-            while (scope.isElement(element) && !action) {
+            while (utils.isElement(element) && !action) {
                 this.matches = [];
                 this.matchElements = [];
 
@@ -1303,7 +1293,7 @@
                             var element = eventTarget;
 
                             // check element interactables
-                            while (scope.isElement(element)) {
+                            while (utils.isElement(element)) {
                                 var elementInteractable = scope.interactables.get(element);
 
                                 if (elementInteractable
@@ -1348,7 +1338,7 @@
 
                                 element = eventTarget;
 
-                                while (scope.isElement(element)) {
+                                while (utils.isElement(element)) {
                                     var selectorInteractable = scope.interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
@@ -1852,7 +1842,7 @@
                     accept = current.options.drop.accept;
 
                 // test the draggable element against the dropzone's accept setting
-                if ((scope.isElement(accept) && accept !== element)
+                if ((utils.isElement(accept) && accept !== element)
                     || (scope.isString(accept)
                         && !scope.matchesSelector(element, accept))) {
 
@@ -2232,7 +2222,7 @@
                         : undefined;
 
                 if (interactable._iEvents[eventType]
-                    && scope.isElement(element)
+                    && utils.isElement(element)
                     && scope.inContext(interactable, element)
                     && !scope.testIgnore(interactable, element, eventTarget)
                     && scope.testAllow(interactable, element, eventTarget)
@@ -2527,7 +2517,7 @@
                 restriction = restriction(page.x, page.y, this.element);
             }
 
-            if (scope.isElement(restriction)) {
+            if (utils.isElement(restriction)) {
                 restriction = scope.getElementRect(restriction);
             }
 
@@ -3125,9 +3115,9 @@
         }
 
         // the remaining checks require an element
-        if (!scope.isElement(element)) { return false; }
+        if (!utils.isElement(element)) { return false; }
 
-        return scope.isElement(value)
+        return utils.isElement(value)
                     // the value is an element to use as a resize handle
                     ? value === element
                     // otherwise check if element matches value as selector
@@ -3258,7 +3248,7 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (scope.isElement(element)) {
+        while (utils.isElement(element)) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
@@ -3373,7 +3363,7 @@
 
             if (context && (_window.Node
                     ? context instanceof _window.Node
-                    : (scope.isElement(context) || context === _window.document))) {
+                    : (utils.isElement(context) || context === _window.document))) {
 
                 this._context = context;
             }
@@ -3381,7 +3371,7 @@
         else {
             _window = scope.getWindow(element);
 
-            if (scope.isElement(element, _window)) {
+            if (utils.isElement(element, _window)) {
 
                 if (scope.PointerEvent) {
                     events.add(this._element, scope.pEventTypes.down, listeners.pointerDown );
@@ -3682,7 +3672,7 @@
          = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
         \*/
         accept: function (newValue) {
-            if (scope.isElement(newValue)) {
+            if (utils.isElement(newValue)) {
                 this.options.drop.accept = newValue;
 
                 return this;
@@ -4131,7 +4121,7 @@
         getRect: function rectCheck (element) {
             element = element || this._element;
 
-            if (this.selector && !(scope.isElement(element))) {
+            if (this.selector && !(utils.isElement(element))) {
                 element = this._context.querySelector(this.selector);
             }
 
@@ -4361,7 +4351,7 @@
                 return this;
             }
 
-            if (scope.isElement(newValue)) {              // specific element
+            if (utils.isElement(newValue)) {              // specific element
                 this.options.ignoreFrom = newValue;
                 return this;
             }
@@ -4390,7 +4380,7 @@
                 return this;
             }
 
-            if (scope.isElement(newValue)) {              // specific element
+            if (utils.isElement(newValue)) {              // specific element
                 this.options.allowFrom = newValue;
                 return this;
             }
