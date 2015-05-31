@@ -5,33 +5,15 @@
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function (realWindow) {
+(function () {
     'use strict';
-
-    // return early if there's no window to work with (eg. Node.js)
-    if (!realWindow) { return; }
 
     var scope = require('./scope');
 
-    scope.realWindow = realWindow;
+    // return early if there's no window to work with (eg. Node.js)
+    if (!scope.realWindow) { return; }
 
     // get wrapped window if using Shadow DOM polyfill
-    scope.window = (function () {
-        // create a TextNode
-        var el = realWindow.document.createTextNode('');
-
-        // check if it's wrapped by a polyfill
-        if (el.ownerDocument !== realWindow.document
-            && typeof realWindow.wrap === 'function'
-            && realWindow.wrap(el) === el) {
-            // return wrapped window
-            return realWindow.wrap(realWindow);
-        }
-
-        // no Shadow DOM polyfil or native implementation
-        return realWindow;
-    }());
-
     scope.blank = function () {};
 
     scope.document           = scope.window.document;
@@ -343,8 +325,8 @@
     scope.ie8MatchesSelector = null;
 
         // native requestAnimationFrame or polyfill
-    var reqFrame = realWindow.requestAnimationFrame,
-        cancelFrame = realWindow.cancelAnimationFrame,
+    var reqFrame = scope.realWindow.requestAnimationFrame,
+        cancelFrame = scope.realWindow.cancelAnimationFrame,
 
         // Events wrapper
         events = (function () {
@@ -1148,7 +1130,7 @@
         }
 
         // remove /deep/ from selectors if shadowDOM polyfill is used
-        if (scope.window !== realWindow) {
+        if (scope.window !== scope.realWindow) {
             selector = selector.replace(/\/deep\//g, ' ');
         }
 
@@ -5818,9 +5800,9 @@
         var lastTime = 0,
             vendors = ['ms', 'moz', 'webkit', 'o'];
 
-        for(var x = 0; x < vendors.length && !realWindow.requestAnimationFrame; ++x) {
-            reqFrame = realWindow[vendors[x]+'RequestAnimationFrame'];
-            cancelFrame = realWindow[vendors[x]+'CancelAnimationFrame'] || realWindow[vendors[x]+'CancelRequestAnimationFrame'];
+        for(var x = 0; x < vendors.length && !scope.realWindow.requestAnimationFrame; ++x) {
+            reqFrame = scope.realWindow[vendors[x]+'RequestAnimationFrame'];
+            cancelFrame = scope.realWindow[vendors[x]+'CancelAnimationFrame'] || scope.realWindow[vendors[x]+'CancelRequestAnimationFrame'];
         }
 
         if (!reqFrame) {
@@ -5857,7 +5839,7 @@
         });
     }
     else {
-        realWindow.interact = interact;
+        scope.realWindow.interact = interact;
     }
 
-} (typeof window === 'undefined'? undefined : window));
+} ());
