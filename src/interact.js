@@ -11,7 +11,7 @@
     // return early if there's no window to work with (eg. Node.js)
     if (!realWindow) { return; }
 
-    var scope = {};
+    var scope = require('./scope');
 
     scope.realWindow = realWindow;
 
