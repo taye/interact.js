@@ -11,9 +11,8 @@
     // return early if there's no window to work with (eg. Node.js)
     if (!require('./utils/window').window) { return; }
 
-    var scope = require('./scope');
-
-    scope.blank = function () {};
+    var scope = require('./scope'),
+        utils = require('./utils');
 
     scope.pEventTypes = null;
 
@@ -332,7 +331,7 @@
             : o.nodeType === 1 && typeof o.nodeName === "string");
     };
 
-    scope.extend(scope, require('./utils/isType'));
+    utils.extend(scope, require('./utils/isType'));
 
     scope.trySelector = function (value) {
         if (!scope.isString(value)) { return false; }
@@ -411,7 +410,7 @@
             if (/inertiastart/.test(pointer.type)) {
                 interaction = interaction || pointer.interaction;
 
-                scope.extend(page, interaction.inertiaStatus.upCoords.page);
+                utils.extend(page, interaction.inertiaStatus.upCoords.page);
 
                 page.x += interaction.inertiaStatus.sx;
                 page.y += interaction.inertiaStatus.sy;
@@ -440,7 +439,7 @@
 
         if (pointer instanceof InteractEvent) {
             if (/inertiastart/.test(pointer.type)) {
-                scope.extend(client, interaction.inertiaStatus.upCoords.client);
+                utils.extend(client, interaction.inertiaStatus.upCoords.client);
 
                 client.x += interaction.inertiaStatus.sx;
                 client.y += interaction.inertiaStatus.sy;
@@ -904,7 +903,7 @@
         return index;
     };
 
-    scope.extend(scope, require('./utils/arr.js'));
+    utils.extend(scope, require('./utils/arr.js'));
 
     scope.matchesSelector = function (element, selector, nodeList) {
         if (scope.ie8MatchesSelector) {
@@ -1235,7 +1234,7 @@
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
             var that = this,
                 // copy event to be used in timeout for IE8
-                eventCopy = events.useAttachEvent? scope.extend({}, event) : event,
+                eventCopy = events.useAttachEvent? utils.extend({}, event) : event,
                 element = eventTarget,
                 pointerIndex = this.addPointer(pointer),
                 action;
@@ -1315,7 +1314,7 @@
                 // do these now since pointerDown isn't being called from here
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                scope.extend(this.downPointer, pointer);
+                utils.extend(this.downPointer, pointer);
 
                 scope.copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
@@ -1385,7 +1384,7 @@
 
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                scope.extend(this.downPointer, pointer);
+                utils.extend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords);
                 this.pointerWasMoved = false;
@@ -1753,7 +1752,7 @@
                 var startRect = this.target.getRect(this.element);
 
                 if (this.target.options.resize.square) {
-                    var squareEdges = scope.extend({}, this.prepared.edges);
+                    var squareEdges = utils.extend({}, this.prepared.edges);
 
                     squareEdges.top    = squareEdges.top    || (squareEdges.left   && !squareEdges.bottom);
                     squareEdges.left   = squareEdges.left   || (squareEdges.top    && !squareEdges.right );
@@ -1768,9 +1767,9 @@
 
                 this.resizeRects = {
                     start     : startRect,
-                    current   : scope.extend({}, startRect),
-                    restricted: scope.extend({}, startRect),
-                    previous  : scope.extend({}, startRect),
+                    current   : utils.extend({}, startRect),
+                    restricted: utils.extend({}, startRect),
+                    previous  : utils.extend({}, startRect),
                     delta     : {
                         left: 0, right : 0, width : 0,
                         top : 0, bottom: 0, height: 0
@@ -1803,7 +1802,7 @@
                     current    = this.resizeRects.current,
                     restricted = this.resizeRects.restricted,
                     delta      = this.resizeRects.delta,
-                    previous   = scope.extend(this.resizeRects.previous, restricted);
+                    previous   = utils.extend(this.resizeRects.previous, restricted);
 
                 if (this.target.options.resize.square) {
                     var originalEdges = edges;
@@ -1826,7 +1825,7 @@
 
                 if (invertible) {
                     // if invertible, copy the current rect
-                    scope.extend(restricted, current);
+                    utils.extend(restricted, current);
 
                     if (invert === 'reposition') {
                         // swap edge values if necessary to keep width/height positive
@@ -2044,7 +2043,7 @@
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = scope.extend({}, this.curCoords.page),
+                        var page = utils.extend({}, this.curCoords.page),
                             origin = scope.getOriginXY(target, this.element),
                             statusObject;
 
@@ -2576,9 +2575,9 @@
                 pointerEvent = pointer;
             }
             else {
-                scope.extend(pointerEvent, event);
+                utils.extend(pointerEvent, event);
                 if (event !== pointer) {
-                    scope.extend(pointerEvent, pointer);
+                    utils.extend(pointerEvent, pointer);
                 }
 
                 pointerEvent.preventDefault           = preventOriginalDefault;
@@ -2623,7 +2622,7 @@
             if (createNewDoubleTap) {
                 var doubleTap = {};
 
-                scope.extend(doubleTap, pointerEvent);
+                utils.extend(doubleTap, pointerEvent);
 
                 doubleTap.dt   = interval;
                 doubleTap.type = 'doubletap';
@@ -2667,7 +2666,7 @@
             else {
                 var origin = scope.getOriginXY(this.target, this.element);
 
-                page = scope.extend({}, pageCoords);
+                page = utils.extend({}, pageCoords);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2795,7 +2794,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = scope.extend({}, pageCoords);
+                    : page = utils.extend({}, pageCoords);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -3124,8 +3123,8 @@
 
         element = element || interaction.element;
 
-        page   = scope.extend({}, coords.page);
-        client = scope.extend({}, coords.client);
+        page   = utils.extend({}, coords.page);
+        client = utils.extend({}, coords.client);
 
         page.x -= origin.x;
         page.y -= origin.y;
@@ -3360,7 +3359,7 @@
     }
 
     InteractEvent.prototype = {
-        preventDefault: scope.blank,
+        preventDefault: utils.blank,
         stopImmediatePropagation: function () {
             this.immediatePropagationStopped = this.propagationStopped = true;
         },
@@ -3442,7 +3441,7 @@
             action = null,
             resizeAxes = null,
             resizeEdges,
-            page = scope.extend({}, interaction.curCoords.page),
+            page = utils.extend({}, interaction.curCoords.page),
             options = this.options;
 
         if (!rect) { return null; }
@@ -3795,7 +3794,7 @@
                     // if the option in the options arg is an object value
                     if (scope.isObject(options[option])) {
                         // duplicate the object
-                        this.options[action][option] = scope.extend(this.options[action][option] || {}, options[option]);
+                        this.options[action][option] = utils.extend(this.options[action][option] || {}, options[option]);
 
                         if (scope.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
                             this.options[action][option].enabled = options[option].enabled === false? false : true;
@@ -4163,7 +4162,7 @@
         \*/
         autoScroll: function (options) {
             if (scope.isObject(options)) {
-                options = scope.extend({ actions: ['drag', 'resize']}, options);
+                options = utils.extend({ actions: ['drag', 'resize']}, options);
             }
             else if (scope.isBool(options)) {
                 options = { actions: ['drag', 'resize'], enabled: options };
@@ -4255,13 +4254,13 @@
                     var thisOption = this.options[action][option];
 
                     if (scope.isObject(options)) {
-                        scope.extend(thisOption, options);
+                        utils.extend(thisOption, options);
                         thisOption.enabled = options.enabled === false? false: true;
 
                         if (option === 'snap') {
                             if (thisOption.mode === 'grid') {
                                 thisOption.targets = [
-                                    interact.createSnapGrid(scope.extend({
+                                    interact.createSnapGrid(utils.extend({
                                         offset: thisOption.gridOffset || { x: 0, y: 0 }
                                     }, thisOption.grid || {}))
                                 ];
@@ -4615,7 +4614,7 @@
                 var action = actions[i];
 
                 if (action in options) {
-                    var perAction = scope.extend({
+                    var perAction = utils.extend({
                             actions: [action],
                             restriction: options[action]
                         }, options);
@@ -4981,17 +4980,17 @@
                 options = {};
             }
 
-            this.options = scope.extend({}, scope.defaultOptions.base);
+            this.options = utils.extend({}, scope.defaultOptions.base);
 
             var i,
                 actions = ['drag', 'drop', 'resize', 'gesture'],
                 methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
-                perActions = scope.extend(scope.extend({}, scope.defaultOptions.perAction), options[action] || {});
+                perActions = utils.extend(utils.extend({}, scope.defaultOptions.perAction), options[action] || {});
 
             for (i = 0; i < actions.length; i++) {
                 var action = actions[i];
 
-                this.options[action] = scope.extend({}, scope.defaultOptions[action]);
+                this.options[action] = utils.extend({}, scope.defaultOptions[action]);
 
                 this.setPerAction(action, perActions);
 

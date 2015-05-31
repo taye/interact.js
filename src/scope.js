@@ -1,10 +1,9 @@
 'use strict';
 
-var scope = {};
+var scope = {},
+    extend = require('./utils/extend');
 
-scope.extend = require('./utils/extend');
-
-scope.extend(scope, require('./utils/window'));
-scope.extend(scope, require('./utils/domObjects'));
+extend(scope, require('./utils/window'));
+extend(scope, require('./utils/domObjects'));
 
 module.exports = scope;
