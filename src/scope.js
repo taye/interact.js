@@ -2,9 +2,9 @@
 
 var scope = {};
 
-var win = require('./utils/window');
+scope.extend = require('./utils/extend');
 
-scope.window     = win.window;
-scope.realWindow = win.realWindow;
+scope.extend(scope, require('./utils/window'));
+scope.extend(scope, require('./utils/domObjects'));
 
 module.exports = scope;

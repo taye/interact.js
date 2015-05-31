@@ -5,6 +5,8 @@ if (typeof window === 'undefined') {
     module.exports.realWindow = undefined;
 }
 else {
+    // get wrapped window if using Shadow DOM polyfill
+
     module.exports.realWindow = window;
 
     // create a TextNode
@@ -21,3 +23,15 @@ else {
     // no Shadow DOM polyfil or native implementation
     module.exports.window = window;
 }
+
+var isWindow = require('./isType').isWindow;
+
+module.exports.getWindow = function getWindow (node) {
+    if (isWindow(node)) {
+        return node;
+    }
+
+    var rootNode = (node.ownerDocument || node);
+
+    return rootNode.defaultView || rootNode.parentWindow || module.exports.window;
+};

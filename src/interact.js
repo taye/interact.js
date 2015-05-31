@@ -8,22 +8,13 @@
 (function () {
     'use strict';
 
+    // return early if there's no window to work with (eg. Node.js)
+    if (!require('./utils/window').window) { return; }
+
     var scope = require('./scope');
 
-    // return early if there's no window to work with (eg. Node.js)
-    if (!scope.realWindow) { return; }
-
-    // get wrapped window if using Shadow DOM polyfill
     scope.blank = function () {};
 
-    scope.document           = scope.window.document;
-    scope.DocumentFragment   = scope.window.DocumentFragment   || scope.blank;
-    scope.SVGElement         = scope.window.SVGElement         || scope.blank;
-    scope.SVGSVGElement      = scope.window.SVGSVGElement      || scope.blank;
-    scope.SVGElementInstance = scope.window.SVGElementInstance || scope.blank;
-    scope.HTMLElement        = scope.window.HTMLElement        || scope.window.Element;
-
-    scope.PointerEvent = (scope.window.PointerEvent || scope.window.MSPointerEvent);
     scope.pEventTypes = null;
 
     scope.hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); };
@@ -329,177 +320,7 @@
         cancelFrame = scope.realWindow.cancelAnimationFrame,
 
         // Events wrapper
-        events = (function () {
-            var useAttachEvent = ('attachEvent' in scope.window) && !('addEventListener' in scope.window),
-                addEvent       = useAttachEvent?  'attachEvent': 'addEventListener',
-                removeEvent    = useAttachEvent?  'detachEvent': 'removeEventListener',
-                on             = useAttachEvent? 'on': '',
-
-                elements          = [],
-                targets           = [],
-                attachedListeners = [];
-
-            function add (element, type, listener, useCapture) {
-                var elementIndex = scope.indexOf(elements, element),
-                    target = targets[elementIndex];
-
-                if (!target) {
-                    target = {
-                        events: {},
-                        typeCount: 0
-                    };
-
-                    elementIndex = elements.push(element) - 1;
-                    targets.push(target);
-
-                    attachedListeners.push((useAttachEvent ? {
-                            supplied: [],
-                            wrapped : [],
-                            useCount: []
-                        } : null));
-                }
-
-                if (!target.events[type]) {
-                    target.events[type] = [];
-                    target.typeCount++;
-                }
-
-                if (!scope.contains(target.events[type], listener)) {
-                    var ret;
-
-                    if (useAttachEvent) {
-                        var listeners = attachedListeners[elementIndex],
-                            listenerIndex = scope.indexOf(listeners.supplied, listener);
-
-                        var wrapped = listeners.wrapped[listenerIndex] || function (event) {
-                            if (!event.immediatePropagationStopped) {
-                                event.target = event.srcElement;
-                                event.currentTarget = element;
-
-                                event.preventDefault = event.preventDefault || preventDef;
-                                event.stopPropagation = event.stopPropagation || stopProp;
-                                event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
-
-                                if (/mouse|click/.test(event.type)) {
-                                    event.pageX = event.clientX + scope.getWindow(element).document.documentElement.scrollLeft;
-                                    event.pageY = event.clientY + scope.getWindow(element).document.documentElement.scrollTop;
-                                }
-
-                                listener(event);
-                            }
-                        };
-
-                        ret = element[addEvent](on + type, wrapped, Boolean(useCapture));
-
-                        if (listenerIndex === -1) {
-                            listeners.supplied.push(listener);
-                            listeners.wrapped.push(wrapped);
-                            listeners.useCount.push(1);
-                        }
-                        else {
-                            listeners.useCount[listenerIndex]++;
-                        }
-                    }
-                    else {
-                        ret = element[addEvent](type, listener, useCapture || false);
-                    }
-                    target.events[type].push(listener);
-
-                    return ret;
-                }
-            }
-
-            function remove (element, type, listener, useCapture) {
-                var i,
-                    elementIndex = scope.indexOf(elements, element),
-                    target = targets[elementIndex],
-                    listeners,
-                    listenerIndex,
-                    wrapped = listener;
-
-                if (!target || !target.events) {
-                    return;
-                }
-
-                if (useAttachEvent) {
-                    listeners = attachedListeners[elementIndex];
-                    listenerIndex = scope.indexOf(listeners.supplied, listener);
-                    wrapped = listeners.wrapped[listenerIndex];
-                }
-
-                if (type === 'all') {
-                    for (type in target.events) {
-                        if (target.events.hasOwnProperty(type)) {
-                            remove(element, type, 'all');
-                        }
-                    }
-                    return;
-                }
-
-                if (target.events[type]) {
-                    var len = target.events[type].length;
-
-                    if (listener === 'all') {
-                        for (i = 0; i < len; i++) {
-                            remove(element, type, target.events[type][i], Boolean(useCapture));
-                        }
-                        return;
-                    } else {
-                        for (i = 0; i < len; i++) {
-                            if (target.events[type][i] === listener) {
-                                element[removeEvent](on + type, wrapped, useCapture || false);
-                                target.events[type].splice(i, 1);
-
-                                if (useAttachEvent && listeners) {
-                                    listeners.useCount[listenerIndex]--;
-                                    if (listeners.useCount[listenerIndex] === 0) {
-                                        listeners.supplied.splice(listenerIndex, 1);
-                                        listeners.wrapped.splice(listenerIndex, 1);
-                                        listeners.useCount.splice(listenerIndex, 1);
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-
-                    if (target.events[type] && target.events[type].length === 0) {
-                        target.events[type] = null;
-                        target.typeCount--;
-                    }
-                }
-
-                if (!target.typeCount) {
-                    targets.splice(elementIndex, 1);
-                    elements.splice(elementIndex, 1);
-                    attachedListeners.splice(elementIndex, 1);
-                }
-            }
-
-            function preventDef () {
-                this.returnValue = false;
-            }
-
-            function stopProp () {
-                this.cancelBubble = true;
-            }
-
-            function stopImmProp () {
-                this.cancelBubble = true;
-                this.immediatePropagationStopped = true;
-            }
-
-            return {
-                add: add,
-                remove: remove,
-                useAttachEvent: useAttachEvent,
-
-                _elements: elements,
-                _targets: targets,
-                _attachedListeners: attachedListeners
-            };
-        }());
+        events = require('./utils/events');
 
     scope.isElement = function (o) {
         if (!o || (typeof o !== 'object')) { return false; }
@@ -510,18 +331,8 @@
             ? o instanceof _window.Element //DOM2
             : o.nodeType === 1 && typeof o.nodeName === "string");
     };
-    scope.isWindow = function (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); };
-    scope.isDocFrag = function (thing) { return !!thing && thing instanceof scope.DocumentFragment; };
-    scope.isArray = function (thing) {
-        return scope.isObject(thing)
-                && (typeof thing.length !== undefined)
-                && scope.isFunction(thing.splice);
-    };
-    scope.isObject = function   (thing) { return !!thing && (typeof thing === 'object'); };
-    scope.isFunction = function (thing) { return typeof thing === 'function'; };
-    scope.isNumber = function   (thing) { return typeof thing === 'number'  ; };
-    scope.isBool = function     (thing) { return typeof thing === 'boolean' ; };
-    scope.isString = function   (thing) { return typeof thing === 'string'  ; };
+
+    scope.extend(scope, require('./utils/isType'));
 
     scope.trySelector = function (value) {
         if (!scope.isString(value)) { return false; }
@@ -529,13 +340,6 @@
         // an exception will be raised if it is invalid
         scope.document.querySelector(value);
         return true;
-    };
-
-    scope.extend = function (dest, source) {
-        for (var prop in source) {
-            dest[prop] = source[prop];
-        }
-        return dest;
     };
 
     scope.copyCoords = function (dest, src) {
@@ -670,16 +474,6 @@
         return (element instanceof scope.SVGElementInstance
             ? element.correspondingUseElement
             : element);
-    };
-
-    scope.getWindow = function (node) {
-        if (scope.isWindow(node)) {
-            return node;
-        }
-
-        var rootNode = (node.ownerDocument || node);
-
-        return rootNode.defaultView || rootNode.parentWindow || scope.window;
     };
 
     scope.getElementRect = function (element) {
@@ -1110,19 +904,7 @@
         return index;
     };
 
-    scope.indexOf = function (array, target) {
-        for (var i = 0, len = array.length; i < len; i++) {
-            if (array[i] === target) {
-                return i;
-            }
-        }
-
-        return -1;
-    };
-
-    scope.contains = function (array, target) {
-        return scope.indexOf(array, target) !== -1;
-    };
+    scope.extend(scope, require('./utils/arr.js'));
 
     scope.matchesSelector = function (element, selector, nodeList) {
         if (scope.ie8MatchesSelector) {
