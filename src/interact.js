@@ -49,8 +49,7 @@
     // Allow this many interactions to happen simultaneously
     scope.maxInteractions = Infinity;
 
-    // Check if is IE9 or older
-    scope.actionCursors = (scope.document.all && !scope.window.atob) ? {
+    scope.actionCursors = browser.isIe9OrOlder ? {
         drag    : 'move',
         resizex : 'e-resize',
         resizey : 's-resize',

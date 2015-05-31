@@ -20,4 +20,6 @@ browser.isOperaMobile = (navigator.appName == 'Opera'
 browser.isIOS7orLower = (/iP(hone|od|ad)/.test(navigator.platform)
                                 && /OS [1-7][^\d]/.test(navigator.appVersion));
 
+browser.isIe9OrOlder = domObjects.document.all && !win.window.atob;
+
 module.exports = browser;
