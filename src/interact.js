@@ -11,338 +11,344 @@
     // return early if there's no window to work with (eg. Node.js)
     if (!realWindow) { return; }
 
-    var // get wrapped window if using Shadow DOM polyfill
-        window = (function () {
-            // create a TextNode
-            var el = realWindow.document.createTextNode('');
+    var scope = {};
 
-            // check if it's wrapped by a polyfill
-            if (el.ownerDocument !== realWindow.document
-                && typeof realWindow.wrap === 'function'
-                && realWindow.wrap(el) === el) {
-                // return wrapped window
-                return realWindow.wrap(realWindow);
-            }
+    scope.realWindow = realWindow;
 
-            // no Shadow DOM polyfil or native implementation
-            return realWindow;
-        }()),
+    // get wrapped window if using Shadow DOM polyfill
+    scope.window = (function () {
+        // create a TextNode
+        var el = realWindow.document.createTextNode('');
 
-        document           = window.document,
-        DocumentFragment   = window.DocumentFragment   || blank,
-        SVGElement         = window.SVGElement         || blank,
-        SVGSVGElement      = window.SVGSVGElement      || blank,
-        SVGElementInstance = window.SVGElementInstance || blank,
-        HTMLElement        = window.HTMLElement        || window.Element,
+        // check if it's wrapped by a polyfill
+        if (el.ownerDocument !== realWindow.document
+            && typeof realWindow.wrap === 'function'
+            && realWindow.wrap(el) === el) {
+            // return wrapped window
+            return realWindow.wrap(realWindow);
+        }
 
-        PointerEvent = (window.PointerEvent || window.MSPointerEvent),
-        pEventTypes,
+        // no Shadow DOM polyfil or native implementation
+        return realWindow;
+    }());
 
-        hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); },
+    scope.blank = function () {};
 
-        tmpXY = {},     // reduce object creation in getXY()
+    scope.document           = scope.window.document;
+    scope.DocumentFragment   = scope.window.DocumentFragment   || scope.blank;
+    scope.SVGElement         = scope.window.SVGElement         || scope.blank;
+    scope.SVGSVGElement      = scope.window.SVGSVGElement      || scope.blank;
+    scope.SVGElementInstance = scope.window.SVGElementInstance || scope.blank;
+    scope.HTMLElement        = scope.window.HTMLElement        || scope.window.Element;
 
-        documents       = [],   // all documents being listened to
+    scope.PointerEvent = (scope.window.PointerEvent || scope.window.MSPointerEvent);
+    scope.pEventTypes = null;
 
-        interactables   = [],   // all set interactables
-        interactions    = [],   // all interactions
+    scope.hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); };
 
-        dynamicDrop     = false,
+    scope.tmpXY = {};     // reduce object creation in getXY()
 
-        // {
-        //      type: {
-        //          selectors: ['selector', ...],
-        //          contexts : [document, ...],
-        //          listeners: [[listener, useCapture], ...]
-        //      }
-        //  }
-        delegatedEvents = {},
+    scope.documents       = [];   // all documents being listened to
 
-        defaultOptions = {
-            base: {
-                accept        : null,
-                actionChecker : null,
-                styleCursor   : true,
-                preventDefault: 'auto',
-                origin        : { x: 0, y: 0 },
-                deltaSource   : 'page',
-                allowFrom     : null,
-                ignoreFrom    : null,
-                _context      : document,
-                dropChecker   : null
-            },
+    scope.interactables   = [];   // all set interactables
+    scope.interactions    = [];   // all interactions
 
-            drag: {
-                enabled: false,
-                manualStart: true,
-                max: Infinity,
-                maxPerElement: 1,
+    scope.dynamicDrop     = false;
 
-                snap: null,
-                restrict: null,
-                inertia: null,
-                autoScroll: null,
+    // {
+    //      type: {
+    //          selectors: ['selector', ...],
+    //          contexts : [document, ...],
+    //          listeners: [[listener, useCapture], ...]
+    //      }
+    //  }
+    scope.delegatedEvents = {};
 
-                axis: 'xy',
-            },
-
-            drop: {
-                enabled: false,
-                accept: null,
-                overlap: 'pointer'
-            },
-
-            resize: {
-                enabled: false,
-                manualStart: false,
-                max: Infinity,
-                maxPerElement: 1,
-
-                snap: null,
-                restrict: null,
-                inertia: null,
-                autoScroll: null,
-
-                square: false,
-                axis: 'xy',
-
-                // use default margin
-                margin: NaN,
-
-                // object with props left, right, top, bottom which are
-                // true/false values to resize when the pointer is over that edge,
-                // CSS selectors to match the handles for each direction
-                // or the Elements for each handle
-                edges: null,
-
-                // a value of 'none' will limit the resize rect to a minimum of 0x0
-                // 'negate' will alow the rect to have negative width/height
-                // 'reposition' will keep the width/height positive by swapping
-                // the top and bottom edges and/or swapping the left and right edges
-                invert: 'none'
-            },
-
-            gesture: {
-                manualStart: false,
-                enabled: false,
-                max: Infinity,
-                maxPerElement: 1,
-
-                restrict: null
-            },
-
-            perAction: {
-                manualStart: false,
-                max: Infinity,
-                maxPerElement: 1,
-
-                snap: {
-                    enabled     : false,
-                    endOnly     : false,
-                    range       : Infinity,
-                    targets     : null,
-                    offsets     : null,
-
-                    relativePoints: null
-                },
-
-                restrict: {
-                    enabled: false,
-                    endOnly: false
-                },
-
-                autoScroll: {
-                    enabled     : false,
-                    container   : null,     // the item that is scrolled (Window or HTMLElement)
-                    margin      : 60,
-                    speed       : 300       // the scroll speed in pixels per second
-                },
-
-                inertia: {
-                    enabled          : false,
-                    resistance       : 10,    // the lambda in exponential decay
-                    minSpeed         : 100,   // target speed must be above this for inertia to start
-                    endSpeed         : 10,    // the speed at which inertia is slow enough to stop
-                    allowResume      : true,  // allow resuming an action in inertia phase
-                    zeroResumeDelta  : true,  // if an action is resumed after launch, set dx/dy to 0
-                    smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
-                }
-            },
-
-            _holdDuration: 600
+    scope.defaultOptions = {
+        base: {
+            accept        : null,
+            actionChecker : null,
+            styleCursor   : true,
+            preventDefault: 'auto',
+            origin        : { x: 0, y: 0 },
+            deltaSource   : 'page',
+            allowFrom     : null,
+            ignoreFrom    : null,
+            _context      : scope.document,
+            dropChecker   : null
         },
 
-        // Things related to autoScroll
-        autoScroll = {
-            interaction: null,
-            i: null,    // the handle returned by window.setInterval
-            x: 0, y: 0, // Direction each pulse is to scroll in
+        drag: {
+            enabled: false,
+            manualStart: true,
+            max: Infinity,
+            maxPerElement: 1,
 
-            // scroll the window by the values in scroll.x/y
-            scroll: function () {
-                var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll,
-                    container = options.container || getWindow(autoScroll.interaction.element),
-                    now = new Date().getTime(),
-                    // change in time in seconds
-                    dt = (now - autoScroll.prevTime) / 1000,
-                    // displacement
-                    s = options.speed * dt;
+            snap: null,
+            restrict: null,
+            inertia: null,
+            autoScroll: null,
 
-                if (s >= 1) {
-                    if (isWindow(container)) {
-                        container.scrollBy(autoScroll.x * s, autoScroll.y * s);
-                    }
-                    else if (container) {
-                        container.scrollLeft += autoScroll.x * s;
-                        container.scrollTop  += autoScroll.y * s;
-                    }
+            axis: 'xy',
+        },
 
-                    autoScroll.prevTime = now;
-                }
+        drop: {
+            enabled: false,
+            accept: null,
+            overlap: 'pointer'
+        },
 
-                if (autoScroll.isScrolling) {
-                    cancelFrame(autoScroll.i);
-                    autoScroll.i = reqFrame(autoScroll.scroll);
-                }
+        resize: {
+            enabled: false,
+            manualStart: false,
+            max: Infinity,
+            maxPerElement: 1,
+
+            snap: null,
+            restrict: null,
+            inertia: null,
+            autoScroll: null,
+
+            square: false,
+            axis: 'xy',
+
+            // use default margin
+            margin: NaN,
+
+            // object with props left, right, top, bottom which are
+            // true/false values to resize when the pointer is over that edge,
+            // CSS selectors to match the handles for each direction
+            // or the Elements for each handle
+            edges: null,
+
+            // a value of 'none' will limit the resize rect to a minimum of 0x0
+            // 'negate' will alow the rect to have negative width/height
+            // 'reposition' will keep the width/height positive by swapping
+            // the top and bottom edges and/or swapping the left and right edges
+            invert: 'none'
+        },
+
+        gesture: {
+            manualStart: false,
+            enabled: false,
+            max: Infinity,
+            maxPerElement: 1,
+
+            restrict: null
+        },
+
+        perAction: {
+            manualStart: false,
+            max: Infinity,
+            maxPerElement: 1,
+
+            snap: {
+                enabled     : false,
+                endOnly     : false,
+                range       : Infinity,
+                targets     : null,
+                offsets     : null,
+
+                relativePoints: null
             },
 
-            isScrolling: false,
-            prevTime: 0,
-
-            start: function (interaction) {
-                autoScroll.isScrolling = true;
-                cancelFrame(autoScroll.i);
-
-                autoScroll.interaction = interaction;
-                autoScroll.prevTime = new Date().getTime();
-                autoScroll.i = reqFrame(autoScroll.scroll);
+            restrict: {
+                enabled: false,
+                endOnly: false
             },
 
-            stop: function () {
-                autoScroll.isScrolling = false;
-                cancelFrame(autoScroll.i);
+            autoScroll: {
+                enabled     : false,
+                container   : null,     // the item that is scrolled (Window or HTMLElement)
+                margin      : 60,
+                speed       : 300       // the scroll speed in pixels per second
+            },
+
+            inertia: {
+                enabled          : false,
+                resistance       : 10,    // the lambda in exponential decay
+                minSpeed         : 100,   // target speed must be above this for inertia to start
+                endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+                allowResume      : true,  // allow resuming an action in inertia phase
+                zeroResumeDelta  : true,  // if an action is resumed after launch, set dx/dy to 0
+                smoothEndDuration: 300    // animate to snap/restrict endOnly if there's no inertia
             }
         },
 
-        // Does the browser support touch input?
-        supportsTouch = (('ontouchstart' in window) || window.DocumentTouch && document instanceof window.DocumentTouch),
+        _holdDuration: 600
+    };
 
-        // Does the browser support PointerEvents
-        supportsPointerEvent = !!PointerEvent,
+    // Things related to autoScroll
+    scope.autoScroll = {
+        interaction: null,
+        i: null,    // the handle returned by window.setInterval
+        x: 0, y: 0, // Direction each pulse is to scroll in
 
-        // Less Precision with touch input
-        margin = supportsTouch || supportsPointerEvent? 20: 10,
+        // scroll the window by the values in scroll.x/y
+        scroll: function () {
+            var options = scope.autoScroll.interaction.target.options[scope.autoScroll.interaction.prepared.name].autoScroll,
+                container = options.container || scope.getWindow(scope.autoScroll.interaction.element),
+                now = new Date().getTime(),
+                // change in time in seconds
+                dt = (now - scope.autoScroll.prevTime) / 1000,
+                // displacement
+                s = options.speed * dt;
 
-        pointerMoveTolerance = 1,
+            if (s >= 1) {
+                if (scope.isWindow(container)) {
+                    container.scrollBy(scope.autoScroll.x * s, scope.autoScroll.y * s);
+                }
+                else if (container) {
+                    container.scrollLeft += scope.autoScroll.x * s;
+                    container.scrollTop  += scope.autoScroll.y * s;
+                }
 
-        // for ignoring browser's simulated mouse events
-        prevTouchTime = 0,
+                scope.autoScroll.prevTime = now;
+            }
 
-        // Allow this many interactions to happen simultaneously
-        maxInteractions = Infinity,
-
-        // Check if is IE9 or older
-        actionCursors = (document.all && !window.atob) ? {
-            drag    : 'move',
-            resizex : 'e-resize',
-            resizey : 's-resize',
-            resizexy: 'se-resize',
-
-            resizetop        : 'n-resize',
-            resizeleft       : 'w-resize',
-            resizebottom     : 's-resize',
-            resizeright      : 'e-resize',
-            resizetopleft    : 'se-resize',
-            resizebottomright: 'se-resize',
-            resizetopright   : 'ne-resize',
-            resizebottomleft : 'ne-resize',
-
-            gesture : ''
-        } : {
-            drag    : 'move',
-            resizex : 'ew-resize',
-            resizey : 'ns-resize',
-            resizexy: 'nwse-resize',
-
-            resizetop        : 'ns-resize',
-            resizeleft       : 'ew-resize',
-            resizebottom     : 'ns-resize',
-            resizeright      : 'ew-resize',
-            resizetopleft    : 'nwse-resize',
-            resizebottomright: 'nwse-resize',
-            resizetopright   : 'nesw-resize',
-            resizebottomleft : 'nesw-resize',
-
-            gesture : ''
+            if (scope.autoScroll.isScrolling) {
+                cancelFrame(scope.autoScroll.i);
+                scope.autoScroll.i = reqFrame(scope.autoScroll.scroll);
+            }
         },
 
-        actionIsEnabled = {
-            drag   : true,
-            resize : true,
-            gesture: true
+        isScrolling: false,
+        prevTime: 0,
+
+        start: function (interaction) {
+            scope.autoScroll.isScrolling = true;
+            cancelFrame(scope.autoScroll.i);
+
+            scope.autoScroll.interaction = interaction;
+            scope.autoScroll.prevTime = new Date().getTime();
+            scope.autoScroll.i = reqFrame(scope.autoScroll.scroll);
         },
 
-        // because Webkit and Opera still use 'mousewheel' event type
-        wheelEvent = 'onmousewheel' in document? 'mousewheel': 'wheel',
+        stop: function () {
+            scope.autoScroll.isScrolling = false;
+            cancelFrame(scope.autoScroll.i);
+        }
+    };
 
-        eventTypes = [
-            'dragstart',
-            'dragmove',
-            'draginertiastart',
-            'dragend',
-            'dragenter',
-            'dragleave',
-            'dropactivate',
-            'dropdeactivate',
-            'dropmove',
-            'drop',
-            'resizestart',
-            'resizemove',
-            'resizeinertiastart',
-            'resizeend',
-            'gesturestart',
-            'gesturemove',
-            'gestureinertiastart',
-            'gestureend',
+    // Does the browser support touch input?
+    scope.supportsTouch = (('ontouchstart' in scope.window) || scope.window.DocumentTouch && scope.document instanceof scope.window.DocumentTouch);
 
-            'down',
-            'move',
-            'up',
-            'cancel',
-            'tap',
-            'doubletap',
-            'hold'
-        ],
+    // Does the browser support PointerEvents
+    scope.supportsPointerEvent = !!scope.PointerEvent;
 
-        globalEvents = {},
+    // Less Precision with touch input
+    scope.margin = scope.supportsTouch || scope.supportsPointerEvent? 20: 10;
 
-        // Opera Mobile must be handled differently
-        isOperaMobile = navigator.appName == 'Opera' &&
-            supportsTouch &&
-            navigator.userAgent.match('Presto'),
+    scope.pointerMoveTolerance = 1;
 
-        // scrolling doesn't change the result of
-        // getBoundingClientRect/getClientRects on iOS <=7 but it does on iOS 8
-        isIOS7orLower = (/iP(hone|od|ad)/.test(navigator.platform)
-                            && /OS [1-7][^\d]/.test(navigator.appVersion)),
+    // for ignoring browser's simulated mouse events
+    scope.prevTouchTime = 0;
 
-        // prefix matchesSelector
-        prefixedMatchesSelector = 'matches' in Element.prototype?
-                'matches': 'webkitMatchesSelector' in Element.prototype?
-                    'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
-                        'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
-                            'oMatchesSelector': 'msMatchesSelector',
+    // Allow this many interactions to happen simultaneously
+    scope.maxInteractions = Infinity;
 
-        // will be polyfill function if browser is IE8
-        ie8MatchesSelector,
+    // Check if is IE9 or older
+    scope.actionCursors = (scope.document.all && !scope.window.atob) ? {
+        drag    : 'move',
+        resizex : 'e-resize',
+        resizey : 's-resize',
+        resizexy: 'se-resize',
+
+        resizetop        : 'n-resize',
+        resizeleft       : 'w-resize',
+        resizebottom     : 's-resize',
+        resizeright      : 'e-resize',
+        resizetopleft    : 'se-resize',
+        resizebottomright: 'se-resize',
+        resizetopright   : 'ne-resize',
+        resizebottomleft : 'ne-resize',
+
+        gesture : ''
+    } : {
+        drag    : 'move',
+        resizex : 'ew-resize',
+        resizey : 'ns-resize',
+        resizexy: 'nwse-resize',
+
+        resizetop        : 'ns-resize',
+        resizeleft       : 'ew-resize',
+        resizebottom     : 'ns-resize',
+        resizeright      : 'ew-resize',
+        resizetopleft    : 'nwse-resize',
+        resizebottomright: 'nwse-resize',
+        resizetopright   : 'nesw-resize',
+        resizebottomleft : 'nesw-resize',
+
+        gesture : ''
+    };
+
+    scope.actionIsEnabled = {
+        drag   : true,
+        resize : true,
+        gesture: true
+    };
+
+    // because Webkit and Opera still use 'mousewheel' event type
+    scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
+
+    scope.eventTypes = [
+        'dragstart',
+        'dragmove',
+        'draginertiastart',
+        'dragend',
+        'dragenter',
+        'dragleave',
+        'dropactivate',
+        'dropdeactivate',
+        'dropmove',
+        'drop',
+        'resizestart',
+        'resizemove',
+        'resizeinertiastart',
+        'resizeend',
+        'gesturestart',
+        'gesturemove',
+        'gestureinertiastart',
+        'gestureend',
+
+        'down',
+        'move',
+        'up',
+        'cancel',
+        'tap',
+        'doubletap',
+        'hold'
+    ];
+
+    scope.globalEvents = {};
+
+    // Opera Mobile must be handled differently
+    scope.isOperaMobile = navigator.appName == 'Opera' &&
+        scope.supportsTouch &&
+        navigator.userAgent.match('Presto');
+
+    // scrolling doesn't change the result of
+    // getBoundingClientRect/getClientRects on iOS <=7 but it does on iOS 8
+    scope.isIOS7orLower = (/iP(hone|od|ad)/.test(navigator.platform)
+                        && /OS [1-7][^\d]/.test(navigator.appVersion));
+
+    // prefix matchesSelector
+    scope.prefixedMatchesSelector = 'matches' in Element.prototype?
+            'matches': 'webkitMatchesSelector' in Element.prototype?
+                'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
+                    'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
+                        'oMatchesSelector': 'msMatchesSelector';
+
+    // will be polyfill function if browser is IE8
+    scope.ie8MatchesSelector = null;
 
         // native requestAnimationFrame or polyfill
-        reqFrame = realWindow.requestAnimationFrame,
+    var reqFrame = realWindow.requestAnimationFrame,
         cancelFrame = realWindow.cancelAnimationFrame,
 
         // Events wrapper
         events = (function () {
-            var useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window),
+            var useAttachEvent = ('attachEvent' in scope.window) && !('addEventListener' in scope.window),
                 addEvent       = useAttachEvent?  'attachEvent': 'addEventListener',
                 removeEvent    = useAttachEvent?  'detachEvent': 'removeEventListener',
                 on             = useAttachEvent? 'on': '',
@@ -393,8 +399,8 @@
                                 event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
                                 if (/mouse|click/.test(event.type)) {
-                                    event.pageX = event.clientX + getWindow(element).document.documentElement.scrollLeft;
-                                    event.pageY = event.clientY + getWindow(element).document.documentElement.scrollTop;
+                                    event.pageX = event.clientX + scope.getWindow(element).document.documentElement.scrollLeft;
+                                    event.pageY = event.clientY + scope.getWindow(element).document.documentElement.scrollTop;
                                 }
 
                                 listener(event);
@@ -513,46 +519,44 @@
             };
         }());
 
-    function blank () {}
-
-    function isElement (o) {
+    scope.isElement = function (o) {
         if (!o || (typeof o !== 'object')) { return false; }
 
-        var _window = getWindow(o) || window;
+        var _window = scope.getWindow(o) || scope.window;
 
         return (/object|function/.test(typeof _window.Element)
             ? o instanceof _window.Element //DOM2
             : o.nodeType === 1 && typeof o.nodeName === "string");
-    }
-    function isWindow (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); }
-    function isDocFrag (thing) { return !!thing && thing instanceof DocumentFragment; }
-    function isArray (thing) {
-        return isObject(thing)
+    };
+    scope.isWindow = function (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); };
+    scope.isDocFrag = function (thing) { return !!thing && thing instanceof scope.DocumentFragment; };
+    scope.isArray = function (thing) {
+        return scope.isObject(thing)
                 && (typeof thing.length !== undefined)
-                && isFunction(thing.splice);
-    }
-    function isObject   (thing) { return !!thing && (typeof thing === 'object'); }
-    function isFunction (thing) { return typeof thing === 'function'; }
-    function isNumber   (thing) { return typeof thing === 'number'  ; }
-    function isBool     (thing) { return typeof thing === 'boolean' ; }
-    function isString   (thing) { return typeof thing === 'string'  ; }
+                && scope.isFunction(thing.splice);
+    };
+    scope.isObject = function   (thing) { return !!thing && (typeof thing === 'object'); };
+    scope.isFunction = function (thing) { return typeof thing === 'function'; };
+    scope.isNumber = function   (thing) { return typeof thing === 'number'  ; };
+    scope.isBool = function     (thing) { return typeof thing === 'boolean' ; };
+    scope.isString = function   (thing) { return typeof thing === 'string'  ; };
 
-    function trySelector (value) {
-        if (!isString(value)) { return false; }
+    scope.trySelector = function (value) {
+        if (!scope.isString(value)) { return false; }
 
         // an exception will be raised if it is invalid
-        document.querySelector(value);
+        scope.document.querySelector(value);
         return true;
-    }
+    };
 
-    function extend (dest, source) {
+    scope.extend = function (dest, source) {
         for (var prop in source) {
             dest[prop] = source[prop];
         }
         return dest;
-    }
+    };
 
-    function copyCoords (dest, src) {
+    scope.copyCoords = function (dest, src) {
         dest.page = dest.page || {};
         dest.page.x = src.page.x;
         dest.page.y = src.page.y;
@@ -562,30 +566,30 @@
         dest.client.y = src.client.y;
 
         dest.timeStamp = src.timeStamp;
-    }
+    };
 
-    function setEventXY (targetObj, pointer, interaction) {
+    scope.setEventXY = function (targetObj, pointer, interaction) {
         if (!pointer) {
             if (interaction.pointerIds.length > 1) {
-                pointer = touchAverage(interaction.pointers);
+                pointer = scope.touchAverage(interaction.pointers);
             }
             else {
                 pointer = interaction.pointers[0];
             }
         }
 
-        getPageXY(pointer, tmpXY, interaction);
-        targetObj.page.x = tmpXY.x;
-        targetObj.page.y = tmpXY.y;
+        scope.getPageXY(pointer, scope.tmpXY, interaction);
+        targetObj.page.x = scope.tmpXY.x;
+        targetObj.page.y = scope.tmpXY.y;
 
-        getClientXY(pointer, tmpXY, interaction);
-        targetObj.client.x = tmpXY.x;
-        targetObj.client.y = tmpXY.y;
+        scope.getClientXY(pointer, scope.tmpXY, interaction);
+        targetObj.client.x = scope.tmpXY.x;
+        targetObj.client.y = scope.tmpXY.y;
 
         targetObj.timeStamp = new Date().getTime();
-    }
+    };
 
-    function setEventDeltas (targetObj, prev, cur) {
+    scope.setEventDeltas = function (targetObj, prev, cur) {
         targetObj.page.x     = cur.page.x      - prev.page.x;
         targetObj.page.y     = cur.page.y      - prev.page.y;
         targetObj.client.x   = cur.client.x    - prev.client.x;
@@ -594,17 +598,17 @@
 
         // set pointer velocity
         var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-        targetObj.page.speed   = hypot(targetObj.page.x, targetObj.page.y) / dt;
+        targetObj.page.speed   = scope.hypot(targetObj.page.x, targetObj.page.y) / dt;
         targetObj.page.vx      = targetObj.page.x / dt;
         targetObj.page.vy      = targetObj.page.y / dt;
 
-        targetObj.client.speed = hypot(targetObj.client.x, targetObj.page.y) / dt;
+        targetObj.client.speed = scope.hypot(targetObj.client.x, targetObj.page.y) / dt;
         targetObj.client.vx    = targetObj.client.x / dt;
         targetObj.client.vy    = targetObj.client.y / dt;
-    }
+    };
 
     // Get specified X/Y coords for mouse or event.touches[0]
-    function getXY (type, pointer, xy) {
+    scope.getXY = function (type, pointer, xy) {
         xy = xy || {};
         type = type || 'page';
 
@@ -612,16 +616,16 @@
         xy.y = pointer[type + 'Y'];
 
         return xy;
-    }
+    };
 
-    function getPageXY (pointer, page, interaction) {
+    scope.getPageXY = function (pointer, page, interaction) {
         page = page || {};
 
         if (pointer instanceof InteractEvent) {
             if (/inertiastart/.test(pointer.type)) {
                 interaction = interaction || pointer.interaction;
 
-                extend(page, interaction.inertiaStatus.upCoords.page);
+                scope.extend(page, interaction.inertiaStatus.upCoords.page);
 
                 page.x += interaction.inertiaStatus.sx;
                 page.y += interaction.inertiaStatus.sy;
@@ -632,25 +636,25 @@
             }
         }
         // Opera Mobile handles the viewport and scrolling oddly
-        else if (isOperaMobile) {
-            getXY('screen', pointer, page);
+        else if (scope.isOperaMobile) {
+            scope.getXY('screen', pointer, page);
 
-            page.x += window.scrollX;
-            page.y += window.scrollY;
+            page.x += scope.window.scrollX;
+            page.y += scope.window.scrollY;
         }
         else {
-            getXY('page', pointer, page);
+            scope.getXY('page', pointer, page);
         }
 
         return page;
-    }
+    };
 
-    function getClientXY (pointer, client, interaction) {
+    scope.getClientXY = function (pointer, client, interaction) {
         client = client || {};
 
         if (pointer instanceof InteractEvent) {
             if (/inertiastart/.test(pointer.type)) {
-                extend(client, interaction.inertiaStatus.upCoords.client);
+                scope.extend(client, interaction.inertiaStatus.upCoords.client);
 
                 client.x += interaction.inertiaStatus.sx;
                 client.y += interaction.inertiaStatus.sy;
@@ -662,45 +666,45 @@
         }
         else {
             // Opera Mobile handles the viewport and scrolling oddly
-            getXY(isOperaMobile? 'screen': 'client', pointer, client);
+            scope.getXY(scope.isOperaMobile? 'screen': 'client', pointer, client);
         }
 
         return client;
-    }
+    };
 
-    function getScrollXY (win) {
-        win = win || window;
+    scope.getScrollXY = function (win) {
+        win = win || scope.window;
         return {
             x: win.scrollX || win.document.documentElement.scrollLeft,
             y: win.scrollY || win.document.documentElement.scrollTop
         };
-    }
+    };
 
-    function getPointerId (pointer) {
-        return isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
-    }
+    scope.getPointerId = function (pointer) {
+        return scope.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    };
 
-    function getActualElement (element) {
-        return (element instanceof SVGElementInstance
+    scope.getActualElement = function (element) {
+        return (element instanceof scope.SVGElementInstance
             ? element.correspondingUseElement
             : element);
-    }
+    };
 
-    function getWindow (node) {
-        if (isWindow(node)) {
+    scope.getWindow = function (node) {
+        if (scope.isWindow(node)) {
             return node;
         }
 
         var rootNode = (node.ownerDocument || node);
 
-        return rootNode.defaultView || rootNode.parentWindow || window;
-    }
+        return rootNode.defaultView || rootNode.parentWindow || scope.window;
+    };
 
-    function getElementRect (element) {
-        var scroll = isIOS7orLower
+    scope.getElementRect = function (element) {
+        var scroll = scope.isIOS7orLower
                 ? { x: 0, y: 0 }
-                : getScrollXY(getWindow(element)),
-            clientRect = (element instanceof SVGElement)?
+                : scope.getScrollXY(scope.getWindow(element)),
+            clientRect = (element instanceof scope.SVGElement)?
                 element.getBoundingClientRect():
                 element.getClientRects()[0];
 
@@ -712,13 +716,13 @@
             width : clientRect.width || clientRect.right - clientRect.left,
             height: clientRect.heigh || clientRect.bottom - clientRect.top
         };
-    }
+    };
 
-    function getTouchPair (event) {
+    scope.getTouchPair = function (event) {
         var touches = [];
 
         // array of touches is supplied
-        if (isArray(event)) {
+        if (scope.isArray(event)) {
             touches[0] = event[0];
             touches[1] = event[1];
         }
@@ -741,10 +745,10 @@
         }
 
         return touches;
-    }
+    };
 
-    function touchAverage (event) {
-        var touches = getTouchPair(event);
+    scope.touchAverage = function (event) {
+        var touches = scope.getTouchPair(event);
 
         return {
             pageX: (touches[0].pageX + touches[1].pageX) / 2,
@@ -752,14 +756,14 @@
             clientX: (touches[0].clientX + touches[1].clientX) / 2,
             clientY: (touches[0].clientY + touches[1].clientY) / 2
         };
-    }
+    };
 
-    function touchBBox (event) {
+    scope.touchBBox = function (event) {
         if (!event.length && !(event.touches && event.touches.length > 1)) {
             return;
         }
 
-        var touches = getTouchPair(event),
+        var touches = scope.getTouchPair(event),
             minX = Math.min(touches[0].pageX, touches[1].pageX),
             minY = Math.min(touches[0].pageY, touches[1].pageY),
             maxX = Math.max(touches[0].pageX, touches[1].pageX),
@@ -773,33 +777,33 @@
             width: maxX - minX,
             height: maxY - minY
         };
-    }
+    };
 
-    function touchDistance (event, deltaSource) {
-        deltaSource = deltaSource || defaultOptions.deltaSource;
+    scope.touchDistance = function (event, deltaSource) {
+        deltaSource = deltaSource || scope.defaultOptions.deltaSource;
 
         var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touches = getTouchPair(event);
+            touches = scope.getTouchPair(event);
 
 
         var dx = touches[0][sourceX] - touches[1][sourceX],
             dy = touches[0][sourceY] - touches[1][sourceY];
 
-        return hypot(dx, dy);
-    }
+        return scope.hypot(dx, dy);
+    };
 
-    function touchAngle (event, prevAngle, deltaSource) {
-        deltaSource = deltaSource || defaultOptions.deltaSource;
+    scope.touchAngle = function (event, prevAngle, deltaSource) {
+        deltaSource = deltaSource || scope.defaultOptions.deltaSource;
 
         var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touches = getTouchPair(event),
+            touches = scope.getTouchPair(event),
             dx = touches[0][sourceX] - touches[1][sourceX],
             dy = touches[0][sourceY] - touches[1][sourceY],
             angle = 180 * Math.atan(dy / dx) / Math.PI;
 
-        if (isNumber(prevAngle)) {
+        if (scope.isNumber(prevAngle)) {
             var dr = angle - prevAngle,
                 drClamped = dr % 360;
 
@@ -818,57 +822,57 @@
         }
 
         return  angle;
-    }
+    };
 
-    function getOriginXY (interactable, element) {
+    scope.getOriginXY = function (interactable, element) {
         var origin = interactable
                 ? interactable.options.origin
-                : defaultOptions.origin;
+                : scope.defaultOptions.origin;
 
         if (origin === 'parent') {
-            origin = parentElement(element);
+            origin = scope.parentElement(element);
         }
         else if (origin === 'self') {
             origin = interactable.getRect(element);
         }
-        else if (trySelector(origin)) {
-            origin = closest(element, origin) || { x: 0, y: 0 };
+        else if (scope.trySelector(origin)) {
+            origin = scope.closest(element, origin) || { x: 0, y: 0 };
         }
 
-        if (isFunction(origin)) {
+        if (scope.isFunction(origin)) {
             origin = origin(interactable && element);
         }
 
-        if (isElement(origin))  {
-            origin = getElementRect(origin);
+        if (scope.isElement(origin))  {
+            origin = scope.getElementRect(origin);
         }
 
         origin.x = ('x' in origin)? origin.x : origin.left;
         origin.y = ('y' in origin)? origin.y : origin.top;
 
         return origin;
-    }
+    };
 
     // http://stackoverflow.com/a/5634528/2280888
-    function _getQBezierValue(t, p1, p2, p3) {
+    scope._getQBezierValue = function (t, p1, p2, p3) {
         var iT = 1 - t;
         return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
-    }
+    };
 
-    function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
+    scope.getQuadraticCurvePoint = function (startX, startY, cpX, cpY, endX, endY, position) {
         return {
-            x:  _getQBezierValue(position, startX, cpX, endX),
-            y:  _getQBezierValue(position, startY, cpY, endY)
+            x:  scope._getQBezierValue(position, startX, cpX, endX),
+            y:  scope._getQBezierValue(position, startY, cpY, endY)
         };
-    }
+    };
 
     // http://gizma.com/easing/
-    function easeOutQuad (t, b, c, d) {
+    scope.easeOutQuad = function (t, b, c, d) {
         t /= d;
         return -c * t*(t-2) + b;
-    }
+    };
 
-    function nodeContains (parent, child) {
+    scope.nodeContains = function (parent, child) {
         while (child) {
             if (child === parent) {
                 return true;
@@ -878,79 +882,79 @@
         }
 
         return false;
-    }
+    };
 
-    function closest (child, selector) {
-        var parent = parentElement(child);
+    scope.closest = function (child, selector) {
+        var parent = scope.parentElement(child);
 
-        while (isElement(parent)) {
+        while (scope.isElement(parent)) {
             if (matchesSelector(parent, selector)) { return parent; }
 
-            parent = parentElement(parent);
+            parent = scope.parentElement(parent);
         }
 
         return null;
-    }
+    };
 
-    function parentElement (node) {
+    scope.parentElement = function (node) {
         var parent = node.parentNode;
 
-        if (isDocFrag(parent)) {
+        if (scope.isDocFrag(parent)) {
             // skip past #shado-root fragments
-            while ((parent = parent.host) && isDocFrag(parent)) {}
+            while ((parent = parent.host) && scope.isDocFrag(parent)) {}
 
             return parent;
         }
 
         return parent;
-    }
+    };
 
-    function inContext (interactable, element) {
+    scope.inContext = function (interactable, element) {
         return interactable._context === element.ownerDocument
-                || nodeContains(interactable._context, element);
-    }
+                || scope.nodeContains(interactable._context, element);
+    };
 
-    function testIgnore (interactable, interactableElement, element) {
+    scope.testIgnore = function (interactable, interactableElement, element) {
         var ignoreFrom = interactable.options.ignoreFrom;
 
-        if (!ignoreFrom || !isElement(element)) { return false; }
+        if (!ignoreFrom || !scope.isElement(element)) { return false; }
 
-        if (isString(ignoreFrom)) {
+        if (scope.isString(ignoreFrom)) {
             return matchesUpTo(element, ignoreFrom, interactableElement);
         }
-        else if (isElement(ignoreFrom)) {
-            return nodeContains(ignoreFrom, element);
+        else if (scope.isElement(ignoreFrom)) {
+            return scope.nodeContains(ignoreFrom, element);
         }
 
         return false;
-    }
+    };
 
-    function testAllow (interactable, interactableElement, element) {
+    scope.testAllow = function (interactable, interactableElement, element) {
         var allowFrom = interactable.options.allowFrom;
 
         if (!allowFrom) { return true; }
 
-        if (!isElement(element)) { return false; }
+        if (!scope.isElement(element)) { return false; }
 
-        if (isString(allowFrom)) {
+        if (scope.isString(allowFrom)) {
             return matchesUpTo(element, allowFrom, interactableElement);
         }
-        else if (isElement(allowFrom)) {
-            return nodeContains(allowFrom, element);
+        else if (scope.isElement(allowFrom)) {
+            return scope.nodeContains(allowFrom, element);
         }
 
         return false;
-    }
+    };
 
-    function checkAxis (axis, interactable) {
+    scope.checkAxis = function (axis, interactable) {
         if (!interactable) { return false; }
 
         var thisAxis = interactable.options.drag.axis;
 
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
-    }
+    };
 
-    function checkSnap (interactable, action) {
+    scope.checkSnap = function (interactable, action) {
         var options = interactable.options;
 
         if (/^resize/.test(action)) {
@@ -958,9 +962,9 @@
         }
 
         return options[action].snap && options[action].snap.enabled;
-    }
+    };
 
-    function checkRestrict (interactable, action) {
+    scope.checkRestrict = function (interactable, action) {
         var options = interactable.options;
 
         if (/^resize/.test(action)) {
@@ -968,9 +972,9 @@
         }
 
         return  options[action].restrict && options[action].restrict.enabled;
-    }
+    };
 
-    function checkAutoScroll (interactable, action) {
+    scope.checkAutoScroll = function (interactable, action) {
         var options = interactable.options;
 
         if (/^resize/.test(action)) {
@@ -978,9 +982,9 @@
         }
 
         return  options[action].autoScroll && options[action].autoScroll.enabled;
-    }
+    };
 
-    function withinInteractionLimit (interactable, element, action) {
+    scope.withinInteractionLimit = function (interactable, element, action) {
         var options = interactable.options,
             maxActions = options[action.name].max,
             maxPerElement = options[action.name].maxPerElement,
@@ -988,8 +992,8 @@
             targetCount = 0,
             targetElementCount = 0;
 
-        for (var i = 0, len = interactions.length; i < len; i++) {
-            var interaction = interactions[i],
+        for (var i = 0, len = scope.interactions.length; i < len; i++) {
+            var interaction = scope.interactions[i],
                 otherAction = interaction.prepared.name,
                 active = interaction.interacting();
 
@@ -997,7 +1001,7 @@
 
             activeInteractions++;
 
-            if (activeInteractions >= maxInteractions) {
+            if (activeInteractions >= scope.maxInteractions) {
                 return false;
             }
 
@@ -1018,11 +1022,11 @@
             }
         }
 
-        return maxInteractions > 0;
-    }
+        return scope.maxInteractions > 0;
+    };
 
     // Test for the element that's "above" all other qualifiers
-    function indexOfDeepestElement (elements) {
+    scope.indexOfDeepestElement = function (elements) {
         var dropzone,
             deepestZone = elements[0],
             index = deepestZone? 0: -1,
@@ -1069,9 +1073,9 @@
 
             // if this element is an svg element and the current deepest is
             // an HTMLElement
-            if (deepestZone instanceof HTMLElement
-                && dropzone instanceof SVGElement
-                && !(dropzone instanceof SVGSVGElement)) {
+            if (deepestZone instanceof scope.HTMLElement
+                && dropzone instanceof scope.SVGElement
+                && !(dropzone instanceof scope.SVGSVGElement)) {
 
                 if (dropzone === deepestZone.parentNode) {
                     continue;
@@ -1122,7 +1126,7 @@
         }
 
         return index;
-    }
+    };
 
     function Interaction () {
         this.target          = null; // current interactable being interacted with
@@ -1163,7 +1167,7 @@
             i  : null
         };
 
-        if (isFunction(Function.prototype.bind)) {
+        if (scope.isFunction(Function.prototype.bind)) {
             this.boundInertiaFrame = this.inertiaFrame.bind(this);
             this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
         }
@@ -1270,13 +1274,13 @@
 
         this.mouse = false;
 
-        interactions.push(this);
+        scope.interactions.push(this);
     }
 
     Interaction.prototype = {
-        getPageXY  : function (pointer, xy) { return   getPageXY(pointer, xy, this); },
-        getClientXY: function (pointer, xy) { return getClientXY(pointer, xy, this); },
-        setEventXY : function (target, ptr) { return  setEventXY(target, ptr, this); },
+        getPageXY  : function (pointer, xy) { return   scope.getPageXY(pointer, xy, this); },
+        getClientXY: function (pointer, xy) { return scope.getClientXY(pointer, xy, this); },
+        setEventXY : function (target, ptr) { return  scope.setEventXY(target, ptr, this); },
 
         pointerOver: function (pointer, event, eventTarget) {
             if (this.prepared.name || !this.mouse) { return; }
@@ -1288,8 +1292,8 @@
             this.addPointer(pointer);
 
             if (this.target
-                && (testIgnore(this.target, this.element, eventTarget)
-                    || !testAllow(this.target, this.element, eventTarget))) {
+                && (scope.testIgnore(this.target, this.element, eventTarget)
+                    || !scope.testAllow(this.target, this.element, eventTarget))) {
                 // if the eventTarget should be ignored or shouldn't be allowed
                 // clear the previous target
                 this.target = null;
@@ -1298,23 +1302,23 @@
                 this.matchElements = [];
             }
 
-            var elementInteractable = interactables.get(eventTarget),
+            var elementInteractable = scope.interactables.get(eventTarget),
                 elementAction = (elementInteractable
-                                 && !testIgnore(elementInteractable, eventTarget, eventTarget)
-                                 && testAllow(elementInteractable, eventTarget, eventTarget)
+                                 && !scope.testIgnore(elementInteractable, eventTarget, eventTarget)
+                                 && scope.testAllow(elementInteractable, eventTarget, eventTarget)
                                  && validateAction(
                                      elementInteractable.getAction(pointer, event, this, eventTarget),
                                      elementInteractable));
 
-            if (elementAction && !withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
+            if (elementAction && !scope.withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
                  elementAction = null;
             }
 
             function pushCurMatches (interactable, selector) {
                 if (interactable
-                    && inContext(interactable, eventTarget)
-                    && !testIgnore(interactable, eventTarget, eventTarget)
-                    && testAllow(interactable, eventTarget, eventTarget)
+                    && scope.inContext(interactable, eventTarget)
+                    && !scope.testIgnore(interactable, eventTarget, eventTarget)
+                    && scope.testAllow(interactable, eventTarget, eventTarget)
                     && matchesSelector(eventTarget, selector)) {
 
                     curMatches.push(interactable);
@@ -1329,7 +1333,7 @@
                 this.matchElements = [];
             }
             else {
-                interactables.forEachSelector(pushCurMatches);
+                scope.interactables.forEachSelector(pushCurMatches);
 
                 if (this.validateSelector(pointer, event, curMatches, curMatchElements)) {
                     this.matches = curMatches;
@@ -1337,14 +1341,14 @@
 
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
                     events.add(eventTarget,
-                                        PointerEvent? pEventTypes.move : 'mousemove',
+                                        scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
                                         listeners.pointerHover);
                 }
                 else if (this.target) {
-                    if (nodeContains(prevTargetElement, eventTarget)) {
+                    if (scope.nodeContains(prevTargetElement, eventTarget)) {
                         this.pointerHover(pointer, event, this.matches, this.matchElements);
                         events.add(this.element,
-                                            PointerEvent? pEventTypes.move : 'mousemove',
+                                            scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
                                             listeners.pointerHover);
                     }
                     else {
@@ -1394,9 +1398,9 @@
             if (this.prepared.name) { return; }
 
             // Remove temporary event listeners for selector Interactables
-            if (!interactables.get(eventTarget)) {
+            if (!scope.interactables.get(eventTarget)) {
                 events.remove(eventTarget,
-                                       PointerEvent? pEventTypes.move : 'mousemove',
+                                       scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
                                        listeners.pointerHover);
             }
 
@@ -1408,21 +1412,21 @@
         selectorDown: function (pointer, event, eventTarget, curEventTarget) {
             var that = this,
                 // copy event to be used in timeout for IE8
-                eventCopy = events.useAttachEvent? extend({}, event) : event,
+                eventCopy = events.useAttachEvent? scope.extend({}, event) : event,
                 element = eventTarget,
                 pointerIndex = this.addPointer(pointer),
                 action;
 
             this.holdTimers[pointerIndex] = setTimeout(function () {
                 that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
-            }, defaultOptions._holdDuration);
+            }, scope.defaultOptions._holdDuration);
 
             this.pointerIsDown = true;
 
             // Check if the down event hits the current inertia target
             if (this.inertiaStatus.active && this.target.selector) {
                 // climb up the DOM tree from the event target
-                while (isElement(element)) {
+                while (scope.isElement(element)) {
 
                     // if this element is the current inertia target element
                     if (element === this.element
@@ -1436,7 +1440,7 @@
                         this.collectEventTargets(pointer, event, eventTarget, 'down');
                         return;
                     }
-                    element = parentElement(element);
+                    element = scope.parentElement(element);
                 }
             }
 
@@ -1447,13 +1451,13 @@
             }
 
             function pushMatches (interactable, selector, context) {
-                var elements = ie8MatchesSelector
+                var elements = scope.ie8MatchesSelector
                     ? context.querySelectorAll(selector)
                     : undefined;
 
-                if (inContext(interactable, element)
-                    && !testIgnore(interactable, element, eventTarget)
-                    && testAllow(interactable, element, eventTarget)
+                if (scope.inContext(interactable, element)
+                    && !scope.testIgnore(interactable, element, eventTarget)
+                    && scope.testAllow(interactable, element, eventTarget)
                     && matchesSelector(element, selector, elements)) {
 
                     that.matches.push(interactable);
@@ -1465,14 +1469,14 @@
             this.setEventXY(this.curCoords, pointer);
             this.downEvent = event;
 
-            while (isElement(element) && !action) {
+            while (scope.isElement(element) && !action) {
                 this.matches = [];
                 this.matchElements = [];
 
-                interactables.forEachSelector(pushMatches);
+                scope.interactables.forEachSelector(pushMatches);
 
                 action = this.validateSelector(pointer, event, this.matches, this.matchElements);
-                element = parentElement(element);
+                element = scope.parentElement(element);
             }
 
             if (action) {
@@ -1488,9 +1492,9 @@
                 // do these now since pointerDown isn't being called from here
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                extend(this.downPointer, pointer);
+                scope.extend(this.downPointer, pointer);
 
-                copyCoords(this.prevCoords, this.curCoords);
+                scope.copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
             }
 
@@ -1517,13 +1521,13 @@
             // Otherwise, set the target if there is no action prepared
             if ((this.pointerIds.length < 2 && !this.target) || !this.prepared.name) {
 
-                var interactable = interactables.get(curEventTarget);
+                var interactable = scope.interactables.get(curEventTarget);
 
                 if (interactable
-                    && !testIgnore(interactable, curEventTarget, eventTarget)
-                    && testAllow(interactable, curEventTarget, eventTarget)
+                    && !scope.testIgnore(interactable, curEventTarget, eventTarget)
+                    && scope.testAllow(interactable, curEventTarget, eventTarget)
                     && (action = validateAction(forceAction || interactable.getAction(pointer, event, this, curEventTarget), interactable, eventTarget))
-                    && withinInteractionLimit(interactable, curEventTarget, action)) {
+                    && scope.withinInteractionLimit(interactable, curEventTarget, action)) {
                     this.target = interactable;
                     this.element = curEventTarget;
                 }
@@ -1558,7 +1562,7 @@
 
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                extend(this.downPointer, pointer);
+                scope.extend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords);
                 this.pointerWasMoved = false;
@@ -1580,8 +1584,8 @@
         setModifications: function (coords, preEnd) {
             var target         = this.target,
                 shouldMove     = true,
-                shouldSnap     = checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
-                shouldRestrict = checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
+                shouldSnap     = scope.checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
+                shouldRestrict = scope.checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
 
             if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
             if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
@@ -1598,7 +1602,7 @@
 
         setStartOffsets: function (action, interactable, element) {
             var rect = interactable.getRect(element),
-                origin = getOriginXY(interactable, element),
+                origin = scope.getOriginXY(interactable, element),
                 snap = interactable.options[this.prepared.name].snap,
                 restrict = interactable.options[this.prepared.name].restrict,
                 width, height;
@@ -1693,8 +1697,8 @@
 
             // if this interaction had been removed after stopping
             // add it back
-            if (indexOf(interactions, this) === -1) {
-                interactions.push(this);
+            if (indexOf(scope.interactions, this) === -1) {
+                scope.interactions.push(this);
             }
 
             this.prepared.name  = action.name;
@@ -1723,14 +1727,14 @@
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
             var dx, dy,
-                pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
+                pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             // register movement greater than pointerMoveTolerance
             if (this.pointerIsDown && !this.pointerWasMoved) {
                 dx = this.curCoords.client.x - this.startCoords.client.x;
                 dy = this.curCoords.client.y - this.startCoords.client.y;
 
-                this.pointerWasMoved = hypot(dx, dy) > pointerMoveTolerance;
+                this.pointerWasMoved = scope.hypot(dx, dy) > scope.pointerMoveTolerance;
             }
 
             if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
@@ -1749,7 +1753,7 @@
             }
 
             // set pointer coordinate, time changes and speeds
-            setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+            scope.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
             if (!this.prepared.name) { return; }
 
@@ -1759,7 +1763,7 @@
 
                 // if just starting an action, calculate the pointer speed now
                 if (!this.interacting()) {
-                    setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+                    scope.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
                     // check if a drag is in the correct axis
                     if (this.prepared.name === 'drag') {
@@ -1778,14 +1782,14 @@
                             var element = eventTarget;
 
                             // check element interactables
-                            while (isElement(element)) {
-                                var elementInteractable = interactables.get(element);
+                            while (scope.isElement(element)) {
+                                var elementInteractable = scope.interactables.get(element);
 
                                 if (elementInteractable
                                     && elementInteractable !== this.target
                                     && !elementInteractable.options.drag.manualStart
                                     && elementInteractable.getAction(this.downPointer, this.downEvent, this, element).name === 'drag'
-                                    && checkAxis(axis, elementInteractable)) {
+                                    && scope.checkAxis(axis, elementInteractable)) {
 
                                     this.prepared.name = 'drag';
                                     this.target = elementInteractable;
@@ -1793,7 +1797,7 @@
                                     break;
                                 }
 
-                                element = parentElement(element);
+                                element = scope.parentElement(element);
                             }
 
                             // if there's no drag from element interactables,
@@ -1802,20 +1806,20 @@
                                 var thisInteraction = this;
 
                                 var getDraggable = function (interactable, selector, context) {
-                                    var elements = ie8MatchesSelector
+                                    var elements = scope.ie8MatchesSelector
                                         ? context.querySelectorAll(selector)
                                         : undefined;
 
                                     if (interactable === thisInteraction.target) { return; }
 
-                                    if (inContext(interactable, eventTarget)
+                                    if (scope.inContext(interactable, eventTarget)
                                         && !interactable.options.drag.manualStart
-                                        && !testIgnore(interactable, element, eventTarget)
-                                        && testAllow(interactable, element, eventTarget)
+                                        && !scope.testIgnore(interactable, element, eventTarget)
+                                        && scope.testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
                                         && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
-                                        && checkAxis(axis, interactable)
-                                        && withinInteractionLimit(interactable, element, 'drag')) {
+                                        && scope.checkAxis(axis, interactable)
+                                        && scope.withinInteractionLimit(interactable, element, 'drag')) {
 
                                         return interactable;
                                     }
@@ -1823,8 +1827,8 @@
 
                                 element = eventTarget;
 
-                                while (isElement(element)) {
-                                    var selectorInteractable = interactables.forEachSelector(getDraggable);
+                                while (scope.isElement(element)) {
+                                    var selectorInteractable = scope.interactables.forEachSelector(getDraggable);
 
                                     if (selectorInteractable) {
                                         this.prepared.name = 'drag';
@@ -1833,7 +1837,7 @@
                                         break;
                                     }
 
-                                    element = parentElement(element);
+                                    element = scope.parentElement(element);
                                 }
                             }
                         }
@@ -1844,7 +1848,7 @@
 
                 if (starting
                     && (this.target.options[this.prepared.name].manualStart
-                        || !withinInteractionLimit(this.target, this.element, this.prepared))) {
+                        || !scope.withinInteractionLimit(this.target, this.element, this.prepared))) {
                     this.stop();
                     return;
                 }
@@ -1865,7 +1869,7 @@
                 }
             }
 
-            copyCoords(this.prevCoords, this.curCoords);
+            scope.copyCoords(this.prevCoords, this.curCoords);
 
             if (this.dragging || this.resizing) {
                 this.autoScrollMove(pointer);
@@ -1926,7 +1930,7 @@
                 var startRect = this.target.getRect(this.element);
 
                 if (this.target.options.resize.square) {
-                    var squareEdges = extend({}, this.prepared.edges);
+                    var squareEdges = scope.extend({}, this.prepared.edges);
 
                     squareEdges.top    = squareEdges.top    || (squareEdges.left   && !squareEdges.bottom);
                     squareEdges.left   = squareEdges.left   || (squareEdges.top    && !squareEdges.right );
@@ -1941,9 +1945,9 @@
 
                 this.resizeRects = {
                     start     : startRect,
-                    current   : extend({}, startRect),
-                    restricted: extend({}, startRect),
-                    previous  : extend({}, startRect),
+                    current   : scope.extend({}, startRect),
+                    restricted: scope.extend({}, startRect),
+                    previous  : scope.extend({}, startRect),
                     delta     : {
                         left: 0, right : 0, width : 0,
                         top : 0, bottom: 0, height: 0
@@ -1976,7 +1980,7 @@
                     current    = this.resizeRects.current,
                     restricted = this.resizeRects.restricted,
                     delta      = this.resizeRects.delta,
-                    previous   = extend(this.resizeRects.previous, restricted);
+                    previous   = scope.extend(this.resizeRects.previous, restricted);
 
                 if (this.target.options.resize.square) {
                     var originalEdges = edges;
@@ -1999,7 +2003,7 @@
 
                 if (invertible) {
                     // if invertible, copy the current rect
-                    extend(restricted, current);
+                    scope.extend(restricted, current);
 
                     if (invert === 'reposition') {
                         // swap edge values if necessary to keep width/height positive
@@ -2091,7 +2095,7 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -2104,7 +2108,7 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -2148,8 +2152,8 @@
                     inertiaPossible = false,
                     inertia = false,
                     smoothEnd = false,
-                    endSnap = checkSnap(target, this.prepared.name) && options[this.prepared.name].snap.endOnly,
-                    endRestrict = checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
+                    endSnap = scope.checkSnap(target, this.prepared.name) && options[this.prepared.name].snap.endOnly,
+                    endRestrict = scope.checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
                     dx = 0,
                     dy = 0,
                     startEvent;
@@ -2201,7 +2205,7 @@
                 }
 
                 if (inertia || smoothEnd) {
-                    copyCoords(inertiaStatus.upCoords, this.curCoords);
+                    scope.copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointers[0] = inertiaStatus.startEvent = startEvent =
                         new InteractEvent(this, event, this.prepared.name, 'inertiastart', this.element);
@@ -2217,8 +2221,8 @@
 
                         this.calcInertia(inertiaStatus);
 
-                        var page = extend({}, this.curCoords.page),
-                            origin = getOriginXY(target, this.element),
+                        var page = scope.extend({}, this.curCoords.page),
+                            origin = scope.getOriginXY(target, this.element),
                             statusObject;
 
                         page.x = page.x + inertiaStatus.xe - origin.x;
@@ -2320,15 +2324,15 @@
             element = element || this.element;
 
             // collect all dropzones and their elements which qualify for a drop
-            for (i = 0; i < interactables.length; i++) {
-                if (!interactables[i].options.drop.enabled) { continue; }
+            for (i = 0; i < scope.interactables.length; i++) {
+                if (!scope.interactables[i].options.drop.enabled) { continue; }
 
-                var current = interactables[i],
+                var current = scope.interactables[i],
                     accept = current.options.drop.accept;
 
                 // test the draggable element against the dropzone's accept setting
-                if ((isElement(accept) && accept !== element)
-                    || (isString(accept)
+                if ((scope.isElement(accept) && accept !== element)
+                    || (scope.isString(accept)
                         && !matchesSelector(element, accept))) {
 
                     continue;
@@ -2395,7 +2399,7 @@
         getDrop: function (event, dragElement) {
             var validDrops = [];
 
-            if (dynamicDrop) {
+            if (scope.dynamicDrop) {
                 this.setActiveDrops(dragElement);
             }
 
@@ -2411,7 +2415,7 @@
             }
 
             // get the most appropriate dropzone based on DOM depth and order
-            var dropIndex = indexOfDeepestElement(validDrops),
+            var dropIndex = scope.indexOfDeepestElement(validDrops),
                 dropzone  = this.activeDrops.dropzones[dropIndex] || null,
                 element   = this.activeDrops.elements [dropIndex] || null;
 
@@ -2538,7 +2542,7 @@
 
         stop: function (event) {
             if (this.interacting()) {
-                autoScroll.stop();
+                scope.autoScroll.stop();
                 this.matches = [];
                 this.matchElements = [];
 
@@ -2549,7 +2553,7 @@
                 }
 
                 // prevent Default only if were previously interacting
-                if (event && isFunction(event.preventDefault)) {
+                if (event && scope.isFunction(event.preventDefault)) {
                     this.checkAndPreventDefault(event, target, this.element);
                 }
 
@@ -2566,15 +2570,15 @@
 
             // remove pointers if their ID isn't in this.pointerIds
             for (var i = 0; i < this.pointers.length; i++) {
-                if (indexOf(this.pointerIds, getPointerId(this.pointers[i])) === -1) {
+                if (indexOf(this.pointerIds, scope.getPointerId(this.pointers[i])) === -1) {
                     this.pointers.splice(i, 1);
                 }
             }
 
-            for (i = 0; i < interactions.length; i++) {
+            for (i = 0; i < scope.interactions.length; i++) {
                 // remove this interaction if it's not the only one of it's type
-                if (interactions[i] !== this && interactions[i].mouse === this.mouse) {
-                    interactions.splice(indexOf(interactions, this), 1);
+                if (scope.interactions[i] !== this && scope.interactions[i].mouse === this.mouse) {
+                    scope.interactions.splice(indexOf(scope.interactions, this), 1);
                 }
             }
         },
@@ -2594,7 +2598,7 @@
                     inertiaStatus.sy = inertiaStatus.ye * progress;
                 }
                 else {
-                    var quadPoint = getQuadraticCurvePoint(
+                    var quadPoint = scope.getQuadraticCurvePoint(
                             0, 0,
                             inertiaStatus.xe, inertiaStatus.ye,
                             inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
@@ -2625,8 +2629,8 @@
                 duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
 
             if (t < duration) {
-                inertiaStatus.sx = easeOutQuad(t, 0, inertiaStatus.xe, duration);
-                inertiaStatus.sy = easeOutQuad(t, 0, inertiaStatus.ye, duration);
+                inertiaStatus.sx = scope.easeOutQuad(t, 0, inertiaStatus.xe, duration);
+                inertiaStatus.sy = scope.easeOutQuad(t, 0, inertiaStatus.ye, duration);
 
                 this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
@@ -2646,7 +2650,7 @@
         },
 
         addPointer: function (pointer) {
-            var id = getPointerId(pointer),
+            var id = scope.getPointerId(pointer),
                 index = this.mouse? 0 : indexOf(this.pointerIds, id);
 
             if (index === -1) {
@@ -2660,7 +2664,7 @@
         },
 
         removePointer: function (pointer) {
-            var id = getPointerId(pointer),
+            var id = scope.getPointerId(pointer),
                 index = this.mouse? 0 : indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
@@ -2680,7 +2684,7 @@
             // The inertia start event should be this.pointers[0]
             if (this.inertiaStatus.active) { return; }
 
-            var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
+            var index = this.mouse? 0: indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             if (index === -1) { return; }
 
@@ -2688,7 +2692,7 @@
         },
 
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             // do not fire a tap event if the pointer was moved before being lifted
             if (eventType === 'tap' && (this.pointerWasMoved
@@ -2702,15 +2706,15 @@
                 element = eventTarget;
 
             function collectSelectors (interactable, selector, context) {
-                var els = ie8MatchesSelector
+                var els = scope.ie8MatchesSelector
                         ? context.querySelectorAll(selector)
                         : undefined;
 
                 if (interactable._iEvents[eventType]
-                    && isElement(element)
-                    && inContext(interactable, element)
-                    && !testIgnore(interactable, element, eventTarget)
-                    && testAllow(interactable, element, eventTarget)
+                    && scope.isElement(element)
+                    && scope.inContext(interactable, element)
+                    && !scope.testIgnore(interactable, element, eventTarget)
+                    && scope.testAllow(interactable, element, eventTarget)
                     && matchesSelector(element, selector, els)) {
 
                     targets.push(interactable);
@@ -2724,9 +2728,9 @@
                     elements.push(element);
                 }
 
-                interactables.forEachSelector(collectSelectors);
+                scope.interactables.forEachSelector(collectSelectors);
 
-                element = parentElement(element);
+                element = scope.parentElement(element);
             }
 
             // create the tap event even if there are no listeners so that
@@ -2737,7 +2741,7 @@
         },
 
         firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(getPointerId(pointer)),
+            var pointerIndex = this.mouse? 0 : indexOf(scope.getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
@@ -2749,9 +2753,9 @@
                 pointerEvent = pointer;
             }
             else {
-                extend(pointerEvent, event);
+                scope.extend(pointerEvent, event);
                 if (event !== pointer) {
-                    extend(pointerEvent, pointer);
+                    scope.extend(pointerEvent, pointer);
                 }
 
                 pointerEvent.preventDefault           = preventOriginalDefault;
@@ -2762,9 +2766,9 @@
                 pointerEvent.timeStamp     = new Date().getTime();
                 pointerEvent.originalEvent = event;
                 pointerEvent.type          = eventType;
-                pointerEvent.pointerId     = getPointerId(pointer);
-                pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
-                                                    : isString(pointer.pointerType)
+                pointerEvent.pointerId     = scope.getPointerId(pointer);
+                pointerEvent.pointerType   = this.mouse? 'mouse' : !scope.supportsPointerEvent? 'touch'
+                                                    : scope.isString(pointer.pointerType)
                                                         ? pointer.pointerType
                                                         : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
             }
@@ -2796,7 +2800,7 @@
             if (createNewDoubleTap) {
                 var doubleTap = {};
 
-                extend(doubleTap, pointerEvent);
+                scope.extend(doubleTap, pointerEvent);
 
                 doubleTap.dt   = interval;
                 doubleTap.type = 'doubletap';
@@ -2816,7 +2820,7 @@
                     matchElement = matchElements[i],
                     action = validateAction(match.getAction(pointer, event, this, matchElement), match);
 
-                if (action && withinInteractionLimit(match, matchElement, action)) {
+                if (action && scope.withinInteractionLimit(match, matchElement, action)) {
                     this.target = match;
                     this.element = matchElement;
 
@@ -2838,9 +2842,9 @@
                 page = { x: status.x, y: status.y };
             }
             else {
-                var origin = getOriginXY(this.target, this.element);
+                var origin = scope.getOriginXY(this.target, this.element);
 
-                page = extend({}, pageCoords);
+                page = scope.extend({}, pageCoords);
 
                 page.x -= origin.x;
                 page.y -= origin.y;
@@ -2861,7 +2865,7 @@
                 };
 
                 for (i = 0; i < len; i++) {
-                    if (isFunction(snap.targets[i])) {
+                    if (scope.isFunction(snap.targets[i])) {
                         target = snap.targets[i](relative.x, relative.y, this);
                     }
                     else {
@@ -2871,10 +2875,10 @@
                     if (!target) { continue; }
 
                     targets.push({
-                        x: isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
-                        y: isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
+                        x: scope.isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
+                        y: scope.isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
 
-                        range: isNumber(target.range)? target.range: snap.range
+                        range: scope.isNumber(target.range)? target.range: snap.range
                     });
                 }
             }
@@ -2894,7 +2898,7 @@
                 var range = target.range,
                     dx = target.x - page.x,
                     dy = target.y - page.y,
-                    distance = hypot(dx, dy),
+                    distance = scope.hypot(dx, dy),
                     inRange = distance <= range;
 
                 // Infinite targets count as being out of range
@@ -2968,7 +2972,7 @@
 
             page = status.useStatusXY
                     ? page = { x: status.x, y: status.y }
-                    : page = extend({}, pageCoords);
+                    : page = scope.extend({}, pageCoords);
 
             if (status.snap && status.snap.locked) {
                 page.x += status.snap.dx || 0;
@@ -2984,26 +2988,26 @@
 
             var rect, restrictedX, restrictedY;
 
-            if (isString(restriction)) {
+            if (scope.isString(restriction)) {
                 if (restriction === 'parent') {
-                    restriction = parentElement(this.element);
+                    restriction = scope.parentElement(this.element);
                 }
                 else if (restriction === 'self') {
                     restriction = target.getRect(this.element);
                 }
                 else {
-                    restriction = closest(this.element, restriction);
+                    restriction = scope.closest(this.element, restriction);
                 }
 
                 if (!restriction) { return status; }
             }
 
-            if (isFunction(restriction)) {
+            if (scope.isFunction(restriction)) {
                 restriction = restriction(page.x, page.y, this.element);
             }
 
-            if (isElement(restriction)) {
-                restriction = getElementRect(restriction);
+            if (scope.isElement(restriction)) {
+                restriction = scope.getElementRect(restriction);
             }
 
             rect = restriction;
@@ -3088,12 +3092,12 @@
 
         autoScrollMove: function (pointer) {
             if (!(this.interacting()
-                && checkAutoScroll(this.target, this.prepared.name))) {
+                && scope.checkAutoScroll(this.target, this.prepared.name))) {
                 return;
             }
 
             if (this.inertiaStatus.active) {
-                autoScroll.x = autoScroll.y = 0;
+                scope.autoScroll.x = scope.autoScroll.y = 0;
                 return;
             }
 
@@ -3102,32 +3106,32 @@
                 bottom,
                 left,
                 options = this.target.options[this.prepared.name].autoScroll,
-                container = options.container || getWindow(this.element);
+                container = options.container || scope.getWindow(this.element);
 
-            if (isWindow(container)) {
-                left   = pointer.clientX < autoScroll.margin;
-                top    = pointer.clientY < autoScroll.margin;
-                right  = pointer.clientX > container.innerWidth  - autoScroll.margin;
-                bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
+            if (scope.isWindow(container)) {
+                left   = pointer.clientX < scope.autoScroll.margin;
+                top    = pointer.clientY < scope.autoScroll.margin;
+                right  = pointer.clientX > container.innerWidth  - scope.autoScroll.margin;
+                bottom = pointer.clientY > container.innerHeight - scope.autoScroll.margin;
             }
             else {
-                var rect = getElementRect(container);
+                var rect = scope.getElementRect(container);
 
-                left   = pointer.clientX < rect.left   + autoScroll.margin;
-                top    = pointer.clientY < rect.top    + autoScroll.margin;
-                right  = pointer.clientX > rect.right  - autoScroll.margin;
-                bottom = pointer.clientY > rect.bottom - autoScroll.margin;
+                left   = pointer.clientX < rect.left   + scope.autoScroll.margin;
+                top    = pointer.clientY < rect.top    + scope.autoScroll.margin;
+                right  = pointer.clientX > rect.right  - scope.autoScroll.margin;
+                bottom = pointer.clientY > rect.bottom - scope.autoScroll.margin;
             }
 
-            autoScroll.x = (right ? 1: left? -1: 0);
-            autoScroll.y = (bottom? 1:  top? -1: 0);
+            scope.autoScroll.x = (right ? 1: left? -1: 0);
+            scope.autoScroll.y = (bottom? 1:  top? -1: 0);
 
-            if (!autoScroll.isScrolling) {
+            if (!scope.autoScroll.isScrolling) {
                 // set the autoScroll properties to those of the target
-                autoScroll.margin = options.margin;
-                autoScroll.speed  = options.speed;
+                scope.autoScroll.margin = options.margin;
+                scope.autoScroll.speed  = options.speed;
 
-                autoScroll.start(this);
+                scope.autoScroll.start(this);
             }
         },
 
@@ -3139,18 +3143,18 @@
     };
 
     function getInteractionFromPointer (pointer, eventType, eventTarget) {
-        var i = 0, len = interactions.length,
+        var i = 0, len = scope.interactions.length,
             mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
                           // MSPointerEvent.MSPOINTER_TYPE_MOUSE
                           || pointer.pointerType === 4),
             interaction;
 
-        var id = getPointerId(pointer);
+        var id = scope.getPointerId(pointer);
 
         // try to resume inertia with a new pointer
         if (/down|start/i.test(eventType)) {
             for (i = 0; i < len; i++) {
-                interaction = interactions[i];
+                interaction = scope.interactions[i];
 
                 var element = eventTarget;
 
@@ -3167,19 +3171,19 @@
 
                             return interaction;
                         }
-                        element = parentElement(element);
+                        element = scope.parentElement(element);
                     }
                 }
             }
         }
 
         // if it's a mouse interaction
-        if (mouseEvent || !(supportsTouch || supportsPointerEvent)) {
+        if (mouseEvent || !(scope.supportsTouch || scope.supportsPointerEvent)) {
 
             // find a mouse interaction that's not in inertia phase
             for (i = 0; i < len; i++) {
-                if (interactions[i].mouse && !interactions[i].inertiaStatus.active) {
-                    return interactions[i];
+                if (scope.interactions[i].mouse && !scope.interactions[i].inertiaStatus.active) {
+                    return scope.interactions[i];
                 }
             }
 
@@ -3187,7 +3191,7 @@
             // if the eventType is a mousedown, and inertia is active
             // ignore the interaction
             for (i = 0; i < len; i++) {
-                if (interactions[i].mouse && !(/down/.test(eventType) && interactions[i].inertiaStatus.active)) {
+                if (scope.interactions[i].mouse && !(/down/.test(eventType) && scope.interactions[i].inertiaStatus.active)) {
                     return interaction;
                 }
             }
@@ -3201,8 +3205,8 @@
 
         // get interaction that has this pointer
         for (i = 0; i < len; i++) {
-            if (contains(interactions[i].pointerIds, id)) {
-                return interactions[i];
+            if (contains(scope.interactions[i].pointerIds, id)) {
+                return scope.interactions[i];
             }
         }
 
@@ -3213,7 +3217,7 @@
 
         // get first idle interaction
         for (i = 0; i < len; i++) {
-            interaction = interactions[i];
+            interaction = scope.interactions[i];
 
             if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
                 && !interaction.interacting()
@@ -3231,14 +3235,14 @@
     function doOnInteractions (method) {
         return (function (event) {
             var interaction,
-                eventTarget = getActualElement(event.path
+                eventTarget = scope.getActualElement(event.path
                                                ? event.path[0]
                                                : event.target),
-                curEventTarget = getActualElement(event.currentTarget),
+                curEventTarget = scope.getActualElement(event.currentTarget),
                 i;
 
-            if (supportsTouch && /touch/.test(event.type)) {
-                prevTouchTime = new Date().getTime();
+            if (scope.supportsTouch && /touch/.test(event.type)) {
+                scope.prevTouchTime = new Date().getTime();
 
                 for (i = 0; i < event.changedTouches.length; i++) {
                     var pointer = event.changedTouches[i];
@@ -3253,17 +3257,17 @@
                 }
             }
             else {
-                if (!supportsPointerEvent && /mouse/.test(event.type)) {
+                if (!scope.supportsPointerEvent && /mouse/.test(event.type)) {
                     // ignore mouse events while touch interactions are active
-                    for (i = 0; i < interactions.length; i++) {
-                        if (!interactions[i].mouse && interactions[i].pointerIsDown) {
+                    for (i = 0; i < scope.interactions.length; i++) {
+                        if (!scope.interactions[i].mouse && scope.interactions[i].pointerIsDown) {
                             return;
                         }
                     }
 
                     // try to ignore mouse events that are simulated by the browser
                     // after a touch event
-                    if (new Date().getTime() - prevTouchTime < 500) {
+                    if (new Date().getTime() - scope.prevTouchTime < 500) {
                         return;
                     }
                 }
@@ -3286,19 +3290,19 @@
             snapStatus  = interaction.snapStatus,
             restrictStatus  = interaction.restrictStatus,
             pointers    = interaction.pointers,
-            deltaSource = (target && target.options || defaultOptions).deltaSource,
+            deltaSource = (target && target.options || scope.defaultOptions).deltaSource,
             sourceX     = deltaSource + 'X',
             sourceY     = deltaSource + 'Y',
-            options     = target? target.options: defaultOptions,
-            origin      = getOriginXY(target, element),
+            options     = target? target.options: scope.defaultOptions,
+            origin      = scope.getOriginXY(target, element),
             starting    = phase === 'start',
             ending      = phase === 'end',
             coords      = starting? interaction.startCoords : interaction.curCoords;
 
         element = element || interaction.element;
 
-        page   = extend({}, coords.page);
-        client = extend({}, coords.client);
+        page   = scope.extend({}, coords.page);
+        client = scope.extend({}, coords.client);
 
         page.x -= origin.x;
         page.y -= origin.y;
@@ -3308,7 +3312,7 @@
 
         var relativePoints = options[action].snap && options[action].snap.relativePoints ;
 
-        if (checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
+        if (scope.checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
             this.snap = {
                 range  : snapStatus.range,
                 locked : snapStatus.locked,
@@ -3328,7 +3332,7 @@
             }
         }
 
-        if (checkRestrict(target, action) && !(starting && options[action].restrict.elementRect) && restrictStatus.restricted) {
+        if (scope.checkRestrict(target, action) && !(starting && options[action].restrict.elementRect) && restrictStatus.restricted) {
             page.x += restrictStatus.dx;
             page.y += restrictStatus.dy;
             client.x += restrictStatus.dx;
@@ -3436,11 +3440,11 @@
             this.touches = [pointers[0], pointers[1]];
 
             if (starting) {
-                this.distance = touchDistance(pointers, deltaSource);
-                this.box      = touchBBox(pointers);
+                this.distance = scope.touchDistance(pointers, deltaSource);
+                this.box      = scope.touchBBox(pointers);
                 this.scale    = 1;
                 this.ds       = 0;
-                this.angle    = touchAngle(pointers, undefined, deltaSource);
+                this.angle    = scope.touchAngle(pointers, undefined, deltaSource);
                 this.da       = 0;
             }
             else if (ending || event instanceof InteractEvent) {
@@ -3452,10 +3456,10 @@
                 this.da       = this.angle - interaction.gesture.startAngle;
             }
             else {
-                this.distance = touchDistance(pointers, deltaSource);
-                this.box      = touchBBox(pointers);
+                this.distance = scope.touchDistance(pointers, deltaSource);
+                this.box      = scope.touchBBox(pointers);
                 this.scale    = this.distance / interaction.gesture.startDistance;
-                this.angle    = touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+                this.angle    = scope.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
                 this.ds = this.scale - interaction.gesture.prevScale;
                 this.da = this.angle - interaction.gesture.prevAngle;
@@ -3488,7 +3492,7 @@
                     dy = this[sourceY] - interaction.prevEvent[sourceY],
                     dt = this.dt / 1000;
 
-                this.speed = hypot(dx, dy) / dt;
+                this.speed = scope.hypot(dx, dy) / dt;
                 this.velocityX = dx / dt;
                 this.velocityY = dy / dt;
             }
@@ -3533,7 +3537,7 @@
     }
 
     InteractEvent.prototype = {
-        preventDefault: blank,
+        preventDefault: scope.blank,
         stopImmediatePropagation: function () {
             this.immediatePropagationStopped = this.propagationStopped = true;
         },
@@ -3550,11 +3554,11 @@
         var cursor = '';
 
         if (action.name === 'drag') {
-            cursor =  actionCursors.drag;
+            cursor =  scope.actionCursors.drag;
         }
         if (action.name === 'resize') {
             if (action.axis) {
-                cursor =  actionCursors[action.name + action.axis];
+                cursor =  scope.actionCursors[action.name + action.axis];
             }
             else if (action.edges) {
                 var cursorKey = 'resize',
@@ -3566,7 +3570,7 @@
                     }
                 }
 
-                cursor = actionCursors[cursorKey];
+                cursor = scope.actionCursors[cursorKey];
             }
         }
 
@@ -3580,8 +3584,8 @@
         // true value, use pointer coords and element rect
         if (value === true) {
             // if dimensions are negative, "switch" edges
-            var width = isNumber(rect.width)? rect.width : rect.right - rect.left,
-                height = isNumber(rect.height)? rect.height : rect.bottom - rect.top;
+            var width = scope.isNumber(rect.width)? rect.width : rect.right - rect.left,
+                height = scope.isNumber(rect.height)? rect.height : rect.bottom - rect.top;
 
             if (width < 0) {
                 if      (name === 'left' ) { name = 'right'; }
@@ -3600,9 +3604,9 @@
         }
 
         // the remaining checks require an element
-        if (!isElement(element)) { return false; }
+        if (!scope.isElement(element)) { return false; }
 
-        return isElement(value)
+        return scope.isElement(value)
                     // the value is an element to use as a resize handle
                     ? value === element
                     // otherwise check if element matches value as selector
@@ -3615,12 +3619,12 @@
             action = null,
             resizeAxes = null,
             resizeEdges,
-            page = extend({}, interaction.curCoords.page),
+            page = scope.extend({}, interaction.curCoords.page),
             options = this.options;
 
         if (!rect) { return null; }
 
-        if (actionIsEnabled.resize && options.resize.enabled) {
+        if (scope.actionIsEnabled.resize && options.resize.enabled) {
             var resizeOptions = options.resize;
 
             resizeEdges = {
@@ -3628,7 +3632,7 @@
             };
 
             // if using resize.edges
-            if (isObject(resizeOptions.edges)) {
+            if (scope.isObject(resizeOptions.edges)) {
                 for (var edge in resizeEdges) {
                     resizeEdges[edge] = checkResizeEdge(edge,
                                                         resizeOptions.edges[edge],
@@ -3636,7 +3640,7 @@
                                                         interaction._eventTarget,
                                                         element,
                                                         rect,
-                                                        resizeOptions.margin || margin);
+                                                        resizeOptions.margin || scope.margin);
                 }
 
                 resizeEdges.left = resizeEdges.left && !resizeEdges.right;
@@ -3645,8 +3649,8 @@
                 shouldResize = resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom;
             }
             else {
-                var right  = options.resize.axis !== 'y' && page.x > (rect.right  - margin),
-                    bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - margin);
+                var right  = options.resize.axis !== 'y' && page.x > (rect.right  - scope.margin),
+                    bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - scope.margin);
 
                 shouldResize = right || bottom;
                 resizeAxes = (right? 'x' : '') + (bottom? 'y' : '');
@@ -3655,11 +3659,11 @@
 
         action = shouldResize
             ? 'resize'
-            : actionIsEnabled.drag && options.drag.enabled
+            : scope.actionIsEnabled.drag && options.drag.enabled
                 ? 'drag'
                 : null;
 
-        if (actionIsEnabled.gesture
+        if (scope.actionIsEnabled.gesture
             && interaction.pointerIds.length >=2
             && !(interaction.dragging || interaction.resizing)) {
             action = 'gesture';
@@ -3679,7 +3683,7 @@
     // Check if action is enabled globally and the current target supports it
     // If so, return the validated action. Otherwise, return null
     function validateAction (action, interactable) {
-        if (!isObject(action)) { return null; }
+        if (!scope.isObject(action)) { return null; }
 
         var actionName = action.name,
             options = interactable.options;
@@ -3687,7 +3691,7 @@
         if ((  (actionName  === 'resize'   && options.resize.enabled )
             || (actionName      === 'drag'     && options.drag.enabled  )
             || (actionName      === 'gesture'  && options.gesture.enabled))
-            && actionIsEnabled[actionName]) {
+            && scope.actionIsEnabled[actionName]) {
 
             if (actionName === 'resize' || actionName === 'resizeyx') {
                 actionName = 'resizexy';
@@ -3716,8 +3720,8 @@
     // listener is added to a selector interactable
     function delegateListener (event, useCapture) {
         var fakeEvent = {},
-            delegated = delegatedEvents[event.type],
-            eventTarget = getActualElement(event.path
+            delegated = scope.delegatedEvents[event.type],
+            eventTarget = scope.getActualElement(event.path
                                            ? event.path[0]
                                            : event.target),
             element = eventTarget;
@@ -3733,14 +3737,14 @@
         fakeEvent.preventDefault = preventOriginalDefault;
 
         // climb up document tree looking for selector matches
-        while (isElement(element)) {
+        while (scope.isElement(element)) {
             for (var i = 0; i < delegated.selectors.length; i++) {
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
 
                 if (matchesSelector(element, selector)
-                    && nodeContains(context, eventTarget)
-                    && nodeContains(context, element)) {
+                    && scope.nodeContains(context, eventTarget)
+                    && scope.nodeContains(context, element)) {
 
                     var listeners = delegated.listeners[i];
 
@@ -3754,7 +3758,7 @@
                 }
             }
 
-            element = parentElement(element);
+            element = scope.parentElement(element);
         }
     }
 
@@ -3762,8 +3766,8 @@
         return delegateListener.call(this, event, true);
     }
 
-    interactables.indexOfElement = function indexOfElement (element, context) {
-        context = context || document;
+    scope.interactables.indexOfElement = function indexOfElement (element, context) {
+        context = context || scope.document;
 
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
@@ -3778,11 +3782,11 @@
         return -1;
     };
 
-    interactables.get = function interactableGet (element, options) {
+    scope.interactables.get = function interactableGet (element, options) {
         return this[this.indexOfElement(element, options && options.context)];
     };
 
-    interactables.forEachSelector = function (callback) {
+    scope.interactables.forEachSelector = function (callback) {
         for (var i = 0; i < this.length; i++) {
             var interactable = this[i];
 
@@ -3824,7 +3828,7 @@
      |     .autoScroll(true);
     \*/
     function interact (element, options) {
-        return interactables.get(element, options) || new Interactable(element, options);
+        return scope.interactables.get(element, options) || new Interactable(element, options);
     }
 
     /*\
@@ -3839,28 +3843,28 @@
 
         var _window;
 
-        if (trySelector(element)) {
+        if (scope.trySelector(element)) {
             this.selector = element;
 
             var context = options && options.context;
 
-            _window = context? getWindow(context) : window;
+            _window = context? scope.getWindow(context) : scope.window;
 
             if (context && (_window.Node
                     ? context instanceof _window.Node
-                    : (isElement(context) || context === _window.document))) {
+                    : (scope.isElement(context) || context === _window.document))) {
 
                 this._context = context;
             }
         }
         else {
-            _window = getWindow(element);
+            _window = scope.getWindow(element);
 
-            if (isElement(element, _window)) {
+            if (scope.isElement(element, _window)) {
 
-                if (PointerEvent) {
-                    events.add(this._element, pEventTypes.down, listeners.pointerDown );
-                    events.add(this._element, pEventTypes.move, listeners.pointerHover);
+                if (scope.PointerEvent) {
+                    events.add(this._element, scope.pEventTypes.down, listeners.pointerDown );
+                    events.add(this._element, scope.pEventTypes.move, listeners.pointerHover);
                 }
                 else {
                     events.add(this._element, 'mousedown' , listeners.pointerDown );
@@ -3873,11 +3877,11 @@
 
         this._doc = _window.document;
 
-        if (!contains(documents, this._doc)) {
+        if (!contains(scope.documents, this._doc)) {
             listenToDocument(this._doc);
         }
 
-        interactables.push(this);
+        scope.interactables.push(this);
 
         this.set(options);
     }
@@ -3885,20 +3889,20 @@
     Interactable.prototype = {
         setOnEvents: function (action, phases) {
             if (action === 'drop') {
-                if (isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
-                if (isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
-                if (isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
-                if (isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
-                if (isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
-                if (isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
+                if (scope.isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
+                if (scope.isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
+                if (scope.isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
+                if (scope.isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
+                if (scope.isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
+                if (scope.isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
             }
             else {
                 action = 'on' + action;
 
-                if (isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
-                if (isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
-                if (isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
-                if (isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
+                if (scope.isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
+                if (scope.isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
+                if (scope.isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
+                if (scope.isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
             }
 
             return this;
@@ -3936,7 +3940,7 @@
          | });
         \*/
         draggable: function (options) {
-            if (isObject(options)) {
+            if (scope.isObject(options)) {
                 this.options.drag.enabled = options.enabled === false? false: true;
                 this.setPerAction('drag', options);
                 this.setOnEvents('drag', options);
@@ -3951,7 +3955,7 @@
                 return this;
             }
 
-            if (isBool(options)) {
+            if (scope.isBool(options)) {
                 this.options.drag.enabled = options;
 
                 return this;
@@ -3964,17 +3968,17 @@
             // for all the default per-action options
             for (var option in options) {
                 // if this option exists for this action
-                if (option in defaultOptions[action]) {
+                if (option in scope.defaultOptions[action]) {
                     // if the option in the options arg is an object value
-                    if (isObject(options[option])) {
+                    if (scope.isObject(options[option])) {
                         // duplicate the object
-                        this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+                        this.options[action][option] = scope.extend(this.options[action][option] || {}, options[option]);
 
-                        if (isObject(defaultOptions.perAction[option]) && 'enabled' in defaultOptions.perAction[option]) {
+                        if (scope.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
                             this.options[action][option].enabled = options[option].enabled === false? false : true;
                         }
                     }
-                    else if (isBool(options[option]) && isObject(defaultOptions.perAction[option])) {
+                    else if (scope.isBool(options[option]) && scope.isObject(scope.defaultOptions.perAction[option])) {
                         this.options[action][option].enabled = options[option];
                     }
                     else if (options[option] !== undefined) {
@@ -4015,7 +4019,7 @@
          = (boolean | object) The current setting or this Interactable
         \*/
         dropzone: function (options) {
-            if (isObject(options)) {
+            if (scope.isObject(options)) {
                 this.options.drop.enabled = options.enabled === false? false: true;
                 this.setOnEvents('drop', options);
                 this.accept(options.accept);
@@ -4023,14 +4027,14 @@
                 if (/^(pointer|center)$/.test(options.overlap)) {
                     this.options.drop.overlap = options.overlap;
                 }
-                else if (isNumber(options.overlap)) {
+                else if (scope.isNumber(options.overlap)) {
                     this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
                 }
 
                 return this;
             }
 
-            if (isBool(options)) {
+            if (scope.isBool(options)) {
                 this.options.drop.enabled = options;
 
                 return this;
@@ -4053,8 +4057,8 @@
             var dropOverlap = this.options.drop.overlap;
 
             if (dropOverlap === 'pointer') {
-                var page = getPageXY(pointer),
-                    origin = getOriginXY(draggable, draggableElement),
+                var page = scope.getPageXY(pointer),
+                    origin = scope.getOriginXY(draggable, draggableElement),
                     horizontal,
                     vertical;
 
@@ -4076,7 +4080,7 @@
                 dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
             }
 
-            if (isNumber(dropOverlap)) {
+            if (scope.isNumber(dropOverlap)) {
                 var overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
                                   * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top ))),
                     overlapRatio = overlapArea / (dragRect.width * dragRect.height);
@@ -4125,7 +4129,7 @@
          | }
         \*/
         dropChecker: function (checker) {
-            if (isFunction(checker)) {
+            if (scope.isFunction(checker)) {
                 this.options.dropChecker = checker;
 
                 return this;
@@ -4157,14 +4161,14 @@
          = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
         \*/
         accept: function (newValue) {
-            if (isElement(newValue)) {
+            if (scope.isElement(newValue)) {
                 this.options.drop.accept = newValue;
 
                 return this;
             }
 
             // test if it is a valid CSS selector
-            if (trySelector(newValue)) {
+            if (scope.trySelector(newValue)) {
                 this.options.drop.accept = newValue;
 
                 return this;
@@ -4216,7 +4220,7 @@
          | });
         \*/
         resizable: function (options) {
-            if (isObject(options)) {
+            if (scope.isObject(options)) {
                 this.options.resize.enabled = options.enabled === false? false: true;
                 this.setPerAction('resize', options);
                 this.setOnEvents('resize', options);
@@ -4225,16 +4229,16 @@
                     this.options.resize.axis = options.axis;
                 }
                 else if (options.axis === null) {
-                    this.options.resize.axis = defaultOptions.resize.axis;
+                    this.options.resize.axis = scope.defaultOptions.resize.axis;
                 }
 
-                if (isBool(options.square)) {
+                if (scope.isBool(options.square)) {
                     this.options.resize.square = options.square;
                 }
 
                 return this;
             }
-            if (isBool(options)) {
+            if (scope.isBool(options)) {
                 this.options.resize.enabled = options;
 
                 return this;
@@ -4258,7 +4262,7 @@
          = (object) this Interactable
         \*/
         squareResize: function (newValue) {
-            if (isBool(newValue)) {
+            if (scope.isBool(newValue)) {
                 this.options.resize.square = newValue;
 
                 return this;
@@ -4297,7 +4301,7 @@
          | });
         \*/
         gesturable: function (options) {
-            if (isObject(options)) {
+            if (scope.isObject(options)) {
                 this.options.gesture.enabled = options.enabled === false? false: true;
                 this.setPerAction('gesture', options);
                 this.setOnEvents('gesture', options);
@@ -4305,7 +4309,7 @@
                 return this;
             }
 
-            if (isBool(options)) {
+            if (scope.isBool(options)) {
                 this.options.gesture.enabled = options;
 
                 return this;
@@ -4335,10 +4339,10 @@
          = (Interactable) this Interactable
         \*/
         autoScroll: function (options) {
-            if (isObject(options)) {
-                options = extend({ actions: ['drag', 'resize']}, options);
+            if (scope.isObject(options)) {
+                options = scope.extend({ actions: ['drag', 'resize']}, options);
             }
-            else if (isBool(options)) {
+            else if (scope.isBool(options)) {
                 options = { actions: ['drag', 'resize'], enabled: options };
             }
 
@@ -4413,28 +4417,28 @@
         },
 
         setOptions: function (option, options) {
-            var actions = options && isArray(options.actions)
+            var actions = options && scope.isArray(options.actions)
                     ? options.actions
                     : ['drag'];
 
             var i;
 
-            if (isObject(options) || isBool(options)) {
+            if (scope.isObject(options) || scope.isBool(options)) {
                 for (i = 0; i < actions.length; i++) {
                     var action = /resize/.test(actions[i])? 'resize' : actions[i];
 
-                    if (!isObject(this.options[action])) { continue; }
+                    if (!scope.isObject(this.options[action])) { continue; }
 
                     var thisOption = this.options[action][option];
 
-                    if (isObject(options)) {
-                        extend(thisOption, options);
+                    if (scope.isObject(options)) {
+                        scope.extend(thisOption, options);
                         thisOption.enabled = options.enabled === false? false: true;
 
                         if (option === 'snap') {
                             if (thisOption.mode === 'grid') {
                                 thisOption.targets = [
-                                    interact.createSnapGrid(extend({
+                                    interact.createSnapGrid(scope.extend({
                                         offset: thisOption.gridOffset || { x: 0, y: 0 }
                                     }, thisOption.grid || {}))
                                 ];
@@ -4451,7 +4455,7 @@
                             }
                         }
                     }
-                    else if (isBool(options)) {
+                    else if (scope.isBool(options)) {
                         thisOption.enabled = options;
                     }
                 }
@@ -4463,7 +4467,7 @@
                 allActions = ['drag', 'resize', 'gesture'];
 
             for (i = 0; i < allActions.length; i++) {
-                if (option in defaultOptions[allActions[i]]) {
+                if (option in scope.defaultOptions[allActions[i]]) {
                     ret[allActions[i]] = this.options[allActions[i]][option];
                 }
             }
@@ -4570,7 +4574,7 @@
          | });
         \*/
         actionChecker: function (checker) {
-            if (isFunction(checker)) {
+            if (scope.isFunction(checker)) {
                 this.options.actionChecker = checker;
 
                 return this;
@@ -4606,11 +4610,11 @@
         getRect: function rectCheck (element) {
             element = element || this._element;
 
-            if (this.selector && !(isElement(element))) {
+            if (this.selector && !(scope.isElement(element))) {
                 element = this._context.querySelector(this.selector);
             }
 
-            return getElementRect(element);
+            return scope.getElementRect(element);
         },
 
         /*\
@@ -4624,7 +4628,7 @@
          = (function | object) The checker function or this Interactable
         \*/
         rectChecker: function (checker) {
-            if (isFunction(checker)) {
+            if (scope.isFunction(checker)) {
                 this.getRect = checker;
 
                 return this;
@@ -4651,7 +4655,7 @@
          = (boolean | Interactable) The current setting or this Interactable
         \*/
         styleCursor: function (newValue) {
-            if (isBool(newValue)) {
+            if (scope.isBool(newValue)) {
                 this.options.styleCursor = newValue;
 
                 return this;
@@ -4685,7 +4689,7 @@
                 return this;
             }
 
-            if (isBool(newValue)) {
+            if (scope.isBool(newValue)) {
                 this.options.preventDefault = newValue? 'always' : 'never';
                 return this;
             }
@@ -4707,11 +4711,11 @@
          = (object) The current origin or this Interactable
         \*/
         origin: function (newValue) {
-            if (trySelector(newValue)) {
+            if (scope.trySelector(newValue)) {
                 this.options.origin = newValue;
                 return this;
             }
-            else if (isObject(newValue)) {
+            else if (scope.isObject(newValue)) {
                 this.options.origin = newValue;
                 return this;
             }
@@ -4777,7 +4781,7 @@
          | });
         \*/
         restrict: function (options) {
-            if (!isObject(options)) {
+            if (!scope.isObject(options)) {
                 return this.setOptions('restrict', options);
             }
 
@@ -4788,7 +4792,7 @@
                 var action = actions[i];
 
                 if (action in options) {
-                    var perAction = extend({
+                    var perAction = scope.extend({
                             actions: [action],
                             restriction: options[action]
                         }, options);
@@ -4813,7 +4817,7 @@
             return this._context;
         },
 
-        _context: document,
+        _context: scope.document,
 
         /*\
          * Interactable.ignoreFrom
@@ -4831,12 +4835,12 @@
          | interact(element).ignoreFrom('input, textarea, a');
         \*/
         ignoreFrom: function (newValue) {
-            if (trySelector(newValue)) {            // CSS selector to match event.target
+            if (scope.trySelector(newValue)) {            // CSS selector to match event.target
                 this.options.ignoreFrom = newValue;
                 return this;
             }
 
-            if (isElement(newValue)) {              // specific element
+            if (scope.isElement(newValue)) {              // specific element
                 this.options.ignoreFrom = newValue;
                 return this;
             }
@@ -4860,12 +4864,12 @@
          | interact(element).allowFrom('.handle');
         \*/
         allowFrom: function (newValue) {
-            if (trySelector(newValue)) {            // CSS selector to match event.target
+            if (scope.trySelector(newValue)) {            // CSS selector to match event.target
                 this.options.allowFrom = newValue;
                 return this;
             }
 
-            if (isElement(newValue)) {              // specific element
+            if (scope.isElement(newValue)) {              // specific element
                 this.options.allowFrom = newValue;
                 return this;
             }
@@ -4897,7 +4901,7 @@
          = (Interactable) this Interactable
         \*/
         fire: function (iEvent) {
-            if (!(iEvent && iEvent.type) || !contains(eventTypes, iEvent.type)) {
+            if (!(iEvent && iEvent.type) || !contains(scope.eventTypes, iEvent.type)) {
                 return this;
             }
 
@@ -4918,13 +4922,13 @@
             }
 
             // interactable.onevent listener
-            if (isFunction(this[onEvent])) {
+            if (scope.isFunction(this[onEvent])) {
                 funcName = this[onEvent].name;
                 this[onEvent](iEvent);
             }
 
             // interact.on() listeners
-            if (iEvent.type in globalEvents && (listeners = globalEvents[iEvent.type]))  {
+            if (iEvent.type in scope.globalEvents && (listeners = scope.globalEvents[iEvent.type]))  {
 
                 for (i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
                     funcName = listeners[i].name;
@@ -4949,11 +4953,11 @@
         on: function (eventType, listener, useCapture) {
             var i;
 
-            if (isString(eventType) && eventType.search(' ') !== -1) {
+            if (scope.isString(eventType) && eventType.search(' ') !== -1) {
                 eventType = eventType.trim().split(/ +/);
             }
 
-            if (isArray(eventType)) {
+            if (scope.isArray(eventType)) {
                 for (i = 0; i < eventType.length; i++) {
                     this.on(eventType[i], listener, useCapture);
                 }
@@ -4961,7 +4965,7 @@
                 return this;
             }
 
-            if (isObject(eventType)) {
+            if (scope.isObject(eventType)) {
                 for (var prop in eventType) {
                     this.on(prop, eventType[prop], listener);
                 }
@@ -4970,13 +4974,13 @@
             }
 
             if (eventType === 'wheel') {
-                eventType = wheelEvent;
+                eventType = scope.wheelEvent;
             }
 
             // convert to boolean
             useCapture = useCapture? true: false;
 
-            if (contains(eventTypes, eventType)) {
+            if (contains(scope.eventTypes, eventType)) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
                     this._iEvents[eventType] = [listener];
@@ -4987,21 +4991,21 @@
             }
             // delegated event for selector
             else if (this.selector) {
-                if (!delegatedEvents[eventType]) {
-                    delegatedEvents[eventType] = {
+                if (!scope.delegatedEvents[eventType]) {
+                    scope.delegatedEvents[eventType] = {
                         selectors: [],
                         contexts : [],
                         listeners: []
                     };
 
                     // add delegate listener functions
-                    for (i = 0; i < documents.length; i++) {
-                        events.add(documents[i], eventType, delegateListener);
-                        events.add(documents[i], eventType, delegateUseCapture, true);
+                    for (i = 0; i < scope.documents.length; i++) {
+                        events.add(scope.documents[i], eventType, delegateListener);
+                        events.add(scope.documents[i], eventType, delegateUseCapture, true);
                     }
                 }
 
-                var delegated = delegatedEvents[eventType],
+                var delegated = scope.delegatedEvents[eventType],
                     index;
 
                 for (index = delegated.selectors.length - 1; index >= 0; index--) {
@@ -5043,11 +5047,11 @@
         off: function (eventType, listener, useCapture) {
             var i;
 
-            if (isString(eventType) && eventType.search(' ') !== -1) {
+            if (scope.isString(eventType) && eventType.search(' ') !== -1) {
                 eventType = eventType.trim().split(/ +/);
             }
 
-            if (isArray(eventType)) {
+            if (scope.isArray(eventType)) {
                 for (i = 0; i < eventType.length; i++) {
                     this.off(eventType[i], listener, useCapture);
                 }
@@ -5055,7 +5059,7 @@
                 return this;
             }
 
-            if (isObject(eventType)) {
+            if (scope.isObject(eventType)) {
                 for (var prop in eventType) {
                     this.off(prop, eventType[prop], listener);
                 }
@@ -5070,11 +5074,11 @@
             useCapture = useCapture? true: false;
 
             if (eventType === 'wheel') {
-                eventType = wheelEvent;
+                eventType = scope.wheelEvent;
             }
 
             // if it is an action event type
-            if (contains(eventTypes, eventType)) {
+            if (contains(scope.eventTypes, eventType)) {
                 eventList = this._iEvents[eventType];
 
                 if (eventList && (index = indexOf(eventList, listener)) !== -1) {
@@ -5083,7 +5087,7 @@
             }
             // delegated event
             else if (this.selector) {
-                var delegated = delegatedEvents[eventType],
+                var delegated = scope.delegatedEvents[eventType],
                     matchFound = false;
 
                 if (!delegated) { return this; }
@@ -5119,7 +5123,7 @@
 
                                     // remove the arrays if they are empty
                                     if (!delegated.selectors.length) {
-                                        delegatedEvents[eventType] = null;
+                                        scope.delegatedEvents[eventType] = null;
                                     }
                                 }
 
@@ -5150,21 +5154,21 @@
          = (object) This Interactablw
         \*/
         set: function (options) {
-            if (!isObject(options)) {
+            if (!scope.isObject(options)) {
                 options = {};
             }
 
-            this.options = extend({}, defaultOptions.base);
+            this.options = scope.extend({}, scope.defaultOptions.base);
 
             var i,
                 actions = ['drag', 'drop', 'resize', 'gesture'],
                 methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
-                perActions = extend(extend({}, defaultOptions.perAction), options[action] || {});
+                perActions = scope.extend(scope.extend({}, scope.defaultOptions.perAction), options[action] || {});
 
             for (i = 0; i < actions.length; i++) {
                 var action = actions[i];
 
-                this.options[action] = extend({}, defaultOptions[action]);
+                this.options[action] = scope.extend({}, scope.defaultOptions[action]);
 
                 this.setPerAction(action, perActions);
 
@@ -5180,7 +5184,7 @@
             for (i = 0, len = settings.length; i < len; i++) {
                 var setting = settings[i];
 
-                this.options[setting] = defaultOptions.base[setting];
+                this.options[setting] = scope.defaultOptions.base[setting];
 
                 if (setting in options) {
                     this[setting](options[setting]);
@@ -5202,7 +5206,7 @@
         unset: function () {
             events.remove(this._element, 'all');
 
-            if (!isString(this.selector)) {
+            if (!scope.isString(this.selector)) {
                 events.remove(this, 'all');
                 if (this.options.styleCursor) {
                     this._element.style.cursor = '';
@@ -5210,8 +5214,8 @@
             }
             else {
                 // remove delegated events
-                for (var type in delegatedEvents) {
-                    var delegated = delegatedEvents[type];
+                for (var type in scope.delegatedEvents) {
+                    var delegated = scope.delegatedEvents[type];
 
                     for (var i = 0; i < delegated.selectors.length; i++) {
                         if (delegated.selectors[i] === this.selector
@@ -5223,7 +5227,7 @@
 
                             // remove the arrays if they are empty
                             if (!delegated.selectors.length) {
-                                delegatedEvents[type] = null;
+                                scope.delegatedEvents[type] = null;
                             }
                         }
 
@@ -5237,7 +5241,7 @@
 
             this.dropzone(false);
 
-            interactables.splice(indexOf(interactables, this), 1);
+            scope.interactables.splice(indexOf(scope.interactables, this), 1);
 
             return interact;
         }
@@ -5248,7 +5252,7 @@
 
         return function () {
             if (!warned) {
-                window.console.warn(message);
+                scope.window.console.warn(message);
                 warned = true;
             }
 
@@ -5276,7 +5280,7 @@
      = (boolean) Indicates if the element or CSS selector was previously passed to interact
     \*/
     interact.isSet = function(element, options) {
-        return interactables.indexOfElement(element, options && options.context) !== -1;
+        return scope.interactables.indexOfElement(element, options && options.context) !== -1;
     };
 
     /*\
@@ -5292,11 +5296,11 @@
      = (object) interact
     \*/
     interact.on = function (type, listener, useCapture) {
-        if (isString(type) && type.search(' ') !== -1) {
+        if (scope.isString(type) && type.search(' ') !== -1) {
             type = type.trim().split(/ +/);
         }
 
-        if (isArray(type)) {
+        if (scope.isArray(type)) {
             for (var i = 0; i < type.length; i++) {
                 interact.on(type[i], listener, useCapture);
             }
@@ -5304,7 +5308,7 @@
             return interact;
         }
 
-        if (isObject(type)) {
+        if (scope.isObject(type)) {
             for (var prop in type) {
                 interact.on(prop, type[prop], listener);
             }
@@ -5313,18 +5317,18 @@
         }
 
         // if it is an InteractEvent type, add listener to globalEvents
-        if (contains(eventTypes, type)) {
+        if (contains(scope.eventTypes, type)) {
             // if this type of event was never bound
-            if (!globalEvents[type]) {
-                globalEvents[type] = [listener];
+            if (!scope.globalEvents[type]) {
+                scope.globalEvents[type] = [listener];
             }
             else {
-                globalEvents[type].push(listener);
+                scope.globalEvents[type].push(listener);
             }
         }
         // If non InteractEvent type, addEventListener to document
         else {
-            events.add(document, type, listener, useCapture);
+            events.add(scope.document, type, listener, useCapture);
         }
 
         return interact;
@@ -5342,11 +5346,11 @@
      = (object) interact
      \*/
     interact.off = function (type, listener, useCapture) {
-        if (isString(type) && type.search(' ') !== -1) {
+        if (scope.isString(type) && type.search(' ') !== -1) {
             type = type.trim().split(/ +/);
         }
 
-        if (isArray(type)) {
+        if (scope.isArray(type)) {
             for (var i = 0; i < type.length; i++) {
                 interact.off(type[i], listener, useCapture);
             }
@@ -5354,7 +5358,7 @@
             return interact;
         }
 
-        if (isObject(type)) {
+        if (scope.isObject(type)) {
             for (var prop in type) {
                 interact.off(prop, type[prop], listener);
             }
@@ -5362,15 +5366,15 @@
             return interact;
         }
 
-        if (!contains(eventTypes, type)) {
-            events.remove(document, type, listener, useCapture);
+        if (!contains(scope.eventTypes, type)) {
+            events.remove(scope.document, type, listener, useCapture);
         }
         else {
             var index;
 
-            if (type in globalEvents
-                && (index = indexOf(globalEvents[type], listener)) !== -1) {
-                globalEvents[type].splice(index, 1);
+            if (type in scope.globalEvents
+                && (index = indexOf(scope.globalEvents[type], listener)) !== -1) {
+                scope.globalEvents[type].splice(index, 1);
             }
         }
 
@@ -5390,11 +5394,11 @@
     \*/
     interact.enableDragging = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
-            actionIsEnabled.drag = newValue;
+            scope.actionIsEnabled.drag = newValue;
 
             return interact;
         }
-        return actionIsEnabled.drag;
+        return scope.actionIsEnabled.drag;
     }, 'interact.enableDragging is deprecated and will soon be removed.');
 
     /*\
@@ -5410,11 +5414,11 @@
     \*/
     interact.enableResizing = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
-            actionIsEnabled.resize = newValue;
+            scope.actionIsEnabled.resize = newValue;
 
             return interact;
         }
-        return actionIsEnabled.resize;
+        return scope.actionIsEnabled.resize;
     }, 'interact.enableResizing is deprecated and will soon be removed.');
 
     /*\
@@ -5430,14 +5434,14 @@
     \*/
     interact.enableGesturing = warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
-            actionIsEnabled.gesture = newValue;
+            scope.actionIsEnabled.gesture = newValue;
 
             return interact;
         }
-        return actionIsEnabled.gesture;
+        return scope.actionIsEnabled.gesture;
     }, 'interact.enableGesturing is deprecated and will soon be removed.');
 
-    interact.eventTypes = eventTypes;
+    interact.eventTypes = scope.eventTypes;
 
     /*\
      * interact.debug
@@ -5447,10 +5451,10 @@
      = (object) An object with properties that outline the current state and expose internal functions and variables
     \*/
     interact.debug = function () {
-        var interaction = interactions[0] || new Interaction();
+        var interaction = scope.interactions[0] || new Interaction();
 
         return {
-            interactions          : interactions,
+            interactions          : scope.interactions,
             target                : interaction.target,
             dragging              : interaction.dragging,
             resizing              : interaction.resizing,
@@ -5478,12 +5482,12 @@
             prevEvent             : interaction.prevEvent,
 
             Interactable          : Interactable,
-            interactables         : interactables,
+            interactables         : scope.interactables,
             pointerIsDown         : interaction.pointerIsDown,
-            defaultOptions        : defaultOptions,
+            defaultOptions        : scope.defaultOptions,
             defaultActionChecker  : defaultActionChecker,
 
-            actionCursors         : actionCursors,
+            actionCursors         : scope.actionCursors,
             dragMove              : listeners.dragMove,
             resizeMove            : listeners.resizeMove,
             gestureMove           : listeners.gestureMove,
@@ -5492,23 +5496,23 @@
             pointerMove           : listeners.pointerMove,
             pointerHover          : listeners.pointerHover,
 
-            eventTypes            : eventTypes,
+            eventTypes            : scope.eventTypes,
 
             events                : events,
-            globalEvents          : globalEvents,
-            delegatedEvents       : delegatedEvents
+            globalEvents          : scope.globalEvents,
+            delegatedEvents       : scope.delegatedEvents
         };
     };
 
     // expose the functions used to calculate multi-touch properties
-    interact.getTouchAverage  = touchAverage;
-    interact.getTouchBBox     = touchBBox;
-    interact.getTouchDistance = touchDistance;
-    interact.getTouchAngle    = touchAngle;
+    interact.getTouchAverage  = scope.touchAverage;
+    interact.getTouchBBox     = scope.touchBBox;
+    interact.getTouchDistance = scope.touchDistance;
+    interact.getTouchAngle    = scope.touchAngle;
 
-    interact.getElementRect   = getElementRect;
+    interact.getElementRect   = scope.getElementRect;
     interact.matchesSelector  = matchesSelector;
-    interact.closest          = closest;
+    interact.closest          = scope.closest;
 
     /*\
      * interact.margin
@@ -5522,12 +5526,12 @@
      = (number | interact) The current margin value or interact
     \*/
     interact.margin = function (newvalue) {
-        if (isNumber(newvalue)) {
-            margin = newvalue;
+        if (scope.isNumber(newvalue)) {
+            scope.margin = newvalue;
 
             return interact;
         }
-        return margin;
+        return scope.margin;
     };
 
     /*\
@@ -5537,7 +5541,7 @@
      = (boolean) Whether or not the browser supports touch input
     \*/
     interact.supportsTouch = function () {
-        return supportsTouch;
+        return scope.supportsTouch;
     };
 
     /*\
@@ -5547,7 +5551,7 @@
      = (boolean) Whether or not the browser supports PointerEvents
     \*/
     interact.supportsPointerEvent = function () {
-        return supportsPointerEvent;
+        return scope.supportsPointerEvent;
     };
 
     /*\
@@ -5560,8 +5564,8 @@
      = (object) interact
     \*/
     interact.stop = function (event) {
-        for (var i = interactions.length - 1; i > 0; i--) {
-            interactions[i].stop(event);
+        for (var i = scope.interactions.length - 1; i > 0; i--) {
+            scope.interactions[i].stop(event);
         }
 
         return interact;
@@ -5579,16 +5583,16 @@
      = (boolean | interact) The current setting or interact
     \*/
     interact.dynamicDrop = function (newValue) {
-        if (isBool(newValue)) {
+        if (scope.isBool(newValue)) {
             //if (dragging && dynamicDrop !== newValue && !newValue) {
                 //calcRects(dropzones);
             //}
 
-            dynamicDrop = newValue;
+            scope.dynamicDrop = newValue;
 
             return interact;
         }
-        return dynamicDrop;
+        return scope.dynamicDrop;
     };
 
     /*\
@@ -5601,13 +5605,13 @@
      = (number | Interactable) The current setting or interact
     \*/
     interact.pointerMoveTolerance = function (newValue) {
-        if (isNumber(newValue)) {
-            pointerMoveTolerance = newValue;
+        if (scope.isNumber(newValue)) {
+            scope.pointerMoveTolerance = newValue;
 
             return this;
         }
 
-        return pointerMoveTolerance;
+        return scope.pointerMoveTolerance;
     };
 
     /*\
@@ -5623,13 +5627,13 @@
      - newValue (number) #optional Any number. newValue <= 0 means no interactions.
     \*/
     interact.maxInteractions = function (newValue) {
-        if (isNumber(newValue)) {
-            maxInteractions = newValue;
+        if (scope.isNumber(newValue)) {
+            scope.maxInteractions = newValue;
 
             return this;
         }
 
-        return maxInteractions;
+        return scope.maxInteractions;
     };
 
     interact.createSnapGrid = function (grid) {
@@ -5637,7 +5641,7 @@
             var offsetX = 0,
                 offsetY = 0;
 
-            if (isObject(grid.offset)) {
+            if (scope.isObject(grid.offset)) {
                 offsetX = grid.offset.x;
                 offsetY = grid.offset.y;
             }
@@ -5657,43 +5661,43 @@
     };
 
     function endAllInteractions (event) {
-        for (var i = 0; i < interactions.length; i++) {
-            interactions[i].pointerEnd(event, event);
+        for (var i = 0; i < scope.interactions.length; i++) {
+            scope.interactions[i].pointerEnd(event, event);
         }
     }
 
     function listenToDocument (doc) {
-        if (contains(documents, doc)) { return; }
+        if (contains(scope.documents, doc)) { return; }
 
         var win = doc.defaultView || doc.parentWindow;
 
         // add delegate event listener
-        for (var eventType in delegatedEvents) {
+        for (var eventType in scope.delegatedEvents) {
             events.add(doc, eventType, delegateListener);
             events.add(doc, eventType, delegateUseCapture, true);
         }
 
-        if (PointerEvent) {
-            if (PointerEvent === win.MSPointerEvent) {
-                pEventTypes = {
+        if (scope.PointerEvent) {
+            if (scope.PointerEvent === win.MSPointerEvent) {
+                scope.pEventTypes = {
                     up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
                     out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
             }
             else {
-                pEventTypes = {
+                scope.pEventTypes = {
                     up: 'pointerup', down: 'pointerdown', over: 'pointerover',
                     out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
             }
 
-            events.add(doc, pEventTypes.down  , listeners.selectorDown );
-            events.add(doc, pEventTypes.move  , listeners.pointerMove  );
-            events.add(doc, pEventTypes.over  , listeners.pointerOver  );
-            events.add(doc, pEventTypes.out   , listeners.pointerOut   );
-            events.add(doc, pEventTypes.up    , listeners.pointerUp    );
-            events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
+            events.add(doc, scope.pEventTypes.down  , listeners.selectorDown );
+            events.add(doc, scope.pEventTypes.move  , listeners.pointerMove  );
+            events.add(doc, scope.pEventTypes.over  , listeners.pointerOver  );
+            events.add(doc, scope.pEventTypes.out   , listeners.pointerOut   );
+            events.add(doc, scope.pEventTypes.up    , listeners.pointerUp    );
+            events.add(doc, scope.pEventTypes.cancel, listeners.pointerCancel);
 
             // autoscroll
-            events.add(doc, pEventTypes.move, listeners.autoScrollMove);
+            events.add(doc, scope.pEventTypes.move, listeners.autoScrollMove);
         }
         else {
             events.add(doc, 'mousedown', listeners.selectorDown);
@@ -5734,7 +5738,7 @@
         if (events.useAttachEvent) {
             // For IE's lack of Event#preventDefault
             events.add(doc, 'selectstart', function (event) {
-                var interaction = interactions[0];
+                var interaction = scope.interactions[0];
 
                 if (interaction.currentAction()) {
                     interaction.checkAndPreventDefault(event);
@@ -5745,10 +5749,10 @@
             events.add(doc, 'dblclick', doOnInteractions('ie8Dblclick'));
         }
 
-        documents.push(doc);
+        scope.documents.push(doc);
     }
 
-    listenToDocument(document);
+    listenToDocument(scope.document);
 
     function indexOf (array, target) {
         for (var i = 0, len = array.length; i < len; i++) {
@@ -5765,25 +5769,25 @@
     }
 
     function matchesSelector (element, selector, nodeList) {
-        if (ie8MatchesSelector) {
-            return ie8MatchesSelector(element, selector, nodeList);
+        if (scope.ie8MatchesSelector) {
+            return scope.ie8MatchesSelector(element, selector, nodeList);
         }
 
         // remove /deep/ from selectors if shadowDOM polyfill is used
-        if (window !== realWindow) {
+        if (scope.window !== realWindow) {
             selector = selector.replace(/\/deep\//g, ' ');
         }
 
-        return element[prefixedMatchesSelector](selector);
+        return element[scope.prefixedMatchesSelector](selector);
     }
 
     function matchesUpTo (element, selector, limit) {
-        while (isElement(element)) {
+        while (scope.isElement(element)) {
             if (matchesSelector(element, selector)) {
                 return true;
             }
 
-            element = parentElement(element);
+            element = scope.parentElement(element);
 
             if (element === limit) {
                 return matchesSelector(element, selector);
@@ -5795,8 +5799,8 @@
 
     // For IE8's lack of an Element#matchesSelector
     // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-    if (!(prefixedMatchesSelector in Element.prototype) || !isFunction(Element.prototype[prefixedMatchesSelector])) {
-        ie8MatchesSelector = function (element, selector, elems) {
+    if (!(scope.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[scope.prefixedMatchesSelector])) {
+        scope.ie8MatchesSelector = function (element, selector, elems) {
             elems = elems || element.parentNode.querySelectorAll(selector);
 
             for (var i = 0, len = elems.length; i < len; i++) {
