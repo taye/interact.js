@@ -358,7 +358,7 @@
                 attachedListeners = [];
 
             function add (element, type, listener, useCapture) {
-                var elementIndex = indexOf(elements, element),
+                var elementIndex = scope.indexOf(elements, element),
                     target = targets[elementIndex];
 
                 if (!target) {
@@ -382,12 +382,12 @@
                     target.typeCount++;
                 }
 
-                if (!contains(target.events[type], listener)) {
+                if (!scope.contains(target.events[type], listener)) {
                     var ret;
 
                     if (useAttachEvent) {
                         var listeners = attachedListeners[elementIndex],
-                            listenerIndex = indexOf(listeners.supplied, listener);
+                            listenerIndex = scope.indexOf(listeners.supplied, listener);
 
                         var wrapped = listeners.wrapped[listenerIndex] || function (event) {
                             if (!event.immediatePropagationStopped) {
@@ -429,7 +429,7 @@
 
             function remove (element, type, listener, useCapture) {
                 var i,
-                    elementIndex = indexOf(elements, element),
+                    elementIndex = scope.indexOf(elements, element),
                     target = targets[elementIndex],
                     listeners,
                     listenerIndex,
@@ -441,7 +441,7 @@
 
                 if (useAttachEvent) {
                     listeners = attachedListeners[elementIndex];
-                    listenerIndex = indexOf(listeners.supplied, listener);
+                    listenerIndex = scope.indexOf(listeners.supplied, listener);
                     wrapped = listeners.wrapped[listenerIndex];
                 }
 
@@ -888,7 +888,7 @@
         var parent = scope.parentElement(child);
 
         while (scope.isElement(parent)) {
-            if (matchesSelector(parent, selector)) { return parent; }
+            if (scope.matchesSelector(parent, selector)) { return parent; }
 
             parent = scope.parentElement(parent);
         }
@@ -920,7 +920,7 @@
         if (!ignoreFrom || !scope.isElement(element)) { return false; }
 
         if (scope.isString(ignoreFrom)) {
-            return matchesUpTo(element, ignoreFrom, interactableElement);
+            return scope.matchesUpTo(element, ignoreFrom, interactableElement);
         }
         else if (scope.isElement(ignoreFrom)) {
             return scope.nodeContains(ignoreFrom, element);
@@ -937,7 +937,7 @@
         if (!scope.isElement(element)) { return false; }
 
         if (scope.isString(allowFrom)) {
-            return matchesUpTo(element, allowFrom, interactableElement);
+            return scope.matchesUpTo(element, allowFrom, interactableElement);
         }
         else if (scope.isElement(allowFrom)) {
             return scope.nodeContains(allowFrom, element);
@@ -1127,6 +1127,65 @@
 
         return index;
     };
+
+    scope.indexOf = function (array, target) {
+        for (var i = 0, len = array.length; i < len; i++) {
+            if (array[i] === target) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
+    scope.contains = function (array, target) {
+        return scope.indexOf(array, target) !== -1;
+    };
+
+    scope.matchesSelector = function (element, selector, nodeList) {
+        if (scope.ie8MatchesSelector) {
+            return scope.ie8MatchesSelector(element, selector, nodeList);
+        }
+
+        // remove /deep/ from selectors if shadowDOM polyfill is used
+        if (scope.window !== realWindow) {
+            selector = selector.replace(/\/deep\//g, ' ');
+        }
+
+        return element[scope.prefixedMatchesSelector](selector);
+    };
+
+    scope.matchesUpTo = function (element, selector, limit) {
+        while (scope.isElement(element)) {
+            if (scope.matchesSelector(element, selector)) {
+                return true;
+            }
+
+            element = scope.parentElement(element);
+
+            if (element === limit) {
+                return scope.matchesSelector(element, selector);
+            }
+        }
+
+        return false;
+    };
+
+    // For IE8's lack of an Element#matchesSelector
+    // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
+    if (!(scope.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[scope.prefixedMatchesSelector])) {
+        scope.ie8MatchesSelector = function (element, selector, elems) {
+            elems = elems || element.parentNode.querySelectorAll(selector);
+
+            for (var i = 0, len = elems.length; i < len; i++) {
+                if (elems[i] === element) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
 
     function Interaction () {
         this.target          = null; // current interactable being interacted with
@@ -1319,7 +1378,7 @@
                     && scope.inContext(interactable, eventTarget)
                     && !scope.testIgnore(interactable, eventTarget, eventTarget)
                     && scope.testAllow(interactable, eventTarget, eventTarget)
-                    && matchesSelector(eventTarget, selector)) {
+                    && scope.matchesSelector(eventTarget, selector)) {
 
                     curMatches.push(interactable);
                     curMatchElements.push(eventTarget);
@@ -1458,7 +1517,7 @@
                 if (scope.inContext(interactable, element)
                     && !scope.testIgnore(interactable, element, eventTarget)
                     && scope.testAllow(interactable, element, eventTarget)
-                    && matchesSelector(element, selector, elements)) {
+                    && scope.matchesSelector(element, selector, elements)) {
 
                     that.matches.push(interactable);
                     that.matchElements.push(element);
@@ -1697,7 +1756,7 @@
 
             // if this interaction had been removed after stopping
             // add it back
-            if (indexOf(scope.interactions, this) === -1) {
+            if (scope.indexOf(scope.interactions, this) === -1) {
                 scope.interactions.push(this);
             }
 
@@ -1727,7 +1786,7 @@
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
             var dx, dy,
-                pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
+                pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             // register movement greater than pointerMoveTolerance
             if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -1816,7 +1875,7 @@
                                         && !interactable.options.drag.manualStart
                                         && !scope.testIgnore(interactable, element, eventTarget)
                                         && scope.testAllow(interactable, element, eventTarget)
-                                        && matchesSelector(element, selector, elements)
+                                        && scope.matchesSelector(element, selector, elements)
                                         && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
                                         && scope.checkAxis(axis, interactable)
                                         && scope.withinInteractionLimit(interactable, element, 'drag')) {
@@ -2095,7 +2154,7 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -2108,7 +2167,7 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -2333,7 +2392,7 @@
                 // test the draggable element against the dropzone's accept setting
                 if ((scope.isElement(accept) && accept !== element)
                     || (scope.isString(accept)
-                        && !matchesSelector(element, accept))) {
+                        && !scope.matchesSelector(element, accept))) {
 
                     continue;
                 }
@@ -2570,7 +2629,7 @@
 
             // remove pointers if their ID isn't in this.pointerIds
             for (var i = 0; i < this.pointers.length; i++) {
-                if (indexOf(this.pointerIds, scope.getPointerId(this.pointers[i])) === -1) {
+                if (scope.indexOf(this.pointerIds, scope.getPointerId(this.pointers[i])) === -1) {
                     this.pointers.splice(i, 1);
                 }
             }
@@ -2578,7 +2637,7 @@
             for (i = 0; i < scope.interactions.length; i++) {
                 // remove this interaction if it's not the only one of it's type
                 if (scope.interactions[i] !== this && scope.interactions[i].mouse === this.mouse) {
-                    scope.interactions.splice(indexOf(scope.interactions, this), 1);
+                    scope.interactions.splice(scope.indexOf(scope.interactions, this), 1);
                 }
             }
         },
@@ -2651,7 +2710,7 @@
 
         addPointer: function (pointer) {
             var id = scope.getPointerId(pointer),
-                index = this.mouse? 0 : indexOf(this.pointerIds, id);
+                index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
 
             if (index === -1) {
                 index = this.pointerIds.length;
@@ -2665,7 +2724,7 @@
 
         removePointer: function (pointer) {
             var id = scope.getPointerId(pointer),
-                index = this.mouse? 0 : indexOf(this.pointerIds, id);
+                index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
 
@@ -2684,7 +2743,7 @@
             // The inertia start event should be this.pointers[0]
             if (this.inertiaStatus.active) { return; }
 
-            var index = this.mouse? 0: indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var index = this.mouse? 0: scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             if (index === -1) { return; }
 
@@ -2692,7 +2751,7 @@
         },
 
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
 
             // do not fire a tap event if the pointer was moved before being lifted
             if (eventType === 'tap' && (this.pointerWasMoved
@@ -2715,7 +2774,7 @@
                     && scope.inContext(interactable, element)
                     && !scope.testIgnore(interactable, element, eventTarget)
                     && scope.testAllow(interactable, element, eventTarget)
-                    && matchesSelector(element, selector, els)) {
+                    && scope.matchesSelector(element, selector, els)) {
 
                     targets.push(interactable);
                     elements.push(element);
@@ -2741,7 +2800,7 @@
         },
 
         firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(scope.getPointerId(pointer)),
+            var pointerIndex = this.mouse? 0 : scope.indexOf(scope.getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
@@ -3205,7 +3264,7 @@
 
         // get interaction that has this pointer
         for (i = 0; i < len; i++) {
-            if (contains(scope.interactions[i].pointerIds, id)) {
+            if (scope.contains(scope.interactions[i].pointerIds, id)) {
                 return scope.interactions[i];
             }
         }
@@ -3610,7 +3669,7 @@
                     // the value is an element to use as a resize handle
                     ? value === element
                     // otherwise check if element matches value as selector
-                    : matchesUpTo(element, value, interactableElement);
+                    : scope.matchesUpTo(element, value, interactableElement);
     }
 
     function defaultActionChecker (pointer, interaction, element) {
@@ -3742,7 +3801,7 @@
                 var selector = delegated.selectors[i],
                     context = delegated.contexts[i];
 
-                if (matchesSelector(element, selector)
+                if (scope.matchesSelector(element, selector)
                     && scope.nodeContains(context, eventTarget)
                     && scope.nodeContains(context, element)) {
 
@@ -3877,7 +3936,7 @@
 
         this._doc = _window.document;
 
-        if (!contains(scope.documents, this._doc)) {
+        if (!scope.contains(scope.documents, this._doc)) {
             listenToDocument(this._doc);
         }
 
@@ -4901,7 +4960,7 @@
          = (Interactable) this Interactable
         \*/
         fire: function (iEvent) {
-            if (!(iEvent && iEvent.type) || !contains(scope.eventTypes, iEvent.type)) {
+            if (!(iEvent && iEvent.type) || !scope.contains(scope.eventTypes, iEvent.type)) {
                 return this;
             }
 
@@ -4980,7 +5039,7 @@
             // convert to boolean
             useCapture = useCapture? true: false;
 
-            if (contains(scope.eventTypes, eventType)) {
+            if (scope.contains(scope.eventTypes, eventType)) {
                 // if this type of event was never bound to this Interactable
                 if (!(eventType in this._iEvents)) {
                     this._iEvents[eventType] = [listener];
@@ -5078,10 +5137,10 @@
             }
 
             // if it is an action event type
-            if (contains(scope.eventTypes, eventType)) {
+            if (scope.contains(scope.eventTypes, eventType)) {
                 eventList = this._iEvents[eventType];
 
-                if (eventList && (index = indexOf(eventList, listener)) !== -1) {
+                if (eventList && (index = scope.indexOf(eventList, listener)) !== -1) {
                     this._iEvents[eventType].splice(index, 1);
                 }
             }
@@ -5241,7 +5300,7 @@
 
             this.dropzone(false);
 
-            scope.interactables.splice(indexOf(scope.interactables, this), 1);
+            scope.interactables.splice(scope.indexOf(scope.interactables, this), 1);
 
             return interact;
         }
@@ -5317,7 +5376,7 @@
         }
 
         // if it is an InteractEvent type, add listener to globalEvents
-        if (contains(scope.eventTypes, type)) {
+        if (scope.contains(scope.eventTypes, type)) {
             // if this type of event was never bound
             if (!scope.globalEvents[type]) {
                 scope.globalEvents[type] = [listener];
@@ -5366,14 +5425,14 @@
             return interact;
         }
 
-        if (!contains(scope.eventTypes, type)) {
+        if (!scope.contains(scope.eventTypes, type)) {
             events.remove(scope.document, type, listener, useCapture);
         }
         else {
             var index;
 
             if (type in scope.globalEvents
-                && (index = indexOf(scope.globalEvents[type], listener)) !== -1) {
+                && (index = scope.indexOf(scope.globalEvents[type], listener)) !== -1) {
                 scope.globalEvents[type].splice(index, 1);
             }
         }
@@ -5511,7 +5570,7 @@
     interact.getTouchAngle    = scope.touchAngle;
 
     interact.getElementRect   = scope.getElementRect;
-    interact.matchesSelector  = matchesSelector;
+    interact.matchesSelector  = scope.matchesSelector;
     interact.closest          = scope.closest;
 
     /*\
@@ -5667,7 +5726,7 @@
     }
 
     function listenToDocument (doc) {
-        if (contains(scope.documents, doc)) { return; }
+        if (scope.contains(scope.documents, doc)) { return; }
 
         var win = doc.defaultView || doc.parentWindow;
 
@@ -5753,65 +5812,6 @@
     }
 
     listenToDocument(scope.document);
-
-    function indexOf (array, target) {
-        for (var i = 0, len = array.length; i < len; i++) {
-            if (array[i] === target) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    function contains (array, target) {
-        return indexOf(array, target) !== -1;
-    }
-
-    function matchesSelector (element, selector, nodeList) {
-        if (scope.ie8MatchesSelector) {
-            return scope.ie8MatchesSelector(element, selector, nodeList);
-        }
-
-        // remove /deep/ from selectors if shadowDOM polyfill is used
-        if (scope.window !== realWindow) {
-            selector = selector.replace(/\/deep\//g, ' ');
-        }
-
-        return element[scope.prefixedMatchesSelector](selector);
-    }
-
-    function matchesUpTo (element, selector, limit) {
-        while (scope.isElement(element)) {
-            if (matchesSelector(element, selector)) {
-                return true;
-            }
-
-            element = scope.parentElement(element);
-
-            if (element === limit) {
-                return matchesSelector(element, selector);
-            }
-        }
-
-        return false;
-    }
-
-    // For IE8's lack of an Element#matchesSelector
-    // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-    if (!(scope.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[scope.prefixedMatchesSelector])) {
-        scope.ie8MatchesSelector = function (element, selector, elems) {
-            elems = elems || element.parentNode.querySelectorAll(selector);
-
-            for (var i = 0, len = elems.length; i < len; i++) {
-                if (elems[i] === element) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-    }
 
     // requestAnimationFrame polyfill
     (function() {
