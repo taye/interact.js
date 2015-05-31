@@ -5268,6 +5268,6 @@
             return interact;
         });
     }
-    else {
-        scope.realWindow.interact = interact;
-    }
+
+    // always export interact on the global scope
+    scope.realWindow.interact = interact;
