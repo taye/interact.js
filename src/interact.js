@@ -5,7 +5,7 @@
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function () {
+
     'use strict';
 
     // return early if there's no window to work with (eg. Node.js)
@@ -5271,5 +5271,3 @@
     else {
         scope.realWindow.interact = interact;
     }
-
-} ());
