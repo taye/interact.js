@@ -6,6 +6,8 @@ var pointerUtils = {},
     win = require('./window'),
     hypot = require('./hypot'),
     extend = require('./extend'),
+
+    // scope shouldn't be necessary in this module
     scope = require('../scope');
 
 pointerUtils.copyCoords = function (dest, src) {
@@ -122,6 +124,10 @@ pointerUtils.getClientXY = function (pointer, client, interaction) {
     }
 
     return client;
+};
+
+pointerUtils.getPointerId = function (pointer) {
+    return scope.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
 };
 
 module.exports = pointerUtils;

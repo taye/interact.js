@@ -156,10 +156,6 @@
         };
     };
 
-    utils.getPointerId = function (pointer) {
-        return scope.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
-    };
-
     scope.getActualElement = function (element) {
         return (element instanceof scope.SVGElementInstance
             ? element.correspondingUseElement
