@@ -16,8 +16,6 @@
 
     scope.pEventTypes = null;
 
-    scope.hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); };
-
     scope.tmpXY = {};     // reduce object creation in getXY()
 
     scope.documents       = [];   // all documents being listened to
@@ -222,11 +220,11 @@
 
         // set pointer velocity
         var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-        targetObj.page.speed   = scope.hypot(targetObj.page.x, targetObj.page.y) / dt;
+        targetObj.page.speed   = utils.hypot(targetObj.page.x, targetObj.page.y) / dt;
         targetObj.page.vx      = targetObj.page.x / dt;
         targetObj.page.vy      = targetObj.page.y / dt;
 
-        targetObj.client.speed = scope.hypot(targetObj.client.x, targetObj.page.y) / dt;
+        targetObj.client.speed = utils.hypot(targetObj.client.x, targetObj.page.y) / dt;
         targetObj.client.vx    = targetObj.client.x / dt;
         targetObj.client.vy    = targetObj.client.y / dt;
     };
@@ -404,7 +402,7 @@
         var dx = touches[0][sourceX] - touches[1][sourceX],
             dy = touches[0][sourceY] - touches[1][sourceY];
 
-        return scope.hypot(dx, dy);
+        return utils.hypot(dx, dy);
     };
 
     scope.touchAngle = function (event, prevAngle, deltaSource) {
@@ -1395,7 +1393,7 @@
                 dx = this.curCoords.client.x - this.startCoords.client.x;
                 dy = this.curCoords.client.y - this.startCoords.client.y;
 
-                this.pointerWasMoved = scope.hypot(dx, dy) > scope.pointerMoveTolerance;
+                this.pointerWasMoved = utils.hypot(dx, dy) > scope.pointerMoveTolerance;
             }
 
             if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
@@ -2559,7 +2557,7 @@
                 var range = target.range,
                     dx = target.x - page.x,
                     dy = target.y - page.y,
-                    distance = scope.hypot(dx, dy),
+                    distance = utils.hypot(dx, dy),
                     inRange = distance <= range;
 
                 // Infinite targets count as being out of range
@@ -3153,7 +3151,7 @@
                     dy = this[sourceY] - interaction.prevEvent[sourceY],
                     dt = this.dt / 1000;
 
-                this.speed = scope.hypot(dx, dy) / dt;
+                this.speed = utils.hypot(dx, dy) / dt;
                 this.velocityX = dx / dt;
                 this.velocityY = dy / dt;
             }
@@ -4908,28 +4906,15 @@
         }
     };
 
-    function warnOnce (method, message) {
-        var warned = false;
-
-        return function () {
-            if (!warned) {
-                scope.window.console.warn(message);
-                warned = true;
-            }
-
-            return method.apply(this, arguments);
-        };
-    }
-
-    Interactable.prototype.snap = warnOnce(Interactable.prototype.snap,
+    Interactable.prototype.snap = utils.warnOnce(Interactable.prototype.snap,
          'Interactable#snap is deprecated. See the new documentation for snapping at http://interactjs.io/docs/snapping');
-    Interactable.prototype.restrict = warnOnce(Interactable.prototype.restrict,
+    Interactable.prototype.restrict = utils.warnOnce(Interactable.prototype.restrict,
          'Interactable#restrict is deprecated. See the new documentation for resticting at http://interactjs.io/docs/restriction');
-    Interactable.prototype.inertia = warnOnce(Interactable.prototype.inertia,
+    Interactable.prototype.inertia = utils.warnOnce(Interactable.prototype.inertia,
          'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/inertia');
-    Interactable.prototype.autoScroll = warnOnce(Interactable.prototype.autoScroll,
+    Interactable.prototype.autoScroll = utils.warnOnce(Interactable.prototype.autoScroll,
          'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
-    Interactable.prototype.squareResize = warnOnce(Interactable.prototype.squareResize,
+    Interactable.prototype.squareResize = utils.warnOnce(Interactable.prototype.squareResize,
          'Interactable#squareResize is deprecated. See http://interactjs.io/docs/#resize-square');
 
     /*\
@@ -5053,7 +5038,7 @@
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableDragging = warnOnce(function (newValue) {
+    interact.enableDragging = utils.warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             scope.actionIsEnabled.drag = newValue;
 
@@ -5073,7 +5058,7 @@
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableResizing = warnOnce(function (newValue) {
+    interact.enableResizing = utils.warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             scope.actionIsEnabled.resize = newValue;
 
@@ -5093,7 +5078,7 @@
      - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
      = (boolean | object) The current setting or interact
     \*/
-    interact.enableGesturing = warnOnce(function (newValue) {
+    interact.enableGesturing = utils.warnOnce(function (newValue) {
         if (newValue !== null && newValue !== undefined) {
             scope.actionIsEnabled.gesture = newValue;
 
