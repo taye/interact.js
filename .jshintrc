@@ -2,6 +2,7 @@
     "strict"   : true,
     "validthis": true,
     "browser"  : true,
+    "node"     : true,
     "jquery"   : true,
     "curly"    : true,
     "laxbreak" : true,
@@ -10,5 +11,6 @@
     "undef"    : true,
     "unused"   : true,
     "strict"   : true,
+    "elision"  : true,
     "trailing" : true
 }
