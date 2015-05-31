@@ -5400,34 +5400,6 @@
 
     listenToDocument(scope.document);
 
-    // requestAnimationFrame polyfill
-    (function() {
-        var lastTime = 0,
-            vendors = ['ms', 'moz', 'webkit', 'o'];
-
-        for(var x = 0; x < vendors.length && !scope.realWindow.requestAnimationFrame; ++x) {
-            reqFrame = scope.realWindow[vendors[x]+'RequestAnimationFrame'];
-            cancelFrame = scope.realWindow[vendors[x]+'CancelAnimationFrame'] || scope.realWindow[vendors[x]+'CancelRequestAnimationFrame'];
-        }
-
-        if (!reqFrame) {
-            reqFrame = function(callback) {
-                var currTime = new Date().getTime(),
-                    timeToCall = Math.max(0, 16 - (currTime - lastTime)),
-                    id = setTimeout(function() { callback(currTime + timeToCall); },
-                  timeToCall);
-                lastTime = currTime + timeToCall;
-                return id;
-            };
-        }
-
-        if (!cancelFrame) {
-            cancelFrame = function(id) {
-                clearTimeout(id);
-            };
-        }
-    }());
-
     /* global exports: true, module, define */
 
     // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
