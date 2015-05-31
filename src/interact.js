@@ -12,11 +12,10 @@
     if (!require('./utils/window').window) { return; }
 
     var scope = require('./scope'),
-        utils = require('./utils');
+        utils = require('./utils'),
+        browser = utils.browser;
 
     scope.pEventTypes = null;
-
-    scope.tmpXY = {};     // reduce object creation in getXY()
 
     scope.documents       = [];   // all documents being listened to
 
@@ -39,14 +38,8 @@
     // Things related to autoScroll
     scope.autoScroll = require('./autoScroll');
 
-    // Does the browser support touch input?
-    scope.supportsTouch = (('ontouchstart' in scope.window) || scope.window.DocumentTouch && scope.document instanceof scope.window.DocumentTouch);
-
-    // Does the browser support PointerEvents
-    scope.supportsPointerEvent = !!scope.PointerEvent;
-
     // Less Precision with touch input
-    scope.margin = scope.supportsTouch || scope.supportsPointerEvent? 20: 10;
+    scope.margin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
     scope.pointerMoveTolerance = 1;
 
@@ -131,16 +124,6 @@
 
     scope.globalEvents = {};
 
-    // Opera Mobile must be handled differently
-    scope.isOperaMobile = navigator.appName == 'Opera' &&
-        scope.supportsTouch &&
-        navigator.userAgent.match('Presto');
-
-    // scrolling doesn't change the result of
-    // getBoundingClientRect/getClientRects on iOS <=7 but it does on iOS 8
-    scope.isIOS7orLower = (/iP(hone|od|ad)/.test(navigator.platform)
-                        && /OS [1-7][^\d]/.test(navigator.appVersion));
-
     // prefix matchesSelector
     scope.prefixedMatchesSelector = 'matches' in Element.prototype?
             'matches': 'webkitMatchesSelector' in Element.prototype?
@@ -168,130 +151,12 @@
             : o.nodeType === 1 && typeof o.nodeName === "string");
     };
 
-    utils.extend(scope, require('./utils/isType'));
-
     scope.trySelector = function (value) {
         if (!scope.isString(value)) { return false; }
 
         // an exception will be raised if it is invalid
         scope.document.querySelector(value);
         return true;
-    };
-
-    scope.copyCoords = function (dest, src) {
-        dest.page = dest.page || {};
-        dest.page.x = src.page.x;
-        dest.page.y = src.page.y;
-
-        dest.client = dest.client || {};
-        dest.client.x = src.client.x;
-        dest.client.y = src.client.y;
-
-        dest.timeStamp = src.timeStamp;
-    };
-
-    scope.setEventXY = function (targetObj, pointer, interaction) {
-        if (!pointer) {
-            if (interaction.pointerIds.length > 1) {
-                pointer = scope.touchAverage(interaction.pointers);
-            }
-            else {
-                pointer = interaction.pointers[0];
-            }
-        }
-
-        scope.getPageXY(pointer, scope.tmpXY, interaction);
-        targetObj.page.x = scope.tmpXY.x;
-        targetObj.page.y = scope.tmpXY.y;
-
-        scope.getClientXY(pointer, scope.tmpXY, interaction);
-        targetObj.client.x = scope.tmpXY.x;
-        targetObj.client.y = scope.tmpXY.y;
-
-        targetObj.timeStamp = new Date().getTime();
-    };
-
-    scope.setEventDeltas = function (targetObj, prev, cur) {
-        targetObj.page.x     = cur.page.x      - prev.page.x;
-        targetObj.page.y     = cur.page.y      - prev.page.y;
-        targetObj.client.x   = cur.client.x    - prev.client.x;
-        targetObj.client.y   = cur.client.y    - prev.client.y;
-        targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
-
-        // set pointer velocity
-        var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-        targetObj.page.speed   = utils.hypot(targetObj.page.x, targetObj.page.y) / dt;
-        targetObj.page.vx      = targetObj.page.x / dt;
-        targetObj.page.vy      = targetObj.page.y / dt;
-
-        targetObj.client.speed = utils.hypot(targetObj.client.x, targetObj.page.y) / dt;
-        targetObj.client.vx    = targetObj.client.x / dt;
-        targetObj.client.vy    = targetObj.client.y / dt;
-    };
-
-    // Get specified X/Y coords for mouse or event.touches[0]
-    scope.getXY = function (type, pointer, xy) {
-        xy = xy || {};
-        type = type || 'page';
-
-        xy.x = pointer[type + 'X'];
-        xy.y = pointer[type + 'Y'];
-
-        return xy;
-    };
-
-    scope.getPageXY = function (pointer, page, interaction) {
-        page = page || {};
-
-        if (pointer instanceof InteractEvent) {
-            if (/inertiastart/.test(pointer.type)) {
-                interaction = interaction || pointer.interaction;
-
-                utils.extend(page, interaction.inertiaStatus.upCoords.page);
-
-                page.x += interaction.inertiaStatus.sx;
-                page.y += interaction.inertiaStatus.sy;
-            }
-            else {
-                page.x = pointer.pageX;
-                page.y = pointer.pageY;
-            }
-        }
-        // Opera Mobile handles the viewport and scrolling oddly
-        else if (scope.isOperaMobile) {
-            scope.getXY('screen', pointer, page);
-
-            page.x += scope.window.scrollX;
-            page.y += scope.window.scrollY;
-        }
-        else {
-            scope.getXY('page', pointer, page);
-        }
-
-        return page;
-    };
-
-    scope.getClientXY = function (pointer, client, interaction) {
-        client = client || {};
-
-        if (pointer instanceof InteractEvent) {
-            if (/inertiastart/.test(pointer.type)) {
-                utils.extend(client, interaction.inertiaStatus.upCoords.client);
-
-                client.x += interaction.inertiaStatus.sx;
-                client.y += interaction.inertiaStatus.sy;
-            }
-            else {
-                client.x = pointer.clientX;
-                client.y = pointer.clientY;
-            }
-        }
-        else {
-            // Opera Mobile handles the viewport and scrolling oddly
-            scope.getXY(scope.isOperaMobile? 'screen': 'client', pointer, client);
-        }
-
-        return client;
     };
 
     scope.getScrollXY = function (win) {
@@ -302,7 +167,7 @@
         };
     };
 
-    scope.getPointerId = function (pointer) {
+    utils.getPointerId = function (pointer) {
         return scope.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
     };
 
@@ -313,7 +178,7 @@
     };
 
     scope.getElementRect = function (element) {
-        var scroll = scope.isIOS7orLower
+        var scroll = browser.isIOS7orLower
                 ? { x: 0, y: 0 }
                 : scope.getScrollXY(scope.getWindow(element)),
             clientRect = (element instanceof scope.SVGElement)?
@@ -330,7 +195,7 @@
         };
     };
 
-    scope.getTouchPair = function (event) {
+    utils.getTouchPair = function (event) {
         var touches = [];
 
         // array of touches is supplied
@@ -359,8 +224,8 @@
         return touches;
     };
 
-    scope.touchAverage = function (event) {
-        var touches = scope.getTouchPair(event);
+    utils.touchAverage = function (event) {
+        var touches = utils.getTouchPair(event);
 
         return {
             pageX: (touches[0].pageX + touches[1].pageX) / 2,
@@ -370,12 +235,12 @@
         };
     };
 
-    scope.touchBBox = function (event) {
+    utils.touchBBox = function (event) {
         if (!event.length && !(event.touches && event.touches.length > 1)) {
             return;
         }
 
-        var touches = scope.getTouchPair(event),
+        var touches = utils.getTouchPair(event),
             minX = Math.min(touches[0].pageX, touches[1].pageX),
             minY = Math.min(touches[0].pageY, touches[1].pageY),
             maxX = Math.max(touches[0].pageX, touches[1].pageX),
@@ -391,12 +256,12 @@
         };
     };
 
-    scope.touchDistance = function (event, deltaSource) {
+    utils.touchDistance = function (event, deltaSource) {
         deltaSource = deltaSource || scope.defaultOptions.deltaSource;
 
         var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touches = scope.getTouchPair(event);
+            touches = utils.getTouchPair(event);
 
 
         var dx = touches[0][sourceX] - touches[1][sourceX],
@@ -405,12 +270,12 @@
         return utils.hypot(dx, dy);
     };
 
-    scope.touchAngle = function (event, prevAngle, deltaSource) {
+    utils.touchAngle = function (event, prevAngle, deltaSource) {
         deltaSource = deltaSource || scope.defaultOptions.deltaSource;
 
         var sourceX = deltaSource + 'X',
             sourceY = deltaSource + 'Y',
-            touches = scope.getTouchPair(event),
+            touches = utils.getTouchPair(event),
             dx = touches[0][sourceX] - touches[1][sourceX],
             dy = touches[0][sourceY] - touches[1][sourceY],
             angle = 180 * Math.atan(dy / dx) / Math.PI;
@@ -740,8 +605,6 @@
         return index;
     };
 
-    utils.extend(scope, require('./utils/arr.js'));
-
     scope.matchesSelector = function (element, selector, nodeList) {
         if (scope.ie8MatchesSelector) {
             return scope.ie8MatchesSelector(element, selector, nodeList);
@@ -937,9 +800,9 @@
     }
 
     Interaction.prototype = {
-        getPageXY  : function (pointer, xy) { return   scope.getPageXY(pointer, xy, this); },
-        getClientXY: function (pointer, xy) { return scope.getClientXY(pointer, xy, this); },
-        setEventXY : function (target, ptr) { return  scope.setEventXY(target, ptr, this); },
+        getPageXY  : function (pointer, xy) { return   utils.getPageXY(pointer, xy, this); },
+        getClientXY: function (pointer, xy) { return utils.getClientXY(pointer, xy, this); },
+        setEventXY : function (target, ptr) { return  utils.setEventXY(target, ptr, this); },
 
         pointerOver: function (pointer, event, eventTarget) {
             if (this.prepared.name || !this.mouse) { return; }
@@ -1153,7 +1016,7 @@
                 this.downTargets[pointerIndex] = eventTarget;
                 utils.extend(this.downPointer, pointer);
 
-                scope.copyCoords(this.prevCoords, this.curCoords);
+                utils.copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
             }
 
@@ -1386,7 +1249,7 @@
                                  && this.curCoords.client.y === this.prevCoords.client.y);
 
             var dx, dy,
-                pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
+                pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
             // register movement greater than pointerMoveTolerance
             if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -1412,7 +1275,7 @@
             }
 
             // set pointer coordinate, time changes and speeds
-            scope.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+            utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
             if (!this.prepared.name) { return; }
 
@@ -1422,7 +1285,7 @@
 
                 // if just starting an action, calculate the pointer speed now
                 if (!this.interacting()) {
-                    scope.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+                    utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
                     // check if a drag is in the correct axis
                     if (this.prepared.name === 'drag') {
@@ -1528,7 +1391,7 @@
                 }
             }
 
-            scope.copyCoords(this.prevCoords, this.curCoords);
+            utils.copyCoords(this.prevCoords, this.curCoords);
 
             if (this.dragging || this.resizing) {
                 this.autoScrollMove(pointer);
@@ -1754,7 +1617,7 @@
         },
 
         pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -1767,7 +1630,7 @@
         },
 
         pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
             clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -1864,7 +1727,7 @@
                 }
 
                 if (inertia || smoothEnd) {
-                    scope.copyCoords(inertiaStatus.upCoords, this.curCoords);
+                    utils.copyCoords(inertiaStatus.upCoords, this.curCoords);
 
                     this.pointers[0] = inertiaStatus.startEvent = startEvent =
                         new InteractEvent(this, event, this.prepared.name, 'inertiastart', this.element);
@@ -2229,7 +2092,7 @@
 
             // remove pointers if their ID isn't in this.pointerIds
             for (var i = 0; i < this.pointers.length; i++) {
-                if (scope.indexOf(this.pointerIds, scope.getPointerId(this.pointers[i])) === -1) {
+                if (scope.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
                     this.pointers.splice(i, 1);
                 }
             }
@@ -2309,7 +2172,7 @@
         },
 
         addPointer: function (pointer) {
-            var id = scope.getPointerId(pointer),
+            var id = utils.getPointerId(pointer),
                 index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
 
             if (index === -1) {
@@ -2323,7 +2186,7 @@
         },
 
         removePointer: function (pointer) {
-            var id = scope.getPointerId(pointer),
+            var id = utils.getPointerId(pointer),
                 index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
 
             if (index === -1) { return; }
@@ -2343,7 +2206,7 @@
             // The inertia start event should be this.pointers[0]
             if (this.inertiaStatus.active) { return; }
 
-            var index = this.mouse? 0: scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var index = this.mouse? 0: scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
             if (index === -1) { return; }
 
@@ -2351,7 +2214,7 @@
         },
 
         collectEventTargets: function (pointer, event, eventTarget, eventType) {
-            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, scope.getPointerId(pointer));
+            var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
             // do not fire a tap event if the pointer was moved before being lifted
             if (eventType === 'tap' && (this.pointerWasMoved
@@ -2400,7 +2263,7 @@
         },
 
         firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-            var pointerIndex = this.mouse? 0 : scope.indexOf(scope.getPointerId(pointer)),
+            var pointerIndex = this.mouse? 0 : scope.indexOf(utils.getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
@@ -2425,8 +2288,8 @@
                 pointerEvent.timeStamp     = new Date().getTime();
                 pointerEvent.originalEvent = event;
                 pointerEvent.type          = eventType;
-                pointerEvent.pointerId     = scope.getPointerId(pointer);
-                pointerEvent.pointerType   = this.mouse? 'mouse' : !scope.supportsPointerEvent? 'touch'
+                pointerEvent.pointerId     = utils.getPointerId(pointer);
+                pointerEvent.pointerType   = this.mouse? 'mouse' : !browser.supportsPointerEvent? 'touch'
                                                     : scope.isString(pointer.pointerType)
                                                         ? pointer.pointerType
                                                         : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
@@ -2808,7 +2671,7 @@
                           || pointer.pointerType === 4),
             interaction;
 
-        var id = scope.getPointerId(pointer);
+        var id = utils.getPointerId(pointer);
 
         // try to resume inertia with a new pointer
         if (/down|start/i.test(eventType)) {
@@ -2837,7 +2700,7 @@
         }
 
         // if it's a mouse interaction
-        if (mouseEvent || !(scope.supportsTouch || scope.supportsPointerEvent)) {
+        if (mouseEvent || !(browser.supportsTouch || browser.supportsPointerEvent)) {
 
             // find a mouse interaction that's not in inertia phase
             for (i = 0; i < len; i++) {
@@ -2900,7 +2763,7 @@
                 curEventTarget = scope.getActualElement(event.currentTarget),
                 i;
 
-            if (scope.supportsTouch && /touch/.test(event.type)) {
+            if (browser.supportsTouch && /touch/.test(event.type)) {
                 scope.prevTouchTime = new Date().getTime();
 
                 for (i = 0; i < event.changedTouches.length; i++) {
@@ -2916,7 +2779,7 @@
                 }
             }
             else {
-                if (!scope.supportsPointerEvent && /mouse/.test(event.type)) {
+                if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
                     // ignore mouse events while touch interactions are active
                     for (i = 0; i < scope.interactions.length; i++) {
                         if (!scope.interactions[i].mouse && scope.interactions[i].pointerIsDown) {
@@ -3099,11 +2962,11 @@
             this.touches = [pointers[0], pointers[1]];
 
             if (starting) {
-                this.distance = scope.touchDistance(pointers, deltaSource);
-                this.box      = scope.touchBBox(pointers);
+                this.distance = utils.touchDistance(pointers, deltaSource);
+                this.box      = utils.touchBBox(pointers);
                 this.scale    = 1;
                 this.ds       = 0;
-                this.angle    = scope.touchAngle(pointers, undefined, deltaSource);
+                this.angle    = utils.touchAngle(pointers, undefined, deltaSource);
                 this.da       = 0;
             }
             else if (ending || event instanceof InteractEvent) {
@@ -3115,10 +2978,10 @@
                 this.da       = this.angle - interaction.gesture.startAngle;
             }
             else {
-                this.distance = scope.touchDistance(pointers, deltaSource);
-                this.box      = scope.touchBBox(pointers);
+                this.distance = utils.touchDistance(pointers, deltaSource);
+                this.box      = utils.touchBBox(pointers);
                 this.scale    = this.distance / interaction.gesture.startDistance;
-                this.angle    = scope.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+                this.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
                 this.ds = this.scale - interaction.gesture.prevScale;
                 this.da = this.angle - interaction.gesture.prevAngle;
@@ -3716,7 +3579,7 @@
             var dropOverlap = this.options.drop.overlap;
 
             if (dropOverlap === 'pointer') {
-                var page = scope.getPageXY(pointer),
+                var page = utils.getPageXY(pointer),
                     origin = scope.getOriginXY(draggable, draggableElement),
                     horizontal,
                     vertical;
@@ -5151,10 +5014,10 @@
     };
 
     // expose the functions used to calculate multi-touch properties
-    interact.getTouchAverage  = scope.touchAverage;
-    interact.getTouchBBox     = scope.touchBBox;
-    interact.getTouchDistance = scope.touchDistance;
-    interact.getTouchAngle    = scope.touchAngle;
+    interact.getTouchAverage  = utils.touchAverage;
+    interact.getTouchBBox     = utils.touchBBox;
+    interact.getTouchDistance = utils.touchDistance;
+    interact.getTouchAngle    = utils.touchAngle;
 
     interact.getElementRect   = scope.getElementRect;
     interact.matchesSelector  = scope.matchesSelector;
@@ -5187,7 +5050,7 @@
      = (boolean) Whether or not the browser supports touch input
     \*/
     interact.supportsTouch = function () {
-        return scope.supportsTouch;
+        return browser.supportsTouch;
     };
 
     /*\
@@ -5197,7 +5060,7 @@
      = (boolean) Whether or not the browser supports PointerEvents
     \*/
     interact.supportsPointerEvent = function () {
-        return scope.supportsPointerEvent;
+        return browser.supportsPointerEvent;
     };
 
     /*\
@@ -5399,6 +5262,11 @@
     }
 
     listenToDocument(scope.document);
+
+    scope.interact = interact;
+    scope.Interactable = Interactable;
+    scope.Interaction = Interaction;
+    scope.InteractEvent = InteractEvent;
 
     /* global exports: true, module, define */
 

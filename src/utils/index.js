@@ -6,14 +6,12 @@ var utils = {},
 
 utils.blank  = function () {};
 
-utils.hypot = Math.hypot || function (x, y) { return Math.sqrt(x * x + y * y); };
-
 utils.warnOnce = function (method, message) {
     var warned = false;
 
     return function () {
         if (!warned) {
-            win.console.warn(message);
+            win.window.console.warn(message);
             warned = true;
         }
 
@@ -21,10 +19,13 @@ utils.warnOnce = function (method, message) {
     };
 };
 
-utils.extend = extend;
-utils.raf    = require('./raf');
+utils.extend  = extend;
+utils.hypot   = require('./hypot');
+utils.raf     = require('./raf');
+utils.browser = require('./browser');
 
 extend(utils, require('./arr'));
 extend(utils, require('./isType'));
+extend(utils, require('./pointerUtils'));
 
 module.exports = utils;
