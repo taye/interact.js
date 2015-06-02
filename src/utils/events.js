@@ -64,7 +64,7 @@ function add (element, type, listener, useCapture) {
                 }
             };
 
-            ret = element[addEvent](on + type, wrapped, Boolean(useCapture));
+            ret = element[addEvent](on + type, wrapped, !!useCapture);
 
             if (listenerIndex === -1) {
                 listeners.supplied.push(listener);
@@ -76,7 +76,7 @@ function add (element, type, listener, useCapture) {
             }
         }
         else {
-            ret = element[addEvent](type, listener, useCapture || false);
+            ret = element[addEvent](type, listener, !!useCapture);
         }
         target.events[type].push(listener);
 
@@ -116,13 +116,13 @@ function remove (element, type, listener, useCapture) {
 
         if (listener === 'all') {
             for (i = 0; i < len; i++) {
-                remove(element, type, target.events[type][i], Boolean(useCapture));
+                remove(element, type, target.events[type][i], !!useCapture);
             }
             return;
         } else {
             for (i = 0; i < len; i++) {
                 if (target.events[type][i] === listener) {
-                    element[removeEvent](on + type, wrapped, useCapture || false);
+                    element[removeEvent](on + type, wrapped, !!useCapture);
                     target.events[type].splice(i, 1);
 
                     if (useAttachEvent && listeners) {
