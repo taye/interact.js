@@ -20,7 +20,7 @@ var isType = {
 
     isArray    : function (thing) {
         return isObject(thing)
-            && (typeof thing.length !== undefined)
+            && (typeof thing.length !== 'undefined')
             && isFunction(thing.splice);
     },
 
