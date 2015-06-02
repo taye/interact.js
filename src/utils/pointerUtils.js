@@ -6,9 +6,9 @@ var pointerUtils = {},
     win = require('./window'),
     hypot = require('./hypot'),
     extend = require('./extend'),
-
-    // scope shouldn't be necessary in this module
-    scope = require('../scope');
+    browser = require('./browser'),
+    isType = require('./isType'),
+    InteractEvent = require('../InteractEvent');
 
 pointerUtils.copyCoords = function (dest, src) {
     dest.page = dest.page || {};
@@ -75,7 +75,7 @@ pointerUtils.getXY = function (type, pointer, xy) {
 pointerUtils.getPageXY = function (pointer, page, interaction) {
     page = page || {};
 
-    if (pointer instanceof scope.InteractEvent) {
+    if (pointer instanceof InteractEvent) {
         if (/inertiastart/.test(pointer.type)) {
             interaction = interaction || pointer.interaction;
 
@@ -90,7 +90,7 @@ pointerUtils.getPageXY = function (pointer, page, interaction) {
         }
     }
     // Opera Mobile handles the viewport and scrolling oddly
-    else if (scope.isOperaMobile) {
+    else if (browser.isOperaMobile) {
         pointerUtils.getXY('screen', pointer, page);
 
         page.x += win.window.scrollX;
@@ -106,7 +106,7 @@ pointerUtils.getPageXY = function (pointer, page, interaction) {
 pointerUtils.getClientXY = function (pointer, client, interaction) {
     client = client || {};
 
-    if (pointer instanceof scope.InteractEvent) {
+    if (pointer instanceof InteractEvent) {
         if (/inertiastart/.test(pointer.type)) {
             extend(client, interaction.inertiaStatus.upCoords.client);
 
@@ -120,14 +120,14 @@ pointerUtils.getClientXY = function (pointer, client, interaction) {
     }
     else {
         // Opera Mobile handles the viewport and scrolling oddly
-        pointerUtils.getXY(scope.isOperaMobile? 'screen': 'client', pointer, client);
+        pointerUtils.getXY(browser.isOperaMobile? 'screen': 'client', pointer, client);
     }
 
     return client;
 };
 
 pointerUtils.getPointerId = function (pointer) {
-    return scope.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
 };
 
 module.exports = pointerUtils;
