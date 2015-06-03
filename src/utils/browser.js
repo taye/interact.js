@@ -20,7 +20,15 @@ var browser = {
     // getBoundingClientRect/getClientRects on iOS <=7 but it does on iOS 8
     isIOS7orLower : (/iP(hone|od|ad)/.test(navigator.platform) && /OS [1-7][^\d]/.test(navigator.appVersion)),
 
-    isIe9OrOlder : domObjects.document.all && !win.window.atob
+    isIe9OrOlder : domObjects.document.all && !win.window.atob,
+
+    // prefix matchesSelector
+    prefixedMatchesSelector: 'matches' in Element.prototype?
+            'matches': 'webkitMatchesSelector' in Element.prototype?
+                'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
+                    'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
+                        'oMatchesSelector': 'msMatchesSelector'
+
 };
 
 module.exports = browser;

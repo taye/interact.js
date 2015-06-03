@@ -124,7 +124,7 @@
     scope.globalEvents = {};
 
     // prefix matchesSelector
-    scope.prefixedMatchesSelector = 'matches' in Element.prototype?
+    browser.prefixedMatchesSelector = 'matches' in Element.prototype?
             'matches': 'webkitMatchesSelector' in Element.prototype?
                 'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
                     'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
@@ -499,7 +499,7 @@
             selector = selector.replace(/\/deep\//g, ' ');
         }
 
-        return element[scope.prefixedMatchesSelector](selector);
+        return element[browser.prefixedMatchesSelector](selector);
     };
 
     scope.matchesUpTo = function (element, selector, limit) {
@@ -520,7 +520,7 @@
 
     // For IE8's lack of an Element#matchesSelector
     // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-    if (!(scope.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[scope.prefixedMatchesSelector])) {
+    if (!(browser.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[browser.prefixedMatchesSelector])) {
         scope.ie8MatchesSelector = function (element, selector, elems) {
             elems = elems || element.parentNode.querySelectorAll(selector);
 
