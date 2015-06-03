@@ -1,6 +1,6 @@
 'use strict';
 
-var utils = {},
+var utils = module.exports,
     extend = require('./extend'),
     win = require('./window');
 
@@ -27,5 +27,3 @@ utils.browser = require('./browser');
 extend(utils, require('./arr'));
 extend(utils, require('./isType'));
 extend(utils, require('./pointerUtils'));
-
-module.exports = utils;
