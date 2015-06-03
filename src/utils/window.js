@@ -1,6 +1,6 @@
 'use strict';
 
-var isWindow = require('./isType').isWindow;
+var isWindow = require('./isWindow');
 
 var isShadowDom = function() {
     // create a TextNode

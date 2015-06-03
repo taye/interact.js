@@ -13,16 +13,12 @@ var isType = {
             ? o instanceof _window.Element //DOM2
             : o.nodeType === 1 && typeof o.nodeName === "string");
     },
+
+    isArray    : null,
     
-    isWindow   : function (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); },
+    isWindow   : require('./isWindow'),
 
     isDocFrag  : function (thing) { return !!thing && thing instanceof domObjects.DocumentFragment; },
-
-    isArray    : function (thing) {
-        return isObject(thing)
-            && (typeof thing.length !== 'undefined')
-            && isFunction(thing.splice);
-    },
 
     isObject   : function (thing) { return !!thing && (typeof thing === 'object'); },
 
@@ -34,6 +30,12 @@ var isType = {
 
     isString   : function (thing) { return typeof thing === 'string'  ; }
     
+};
+
+isType.isArray = function (thing) {
+    return isType.isObject(thing)
+        && (typeof thing.length !== 'undefined')
+        && isType.isFunction(thing.splice);
 };
 
 module.exports = isType;
