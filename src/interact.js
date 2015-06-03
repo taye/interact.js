@@ -2822,21 +2822,4 @@
     scope.Interaction = Interaction;
     scope.InteractEvent = InteractEvent;
 
-    /* global exports: true, module, define */
-
-    // http://documentcloud.github.io/underscore/docs/underscore.html#section-11
-    if (typeof exports !== 'undefined') {
-        if (typeof module !== 'undefined' && module.exports) {
-            exports = module.exports = interact;
-        }
-        exports.interact = interact;
-    }
-    // AMD
-    else if (typeof define === 'function' && define.amd) {
-        define('interact', function() {
-            return interact;
-        });
-    }
-    else {
-        scope.realWindow.interact = interact;
-    }
+    module.exports = interact;
