@@ -32,10 +32,9 @@ module.exports = {
           entries: src + '/interact.js',
           dest: dest,
           outputName: 'interact.js',
+          outputNameMin: 'interact.min.js',
           // Additional file extentions to make optional
-          extensions: [],
-          // list of modules to make require-able externally
-          require: ['interact']
+          extensions: []
         }
     ]
   },
