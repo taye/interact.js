@@ -114,13 +114,6 @@
 
     scope.globalEvents = {};
 
-    // prefix matchesSelector
-    browser.prefixedMatchesSelector = 'matches' in Element.prototype?
-            'matches': 'webkitMatchesSelector' in Element.prototype?
-                'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
-                    'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
-                        'oMatchesSelector': 'msMatchesSelector';
-
     // will be polyfill function if browser is IE8
     scope.ie8MatchesSelector = null;
 
