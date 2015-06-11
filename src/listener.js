@@ -1,5 +1,10 @@
+'use strict';
+
 var events = require('./utils/events');
 var scope = require('./scope');
+var browser = require('./utils/browser');
+var utils = require('./utils');
+var Interaction = require('./Interaction');
 
 var listeners = {};
 
@@ -10,7 +15,7 @@ var listeners = {};
 //          listeners: [[listener, useCapture], ...]
 //      }
 //  }
-delegatedEvents = {};
+var delegatedEvents = {};
 
 var interactionListeners = [
     'dragStart',
@@ -33,6 +38,12 @@ var interactionListeners = [
     'recordPointer',
     'autoScrollMove'
 ];
+
+function endAllInteractions (event) {
+    for (var i = 0; i < scope.interactions.length; i++) {
+        scope.interactions[i].pointerEnd(event, event);
+    }
+}
 
 function listenToDocument (doc) {
     if (scope.contains(scope.documents, doc)) { return; }

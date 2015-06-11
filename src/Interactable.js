@@ -1,4 +1,10 @@
+'use strict';
+
 var scope = require('./scope');
+var listener = require('./listener');
+var defaultActionChecker = require('./defaultActionChecker');
+var utils = require('./utils');
+var events = require('./utils/events');
 
 /*\
  * Interactable
@@ -32,14 +38,14 @@ function Interactable (element, options) {
         if (utils.isElement(element, _window)) {
 
             if (scope.PointerEvent) {
-                events.add(this._element, scope.pEventTypes.down, scope.listeners.pointerDown );
-                events.add(this._element, scope.pEventTypes.move, scope.listeners.pointerHover);
+                events.add(this._element, scope.pEventTypes.down, listener.listeners.pointerDown );
+                events.add(this._element, scope.pEventTypes.move, listener.listeners.pointerHover);
             }
             else {
-                events.add(this._element, 'mousedown' , scope.listeners.pointerDown );
-                events.add(this._element, 'mousemove' , scope.listeners.pointerHover);
-                events.add(this._element, 'touchstart', scope.listeners.pointerDown );
-                events.add(this._element, 'touchmove' , scope.listeners.pointerHover);
+                events.add(this._element, 'mousedown' , listener.listeners.pointerDown );
+                events.add(this._element, 'mousemove' , listener.listeners.pointerHover);
+                events.add(this._element, 'touchstart', listener.listeners.pointerDown );
+                events.add(this._element, 'touchmove' , listener.listeners.pointerHover);
             }
         }
     }
@@ -47,7 +53,7 @@ function Interactable (element, options) {
     this._doc = _window.document;
 
     if (!scope.contains(scope.documents, this._doc)) {
-        listenToDocument(this._doc);
+        listener.listenToDocument(this._doc);
     }
 
     scope.interactables.push(this);
