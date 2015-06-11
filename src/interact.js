@@ -994,30 +994,6 @@
         return scope.maxInteractions;
     };
 
-    interact.createSnapGrid = function (grid) {
-        return function (x, y) {
-            var offsetX = 0,
-                offsetY = 0;
-
-            if (scope.isObject(grid.offset)) {
-                offsetX = grid.offset.x;
-                offsetY = grid.offset.y;
-            }
-
-            var gridx = Math.round((x - offsetX) / grid.x),
-                gridy = Math.round((y - offsetY) / grid.y),
-
-                newX = gridx * grid.x + offsetX,
-                newY = gridy * grid.y + offsetY;
-
-            return {
-                x: newX,
-                y: newY,
-                range: grid.range
-            };
-        };
-    };
-
     listener.listenToDocument(scope.document);
 
     scope.interact = interact;

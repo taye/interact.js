@@ -591,7 +591,32 @@ Interactable.prototype = {
         return ret.drag;
     },
 
+    createSnapGrid : function (grid) {
+        return function (x, y) {
+            var offsetX = 0,
+                offsetY = 0;
+
+            if (scope.isObject(grid.offset)) {
+                offsetX = grid.offset.x;
+                offsetY = grid.offset.y;
+            }
+
+            var gridx = Math.round((x - offsetX) / grid.x),
+                gridy = Math.round((y - offsetY) / grid.y),
+
+                newX = gridx * grid.x + offsetX,
+                newY = gridy * grid.y + offsetY;
+
+            return {
+                x: newX,
+                y: newY,
+                range: grid.range
+            };
+        };
+    },
+
     setOptions: function (option, options) {
+        var self = this;
         var actions = options && scope.isArray(options.actions)
             ? options.actions
             : ['drag'];
@@ -613,7 +638,7 @@ Interactable.prototype = {
                     if (option === 'snap') {
                         if (thisOption.mode === 'grid') {
                             thisOption.targets = [
-                                interact.createSnapGrid(utils.extend({
+                                self.createSnapGrid(utils.extend({
                                     offset: thisOption.gridOffset || { x: 0, y: 0 }
                                 }, thisOption.grid || {}))
                             ];
