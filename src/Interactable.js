@@ -1442,8 +1442,6 @@ Interactable.prototype = {
         this.dropzone(false);
 
         scope.interactables.splice(scope.indexOf(scope.interactables, this), 1);
-
-        return interact;
     }
 };
 
