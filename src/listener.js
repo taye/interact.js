@@ -337,7 +337,9 @@ var listener = {
     listenToDocument: listenToDocument,
     bindInteractionListeners: bindInteractionListeners,
     listeners: listeners,
-    delegatedEvents: delegatedEvents
+    delegatedEvents: delegatedEvents,
+    delegateListener: delegateListener,
+    delegateUseCapture: delegateUseCapture
 };
 
 module.exports = listener;

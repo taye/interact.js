@@ -518,43 +518,6 @@
 
     var Interaction = require('./Interaction');
 
-    function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
-        // false, '', undefined, null
-        if (!value) { return false; }
-
-        // true value, use pointer coords and element rect
-        if (value === true) {
-            // if dimensions are negative, "switch" edges
-            var width = scope.isNumber(rect.width)? rect.width : rect.right - rect.left,
-                height = scope.isNumber(rect.height)? rect.height : rect.bottom - rect.top;
-
-            if (width < 0) {
-                if      (name === 'left' ) { name = 'right'; }
-                else if (name === 'right') { name = 'left' ; }
-            }
-            if (height < 0) {
-                if      (name === 'top'   ) { name = 'bottom'; }
-                else if (name === 'bottom') { name = 'top'   ; }
-            }
-
-            if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
-            if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
-
-            if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
-            if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
-        }
-
-        // the remaining checks require an element
-        if (!utils.isElement(element)) { return false; }
-
-        return utils.isElement(value)
-                    // the value is an element to use as a resize handle
-                    ? value === element
-                    // otherwise check if element matches value as selector
-                    : scope.matchesUpTo(element, value, interactableElement);
-    }
-
-
     var InteractEvent = require('./InteractEvent');
 
     var listener = require('./listener');

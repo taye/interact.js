@@ -1200,8 +1200,8 @@ Interactable.prototype = {
 
                 // add delegate listener functions
                 for (i = 0; i < scope.documents.length; i++) {
-                    events.add(scope.documents[i], eventType, delegateListener);
-                    events.add(scope.documents[i], eventType, delegateUseCapture, true);
+                    events.add(scope.documents[i], eventType, listener.delegateListener);
+                    events.add(scope.documents[i], eventType, listener.delegateUseCapture, true);
                 }
             }
 
@@ -1318,8 +1318,8 @@ Interactable.prototype = {
                                 delegated.listeners.splice(index, 1);
 
                                 // remove delegate function from context
-                                events.remove(this._context, eventType, delegateListener);
-                                events.remove(this._context, eventType, delegateUseCapture, true);
+                                events.remove(this._context, eventType, listener.delegateListener);
+                                events.remove(this._context, eventType, listener.delegateUseCapture, true);
 
                                 // remove the arrays if they are empty
                                 if (!delegated.selectors.length) {
@@ -1361,6 +1361,7 @@ Interactable.prototype = {
         this.options = utils.extend({}, scope.defaultOptions.base);
 
         var i,
+            len,
             actions = ['drag', 'drop', 'resize', 'gesture'],
             methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
             perActions = utils.extend(utils.extend({}, scope.defaultOptions.perAction), options[action] || {});
@@ -1401,7 +1402,6 @@ Interactable.prototype = {
      * Remove this interactable from the list of interactables and remove
      * it's drag, drop, resize and gesture capabilities
      *
-     = (object) @interact
      \*/
     unset: function () {
         events.remove(this._element, 'all');
@@ -1431,8 +1431,8 @@ Interactable.prototype = {
                         }
                     }
 
-                    events.remove(this._context, type, delegateListener);
-                    events.remove(this._context, type, delegateUseCapture, true);
+                    events.remove(this._context, type, listener.delegateListener);
+                    events.remove(this._context, type, listener.delegateUseCapture, true);
 
                     break;
                 }
