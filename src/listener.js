@@ -111,7 +111,6 @@ function listenToDocument (doc) {
         }
     }
     catch (error) {
-        interact.windowParentError = error;
     }
 
     if (events.useAttachEvent) {
