@@ -696,22 +696,34 @@
         return rootNode.defaultView || rootNode.parentWindow || window;
     }
 
-    function getElementRect (element) {
-        var scroll = isIOS7orLower
-                ? { x: 0, y: 0 }
-                : getScrollXY(getWindow(element)),
-            clientRect = (element instanceof SVGElement)?
-                element.getBoundingClientRect():
-                element.getClientRects()[0];
+    function getElementClientRect (element) {
+        var clientRect = (element instanceof SVGElement
+                            ? element.getBoundingClientRect()
+                            : element.getClientRects()[0]);
 
         return clientRect && {
-            left  : clientRect.left   + scroll.x,
-            right : clientRect.right  + scroll.x,
-            top   : clientRect.top    + scroll.y,
-            bottom: clientRect.bottom + scroll.y,
+            left  : clientRect.left,
+            right : clientRect.right,
+            top   : clientRect.top,
+            bottom: clientRect.bottom,
             width : clientRect.width || clientRect.right - clientRect.left,
             height: clientRect.heigh || clientRect.bottom - clientRect.top
         };
+    }
+
+    function getElementRect (element) {
+        var clientRect = getElementClientRect(element);
+
+        if (!isIOS7orLower && clientRect) {
+            var scroll = getScrollXY(getWindow(element));
+
+            clientRect.left   += scroll.x;
+            clientRect.right  += scroll.x;
+            clientRect.top    += scroll.y;
+            clientRect.bottom += scroll.y;
+        }
+
+        return clientRect;
     }
 
     function getTouchPair (event) {
@@ -3111,7 +3123,7 @@
                 bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
             }
             else {
-                var rect = getElementRect(container);
+                var rect = getElementClientRect(container);
 
                 left   = pointer.clientX < rect.left   + autoScroll.margin;
                 top    = pointer.clientY < rect.top    + autoScroll.margin;
