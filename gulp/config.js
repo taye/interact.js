@@ -33,6 +33,7 @@ module.exports = {
           dest: dest,
           outputName: 'interact.js',
           outputNameMin: 'interact.min.js',
+          standalone: 'interact',
           // Additional file extentions to make optional
           extensions: []
         }
