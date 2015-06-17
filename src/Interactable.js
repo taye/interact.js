@@ -591,7 +591,7 @@ Interactable.prototype = {
         return ret.drag;
     },
 
-    createSnapGrid : function (grid) {
+    createSnapGrid: function (grid) {
         return function (x, y) {
             var offsetX = 0,
                 offsetY = 0;

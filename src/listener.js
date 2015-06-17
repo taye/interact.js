@@ -6,7 +6,7 @@ var browser = require('./utils/browser');
 var utils = require('./utils');
 var Interaction = require('./Interaction');
 
-var listeners = {};
+var listeners = scope.listeners;
 
 // {
 //      type: {

@@ -19,6 +19,8 @@ scope.documents       = [];   // all documents being listened to
 scope.interactables   = [];   // all set interactables
 scope.interactions    = [];   // all interactions
 
+scope.listeners = {};
+
 scope.dynamicDrop     = false;
 
 scope.defaultOptions = require('./defaultOptions');
