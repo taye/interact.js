@@ -2749,7 +2749,7 @@
         },
 
         firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-            var pointerIndex = this.mouse? 0 : indexOf(getPointerId(pointer)),
+            var pointerIndex = this.mouse? 0 : indexOf(this.pointerIds, getPointerId(pointer)),
                 pointerEvent = {},
                 i,
                 // for tap events
