@@ -5860,7 +5860,7 @@
     }
     // AMD
     else if (typeof define === 'function' && define.amd) {
-        define('interact', function() {
+        define(function() {
             return interact;
         });
     }
