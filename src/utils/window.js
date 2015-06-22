@@ -2,39 +2,36 @@
 
 var isWindow = require('./isWindow');
 
-var isShadowDom = function() {
+if (typeof window === 'undefined') {
+    module.exports.window     = undefined;
+    module.exports.realWindow = undefined;
+}
+else {
+    // get wrapped window if using Shadow DOM polyfill
+
+    module.exports.realWindow = window;
+
     // create a TextNode
     var el = window.document.createTextNode('');
 
     // check if it's wrapped by a polyfill
-    return el.ownerDocument !== window.document
+    if (el.ownerDocument !== window.document
         && typeof window.wrap === 'function'
-        && window.wrap(el) === el;
-};
-
-var win = {
-
-    window: undefined,
-
-    realWindow: window,
-
-    getWindow: function getWindow (node) {
-        if (isWindow(node)) {
-            return node;
-        }
-
-        var rootNode = (node.ownerDocument || node);
-
-        return rootNode.defaultView || rootNode.parentWindow || win.window;
+        && window.wrap(el) === el) {
+        // return wrapped window
+        module.exports.window = window.wrap(window);
     }
-};
 
-if (typeof window !== 'undefined') {
-    if (isShadowDom()) {
-        win.window = window.wrap(window);
-    } else {
-        win.window = window;
-    }
+    // no Shadow DOM polyfil or native implementation
+    module.exports.window = window;
 }
 
-module.exports = win;
+module.exports.getWindow = function getWindow (node) {
+    if (isWindow(node)) {
+        return node;
+    }
+
+    var rootNode = (node.ownerDocument || node);
+
+    return rootNode.defaultView || rootNode.parentWindow || module.exports.window;
+};
