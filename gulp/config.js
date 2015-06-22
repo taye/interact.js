@@ -8,18 +8,6 @@ module.exports = {
       baseDir: dest
     }
   },
-  sass: {
-    src: src + "/sass/**/*.{sass,scss}",
-    dest: dest,
-    settings: {
-      indentedSyntax: true, // Enable .sass syntax!
-      imagePath: 'images' // Used by the image-url helper
-    }
-  },
-  images: {
-    src: src + "/images/**",
-    dest: dest + "/images"
-  },
   markup: {
     src: src + "/htdocs/**",
     dest: dest
