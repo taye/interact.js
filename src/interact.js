@@ -19,13 +19,6 @@
         InteractEvent = require('./InteractEvent'),
         Interaction = require('./Interaction');
 
-    scope.pEventTypes = null;
-
-    scope.documents       = [];   // all documents being listened to
-
-    scope.interactables   = [];   // all set interactables
-    scope.interactions    = [];   // all interactions
-
     scope.dynamicDrop     = false;
 
     scope.defaultOptions = require('./defaultOptions');
@@ -138,11 +131,11 @@
         else if (origin === 'self') {
             origin = interactable.getRect(element);
         }
-        else if (scope.trySelector(origin)) {
+        else if (utils.trySelector(origin)) {
             origin = utils.closest(element, origin) || { x: 0, y: 0 };
         }
 
-        if (scope.isFunction(origin)) {
+        if (utils.isFunction(origin)) {
             origin = origin(interactable && element);
         }
 
@@ -166,7 +159,7 @@
 
         if (!ignoreFrom || !utils.isElement(element)) { return false; }
 
-        if (scope.isString(ignoreFrom)) {
+        if (utils.isString(ignoreFrom)) {
             return utils.matchesUpTo(element, ignoreFrom, interactableElement);
         }
         else if (utils.isElement(ignoreFrom)) {
@@ -183,7 +176,7 @@
 
         if (!utils.isElement(element)) { return false; }
 
-        if (scope.isString(allowFrom)) {
+        if (utils.isString(allowFrom)) {
             return utils.matchesUpTo(element, allowFrom, interactableElement);
         }
         else if (utils.isElement(allowFrom)) {
@@ -338,11 +331,11 @@
      = (object) interact
     \*/
     interact.on = function (type, listener, useCapture) {
-        if (scope.isString(type) && type.search(' ') !== -1) {
+        if (utils.isString(type) && type.search(' ') !== -1) {
             type = type.trim().split(/ +/);
         }
 
-        if (scope.isArray(type)) {
+        if (utils.isArray(type)) {
             for (var i = 0; i < type.length; i++) {
                 interact.on(type[i], listener, useCapture);
             }
@@ -350,7 +343,7 @@
             return interact;
         }
 
-        if (scope.isObject(type)) {
+        if (utils.isObject(type)) {
             for (var prop in type) {
                 interact.on(prop, type[prop], listener);
             }
@@ -359,7 +352,7 @@
         }
 
         // if it is an InteractEvent type, add listener to globalEvents
-        if (scope.contains(scope.eventTypes, type)) {
+        if (utils.contains(scope.eventTypes, type)) {
             // if this type of event was never bound
             if (!scope.globalEvents[type]) {
                 scope.globalEvents[type] = [listener];
@@ -388,11 +381,11 @@
      = (object) interact
      \*/
     interact.off = function (type, listener, useCapture) {
-        if (scope.isString(type) && type.search(' ') !== -1) {
+        if (utils.isString(type) && type.search(' ') !== -1) {
             type = type.trim().split(/ +/);
         }
 
-        if (scope.isArray(type)) {
+        if (utils.isArray(type)) {
             for (var i = 0; i < type.length; i++) {
                 interact.off(type[i], listener, useCapture);
             }
@@ -400,7 +393,7 @@
             return interact;
         }
 
-        if (scope.isObject(type)) {
+        if (utils.isObject(type)) {
             for (var prop in type) {
                 interact.off(prop, type[prop], listener);
             }
@@ -408,14 +401,14 @@
             return interact;
         }
 
-        if (!scope.contains(scope.eventTypes, type)) {
+        if (!utils.contains(scope.eventTypes, type)) {
             events.remove(scope.document, type, listener, useCapture);
         }
         else {
             var index;
 
             if (type in scope.globalEvents
-                && (index = scope.indexOf(scope.globalEvents[type], listener)) !== -1) {
+                && (index = utils.indexOf(scope.globalEvents[type], listener)) !== -1) {
                 scope.globalEvents[type].splice(index, 1);
             }
         }
@@ -568,7 +561,7 @@
      = (number | interact) The current margin value or interact
     \*/
     interact.margin = function (newvalue) {
-        if (scope.isNumber(newvalue)) {
+        if (utils.isNumber(newvalue)) {
             scope.margin = newvalue;
 
             return interact;
@@ -625,7 +618,7 @@
      = (boolean | interact) The current setting or interact
     \*/
     interact.dynamicDrop = function (newValue) {
-        if (scope.isBool(newValue)) {
+        if (utils.isBool(newValue)) {
             //if (dragging && dynamicDrop !== newValue && !newValue) {
                 //calcRects(dropzones);
             //}
@@ -647,7 +640,7 @@
      = (number | Interactable) The current setting or interact
     \*/
     interact.pointerMoveTolerance = function (newValue) {
-        if (scope.isNumber(newValue)) {
+        if (utils.isNumber(newValue)) {
             scope.pointerMoveTolerance = newValue;
 
             return this;
@@ -669,7 +662,7 @@
      - newValue (number) #optional Any number. newValue <= 0 means no interactions.
     \*/
     interact.maxInteractions = function (newValue) {
-        if (scope.isNumber(newValue)) {
+        if (utils.isNumber(newValue)) {
             scope.maxInteractions = newValue;
 
             return this;
@@ -683,7 +676,7 @@
             var offsetX = 0,
                 offsetY = 0;
 
-            if (scope.isObject(grid.offset)) {
+            if (utils.isObject(grid.offset)) {
                 offsetX = grid.offset.x;
                 offsetY = grid.offset.y;
             }
@@ -709,7 +702,7 @@
     }
 
     function listenToDocument (doc) {
-        if (scope.contains(scope.documents, doc)) { return; }
+        if (utils.contains(scope.documents, doc)) { return; }
 
         var win = doc.defaultView || doc.parentWindow;
 

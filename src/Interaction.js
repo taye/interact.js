@@ -46,7 +46,7 @@ function Interaction () {
         i  : null
     };
 
-    if (scope.isFunction(Function.prototype.bind)) {
+    if (utils.isFunction(Function.prototype.bind)) {
         this.boundInertiaFrame = this.inertiaFrame.bind(this);
         this.boundSmoothEndFrame = this.smoothEndFrame.bind(this);
     }
@@ -159,7 +159,7 @@ function Interaction () {
 // Check if action is enabled globally and the current target supports it
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable) {
-    if (!scope.isObject(action)) { return null; }
+    if (!utils.isObject(action)) { return null; }
 
     var actionName = action.name,
         options = interactable.options;
@@ -629,7 +629,7 @@ Interaction.prototype = {
 
         // if this interaction had been removed after stopping
         // add it back
-        if (scope.indexOf(scope.interactions, this) === -1) {
+        if (utils.indexOf(scope.interactions, this) === -1) {
             scope.interactions.push(this);
         }
 
@@ -659,7 +659,7 @@ Interaction.prototype = {
         && this.curCoords.client.y === this.prevCoords.client.y);
 
         var dx, dy,
-            pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
+            pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         // register movement greater than pointerMoveTolerance
         if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -1027,7 +1027,7 @@ Interaction.prototype = {
     },
 
     pointerUp: function (pointer, event, eventTarget, curEventTarget) {
-        var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
+        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -1040,7 +1040,7 @@ Interaction.prototype = {
     },
 
     pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
-        var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
+        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         clearTimeout(this.holdTimers[pointerIndex]);
 
@@ -1264,7 +1264,7 @@ Interaction.prototype = {
 
             // test the draggable element against the dropzone's accept setting
             if ((utils.isElement(accept) && accept !== element)
-                || (scope.isString(accept)
+                || (utils.isString(accept)
                 && !utils.matchesSelector(element, accept))) {
 
                 continue;
@@ -1485,7 +1485,7 @@ Interaction.prototype = {
             }
 
             // prevent Default only if were previously interacting
-            if (event && scope.isFunction(event.preventDefault)) {
+            if (event && utils.isFunction(event.preventDefault)) {
                 this.checkAndPreventDefault(event, target, this.element);
             }
 
@@ -1502,7 +1502,7 @@ Interaction.prototype = {
 
         // remove pointers if their ID isn't in this.pointerIds
         for (var i = 0; i < this.pointers.length; i++) {
-            if (scope.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
+            if (utils.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
                 this.pointers.splice(i, 1);
             }
         }
@@ -1510,7 +1510,7 @@ Interaction.prototype = {
         for (i = 0; i < scope.interactions.length; i++) {
             // remove this interaction if it's not the only one of it's type
             if (scope.interactions[i] !== this && scope.interactions[i].mouse === this.mouse) {
-                scope.interactions.splice(scope.indexOf(scope.interactions, this), 1);
+                scope.interactions.splice(utils.indexOf(scope.interactions, this), 1);
             }
         }
     },
@@ -1583,7 +1583,7 @@ Interaction.prototype = {
 
     addPointer: function (pointer) {
         var id = utils.getPointerId(pointer),
-            index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
+            index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
         if (index === -1) {
             index = this.pointerIds.length;
@@ -1597,7 +1597,7 @@ Interaction.prototype = {
 
     removePointer: function (pointer) {
         var id = utils.getPointerId(pointer),
-            index = this.mouse? 0 : scope.indexOf(this.pointerIds, id);
+            index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
         if (index === -1) { return; }
 
@@ -1616,7 +1616,7 @@ Interaction.prototype = {
         // The inertia start event should be this.pointers[0]
         if (this.inertiaStatus.active) { return; }
 
-        var index = this.mouse? 0: scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
+        var index = this.mouse? 0: utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         if (index === -1) { return; }
 
@@ -1624,7 +1624,7 @@ Interaction.prototype = {
     },
 
     collectEventTargets: function (pointer, event, eventTarget, eventType) {
-        var pointerIndex = this.mouse? 0 : scope.indexOf(this.pointerIds, utils.getPointerId(pointer));
+        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         // do not fire a tap event if the pointer was moved before being lifted
         if (eventType === 'tap' && (this.pointerWasMoved
@@ -1676,7 +1676,7 @@ Interaction.prototype = {
     },
 
     firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-        var pointerIndex = this.mouse? 0 : scope.indexOf(utils.getPointerId(pointer)),
+        var pointerIndex = this.mouse? 0 : utils.indexOf(utils.getPointerId(pointer)),
             pointerEvent = {},
             i,
         // for tap events
@@ -1703,7 +1703,7 @@ Interaction.prototype = {
             pointerEvent.type          = eventType;
             pointerEvent.pointerId     = utils.getPointerId(pointer);
             pointerEvent.pointerType   = this.mouse? 'mouse' : !browser.supportsPointerEvent? 'touch'
-                : scope.isString(pointer.pointerType)
+                : utils.isString(pointer.pointerType)
                 ? pointer.pointerType
                 : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
         }
@@ -1800,7 +1800,7 @@ Interaction.prototype = {
             };
 
             for (i = 0; i < len; i++) {
-                if (scope.isFunction(snap.targets[i])) {
+                if (utils.isFunction(snap.targets[i])) {
                     target = snap.targets[i](relative.x, relative.y, this);
                 }
                 else {
@@ -1810,10 +1810,10 @@ Interaction.prototype = {
                 if (!target) { continue; }
 
                 targets.push({
-                    x: scope.isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
-                    y: scope.isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
+                    x: utils.isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
+                    y: utils.isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
 
-                    range: scope.isNumber(target.range)? target.range: snap.range
+                    range: utils.isNumber(target.range)? target.range: snap.range
                 });
             }
         }
@@ -1923,7 +1923,7 @@ Interaction.prototype = {
 
         var rect, restrictedX, restrictedY;
 
-        if (scope.isString(restriction)) {
+        if (utils.isString(restriction)) {
             if (restriction === 'parent') {
                 restriction = utils.parentElement(this.element);
             }
@@ -1937,7 +1937,7 @@ Interaction.prototype = {
             if (!restriction) { return status; }
         }
 
-        if (scope.isFunction(restriction)) {
+        if (utils.isFunction(restriction)) {
             restriction = restriction(page.x, page.y, this.element);
         }
 
@@ -2043,7 +2043,7 @@ Interaction.prototype = {
             options = this.target.options[this.prepared.name].autoScroll,
             container = options.container || scope.getWindow(this.element);
 
-        if (scope.isWindow(container)) {
+        if (utils.isWindow(container)) {
             left   = pointer.clientX < scope.autoScroll.margin;
             top    = pointer.clientY < scope.autoScroll.margin;
             right  = pointer.clientX > container.innerWidth  - scope.autoScroll.margin;
@@ -2181,7 +2181,7 @@ function getInteractionFromPointer (pointer, eventType, eventTarget) {
 
     // get interaction that has this pointer
     for (i = 0; i < len; i++) {
-        if (scope.contains(scope.interactions[i].pointerIds, id)) {
+        if (utils.contains(scope.interactions[i].pointerIds, id)) {
             return scope.interactions[i];
         }
     }

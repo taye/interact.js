@@ -16,7 +16,7 @@ function Interactable (element, options) {
 
     var _window;
 
-    if (scope.trySelector(element)) {
+    if (utils.trySelector(element)) {
         this.selector = element;
 
         var context = options && options.context;
@@ -50,7 +50,7 @@ function Interactable (element, options) {
 
     this._doc = _window.document;
 
-    if (!scope.contains(scope.documents, this._doc)) {
+    if (!utils.contains(scope.documents, this._doc)) {
         scope.listenToDocument(this._doc);
     }
 
@@ -62,20 +62,20 @@ function Interactable (element, options) {
 Interactable.prototype = {
     setOnEvents: function (action, phases) {
         if (action === 'drop') {
-            if (scope.isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
-            if (scope.isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
-            if (scope.isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
-            if (scope.isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
-            if (scope.isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
-            if (scope.isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
+            if (utils.isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
+            if (utils.isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
+            if (utils.isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
+            if (utils.isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
+            if (utils.isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
+            if (utils.isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
         }
         else {
             action = 'on' + action;
 
-            if (scope.isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
-            if (scope.isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
-            if (scope.isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
-            if (scope.isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
+            if (utils.isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
+            if (utils.isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
+            if (utils.isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
+            if (utils.isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
         }
 
         return this;
@@ -113,7 +113,7 @@ Interactable.prototype = {
      | });
     \*/
     draggable: function (options) {
-        if (scope.isObject(options)) {
+        if (utils.isObject(options)) {
             this.options.drag.enabled = options.enabled === false? false: true;
             this.setPerAction('drag', options);
             this.setOnEvents('drag', options);
@@ -128,7 +128,7 @@ Interactable.prototype = {
             return this;
         }
 
-        if (scope.isBool(options)) {
+        if (utils.isBool(options)) {
             this.options.drag.enabled = options;
 
             return this;
@@ -143,15 +143,15 @@ Interactable.prototype = {
             // if this option exists for this action
             if (option in scope.defaultOptions[action]) {
                 // if the option in the options arg is an object value
-                if (scope.isObject(options[option])) {
+                if (utils.isObject(options[option])) {
                     // duplicate the object
                     this.options[action][option] = utils.extend(this.options[action][option] || {}, options[option]);
 
-                    if (scope.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
+                    if (utils.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
                         this.options[action][option].enabled = options[option].enabled === false? false : true;
                     }
                 }
-                else if (scope.isBool(options[option]) && scope.isObject(scope.defaultOptions.perAction[option])) {
+                else if (utils.isBool(options[option]) && utils.isObject(scope.defaultOptions.perAction[option])) {
                     this.options[action][option].enabled = options[option];
                 }
                 else if (options[option] !== undefined) {
@@ -192,7 +192,7 @@ Interactable.prototype = {
      = (boolean | object) The current setting or this Interactable
     \*/
     dropzone: function (options) {
-        if (scope.isObject(options)) {
+        if (utils.isObject(options)) {
             this.options.drop.enabled = options.enabled === false? false: true;
             this.setOnEvents('drop', options);
             this.accept(options.accept);
@@ -200,14 +200,14 @@ Interactable.prototype = {
             if (/^(pointer|center)$/.test(options.overlap)) {
                 this.options.drop.overlap = options.overlap;
             }
-            else if (scope.isNumber(options.overlap)) {
+            else if (utils.isNumber(options.overlap)) {
                 this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
             }
 
             return this;
         }
 
-        if (scope.isBool(options)) {
+        if (utils.isBool(options)) {
             this.options.drop.enabled = options;
 
             return this;
@@ -253,7 +253,7 @@ Interactable.prototype = {
             dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
         }
 
-        if (scope.isNumber(dropOverlap)) {
+        if (utils.isNumber(dropOverlap)) {
             var overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
                               * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top ))),
                 overlapRatio = overlapArea / (dragRect.width * dragRect.height);
@@ -302,7 +302,7 @@ Interactable.prototype = {
      | }
     \*/
     dropChecker: function (checker) {
-        if (scope.isFunction(checker)) {
+        if (utils.isFunction(checker)) {
             this.options.dropChecker = checker;
 
             return this;
@@ -341,7 +341,7 @@ Interactable.prototype = {
         }
 
         // test if it is a valid CSS selector
-        if (scope.trySelector(newValue)) {
+        if (utils.trySelector(newValue)) {
             this.options.drop.accept = newValue;
 
             return this;
@@ -393,7 +393,7 @@ Interactable.prototype = {
      | });
     \*/
     resizable: function (options) {
-        if (scope.isObject(options)) {
+        if (utils.isObject(options)) {
             this.options.resize.enabled = options.enabled === false? false: true;
             this.setPerAction('resize', options);
             this.setOnEvents('resize', options);
@@ -405,13 +405,13 @@ Interactable.prototype = {
                 this.options.resize.axis = scope.defaultOptions.resize.axis;
             }
 
-            if (scope.isBool(options.square)) {
+            if (utils.isBool(options.square)) {
                 this.options.resize.square = options.square;
             }
 
             return this;
         }
-        if (scope.isBool(options)) {
+        if (utils.isBool(options)) {
             this.options.resize.enabled = options;
 
             return this;
@@ -435,7 +435,7 @@ Interactable.prototype = {
      = (object) this Interactable
     \*/
     squareResize: function (newValue) {
-        if (scope.isBool(newValue)) {
+        if (utils.isBool(newValue)) {
             this.options.resize.square = newValue;
 
             return this;
@@ -474,7 +474,7 @@ Interactable.prototype = {
      | });
     \*/
     gesturable: function (options) {
-        if (scope.isObject(options)) {
+        if (utils.isObject(options)) {
             this.options.gesture.enabled = options.enabled === false? false: true;
             this.setPerAction('gesture', options);
             this.setOnEvents('gesture', options);
@@ -482,7 +482,7 @@ Interactable.prototype = {
             return this;
         }
 
-        if (scope.isBool(options)) {
+        if (utils.isBool(options)) {
             this.options.gesture.enabled = options;
 
             return this;
@@ -512,10 +512,10 @@ Interactable.prototype = {
      = (Interactable) this Interactable
     \*/
     autoScroll: function (options) {
-        if (scope.isObject(options)) {
+        if (utils.isObject(options)) {
             options = utils.extend({ actions: ['drag', 'resize']}, options);
         }
-        else if (scope.isBool(options)) {
+        else if (utils.isBool(options)) {
             options = { actions: ['drag', 'resize'], enabled: options };
         }
 
@@ -590,21 +590,21 @@ Interactable.prototype = {
     },
 
     setOptions: function (option, options) {
-        var actions = options && scope.isArray(options.actions)
+        var actions = options && utils.isArray(options.actions)
                 ? options.actions
                 : ['drag'];
 
         var i;
 
-        if (scope.isObject(options) || scope.isBool(options)) {
+        if (utils.isObject(options) || utils.isBool(options)) {
             for (i = 0; i < actions.length; i++) {
                 var action = /resize/.test(actions[i])? 'resize' : actions[i];
 
-                if (!scope.isObject(this.options[action])) { continue; }
+                if (!utils.isObject(this.options[action])) { continue; }
 
                 var thisOption = this.options[action][option];
 
-                if (scope.isObject(options)) {
+                if (utils.isObject(options)) {
                     utils.extend(thisOption, options);
                     thisOption.enabled = options.enabled === false? false: true;
 
@@ -628,7 +628,7 @@ Interactable.prototype = {
                         }
                     }
                 }
-                else if (scope.isBool(options)) {
+                else if (utils.isBool(options)) {
                     thisOption.enabled = options;
                 }
             }
@@ -747,7 +747,7 @@ Interactable.prototype = {
      | });
     \*/
     actionChecker: function (checker) {
-        if (scope.isFunction(checker)) {
+        if (utils.isFunction(checker)) {
             this.options.actionChecker = checker;
 
             return this;
@@ -801,7 +801,7 @@ Interactable.prototype = {
      = (function | object) The checker function or this Interactable
     \*/
     rectChecker: function (checker) {
-        if (scope.isFunction(checker)) {
+        if (utils.isFunction(checker)) {
             this.getRect = checker;
 
             return this;
@@ -828,7 +828,7 @@ Interactable.prototype = {
      = (boolean | Interactable) The current setting or this Interactable
     \*/
     styleCursor: function (newValue) {
-        if (scope.isBool(newValue)) {
+        if (utils.isBool(newValue)) {
             this.options.styleCursor = newValue;
 
             return this;
@@ -862,7 +862,7 @@ Interactable.prototype = {
             return this;
         }
 
-        if (scope.isBool(newValue)) {
+        if (utils.isBool(newValue)) {
             this.options.preventDefault = newValue? 'always' : 'never';
             return this;
         }
@@ -884,11 +884,11 @@ Interactable.prototype = {
      = (object) The current origin or this Interactable
     \*/
     origin: function (newValue) {
-        if (scope.trySelector(newValue)) {
+        if (utils.trySelector(newValue)) {
             this.options.origin = newValue;
             return this;
         }
-        else if (scope.isObject(newValue)) {
+        else if (utils.isObject(newValue)) {
             this.options.origin = newValue;
             return this;
         }
@@ -954,7 +954,7 @@ Interactable.prototype = {
      | });
     \*/
     restrict: function (options) {
-        if (!scope.isObject(options)) {
+        if (!utils.isObject(options)) {
             return this.setOptions('restrict', options);
         }
 
@@ -1008,7 +1008,7 @@ Interactable.prototype = {
      | interact(element).ignoreFrom('input, textarea, a');
     \*/
     ignoreFrom: function (newValue) {
-        if (scope.trySelector(newValue)) {            // CSS selector to match event.target
+        if (utils.trySelector(newValue)) {            // CSS selector to match event.target
             this.options.ignoreFrom = newValue;
             return this;
         }
@@ -1037,7 +1037,7 @@ Interactable.prototype = {
      | interact(element).allowFrom('.handle');
     \*/
     allowFrom: function (newValue) {
-        if (scope.trySelector(newValue)) {            // CSS selector to match event.target
+        if (utils.trySelector(newValue)) {            // CSS selector to match event.target
             this.options.allowFrom = newValue;
             return this;
         }
@@ -1074,7 +1074,7 @@ Interactable.prototype = {
      = (Interactable) this Interactable
     \*/
     fire: function (iEvent) {
-        if (!(iEvent && iEvent.type) || !scope.contains(scope.eventTypes, iEvent.type)) {
+        if (!(iEvent && iEvent.type) || !utils.contains(scope.eventTypes, iEvent.type)) {
             return this;
         }
 
@@ -1095,7 +1095,7 @@ Interactable.prototype = {
         }
 
         // interactable.onevent listener
-        if (scope.isFunction(this[onEvent])) {
+        if (utils.isFunction(this[onEvent])) {
             funcName = this[onEvent].name;
             this[onEvent](iEvent);
         }
@@ -1126,11 +1126,11 @@ Interactable.prototype = {
     on: function (eventType, listener, useCapture) {
         var i;
 
-        if (scope.isString(eventType) && eventType.search(' ') !== -1) {
+        if (utils.isString(eventType) && eventType.search(' ') !== -1) {
             eventType = eventType.trim().split(/ +/);
         }
 
-        if (scope.isArray(eventType)) {
+        if (utils.isArray(eventType)) {
             for (i = 0; i < eventType.length; i++) {
                 this.on(eventType[i], listener, useCapture);
             }
@@ -1138,7 +1138,7 @@ Interactable.prototype = {
             return this;
         }
 
-        if (scope.isObject(eventType)) {
+        if (utils.isObject(eventType)) {
             for (var prop in eventType) {
                 this.on(prop, eventType[prop], listener);
             }
@@ -1153,7 +1153,7 @@ Interactable.prototype = {
         // convert to boolean
         useCapture = useCapture? true: false;
 
-        if (scope.contains(scope.eventTypes, eventType)) {
+        if (utils.contains(scope.eventTypes, eventType)) {
             // if this type of event was never bound to this Interactable
             if (!(eventType in this._iEvents)) {
                 this._iEvents[eventType] = [listener];
@@ -1187,11 +1187,11 @@ Interactable.prototype = {
     off: function (eventType, listener, useCapture) {
         var i;
 
-        if (scope.isString(eventType) && eventType.search(' ') !== -1) {
+        if (utils.isString(eventType) && eventType.search(' ') !== -1) {
             eventType = eventType.trim().split(/ +/);
         }
 
-        if (scope.isArray(eventType)) {
+        if (utils.isArray(eventType)) {
             for (i = 0; i < eventType.length; i++) {
                 this.off(eventType[i], listener, useCapture);
             }
@@ -1199,7 +1199,7 @@ Interactable.prototype = {
             return this;
         }
 
-        if (scope.isObject(eventType)) {
+        if (utils.isObject(eventType)) {
             for (var prop in eventType) {
                 this.off(prop, eventType[prop], listener);
             }
@@ -1218,10 +1218,10 @@ Interactable.prototype = {
         }
 
         // if it is an action event type
-        if (scope.contains(scope.eventTypes, eventType)) {
+        if (utils.contains(scope.eventTypes, eventType)) {
             eventList = this._iEvents[eventType];
 
-            if (eventList && (index = scope.indexOf(eventList, listener)) !== -1) {
+            if (eventList && (index = utils.indexOf(eventList, listener)) !== -1) {
                 this._iEvents[eventType].splice(index, 1);
             }
         }
@@ -1246,7 +1246,7 @@ Interactable.prototype = {
      = (object) This Interactablw
     \*/
     set: function (options) {
-        if (!scope.isObject(options)) {
+        if (!utils.isObject(options)) {
             options = {};
         }
 
@@ -1299,7 +1299,7 @@ Interactable.prototype = {
     unset: function () {
         events.remove(this._element, 'all');
 
-        if (!scope.isString(this.selector)) {
+        if (!utils.isString(this.selector)) {
             events.remove(this, 'all');
             if (this.options.styleCursor) {
                 this._element.style.cursor = '';
@@ -1334,7 +1334,7 @@ Interactable.prototype = {
 
         this.dropzone(false);
 
-        scope.interactables.splice(scope.indexOf(scope.interactables, this), 1);
+        scope.interactables.splice(utils.indexOf(scope.interactables, this), 1);
 
         return scope.interact;
     }
@@ -1347,8 +1347,8 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     // true value, use pointer coords and element rect
     if (value === true) {
         // if dimensions are negative, "switch" edges
-        var width = scope.isNumber(rect.width)? rect.width : rect.right - rect.left,
-            height = scope.isNumber(rect.height)? rect.height : rect.bottom - rect.top;
+        var width = utils.isNumber(rect.width)? rect.width : rect.right - rect.left,
+            height = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top;
 
         if (width < 0) {
             if      (name === 'left' ) { name = 'right'; }
@@ -1395,7 +1395,7 @@ function defaultActionChecker (pointer, interaction, element) {
         };
 
         // if using resize.edges
-        if (scope.isObject(resizeOptions.edges)) {
+        if (utils.isObject(resizeOptions.edges)) {
             for (var edge in resizeEdges) {
                 resizeEdges[edge] = checkResizeEdge(edge,
                                                     resizeOptions.edges[edge],
