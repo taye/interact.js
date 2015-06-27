@@ -1,6 +1,7 @@
 'use strict';
 
 var win = require('./window'),
+    isType = require('./isType'),
     domObjects = require('./domObjects');
 
 var browser = {
@@ -27,8 +28,11 @@ var browser = {
             'matches': 'webkitMatchesSelector' in Element.prototype?
                 'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype?
                     'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
-                        'oMatchesSelector': 'msMatchesSelector'
+                        'oMatchesSelector': 'msMatchesSelector',
 
+    useMatchesSelectorPolyfill: false
 };
+
+browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);
 
 module.exports = browser;

@@ -26,4 +26,5 @@ utils.browser = require('./browser');
 
 extend(utils, require('./arr'));
 extend(utils, require('./isType'));
+extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));

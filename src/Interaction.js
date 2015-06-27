@@ -251,7 +251,7 @@ Interaction.prototype = {
                 && scope.inContext(interactable, eventTarget)
                 && !scope.testIgnore(interactable, eventTarget, eventTarget)
                 && scope.testAllow(interactable, eventTarget, eventTarget)
-                && scope.matchesSelector(eventTarget, selector)) {
+                && utils.matchesSelector(eventTarget, selector)) {
 
                 curMatches.push(interactable);
                 curMatchElements.push(eventTarget);
@@ -277,7 +277,7 @@ Interaction.prototype = {
                     scope.listeners.pointerHover);
             }
             else if (this.target) {
-                if (scope.nodeContains(prevTargetElement, eventTarget)) {
+                if (utils.nodeContains(prevTargetElement, eventTarget)) {
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
                     events.add(this.element,
                         scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
@@ -372,7 +372,7 @@ Interaction.prototype = {
                     this.collectEventTargets(pointer, event, eventTarget, 'down');
                     return;
                 }
-                element = scope.parentElement(element);
+                element = utils.parentElement(element);
             }
         }
 
@@ -383,14 +383,14 @@ Interaction.prototype = {
         }
 
         function pushMatches (interactable, selector, context) {
-            var elements = scope.ie8MatchesSelector
+            var elements = browser.useMatchesSelectorPolyfill
                 ? context.querySelectorAll(selector)
                 : undefined;
 
             if (scope.inContext(interactable, element)
                 && !scope.testIgnore(interactable, element, eventTarget)
                 && scope.testAllow(interactable, element, eventTarget)
-                && scope.matchesSelector(element, selector, elements)) {
+                && utils.matchesSelector(element, selector, elements)) {
 
                 that.matches.push(interactable);
                 that.matchElements.push(element);
@@ -408,7 +408,7 @@ Interaction.prototype = {
             scope.interactables.forEachSelector(pushMatches);
 
             action = this.validateSelector(pointer, event, this.matches, this.matchElements);
-            element = scope.parentElement(element);
+            element = utils.parentElement(element);
         }
 
         if (action) {
@@ -729,7 +729,7 @@ Interaction.prototype = {
                                 break;
                             }
 
-                            element = scope.parentElement(element);
+                            element = utils.parentElement(element);
                         }
 
                         // if there's no drag from element interactables,
@@ -738,7 +738,7 @@ Interaction.prototype = {
                             var thisInteraction = this;
 
                             var getDraggable = function (interactable, selector, context) {
-                                var elements = scope.ie8MatchesSelector
+                                var elements = browser.useMatchesSelectorPolyfill
                                     ? context.querySelectorAll(selector)
                                     : undefined;
 
@@ -748,7 +748,7 @@ Interaction.prototype = {
                                     && !interactable.options.drag.manualStart
                                     && !scope.testIgnore(interactable, element, eventTarget)
                                     && scope.testAllow(interactable, element, eventTarget)
-                                    && scope.matchesSelector(element, selector, elements)
+                                    && utils.matchesSelector(element, selector, elements)
                                     && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
                                     && scope.checkAxis(axis, interactable)
                                     && scope.withinInteractionLimit(interactable, element, 'drag')) {
@@ -769,7 +769,7 @@ Interaction.prototype = {
                                     break;
                                 }
 
-                                element = scope.parentElement(element);
+                                element = utils.parentElement(element);
                             }
                         }
                     }
@@ -1265,7 +1265,7 @@ Interaction.prototype = {
             // test the draggable element against the dropzone's accept setting
             if ((utils.isElement(accept) && accept !== element)
                 || (scope.isString(accept)
-                && !scope.matchesSelector(element, accept))) {
+                && !utils.matchesSelector(element, accept))) {
 
                 continue;
             }
@@ -1638,7 +1638,7 @@ Interaction.prototype = {
             element = eventTarget;
 
         function collectSelectors (interactable, selector, context) {
-            var els = scope.ie8MatchesSelector
+            var els = browser.useMatchesSelectorPolyfill
                 ? context.querySelectorAll(selector)
                 : undefined;
 
@@ -1647,7 +1647,7 @@ Interaction.prototype = {
                 && scope.inContext(interactable, element)
                 && !scope.testIgnore(interactable, element, eventTarget)
                 && scope.testAllow(interactable, element, eventTarget)
-                && scope.matchesSelector(element, selector, els)) {
+                && utils.matchesSelector(element, selector, els)) {
 
                 targets.push(interactable);
                 elements.push(element);
@@ -1665,7 +1665,7 @@ Interaction.prototype = {
 
             scope.interactables.forEachSelector(collectSelectors);
 
-            element = scope.parentElement(element);
+            element = utils.parentElement(element);
         }
 
         // create the tap event even if there are no listeners so that
@@ -1925,13 +1925,13 @@ Interaction.prototype = {
 
         if (scope.isString(restriction)) {
             if (restriction === 'parent') {
-                restriction = scope.parentElement(this.element);
+                restriction = utils.parentElement(this.element);
             }
             else if (restriction === 'self') {
                 restriction = target.getRect(this.element);
             }
             else {
-                restriction = scope.closest(this.element, restriction);
+                restriction = utils.closest(this.element, restriction);
             }
 
             if (!restriction) { return status; }

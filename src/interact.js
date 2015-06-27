@@ -24,15 +24,6 @@
 
     scope.dynamicDrop     = false;
 
-    // {
-    //      type: {
-    //          selectors: ['selector', ...],
-    //          contexts : [document, ...],
-    //          listeners: [[listener, useCapture], ...]
-    //      }
-    //  }
-    scope.delegatedEvents = {};
-
     scope.defaultOptions = require('./defaultOptions');
 
     // Things related to autoScroll
@@ -130,9 +121,6 @@
                     'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                         'oMatchesSelector': 'msMatchesSelector';
 
-    // will be polyfill function if browser is IE8
-    scope.ie8MatchesSelector = null;
-
     // Events wrapper
     var events = require('./utils/events');
 
@@ -191,13 +179,13 @@
                 : scope.defaultOptions.origin;
 
         if (origin === 'parent') {
-            origin = scope.parentElement(element);
+            origin = utils.parentElement(element);
         }
         else if (origin === 'self') {
             origin = interactable.getRect(element);
         }
         else if (scope.trySelector(origin)) {
-            origin = scope.closest(element, origin) || { x: 0, y: 0 };
+            origin = utils.closest(element, origin) || { x: 0, y: 0 };
         }
 
         if (scope.isFunction(origin)) {
@@ -233,46 +221,9 @@
         return -c * t*(t-2) + b;
     };
 
-    scope.nodeContains = function (parent, child) {
-        while (child) {
-            if (child === parent) {
-                return true;
-            }
-
-            child = child.parentNode;
-        }
-
-        return false;
-    };
-
-    scope.closest = function (child, selector) {
-        var parent = scope.parentElement(child);
-
-        while (utils.isElement(parent)) {
-            if (scope.matchesSelector(parent, selector)) { return parent; }
-
-            parent = scope.parentElement(parent);
-        }
-
-        return null;
-    };
-
-    scope.parentElement = function (node) {
-        var parent = node.parentNode;
-
-        if (scope.isDocFrag(parent)) {
-            // skip past #shado-root fragments
-            while ((parent = parent.host) && scope.isDocFrag(parent)) {}
-
-            return parent;
-        }
-
-        return parent;
-    };
-
     scope.inContext = function (interactable, element) {
         return interactable._context === element.ownerDocument
-                || scope.nodeContains(interactable._context, element);
+                || utils.nodeContains(interactable._context, element);
     };
 
     scope.testIgnore = function (interactable, interactableElement, element) {
@@ -284,7 +235,7 @@
             return scope.matchesUpTo(element, ignoreFrom, interactableElement);
         }
         else if (utils.isElement(ignoreFrom)) {
-            return scope.nodeContains(ignoreFrom, element);
+            return utils.nodeContains(ignoreFrom, element);
         }
 
         return false;
@@ -301,7 +252,7 @@
             return scope.matchesUpTo(element, allowFrom, interactableElement);
         }
         else if (utils.isElement(allowFrom)) {
-            return scope.nodeContains(allowFrom, element);
+            return utils.nodeContains(allowFrom, element);
         }
 
         return false;
@@ -489,50 +440,21 @@
         return index;
     };
 
-    scope.matchesSelector = function (element, selector, nodeList) {
-        if (scope.ie8MatchesSelector) {
-            return scope.ie8MatchesSelector(element, selector, nodeList);
-        }
-
-        // remove /deep/ from selectors if shadowDOM polyfill is used
-        if (scope.window !== scope.realWindow) {
-            selector = selector.replace(/\/deep\//g, ' ');
-        }
-
-        return element[browser.prefixedMatchesSelector](selector);
-    };
-
     scope.matchesUpTo = function (element, selector, limit) {
         while (utils.isElement(element)) {
-            if (scope.matchesSelector(element, selector)) {
+            if (utils.matchesSelector(element, selector)) {
                 return true;
             }
 
-            element = scope.parentElement(element);
+            element = utils.parentElement(element);
 
             if (element === limit) {
-                return scope.matchesSelector(element, selector);
+                return utils.matchesSelector(element, selector);
             }
         }
 
         return false;
     };
-
-    // For IE8's lack of an Element#matchesSelector
-    // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-    if (!(browser.prefixedMatchesSelector in Element.prototype) || !scope.isFunction(Element.prototype[browser.prefixedMatchesSelector])) {
-        scope.ie8MatchesSelector = function (element, selector, elems) {
-            elems = elems || element.parentNode.querySelectorAll(selector);
-
-            for (var i = 0, len = elems.length; i < len; i++) {
-                if (elems[i] === element) {
-                    return true;
-                }
-            }
-
-            return false;
-        };
-    }
 
     var Interaction = require('./Interaction');
 
@@ -565,7 +487,7 @@
 
                             return interaction;
                         }
-                        element = scope.parentElement(element);
+                        element = utils.parentElement(element);
                     }
                 }
             }
@@ -677,10 +599,6 @@
         });
     }
 
-    function preventOriginalDefault () {
-        this.originalEvent.preventDefault();
-    }
-
     function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
         // false, '', undefined, null
         if (!value) { return false; }
@@ -790,56 +708,6 @@
         var listenerName = interactionListeners[i];
 
         scope.listeners[listenerName] = doOnInteractions(listenerName);
-    }
-
-    // bound to the interactable context when a DOM event
-    // listener is added to a selector interactable
-    function delegateListener (event, useCapture) {
-        var fakeEvent = {},
-            delegated = scope.delegatedEvents[event.type],
-            eventTarget = scope.getActualElement(event.path
-                                           ? event.path[0]
-                                           : event.target),
-            element = eventTarget;
-
-        useCapture = useCapture? true: false;
-
-        // duplicate the event so that currentTarget can be changed
-        for (var prop in event) {
-            fakeEvent[prop] = event[prop];
-        }
-
-        fakeEvent.originalEvent = event;
-        fakeEvent.preventDefault = preventOriginalDefault;
-
-        // climb up document tree looking for selector matches
-        while (utils.isElement(element)) {
-            for (var i = 0; i < delegated.selectors.length; i++) {
-                var selector = delegated.selectors[i],
-                    context = delegated.contexts[i];
-
-                if (scope.matchesSelector(element, selector)
-                    && scope.nodeContains(context, eventTarget)
-                    && scope.nodeContains(context, element)) {
-
-                    var listeners = delegated.listeners[i];
-
-                    fakeEvent.currentTarget = element;
-
-                    for (var j = 0; j < listeners.length; j++) {
-                        if (listeners[j][1] === useCapture) {
-                            listeners[j][0](fakeEvent);
-                        }
-                    }
-                }
-            }
-
-            element = scope.parentElement(element);
-        }
-    }
-
-    function delegateUseCapture (event) {
-        return delegateListener.call(this, event, true);
     }
 
     scope.interactables.indexOfElement = function indexOfElement (element, context) {
@@ -2067,40 +1935,7 @@
             }
             // delegated event for selector
             else if (this.selector) {
-                if (!scope.delegatedEvents[eventType]) {
-                    scope.delegatedEvents[eventType] = {
-                        selectors: [],
-                        contexts : [],
-                        listeners: []
-                    };
-
-                    // add delegate listener functions
-                    for (i = 0; i < scope.documents.length; i++) {
-                        events.add(scope.documents[i], eventType, delegateListener);
-                        events.add(scope.documents[i], eventType, delegateUseCapture, true);
-                    }
-                }
-
-                var delegated = scope.delegatedEvents[eventType],
-                    index;
-
-                for (index = delegated.selectors.length - 1; index >= 0; index--) {
-                    if (delegated.selectors[index] === this.selector
-                        && delegated.contexts[index] === this._context) {
-                        break;
-                    }
-                }
-
-                if (index === -1) {
-                    index = delegated.selectors.length;
-
-                    delegated.selectors.push(this.selector);
-                    delegated.contexts .push(this._context);
-                    delegated.listeners.push([]);
-                }
-
-                // keep listener and useCapture flag
-                delegated.listeners[index].push([listener, useCapture]);
+                events.addDelegate(this.selector, this._context, eventType, listener, useCapture);
             }
             else {
                 events.add(this._element, eventType, listener, useCapture);
@@ -2163,55 +1998,7 @@
             }
             // delegated event
             else if (this.selector) {
-                var delegated = scope.delegatedEvents[eventType],
-                    matchFound = false;
-
-                if (!delegated) { return this; }
-
-                // count from last index of delegated to 0
-                for (index = delegated.selectors.length - 1; index >= 0; index--) {
-                    // look for matching selector and context Node
-                    if (delegated.selectors[index] === this.selector
-                        && delegated.contexts[index] === this._context) {
-
-                        var listeners = delegated.listeners[index];
-
-                        // each item of the listeners array is an array: [function, useCaptureFlag]
-                        for (i = listeners.length - 1; i >= 0; i--) {
-                            var fn = listeners[i][0],
-                                useCap = listeners[i][1];
-
-                            // check if the listener functions and useCapture flags match
-                            if (fn === listener && useCap === useCapture) {
-                                // remove the listener from the array of listeners
-                                listeners.splice(i, 1);
-
-                                // if all listeners for this interactable have been removed
-                                // remove the interactable from the delegated arrays
-                                if (!listeners.length) {
-                                    delegated.selectors.splice(index, 1);
-                                    delegated.contexts .splice(index, 1);
-                                    delegated.listeners.splice(index, 1);
-
-                                    // remove delegate function from context
-                                    events.remove(this._context, eventType, delegateListener);
-                                    events.remove(this._context, eventType, delegateUseCapture, true);
-
-                                    // remove the arrays if they are empty
-                                    if (!delegated.selectors.length) {
-                                        scope.delegatedEvents[eventType] = null;
-                                    }
-                                }
-
-                                // only remove one listener
-                                matchFound = true;
-                                break;
-                            }
-                        }
-
-                        if (matchFound) { break; }
-                    }
-                }
+                events.removeDelegate(this.selector, this._context, eventType, listener, useCapture);
             }
             // remove listener from this Interatable's element
             else {
@@ -2307,8 +2094,8 @@
                             }
                         }
 
-                        events.remove(this._context, type, delegateListener);
-                        events.remove(this._context, type, delegateUseCapture, true);
+                        events.remove(this._context, type, events.delegateListener);
+                        events.remove(this._context, type, events.delegateUseCapture, true);
 
                         break;
                     }
@@ -2574,8 +2361,8 @@
     interact.getTouchAngle    = utils.touchAngle;
 
     interact.getElementRect   = scope.getElementRect;
-    interact.matchesSelector  = scope.matchesSelector;
-    interact.closest          = scope.closest;
+    interact.matchesSelector  = utils.matchesSelector;
+    interact.closest          = utils.closest;
 
     /*\
      * interact.margin
@@ -2736,8 +2523,8 @@
 
         // add delegate event listener
         for (var eventType in scope.delegatedEvents) {
-            events.add(doc, eventType, delegateListener);
-            events.add(doc, eventType, delegateUseCapture, true);
+            events.add(doc, eventType, events.delegateListener);
+            events.add(doc, eventType, events.delegateUseCapture, true);
         }
 
         if (scope.PointerEvent) {
@@ -2813,6 +2600,7 @@
         }
 
         scope.documents.push(doc);
+        events.documents.push(doc);
     }
 
     listenToDocument(scope.document);
