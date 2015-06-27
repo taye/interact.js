@@ -28,8 +28,15 @@ var isType = {
 
     isBool     : function (thing) { return typeof thing === 'boolean' ; },
 
-    isString   : function (thing) { return typeof thing === 'string'  ; }
+    isString   : function (thing) { return typeof thing === 'string'  ; },
     
+    trySelector: function (value) {
+        if (!isType.isString(value)) { return false; }
+
+        // an exception will be raised if it is invalid
+        domObjects.document.querySelector(value);
+        return true;
+    }
 };
 
 isType.isArray = function (thing) {

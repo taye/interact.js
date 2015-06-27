@@ -242,7 +242,7 @@ Interaction.prototype = {
                 elementInteractable.getAction(pointer, event, this, eventTarget),
                 elementInteractable));
 
-        if (elementAction && !scope.withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
+        if (elementAction && !withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
             elementAction = null;
         }
 
@@ -459,7 +459,7 @@ Interaction.prototype = {
                 && !scope.testIgnore(interactable, curEventTarget, eventTarget)
                 && scope.testAllow(interactable, curEventTarget, eventTarget)
                 && (action = validateAction(forceAction || interactable.getAction(pointer, event, this, curEventTarget), interactable, eventTarget))
-                && scope.withinInteractionLimit(interactable, curEventTarget, action)) {
+                && withinInteractionLimit(interactable, curEventTarget, action)) {
                 this.target = interactable;
                 this.element = curEventTarget;
             }
@@ -751,7 +751,7 @@ Interaction.prototype = {
                                     && utils.matchesSelector(element, selector, elements)
                                     && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
                                     && scope.checkAxis(axis, interactable)
-                                    && scope.withinInteractionLimit(interactable, element, 'drag')) {
+                                    && withinInteractionLimit(interactable, element, 'drag')) {
 
                                     return interactable;
                                 }
@@ -780,7 +780,7 @@ Interaction.prototype = {
 
             if (starting
                 && (this.target.options[this.prepared.name].manualStart
-                || !scope.withinInteractionLimit(this.target, this.element, this.prepared))) {
+                || !withinInteractionLimit(this.target, this.element, this.prepared))) {
                 this.stop(event);
                 return;
             }
@@ -1347,7 +1347,7 @@ Interaction.prototype = {
         }
 
         // get the most appropriate dropzone based on DOM depth and order
-        var dropIndex = scope.indexOfDeepestElement(validDrops),
+        var dropIndex = utils.indexOfDeepestElement(validDrops),
             dropzone  = this.activeDrops.dropzones[dropIndex] || null,
             element   = this.activeDrops.elements [dropIndex] || null;
 
@@ -1530,7 +1530,7 @@ Interaction.prototype = {
                 inertiaStatus.sy = inertiaStatus.ye * progress;
             }
             else {
-                var quadPoint = scope.getQuadraticCurvePoint(
+                var quadPoint = utils.getQuadraticCurvePoint(
                     0, 0,
                     inertiaStatus.xe, inertiaStatus.ye,
                     inertiaStatus.modifiedXe, inertiaStatus.modifiedYe,
@@ -1561,8 +1561,8 @@ Interaction.prototype = {
             duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
 
         if (t < duration) {
-            inertiaStatus.sx = scope.easeOutQuad(t, 0, inertiaStatus.xe, duration);
-            inertiaStatus.sy = scope.easeOutQuad(t, 0, inertiaStatus.ye, duration);
+            inertiaStatus.sx = utils.easeOutQuad(t, 0, inertiaStatus.xe, duration);
+            inertiaStatus.sy = utils.easeOutQuad(t, 0, inertiaStatus.ye, duration);
 
             this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
@@ -1755,7 +1755,7 @@ Interaction.prototype = {
                 matchElement = matchElements[i],
                 action = validateAction(match.getAction(pointer, event, this, matchElement), match);
 
-            if (action && scope.withinInteractionLimit(match, matchElement, action)) {
+            if (action && withinInteractionLimit(match, matchElement, action)) {
                 this.target = match;
                 this.element = matchElement;
 
@@ -1942,7 +1942,7 @@ Interaction.prototype = {
         }
 
         if (utils.isElement(restriction)) {
-            restriction = scope.getElementRect(restriction);
+            restriction = utils.getElementRect(restriction);
         }
 
         rect = restriction;
@@ -2050,7 +2050,7 @@ Interaction.prototype = {
             bottom = pointer.clientY > container.innerHeight - scope.autoScroll.margin;
         }
         else {
-            var rect = scope.getElementRect(container);
+            var rect = utils.getElementRect(container);
 
             left   = pointer.clientX < rect.left   + scope.autoScroll.margin;
             top    = pointer.clientY < rect.top    + scope.autoScroll.margin;
@@ -2074,7 +2074,192 @@ Interaction.prototype = {
         this._eventTarget    = target;
         this._curEventTarget = currentTarget;
     }
-
 };
+
+function withinInteractionLimit (interactable, element, action) {
+    var options = interactable.options,
+        maxActions = options[action.name].max,
+        maxPerElement = options[action.name].maxPerElement,
+        activeInteractions = 0,
+        targetCount = 0,
+        targetElementCount = 0;
+
+    for (var i = 0, len = scope.interactions.length; i < len; i++) {
+        var interaction = scope.interactions[i],
+            otherAction = interaction.prepared.name,
+            active = interaction.interacting();
+
+        if (!active) { continue; }
+
+        activeInteractions++;
+
+        if (activeInteractions >= scope.maxInteractions) {
+            return false;
+        }
+
+        if (interaction.target !== interactable) { continue; }
+
+        targetCount += (otherAction === action.name)|0;
+
+        if (targetCount >= maxActions) {
+            return false;
+        }
+
+        if (interaction.element === element) {
+            targetElementCount++;
+
+            if (otherAction !== action.name || targetElementCount >= maxPerElement) {
+                return false;
+            }
+        }
+    }
+
+    return scope.maxInteractions > 0;
+}
+
+
+function getInteractionFromPointer (pointer, eventType, eventTarget) {
+    var i = 0, len = scope.interactions.length,
+        mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
+                      // MSPointerEvent.MSPOINTER_TYPE_MOUSE
+                      || pointer.pointerType === 4),
+        interaction;
+
+    var id = utils.getPointerId(pointer);
+
+    // try to resume inertia with a new pointer
+    if (/down|start/i.test(eventType)) {
+        for (i = 0; i < len; i++) {
+            interaction = scope.interactions[i];
+
+            var element = eventTarget;
+
+            if (interaction.inertiaStatus.active && interaction.target.options[interaction.prepared.name].inertia.allowResume
+                && (interaction.mouse === mouseEvent)) {
+                while (element) {
+                    // if the element is the interaction element
+                    if (element === interaction.element) {
+                        // update the interaction's pointer
+                        if (interaction.pointers[0]) {
+                            interaction.removePointer(interaction.pointers[0]);
+                        }
+                        interaction.addPointer(pointer);
+
+                        return interaction;
+                    }
+                    element = utils.parentElement(element);
+                }
+            }
+        }
+    }
+
+    // if it's a mouse interaction
+    if (mouseEvent || !(browser.supportsTouch || browser.supportsPointerEvent)) {
+
+        // find a mouse interaction that's not in inertia phase
+        for (i = 0; i < len; i++) {
+            if (scope.interactions[i].mouse && !scope.interactions[i].inertiaStatus.active) {
+                return scope.interactions[i];
+            }
+        }
+
+        // find any interaction specifically for mouse.
+        // if the eventType is a mousedown, and inertia is active
+        // ignore the interaction
+        for (i = 0; i < len; i++) {
+            if (scope.interactions[i].mouse && !(/down/.test(eventType) && scope.interactions[i].inertiaStatus.active)) {
+                return interaction;
+            }
+        }
+
+        // create a new interaction for mouse
+        interaction = new Interaction();
+        interaction.mouse = true;
+
+        return interaction;
+    }
+
+    // get interaction that has this pointer
+    for (i = 0; i < len; i++) {
+        if (scope.contains(scope.interactions[i].pointerIds, id)) {
+            return scope.interactions[i];
+        }
+    }
+
+    // at this stage, a pointerUp should not return an interaction
+    if (/up|end|out/i.test(eventType)) {
+        return null;
+    }
+
+    // get first idle interaction
+    for (i = 0; i < len; i++) {
+        interaction = scope.interactions[i];
+
+        if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
+            && !interaction.interacting()
+            && !(!mouseEvent && interaction.mouse)) {
+
+            interaction.addPointer(pointer);
+
+            return interaction;
+        }
+    }
+
+    return new Interaction();
+}
+
+function doOnInteractions (method) {
+    return (function (event) {
+        var interaction,
+            eventTarget = utils.getActualElement(event.path
+                                           ? event.path[0]
+                                           : event.target),
+            curEventTarget = utils.getActualElement(event.currentTarget),
+            i;
+
+        if (browser.supportsTouch && /touch/.test(event.type)) {
+            scope.prevTouchTime = new Date().getTime();
+
+            for (i = 0; i < event.changedTouches.length; i++) {
+                var pointer = event.changedTouches[i];
+
+                interaction = getInteractionFromPointer(pointer, event.type, eventTarget);
+
+                if (!interaction) { continue; }
+
+                interaction._updateEventTargets(eventTarget, curEventTarget);
+
+                interaction[method](pointer, event, eventTarget, curEventTarget);
+            }
+        }
+        else {
+            if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
+                // ignore mouse events while touch interactions are active
+                for (i = 0; i < scope.interactions.length; i++) {
+                    if (!scope.interactions[i].mouse && scope.interactions[i].pointerIsDown) {
+                        return;
+                    }
+                }
+
+                // try to ignore mouse events that are simulated by the browser
+                // after a touch event
+                if (new Date().getTime() - scope.prevTouchTime < 500) {
+                    return;
+                }
+            }
+
+            interaction = getInteractionFromPointer(event, event.type, eventTarget);
+
+            if (!interaction) { return; }
+
+            interaction._updateEventTargets(eventTarget, curEventTarget);
+
+            interaction[method](event, event, eventTarget, curEventTarget);
+        }
+    });
+}
+
+Interaction.getInteractionFromPointer = getInteractionFromPointer;
+Interaction.doOnInteractions = doOnInteractions;
 
 module.exports = Interaction;

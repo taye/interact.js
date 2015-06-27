@@ -261,9 +261,9 @@ function removeDelegate (selector, context, type, listener, useCapture) {
 function delegateListener (event, useCapture) {
     var fakeEvent = {},
         delegated = delegatedEvents[event.type],
-        eventTarget = getActualElement(event.path
-                                       ? event.path[0]
-                                       : event.target),
+        eventTarget = domUtils.getActualElement(event.path
+                                                   ? event.path[0]
+                                                   : event.target),
         element = eventTarget;
 
     useCapture = useCapture? true: false;
@@ -321,12 +321,6 @@ function stopProp () {
 function stopImmProp () {
     this.cancelBubble = true;
     this.immediatePropagationStopped = true;
-}
-
-function getActualElement (element) {
-    return (element instanceof domObjects.SVGElementInstance
-        ? element.correspondingUseElement
-        : element);
 }
 
 module.exports = {
