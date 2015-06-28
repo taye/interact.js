@@ -482,61 +482,11 @@
      * interact.debug
      [ method ]
      *
-     * Returns debugging data
+     * Returns an object which exposes internal data
      = (object) An object with properties that outline the current state and expose internal functions and variables
     \*/
     interact.debug = function () {
-        var interaction = scope.interactions[0] || new Interaction();
-
-        return {
-            interactions          : scope.interactions,
-            target                : interaction.target,
-            dragging              : interaction.dragging,
-            resizing              : interaction.resizing,
-            gesturing             : interaction.gesturing,
-            prepared              : interaction.prepared,
-            matches               : interaction.matches,
-            matchElements         : interaction.matchElements,
-
-            prevCoords            : interaction.prevCoords,
-            startCoords           : interaction.startCoords,
-
-            pointerIds            : interaction.pointerIds,
-            pointers              : interaction.pointers,
-            addPointer            : scope.listeners.addPointer,
-            removePointer         : scope.listeners.removePointer,
-            recordPointer         : scope.listeners.recordPointer,
-
-            snap                  : interaction.snapStatus,
-            restrict              : interaction.restrictStatus,
-            inertia               : interaction.inertiaStatus,
-
-            downTime              : interaction.downTimes[0],
-            downEvent             : interaction.downEvent,
-            downPointer           : interaction.downPointer,
-            prevEvent             : interaction.prevEvent,
-
-            Interactable          : Interactable,
-            interactables         : scope.interactables,
-            pointerIsDown         : interaction.pointerIsDown,
-            defaultOptions        : scope.defaultOptions,
-            defaultActionChecker  : scope.defaultActionChecker,
-
-            actionCursors         : scope.actionCursors,
-            dragMove              : scope.listeners.dragMove,
-            resizeMove            : scope.listeners.resizeMove,
-            gestureMove           : scope.listeners.gestureMove,
-            pointerUp             : scope.listeners.pointerUp,
-            pointerDown           : scope.listeners.pointerDown,
-            pointerMove           : scope.listeners.pointerMove,
-            pointerHover          : scope.listeners.pointerHover,
-
-            eventTypes            : scope.eventTypes,
-
-            events                : events,
-            globalEvents          : scope.globalEvents,
-            delegatedEvents       : scope.delegatedEvents
-        };
+        return scope;
     };
 
     // expose the functions used to calculate multi-touch properties

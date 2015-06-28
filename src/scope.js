@@ -10,6 +10,8 @@ scope.documents       = [];   // all documents being listened to
 scope.interactables   = [];   // all set interactables
 scope.interactions    = [];   // all interactions
 
+scope.events = require('./utils/events');
+
 extend(scope, require('./utils/window'));
 extend(scope, require('./utils/domObjects'));
 
