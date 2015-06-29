@@ -21,8 +21,6 @@
 
     scope.dynamicDrop     = false;
 
-    scope.defaultOptions = require('./defaultOptions');
-
     // Things related to autoScroll
     scope.autoScroll = require('./autoScroll');
 
@@ -37,40 +35,6 @@
     // Allow this many interactions to happen simultaneously
     scope.maxInteractions = Infinity;
 
-    scope.actionCursors = browser.isIe9OrOlder ? {
-        drag    : 'move',
-        resizex : 'e-resize',
-        resizey : 's-resize',
-        resizexy: 'se-resize',
-
-        resizetop        : 'n-resize',
-        resizeleft       : 'w-resize',
-        resizebottom     : 's-resize',
-        resizeright      : 'e-resize',
-        resizetopleft    : 'se-resize',
-        resizebottomright: 'se-resize',
-        resizetopright   : 'ne-resize',
-        resizebottomleft : 'ne-resize',
-
-        gesture : ''
-    } : {
-        drag    : 'move',
-        resizex : 'ew-resize',
-        resizey : 'ns-resize',
-        resizexy: 'nwse-resize',
-
-        resizetop        : 'ns-resize',
-        resizeleft       : 'ew-resize',
-        resizebottom     : 'ns-resize',
-        resizeright      : 'ew-resize',
-        resizetopleft    : 'nwse-resize',
-        resizebottomright: 'nwse-resize',
-        resizetopright   : 'nesw-resize',
-        resizebottomleft : 'nesw-resize',
-
-        gesture : ''
-    };
-
     scope.actionIsEnabled = {
         drag   : true,
         resize : true,
@@ -81,25 +45,6 @@
     scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
 
     scope.eventTypes = [
-        'dragstart',
-        'dragmove',
-        'draginertiastart',
-        'dragend',
-        'dragenter',
-        'dragleave',
-        'dropactivate',
-        'dropdeactivate',
-        'dropmove',
-        'drop',
-        'resizestart',
-        'resizemove',
-        'resizeinertiastart',
-        'resizeend',
-        'gesturestart',
-        'gesturemove',
-        'gestureinertiastart',
-        'gestureend',
-
         'down',
         'move',
         'up',
@@ -747,3 +692,7 @@
     scope.listenToDocument = scope.listenToDocument;
 
     module.exports = interact;
+
+    require('./actions/resize');
+    require('./actions/drag');
+    require('./actions/gesture');
