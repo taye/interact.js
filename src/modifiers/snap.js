@@ -151,8 +151,34 @@ var snap = {
         return status;
     },
 
+    modifyCoords: function (page, client, interactable, status, actionName, phase) {
+        var relativePoints = interactable.options[actionName].snap && interactable.options.relativePoints;
+
+        if (modifiers.snap.shouldDo(interactable, actionName)
+            && !(phase === 'start' && relativePoints && relativePoints.length)) {
+
+            if (status.locked) {
+                page.x += status.dx;
+                page.y += status.dy;
+                client.x += status.dx;
+                client.y += status.dy;
+            }
+
+            return {
+                range  : status.range,
+                locked : status.locked,
+                x      : status.snappedX,
+                y      : status.snappedY,
+                realX  : status.realX,
+                realY  : status.realY,
+                dx     : status.dx,
+                dy     : status.dy
+            };
+        }
+    }
 };
 
 modifiers.snap = snap;
+modifiers.names.push('snap');
 
 module.exports = snap;

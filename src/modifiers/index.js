@@ -1,5 +1,7 @@
 'use strict';
 
-var modifiers = {};
+var modifiers = {
+    names: []
+};
 
 module.exports = modifiers;

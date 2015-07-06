@@ -8,7 +8,6 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     var client,
         page,
         target      = interaction.target,
-        snapStatus  = interaction.snapStatus,
         restrictStatus  = interaction.restrictStatus,
         pointers    = interaction.pointers,
         deltaSource = (target && target.options || scope.defaultOptions).deltaSource,
@@ -31,27 +30,19 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     client.x -= origin.x;
     client.y -= origin.y;
 
-    var relativePoints = options[action].snap && options[action].snap.relativePoints ;
+    this.ctrlKey   = event.ctrlKey;
+    this.altKey    = event.altKey;
+    this.shiftKey  = event.shiftKey;
+    this.metaKey   = event.metaKey;
+    this.button    = event.button;
+    this.target    = element;
+    this.t0        = interaction.downTimes[0];
+    this.type      = action + (phase || '');
 
-    if (modifiers.snap.shouldDo(target, action) && !(starting && relativePoints && relativePoints.length)) {
-        this.snap = {
-            range  : snapStatus.range,
-            locked : snapStatus.locked,
-            x      : snapStatus.snappedX,
-            y      : snapStatus.snappedY,
-            realX  : snapStatus.realX,
-            realY  : snapStatus.realY,
-            dx     : snapStatus.dx,
-            dy     : snapStatus.dy
-        };
+    this.interaction = interaction;
+    this.interactable = target;
 
-        if (snapStatus.locked) {
-            page.x += snapStatus.dx;
-            page.y += snapStatus.dy;
-            client.x += snapStatus.dx;
-            client.y += snapStatus.dy;
-        }
-    }
+    this.snap = modifiers.snap.modifyCoords(page, client, target, interaction.snapStatus, action, phase);
 
     if (scope.checkRestrict(target, action) && !(starting && options[action].restrict.elementRect) && restrictStatus.restricted) {
         page.x += restrictStatus.dx;
@@ -74,17 +65,6 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     this.y0        = interaction.startCoords.page.y - origin.y;
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
-    this.ctrlKey   = event.ctrlKey;
-    this.altKey    = event.altKey;
-    this.shiftKey  = event.shiftKey;
-    this.metaKey   = event.metaKey;
-    this.button    = event.button;
-    this.target    = element;
-    this.t0        = interaction.downTimes[0];
-    this.type      = action + (phase || '');
-
-    this.interaction = interaction;
-    this.interactable = target;
 
     var inertiaStatus = interaction.inertiaStatus;
 
