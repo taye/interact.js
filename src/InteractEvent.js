@@ -41,8 +41,12 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     this.interaction = interaction;
     this.interactable = target;
 
-    this.snap     = modifiers.snap.modifyCoords    (page, client, target, interaction.snapStatus    , action, phase);
-    this.restrict = modifiers.restrict.modifyCoords(page, client, target, interaction.restrictStatus, action, phase);
+    for (var i = 0; i < modifiers.names.length; i++) {
+        var modifierName = modifiers.names[i],
+            modifier = modifiers[modifierName];
+
+        this[modifierName] = modifier.modifyCoords(page, client, target, interaction[modifierName + 'Status'], action, phase);
+    }
 
     this.pageX     = page.x;
     this.pageY     = page.y;

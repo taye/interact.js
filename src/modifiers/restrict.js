@@ -11,11 +11,9 @@ var restrict = {
         elementRect: null
     },
     shouldDo: function (interactable, actionName, preEnd) {
-        var options = interactable.options;
+        var restrict = interactable.options[actionName].restrict;
 
-        return (options[actionName].restrict
-                && options[actionName].restrict.enabled
-                && (preEnd || !interactable.options[actionName].restrict.endOnly));
+        return (restrict && restrict.enabled && (preEnd || !restrict.endOnly));
     },
     set: function (pageCoords, interaction, status) {
         var target = interaction.target,
@@ -32,11 +30,6 @@ var restrict = {
         page = status.useStatusXY
             ? page = { x: status.x, y: status.y }
             : page = utils.extend({}, pageCoords);
-
-        if (status.snap && status.snap.locked) {
-            page.x += status.snap.dx || 0;
-            page.y += status.snap.dy || 0;
-        }
 
         page.x -= interaction.inertiaStatus.resumeDx;
         page.y -= interaction.inertiaStatus.resumeDy;

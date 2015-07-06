@@ -143,8 +143,6 @@ function Interaction () {
         changed    : false
     };
 
-    this.restrictStatus.snap = this.snapStatus;
-
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
     this.gesturing       = false;
@@ -515,22 +513,29 @@ Interaction.prototype = {
     },
 
     setModifications: function (coords, preEnd) {
-        var target         = this.target,
-            shouldMove     = true,
-            shouldSnap     = modifiers.snap.shouldDo(target, this.prepared.name, preEnd),
-            shouldRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, preEnd);
+        var target = this.target,
+            lastStatus = null;
 
-        if (shouldSnap    ) { modifiers.snap    .set(coords, this); } else { this.snapStatus    .locked     = false; }
-        if (shouldRestrict) { modifiers.restrict.set(coords, this); } else { this.restrictStatus.locked = false; }
+        coords = utils.extend({}, coords);
 
-        if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
-            shouldMove = shouldRestrict && this.restrictStatus.locked && this.restrictStatus.changed;
+        for (var i = 0; i < modifiers.names.length; i++) {
+            var modifierName = modifiers.names[i],
+                modifier = modifiers[modifierName];
+
+            if (!modifier.shouldDo(target, this.prepared.name, preEnd)) { continue; }
+
+            var status = modifier.set(coords, this, this[modifierName + 'Status']);
+
+            if (status.locked) {
+                coords.x += status.dx;
+                coords.y += status.dy;
+            }
+
+            lastStatus = status;
         }
-        else if (shouldRestrict && this.restrictStatus.locked && !this.restrictStatus.changed) {
-            shouldMove = false;
-        }
 
-        return shouldMove;
+        // shouldMove
+        return !lastStatus || !lastStatus.locked || lastStatus.changed;
     },
 
     setStartOffsets: function (action, interactable, element) {
@@ -1319,14 +1324,6 @@ Interaction.prototype = {
                 return action;
             }
         }
-    },
-
-    setSnapping: function (pageCoords, status) {
-        return modifiers.snap.set(pageCoords, status, this);
-    },
-
-    setRestriction: function (pageCoords, status) {
-        return modifiers.restrict.set(pageCoords, this, status);
     },
 
     checkAndPreventDefault: function (event, interactable, element) {

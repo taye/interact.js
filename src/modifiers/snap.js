@@ -7,20 +7,18 @@ var modifiers = require('./index'),
 
 var snap = {
     options: {
-        enabled     : false,
-        endOnly     : false,
-        range       : Infinity,
-        targets     : null,
-        offsets     : null,
+        enabled: false,
+        endOnly: false,
+        range  : Infinity,
+        targets: null,
+        offsets: null,
 
         relativePoints: null
     },
     shouldDo: function (interactable, actionName, preEnd) {
-        var options = interactable.options;
+        var snap = interactable.options[actionName].snap;
 
-        return (options[actionName].snap
-                && options[actionName].snap.enabled
-                && (preEnd || !interactable.options[actionName].snap.endOnly));
+        return (snap && snap.enabled && (preEnd || !snap.endOnly));
     },
     set: function (pageCoords, interaction, status) {
         var snap = interaction.target.options[interaction.prepared.name].snap,
@@ -46,8 +44,8 @@ var snap = {
         status.realX = page.x;
         status.realY = page.y;
 
-        page.x = page.x - interaction.inertiaStatus.resumeDx;
-        page.y = page.y - interaction.inertiaStatus.resumeDy;
+        page.x -= interaction.inertiaStatus.resumeDx;
+        page.y -= interaction.inertiaStatus.resumeDy;
 
         var len = snap.targets? snap.targets.length : 0;
 
@@ -152,7 +150,8 @@ var snap = {
     },
 
     modifyCoords: function (page, client, interactable, status, actionName, phase) {
-        var relativePoints = interactable.options[actionName].snap && interactable.options.relativePoints;
+        var options = interactable.options[actionName].snap,
+            relativePoints = options && options.relativePoints;
 
         if (modifiers.snap.shouldDo(interactable, actionName)
             && !(phase === 'start' && relativePoints && relativePoints.length)) {
