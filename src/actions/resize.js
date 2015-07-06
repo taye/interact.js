@@ -258,37 +258,6 @@ Interactable.prototype.resizable = function (options) {
     return this.options.resize;
 };
 
-/*\
- * Interactable.squareResize
- [ method ]
- *
- * Deprecated. Add a `square: true || false` property to @Interactable.resizable instead
- *
- * Gets or sets whether resizing is forced 1:1 aspect
- *
- = (boolean) Current setting
- *
- * or
- *
- - newValue (boolean) #optional
- = (object) this Interactable
-\*/
-Interactable.prototype.squareResize = function (newValue) {
-    if (utils.isBool(newValue)) {
-        this.options.resize.square = newValue;
-
-        return this;
-    }
-
-    if (newValue === null) {
-        delete this.options.resize.square;
-
-        return this;
-    }
-
-    return this.options.resize.square;
-};
-
 function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
     // false, '', undefined, null
     if (!value) { return false; }

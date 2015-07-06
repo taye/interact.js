@@ -230,17 +230,6 @@
         return scope.interactables.get(element, options) || new Interactable(element, options);
     }
 
-    Interactable.prototype.snap = utils.warnOnce(Interactable.prototype.snap,
-         'Interactable#snap is deprecated. See the new documentation for snapping at http://interactjs.io/docs/snapping');
-    Interactable.prototype.restrict = utils.warnOnce(Interactable.prototype.restrict,
-         'Interactable#restrict is deprecated. See the new documentation for resticting at http://interactjs.io/docs/restriction');
-    Interactable.prototype.inertia = utils.warnOnce(Interactable.prototype.inertia,
-         'Interactable#inertia is deprecated. See the new documentation for inertia at http://interactjs.io/docs/inertia');
-    Interactable.prototype.autoScroll = utils.warnOnce(Interactable.prototype.autoScroll,
-         'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
-    Interactable.prototype.squareResize = utils.warnOnce(Interactable.prototype.squareResize,
-         'Interactable#squareResize is deprecated. See http://interactjs.io/docs/#resize-square');
-
     /*\
      * interact.isSet
      [ method ]
@@ -350,68 +339,6 @@
 
         return interact;
     };
-
-    /*\
-     * interact.enableDragging
-     [ method ]
-     *
-     * Deprecated.
-     *
-     * Returns or sets whether dragging is enabled for any Interactables
-     *
-     - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
-     = (boolean | object) The current setting or interact
-    \*/
-    interact.enableDragging = utils.warnOnce(function (newValue) {
-        if (newValue !== null && newValue !== undefined) {
-            scope.actionIsEnabled.drag = newValue;
-
-            return interact;
-        }
-        return scope.actionIsEnabled.drag;
-    }, 'interact.enableDragging is deprecated and will soon be removed.');
-
-    /*\
-     * interact.enableResizing
-     [ method ]
-     *
-     * Deprecated.
-     *
-     * Returns or sets whether resizing is enabled for any Interactables
-     *
-     - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
-     = (boolean | object) The current setting or interact
-    \*/
-    interact.enableResizing = utils.warnOnce(function (newValue) {
-        if (newValue !== null && newValue !== undefined) {
-            scope.actionIsEnabled.resize = newValue;
-
-            return interact;
-        }
-        return scope.actionIsEnabled.resize;
-    }, 'interact.enableResizing is deprecated and will soon be removed.');
-
-    /*\
-     * interact.enableGesturing
-     [ method ]
-     *
-     * Deprecated.
-     *
-     * Returns or sets whether gesturing is enabled for any Interactables
-     *
-     - newValue (boolean) #optional `true` to allow the action; `false` to disable action for all Interactables
-     = (boolean | object) The current setting or interact
-    \*/
-    interact.enableGesturing = utils.warnOnce(function (newValue) {
-        if (newValue !== null && newValue !== undefined) {
-            scope.actionIsEnabled.gesture = newValue;
-
-            return interact;
-        }
-        return scope.actionIsEnabled.gesture;
-    }, 'interact.enableGesturing is deprecated and will soon be removed.');
-
-    interact.eventTypes = scope.eventTypes;
 
     /*\
      * interact.debug
