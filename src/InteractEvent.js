@@ -8,7 +8,6 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     var client,
         page,
         target      = interaction.target,
-        restrictStatus  = interaction.restrictStatus,
         pointers    = interaction.pointers,
         deltaSource = (target && target.options || scope.defaultOptions).deltaSource,
         sourceX     = deltaSource + 'X',
@@ -42,19 +41,8 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     this.interaction = interaction;
     this.interactable = target;
 
-    this.snap = modifiers.snap.modifyCoords(page, client, target, interaction.snapStatus, action, phase);
-
-    if (scope.checkRestrict(target, action) && !(starting && options[action].restrict.elementRect) && restrictStatus.restricted) {
-        page.x += restrictStatus.dx;
-        page.y += restrictStatus.dy;
-        client.x += restrictStatus.dx;
-        client.y += restrictStatus.dy;
-
-        this.restrict = {
-            dx: restrictStatus.dx,
-            dy: restrictStatus.dy
-        };
-    }
+    this.snap     = modifiers.snap.modifyCoords    (page, client, target, interaction.snapStatus    , action, phase);
+    this.restrict = modifiers.restrict.modifyCoords(page, client, target, interaction.restrictStatus, action, phase);
 
     this.pageX     = page.x;
     this.pageY     = page.y;

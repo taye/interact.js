@@ -518,10 +518,10 @@ Interaction.prototype = {
         var target         = this.target,
             shouldMove     = true,
             shouldSnap     = modifiers.snap.shouldDo(target, this.prepared.name, preEnd),
-            shouldRestrict = scope.checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
+            shouldRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, preEnd);
 
-        if (shouldSnap    ) { modifiers.snap.set(coords, this); } else { this.snapStatus.locked = false; }
-        if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
+        if (shouldSnap    ) { modifiers.snap    .set(coords, this); } else { this.snapStatus    .locked     = false; }
+        if (shouldRestrict) { modifiers.restrict.set(coords, this); } else { this.restrictStatus.restricted = false; }
 
         if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
             shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
@@ -871,7 +871,7 @@ Interaction.prototype = {
                 inertia = false,
                 smoothEnd = false,
                 endSnap = modifiers.snap.shouldDo(target, this.prepared.name, true) && options[this.prepared.name].snap.endOnly,
-                endRestrict = scope.checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
+                endRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, true) && options[this.prepared.name].restrict.endOnly,
                 dx = 0,
                 dy = 0,
                 startEvent;
@@ -910,7 +910,7 @@ Interaction.prototype = {
                 }
 
                 if (endRestrict) {
-                    this.setRestriction(this.curCoords.page, snapRestrict);
+                    modifiers.restrict.set(this.curCoords.page, this, snapRestrict);
                     if (snapRestrict.restricted) {
                         dx += snapRestrict.dx;
                         dy += snapRestrict.dy;
@@ -969,7 +969,7 @@ Interaction.prototype = {
                     }
 
                     if (endRestrict) {
-                        var restrict = this.setRestriction(this.curCoords.page, statusObject);
+                        var restrict = modifiers.restrict.set(this.curCoords.page, this, statusObject);
 
                         if (restrict.restricted) {
                             dx += restrict.dx;
@@ -1326,85 +1326,7 @@ Interaction.prototype = {
     },
 
     setRestriction: function (pageCoords, status) {
-        var target = this.target,
-            restrict = target && target.options[this.prepared.name].restrict,
-            restriction = restrict && restrict.restriction,
-            page;
-
-        if (!restriction) {
-            return status;
-        }
-
-        status = status || this.restrictStatus;
-
-        page = status.useStatusXY
-            ? page = { x: status.x, y: status.y }
-            : page = utils.extend({}, pageCoords);
-
-        if (status.snap && status.snap.locked) {
-            page.x += status.snap.dx || 0;
-            page.y += status.snap.dy || 0;
-        }
-
-        page.x -= this.inertiaStatus.resumeDx;
-        page.y -= this.inertiaStatus.resumeDy;
-
-        status.dx = 0;
-        status.dy = 0;
-        status.restricted = false;
-
-        var rect, restrictedX, restrictedY;
-
-        if (utils.isString(restriction)) {
-            if (restriction === 'parent') {
-                restriction = utils.parentElement(this.element);
-            }
-            else if (restriction === 'self') {
-                restriction = target.getRect(this.element);
-            }
-            else {
-                restriction = utils.closest(this.element, restriction);
-            }
-
-            if (!restriction) { return status; }
-        }
-
-        if (utils.isFunction(restriction)) {
-            restriction = restriction(page.x, page.y, this.element);
-        }
-
-        if (utils.isElement(restriction)) {
-            restriction = utils.getElementRect(restriction);
-        }
-
-        rect = restriction;
-
-        if (!restriction) {
-            restrictedX = page.x;
-            restrictedY = page.y;
-        }
-        // object is assumed to have
-        // x, y, width, height or
-        // left, top, right, bottom
-        else if ('x' in restriction && 'y' in restriction) {
-            restrictedX = Math.max(Math.min(rect.x + rect.width  - this.restrictOffset.right , page.x), rect.x + this.restrictOffset.left);
-            restrictedY = Math.max(Math.min(rect.y + rect.height - this.restrictOffset.bottom, page.y), rect.y + this.restrictOffset.top );
-        }
-        else {
-            restrictedX = Math.max(Math.min(rect.right  - this.restrictOffset.right , page.x), rect.left + this.restrictOffset.left);
-            restrictedY = Math.max(Math.min(rect.bottom - this.restrictOffset.bottom, page.y), rect.top  + this.restrictOffset.top );
-        }
-
-        status.dx = restrictedX - page.x;
-        status.dy = restrictedY - page.y;
-
-        status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
-        status.restricted = !!(status.dx || status.dy);
-
-        status.restrictedX = restrictedX;
-        status.restrictedY = restrictedY;
-
-        return status;
+        return modifiers.restrict.set(pageCoords, this, status);
     },
 
     checkAndPreventDefault: function (event, interactable, element) {

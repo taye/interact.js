@@ -139,16 +139,6 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     };
 
-    scope.checkRestrict = function (interactable, action) {
-        var options = interactable.options;
-
-        if (/^resize/.test(action)) {
-            action = 'resize';
-        }
-
-        return  options[action].restrict && options[action].restrict.enabled;
-    };
-
     scope.checkAutoScroll = function (interactable, action) {
         var options = interactable.options;
 
@@ -615,3 +605,4 @@
     require('./actions/gesture');
 
     require('./modifiers/snap');
+    require('./modifiers/restrict');
