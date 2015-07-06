@@ -139,7 +139,7 @@ function Interaction () {
         dx         : 0, dy         : 0,
         restrictedX: 0, restrictedY: 0,
         snap       : null,
-        restricted : false,
+        locked : false,
         changed    : false
     };
 
@@ -521,12 +521,12 @@ Interaction.prototype = {
             shouldRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, preEnd);
 
         if (shouldSnap    ) { modifiers.snap    .set(coords, this); } else { this.snapStatus    .locked     = false; }
-        if (shouldRestrict) { modifiers.restrict.set(coords, this); } else { this.restrictStatus.restricted = false; }
+        if (shouldRestrict) { modifiers.restrict.set(coords, this); } else { this.restrictStatus.locked = false; }
 
         if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
-            shouldMove = shouldRestrict && this.restrictStatus.restricted && this.restrictStatus.changed;
+            shouldMove = shouldRestrict && this.restrictStatus.locked && this.restrictStatus.changed;
         }
-        else if (shouldRestrict && this.restrictStatus.restricted && !this.restrictStatus.changed) {
+        else if (shouldRestrict && this.restrictStatus.locked && !this.restrictStatus.changed) {
             shouldMove = false;
         }
 
@@ -911,7 +911,7 @@ Interaction.prototype = {
 
                 if (endRestrict) {
                     modifiers.restrict.set(this.curCoords.page, this, snapRestrict);
-                    if (snapRestrict.restricted) {
+                    if (snapRestrict.locked) {
                         dx += snapRestrict.dx;
                         dy += snapRestrict.dy;
                     }
@@ -971,7 +971,7 @@ Interaction.prototype = {
                     if (endRestrict) {
                         var restrict = modifiers.restrict.set(this.curCoords.page, this, statusObject);
 
-                        if (restrict.restricted) {
+                        if (restrict.locked) {
                             dx += restrict.dx;
                             dy += restrict.dy;
                         }

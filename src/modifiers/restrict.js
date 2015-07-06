@@ -43,7 +43,7 @@ var restrict = {
 
         status.dx = 0;
         status.dy = 0;
-        status.restricted = false;
+        status.locked = false;
 
         var rect, restrictedX, restrictedY;
 
@@ -93,7 +93,7 @@ var restrict = {
         status.dy = restrictedY - page.y;
 
         status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
-        status.restricted = !!(status.dx || status.dy);
+        status.locked = !!(status.dx || status.dy);
 
         status.restrictedX = restrictedX;
         status.restrictedY = restrictedY;
@@ -108,7 +108,7 @@ var restrict = {
         if (modifiers.restrict.shouldDo(interactable, actionName)
             && !(phase === 'start' && elementRect && status.locked)) {
 
-            if (status.restricted) {
+            if (status.locked) {
                 page.x += status.dx;
                 page.y += status.dy;
                 client.x += status.dx;
