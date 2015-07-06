@@ -1,11 +1,12 @@
 'use strict';
 
-var scope = require('./scope');
-var utils = require('./utils');
-var animationFrame = utils.raf;
-var InteractEvent = require('./InteractEvent');
-var events = require('./utils/events');
-var browser = require('./utils/browser');
+var scope = require('./scope'),
+    utils = require('./utils'),
+    animationFrame = utils.raf,
+    InteractEvent = require('./InteractEvent'),
+    events = require('./utils/events'),
+    browser = require('./utils/browser'),
+    modifiers = require('./modifiers/');
 
 function Interaction () {
     this.target          = null; // current interactable being interacted with
@@ -516,10 +517,10 @@ Interaction.prototype = {
     setModifications: function (coords, preEnd) {
         var target         = this.target,
             shouldMove     = true,
-            shouldSnap     = scope.checkSnap(target, this.prepared.name)     && (!target.options[this.prepared.name].snap.endOnly     || preEnd),
+            shouldSnap     = modifiers.snap.shouldDo(target, this.prepared.name, preEnd),
             shouldRestrict = scope.checkRestrict(target, this.prepared.name) && (!target.options[this.prepared.name].restrict.endOnly || preEnd);
 
-        if (shouldSnap    ) { this.setSnapping   (coords); } else { this.snapStatus    .locked     = false; }
+        if (shouldSnap    ) { modifiers.snap.set(coords, this); } else { this.snapStatus.locked = false; }
         if (shouldRestrict) { this.setRestriction(coords); } else { this.restrictStatus.restricted = false; }
 
         if (shouldSnap && this.snapStatus.locked && !this.snapStatus.changed) {
@@ -869,7 +870,7 @@ Interaction.prototype = {
                 inertiaPossible = false,
                 inertia = false,
                 smoothEnd = false,
-                endSnap = scope.checkSnap(target, this.prepared.name) && options[this.prepared.name].snap.endOnly,
+                endSnap = modifiers.snap.shouldDo(target, this.prepared.name, true) && options[this.prepared.name].snap.endOnly,
                 endRestrict = scope.checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
                 dx = 0,
                 dy = 0,
@@ -901,7 +902,7 @@ Interaction.prototype = {
                 snapRestrict.snap = snapRestrict.restrict = snapRestrict;
 
                 if (endSnap) {
-                    this.setSnapping(this.curCoords.page, snapRestrict);
+                    modifiers.snap.set(this.curCoords.page, this, snapRestrict);
                     if (snapRestrict.locked) {
                         dx += snapRestrict.dx;
                         dy += snapRestrict.dy;
@@ -959,7 +960,7 @@ Interaction.prototype = {
                     dx = dy = 0;
 
                     if (endSnap) {
-                        var snap = this.setSnapping(this.curCoords.page, statusObject);
+                        var snap = modifiers.snap.set(this.curCoords.page, this, statusObject);
 
                         if (snap.locked) {
                             dx += snap.dx;
@@ -1321,132 +1322,7 @@ Interaction.prototype = {
     },
 
     setSnapping: function (pageCoords, status) {
-        var snap = this.target.options[this.prepared.name].snap,
-            targets = [],
-            target,
-            page,
-            i;
-
-        status = status || this.snapStatus;
-
-        if (status.useStatusXY) {
-            page = { x: status.x, y: status.y };
-        }
-        else {
-            var origin = scope.getOriginXY(this.target, this.element);
-
-            page = utils.extend({}, pageCoords);
-
-            page.x -= origin.x;
-            page.y -= origin.y;
-        }
-
-        status.realX = page.x;
-        status.realY = page.y;
-
-        page.x = page.x - this.inertiaStatus.resumeDx;
-        page.y = page.y - this.inertiaStatus.resumeDy;
-
-        var len = snap.targets? snap.targets.length : 0;
-
-        for (var relIndex = 0; relIndex < this.snapOffsets.length; relIndex++) {
-            var relative = {
-                x: page.x - this.snapOffsets[relIndex].x,
-                y: page.y - this.snapOffsets[relIndex].y
-            };
-
-            for (i = 0; i < len; i++) {
-                if (utils.isFunction(snap.targets[i])) {
-                    target = snap.targets[i](relative.x, relative.y, this);
-                }
-                else {
-                    target = snap.targets[i];
-                }
-
-                if (!target) { continue; }
-
-                targets.push({
-                    x: utils.isNumber(target.x) ? (target.x + this.snapOffsets[relIndex].x) : relative.x,
-                    y: utils.isNumber(target.y) ? (target.y + this.snapOffsets[relIndex].y) : relative.y,
-
-                    range: utils.isNumber(target.range)? target.range: snap.range
-                });
-            }
-        }
-
-        var closest = {
-            target: null,
-            inRange: false,
-            distance: 0,
-            range: 0,
-            dx: 0,
-            dy: 0
-        };
-
-        for (i = 0, len = targets.length; i < len; i++) {
-            target = targets[i];
-
-            var range = target.range,
-                dx = target.x - page.x,
-                dy = target.y - page.y,
-                distance = utils.hypot(dx, dy),
-                inRange = distance <= range;
-
-            // Infinite targets count as being out of range
-            // compared to non infinite ones that are in range
-            if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-                inRange = false;
-            }
-
-            if (!closest.target || (inRange
-                    // is the closest target in range?
-                    ? (closest.inRange && range !== Infinity
-                    // the pointer is relatively deeper in this target
-                    ? distance / range < closest.distance / closest.range
-                    // this target has Infinite range and the closest doesn't
-                    : (range === Infinity && closest.range !== Infinity)
-                    // OR this target is closer that the previous closest
-                || distance < closest.distance)
-                    // The other is not in range and the pointer is closer to this target
-                    : (!closest.inRange && distance < closest.distance))) {
-
-                if (range === Infinity) {
-                    inRange = true;
-                }
-
-                closest.target = target;
-                closest.distance = distance;
-                closest.range = range;
-                closest.inRange = inRange;
-                closest.dx = dx;
-                closest.dy = dy;
-
-                status.range = range;
-            }
-        }
-
-        var snapChanged;
-
-        if (closest.target) {
-            snapChanged = (status.snappedX !== closest.target.x || status.snappedY !== closest.target.y);
-
-            status.snappedX = closest.target.x;
-            status.snappedY = closest.target.y;
-        }
-        else {
-            snapChanged = true;
-
-            status.snappedX = NaN;
-            status.snappedY = NaN;
-        }
-
-        status.dx = closest.dx;
-        status.dy = closest.dy;
-
-        status.changed = (snapChanged || (closest.inRange && !status.locked));
-        status.locked = closest.inRange;
-
-        return status;
+        return modifiers.snap.set(pageCoords, status, this);
     },
 
     setRestriction: function (pageCoords, status) {

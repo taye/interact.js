@@ -1,7 +1,8 @@
 'use strict';
 
-var scope = require('./scope');
-var utils = require('./utils');
+var scope = require('./scope'),
+    utils = require('./utils'),
+    modifiers = require('./modifiers');
 
 function InteractEvent (interaction, event, action, phase, element, related) {
     var client,
@@ -32,7 +33,7 @@ function InteractEvent (interaction, event, action, phase, element, related) {
 
     var relativePoints = options[action].snap && options[action].snap.relativePoints ;
 
-    if (scope.checkSnap(target, action) && !(starting && relativePoints && relativePoints.length)) {
+    if (modifiers.snap.shouldDo(target, action) && !(starting && relativePoints && relativePoints.length)) {
         this.snap = {
             range  : snapStatus.range,
             locked : snapStatus.locked,

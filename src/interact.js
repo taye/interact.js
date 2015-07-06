@@ -139,16 +139,6 @@
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
     };
 
-    scope.checkSnap = function (interactable, action) {
-        var options = interactable.options;
-
-        if (/^resize/.test(action)) {
-            action = 'resize';
-        }
-
-        return options[action].snap && options[action].snap.enabled;
-    };
-
     scope.checkRestrict = function (interactable, action) {
         var options = interactable.options;
 
@@ -696,3 +686,5 @@
     require('./actions/resize');
     require('./actions/drag');
     require('./actions/gesture');
+
+    require('./modifiers/snap');
