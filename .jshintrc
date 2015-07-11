@@ -11,6 +11,5 @@
     "undef"    : true,
     "unused"   : true,
     "strict"   : true,
-    "elision"  : true,
     "trailing" : true
 }

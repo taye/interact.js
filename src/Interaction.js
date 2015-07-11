@@ -1267,7 +1267,7 @@ Interaction.prototype = {
             pointerEvent.pointerType   = this.mouse? 'mouse' : !browser.supportsPointerEvent? 'touch'
                 : utils.isString(pointer.pointerType)
                 ? pointer.pointerType
-                : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+                : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
         }
 
         if (eventType === 'tap') {
