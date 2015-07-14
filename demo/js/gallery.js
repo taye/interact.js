@@ -2,11 +2,21 @@ interact(document).on('DOMContentLoaded', function () {
 "use strict";
 /* global interact, Modernizr */
 
+/*
+ * This demo is very broken!
+ */
+
 var preTransform = Modernizr.prefixed('transform'),
     snapTarget = {};
 
 interact('#gallery .thumbnail')
     .draggable({
+        snap: {
+            targets: [],
+            relativePoints: [ { x: 0.5, y: 0.5 } ],
+            endOnly: true
+        },
+        inertia: true,
         onstart: function (event) {
             snapTarget = {
                 x: $('#gallery .stage').width() / 2,
@@ -34,7 +44,7 @@ interact('#gallery .thumbnail')
             var $thumb = $(event.target);
 
             // if the drag was snapped to the stage
-            if (event.pageX === snapTarget.x && event.pageY === snapTarget.y) {
+            if (event.dropzone) {
                 $('#gallery .stage img').removeClass('active');
                 $('#gallery .thumbnail').removeClass('expanded')
                     .not($thumb).css(preTransform, '');
@@ -49,19 +59,21 @@ interact('#gallery .thumbnail')
             $thumb.removeClass('dragging');
         }
     })
-    .origin($('#gallery')[0])
-    .snap({
-        mode: 'path',
-        // If the pointer is far enough above the bottom of the stage
-        // then snap to the center of the stage
-        paths: [function (x, y) {
-            if (y < $('#gallery .stage').height() * 0.7) {
-                return snapTarget;
-            }
-            return {};
-        }],
-        endOnly: true
-    })
-    //.snap(false)
-    .inertia(true);
+    .origin($('#gallery')[0]);
+
+    interact('#gallery .stage')
+        .dropzone({
+            accept: ' #gallery .thumbnail',
+            overlap: 1,
+        })
+        .on('dragenter', function (event) {
+            event.draggable.draggable({
+                snap: { targets: [snapTarget] }
+            });
+        })
+        .on('dragleave drop', function (event) {
+            event.draggable.draggable({
+                snap: { targets: [] }
+            });
+        });
 }());

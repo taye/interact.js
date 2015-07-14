@@ -228,14 +228,14 @@
 
         interact(canvas)
             .draggable({
+                inertia: { enabled: status.inertia.checked },
                 snap: {
                     targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
                     enabled: !status.offMode.checked,
                     endOnly: status.endOnly.checked,
                     offset: status.relative.checked? 'startCoords' : null
                 }
-            })
-            .inertia(status.inertia.checked);
+            });
 
         if (!status.relative.checked) {
             snapOffset.x = snapOffset.y = 0;

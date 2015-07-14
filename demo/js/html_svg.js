@@ -9,7 +9,8 @@
 
     var svg,
         svgNS = 'http://www.w3.org/2000/svg',
-        SVGElement = window.SVGElement;
+        SVGElement = window.SVGElement,
+        eventTypes = interact.debug().eventTypes;
 
     function DemoGraphic(id) {
             var width = window.innerWidth,
@@ -86,7 +87,7 @@
         textProp = 'textContent';
         nl = '\n';
 
-        if ( target.demo && indexOf(interact.eventTypes, e.type) !== -1 ) {
+        if ( target.demo && indexOf(eventTypes, e.type) !== -1 ) {
             target.text[textProp] = nl + e.type;
             target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
             target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
@@ -232,8 +233,8 @@
         interact('div.demo-node, .demo-node ellipse')
             .draggable({
                 max: 2,
-                autoScroll: { enabled: true },
-                inertia: { enabled: true }
+                autoScroll: true,
+                inertia: true
             })
             .gesturable({ max: 1 })
             .resizable({

@@ -2,15 +2,15 @@ function setInteractables () {
   'use strict';
 
   interact('.draggable', { context: document })
-  .autoScroll(true)
   .draggable({
     onmove: onMove,
-  })
-  .inertia(true)
-  .restrict({
-    drag: "parent",
-    endOnly: true,
-    elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    inertia: { enabled: true },
+    restrict: {
+      drag: "parent",
+      endOnly: true,
+      elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+    },
+    autoScroll: true
   });
 
   function onMove (event) {
