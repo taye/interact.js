@@ -108,7 +108,7 @@ Interactable.prototype = {
     },
 
     getAction: function (pointer, event, interaction, element) {
-        var action = this.defaultActionChecker(pointer, interaction, element);
+        var action = this.defaultActionChecker(pointer, event, interaction, element);
 
         if (this.options.actionChecker) {
             return this.options.actionChecker(pointer, event, action, this, element, interaction);

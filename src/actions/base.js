@@ -14,7 +14,7 @@ var actions = {
         }
     },
 
-    defaultActionChecker: function (pointer, interaction, element) {
+    defaultActionChecker: function (pointer, event, interaction, element) {
         var rect = this.getRect(element),
             action = null;
 

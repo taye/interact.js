@@ -45,7 +45,7 @@ function InteractEvent (interaction, event, action, phase, element, related) {
         var modifierName = modifiers.names[i],
             modifier = modifiers[modifierName];
 
-        this[modifierName] = modifier.modifyCoords(page, client, target, interaction[modifierName + 'Status'], action, phase);
+        this[modifierName] = modifier.modifyCoords(page, client, target, interaction.modifierStatuses[modifierName], action, phase);
     }
 
     this.pageX     = page.x;

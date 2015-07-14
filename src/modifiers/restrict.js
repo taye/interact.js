@@ -10,10 +10,10 @@ var restrict = {
         restriction: null,
         elementRect: null
     },
-    shouldDo: function (interactable, actionName, preEnd) {
+    shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
         var restrict = interactable.options[actionName].restrict;
 
-        return (restrict && restrict.enabled && (preEnd || !restrict.endOnly));
+        return restrict && restrict.enabled && (preEnd || !restrict.endOnly) && (!requireEndOnly || restrict.endOnly);
     },
     set: function (pageCoords, interaction, status) {
         var target = interaction.target,
@@ -24,8 +24,6 @@ var restrict = {
         if (!restriction) {
             return status;
         }
-
-        status = status || interaction.restrictStatus;
 
         page = status.useStatusXY
             ? page = { x: status.x, y: status.y }
@@ -90,6 +88,15 @@ var restrict = {
 
         status.restrictedX = restrictedX;
         status.restrictedY = restrictedY;
+
+        return status;
+    },
+
+    reset: function (status) {
+        status.dx = status.dy = 0;
+        status.modifiedX = status.modifiedY = NaN;
+        status.locked = false;
+        status.changed = true;
 
         return status;
     },

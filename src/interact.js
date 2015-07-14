@@ -596,7 +596,7 @@
     scope.Interactable = Interactable;
     scope.Interaction = Interaction;
     scope.InteractEvent = InteractEvent;
-    scope.listenToDocument = scope.listenToDocument;
+    scope.listenToDocument = listenToDocument;
 
     module.exports = interact;
 

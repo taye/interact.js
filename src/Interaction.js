@@ -125,23 +125,7 @@ function Interaction () {
         prevAngle : 0       // angle of the previous gesture event
     };
 
-    this.snapStatus = {
-        x       : 0, y       : 0,
-        dx      : 0, dy      : 0,
-        realX   : 0, realY   : 0,
-        snappedX: 0, snappedY: 0,
-        targets : [],
-        locked  : false,
-        changed : false
-    };
-
-    this.restrictStatus = {
-        dx         : 0, dy         : 0,
-        restrictedX: 0, restrictedY: 0,
-        snap       : null,
-        locked : false,
-        changed    : false
-    };
+    this.modifierStatuses = modifiers.resetStatuses({});
 
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
@@ -488,8 +472,7 @@ Interaction.prototype = {
             this.prepared.axis  = action.axis;
             this.prepared.edges = action.edges;
 
-            this.snapStatus.snappedX = this.snapStatus.snappedY =
-                this.restrictStatus.restrictedX = this.restrictStatus.restrictedY = NaN;
+            modifiers.resetStatuses(this.modifierStatuses);
 
             this.downTimes[pointerIndex] = new Date().getTime();
             this.downTargets[pointerIndex] = eventTarget;
@@ -510,32 +493,6 @@ Interaction.prototype = {
 
             this.checkAndPreventDefault(event, target, this.element);
         }
-    },
-
-    setModifications: function (coords, preEnd) {
-        var target = this.target,
-            lastStatus = null;
-
-        coords = utils.extend({}, coords);
-
-        for (var i = 0; i < modifiers.names.length; i++) {
-            var modifierName = modifiers.names[i],
-                modifier = modifiers[modifierName];
-
-            if (!modifier.shouldDo(target, this.prepared.name, preEnd)) { continue; }
-
-            var status = modifier.set(coords, this, this[modifierName + 'Status']);
-
-            if (status.locked) {
-                coords.x += status.dx;
-                coords.y += status.dy;
-            }
-
-            lastStatus = status;
-        }
-
-        // shouldMove
-        return !lastStatus || !lastStatus.locked || lastStatus.changed;
     },
 
     setStartOffsets: function (action, interactable, element) {
@@ -647,7 +604,8 @@ Interaction.prototype = {
 
         this.setEventXY(this.startCoords);
         this.setStartOffsets(action.name, interactable, element);
-        this.setModifications(this.startCoords.page);
+
+        modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
         this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
     },
@@ -796,10 +754,10 @@ Interaction.prototype = {
                     this.start(this.prepared, this.target, this.element);
                 }
 
-                var shouldMove = this.setModifications(this.curCoords.page, preEnd);
+                var modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
 
                 // move if snapping or restriction doesn't prevent it
-                if (shouldMove || starting) {
+                if (modifierResult.shouldMove || starting) {
                     this.prevEvent = this[this.prepared.name + 'Move'](event);
                 }
 
@@ -875,8 +833,9 @@ Interaction.prototype = {
                 inertiaPossible = false,
                 inertia = false,
                 smoothEnd = false,
-                endSnap = modifiers.snap.shouldDo(target, this.prepared.name, true) && options[this.prepared.name].snap.endOnly,
-                endRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, true) && options[this.prepared.name].restrict.endOnly,
+                statuses = {},
+                modifierResult,
+                page = utils.extend({}, this.curCoords.page),
                 dx = 0,
                 dy = 0,
                 startEvent;
@@ -900,29 +859,13 @@ Interaction.prototype = {
             && pointerSpeed > inertiaOptions.minSpeed
             && pointerSpeed > inertiaOptions.endSpeed);
 
-            if (inertiaPossible && !inertia && (endSnap || endRestrict)) {
+            // smoothEnd
+            if (inertiaPossible && !inertia) {
+                modifiers.resetStatuses(statuses);
 
-                var snapRestrict = {};
+                modifierResult = modifiers.setAll(this, page, statuses, true, true);
 
-                snapRestrict.snap = snapRestrict.restrict = snapRestrict;
-
-                if (endSnap) {
-                    modifiers.snap.set(this.curCoords.page, this, snapRestrict);
-                    if (snapRestrict.locked) {
-                        dx += snapRestrict.dx;
-                        dy += snapRestrict.dy;
-                    }
-                }
-
-                if (endRestrict) {
-                    modifiers.restrict.set(this.curCoords.page, this, snapRestrict);
-                    if (snapRestrict.locked) {
-                        dx += snapRestrict.dx;
-                        dy += snapRestrict.dy;
-                    }
-                }
-
-                if (dx || dy) {
+                if (modifierResult.shouldMove && modifierResult.locked) {
                     smoothEnd = true;
                 }
             }
@@ -944,46 +887,17 @@ Interaction.prototype = {
 
                     this.calcInertia(inertiaStatus);
 
-                    var page = utils.extend({}, this.curCoords.page),
-                        origin = scope.getOriginXY(target, this.element),
-                        statusObject;
+                    page = utils.extend({}, this.curCoords.page);
 
-                    page.x = page.x + inertiaStatus.xe - origin.x;
-                    page.y = page.y + inertiaStatus.ye - origin.y;
+                    page.x += inertiaStatus.xe;
+                    page.y += inertiaStatus.ye;
 
-                    statusObject = {
-                        useStatusXY: true,
-                        x: page.x,
-                        y: page.y,
-                        dx: 0,
-                        dy: 0,
-                        snap: null
-                    };
+                    modifiers.resetStatuses(statuses);
 
-                    statusObject.snap = statusObject;
+                    modifierResult = modifiers.setAll(this, page, statuses, true, true);
 
-                    dx = dy = 0;
-
-                    if (endSnap) {
-                        var snap = modifiers.snap.set(this.curCoords.page, this, statusObject);
-
-                        if (snap.locked) {
-                            dx += snap.dx;
-                            dy += snap.dy;
-                        }
-                    }
-
-                    if (endRestrict) {
-                        var restrict = modifiers.restrict.set(this.curCoords.page, this, statusObject);
-
-                        if (restrict.locked) {
-                            dx += restrict.dx;
-                            dy += restrict.dy;
-                        }
-                    }
-
-                    inertiaStatus.modifiedXe += dx;
-                    inertiaStatus.modifiedYe += dy;
+                    inertiaStatus.modifiedXe += modifierResult.dx;
+                    inertiaStatus.modifiedYe += modifierResult.dy;
 
                     inertiaStatus.i = animationFrame.request(this.boundInertiaFrame);
                 }
@@ -1000,6 +914,9 @@ Interaction.prototype = {
                 inertiaStatus.active = true;
                 return;
             }
+
+            var endSnap = modifiers.snap.shouldDo(target, this.prepared.name, true, true),
+                endRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, true, true);
 
             if (endSnap || endRestrict) {
                 // fire a move event at the snapped coordinates
@@ -1058,9 +975,11 @@ Interaction.prototype = {
 
         this.clearTargets();
 
-        this.pointerIsDown = this.snapStatus.locked = this.dragging = this.resizing = this.gesturing = false;
+        this.pointerIsDown = this.dragging = this.resizing = this.gesturing = false;
         this.prepared.name = this.prevEvent = null;
         this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
+
+        modifiers.resetStatuses(this.modifierStatuses);
 
         // remove pointers if their ID isn't in this.pointerIds
         for (var i = 0; i < this.pointers.length; i++) {

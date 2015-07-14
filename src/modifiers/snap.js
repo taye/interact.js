@@ -15,10 +15,10 @@ var snap = {
 
         relativePoints: null
     },
-    shouldDo: function (interactable, actionName, preEnd) {
+    shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
         var snap = interactable.options[actionName].snap;
 
-        return (snap && snap.enabled && (preEnd || !snap.endOnly));
+        return snap && snap.enabled && (preEnd || !snap.endOnly) && (!requireEndOnly || snap.endOnly);
     },
     set: function (pageCoords, interaction, status) {
         var snap = interaction.target.options[interaction.prepared.name].snap,
@@ -26,8 +26,6 @@ var snap = {
             target,
             page,
             i;
-
-        status = status || interaction.snapStatus;
 
         if (status.useStatusXY) {
             page = { x: status.x, y: status.y };
@@ -149,11 +147,20 @@ var snap = {
         return status;
     },
 
-    modifyCoords: function (page, client, interactable, status, actionName, phase) {
-        var options = interactable.options[actionName].snap,
-            relativePoints = options && options.relativePoints;
+    reset: function (status) {
+        status.dx = status.dy = 0;
+        status.snappedX = status.snappedY = NaN;
+        status.locked = false;
+        status.changed = true;
 
-        if (modifiers.snap.shouldDo(interactable, actionName)
+        return status;
+    },
+
+    modifyCoords: function (page, client, interactable, status, actionName, phase) {
+        var snap = interactable.options[actionName].snap,
+            relativePoints = snap && snap.relativePoints;
+
+        if (snap && snap.enabled
             && !(phase === 'start' && relativePoints && relativePoints.length)) {
 
             if (status.locked) {
