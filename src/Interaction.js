@@ -1157,7 +1157,7 @@ Interaction.prototype = {
     },
 
     firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-        var pointerIndex = this.mouse? 0 : utils.indexOf(utils.getPointerId(pointer)),
+        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer)),
             pointerEvent = {},
             i,
         // for tap events
@@ -1320,7 +1320,7 @@ Interaction.prototype = {
             bottom = pointer.clientY > container.innerHeight - scope.autoScroll.margin;
         }
         else {
-            var rect = utils.getElementRect(container);
+            var rect = utils.getElementClientRect(container);
 
             left   = pointer.clientX < rect.left   + scope.autoScroll.margin;
             top    = pointer.clientY < rect.top    + scope.autoScroll.margin;

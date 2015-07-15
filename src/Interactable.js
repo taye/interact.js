@@ -583,7 +583,7 @@ Interactable.prototype = {
      *
      * Reset the options of this Interactable
      - options (object) The new settings to apply
-     = (object) This Interactablw
+     = (object) This Interactable
     \*/
     set: function (options) {
         if (!utils.isObject(options)) {

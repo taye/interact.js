@@ -202,22 +202,34 @@ var domUtils = {
         };
     },
 
-    getElementRect: function (element) {
-        var scroll = browser.isIOS7orLower
-                ? { x: 0, y: 0 }
-                : domUtils.getScrollXY(win.getWindow(element)),
-            clientRect = (element instanceof domObjects.SVGElement)?
-                element.getBoundingClientRect():
-                element.getClientRects()[0];
+    getElementClientRect: function (element) {
+        var clientRect = (element instanceof domObjects.SVGElement
+                            ? element.getBoundingClientRect()
+                            : element.getClientRects()[0]);
 
         return clientRect && {
-            left  : clientRect.left   + scroll.x,
-            right : clientRect.right  + scroll.x,
-            top   : clientRect.top    + scroll.y,
-            bottom: clientRect.bottom + scroll.y,
+            left  : clientRect.left,
+            right : clientRect.right,
+            top   : clientRect.top,
+            bottom: clientRect.bottom,
             width : clientRect.width || clientRect.right - clientRect.left,
             height: clientRect.heigh || clientRect.bottom - clientRect.top
         };
+    },
+
+    getElementRect: function (element) {
+        var clientRect = domUtils.getElementClientRect(element);
+
+        if (!browser.isIOS7orLower && clientRect) {
+            var scroll = domUtils.getScrollXY(win.getWindow(element));
+
+            clientRect.left   += scroll.x;
+            clientRect.right  += scroll.x;
+            clientRect.top    += scroll.y;
+            clientRect.bottom += scroll.y;
+        }
+
+        return clientRect;
     }
 };
 
