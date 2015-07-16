@@ -83,7 +83,7 @@
                 inertia: null,
                 autoScroll: null,
 
-                axis: 'xy',
+                axis: 'xy'
             },
 
             drop: {
