@@ -193,9 +193,9 @@ function preventOriginalDefault () {
 }
 
 Interaction.prototype = {
-    getPageXY  : function (pointer, xy) { return   utils.getPageXY(pointer, xy, this); },
-    getClientXY: function (pointer, xy) { return utils.getClientXY(pointer, xy, this); },
-    setEventXY : function (target, ptr) { return  utils.setEventXY(target, ptr, this); },
+    setEventXY : function (target, pointer, event) {
+        utils.setEventXY(target, pointer, event, this);
+    },
 
     pointerOver: function (pointer, event, eventTarget) {
         if (this.prepared.name || !this.mouse) { return; }
