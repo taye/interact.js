@@ -1,0 +1,8 @@
+languages:
+  JavaScript: true
+
+ exclude_paths:
+ - "demo/*"
+ - "docs/*"
+ - "gulp/*"
+ - "test/*"
