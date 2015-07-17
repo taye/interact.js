@@ -193,8 +193,27 @@ function preventOriginalDefault () {
 }
 
 Interaction.prototype = {
-    setEventXY : function (target, pointer, event) {
-        utils.setEventXY(target, pointer, event, this);
+    setEventXY: function (targetObj, pointer) {
+        if (!pointer) {
+            if (this.pointerIds.length > 1) {
+                pointer = utils.touchAverage(this.pointers);
+            }
+            else {
+                pointer = this.pointers[0];
+            }
+        }
+
+        var tmpXY = {};
+
+        utils.getPageXY(pointer, tmpXY, this);
+        targetObj.page.x = tmpXY.x;
+        targetObj.page.y = tmpXY.y;
+
+        utils.getClientXY(pointer, tmpXY, this);
+        targetObj.client.x = tmpXY.x;
+        targetObj.client.y = tmpXY.y;
+
+        targetObj.timeStamp = new Date().getTime();
     },
 
     pointerOver: function (pointer, event, eventTarget) {

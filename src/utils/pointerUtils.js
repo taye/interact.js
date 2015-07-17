@@ -2,7 +2,6 @@
 
 var pointerUtils = {},
     // reduce object creation in getXY()
-    tmpXY = {},
     win = require('./window'),
     hypot = require('./hypot'),
     extend = require('./extend'),
@@ -20,27 +19,6 @@ pointerUtils.copyCoords = function (dest, src) {
     dest.client.y = src.client.y;
 
     dest.timeStamp = src.timeStamp;
-};
-
-pointerUtils.setEventXY = function (targetObj, pointer, interaction) {
-    if (!pointer) {
-        if (interaction.pointerIds.length > 1) {
-            pointer = pointerUtils.touchAverage(interaction.pointers);
-        }
-        else {
-            pointer = interaction.pointers[0];
-        }
-    }
-
-    pointerUtils.getPageXY(pointer, tmpXY, interaction);
-    targetObj.page.x = tmpXY.x;
-    targetObj.page.y = tmpXY.y;
-
-    pointerUtils.getClientXY(pointer, tmpXY, interaction);
-    targetObj.client.x = tmpXY.x;
-    targetObj.client.y = tmpXY.y;
-
-    targetObj.timeStamp = new Date().getTime();
 };
 
 pointerUtils.setEventDeltas = function (targetObj, prev, cur) {
