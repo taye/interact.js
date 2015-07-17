@@ -2157,8 +2157,6 @@
 
                 var pointerSpeed,
                     now = new Date().getTime(),
-                    inertiaPossible = false,
-                    inertia = false,
                     smoothEnd = false,
                     endSnap = checkSnap(target, this.prepared.name) && options[this.prepared.name].snap.endOnly,
                     endRestrict = checkRestrict(target, this.prepared.name) && options[this.prepared.name].restrict.endOnly,
@@ -2176,11 +2174,11 @@
                 }
 
                 // check if inertia should be started
-                inertiaPossible = (inertiaOptions && inertiaOptions.enabled
+                var inertiaPossible = (inertiaOptions && inertiaOptions.enabled
                                    && this.prepared.name !== 'gesture'
                                    && event !== inertiaStatus.startEvent);
 
-                inertia = (inertiaPossible
+                var inertia = (inertiaPossible
                            && (now - this.curCoords.timeStamp) < 50
                            && pointerSpeed > inertiaOptions.minSpeed
                            && pointerSpeed > inertiaOptions.endSpeed);
@@ -3624,7 +3622,6 @@
     function defaultActionChecker (pointer, interaction, element) {
         var rect = this.getRect(element),
             shouldResize = false,
-            action = null,
             resizeAxes = null,
             resizeEdges,
             page = extend({}, interaction.curCoords.page),
@@ -3665,7 +3662,7 @@
             }
         }
 
-        action = shouldResize
+        var action = shouldResize
             ? 'resize'
             : actionIsEnabled.drag && options.drag.enabled
                 ? 'drag'
