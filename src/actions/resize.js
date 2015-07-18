@@ -14,7 +14,7 @@ var resize = {
         var page = utils.extend({}, interaction.curCoords.page),
             options = interactable.options;
 
-        if (scope.actionIsEnabled.resize && options.resize.enabled) {
+        if (options.resize.enabled) {
             var resizeOptions = options.resize,
                 resizeEdges = {
                     left: false, right: false, top: false, bottom: false

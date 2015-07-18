@@ -1,16 +1,14 @@
 'use strict';
 
 var base = require('./base'),
-    scope = base.scope,
     utils = require('../utils'),
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable');
 
 var gesture = {
     checker: function (pointer, event, interactable, element, interaction) {
-        if (scope.actionIsEnabled.gesture
-            && interaction.pointerIds.length >=2
-        && !(interaction.dragging || interaction.resizing)) {
+        if (interaction.pointerIds.length >=2
+            && !(interaction.dragging || interaction.resizing)) {
             return { name: 'gesture' };
         }
 

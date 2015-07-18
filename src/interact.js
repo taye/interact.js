@@ -35,12 +35,6 @@
     // Allow this many interactions to happen simultaneously
     scope.maxInteractions = Infinity;
 
-    scope.actionIsEnabled = {
-        drag   : true,
-        resize : true,
-        gesture: true
-    };
-
     // because Webkit and Opera still use 'mousewheel' event type
     scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
 

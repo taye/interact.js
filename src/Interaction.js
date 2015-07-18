@@ -140,7 +140,7 @@ function Interaction () {
     scope.interactions.push(this);
 }
 
-// Check if action is enabled globally and the current target supports it
+// Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable) {
     if (!utils.isObject(action)) { return null; }
@@ -148,10 +148,9 @@ function validateAction (action, interactable) {
     var actionName = action.name,
         options = interactable.options;
 
-    if ((  (actionName  === 'resize'   && options.resize.enabled )
+    if (   (actionName  === 'resize'   && options.resize.enabled )
         || (actionName      === 'drag'     && options.drag.enabled  )
-        || (actionName      === 'gesture'  && options.gesture.enabled))
-        && scope.actionIsEnabled[actionName]) {
+        || (actionName      === 'gesture'  && options.gesture.enabled)) {
 
         if (actionName === 'resize' || actionName === 'resizeyx') {
             actionName = 'resizexy';

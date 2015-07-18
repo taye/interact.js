@@ -8,7 +8,7 @@ var base = require('./base'),
 
 var drag = {
     checker: function (pointer, event, interactable) {
-        return scope.actionIsEnabled.drag && interactable.options.drag.enabled
+        return interactable.options.drag.enabled
             ? { name: 'drag' }
             : null;
     },
