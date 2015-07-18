@@ -1,12 +1,10 @@
 'use strict';
 
 var scope = require('../scope'),
-    browser = require('../utils/browser'),
-    checkers = [];
+    browser = require('../utils/browser');
 
 var actions = {
     scope: scope,
-    checkers: checkers,
 
     addEventTypes: function (eventTypes) {
         for (var i = 0; i < eventTypes.length; i++) {
@@ -14,16 +12,20 @@ var actions = {
         }
     },
 
-    defaultActionChecker: function (pointer, event, interaction, element) {
+    defaultChecker: function (pointer, event, interaction, element) {
         var rect = this.getRect(element),
             action = null;
 
-        for (var i = 0; !action && i < checkers.length; i++) {
-            action = checkers[i](pointer, event, this, element, interaction, rect);
+        for (var i = 0; !action && i < actions.names.length; i++) {
+            var actionName = actions.names[i];
+
+            action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
         }
 
         return action;
-    }
+    },
+
+    names: []
 };
 
 scope.actionCursors = browser.isIe9OrOlder ? {

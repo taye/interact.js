@@ -6,6 +6,7 @@ var scope = require('./scope'),
     InteractEvent = require('./InteractEvent'),
     events = require('./utils/events'),
     browser = require('./utils/browser'),
+    actions = require('./actions/base'),
     modifiers = require('./modifiers/');
 
 function Interaction () {
@@ -626,7 +627,7 @@ Interaction.prototype = {
 
         modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
-        this.prevEvent = this[this.prepared.name + 'Start'](this.downEvent);
+        this.prevEvent = actions[this.prepared.name].start(this, this.downEvent);
     },
 
     pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
@@ -777,7 +778,7 @@ Interaction.prototype = {
 
                 // move if snapping or restriction doesn't prevent it
                 if (modifierResult.shouldMove || starting) {
-                    this.prevEvent = this[this.prepared.name + 'Move'](event);
+                    this.prevEvent = actions[this.prepared.name].move(this, event);
                 }
 
                 this.checkAndPreventDefault(event, this.target, this.element);
@@ -943,14 +944,8 @@ Interaction.prototype = {
             }
         }
 
-        if (this.dragging) {
-            this.dragEnd(event);
-        }
-        else if (this.resizing) {
-            this.resizeEnd(event);
-        }
-        else if (this.gesturing) {
-            this.gestureEnd(event);
+        if (this.interacting()) {
+            actions[this.prepared.name].end(this, event);
         }
 
         this.stop(event);

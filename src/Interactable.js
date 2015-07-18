@@ -3,7 +3,7 @@
 var scope = require('./scope'),
     utils = require('./utils'),
     events = require('./utils/events'),
-    actionBase = require('./actions/base');
+    actions = require('./actions/base');
 
 /*\
  * Interactable
@@ -117,7 +117,7 @@ Interactable.prototype = {
         return action;
     },
 
-    defaultActionChecker: actionBase.defaultActionChecker,
+    defaultActionChecker: actions.defaultChecker,
 
     /*\
      * Interactable.actionChecker

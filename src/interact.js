@@ -59,7 +59,6 @@
     scope.listeners = {};
 
     var interactionListeners = [
-        'dragStart', 'dragMove', 'resizeStart', 'resizeMove', 'gestureStart', 'gestureMove',
         'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
         'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
         'addPointer', 'removePointer', 'recordPointer', 'autoScrollMove'

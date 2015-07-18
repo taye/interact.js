@@ -3,73 +3,67 @@
 var base = require('./base'),
     scope = base.scope,
     utils = require('../utils'),
-    Interaction = require('../Interaction'),
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable');
 
-base.addEventTypes([
-    'gesturestart',
-    'gesturemove',
-    'gestureinertiastart',
-    'gestureend'
-]);
-
-base.checkers.push(function (pointer, event, interactable, element, interaction) {
-    if (scope.actionIsEnabled.gesture
-        && interaction.pointerIds.length >=2
+var gesture = {
+    checker: function (pointer, event, interactable, element, interaction) {
+        if (scope.actionIsEnabled.gesture
+            && interaction.pointerIds.length >=2
         && !(interaction.dragging || interaction.resizing)) {
             return { name: 'gesture' };
+        }
+
+        return null;
+    },
+
+    start: function (interaction, event) {
+        var gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
+
+        gestureEvent.ds = 0;
+
+        interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
+        interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
+        interaction.gesture.scale = 1;
+
+        interaction.gesturing = true;
+
+        interaction.target.fire(gestureEvent);
+
+        return gestureEvent;
+    },
+
+    move: function (interaction, event) {
+        if (!interaction.pointerIds.length) {
+            return interaction.prevEvent;
+        }
+
+        var gestureEvent;
+
+        gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
+        gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
+
+        interaction.target.fire(gestureEvent);
+
+        interaction.gesture.prevAngle = gestureEvent.angle;
+        interaction.gesture.prevDistance = gestureEvent.distance;
+
+        if (gestureEvent.scale !== Infinity &&
+            gestureEvent.scale !== null &&
+            gestureEvent.scale !== undefined  &&
+            !isNaN(gestureEvent.scale)) {
+
+            interaction.gesture.scale = gestureEvent.scale;
+        }
+
+        return gestureEvent;
+    },
+
+    end: function (interaction, event) {
+        var endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
+
+        interaction.target.fire(endEvent);
     }
-
-    return null;
-});
-
-Interaction.prototype.gestureStart = function (event) {
-    var gestureEvent = new InteractEvent(this, event, 'gesture', 'start', this.element);
-
-    gestureEvent.ds = 0;
-
-    this.gesture.startDistance = this.gesture.prevDistance = gestureEvent.distance;
-    this.gesture.startAngle = this.gesture.prevAngle = gestureEvent.angle;
-    this.gesture.scale = 1;
-
-    this.gesturing = true;
-
-    this.target.fire(gestureEvent);
-
-    return gestureEvent;
-};
-
-Interaction.prototype.gestureMove = function (event) {
-    if (!this.pointerIds.length) {
-        return this.prevEvent;
-    }
-
-    var gestureEvent;
-
-    gestureEvent = new InteractEvent(this, event, 'gesture', 'move', this.element);
-    gestureEvent.ds = gestureEvent.scale - this.gesture.scale;
-
-    this.target.fire(gestureEvent);
-
-    this.gesture.prevAngle = gestureEvent.angle;
-    this.gesture.prevDistance = gestureEvent.distance;
-
-    if (gestureEvent.scale !== Infinity &&
-        gestureEvent.scale !== null &&
-        gestureEvent.scale !== undefined  &&
-        !isNaN(gestureEvent.scale)) {
-
-        this.gesture.scale = gestureEvent.scale;
-    }
-
-    return gestureEvent;
-};
-
-Interaction.prototype.gestureEnd = function (event) {
-    var endEvent = new InteractEvent(this, event, 'gesture', 'end', this.element);
-
-    this.target.fire(endEvent);
 };
 
 /*\
@@ -113,3 +107,13 @@ Interactable.prototype.gesturable = function (options) {
     return this.options.gesture;
 };
 
+base.gesture = gesture;
+base.names.push('gesture');
+base.addEventTypes([
+    'gesturestart',
+    'gesturemove',
+    'gestureinertiastart',
+    'gestureend'
+]);
+
+module.exports = gesture;
