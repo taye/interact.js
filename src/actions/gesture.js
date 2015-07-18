@@ -17,6 +17,10 @@ var gesture = {
         return null;
     },
 
+    getCursor: function () {
+        return '';
+    },
+
     start: function (interaction, event) {
         var gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
 

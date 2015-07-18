@@ -162,33 +162,6 @@ function validateAction (action, interactable) {
     return null;
 }
 
-function getActionCursor (action) {
-    var cursor = '';
-
-    if (action.name === 'drag') {
-        cursor =  scope.actionCursors.drag;
-    }
-    if (action.name === 'resize') {
-        if (action.axis) {
-            cursor =  scope.actionCursors[action.name + action.axis];
-        }
-        else if (action.edges) {
-            var cursorKey = 'resize',
-                edgeNames = ['top', 'bottom', 'left', 'right'];
-
-            for (var i = 0; i < 4; i++) {
-                if (action.edges[edgeNames[i]]) {
-                    cursorKey += edgeNames[i];
-                }
-            }
-
-            cursor = scope.actionCursors[cursorKey];
-        }
-    }
-
-    return cursor;
-}
-
 function preventOriginalDefault () {
     this.originalEvent.preventDefault();
 }
@@ -317,7 +290,7 @@ Interaction.prototype = {
 
             if (target && target.options.styleCursor) {
                 if (action) {
-                    target._doc.documentElement.style.cursor = getActionCursor(action);
+                    target._doc.documentElement.style.cursor = actions[action.name].getCursor(action);
                 }
                 else {
                     target._doc.documentElement.style.cursor = '';
@@ -479,7 +452,7 @@ Interaction.prototype = {
             if (!action) { return; }
 
             if (options.styleCursor) {
-                target._doc.documentElement.style.cursor = getActionCursor(action);
+                target._doc.documentElement.style.cursor = actions[action.name].getCursor(action);
             }
 
             this.resizeAxes = action.name === 'resize'? action.axis : null;

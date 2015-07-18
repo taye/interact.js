@@ -2,6 +2,7 @@
 
 var base = require('./base'),
     utils = require('../utils'),
+    browser = require('../utils/browser'),
     scope = base.scope,
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable');
@@ -55,6 +56,52 @@ var resize = {
         }
 
         return null;
+    },
+
+    cursors: (browser.isIe9OrOlder ? {
+        x : 'e-resize',
+        y : 's-resize',
+        xy: 'se-resize',
+
+        top        : 'n-resize',
+        left       : 'w-resize',
+        bottom     : 's-resize',
+        right      : 'e-resize',
+        topleft    : 'se-resize',
+        bottomright: 'se-resize',
+        topright   : 'ne-resize',
+        bottomleft : 'ne-resize',
+    } : {
+        x : 'ew-resize',
+        y : 'ns-resize',
+        xy: 'nwse-resize',
+
+        top        : 'ns-resize',
+        left       : 'ew-resize',
+        bottom     : 'ns-resize',
+        right      : 'ew-resize',
+        topleft    : 'nwse-resize',
+        bottomright: 'nwse-resize',
+        topright   : 'nesw-resize',
+        bottomleft : 'nesw-resize',
+    }),
+
+    getCursor: function (action) {
+        if (action.axis) {
+            return resize.cursors[action.name + action.axis];
+        }
+        else if (action.edges) {
+            var cursorKey = '',
+                edgeNames = ['top', 'bottom', 'left', 'right'];
+
+            for (var i = 0; i < 4; i++) {
+                if (action.edges[edgeNames[i]]) {
+                    cursorKey += edgeNames[i];
+                }
+            }
+
+            return resize.cursors[cursorKey];
+        }
     },
 
     start: function (interaction, event) {

@@ -13,6 +13,10 @@ var drag = {
             : null;
     },
 
+    getCursor: function () {
+        return 'move';
+    },
+
     start: function (interaction, event) {
         var dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
 
