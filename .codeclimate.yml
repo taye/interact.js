@@ -1,7 +1,7 @@
 languages:
   JavaScript: true
 
- exclude_paths:
+exclude_paths:
  - "demo/*"
  - "docs/*"
  - "gulp/*"
