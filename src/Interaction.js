@@ -143,21 +143,10 @@ function Interaction () {
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable) {
-    if (!utils.isObject(action)) { return null; }
-
-    var actionName = action.name,
-        options = interactable.options;
-
-    if (   (actionName  === 'resize'   && options.resize.enabled )
-        || (actionName      === 'drag'     && options.drag.enabled  )
-        || (actionName      === 'gesture'  && options.gesture.enabled)) {
-
-        if (actionName === 'resize' || actionName === 'resizeyx') {
-            actionName = 'resizexy';
-        }
-
+    if (utils.isObject(action) && interactable.options[action.name].enabled) {
         return action;
     }
+
     return null;
 }
 
