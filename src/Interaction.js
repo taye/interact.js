@@ -204,7 +204,7 @@ Interaction.prototype = {
                 elementInteractable.getAction(pointer, event, this, eventTarget),
                 elementInteractable));
 
-        if (elementAction && !withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
+        if (elementAction && !scope.withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
             elementAction = null;
         }
 
@@ -421,7 +421,7 @@ Interaction.prototype = {
                 && !scope.testIgnore(interactable, curEventTarget, eventTarget)
                 && scope.testAllow(interactable, curEventTarget, eventTarget)
                 && (action = validateAction(forceAction || interactable.getAction(pointer, event, this, curEventTarget), interactable, eventTarget))
-                && withinInteractionLimit(interactable, curEventTarget, action)) {
+                && scope.withinInteractionLimit(interactable, curEventTarget, action)) {
                 this.target = interactable;
                 this.element = curEventTarget;
             }
@@ -723,7 +723,7 @@ Interaction.prototype = {
 
             if (starting
                 && (this.target.options[this.prepared.name].manualStart
-                || !withinInteractionLimit(this.target, this.element, this.prepared))) {
+                || !scope.withinInteractionLimit(this.target, this.element, this.prepared))) {
                 this.stop(event);
                 return;
             }
@@ -1205,7 +1205,7 @@ Interaction.prototype = {
                 matchElement = matchElements[i],
                 action = validateAction(match.getAction(pointer, event, this, matchElement), match);
 
-            if (action && withinInteractionLimit(match, matchElement, action)) {
+            if (action && scope.withinInteractionLimit(match, matchElement, action)) {
                 this.target = match;
                 this.element = matchElement;
 
@@ -1314,48 +1314,6 @@ Interaction.prototype = {
         this._curEventTarget = currentTarget;
     }
 };
-
-function withinInteractionLimit (interactable, element, action) {
-    var options = interactable.options,
-        maxActions = options[action.name].max,
-        maxPerElement = options[action.name].maxPerElement,
-        activeInteractions = 0,
-        targetCount = 0,
-        targetElementCount = 0;
-
-    for (var i = 0, len = scope.interactions.length; i < len; i++) {
-        var interaction = scope.interactions[i],
-            otherAction = interaction.prepared.name,
-            active = interaction.interacting();
-
-        if (!active) { continue; }
-
-        activeInteractions++;
-
-        if (activeInteractions >= scope.maxInteractions) {
-            return false;
-        }
-
-        if (interaction.target !== interactable) { continue; }
-
-        targetCount += (otherAction === action.name)|0;
-
-        if (targetCount >= maxActions) {
-            return false;
-        }
-
-        if (interaction.element === element) {
-            targetElementCount++;
-
-            if (otherAction !== action.name || targetElementCount >= maxPerElement) {
-                return false;
-            }
-        }
-    }
-
-    return scope.maxInteractions > 0;
-}
-
 
 function getInteractionFromPointer (pointer, eventType, eventTarget) {
     var i = 0, len = scope.interactions.length,
@@ -1500,5 +1458,6 @@ function doOnInteractions (method) {
 
 Interaction.getInteractionFromPointer = getInteractionFromPointer;
 Interaction.doOnInteractions = doOnInteractions;
+Interaction.withinLimit = scope.withinInteractionLimit;
 
 module.exports = Interaction;
