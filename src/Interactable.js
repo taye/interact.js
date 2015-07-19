@@ -643,8 +643,8 @@ Interactable.prototype = {
         }
         else {
             // remove delegated events
-            for (var type in scope.delegatedEvents) {
-                var delegated = scope.delegatedEvents[type];
+            for (var type in events.delegatedEvents) {
+                var delegated = events.delegatedEvents[type];
 
                 for (var i = 0; i < delegated.selectors.length; i++) {
                     if (delegated.selectors[i] === this.selector
@@ -656,7 +656,7 @@ Interactable.prototype = {
 
                         // remove the arrays if they are empty
                         if (!delegated.selectors.length) {
-                            scope.delegatedEvents[type] = null;
+                            delegated[type] = null;
                         }
                     }
 

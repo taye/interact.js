@@ -332,6 +332,7 @@ module.exports = {
 
     delegateListener: delegateListener,
     delegateUseCapture: delegateUseCapture,
+    delegatedEvents: delegatedEvents,
     documents: documents,
 
     useAttachEvent: useAttachEvent,
