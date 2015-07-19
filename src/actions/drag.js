@@ -3,7 +3,9 @@
 var base = require('./base'),
     scope = base.scope,
     utils = require('../utils'),
+    browser = utils.browser,
     InteractEvent = require('../InteractEvent'),
+    Interaction = require('../Interaction'),
     Interactable = require('../Interactable');
 
 var drag = {
@@ -15,6 +17,86 @@ var drag = {
 
     getCursor: function () {
         return 'move';
+    },
+
+    beforeStart: function (interaction, pointer, event, eventTarget, curEventTarget, dx, dy) {
+        // check if a drag is in the correct axis
+        if (interaction.prepared.name === 'drag') {
+            var absX = Math.abs(dx),
+                absY = Math.abs(dy),
+                targetAxis = interaction.target.options.drag.axis,
+                axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+
+            // if the movement isn't in the axis of the interactable
+            if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+                // cancel the prepared action
+                interaction.prepared.name = null;
+
+                // then try to get a drag from another ineractable
+
+                var element = eventTarget;
+
+                // check element interactables
+                while (utils.isElement(element)) {
+                    var elementInteractable = scope.interactables.get(element);
+
+                    if (elementInteractable
+                        && elementInteractable !== interaction.target
+                        && !elementInteractable.options.drag.manualStart
+                        && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
+                        && scope.checkAxis(axis, elementInteractable)) {
+
+                        interaction.prepared.name = 'drag';
+                        interaction.target = elementInteractable;
+                        interaction.element = element;
+                        break;
+                    }
+
+                    element = utils.parentElement(element);
+                }
+
+                // if there's no drag from element interactables,
+                // check the selector interactables
+                if (!interaction.prepared.name) {
+                    var interactionInteraction = interaction;
+
+                    var getDraggable = function (interactable, selector, context) {
+                        var elements = browser.useMatchesSelectorPolyfill
+                            ? context.querySelectorAll(selector)
+                            : undefined;
+
+                        if (interactable === interactionInteraction.target) { return; }
+
+                        if (scope.inContext(interactable, eventTarget)
+                            && !interactable.options.drag.manualStart
+                            && !scope.testIgnore(interactable, element, eventTarget)
+                            && scope.testAllow(interactable, element, eventTarget)
+                            && utils.matchesSelector(element, selector, elements)
+                            && interactable.getAction(interactionInteraction.downPointer, interactionInteraction.downEvent, interactionInteraction, element).name === 'drag'
+                            && scope.checkAxis(axis, interactable)
+                            && scope.withinInteractionLimit(interactable, element, 'drag')) {
+
+                            return interactable;
+                        }
+                    };
+
+                    element = eventTarget;
+
+                    while (utils.isElement(element)) {
+                        var selectorInteractable = scope.interactables.forEachSelector(getDraggable);
+
+                        if (selectorInteractable) {
+                            interaction.prepared.name = 'drag';
+                            interaction.target = selectorInteractable;
+                            interaction.element = element;
+                            break;
+                        }
+
+                        element = utils.parentElement(element);
+                    }
+                }
+            }
+        }
     },
 
     start: function (interaction, event) {

@@ -104,6 +104,8 @@ var resize = {
         }
     },
 
+    beforeStart: utils.blank,
+
     start: function (interaction, event) {
         var resizeEvent = new InteractEvent(interaction, event, 'resize', 'start', interaction.element);
 

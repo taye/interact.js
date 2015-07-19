@@ -18,6 +18,8 @@ var gesture = {
         return '';
     },
 
+    beforeStart: utils.blank,
+
     start: function (interaction, event) {
         var gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
 
