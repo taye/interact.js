@@ -20,7 +20,7 @@ var drag = {
     start: function (interaction, event) {
         var dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
 
-        interaction.dragging = true;
+        interaction._interacting = true;
         interaction.target.fire(dragEvent);
 
         // reset active dropzones
@@ -83,6 +83,12 @@ var drag = {
         }
 
         interaction.target.fire(endEvent);
+    },
+
+    stop: function (interaction) {
+        interaction.activeDrops.dropzones =
+            interaction.activeDrops.elements =
+            interaction.activeDrops.rects = null;
     }
 };
 
@@ -560,5 +566,7 @@ base.addEventTypes([
     'dropmove',
     'drop'
 ]);
+base.methodDict.drag = 'draggable';
+base.methodDict.drop = 'dropzone';
 
 module.exports = drag;

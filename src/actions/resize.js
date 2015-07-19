@@ -141,7 +141,7 @@ var resize = {
 
         interaction.target.fire(resizeEvent);
 
-        interaction.resizing = true;
+        interaction._interacting = true;
 
         return resizeEvent;
     },
@@ -233,7 +233,9 @@ var resize = {
         var endEvent = new InteractEvent(interaction, event, 'resize', 'end', interaction.element);
 
         interaction.target.fire(endEvent);
-    }
+    },
+
+    stop: utils.blank
 };
 
 /*\
@@ -343,5 +345,6 @@ base.addEventTypes([
     'resizeinertiastart',
     'resizeend'
 ]);
+base.methodDict.resize = 'resizable';
 
 module.exports = resize;

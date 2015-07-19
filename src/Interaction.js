@@ -130,9 +130,7 @@ function Interaction () {
 
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
-    this.gesturing       = false;
-    this.dragging        = false;
-    this.resizing        = false;
+    this._interacting    = false;
     this.resizeAxes      = 'xy';
 
     this.mouse = false;
@@ -748,9 +746,7 @@ Interaction.prototype = {
 
         utils.copyCoords(this.prevCoords, this.curCoords);
 
-        if (this.dragging || this.resizing) {
-            this.autoScrollMove(pointer);
-        }
+        this.autoScrollMove(pointer);
     },
 
     pointerHold: function (pointer, event, eventTarget) {
@@ -913,11 +909,11 @@ Interaction.prototype = {
     },
 
     currentAction: function () {
-        return (this.dragging && 'drag') || (this.resizing && 'resize') || (this.gesturing && 'gesture') || null;
+        return this._interacting? this.prepared.name: null;
     },
 
     interacting: function () {
-        return this.dragging || this.resizing || this.gesturing;
+        return this._interacting;
     },
 
     clearTargets: function () {
@@ -943,14 +939,12 @@ Interaction.prototype = {
                 this.checkAndPreventDefault(event, target, this.element);
             }
 
-            if (this.dragging) {
-                this.activeDrops.dropzones = this.activeDrops.elements = this.activeDrops.rects = null;
-            }
+            actions[this.prepared.name].stop(this, event);
         }
 
         this.clearTargets();
 
-        this.pointerIsDown = this.dragging = this.resizing = this.gesturing = false;
+        this.pointerIsDown = this._interacting = false;
         this.prepared.name = this.prevEvent = null;
         this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 

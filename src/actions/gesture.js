@@ -7,8 +7,7 @@ var base = require('./base'),
 
 var gesture = {
     checker: function (pointer, event, interactable, element, interaction) {
-        if (interaction.pointerIds.length >=2
-            && !(interaction.dragging || interaction.resizing)) {
+        if (interaction.pointerIds.length >= 2) {
             return { name: 'gesture' };
         }
 
@@ -28,7 +27,7 @@ var gesture = {
         interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
         interaction.gesture.scale = 1;
 
-        interaction.gesturing = true;
+        interaction._interacting = true;
 
         interaction.target.fire(gestureEvent);
 
@@ -65,7 +64,9 @@ var gesture = {
         var endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
 
         interaction.target.fire(endEvent);
-    }
+    },
+
+    stop: utils.blank
 };
 
 /*\
@@ -117,5 +118,6 @@ base.addEventTypes([
     'gestureinertiastart',
     'gestureend'
 ]);
+base.methodDict.gesture = 'gesturable';
 
 module.exports = gesture;

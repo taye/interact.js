@@ -592,20 +592,16 @@ Interactable.prototype = {
 
         this.options = utils.extend({}, scope.defaultOptions.base);
 
-        var i,
-            len,
-            actions = ['drag', 'drop', 'resize', 'gesture'],
-            methods = ['draggable', 'dropzone', 'resizable', 'gesturable'],
-            perActions = utils.extend(utils.extend({}, scope.defaultOptions.perAction), options[action] || {});
+        var perActions = utils.extend(utils.extend({}, scope.defaultOptions.perAction), options[actionName] || {});
 
-        for (i = 0; i < actions.length; i++) {
-            var action = actions[i];
+        for (var actionName in actions.methodDict) {
+            var methodName = actions.methodDict[actionName];
 
-            this.options[action] = utils.extend({}, scope.defaultOptions[action]);
+            this.options[actionName] = utils.extend({}, scope.defaultOptions[actionName]);
 
-            this.setPerAction(action, perActions);
+            this.setPerAction(actionName, perActions);
 
-            this[methods[i]](options[action]);
+            this[methodName](options[actionName]);
         }
 
         var settings = [
@@ -614,7 +610,7 @@ Interactable.prototype = {
                 'rectChecker'
             ];
 
-        for (i = 0, len = settings.length; i < len; i++) {
+        for (var i = 0, len = settings.length; i < len; i++) {
             var setting = settings[i];
 
             this.options[setting] = scope.defaultOptions.base[setting];
@@ -632,7 +628,7 @@ Interactable.prototype = {
      [ method ]
      *
      * Remove this interactable from the list of interactables and remove
-     * it's drag, drop, resize and gesture capabilities
+     * it's action capabilities and event listeners
      *
      = (object) @interact
     \*/

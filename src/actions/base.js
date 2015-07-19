@@ -24,7 +24,8 @@ var actions = {
         return action;
     },
 
-    names: []
+    names: [],
+    methodDict: {}
 };
 
 module.exports = actions;
