@@ -737,8 +737,6 @@ Interaction.prototype = {
                 statuses = {},
                 modifierResult,
                 page = utils.extend({}, this.curCoords.page),
-                dx = 0,
-                dy = 0,
                 startEvent;
 
             if (this.dragging) {
@@ -804,8 +802,8 @@ Interaction.prototype = {
                 }
                 else {
                     inertiaStatus.smoothEnd = true;
-                    inertiaStatus.xe = dx;
-                    inertiaStatus.ye = dy;
+                    inertiaStatus.xe = modifierResult.dx;
+                    inertiaStatus.ye = modifierResult.dy;
 
                     inertiaStatus.sx = inertiaStatus.sy = 0;
 

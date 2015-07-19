@@ -32,6 +32,8 @@ var modifiers = {
 
                 result.dx += currentStatus.dx;
                 result.dy += currentStatus.dy;
+
+                result.locked = true;
             }
         }
 
