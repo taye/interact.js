@@ -5,7 +5,6 @@ var base = require('./base'),
     utils = require('../utils'),
     browser = utils.browser,
     InteractEvent = require('../InteractEvent'),
-    Interaction = require('../Interaction'),
     Interactable = require('../Interactable');
 
 var drag = {
