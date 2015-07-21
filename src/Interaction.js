@@ -814,12 +814,13 @@ Interaction.prototype = {
                 return;
             }
 
-            var endSnap = modifiers.snap.shouldDo(target, this.prepared.name, true, true),
-                endRestrict = modifiers.restrict.shouldDo(target, this.prepared.name, true, true);
-
-            if (endSnap || endRestrict) {
-                // fire a move event at the snapped coordinates
-                this.pointerMove(pointer, event, eventTarget, curEventTarget, true);
+            for (var i = 0; i < modifiers.names.length; i++) {
+                // if the endOnly option is true for any modifier
+                if (modifiers[modifiers.names[i]].shouldDo(target, this.prepared.name, true, true)) {
+                    // fire a move event at the snapped coordinates
+                    this.pointerMove(pointer, event, eventTarget, curEventTarget, true);
+                    break;
+                }
             }
         }
 
