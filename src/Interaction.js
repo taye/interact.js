@@ -762,7 +762,7 @@ Interaction.prototype = {
             if (inertiaPossible && !inertia) {
                 modifiers.resetStatuses(statuses);
 
-                modifierResult = modifiers.setAll(this, page, statuses, true, true);
+                modifierResult = modifiers.setAll(this, page, statuses, true);
 
                 if (modifierResult.shouldMove && modifierResult.locked) {
                     smoothEnd = true;
