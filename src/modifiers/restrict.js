@@ -15,6 +15,25 @@ var restrict = {
 
         return restrict && restrict.enabled && (preEnd || !restrict.endOnly) && (!requireEndOnly || restrict.endOnly);
     },
+
+    setOffset: function (interaction, interactable, element, rect, startOffset) {
+        var elementRect = interactable.options[interaction.prepared.name].restrict.elementRect,
+            offset = {};
+
+        if (rect && elementRect) {
+            offset.left = startOffset.left - (rect.width  * elementRect.left);
+            offset.top  = startOffset.top  - (rect.height * elementRect.top);
+
+            offset.right  = startOffset.right  - (rect.width  * (1 - elementRect.right));
+            offset.bottom = startOffset.bottom - (rect.height * (1 - elementRect.bottom));
+        }
+        else {
+            offset.left = offset.top = offset.right = offset.bottom = 0;
+        }
+
+        return offset;
+    },
+
     set: function (pageCoords, interaction, status) {
         var target = interaction.target,
             restrict = target && target.options[interaction.prepared.name].restrict,
@@ -62,7 +81,7 @@ var restrict = {
 
         rect = restriction;
 
-        var offset = interaction.restrictOffset;
+        var offset = interaction.modifierOffsets.restrict;
 
         if (!restriction) {
             restrictedX = page.x;

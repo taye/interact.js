@@ -109,9 +109,9 @@ function Interaction () {
     this.tapTime   = 0;         // time of the most recent tap event
     this.prevTap   = null;
 
-    this.startOffset    = { left: 0, right: 0, top: 0, bottom: 0 };
-    this.restrictOffset = { left: 0, right: 0, top: 0, bottom: 0 };
-    this.snapOffsets    = [];
+    this.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
+    this.modifierOffsets = {};
+    this.modifierStatuses = modifiers.resetStatuses({});
 
     this.gesture = {
         start: { x: 0, y: 0 },
@@ -125,8 +125,6 @@ function Interaction () {
         startAngle: 0,      // angle of line joining two touches
         prevAngle : 0       // angle of the previous gesture event
     };
-
-    this.modifierStatuses = modifiers.resetStatuses({});
 
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
@@ -235,14 +233,14 @@ Interaction.prototype = {
 
                 this.pointerHover(pointer, event, this.matches, this.matchElements);
                 events.add(eventTarget,
-                    scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
+                    scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
                     scope.listeners.pointerHover);
             }
             else if (this.target) {
                 if (utils.nodeContains(prevTargetElement, eventTarget)) {
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
                     events.add(this.element,
-                        scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
+                        scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
                         scope.listeners.pointerHover);
                 }
                 else {
@@ -294,7 +292,7 @@ Interaction.prototype = {
         // Remove temporary event listeners for selector Interactables
         if (!scope.interactables.get(eventTarget)) {
             events.remove(eventTarget,
-                scope.PointerEvent? scope.pEventTypes.move : 'mousemove',
+                scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
                 scope.listeners.pointerHover);
         }
 
@@ -475,11 +473,7 @@ Interaction.prototype = {
     },
 
     setStartOffsets: function (action, interactable, element) {
-        var rect = interactable.getRect(element),
-            origin = scope.getOriginXY(interactable, element),
-            snap = interactable.options[this.prepared.name].snap,
-            restrict = interactable.options[this.prepared.name].restrict,
-            width, height;
+        var rect = interactable.getRect(element);
 
         if (rect) {
             this.startOffset.left = this.startCoords.page.x - rect.left;
@@ -488,46 +482,14 @@ Interaction.prototype = {
             this.startOffset.right  = rect.right  - this.startCoords.page.x;
             this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
 
-            if ('width' in rect) { width = rect.width; }
-            else { width = rect.right - rect.left; }
-            if ('height' in rect) { height = rect.height; }
-            else { height = rect.bottom - rect.top; }
+            if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
+            if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
         }
         else {
             this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
         }
 
-        this.snapOffsets.splice(0);
-
-        var snapOffset = snap && snap.offset === 'startCoords'
-            ? {
-            x: this.startCoords.page.x - origin.x,
-            y: this.startCoords.page.y - origin.y
-        }
-            : snap && snap.offset || { x: 0, y: 0 };
-
-        if (rect && snap && snap.relativePoints && snap.relativePoints.length) {
-            for (var i = 0; i < snap.relativePoints.length; i++) {
-                this.snapOffsets.push({
-                    x: this.startOffset.left - (width  * snap.relativePoints[i].x) + snapOffset.x,
-                    y: this.startOffset.top  - (height * snap.relativePoints[i].y) + snapOffset.y
-                });
-            }
-        }
-        else {
-            this.snapOffsets.push(snapOffset);
-        }
-
-        if (rect && restrict.elementRect) {
-            this.restrictOffset.left = this.startOffset.left - (width  * restrict.elementRect.left);
-            this.restrictOffset.top  = this.startOffset.top  - (height * restrict.elementRect.top);
-
-            this.restrictOffset.right  = this.startOffset.right  - (width  * (1 - restrict.elementRect.right));
-            this.restrictOffset.bottom = this.startOffset.bottom - (height * (1 - restrict.elementRect.bottom));
-        }
-        else {
-            this.restrictOffset.left = this.restrictOffset.top = this.restrictOffset.right = this.restrictOffset.bottom = 0;
-        }
+        modifiers.setOffsets(this, interactable, element, rect, this.modifierOffsets);
     },
 
     /*\
@@ -582,7 +544,7 @@ Interaction.prototype = {
         this.element        = element;
 
         this.setEventXY(this.startCoords);
-        this.setStartOffsets(action.name, interactable, element);
+        this.setStartOffsets(action.name, interactable, element, this.modifierOffsets);
 
         modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 

@@ -2,6 +2,7 @@
 
 var modifiers = require('./index'),
     scope = require('../scope'),
+    interact = require('../interact'),
     utils = require('../utils');
     //defaultOptions = require('../defaultOptions');
 
@@ -20,6 +21,32 @@ var snap = {
 
         return snap && snap.enabled && (preEnd || !snap.endOnly) && (!requireEndOnly || snap.endOnly);
     },
+
+    setOffset: function (interaction, interactable, element, rect, startOffset) {
+        var offsets = [],
+            origin = scope.getOriginXY(interactable, element),
+            snapOffset = (snap && snap.offset === 'startCoords'
+                ? {
+                    x: interaction.startCoords.page.x - origin.x,
+                    y: interaction.startCoords.page.y - origin.y
+                }
+                : snap && snap.offset || { x: 0, y: 0 });
+
+        if (rect && snap && snap.relativePoints && snap.relativePoints.length) {
+            for (var i = 0; i < snap.relativePoints.length; i++) {
+                offsets.push({
+                    x: startOffset.left - (rect.width  * snap.relativePoints[i].x) + snapOffset.x,
+                    y: startOffset.top  - (rect.height * snap.relativePoints[i].y) + snapOffset.y
+                });
+            }
+        }
+        else {
+            offsets.push(snapOffset);
+        }
+
+        return offsets;
+    },
+
     set: function (pageCoords, interaction, status) {
         var snap = interaction.target.options[interaction.prepared.name].snap,
             targets = [],
@@ -45,12 +72,13 @@ var snap = {
         page.x -= interaction.inertiaStatus.resumeDx;
         page.y -= interaction.inertiaStatus.resumeDy;
 
-        var len = snap.targets? snap.targets.length : 0;
+        var len = snap.targets? snap.targets.length : 0,
+            offsets = interaction.modifierOffsets.snap;
 
-        for (var relIndex = 0; relIndex < interaction.snapOffsets.length; relIndex++) {
+        for (var relIndex = 0; relIndex < offsets.length; relIndex++) {
             var relative = {
-                x: page.x - interaction.snapOffsets[relIndex].x,
-                y: page.y - interaction.snapOffsets[relIndex].y
+                x: page.x - offsets[relIndex].x,
+                y: page.y - offsets[relIndex].y
             };
 
             for (i = 0; i < len; i++) {
@@ -64,8 +92,8 @@ var snap = {
                 if (!target) { continue; }
 
                 targets.push({
-                    x: utils.isNumber(target.x) ? (target.x + interaction.snapOffsets[relIndex].x) : relative.x,
-                    y: utils.isNumber(target.y) ? (target.y + interaction.snapOffsets[relIndex].y) : relative.y,
+                    x: utils.isNumber(target.x) ? (target.x + offsets[relIndex].x) : relative.x,
+                    y: utils.isNumber(target.y) ? (target.y + offsets[relIndex].y) : relative.y,
 
                     range: utils.isNumber(target.range)? target.range: snap.range
                 });
@@ -186,5 +214,29 @@ var snap = {
 
 modifiers.snap = snap;
 modifiers.names.push('snap');
+
+interact.createSnapGrid = function (grid) {
+    return function (x, y) {
+        var offsetX = 0,
+            offsetY = 0;
+
+        if (utils.isObject(grid.offset)) {
+            offsetX = grid.offset.x;
+            offsetY = grid.offset.y;
+        }
+
+        var gridx = Math.round((x - offsetX) / grid.x),
+            gridy = Math.round((y - offsetY) / grid.y),
+
+            newX = gridx * grid.x + offsetX,
+            newY = gridy * grid.y + offsetY;
+
+        return {
+            x: newX,
+            y: newY,
+            range: grid.range
+        };
+    };
+};
 
 module.exports = snap;

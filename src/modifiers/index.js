@@ -5,6 +5,17 @@ var utils = require('../utils');
 var modifiers = {
     names: [],
 
+    setOffsets: function (interaction, interactable, element, rect, offsets) {
+        for (var i = 0; i < modifiers.names.length; i++) {
+            var modifierName = modifiers.names[i];
+
+            offsets[modifierName] =
+                modifiers[modifiers.names[i]].setOffset(interaction,
+                                                        interactable, element, rect,
+                                                        interaction.startOffset);
+        }
+    },
+
     setAll: function (interaction, coords, statuses, preEnd, requireEndOnly) {
         var result = {
                 dx: 0,

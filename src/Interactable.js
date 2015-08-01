@@ -2,6 +2,7 @@
 
 var scope = require('./scope'),
     utils = require('./utils'),
+    browser = require('./utils/browser'),
     events = require('./utils/events'),
     actions = require('./actions/base');
 
@@ -37,8 +38,8 @@ function Interactable (element, options) {
         if (utils.isElement(element, _window)) {
 
             if (scope.PointerEvent) {
-                events.add(this._element, scope.pEventTypes.down, scope.listeners.pointerDown );
-                events.add(this._element, scope.pEventTypes.move, scope.listeners.pointerHover);
+                events.add(this._element, browser.pEventTypes.down, scope.listeners.pointerDown );
+                events.add(this._element, browser.pEventTypes.move, scope.listeners.pointerHover);
             }
             else {
                 events.add(this._element, 'mousedown' , scope.listeners.pointerDown );
