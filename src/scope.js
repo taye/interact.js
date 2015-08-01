@@ -3,8 +3,6 @@
 var scope = {},
     extend = require('./utils/extend');
 
-scope.pEventTypes = null;
-
 scope.documents       = [];   // all documents being listened to
 
 scope.interactables   = [];   // all set interactables

@@ -30,7 +30,18 @@ var browser = {
                     'mozMatchesSelector': 'oMatchesSelector' in Element.prototype?
                         'oMatchesSelector': 'msMatchesSelector',
 
-    useMatchesSelectorPolyfill: false
+    useMatchesSelectorPolyfill: false,
+
+    pEventTypes: (domObjects.PointerEvent
+                    ? (domObjects.PointerEvent === win.window.MSPointerEvent
+                       ? {
+                           up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+                           out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' }
+                       : {
+                           up: 'pointerup', down: 'pointerdown', over: 'pointerover',
+                           out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' })
+                    : null)
+
 };
 
 browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);

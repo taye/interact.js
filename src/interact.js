@@ -466,30 +466,6 @@
         return scope.maxInteractions;
     };
 
-    interact.createSnapGrid = function (grid) {
-        return function (x, y) {
-            var offsetX = 0,
-                offsetY = 0;
-
-            if (utils.isObject(grid.offset)) {
-                offsetX = grid.offset.x;
-                offsetY = grid.offset.y;
-            }
-
-            var gridx = Math.round((x - offsetX) / grid.x),
-                gridy = Math.round((y - offsetY) / grid.y),
-
-                newX = gridx * grid.x + offsetX,
-                newY = gridy * grid.y + offsetY;
-
-            return {
-                x: newX,
-                y: newY,
-                range: grid.range
-            };
-        };
-    };
-
     function endAllInteractions (event) {
         for (var i = 0; i < scope.interactions.length; i++) {
             scope.interactions[i].pointerEnd(event, event);
@@ -499,7 +475,8 @@
     function listenToDocument (doc) {
         if (utils.contains(scope.documents, doc)) { return; }
 
-        var win = doc.defaultView || doc.parentWindow;
+        var win = doc.defaultView || doc.parentWindow,
+            pEventTypes = browser.pEventTypes;
 
         // add delegate event listener
         for (var eventType in scope.delegatedEvents) {
@@ -508,26 +485,15 @@
         }
 
         if (scope.PointerEvent) {
-            if (scope.PointerEvent === win.MSPointerEvent) {
-                scope.pEventTypes = {
-                    up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-                    out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' };
-            }
-            else {
-                scope.pEventTypes = {
-                    up: 'pointerup', down: 'pointerdown', over: 'pointerover',
-                    out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' };
-            }
-
-            events.add(doc, scope.pEventTypes.down  , scope.listeners.selectorDown );
-            events.add(doc, scope.pEventTypes.move  , scope.listeners.pointerMove  );
-            events.add(doc, scope.pEventTypes.over  , scope.listeners.pointerOver  );
-            events.add(doc, scope.pEventTypes.out   , scope.listeners.pointerOut   );
-            events.add(doc, scope.pEventTypes.up    , scope.listeners.pointerUp    );
-            events.add(doc, scope.pEventTypes.cancel, scope.listeners.pointerCancel);
+            events.add(doc, pEventTypes.down  , scope.listeners.selectorDown );
+            events.add(doc, pEventTypes.move  , scope.listeners.pointerMove  );
+            events.add(doc, pEventTypes.over  , scope.listeners.pointerOver  );
+            events.add(doc, pEventTypes.out   , scope.listeners.pointerOut   );
+            events.add(doc, pEventTypes.up    , scope.listeners.pointerUp    );
+            events.add(doc, pEventTypes.cancel, scope.listeners.pointerCancel);
 
             // autoscroll
-            events.add(doc, scope.pEventTypes.move, scope.listeners.autoScrollMove);
+            events.add(doc, pEventTypes.move, scope.listeners.autoScrollMove);
         }
         else {
             events.add(doc, 'mousedown', scope.listeners.selectorDown);
