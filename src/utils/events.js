@@ -2,7 +2,6 @@
 
 var arr = require('./arr'),
     isType = require('./isType'),
-    domObjects = require('./domObjects'),
     domUtils = require('./domUtils'),
     indexOf  = arr.indexOf,
     contains = arr.contains,
