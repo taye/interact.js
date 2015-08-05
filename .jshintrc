@@ -10,6 +10,5 @@
     "noarg"    : true,
     "undef"    : true,
     "unused"   : true,
-    "strict"   : true,
     "trailing" : true
 }
