@@ -166,13 +166,13 @@ describe('Interactable', function () {
             iDiv.actionChecker(returnActionI);
 
             for (i = 0; action = actions[i], i < actions.length; i++) {
-                debug.pointerDown.call(div, mockEvent({
+                debug.listeners.pointerDown.call(div, mockEvent({
                     target: div,
                     pointerId: 1
                 }));
 
                 if (PointerEvent && action === 'gesture') {
-                    debug.pointerDown.call(div, mockEvent({
+                    debug.listeners.pointerDown.call(div, mockEvent({
                         target: div,
                         pointerId: 2
                     }));
@@ -210,10 +210,10 @@ describe('Events', function () {
             return 'drag';
         });
 
-        debug.pointerDown(mockEvents[0]);
-        debug.pointerMove(mockEvents[1]);
-        debug.pointerMove(mockEvents[2]);
-        debug.pointerUp(mockEvents[3]);
+        debug.listeners.pointerDown(mockEvents[0]);
+        debug.listeners.pointerMove(mockEvents[1]);
+        debug.listeners.pointerMove(mockEvents[2]);
+        debug.listeners.pointerUp(mockEvents[3]);
 
         it('should be triggered by mousedown -> mousemove -> mouseup sequence', function () {
             events.length.should.equal(4);
@@ -309,19 +309,19 @@ describe('Events', function () {
         // don't call the related functions. The recorded pointermove events
         // are used to calculate gesture angle, scale, etc.
 
-        debug.pointerDown(mockEvents[0]);
-        debug.pointerDown(mockEvents[1]);
+        debug.listeners.pointerDown(mockEvents[0]);
+        debug.listeners.pointerDown(mockEvents[1]);
 
         debugRecord = PointerEvent && debug.recordPointer || debug.recordTouches || debug.recordPointer;
 
-        debugRecord(mockEvents[2]);
-        debug.pointerMove(mockEvents[2]);
+        debugRecord && debugRecord(mockEvents[2]);
+        debug.listeners.pointerMove(mockEvents[2]);
 
-        debugRecord(mockEvents[3]);
-        debug.pointerMove(mockEvents[3]);
+        debugRecord && debugRecord(mockEvents[3]);
+        debug.listeners.pointerMove(mockEvents[3]);
 
-        debug.pointerUp(mockEvents[4]);
-        debug.pointerUp(mockEvents[5]);
+        debug.listeners.pointerUp(mockEvents[4]);
+        debug.listeners.pointerUp(mockEvents[5]);
 
         it('should be started by 2 touches starting and moving and end when there are fewer than two active touches', function () {
             gestureEvents.length.should.equal(4);
