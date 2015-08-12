@@ -721,7 +721,7 @@
             top   : clientRect.top,
             bottom: clientRect.bottom,
             width : clientRect.width || clientRect.right - clientRect.left,
-            height: clientRect.heigh || clientRect.bottom - clientRect.top
+            height: clientRect.height || clientRect.bottom - clientRect.top
         };
     }
 
