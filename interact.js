@@ -5573,7 +5573,7 @@
      = (object) interact
     \*/
     interact.stop = function (event) {
-        for (var i = interactions.length - 1; i > 0; i--) {
+        for (var i = interactions.length - 1; i >= 0; i--) {
             interactions[i].stop(event);
         }
 
