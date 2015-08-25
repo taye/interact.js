@@ -5187,7 +5187,7 @@
             var settings = [
                     'accept', 'actionChecker', 'allowFrom', 'deltaSource',
                     'dropChecker', 'ignoreFrom', 'origin', 'preventDefault',
-                    'rectChecker'
+                    'rectChecker', 'styleCursor'
                 ];
 
             for (i = 0, len = settings.length; i < len; i++) {
