@@ -21,9 +21,6 @@
 
     scope.dynamicDrop     = false;
 
-    // Things related to autoScroll
-    scope.autoScroll = require('./autoScroll');
-
     // Less Precision with touch input
     scope.margin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
@@ -55,7 +52,7 @@
     var interactionListeners = [
         'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
         'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
-        'addPointer', 'removePointer', 'recordPointer', 'autoScrollMove'
+        'addPointer', 'removePointer', 'recordPointer'
     ];
 
     scope.getOriginXY = function (interactable, element) {
@@ -130,16 +127,6 @@
         var thisAxis = interactable.options.drag.axis;
 
         return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
-    };
-
-    scope.checkAutoScroll = function (interactable, action) {
-        var options = interactable.options;
-
-        if (/^resize/.test(action)) {
-            action = 'resize';
-        }
-
-        return  options[action].autoScroll && options[action].autoScroll.enabled;
     };
 
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
@@ -491,9 +478,6 @@
             events.add(doc, pEventTypes.out   , scope.listeners.pointerOut   );
             events.add(doc, pEventTypes.up    , scope.listeners.pointerUp    );
             events.add(doc, pEventTypes.cancel, scope.listeners.pointerCancel);
-
-            // autoscroll
-            events.add(doc, pEventTypes.move, scope.listeners.autoScrollMove);
         }
         else {
             events.add(doc, 'mousedown', scope.listeners.selectorDown);
@@ -506,10 +490,6 @@
             events.add(doc, 'touchmove'  , scope.listeners.pointerMove  );
             events.add(doc, 'touchend'   , scope.listeners.pointerUp    );
             events.add(doc, 'touchcancel', scope.listeners.pointerCancel);
-
-            // autoscroll
-            events.add(doc, 'mousemove', scope.listeners.autoScrollMove);
-            events.add(doc, 'touchmove', scope.listeners.autoScrollMove);
         }
 
         events.add(win, 'blur', endAllInteractions);

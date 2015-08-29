@@ -5,6 +5,7 @@ var scope = require('./scope'),
     animationFrame = utils.raf,
     InteractEvent = require('./InteractEvent'),
     events = require('./utils/events'),
+    signals = require('./utils/signals'),
     browser = require('./utils/browser'),
     actions = require('./actions/base'),
     modifiers = require('./modifiers/');
@@ -632,7 +633,11 @@ Interaction.prototype = {
 
         utils.copyCoords(this.prevCoords, this.curCoords);
 
-        this.autoScrollMove(pointer);
+        signals.fire('interaction-move-done', {
+            interaction: this,
+            pointer: pointer,
+            event: event
+        });
     },
 
     pointerHold: function (pointer, event, eventTarget) {
@@ -808,8 +813,9 @@ Interaction.prototype = {
     },
 
     stop: function (event) {
-        if (this.interacting()) {
-            scope.autoScroll.stop();
+        if (this._interacting) {
+            signals.fire('interaction-stop-active', { interaction: this });
+
             this.matches = [];
             this.matchElements = [];
 
@@ -1147,51 +1153,6 @@ Interaction.prototype = {
 
         status.lambda_v0 = lambda / status.v0;
         status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
-    },
-
-    autoScrollMove: function (pointer) {
-        if (!(this.interacting()
-            && scope.checkAutoScroll(this.target, this.prepared.name))) {
-            return;
-        }
-
-        if (this.inertiaStatus.active) {
-            scope.autoScroll.x = scope.autoScroll.y = 0;
-            return;
-        }
-
-        var top,
-            right,
-            bottom,
-            left,
-            options = this.target.options[this.prepared.name].autoScroll,
-            container = options.container || scope.getWindow(this.element);
-
-        if (utils.isWindow(container)) {
-            left   = pointer.clientX < scope.autoScroll.margin;
-            top    = pointer.clientY < scope.autoScroll.margin;
-            right  = pointer.clientX > container.innerWidth  - scope.autoScroll.margin;
-            bottom = pointer.clientY > container.innerHeight - scope.autoScroll.margin;
-        }
-        else {
-            var rect = utils.getElementClientRect(container);
-
-            left   = pointer.clientX < rect.left   + scope.autoScroll.margin;
-            top    = pointer.clientY < rect.top    + scope.autoScroll.margin;
-            right  = pointer.clientX > rect.right  - scope.autoScroll.margin;
-            bottom = pointer.clientY > rect.bottom - scope.autoScroll.margin;
-        }
-
-        scope.autoScroll.x = (right ? 1: left? -1: 0);
-        scope.autoScroll.y = (bottom? 1:  top? -1: 0);
-
-        if (!scope.autoScroll.isScrolling) {
-            // set the autoScroll properties to those of the target
-            scope.autoScroll.margin = options.margin;
-            scope.autoScroll.speed  = options.speed;
-
-            scope.autoScroll.start(this);
-        }
     },
 
     _updateEventTargets: function (target, currentTarget) {

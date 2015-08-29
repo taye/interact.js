@@ -1,8 +1,10 @@
 'use strict';
 
-var raf       = require('./utils/raf'),
-    getWindow = require('./utils/window').getWindow,
-    isWindow  = require('./utils/isType').isWindow;
+var raf         = require('./utils/raf'),
+    getWindow   = require('./utils/window').getWindow,
+    isWindow    = require('./utils/isType').isWindow,
+    domUtils    = require('./utils/domUtils'),
+    signals     = require('./utils/signals');
 
 var autoScroll = {
 
@@ -53,7 +55,65 @@ var autoScroll = {
             raf.cancel(autoScroll.i);
             autoScroll.i = raf.request(autoScroll.scroll);
         }
+    },
+    check: function (interactable, actionName) {
+        var options = interactable.options;
+
+        return  options[actionName].autoScroll && options[actionName].autoScroll.enabled;
+    },
+    onInteractionMove: function (arg) {
+        var interaction = arg.interaction,
+            pointer = arg.pointer;
+
+        if (!(interaction.interacting()
+            && autoScroll.check(interaction.target, interaction.prepared.name))) {
+            return;
+        }
+
+        if (interaction.inertiaStatus.active) {
+            autoScroll.x = autoScroll.y = 0;
+            return;
+        }
+
+        var top,
+            right,
+            bottom,
+            left,
+            options = interaction.target.options[interaction.prepared.name].autoScroll,
+            container = options.container || getWindow(interaction.element);
+
+        if (isWindow(container)) {
+            left   = pointer.clientX < autoScroll.margin;
+            top    = pointer.clientY < autoScroll.margin;
+            right  = pointer.clientX > container.innerWidth  - autoScroll.margin;
+            bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
+        }
+        else {
+            var rect = domUtils.getElementClientRect(container);
+
+            left   = pointer.clientX < rect.left   + autoScroll.margin;
+            top    = pointer.clientY < rect.top    + autoScroll.margin;
+            right  = pointer.clientX > rect.right  - autoScroll.margin;
+            bottom = pointer.clientY > rect.bottom - autoScroll.margin;
+        }
+
+        autoScroll.x = (right ? 1: left? -1: 0);
+        autoScroll.y = (bottom? 1:  top? -1: 0);
+
+        if (!autoScroll.isScrolling) {
+            // set the autoScroll properties to those of the target
+            autoScroll.margin = options.margin;
+            autoScroll.speed  = options.speed;
+
+            autoScroll.start(interaction);
+        }
     }
 };
+
+signals.on('interaction-stop-active', function () {
+    autoScroll.stop();
+});
+
+signals.on('interaction-move-done', autoScroll.onInteractionMove);
 
 module.exports = autoScroll;
