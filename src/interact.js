@@ -501,7 +501,7 @@
             interact.windowParentError = error;
         }
 
-        if (events.useAttachEvent) {
+        if (browser.isIE8) {
             // For IE's lack of Event#preventDefault
             events.add(doc, 'selectstart', function (event) {
                 var interaction = scope.interactions[0];

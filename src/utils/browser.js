@@ -12,6 +12,8 @@ var browser = {
     // Does the browser support PointerEvents
     supportsPointerEvent : !!domObjects.PointerEvent,
 
+    isIE8 : ('attachEvent' in win.window) && !('addEventListener' in win.window),
+
     // Opera Mobile must be handled differently
     isOperaMobile : (navigator.appName === 'Opera'
         && browser.supportsTouch
