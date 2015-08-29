@@ -3,7 +3,8 @@
 var base = require('./base'),
     utils = require('../utils'),
     InteractEvent = require('../InteractEvent'),
-    Interactable = require('../Interactable');
+    Interactable = require('../Interactable'),
+    scope = base.scope;
 
 var gesture = {
     checker: function (pointer, event, interactable, element, interaction) {
@@ -114,7 +115,7 @@ Interactable.prototype.gesturable = function (options) {
 
 base.gesture = gesture;
 base.names.push('gesture');
-base.addEventTypes([
+scope.addEventTypes([
     'gesturestart',
     'gesturemove',
     'gestureinertiastart',

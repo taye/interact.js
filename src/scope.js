@@ -15,6 +15,14 @@ scope.events = require('./utils/events');
 extend(scope, require('./utils/window'));
 extend(scope, require('./utils/domObjects'));
 
+scope.eventTypes = [];
+
+scope.addEventTypes = function (eventTypes) {
+    for (var i = 0; i < eventTypes.length; i++) {
+        scope.eventTypes.push(eventTypes[i]);
+    }
+};
+
 scope.withinInteractionLimit = function (interactable, element, action) {
     var options = interactable.options,
         maxActions = options[action.name].max,

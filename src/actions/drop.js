@@ -470,7 +470,7 @@ Interactable.prototype.accept = function (newValue) {
     return this.options.drop.accept;
 };
 
-base.addEventTypes([
+scope.addEventTypes([
     'dragenter',
     'dragleave',
     'dropactivate',

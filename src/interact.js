@@ -35,16 +35,6 @@
     // because Webkit and Opera still use 'mousewheel' event type
     scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
 
-    scope.eventTypes = [
-        'down',
-        'move',
-        'up',
-        'cancel',
-        'tap',
-        'doubletap',
-        'hold'
-    ];
-
     scope.globalEvents = {};
 
     scope.listeners = {};
