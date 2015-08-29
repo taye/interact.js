@@ -30,7 +30,7 @@ var signals = {
         if (!targetListeners) { return; }
 
         for (var i = 0; i < targetListeners.length; i++) {
-            targetListeners[i](arg);
+            targetListeners[i](arg, name);
         }
     },
     listeners: listeners
