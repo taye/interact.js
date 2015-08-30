@@ -394,10 +394,3 @@
     scope.interact = interact;
 
     module.exports = interact;
-
-    require('./actions/resize');
-    require('./actions/drag');
-    require('./actions/gesture');
-
-    require('./modifiers/snap');
-    require('./modifiers/restrict');
