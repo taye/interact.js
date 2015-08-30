@@ -1,15 +1,12 @@
 'use strict';
 
-var isWindow = require('./isWindow');
+var win = module.exports,
+    isWindow = require('./isWindow');
 
-if (typeof window === 'undefined') {
-    module.exports.window     = undefined;
-    module.exports.realWindow = undefined;
-}
-else {
+function init (window) {
     // get wrapped window if using Shadow DOM polyfill
 
-    module.exports.realWindow = window;
+    win.realWindow = window;
 
     // create a TextNode
     var el = window.document.createTextNode('');
@@ -19,19 +16,29 @@ else {
         && typeof window.wrap === 'function'
         && window.wrap(el) === el) {
         // return wrapped window
-        module.exports.window = window.wrap(window);
+        win.window = window.wrap(window);
     }
 
     // no Shadow DOM polyfil or native implementation
-    module.exports.window = window;
+    win.window = window;
 }
 
-module.exports.getWindow = function getWindow (node) {
+if (typeof window === 'undefined') {
+    win.window     = undefined;
+    win.realWindow = undefined;
+}
+else {
+    init(window);
+}
+
+win.getWindow = function getWindow (node) {
     if (isWindow(node)) {
         return node;
     }
 
     var rootNode = (node.ownerDocument || node);
 
-    return rootNode.defaultView || rootNode.parentWindow || module.exports.window;
+    return rootNode.defaultView || rootNode.parentWindow || win.window;
 };
+
+win.init = init;
