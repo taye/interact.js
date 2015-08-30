@@ -17,7 +17,7 @@ module.exports = {
     // bundle config in the list below
     bundleConfigs: [
         {
-          entries: src + '/interact.js',
+          entries: src + '/index.js',
           dest: dest,
           outputName: 'interact.js',
           outputNameMin: 'interact.min.js',
