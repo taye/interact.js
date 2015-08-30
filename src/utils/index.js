@@ -2,6 +2,7 @@
 
 var utils = module.exports,
     extend = require('./extend'),
+    defaultOptions = require('../defaultOptions'),
     win = require('./window');
 
 utils.blank  = function () {};
@@ -36,6 +37,35 @@ utils.getQuadraticCurvePoint = function (startX, startY, cpX, cpY, endX, endY, p
 utils.easeOutQuad = function (t, b, c, d) {
     t /= d;
     return -c * t*(t-2) + b;
+};
+
+utils.getOriginXY = function (interactable, element) {
+    var origin = interactable
+            ? interactable.options.origin
+            : defaultOptions.origin;
+
+    if (origin === 'parent') {
+        origin = utils.parentElement(element);
+    }
+    else if (origin === 'self') {
+        origin = interactable.getRect(element);
+    }
+    else if (utils.trySelector(origin)) {
+        origin = utils.closest(element, origin) || { x: 0, y: 0 };
+    }
+
+    if (utils.isFunction(origin)) {
+        origin = origin(interactable && element);
+    }
+
+    if (utils.isElement(origin))  {
+        origin = utils.getElementRect(origin);
+    }
+
+    origin.x = ('x' in origin)? origin.x : origin.left;
+    origin.y = ('y' in origin)? origin.y : origin.top;
+
+    return origin;
 };
 
 

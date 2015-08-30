@@ -24,7 +24,7 @@ var snap = {
 
     setOffset: function (interaction, interactable, element, rect, startOffset) {
         var offsets = [],
-            origin = scope.getOriginXY(interactable, element),
+            origin = utils.getOriginXY(interactable, element),
             snapOffset = (snap && snap.offset === 'startCoords'
                 ? {
                     x: interaction.startCoords.page.x - origin.x,
@@ -58,7 +58,7 @@ var snap = {
             page = { x: status.x, y: status.y };
         }
         else {
-            var origin = scope.getOriginXY(interaction.target, interaction.element);
+            var origin = utils.getOriginXY(interaction.target, interaction.element);
 
             page = utils.extend({}, pageCoords);
 

@@ -13,7 +13,7 @@ function InteractEvent (interaction, event, action, phase, element, related) {
         sourceX     = deltaSource + 'X',
         sourceY     = deltaSource + 'Y',
         options     = target? target.options: scope.defaultOptions,
-        origin      = scope.getOriginXY(target, element),
+        origin      = utils.getOriginXY(target, element),
         starting    = phase === 'start',
         ending      = phase === 'end',
         coords      = starting? interaction.startCoords : interaction.curCoords;

@@ -46,35 +46,6 @@
         'addPointer', 'removePointer', 'recordPointer'
     ];
 
-    scope.getOriginXY = function (interactable, element) {
-        var origin = interactable
-                ? interactable.options.origin
-                : scope.defaultOptions.origin;
-
-        if (origin === 'parent') {
-            origin = utils.parentElement(element);
-        }
-        else if (origin === 'self') {
-            origin = interactable.getRect(element);
-        }
-        else if (utils.trySelector(origin)) {
-            origin = utils.closest(element, origin) || { x: 0, y: 0 };
-        }
-
-        if (utils.isFunction(origin)) {
-            origin = origin(interactable && element);
-        }
-
-        if (utils.isElement(origin))  {
-            origin = utils.getElementRect(origin);
-        }
-
-        origin.x = ('x' in origin)? origin.x : origin.left;
-        origin.y = ('y' in origin)? origin.y : origin.top;
-
-        return origin;
-    };
-
     scope.inContext = function (interactable, element) {
         return interactable._context === element.ownerDocument
                 || utils.nodeContains(interactable._context, element);
