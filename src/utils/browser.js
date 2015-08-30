@@ -6,7 +6,7 @@ var win = require('./window'),
 
 var browser = {
     // Does the browser support touch input?
-    supportsTouch : !!(('ontouchstart' in win) || win.window.DocumentTouch
+    supportsTouch : !!(('ontouchstart' in win.window) || win.window.DocumentTouch
         && domObjects.document instanceof win.DocumentTouch),
 
     // Does the browser support PointerEvents
