@@ -4,9 +4,16 @@ var raf         = require('./utils/raf'),
     getWindow   = require('./utils/window').getWindow,
     isWindow    = require('./utils/isType').isWindow,
     domUtils    = require('./utils/domUtils'),
-    signals     = require('./utils/signals');
+    signals     = require('./utils/signals'),
+    defaultOptions = require('./defaultOptions');
 
 var autoScroll = {
+    defaults: {
+        enabled     : false,
+        container   : null,     // the item that is scrolled (Window or HTMLElement)
+        margin      : 60,
+        speed       : 300       // the scroll speed in pixels per second
+    },
 
     interaction: null,
     i: null,    // the handle returned by window.setInterval
@@ -115,5 +122,7 @@ signals.on('interaction-stop-active', function () {
 });
 
 signals.on('interaction-move-done', autoScroll.onInteractionMove);
+
+defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;

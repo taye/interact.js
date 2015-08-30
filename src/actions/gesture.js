@@ -4,9 +4,19 @@ var base = require('./base'),
     utils = require('../utils'),
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable'),
-    scope = base.scope;
+    scope = base.scope,
+    defaultOptions = require('../defaultOptions');
 
 var gesture = {
+    defaults: {
+        manualStart: false,
+        enabled: false,
+        max: Infinity,
+        maxPerElement: 1,
+
+        restrict: null
+    },
+
     checker: function (pointer, event, interactable, element, interaction) {
         if (interaction.pointerIds.length >= 2) {
             return { name: 'gesture' };
@@ -122,5 +132,7 @@ utils.merge(scope.eventTypes, [
     'gestureend'
 ]);
 base.methodDict.gesture = 'gesturable';
+
+defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;

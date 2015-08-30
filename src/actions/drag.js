@@ -6,9 +6,24 @@ var base = require('./base'),
     utils = require('../utils'),
     browser = utils.browser,
     InteractEvent = require('../InteractEvent'),
-    Interactable = require('../Interactable');
+    Interactable = require('../Interactable'),
+    defaultOptions = require('../defaultOptions');
 
 var drag = {
+    defaults: {
+        enabled: false,
+        manualStart: true,
+        max: Infinity,
+        maxPerElement: 1,
+
+        snap: null,
+        restrict: null,
+        inertia: null,
+        autoScroll: null,
+
+        axis: 'xy'
+    },
+
     checker: function (pointer, event, interactable) {
         return interactable.options.drag.enabled
             ? { name: 'drag' }
@@ -43,7 +58,7 @@ var drag = {
                     && elementInteractable !== interaction.target
                     && !elementInteractable.options.drag.manualStart
                     && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-                    && scope.checkAxis(axis, elementInteractable)) {
+                    && checkAxis(axis, elementInteractable)) {
 
                     interaction.prepared.name = 'drag';
                     interaction.target = elementInteractable;
@@ -72,7 +87,7 @@ var drag = {
                         && scope.testAllow(interactable, element, eventTarget)
                         && utils.matchesSelector(element, selector, elements)
                         && interactable.getAction(interactionInteraction.downPointer, interactionInteraction.downEvent, interactionInteraction, element).name === 'drag'
-                        && scope.checkAxis(axis, interactable)
+                        && checkAxis(axis, interactable)
                         && scope.withinInteractionLimit(interactable, element, 'drag')) {
 
                         return interactable;
@@ -126,6 +141,14 @@ var drag = {
 
     stop: drop.stop
 };
+
+function checkAxis (axis, interactable) {
+    if (!interactable) { return false; }
+
+    var thisAxis = interactable.options.drag.axis;
+
+    return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
+}
 
 /*\
  * Interactable.draggable
@@ -192,5 +215,7 @@ utils.merge(scope.eventTypes, [
     'dragend'
 ]);
 base.methodDict.drag = 'draggable';
+
+defaultOptions.drag = drag.defaults;
 
 module.exports = drag;

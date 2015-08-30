@@ -63,22 +63,12 @@ function Interactable (element, options) {
 
 Interactable.prototype = {
     setOnEvents: function (action, phases) {
-        if (action === 'drop') {
-            if (utils.isFunction(phases.ondrop)          ) { this.ondrop           = phases.ondrop          ; }
-            if (utils.isFunction(phases.ondropactivate)  ) { this.ondropactivate   = phases.ondropactivate  ; }
-            if (utils.isFunction(phases.ondropdeactivate)) { this.ondropdeactivate = phases.ondropdeactivate; }
-            if (utils.isFunction(phases.ondragenter)     ) { this.ondragenter      = phases.ondragenter     ; }
-            if (utils.isFunction(phases.ondragleave)     ) { this.ondragleave      = phases.ondragleave     ; }
-            if (utils.isFunction(phases.ondropmove)      ) { this.ondropmove       = phases.ondropmove      ; }
-        }
-        else {
-            action = 'on' + action;
+        var onAction = 'on' + action;
 
-            if (utils.isFunction(phases.onstart)       ) { this[action + 'start'         ] = phases.onstart         ; }
-            if (utils.isFunction(phases.onmove)        ) { this[action + 'move'          ] = phases.onmove          ; }
-            if (utils.isFunction(phases.onend)         ) { this[action + 'end'           ] = phases.onend           ; }
-            if (utils.isFunction(phases.oninertiastart)) { this[action + 'inertiastart'  ] = phases.oninertiastart  ; }
-        }
+        if (utils.isFunction(phases.onstart)       ) { this[onAction + 'start'        ] = phases.onstart         ; }
+        if (utils.isFunction(phases.onmove)        ) { this[onAction + 'move'         ] = phases.onmove          ; }
+        if (utils.isFunction(phases.onend)         ) { this[onAction + 'end'          ] = phases.onend           ; }
+        if (utils.isFunction(phases.oninertiastart)) { this[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
         return this;
     },

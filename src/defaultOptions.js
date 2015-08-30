@@ -14,91 +14,10 @@ module.exports = {
         dropChecker   : null
     },
 
-    drag: {
-        enabled: false,
-        manualStart: true,
-        max: Infinity,
-        maxPerElement: 1,
-
-        snap: null,
-        restrict: null,
-        inertia: null,
-        autoScroll: null,
-
-        axis: 'xy'
-    },
-
-    drop: {
-        enabled: false,
-        accept: null,
-        overlap: 'pointer'
-    },
-
-    resize: {
-        enabled: false,
-        manualStart: false,
-        max: Infinity,
-        maxPerElement: 1,
-
-        snap: null,
-        restrict: null,
-        inertia: null,
-        autoScroll: null,
-
-        square: false,
-        axis: 'xy',
-
-        // use default margin
-        margin: NaN,
-
-        // object with props left, right, top, bottom which are
-        // true/false values to resize when the pointer is over that edge,
-        // CSS selectors to match the handles for each direction
-        // or the Elements for each handle
-        edges: null,
-
-        // a value of 'none' will limit the resize rect to a minimum of 0x0
-        // 'negate' will alow the rect to have negative width/height
-        // 'reposition' will keep the width/height positive by swapping
-        // the top and bottom edges and/or swapping the left and right edges
-        invert: 'none'
-    },
-
-    gesture: {
-        manualStart: false,
-        enabled: false,
-        max: Infinity,
-        maxPerElement: 1,
-
-        restrict: null
-    },
-
     perAction: {
         manualStart: false,
         max: Infinity,
         maxPerElement: 1,
-
-        snap: {
-            enabled     : false,
-            endOnly     : false,
-            range       : Infinity,
-            targets     : null,
-            offsets     : null,
-
-            relativePoints: null
-        },
-
-        restrict: {
-            enabled: false,
-            endOnly: false
-        },
-
-        autoScroll: {
-            enabled     : false,
-            container   : null,     // the item that is scrolled (Window or HTMLElement)
-            margin      : 60,
-            speed       : 300       // the scroll speed in pixels per second
-        },
 
         inertia: {
             enabled          : false,

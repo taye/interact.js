@@ -790,13 +790,9 @@ Interaction.prototype = {
         return this._interacting;
     },
 
-    clearTargets: function () {
-        this.target = this.element = null;
-
-        this.dropTarget = this.dropElement = this.prevDropTarget = this.prevDropElement = null;
-    },
-
     stop: function (event) {
+        signals.fire('interaction-stop', { interaction: this });
+
         if (this._interacting) {
             signals.fire('interaction-stop-active', { interaction: this });
 
@@ -817,7 +813,7 @@ Interaction.prototype = {
             actions[this.prepared.name].stop(this, event);
         }
 
-        this.clearTargets();
+        this.target = this.element = null;
 
         this.pointerIsDown = this._interacting = false;
         this.prepared.name = this.prevEvent = null;

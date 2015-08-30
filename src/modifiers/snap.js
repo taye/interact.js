@@ -3,11 +3,11 @@
 var modifiers = require('./index'),
     scope = require('../scope'),
     interact = require('../interact'),
-    utils = require('../utils');
-    //defaultOptions = require('../defaultOptions');
+    utils = require('../utils'),
+    defaultOptions = require('../defaultOptions');
 
 var snap = {
-    options: {
+    defaults: {
         enabled: false,
         endOnly: false,
         range  : Infinity,
@@ -212,9 +212,6 @@ var snap = {
     }
 };
 
-modifiers.snap = snap;
-modifiers.names.push('snap');
-
 interact.createSnapGrid = function (grid) {
     return function (x, y) {
         var offsetX = 0,
@@ -238,5 +235,10 @@ interact.createSnapGrid = function (grid) {
         };
     };
 };
+
+modifiers.snap = snap;
+modifiers.names.push('snap');
+
+defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;

@@ -112,14 +112,6 @@
         return false;
     };
 
-    scope.checkAxis = function (axis, interactable) {
-        if (!interactable) { return false; }
-
-        var thisAxis = interactable.options.drag.axis;
-
-        return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
-    };
-
     for (var i = 0, len = interactionListeners.length; i < len; i++) {
         var listenerName = interactionListeners[i];
 

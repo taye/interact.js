@@ -1,7 +1,8 @@
 'use strict';
 
 var modifiers = require('./index'),
-    utils = require('../utils');
+    utils = require('../utils'),
+    defaultOptions = require('../defaultOptions');
 
 var restrict = {
     options: {
@@ -144,6 +145,8 @@ var restrict = {
 
 modifiers.restrict = restrict;
 modifiers.names.push('restrict');
+
+defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 

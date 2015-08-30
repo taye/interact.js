@@ -5,9 +5,40 @@ var base = require('./base'),
     browser = require('../utils/browser'),
     scope = base.scope,
     InteractEvent = require('../InteractEvent'),
-    Interactable = require('../Interactable');
+    Interactable = require('../Interactable'),
+    defaultOptions = require('../defaultOptions');
 
 var resize = {
+    defaults: {
+        enabled: false,
+        manualStart: false,
+        max: Infinity,
+        maxPerElement: 1,
+
+        snap: null,
+        restrict: null,
+        inertia: null,
+        autoScroll: null,
+
+        square: false,
+        axis: 'xy',
+
+        // use default margin
+        margin: NaN,
+
+        // object with props left, right, top, bottom which are
+        // true/false values to resize when the pointer is over that edge,
+        // CSS selectors to match the handles for each direction
+        // or the Elements for each handle
+        edges: null,
+
+        // a value of 'none' will limit the resize rect to a minimum of 0x0
+        // 'negate' will alow the rect to have negative width/height
+        // 'reposition' will keep the width/height positive by swapping
+        // the top and bottom edges and/or swapping the left and right edges
+        invert: 'none'
+    },
+
     checker: function (pointer, event, interactable, element, interaction, rect) {
         if (!rect) { return null; }
 
@@ -348,5 +379,7 @@ utils.merge(scope.eventTypes, [
     'resizeend'
 ]);
 base.methodDict.resize = 'resizable';
+
+defaultOptions.resize = resize.defaults;
 
 module.exports = resize;

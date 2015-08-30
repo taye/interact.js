@@ -3,10 +3,17 @@
 var base = require('./base'),
     utils = require('../utils'),
     scope = require('../scope'),
-    Interactable = require('../Interactable');
+    signals = require('../utils/signals'),
+    Interactable = require('../Interactable'),
+    defaultOptions = require('../defaultOptions');
 
 var drop = {
-    //beforeStart: function 
+    defaults: {
+        enabled: false,
+        accept: null,
+        overlap: 'pointer'
+    },
+
     start: function (interaction, event, dragEvent) {
         // reset active dropzones
         interaction.activeDrops.dropzones = [];
@@ -308,7 +315,14 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
 Interactable.prototype.dropzone = function (options) {
     if (utils.isObject(options)) {
         this.options.drop.enabled = options.enabled === false? false: true;
-        this.setOnEvents('drop', options);
+
+        if (utils.isFunction(options.ondrop)          ) { this.ondrop           = options.ondrop          ; }
+        if (utils.isFunction(options.ondropactivate)  ) { this.ondropactivate   = options.ondropactivate  ; }
+        if (utils.isFunction(options.ondropdeactivate)) { this.ondropdeactivate = options.ondropdeactivate; }
+        if (utils.isFunction(options.ondragenter)     ) { this.ondragenter      = options.ondragenter     ; }
+        if (utils.isFunction(options.ondragleave)     ) { this.ondragleave      = options.ondragleave     ; }
+        if (utils.isFunction(options.ondropmove)      ) { this.ondropmove       = options.ondropmove      ; }
+
         this.accept(options.accept);
 
         if (/^(pointer|center)$/.test(options.overlap)) {
@@ -470,6 +484,13 @@ Interactable.prototype.accept = function (newValue) {
     return this.options.drop.accept;
 };
 
+signals.on('interaction-stop', function (arg) {
+    var interaction = arg.interaction;
+
+    interaction.dropTarget = interaction.dropElement
+        = interaction.prevDropTarget = interaction.prevDropElement = null;
+});
+
 utils.merge(scope.eventTypes, [
     'dragenter',
     'dragleave',
@@ -479,4 +500,7 @@ utils.merge(scope.eventTypes, [
     'drop'
 ]);
 base.methodDict.drop = 'dropzone';
+
+defaultOptions.drop = drop.defaults;
+
 module.exports = drop;
