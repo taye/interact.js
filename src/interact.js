@@ -16,9 +16,7 @@
         browser = utils.browser,
         events = require('./utils/events'),
         signals = require('./utils/signals'),
-        Interactable = require('./Interactable'),
-        InteractEvent = require('./InteractEvent'),
-        Interaction = require('./Interaction');
+        Interactable = require('./Interactable');
 
     scope.dynamicDrop     = false;
 
@@ -37,14 +35,6 @@
     scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
 
     scope.globalEvents = {};
-
-    scope.listeners = {};
-
-    var interactionListeners = [
-        'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
-        'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
-        'addPointer', 'removePointer', 'recordPointer'
-    ];
 
     scope.inContext = function (interactable, element) {
         return interactable._context === element.ownerDocument
@@ -82,12 +72,6 @@
 
         return false;
     };
-
-    for (var i = 0, len = interactionListeners.length; i < len; i++) {
-        var listenerName = interactionListeners[i];
-
-        scope.listeners[listenerName] = Interaction.doOnInteractions(listenerName);
-    }
 
     scope.interactables.indexOfElement = function indexOfElement (element, context) {
         context = context || scope.document;
@@ -407,91 +391,7 @@
         return scope.maxInteractions;
     };
 
-    function endAllInteractions (event) {
-        for (var i = 0; i < scope.interactions.length; i++) {
-            scope.interactions[i].pointerEnd(event, event);
-        }
-    }
-
-    function listenToDocument (doc) {
-        if (utils.contains(scope.documents, doc)) { return; }
-
-        var win = doc.defaultView || doc.parentWindow,
-            pEventTypes = browser.pEventTypes;
-
-        // add delegate event listener
-        for (var eventType in scope.delegatedEvents) {
-            events.add(doc, eventType, events.delegateListener);
-            events.add(doc, eventType, events.delegateUseCapture, true);
-        }
-
-        if (scope.PointerEvent) {
-            events.add(doc, pEventTypes.down  , scope.listeners.selectorDown );
-            events.add(doc, pEventTypes.move  , scope.listeners.pointerMove  );
-            events.add(doc, pEventTypes.over  , scope.listeners.pointerOver  );
-            events.add(doc, pEventTypes.out   , scope.listeners.pointerOut   );
-            events.add(doc, pEventTypes.up    , scope.listeners.pointerUp    );
-            events.add(doc, pEventTypes.cancel, scope.listeners.pointerCancel);
-        }
-        else {
-            events.add(doc, 'mousedown', scope.listeners.selectorDown);
-            events.add(doc, 'mousemove', scope.listeners.pointerMove );
-            events.add(doc, 'mouseup'  , scope.listeners.pointerUp   );
-            events.add(doc, 'mouseover', scope.listeners.pointerOver );
-            events.add(doc, 'mouseout' , scope.listeners.pointerOut  );
-
-            events.add(doc, 'touchstart' , scope.listeners.selectorDown );
-            events.add(doc, 'touchmove'  , scope.listeners.pointerMove  );
-            events.add(doc, 'touchend'   , scope.listeners.pointerUp    );
-            events.add(doc, 'touchcancel', scope.listeners.pointerCancel);
-        }
-
-        events.add(win, 'blur', endAllInteractions);
-
-        try {
-            if (win.frameElement) {
-                var parentDoc = win.frameElement.ownerDocument,
-                    parentWindow = parentDoc.defaultView;
-
-                events.add(parentDoc   , 'mouseup'      , scope.listeners.pointerEnd);
-                events.add(parentDoc   , 'touchend'     , scope.listeners.pointerEnd);
-                events.add(parentDoc   , 'touchcancel'  , scope.listeners.pointerEnd);
-                events.add(parentDoc   , 'pointerup'    , scope.listeners.pointerEnd);
-                events.add(parentDoc   , 'MSPointerUp'  , scope.listeners.pointerEnd);
-                events.add(parentWindow, 'blur'         , endAllInteractions );
-            }
-        }
-        catch (error) {
-            interact.windowParentError = error;
-        }
-
-        if (browser.isIE8) {
-            // For IE's lack of Event#preventDefault
-            events.add(doc, 'selectstart', function (event) {
-                var interaction = scope.interactions[0];
-
-                if (interaction.currentAction()) {
-                    interaction.checkAndPreventDefault(event);
-                }
-            });
-        }
-
-        scope.documents.push(doc);
-        events.documents.push(doc);
-
-        signals.fire('listen-to-document', {
-            doc: doc,
-            win: win,
-        });
-    }
-
-    listenToDocument(scope.document);
-
     scope.interact = interact;
-    scope.Interactable = Interactable;
-    scope.Interaction = Interaction;
-    scope.InteractEvent = InteractEvent;
-    scope.listenToDocument = listenToDocument;
 
     module.exports = interact;
 

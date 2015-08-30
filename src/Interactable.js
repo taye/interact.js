@@ -2,8 +2,8 @@
 
 var scope = require('./scope'),
     utils = require('./utils'),
-    browser = require('./utils/browser'),
     events = require('./utils/events'),
+    signals = require('./utils/signals'),
     actions = require('./actions/base');
 
 /*\
@@ -34,26 +34,22 @@ function Interactable (element, options) {
     }
     else {
         _window = scope.getWindow(element);
-
-        if (utils.isElement(element, _window)) {
-
-            if (scope.PointerEvent) {
-                events.add(this._element, browser.pEventTypes.down, scope.listeners.pointerDown );
-                events.add(this._element, browser.pEventTypes.move, scope.listeners.pointerHover);
-            }
-            else {
-                events.add(this._element, 'mousedown' , scope.listeners.pointerDown );
-                events.add(this._element, 'mousemove' , scope.listeners.pointerHover);
-                events.add(this._element, 'touchstart', scope.listeners.pointerDown );
-                events.add(this._element, 'touchmove' , scope.listeners.pointerHover);
-            }
-        }
     }
 
     this._doc = _window.document;
 
-    if (!utils.contains(scope.documents, this._doc)) {
-        scope.listenToDocument(this._doc);
+    signals.fire('interactable-new', {
+        interactable: this,
+        element: element,
+        options: options,
+        win: _window
+    });
+
+    if (this._doc !== scope.document) {
+        signals.fire('listen-to-document', {
+            doc: this._doc,
+            win: _window
+        });
     }
 
     scope.interactables.push(this);
@@ -658,6 +654,8 @@ Interactable.prototype = {
                 }
             }
         }
+
+        signals.fire('interactable-unset', { interactable: this });
 
         this.dropzone(false);
 

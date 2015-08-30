@@ -1,7 +1,9 @@
 'use strict';
 
 var scope = {},
-    extend = require('./utils/extend');
+    utils = require('./utils'),
+    signals = require('./utils/signals'),
+    extend = utils.extend;
 
 scope.documents       = [];   // all documents being listened to
 
@@ -11,6 +13,7 @@ scope.interactions    = [];   // all interactions
 scope.defaultOptions = require('./defaultOptions');
 
 scope.events = require('./utils/events');
+scope.signals = require('./utils/signals');
 
 extend(scope, require('./utils/window'));
 extend(scope, require('./utils/domObjects'));
@@ -58,5 +61,18 @@ scope.withinInteractionLimit = function (interactable, element, action) {
     return scope.maxInteractions > 0;
 };
 
+scope.endAllInteractions = function (event) {
+    for (var i = 0; i < scope.interactions.length; i++) {
+        scope.interactions[i].pointerEnd(event, event);
+    }
+};
+
+signals.on('listen-to-document', function (arg) {
+    // if document is already known
+    if (utils.contains(scope.documents, arg.doc)) {
+        // don't call any further signal listeners
+        return false;
+    }
+});
 
 module.exports = scope;

@@ -8,7 +8,14 @@ var scope = require('./scope'),
     signals = require('./utils/signals'),
     browser = require('./utils/browser'),
     actions = require('./actions/base'),
-    modifiers = require('./modifiers/');
+    modifiers = require('./modifiers/'),
+    methodNames = [
+        'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
+        'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
+        'addPointer', 'removePointer', 'recordPointer'
+    ],
+    listeners = {};
+
 
 function Interaction () {
     this.target          = null; // current interactable being interacted with
@@ -231,14 +238,14 @@ Interaction.prototype = {
                 this.pointerHover(pointer, event, this.matches, this.matchElements);
                 events.add(eventTarget,
                     scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                    scope.listeners.pointerHover);
+                    listeners.pointerHover);
             }
             else if (this.target) {
                 if (utils.nodeContains(prevTargetElement, eventTarget)) {
                     this.pointerHover(pointer, event, this.matches, this.matchElements);
                     events.add(this.element,
                         scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                        scope.listeners.pointerHover);
+                        listeners.pointerHover);
                 }
                 else {
                     this.target = null;
@@ -290,7 +297,7 @@ Interaction.prototype = {
         if (!scope.interactables.get(eventTarget)) {
             events.remove(eventTarget,
                 scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                scope.listeners.pointerHover);
+                listeners.pointerHover);
         }
 
         if (this.target && this.target.options.styleCursor && !this.interacting()) {
@@ -1015,6 +1022,12 @@ Interaction.prototype = {
     }
 };
 
+for (var i = 0, len = methodNames.length; i < len; i++) {
+    var method = methodNames[i];
+
+    listeners[method] = doOnInteractions(method);
+}
+
 function getInteractionFromPointer (pointer, eventType, eventTarget) {
     var i = 0, len = scope.interactions.length,
         mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
@@ -1155,6 +1168,113 @@ function doOnInteractions (method) {
         }
     });
 }
+
+signals.on('interactable-new', function (arg) {
+    var interactable = arg.interactable,
+        element = interactable._element;
+
+    if (utils.isElement(element, arg.win)) {
+        if (scope.PointerEvent) {
+            events.add(element, browser.pEventTypes.down, listeners.pointerDown );
+            events.add(element, browser.pEventTypes.move, listeners.pointerHover);
+        }
+        else {
+            events.add(element, 'mousedown' , listeners.pointerDown );
+            events.add(element, 'mousemove' , listeners.pointerHover);
+            events.add(element, 'touchstart', listeners.pointerDown );
+            events.add(element, 'touchmove' , listeners.pointerHover);
+        }
+    }
+});
+
+signals.on('interactable-unset', function (arg) {
+    var interactable = arg.interactable,
+        element = interactable._element;
+
+    if (!interactable.selector && utils.isElement(element, arg.win)) {
+        if (scope.PointerEvent) {
+            events.remove(element, browser.pEventTypes.down, listeners.pointerDown );
+            events.remove(element, browser.pEventTypes.move, listeners.pointerHover);
+        }
+        else {
+            events.remove(element, 'mousedown' , listeners.pointerDown );
+            events.remove(element, 'mousemove' , listeners.pointerHover);
+            events.remove(element, 'touchstart', listeners.pointerDown );
+            events.remove(element, 'touchmove' , listeners.pointerHover);
+        }
+    }
+});
+
+signals.on('listen-to-document', function (arg) {
+    var doc = arg.doc,
+        win = arg.win,
+        pEventTypes = browser.pEventTypes;
+
+    // add delegate event listener
+    for (var eventType in scope.delegatedEvents) {
+        events.add(doc, eventType, events.delegateListener);
+        events.add(doc, eventType, events.delegateUseCapture, true);
+    }
+
+    if (scope.PointerEvent) {
+        events.add(doc, pEventTypes.down  , listeners.selectorDown );
+        events.add(doc, pEventTypes.move  , listeners.pointerMove  );
+        events.add(doc, pEventTypes.over  , listeners.pointerOver  );
+        events.add(doc, pEventTypes.out   , listeners.pointerOut   );
+        events.add(doc, pEventTypes.up    , listeners.pointerUp    );
+        events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
+    }
+    else {
+        events.add(doc, 'mousedown', listeners.selectorDown);
+        events.add(doc, 'mousemove', listeners.pointerMove );
+        events.add(doc, 'mouseup'  , listeners.pointerUp   );
+        events.add(doc, 'mouseover', listeners.pointerOver );
+        events.add(doc, 'mouseout' , listeners.pointerOut  );
+
+        events.add(doc, 'touchstart' , listeners.selectorDown );
+        events.add(doc, 'touchmove'  , listeners.pointerMove  );
+        events.add(doc, 'touchend'   , listeners.pointerUp    );
+        events.add(doc, 'touchcancel', listeners.pointerCancel);
+    }
+
+    events.add(win, 'blur', scope.endAllInteractions);
+
+    try {
+        if (win.frameElement) {
+            var parentDoc = win.frameElement.ownerDocument,
+                parentWindow = parentDoc.defaultView;
+
+            events.add(parentDoc   , 'mouseup'      , listeners.pointerEnd);
+            events.add(parentDoc   , 'touchend'     , listeners.pointerEnd);
+            events.add(parentDoc   , 'touchcancel'  , listeners.pointerEnd);
+            events.add(parentDoc   , 'pointerup'    , listeners.pointerEnd);
+            events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerEnd);
+            events.add(parentWindow, 'blur'         , scope.endAllInteractions );
+        }
+    }
+    catch (error) {
+        scope.windowParentError = error;
+    }
+
+    if (browser.isIE8) {
+        // For IE's lack of Event#preventDefault
+        events.add(doc, 'selectstart', function (event) {
+            var interaction = scope.interactions[0];
+
+            if (interaction.currentAction()) {
+                interaction.checkAndPreventDefault(event);
+            }
+        });
+    }
+
+    scope.documents.push(doc);
+    events.documents.push(doc);
+});
+
+signals.fire('listen-to-document', {
+    win: scope.window,
+    doc: scope.document
+});
 
 Interaction.getInteractionFromPointer = getInteractionFromPointer;
 Interaction.doOnInteractions = doOnInteractions;
