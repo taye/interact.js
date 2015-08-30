@@ -5,6 +5,7 @@ var base = require('./base'),
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable'),
     scope = base.scope,
+    signals = require('../utils/signals'),
     defaultOptions = require('../defaultOptions');
 
 var gesture = {
@@ -122,6 +123,43 @@ Interactable.prototype.gesturable = function (options) {
 
     return this.options.gesture;
 };
+
+signals.on('interactevent-delta', function (arg) {
+    if (arg.action !== 'gesture') { return; }
+
+    var interaction = arg.interaction,
+        iEvent = arg.interactEvent,
+        pointers = interaction.pointers;
+
+    iEvent.touches = [pointers[0], pointers[1]];
+
+    if (arg.starting) {
+        iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+        iEvent.box      = utils.touchBBox(pointers);
+        iEvent.scale    = 1;
+        iEvent.ds       = 0;
+        iEvent.angle    = utils.touchAngle(pointers, undefined, arg.deltaSource);
+        iEvent.da       = 0;
+    }
+    else if (arg.ending || event instanceof InteractEvent) {
+        iEvent.distance = interaction.prevEvent.distance;
+        iEvent.box      = interaction.prevEvent.box;
+        iEvent.scale    = interaction.prevEvent.scale;
+        iEvent.ds       = iEvent.scale - 1;
+        iEvent.angle    = interaction.prevEvent.angle;
+        iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
+    }
+    else {
+        iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+        iEvent.box      = utils.touchBBox(pointers);
+        iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
+        iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, arg.deltaSource);
+
+        iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+        iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
+    }
+});
+
 
 base.gesture = gesture;
 base.names.push('gesture');

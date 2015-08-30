@@ -3,7 +3,8 @@
 var base = require('./base'),
     utils = require('../utils'),
     browser = require('../utils/browser'),
-    scope = base.scope,
+    signals = require('../utils/signals'),
+    scope = require('../scope'),
     InteractEvent = require('../InteractEvent'),
     Interactable = require('../Interactable'),
     defaultOptions = require('../defaultOptions');
@@ -369,6 +370,34 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
                 // otherwise check if element matches value as selector
                 : utils.matchesUpTo(element, value, interactableElement);
 }
+
+signals.on('interact-event-set-delta', function (arg) {
+    var interaction = arg.interaction,
+        iEvent = arg.interactEvent,
+        options = interaction.target.options;
+
+    if (arg.action !== 'resize' || !interaction.resizeAxes) { return; }
+
+    if (options.resize.square) {
+        if (interaction.resizeAxes === 'y') {
+            iEvent.dx = iEvent.dy;
+        }
+        else {
+            iEvent.dy = iEvent.dx;
+        }
+        iEvent.axes = 'xy';
+    }
+    else {
+        iEvent.axes = interaction.resizeAxes;
+
+        if (interaction.resizeAxes === 'x') {
+            iEvent.dy = 0;
+        }
+        else if (interaction.resizeAxes === 'y') {
+            iEvent.dx = 0;
+        }
+    }
+});
 
 base.resize = resize;
 base.names.push('resize');

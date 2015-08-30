@@ -2,6 +2,7 @@
 
 var scope = require('./scope'),
     utils = require('./utils'),
+    signals = require('./utils/signals'),
     modifiers = require('./modifiers');
 
 function InteractEvent (interaction, event, action, phase, element, related) {
@@ -58,7 +59,22 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
 
-    var inertiaStatus = interaction.inertiaStatus;
+    var inertiaStatus = interaction.inertiaStatus,
+        signalArg = {
+            interactEvent: this,
+            interaction: interaction,
+            event: event,
+            action: action,
+            phase: phase,
+            element: element,
+            related: related,
+            page: page,
+            client: client,
+            coords: coords,
+            starting: starting,
+            ending: ending,
+            deltaSource: deltaSource
+        };
 
     if (inertiaStatus.active) {
         this.detail = 'inertia';
@@ -108,56 +124,7 @@ function InteractEvent (interaction, event, action, phase, element, related) {
         this.dx = this.dy = 0;
     }
 
-    if (action === 'resize' && interaction.resizeAxes) {
-        if (options.resize.square) {
-            if (interaction.resizeAxes === 'y') {
-                this.dx = this.dy;
-            }
-            else {
-                this.dy = this.dx;
-            }
-            this.axes = 'xy';
-        }
-        else {
-            this.axes = interaction.resizeAxes;
-
-            if (interaction.resizeAxes === 'x') {
-                this.dy = 0;
-            }
-            else if (interaction.resizeAxes === 'y') {
-                this.dx = 0;
-            }
-        }
-    }
-    else if (action === 'gesture') {
-        this.touches = [pointers[0], pointers[1]];
-
-        if (starting) {
-            this.distance = utils.touchDistance(pointers, deltaSource);
-            this.box      = utils.touchBBox(pointers);
-            this.scale    = 1;
-            this.ds       = 0;
-            this.angle    = utils.touchAngle(pointers, undefined, deltaSource);
-            this.da       = 0;
-        }
-        else if (ending || event instanceof InteractEvent) {
-            this.distance = interaction.prevEvent.distance;
-            this.box      = interaction.prevEvent.box;
-            this.scale    = interaction.prevEvent.scale;
-            this.ds       = this.scale - 1;
-            this.angle    = interaction.prevEvent.angle;
-            this.da       = this.angle - interaction.gesture.startAngle;
-        }
-        else {
-            this.distance = utils.touchDistance(pointers, deltaSource);
-            this.box      = utils.touchBBox(pointers);
-            this.scale    = this.distance / interaction.gesture.startDistance;
-            this.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
-
-            this.ds = this.scale - interaction.gesture.prevScale;
-            this.da = this.angle - interaction.gesture.prevAngle;
-        }
-    }
+    signals.fire('interactevent-set-delta', signalArg);
 
     if (starting) {
         this.timeStamp = interaction.downTimes[0];
