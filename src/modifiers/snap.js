@@ -1,7 +1,6 @@
 'use strict';
 
 var modifiers = require('./index'),
-    scope = require('../scope'),
     interact = require('../interact'),
     utils = require('../utils'),
     defaultOptions = require('../defaultOptions');

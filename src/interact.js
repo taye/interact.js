@@ -15,7 +15,6 @@
         utils = require('./utils'),
         browser = utils.browser,
         events = require('./utils/events'),
-        signals = require('./utils/signals'),
         Interactable = require('./Interactable');
 
     scope.dynamicDrop     = false;

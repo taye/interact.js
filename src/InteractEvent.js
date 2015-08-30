@@ -9,7 +9,6 @@ function InteractEvent (interaction, event, action, phase, element, related) {
     var client,
         page,
         target      = interaction.target,
-        pointers    = interaction.pointers,
         deltaSource = (target && target.options || scope.defaultOptions).deltaSource,
         sourceX     = deltaSource + 'X',
         sourceY     = deltaSource + 'Y',
