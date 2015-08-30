@@ -15,6 +15,7 @@
         utils = require('./utils'),
         browser = utils.browser,
         events = require('./utils/events'),
+        signals = require('./utils/signals'),
         Interactable = require('./Interactable'),
         InteractEvent = require('./InteractEvent'),
         Interaction = require('./Interaction');
@@ -510,13 +511,15 @@
                     interaction.checkAndPreventDefault(event);
                 }
             });
-
-            // For IE's bad dblclick event sequence
-            events.add(doc, 'dblclick', Interaction.doOnInteractions('ie8Dblclick'));
         }
 
         scope.documents.push(doc);
         events.documents.push(doc);
+
+        signals.fire('listen-to-document', {
+            doc: doc,
+            win: win,
+        });
     }
 
     listenToDocument(scope.document);

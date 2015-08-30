@@ -147,10 +147,6 @@ function validateAction (action, interactable) {
     return null;
 }
 
-function preventOriginalDefault () {
-    this.originalEvent.preventDefault();
-}
-
 Interaction.prototype = {
     setEventXY: function (targetObj, pointer) {
         if (!pointer) {
@@ -304,17 +300,19 @@ Interaction.prototype = {
 
     selectorDown: function (pointer, event, eventTarget, curEventTarget) {
         var that = this,
-        // copy event to be used in timeout for IE8
-            eventCopy = events.useAttachEvent? utils.extend({}, event) : event,
             element = eventTarget,
             pointerIndex = this.addPointer(pointer),
             action;
 
-        this.holdTimers[pointerIndex] = setTimeout(function () {
-            that.pointerHold(events.useAttachEvent? eventCopy : pointer, eventCopy, eventTarget, curEventTarget);
-        }, scope.defaultOptions._holdDuration);
-
         this.pointerIsDown = true;
+
+        signals.fire('interaction-down', {
+            interaction: this,
+            pointer: pointer,
+            event: event,
+            eventTarget: eventTarget,
+            pointerIndex: pointerIndex
+        });
 
         // Check if the down event hits the current inertia target
         if (this.inertiaStatus.active && this.target.selector) {
@@ -330,7 +328,6 @@ Interaction.prototype = {
                     animationFrame.cancel(this.inertiaStatus.i);
                     this.inertiaStatus.active = false;
 
-                    this.collectEventTargets(pointer, event, eventTarget, 'down');
                     return;
                 }
                 element = utils.parentElement(element);
@@ -339,7 +336,6 @@ Interaction.prototype = {
 
         // do nothing if interacting
         if (this.interacting()) {
-            this.collectEventTargets(pointer, event, eventTarget, 'down');
             return;
         }
 
@@ -377,8 +373,6 @@ Interaction.prototype = {
             this.prepared.axis  = action.axis;
             this.prepared.edges = action.edges;
 
-            this.collectEventTargets(pointer, event, eventTarget, 'down');
-
             return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
         }
         else {
@@ -390,8 +384,6 @@ Interaction.prototype = {
             utils.copyCoords(this.prevCoords, this.curCoords);
             this.pointerWasMoved = false;
         }
-
-        this.collectEventTargets(pointer, event, eventTarget, 'down');
     },
 
     // Determine action to be performed on next pointerMove and add appropriate
@@ -564,8 +556,7 @@ Interaction.prototype = {
         && this.curCoords.client.x === this.prevCoords.client.x
         && this.curCoords.client.y === this.prevCoords.client.y);
 
-        var dx, dy,
-            pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+        var dx, dy;
 
         // register movement greater than pointerMoveTolerance
         if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -575,13 +566,15 @@ Interaction.prototype = {
             this.pointerWasMoved = utils.hypot(dx, dy) > scope.pointerMoveTolerance;
         }
 
-        if (!duplicateMove && (!this.pointerIsDown || this.pointerWasMoved)) {
-            if (this.pointerIsDown) {
-                clearTimeout(this.holdTimers[pointerIndex]);
-            }
-
-            this.collectEventTargets(pointer, event, eventTarget, 'move');
-        }
+        signals.fire('interaction-move', {
+            interaction: this,
+            pointer: pointer,
+            event: event,
+            eventTarget: eventTarget,
+            duplicate: duplicateMove,
+            dx: dx,
+            dy: dy
+        });
 
         if (!this.pointerIsDown) { return; }
 
@@ -640,17 +633,19 @@ Interaction.prototype = {
         });
     },
 
-    pointerHold: function (pointer, event, eventTarget) {
-        this.collectEventTargets(pointer, event, eventTarget, 'hold');
-    },
-
     pointerUp: function (pointer, event, eventTarget, curEventTarget) {
         var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
         clearTimeout(this.holdTimers[pointerIndex]);
 
-        this.collectEventTargets(pointer, event, eventTarget, 'up' );
-        this.collectEventTargets(pointer, event, eventTarget, 'tap');
+        signals.fire('interaction-up', {
+            interaction: this,
+            pointer: pointer,
+            event: event,
+            eventTarget: eventTarget,
+            curEventTarget: curEventTarget
+        });
+
 
         this.pointerEnd(pointer, event, eventTarget, curEventTarget);
 
@@ -662,27 +657,16 @@ Interaction.prototype = {
 
         clearTimeout(this.holdTimers[pointerIndex]);
 
-        this.collectEventTargets(pointer, event, eventTarget, 'cancel');
+        signals.fire('interaction-cancel', {
+            interaction: this,
+            pointer: pointer,
+            event: event,
+            eventTarget: eventTarget
+        });
+
         this.pointerEnd(pointer, event, eventTarget, curEventTarget);
 
         this.removePointer(pointer);
-    },
-
-    // http://www.quirksmode.org/dom/events/click.html
-    // >Events leading to dblclick
-    //
-    // IE8 doesn't fire down event before dblclick.
-    // This workaround tries to fire a tap and doubletap after dblclick
-    ie8Dblclick: function (pointer, event, eventTarget) {
-        if (this.prevTap
-            && event.clientX === this.prevTap.clientX
-            && event.clientY === this.prevTap.clientY
-            && eventTarget   === this.prevTap.target) {
-
-            this.downTargets[0] = eventTarget;
-            this.downTimes[0] = new Date().getTime();
-            this.collectEventTargets(pointer, event, eventTarget, 'tap');
-        }
     },
 
     // End interact move events and stop auto-scroll unless inertia is enabled
@@ -962,132 +946,6 @@ Interaction.prototype = {
         if (index === -1) { return; }
 
         this.pointers[index] = pointer;
-    },
-
-    collectEventTargets: function (pointer, event, eventTarget, eventType) {
-        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
-
-        // do not fire a tap event if the pointer was moved before being lifted
-        if (eventType === 'tap' && (this.pointerWasMoved
-                // or if the pointerup target is different to the pointerdown target
-            || !(this.downTargets[pointerIndex] && this.downTargets[pointerIndex] === eventTarget))) {
-            return;
-        }
-
-        var targets = [],
-            elements = [],
-            element = eventTarget;
-
-        function collectSelectors (interactable, selector, context) {
-            var els = browser.useMatchesSelectorPolyfill
-                ? context.querySelectorAll(selector)
-                : undefined;
-
-            if (interactable._iEvents[eventType]
-                && utils.isElement(element)
-                && scope.inContext(interactable, element)
-                && !scope.testIgnore(interactable, element, eventTarget)
-                && scope.testAllow(interactable, element, eventTarget)
-                && utils.matchesSelector(element, selector, els)) {
-
-                targets.push(interactable);
-                elements.push(element);
-            }
-        }
-
-
-        var interact = scope.interact;
-
-        while (element) {
-            if (interact.isSet(element) && interact(element)._iEvents[eventType]) {
-                targets.push(interact(element));
-                elements.push(element);
-            }
-
-            scope.interactables.forEachSelector(collectSelectors);
-
-            element = utils.parentElement(element);
-        }
-
-        // create the tap event even if there are no listeners so that
-        // doubletap can still be created and fired
-        if (targets.length || eventType === 'tap') {
-            this.firePointers(pointer, event, eventTarget, targets, elements, eventType);
-        }
-    },
-
-    firePointers: function (pointer, event, eventTarget, targets, elements, eventType) {
-        var pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer)),
-            pointerEvent = {},
-            i,
-        // for tap events
-            interval, createNewDoubleTap;
-
-        // if it's a doubletap then the event properties would have been
-        // copied from the tap event and provided as the pointer argument
-        if (eventType === 'doubletap') {
-            pointerEvent = pointer;
-        }
-        else {
-            utils.extend(pointerEvent, event);
-            if (event !== pointer) {
-                utils.extend(pointerEvent, pointer);
-            }
-
-            pointerEvent.preventDefault           = preventOriginalDefault;
-            pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
-            pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
-            pointerEvent.interaction              = this;
-
-            pointerEvent.timeStamp     = new Date().getTime();
-            pointerEvent.originalEvent = event;
-            pointerEvent.type          = eventType;
-            pointerEvent.pointerId     = utils.getPointerId(pointer);
-            pointerEvent.pointerType   = this.mouse? 'mouse' : !browser.supportsPointerEvent? 'touch'
-                : utils.isString(pointer.pointerType)
-                ? pointer.pointerType
-                : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
-        }
-
-        if (eventType === 'tap') {
-            pointerEvent.dt = pointerEvent.timeStamp - this.downTimes[pointerIndex];
-
-            interval = pointerEvent.timeStamp - this.tapTime;
-            createNewDoubleTap = !!(this.prevTap && this.prevTap.type !== 'doubletap'
-            && this.prevTap.target === pointerEvent.target
-            && interval < 500);
-
-            pointerEvent.double = createNewDoubleTap;
-
-            this.tapTime = pointerEvent.timeStamp;
-        }
-
-        for (i = 0; i < targets.length; i++) {
-            pointerEvent.currentTarget = elements[i];
-            pointerEvent.interactable = targets[i];
-            targets[i].fire(pointerEvent);
-
-            if (pointerEvent.immediatePropagationStopped
-                ||(pointerEvent.propagationStopped && elements[i + 1] !== pointerEvent.currentTarget)) {
-                break;
-            }
-        }
-
-        if (createNewDoubleTap) {
-            var doubleTap = {};
-
-            utils.extend(doubleTap, pointerEvent);
-
-            doubleTap.dt   = interval;
-            doubleTap.type = 'doubletap';
-
-            this.collectEventTargets(doubleTap, event, eventTarget, 'doubletap');
-
-            this.prevTap = doubleTap;
-        }
-        else if (eventType === 'tap') {
-            this.prevTap = pointerEvent;
-        }
     },
 
     validateSelector: function (pointer, event, matches, matchElements) {
