@@ -185,7 +185,7 @@ Interactable.prototype.draggable = function (options) {
 
 base.drag = drag;
 base.names.push('drag');
-scope.addEventTypes([
+utils.merge(scope.eventTypes, [
     'dragstart',
     'dragmove',
     'draginertiastart',

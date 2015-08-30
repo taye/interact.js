@@ -223,7 +223,7 @@ if (browser.ie8) {
     });
 }
 
-scope.addEventTypes([
+utils.merge(scope.eventTypes, [
     'down',
     'move',
     'up',

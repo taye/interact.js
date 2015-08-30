@@ -115,7 +115,7 @@ Interactable.prototype.gesturable = function (options) {
 
 base.gesture = gesture;
 base.names.push('gesture');
-scope.addEventTypes([
+utils.merge(scope.eventTypes, [
     'gesturestart',
     'gesturemove',
     'gestureinertiastart',

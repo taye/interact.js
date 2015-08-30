@@ -14,7 +14,16 @@ function contains (array, target) {
     return indexOf(array, target) !== -1;
 }
 
+function merge (target, source) {
+    for (var i = 0; i < source.length; i++) {
+        target.push(source[i]);
+    }
+
+    return target;
+}
+
 module.exports = {
     indexOf: indexOf,
-    contains: contains
+    contains: contains,
+    merge: merge
 };

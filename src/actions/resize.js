@@ -341,7 +341,7 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
 
 base.resize = resize;
 base.names.push('resize');
-scope.addEventTypes([
+utils.merge(scope.eventTypes, [
     'resizestart',
     'resizemove',
     'resizeinertiastart',
