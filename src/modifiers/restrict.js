@@ -5,7 +5,7 @@ var modifiers = require('./index'),
     defaultOptions = require('../defaultOptions');
 
 var restrict = {
-    options: {
+    defaults: {
         enabled    : false,
         endOnly    : false,
         restriction: null,

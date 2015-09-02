@@ -359,7 +359,7 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
 
     if (dropOverlap === 'pointer') {
         var page = utils.getPageXY(pointer),
-            origin = scope.getOriginXY(draggable, draggableElement),
+            origin = utils.getOriginXY(draggable, draggableElement),
             horizontal,
             vertical;
 
