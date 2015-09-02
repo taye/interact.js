@@ -3,6 +3,7 @@
     "validthis": true,
     "browser"  : true,
     "node"     : true,
+    "esnext"   : true,
     "jquery"   : true,
     "curly"    : true,
     "laxbreak" : true,
