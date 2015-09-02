@@ -8,9 +8,6 @@
 
     'use strict';
 
-    // return early if there's no window to work with (eg. Node.js)
-    if (!require('./utils/window').window) { return; }
-
     var scope = require('./scope'),
         utils = require('./utils'),
         browser = utils.browser,
