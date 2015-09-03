@@ -1,5 +1,3 @@
-'use strict';
-
 // browser entry point
 
 module.exports = require('./interact');

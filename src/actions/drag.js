@@ -1,153 +1,150 @@
-'use strict';
+const base = require('./base');
+const drop = require('./drop');
+const scope = base.scope;
+const utils = require('../utils');
+const browser = utils.browser;
+const InteractEvent = require('../InteractEvent');
+const Interactable = require('../Interactable');
+const defaultOptions = require('../defaultOptions');
 
-var base = require('./base'),
-    drop = require('./drop'),
-    scope = base.scope,
-    utils = require('../utils'),
-    browser = utils.browser,
-    InteractEvent = require('../InteractEvent'),
-    Interactable = require('../Interactable'),
-    defaultOptions = require('../defaultOptions');
+const drag = {
+  defaults: {
+    enabled: false,
+    manualStart: true,
+    max: Infinity,
+    maxPerElement: 1,
 
-var drag = {
-    defaults: {
-        enabled: false,
-        manualStart: true,
-        max: Infinity,
-        maxPerElement: 1,
+    snap: null,
+    restrict: null,
+    inertia: null,
+    autoScroll: null,
 
-        snap: null,
-        restrict: null,
-        inertia: null,
-        autoScroll: null,
+    axis: 'xy',
+  },
 
-        axis: 'xy'
-    },
+  checker: function (pointer, event, interactable) {
+    return interactable.options.drag.enabled
+      ? { name: 'drag' }
+      : null;
+  },
 
-    checker: function (pointer, event, interactable) {
-        return interactable.options.drag.enabled
-            ? { name: 'drag' }
-            : null;
-    },
+  getCursor: function () {
+    return 'move';
+  },
 
-    getCursor: function () {
-        return 'move';
-    },
+  beforeStart: function (interaction, pointer, event, eventTarget, curEventTarget, dx, dy) {
+    // check if a drag is in the correct axis
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+    const targetAxis = interaction.target.options.drag.axis;
+    const axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
-    beforeStart: function (interaction, pointer, event, eventTarget, curEventTarget, dx, dy) {
-        // check if a drag is in the correct axis
-        var absX = Math.abs(dx),
-            absY = Math.abs(dy),
-            targetAxis = interaction.target.options.drag.axis,
-            axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+    // if the movement isn't in the axis of the interactable
+    if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+      // cancel the prepared action
+      interaction.prepared.name = null;
 
-        // if the movement isn't in the axis of the interactable
-        if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
-            // cancel the prepared action
-            interaction.prepared.name = null;
+      // then try to get a drag from another ineractable
 
-            // then try to get a drag from another ineractable
+      let element = eventTarget;
 
-            var element = eventTarget;
+      // check element interactables
+      while (utils.isElement(element)) {
+        const elementInteractable = scope.interactables.get(element);
 
-            // check element interactables
-            while (utils.isElement(element)) {
-                var elementInteractable = scope.interactables.get(element);
+        if (elementInteractable
+            && elementInteractable !== interaction.target
+            && !elementInteractable.options.drag.manualStart
+            && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
+            && checkAxis(axis, elementInteractable)) {
 
-                if (elementInteractable
-                    && elementInteractable !== interaction.target
-                    && !elementInteractable.options.drag.manualStart
-                    && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-                    && checkAxis(axis, elementInteractable)) {
-
-                    interaction.prepared.name = 'drag';
-                    interaction.target = elementInteractable;
-                    interaction.element = element;
-                    break;
-                }
-
-                element = utils.parentElement(element);
-            }
-
-            // if there's no drag from element interactables,
-            // check the selector interactables
-            if (!interaction.prepared.name) {
-                var interactionInteraction = interaction;
-
-                var getDraggable = function (interactable, selector, context) {
-                    var elements = browser.useMatchesSelectorPolyfill
-                        ? context.querySelectorAll(selector)
-                        : undefined;
-
-                    if (interactable === interactionInteraction.target) { return; }
-
-                    if (scope.inContext(interactable, eventTarget)
-                        && !interactable.options.drag.manualStart
-                        && !scope.testIgnore(interactable, element, eventTarget)
-                        && scope.testAllow(interactable, element, eventTarget)
-                        && utils.matchesSelector(element, selector, elements)
-                        && interactable.getAction(interactionInteraction.downPointer, interactionInteraction.downEvent, interactionInteraction, element).name === 'drag'
-                        && checkAxis(axis, interactable)
-                        && scope.withinInteractionLimit(interactable, element, 'drag')) {
-
-                        return interactable;
-                    }
-                };
-
-                element = eventTarget;
-
-                while (utils.isElement(element)) {
-                    var selectorInteractable = scope.interactables.forEachSelector(getDraggable);
-
-                    if (selectorInteractable) {
-                        interaction.prepared.name = 'drag';
-                        interaction.target = selectorInteractable;
-                        interaction.element = element;
-                        break;
-                    }
-
-                    element = utils.parentElement(element);
-                }
-            }
+          interaction.prepared.name = 'drag';
+          interaction.target = elementInteractable;
+          interaction.element = element;
+          break;
         }
-    },
 
-    start: function (interaction, event) {
-        var dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
+        element = utils.parentElement(element);
+      }
 
-        interaction._interacting = true;
-        interaction.target.fire(dragEvent);
+      // if there's no drag from element interactables,
+      // check the selector interactables
+      if (!interaction.prepared.name) {
 
-        drop.start(interaction, event, dragEvent);
+        const getDraggable = function (interactable, selector, context) {
+          const elements = browser.useMatchesSelectorPolyfill
+              ? context.querySelectorAll(selector)
+              : undefined;
 
-        return dragEvent;
-    },
+          if (interactable === interaction.target) { return; }
 
-    move: function (interaction, event) {
-        var dragEvent  = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
+          if (scope.inContext(interactable, eventTarget)
+              && !interactable.options.drag.manualStart
+              && !scope.testIgnore(interactable, element, eventTarget)
+              && scope.testAllow(interactable, element, eventTarget)
+              && utils.matchesSelector(element, selector, elements)
+              && interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
+              && checkAxis(axis, interactable)
+              && scope.withinInteractionLimit(interactable, element, 'drag')) {
 
-        drop.move(interaction, event, dragEvent);
+            return interactable;
+          }
+        };
 
-        return dragEvent;
-    },
+        element = eventTarget;
 
-    end: function (interaction, event) {
-        var endEvent = new InteractEvent(interaction, event, 'drag', 'end', interaction.element);
+        while (utils.isElement(element)) {
+          const selectorInteractable = scope.interactables.forEachSelector(getDraggable);
 
-        drop.end(interaction, event, endEvent);
+          if (selectorInteractable) {
+            interaction.prepared.name = 'drag';
+            interaction.target = selectorInteractable;
+            interaction.element = element;
+            break;
+          }
 
-        interaction.target.fire(endEvent);
-    },
+          element = utils.parentElement(element);
+        }
+      }
+    }
+  },
 
-    stop: drop.stop
+  start: function (interaction, event) {
+    const dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
+
+    interaction._interacting = true;
+    interaction.target.fire(dragEvent);
+
+    drop.start(interaction, event, dragEvent);
+
+    return dragEvent;
+  },
+
+  move: function (interaction, event) {
+    const dragEvent  = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
+
+    drop.move(interaction, event, dragEvent);
+
+    return dragEvent;
+  },
+
+  end: function (interaction, event) {
+    const endEvent = new InteractEvent(interaction, event, 'drag', 'end', interaction.element);
+
+    drop.end(interaction, event, endEvent);
+
+    interaction.target.fire(endEvent);
+  },
+
+  stop: drop.stop,
 };
 
 function checkAxis (axis, interactable) {
-    if (!interactable) { return false; }
+  if (!interactable) { return false; }
 
-    var thisAxis = interactable.options.drag.axis;
+  const thisAxis = interactable.options.drag.axis;
 
-    return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
+  return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
 }
 
 /*\
@@ -182,37 +179,37 @@ function checkAxis (axis, interactable) {
  | });
 \*/
 Interactable.prototype.draggable = function (options) {
-    if (utils.isObject(options)) {
-        this.options.drag.enabled = options.enabled === false? false: true;
-        this.setPerAction('drag', options);
-        this.setOnEvents('drag', options);
+  if (utils.isObject(options)) {
+    this.options.drag.enabled = options.enabled === false? false: true;
+    this.setPerAction('drag', options);
+    this.setOnEvents('drag', options);
 
-        if (/^x$|^y$|^xy$/.test(options.axis)) {
-            this.options.drag.axis = options.axis;
-        }
-        else if (options.axis === null) {
-            delete this.options.drag.axis;
-        }
-
-        return this;
+    if (/^x$|^y$|^xy$/.test(options.axis)) {
+      this.options.drag.axis = options.axis;
+    }
+    else if (options.axis === null) {
+      delete this.options.drag.axis;
     }
 
-    if (utils.isBool(options)) {
-        this.options.drag.enabled = options;
+    return this;
+  }
 
-        return this;
-    }
+  if (utils.isBool(options)) {
+    this.options.drag.enabled = options;
 
-    return this.options.drag;
+    return this;
+  }
+
+  return this.options.drag;
 };
 
 base.drag = drag;
 base.names.push('drag');
 utils.merge(scope.eventTypes, [
-    'dragstart',
-    'dragmove',
-    'draginertiastart',
-    'dragend'
+  'dragstart',
+  'dragmove',
+  'draginertiastart',
+  'dragend',
 ]);
 base.methodDict.drag = 'draggable';
 

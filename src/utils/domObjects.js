@@ -1,8 +1,7 @@
-'use strict';
+const domObjects = {};
+const win = require('./window').window;
 
-var domObjects = {},
-    win = require('./window').window,
-    blank = function () {};
+function blank () {}
 
 domObjects.document           = win.document;
 domObjects.DocumentFragment   = win.DocumentFragment   || blank;

@@ -1,86 +1,84 @@
-'use strict';
+const base = require('./base');
+const utils = require('../utils');
+const InteractEvent = require('../InteractEvent');
+const Interactable = require('../Interactable');
+const scope = base.scope;
+const signals = require('../utils/signals');
+const defaultOptions = require('../defaultOptions');
 
-var base = require('./base'),
-    utils = require('../utils'),
-    InteractEvent = require('../InteractEvent'),
-    Interactable = require('../Interactable'),
-    scope = base.scope,
-    signals = require('../utils/signals'),
-    defaultOptions = require('../defaultOptions');
+const gesture = {
+  defaults: {
+    manualStart: false,
+    enabled: false,
+    max: Infinity,
+    maxPerElement: 1,
 
-var gesture = {
-    defaults: {
-        manualStart: false,
-        enabled: false,
-        max: Infinity,
-        maxPerElement: 1,
+    restrict: null,
+  },
 
-        restrict: null
-    },
+  checker: function (pointer, event, interactable, element, interaction) {
+    if (interaction.pointerIds.length >= 2) {
+      return { name: 'gesture' };
+    }
 
-    checker: function (pointer, event, interactable, element, interaction) {
-        if (interaction.pointerIds.length >= 2) {
-            return { name: 'gesture' };
-        }
+    return null;
+  },
 
-        return null;
-    },
+  getCursor: function () {
+    return '';
+  },
 
-    getCursor: function () {
-        return '';
-    },
+  beforeStart: utils.blank,
 
-    beforeStart: utils.blank,
+  start: function (interaction, event) {
+    const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
 
-    start: function (interaction, event) {
-        var gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
+    gestureEvent.ds = 0;
 
-        gestureEvent.ds = 0;
+    interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
+    interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
+    interaction.gesture.scale = 1;
 
-        interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
-        interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
-        interaction.gesture.scale = 1;
+    interaction._interacting = true;
 
-        interaction._interacting = true;
+    interaction.target.fire(gestureEvent);
 
-        interaction.target.fire(gestureEvent);
+    return gestureEvent;
+  },
 
-        return gestureEvent;
-    },
+  move: function (interaction, event) {
+    if (!interaction.pointerIds.length) {
+      return interaction.prevEvent;
+    }
 
-    move: function (interaction, event) {
-        if (!interaction.pointerIds.length) {
-            return interaction.prevEvent;
-        }
+    let gestureEvent;
 
-        var gestureEvent;
+    gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
+    gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
 
-        gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
-        gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
+    interaction.target.fire(gestureEvent);
 
-        interaction.target.fire(gestureEvent);
+    interaction.gesture.prevAngle = gestureEvent.angle;
+    interaction.gesture.prevDistance = gestureEvent.distance;
 
-        interaction.gesture.prevAngle = gestureEvent.angle;
-        interaction.gesture.prevDistance = gestureEvent.distance;
-
-        if (gestureEvent.scale !== Infinity &&
-            gestureEvent.scale !== null &&
-            gestureEvent.scale !== undefined  &&
+    if (gestureEvent.scale !== Infinity &&
+        gestureEvent.scale !== null &&
+          gestureEvent.scale !== undefined  &&
             !isNaN(gestureEvent.scale)) {
 
-            interaction.gesture.scale = gestureEvent.scale;
-        }
+      interaction.gesture.scale = gestureEvent.scale;
+    }
 
-        return gestureEvent;
-    },
+    return gestureEvent;
+  },
 
-    end: function (interaction, event) {
-        var endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
+  end: function (interaction, event) {
+    const endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
 
-        interaction.target.fire(endEvent);
-    },
+    interaction.target.fire(endEvent);
+  },
 
-    stop: utils.blank
+  stop: utils.blank,
 };
 
 /*\
@@ -91,7 +89,7 @@ var gesture = {
  * Interactable's element
  *
  = (boolean) Indicates if this can be the target of gesture events
- | var isGestureable = interact(element).gesturable();
+   | var isGestureable = interact(element).gesturable();
  * or
  - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
  = (object) this Interactable
@@ -107,67 +105,65 @@ var gesture = {
  | });
 \*/
 Interactable.prototype.gesturable = function (options) {
-    if (utils.isObject(options)) {
-        this.options.gesture.enabled = options.enabled === false? false: true;
-        this.setPerAction('gesture', options);
-        this.setOnEvents('gesture', options);
+  if (utils.isObject(options)) {
+    this.options.gesture.enabled = options.enabled === false? false: true;
+    this.setPerAction('gesture', options);
+    this.setOnEvents('gesture', options);
 
-        return this;
-    }
+    return this;
+  }
 
-    if (utils.isBool(options)) {
-        this.options.gesture.enabled = options;
+  if (utils.isBool(options)) {
+    this.options.gesture.enabled = options;
 
-        return this;
-    }
+    return this;
+  }
 
-    return this.options.gesture;
+  return this.options.gesture;
 };
 
 signals.on('interactevent-delta', function (arg) {
-    if (arg.action !== 'gesture') { return; }
+  if (arg.action !== 'gesture') { return; }
 
-    var interaction = arg.interaction,
-        iEvent = arg.interactEvent,
-        pointers = interaction.pointers;
+  const {interaction, iEvent} = {arg};
+  const pointers = interaction.pointers;
 
-    iEvent.touches = [pointers[0], pointers[1]];
+  iEvent.touches = [pointers[0], pointers[1]];
 
-    if (arg.starting) {
-        iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
-        iEvent.box      = utils.touchBBox(pointers);
-        iEvent.scale    = 1;
-        iEvent.ds       = 0;
-        iEvent.angle    = utils.touchAngle(pointers, undefined, arg.deltaSource);
-        iEvent.da       = 0;
-    }
-    else if (arg.ending || event instanceof InteractEvent) {
-        iEvent.distance = interaction.prevEvent.distance;
-        iEvent.box      = interaction.prevEvent.box;
-        iEvent.scale    = interaction.prevEvent.scale;
-        iEvent.ds       = iEvent.scale - 1;
-        iEvent.angle    = interaction.prevEvent.angle;
-        iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
-    }
-    else {
-        iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
-        iEvent.box      = utils.touchBBox(pointers);
-        iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
-        iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, arg.deltaSource);
+  if (arg.starting) {
+    iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+    iEvent.box      = utils.touchBBox(pointers);
+    iEvent.scale    = 1;
+    iEvent.ds       = 0;
+    iEvent.angle    = utils.touchAngle(pointers, undefined, arg.deltaSource);
+    iEvent.da       = 0;
+  }
+  else if (arg.ending || event instanceof InteractEvent) {
+    iEvent.distance = interaction.prevEvent.distance;
+    iEvent.box      = interaction.prevEvent.box;
+    iEvent.scale    = interaction.prevEvent.scale;
+    iEvent.ds       = iEvent.scale - 1;
+    iEvent.angle    = interaction.prevEvent.angle;
+    iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
+  }
+  else {
+    iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+    iEvent.box      = utils.touchBBox(pointers);
+    iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
+    iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, arg.deltaSource);
 
-        iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
-        iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
-    }
+    iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+    iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
+  }
 });
-
 
 base.gesture = gesture;
 base.names.push('gesture');
 utils.merge(scope.eventTypes, [
-    'gesturestart',
-    'gesturemove',
-    'gestureinertiastart',
-    'gestureend'
+  'gesturestart',
+  'gesturemove',
+  'gestureinertiastart',
+  'gestureend',
 ]);
 base.methodDict.gesture = 'gesturable';
 

@@ -6,8 +6,6 @@
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
 
-'use strict';
-
 const scope = require('./scope');
 const utils = require('./utils');
 const browser = utils.browser;
@@ -32,12 +30,12 @@ scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
 
 scope.globalEvents = {};
 
-scope.inContext = function(interactable, element) {
+scope.inContext = function (interactable, element) {
   return (interactable._context === element.ownerDocument
           || utils.nodeContains(interactable._context, element));
 };
 
-scope.testIgnore = function(interactable, interactableElement, element) {
+scope.testIgnore = function (interactable, interactableElement, element) {
   const ignoreFrom = interactable.options.ignoreFrom;
 
   if (!ignoreFrom || !utils.isElement(element)) { return false; }
@@ -52,7 +50,7 @@ scope.testIgnore = function(interactable, interactableElement, element) {
   return false;
 };
 
-scope.testAllow = function(interactable, interactableElement, element) {
+scope.testAllow = function (interactable, interactableElement, element) {
   const allowFrom = interactable.options.allowFrom;
 
   if (!allowFrom) { return true; }
@@ -69,7 +67,7 @@ scope.testAllow = function(interactable, interactableElement, element) {
   return false;
 };
 
-scope.interactables.indexOfElement = function indexOfElement(element, context) {
+scope.interactables.indexOfElement = function indexOfElement (element, context) {
   context = context || scope.document;
 
   for (let i = 0; i < this.length; i++) {
@@ -85,11 +83,11 @@ scope.interactables.indexOfElement = function indexOfElement(element, context) {
   return -1;
 };
 
-scope.interactables.get = function interactableGet(element, options) {
+scope.interactables.get = function interactableGet (element, options) {
   return this[this.indexOfElement(element, options && options.context)];
 };
 
-scope.interactables.forEachSelector = function(callback) {
+scope.interactables.forEachSelector = function (callback) {
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
@@ -125,12 +123,12 @@ scope.interactables.forEachSelector = function(callback) {
  | var rectables = interact('rect');
  | rectables
  |     .gesturable(true)
- |     .on('gesturemove', function(event) {
+ |     .on('gesturemove', function (event) {
  |         // something cool...
  |     })
  |     .autoScroll(true);
 \*/
-function interact(element, options) {
+function interact (element, options) {
   return scope.interactables.get(element, options) || new Interactable(element, options);
 }
 
@@ -142,7 +140,7 @@ function interact(element, options) {
  - element (Element) The Element being searched for
  = (boolean) Indicates if the element or CSS selector was previously passed to interact
 \*/
-interact.isSet = function(element, options) {
+interact.isSet = function (element, options) {
   return scope.interactables.indexOfElement(element, options && options.context) !== -1;
 };
 
@@ -154,25 +152,25 @@ interact.isSet = function(element, options) {
  * `document`
  *
  - type       (string | array | object) The types of events to listen for
- - listener   (function) The function to be called on the given event(s)
+ - listener   (function) The function event (s)
  - useCapture (boolean) #optional useCapture flag for addEventListener
  = (object) interact
 \*/
-interact.on = function(type, listener, useCapture) {
+interact.on = function (type, listener, useCapture) {
   if (utils.isString(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
   if (utils.isArray(type)) {
-    for (let i = 0; i < type.length; i++) {
-      interact.on(type[i], listener, useCapture);
+    for (const eventType of type) {
+      interact.on(eventType, listener, useCapture);
     }
 
     return interact;
   }
 
   if (utils.isObject(type)) {
-    for (let prop in type) {
+    for (const prop in type) {
       interact.on(prop, type[prop], listener);
     }
 
@@ -208,21 +206,21 @@ interact.on = function(type, listener, useCapture) {
  - useCapture (boolean) #optional useCapture flag for removeEventListener
  = (object) interact
  \*/
-interact.off = function(type, listener, useCapture) {
+interact.off = function (type, listener, useCapture) {
   if (utils.isString(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
   if (utils.isArray(type)) {
-    for (let i = 0; i < type.length; i++) {
-      interact.off(type[i], listener, useCapture);
+    for (const eventType of type) {
+      interact.off(eventType, listener, useCapture);
     }
 
     return interact;
   }
 
   if (utils.isObject(type)) {
-    for (let prop in type) {
+    for (const prop in type) {
       interact.off(prop, type[prop], listener);
     }
 
@@ -251,7 +249,7 @@ interact.off = function(type, listener, useCapture) {
  * Returns an object which exposes internal data
  = (object) An object with properties that outline the current state and expose internal functions and variables
 \*/
-interact.debug = function() {
+interact.debug = function () {
   return scope;
 };
 
@@ -276,7 +274,7 @@ interact.closest          = utils.closest;
  - newValue (number) #optional
  = (number | interact) The current margin value or interact
 \*/
-interact.margin = function(newvalue) {
+interact.margin = function (newvalue) {
   if (utils.isNumber(newvalue)) {
     scope.margin = newvalue;
 
@@ -291,7 +289,7 @@ interact.margin = function(newvalue) {
  *
  = (boolean) Whether or not the browser supports touch input
 \*/
-interact.supportsTouch = function() {
+interact.supportsTouch = function () {
   return browser.supportsTouch;
 };
 
@@ -301,7 +299,7 @@ interact.supportsTouch = function() {
  *
  = (boolean) Whether or not the browser supports PointerEvents
 \*/
-interact.supportsPointerEvent = function() {
+interact.supportsPointerEvent = function () {
   return browser.supportsPointerEvent;
 };
 
@@ -314,7 +312,7 @@ interact.supportsPointerEvent = function() {
  - event (Event) An event on which to call preventDefault()
  = (object) interact
 \*/
-interact.stop = function(event) {
+interact.stop = function (event) {
   for (let i = scope.interactions.length - 1; i >= 0; i--) {
     scope.interactions[i].stop(event);
   }
@@ -333,7 +331,7 @@ interact.stop = function(event) {
  - newValue (boolean) #optional True to check on each move. False to check only before start
  = (boolean | interact) The current setting or interact
 \*/
-interact.dynamicDrop = function(newValue) {
+interact.dynamicDrop = function (newValue) {
   if (utils.isBool(newValue)) {
     //if (dragging && dynamicDrop !== newValue && !newValue) {
       //calcRects(dropzones);
@@ -355,7 +353,7 @@ interact.dynamicDrop = function(newValue) {
  - newValue (number) #optional The movement from the start position must be greater than this value
  = (number | Interactable) The current setting or interact
 \*/
-interact.pointerMoveTolerance = function(newValue) {
+interact.pointerMoveTolerance = function (newValue) {
   if (utils.isNumber(newValue)) {
     scope.pointerMoveTolerance = newValue;
 
@@ -377,7 +375,7 @@ interact.pointerMoveTolerance = function(newValue) {
  **
  - newValue (number) #optional Any number. newValue <= 0 means no interactions.
 \*/
-interact.maxInteractions = function(newValue) {
+interact.maxInteractions = function (newValue) {
   if (utils.isNumber(newValue)) {
     scope.maxInteractions = newValue;
 

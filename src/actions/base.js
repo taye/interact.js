@@ -1,25 +1,23 @@
-'use strict';
+const scope = require('../scope');
 
-var scope = require('../scope');
+const actions = {
+  scope: scope,
 
-var actions = {
-    scope: scope,
+  defaultChecker: function (pointer, event, interaction, element) {
+    const rect = this.getRect(element);
+    let action = null;
 
-    defaultChecker: function (pointer, event, interaction, element) {
-        var rect = this.getRect(element),
-            action = null;
+    for (const actionName of actions.names) {
+      action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
 
-        for (var i = 0; !action && i < actions.names.length; i++) {
-            var actionName = actions.names[i];
-
-            action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
-        }
-
+      if (action) {
         return action;
-    },
+      }
+    }
+  },
 
-    names: [],
-    methodDict: {}
+  names: [],
+  methodDict: {},
 };
 
 module.exports = actions;

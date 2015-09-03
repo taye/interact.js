@@ -1,48 +1,46 @@
-'use strict';
+const win = require('./window');
+const domObjects = require('./domObjects');
 
-var win = require('./window'),
-    domObjects = require('./domObjects');
+const isType = {
+  isElement : function (o) {
+    if (!o || (typeof o !== 'object')) { return false; }
 
-var isType = {
-    isElement : function (o) {
-        if (!o || (typeof o !== 'object')) { return false; }
-    
-        var _window = win.getWindow(o) || win.window;
-    
-        return (/object|function/.test(typeof _window.Element)
-            ? o instanceof _window.Element //DOM2
-            : o.nodeType === 1 && typeof o.nodeName === "string");
-    },
+    const _window = win.getWindow(o) || win.window;
 
-    isArray    : null,
-    
-    isWindow   : require('./isWindow'),
+    return (/object|function/.test(typeof _window.Element)
+      ? o instanceof _window.Element //DOM2
+      : o.nodeType === 1 && typeof o.nodeName === 'string');
+  },
 
-    isDocFrag  : function (thing) { return !!thing && thing instanceof domObjects.DocumentFragment; },
+  isArray    : null,
 
-    isObject   : function (thing) { return !!thing && (typeof thing === 'object'); },
+  isWindow   : require('./isWindow'),
 
-    isFunction : function (thing) { return typeof thing === 'function'; },
+  isDocFrag  : function (thing) { return !!thing && thing instanceof domObjects.DocumentFragment; },
 
-    isNumber   : function (thing) { return typeof thing === 'number'  ; },
+  isObject   : function (thing) { return !!thing && (typeof thing === 'object'); },
 
-    isBool     : function (thing) { return typeof thing === 'boolean' ; },
+  isFunction : function (thing) { return typeof thing === 'function'; },
 
-    isString   : function (thing) { return typeof thing === 'string'  ; },
-    
-    trySelector: function (value) {
-        if (!isType.isString(value)) { return false; }
+  isNumber   : function (thing) { return typeof thing === 'number'  ; },
 
-        // an exception will be raised if it is invalid
-        domObjects.document.querySelector(value);
-        return true;
-    }
+  isBool     : function (thing) { return typeof thing === 'boolean' ; },
+
+  isString   : function (thing) { return typeof thing === 'string'  ; },
+
+  trySelector: function (value) {
+    if (!isType.isString(value)) { return false; }
+
+    // an exception will be raised if it is invalid
+    domObjects.document.querySelector(value);
+    return true;
+  },
 };
 
 isType.isArray = function (thing) {
-    return isType.isObject(thing)
-        && (typeof thing.length !== 'undefined')
-        && isType.isFunction(thing.splice);
+  return (isType.isObject(thing)
+      && (typeof thing.length !== 'undefined')
+      && isType.isFunction(thing.splice));
 };
 
 module.exports = isType;
