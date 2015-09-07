@@ -5519,9 +5519,10 @@
     interact.getTouchDistance = touchDistance;
     interact.getTouchAngle    = touchAngle;
 
-    interact.getElementRect   = getElementRect;
-    interact.matchesSelector  = matchesSelector;
-    interact.closest          = closest;
+    interact.getElementRect         = getElementRect;
+    interact.getElementClientRect   = getElementClientRect;
+    interact.matchesSelector        = matchesSelector;
+    interact.closest                = closest;
 
     /*\
      * interact.margin
