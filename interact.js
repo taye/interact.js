@@ -4039,6 +4039,9 @@
                 else if (isNumber(options.overlap)) {
                     this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
                 }
+                if ('checker' in options) {
+                  this.options.drop.checker = options.checker;
+                }
 
                 return this;
             }
@@ -4058,8 +4061,8 @@
             // if the dropzone has no rect (eg. display: none)
             // call the custom dropChecker or just return false
             if (!(rect = rect || this.getRect(dropElement))) {
-                return (this.options.dropChecker
-                    ? this.options.dropChecker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
+                return (this.options.drop.checker
+                    ? this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
                     : false);
             }
 
@@ -4097,8 +4100,8 @@
                 dropped = overlapRatio >= dropOverlap;
             }
 
-            if (this.options.dropChecker) {
-                dropped = this.options.dropChecker(pointer, dropped, this, dropElement, draggable, draggableElement);
+            if (this.options.drop.checker) {
+                dropped = this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement);
             }
 
             return dropped;
@@ -4107,6 +4110,8 @@
         /*\
          * Interactable.dropChecker
          [ method ]
+         *
+         * DEPRECATED. Use interactable.dropzone({ checker: function... }) instead.
          *
          * Gets or sets the function used to check if a dragged element is
          * over this Interactable.
@@ -4139,7 +4144,7 @@
         \*/
         dropChecker: function (checker) {
             if (isFunction(checker)) {
-                this.options.dropChecker = checker;
+                this.options.drop.checker = checker;
 
                 return this;
             }
@@ -4149,7 +4154,7 @@
                 return this;
             }
 
-            return this.options.dropChecker;
+            return this.options.drop.checker;
         },
 
         /*\
@@ -5279,6 +5284,9 @@
          'Interactable#autoScroll is deprecated. See the new documentation for autoScroll at http://interactjs.io/docs/#autoscroll');
     Interactable.prototype.squareResize = warnOnce(Interactable.prototype.squareResize,
          'Interactable#squareResize is deprecated. See http://interactjs.io/docs/#resize-square');
+
+    Interactable.prototype.dropChecker = warnOnce(Interactable.prototype.dropChecker,
+         'Interactable#dropChecker is deprecated. use Interactable#dropzone({ dropChecker: checkerFunction }) instead');
 
     /*\
      * interact.isSet
