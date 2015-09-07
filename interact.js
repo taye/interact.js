@@ -5285,6 +5285,8 @@
     Interactable.prototype.squareResize = warnOnce(Interactable.prototype.squareResize,
          'Interactable#squareResize is deprecated. See http://interactjs.io/docs/#resize-square');
 
+    Interactable.prototype.accept = warnOnce(Interactable.prototype.accept,
+         'Interactable#accept is deprecated. use Interactable#dropzone({ accept: target }) instead');
     Interactable.prototype.dropChecker = warnOnce(Interactable.prototype.dropChecker,
          'Interactable#dropChecker is deprecated. use Interactable#dropzone({ dropChecker: checkerFunction }) instead');
 
