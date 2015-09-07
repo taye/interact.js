@@ -5744,6 +5744,21 @@
             interact.windowParentError = error;
         }
 
+        // prevent native HTML5 drag on interact.js target elements
+        events.add(doc, 'dragstart', function (event) {
+            for (var i = 0; i < interactions.length; i++) {
+                var interaction = interactions[i];
+
+                if (interaction.element
+                    && (interaction.element === event.target
+                        || nodeContains(interaction.element, event.target))) {
+
+                    interaction.checkAndPreventDefault(event, interaction.target, interaction.element);
+                    return;
+                }
+            }
+        });
+
         if (events.useAttachEvent) {
             // For IE's lack of Event#preventDefault
             events.add(doc, 'selectstart', function (event) {
