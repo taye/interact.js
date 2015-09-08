@@ -220,7 +220,7 @@ const domUtils = {
   getElementRect: function (element) {
     const clientRect = domUtils.getElementClientRect(element);
 
-    if (!browser.isIOS7orLower && clientRect) {
+    if (!browser.isIOS7 && clientRect) {
       const scroll = domUtils.getScrollXY(win.getWindow(element));
 
       clientRect.left   += scroll.x;

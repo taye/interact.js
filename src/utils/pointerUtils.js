@@ -107,4 +107,14 @@ pointerUtils.getPointerId = function (pointer) {
   return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
 };
 
+pointerUtils.pointerExtend = function (dest, source) {
+  for (const prop in source) {
+    if (prop !== 'webkitMovementX' && prop !== 'webkitMovementY') {
+      dest[prop] = source[prop];
+    }
+  }
+  return dest;
+};
+
+
 module.exports = pointerUtils;

@@ -364,7 +364,7 @@ class Interaction {
       // do these now since pointerDown isn't being called from here
       this.downTimes[pointerIndex] = new Date().getTime();
       this.downTargets[pointerIndex] = eventTarget;
-      utils.extend(this.downPointer, pointer);
+      utils.pointerExtend(this.downPointer, pointer);
 
       utils.copyCoords(this.prevCoords, this.curCoords);
       this.pointerWasMoved = false;
@@ -431,7 +431,7 @@ class Interaction {
 
       this.downTimes[pointerIndex] = new Date().getTime();
       this.downTargets[pointerIndex] = eventTarget;
-      utils.extend(this.downPointer, pointer);
+      utils.pointerExtend(this.downPointer, pointer);
 
       this.setEventXY(this.prevCoords);
       this.pointerWasMoved = false;
@@ -1243,6 +1243,20 @@ signals.on('listen-to-document', function (arg) {
   catch (error) {
     scope.windowParentError = error;
   }
+
+  // prevent native HTML5 drag on interact.js target elements
+  events.add(doc, 'dragstart', function (event) {
+    for (const interaction of scope.interactions) {
+
+      if (interaction.element
+          && (interaction.element === event.target
+              || utils.nodeContains(interaction.element, event.target))) {
+
+        interaction.checkAndPreventDefault(event, interaction.target, interaction.element);
+        return;
+      }
+    }
+  });
 
   if (browser.isIE8) {
     // For IE's lack of Event#preventDefault

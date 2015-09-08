@@ -9,7 +9,7 @@ module.exports = {
     allowFrom     : null,
     ignoreFrom    : null,
     _context      : require('./utils/domObjects').document,
-    dropChecker   : null,
+    checker       : null,
   },
 
   perAction: {

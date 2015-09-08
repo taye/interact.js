@@ -1,5 +1,8 @@
 // browser entry point
 
+// Legacy browser support
+require('./ie8');
+
 module.exports = require('./interact');
 
 // actions

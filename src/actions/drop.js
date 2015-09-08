@@ -322,6 +322,10 @@ Interactable.prototype.dropzone = function (options) {
     else if (utils.isNumber(options.overlap)) {
       this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
     }
+    if ('checker' in options) {
+      this.options.drop.checker = options.checker;
+    }
+
 
     return this;
   }
@@ -341,8 +345,8 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
   // if the dropzone has no rect (eg. display: none)
   // call the custom dropChecker or just return false
   if (!(rect = rect || this.getRect(dropElement))) {
-    return (this.options.dropChecker
-      ? this.options.dropChecker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
+    return (this.options.drop.checker
+      ? this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
       : false);
   }
 
@@ -381,8 +385,8 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
     dropped = overlapRatio >= dropOverlap;
   }
 
-  if (this.options.dropChecker) {
-    dropped = this.options.dropChecker(pointer, dropped, this, dropElement, draggable, draggableElement);
+  if (this.options.drop.checker) {
+    dropped = this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement);
   }
 
   return dropped;
@@ -391,6 +395,8 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
 /*\
  * Interactable.dropChecker
  [ method ]
+ *
+ * DEPRECATED. Use interactable.dropzone({ checker: function... }) instead.
  *
  * Gets or sets the function used to check if a dragged element is
  * over this Interactable.
@@ -421,9 +427,9 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
  |   return dropped && event.target.hasAttribute('allow-drop');
  | }
 \*/
-Interactable.prototype.dropChecker = function (checker) {
+Interactable.prototype.dropChecker = utils.warnOnce(function (checker) {
   if (utils.isFunction(checker)) {
-    this.options.dropChecker = checker;
+    this.options.drop.checker = checker;
 
     return this;
   }
@@ -433,8 +439,8 @@ Interactable.prototype.dropChecker = function (checker) {
     return this;
   }
 
-  return this.options.dropChecker;
-};
+  return this.options.drop.checker;
+}, 'Interactable#dropChecker is deprecated. use Interactable#dropzone({ dropChecker: checkerFunction }) instead');
 
 /*\
  * Interactable.accept
@@ -453,7 +459,7 @@ Interactable.prototype.dropChecker = function (checker) {
  *
  = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
 \*/
-Interactable.prototype.accept = function (newValue) {
+Interactable.prototype.accept = utils.warnOnce(function (newValue) {
   if (utils.isElement(newValue)) {
     this.options.drop.accept = newValue;
 
@@ -474,7 +480,7 @@ Interactable.prototype.accept = function (newValue) {
   }
 
   return this.options.drop.accept;
-};
+}, 'Interactable#accept is deprecated. use Interactable#dropzone({ accept: target }) instead');
 
 signals.on('interaction-stop', function (arg) {
   const interaction = arg.interaction;

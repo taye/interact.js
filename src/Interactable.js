@@ -585,7 +585,7 @@ class Interactable {
     const settings = [
       'accept', 'actionChecker', 'allowFrom', 'deltaSource',
       'dropChecker', 'ignoreFrom', 'origin', 'preventDefault',
-      'rectChecker',
+      'rectChecker', 'styleCursor',
     ];
 
     for (let i = 0, len = settings.length; i < len; i++) {

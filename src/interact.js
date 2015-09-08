@@ -259,9 +259,10 @@ interact.getTouchBBox     = utils.touchBBox;
 interact.getTouchDistance = utils.touchDistance;
 interact.getTouchAngle    = utils.touchAngle;
 
-interact.getElementRect   = utils.getElementRect;
-interact.matchesSelector  = utils.matchesSelector;
-interact.closest          = utils.closest;
+interact.getElementRect       = utils.getElementRect;
+interact.getElementClientRect = utils.getElementClientRect;
+interact.matchesSelector      = utils.matchesSelector;
+interact.closest              = utils.closest;
 
 /*\
  * interact.margin

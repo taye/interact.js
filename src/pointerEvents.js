@@ -36,9 +36,9 @@ function firePointers (interaction, pointer, event, eventTarget, targets, elemen
     pointerEvent = pointer;
   }
   else {
-    utils.extend(pointerEvent, event);
+    utils.pointerExtend(pointerEvent, event);
     if (event !== pointer) {
-      utils.extend(pointerEvent, pointer);
+      utils.pointerExtend(pointerEvent, pointer);
     }
 
     pointerEvent.preventDefault           = preventOriginalDefault;
