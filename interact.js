@@ -543,12 +543,13 @@
         document.querySelector(value);
         return true;
     }
-
+    
     function extend (dest, source) {
-        for (var prop in source) {
+      for (var prop in source) {
+          if(prop != 'webkitMovementY' && prop != 'webkitMovementX')
             dest[prop] = source[prop];
-        }
-        return dest;
+      }
+      return dest;
     }
 
     function copyCoords (dest, src) {
