@@ -551,6 +551,15 @@
         return dest;
     }
 
+    function pointerExtend (dest, source) {
+        for (var prop in source) {
+            if (prop !== 'webkitMovementX' && prop !== 'webkitMovementY') {
+                dest[prop] = source[prop];
+            }
+        }
+        return dest;
+    }
+
     function copyCoords (dest, src) {
         dest.page = dest.page || {};
         dest.page.x = src.page.x;
@@ -1499,7 +1508,7 @@
                 // do these now since pointerDown isn't being called from here
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                extend(this.downPointer, pointer);
+                pointerExtend(this.downPointer, pointer);
 
                 copyCoords(this.prevCoords, this.curCoords);
                 this.pointerWasMoved = false;
@@ -1569,7 +1578,7 @@
 
                 this.downTimes[pointerIndex] = new Date().getTime();
                 this.downTargets[pointerIndex] = eventTarget;
-                extend(this.downPointer, pointer);
+                pointerExtend(this.downPointer, pointer);
 
                 this.setEventXY(this.prevCoords);
                 this.pointerWasMoved = false;
@@ -2760,9 +2769,9 @@
                 pointerEvent = pointer;
             }
             else {
-                extend(pointerEvent, event);
+                pointerExtend(pointerEvent, event);
                 if (event !== pointer) {
-                    extend(pointerEvent, pointer);
+                    pointerExtend(pointerEvent, pointer);
                 }
 
                 pointerEvent.preventDefault           = preventOriginalDefault;
