@@ -14,138 +14,127 @@ const methodNames = [
 ];
 const listeners = {};
 
+class Interaction {
+  constructor () {
+    this.target          = null; // current interactable being interacted with
+    this.element         = null; // the target element of the interactable
+    this.dropTarget      = null; // the dropzone a drag target might be dropped into
+    this.dropElement     = null; // the element at the time of checking
+    this.prevDropTarget  = null; // the dropzone that was recently dragged away from
+    this.prevDropElement = null; // the element at the time of checking
 
-function Interaction () {
-  this.target          = null; // current interactable being interacted with
-  this.element         = null; // the target element of the interactable
-  this.dropTarget      = null; // the dropzone a drag target might be dropped into
-  this.dropElement     = null; // the element at the time of checking
-  this.prevDropTarget  = null; // the dropzone that was recently dragged away from
-  this.prevDropElement = null; // the element at the time of checking
+    this.prepared        = {     // action that's ready to be fired on next move event
+      name : null,
+      axis : null,
+      edges: null,
+    };
 
-  this.prepared        = {     // action that's ready to be fired on next move event
-    name : null,
-    axis : null,
-    edges: null,
-  };
+    this.matches         = [];   // all selectors that are matched by target element
+    this.matchElements   = [];   // corresponding elements
 
-  this.matches         = [];   // all selectors that are matched by target element
-  this.matchElements   = [];   // corresponding elements
+    this.inertiaStatus = {
+      active   : false,
+      smoothEnd: false,
 
-  this.inertiaStatus = {
-    active       : false,
-    smoothEnd    : false,
+      startEvent: null,
+      upCoords  : {},
 
-    startEvent: null,
-    upCoords: {},
+      xe: 0, ye: 0,
+      sx: 0, sy: 0,
 
-    xe: 0, ye: 0,
-    sx: 0, sy: 0,
+      t0: 0,
+      vx0: 0, vys: 0,
+      duration: 0,
 
-    t0: 0,
-    vx0: 0, vys: 0,
-    duration: 0,
+      resumeDx: 0,
+      resumeDy: 0,
 
-    resumeDx: 0,
-    resumeDy: 0,
+      lambda_v0: 0,
+      one_ve_v0: 0,
+      i  : null,
+    };
 
-    lambda_v0: 0,
-    one_ve_v0: 0,
-    i  : null,
-  };
+    this.boundInertiaFrame   = () => this.inertiaFrame  ();
+    this.boundSmoothEndFrame = () => this.smoothEndFrame();
 
-  this.boundInertiaFrame = () => { this.inertiaFrame(); };
-  this.boundSmoothEndFrame = () => { this.smoothEndFrame(); };
+    this.activeDrops = {
+      dropzones: [],      // the dropzones that are mentioned below
+      elements : [],      // elements of dropzones that accept the target draggable
+      rects    : [],      // the rects of the elements mentioned above
+    };
 
-  this.activeDrops = {
-    dropzones: [],      // the dropzones that are mentioned below
-    elements : [],      // elements of dropzones that accept the target draggable
-    rects    : [],      // the rects of the elements mentioned above
-  };
+    // keep track of added pointers
+    this.pointers    = [];
+    this.pointerIds  = [];
+    this.downTargets = [];
+    this.downTimes   = [];
+    this.holdTimers  = [];
 
-  // keep track of added pointers
-  this.pointers    = [];
-  this.pointerIds  = [];
-  this.downTargets = [];
-  this.downTimes   = [];
-  this.holdTimers  = [];
+    // Previous native pointer move event coordinates
+    this.prevCoords = {
+      page     : { x: 0, y: 0 },
+      client   : { x: 0, y: 0 },
+      timeStamp: 0,
+    };
+    // current native pointer move event coordinates
+    this.curCoords = {
+      page     : { x: 0, y: 0 },
+      client   : { x: 0, y: 0 },
+      timeStamp: 0,
+    };
 
-  // Previous native pointer move event coordinates
-  this.prevCoords = {
-    page     : { x: 0, y: 0 },
-    client   : { x: 0, y: 0 },
-    timeStamp: 0,
-  };
-  // current native pointer move event coordinates
-  this.curCoords = {
-    page     : { x: 0, y: 0 },
-    client   : { x: 0, y: 0 },
-    timeStamp: 0,
-  };
+    // Starting InteractEvent pointer coordinates
+    this.startCoords = {
+      page     : { x: 0, y: 0 },
+      client   : { x: 0, y: 0 },
+      timeStamp: 0,
+    };
 
-  // Starting InteractEvent pointer coordinates
-  this.startCoords = {
-    page     : { x: 0, y: 0 },
-    client   : { x: 0, y: 0 },
-    timeStamp: 0,
-  };
+    // Change in coordinates and time of the pointer
+    this.pointerDelta = {
+      page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+      client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
+      timeStamp: 0,
+    };
 
-  // Change in coordinates and time of the pointer
-  this.pointerDelta = {
-    page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-    client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-    timeStamp: 0,
-  };
+    this.downEvent   = null;    // pointerdown/mousedown/touchstart event
+    this.downPointer = {};
 
-  this.downEvent   = null;    // pointerdown/mousedown/touchstart event
-  this.downPointer = {};
+    this._eventTarget    = null;
+    this._curEventTarget = null;
 
-  this._eventTarget    = null;
-  this._curEventTarget = null;
+    this.prevEvent = null;      // previous action event
+    this.tapTime   = 0;         // time of the most recent tap event
+    this.prevTap   = null;
 
-  this.prevEvent = null;      // previous action event
-  this.tapTime   = 0;         // time of the most recent tap event
-  this.prevTap   = null;
+    this.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
+    this.modifierOffsets  = {};
+    this.modifierStatuses = modifiers.resetStatuses({});
 
-  this.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
-  this.modifierOffsets = {};
-  this.modifierStatuses = modifiers.resetStatuses({});
+    this.gesture = {
+      start: { x: 0, y: 0 },
 
-  this.gesture = {
-    start: { x: 0, y: 0 },
+      startDistance: 0,   // distance between two touches of touchStart
+      prevDistance : 0,
+      distance     : 0,
 
-    startDistance: 0,   // distance between two touches of touchStart
-    prevDistance : 0,
-    distance     : 0,
+      scale: 1,           // gesture.distance / gesture.startDistance
 
-    scale: 1,           // gesture.distance / gesture.startDistance
+      startAngle: 0,      // angle of line joining two touches
+      prevAngle : 0,      // angle of the previous gesture event
+    };
 
-    startAngle: 0,      // angle of line joining two touches
-    prevAngle : 0,      // angle of the previous gesture event
-  };
+    this.pointerIsDown   = false;
+    this.pointerWasMoved = false;
+    this._interacting    = false;
+    this.resizeAxes      = 'xy';
 
-  this.pointerIsDown   = false;
-  this.pointerWasMoved = false;
-  this._interacting    = false;
-  this.resizeAxes      = 'xy';
+    this.mouse = false;
 
-  this.mouse = false;
-
-  scope.interactions.push(this);
-}
-
-// Check if the current target supports the action.
-// If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable) {
-  if (utils.isObject(action) && interactable.options[action.name].enabled) {
-    return action;
+    scope.interactions.push(this);
   }
 
-  return null;
-}
-
-Interaction.prototype = {
-  setEventXY: function (targetObj, pointer) {
+  setEventXY (targetObj, pointer) {
     if (!pointer) {
       if (this.pointerIds.length > 1) {
         pointer = utils.touchAverage(this.pointers);
@@ -166,9 +155,9 @@ Interaction.prototype = {
     targetObj.client.y = tmpXY.y;
 
     targetObj.timeStamp = new Date().getTime();
-  },
+  }
 
-  pointerOver: function (pointer, event, eventTarget) {
+  pointerOver (pointer, event, eventTarget) {
     if (this.prepared.name || !this.mouse) { return; }
 
     const curMatches = [];
@@ -245,11 +234,11 @@ Interaction.prototype = {
         }
       }
     }
-  },
+  }
 
   // Check what action would be performed on pointerMove target if a mouse
   // button were pressed and change the cursor accordingly
-  pointerHover: function (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
+  pointerHover (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
     const target = this.target;
 
     if (!this.prepared.name && this.mouse) {
@@ -278,9 +267,9 @@ Interaction.prototype = {
     else if (this.prepared.name) {
       this.checkAndPreventDefault(event, target, this.element);
     }
-  },
+  }
 
-  pointerOut: function (pointer, event, eventTarget) {
+  pointerOut (pointer, event, eventTarget) {
     if (this.prepared.name) { return; }
 
     // Remove temporary event listeners for selector Interactables
@@ -293,9 +282,9 @@ Interaction.prototype = {
     if (this.target && this.target.options.styleCursor && !this.interacting()) {
       this.target._doc.documentElement.style.cursor = '';
     }
-  },
+  }
 
-  selectorDown: function (pointer, event, eventTarget, curEventTarget) {
+  selectorDown (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.addPointer(pointer);
     let element = eventTarget;
     let action;
@@ -380,11 +369,11 @@ Interaction.prototype = {
       utils.copyCoords(this.prevCoords, this.curCoords);
       this.pointerWasMoved = false;
     }
-  },
+  }
 
   // Determine action to be performed on next pointerMove and add appropriate
   // style and event Listeners
-  pointerDown: function (pointer, event, eventTarget, curEventTarget, forceAction) {
+  pointerDown (pointer, event, eventTarget, curEventTarget, forceAction) {
     if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared.name) {
       this.checkAndPreventDefault(event, this.target, this.element);
 
@@ -459,9 +448,9 @@ Interaction.prototype = {
 
       this.checkAndPreventDefault(event, target, this.element);
     }
-  },
+  }
 
-  setStartOffsets: function (action, interactable, element) {
+  setStartOffsets (action, interactable, element) {
     const rect = interactable.getRect(element);
 
     if (rect) {
@@ -479,7 +468,7 @@ Interaction.prototype = {
     }
 
     modifiers.setOffsets(this, interactable, element, rect, this.modifierOffsets);
-  },
+  }
 
   /*\
    * Interaction.start
@@ -513,7 +502,7 @@ Interaction.prototype = {
    |     }
    | });
    \*/
-  start: function (action, interactable, element) {
+  start (action, interactable, element) {
     if (this.interacting()
         || !this.pointerIsDown
         || this.pointerIds.length < (action.name === 'gesture'? 2 : 1)) {
@@ -538,9 +527,9 @@ Interaction.prototype = {
     modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
     this.prevEvent = actions[this.prepared.name].start(this, this.downEvent);
-  },
+  }
 
-  pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
+  pointerMove (pointer, event, eventTarget, curEventTarget, preEnd) {
     this.recordPointer(pointer);
 
     this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
@@ -628,9 +617,9 @@ Interaction.prototype = {
       pointer: pointer,
       event: event,
     });
-  },
+  }
 
-  pointerUp: function (pointer, event, eventTarget, curEventTarget) {
+  pointerUp (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
@@ -647,9 +636,9 @@ Interaction.prototype = {
     this.pointerEnd(pointer, event, eventTarget, curEventTarget);
 
     this.removePointer(pointer);
-  },
+  }
 
-  pointerCancel: function (pointer, event, eventTarget, curEventTarget) {
+  pointerCancel (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
@@ -664,10 +653,10 @@ Interaction.prototype = {
     this.pointerEnd(pointer, event, eventTarget, curEventTarget);
 
     this.removePointer(pointer);
-  },
+  }
 
   // End interact move events and stop auto-scroll unless inertia is enabled
-  pointerEnd: function (pointer, event, eventTarget, curEventTarget) {
+  pointerEnd (pointer, event, eventTarget, curEventTarget) {
     const target = this.target;
     const options = target && target.options;
     const inertiaOptions = options && this.prepared.name && options[this.prepared.name].inertia;
@@ -776,17 +765,17 @@ Interaction.prototype = {
     }
 
     this.stop(event);
-  },
+  }
 
-  currentAction: function () {
+  currentAction () {
     return this._interacting? this.prepared.name: null;
-  },
+  }
 
-  interacting: function () {
+  interacting () {
     return this._interacting;
-  },
+  }
 
-  stop: function (event) {
+  stop (event) {
     signals.fire('interaction-stop', { interaction: this });
 
     if (this._interacting) {
@@ -830,9 +819,9 @@ Interaction.prototype = {
         scope.interactions.splice(utils.indexOf(scope.interactions, this), 1);
       }
     }
-  },
+  }
 
-  inertiaFrame: function () {
+  inertiaFrame () {
     const inertiaStatus = this.inertiaStatus;
     const options = this.target.options[this.prepared.name].inertia;
     const lambda = options.resistance;
@@ -871,9 +860,9 @@ Interaction.prototype = {
       inertiaStatus.active = false;
       this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
     }
-  },
+  }
 
-  smoothEndFrame: function () {
+  smoothEndFrame () {
     const inertiaStatus = this.inertiaStatus;
     const t = new Date().getTime() - inertiaStatus.t0;
     const duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
@@ -897,9 +886,9 @@ Interaction.prototype = {
 
       this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
     }
-  },
+  }
 
-  addPointer: function (pointer) {
+  addPointer (pointer) {
     const id = utils.getPointerId(pointer);
     let index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
@@ -911,9 +900,9 @@ Interaction.prototype = {
     this.pointers[index] = pointer;
 
     return index;
-  },
+  }
 
-  removePointer: function (pointer) {
+  removePointer (pointer) {
     const id = utils.getPointerId(pointer);
     const index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
@@ -927,9 +916,9 @@ Interaction.prototype = {
     this.downTargets.splice(index, 1);
     this.downTimes  .splice(index, 1);
     this.holdTimers .splice(index, 1);
-  },
+  }
 
-  recordPointer: function (pointer) {
+  recordPointer (pointer) {
     // Do not update pointers while inertia is active.
     // The inertia start event should be this.pointers[0]
     if (this.inertiaStatus.active) { return; }
@@ -939,9 +928,9 @@ Interaction.prototype = {
     if (index === -1) { return; }
 
     this.pointers[index] = pointer;
-  },
+  }
 
-  validateSelector: function (pointer, event, matches, matchElements) {
+  validateSelector (pointer, event, matches, matchElements) {
     for (let i = 0, len = matches.length; i < len; i++) {
       const match = matches[i];
       const matchElement = matchElements[i];
@@ -954,9 +943,9 @@ Interaction.prototype = {
         return action;
       }
     }
-  },
+  }
 
-  checkAndPreventDefault: function (event, interactable, element) {
+  checkAndPreventDefault (event, interactable, element) {
     if (!(interactable = interactable || this.target)) { return; }
 
     const options = interactable.options;
@@ -986,9 +975,9 @@ Interaction.prototype = {
       event.preventDefault();
       return;
     }
-  },
+  }
 
-  calcInertia: function (status) {
+  calcInertia (status) {
     const inertiaOptions = this.target.options[this.prepared.name].inertia;
     const lambda = inertiaOptions.resistance;
     const inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
@@ -1004,13 +993,23 @@ Interaction.prototype = {
 
     status.lambda_v0 = lambda / status.v0;
     status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
-  },
+  }
 
-  _updateEventTargets: function (target, currentTarget) {
+  _updateEventTargets (target, currentTarget) {
     this._eventTarget    = target;
     this._curEventTarget = currentTarget;
-  },
-};
+  }
+}
+
+// Check if the current target supports the action.
+// If so, return the validated action. Otherwise, return null
+function validateAction (action, interactable) {
+  if (utils.isObject(action) && interactable.options[action.name].enabled) {
+    return action;
+  }
+
+  return null;
+}
 
 for (let i = 0, len = methodNames.length; i < len; i++) {
   const method = methodNames[i];

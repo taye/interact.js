@@ -10,53 +10,54 @@ const actions = require('./actions/base');
  **
  * Object type returned by @interact
 \*/
-function Interactable (element, options) {
-  this._element = element;
-  this._iEvents = this._iEvents || {};
+class Interactable {
+  constructor (element, options) {
+    this._element = element;
+    this._context = scope.document;
+    this._iEvents = this._iEvents || {};
 
-  let _window;
+    let _window;
 
-  if (utils.trySelector(element)) {
-    this.selector = element;
+    if (utils.trySelector(element)) {
+      this.selector = element;
 
-    const context = options && options.context;
+      const context = options && options.context;
 
-    _window = context? scope.getWindow(context) : scope.window;
+      _window = context? scope.getWindow(context) : scope.window;
 
-    if (context && (_window.Node
-      ? context instanceof _window.Node
-      : (utils.isElement(context) || context === _window.document))) {
+      if (context && (_window.Node
+        ? context instanceof _window.Node
+        : (utils.isElement(context) || context === _window.document))) {
 
-      this._context = context;
+        this._context = context;
+      }
     }
-  }
-  else {
-    _window = scope.getWindow(element);
-  }
+    else {
+      _window = scope.getWindow(element);
+    }
 
-  this._doc = _window.document;
+    this._doc = _window.document;
 
-  signals.fire('interactable-new', {
-    interactable: this,
-    element: element,
-    options: options,
-    win: _window,
-  });
-
-  if (this._doc !== scope.document) {
-    signals.fire('listen-to-document', {
-      doc: this._doc,
+    signals.fire('interactable-new', {
+      interactable: this,
+      element: element,
+      options: options,
       win: _window,
     });
+
+    if (this._doc !== scope.document) {
+      signals.fire('listen-to-document', {
+        doc: this._doc,
+        win: _window,
+      });
+    }
+
+    scope.interactables.push(this);
+
+    this.set(options);
   }
 
-  scope.interactables.push(this);
-
-  this.set(options);
-}
-
-Interactable.prototype = {
-  setOnEvents: function (action, phases) {
+  setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
     if (utils.isFunction(phases.onstart)       ) { this[onAction + 'start'        ] = phases.onstart         ; }
@@ -65,9 +66,9 @@ Interactable.prototype = {
     if (utils.isFunction(phases.oninertiastart)) { this[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
-  },
+  }
 
-  setPerAction: function (action, options) {
+  setPerAction (action, options) {
     // for all the default per-action options
     for (const option in options) {
       // if this option exists for this action
@@ -90,9 +91,9 @@ Interactable.prototype = {
         }
       }
     }
-  },
+  }
 
-  getAction: function (pointer, event, interaction, element) {
+  getAction (pointer, event, interaction, element) {
     const action = this.defaultActionChecker(pointer, event, interaction, element);
 
     if (this.options.actionChecker) {
@@ -100,9 +101,7 @@ Interactable.prototype = {
     }
 
     return action;
-  },
-
-  defaultActionChecker: actions.defaultChecker,
+  }
 
   /*\
    * Interactable.actionChecker
@@ -132,7 +131,7 @@ Interactable.prototype = {
    |   return action;
    | });
   \*/
-  actionChecker: function (checker) {
+  actionChecker (checker) {
     if (utils.isFunction(checker)) {
       this.options.actionChecker = checker;
 
@@ -146,7 +145,7 @@ Interactable.prototype = {
     }
 
     return this.options.actionChecker;
-  },
+  }
 
   /*\
    * Interactable.getRect
@@ -166,7 +165,7 @@ Interactable.prototype = {
    o     height: 0
    o }
   \*/
-  getRect: function rectCheck (element) {
+  getRect (element) {
     element = element || this._element;
 
     if (this.selector && !(utils.isElement(element))) {
@@ -174,7 +173,7 @@ Interactable.prototype = {
     }
 
     return utils.getElementRect(element);
-  },
+  }
 
   /*\
    * Interactable.rectChecker
@@ -186,7 +185,7 @@ Interactable.prototype = {
    - checker (function) #optional A function which returns this Interactable's bounding rectangle. See @Interactable.getRect
    = (function | object) The checker function or this Interactable
   \*/
-  rectChecker: function (checker) {
+  rectChecker (checker) {
     if (utils.isFunction(checker)) {
       this.getRect = checker;
 
@@ -200,7 +199,7 @@ Interactable.prototype = {
     }
 
     return this.getRect;
-  },
+  }
 
   /*\
    * Interactable.styleCursor
@@ -213,7 +212,7 @@ Interactable.prototype = {
    - newValue (boolean) #optional
    = (boolean | Interactable) The current setting or this Interactable
   \*/
-  styleCursor: function (newValue) {
+  styleCursor (newValue) {
     if (utils.isBool(newValue)) {
       this.options.styleCursor = newValue;
 
@@ -227,7 +226,7 @@ Interactable.prototype = {
     }
 
     return this.options.styleCursor;
-  },
+  }
 
   /*\
    * Interactable.preventDefault
@@ -242,7 +241,7 @@ Interactable.prototype = {
    - newValue (string) #optional `true`, `false` or `'auto'`
    = (string | Interactable) The current setting or this Interactable
   \*/
-  preventDefault: function (newValue) {
+  preventDefault (newValue) {
     if (/^(always|never|auto)$/.test(newValue)) {
       this.options.preventDefault = newValue;
       return this;
@@ -254,7 +253,7 @@ Interactable.prototype = {
     }
 
     return this.options.preventDefault;
-  },
+  }
 
   /*\
    * Interactable.origin
@@ -269,7 +268,7 @@ Interactable.prototype = {
    **
    = (object) The current origin or this Interactable
   \*/
-  origin: function (newValue) {
+  origin (newValue) {
     if (utils.trySelector(newValue)) {
       this.options.origin = newValue;
       return this;
@@ -280,7 +279,7 @@ Interactable.prototype = {
     }
 
     return this.options.origin;
-  },
+  }
 
   /*\
    * Interactable.deltaSource
@@ -292,7 +291,7 @@ Interactable.prototype = {
    - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
    = (string | object) The current deltaSource or this Interactable
   \*/
-  deltaSource: function (newValue) {
+  deltaSource (newValue) {
     if (newValue === 'page' || newValue === 'client') {
       this.options.deltaSource = newValue;
 
@@ -300,7 +299,7 @@ Interactable.prototype = {
     }
 
     return this.options.deltaSource;
-  },
+  }
 
   /*\
    * Interactable.context
@@ -311,11 +310,9 @@ Interactable.prototype = {
    = (Node) The context Node of this Interactable
    **
   \*/
-  context: function () {
+  context () {
     return this._context;
-  },
-
-  _context: scope.document,
+  }
 
   /*\
    * Interactable.ignoreFrom
@@ -332,7 +329,7 @@ Interactable.prototype = {
    | // or
    | interact(element).ignoreFrom('input, textarea, a');
   \*/
-  ignoreFrom: function (newValue) {
+  ignoreFrom (newValue) {
     if (utils.trySelector(newValue)) {            // CSS selector to match event.target
       this.options.ignoreFrom = newValue;
       return this;
@@ -344,7 +341,7 @@ Interactable.prototype = {
     }
 
     return this.options.ignoreFrom;
-  },
+  }
 
   /*\
    * Interactable.allowFrom
@@ -361,7 +358,7 @@ Interactable.prototype = {
    | // or
    | interact(element).allowFrom('.handle');
   \*/
-  allowFrom: function (newValue) {
+  allowFrom (newValue) {
     if (utils.trySelector(newValue)) {            // CSS selector to match event.target
       this.options.allowFrom = newValue;
       return this;
@@ -373,7 +370,7 @@ Interactable.prototype = {
     }
 
     return this.options.allowFrom;
-  },
+  }
 
   /*\
    * Interactable.element
@@ -384,9 +381,9 @@ Interactable.prototype = {
    *
    = (Element) HTML / SVG Element
   \*/
-  element: function () {
+  element () {
     return this._element;
-  },
+  }
 
   /*\
    * Interactable.fire
@@ -398,7 +395,7 @@ Interactable.prototype = {
    - iEvent (InteractEvent) The InteractEvent object to be fired on this Interactable
    = (Interactable) this Interactable
   \*/
-  fire: function (iEvent) {
+  fire (iEvent) {
     if (!(iEvent && iEvent.type) || !utils.contains(scope.eventTypes, iEvent.type)) {
       return this;
     }
@@ -431,7 +428,7 @@ Interactable.prototype = {
     }
 
     return this;
-  },
+  }
 
   /*\
    * Interactable.on
@@ -444,7 +441,7 @@ Interactable.prototype = {
    - useCapture (boolean) #optional useCapture flag for addEventListener
    = (object) This Interactable
   \*/
-  on: function (eventType, listener, useCapture) {
+  on (eventType, listener, useCapture) {
     let i;
 
     if (utils.isString(eventType) && eventType.search(' ') !== -1) {
@@ -492,7 +489,7 @@ Interactable.prototype = {
     }
 
     return this;
-  },
+  }
 
   /*\
    * Interactable.off
@@ -505,7 +502,7 @@ Interactable.prototype = {
    - useCapture (boolean) #optional useCapture flag for removeEventListener
    = (object) This Interactable
   \*/
-  off: function (eventType, listener, useCapture) {
+  off (eventType, listener, useCapture) {
     let i;
 
     if (utils.isString(eventType) && eventType.search(' ') !== -1) {
@@ -556,7 +553,7 @@ Interactable.prototype = {
     }
 
     return this;
-  },
+  }
 
   /*\
    * Interactable.set
@@ -566,7 +563,7 @@ Interactable.prototype = {
    - options (object) The new settings to apply
    = (object) This Interactable
   \*/
-  set: function (options) {
+  set (options) {
     if (!utils.isObject(options)) {
       options = {};
     }
@@ -602,7 +599,7 @@ Interactable.prototype = {
     }
 
     return this;
-  },
+  }
 
   /*\
    * Interactable.unset
@@ -613,7 +610,7 @@ Interactable.prototype = {
    *
    = (object) @interact
   \*/
-  unset: function () {
+  unset () {
     events.remove(this._element, 'all');
 
     if (!utils.isString(this.selector)) {
@@ -656,7 +653,9 @@ Interactable.prototype = {
     scope.interactables.splice(utils.indexOf(scope.interactables, this), 1);
 
     return scope.interact;
-  },
-};
+  }
+}
+
+Interactable.prototype.defaultActionChecker = actions.defaultChecker;
 
 module.exports = Interactable;
