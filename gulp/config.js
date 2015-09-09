@@ -30,14 +30,5 @@ module.exports = {
         extensions: [],
       },
     ],
-  },
-  jshint: {
-      src: src + "/**/*.js",
-      settings: '.jshintrc'
-  },
-  production: {
-    cssSrc: dest + '/*.css',
-    jsSrc: dest + '/*.js',
-    dest: dest
   }
 };

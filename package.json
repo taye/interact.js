@@ -6,6 +6,10 @@
     "url": "https://github.com/taye/interact.js.git"
   },
   "main": "./index.js",
+  "scripts": {
+    "gulp": "./node_modules/.bin/gulp",
+    "build": "./node_modules/.bin/gulp build"
+  },
   "browser": "./src/index.js",
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
