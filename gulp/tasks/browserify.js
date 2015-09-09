@@ -24,7 +24,9 @@ var _ = require('lodash');
 var uglify = require('gulp-uglify');
 var buffer = require('vinyl-buffer');
 var sourcemaps = require('gulp-sourcemaps');
+var exorcist = require('exorcist');
 var rename = require('gulp-rename');
+var path = require('path');
 
 var browserifyTask = function (devMode) {
 
@@ -32,7 +34,7 @@ var browserifyTask = function (devMode) {
 
         if (devMode) {
             // Add watchify args and debug (sourcemaps) option
-            _.extend(bundleConfig, watchify.args, {debug: true});
+            _.extend(bundleConfig, watchify.args);
             // A watchify require/external bug that prevents proper recompiling,
             // so (for now) we'll ignore these options during development. Running
             // `gulp browserify` directly will properly require and externalize.
@@ -46,21 +48,24 @@ var browserifyTask = function (devMode) {
             bundleLogger.start(bundleConfig.outputName);
 
             return b
-                .transform(require('babelify'))
                 .bundle()
                 // Report compile errors
                 .on('error', handleErrors)
                 // Use vinyl-source-stream to make the
                 // stream gulp compatible. Specify the
                 // desired output filename here.
+                .pipe(exorcist(path.join(bundleConfig.dest, bundleConfig.outputName + '.map'),
+                               undefined,
+                               '',
+                               './'))
                 .pipe(source(bundleConfig.outputName))
                 .pipe(gulp.dest(bundleConfig.dest))
                 .pipe(buffer())
                 .pipe(sourcemaps.init({loadMaps: true}))
                     .pipe(uglify())
                     .on('error', gulpUtil.log)
+                    .pipe(rename(bundleConfig.outputNameMin))
                 .pipe(sourcemaps.write('./'))
-                .pipe(rename(bundleConfig.outputNameMin))
                 .pipe(gulp.dest(bundleConfig.dest))
                 .pipe(browserSync.reload({
                     stream: true
