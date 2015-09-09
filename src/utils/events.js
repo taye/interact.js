@@ -54,7 +54,7 @@ function add (element, type, listener, useCapture) {
     let ret;
 
     if (useAttachEvent) {
-      const { supplied, wrapped, useCount } = [ attachedListeners[elementIndex] ];
+      const { supplied, wrapped, useCount } = attachedListeners[elementIndex];
       const listenerIndex = indexOf(supplied, listener);
 
       const wrappedListener = wrapped[listenerIndex] || function (event) {
