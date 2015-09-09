@@ -551,9 +551,12 @@
         return dest;
     }
 
+    var webkitUnprefixedRE = /(Movement[XY]|Radius[XY]|RotationAngle)$/;
+
     function pointerExtend (dest, source) {
         for (var prop in source) {
-            if (prop !== 'webkitMovementX' && prop !== 'webkitMovementY') {
+            if (prop.indexOf('webkit') === -1
+                || !webkitUnprefixedRE.test(prop)) {
                 dest[prop] = source[prop];
             }
         }
