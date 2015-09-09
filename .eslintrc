@@ -4,8 +4,7 @@ extends: 'eslint:recommended'
 
 env:
   browser: true
-  es6: true
-  node: true
+  commonjs: true
 
 rules:
   comma-dangle: [2, always-multiline]
@@ -21,6 +20,7 @@ rules:
   no-extra-bind: 2
   no-self-compare: 2
   no-sequences: 2
+  no-shadow: 2
   no-shadow-restricted-names: 2
   no-trailing-spaces: 2
   no-unused-expressions: 2
@@ -32,21 +32,15 @@ rules:
   space-after-keywords: [2, always]
   space-before-function-paren: [2, always]
   strict: [2, never]
-  use-isnan: 2
 
 ecma-features:
   arrow-functions: true
   block-bindings: true
   classes: true
   for-of: true
-  default-params: true
   destructuring: true
-  generators: false
   object-literal-computed-properties: true
-  object-literal-duplicate-properties: false
   object-literal-shorthand-methods: true
   oobject-literal-shorthand-properties: true
-  spread: true
   super-in-functions: true
   template-strings: true
-  jsx: false

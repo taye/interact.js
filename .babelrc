@@ -1,5 +1,4 @@
 {
-  "stage": 1,
   "loose": ["all"],
   "whitelist": [
     "es3.memberExpressionLiterals",
@@ -12,10 +11,8 @@
     "es6.forOf",
     "es6.literals",
     "es6.objectSuper",
-    "es6.parameters",
     "es6.properties.computed",
     "es6.properties.shorthand",
-    "es6.spread",
     "es6.tailCall",
     "es6.templateLiterals"
   ]
