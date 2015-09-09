@@ -1,10 +1,10 @@
 const pointerUtils = {};
-    // reduce object creation in getXY()
-const win = require('./window');
-const hypot = require('./hypot');
-const extend = require('./extend');
-const browser = require('./browser');
-const isType = require('./isType');
+
+const win           = require('./window');
+const hypot         = require('./hypot');
+const extend        = require('./extend');
+const browser       = require('./browser');
+const isType        = require('./isType');
 const InteractEvent = require('../InteractEvent');
 
 pointerUtils.copyCoords = function (dest, src) {
@@ -20,11 +20,13 @@ pointerUtils.copyCoords = function (dest, src) {
 };
 
 pointerUtils.setEventDeltas = function (targetObj, prev, cur) {
-  targetObj.page.x     = cur.page.x      - prev.page.x;
-  targetObj.page.y     = cur.page.y      - prev.page.y;
-  targetObj.client.x   = cur.client.x    - prev.client.x;
-  targetObj.client.y   = cur.client.y    - prev.client.y;
-  targetObj.timeStamp = new Date().getTime() - prev.timeStamp;
+  const now = new Date().getTime();
+
+  targetObj.page.x    = cur.page.x   - prev.page.x;
+  targetObj.page.y    = cur.page.y   - prev.page.y;
+  targetObj.client.x  = cur.client.x - prev.client.x;
+  targetObj.client.y  = cur.client.y - prev.client.y;
+  targetObj.timeStamp = now          - prev.timeStamp;
 
   // set pointer velocity
   const dt = Math.max(targetObj.timeStamp / 1000, 0.001);

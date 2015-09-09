@@ -1,8 +1,8 @@
-const win = require('./window');
+const win        = require('./window');
 const domObjects = require('./domObjects');
 
 const isType = {
-  isElement : function (o) {
+  isElement  : function (o) {
     if (!o || (typeof o !== 'object')) { return false; }
 
     const _window = win.getWindow(o) || win.window;

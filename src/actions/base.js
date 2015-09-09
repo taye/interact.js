@@ -1,7 +1,7 @@
 const scope = require('../scope');
 
 const actions = {
-  scope: scope,
+  scope,
 
   defaultChecker: function (pointer, event, interaction, element) {
     const rect = this.getRect(element);

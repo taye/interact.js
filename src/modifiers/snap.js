@@ -15,26 +15,29 @@ const snap = {
   },
 
   shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const snap = interactable.options[actionName].snap;
+    const snapOptions = interactable.options[actionName].snap;
 
-    return snap && snap.enabled && (preEnd || !snap.endOnly) && (!requireEndOnly || snap.endOnly);
+    return (snapOptions && snapOptions.enabled
+            && (preEnd || !snapOptions.endOnly)
+            && (!requireEndOnly || snapOptions.endOnly));
   },
 
   setOffset: function (interaction, interactable, element, rect, startOffset) {
     const offsets = [];
     const origin = utils.getOriginXY(interactable, element);
-    const snapOffset = (snap && snap.offset === 'startCoords'
+    const snapOptions = interactable.options[interaction.prepared.name].snap;
+    const snapOffset = (snapOptions && snapOptions.offset === 'startCoords'
       ? {
         x: interaction.startCoords.page.x - origin.x,
         y: interaction.startCoords.page.y - origin.y,
       }
-      : snap && snap.offset || { x: 0, y: 0 });
+      : snapOptions && snapOptions.offset || { x: 0, y: 0 });
 
-    if (rect && snap && snap.relativePoints && snap.relativePoints.length) {
-      for (let i = 0; i < snap.relativePoints.length; i++) {
+    if (rect && snapOptions && snapOptions.relativePoints && snapOptions.relativePoints.length) {
+      for (const { x: relativeX, y: relativeY } of snapOptions.relativePoints) {
         offsets.push({
-          x: startOffset.left - (rect.width  * snap.relativePoints[i].x) + snapOffset.x,
-          y: startOffset.top  - (rect.height * snap.relativePoints[i].y) + snapOffset.y,
+          x: startOffset.left - (rect.width  * relativeX) + snapOffset.x,
+          y: startOffset.top  - (rect.height * relativeY) + snapOffset.y,
         });
       }
     }
@@ -46,7 +49,7 @@ const snap = {
   },
 
   set: function (pageCoords, interaction, status) {
-    const snap = interaction.target.options[interaction.prepared.name].snap;
+    const snapOptions = interaction.target.options[interaction.prepared.name].snap;
     const targets = [];
     let target;
     let page;
@@ -71,29 +74,27 @@ const snap = {
     page.y -= interaction.inertiaStatus.resumeDy;
 
     const offsets = interaction.modifierOffsets.snap;
-    let len = snap.targets? snap.targets.length : 0;
+    let len = snapOptions.targets? snapOptions.targets.length : 0;
 
-    for (let relIndex = 0; relIndex < offsets.length; relIndex++) {
-      const relative = {
-        x: page.x - offsets[relIndex].x,
-        y: page.y - offsets[relIndex].y,
-      };
+    for (const { x: offsetX, y: offsetY } of offsets) {
+      const relativeX = page.x - offsetX;
+      const relativeY = page.y - offsetY;
 
-      for (i = 0; i < len; i++) {
-        if (utils.isFunction(snap.targets[i])) {
-          target = snap.targets[i](relative.x, relative.y, interaction);
+      for (const snapTarget of snapOptions.targets) {
+        if (utils.isFunction(snapTarget)) {
+          target = snapTarget(relativeX, relativeY, interaction);
         }
         else {
-          target = snap.targets[i];
+          target = snapTarget;
         }
 
         if (!target) { continue; }
 
         targets.push({
-          x: utils.isNumber(target.x) ? (target.x + offsets[relIndex].x) : relative.x,
-          y: utils.isNumber(target.y) ? (target.y + offsets[relIndex].y) : relative.y,
+          x: utils.isNumber(target.x) ? (target.x + offsetX) : relativeX,
+          y: utils.isNumber(target.y) ? (target.y + offsetY) : relativeY,
 
-          range: utils.isNumber(target.range)? target.range: snap.range,
+          range: utils.isNumber(target.range)? target.range: snapOptions.range,
         });
       }
     }
@@ -179,10 +180,10 @@ const snap = {
   },
 
   modifyCoords: function (page, client, interactable, status, actionName, phase) {
-    const snap = interactable.options[actionName].snap;
-    const relativePoints = snap && snap.relativePoints;
+    const snapOptions = interactable.options[actionName].snap;
+    const relativePoints = snapOptions && snapOptions.relativePoints;
 
-    if (snap && snap.enabled
+    if (snapOptions && snapOptions.enabled
         && !(phase === 'start' && relativePoints && relativePoints.length)) {
 
       if (status.locked) {

@@ -11,9 +11,11 @@ const restrict = {
   },
 
   shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const restrict = interactable.options[actionName].restrict;
+    const restrictOptions = interactable.options[actionName].restrict;
 
-    return restrict && restrict.enabled && (preEnd || !restrict.endOnly) && (!requireEndOnly || restrict.endOnly);
+    return (restrictOptions && restrictOptions.enabled
+            && (preEnd || !restrictOptions.endOnly)
+            && (!requireEndOnly || restrictOptions.endOnly));
   },
 
   setOffset: function (interaction, interactable, element, rect, startOffset) {
@@ -35,9 +37,9 @@ const restrict = {
   },
 
   set: function (pageCoords, interaction, status) {
-    const target = interaction.target;
-    const restrict = target && target.options[interaction.prepared.name].restrict;
-    let restriction = restrict && restrict.restriction;
+    const target    = interaction.target;
+    const restrictOptions  = target && target.options[interaction.prepared.name].restrict;
+    let restriction = restrictOptions && restrictOptions.restriction;
 
     if (!restriction) {
       return status;

@@ -149,32 +149,30 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
   }
 }
 
-signals.on('interaction-move', function (arg) {
-  const interaction = arg.interaction;
+signals.on('interaction-move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
   const pointerIndex = (interaction.mouse
     ? 0
-    : utils.indexOf(interaction.pointerIds, utils.getPointerId(arg.pointer)));
+    : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer)));
 
-  if (!arg.duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
+  if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
     if (interaction.pointerIsDown) {
       clearTimeout(interaction.holdTimers[pointerIndex]);
     }
 
-    collectEventTargets(interaction, arg.pointer, arg.event, arg.eventTarget, 'move');
+    collectEventTargets(interaction, pointer, event, eventTarget, 'move');
   }
 });
 
-signals.on('interaction-down', function (arg) {
-  const interaction = arg.interaction;
+signals.on('interaction-down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
   // copy event to be used in timeout for IE8
-  const eventCopy = browser.isIE8? utils.extend({}, arg.event) : arg.event;
+  const eventCopy = browser.isIE8? utils.extend({}, event) : event;
 
-  interaction.holdTimers[arg.pointerIndex] = setTimeout(function () {
+  interaction.holdTimers[pointerIndex] = setTimeout(function () {
 
     collectEventTargets(interaction,
-                        browser.isIE8? eventCopy : arg.pointer,
+                        browser.isIE8? eventCopy : pointer,
                         eventCopy,
-                        arg.eventTarget,
+                        eventTarget,
                         'hold');
 
   }, scope.defaultOptions._holdDuration);
@@ -218,8 +216,8 @@ if (browser.ie8) {
     }
   };
 
-  signals.on('listen-to-document', function (arg) {
-    events.add(arg.doc, 'dblclick', onIE8Dblclick);
+  signals.on('listen-to-document', function ({ doc }) {
+    events.add(doc, 'dblclick', onIE8Dblclick);
   });
 }
 

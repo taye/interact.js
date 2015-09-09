@@ -1,6 +1,6 @@
-const win = require('./window');
-const browser = require('./browser');
-const isType = require('./isType');
+const win        = require('./window');
+const browser    = require('./browser');
+const isType     = require('./isType');
 const domObjects = require('./domObjects');
 
 const domUtils = {
@@ -44,17 +44,19 @@ const domUtils = {
   },
 
   // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-  matchesSelectorPolyfill: (browser.useMatchesSelectorPolyfill? function (element, selector, elems) {
-    elems = elems || element.parentNode.querySelectorAll(selector);
+  matchesSelectorPolyfill: browser.useMatchesSelectorPolyfill
+    ? function (element, selector, elems) {
+      elems = elems || element.parentNode.querySelectorAll(selector);
 
-    for (let i = 0, len = elems.length; i < len; i++) {
-      if (elems[i] === element) {
-        return true;
+      for (let i = 0, len = elems.length; i < len; i++) {
+        if (elems[i] === element) {
+          return true;
+        }
       }
-    }
 
-    return false;
-  } : null),
+      return false;
+    }
+    : null,
 
   matchesSelector: function (element, selector, nodeList) {
     if (browser.useMatchesSelectorPolyfill) {

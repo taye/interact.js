@@ -1,8 +1,8 @@
+const arr = require('./arr');
+
 const listeners = {
   // signalName: [listeners],
 };
-
-const arr = require('./arr');
 
 const signals = {
   on: function (name, listener) {

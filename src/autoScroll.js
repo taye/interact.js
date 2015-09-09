@@ -7,10 +7,10 @@ const defaultOptions = require('./defaultOptions');
 
 const autoScroll = {
   defaults: {
-    enabled     : false,
-    container   : null,     // the item that is scrolled (Window or HTMLElement)
-    margin      : 60,
-    speed       : 300,      // the scroll speed in pixels per second
+    enabled  : false,
+    container: null,     // the item that is scrolled (Window or HTMLElement)
+    margin   : 60,
+    speed    : 300,      // the scroll speed in pixels per second
   },
 
   interaction: null,
@@ -64,12 +64,9 @@ const autoScroll = {
   check: function (interactable, actionName) {
     const options = interactable.options;
 
-    return  options[actionName].autoScroll && options[actionName].autoScroll.enabled;
+    return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function (arg) {
-    const interaction = arg.interaction;
-    const pointer = arg.pointer;
-
+  onInteractionMove: function ({ interaction, pointer }) {
     if (!(interaction.interacting()
           && autoScroll.check(interaction.target, interaction.prepared.name))) {
       return;

@@ -1,22 +1,18 @@
-const scope = {};
-const utils = require('./utils');
+const scope   = {};
+const utils   = require('./utils');
 const signals = require('./utils/signals');
-const extend = utils.extend;
-
-scope.documents       = [];   // all documents being listened to
-
-scope.interactables   = [];   // all set interactables
-scope.interactions    = [];   // all interactions
 
 scope.defaultOptions = require('./defaultOptions');
+scope.events         = require('./utils/events');
+scope.signals        = require('./utils/signals');
 
-scope.events = require('./utils/events');
-scope.signals = require('./utils/signals');
+utils.extend(scope, require('./utils/window'));
+utils.extend(scope, require('./utils/domObjects'));
 
-extend(scope, require('./utils/window'));
-extend(scope, require('./utils/domObjects'));
-
-scope.eventTypes = [];
+scope.documents     = [];   // all documents being listened to
+scope.interactables = [];   // all set interactables
+scope.interactions  = [];   // all interactions
+scope.eventTypes    = [];   // all event types specific to interact.js
 
 scope.withinInteractionLimit = function (interactable, element, action) {
   const options = interactable.options;
@@ -64,9 +60,9 @@ scope.endAllInteractions = function (event) {
   }
 };
 
-signals.on('listen-to-document', function (arg) {
+signals.on('listen-to-document', function ({ doc }) {
   // if document is already known
-  if (utils.contains(scope.documents, arg.doc)) {
+  if (utils.contains(scope.documents, doc)) {
     // don't call any further signal listeners
     return false;
   }

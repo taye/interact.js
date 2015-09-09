@@ -8,7 +8,6 @@ module.exports = {
     deltaSource   : 'page',
     allowFrom     : null,
     ignoreFrom    : null,
-    _context      : require('./utils/domObjects').document,
     checker       : null,
   },
 

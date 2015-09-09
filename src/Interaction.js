@@ -1,18 +1,19 @@
-const scope = require('./scope');
-const utils = require('./utils');
+const scope          = require('./scope');
+const utils          = require('./utils');
+const InteractEvent  = require('./InteractEvent');
+const events         = require('./utils/events');
+const signals        = require('./utils/signals');
+const browser        = require('./utils/browser');
+const actions        = require('./actions/base');
+const modifiers      = require('./modifiers/');
 const animationFrame = utils.raf;
-const InteractEvent = require('./InteractEvent');
-const events = require('./utils/events');
-const signals = require('./utils/signals');
-const browser = require('./utils/browser');
-const actions = require('./actions/base');
-const modifiers = require('./modifiers/');
+
+const listeners   = {};
 const methodNames = [
   'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
   'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
   'addPointer', 'removePointer', 'recordPointer',
 ];
-const listeners = {};
 
 class Interaction {
   constructor () {
@@ -292,11 +293,11 @@ class Interaction {
     this.pointerIsDown = true;
 
     signals.fire('interaction-down', {
+      pointer,
+      event,
+      eventTarget,
+      pointerIndex,
       interaction: this,
-      pointer: pointer,
-      event: event,
-      eventTarget: eventTarget,
-      pointerIndex: pointerIndex,
     });
 
     // Check if the down event hits the current inertia target
@@ -553,13 +554,13 @@ class Interaction {
     }
 
     signals.fire('interaction-move', {
+      pointer,
+      event,
+      eventTarget,
+      dx,
+      dy,
       interaction: this,
-      pointer: pointer,
-      event: event,
-      eventTarget: eventTarget,
       duplicate: duplicateMove,
-      dx: dx,
-      dy: dy,
     });
 
     if (!this.pointerIsDown) { return; }
@@ -613,9 +614,9 @@ class Interaction {
     utils.copyCoords(this.prevCoords, this.curCoords);
 
     signals.fire('interaction-move-done', {
+      pointer,
+      event,
       interaction: this,
-      pointer: pointer,
-      event: event,
     });
   }
 
@@ -625,11 +626,11 @@ class Interaction {
     clearTimeout(this.holdTimers[pointerIndex]);
 
     signals.fire('interaction-up', {
+      pointer,
+      event,
+      eventTarget,
+      curEventTarget,
       interaction: this,
-      pointer: pointer,
-      event: event,
-      eventTarget: eventTarget,
-      curEventTarget: curEventTarget,
     });
 
 
@@ -644,10 +645,10 @@ class Interaction {
     clearTimeout(this.holdTimers[pointerIndex]);
 
     signals.fire('interaction-cancel', {
+      pointer,
+      event,
+      eventTarget,
       interaction: this,
-      pointer: pointer,
-      event: event,
-      eventTarget: eventTarget,
     });
 
     this.pointerEnd(pointer, event, eventTarget, curEventTarget);
@@ -1157,11 +1158,10 @@ function doOnInteractions (method) {
   });
 }
 
-signals.on('interactable-new', function (arg) {
-  const interactable = arg.interactable;
+signals.on('interactable-new', function ({ interactable, win }) {
   const element = interactable._element;
 
-  if (utils.isElement(element, arg.win)) {
+  if (utils.isElement(element, win)) {
     if (scope.PointerEvent) {
       events.add(element, browser.pEventTypes.down, listeners.pointerDown );
       events.add(element, browser.pEventTypes.move, listeners.pointerHover);
@@ -1175,11 +1175,10 @@ signals.on('interactable-new', function (arg) {
   }
 });
 
-signals.on('interactable-unset', function (arg) {
-  const interactable = arg.interactable;
+signals.on('interactable-unset', function ({ interactable, win }) {
   const element = interactable._element;
 
-  if (!interactable.selector && utils.isElement(element, arg.win)) {
+  if (!interactable.selector && utils.isElement(element, win)) {
     if (scope.PointerEvent) {
       events.remove(element, browser.pEventTypes.down, listeners.pointerDown );
       events.remove(element, browser.pEventTypes.move, listeners.pointerHover);
@@ -1193,9 +1192,7 @@ signals.on('interactable-unset', function (arg) {
   }
 });
 
-signals.on('listen-to-document', function (arg) {
-  const doc = arg.doc;
-  const win = arg.win;
+signals.on('listen-to-document', function ({ doc, win }) {
   const pEventTypes = browser.pEventTypes;
 
   // add delegate event listener

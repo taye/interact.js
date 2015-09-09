@@ -1,3 +1,1 @@
-module.exports = function isWindow (thing) {
-  return !!(thing && thing.Window) && (thing instanceof thing.Window);
-};
+module.exports = (thing) => !!(thing && thing.Window) && (thing instanceof thing.Window);

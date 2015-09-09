@@ -8,9 +8,9 @@ const defaultOptions = require('../defaultOptions');
 
 const gesture = {
   defaults: {
-    manualStart: false,
-    enabled: false,
-    max: Infinity,
+    manualStart  : false,
+    enabled      : false,
+    max          : Infinity,
     maxPerElement: 1,
 
     restrict: null,
@@ -61,10 +61,10 @@ const gesture = {
     interaction.gesture.prevAngle = gestureEvent.angle;
     interaction.gesture.prevDistance = gestureEvent.distance;
 
-    if (gestureEvent.scale !== Infinity &&
-        gestureEvent.scale !== null &&
-          gestureEvent.scale !== undefined  &&
-            !isNaN(gestureEvent.scale)) {
+    if (gestureEvent.scale !== Infinity
+        && gestureEvent.scale !== null
+        && gestureEvent.scale !== undefined
+        && !isNaN(gestureEvent.scale)) {
 
       interaction.gesture.scale = gestureEvent.scale;
     }
@@ -125,20 +125,20 @@ Interactable.prototype.gesturable = function (options) {
 signals.on('interactevent-delta', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
-  const {interaction, iEvent} = {arg};
+  const { interaction, iEvent, starting, ending, deltaSource } = {arg};
   const pointers = interaction.pointers;
 
   iEvent.touches = [pointers[0], pointers[1]];
 
-  if (arg.starting) {
-    iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+  if (starting) {
+    iEvent.distance = utils.touchDistance(pointers, deltaSource);
     iEvent.box      = utils.touchBBox(pointers);
     iEvent.scale    = 1;
     iEvent.ds       = 0;
-    iEvent.angle    = utils.touchAngle(pointers, undefined, arg.deltaSource);
+    iEvent.angle    = utils.touchAngle(pointers, undefined, deltaSource);
     iEvent.da       = 0;
   }
-  else if (arg.ending || event instanceof InteractEvent) {
+  else if (ending || event instanceof InteractEvent) {
     iEvent.distance = interaction.prevEvent.distance;
     iEvent.box      = interaction.prevEvent.box;
     iEvent.scale    = interaction.prevEvent.scale;
@@ -147,10 +147,10 @@ signals.on('interactevent-delta', function (arg) {
     iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
   }
   else {
-    iEvent.distance = utils.touchDistance(pointers, arg.deltaSource);
+    iEvent.distance = utils.touchDistance(pointers, deltaSource);
     iEvent.box      = utils.touchBBox(pointers);
     iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
-    iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, arg.deltaSource);
+    iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
     iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
     iEvent.da = iEvent.angle - interaction.gesture.prevAngle;

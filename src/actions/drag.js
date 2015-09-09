@@ -9,14 +9,14 @@ const defaultOptions = require('../defaultOptions');
 
 const drag = {
   defaults: {
-    enabled: false,
-    manualStart: true,
-    max: Infinity,
+    enabled      : false,
+    manualStart  : true,
+    max          : Infinity,
     maxPerElement: 1,
 
-    snap: null,
-    restrict: null,
-    inertia: null,
+    snap      : null,
+    restrict  : null,
+    inertia   : null,
     autoScroll: null,
 
     axis: 'xy',

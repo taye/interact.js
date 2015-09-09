@@ -9,18 +9,18 @@ const defaultOptions = require('../defaultOptions');
 
 const resize = {
   defaults: {
-    enabled: false,
-    manualStart: false,
-    max: Infinity,
+    enabled      : false,
+    manualStart  : false,
+    max          : Infinity,
     maxPerElement: 1,
 
-    snap: null,
-    restrict: null,
-    inertia: null,
+    snap      : null,
+    restrict  : null,
+    inertia   : null,
     autoScroll: null,
 
     square: false,
-    axis: 'xy',
+    axis  : 'xy',
 
     // use default margin
     margin: NaN,
@@ -53,11 +53,11 @@ const resize = {
         for (const edge in resizeEdges) {
           resizeEdges[edge] = checkResizeEdge(edge,
                                               resizeOptions.edges[edge],
-          page,
-          interaction._eventTarget,
-          element,
-          rect,
-          resizeOptions.margin || scope.margin);
+                                              page,
+                                              interaction._eventTarget,
+                                              element,
+                                              rect,
+                                              resizeOptions.margin || scope.margin);
         }
 
         resizeEdges.left = resizeEdges.left && !resizeEdges.right;
@@ -338,8 +338,8 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width = utils.isNumber(rect.width)? rect.width : rect.right - rect.left;
-    const height = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top;
+    const width  = utils.isNumber(rect.width )? rect.width  : rect.right  - rect.left;
+    const height = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top ;
 
     if (width < 0) {
       if      (name === 'left' ) { name = 'right'; }
@@ -364,15 +364,13 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   // the value is an element to use as a resize handle
     ? value === element
     // otherwise check if element matches value as selector
-      : utils.matchesUpTo(element, value, interactableElement);
+    : utils.matchesUpTo(element, value, interactableElement);
 }
 
-signals.on('interact-event-set-delta', function (arg) {
-  const interaction = arg.interaction;
-  const iEvent = arg.interactEvent;
-  const options = interaction.target.options;
+signals.on('interactevent-set-delta', function ({ interaction, iEvent, action }) {
+  if (action !== 'resize' || !interaction.resizeAxes) { return; }
 
-  if (arg.action !== 'resize' || !interaction.resizeAxes) { return; }
+  const options = interaction.target.options;
 
   if (options.resize.square) {
     if (interaction.resizeAxes === 'y') {

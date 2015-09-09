@@ -14,7 +14,7 @@ const modifiers = {
     }
   },
 
-  setAll: function (interaction, coords, statuses, preEnd, requireEndOnly) {
+  setAll: function (interaction, coordsArg, statuses, preEnd, requireEndOnly) {
     const result = {
       dx: 0,
       dy: 0,
@@ -23,12 +23,11 @@ const modifiers = {
       shouldMove: true,
     };
     const target = interaction.target;
+    const coords = utils.extend({}, coordsArg);
+
     let currentStatus;
 
-    coords = utils.extend({}, coords);
-
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
+    for (const modifierName of modifiers.names) {
       const modifier = modifiers[modifierName];
 
       if (!modifier.shouldDo(target, interaction.prepared.name, preEnd, requireEndOnly)) { continue; }
@@ -54,9 +53,7 @@ const modifiers = {
   },
 
   resetStatuses: function (statuses) {
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
-
+    for (const modifierName of modifiers.names) {
       statuses[modifierName] = modifiers[modifierName].reset(statuses[modifierName] || {});
     }
 

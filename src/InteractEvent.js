@@ -1,6 +1,6 @@
-const scope = require('./scope');
-const utils = require('./utils');
-const signals = require('./utils/signals');
+const scope     = require('./scope');
+const utils     = require('./utils');
+const signals   = require('./utils/signals');
 const modifiers = require('./modifiers');
 
 class InteractEvent {
@@ -15,13 +15,10 @@ class InteractEvent {
     const ending      = phase === 'end';
     const coords      = starting? interaction.startCoords : interaction.curCoords;
 
-    let client;
-    let page;
-
     element = element || interaction.element;
 
-    page   = utils.extend({}, coords.page);
-    client = utils.extend({}, coords.client);
+    const page   = utils.extend({}, coords.page);
+    const client = utils.extend({}, coords.client);
 
     page.x -= origin.x;
     page.y -= origin.y;
@@ -61,19 +58,19 @@ class InteractEvent {
 
     const inertiaStatus = interaction.inertiaStatus;
     const signalArg = {
-      interactEvent: this,
-      interaction: interaction,
-      event: event,
-      action: action,
-      phase: phase,
-      element: element,
-      related: related,
-      page: page,
-      client: client,
-      coords: coords,
-      starting: starting,
-      ending: ending,
-      deltaSource: deltaSource,
+      interaction,
+      event,
+      action,
+      phase,
+      element,
+      related,
+      page,
+      client,
+      coords,
+      starting,
+      ending,
+      deltaSource,
+      iEvent: this,
     };
 
     if (inertiaStatus.active) {
@@ -183,11 +180,11 @@ class InteractEvent {
       const down  = !up   &&   45 - overlap <= angle && angle < 135 + overlap;
 
       this.swipe = {
-        up   : up,
-        down : down,
-        left : left,
-        right: right,
-        angle: angle,
+        up,
+        down,
+        left,
+        right,
+        angle,
         speed: interaction.prevEvent.speed,
         velocity: {
           x: interaction.prevEvent.velocityX,

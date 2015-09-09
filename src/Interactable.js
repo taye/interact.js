@@ -39,9 +39,9 @@ class Interactable {
     this._doc = _window.document;
 
     signals.fire('interactable-new', {
+      element,
+      options,
       interactable: this,
-      element: element,
-      options: options,
       win: _window,
     });
 
@@ -401,15 +401,13 @@ class Interactable {
     }
 
     let listeners;
-    let i;
-    let len;
     const onEvent = 'on' + iEvent.type;
 
     // Interactable#on() listeners
     if (iEvent.type in this._iEvents) {
       listeners = this._iEvents[iEvent.type];
 
-      for (i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+      for (let i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
         listeners[i](iEvent);
       }
     }
@@ -422,7 +420,7 @@ class Interactable {
     // interact.on() listeners
     if (iEvent.type in scope.globalEvents && (listeners = scope.globalEvents[iEvent.type]))  {
 
-      for (i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
+      for (let i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
         listeners[i](iEvent);
       }
     }
@@ -442,14 +440,12 @@ class Interactable {
    = (object) This Interactable
   \*/
   on (eventType, listener, useCapture) {
-    let i;
-
     if (utils.isString(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
     if (utils.isArray(eventType)) {
-      for (i = 0; i < eventType.length; i++) {
+      for (let i = 0; i < eventType.length; i++) {
         this.on(eventType[i], listener, useCapture);
       }
 
@@ -503,14 +499,12 @@ class Interactable {
    = (object) This Interactable
   \*/
   off (eventType, listener, useCapture) {
-    let i;
-
     if (utils.isString(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
     if (utils.isArray(eventType)) {
-      for (i = 0; i < eventType.length; i++) {
+      for (let i = 0; i < eventType.length; i++) {
         this.off(eventType[i], listener, useCapture);
       }
 
@@ -525,8 +519,6 @@ class Interactable {
       return this;
     }
 
-    let eventList;
-    let index = -1;
 
     // convert to boolean
     useCapture = useCapture? true: false;
@@ -537,9 +529,10 @@ class Interactable {
 
     // if it is an action event type
     if (utils.contains(scope.eventTypes, eventType)) {
-      eventList = this._iEvents[eventType];
+      const eventList = this._iEvents[eventType];
+      const index     = eventList? utils.indexOf(eventList, listener) : -1;
 
-      if (eventList && (index = utils.indexOf(eventList, listener)) !== -1) {
+      if (index !== -1) {
         this._iEvents[eventType].splice(index, 1);
       }
     }
@@ -647,8 +640,6 @@ class Interactable {
     }
 
     signals.fire('interactable-unset', { interactable: this });
-
-    this.dropzone(false);
 
     scope.interactables.splice(utils.indexOf(scope.interactables, this), 1);
 

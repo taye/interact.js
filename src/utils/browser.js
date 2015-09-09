@@ -1,5 +1,5 @@
-const win = require('./window');
-const isType = require('./isType');
+const win        = require('./window');
+const isType     = require('./isType');
 const domObjects = require('./domObjects');
 
 const browser = {
@@ -34,13 +34,11 @@ const browser = {
 
   pEventTypes: (domObjects.PointerEvent
     ? (domObjects.PointerEvent === win.window.MSPointerEvent
-    ? {
-      up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-      out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' }
-        : {
-          up: 'pointerup', down: 'pointerdown', over: 'pointerover',
+      ? { up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
+          out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' }
+      : { up: 'pointerup', down: 'pointerdown', over: 'pointerover',
           out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' })
-            : null),
+    : null),
 };
 
 browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);

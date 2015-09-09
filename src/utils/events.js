@@ -54,16 +54,16 @@ function add (element, type, listener, useCapture) {
     let ret;
 
     if (useAttachEvent) {
-      const listeners = attachedListeners[elementIndex];
-      const listenerIndex = indexOf(listeners.supplied, listener);
+      const { supplied, wrapped, useCount } = [ attachedListeners[elementIndex] ];
+      const listenerIndex = indexOf(supplied, listener);
 
-      const wrapped = listeners.wrapped[listenerIndex] || function (event) {
+      const wrappedListener = wrapped[listenerIndex] || function (event) {
         if (!event.immediatePropagationStopped) {
           event.target = event.srcElement;
           event.currentTarget = element;
 
-          event.preventDefault = event.preventDefault || preventDef;
-          event.stopPropagation = event.stopPropagation || stopProp;
+          event.preventDefault           = event.preventDefault           || preventDef;
+          event.stopPropagation          = event.stopPropagation          || stopProp;
           event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
 
           if (/mouse|click/.test(event.type)) {
@@ -75,15 +75,15 @@ function add (element, type, listener, useCapture) {
         }
       };
 
-      ret = element[addEvent](on + type, wrapped, !!useCapture);
+      ret = element[addEvent](on + type, wrappedListener, !!useCapture);
 
       if (listenerIndex === -1) {
-        listeners.supplied.push(listener);
-        listeners.wrapped.push(wrapped);
-        listeners.useCount.push(1);
+        supplied.push(listener);
+        wrapped.push(wrappedListener);
+        useCount.push(1);
       }
       else {
-        listeners.useCount[listenerIndex]++;
+        useCount[listenerIndex]++;
       }
     }
     else {
@@ -98,19 +98,19 @@ function add (element, type, listener, useCapture) {
 function remove (element, type, listener, useCapture) {
   const elementIndex = indexOf(elements, element);
   const target = targets[elementIndex];
-  let wrapped = listener;
-  let listeners;
-  let listenerIndex;
-  let i;
 
   if (!target || !target.events) {
     return;
   }
 
+  let wrappedListener = listener;
+  let listeners;
+  let listenerIndex;
+
   if (useAttachEvent) {
     listeners = attachedListeners[elementIndex];
     listenerIndex = indexOf(listeners.supplied, listener);
-    wrapped = listeners.wrapped[listenerIndex];
+    wrappedListener = listeners.wrapped[listenerIndex];
   }
 
   if (type === 'all') {
@@ -126,14 +126,15 @@ function remove (element, type, listener, useCapture) {
     const len = target.events[type].length;
 
     if (listener === 'all') {
-      for (i = 0; i < len; i++) {
+      for (let i = 0; i < len; i++) {
         remove(element, type, target.events[type][i], !!useCapture);
       }
       return;
-    } else {
-      for (i = 0; i < len; i++) {
+    }
+    else {
+      for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element[removeEvent](on + type, wrapped, !!useCapture);
+          element[removeEvent](on + type, wrappedListener, !!useCapture);
           target.events[type].splice(i, 1);
 
           if (useAttachEvent && listeners) {
@@ -321,18 +322,18 @@ function stopImmProp () {
 }
 
 module.exports = {
-  add: add,
-  remove: remove,
+  add,
+  remove,
 
-  addDelegate: addDelegate,
-  removeDelegate: removeDelegate,
+  addDelegate,
+  removeDelegate,
 
-  delegateListener: delegateListener,
-  delegateUseCapture: delegateUseCapture,
-  delegatedEvents: delegatedEvents,
-  documents: documents,
+  delegateListener,
+  delegateUseCapture,
+  delegatedEvents,
+  documents,
 
-  useAttachEvent: useAttachEvent,
+  useAttachEvent,
 
   _elements: elements,
   _targets: targets,

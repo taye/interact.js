@@ -6,10 +6,10 @@
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
 
-const scope = require('./scope');
-const utils = require('./utils');
-const browser = utils.browser;
-const events = require('./utils/events');
+const scope        = require('./scope');
+const utils        = require('./utils');
+const browser      = utils.browser;
+const events       = require('./utils/events');
 const Interactable = require('./Interactable');
 
 scope.dynamicDrop = false;
