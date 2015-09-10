@@ -2782,11 +2782,12 @@
                 pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
                 pointerEvent.interaction              = this;
 
-                pointerEvent.timeStamp     = new Date().getTime();
-                pointerEvent.originalEvent = event;
-                pointerEvent.type          = eventType;
-                pointerEvent.pointerId     = getPointerId(pointer);
-                pointerEvent.pointerType   = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
+                pointerEvent.timeStamp       = new Date().getTime();
+                pointerEvent.originalEvent   = event;
+                pointerEvent.originalPointer = pointer;
+                pointerEvent.type            = eventType;
+                pointerEvent.pointerId       = getPointerId(pointer);
+                pointerEvent.pointerType     = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
                                                     : isString(pointer.pointerType)
                                                         ? pointer.pointerType
                                                         : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
