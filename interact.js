@@ -4044,13 +4044,15 @@
             if (isObject(options)) {
                 this.options.drop.enabled = options.enabled === false? false: true;
                 this.setOnEvents('drop', options);
-                this.accept(options.accept);
 
                 if (/^(pointer|center)$/.test(options.overlap)) {
                     this.options.drop.overlap = options.overlap;
                 }
                 else if (isNumber(options.overlap)) {
                     this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
+                }
+                if ('accept' in options) {
+                  this.options.drop.accept = options.accept;
                 }
                 if ('checker' in options) {
                   this.options.drop.checker = options.checker;
