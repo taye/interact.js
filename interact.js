@@ -2598,6 +2598,7 @@
                 // remove this interaction if it's not the only one of it's type
                 if (interactions[i] !== this && interactions[i].mouse === this.mouse) {
                     interactions.splice(indexOf(interactions, this), 1);
+                    break;
                 }
             }
         },
