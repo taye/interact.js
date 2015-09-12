@@ -1169,6 +1169,7 @@
         this.inertiaStatus = {
             active       : false,
             smoothEnd    : false,
+            ending       : false,
 
             startEvent: null,
             upCoords: {},
@@ -2166,7 +2167,7 @@
 
             if (this.interacting()) {
 
-                if (inertiaStatus.active) { return; }
+                if (inertiaStatus.active && !inertiaStatus.ending) { return; }
 
                 var pointerSpeed,
                     now = new Date().getTime(),
@@ -2635,13 +2636,15 @@
                 inertiaStatus.i = reqFrame(this.boundInertiaFrame);
             }
             else {
+                inertiaStatus.ending = true;
+
                 inertiaStatus.sx = inertiaStatus.modifiedXe;
                 inertiaStatus.sy = inertiaStatus.modifiedYe;
 
                 this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
-
-                inertiaStatus.active = false;
                 this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.active = inertiaStatus.ending = false;
             }
         },
 
@@ -2659,15 +2662,16 @@
                 inertiaStatus.i = reqFrame(this.boundSmoothEndFrame);
             }
             else {
+                inertiaStatus.ending = true;
+
                 inertiaStatus.sx = inertiaStatus.xe;
                 inertiaStatus.sy = inertiaStatus.ye;
 
                 this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
-
-                inertiaStatus.active = false;
-                inertiaStatus.smoothEnd = false;
-
                 this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+                inertiaStatus.smoothEnd =
+                  inertiaStatus.active = inertiaStatus.ending = false;
             }
         },
 
