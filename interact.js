@@ -1925,7 +1925,7 @@
             var target = this.target,
                 dragEvent  = new InteractEvent(this, event, 'drag', 'move', this.element),
                 draggableElement = this.element,
-                drop = this.getDrop(event, draggableElement);
+                drop = this.getDrop(dragEvent, event, draggableElement);
 
             this.dropTarget = drop.dropzone;
             this.dropElement = drop.element;
@@ -2309,7 +2309,7 @@
                 endEvent = new InteractEvent(this, event, 'drag', 'end', this.element);
 
                 var draggableElement = this.element,
-                    drop = this.getDrop(event, draggableElement);
+                    drop = this.getDrop(endEvent, event, draggableElement);
 
                 this.dropTarget = drop.dropzone;
                 this.dropElement = drop.element;
@@ -2417,7 +2417,7 @@
             }
         },
 
-        getDrop: function (event, dragElement) {
+        getDrop: function (dragEvent, event, dragElement) {
             var validDrops = [];
 
             if (dynamicDrop) {
@@ -2430,7 +2430,7 @@
                     currentElement = this.activeDrops.elements [j],
                     rect           = this.activeDrops.rects    [j];
 
-                validDrops.push(current.dropCheck(this.pointers[0], event, this.target, dragElement, currentElement, rect)
+                validDrops.push(current.dropCheck(dragEvent, event, this.target, dragElement, currentElement, rect)
                                 ? currentElement
                                 : null);
             }
@@ -4072,21 +4072,21 @@
             return this.options.drop;
         },
 
-        dropCheck: function (pointer, event, draggable, draggableElement, dropElement, rect) {
+        dropCheck: function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
             var dropped = false;
 
             // if the dropzone has no rect (eg. display: none)
             // call the custom dropChecker or just return false
             if (!(rect = rect || this.getRect(dropElement))) {
                 return (this.options.drop.checker
-                    ? this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
+                    ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement)
                     : false);
             }
 
             var dropOverlap = this.options.drop.overlap;
 
             if (dropOverlap === 'pointer') {
-                var page = getPageXY(pointer),
+                var page = getPageXY(dragEvent),
                     origin = getOriginXY(draggable, draggableElement),
                     horizontal,
                     vertical;
@@ -4118,7 +4118,7 @@
             }
 
             if (this.options.drop.checker) {
-                dropped = this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement);
+                dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
             }
 
             return dropped;
