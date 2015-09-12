@@ -773,7 +773,9 @@
             pageX: (touches[0].pageX + touches[1].pageX) / 2,
             pageY: (touches[0].pageY + touches[1].pageY) / 2,
             clientX: (touches[0].clientX + touches[1].clientX) / 2,
-            clientY: (touches[0].clientY + touches[1].clientY) / 2
+            clientY: (touches[0].clientY + touches[1].clientY) / 2,
+            screenX: (touches[0].screenX + touches[1].screenX) / 2,
+            screenY: (touches[0].screenY + touches[1].screenY) / 2
         };
     }
 
