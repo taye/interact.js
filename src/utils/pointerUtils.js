@@ -110,6 +110,112 @@ const pointerUtils = {
     }
     return dest;
   },
+
+  getTouchPair: function (event) {
+    const touches = [];
+
+    // array of touches is supplied
+    if (isType.isArray(event)) {
+      touches[0] = event[0];
+      touches[1] = event[1];
+    }
+    // an event
+    else {
+      if (event.type === 'touchend') {
+        if (event.touches.length === 1) {
+          touches[0] = event.touches[0];
+          touches[1] = event.changedTouches[0];
+        }
+        else if (event.touches.length === 0) {
+          touches[0] = event.changedTouches[0];
+          touches[1] = event.changedTouches[1];
+        }
+      }
+      else {
+        touches[0] = event.touches[0];
+        touches[1] = event.touches[1];
+      }
+    }
+
+    return touches;
+  },
+
+  touchAverage: function (event) {
+    const touches = pointerUtils.getTouchPair(event);
+
+    return {
+      pageX: (touches[0].pageX + touches[1].pageX) / 2,
+      pageY: (touches[0].pageY + touches[1].pageY) / 2,
+      clientX: (touches[0].clientX + touches[1].clientX) / 2,
+      clientY: (touches[0].clientY + touches[1].clientY) / 2,
+    };
+  },
+
+  touchBBox: function (event) {
+    if (!event.length && !(event.touches && event.touches.length > 1)) {
+      return;
+    }
+
+    const touches = pointerUtils.getTouchPair(event);
+    const minX = Math.min(touches[0].pageX, touches[1].pageX);
+    const minY = Math.min(touches[0].pageY, touches[1].pageY);
+    const maxX = Math.max(touches[0].pageX, touches[1].pageX);
+    const maxY = Math.max(touches[0].pageY, touches[1].pageY);
+
+    return {
+      x: minX,
+      y: minY,
+      left: minX,
+      top: minY,
+      width: maxX - minX,
+      height: maxY - minY,
+    };
+  },
+
+  touchDistance: function (event, deltaSource) {
+    deltaSource = deltaSource;
+
+    const sourceX = deltaSource + 'X';
+    const sourceY = deltaSource + 'Y';
+    const touches = pointerUtils.getTouchPair(event);
+
+
+    const dx = touches[0][sourceX] - touches[1][sourceX];
+    const dy = touches[0][sourceY] - touches[1][sourceY];
+
+    return hypot(dx, dy);
+  },
+
+  touchAngle: function (event, prevAngle, deltaSource) {
+    deltaSource = deltaSource;
+
+    const sourceX = deltaSource + 'X';
+    const sourceY = deltaSource + 'Y';
+    const touches = pointerUtils.getTouchPair(event);
+    const dx = touches[0][sourceX] - touches[1][sourceX];
+    const dy = touches[0][sourceY] - touches[1][sourceY];
+    let angle = 180 * Math.atan(dy / dx) / Math.PI;
+
+    if (isType.isNumber(prevAngle)) {
+      const dr = angle - prevAngle;
+      const drClamped = dr % 360;
+
+      if (drClamped > 315) {
+        angle -= 360 + (angle / 360)|0 * 360;
+      }
+      else if (drClamped > 135) {
+        angle -= 180 + (angle / 360)|0 * 360;
+      }
+      else if (drClamped < -315) {
+        angle += 360 + (angle / 360)|0 * 360;
+      }
+      else if (drClamped < -135) {
+        angle += 180 + (angle / 360)|0 * 360;
+      }
+    }
+
+    return  angle;
+  },
 };
 
 module.exports = pointerUtils;
