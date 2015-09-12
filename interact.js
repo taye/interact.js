@@ -643,7 +643,9 @@
             }
         }
         // Opera Mobile handles the viewport and scrolling oddly
-        else if (isOperaMobile) {
+        else if (isOperaMobile
+                 && (pointer instanceof window.Event
+                     || (supportsTouch && window.Touch && pointer instanceof window.Touch))) {
             getXY('screen', pointer, page);
 
             page.x += window.scrollX;
@@ -671,9 +673,14 @@
                 client.y = pointer.clientY;
             }
         }
-        else {
+        else if (isOperaMobile
+                 && (pointer instanceof window.Event
+                     || (supportsTouch && window.Touch && pointer instanceof window.Touch))) {
             // Opera Mobile handles the viewport and scrolling oddly
-            getXY(isOperaMobile? 'screen': 'client', pointer, client);
+            getXY('screen', pointer, client);
+        }
+        else {
+          getXY('client', pointer, client);
         }
 
         return client;
