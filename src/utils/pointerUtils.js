@@ -5,7 +5,6 @@ const hypot         = require('./hypot');
 const extend        = require('./extend');
 const browser       = require('./browser');
 const isType        = require('./isType');
-const InteractEvent = require('../InteractEvent');
 
 pointerUtils.copyCoords = function (dest, src) {
   dest.page = dest.page || {};
@@ -40,66 +39,61 @@ pointerUtils.setEventDeltas = function (targetObj, prev, cur) {
   targetObj.client.vy    = targetObj.client.y / dt;
 };
 
+pointerUtils.isInertiaPointer = function (pointer) {
+  return (!!pointer.interaction && /inertiastart/.test(pointer.type));
+};
+
 // Get specified X/Y coords for mouse or event.touches[0]
-pointerUtils.getXY = function (type, pointer, xy) {
-  xy = xy || {};
+pointerUtils.getXY = function (type, pointer, xy, inertia) {
+  xy   = xy   || {};
   type = type || 'page';
 
-  xy.x = pointer[type + 'X'];
-  xy.y = pointer[type + 'Y'];
+  if (inertia) {
+    var interaction = pointer.interaction;
+
+    extend(xy, interaction.inertiaStatus.upCoords[type]);
+
+    xy.x += interaction.inertiaStatus.sx;
+    xy.y += interaction.inertiaStatus.sy;
+  }
+  else {
+    xy.x = pointer[type + 'X'];
+    xy.y = pointer[type + 'Y'];
+  }
 
   return xy;
 };
 
-pointerUtils.getPageXY = function (pointer, page, interaction) {
+pointerUtils.getPageXY = function (pointer, page) {
   page = page || {};
 
-  if (pointer instanceof InteractEvent) {
-    if (/inertiastart/.test(pointer.type)) {
-      interaction = interaction || pointer.interaction;
+  const inertia = pointerUtils.isInertiaPointer(pointer);
 
-      extend(page, interaction.inertiaStatus.upCoords.page);
-
-      page.x += interaction.inertiaStatus.sx;
-      page.y += interaction.inertiaStatus.sy;
-    }
-    else {
-      page.x = pointer.pageX;
-      page.y = pointer.pageY;
-    }
-  }
   // Opera Mobile handles the viewport and scrolling oddly
-  else if (browser.isOperaMobile) {
-    pointerUtils.getXY('screen', pointer, page);
+  if (browser.isOperaMobile && !inertia) {
+    pointerUtils.getXY('screen', pointer, page, inertia);
 
     page.x += win.window.scrollX;
     page.y += win.window.scrollY;
   }
   else {
-    pointerUtils.getXY('page', pointer, page);
+    pointerUtils.getXY('page', pointer, page, inertia);
   }
 
   return page;
 };
 
-pointerUtils.getClientXY = function (pointer, client, interaction) {
+pointerUtils.getClientXY = function (pointer, client) {
   client = client || {};
 
-  if (pointer instanceof InteractEvent) {
-    if (/inertiastart/.test(pointer.type)) {
-      extend(client, interaction.inertiaStatus.upCoords.client);
+  const inertia = pointerUtils.isInertiaPointer(pointer);
 
-      client.x += interaction.inertiaStatus.sx;
-      client.y += interaction.inertiaStatus.sy;
-    }
-    else {
-      client.x = pointer.clientX;
-      client.y = pointer.clientY;
-    }
+  // Opera Mobile handles the viewport and scrolling oddly
+  if (browser.isOperaMobile && !inertia) {
+    client = pointerUtils.getXY('screen', pointer, client, inertia);
   }
   else {
-    // Opera Mobile handles the viewport and scrolling oddly
-    pointerUtils.getXY(browser.isOperaMobile? 'screen': 'client', pointer, client);
+    client = pointerUtils.getXY('client', pointer, client, inertia);
   }
 
   return client;
