@@ -575,15 +575,10 @@
         dest.timeStamp = src.timeStamp;
     }
 
-    function setEventXY (targetObj, pointer, interaction) {
-        if (!pointer) {
-            if (interaction.pointerIds.length > 1) {
-                pointer = touchAverage(interaction.pointers);
-            }
-            else {
-                pointer = interaction.pointers[0];
-            }
-        }
+    function setEventXY (targetObj, pointers, interaction) {
+        var pointer = (pointers.length > 1
+                       ? pointerAverage(pointers)
+                       : pointers[0]);
 
         getPageXY(pointer, tmpXY, interaction);
         targetObj.page.x = tmpXY.x;
@@ -773,17 +768,27 @@
         return touches;
     }
 
-    function touchAverage (event) {
-        var touches = getTouchPair(event);
-
-        return {
-            pageX: (touches[0].pageX + touches[1].pageX) / 2,
-            pageY: (touches[0].pageY + touches[1].pageY) / 2,
-            clientX: (touches[0].clientX + touches[1].clientX) / 2,
-            clientY: (touches[0].clientY + touches[1].clientY) / 2,
-            screenX: (touches[0].screenX + touches[1].screenX) / 2,
-            screenY: (touches[0].screenY + touches[1].screenY) / 2
+    function pointerAverage (pointers) {
+        var average = {
+            pageX  : 0,
+            pageY  : 0,
+            clientX: 0,
+            clientY: 0,
+            screenX: 0,
+            screenY: 0
         };
+        var prop;
+
+        for (var i = 0; i < pointers.length; i++) {
+            for (prop in average) {
+                average[prop] += pointers[i][prop];
+            }
+        }
+        for (prop in average) {
+            average[prop] /= pointers.length;
+        }
+
+        return average;
     }
 
     function touchBBox (event) {
@@ -1400,7 +1405,7 @@
                 var action;
 
                 // update pointer coords for defaultActionChecker to use
-                this.setEventXY(this.curCoords, pointer);
+                this.setEventXY(this.curCoords, [pointer]);
 
                 if (matches) {
                     action = this.validateSelector(pointer, event, matches, matchElements);
@@ -1495,7 +1500,7 @@
             }
 
             // update pointer coords for defaultActionChecker to use
-            this.setEventXY(this.curCoords, pointer);
+            this.setEventXY(this.curCoords, [pointer]);
             this.downEvent = event;
 
             while (isElement(element) && !action) {
@@ -1568,7 +1573,7 @@
             if (target && (forceAction || !this.prepared.name)) {
                 action = action || validateAction(forceAction || target.getAction(pointer, event, this, curEventTarget), target, this.element);
 
-                this.setEventXY(this.startCoords);
+                this.setEventXY(this.startCoords, this.pointers);
 
                 if (!action) { return; }
 
@@ -1593,7 +1598,7 @@
                 this.downTargets[pointerIndex] = eventTarget;
                 pointerExtend(this.downPointer, pointer);
 
-                this.setEventXY(this.prevCoords);
+                copyCoords(this.prevCoords, this.startCoords);
                 this.pointerWasMoved = false;
 
                 this.checkAndPreventDefault(event, target, this.element);
@@ -1736,7 +1741,7 @@
             this.target         = interactable;
             this.element        = element;
 
-            this.setEventXY(this.startCoords);
+            this.setEventXY(this.startCoords, this.pointers);
             this.setStartOffsets(action.name, interactable, element);
             this.setModifications(this.startCoords.page);
 
@@ -1746,9 +1751,22 @@
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
             this.recordPointer(pointer);
 
-            this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
-                                                ? this.inertiaStatus.startEvent
-                                                : undefined);
+            if (this.inertiaStatus.active) {
+                var pageUp   = this.inertiaStatus.upCoords.page;
+                var clientUp = this.inertiaStatus.upCoords.client;
+
+                var inertiaPosition = {
+                    pageX  : pageUp.x   + this.inertiaStatus.sx,
+                    pageY  : pageUp.y   + this.inertiaStatus.sy,
+                    clientX: clientUp.x + this.inertiaStatus.sx,
+                    clientY: clientUp.y + this.inertiaStatus.sy
+                };
+
+                this.setEventXY(this.curCoords, [inertiaPosition]);
+            }
+            else {
+                this.setEventXY(this.curCoords, this.pointers);
+            }
 
             var duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
                                  && this.curCoords.page.y === this.prevCoords.page.y
@@ -2702,10 +2720,7 @@
 
             if (index === -1) { return; }
 
-            if (!this.interacting()) {
-                this.pointers.splice(index, 1);
-            }
-
+            this.pointers   .splice(index, 1);
             this.pointerIds .splice(index, 1);
             this.downTargets.splice(index, 1);
             this.downTimes  .splice(index, 1);
@@ -5554,7 +5569,7 @@
     };
 
     // expose the functions used to calculate multi-touch properties
-    interact.getTouchAverage  = touchAverage;
+    interact.getPointerAverage = pointerAverage;
     interact.getTouchBBox     = touchBBox;
     interact.getTouchDistance = touchDistance;
     interact.getTouchAngle    = touchAngle;
