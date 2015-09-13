@@ -1,7 +1,6 @@
-const win     = require('./window');
 const hypot   = require('./hypot');
-const extend  = require('./extend');
 const browser = require('./browser');
+const dom     = require('./domObjects');
 const isType  = require('./isType');
 
 const pointerUtils = {
@@ -38,27 +37,17 @@ const pointerUtils = {
     targetObj.client.vy    = targetObj.client.y / dt;
   },
 
-  isInertiaPointer: function (pointer) {
-    return (!!pointer.interaction && /inertiastart/.test(pointer.type));
+  isNativePointer: function  (pointer) {
+    return (pointer instanceof dom.Event || pointer instanceof dom.Touch);
   },
 
   // Get specified X/Y coords for mouse or event.touches[0]
-  getXY: function (type, pointer, xy, inertia) {
-    xy   = xy   || {};
+  getXY: function (type, pointer, xy) {
+    xy = xy || {};
     type = type || 'page';
 
-    if (inertia) {
-      const interaction = pointer.interaction;
-
-      extend(xy, interaction.inertiaStatus.upCoords[type]);
-
-      xy.x += interaction.inertiaStatus.sx;
-      xy.y += interaction.inertiaStatus.sy;
-    }
-    else {
-      xy.x = pointer[type + 'X'];
-      xy.y = pointer[type + 'Y'];
-    }
+    xy.x = pointer[type + 'X'];
+    xy.y = pointer[type + 'Y'];
 
     return xy;
   },
@@ -66,17 +55,15 @@ const pointerUtils = {
   getPageXY: function (pointer, page) {
     page = page || {};
 
-    const inertia = pointerUtils.isInertiaPointer(pointer);
-
     // Opera Mobile handles the viewport and scrolling oddly
-    if (browser.isOperaMobile && !inertia) {
-      pointerUtils.getXY('screen', pointer, page, inertia);
+    if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+      pointerUtils.getXY('screen', pointer, page);
 
-      page.x += win.window.scrollX;
-      page.y += win.window.scrollY;
+      page.x += window.scrollX;
+      page.y += window.scrollY;
     }
     else {
-      pointerUtils.getXY('page', pointer, page, inertia);
+      pointerUtils.getXY('page', pointer, page);
     }
 
     return page;
@@ -85,14 +72,12 @@ const pointerUtils = {
   getClientXY: function (pointer, client) {
     client = client || {};
 
-    const inertia = pointerUtils.isInertiaPointer(pointer);
-
-    // Opera Mobile handles the viewport and scrolling oddly
-    if (browser.isOperaMobile && !inertia) {
-      client = pointerUtils.getXY(browser.isOperaMobile? 'screen': 'client', pointer, client, inertia);
+    if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+      // Opera Mobile handles the viewport and scrolling oddly
+      pointerUtils.getXY('screen', pointer, client);
     }
     else {
-      client = pointerUtils.getXY('client', pointer, client, inertia);
+      pointerUtils.getXY('client', pointer, client);
     }
 
     return client;
@@ -140,15 +125,26 @@ const pointerUtils = {
     return touches;
   },
 
-  touchAverage: function (event) {
-    const touches = pointerUtils.getTouchPair(event);
-
-    return {
-      pageX: (touches[0].pageX + touches[1].pageX) / 2,
-      pageY: (touches[0].pageY + touches[1].pageY) / 2,
-      clientX: (touches[0].clientX + touches[1].clientX) / 2,
-      clientY: (touches[0].clientY + touches[1].clientY) / 2,
+  pointerAverage: function (pointers) {
+    const average = {
+      pageX  : 0,
+      pageY  : 0,
+      clientX: 0,
+      clientY: 0,
+      screenX: 0,
+      screenY: 0,
     };
+
+    for (const pointer of pointers) {
+      for (const prop in average) {
+        average[prop] += pointer[prop];
+      }
+    }
+    for (const prop in average) {
+      average[prop] /= pointers.length;
+    }
+
+    return average;
   },
 
   touchBBox: function (event) {

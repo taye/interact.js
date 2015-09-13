@@ -31,7 +31,7 @@ const drop = {
 
   move: function (interaction, event, dragEvent) {
     const draggableElement = interaction.element;
-    const dropOptions = getDrop(interaction, event, draggableElement);
+    const dropOptions = getDrop(dragEvent, event, draggableElement);
 
     interaction.dropTarget  = dropOptions.dropzone;
     interaction.dropElement = dropOptions.element;
@@ -50,7 +50,7 @@ const drop = {
 
   end: function (interaction, event, endEvent) {
     const draggableElement = interaction.element;
-    const dropResult = getDrop(interaction, event, draggableElement);
+    const dropResult = getDrop(endEvent, event, draggableElement);
 
     interaction.dropTarget  = dropResult.dropzone;
     interaction.dropElement = dropResult.element;
@@ -148,7 +148,8 @@ function setActiveDrops (interaction, dragElement) {
   }
 }
 
-function getDrop (interaction, event, dragElement) {
+function getDrop (dragEvent, event, dragElement) {
+  const interaction = dragEvent.interaction;
   const validDrops = [];
 
   if (scope.dynamicDrop) {
@@ -161,7 +162,7 @@ function getDrop (interaction, event, dragElement) {
     const currentElement = interaction.activeDrops.elements [j];
     const rect           = interaction.activeDrops.rects    [j];
 
-    validDrops.push(current.dropCheck(interaction.pointers[0], event, interaction.target, dragElement, currentElement, rect)
+    validDrops.push(current.dropCheck(dragEvent, event, interaction.target, dragElement, currentElement, rect)
       ? currentElement
       : null);
   }
@@ -316,13 +317,14 @@ Interactable.prototype.dropzone = function (options) {
     if (utils.isFunction(options.ondragleave)     ) { this.ondragleave      = options.ondragleave     ; }
     if (utils.isFunction(options.ondropmove)      ) { this.ondropmove       = options.ondropmove      ; }
 
-    this.accept(options.accept);
-
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
     }
     else if (utils.isNumber(options.overlap)) {
       this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
+    }
+    if ('accept' in options) {
+      this.options.drop.accept = options.accept;
     }
     if ('checker' in options) {
       this.options.drop.checker = options.checker;
@@ -341,14 +343,14 @@ Interactable.prototype.dropzone = function (options) {
   return this.options.drop;
 };
 
-Interactable.prototype.dropCheck = function (pointer, event, draggable, draggableElement, dropElement, rect) {
+Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
   let dropped = false;
 
   // if the dropzone has no rect (eg. display: none)
   // call the custom dropChecker or just return false
   if (!(rect = rect || this.getRect(dropElement))) {
     return (this.options.drop.checker
-      ? this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement)
+      ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement)
       : false);
   }
 
@@ -356,7 +358,7 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
 
   if (dropOverlap === 'pointer') {
     const origin = utils.getOriginXY(draggable, draggableElement);
-    const page = utils.getPageXY(pointer);
+    const page = utils.getPageXY(dragEvent);
     let horizontal;
     let vertical;
 
@@ -388,7 +390,7 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
   }
 
   if (this.options.drop.checker) {
-    dropped = this.options.drop.checker(pointer, event, dropped, this, dropElement, draggable, draggableElement);
+    dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
   }
 
   return dropped;
@@ -408,9 +410,9 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
  *
  * The checker function takes the following arguments:
  *
- - pointer (Touch | PointerEvent | MouseEvent) The pointer/event that ends a drag
- - event (TouchEvent | PointerEvent | MouseEvent) The event related to the pointer
- - dropped (boolean) The value from the default drop check
+ - dragEvent (InteractEvent) The related dragmove or dragend event
+ - event (TouchEvent | PointerEvent | MouseEvent) The user move/up/end Event related to the dragEvent
+ - dropped (boolean) The value from the default drop checker
  - dropzone (Interactable) The dropzone interactable
  - dropElement (Element) The dropzone element
  - draggable (Interactable) The Interactable being dragged
@@ -418,9 +420,9 @@ Interactable.prototype.dropCheck = function (pointer, event, draggable, draggabl
  *
  > Usage:
  | interact(target)
- | .dropChecker(function (pointer,           // Touch/PointerEvent/MouseEvent
+ | .dropChecker(function(dragEvent,         // related dragmove or dragend event
  |                       event,             // TouchEvent/PointerEvent/MouseEvent
- |                       dropped,           // result of the default checker
+ |                       dropped,           // bool result of the default checker
  |                       dropzone,          // dropzone Interactable
  |                       dropElement,       // dropzone elemnt
  |                       draggable,         // draggable Interactable

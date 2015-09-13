@@ -4,6 +4,7 @@ const InteractEvent  = require('./InteractEvent');
 const events         = require('./utils/events');
 const signals        = require('./utils/signals');
 const browser        = require('./utils/browser');
+const finder         = require('./utils/interactionFinder');
 const actions        = require('./actions/base');
 const modifiers      = require('./modifiers/');
 const animationFrame = utils.raf;
@@ -36,6 +37,7 @@ class Interaction {
     this.inertiaStatus = {
       active   : false,
       smoothEnd: false,
+      ending   : false,
 
       startEvent: null,
       upCoords  : {},
@@ -135,15 +137,10 @@ class Interaction {
     scope.interactions.push(this);
   }
 
-  setEventXY (targetObj, pointer) {
-    if (!pointer) {
-      if (this.pointerIds.length > 1) {
-        pointer = utils.touchAverage(this.pointers);
-      }
-      else {
-        pointer = this.pointers[0];
-      }
-    }
+  setEventXY (targetObj, pointers) {
+    const pointer = (pointers.length > 1
+                     ? utils.pointerAverage(pointers)
+                     : pointers[0]);
 
     const tmpXY = {};
 
@@ -247,7 +244,7 @@ class Interaction {
       let action;
 
       // update pointer coords for defaultActionChecker to use
-      this.setEventXY(this.curCoords, pointer);
+      this.setEventXY(this.curCoords, [pointer]);
 
       if (matches) {
         action = this.validateSelector(pointer, event, matches, matchElements);
@@ -341,7 +338,7 @@ class Interaction {
     };
 
     // update pointer coords for defaultActionChecker to use
-    this.setEventXY(this.curCoords, pointer);
+    this.setEventXY(this.curCoords, [pointer]);
     this.downEvent = event;
 
     while (utils.isElement(element) && !action) {
@@ -410,7 +407,7 @@ class Interaction {
     if (target && (forceAction || !this.prepared.name)) {
       action = action || validateAction(forceAction || target.getAction(pointer, event, this, curEventTarget), target, this.element);
 
-      this.setEventXY(this.startCoords);
+      this.setEventXY(this.startCoords, this.pointers);
 
       if (!action) { return; }
 
@@ -434,7 +431,7 @@ class Interaction {
       this.downTargets[pointerIndex] = eventTarget;
       utils.pointerExtend(this.downPointer, pointer);
 
-      this.setEventXY(this.prevCoords);
+      utils.copyCoords(this.prevCoords, this.startCoords);
       this.pointerWasMoved = false;
 
       this.checkAndPreventDefault(event, target, this.element);
@@ -522,7 +519,7 @@ class Interaction {
     this.target         = interactable;
     this.element        = element;
 
-    this.setEventXY(this.startCoords);
+    this.setEventXY(this.startCoords, this.pointers);
     this.setStartOffsets(action.name, interactable, element, this.modifierOffsets);
 
     modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
@@ -531,11 +528,21 @@ class Interaction {
   }
 
   pointerMove (pointer, event, eventTarget, curEventTarget, preEnd) {
-    this.recordPointer(pointer);
+    if (this.inertiaStatus.active) {
+      const pageUp   = this.inertiaStatus.upCoords.page;
+      const clientUp = this.inertiaStatus.upCoords.client;
 
-    this.setEventXY(this.curCoords, (pointer instanceof InteractEvent)
-        ? this.inertiaStatus.startEvent
-        : undefined);
+      this.setEventXY(this.curCoords, [ {
+        pageX  : pageUp.x   + this.inertiaStatus.sx,
+        pageY  : pageUp.y   + this.inertiaStatus.sy,
+        clientX: clientUp.x + this.inertiaStatus.sx,
+        clientY: clientUp.y + this.inertiaStatus.sy,
+      } ]);
+    }
+    else {
+      this.recordPointer(pointer);
+      this.setEventXY(this.curCoords, this.pointers);
+    }
 
     const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
     && this.curCoords.page.y === this.prevCoords.page.y
@@ -665,7 +672,7 @@ class Interaction {
 
     if (this.interacting()) {
 
-      if (inertiaStatus.active) { return; }
+      if (inertiaStatus.active && !inertiaStatus.ending) { return; }
 
       const now = new Date().getTime();
       const statuses = {};
@@ -818,6 +825,7 @@ class Interaction {
       // remove this interaction if it's not the only one of it's type
       if (scope.interactions[i] !== this && scope.interactions[i].mouse === this.mouse) {
         scope.interactions.splice(utils.indexOf(scope.interactions, this), 1);
+        break;
       }
     }
   }
@@ -853,13 +861,15 @@ class Interaction {
       inertiaStatus.i = animationFrame.request(this.boundInertiaFrame);
     }
     else {
+      inertiaStatus.ending = true;
+
       inertiaStatus.sx = inertiaStatus.modifiedXe;
       inertiaStatus.sy = inertiaStatus.modifiedYe;
 
       this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
-      inertiaStatus.active = false;
       this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+      inertiaStatus.active = inertiaStatus.ending = false;
     }
   }
 
@@ -877,15 +887,16 @@ class Interaction {
       inertiaStatus.i = animationFrame.request(this.boundSmoothEndFrame);
     }
     else {
+      inertiaStatus.ending = true;
+
       inertiaStatus.sx = inertiaStatus.xe;
       inertiaStatus.sy = inertiaStatus.ye;
 
       this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
-
-      inertiaStatus.active = false;
-      inertiaStatus.smoothEnd = false;
-
       this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+
+      inertiaStatus.smoothEnd =
+        inertiaStatus.active = inertiaStatus.ending = false;
     }
   }
 
@@ -909,10 +920,7 @@ class Interaction {
 
     if (index === -1) { return; }
 
-    if (!this.interacting()) {
-      this.pointers.splice(index, 1);
-    }
-
+    this.pointers   .splice(index, 1);
     this.pointerIds .splice(index, 1);
     this.downTargets.splice(index, 1);
     this.downTimes  .splice(index, 1);
@@ -920,10 +928,6 @@ class Interaction {
   }
 
   recordPointer (pointer) {
-    // Do not update pointers while inertia is active.
-    // The inertia start event should be this.pointers[0]
-    if (this.inertiaStatus.active) { return; }
-
     const index = this.mouse? 0: utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     if (index === -1) { return; }
@@ -1018,142 +1022,57 @@ for (let i = 0, len = methodNames.length; i < len; i++) {
   listeners[method] = doOnInteractions(method);
 }
 
-function getInteractionFromPointer (pointer, eventType, eventTarget) {
-  const mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
-                      // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                      || pointer.pointerType === 4);
-  let i = 0;
-  const len = scope.interactions.length;
-  let interaction;
-
-  const id = utils.getPointerId(pointer);
-
-  // try to resume inertia with a new pointer
-  if (/down|start/i.test(eventType)) {
-    for (i = 0; i < len; i++) {
-      interaction = scope.interactions[i];
-
-      let element = eventTarget;
-
-      if (interaction.inertiaStatus.active && interaction.target.options[interaction.prepared.name].inertia.allowResume
-          && (interaction.mouse === mouseEvent)) {
-        while (element) {
-          // if the element is the interaction element
-          if (element === interaction.element) {
-            // update the interaction's pointer
-            if (interaction.pointers[0]) {
-              interaction.removePointer(interaction.pointers[0]);
-            }
-            interaction.addPointer(pointer);
-
-            return interaction;
-          }
-          element = utils.parentElement(element);
-        }
-      }
-    }
-  }
-
-  // if it's a mouse interaction
-  if (mouseEvent || !(browser.supportsTouch || browser.supportsPointerEvent)) {
-
-    // find a mouse interaction that's not in inertia phase
-    for (i = 0; i < len; i++) {
-      if (scope.interactions[i].mouse && !scope.interactions[i].inertiaStatus.active) {
-        return scope.interactions[i];
-      }
-    }
-
-    // find any interaction specifically for mouse.
-    // if the eventType is a mousedown, and inertia is active
-    // ignore the interaction
-    for (i = 0; i < len; i++) {
-      if (scope.interactions[i].mouse && !(/down/.test(eventType) && scope.interactions[i].inertiaStatus.active)) {
-        return interaction;
-      }
-    }
-
-    // create a new interaction for mouse
-    interaction = new Interaction();
-    interaction.mouse = true;
-
-    return interaction;
-  }
-
-  // get interaction that has this pointer
-  for (i = 0; i < len; i++) {
-    if (utils.contains(scope.interactions[i].pointerIds, id)) {
-      return scope.interactions[i];
-    }
-  }
-
-  // at this stage, a pointerUp should not return an interaction
-  if (/up|end|out/i.test(eventType)) {
-    return null;
-  }
-
-  // get first idle interaction
-  for (i = 0; i < len; i++) {
-    interaction = scope.interactions[i];
-
-    if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
-        && !interaction.interacting()
-        && !(!mouseEvent && interaction.mouse)) {
-
-      interaction.addPointer(pointer);
-
-      return interaction;
-    }
-  }
-
-  return new Interaction();
-}
-
 function doOnInteractions (method) {
   return (function (event) {
-    let interaction;
     const eventTarget = utils.getActualElement(event.path ? event.path[0] : event.target);
     const curEventTarget = utils.getActualElement(event.currentTarget);
-    let i;
+    const matches = []; // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
       scope.prevTouchTime = new Date().getTime();
 
-      for (i = 0; i < event.changedTouches.length; i++) {
-        const pointer = event.changedTouches[i];
+      for (const pointer of event.changedTouches) {
+        const interaction = finder.search(pointer, event.type, eventTarget, true);
 
-        interaction = getInteractionFromPointer(pointer, event.type, eventTarget);
-
-        if (!interaction) { continue; }
-
-        interaction._updateEventTargets(eventTarget, curEventTarget);
-
-        interaction[method](pointer, event, eventTarget, curEventTarget);
+        if (interaction) {
+          matches.push([pointer, interaction]);
+        }
       }
     }
     else {
+      let invalidPointer = false;
+
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
-        for (i = 0; i < scope.interactions.length; i++) {
-          if (!scope.interactions[i].mouse && scope.interactions[i].pointerIsDown) {
-            return;
-          }
+        for (let i = 0; i < scope.interactions.length && !invalidPointer; i++) {
+          invalidPointer = !scope.interactions[i].mouse && scope.interactions[i].pointerIsDown;
         }
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        if (new Date().getTime() - scope.prevTouchTime < 500) {
-          return;
+        invalidPointer = invalidPointer || (new Date().getTime() - scope.prevTouchTime < 500);
+
+        if (!invalidPointer) {
+          let interaction = finder.search(event, event.type, eventTarget, true);
+
+          if (!interaction && (/mouse/i.test(event.pointerType || event.type)
+                               // MSPointerEvent.MSPOINTER_TYPE_MOUSE
+                               || event.pointerType === 4)) {
+
+            interaction = new Interaction();
+            interaction.mouse = true;
+          }
+
+          if (interaction) {
+            matches.push([event, interaction]);
+          }
         }
       }
+    }
 
-      interaction = getInteractionFromPointer(event, event.type, eventTarget);
-
-      if (!interaction) { return; }
-
+    for (const [pointer, interaction] of matches) {
       interaction._updateEventTargets(eventTarget, curEventTarget);
-
-      interaction[method](event, event, eventTarget, curEventTarget);
+      interaction[method](pointer, event, eventTarget, curEventTarget);
     }
   });
 }
@@ -1264,7 +1183,6 @@ signals.fire('listen-to-document', {
   doc: scope.document,
 });
 
-Interaction.getInteractionFromPointer = getInteractionFromPointer;
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.withinLimit = scope.withinInteractionLimit;
 

@@ -254,10 +254,10 @@ interact.debug = function () {
 };
 
 // expose the functions used to calculate multi-touch properties
-interact.getTouchAverage  = utils.touchAverage;
-interact.getTouchBBox     = utils.touchBBox;
-interact.getTouchDistance = utils.touchDistance;
-interact.getTouchAngle    = utils.touchAngle;
+interact.getPointerAverage  = utils.pointerAverage;
+interact.getTouchBBox       = utils.touchBBox;
+interact.getTouchDistance   = utils.touchDistance;
+interact.getTouchAngle      = utils.touchAngle;
 
 interact.getElementRect       = utils.getElementRect;
 interact.getElementClientRect = utils.getElementClientRect;

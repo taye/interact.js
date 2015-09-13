@@ -10,6 +10,8 @@ domObjects.SVGSVGElement      = win.SVGSVGElement      || blank;
 domObjects.SVGElementInstance = win.SVGElementInstance || blank;
 domObjects.HTMLElement        = win.HTMLElement        || win.Element;
 
+domObjects.Event        = win.Event;
+domObjects.Touch        = win.Touch || blank;
 domObjects.PointerEvent = (win.PointerEvent || win.MSPointerEvent);
 
 module.exports = domObjects;

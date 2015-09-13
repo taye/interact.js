@@ -1,7 +1,7 @@
 // browser entry point
 
 // Legacy browser support
-require('./ie8');
+require('./legacyBrowsers');
 
 // actions
 require('./actions/resize');
