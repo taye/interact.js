@@ -609,6 +609,11 @@
         targetObj.client.vy    = targetObj.client.y / dt;
     }
 
+    function isNativePointer (pointer) {
+        return (pointer instanceof window.Event
+            || (supportsTouch && window.Touch && pointer instanceof window.Touch));
+    }
+
     // Get specified X/Y coords for mouse or event.touches[0]
     function getXY (type, pointer, xy) {
         xy = xy || {};
@@ -620,27 +625,11 @@
         return xy;
     }
 
-    function getPageXY (pointer, page, interaction) {
+    function getPageXY (pointer, page) {
         page = page || {};
 
-        if (pointer instanceof InteractEvent) {
-            if (/inertiastart/.test(pointer.type)) {
-                interaction = interaction || pointer.interaction;
-
-                extend(page, interaction.inertiaStatus.upCoords.page);
-
-                page.x += interaction.inertiaStatus.sx;
-                page.y += interaction.inertiaStatus.sy;
-            }
-            else {
-                page.x = pointer.pageX;
-                page.y = pointer.pageY;
-            }
-        }
         // Opera Mobile handles the viewport and scrolling oddly
-        else if (isOperaMobile
-                 && (pointer instanceof window.Event
-                     || (supportsTouch && window.Touch && pointer instanceof window.Touch))) {
+        if (isOperaMobile && isNativePointer(pointer)) {
             getXY('screen', pointer, page);
 
             page.x += window.scrollX;
@@ -653,24 +642,10 @@
         return page;
     }
 
-    function getClientXY (pointer, client, interaction) {
+    function getClientXY (pointer, client) {
         client = client || {};
 
-        if (pointer instanceof InteractEvent) {
-            if (/inertiastart/.test(pointer.type)) {
-                extend(client, interaction.inertiaStatus.upCoords.client);
-
-                client.x += interaction.inertiaStatus.sx;
-                client.y += interaction.inertiaStatus.sy;
-            }
-            else {
-                client.x = pointer.clientX;
-                client.y = pointer.clientY;
-            }
-        }
-        else if (isOperaMobile
-                 && (pointer instanceof window.Event
-                     || (supportsTouch && window.Touch && pointer instanceof window.Touch))) {
+        if (isOperaMobile && isNativePointer(pointer)) {
             // Opera Mobile handles the viewport and scrolling oddly
             getXY('screen', pointer, client);
         }
