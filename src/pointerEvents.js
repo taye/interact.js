@@ -1,10 +1,9 @@
 const scope = require('./scope');
-const Interaction = require('./Interaction');
 const InteractEvent = require('./InteractEvent');
 const utils = require('./utils');
 const browser = require('./utils/browser');
-const events = require('./utils/events');
 const signals = require('./utils/signals');
+
 const simpleSignals = [
   'interaction-down',
   'interaction-up',
@@ -192,35 +191,6 @@ for (let i = 0; i < simpleSignals.length; i++) {
   signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
 }
 
-if (browser.ie8) {
-  // http://www.quirksmode.org/dom/events/click.html
-  // >Events leading to dblclick
-  //
-  // IE8 doesn't fire down event before dblclick.
-  // This workaround tries to fire a tap and doubletap after dblclick
-  const onIE8Dblclick = function (event) {
-    const target = Interaction.getInteractionFromPointer(event);
-
-    if (!target) { return; }
-
-    const interaction = target.interaction;
-
-    if (interaction.prevTap
-        && event.clientX === interaction.prevTap.clientX
-        && event.clientY === interaction.prevTap.clientY
-        && target.eventTarget   === interaction.prevTap.target) {
-
-      interaction.downTargets[0] = target.eventTarget;
-      interaction.downTimes[0] = new Date().getTime();
-      collectEventTargets(interaction, target.pointer, target.event, target.eventTarget, 'tap');
-    }
-  };
-
-  signals.on('listen-to-document', function ({ doc }) {
-    events.add(doc, 'dblclick', onIE8Dblclick);
-  });
-}
-
 utils.merge(scope.eventTypes, [
   'down',
   'move',
@@ -231,8 +201,8 @@ utils.merge(scope.eventTypes, [
   'hold',
 ]);
 
-module.exports = {
-  firePointers: firePointers,
-  collectEventTargets: collectEventTargets,
-  preventOriginalDefault: preventOriginalDefault,
+module.exports = scope.pointerEvents = {
+  firePointers,
+  collectEventTargets,
+  preventOriginalDefault,
 };

@@ -1255,17 +1255,6 @@ signals.on('listen-to-document', function ({ doc, win }) {
     }
   });
 
-  if (browser.isIE8) {
-    // For IE's lack of Event#preventDefault
-    events.add(doc, 'selectstart', function (event) {
-      const interaction = scope.interactions[0];
-
-      if (interaction.currentAction()) {
-        interaction.checkAndPreventDefault(event);
-      }
-    });
-  }
-
   scope.documents.push(doc);
   events.documents.push(doc);
 });

@@ -3,8 +3,6 @@
 // Legacy browser support
 require('./ie8');
 
-module.exports = require('./interact');
-
 // actions
 require('./actions/resize');
 require('./actions/drag');
@@ -19,3 +17,7 @@ require('./pointerEvents');
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
+
+require('./Interaction.js');
+
+module.exports = require('./interact');
