@@ -1749,8 +1749,6 @@
         },
 
         pointerMove: function (pointer, event, eventTarget, curEventTarget, preEnd) {
-            this.recordPointer(pointer);
-
             if (this.inertiaStatus.active) {
                 var pageUp   = this.inertiaStatus.upCoords.page;
                 var clientUp = this.inertiaStatus.upCoords.client;
@@ -1765,6 +1763,7 @@
                 this.setEventXY(this.curCoords, [inertiaPosition]);
             }
             else {
+                this.recordPointer(pointer);
                 this.setEventXY(this.curCoords, this.pointers);
             }
 
@@ -2728,10 +2727,6 @@
         },
 
         recordPointer: function (pointer) {
-            // Do not update pointers while inertia is active.
-            // The inertia start event should be this.pointers[0]
-            if (this.inertiaStatus.active) { return; }
-
             var index = this.mouse? 0: indexOf(this.pointerIds, getPointerId(pointer));
 
             if (index === -1) { return; }
@@ -3212,12 +3207,6 @@
                     while (element) {
                         // if the element is the interaction element
                         if (element === interaction.element) {
-                            // update the interaction's pointer
-                            if (interaction.pointers[0]) {
-                                interaction.removePointer(interaction.pointers[0]);
-                            }
-                            interaction.addPointer(pointer);
-
                             return interaction;
                         }
                         element = parentElement(element);
@@ -3271,8 +3260,6 @@
             if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
                 && !interaction.interacting()
                 && !(!mouseEvent && interaction.mouse)) {
-
-                interaction.addPointer(pointer);
 
                 return interaction;
             }
