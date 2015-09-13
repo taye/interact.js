@@ -184,20 +184,33 @@
                     container = options.container || getWindow(autoScroll.interaction.element),
                     now = new Date().getTime(),
                     // change in time in seconds
-                    dt = (now - autoScroll.prevTime) / 1000,
-                    // displacement
-                    s = options.speed * dt;
+                    dtx = (now - autoScroll.prevTimeX) / 1000,
+                    dty = (now - autoScroll.prevTimeY) / 1000,
+                    vx, vy, sx, sy;
 
-                if (s >= 1) {
+                // displacement
+                if (options.velocity) {
+                  vx = options.velocity.x;
+                  vy = options.velocity.y;
+                }
+                else {
+                  vx = vy = options.speed
+                }
+ 
+                sx = vx * dtx;
+                sy = vy * dty;
+
+                if (sx >= 1 || sy >= 1) {
                     if (isWindow(container)) {
-                        container.scrollBy(autoScroll.x * s, autoScroll.y * s);
+                        container.scrollBy(autoScroll.x * sx, autoScroll.y * sy);
                     }
                     else if (container) {
-                        container.scrollLeft += autoScroll.x * s;
-                        container.scrollTop  += autoScroll.y * s;
+                        container.scrollLeft += autoScroll.x * sx;
+                        container.scrollTop  += autoScroll.y * sy;
                     }
 
-                    autoScroll.prevTime = now;
+                    if (sx >=1) autoScroll.prevTimeX = now;
+                    if (sy >= 1) autoScroll.prevTimeY = now;
                 }
 
                 if (autoScroll.isScrolling) {
@@ -207,14 +220,16 @@
             },
 
             isScrolling: false,
-            prevTime: 0,
+            prevTimeX: 0,
+            prevTimeY: 0,
 
             start: function (interaction) {
                 autoScroll.isScrolling = true;
                 cancelFrame(autoScroll.i);
 
                 autoScroll.interaction = interaction;
-                autoScroll.prevTime = new Date().getTime();
+                autoScroll.prevTimeX = new Date().getTime();
+                autoScroll.prevTimeY = new Date().getTime();
                 autoScroll.i = reqFrame(autoScroll.scroll);
             },
 
