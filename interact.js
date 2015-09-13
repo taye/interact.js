@@ -4151,9 +4151,9 @@
          *
          * The checker function takes the following arguments:
          *
-         - pointer (Touch | PointerEvent | MouseEvent) The pointer/event that ends a drag
-         - event (TouchEvent | PointerEvent | MouseEvent) The event related to the pointer
-         - dropped (boolean) The value from the default drop check
+         - dragEvent (InteractEvent) The related dragmove or dragend event
+         - event (TouchEvent | PointerEvent | MouseEvent) The user move/up/end Event related to the dragEvent
+         - dropped (boolean) The value from the default drop checker
          - dropzone (Interactable) The dropzone interactable
          - dropElement (Element) The dropzone element
          - draggable (Interactable) The Interactable being dragged
@@ -4161,9 +4161,9 @@
          *
          > Usage:
          | interact(target)
-         | .dropChecker(function(pointer,           // Touch/PointerEvent/MouseEvent
+         | .dropChecker(function(dragEvent,         // related dragmove or dragend event
          |                       event,             // TouchEvent/PointerEvent/MouseEvent
-         |                       dropped,           // result of the default checker
+         |                       dropped,           // bool result of the default checker
          |                       dropzone,          // dropzone Interactable
          |                       dropElement,       // dropzone elemnt
          |                       draggable,         // draggable Interactable
