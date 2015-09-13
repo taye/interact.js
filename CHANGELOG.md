@@ -1,4 +1,10 @@
-## Upcomming Changes
+## Upcoming Changes
+
+### Fixes
+
+ - incorrect coordinates of the first movement of every action
+
+## 1.2.5
 
 ### Changed parameters to actionChecker and drop.checker
 
@@ -27,7 +33,8 @@ See https://github.com/taye/interact.js/issues/166#issuecomment-91234390
 ### Fixes
 
  - touch coords on Presto Opera Mobile - see commits [886e54c](https://github.com/taye/interact.js/commit/886e54c) and [5a3a850](https://github.com/taye/interact.js/commit/5a3a850)
- - avoid accessing some recently deprecated event properties in Blink - see
+ - bug with multiple pointers - see commit [64882d3](https://github.com/taye/interact.js/commit/64882d3)
+ - accessing certain recently deprecated event properties in Blink - see
    commits [e91fbc6](https://github.com/taye/interact.js/commit/e91fbc6) and [195cfe9](https://github.com/taye/interact.js/commit/195cfe9)
  - dropzones with `accept: 'pointer'` in scrolled pages on iOS6 and lower - see
    commit [0b94aac](https://github.com/taye/interact.js/commit/0b94aac)
