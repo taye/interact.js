@@ -1725,13 +1725,17 @@
                 interactions.push(this);
             }
 
+            // set the startCoords if there was no prepared action
+            if (!this.prepared.name) {
+                this.setEventXY(this.startCoords, this.pointers);
+            }
+
             this.prepared.name  = action.name;
             this.prepared.axis  = action.axis;
             this.prepared.edges = action.edges;
             this.target         = interactable;
             this.element        = element;
 
-            this.setEventXY(this.startCoords, this.pointers);
             this.setStartOffsets(action.name, interactable, element);
             this.setModifications(this.startCoords.page);
 
