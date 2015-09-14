@@ -566,14 +566,25 @@
         return dest;
     }
 
-    var webkitUnprefixedRE = /(Movement[XY]|Radius[XY]|RotationAngle)$/;
+    var prefixedPropREs = {
+      webkit: /(Movement[XY]|Radius[XY]|RotationAngle)$/
+    };
 
     function pointerExtend (dest, source) {
         for (var prop in source) {
-            if (prop.indexOf('webkit') === -1
-                || !webkitUnprefixedRE.test(prop)) {
-                dest[prop] = source[prop];
+          var deprecated = false;
+
+          // skip deprecated prefixed properties
+          for (var vendor in prefixedPropREs) {
+            if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {
+              deprecated = true;
+              break;
             }
+          }
+
+          if (!deprecated) {
+            dest[prop] = source[prop];
+          }
         }
         return dest;
     }
@@ -5545,7 +5556,9 @@
 
             events                : events,
             globalEvents          : globalEvents,
-            delegatedEvents       : delegatedEvents
+            delegatedEvents       : delegatedEvents,
+
+            prefixedPropREs       : prefixedPropREs
         };
     };
 
