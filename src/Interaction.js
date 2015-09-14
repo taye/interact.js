@@ -6,7 +6,7 @@ const signals        = require('./utils/signals');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
 const actions        = require('./actions/base');
-const modifiers      = require('./modifiers/');
+const modifiers      = require('./modifiers/base');
 const animationFrame = utils.raf;
 
 const listeners   = {};

@@ -1,7 +1,7 @@
 const scope     = require('./scope');
 const utils     = require('./utils');
 const signals   = require('./utils/signals');
-const modifiers = require('./modifiers');
+const modifiers = require('./modifiers/base');
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {

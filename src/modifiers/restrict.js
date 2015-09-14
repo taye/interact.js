@@ -1,4 +1,4 @@
-const modifiers = require('./index');
+const modifiers = require('./base');
 const utils = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
