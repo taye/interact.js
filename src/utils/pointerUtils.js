@@ -87,9 +87,24 @@ const pointerUtils = {
     return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
   },
 
+  prefixedPropREs: {
+    webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
+  },
+
   pointerExtend: function (dest, source) {
     for (const prop in source) {
-      if (prop !== 'webkitMovementX' && prop !== 'webkitMovementY') {
+      const prefixedPropREs = pointerUtils.prefixedPropREs;
+      let deprecated = false;
+
+      // skip deprecated prefixed properties
+      for (const vendor in prefixedPropREs) {
+        if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {
+          deprecated = true;
+          break;
+        }
+      }
+
+      if (!deprecated) {
         dest[prop] = source[prop];
       }
     }

@@ -60,6 +60,8 @@ scope.endAllInteractions = function (event) {
   }
 };
 
+scope.prefixedPropREs = utils.prefixedPropREs;
+
 signals.on('listen-to-document', function ({ doc }) {
   // if document is already known
   if (utils.contains(scope.documents, doc)) {
