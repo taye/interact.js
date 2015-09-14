@@ -4,6 +4,9 @@ const events  = require('./utils/events');
 const signals = require('./utils/signals');
 const actions = require('./actions/base');
 
+// all set interactables
+scope.interactables = [];
+
 /*\
  * Interactable
  [ property ]

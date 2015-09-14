@@ -16,6 +16,9 @@ const methodNames = [
   'addPointer', 'removePointer', 'recordPointer',
 ];
 
+// all active and idle interactions
+scope.interactions = [];
+
 class Interaction {
   constructor () {
     this.target          = null; // current interactable being interacted with

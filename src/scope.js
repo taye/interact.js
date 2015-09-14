@@ -9,10 +9,8 @@ scope.signals        = require('./utils/signals');
 utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));
 
-scope.documents     = [];   // all documents being listened to
-scope.interactables = [];   // all set interactables
-scope.interactions  = [];   // all interactions
-scope.eventTypes    = [];   // all event types specific to interact.js
+scope.documents  = [];  // all documents being listened to
+scope.eventTypes = [];  // all event types specific to interact.js
 
 scope.withinInteractionLimit = function (interactable, element, action) {
   const options = interactable.options;
