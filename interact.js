@@ -567,7 +567,7 @@
     }
 
     var prefixedPropREs = {
-      webkit: /(Movement[XY]|Radius[XY]|RotationAngle)$/
+      webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
     };
 
     function pointerExtend (dest, source) {
