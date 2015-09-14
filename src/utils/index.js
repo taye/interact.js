@@ -1,6 +1,5 @@
 const utils = module.exports;
 const extend = require('./extend');
-const defaultOptions = require('../defaultOptions');
 const win = require('./window');
 
 utils.blank = function () {};
@@ -37,40 +36,11 @@ utils.easeOutQuad = function (t, b, c, d) {
   return -c * t*(t-2) + b;
 };
 
-utils.getOriginXY = function (interactable, element) {
-  let origin = interactable
-    ? interactable.options.origin
-    : defaultOptions.origin;
-
-  if (origin === 'parent') {
-    origin = utils.parentElement(element);
-  }
-  else if (origin === 'self') {
-    origin = interactable.getRect(element);
-  }
-  else if (utils.trySelector(origin)) {
-    origin = utils.closest(element, origin) || { x: 0, y: 0 };
-  }
-
-  if (utils.isFunction(origin)) {
-    origin = origin(interactable && element);
-  }
-
-  if (utils.isElement(origin))  {
-    origin = utils.getElementRect(origin);
-  }
-
-  origin.x = ('x' in origin)? origin.x : origin.left;
-  origin.y = ('y' in origin)? origin.y : origin.top;
-
-  return origin;
-};
-
-
-utils.extend  = extend;
-utils.hypot   = require('./hypot');
-utils.raf     = require('./raf');
-utils.browser = require('./browser');
+utils.extend      = extend;
+utils.hypot       = require('./hypot');
+utils.raf         = require('./raf');
+utils.browser     = require('./browser');
+utils.getOriginXY = require('./getOriginXY');
 
 extend(utils, require('./arr'));
 extend(utils, require('./isType'));
