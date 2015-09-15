@@ -1,8 +1,12 @@
-const scope   = require('./scope');
-const utils   = require('./utils');
+const isType  = require('./utils/isType');
 const events  = require('./utils/events');
 const signals = require('./utils/signals');
+const extend  = require('./utils/extend');
 const actions = require('./actions/base');
+const scope   = require('./scope');
+
+const { getElementRect }    = require('./utils/domUtils');
+const { indexOf, contains } = require('./utils/arr');
 
 // all set interactables
 scope.interactables = [];
@@ -21,7 +25,7 @@ class Interactable {
 
     let _window;
 
-    if (utils.trySelector(element)) {
+    if (isType.trySelector(element)) {
       this.selector = element;
 
       const context = options && options.context;
@@ -30,7 +34,7 @@ class Interactable {
 
       if (context && (_window.Node
         ? context instanceof _window.Node
-        : (utils.isElement(context) || context === _window.document))) {
+        : (isType.isElement(context) || context === _window.document))) {
 
         this._context = context;
       }
@@ -63,10 +67,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (utils.isFunction(phases.onstart)       ) { this[onAction + 'start'        ] = phases.onstart         ; }
-    if (utils.isFunction(phases.onmove)        ) { this[onAction + 'move'         ] = phases.onmove          ; }
-    if (utils.isFunction(phases.onend)         ) { this[onAction + 'end'          ] = phases.onend           ; }
-    if (utils.isFunction(phases.oninertiastart)) { this[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (isType.isFunction(phases.onstart)       ) { this[onAction + 'start'        ] = phases.onstart         ; }
+    if (isType.isFunction(phases.onmove)        ) { this[onAction + 'move'         ] = phases.onmove          ; }
+    if (isType.isFunction(phases.onend)         ) { this[onAction + 'end'          ] = phases.onend           ; }
+    if (isType.isFunction(phases.oninertiastart)) { this[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -77,15 +81,15 @@ class Interactable {
       // if this option exists for this action
       if (option in scope.defaultOptions[action]) {
         // if the option in the options arg is an object value
-        if (utils.isObject(options[option])) {
+        if (isType.isObject(options[option])) {
           // duplicate the object
-          this.options[action][option] = utils.extend(this.options[action][option] || {}, options[option]);
+          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
 
-          if (utils.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
+          if (isType.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false? false : true;
           }
         }
-        else if (utils.isBool(options[option]) && utils.isObject(scope.defaultOptions.perAction[option])) {
+        else if (isType.isBool(options[option]) && isType.isObject(scope.defaultOptions.perAction[option])) {
           this.options[action][option].enabled = options[option];
         }
         else if (options[option] !== undefined) {
@@ -135,7 +139,7 @@ class Interactable {
    | });
   \*/
   actionChecker (checker) {
-    if (utils.isFunction(checker)) {
+    if (isType.isFunction(checker)) {
       this.options.actionChecker = checker;
 
       return this;
@@ -171,11 +175,11 @@ class Interactable {
   getRect (element) {
     element = element || this._element;
 
-    if (this.selector && !(utils.isElement(element))) {
+    if (this.selector && !(isType.isElement(element))) {
       element = this._context.querySelector(this.selector);
     }
 
-    return utils.getElementRect(element);
+    return getElementRect(element);
   }
 
   /*\
@@ -189,7 +193,7 @@ class Interactable {
    = (function | object) The checker function or this Interactable
   \*/
   rectChecker (checker) {
-    if (utils.isFunction(checker)) {
+    if (isType.isFunction(checker)) {
       this.getRect = checker;
 
       return this;
@@ -216,7 +220,7 @@ class Interactable {
    = (boolean | Interactable) The current setting or this Interactable
   \*/
   styleCursor (newValue) {
-    if (utils.isBool(newValue)) {
+    if (isType.isBool(newValue)) {
       this.options.styleCursor = newValue;
 
       return this;
@@ -250,7 +254,7 @@ class Interactable {
       return this;
     }
 
-    if (utils.isBool(newValue)) {
+    if (isType.isBool(newValue)) {
       this.options.preventDefault = newValue? 'always' : 'never';
       return this;
     }
@@ -272,11 +276,11 @@ class Interactable {
    = (object) The current origin or this Interactable
   \*/
   origin (newValue) {
-    if (utils.trySelector(newValue)) {
+    if (isType.trySelector(newValue)) {
       this.options.origin = newValue;
       return this;
     }
-    else if (utils.isObject(newValue)) {
+    else if (isType.isObject(newValue)) {
       this.options.origin = newValue;
       return this;
     }
@@ -333,12 +337,12 @@ class Interactable {
    | interact(element).ignoreFrom('input, textarea, a');
   \*/
   ignoreFrom (newValue) {
-    if (utils.trySelector(newValue)) {            // CSS selector to match event.target
+    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
       this.options.ignoreFrom = newValue;
       return this;
     }
 
-    if (utils.isElement(newValue)) {              // specific element
+    if (isType.isElement(newValue)) {              // specific element
       this.options.ignoreFrom = newValue;
       return this;
     }
@@ -362,12 +366,12 @@ class Interactable {
    | interact(element).allowFrom('.handle');
   \*/
   allowFrom (newValue) {
-    if (utils.trySelector(newValue)) {            // CSS selector to match event.target
+    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
       this.options.allowFrom = newValue;
       return this;
     }
 
-    if (utils.isElement(newValue)) {              // specific element
+    if (isType.isElement(newValue)) {              // specific element
       this.options.allowFrom = newValue;
       return this;
     }
@@ -399,7 +403,7 @@ class Interactable {
    = (Interactable) this Interactable
   \*/
   fire (iEvent) {
-    if (!(iEvent && iEvent.type) || !utils.contains(scope.eventTypes, iEvent.type)) {
+    if (!(iEvent && iEvent.type) || !contains(scope.eventTypes, iEvent.type)) {
       return this;
     }
 
@@ -416,7 +420,7 @@ class Interactable {
     }
 
     // interactable.onevent listener
-    if (utils.isFunction(this[onEvent])) {
+    if (isType.isFunction(this[onEvent])) {
       this[onEvent](iEvent);
     }
 
@@ -443,11 +447,11 @@ class Interactable {
    = (object) This Interactable
   \*/
   on (eventType, listener, useCapture) {
-    if (utils.isString(eventType) && eventType.search(' ') !== -1) {
+    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
-    if (utils.isArray(eventType)) {
+    if (isType.isArray(eventType)) {
       for (let i = 0; i < eventType.length; i++) {
         this.on(eventType[i], listener, useCapture);
       }
@@ -455,7 +459,7 @@ class Interactable {
       return this;
     }
 
-    if (utils.isObject(eventType)) {
+    if (isType.isObject(eventType)) {
       for (const prop in eventType) {
         this.on(prop, eventType[prop], listener);
       }
@@ -470,7 +474,7 @@ class Interactable {
     // convert to boolean
     useCapture = useCapture? true: false;
 
-    if (utils.contains(scope.eventTypes, eventType)) {
+    if (contains(scope.eventTypes, eventType)) {
       // if this type of event was never bound to this Interactable
       if (!(eventType in this._iEvents)) {
         this._iEvents[eventType] = [listener];
@@ -502,11 +506,11 @@ class Interactable {
    = (object) This Interactable
   \*/
   off (eventType, listener, useCapture) {
-    if (utils.isString(eventType) && eventType.search(' ') !== -1) {
+    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
-    if (utils.isArray(eventType)) {
+    if (isType.isArray(eventType)) {
       for (let i = 0; i < eventType.length; i++) {
         this.off(eventType[i], listener, useCapture);
       }
@@ -514,7 +518,7 @@ class Interactable {
       return this;
     }
 
-    if (utils.isObject(eventType)) {
+    if (isType.isObject(eventType)) {
       for (const prop in eventType) {
         this.off(prop, eventType[prop], listener);
       }
@@ -531,9 +535,9 @@ class Interactable {
     }
 
     // if it is an action event type
-    if (utils.contains(scope.eventTypes, eventType)) {
+    if (contains(scope.eventTypes, eventType)) {
       const eventList = this._iEvents[eventType];
-      const index     = eventList? utils.indexOf(eventList, listener) : -1;
+      const index     = eventList? indexOf(eventList, listener) : -1;
 
       if (index !== -1) {
         this._iEvents[eventType].splice(index, 1);
@@ -560,18 +564,18 @@ class Interactable {
    = (object) This Interactable
   \*/
   set (options) {
-    if (!utils.isObject(options)) {
+    if (!isType.isObject(options)) {
       options = {};
     }
 
-    this.options = utils.extend({}, scope.defaultOptions.base);
+    this.options = extend({}, scope.defaultOptions.base);
 
-    const perActions = utils.extend({}, scope.defaultOptions.perAction);
+    const perActions = extend({}, scope.defaultOptions.perAction);
 
     for (const actionName in actions.methodDict) {
       const methodName = actions.methodDict[actionName];
 
-      this.options[actionName] = utils.extend({}, scope.defaultOptions[actionName]);
+      this.options[actionName] = extend({}, scope.defaultOptions[actionName]);
 
       this.setPerAction(actionName, perActions);
 
@@ -609,7 +613,7 @@ class Interactable {
   unset () {
     events.remove(this._element, 'all');
 
-    if (!utils.isString(this.selector)) {
+    if (!isType.isString(this.selector)) {
       events.remove(this, 'all');
       if (this.options.styleCursor) {
         this._element.style.cursor = '';
@@ -644,7 +648,7 @@ class Interactable {
 
     signals.fire('interactable-unset', { interactable: this });
 
-    scope.interactables.splice(utils.indexOf(scope.interactables, this), 1);
+    scope.interactables.splice(isType.indexOf(scope.interactables, this), 1);
 
     return scope.interact;
   }

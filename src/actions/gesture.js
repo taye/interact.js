@@ -2,7 +2,7 @@ const base = require('./base');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
-const scope = base.scope;
+const scope = require('../scope');
 const signals = require('../utils/signals');
 const defaultOptions = require('../defaultOptions');
 

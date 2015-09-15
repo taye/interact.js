@@ -1,4 +1,4 @@
-const utils = require('../utils');
+const extend = require('../utils/extend');
 
 const modifiers = {
   names: [],
@@ -23,7 +23,7 @@ const modifiers = {
       shouldMove: true,
     };
     const target = interaction.target;
-    const coords = utils.extend({}, coordsArg);
+    const coords = extend({}, coordsArg);
 
     let currentStatus;
 

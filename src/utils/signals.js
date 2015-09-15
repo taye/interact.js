@@ -1,4 +1,4 @@
-const arr = require('./arr');
+const { indexOf } = require('./arr');
 
 const listeners = {
   // signalName: [listeners],
@@ -16,7 +16,7 @@ const signals = {
   off: function (name, listener) {
     if (!listeners[name]) { return; }
 
-    const index = arr.indexOf(listeners[name], listener);
+    const index = indexOf(listeners[name], listener);
 
     if (index !== -1) {
       listeners[name].splice(index, 1);

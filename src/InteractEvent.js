@@ -1,7 +1,9 @@
-const scope     = require('./scope');
-const utils     = require('./utils');
-const signals   = require('./utils/signals');
-const modifiers = require('./modifiers/base');
+const hypot       = require('./utils/hypot');
+const extend      = require('./utils/extend');
+const getOriginXY = require('./utils/getOriginXY');
+const signals     = require('./utils/signals');
+const modifiers   = require('./modifiers/base');
+const scope       = require('./scope');
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
@@ -10,15 +12,15 @@ class InteractEvent {
     const sourceX     = deltaSource + 'X';
     const sourceY     = deltaSource + 'Y';
     const options     = target? target.options: scope.defaultOptions;
-    const origin      = utils.getOriginXY(target, element);
+    const origin      = getOriginXY(target, element);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
     const coords      = starting? interaction.startCoords : interaction.curCoords;
 
     element = element || interaction.element;
 
-    const page   = utils.extend({}, coords.page);
-    const client = utils.extend({}, coords.client);
+    const page   = extend({}, coords.page);
+    const client = extend({}, coords.client);
 
     page.x -= origin.x;
     page.y -= origin.y;
@@ -149,7 +151,7 @@ class InteractEvent {
         const dy = this[sourceY] - interaction.prevEvent[sourceY];
         const dt = this.dt / 1000;
 
-        this.speed = utils.hypot(dx, dy) / dt;
+        this.speed = hypot(dx, dy) / dt;
         this.velocityX = dx / dt;
         this.velocityY = dy / dt;
       }

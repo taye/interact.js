@@ -1,8 +1,4 @@
-const scope = require('../scope');
-
 const actions = {
-  scope,
-
   defaultChecker: function (pointer, event, interaction, element) {
     const rect = this.getRect(element);
     let action = null;
