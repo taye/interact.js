@@ -19,9 +19,6 @@ scope.margin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
 scope.pointerMoveTolerance = 1;
 
-// for ignoring browser's simulated mouse events
-scope.prevTouchTime = 0;
-
 // Allow this many interactions to happen simultaneously
 scope.maxInteractions = Infinity;
 

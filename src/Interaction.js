@@ -16,6 +16,9 @@ const methodNames = [
   'addPointer', 'removePointer', 'recordPointer',
 ];
 
+// for ignoring browser's simulated mouse events
+let prevTouchTime = 0;
+
 // all active and idle interactions
 scope.interactions = [];
 
@@ -1036,7 +1039,7 @@ function doOnInteractions (method) {
     const matches = []; // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
-      scope.prevTouchTime = new Date().getTime();
+      prevTouchTime = new Date().getTime();
 
       for (const pointer of event.changedTouches) {
         const interaction = finder.search(pointer, event.type, eventTarget, true);
@@ -1057,7 +1060,7 @@ function doOnInteractions (method) {
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        invalidPointer = invalidPointer || (new Date().getTime() - scope.prevTouchTime < 500);
+        invalidPointer = invalidPointer || (new Date().getTime() - prevTouchTime < 500);
 
         if (!invalidPointer) {
           let interaction = finder.search(event, event.type, eventTarget, true);
