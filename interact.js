@@ -5577,6 +5577,7 @@
      * interact.margin
      [ method ]
      *
+     * Deprecated. Use `interact(target).resizable({ margin: number });` instead.
      * Returns or sets the margin for autocheck resizing used in
      * @Interactable.getAction. That is the distance from the bottom and right
      * edges of an element clicking in which will start resizing
@@ -5584,14 +5585,15 @@
      - newValue (number) #optional
      = (number | interact) The current margin value or interact
     \*/
-    interact.margin = function (newvalue) {
+    interact.margin = warnOnce(function (newvalue) {
         if (isNumber(newvalue)) {
             margin = newvalue;
 
             return interact;
         }
         return margin;
-    };
+    },
+    'interact.margin is deprecated. Use interact(target).resizable({ margin: number }); instead.') ;
 
     /*\
      * interact.supportsTouch
