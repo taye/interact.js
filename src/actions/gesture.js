@@ -157,6 +157,21 @@ signals.on('interactevent-delta', function (arg) {
   }
 });
 
+signals.on('interaction-new', function (interaction) {
+  interaction.gesture = {
+    start: { x: 0, y: 0 },
+
+    startDistance: 0,   // distance between two touches of touchStart
+    prevDistance : 0,
+    distance     : 0,
+
+    scale: 1,           // gesture.distance / gesture.startDistance
+
+    startAngle: 0,      // angle of line joining two touches
+    prevAngle : 0,      // angle of the previous gesture event
+  };
+});
+
 base.gesture = gesture;
 base.names.push('gesture');
 utils.merge(scope.eventTypes, [

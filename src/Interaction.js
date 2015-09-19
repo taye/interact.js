@@ -24,21 +24,17 @@ scope.interactions = [];
 
 class Interaction {
   constructor () {
-    this.target          = null; // current interactable being interacted with
-    this.element         = null; // the target element of the interactable
-    this.dropTarget      = null; // the dropzone a drag target might be dropped into
-    this.dropElement     = null; // the element at the time of checking
-    this.prevDropTarget  = null; // the dropzone that was recently dragged away from
-    this.prevDropElement = null; // the element at the time of checking
+    this.target        = null; // current interactable being interacted with
+    this.element       = null; // the target element of the interactable
 
-    this.prepared        = {     // action that's ready to be fired on next move event
+    this.matches       = [];   // all selectors that are matched by target element
+    this.matchElements = [];   // corresponding elements
+
+    this.prepared      = {     // action that's ready to be fired on next move event
       name : null,
       axis : null,
       edges: null,
     };
-
-    this.matches         = [];   // all selectors that are matched by target element
-    this.matchElements   = [];   // corresponding elements
 
     this.inertiaStatus = {
       active   : false,
@@ -65,12 +61,6 @@ class Interaction {
 
     this.boundInertiaFrame   = () => this.inertiaFrame  ();
     this.boundSmoothEndFrame = () => this.smoothEndFrame();
-
-    this.activeDrops = {
-      dropzones: [],      // the dropzones that are mentioned below
-      elements : [],      // elements of dropzones that accept the target draggable
-      rects    : [],      // the rects of the elements mentioned above
-    };
 
     // keep track of added pointers
     this.pointers    = [];
@@ -113,32 +103,18 @@ class Interaction {
     this._curEventTarget = null;
 
     this.prevEvent = null;      // previous action event
-    this.tapTime   = 0;         // time of the most recent tap event
-    this.prevTap   = null;
 
     this.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
     this.modifierOffsets  = {};
     this.modifierStatuses = modifiers.resetStatuses({});
 
-    this.gesture = {
-      start: { x: 0, y: 0 },
-
-      startDistance: 0,   // distance between two touches of touchStart
-      prevDistance : 0,
-      distance     : 0,
-
-      scale: 1,           // gesture.distance / gesture.startDistance
-
-      startAngle: 0,      // angle of line joining two touches
-      prevAngle : 0,      // angle of the previous gesture event
-    };
-
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
     this._interacting    = false;
-    this.resizeAxes      = 'xy';
 
     this.mouse = false;
+
+    signals.fire('interaction-new', this);
 
     scope.interactions.push(this);
   }

@@ -191,6 +191,11 @@ for (let i = 0; i < simpleSignals.length; i++) {
   signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
 }
 
+signals.on('interaction-new', function (interaction) {
+  interaction.prevTap = null;  // the most recent tap event on this interaction
+  interaction.tapTime = 0;     // time of the most recent tap event
+});
+
 utils.merge(scope.eventTypes, [
   'down',
   'move',

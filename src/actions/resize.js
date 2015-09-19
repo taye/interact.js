@@ -367,6 +367,10 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     : utils.matchesUpTo(element, value, interactableElement);
 }
 
+signals.on('interaction-new', function (interaction) {
+  interaction.resizeAxes = 'xy';
+});
+
 signals.on('interactevent-set-delta', function ({ interaction, iEvent, action }) {
   if (action !== 'resize' || !interaction.resizeAxes) { return; }
 

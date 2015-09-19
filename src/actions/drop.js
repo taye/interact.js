@@ -490,6 +490,20 @@ signals.on('interactable-unset', function ({ interactable }) {
   interactable.dropzone(false);
 });
 
+signals.on('interaction-new', function (interaction) {
+  interaction.dropTarget      = null; // the dropzone a drag target might be dropped into
+  interaction.dropElement     = null; // the element at the time of checking
+  interaction.prevDropTarget  = null; // the dropzone that was recently dragged away from
+  interaction.prevDropElement = null; // the element at the time of checking
+
+  interaction.activeDrops = {
+    dropzones: [],      // the dropzones that are mentioned below
+    elements : [],      // elements of dropzones that accept the target draggable
+    rects    : [],      // the rects of the elements mentioned above
+  };
+
+});
+
 signals.on('interaction-stop', function ({ interaction }) {
   interaction.dropTarget = interaction.dropElement =
     interaction.prevDropTarget = interaction.prevDropElement = null;
