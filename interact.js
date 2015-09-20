@@ -538,7 +538,7 @@
             ? o instanceof _window.Element //DOM2
             : o.nodeType === 1 && typeof o.nodeName === "string");
     }
-    function isWindow (thing) { return !!(thing && thing.Window) && (thing instanceof thing.Window); }
+    function isWindow (thing) { return thing === window || !!(thing && thing.Window) && (thing instanceof thing.Window); }
     function isDocFrag (thing) { return !!thing && thing instanceof DocumentFragment; }
     function isArray (thing) {
         return isObject(thing)
