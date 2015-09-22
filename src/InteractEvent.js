@@ -11,7 +11,6 @@ class InteractEvent {
     const deltaSource = (target && target.options || scope.defaultOptions).deltaSource;
     const sourceX     = deltaSource + 'X';
     const sourceY     = deltaSource + 'Y';
-    const options     = target? target.options: scope.defaultOptions;
     const origin      = getOriginXY(target, element);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
@@ -28,18 +27,18 @@ class InteractEvent {
     client.x -= origin.x;
     client.y -= origin.y;
 
-    this.ctrlKey   = event.ctrlKey;
-    this.altKey    = event.altKey;
-    this.shiftKey  = event.shiftKey;
-    this.metaKey   = event.metaKey;
-    this.button    = event.button;
-    this.buttons   = event.buttons;
-    this.target    = element;
-    this.t0        = interaction.downTimes[0];
-    this.type      = action + (phase || '');
-
-    this.interaction  = interaction;
-    this.interactable = target;
+    this.ctrlKey       = event.ctrlKey;
+    this.altKey        = event.altKey;
+    this.shiftKey      = event.shiftKey;
+    this.metaKey       = event.metaKey;
+    this.button        = event.button;
+    this.buttons       = event.buttons;
+    this.target        = element;
+    this.relatedTarget = related || null;
+    this.t0            = interaction.downTimes[interaction.downTimes.length - 1];
+    this.type          = action + (phase || '');
+    this.interaction   = interaction;
+    this.interactable  = target;
 
     for (let i = 0; i < modifiers.names.length; i++) {
       const modifierName = modifiers.names[i];
@@ -58,7 +57,6 @@ class InteractEvent {
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
 
-    const inertiaStatus = interaction.inertiaStatus;
     const signalArg = {
       interaction,
       event,
@@ -75,55 +73,14 @@ class InteractEvent {
       iEvent: this,
     };
 
+    const inertiaStatus = interaction.inertiaStatus;
+
     if (inertiaStatus.active) {
       this.detail = 'inertia';
     }
 
-    if (related) {
-      this.relatedTarget = related;
-    }
-
-    // end event dx, dy is difference between start and end points
-    if (ending) {
-      if (deltaSource === 'client') {
-        this.dx = client.x - interaction.startCoords.client.x;
-        this.dy = client.y - interaction.startCoords.client.y;
-      }
-      else {
-        this.dx = page.x - interaction.startCoords.page.x;
-        this.dy = page.y - interaction.startCoords.page.y;
-      }
-    }
-    else if (starting) {
-      this.dx = 0;
-      this.dy = 0;
-    }
-    // copy properties from previousmove if starting inertia
-    else if (phase === 'inertiastart') {
-      this.dx = interaction.prevEvent.dx;
-      this.dy = interaction.prevEvent.dy;
-    }
-    else {
-      if (deltaSource === 'client') {
-        this.dx = client.x - interaction.prevEvent.clientX;
-        this.dy = client.y - interaction.prevEvent.clientY;
-      }
-      else {
-        this.dx = page.x - interaction.prevEvent.pageX;
-        this.dy = page.y - interaction.prevEvent.pageY;
-      }
-    }
-    if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
-        && !inertiaStatus.active
-        && options[action].inertia && options[action].inertia.zeroResumeDelta) {
-
-      inertiaStatus.resumeDx += this.dx;
-      inertiaStatus.resumeDy += this.dy;
-
-      this.dx = this.dy = 0;
-    }
-
-    signals.fire('interactevent-set-delta', signalArg);
+    signals.fire('interactevent-new', signalArg);
+    signals.fire('interactevent-' + action, signalArg);
 
     if (starting) {
       this.timeStamp = interaction.downTimes[0];
@@ -206,5 +163,51 @@ class InteractEvent {
     this.propagationStopped = true;
   }
 }
+
+signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, ending, starting,
+                                            page, client, deltaSource, inertiaStatus }) {
+  // end event dx, dy is difference between start and end points
+  if (ending) {
+    if (deltaSource === 'client') {
+      iEvent.dx = client.x - interaction.startCoords.client.x;
+      iEvent.dy = client.y - interaction.startCoords.client.y;
+    }
+    else {
+      iEvent.dx = page.x - interaction.startCoords.page.x;
+      iEvent.dy = page.y - interaction.startCoords.page.y;
+    }
+  }
+  else if (starting) {
+    iEvent.dx = 0;
+    iEvent.dy = 0;
+  }
+  // copy properties from previousmove if starting inertia
+  else if (phase === 'inertiastart') {
+    iEvent.dx = interaction.prevEvent.dx;
+    iEvent.dy = interaction.prevEvent.dy;
+  }
+  else {
+    if (deltaSource === 'client') {
+      iEvent.dx = client.x - interaction.prevEvent.clientX;
+      iEvent.dy = client.y - interaction.prevEvent.clientY;
+    }
+    else {
+      iEvent.dx = page.x - interaction.prevEvent.pageX;
+      iEvent.dy = page.y - interaction.prevEvent.pageY;
+    }
+  }
+
+  const options = interaction.target.options;
+
+  if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
+      && !inertiaStatus.active
+      && options[action].inertia && options[action].inertia.zeroResumeDelta) {
+
+    inertiaStatus.resumeDx += iEvent.dx;
+    inertiaStatus.resumeDy += iEvent.dy;
+
+    iEvent.dx = iEvent.dy = 0;
+  }
+});
 
 module.exports = InteractEvent;

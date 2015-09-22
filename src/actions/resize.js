@@ -371,8 +371,8 @@ signals.on('interaction-new', function (interaction) {
   interaction.resizeAxes = 'xy';
 });
 
-signals.on('interactevent-set-delta', function ({ interaction, iEvent, action }) {
-  if (action !== 'resize' || !interaction.resizeAxes) { return; }
+signals.on('interactevent-resize', function ({ interaction, iEvent }) {
+  if (!interaction.resizeAxes) { return; }
 
   const options = interaction.target.options;
 
