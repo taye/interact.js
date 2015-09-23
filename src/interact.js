@@ -1,5 +1,5 @@
 /**
- * interact.js v1.2.4
+ * interact.js v1.2.5
  *
  * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -265,6 +265,7 @@ interact.closest              = utils.closest;
  * interact.margin
  [ method ]
  *
+ * Deprecated. Use `interact(target).resizable({ margin: number });` instead.
  * Returns or sets the margin for autocheck resizing used in
  * @Interactable.getAction. That is the distance from the bottom and right
  * edges of an element clicking in which will start resizing
@@ -272,14 +273,15 @@ interact.closest              = utils.closest;
  - newValue (number) #optional
  = (number | interact) The current margin value or interact
 \*/
-interact.margin = function (newvalue) {
+interact.margin = utils.warnOnce(function (newvalue) {
   if (utils.isNumber(newvalue)) {
     scope.margin = newvalue;
 
     return interact;
   }
   return scope.margin;
-};
+},
+'interact.margin is deprecated. Use interact(target).resizable({ margin: number }); instead.') ;
 
 /*\
  * interact.supportsTouch

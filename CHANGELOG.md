@@ -1,41 +1,61 @@
-## Upcomming Changes
+## Upcoming Changes
 
-### Added `event` parameters to actionCheckers and dropCheckers
+### Fixes
 
-See commits 88dc583df6df3c44bdd63cb8d17e41971594e2ed and 16d74d433fa6275d5bfa13ac8672b4a4aa33216a
+ - incorrect coordinates of the first movement of every action
 
-### Fixed autoScroll for mobile
+## 1.2.5
 
-See #180
+### Changed parameters to actionChecker and drop.checker
 
-### Merged [#183](https://github.com/taye/interact.js/pull/183) to fix an occasional bug
+ - Added `event` as the first argument to actionCheckers. See commit [88dc583](https://github.com/taye/interact.js/commit/88dc583)
+ - Added `dragEvent` as the first parameter to drop.checker functions. See
+   commits [16d74d4](https://github.com/taye/interact.js/commit/16d74d4) and [d0c4b69](https://github.com/taye/interact.js/commit/d0c4b69)
 
-### Improved auto preventDefault
+### Deprecated methods
 
-See commits 1984c805689ec44b9c525a3fc7b6b7253140d583 and 69139592963a15d6b6be910b5969d133418fa6ae
+interactable.accept - instead, use:
 
-### Fixed Interaction#unset
+```javascript
+interact(target).dropzone({ accept: stringOrElement })
+```
 
-See [PR #178](https://github.com/taye/interact.js/pull/178)
+interactable.dropChecker - instead, use:
 
-### Fix coords of start event after manual start
-
-Commit fec73b2a017cabbdc42b381efbc28e658d9a0239
+```javascript
+interact(target).dropzone({ checker: function () {} })
+```
 
 ### Added resize.margin
 
 See https://github.com/taye/interact.js/issues/166#issuecomment-91234390
 
-### Fixed a bug with touch and selector interactables
+### Fixes
 
-See https://gitter.im/taye/interact.js?at=5523d1d92435c9553cf6d3b4
-
-
-### Fixed a touch doubletap bug
-
-See https://gitter.im/taye/interact.js?at=551e4b2faf9675d135ab346d
-
-Add origin subtract for X0 and Y0 [#167](https://github.com/taye/interact.js/pull/145)
+ - touch coords on Presto Opera Mobile - see commits [886e54c](https://github.com/taye/interact.js/commit/886e54c) and [5a3a850](https://github.com/taye/interact.js/commit/5a3a850)
+ - bug with multiple pointers - see commit [64882d3](https://github.com/taye/interact.js/commit/64882d3)
+ - accessing certain recently deprecated event properties in Blink - see
+   commits [e91fbc6](https://github.com/taye/interact.js/commit/e91fbc6) and [195cfe9](https://github.com/taye/interact.js/commit/195cfe9)
+ - dropzones with `accept: 'pointer'` in scrolled pages on iOS6 and lower - see
+   commit [0b94aac](https://github.com/taye/interact.js/commit/0b94aac)
+ - setting styleCursor through Interactable options object - see [PR
+   #270](https://github.com/taye/interact.js/pull/270)
+ - one missed interaction element on stop triggered - see [PR
+   #258](https://github.com/taye/interact.js/pull/258)
+ - pointer dt on touchscreen devices - see [PR
+   #215](https://github.com/taye/interact.js/pull/215)
+ - autoScroll with containers with fixed position - see commit [3635840](https://github.com/taye/interact.js/commit/3635840)
+ - autoScroll for mobile - see #180
+ - preventDefault - see commits [1984c80](https://github.com/taye/interact.js/commit/1984c80) and [6913959](https://github.com/taye/interact.js/commit/6913959)
+ - occasional error - see [issue
+   #183](https://github.com/taye/interact.js/issue/183)
+ - Interactable#unset - see [PR
+   #178](https://github.com/taye/interact.js/pull/178)
+ - coords of start event after manual start - see commit [fec73b2](https://github.com/taye/interact.js/commit/fec73b2)
+ - bug with touch and selector interactables - see commit [d8df3de](https://github.com/taye/interact.js/commit/d8df3de)
+ - touch doubletap bug - see [273f461](https://github.com/taye/interact.js/commit/273f461)
+ - event x0/y0 with origin - see [PR
+   #167](https://github.com/taye/interact.js/pull/167)
 
 ## 1.2.4
 

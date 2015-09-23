@@ -1,4 +1,5 @@
 const win        = require('./window');
+const isWindow   = require('./isWindow');
 const domObjects = require('./domObjects');
 
 const isType = {
@@ -14,7 +15,7 @@ const isType = {
 
   isArray    : null,
 
-  isWindow   : require('./isWindow'),
+  isWindow   : function (thing) { return thing === win.window || isWindow(thing); },
 
   isDocFrag  : function (thing) { return !!thing && thing instanceof domObjects.DocumentFragment; },
 

@@ -806,14 +806,6 @@ class Interaction {
         this.pointers.splice(i, 1);
       }
     }
-
-    for (let i = 0; i < scope.interactions.length; i++) {
-      // remove this interaction if it's not the only one of it's type
-      if (scope.interactions[i] !== this && scope.interactions[i].mouse === this.mouse) {
-        scope.interactions.splice(utils.indexOf(scope.interactions, this), 1);
-        break;
-      }
-    }
   }
 
   inertiaFrame () {
