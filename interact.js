@@ -1551,11 +1551,20 @@
             var pointerIndex = this.addPointer(pointer),
                 action;
 
-            // If it is the second touch of a multi-touch gesture, keep the target
-            // the same if a target was set by the first touch
-            // Otherwise, set the target if there is no action prepared
-            if ((this.pointerIds.length < 2 && !this.target) || !this.prepared.name) {
+            // If it is the second touch of a multi-touch gesture, keep the
+            // target the same and get a new action if a target was set by the
+            // first touch
+            if (this.pointerIds.length > 1 && this.target._element === this.element) {
+                var newAction = validateAction(forceAction || this.target.getAction(pointer, event, this, this.element), this.target);
 
+                if (withinInteractionLimit(this.target, this.element, newAction)) {
+                    action = newAction;
+                }
+
+                this.prepared.name = null;
+            }
+            // Otherwise, set the target if there is no action prepared
+            else if (!this.prepared.name) {
                 var interactable = interactables.get(curEventTarget);
 
                 if (interactable
