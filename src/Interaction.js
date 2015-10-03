@@ -1010,11 +1010,9 @@ function doOnInteractions (method) {
       prevTouchTime = new Date().getTime();
 
       for (const pointer of event.changedTouches) {
-        const interaction = finder.search(pointer, event.type, eventTarget, true);
+        const interaction = finder.search(pointer, event.type, eventTarget);
 
-        if (interaction) {
-          matches.push([pointer, interaction]);
-        }
+        matches.push([pointer, interaction || new Interaction]);
       }
     }
     else {
@@ -1029,22 +1027,20 @@ function doOnInteractions (method) {
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
         invalidPointer = invalidPointer || (new Date().getTime() - prevTouchTime < 500);
+      }
 
-        if (!invalidPointer) {
-          let interaction = finder.search(event, event.type, eventTarget, true);
+      if (!invalidPointer) {
+        let interaction = finder.search(event, event.type, eventTarget);
 
-          if (!interaction && (/mouse/i.test(event.pointerType || event.type)
+        if (!interaction) {
+
+          interaction = new Interaction();
+          interaction.mouse = (/mouse/i.test(event.pointerType || event.type)
                                // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                               || event.pointerType === 4)) {
-
-            interaction = new Interaction();
-            interaction.mouse = true;
-          }
-
-          if (interaction) {
-            matches.push([event, interaction]);
-          }
+                               || event.pointerType === 4);
         }
+
+        matches.push([event, interaction]);
       }
     }
 
