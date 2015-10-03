@@ -122,10 +122,10 @@ Interactable.prototype.gesturable = function (options) {
   return this.options.gesture;
 };
 
-signals.on('interactevent-delta', function (arg) {
+signals.on('interactevent-gesture', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
-  const { interaction, iEvent, starting, ending, deltaSource } = {arg};
+  const { interaction, iEvent, starting, ending, deltaSource } = arg;
   const pointers = interaction.pointers;
 
   iEvent.touches = [pointers[0], pointers[1]];
