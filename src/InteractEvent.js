@@ -165,7 +165,7 @@ class InteractEvent {
 }
 
 signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, ending, starting,
-                                            page, client, deltaSource, inertiaStatus }) {
+                                            page, client, deltaSource }) {
   // end event dx, dy is difference between start and end points
   if (ending) {
     if (deltaSource === 'client') {
@@ -198,6 +198,7 @@ signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, 
   }
 
   const options = interaction.target.options;
+  const inertiaStatus = interaction.inertiaStatus;
 
   if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
       && !inertiaStatus.active
