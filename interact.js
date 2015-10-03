@@ -104,6 +104,7 @@
                 autoScroll: null,
 
                 square: false,
+                preserveAspectRatio: false,
                 axis: 'xy',
 
                 // use default margin
@@ -1989,18 +1990,29 @@
             if (this.prepared.edges) {
                 var startRect = this.target.getRect(this.element);
 
-                if (this.target.options.resize.square) {
-                    var squareEdges = extend({}, this.prepared.edges);
+                /*
+                 * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
+                 * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
+                 * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
+                 * on the active edges and the edge being interacted with.
+                 */
+                if (this.target.options.resize.square || this.target.options.resize.preserveAspectRatio) {
+                    var linkedEdges = extend({}, this.prepared.edges);
 
-                    squareEdges.top    = squareEdges.top    || (squareEdges.left   && !squareEdges.bottom);
-                    squareEdges.left   = squareEdges.left   || (squareEdges.top    && !squareEdges.right );
-                    squareEdges.bottom = squareEdges.bottom || (squareEdges.right  && !squareEdges.top   );
-                    squareEdges.right  = squareEdges.right  || (squareEdges.bottom && !squareEdges.left  );
+                    linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom);
+                    linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right );
+                    linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top   );
+                    linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left  );
 
-                    this.prepared._squareEdges = squareEdges;
+                    this.prepared._linkedEdges = linkedEdges;
                 }
                 else {
-                    this.prepared._squareEdges = null;
+                    this.prepared._linkedEdges = null;
+                }
+
+                // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
+                if (this.target.options.resize.preserveAspectRatio) {
+                    this.resizeStartAspectRatio = startRect.width / startRect.height;
                 }
 
                 this.resizeRects = {
@@ -2040,12 +2052,25 @@
                     current    = this.resizeRects.current,
                     restricted = this.resizeRects.restricted,
                     delta      = this.resizeRects.delta,
-                    previous   = extend(this.resizeRects.previous, restricted);
+                    previous   = extend(this.resizeRects.previous, restricted),
 
-                if (this.target.options.resize.square) {
-                    var originalEdges = edges;
+                    originalEdges = edges;
 
-                    edges = this.prepared._squareEdges;
+                // `resize.preserveAspectRatio` takes precedence over `resize.square`
+                if (this.target.options.resize.preserveAspectRatio) {
+                    var resizeStartAspectRatio = this.resizeStartAspectRatio;
+
+                    edges = this.prepared._linkedEdges;
+
+                    if ((originalEdges.left && originalEdges.bottom)
+                        || (originalEdges.right && originalEdges.top)) {
+                        dy = -dx / resizeStartAspectRatio;
+                    }
+                    else if (originalEdges.left || originalEdges.right) { dy = dx / resizeStartAspectRatio; }
+                    else if (originalEdges.top || originalEdges.bottom) { dx = dy * resizeStartAspectRatio; }
+                }
+                else if (this.target.options.resize.square) {
+                    edges = this.prepared._linkedEdges;
 
                     if ((originalEdges.left && originalEdges.bottom)
                         || (originalEdges.right && originalEdges.top)) {
@@ -4257,6 +4282,14 @@
          |       right : handleEl    // Resize if pointer target is the given Element
          |     },
          |
+         |     // Width and height can be adjusted independently. When `true`, width and
+         |     // height are adjusted at a 1:1 ratio.
+         |     square: false,
+         |
+         |     // Width and height can be adjusted independently. When `true`, width and
+         |     // height maintain the aspect ratio they had when resizing started.
+         |     preserveAspectRatio: false,
+         |
          |     // a value of 'none' will limit the resize rect to a minimum of 0x0
          |     // 'negate' will allow the rect to have negative width/height
          |     // 'reposition' will keep the width/height positive by swapping
@@ -4282,7 +4315,10 @@
                     this.options.resize.axis = defaultOptions.resize.axis;
                 }
 
-                if (isBool(options.square)) {
+                if (isBool(options.preserveAspectRatio)) {
+                    this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
+                }
+                else if (isBool(options.square)) {
                     this.options.resize.square = options.square;
                 }
 
