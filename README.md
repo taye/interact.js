@@ -22,8 +22,8 @@ Installation
 * [Bower](http://bower.io/): `bower install interact`
 * [npm](https://www.npmjs.org/): `npm install interact.js`
 * Direct download the latest version: http://interactjs.io/#download
-* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/VERSION/interact.min.js"></script>`
-* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/VERSION/interact.min.js"></script>` 
+* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
+* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.6/interact.min.js"></script>`
   (replace `VERSION` with the SemVer you want to use)
 
 Documentation

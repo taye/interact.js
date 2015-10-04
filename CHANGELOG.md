@@ -1,4 +1,4 @@
-## Upcoming Changes
+## 1.2.6
 
 ### resize.preserveAspectRatio
 
