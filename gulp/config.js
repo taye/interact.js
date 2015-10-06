@@ -2,6 +2,7 @@ var dest = "./dist";
 var src = './src';
 
 module.exports = {
+  dest: dest,
   browserSync: {
     server: {
       // Serve up our build folder
