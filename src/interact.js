@@ -262,28 +262,6 @@ interact.matchesSelector      = utils.matchesSelector;
 interact.closest              = utils.closest;
 
 /*\
- * interact.margin
- [ method ]
- *
- * Deprecated. Use `interact(target).resizable({ margin: number });` instead.
- * Returns or sets the margin for autocheck resizing used in
- * @Interactable.getAction. That is the distance from the bottom and right
- * edges of an element clicking in which will start resizing
- *
- - newValue (number) #optional
- = (number | interact) The current margin value or interact
-\*/
-interact.margin = utils.warnOnce(function (newvalue) {
-  if (utils.isNumber(newvalue)) {
-    scope.margin = newvalue;
-
-    return interact;
-  }
-  return scope.margin;
-},
-'interact.margin is deprecated. Use interact(target).resizable({ margin: number }); instead.') ;
-
-/*\
  * interact.supportsTouch
  [ method ]
  *

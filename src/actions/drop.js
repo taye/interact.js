@@ -290,14 +290,37 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
  *  - `dragmove` when a draggable that has entered the dropzone is moved
  *  - `drop` when a draggable is dropped into this dropzone
  *
- *  Use the `accept` option to allow only elements that match the given CSS selector or element.
+ * Use the `accept` option to allow only elements that match the given CSS
+ * selector or element. The value can be:
  *
- *  Use the `overlap` option to set how drops are checked for. The allowed values are:
+ *  - **an Element** - only that element can be dropped into this dropzone.
+ *  - **a string**, - the element being dragged must match it as a CSS selector.
+ *  - **`null`** - accept options is cleared - it accepts any element.
+ *
+ * Use the `overlap` option to set how drops are checked for. The allowed
+ * values are:
+ *
  *   - `'pointer'`, the pointer must be over the dropzone (default)
  *   - `'center'`, the draggable element's center must be over the dropzone
  *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
- *       e.g. `0.5` for drop to happen when half of the area of the
- *       draggable is over the dropzone
+ *   e.g. `0.5` for drop to happen when half of the area of the draggable is
+ *   over the dropzone
+ *
+ * Use the `checker` option to specify a function to check if a dragged
+ * element is over this Interactable.
+ *
+ | interact(target)
+ | .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ |                       event,             // TouchEvent/PointerEvent/MouseEvent
+ |                       dropped,           // bool result of the default checker
+ |                       dropzone,          // dropzone Interactable
+ |                       dropElement,       // dropzone elemnt
+ |                       draggable,         // draggable Interactable
+ |                       draggableElement) {// draggable element
+ |
+ |   return dropped && event.target.hasAttribute('allow-drop');
+ | }
+ *
  *
  - options (boolean | object | null) #optional The new value to be set.
  | interact('.drop').dropzone({
@@ -395,96 +418,6 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
 
   return dropped;
 };
-
-/*\
- * Interactable.dropChecker
- [ method ]
- *
- * DEPRECATED. Use interactable.dropzone({ checker: function... }) instead.
- *
- * Gets or sets the function used to check if a dragged element is
- * over this Interactable.
- *
- - checker (function) #optional The function that will be called when checking for a drop
- = (Function | Interactable) The checker function or this Interactable
- *
- * The checker function takes the following arguments:
- *
- - dragEvent (InteractEvent) The related dragmove or dragend event
- - event (TouchEvent | PointerEvent | MouseEvent) The user move/up/end Event related to the dragEvent
- - dropped (boolean) The value from the default drop checker
- - dropzone (Interactable) The dropzone interactable
- - dropElement (Element) The dropzone element
- - draggable (Interactable) The Interactable being dragged
- - draggableElement (Element) The actual element that's being dragged
- *
- > Usage:
- | interact(target)
- | .dropChecker(function(dragEvent,         // related dragmove or dragend event
- |                       event,             // TouchEvent/PointerEvent/MouseEvent
- |                       dropped,           // bool result of the default checker
- |                       dropzone,          // dropzone Interactable
- |                       dropElement,       // dropzone elemnt
- |                       draggable,         // draggable Interactable
- |                       draggableElement) {// draggable element
- |
- |   return dropped && event.target.hasAttribute('allow-drop');
- | }
-\*/
-Interactable.prototype.dropChecker = utils.warnOnce(function (checker) {
-  if (utils.isFunction(checker)) {
-    this.options.drop.checker = checker;
-
-    return this;
-  }
-  if (checker === null) {
-    delete this.options.getRect;
-
-    return this;
-  }
-
-  return this.options.drop.checker;
-}, 'Interactable#dropChecker is deprecated. use Interactable#dropzone({ dropChecker: checkerFunction }) instead');
-
-/*\
- * Interactable.accept
- [ method ]
- *
- * Deprecated. add an `accept` property to the options object passed to
- * @Interactable.dropzone instead.
- *
- * Gets or sets the Element or CSS selector match that this
- * Interactable accepts if it is a dropzone.
- *
- - newValue (Element | string | null) #optional
- * If it is an Element, then only that element can be dropped into this dropzone.
- * If it is a string, the element being dragged must match it as a selector.
- * If it is null, the accept options is cleared - it accepts any element.
- *
- = (string | Element | null | Interactable) The current accept option if given `undefined` or this Interactable
-\*/
-Interactable.prototype.accept = utils.warnOnce(function (newValue) {
-  if (utils.isElement(newValue)) {
-    this.options.drop.accept = newValue;
-
-    return this;
-  }
-
-  // test if it is a valid CSS selector
-  if (utils.trySelector(newValue)) {
-    this.options.drop.accept = newValue;
-
-    return this;
-  }
-
-  if (newValue === null) {
-    delete this.options.drop.accept;
-
-    return this;
-  }
-
-  return this.options.drop.accept;
-}, 'Interactable#accept is deprecated. use Interactable#dropzone({ accept: target }) instead');
 
 signals.on('interactable-unset', function ({ interactable }) {
   interactable.dropzone(false);
