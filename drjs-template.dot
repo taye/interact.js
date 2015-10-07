@@ -10,7 +10,7 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="css/dr.css">
         <link rel="stylesheet" href="css/prism.css">
-        <link rel="icon" href="../img/ijs-32.png"/>
+        <link rel="icon" href="img/ijs-32.png"/>
         <!--[if lt IE 9]>
             <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     </head>
@@ -36,7 +36,7 @@
                   <header id="main-header">
                       <div class="max-width">
                           <hgroup>
-                              <h1><a href="/"><img src="../img/ijs-anim-short.svg" style="background-color:#dfe2e2;height:80px" alt="{{= it.title }}"></a></h1>
+                              <h1><a href="/"><img src="img/ijs-anim-short.svg" style="background-color:#dfe2e2;height:80px" alt="{{= it.title }}"></a></h1>
                               <p>{{= it.subtitle || 'API Reference' }}</p>
                           </hgroup>
                       </div>
