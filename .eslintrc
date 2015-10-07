@@ -1,3 +1,5 @@
+parser: babel-eslint
+
 extends: 'eslint:recommended'
 
 env:
@@ -5,21 +7,40 @@ env:
   commonjs: true
 
 rules:
+  comma-dangle: [2, always-multiline]
   comma-style: [2, last]
   curly: 2
   dot-notation: 2
   eol-last: 2
   eqeqeq: 2
   guard-for-in: 0
+  indent: [2, 2]
   linebreak-style: [2, unix]
   no-caller: 2
   no-extra-bind: 2
   no-self-compare: 2
   no-sequences: 2
+  no-shadow: 2
   no-shadow-restricted-names: 2
   no-trailing-spaces: 2
   no-unused-expressions: 2
+  no-var: 2
+  one-var: [2, never]
+  prefer-const: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   space-after-keywords: [2, always]
   space-before-function-paren: [2, always]
+  strict: [2, never]
+
+ecma-features:
+  arrow-functions: true
+  block-bindings: true
+  classes: true
+  for-of: true
+  destructuring: true
+  object-literal-computed-properties: true
+  object-literal-shorthand-methods: true
+  oobject-literal-shorthand-properties: true
+  super-in-functions: true
+  template-strings: true

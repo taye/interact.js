@@ -1,0 +1,19 @@
+{
+  "loose": ["all"],
+  "whitelist": [
+    "es3.memberExpressionLiterals",
+    "es3.propertyLiterals",
+    "es6.arrowFunctions",
+    "es6.blockScoping",
+    "es6.classes",
+    "es6.constants",
+    "es6.destructuring",
+    "es6.forOf",
+    "es6.literals",
+    "es6.objectSuper",
+    "es6.properties.computed",
+    "es6.properties.shorthand",
+    "es6.tailCall",
+    "es6.templateLiterals"
+  ]
+}
