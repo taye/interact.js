@@ -20,7 +20,8 @@ const resize = {
     autoScroll: null,
 
     square: false,
-    axis  : 'xy',
+    preserveAspectRatio: false,
+    axis: 'xy',
 
     // use default margin
     margin: NaN,
@@ -139,19 +140,31 @@ const resize = {
 
     if (interaction.prepared.edges) {
       const startRect = interaction.target.getRect(interaction.element);
+      const resizeOptions = interaction.target.options.resize;
 
-      if (interaction.target.options.resize.square) {
-        const squareEdges = utils.extend({}, interaction.prepared.edges);
+      /*
+       * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
+       * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
+       * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
+       * on the active edges and the edge being interacted with.
+       */
+      if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
+        const linkedEdges = utils.extend({}, interaction.prepared.edges);
 
-        squareEdges.top    = squareEdges.top    || (squareEdges.left   && !squareEdges.bottom);
-        squareEdges.left   = squareEdges.left   || (squareEdges.top    && !squareEdges.right );
-        squareEdges.bottom = squareEdges.bottom || (squareEdges.right  && !squareEdges.top   );
-        squareEdges.right  = squareEdges.right  || (squareEdges.bottom && !squareEdges.left  );
+        linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom);
+        linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right );
+        linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top   );
+        linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left  );
 
-        interaction.prepared._squareEdges = squareEdges;
+        interaction.prepared._linkedEdges = linkedEdges;
       }
       else {
-        interaction.prepared._squareEdges = null;
+        interaction.prepared._linkedEdges = null;
+      }
+
+      // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
+      if (resizeOptions.preserveAspectRatio) {
+        interaction.resizeStartAspectRatio = startRect.width / startRect.height;
       }
 
       interaction.resizeRects = {
@@ -178,7 +191,8 @@ const resize = {
 
   move: function (interaction, event) {
     const resizeEvent = new InteractEvent(interaction, event, 'resize', 'move', interaction.element);
-    const invert = interaction.target.options.resize.invert;
+    const resizeOptions = interaction.target.options.resize;
+    const invert = resizeOptions.invert;
     const invertible = invert === 'reposition' || invert === 'negate';
 
     let edges = interaction.prepared.edges;
@@ -189,14 +203,26 @@ const resize = {
       const restricted = interaction.resizeRects.restricted;
       const delta      = interaction.resizeRects.delta;
       const previous   = utils.extend(interaction.resizeRects.previous, restricted);
+      const originalEdges = edges;
 
       let dx = resizeEvent.dx;
       let dy = resizeEvent.dy;
 
-      if (interaction.target.options.resize.square) {
-        const originalEdges = edges;
+      // `resize.preserveAspectRatio` takes precedence over `resize.square`
+      if (resizeOptions.preserveAspectRatio) {
+        const resizeStartAspectRatio = interaction.resizeStartAspectRatio;
 
-        edges = interaction.prepared._squareEdges;
+        edges = interaction.prepared._linkedEdges;
+
+        if ((originalEdges.left && originalEdges.bottom)
+            || (originalEdges.right && originalEdges.top)) {
+          dy = -dx / resizeStartAspectRatio;
+        }
+        else if (originalEdges.left || originalEdges.right) { dy = dx / resizeStartAspectRatio; }
+        else if (originalEdges.top || originalEdges.bottom) { dx = dy * resizeStartAspectRatio; }
+      }
+      else if (resizeOptions.square) {
+        edges = interaction.prepared._linkedEdges;
 
         if ((originalEdges.left && originalEdges.bottom)
             || (originalEdges.right && originalEdges.top)) {
@@ -292,6 +318,14 @@ const resize = {
    |     right : handleEl    // Resize if pointer target is the given Element
    |   },
    |
+   |     // Width and height can be adjusted independently. When `true`, width and
+   |     // height are adjusted at a 1:1 ratio.
+   |     square: false,
+   |
+   |     // Width and height can be adjusted independently. When `true`, width and
+   |     // height maintain the aspect ratio they had when resizing started.
+   |     preserveAspectRatio: false,
+   |
    |   // a value of 'none' will limit the resize rect to a minimum of 0x0
    |   // 'negate' will allow the rect to have negative width/height
    |   // 'reposition' will keep the width/height positive by swapping
@@ -317,7 +351,10 @@ Interactable.prototype.resizable = function (options) {
       this.options.resize.axis = scope.defaultOptions.resize.axis;
     }
 
-    if (utils.isBool(options.square)) {
+    if (utils.isBool(options.preserveAspectRatio)) {
+      this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
+    }
+    else if (utils.isBool(options.square)) {
       this.options.resize.square = options.square;
     }
 

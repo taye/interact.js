@@ -1,8 +1,25 @@
-## Upcoming Changes
+## 1.2.6
 
-### Fixes
+### resize.preserveAspectRatio
 
- - incorrect coordinates of the first movement of every action
+```javascript
+interact(target).resizable({ preserveAspectRatio: true });
+```
+
+See [PR #260](https://github.com/taye/interact.js/pull/260).
+
+### Deprecated
+ - `interact.margin(number)` - Use `interact(target).resizable({ margin: number });` instead
+
+### Fixed
+
+ - incorrect coordinates of the first movement of every action ([5e5a040](https://github.com/taye/interact.js/commit/5e5a040))
+ - warning about deprecated "webkitForce" event property ([0943290](https://github.com/taye/interact.js/commit/0943290))
+ - bugs with multiple concurrent interactions ([ed53aee](http://github.com/taye/interact.js/commit/ed53aee))
+ - iPad 1, iOS 5.1.1 error "undefined is not a function" when autoScroll is set
+   to true ([PR #194](https://github.com/taye/interact.js/pull/194))
+
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...master)
 
 ## 1.2.5
 
