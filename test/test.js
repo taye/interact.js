@@ -1,11 +1,16 @@
+var interact = require('../src/interact');
+
+require('./fixtures/data');
+
 var expect = chai.expect,
     should = chai.should(),
     debug = interact.debug(),
     PointerEvent = window.PointerEvent || window.MSPointerEvent;
 
-function blank () {}
+function blank() {
+}
 
-function mockEvent (options, target, currentTarget) {
+function mockEvent(options, target, currentTarget) {
     'use strict';
 
     options.target = options.target || target;
@@ -17,8 +22,8 @@ function mockEvent (options, target, currentTarget) {
         type: options.type,
         pageX: options.x,
         pageY: options.y,
-        clientX: options.x - (options.scrollX|0),
-        clientY: options.y - (options.scrollY|0),
+        clientX: options.x - (options.scrollX | 0),
+        clientY: options.y - (options.scrollY | 0),
         touches: options.touches && options.touches.map(mockEvent),
         changedTouches: options.changed && options.changed.map(mockEvent),
         pointerId: options.pointerId || 0,
@@ -33,15 +38,24 @@ function mockEvent (options, target, currentTarget) {
 describe('interact', function () {
     'use strict';
 
+    before(function () {
+        fixture.setBase('test/fixtures');
+        fixture.load('baseFixture.html');
+    });
+
+    afterEach(function () {
+        fixture.cleanup();
+    });
+
     describe('when called as a function', function () {
         var validSelector = 'svg .draggable, body button';
 
         it('should return an Interactable when given an Element', function () {
-            var bod = interact(document.body);
+            var el = interact(fixture.el);
 
-            expect(bod).to.be.an.instanceof(debug.Interactable);
+            expect(el).to.be.an.instanceof(debug.Interactable);
 
-            bod.element().should.equal(document.body);
+            el.element().should.equal(fixture.el);
         });
 
         it('should return an Interactable when given a valid CSS selector string', function () {
@@ -63,7 +77,8 @@ describe('interact', function () {
             error.should.be.instanceof(DOMException);
         });
 
-        it('should return the same value from a given parameter unless returned Interactable is unset', function () { var iBody = interact(document.body),
+        it('should return the same value from a given parameter unless returned Interactable is unset', function () {
+            var iBody = interact(document.body),
                 iSelector = interact(validSelector);
 
             interact(document.body).should.equal(iBody);
@@ -88,14 +103,14 @@ describe('Interactable', function () {
     var defaults = debug.defaultOptions,
         iable = interact(document.createElement('div')),
         simpleOptions = {
-            draggable    : 'draggable',
-            dropzone     : 'dropzone',
-            resizable   : 'resizable',
-            squareResize : 'squareResize',
-            gesturable  : 'gesturable',
-            styleCursor  : 'styleCursor',
-            origin       : 'origin',
-            deltaSource  : 'deltaSource'
+            draggable: 'draggable',
+            dropzone: 'dropzone',
+            resizable: 'resizable',
+            squareResize: 'squareResize',
+            gesturable: 'gesturable',
+            styleCursor: 'styleCursor',
+            origin: 'origin',
+            deltaSource: 'deltaSource'
         },
         enableOptions = [
             'snap',
@@ -143,19 +158,21 @@ describe('Interactable', function () {
             i,
             action,
             actions = ['drag', 'resizexy', 'resizex', 'resizey', 'gesture'],
-            returnActionI = function () { return actions[i]; };
+            returnActionI = function () {
+                return actions[i];
+            };
 
         it('should set set the function used to determine actions on pointer down events', function () {
             iDiv.actionChecker(returnActionI);
 
             for (i = 0; action = actions[i], i < actions.length; i++) {
-                debug.pointerDown.call(div, mockEvent({
+                debug.listeners.pointerDown.call(div, mockEvent({
                     target: div,
                     pointerId: 1
                 }));
 
                 if (PointerEvent && action === 'gesture') {
-                    debug.pointerDown.call(div, mockEvent({
+                    debug.listeners.pointerDown.call(div, mockEvent({
                         target: div,
                         pointerId: 2
                     }));
@@ -186,21 +203,21 @@ describe('Events', function () {
 
     describe('drag sequence', function () {
         draggable.draggable({
-                onstart: pushEvent,
-                onmove: pushEvent,
-                onend: pushEvent
+            onstart: pushEvent,
+            onmove: pushEvent,
+            onend: pushEvent
         }).actionChecker(function () {
             return 'drag';
         });
 
-        debug.pointerDown(mockEvents[0]);
-        debug.pointerMove(mockEvents[1]);
-        debug.pointerMove(mockEvents[2]);
-        debug.pointerUp  (mockEvents[3]);
+        debug.listeners.pointerDown(mockEvents[0]);
+        debug.listeners.pointerMove(mockEvents[1]);
+        debug.listeners.pointerMove(mockEvents[2]);
+        debug.listeners.pointerUp(mockEvents[3]);
 
         it('should be triggered by mousedown -> mousemove -> mouseup sequence', function () {
             events.length.should.equal(4);
-            
+
             events[0].type.should.equal('dragstart');
             events[1].type.should.equal('dragmove');
             events[2].type.should.equal('dragmove');
@@ -278,28 +295,33 @@ describe('Events', function () {
                 onstart: pushEvent,
                 onmove: pushEvent,
                 onend: pushEvent
-            }).actionChecker(function () { return 'gesture'; }),
+            }).actionChecker(function () {
+                return 'gesture';
+            }),
             mockEvents = data.touch2Move2End2.map(function (e) {
                 return mockEvent(e, element);
             }),
             gestureEvents = [],
-            eventMap = [1, 2, 3, 4];
+            eventMap = [1, 2, 3, 4],
+            debugRecord;
 
         // The pointers must be recorded here since event listeners
         // don't call the related functions. The recorded pointermove events
         // are used to calculate gesture angle, scale, etc.
 
-        debug.pointerDown(mockEvents[0]);
-        debug.pointerDown(mockEvents[1]);
+        debug.listeners.pointerDown(mockEvents[0]);
+        debug.listeners.pointerDown(mockEvents[1]);
 
-        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[2]);
-        debug.pointerMove(mockEvents[2]);
+        debugRecord = PointerEvent && debug.recordPointer || debug.recordTouches || debug.recordPointer;
 
-        debug[PointerEvent? 'recordPointers': 'recordTouches'](mockEvents[3]);
-        debug.pointerMove(mockEvents[3]);
+        debugRecord && debugRecord(mockEvents[2]);
+        debug.listeners.pointerMove(mockEvents[2]);
 
-        debug.pointerUp(mockEvents[4]);
-        debug.pointerUp(mockEvents[5]);
+        debugRecord && debugRecord(mockEvents[3]);
+        debug.listeners.pointerMove(mockEvents[3]);
+
+        debug.listeners.pointerUp(mockEvents[4]);
+        debug.listeners.pointerUp(mockEvents[5]);
 
         it('should be started by 2 touches starting and moving and end when there are fewer than two active touches', function () {
             gestureEvents.length.should.equal(4);
@@ -337,12 +359,12 @@ describe('Events', function () {
                      mEvent = mockEvents[eventMap[i]], gEvent = gestureEvents[i], i < gestureEvents.length;
                      i++) {
 
-                    var average = PointerEvent? mEvent: interact.getTouchAverage(mEvent),
+                    var average = PointerEvent ? mEvent : interact.getTouchAverage(mEvent),
                         coords = ['pageX', 'pageY', 'clientX', 'clientY'];
-                   
-                        coords.forEach(function (coord) {
-                            gEvent[coord].should.equal(average[coord]);
-                        });
+
+                    coords.forEach(function (coord) {
+                        gEvent[coord].should.equal(average[coord]);
+                    });
                 }
             });
         });

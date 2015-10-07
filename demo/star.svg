@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml-stylesheet href="css/star.css" type="text/css"?>
 <svg id="svg-edit-demo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<script type="text/javascript" xlink:href="../interact.js"/>
+<script type="text/javascript" xlink:href="../dist/interact.js"/>
 <script type="text/javascript" xlink:href="js/star.js"/>
 <defs>
     <circle id="point-handle"
