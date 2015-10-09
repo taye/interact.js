@@ -1,10 +1,9 @@
-parser: babel-eslint
-
 extends: 'eslint:recommended'
 
 env:
   browser: true
   commonjs: true
+  es6: true
 
 rules:
   comma-dangle: [2, always-multiline]
