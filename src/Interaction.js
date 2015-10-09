@@ -334,9 +334,7 @@ class Interaction {
     }
 
     if (action) {
-      this.prepared.name  = action.name;
-      this.prepared.axis  = action.axis;
-      this.prepared.edges = action.edges;
+      utils.copyAction(this.prepared, action);
 
       return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
     }
@@ -412,9 +410,7 @@ class Interaction {
         action = null;
       }
 
-      this.prepared.name  = action.name;
-      this.prepared.axis  = action.axis;
-      this.prepared.edges = action.edges;
+      utils.copyAction(this.prepared, action);
 
       modifiers.resetStatuses(this.modifierStatuses);
 
@@ -509,9 +505,7 @@ class Interaction {
       this.setEventXY(this.startCoords, this.pointers);
     }
 
-    this.prepared.name  = action.name;
-    this.prepared.axis  = action.axis;
-    this.prepared.edges = action.edges;
+    utils.copyAction(this.prepared, action);
     this.target         = interactable;
     this.element        = element;
 

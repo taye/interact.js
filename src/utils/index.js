@@ -36,6 +36,14 @@ utils.easeOutQuad = function (t, b, c, d) {
   return -c * t*(t-2) + b;
 };
 
+utils.copyAction = function (dest, src) {
+  dest.name  = src.name;
+  dest.axis  = src.axis;
+  dest.edges = src.edges;
+
+  return dest;
+};
+
 utils.extend      = extend;
 utils.hypot       = require('./hypot');
 utils.raf         = require('./raf');
