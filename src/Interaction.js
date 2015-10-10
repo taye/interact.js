@@ -421,6 +421,10 @@ class Interaction {
       utils.copyCoords(this.prevCoords, this.startCoords);
       this.pointerWasMoved = false;
 
+      signals.fire('interaction-prepared', {
+        interaction: this,
+      });
+
       this.checkAndPreventDefault(event, target, this.element);
     }
     // if inertia is active try to resume action
