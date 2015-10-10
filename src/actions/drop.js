@@ -11,66 +11,55 @@ const drop = {
     accept : null,
     overlap: 'pointer',
   },
-
-  start: function (interaction, event, dragEvent) {
-    // reset active dropzones
-    interaction.activeDrops.dropzones = [];
-    interaction.activeDrops.elements  = [];
-    interaction.activeDrops.rects     = [];
-
-    if (!interaction.dynamicDrop) {
-      setActiveDrops(interaction, interaction.element);
-    }
-
-    const dropEvents = getDropEvents(interaction, event, dragEvent);
-
-    if (dropEvents.activate) {
-      fireActiveDrops(interaction, dropEvents.activate);
-    }
-  },
-
-  move: function (interaction, event, dragEvent) {
-    const draggableElement = interaction.element;
-    const dropOptions = getDrop(dragEvent, event, draggableElement);
-
-    interaction.dropTarget  = dropOptions.dropzone;
-    interaction.dropElement = dropOptions.element;
-
-    const dropEvents = getDropEvents(interaction, event, dragEvent);
-
-    interaction.target.fire(dragEvent);
-
-    if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
-    if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
-    if (dropEvents.move ) {     interaction.dropTarget.fire(dropEvents.move ); }
-
-    interaction.prevDropTarget  = interaction.dropTarget;
-    interaction.prevDropElement = interaction.dropElement;
-  },
-
-  end: function (interaction, event, endEvent) {
-    const draggableElement = interaction.element;
-    const dropResult = getDrop(endEvent, event, draggableElement);
-
-    interaction.dropTarget  = dropResult.dropzone;
-    interaction.dropElement = dropResult.element;
-
-    const dropEvents = getDropEvents(interaction, event, endEvent);
-
-    if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
-    if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
-    if (dropEvents.drop ) {     interaction.dropTarget.fire(dropEvents.drop ); }
-    if (dropEvents.deactivate) {
-      fireActiveDrops(interaction, dropEvents.deactivate);
-    }
-  },
-
-  stop: function (interaction) {
-    interaction.activeDrops.dropzones =
-      interaction.activeDrops.elements =
-      interaction.activeDrops.rects = null;
-  },
 };
+
+signals.on('interaction-start-drag', function ({ interaction, event }) {
+  // reset active dropzones
+  interaction.activeDrops.dropzones = [];
+  interaction.activeDrops.elements  = [];
+  interaction.activeDrops.rects     = [];
+
+  interaction.dropEvents = null;
+
+  if (!interaction.dynamicDrop) {
+    setActiveDrops(interaction, interaction.element);
+  }
+
+  const dragEvent = interaction.prevEvent;
+  const dropEvents = getDropEvents(interaction, event, dragEvent);
+
+  if (dropEvents.activate) {
+    fireActiveDrops(interaction, dropEvents.activate);
+  }
+});
+
+signals.on('interactevent-new-drag', function ({ interaction, iEvent, event }) {
+  if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
+
+  const draggableElement = interaction.element;
+  const dragEvent = iEvent;
+  const dropResult = getDrop(dragEvent, event, draggableElement);
+
+  interaction.dropTarget  = dropResult.dropzone;
+  interaction.dropElement = dropResult.element;
+
+  interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
+});
+
+signals.on('interaction-move-drag', function ({ interaction }) {
+  fireDropEvents(interaction, interaction.dropEvents);
+});
+
+signals.on('interaction-end-drag', function ({ interaction }) {
+  fireDropEvents(interaction, interaction.dropEvents);
+});
+
+signals.on('interaction-stop-drag', function ({ interaction }) {
+  interaction.activeDrops.dropzones =
+    interaction.activeDrops.elements =
+    interaction.activeDrops.rects =
+    interaction.dropEvents = null;
+});
 
 function collectDrops (interaction, element) {
   const drops = [];
@@ -277,6 +266,18 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
   return dropEvents;
 }
 
+function fireDropEvents (interaction, dropEvents) {
+  if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
+  if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
+  if (dropEvents.drop ) {     interaction.dropTarget.fire(dropEvents.drop ); }
+  if (dropEvents.deactivate) {
+    fireActiveDrops(interaction, dropEvents.deactivate);
+  }
+
+  interaction.prevDropTarget  = interaction.dropTarget;
+  interaction.prevDropElement = interaction.dropElement;
+}
+
 /*\
  * Interactable.dropzone
  [ method ]
@@ -428,6 +429,7 @@ signals.on('interaction-new', function (interaction) {
   interaction.dropElement     = null; // the element at the time of checking
   interaction.prevDropTarget  = null; // the dropzone that was recently dragged away from
   interaction.prevDropElement = null; // the element at the time of checking
+  interaction.dropEvents      = null; // the dropEvents related to the current drag event
 
   interaction.activeDrops = {
     dropzones: [],      // the dropzones that are mentioned below

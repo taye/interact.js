@@ -513,7 +513,10 @@ class Interaction {
 
     modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
-    this.prevEvent = actions[this.prepared.name].start(this, this.downEvent);
+    signals.fire('interaction-start-' + this.prepared.name, {
+      interaction: this,
+      event: this.downEvent,
+    });
   }
 
   pointerMove (pointer, event, eventTarget, curEventTarget, preEnd) {
@@ -549,7 +552,7 @@ class Interaction {
       this.pointerWasMoved = utils.hypot(dx, dy) > scope.pointerMoveTolerance;
     }
 
-    signals.fire('interaction-move', {
+    const signalArg = {
       pointer,
       event,
       eventTarget,
@@ -557,7 +560,9 @@ class Interaction {
       dy,
       interaction: this,
       duplicate: duplicateMove,
-    });
+    };
+
+    signals.fire('interaction-move', signalArg);
 
     if (!this.pointerIsDown) { return; }
 
@@ -579,7 +584,7 @@ class Interaction {
       if (!this.interacting()) {
         utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
-        actions[this.prepared.name].beforeStart(this, pointer, event, eventTarget, curEventTarget, dx, dy);
+        signals.fire('interaction-before-start-' + this.prepared.name, signalArg);
       }
 
       const starting = !!this.prepared.name && !this.interacting();
@@ -600,7 +605,7 @@ class Interaction {
 
         // move if snapping or restriction doesn't prevent it
         if (modifierResult.shouldMove || starting) {
-          this.prevEvent = actions[this.prepared.name].move(this, event);
+          signals.fire('interaction-move-' + this.prepared.name, signalArg);
         }
 
         this.checkAndPreventDefault(event, this.target, this.element);
@@ -609,11 +614,7 @@ class Interaction {
 
     utils.copyCoords(this.prevCoords, this.curCoords);
 
-    signals.fire('interaction-move-done', {
-      pointer,
-      event,
-      interaction: this,
-    });
+    signals.fire('interaction-move-done', signalArg);
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
@@ -758,7 +759,10 @@ class Interaction {
     }
 
     if (this.interacting()) {
-      actions[this.prepared.name].end(this, event);
+      signals.fire('interaction-end-' + this.prepared.name, {
+        event,
+        interaction: this,
+      });
     }
 
     this.stop(event);
@@ -792,7 +796,10 @@ class Interaction {
         this.checkAndPreventDefault(event, target, this.element);
       }
 
-      actions[this.prepared.name].stop(this, event);
+      signals.fire('interaction-stop-' + this.prepared.name, {
+        event,
+        interaction: this,
+      });
     }
 
     this.target = this.element = null;

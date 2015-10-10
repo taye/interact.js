@@ -6,6 +6,7 @@ require('./legacyBrowsers');
 // actions
 require('./actions/resize');
 require('./actions/drag');
+require('./actions/drop');
 require('./actions/gesture');
 
 // autoScroll

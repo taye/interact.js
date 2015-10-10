@@ -79,7 +79,7 @@ class InteractEvent {
       this.detail = 'inertia';
     }
 
-    signals.fire('interactevent-new', signalArg);
+    signals.fire('interactevent', signalArg);
     signals.fire('interactevent-' + action, signalArg);
 
     if (starting) {
@@ -151,6 +151,9 @@ class InteractEvent {
         },
       };
     }
+
+    signals.fire('interactevent-new', signalArg);
+    signals.fire('interactevent-new-' + action, signalArg);
   }
 
   preventDefault () {}
@@ -164,7 +167,7 @@ class InteractEvent {
   }
 }
 
-signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, ending, starting,
+signals.on('interactevent', function ({ iEvent, interaction, action, phase, ending, starting,
                                             page, client, deltaSource }) {
   // end event dx, dy is difference between start and end points
   if (ending) {

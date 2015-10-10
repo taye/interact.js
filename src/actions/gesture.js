@@ -27,59 +27,55 @@ const gesture = {
   getCursor: function () {
     return '';
   },
-
-  beforeStart: utils.blank,
-
-  start: function (interaction, event) {
-    const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
-
-    gestureEvent.ds = 0;
-
-    interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
-    interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
-    interaction.gesture.scale = 1;
-
-    interaction._interacting = true;
-
-    interaction.target.fire(gestureEvent);
-
-    return gestureEvent;
-  },
-
-  move: function (interaction, event) {
-    if (!interaction.pointerIds.length) {
-      return interaction.prevEvent;
-    }
-
-    let gestureEvent;
-
-    gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
-    gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
-
-    interaction.target.fire(gestureEvent);
-
-    interaction.gesture.prevAngle = gestureEvent.angle;
-    interaction.gesture.prevDistance = gestureEvent.distance;
-
-    if (gestureEvent.scale !== Infinity
-        && gestureEvent.scale !== null
-        && gestureEvent.scale !== undefined
-        && !isNaN(gestureEvent.scale)) {
-
-      interaction.gesture.scale = gestureEvent.scale;
-    }
-
-    return gestureEvent;
-  },
-
-  end: function (interaction, event) {
-    const endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
-
-    interaction.target.fire(endEvent);
-  },
-
-  stop: utils.blank,
 };
+
+signals.on('interaction-start-gesture', function ({ interaction, event }) {
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
+
+  gestureEvent.ds = 0;
+
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
+  interaction.gesture.scale = 1;
+
+  interaction._interacting = true;
+
+  interaction.target.fire(gestureEvent);
+  interaction.prevEvent = gestureEvent;
+});
+
+signals.on('interaction-move-gesture', function ({ interaction, event }) {
+  if (!interaction.pointerIds.length) {
+    return interaction.prevEvent;
+  }
+
+  let gestureEvent;
+
+  gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
+  gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
+
+  interaction.target.fire(gestureEvent);
+
+  interaction.gesture.prevAngle = gestureEvent.angle;
+  interaction.gesture.prevDistance = gestureEvent.distance;
+
+  if (gestureEvent.scale !== Infinity
+      && gestureEvent.scale !== null
+      && gestureEvent.scale !== undefined
+      && !isNaN(gestureEvent.scale)) {
+
+    interaction.gesture.scale = gestureEvent.scale;
+  }
+
+  interaction.prevEvent = gestureEvent;
+});
+
+signals.on('interaction-end-gesture', function ({ interaction, event }) {
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
+
+  interaction.target.fire(gestureEvent);
+  interaction.prevEvent = gestureEvent;
+});
 
 /*\
  * Interactable.gesturable
