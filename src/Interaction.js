@@ -949,17 +949,21 @@ class Interaction {
     const prevent = options.preventDefault;
 
     if (prevent === 'auto' && element && !/^(input|select|textarea)$/i.test(event.target.nodeName)) {
-      // do not preventDefault on pointerdown if the prepared action is a drag
-      // and dragging can only start from a certain direction - this allows
-      // a touch to pan the viewport if a drag isn't in the right direction
+      const actionOptions = options[this.prepared.name];
+
+      // do not preventDefault on pointerdown if the prepared action is delayed
+      // or it is a drag and dragging can only start from a certain direction -
+      // this allows a touch to pan the viewport if a drag isn't in the right
+      // direction
       if (/down|start/i.test(event.type)
-          && this.prepared.name === 'drag' && options.drag.axis !== 'xy') {
+          && ((this.prepared.name === 'drag' && options.drag.axis !== 'xy')
+              || actionOptions.delay > 0)) {
 
         return;
       }
 
       // with manualStart, only preventDefault while interacting
-      if (options[this.prepared.name] && options[this.prepared.name].manualStart
+      if (actionOptions && actionOptions.manualStart
           && !this.interacting()) {
         return;
       }
