@@ -9,6 +9,8 @@ require('./actions/drag');
 require('./actions/drop');
 require('./actions/gesture');
 
+require('./delay.js');
+
 // autoScroll
 require('./autoScroll');
 
