@@ -1,8 +1,9 @@
 const base = require('./base');
 const utils = require('../utils');
 const scope = require('../scope');
-const signals = require('../utils/signals');
+const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
+const Interaction = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drop = {
@@ -13,7 +14,7 @@ const drop = {
   },
 };
 
-signals.on('interaction-start-drag', function ({ interaction, event }) {
+Interaction.signals.on('start-drag', function ({ interaction, event }) {
   // reset active dropzones
   interaction.activeDrops.dropzones = [];
   interaction.activeDrops.elements  = [];
@@ -33,7 +34,7 @@ signals.on('interaction-start-drag', function ({ interaction, event }) {
   }
 });
 
-signals.on('interactevent-new-drag', function ({ interaction, iEvent, event }) {
+InteractEvent.signals.on('new-drag', function ({ interaction, iEvent, event }) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
 
   const draggableElement = interaction.element;
@@ -46,15 +47,15 @@ signals.on('interactevent-new-drag', function ({ interaction, iEvent, event }) {
   interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 });
 
-signals.on('interaction-move-drag', function ({ interaction }) {
+Interaction.signals.on('move-drag', function ({ interaction }) {
   fireDropEvents(interaction, interaction.dropEvents);
 });
 
-signals.on('interaction-end-drag', function ({ interaction }) {
+Interaction.signals.on('end-drag', function ({ interaction }) {
   fireDropEvents(interaction, interaction.dropEvents);
 });
 
-signals.on('interaction-stop-drag', function ({ interaction }) {
+Interaction.signals.on('stop-drag', function ({ interaction }) {
   interaction.activeDrops.dropzones =
     interaction.activeDrops.elements =
     interaction.activeDrops.rects =
@@ -420,11 +421,11 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
   return dropped;
 };
 
-signals.on('interactable-unset', function ({ interactable }) {
+Interactable.signals.on('unset', function ({ interactable }) {
   interactable.dropzone(false);
 });
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.dropTarget      = null; // the dropzone a drag target might be dropped into
   interaction.dropElement     = null; // the element at the time of checking
   interaction.prevDropTarget  = null; // the dropzone that was recently dragged away from
@@ -439,7 +440,7 @@ signals.on('interaction-new', function (interaction) {
 
 });
 
-signals.on('interaction-stop', function ({ interaction }) {
+Interaction.signals.on('stop', function ({ interaction }) {
   interaction.dropTarget = interaction.dropElement =
     interaction.prevDropTarget = interaction.prevDropElement = null;
 });

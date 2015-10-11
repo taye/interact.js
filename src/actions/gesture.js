@@ -2,8 +2,8 @@ const base = require('./base');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
+const Interaction = require('../Interaction');
 const scope = require('../scope');
-const signals = require('../utils/signals');
 const defaultOptions = require('../defaultOptions');
 
 const gesture = {
@@ -29,7 +29,7 @@ const gesture = {
   },
 };
 
-signals.on('interaction-start-gesture', function ({ interaction, event }) {
+Interaction.signals.on('start-gesture', function ({ interaction, event }) {
   const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
 
   gestureEvent.ds = 0;
@@ -44,7 +44,7 @@ signals.on('interaction-start-gesture', function ({ interaction, event }) {
   interaction.prevEvent = gestureEvent;
 });
 
-signals.on('interaction-move-gesture', function ({ interaction, event }) {
+Interaction.signals.on('move-gesture', function ({ interaction, event }) {
   if (!interaction.pointerIds.length) {
     return interaction.prevEvent;
   }
@@ -70,7 +70,7 @@ signals.on('interaction-move-gesture', function ({ interaction, event }) {
   interaction.prevEvent = gestureEvent;
 });
 
-signals.on('interaction-end-gesture', function ({ interaction, event }) {
+Interaction.signals.on('end-gesture', function ({ interaction, event }) {
   const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
 
   interaction.target.fire(gestureEvent);
@@ -118,7 +118,7 @@ Interactable.prototype.gesturable = function (options) {
   return this.options.gesture;
 };
 
-signals.on('interactevent-gesture', function (arg) {
+InteractEvent.signals.on('gesture', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
   const { interaction, iEvent, starting, ending, deltaSource } = arg;
@@ -153,7 +153,7 @@ signals.on('interactevent-gesture', function (arg) {
   }
 });
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.gesture = {
     start: { x: 0, y: 0 },
 

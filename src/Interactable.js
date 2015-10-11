@@ -1,12 +1,13 @@
 const isType  = require('./utils/isType');
 const events  = require('./utils/events');
-const signals = require('./utils/signals');
 const extend  = require('./utils/extend');
 const actions = require('./actions/base');
 const scope   = require('./scope');
 
 const { getElementRect }    = require('./utils/domUtils');
 const { indexOf, contains } = require('./utils/arr');
+
+const signals = new (require('./utils/Signals'));
 
 // all set interactables
 scope.interactables = [];
@@ -45,7 +46,7 @@ class Interactable {
 
     this._doc = _window.document;
 
-    signals.fire('interactable-new', {
+    signals.fire('new', {
       element,
       options,
       interactable: this,
@@ -646,7 +647,7 @@ class Interactable {
       }
     }
 
-    signals.fire('interactable-unset', { interactable: this });
+    signals.fire('unset', { interactable: this });
 
     scope.interactables.splice(isType.indexOf(scope.interactables, this), 1);
 
@@ -655,5 +656,7 @@ class Interactable {
 }
 
 Interactable.prototype.defaultActionChecker = actions.defaultChecker;
+
+Interactable.signals = signals;
 
 module.exports = Interactable;

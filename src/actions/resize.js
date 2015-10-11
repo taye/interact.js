@@ -1,10 +1,10 @@
 const base = require('./base');
 const utils = require('../utils');
 const browser = require('../utils/browser');
-const signals = require('../utils/signals');
 const scope = require('../scope');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
+const Interaction = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const resize = {
@@ -134,7 +134,7 @@ const resize = {
   },
 };
 
-signals.on('interaction-start-resize', function ({ interaction, event }) {
+Interaction.signals.on('start-resize', function ({ interaction, event }) {
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'start', interaction.element);
 
   if (interaction.prepared.edges) {
@@ -188,7 +188,7 @@ signals.on('interaction-start-resize', function ({ interaction, event }) {
   interaction.prevEvent = resizeEvent;
 });
 
-signals.on('interaction-move-resize', function ({ interaction, event }) {
+Interaction.signals.on('move-resize', function ({ interaction, event }) {
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'move', interaction.element);
   const resizeOptions = interaction.target.options.resize;
   const invert = resizeOptions.invert;
@@ -284,7 +284,7 @@ signals.on('interaction-move-resize', function ({ interaction, event }) {
   interaction.prevEvent = resizeEvent;
 });
 
-signals.on('interaction-end-resize', function ({ interaction, event }) {
+Interaction.signals.on('end-resize', function ({ interaction, event }) {
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'end', interaction.element);
 
   interaction.target.fire(resizeEvent);
@@ -401,11 +401,11 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     : utils.matchesUpTo(element, value, interactableElement);
 }
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.resizeAxes = 'xy';
 });
 
-signals.on('interactevent-resize', function ({ interaction, iEvent }) {
+InteractEvent.signals.on('resize', function ({ interaction, iEvent }) {
   if (!interaction.resizeAxes) { return; }
 
   const options = interaction.target.options;

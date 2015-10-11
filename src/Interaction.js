@@ -1,13 +1,15 @@
 const scope          = require('./scope');
 const utils          = require('./utils');
 const InteractEvent  = require('./InteractEvent');
+const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
-const signals        = require('./utils/signals');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
 const actions        = require('./actions/base');
 const modifiers      = require('./modifiers/base');
 const animationFrame = utils.raf;
+
+const signals = new (require('./utils/Signals'));
 
 const listeners   = {};
 const methodNames = [
@@ -116,7 +118,7 @@ class Interaction {
 
     this.mouse = false;
 
-    signals.fire('interaction-new', this);
+    signals.fire('new', this);
 
     scope.interactions.push(this);
   }
@@ -273,7 +275,7 @@ class Interaction {
 
     this.pointerIsDown = true;
 
-    signals.fire('interaction-down', {
+    signals.fire('down', {
       pointer,
       event,
       eventTarget,
@@ -423,7 +425,7 @@ class Interaction {
       utils.copyCoords(this.prevCoords, this.startCoords);
       this.pointerWasMoved = false;
 
-      signals.fire('interaction-prepared', {
+      signals.fire('prepared', {
         interaction: this,
       });
 
@@ -519,7 +521,7 @@ class Interaction {
 
     modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
-    signals.fire('interaction-start-' + this.prepared.name, {
+    signals.fire('start-' + this.prepared.name, {
       interaction: this,
       event: this.downEvent,
     });
@@ -571,7 +573,7 @@ class Interaction {
       duplicate: duplicateMove,
     };
 
-    signals.fire('interaction-move', signalArg);
+    signals.fire('move', signalArg);
 
     if (!this.pointerIsDown) { return; }
 
@@ -593,7 +595,7 @@ class Interaction {
       if (!this.interacting()) {
         utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
-        signals.fire('interaction-before-start-' + this.prepared.name, signalArg);
+        signals.fire('before-start-' + this.prepared.name, signalArg);
       }
 
       const starting = !!this.prepared.name && !this.interacting();
@@ -614,7 +616,7 @@ class Interaction {
 
         // move if snapping or restriction doesn't prevent it
         if (modifierResult.shouldMove || starting) {
-          signals.fire('interaction-move-' + this.prepared.name, signalArg);
+          signals.fire('move-' + this.prepared.name, signalArg);
         }
 
         this.checkAndPreventDefault(event, this.target, this.element);
@@ -623,7 +625,7 @@ class Interaction {
 
     utils.copyCoords(this.prevCoords, this.curCoords);
 
-    signals.fire('interaction-move-done', signalArg);
+    signals.fire('move-done', signalArg);
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
@@ -631,7 +633,7 @@ class Interaction {
 
     clearTimeout(this.holdTimers[pointerIndex]);
 
-    signals.fire('interaction-up', {
+    signals.fire('up', {
       pointer,
       event,
       eventTarget,
@@ -650,7 +652,7 @@ class Interaction {
 
     clearTimeout(this.holdTimers[pointerIndex]);
 
-    signals.fire('interaction-cancel', {
+    signals.fire('cancel', {
       pointer,
       event,
       eventTarget,
@@ -768,7 +770,7 @@ class Interaction {
     }
 
     if (this.interacting()) {
-      signals.fire('interaction-end-' + this.prepared.name, {
+      signals.fire('end-' + this.prepared.name, {
         event,
         interaction: this,
       });
@@ -786,10 +788,10 @@ class Interaction {
   }
 
   stop (event) {
-    signals.fire('interaction-stop', { interaction: this });
+    signals.fire('stop', { interaction: this });
 
     if (this._interacting) {
-      signals.fire('interaction-stop-active', { interaction: this });
+      signals.fire('stop-active', { interaction: this });
 
       this.matches = [];
       this.matchElements = [];
@@ -805,7 +807,7 @@ class Interaction {
         this.checkAndPreventDefault(event, target, this.element);
       }
 
-      signals.fire('interaction-stop-' + this.prepared.name, {
+      signals.fire('stop-' + this.prepared.name, {
         event,
         interaction: this,
       });
@@ -1074,7 +1076,7 @@ function doOnInteractions (method) {
   });
 }
 
-signals.on('interactable-new', function ({ interactable, win }) {
+Interactable.signals.on('new', function ({ interactable, win }) {
   const element = interactable._element;
 
   if (utils.isElement(element, win)) {
@@ -1091,7 +1093,7 @@ signals.on('interactable-new', function ({ interactable, win }) {
   }
 });
 
-signals.on('interactable-unset', function ({ interactable, win }) {
+Interactable.signals.on('unset', function ({ interactable, win }) {
   const element = interactable._element;
 
   if (!interactable.selector && utils.isElement(element, win)) {
@@ -1108,7 +1110,7 @@ signals.on('interactable-unset', function ({ interactable, win }) {
   }
 });
 
-signals.on('listen-to-document', function ({ doc, win }) {
+scope.signals.on('listen-to-document', function ({ doc, win }) {
   const pEventTypes = browser.pEventTypes;
 
   // add delegate event listener
@@ -1175,12 +1177,13 @@ signals.on('listen-to-document', function ({ doc, win }) {
   events.documents.push(doc);
 });
 
-signals.fire('listen-to-document', {
+scope.signals.fire('listen-to-document', {
   win: scope.window,
   doc: scope.document,
 });
 
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.withinLimit = scope.withinInteractionLimit;
+Interaction.signals = signals;
 
 module.exports = Interaction;

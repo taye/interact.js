@@ -2,7 +2,7 @@ const raf            = require('./utils/raf');
 const getWindow      = require('./utils/window').getWindow;
 const isWindow       = require('./utils/isType').isWindow;
 const domUtils       = require('./utils/domUtils');
-const signals        = require('./utils/signals');
+const Interaction    = require('./Interaction');
 const defaultOptions = require('./defaultOptions');
 
 const autoScroll = {
@@ -113,11 +113,11 @@ const autoScroll = {
   },
 };
 
-signals.on('interaction-stop-active', function () {
+Interaction.signals.on('stop-active', function () {
   autoScroll.stop();
 });
 
-signals.on('interaction-move-done', autoScroll.onInteractionMove);
+Interaction.signals.on('move-done', autoScroll.onInteractionMove);
 
 defaultOptions.perAction.autoScroll = autoScroll.defaults;
 

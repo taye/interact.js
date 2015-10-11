@@ -1,10 +1,10 @@
 const scope   = {};
 const utils   = require('./utils');
-const signals = require('./utils/signals');
 
 scope.defaultOptions = require('./defaultOptions');
 scope.events         = require('./utils/events');
-scope.signals        = require('./utils/signals');
+
+scope.signals        = new (require('./utils/Signals'));
 
 utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));
@@ -60,7 +60,7 @@ scope.endAllInteractions = function (event) {
 
 scope.prefixedPropREs = utils.prefixedPropREs;
 
-signals.on('listen-to-document', function ({ doc }) {
+scope.signals.on('listen-to-document', function ({ doc }) {
   // if document is already known
   if (utils.contains(scope.documents, doc)) {
     // don't call any further signal listeners

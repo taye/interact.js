@@ -1,11 +1,11 @@
-const signals = require('./utils/signals');
+const Interaction = require('./Interaction');
 const actions = require('./actions/base');
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.delayTimer = null;
 });
 
-signals.on('interaction-prepared', function ({ interaction }) {
+Interaction.signals.on('prepared', function ({ interaction }) {
   const delay = interaction.target.options[interaction.prepared.name].delay;
 
   if (delay > 0) {
@@ -16,10 +16,10 @@ signals.on('interaction-prepared', function ({ interaction }) {
 });
 
 for (const action of actions.names) {
-  signals.on('interaction-before-start-' + action, preventImmediateMove);
+  Interaction.signals.on('before-start-' + action, preventImmediateMove);
 }
 
-signals.on('interaction-move-done', function ({ interaction }) {
+Interaction.signals.on('move-done', function ({ interaction }) {
   if (interaction.pointerWasMoved) {
     clearTimeout(interaction.delayTimer);
   }

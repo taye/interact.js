@@ -1,10 +1,10 @@
 const base = require('./base');
 const scope = require('../scope');
 const utils = require('../utils');
-const signals = require('../utils/signals');
 const browser = require('../utils/browser');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
+const Interaction = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drag = {
@@ -33,7 +33,7 @@ const drag = {
   },
 };
 
-signals.on('interaction-before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
+Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
@@ -110,7 +110,7 @@ signals.on('interaction-before-start-drag',  function ({ interaction, eventTarge
   }
 });
 
-signals.on('interaction-start-drag', function ({ interaction, event }) {
+Interaction.signals.on('start-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
 
   interaction._interacting = true;
@@ -118,14 +118,14 @@ signals.on('interaction-start-drag', function ({ interaction, event }) {
   interaction.prevEvent = dragEvent;
 });
 
-signals.on('interaction-move-drag', function ({ interaction, event }) {
+Interaction.signals.on('move-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
 
   interaction.target.fire(dragEvent);
   interaction.prevEvent = dragEvent;
 });
 
-signals.on('interaction-end-drag', function ({ interaction, event }) {
+Interaction.signals.on('end-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'end', interaction.element);
 
   interaction.target.fire(dragEvent);
