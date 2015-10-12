@@ -4,6 +4,9 @@ const Interaction = require('./Interaction');
 const utils = require('./utils');
 const browser = require('./utils/browser');
 
+const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
+const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
+
 function preventOriginalDefault () {
   this.originalEvent.preventDefault();
 }
@@ -174,8 +177,8 @@ function createSignalListener (event) {
   };
 }
 
-for (const eventType of [ 'down', 'up', 'up', 'cancel' ]) {
-  Interaction.signals.on(eventType, createSignalListener(eventType));
+for (let i = 0; i < simpleSignals.length; i++) {
+  Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
 }
 
 Interaction.signals.on('new', function (interaction) {
