@@ -83,9 +83,9 @@ function collectDrops (interaction, element) {
     }
 
     // query for new elements if necessary
-    const dropElements = current.selector
-      ? current._context.querySelectorAll(current.selector)
-      : [current._element];
+    const dropElements = utils.isString(current.target)
+      ? current._context.querySelectorAll(current.target)
+      : [current.target];
 
     for (let i = 0; i < dropElements.length; i++) {
       const currentElement = dropElements[i];

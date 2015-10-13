@@ -64,16 +64,14 @@ scope.testAllow = function (interactable, interactableElement, element) {
   return false;
 };
 
-scope.interactables.indexOfElement = function indexOfElement (element, context) {
+scope.interactables.indexOfElement = function indexOfElement (target, context) {
   context = context || scope.document;
 
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
-    if ((interactable.selector === element
-      && (interactable._context === context))
-      || (!interactable.selector && interactable._element === element)) {
-
+    if (interactable.target === target
+        && (!utils.isString(target) || (interactable._context === context))) {
       return i;
     }
   }
@@ -88,11 +86,12 @@ scope.interactables.forEachSelector = function (callback) {
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
-    if (!interactable.selector) {
+    // skip non CSS selector targets
+    if (!utils.isString(interactable.target)) {
       continue;
     }
 
-    const ret = callback(interactable, interactable.selector, interactable._context, i, this);
+    const ret = callback(interactable, interactable.target, interactable._context, i, this);
 
     if (ret !== undefined) {
       return ret;

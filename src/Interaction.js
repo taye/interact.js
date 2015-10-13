@@ -284,7 +284,7 @@ class Interaction {
     });
 
     // Check if the down event hits the current inertia target
-    if (this.inertiaStatus.active && this.target.selector) {
+    if (this.inertiaStatus.active && utils.isString(this.target.target)) {
       // climb up the DOM tree from the event target
       while (utils.isElement(element)) {
 
@@ -371,7 +371,7 @@ class Interaction {
     // If it is the second touch of a multi-touch gesture, keep the
     // target the same and get a new action if a target was set by the
     // first touch
-    if (this.pointerIds.length > 1 && this.target._element === this.element) {
+    if (this.pointerIds.length > 1 && this.target.target === this.element) {
       const newAction = validateAction(forceAction || this.target.getAction(pointer, event, this, this.element), this.target);
 
       if (scope.withinInteractionLimit(this.target, this.element, newAction)) {
@@ -1077,7 +1077,7 @@ function doOnInteractions (method) {
 }
 
 Interactable.signals.on('new', function ({ interactable, win }) {
-  const element = interactable._element;
+  const element = interactable.target;
 
   if (utils.isElement(element, win)) {
     if (scope.PointerEvent) {
@@ -1094,9 +1094,9 @@ Interactable.signals.on('new', function ({ interactable, win }) {
 });
 
 Interactable.signals.on('unset', function ({ interactable, win }) {
-  const element = interactable._element;
+  const element = interactable.target;
 
-  if (!interactable.selector && utils.isElement(element, win)) {
+  if (!utils.isString(interactable.target) && utils.isElement(element, win)) {
     if (scope.PointerEvent) {
       events.remove(element, browser.pEventTypes.down, listeners.pointerDown );
       events.remove(element, browser.pEventTypes.move, listeners.pointerHover);

@@ -19,15 +19,15 @@ scope.interactables = [];
  * Object type returned by @interact
 \*/
 class Interactable {
-  constructor (element, options) {
-    this._element = element;
+  constructor (target, options) {
+    this.target   = target;
     this._context = scope.document;
     this._iEvents = this._iEvents || {};
 
     let _window;
 
-    if (isType.trySelector(element)) {
-      this.selector = element;
+    if (isType.trySelector(target)) {
+      this.target = target;
 
       const context = options && options.context;
 
@@ -41,13 +41,13 @@ class Interactable {
       }
     }
     else {
-      _window = scope.getWindow(element);
+      _window = scope.getWindow(target);
     }
 
     this._doc = _window.document;
 
     signals.fire('new', {
-      element,
+      target,
       options,
       interactable: this,
       win: _window,
@@ -174,10 +174,10 @@ class Interactable {
    o }
   \*/
   getRect (element) {
-    element = element || this._element;
+    element = element || this.target;
 
-    if (this.selector && !(isType.isElement(element))) {
-      element = this._context.querySelector(this.selector);
+    if (isType.isString(this.target) && !(isType.isElement(element))) {
+      element = this._context.querySelector(this.target);
     }
 
     return getElementRect(element);
@@ -390,7 +390,7 @@ class Interactable {
    = (Element) HTML / SVG Element
   \*/
   element () {
-    return this._element;
+    return this.target;
   }
 
   /*\
@@ -485,11 +485,11 @@ class Interactable {
       }
     }
     // delegated event for selector
-    else if (this.selector) {
-      events.addDelegate(this.selector, this._context, eventType, listener, useCapture);
+    else if (isType.isString(this.target)) {
+      events.addDelegate(this.target, this._context, eventType, listener, useCapture);
     }
     else {
-      events.add(this._element, eventType, listener, useCapture);
+      events.add(this.target, eventType, listener, useCapture);
     }
 
     return this;
@@ -545,12 +545,12 @@ class Interactable {
       }
     }
     // delegated event
-    else if (this.selector) {
-      events.removeDelegate(this.selector, this._context, eventType, listener, useCapture);
+    else if (isType.isString(this.target)) {
+      events.removeDelegate(this.target, this._context, eventType, listener, useCapture);
     }
     // remove listener from this Interatable's element
     else {
-      events.remove(this._element, eventType, listener, useCapture);
+      events.remove(this.target, eventType, listener, useCapture);
     }
 
     return this;
@@ -612,21 +612,15 @@ class Interactable {
    = (object) @interact
   \*/
   unset () {
-    events.remove(this._element, 'all');
+    events.remove(this.target, 'all');
 
-    if (!isType.isString(this.selector)) {
-      events.remove(this, 'all');
-      if (this.options.styleCursor) {
-        this._element.style.cursor = '';
-      }
-    }
-    else {
+    if (isType.isString(this.target)) {
       // remove delegated events
       for (const type in events.delegatedEvents) {
         const delegated = events.delegatedEvents[type];
 
         for (let i = 0; i < delegated.selectors.length; i++) {
-          if (delegated.selectors[i] === this.selector
+          if (delegated.selectors[i] === this.target
               && delegated.contexts[i] === this._context) {
 
             delegated.selectors.splice(i, 1);
@@ -644,6 +638,12 @@ class Interactable {
 
           break;
         }
+      }
+    }
+    else {
+      events.remove(this, 'all');
+      if (this.options.styleCursor) {
+        this.target.style.cursor = '';
       }
     }
 
