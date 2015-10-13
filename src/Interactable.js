@@ -54,7 +54,7 @@ class Interactable {
     });
 
     if (this._doc !== scope.document) {
-      signals.fire('listen-to-document', {
+      scope.signals.fire('listen-to-document', {
         doc: this._doc,
         win: _window,
       });
