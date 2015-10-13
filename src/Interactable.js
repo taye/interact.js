@@ -381,19 +381,6 @@ class Interactable {
   }
 
   /*\
-   * Interactable.element
-   [ method ]
-   *
-   * If this is not a selector Interactable, it returns the element this
-   * interactable represents
-   *
-   = (Element) HTML / SVG Element
-  \*/
-  element () {
-    return this.target;
-  }
-
-  /*\
    * Interactable.fire
    [ method ]
    *
