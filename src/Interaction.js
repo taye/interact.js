@@ -964,7 +964,7 @@ class Interaction {
       // direction
       if (/down|start/i.test(event.type)
           && ((this.prepared.name === 'drag' && options.drag.axis !== 'xy')
-              || actionOptions.delay > 0)) {
+              || (actionOptions && actionOptions.delay > 0))) {
 
         return;
       }

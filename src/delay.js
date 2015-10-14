@@ -6,7 +6,11 @@ Interaction.signals.on('new', function (interaction) {
 });
 
 Interaction.signals.on('prepared', function ({ interaction }) {
-  const delay = interaction.target.options[interaction.prepared.name].delay;
+  const actionName = interaction.prepared.name;
+
+  if (!actionName) { return; }
+
+  const delay = interaction.target.options[actionName].delay;
 
   if (delay > 0) {
     interaction.delayTimer = setTimeout(() => {
@@ -26,7 +30,11 @@ Interaction.signals.on('move-done', function ({ interaction }) {
 });
 
 function preventImmediateMove ({ interaction }) {
-  const delay = interaction.target.options[interaction.prepared.name].delay;
+  const actionName = interaction.prepared.name;
+
+  if (!actionName) { return; }
+
+  const delay = interaction.target.options[actionName].delay;
 
   if (delay > 0) {
     interaction.prepared.name = null;
