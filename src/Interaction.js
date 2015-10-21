@@ -1,7 +1,6 @@
 const scope          = require('./scope');
 const utils          = require('./utils');
 const InteractEvent  = require('./InteractEvent');
-const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
@@ -13,8 +12,8 @@ const signals = new (require('./utils/Signals'));
 
 const listeners   = {};
 const methodNames = [
-  'pointerOver', 'pointerOut', 'pointerHover', 'selectorDown',
-  'pointerDown', 'pointerMove', 'pointerUp', 'pointerCancel', 'pointerEnd',
+  'pointerDown', 'pointerMove', 'pointerHover',
+  'pointerUp', 'pointerCancel', 'pointerEnd',
   'addPointer', 'removePointer', 'recordPointer',
 ];
 
@@ -141,172 +140,10 @@ class Interaction {
     targetObj.timeStamp = new Date().getTime();
   }
 
-  pointerOver (pointer, event, eventTarget) {
-    if (this.prepared.name || !this.mouse) { return; }
+  pointerHover (pointer, event, eventTarget) {
+    if (!this.mouse || this.pointerIsDown) { return; }
 
-    const curMatches = [];
-    const curMatchElements = [];
-    const prevTargetElement = this.element;
-
-    this.addPointer(pointer);
-
-    if (this.target
-        && (scope.testIgnore(this.target, this.element, eventTarget)
-        || !scope.testAllow(this.target, this.element, eventTarget))) {
-      // if the eventTarget should be ignored or shouldn't be allowed
-      // clear the previous target
-      this.target = null;
-      this.element = null;
-      this.matches = [];
-      this.matchElements = [];
-    }
-
-    const elementInteractable = scope.interactables.get(eventTarget);
-    let elementAction = (elementInteractable
-                         && !scope.testIgnore(elementInteractable, eventTarget, eventTarget)
-                         && scope.testAllow(elementInteractable, eventTarget, eventTarget)
-                         && validateAction(
-                           elementInteractable.getAction(pointer, event, this, eventTarget),
-                           elementInteractable));
-
-    if (elementAction && !scope.withinInteractionLimit(elementInteractable, eventTarget, elementAction)) {
-      elementAction = null;
-    }
-
-    function pushCurMatches (interactable, selector) {
-      if (interactable
-          && scope.inContext(interactable, eventTarget)
-          && !scope.testIgnore(interactable, eventTarget, eventTarget)
-          && scope.testAllow(interactable, eventTarget, eventTarget)
-          && utils.matchesSelector(eventTarget, selector)) {
-
-        curMatches.push(interactable);
-        curMatchElements.push(eventTarget);
-      }
-    }
-
-    if (elementAction) {
-      this.target = elementInteractable;
-      this.element = eventTarget;
-      this.matches = [];
-      this.matchElements = [];
-    }
-    else {
-      scope.interactables.forEachSelector(pushCurMatches);
-
-      if (this.validateSelector(pointer, event, curMatches, curMatchElements)) {
-        this.matches = curMatches;
-        this.matchElements = curMatchElements;
-
-        this.pointerHover(pointer, event, this.matches, this.matchElements);
-        events.add(eventTarget,
-                   scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                   listeners.pointerHover);
-      }
-      else if (this.target) {
-        if (utils.nodeContains(prevTargetElement, eventTarget)) {
-          this.pointerHover(pointer, event, this.matches, this.matchElements);
-          events.add(this.element,
-                     scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                     listeners.pointerHover);
-        }
-        else {
-          this.target = null;
-          this.element = null;
-          this.matches = [];
-          this.matchElements = [];
-        }
-      }
-    }
-  }
-
-  // Check what action would be performed on pointerMove target if a mouse
-  // button were pressed and change the cursor accordingly
-  pointerHover (pointer, event, eventTarget, curEventTarget, matches, matchElements) {
-    const target = this.target;
-
-    if (!this.prepared.name && this.mouse) {
-
-      let action;
-
-      // update pointer coords for defaultActionChecker to use
-      this.setEventXY(this.curCoords, [pointer]);
-
-      if (matches) {
-        action = this.validateSelector(pointer, event, matches, matchElements);
-      }
-      else if (target) {
-        action = validateAction(target.getAction(this.pointers[0], event, this, this.element), this.target);
-      }
-
-      if (target && target.options.styleCursor) {
-        if (action) {
-          target._doc.documentElement.style.cursor = actions[action.name].getCursor(action);
-        }
-        else {
-          target._doc.documentElement.style.cursor = '';
-        }
-      }
-    }
-    else if (this.prepared.name) {
-      this.checkAndPreventDefault(event, target, this.element);
-    }
-  }
-
-  pointerOut (pointer, event, eventTarget) {
-    if (this.prepared.name) { return; }
-
-    // Remove temporary event listeners for selector Interactables
-    if (!scope.interactables.get(eventTarget)) {
-      events.remove(eventTarget,
-                    scope.PointerEvent? browser.pEventTypes.move : 'mousemove',
-                    listeners.pointerHover);
-    }
-
-    if (this.target && this.target.options.styleCursor && !this.interacting()) {
-      this.target._doc.documentElement.style.cursor = '';
-    }
-  }
-
-  selectorDown (pointer, event, eventTarget, curEventTarget) {
-    const pointerIndex = this.addPointer(pointer);
-    let element = eventTarget;
-    let action;
-
-    this.pointerIsDown = true;
-
-    signals.fire('down', {
-      pointer,
-      event,
-      eventTarget,
-      pointerIndex,
-      interaction: this,
-    });
-
-    // Check if the down event hits the current inertia target
-    if (this.inertiaStatus.active && utils.isString(this.target.target)) {
-      // climb up the DOM tree from the event target
-      while (utils.isElement(element)) {
-
-        // if this element is the current inertia target element
-        if (element === this.element
-            // and the prospective action is the same as the ongoing one
-            && validateAction(this.target.getAction(pointer, event, this, this.element), this.target).name === this.prepared.name) {
-
-          // stop inertia so that the next move will be a normal one
-          animationFrame.cancel(this.inertiaStatus.i);
-          this.inertiaStatus.active = false;
-
-          return;
-        }
-        element = utils.parentElement(element);
-      }
-    }
-
-    // do nothing if interacting
-    if (this.interacting()) {
-      return;
-    }
+    // this is like when I really start to break things!!!!
 
     const pushMatches = (interactable, selector, context) => {
       const elements = (browser.useMatchesSelectorPolyfill
@@ -323,124 +160,148 @@ class Interaction {
       }
     };
 
-    // update pointer coords for defaultActionChecker to use
-    this.setEventXY(this.curCoords, [pointer]);
-    this.downEvent = event;
+    let element = eventTarget;
+    let action = null;
 
-    while (utils.isElement(element) && !action) {
+    while (!action && utils.isElement(element)) {
       this.matches = [];
       this.matchElements = [];
 
-      scope.interactables.forEachSelector(pushMatches);
+      const elementInteractable = scope.interactables.get(element);
 
-      action = this.validateSelector(pointer, event, this.matches, this.matchElements);
+      if (elementInteractable
+          && !scope.testIgnore(elementInteractable, eventTarget, eventTarget)
+          && scope.testAllow(elementInteractable, eventTarget, eventTarget)
+          && (action = validateAction(elementInteractable.getAction(pointer, event, this, element), elementInteractable))) {
+        this.target = elementInteractable;
+        this.element = element;
+      }
+      else {
+        scope.interactables.forEachSelector(pushMatches);
+
+        action = this.validateSelector(pointer, event, this.matches, this.matchElements);
+      }
+
       element = utils.parentElement(element);
     }
 
-    if (action) {
-      utils.copyAction(this.prepared, action);
-
-      return this.pointerDown(pointer, event, eventTarget, curEventTarget, action);
-    }
-    else {
-      // do these now since pointerDown isn't being called from here
-      this.downTimes[pointerIndex] = new Date().getTime();
-      this.downTargets[pointerIndex] = eventTarget;
-      utils.pointerExtend(this.downPointer, pointer);
-
-      utils.copyCoords(this.prevCoords, this.curCoords);
-      this.pointerWasMoved = false;
-    }
+    this.prepare(action);
   }
 
-  // Determine action to be performed on next pointerMove and add appropriate
-  // style and event Listeners
-  pointerDown (pointer, event, eventTarget, curEventTarget, forceAction) {
-    if (!forceAction && !this.inertiaStatus.active && this.pointerWasMoved && this.prepared.name) {
-      this.checkAndPreventDefault(event, this.target, this.element);
+  pointerDown (pointer, event, eventTarget) {
+    const pointerIndex = this.addPointer(pointer);
+    let element = eventTarget;
+    let action;
 
+    this.pointerIsDown = true;
+
+    signals.fire('down', {
+      pointer,
+      event,
+      eventTarget,
+      pointerIndex,
+      interaction: this,
+    });
+
+    // Check if the down event hits the current inertia target
+    if (this.inertiaStatus.active) {
+      // climb up the DOM tree from the event target
+      while (utils.isElement(element)) {
+
+        // if this element is the current inertia target element
+        if (element === this.element
+            // and the prospective action is the same as the ongoing one
+            && validateAction(this.target.getAction(pointer, event, this, this.element), this.target).name === this.prepared.name) {
+
+          // stop inertia so that the next move will be a normal one
+          animationFrame.cancel(this.inertiaStatus.i);
+          this.inertiaStatus.active = false;
+
+          this.checkAndPreventDefault(event, this.target, this.element);
+          return;
+        }
+        element = utils.parentElement(element);
+      }
+    }
+
+    // do nothing if interacting
+    if (this.interacting()) {
       return;
     }
 
     this.pointerIsDown = true;
     this.downEvent = event;
 
-    const pointerIndex = this.addPointer(pointer);
-    let action;
+    this.downTimes[pointerIndex] = new Date().getTime();
+    this.downTargets[pointerIndex] = eventTarget;
+    // update pointer coords for defaultActionChecker to use
+    this.setEventXY(this.curCoords, this.pointers);
 
-    // If it is the second touch of a multi-touch gesture, keep the
-    // target the same and get a new action if a target was set by the
-    // first touch
-    if (this.pointerIds.length > 1 && this.target.target === this.element) {
-      const newAction = validateAction(forceAction || this.target.getAction(pointer, event, this, this.element), this.target);
+    utils.pointerExtend(this.downPointer, pointer);
 
-      if (scope.withinInteractionLimit(this.target, this.element, newAction)) {
-        action = newAction;
+    this.pointerWasMoved = false;
+
+    const pushMatches = (interactable, selector, context) => {
+      const elements = (browser.useMatchesSelectorPolyfill
+        ? context.querySelectorAll(selector)
+        : undefined);
+
+      if (scope.inContext(interactable, element)
+          && !scope.testIgnore(interactable, element, eventTarget)
+        && scope.testAllow(interactable, element, eventTarget)
+        && utils.matchesSelector(element, selector, elements)) {
+
+        this.matches.push(interactable);
+        this.matchElements.push(element);
       }
+    };
 
-      this.prepared.name = null;
+    while (utils.isElement(element) && !action) {
+      this.matches = [];
+      this.matchElements = [];
+
+      const elementInteractable = scope.interactables.get(element);
+
+      if (elementInteractable
+          && (action = validateAction(elementInteractable.getAction(pointer, event, this, element), elementInteractable))) {
+        this.target = elementInteractable;
+        this.element = element;
+      }
+      else {
+        scope.interactables.forEachSelector(pushMatches);
+
+        action = this.validateSelector(pointer, event, this.matches, this.matchElements);
+        element = utils.parentElement(element);
+      }
     }
-    // Otherwise, set the target if there is no action prepared
-    else if (!this.prepared.name) {
-      const interactable = scope.interactables.get(curEventTarget);
 
-      if (interactable
-          && !scope.testIgnore(interactable, curEventTarget, eventTarget)
-          && scope.testAllow(interactable, curEventTarget, eventTarget)
-          && (action = validateAction(forceAction || interactable.getAction(pointer, event, this, curEventTarget), interactable, eventTarget))
-          && scope.withinInteractionLimit(interactable, curEventTarget, action)) {
-        this.target = interactable;
-        this.element = curEventTarget;
-      }
+    this.prepare(action);
+
+    utils.copyCoords(this.prevCoords, this.curCoords);
+  }
+
+  prepare (action, prevTarget) {
+    if (prevTarget && prevTarget.options.styleCursor) {
+      prevTarget._doc.documentElement.style.cursor = '';
     }
 
     const target = this.target;
-    const options = target && target.options;
 
-    if (target && (forceAction || !this.prepared.name)) {
-      action = action || validateAction(forceAction || target.getAction(pointer, event, this, curEventTarget), target, this.element);
+    if (!target) { return; }
 
-      this.setEventXY(this.startCoords, this.pointers);
+    const options = target.options;
 
-      if (!action) { return; }
-
-      if (options.styleCursor) {
-        target._doc.documentElement.style.cursor = actions[action.name].getCursor(action);
-      }
-
-      this.resizeAxes = action.name === 'resize'? action.axis : null;
-
-      if (action === 'gesture' && this.pointerIds.length < 2) {
-        action = null;
-      }
-
-      utils.copyAction(this.prepared, action);
-
-      modifiers.resetStatuses(this.modifierStatuses);
-
-      this.downTimes[pointerIndex] = new Date().getTime();
-      this.downTargets[pointerIndex] = eventTarget;
-      utils.pointerExtend(this.downPointer, pointer);
-
-      utils.copyCoords(this.prevCoords, this.startCoords);
-      this.pointerWasMoved = false;
-
-      signals.fire('prepared', {
-        interaction: this,
-      });
-
-      this.checkAndPreventDefault(event, target, this.element);
+    if (options.styleCursor) {
+      const cursor = action? actions[action.name].getCursor(action) : '';
+      target._doc.documentElement.style.cursor = cursor;
     }
-    // if inertia is active try to resume action
-    else if (this.inertiaStatus.active
-             && curEventTarget === this.element
-             && validateAction(target.getAction(pointer, event, this, this.element), target).name === this.prepared.name) {
 
-      animationFrame.cancel(this.inertiaStatus.i);
-      this.inertiaStatus.active = false;
+    this.setEventXY(this.startCoords, this.pointers);
+    utils.copyAction(this.prepared, action || {});
 
-      this.checkAndPreventDefault(event, target, this.element);
-    }
+    modifiers.resetStatuses(this.modifierStatuses);
+
+    signals.fire('prepared', { interaction: this });
   }
 
   setStartOffsets (action, interactable, element) {
@@ -1076,40 +937,6 @@ function doOnInteractions (method) {
   });
 }
 
-Interactable.signals.on('new', function ({ interactable, win }) {
-  const element = interactable.target;
-
-  if (utils.isElement(element, win)) {
-    if (scope.PointerEvent) {
-      events.add(element, browser.pEventTypes.down, listeners.pointerDown );
-      events.add(element, browser.pEventTypes.move, listeners.pointerHover);
-    }
-    else {
-      events.add(element, 'mousedown' , listeners.pointerDown );
-      events.add(element, 'mousemove' , listeners.pointerHover);
-      events.add(element, 'touchstart', listeners.pointerDown );
-      events.add(element, 'touchmove' , listeners.pointerHover);
-    }
-  }
-});
-
-Interactable.signals.on('unset', function ({ interactable, win }) {
-  const element = interactable.target;
-
-  if (!utils.isString(interactable.target) && utils.isElement(element, win)) {
-    if (scope.PointerEvent) {
-      events.remove(element, browser.pEventTypes.down, listeners.pointerDown );
-      events.remove(element, browser.pEventTypes.move, listeners.pointerHover);
-    }
-    else {
-      events.remove(element, 'mousedown' , listeners.pointerDown );
-      events.remove(element, 'mousemove' , listeners.pointerHover);
-      events.remove(element, 'touchstart', listeners.pointerDown );
-      events.remove(element, 'touchmove' , listeners.pointerHover);
-    }
-  }
-});
-
 scope.signals.on('listen-to-document', function ({ doc, win }) {
   const pEventTypes = browser.pEventTypes;
 
@@ -1120,21 +947,21 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
   }
 
   if (scope.PointerEvent) {
-    events.add(doc, pEventTypes.down  , listeners.selectorDown );
+    events.add(doc, pEventTypes.down  , listeners.pointerDown  );
     events.add(doc, pEventTypes.move  , listeners.pointerMove  );
-    events.add(doc, pEventTypes.over  , listeners.pointerOver  );
+    events.add(doc, pEventTypes.move  , listeners.pointerHover );
     events.add(doc, pEventTypes.out   , listeners.pointerOut   );
     events.add(doc, pEventTypes.up    , listeners.pointerUp    );
     events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
   }
   else {
-    events.add(doc, 'mousedown', listeners.selectorDown);
+    events.add(doc, 'mousedown', listeners.pointerDown );
     events.add(doc, 'mousemove', listeners.pointerMove );
+    events.add(doc, 'mousemove', listeners.pointerHover);
     events.add(doc, 'mouseup'  , listeners.pointerUp   );
-    events.add(doc, 'mouseover', listeners.pointerOver );
     events.add(doc, 'mouseout' , listeners.pointerOut  );
 
-    events.add(doc, 'touchstart' , listeners.selectorDown );
+    events.add(doc, 'touchstart' , listeners.pointerDown  );
     events.add(doc, 'touchmove'  , listeners.pointerMove  );
     events.add(doc, 'touchend'   , listeners.pointerUp    );
     events.add(doc, 'touchcancel', listeners.pointerCancel);

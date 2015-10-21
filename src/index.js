@@ -4,10 +4,10 @@
 require('./legacyBrowsers');
 
 // actions
+require('./actions/gesture');
 require('./actions/resize');
 require('./actions/drag');
 require('./actions/drop');
-require('./actions/gesture');
 
 require('./delay.js');
 
