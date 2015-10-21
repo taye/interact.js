@@ -629,14 +629,14 @@ class Interactable {
     }
     else {
       events.remove(this, 'all');
-      if (this.options.styleCursor) {
+      if (isType.isElement(this.target) && this.options.styleCursor) {
         this.target.style.cursor = '';
       }
     }
 
     signals.fire('unset', { interactable: this });
 
-    scope.interactables.splice(isType.indexOf(scope.interactables, this), 1);
+    scope.interactables.splice(indexOf(scope.interactables, this), 1);
 
     return scope.interact;
   }
