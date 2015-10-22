@@ -4,9 +4,12 @@
 require('./legacyBrowsers');
 
 // actions
+require('./actions/gesture');
 require('./actions/resize');
 require('./actions/drag');
-require('./actions/gesture');
+require('./actions/drop');
+
+require('./delay.js');
 
 // autoScroll
 require('./autoScroll');
@@ -18,6 +21,7 @@ require('./pointerEvents');
 require('./modifiers/snap');
 require('./modifiers/restrict');
 
-require('./Interaction.js');
+require('./Interaction');
+require('./autoStart');
 
 module.exports = require('./interact');

@@ -2,8 +2,8 @@ const base = require('./base');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
+const Interaction = require('../Interaction');
 const scope = require('../scope');
-const signals = require('../utils/signals');
 const defaultOptions = require('../defaultOptions');
 
 const gesture = {
@@ -27,59 +27,55 @@ const gesture = {
   getCursor: function () {
     return '';
   },
-
-  beforeStart: utils.blank,
-
-  start: function (interaction, event) {
-    const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
-
-    gestureEvent.ds = 0;
-
-    interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
-    interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
-    interaction.gesture.scale = 1;
-
-    interaction._interacting = true;
-
-    interaction.target.fire(gestureEvent);
-
-    return gestureEvent;
-  },
-
-  move: function (interaction, event) {
-    if (!interaction.pointerIds.length) {
-      return interaction.prevEvent;
-    }
-
-    let gestureEvent;
-
-    gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
-    gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
-
-    interaction.target.fire(gestureEvent);
-
-    interaction.gesture.prevAngle = gestureEvent.angle;
-    interaction.gesture.prevDistance = gestureEvent.distance;
-
-    if (gestureEvent.scale !== Infinity
-        && gestureEvent.scale !== null
-        && gestureEvent.scale !== undefined
-        && !isNaN(gestureEvent.scale)) {
-
-      interaction.gesture.scale = gestureEvent.scale;
-    }
-
-    return gestureEvent;
-  },
-
-  end: function (interaction, event) {
-    const endEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
-
-    interaction.target.fire(endEvent);
-  },
-
-  stop: utils.blank,
 };
+
+Interaction.signals.on('start-gesture', function ({ interaction, event }) {
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
+
+  gestureEvent.ds = 0;
+
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
+  interaction.gesture.scale = 1;
+
+  interaction._interacting = true;
+
+  interaction.target.fire(gestureEvent);
+  interaction.prevEvent = gestureEvent;
+});
+
+Interaction.signals.on('move-gesture', function ({ interaction, event }) {
+  if (!interaction.pointerIds.length) {
+    return interaction.prevEvent;
+  }
+
+  let gestureEvent;
+
+  gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
+  gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
+
+  interaction.target.fire(gestureEvent);
+
+  interaction.gesture.prevAngle = gestureEvent.angle;
+  interaction.gesture.prevDistance = gestureEvent.distance;
+
+  if (gestureEvent.scale !== Infinity
+      && gestureEvent.scale !== null
+      && gestureEvent.scale !== undefined
+      && !isNaN(gestureEvent.scale)) {
+
+    interaction.gesture.scale = gestureEvent.scale;
+  }
+
+  interaction.prevEvent = gestureEvent;
+});
+
+Interaction.signals.on('end-gesture', function ({ interaction, event }) {
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
+
+  interaction.target.fire(gestureEvent);
+  interaction.prevEvent = gestureEvent;
+});
 
 /*\
  * Interactable.gesturable
@@ -122,7 +118,7 @@ Interactable.prototype.gesturable = function (options) {
   return this.options.gesture;
 };
 
-signals.on('interactevent-gesture', function (arg) {
+InteractEvent.signals.on('gesture', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
   const { interaction, iEvent, starting, ending, deltaSource } = arg;
@@ -157,7 +153,7 @@ signals.on('interactevent-gesture', function (arg) {
   }
 });
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.gesture = {
     start: { x: 0, y: 0 },
 

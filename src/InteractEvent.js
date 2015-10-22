@@ -1,9 +1,10 @@
-const hypot       = require('./utils/hypot');
-const extend      = require('./utils/extend');
-const getOriginXY = require('./utils/getOriginXY');
-const signals     = require('./utils/signals');
-const modifiers   = require('./modifiers/base');
-const scope       = require('./scope');
+const hypot         = require('./utils/hypot');
+const extend        = require('./utils/extend');
+const getOriginXY   = require('./utils/getOriginXY');
+const modifiers     = require('./modifiers/base');
+const scope         = require('./scope');
+
+const signals = new (require('./utils/Signals'));
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
@@ -79,8 +80,8 @@ class InteractEvent {
       this.detail = 'inertia';
     }
 
-    signals.fire('interactevent-new', signalArg);
-    signals.fire('interactevent-' + action, signalArg);
+    signals.fire('set-delta', signalArg);
+    signals.fire(action, signalArg);
 
     if (starting) {
       this.timeStamp = interaction.downTimes[0];
@@ -151,6 +152,9 @@ class InteractEvent {
         },
       };
     }
+
+    signals.fire('new', signalArg);
+    signals.fire('new-' + action, signalArg);
   }
 
   preventDefault () {}
@@ -164,7 +168,7 @@ class InteractEvent {
   }
 }
 
-signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, ending, starting,
+signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, starting,
                                             page, client, deltaSource }) {
   // end event dx, dy is difference between start and end points
   if (ending) {
@@ -210,5 +214,7 @@ signals.on('interactevent-new', function ({ iEvent, interaction, action, phase, 
     iEvent.dx = iEvent.dy = 0;
   }
 });
+
+InteractEvent.signals = signals;
 
 module.exports = InteractEvent;

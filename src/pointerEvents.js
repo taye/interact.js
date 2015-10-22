@@ -1,21 +1,11 @@
 const scope = require('./scope');
 const InteractEvent = require('./InteractEvent');
+const Interaction = require('./Interaction');
 const utils = require('./utils');
 const browser = require('./utils/browser');
-const signals = require('./utils/signals');
 
-const simpleSignals = [
-  'interaction-down',
-  'interaction-up',
-  'interaction-up',
-  'interaction-cancel',
-];
-const simpleEvents = [
-  'down',
-  'up',
-  'tap',
-  'cancel',
-];
+const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
+const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
 
 function preventOriginalDefault () {
   this.originalEvent.preventDefault();
@@ -148,7 +138,7 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
   }
 }
 
-signals.on('interaction-move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
+Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
   const pointerIndex = (interaction.mouse
     ? 0
     : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer)));
@@ -162,7 +152,7 @@ signals.on('interaction-move', function ({ interaction, pointer, event, eventTar
   }
 });
 
-signals.on('interaction-down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
+Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
   // copy event to be used in timeout for IE8
   const eventCopy = browser.isIE8? utils.extend({}, event) : event;
 
@@ -188,10 +178,10 @@ function createSignalListener (event) {
 }
 
 for (let i = 0; i < simpleSignals.length; i++) {
-  signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
+  Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
 }
 
-signals.on('interaction-new', function (interaction) {
+Interaction.signals.on('new', function (interaction) {
   interaction.prevTap = null;  // the most recent tap event on this interaction
   interaction.tapTime = 0;     // time of the most recent tap event
 });

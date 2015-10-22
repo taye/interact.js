@@ -1,6 +1,5 @@
 const scope   = require('./scope');
 const events  = require('./utils/events');
-const signals = require('./utils/signals');
 const browser = require('./utils/browser');
 const iFinder = require('./utils/interactionFinder');
 
@@ -41,7 +40,7 @@ function onIE8Dblclick (event) {
 }
 
 if (browser.isIE8) {
-  signals.on('listen-to-document', function ({ doc }) {
+  scope.signals.on('listen-to-document', function ({ doc }) {
     // For IE's lack of Event#preventDefault
     events.add(doc, 'selectstart', function (event) {
       const interaction = scope.interactions[0];
