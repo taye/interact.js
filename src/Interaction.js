@@ -4,7 +4,6 @@ const InteractEvent  = require('./InteractEvent');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
-const actions        = require('./actions/base');
 const modifiers      = require('./modifiers/base');
 const animationFrame = utils.raf;
 
@@ -12,7 +11,7 @@ const signals = new (require('./utils/Signals'));
 
 const listeners   = {};
 const methodNames = [
-  'pointerDown', 'pointerMove', 'pointerHover',
+  'pointerDown', 'pointerMove',
   'pointerUp', 'pointerCancel', 'pointerEnd',
   'addPointer', 'removePointer', 'recordPointer',
 ];
@@ -27,9 +26,6 @@ class Interaction {
   constructor () {
     this.target        = null; // current interactable being interacted with
     this.element       = null; // the target element of the interactable
-
-    this.matches       = [];   // all selectors that are matched by target element
-    this.matchElements = [];   // corresponding elements
 
     this.prepared      = {     // action that's ready to be fired on next move event
       name : null,
@@ -140,58 +136,8 @@ class Interaction {
     targetObj.timeStamp = new Date().getTime();
   }
 
-  pointerHover (pointer, event, eventTarget) {
-    if (!this.mouse || this.pointerIsDown) { return; }
-
-    // this is like when I really start to break things!!!!
-
-    const pushMatches = (interactable, selector, context) => {
-      const elements = (browser.useMatchesSelectorPolyfill
-        ? context.querySelectorAll(selector)
-        : undefined);
-
-      if (scope.inContext(interactable, element)
-          && !scope.testIgnore(interactable, element, eventTarget)
-        && scope.testAllow(interactable, element, eventTarget)
-        && utils.matchesSelector(element, selector, elements)) {
-
-        this.matches.push(interactable);
-        this.matchElements.push(element);
-      }
-    };
-
-    let element = eventTarget;
-    let action = null;
-
-    while (!action && utils.isElement(element)) {
-      this.matches = [];
-      this.matchElements = [];
-
-      const elementInteractable = scope.interactables.get(element);
-
-      if (elementInteractable
-          && !scope.testIgnore(elementInteractable, eventTarget, eventTarget)
-          && scope.testAllow(elementInteractable, eventTarget, eventTarget)
-          && (action = validateAction(elementInteractable.getAction(pointer, event, this, element), elementInteractable))) {
-        this.target = elementInteractable;
-        this.element = element;
-      }
-      else {
-        scope.interactables.forEachSelector(pushMatches);
-
-        action = this.validateSelector(pointer, event, this.matches, this.matchElements);
-      }
-
-      element = utils.parentElement(element);
-    }
-
-    this.prepare(action);
-  }
-
   pointerDown (pointer, event, eventTarget) {
     const pointerIndex = this.addPointer(pointer);
-    let element = eventTarget;
-    let action;
 
     this.pointerIsDown = true;
 
@@ -205,6 +151,8 @@ class Interaction {
 
     // Check if the down event hits the current inertia target
     if (this.inertiaStatus.active) {
+      let element = eventTarget;
+
       // climb up the DOM tree from the event target
       while (utils.isElement(element)) {
 
@@ -225,9 +173,7 @@ class Interaction {
     }
 
     // do nothing if interacting
-    if (this.interacting()) {
-      return;
-    }
+    if (this.interacting()) { return; }
 
     this.pointerIsDown = true;
     this.downEvent = event;
@@ -237,71 +183,12 @@ class Interaction {
     // update pointer coords for defaultActionChecker to use
     this.setEventXY(this.curCoords, this.pointers);
 
-    utils.pointerExtend(this.downPointer, pointer);
-
     this.pointerWasMoved = false;
 
-    const pushMatches = (interactable, selector, context) => {
-      const elements = (browser.useMatchesSelectorPolyfill
-        ? context.querySelectorAll(selector)
-        : undefined);
+    this.checkAndPreventDefault(event, this.target, this.element);
 
-      if (scope.inContext(interactable, element)
-          && !scope.testIgnore(interactable, element, eventTarget)
-        && scope.testAllow(interactable, element, eventTarget)
-        && utils.matchesSelector(element, selector, elements)) {
-
-        this.matches.push(interactable);
-        this.matchElements.push(element);
-      }
-    };
-
-    while (utils.isElement(element) && !action) {
-      this.matches = [];
-      this.matchElements = [];
-
-      const elementInteractable = scope.interactables.get(element);
-
-      if (elementInteractable
-          && (action = validateAction(elementInteractable.getAction(pointer, event, this, element), elementInteractable))) {
-        this.target = elementInteractable;
-        this.element = element;
-      }
-      else {
-        scope.interactables.forEachSelector(pushMatches);
-
-        action = this.validateSelector(pointer, event, this.matches, this.matchElements);
-        element = utils.parentElement(element);
-      }
-    }
-
-    this.prepare(action);
-
+    utils.pointerExtend(this.downPointer, pointer);
     utils.copyCoords(this.prevCoords, this.curCoords);
-  }
-
-  prepare (action, prevTarget) {
-    if (prevTarget && prevTarget.options.styleCursor) {
-      prevTarget._doc.documentElement.style.cursor = '';
-    }
-
-    const target = this.target;
-
-    if (!target) { return; }
-
-    const options = target.options;
-
-    if (options.styleCursor) {
-      const cursor = action? actions[action.name].getCursor(action) : '';
-      target._doc.documentElement.style.cursor = cursor;
-    }
-
-    this.setEventXY(this.startCoords, this.pointers);
-    utils.copyAction(this.prepared, action || {});
-
-    modifiers.resetStatuses(this.modifierStatuses);
-
-    signals.fire('prepared', { interaction: this });
   }
 
   setStartOffsets (action, interactable, element) {
@@ -380,6 +267,7 @@ class Interaction {
 
     this.setStartOffsets(action.name, interactable, element, this.modifierOffsets);
 
+    modifiers.resetStatuses(this.modifierStatuses);
     modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
 
     signals.fire('start-' + this.prepared.name, {
@@ -430,63 +318,26 @@ class Interaction {
       eventTarget,
       dx,
       dy,
-      interaction: this,
+      preEnd,
       duplicate: duplicateMove,
+      interaction: this,
     };
-
-    signals.fire('move', signalArg);
-
-    if (!this.pointerIsDown) { return; }
 
     if (duplicateMove && this.pointerWasMoved && !preEnd) {
       this.checkAndPreventDefault(event, this.target, this.element);
-      return;
     }
+    else if (!duplicateMove) {
+      // set pointer coordinate, time changes and speeds
+      utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
-    // set pointer coordinate, time changes and speeds
-    utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      signals.fire('move', signalArg);
 
-    if (!this.prepared.name) { return; }
-
-    if (this.pointerWasMoved
-        // ignore movement while inertia is active
-        && (!this.inertiaStatus.active || (pointer instanceof InteractEvent && /inertiastart/.test(pointer.type)))) {
-
-      // if just starting an action, calculate the pointer speed now
-      if (!this.interacting()) {
-        utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-
-        signals.fire('before-start-' + this.prepared.name, signalArg);
+      if (this.pointerWasMoved) {
+        utils.copyCoords(this.prevCoords, this.curCoords);
       }
 
-      const starting = !!this.prepared.name && !this.interacting();
-
-      if (starting
-          && (this.target.options[this.prepared.name].manualStart
-          || !scope.withinInteractionLimit(this.target, this.element, this.prepared))) {
-        this.stop(event);
-        return;
-      }
-
-      if (this.prepared.name && this.target) {
-        if (starting) {
-          this.start(this.prepared, this.target, this.element);
-        }
-
-        const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
-
-        // move if snapping or restriction doesn't prevent it
-        if (modifierResult.shouldMove || starting) {
-          signals.fire('move-' + this.prepared.name, signalArg);
-        }
-
-        this.checkAndPreventDefault(event, this.target, this.element);
-      }
+      signals.fire('move-done', signalArg);
     }
-
-    utils.copyCoords(this.prevCoords, this.curCoords);
-
-    signals.fire('move-done', signalArg);
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
@@ -654,9 +505,6 @@ class Interaction {
     if (this._interacting) {
       signals.fire('stop-active', { interaction: this });
 
-      this.matches = [];
-      this.matchElements = [];
-
       const target = this.target;
 
       if (target.options.styleCursor) {
@@ -793,21 +641,6 @@ class Interaction {
     if (index === -1) { return; }
 
     this.pointers[index] = pointer;
-  }
-
-  validateSelector (pointer, event, matches, matchElements) {
-    for (let i = 0, len = matches.length; i < len; i++) {
-      const match = matches[i];
-      const matchElement = matchElements[i];
-      const action = validateAction(match.getAction(pointer, event, this, matchElement), match);
-
-      if (action && scope.withinInteractionLimit(match, matchElement, action)) {
-        this.target = match;
-        this.element = matchElement;
-
-        return action;
-      }
-    }
   }
 
   checkAndPreventDefault (event, interactable, element) {
@@ -1011,6 +844,7 @@ scope.signals.fire('listen-to-document', {
 
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.withinLimit = scope.withinInteractionLimit;
+Interaction.validateAction = validateAction;
 Interaction.signals = signals;
 
 module.exports = Interaction;

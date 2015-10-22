@@ -21,6 +21,7 @@ require('./pointerEvents');
 require('./modifiers/snap');
 require('./modifiers/restrict');
 
-require('./Interaction.js');
+require('./Interaction');
+require('./autoStart');
 
 module.exports = require('./interact');
