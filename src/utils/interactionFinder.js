@@ -82,10 +82,17 @@ const finder = {
   // get first idle interaction
   idle: function ({ mouseEvent }) {
     for (const interaction of scope.interactions) {
-      if ((!interaction.prepared.name || (interaction.target.options.gesture.enabled))
-          && !interaction.interacting()
-          && !(!mouseEvent && interaction.mouse)) {
+      // if there's already a pointer held down
+      if (interaction.pointerIds.length === 1) {
+        const target = interaction.target;
+        // the new pointer can only be added if the prepared target supports
+        // gesture actions
+        if (!target || !target.options.gesture.enabled) {
+          continue;
+        }
+      }
 
+      if (!interaction.interacting() && !(!mouseEvent && interaction.mouse)) {
         return interaction;
       }
     }
