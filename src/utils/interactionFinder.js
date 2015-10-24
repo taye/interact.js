@@ -85,11 +85,15 @@ const finder = {
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {
         const target = interaction.target;
-        // the new pointer can only be added if the prepared target supports
-        // gesture actions
-        if (!target || !target.options.gesture.enabled) {
+        // don't add this pointer if there is a target interactable and it
+        // isn't gesturable
+        if (target && !target.options.gesture.enabled) {
           continue;
         }
+      }
+      // maximum of 2 pointers per interaction
+      else if (interaction.pointerIds.length >= 2) {
+        continue;
       }
 
       if (!interaction.interacting() && !(!mouseEvent && interaction.mouse)) {
