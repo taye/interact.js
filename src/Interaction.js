@@ -728,7 +728,8 @@ function doOnInteractions (method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (const pointer of event.changedTouches) {
+      for (let i = 0; i < event.changedTouches.length; i++) {
+        const pointer = event.changedTouches[i];
         const interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction]);
