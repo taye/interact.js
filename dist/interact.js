@@ -1649,20 +1649,8 @@ function doOnInteractions(method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (var _iterator = event.changedTouches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var pointer = _ref;
-
+      for (var i = 0; i < event.changedTouches.length; i++) {
+        var pointer = event.changedTouches[i];
         var interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction()]);
@@ -1696,20 +1684,20 @@ function doOnInteractions(method) {
       }
     }
 
-    for (var _iterator2 = matches, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+    for (var _iterator = matches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+      var _ref;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
+      if (_isArray) {
+        if (_i >= _iterator.length) break;
+        _ref = _iterator[_i++];
       } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
+        _i = _iterator.next();
+        if (_i.done) break;
+        _ref = _i.value;
       }
 
-      var pointer = _ref2[0];
-      var interaction = _ref2[1];
+      var pointer = _ref[0];
+      var interaction = _ref[1];
 
       interaction._updateEventTargets(eventTarget, curEventTarget);
       interaction[method](pointer, event, eventTarget, curEventTarget);
@@ -1717,9 +1705,9 @@ function doOnInteractions(method) {
   };
 }
 
-scope.signals.on('listen-to-document', function (_ref4) {
-  var doc = _ref4.doc;
-  var win = _ref4.win;
+scope.signals.on('listen-to-document', function (_ref3) {
+  var doc = _ref3.doc;
+  var win = _ref3.win;
 
   var pEventTypes = browser.pEventTypes;
 
@@ -1769,19 +1757,19 @@ scope.signals.on('listen-to-document', function (_ref4) {
 
   // prevent native HTML5 drag on interact.js target elements
   events.add(doc, 'dragstart', function (event) {
-    for (var _iterator3 = scope.interactions, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-      var _ref3;
+    for (var _iterator2 = scope.interactions, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+      var _ref2;
 
-      if (_isArray3) {
-        if (_i3 >= _iterator3.length) break;
-        _ref3 = _iterator3[_i3++];
+      if (_isArray2) {
+        if (_i2 >= _iterator2.length) break;
+        _ref2 = _iterator2[_i2++];
       } else {
-        _i3 = _iterator3.next();
-        if (_i3.done) break;
-        _ref3 = _i3.value;
+        _i2 = _iterator2.next();
+        if (_i2.done) break;
+        _ref2 = _i2.value;
       }
 
-      var interaction = _ref3;
+      var interaction = _ref2;
 
       if (interaction.element && (interaction.element === event.target || utils.nodeContains(interaction.element, event.target))) {
 
@@ -5846,12 +5834,16 @@ var finder = {
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {
         var target = interaction.target;
-        // the new pointer can only be added if the prepared target supports
-        // gesture actions
-        if (!target || !target.options.gesture.enabled) {
+        // don't add this pointer if there is a target interactable and it
+        // isn't gesturable
+        if (target && !target.options.gesture.enabled) {
           continue;
         }
       }
+      // maximum of 2 pointers per interaction
+      else if (interaction.pointerIds.length >= 2) {
+          continue;
+        }
 
       if (!interaction.interacting() && !(!mouseEvent && interaction.mouse)) {
         return interaction;
