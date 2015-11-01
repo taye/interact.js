@@ -15,6 +15,8 @@ Interaction.signals.on('move', function ({ interaction, pointer, event, eventTar
 });
 
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
+  if (interaction.interacting()) { return; }
+
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);
 });
