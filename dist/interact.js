@@ -3341,6 +3341,10 @@ Interaction.signals.on('down', function (_ref2) {
   var event = _ref2.event;
   var eventTarget = _ref2.eventTarget;
 
+  if (interaction.interacting()) {
+    return;
+  }
+
   var actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);
 });
@@ -5744,6 +5748,8 @@ var finder = {
       return null;
     }
 
+    var firstNonActive = undefined;
+
     // Find a mouse interaction that's not in inertia phase
     for (var _iterator3 = scope.interactions, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
       var _ref3;
@@ -5759,9 +5765,24 @@ var finder = {
 
       var interaction = _ref3;
 
-      if (interaction.mouse && !interaction.inertiaStatus.active) {
-        return interaction;
+      if (interaction.mouse) {
+        if (!interaction.inertiaStatus.active) {
+          // if the interaction is active, return it immediately
+          if (interaction.interacting()) {
+            return interaction;
+          }
+          // otherwise save it and look for another active interaction
+          else if (!firstNonActive) {
+              firstNonActive = interaction;
+            }
+        }
       }
+    }
+
+    // if no active mouse interaction was found use the first inactive mouse
+    // interaction
+    if (firstNonActive) {
+      return firstNonActive;
     }
 
     // Find any interaction specifically for mouse.
