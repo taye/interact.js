@@ -51,11 +51,28 @@ const finder = {
       return null;
     }
 
+    let firstNonActive;
+
     // Find a mouse interaction that's not in inertia phase
     for (const interaction of scope.interactions) {
-      if (interaction.mouse && !interaction.inertiaStatus.active) {
-        return interaction;
+      if (interaction.mouse) {
+        if (!interaction.inertiaStatus.active) {
+          // if the interaction is active, return it immediately
+          if (interaction.interacting()) {
+            return interaction;
+          }
+          // otherwise save it and look for another active interaction
+          else if (!firstNonActive) {
+            firstNonActive = interaction;
+          }
+        }
       }
+    }
+
+    // if no active mouse interaction was found use the first inactive mouse
+    // interaction
+    if (firstNonActive) {
+      return firstNonActive;
     }
 
     // Find any interaction specifically for mouse.
