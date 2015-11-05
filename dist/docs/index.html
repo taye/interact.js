@@ -25,7 +25,7 @@
                           <ol id="dr-toc">
                               
                               <li class="dr-lvl0">
-                                  <a href="#Interactable" class="undefined"><span>Interactable</span></a>
+                                  <a href="#Interactable" class="dr-property"><span>Interactable</span></a>
                               </li>
                               
                               <li class="dr-lvl1">
@@ -109,6 +109,10 @@
                               </li>
                               
                               <li class="dr-lvl1">
+                                  <a href="#Interaction.end" class="dr-method"><span>Interaction.end()</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
                                   <a href="#Interaction.start" class="dr-method"><span>Interaction.start()</span></a>
                               </li>
                               
@@ -173,7 +177,7 @@
                       
                       <article id="Interactable.draggable">
                           <header>
-                              <h3 class="dr-method">Interactable.draggable([options])<a href="#Interactable.draggable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 166 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drag.js#L166">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.draggable([options])<a href="#Interactable.draggable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 169 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drag.js#L169">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.draggable-extra"></div>
@@ -428,7 +432,7 @@ element is over this Interactable.
                       
                       <article id="Interactable.resizable">
                           <header>
-                              <h3 class="dr-method">Interactable.resizable([options])<a href="#Interactable.resizable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 338 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/resize.js#L338">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.resizable([options])<a href="#Interactable.resizable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 341 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/resize.js#L341">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.resizable-extra"></div>
@@ -569,7 +573,7 @@ Interactable
                       
                       <article id="Interactable.gesturable">
                           <header>
-                              <h3 class="dr-method">Interactable.gesturable([options])<a href="#Interactable.gesturable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 103 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/gesture.js#L103">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.gesturable([options])<a href="#Interactable.gesturable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 106 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/gesture.js#L106">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.gesturable-extra"></div>
@@ -2416,7 +2420,7 @@ gesturable <code>&#39;max&#39;</code> and <code>&#39;maxPerElement&#39;</code> o
                       
                       <article id="Interaction.start">
                           <header>
-                              <h3 class="dr-method">Interaction.start(action, interactable, element)<a href="#Interaction.start" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 246 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L246">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interaction.start(action, interactable, element)<a href="#Interaction.start" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 247 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L247">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interaction.start-extra"></div>
@@ -2500,6 +2504,70 @@ of pointers must be held down - 1 for drag/resize, 2 for gesture.
                         event.currentTarget);
     }
 });</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
+                      <article id="Interaction.end">
+                          <header>
+                              <h3 class="dr-method">Interaction.end([event])<a href="#Interaction.end" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 522 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L522">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interaction.end-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Stop the current action and fire an end event. Inertial movement does
+not happen.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <div class="topcoat-list__container">
+                                      <h3 class="topcoat-list__header">Parameters</h3>
+                                      <ol class="topcoat-list">
+                                          <li class="topcoat-list__item"><span class="dr-param">event</span>
+                                              <span class="dr-type"><em class="dr-type-PointerEvent">PointerEvent</em> </span>
+                                              <span class="dr-description"></span></li>
+                                          
+                                      </ol>
+                                  </div>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(target)
+  .draggable(true)
+  .on('move', function (event) {
+    if (event.pageX > 1000) {
+      // end the current action
+      event.interaction.end();
+      // stop all further listeners from being called
+      event.stopImmediatePropagation();
+    }
+  });</code></pre></section>
                                   
                                   
                                   

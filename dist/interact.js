@@ -927,6 +927,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var scope = require('./scope');
 var utils = require('./utils');
 var InteractEvent = require('./InteractEvent');
+var Interactable = require('./Interactable');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
 var finder = require('./utils/interactionFinder');
@@ -1259,7 +1260,21 @@ var Interaction = (function () {
       // set pointer coordinate, time changes and speeds
       utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
+      var interactingBeforeMove = this.interacting();
+
       signals.fire('move', signalArg);
+
+      // if interacting, fire a 'move-{action}' signal
+      if (this.interacting()) {
+        var modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
+
+        // move if snapping or restriction doesn't prevent it
+        if (modifierResult.shouldMove || !interactingBeforeMove) {
+          Interaction.signals.fire('move-' + this.prepared.name, signalArg);
+        }
+
+        this.checkAndPreventDefault(event, this.target, this.element);
+      }
 
       if (this.pointerWasMoved) {
         utils.copyCoords(this.prevCoords, this.curCoords);
@@ -1408,6 +1423,33 @@ var Interaction = (function () {
       }
     }
 
+    this.end(event);
+  };
+
+  /*\
+   * Interaction.end
+   [ method ]
+   *
+   * Stop the current action and fire an end event. Inertial movement does
+   * not happen.
+   *
+   - event (PointerEvent) #optional
+   **
+   | interact(target)
+   |   .draggable(true)
+   |   .on('move', function (event) {
+   |     if (event.pageX > 1000) {
+   |       // end the current action
+   |       event.interaction.end();
+   |       // stop all further listeners from being called
+   |       event.stopImmediatePropagation();
+   |     }
+   |   });
+   \*/
+
+  Interaction.prototype.end = function end(event) {
+    event = event || this.prevEvent;
+
     if (this.interacting()) {
       signals.fire('end-' + this.prepared.name, {
         event: event,
@@ -1456,13 +1498,6 @@ var Interaction = (function () {
     this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
     modifiers.resetStatuses(this.modifierStatuses);
-
-    // remove pointers if their ID isn't in this.pointerIds
-    for (var i = 0; i < this.pointers.length; i++) {
-      if (utils.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
-        this.pointers.splice(i, 1);
-      }
-    }
   };
 
   Interaction.prototype.inertiaFrame = function inertiaFrame() {
@@ -1705,9 +1740,9 @@ function doOnInteractions(method) {
   };
 }
 
-scope.signals.on('listen-to-document', function (_ref3) {
-  var doc = _ref3.doc;
-  var win = _ref3.win;
+scope.signals.on('listen-to-document', function (_ref4) {
+  var doc = _ref4.doc;
+  var win = _ref4.win;
 
   var pEventTypes = browser.pEventTypes;
 
@@ -1788,6 +1823,30 @@ scope.signals.fire('listen-to-document', {
   doc: scope.document
 });
 
+// Stop related interactions when an Interactable is unset
+Interactable.signals.on('unset', function (_ref5) {
+  var interactable = _ref5.interactable;
+
+  for (var _iterator3 = scope.interactions, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+    var _ref3;
+
+    if (_isArray3) {
+      if (_i3 >= _iterator3.length) break;
+      _ref3 = _iterator3[_i3++];
+    } else {
+      _i3 = _iterator3.next();
+      if (_i3.done) break;
+      _ref3 = _i3.value;
+    }
+
+    var interaction = _ref3;
+
+    if (interaction.target === interactable && interaction.interacting()) {
+      interaction.end();
+    }
+  }
+});
+
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.withinLimit = scope.withinInteractionLimit;
 Interaction.validateAction = validateAction;
@@ -1795,7 +1854,7 @@ Interaction.signals = signals;
 
 module.exports = Interaction;
 
-},{"./InteractEvent":2,"./modifiers/base":17,"./scope":21,"./utils":31,"./utils/Signals":22,"./utils/browser":24,"./utils/events":27,"./utils/interactionFinder":32}],5:[function(require,module,exports){
+},{"./InteractEvent":2,"./Interactable":3,"./modifiers/base":17,"./scope":21,"./utils":31,"./utils/Signals":22,"./utils/browser":24,"./utils/events":27,"./utils/interactionFinder":32}],5:[function(require,module,exports){
 var actions = {
   defaultChecker: function (pointer, event, interaction, element) {
     var rect = this.getRect(element);
@@ -1947,6 +2006,11 @@ Interaction.signals.on('move-drag', function (_ref3) {
 
   interaction.target.fire(dragEvent);
   interaction.prevEvent = dragEvent;
+
+  // if the action was ended in a dragmove listener
+  if (!interaction.interacting()) {
+    return false;
+  }
 });
 
 Interaction.signals.on('end-drag', function (_ref4) {
@@ -2597,6 +2661,11 @@ Interaction.signals.on('move-gesture', function (_ref2) {
   }
 
   interaction.prevEvent = gestureEvent;
+
+  // if the action was ended in a gesturemove listener
+  if (!interaction.interacting()) {
+    return false;
+  }
 });
 
 Interaction.signals.on('end-gesture', function (_ref3) {
@@ -3006,6 +3075,11 @@ Interaction.signals.on('move-resize', function (_ref2) {
   interaction.target.fire(resizeEvent);
 
   interaction.prevEvent = resizeEvent;
+
+  // if the action was ended in a resizemove listener
+  if (!interaction.interacting()) {
+    return false;
+  }
 });
 
 Interaction.signals.on('end-resize', function (_ref3) {
@@ -3314,7 +3388,6 @@ module.exports = autoScroll;
 },{"./Interaction":4,"./defaultOptions":12,"./utils/domUtils":26,"./utils/isType":33,"./utils/raf":36,"./utils/window":37}],11:[function(require,module,exports){
 var Interaction = require('./Interaction');
 var actions = require('./actions/base');
-var modifiers = require('./modifiers/base');
 var defaultOptions = require('./defaultOptions');
 var browser = require('./utils/browser');
 var scope = require('./scope');
@@ -3353,7 +3426,6 @@ Interaction.signals.on('move', function (arg) {
   var interaction = arg.interaction;
   var pointer = arg.pointer;
   var event = arg.event;
-  var preEnd = arg.preEnd;
 
   if (!(interaction.pointerIsDown && interaction.pointerWasMoved && interaction.prepared.name)) {
     return;
@@ -3380,15 +3452,6 @@ Interaction.signals.on('move', function (arg) {
       if (starting) {
         interaction.start(interaction.prepared, interaction.target, interaction.element);
       }
-
-      var modifierResult = modifiers.setAll(interaction, interaction.curCoords.page, interaction.modifierStatuses, preEnd);
-
-      // move if snapping or restriction doesn't prevent it
-      if (modifierResult.shouldMove || starting) {
-        Interaction.signals.fire('move-' + interaction.prepared.name, arg);
-      }
-
-      interaction.checkAndPreventDefault(event, interaction.target, interaction.element);
     }
   }
 });
@@ -3483,7 +3546,7 @@ function prepare(interaction, _ref3) {
 
 defaultOptions.perAction.manualStart = false;
 
-},{"./Interaction":4,"./actions/base":5,"./defaultOptions":12,"./modifiers/base":17,"./scope":21,"./utils":31,"./utils/browser":24}],12:[function(require,module,exports){
+},{"./Interaction":4,"./actions/base":5,"./defaultOptions":12,"./scope":21,"./utils":31,"./utils/browser":24}],12:[function(require,module,exports){
 module.exports = {
   base: {
     accept: null,
