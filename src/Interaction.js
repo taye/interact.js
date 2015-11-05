@@ -330,7 +330,21 @@ class Interaction {
       // set pointer coordinate, time changes and speeds
       utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
+      const interactingBeforeMove = this.interacting();
+
       signals.fire('move', signalArg);
+
+      // if interacting, fire a 'move-{action}' signal
+      if (this.interacting()) {
+        const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
+
+        // move if snapping or restriction doesn't prevent it
+        if (modifierResult.shouldMove || !interactingBeforeMove) {
+          Interaction.signals.fire('move-' + this.prepared.name, signalArg);
+        }
+
+        this.checkAndPreventDefault(event, this.target, this.element);
+      }
 
       if (this.pointerWasMoved) {
         utils.copyCoords(this.prevCoords, this.curCoords);

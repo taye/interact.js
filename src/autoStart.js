@@ -1,6 +1,5 @@
 const Interaction    = require('./Interaction');
 const actions        = require('./actions/base');
-const modifiers      = require('./modifiers/base');
 const defaultOptions = require('./defaultOptions');
 const browser        = require('./utils/browser');
 const scope          = require('./scope');
@@ -22,7 +21,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 });
 
 Interaction.signals.on('move', function (arg) {
-  const { interaction, pointer, event, preEnd } = arg;
+  const { interaction, pointer, event } = arg;
 
   if (!(interaction.pointerIsDown && interaction.pointerWasMoved && interaction.prepared.name)) {
     return;
@@ -51,15 +50,6 @@ Interaction.signals.on('move', function (arg) {
       if (starting) {
         interaction.start(interaction.prepared, interaction.target, interaction.element);
       }
-
-      const modifierResult = modifiers.setAll(interaction, interaction.curCoords.page, interaction.modifierStatuses, preEnd);
-
-      // move if snapping or restriction doesn't prevent it
-      if (modifierResult.shouldMove || starting) {
-        Interaction.signals.fire('move-' + interaction.prepared.name, arg);
-      }
-
-      interaction.checkAndPreventDefault(event, interaction.target, interaction.element);
     }
   }
 });
