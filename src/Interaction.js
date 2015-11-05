@@ -1,6 +1,7 @@
 const scope          = require('./scope');
 const utils          = require('./utils');
 const InteractEvent  = require('./InteractEvent');
+const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
@@ -874,6 +875,15 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
 scope.signals.fire('listen-to-document', {
   win: scope.window,
   doc: scope.document,
+});
+
+// Stop related interactions when an Interactable is unset
+Interactable.signals.on('unset', function ( {interactable} ) {
+  for (const interaction of scope.interactions) {
+    if (interaction.target === interactable && interaction.interacting()) {
+      interaction.end();
+    }
+  }
 });
 
 Interaction.doOnInteractions = doOnInteractions;
