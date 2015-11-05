@@ -282,6 +282,9 @@ Interaction.signals.on('move-resize', function ({ interaction, event }) {
   interaction.target.fire(resizeEvent);
 
   interaction.prevEvent = resizeEvent;
+
+  // if the action was ended in a resizemove listener
+  if (!interaction.interacting()) { return false; }
 });
 
 Interaction.signals.on('end-resize', function ({ interaction, event }) {

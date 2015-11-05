@@ -68,6 +68,9 @@ Interaction.signals.on('move-gesture', function ({ interaction, event }) {
   }
 
   interaction.prevEvent = gestureEvent;
+
+  // if the action was ended in a gesturemove listener
+  if (!interaction.interacting()) { return false; }
 });
 
 Interaction.signals.on('end-gesture', function ({ interaction, event }) {

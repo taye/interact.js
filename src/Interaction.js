@@ -1,6 +1,7 @@
 const scope          = require('./scope');
 const utils          = require('./utils');
 const InteractEvent  = require('./InteractEvent');
+const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
@@ -330,7 +331,21 @@ class Interaction {
       // set pointer coordinate, time changes and speeds
       utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
+      const interactingBeforeMove = this.interacting();
+
       signals.fire('move', signalArg);
+
+      // if interacting, fire a 'move-{action}' signal
+      if (this.interacting()) {
+        const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
+
+        // move if snapping or restriction doesn't prevent it
+        if (modifierResult.shouldMove || !interactingBeforeMove) {
+          Interaction.signals.fire('move-' + this.prepared.name, signalArg);
+        }
+
+        this.checkAndPreventDefault(event, this.target, this.element);
+      }
 
       if (this.pointerWasMoved) {
         utils.copyCoords(this.prevCoords, this.curCoords);
@@ -481,6 +496,32 @@ class Interaction {
       }
     }
 
+    this.end(event);
+  }
+
+  /*\
+   * Interaction.end
+   [ method ]
+   *
+   * Stop the current action and fire an end event. Inertial movement does
+   * not happen.
+   *
+   - event (PointerEvent) #optional
+   **
+   | interact(target)
+   |   .draggable(true)
+   |   .on('move', function (event) {
+   |     if (event.pageX > 1000) {
+   |       // end the current action
+   |       event.interaction.end();
+   |       // stop all further listeners from being called
+   |       event.stopImmediatePropagation();
+   |     }
+   |   });
+   \*/
+  end (event) {
+    event = event || this.prevEvent;
+
     if (this.interacting()) {
       signals.fire('end-' + this.prepared.name, {
         event,
@@ -529,13 +570,6 @@ class Interaction {
     this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
     modifiers.resetStatuses(this.modifierStatuses);
-
-    // remove pointers if their ID isn't in this.pointerIds
-    for (let i = 0; i < this.pointers.length; i++) {
-      if (utils.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
-        this.pointers.splice(i, 1);
-      }
-    }
   }
 
   inertiaFrame () {
@@ -841,6 +875,15 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
 scope.signals.fire('listen-to-document', {
   win: scope.window,
   doc: scope.document,
+});
+
+// Stop related interactions when an Interactable is unset
+Interactable.signals.on('unset', function ( {interactable} ) {
+  for (const interaction of scope.interactions) {
+    if (interaction.target === interactable && interaction.interacting()) {
+      interaction.end();
+    }
+  }
 });
 
 Interaction.doOnInteractions = doOnInteractions;
