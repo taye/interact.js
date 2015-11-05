@@ -495,6 +495,32 @@ class Interaction {
       }
     }
 
+    this.end(event);
+  }
+
+  /*\
+   * Interaction.end
+   [ method ]
+   *
+   * Stop the current action and fire an end event. Inertial movement does
+   * not happen.
+   *
+   - event (PointerEvent) #optional
+   **
+   | interact(target)
+   |   .draggable(true)
+   |   .on('move', function (event) {
+   |     if (event.pageX > 1000) {
+   |       // end the current action
+   |       event.interaction.end();
+   |       // stop all further listeners from being called
+   |       event.stopImmediatePropagation();
+   |     }
+   |   });
+   \*/
+  end (event) {
+    event = event || this.prevEvent;
+
     if (this.interacting()) {
       signals.fire('end-' + this.prepared.name, {
         event,
@@ -543,13 +569,6 @@ class Interaction {
     this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
 
     modifiers.resetStatuses(this.modifierStatuses);
-
-    // remove pointers if their ID isn't in this.pointerIds
-    for (let i = 0; i < this.pointers.length; i++) {
-      if (utils.indexOf(this.pointerIds, utils.getPointerId(this.pointers[i])) === -1) {
-        this.pointers.splice(i, 1);
-      }
-    }
   }
 
   inertiaFrame () {

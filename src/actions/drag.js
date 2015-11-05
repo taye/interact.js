@@ -115,6 +115,9 @@ Interaction.signals.on('move-drag', function ({ interaction, event }) {
 
   interaction.target.fire(dragEvent);
   interaction.prevEvent = dragEvent;
+
+  // if the action was ended in a dragmove listener
+  if (!interaction.interacting()) { return false; }
 });
 
 Interaction.signals.on('end-drag', function ({ interaction, event }) {
