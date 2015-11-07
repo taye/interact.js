@@ -19,15 +19,17 @@ const drag = {
     inertia   : null,
     autoScroll: null,
 
-    axis     : 'xy',
     startAxis: 'xy',
+    lockAxis : 'xy',
   },
 
   checker: function (pointer, event, interactable) {
     const dragOptions = interactable.options.drag;
 
     return dragOptions.enabled
-      ? { name: 'drag', axis: dragOptions.axis }
+      ? { name: 'drag', axis: (dragOptions.lockAxis === 'start'
+                               ? dragOptions.startAxis
+                               : dragOptions.lockAxis)}
       : null;
   },
 
@@ -40,8 +42,15 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
-  const targetAxis = interaction.target.options.drag.startAxis;
+  const dragOptions = interaction.target.options.drag;
+  const targetAxis = dragOptions.startAxis;
   const startAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+
+  const lockAxis = dragOptions.lockAxis;
+
+  interaction.prepared.axis = dragOptions.lockAxis === 'start'
+    ? startAxis
+    : dragOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
   if (startAxis !== 'xy' && targetAxis !== 'xy' && targetAxis !== startAxis) {
@@ -182,7 +191,12 @@ function checkStartAxis (startAxis, interactable) {
  |     // the axis in which the first movement must be
  |     // for the drag sequence to start
  |     // 'xy' by default - any direction
- |     axis: 'x' || 'y' || 'xy',
+ |     startAxis: 'x' || 'y' || 'xy',
+ |
+ |     // 'xy' by default - don't restrict to one axis (move in any direction)
+ |     // 'x' or 'y' to restrict movement to either axis
+ |     // 'start' to restrict movement to the axis the drag started in
+ |     lockAxis: 'x' || 'y' || 'xy' || 'start',
  |
  |     // max number of drags that can happen concurrently
  |     // with elements of this Interactable. Infinity by default
@@ -199,9 +213,8 @@ Interactable.prototype.draggable = function (options) {
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
 
-    if (/^(xy|x|y)$/.test(options.axis)) {
-      this.options.drag.axis = options.axis;
-      this.options.drag.startAxis = options.axis;
+    if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
+      this.options.drag.lockAxis = options.lockAxis;
     }
     if (/^(xy|x|y)$/.test(options.startAxis)) {
       this.options.drag.startAxis = options.startAxis;
