@@ -19,12 +19,15 @@ const drag = {
     inertia   : null,
     autoScroll: null,
 
+    axis     : 'xy',
     startAxis: 'xy',
   },
 
   checker: function (pointer, event, interactable) {
-    return interactable.options.drag.enabled
-      ? { name: 'drag' }
+    const dragOptions = interactable.options.drag;
+
+    return dragOptions.enabled
+      ? { name: 'drag', axis: dragOptions.axis }
       : null;
   },
 
@@ -110,8 +113,32 @@ Interaction.signals.on('start-drag', function ({ interaction, event }) {
   interaction.prevEvent = dragEvent;
 });
 
+Interaction.signals.on('before-move-drag', function ({ interaction }) {
+  const axis = interaction.prepared.axis;
+
+  if (axis === 'x') {
+    interaction.curCoords.page.y   = interaction.startCoords.page.y;
+    interaction.curCoords.client.y = interaction.startCoords.client.y;
+  }
+  else if (axis === 'y') {
+    interaction.curCoords.page.x   = interaction.startCoords.page.x;
+    interaction.curCoords.client.x = interaction.startCoords.client.x;
+  }
+});
+
 Interaction.signals.on('move-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
+
+  const axis = interaction.prepared.axis;
+
+  if (axis === 'x') {
+    dragEvent.pageY   = interaction.startCoords.page.y;
+    dragEvent.clientY = interaction.startCoords.client.y;
+  }
+  else if (axis === 'y') {
+    dragEvent.pageX   = interaction.startCoords.page.x;
+    dragEvent.clientX = interaction.startCoords.client.x;
+  }
 
   interaction.target.fire(dragEvent);
   interaction.prevEvent = dragEvent;
@@ -172,11 +199,12 @@ Interactable.prototype.draggable = function (options) {
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
 
-    if (/^x$|^y$|^xy$/.test(options.axis)) {
+    if (/^(xy|x|y)$/.test(options.axis)) {
       this.options.drag.axis = options.axis;
+      this.options.drag.startAxis = options.axis;
     }
-    else if (options.axis === null) {
-      delete this.options.drag.axis;
+    if (/^(xy|x|y)$/.test(options.startAxis)) {
+      this.options.drag.startAxis = options.startAxis;
     }
 
     return this;

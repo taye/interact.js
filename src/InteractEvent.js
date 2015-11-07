@@ -48,10 +48,21 @@ class InteractEvent {
       this[modifierName] = modifier.modifyCoords(page, client, target, interaction.modifierStatuses[modifierName], action, phase);
     }
 
-    this.pageX     = page.x;
-    this.pageY     = page.y;
-    this.clientX   = client.x;
-    this.clientY   = client.y;
+    if (ending) {
+      const prevEvent = interaction.prevEvent;
+
+      // use previous coords when ending
+      this.pageX = prevEvent.pageX;
+      this.pageY = prevEvent.pageY;
+      this.clientX = prevEvent.clientX;
+      this.clientY = prevEvent.clientY;
+    }
+    else {
+      this.pageX     = page.x;
+      this.pageY     = page.y;
+      this.clientX   = client.x;
+      this.clientY   = client.y;
+    }
 
     this.x0        = interaction.startCoords.page.x - origin.x;
     this.y0        = interaction.startCoords.page.y - origin.y;

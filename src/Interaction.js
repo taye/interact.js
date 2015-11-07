@@ -337,6 +337,8 @@ class Interaction {
 
       // if interacting, fire a 'move-{action}' signal
       if (this.interacting()) {
+        signals.fire('before-move-' + this.prepared.name, signalArg);
+
         const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
 
         // move if snapping or restriction doesn't prevent it
