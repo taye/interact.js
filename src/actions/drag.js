@@ -19,7 +19,7 @@ const drag = {
     inertia   : null,
     autoScroll: null,
 
-    axis: 'xy',
+    startAxis: 'xy',
   },
 
   checker: function (pointer, event, interactable) {
@@ -37,11 +37,11 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
-  const targetAxis = interaction.target.options.drag.axis;
-  const axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+  const targetAxis = interaction.target.options.drag.startAxis;
+  const startAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
-  // if the movement isn't in the axis of the interactable
-  if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
+  // if the movement isn't in the startAxis of the interactable
+  if (startAxis !== 'xy' && targetAxis !== 'xy' && targetAxis !== startAxis) {
     // cancel the prepared action
     interaction.prepared.name = null;
 
@@ -62,7 +62,7 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
             && scope.testAllow(interactable, element, eventTarget)
             && utils.matchesSelector(element, selector, elements)
             && interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-            && checkAxis(axis, interactable)
+            && checkStartAxis(startAxis, interactable)
             && scope.withinInteractionLimit(interactable, element, { name: 'drag' })) {
 
           return interactable;
@@ -79,7 +79,7 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
             && elementInteractable !== interaction.target
             && !elementInteractable.options.drag.manualStart
             && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-            && checkAxis(axis, elementInteractable)) {
+            && checkStartAxis(startAxis, elementInteractable)) {
 
           interaction.prepared.name = 'drag';
           interaction.target = elementInteractable;
@@ -127,12 +127,12 @@ Interaction.signals.on('end-drag', function ({ interaction, event }) {
   interaction.prevEvent = dragEvent;
 });
 
-function checkAxis (axis, interactable) {
+function checkStartAxis (startAxis, interactable) {
   if (!interactable) { return false; }
 
-  const thisAxis = interactable.options.drag.axis;
+  const thisAxis = interactable.options.drag.startAxis;
 
-  return (axis === 'xy' || thisAxis === 'xy' || thisAxis === axis);
+  return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis);
 }
 
 /*\

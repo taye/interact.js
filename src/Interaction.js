@@ -412,9 +412,9 @@ class Interaction {
       let modifierResult;
 
       if (this.dragging) {
-        if      (options.drag.axis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
-        else if (options.drag.axis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
-        else   /*options.drag.axis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
+        if      (options.drag.startAxis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
+        else if (options.drag.startAxis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
+        else   /*options.drag.startAxis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
       }
       else {
         pointerSpeed = this.pointerDelta.client.speed;
@@ -691,7 +691,7 @@ class Interaction {
       // this allows a touch to pan the viewport if a drag isn't in the right
       // direction
       if (/down|start/i.test(event.type)
-          && ((this.prepared.name === 'drag' && options.drag.axis !== 'xy')
+          && ((this.prepared.name === 'drag' && options.drag.startAxis !== 'xy')
               || (actionOptions && actionOptions.delay > 0))) {
 
         return;
