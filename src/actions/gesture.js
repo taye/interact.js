@@ -124,7 +124,7 @@ Interactable.prototype.gesturable = function (options) {
 InteractEvent.signals.on('gesture', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
-  const { interaction, iEvent, starting, ending, deltaSource } = arg;
+  const { interaction, iEvent, event, starting, ending, deltaSource } = arg;
   const pointers = interaction.pointers;
 
   iEvent.touches = [pointers[0], pointers[1]];

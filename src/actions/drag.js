@@ -43,17 +43,15 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
   const dragOptions = interaction.target.options.drag;
-  const targetAxis = dragOptions.startAxis;
-  const startAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
-
-  const lockAxis = dragOptions.lockAxis;
+  const startAxis = dragOptions.startAxis;
+  const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
   interaction.prepared.axis = dragOptions.lockAxis === 'start'
-    ? startAxis
+    ? currentAxis
     : dragOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
-  if (startAxis !== 'xy' && targetAxis !== 'xy' && targetAxis !== startAxis) {
+  if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
     // cancel the prepared action
     interaction.prepared.name = null;
 
@@ -74,7 +72,7 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
             && scope.testAllow(interactable, element, eventTarget)
             && utils.matchesSelector(element, selector, elements)
             && interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-            && checkStartAxis(startAxis, interactable)
+            && checkStartAxis(currentAxis, interactable)
             && scope.withinInteractionLimit(interactable, element, { name: 'drag' })) {
 
           return interactable;
@@ -91,7 +89,7 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
             && elementInteractable !== interaction.target
             && !elementInteractable.options.drag.manualStart
             && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
-            && checkStartAxis(startAxis, elementInteractable)) {
+            && checkStartAxis(currentAxis, elementInteractable)) {
 
           interaction.prepared.name = 'drag';
           interaction.target = elementInteractable;
