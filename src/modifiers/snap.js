@@ -25,15 +25,26 @@ const snap = {
   setOffset: function (interaction, interactable, element, rect, startOffset) {
     const offsets = [];
     const origin = utils.getOriginXY(interactable, element);
-    const snapOptions = interactable.options[interaction.prepared.name].snap;
-    const snapOffset = (snapOptions && snapOptions.offset === 'startCoords'
-      ? {
+    const snapOptions = interactable.options[interaction.prepared.name].snap || {};
+    let snapOffset;
+
+    if (snapOptions.offset === 'startCoords') {
+      snapOffset = {
         x: interaction.startCoords.page.x - origin.x,
         y: interaction.startCoords.page.y - origin.y,
-      }
-      : snapOptions && snapOptions.offset || { x: 0, y: 0 });
+      };
+    }
+    else if (snapOptions.offset === 'self') {
+      snapOffset = {
+        x: rect.left - origin.x,
+        y: rect.top - origin.y,
+      };
+    }
+    else {
+      snapOffset = snapOptions.offset || { x: 0, y: 0 };
+    }
 
-    if (rect && snapOptions && snapOptions.relativePoints && snapOptions.relativePoints.length) {
+    if (rect && snapOptions.relativePoints && snapOptions.relativePoints.length) {
       for (const { x: relativeX, y: relativeY } of snapOptions.relativePoints) {
         offsets.push({
           x: startOffset.left - (rect.width  * relativeX) + snapOffset.x,
