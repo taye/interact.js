@@ -142,6 +142,10 @@ class Interaction {
 
     this.pointerIsDown = true;
 
+    if (!this.interacting()) {
+      this.setEventXY(this.curCoords, this.pointers);
+    }
+
     signals.fire('down', {
       pointer,
       event,
@@ -173,7 +177,7 @@ class Interaction {
       }
     }
 
-    // do nothing if interacting
+    // do nothing more if interacting
     if (this.interacting()) { return; }
 
     this.pointerIsDown = true;
@@ -181,8 +185,6 @@ class Interaction {
 
     this.downTimes[pointerIndex] = new Date().getTime();
     this.downTargets[pointerIndex] = eventTarget;
-    // update pointer coords for defaultActionChecker to use
-    this.setEventXY(this.curCoords, this.pointers);
 
     this.pointerWasMoved = false;
 
