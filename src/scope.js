@@ -4,7 +4,7 @@ const utils   = require('./utils');
 scope.defaultOptions = require('./defaultOptions');
 scope.events         = require('./utils/events');
 
-scope.signals        = new (require('./utils/Signals'));
+scope.signals        = new (require('./utils/Signals'))();
 
 utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));

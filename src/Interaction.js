@@ -8,7 +8,7 @@ const finder         = require('./utils/interactionFinder');
 const modifiers      = require('./modifiers/base');
 const animationFrame = utils.raf;
 
-const signals = new (require('./utils/Signals'));
+const signals = new (require('./utils/Signals'))();
 
 const listeners   = {};
 const methodNames = [
@@ -770,7 +770,7 @@ function doOnInteractions (method) {
         const pointer = event.changedTouches[i];
         const interaction = finder.search(pointer, event.type, eventTarget);
 
-        matches.push([pointer, interaction || new Interaction]);
+        matches.push([pointer, interaction || new Interaction()]);
       }
     }
     else {

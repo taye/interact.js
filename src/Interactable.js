@@ -7,7 +7,7 @@ const scope   = require('./scope');
 const { getElementRect }    = require('./utils/domUtils');
 const { indexOf, contains } = require('./utils/arr');
 
-const signals = new (require('./utils/Signals'));
+const signals = new (require('./utils/Signals'))();
 
 // all set interactables
 scope.interactables = [];

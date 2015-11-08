@@ -59,6 +59,8 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
 
     if (!interaction.prepared.name) {
 
+      let element = eventTarget;
+
       const getDraggable = function (interactable, selector, context) {
         const elements = browser.useMatchesSelectorPolyfill
             ? context.querySelectorAll(selector)
@@ -78,8 +80,6 @@ Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarge
           return interactable;
         }
       };
-
-      let element = eventTarget;
 
       // check all interactables
       while (utils.isElement(element)) {
