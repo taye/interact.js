@@ -11,3 +11,5 @@ exclude_paths:
  - "docs/*"
  - "gulp/*"
  - "test/*"
+ - "gulpfile.js"
+ - "karma.conf.js"
