@@ -359,6 +359,37 @@ class Interaction {
     }
   }
 
+  /*\
+   * Interaction.redoMove
+   [ method ]
+   *
+   * Force a move of the current action at the same coordinates. Useful if
+   * snap/restrict has been changed and you want a movement with the new
+   * settings.
+   *
+   **
+   | interact(target)
+   |   .draggable(true)
+   |   .on('dragmove', function (event) {
+   |     if (someCondition) {
+   |       // change the snap settings
+   |       event.interactable.draggable({ snap: { targets: [] }});
+   |       // fire another move event with re-calculated snap
+   |       event.interaction.redoMove();
+   |     }
+   |   });
+   \*/
+  redoMove () {
+    modifiers.setAll(this, this.curCoords.page, this.modifierStatuses);
+
+    Interaction.signals.fire('move-' + this.prepared.name, {
+      pointer: this.pointers[0],
+      event: this.prevEvent,
+      eventTarget: this._eventTarget,
+      interaction: this,
+    });
+  }
+
   pointerUp (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
