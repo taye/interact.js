@@ -4,7 +4,7 @@ const getOriginXY   = require('./utils/getOriginXY');
 const modifiers     = require('./modifiers/base');
 const scope         = require('./scope');
 
-const signals = new (require('./utils/Signals'));
+const signals = new (require('./utils/Signals'))();
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
