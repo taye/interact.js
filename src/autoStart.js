@@ -200,4 +200,113 @@ Interactable.prototype.actionChecker = function (checker) {
   return this.options.actionChecker;
 };
 
+/*\
+ * Interactable.styleCursor
+ [ method ]
+ *
+ * Returns or sets whether the the cursor should be changed depending on the
+ * action that would be performed if the mouse were pressed and dragged.
+ *
+ - newValue (boolean) #optional
+ = (boolean | Interactable) The current setting or this Interactable
+\*/
+Interactable.prototype.styleCursor = function (newValue) {
+  if (utils.isBool(newValue)) {
+    this.options.styleCursor = newValue;
+
+    return this;
+  }
+
+  if (newValue === null) {
+    delete this.options.styleCursor;
+
+    return this;
+  }
+
+  return this.options.styleCursor;
+};
+
+/*\
+ * Interactable.ignoreFrom
+ [ method ]
+ *
+ * If the target of the `mousedown`, `pointerdown` or `touchstart`
+ * event or any of it's parents match the given CSS selector or
+ * Element, no drag/resize/gesture is started.
+ *
+ - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
+ = (string | Element | object) The current ignoreFrom value or this Interactable
+ **
+ | interact(element, { ignoreFrom: document.getElementById('no-action') });
+ | // or
+ | interact(element).ignoreFrom('input, textarea, a');
+\*/
+Interactable.prototype.ignoreFrom = function (newValue) {
+  if (utils.trySelector(newValue)) {            // CSS selector to match event.target
+    this.options.ignoreFrom = newValue;
+    return this;
+  }
+
+  if (utils.isElement(newValue)) {              // specific element
+    this.options.ignoreFrom = newValue;
+    return this;
+  }
+
+  return this.options.ignoreFrom;
+};
+
+/*\
+ * Interactable.allowFrom
+ [ method ]
+ *
+ * A drag/resize/gesture is started only If the target of the
+ * `mousedown`, `pointerdown` or `touchstart` event or any of it's
+ * parents match the given CSS selector or Element.
+ *
+ - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
+ = (string | Element | object) The current allowFrom value or this Interactable
+ **
+ | interact(element, { allowFrom: document.getElementById('drag-handle') });
+ | // or
+ | interact(element).allowFrom('.handle');
+\*/
+Interactable.prototype.allowFrom = function (newValue) {
+  if (utils.trySelector(newValue)) {            // CSS selector to match event.target
+    this.options.allowFrom = newValue;
+    return this;
+  }
+
+  if (utils.isElement(newValue)) {              // specific element
+    this.options.allowFrom = newValue;
+    return this;
+  }
+
+  return this.options.allowFrom;
+};
+
+Interaction.signals.on('stop-active', function ({ interaction }) {
+  const target = interaction.target;
+
+  if (target.options.styleCursor) {
+    target._doc.documentElement.style.cursor = '';
+  }
+});
+
+Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+  const rect = this.getRect(element);
+  let action = null;
+
+  for (const actionName of actions.names) {
+    action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
+
+    if (action) {
+      return action;
+    }
+  }
+};
+
+defaultOptions.base.actionChecker = null;
+defaultOptions.base.ignoreFrom = null;
+defaultOptions.base.allowFrom = null;
+defaultOptions.base.styleCursor = true;
 defaultOptions.perAction.manualStart = false;

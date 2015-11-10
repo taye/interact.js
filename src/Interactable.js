@@ -156,33 +156,6 @@ class Interactable {
   }
 
   /*\
-   * Interactable.styleCursor
-   [ method ]
-   *
-   * Returns or sets whether the action that would be performed when the
-   * mouse on the element are checked on `mousemove` so that the cursor
-   * may be styled appropriately
-   *
-   - newValue (boolean) #optional
-   = (boolean | Interactable) The current setting or this Interactable
-  \*/
-  styleCursor (newValue) {
-    if (isType.isBool(newValue)) {
-      this.options.styleCursor = newValue;
-
-      return this;
-    }
-
-    if (newValue === null) {
-      delete this.options.styleCursor;
-
-      return this;
-    }
-
-    return this.options.styleCursor;
-  }
-
-  /*\
    * Interactable.preventDefault
    [ method ]
    *
@@ -266,64 +239,6 @@ class Interactable {
   \*/
   context () {
     return this._context;
-  }
-
-  /*\
-   * Interactable.ignoreFrom
-   [ method ]
-   *
-   * If the target of the `mousedown`, `pointerdown` or `touchstart`
-   * event or any of it's parents match the given CSS selector or
-   * Element, no drag/resize/gesture is started.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
-   = (string | Element | object) The current ignoreFrom value or this Interactable
-   **
-   | interact(element, { ignoreFrom: document.getElementById('no-action') });
-   | // or
-   | interact(element).ignoreFrom('input, textarea, a');
-  \*/
-  ignoreFrom (newValue) {
-    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
-      this.options.ignoreFrom = newValue;
-      return this;
-    }
-
-    if (isType.isElement(newValue)) {              // specific element
-      this.options.ignoreFrom = newValue;
-      return this;
-    }
-
-    return this.options.ignoreFrom;
-  }
-
-  /*\
-   * Interactable.allowFrom
-   [ method ]
-   *
-   * A drag/resize/gesture is started only If the target of the
-   * `mousedown`, `pointerdown` or `touchstart` event or any of it's
-   * parents match the given CSS selector or Element.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
-   = (string | Element | object) The current allowFrom value or this Interactable
-   **
-   | interact(element, { allowFrom: document.getElementById('drag-handle') });
-   | // or
-   | interact(element).allowFrom('.handle');
-  \*/
-  allowFrom (newValue) {
-    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
-      this.options.allowFrom = newValue;
-      return this;
-    }
-
-    if (isType.isElement(newValue)) {              // specific element
-      this.options.allowFrom = newValue;
-      return this;
-    }
-
-    return this.options.allowFrom;
   }
 
   /*\
@@ -575,9 +490,6 @@ class Interactable {
     }
     else {
       events.remove(this, 'all');
-      if (isType.isElement(this.target) && this.options.styleCursor) {
-        this.target.style.cursor = '';
-      }
     }
 
     signals.fire('unset', { interactable: this });
@@ -587,8 +499,6 @@ class Interactable {
     return scope.interact;
   }
 }
-
-Interactable.prototype.defaultActionChecker = actions.defaultChecker;
 
 Interactable.signals = signals;
 
