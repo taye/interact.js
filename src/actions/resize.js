@@ -207,28 +207,20 @@ Interaction.signals.on('move-resize', function ({ interaction, event }) {
     let dx = resizeEvent.dx;
     let dy = resizeEvent.dy;
 
-    // `resize.preserveAspectRatio` takes precedence over `resize.square`
-    if (resizeOptions.preserveAspectRatio) {
-      const resizeStartAspectRatio = interaction.resizeStartAspectRatio;
+    if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
+      // `resize.preserveAspectRatio` takes precedence over `resize.square`
+      const startAspectRatio = resizeOptions.preserveAspectRatio
+        ? interaction.resizeStartAspectRatio
+        : 1;
 
       edges = interaction.prepared._linkedEdges;
 
       if ((originalEdges.left && originalEdges.bottom)
           || (originalEdges.right && originalEdges.top)) {
-        dy = -dx / resizeStartAspectRatio;
+        dy = -dx / startAspectRatio;
       }
-      else if (originalEdges.left || originalEdges.right) { dy = dx / resizeStartAspectRatio; }
-      else if (originalEdges.top || originalEdges.bottom) { dx = dy * resizeStartAspectRatio; }
-    }
-    else if (resizeOptions.square) {
-      edges = interaction.prepared._linkedEdges;
-
-      if ((originalEdges.left && originalEdges.bottom)
-          || (originalEdges.right && originalEdges.top)) {
-        dy = -dx;
-      }
-      else if (originalEdges.left || originalEdges.right) { dy = dx; }
-      else if (originalEdges.top || originalEdges.bottom) { dx = dy; }
+      else if (originalEdges.left || originalEdges.right ) { dy = dx / startAspectRatio; }
+      else if (originalEdges.top  || originalEdges.bottom) { dx = dy * startAspectRatio; }
     }
 
     // update the 'current' rect without modifications

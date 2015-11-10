@@ -176,22 +176,23 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
     drop      : null,
   };
 
+  const tmpl = {
+    dragEvent,
+    interaction,
+    target       : interaction.dropElement,
+    dropzone     : interaction.dropTarget,
+    relatedTarget: dragEvent.target,
+    draggable    : dragEvent.interactable,
+    timeStamp    : dragEvent.timeStamp,
+  };
+
   if (interaction.dropElement !== interaction.prevDropElement) {
     // if there was a prevDropTarget, create a dragleave event
     if (interaction.prevDropTarget) {
-      dropEvents.leave = {
-        dragEvent,
-        interaction,
-        target       : interaction.prevDropElement,
-        dropzone     : interaction.prevDropTarget,
-        relatedTarget: dragEvent.target,
-        draggable    : dragEvent.interactable,
-        timeStamp    : dragEvent.timeStamp,
-        type         : 'dragleave',
-      };
+      dropEvents.leave = utils.extend({ type: 'dragleave' }, tmpl);
 
-      dragEvent.dragLeave    = interaction.prevDropElement;
-      dragEvent.prevDropzone = interaction.prevDropTarget;
+      dragEvent.dragLeave    = dropEvents.leave.target   = interaction.prevDropElement;
+      dragEvent.prevDropzone = dropEvents.leave.dropzone = interaction.prevDropTarget;
     }
     // if the dropTarget is not null, create a dragenter event
     if (interaction.dropTarget) {
@@ -212,55 +213,28 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
   }
 
   if (dragEvent.type === 'dragend' && interaction.dropTarget) {
-    dropEvents.drop = {
-      dragEvent,
-      interaction,
-      target       : interaction.dropElement,
-      dropzone     : interaction.dropTarget,
-      relatedTarget: dragEvent.target,
-      draggable    : dragEvent.interactable,
-      timeStamp    : dragEvent.timeStamp,
-      type         : 'drop',
-    };
+    dropEvents.drop = utils.extend({ type: 'drop' }, tmpl);
 
     dragEvent.dropzone = interaction.dropTarget;
   }
   if (dragEvent.type === 'dragstart') {
-    dropEvents.activate = {
-      dragEvent,
-      interaction,
-      target       : null,
-      dropzone     : null,
-      relatedTarget: dragEvent.target,
-      draggable    : dragEvent.interactable,
-      timeStamp    : dragEvent.timeStamp,
-      type         : 'dropactivate',
-    };
+    dropEvents.activate = utils.extend({ type: 'dropactivate' }, tmpl);
+
+    dropEvents.activate.target   = null;
+    dropEvents.activate.dropzone = null;
   }
   if (dragEvent.type === 'dragend') {
-    dropEvents.deactivate = {
-      dragEvent,
-      interaction,
-      target       : null,
-      dropzone     : null,
-      relatedTarget: dragEvent.target,
-      draggable    : dragEvent.interactable,
-      timeStamp    : dragEvent.timeStamp,
-      type         : 'dropdeactivate',
-    };
+    dropEvents.deactivate = utils.extend({ type: 'dropdeactivate' }, tmpl);
+
+    dropEvents.deactivate.target   = null;
+    dropEvents.deactivate.dropzone = null;
   }
   if (dragEvent.type === 'dragmove' && interaction.dropTarget) {
-    dropEvents.move = {
-      dragEvent,
-      interaction,
-      target       : interaction.dropElement,
-      dropzone     : interaction.dropTarget,
-      relatedTarget: dragEvent.target,
-      draggable    : dragEvent.interactable,
+    dropEvents.move = utils.extend({
       dragmove     : dragEvent,
-      timeStamp    : dragEvent.timeStamp,
       type         : 'dropmove',
-    };
+    }, tmpl);
+
     dragEvent.dropzone = interaction.dropTarget;
   }
 
