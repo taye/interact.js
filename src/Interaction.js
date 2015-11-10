@@ -162,15 +162,13 @@ class Interaction {
       while (utils.isElement(element)) {
 
         // if this element is the current inertia target element
-        if (element === this.element
-            // and the prospective action is the same as the ongoing one
-            && validateAction(this.target.getAction(pointer, event, this, this.element), this.target).name === this.prepared.name) {
+        if (element === this.element) {
 
           // stop inertia so that the next move will be a normal one
           animationFrame.cancel(this.inertiaStatus.i);
           this.inertiaStatus.active = false;
 
-          this.checkAndPreventDefault(event, this.target, this.element);
+          this.redoMove();
           return;
         }
         element = utils.parentElement(element);

@@ -1,3 +1,4 @@
+const Interactable   = require('./Interactable');
 const Interaction    = require('./Interaction');
 const actions        = require('./actions/base');
 const defaultOptions = require('./defaultOptions');
@@ -144,5 +145,59 @@ function prepare (interaction, { action, target, element }) {
 
   Interaction.signals.fire('prepared', { interaction: interaction });
 }
+
+Interactable.prototype.getAction = function (pointer, event, interaction, element) {
+  const action = this.defaultActionChecker(pointer, event, interaction, element);
+
+  if (this.options.actionChecker) {
+    return this.options.actionChecker(pointer, event, action, this, element, interaction);
+  }
+
+  return action;
+};
+
+/*\
+ * Interactable.actionChecker
+ [ method ]
+ *
+ * Gets or sets the function used to check action to be performed on
+ * pointerDown
+ *
+ - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
+ = (Function | Interactable) The checker function or this Interactable
+ *
+ | interact('.resize-drag')
+ |   .resizable(true)
+ |   .draggable(true)
+ |   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+ |
+ |   if (interact.matchesSelector(event.target, '.drag-handle') {
+ |     // force drag with handle target
+ |     action.name = drag;
+ |   }
+ |   else {
+ |     // resize from the top and right edges
+ |     action.name  = 'resize';
+ |     action.edges = { top: true, right: true };
+ |   }
+ |
+ |   return action;
+ | });
+\*/
+Interactable.prototype.actionChecker = function (checker) {
+  if (utils.isFunction(checker)) {
+    this.options.actionChecker = checker;
+
+    return this;
+  }
+
+  if (checker === null) {
+    delete this.options.actionChecker;
+
+    return this;
+  }
+
+  return this.options.actionChecker;
+};
 
 defaultOptions.perAction.manualStart = false;

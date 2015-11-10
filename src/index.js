@@ -23,5 +23,6 @@ require('./modifiers/restrict');
 
 require('./Interaction');
 require('./autoStart');
+require('./actions/autoDragAxis');
 
 module.exports = require('./interact');
