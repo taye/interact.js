@@ -375,14 +375,20 @@ class Interaction {
    |   });
    \*/
   redoMove () {
-    modifiers.setAll(this, this.curCoords.page, this.modifierStatuses);
-
-    Interaction.signals.fire('move-' + this.prepared.name, {
+    const signalArg = {
+      dx: 0,
+      dy: 0,
       pointer: this.pointers[0],
       event: this.prevEvent,
       eventTarget: this._eventTarget,
       interaction: this,
-    });
+    };
+
+    signals.fire('before-move-' + this.prepared.name, signalArg);
+
+    modifiers.setAll(this, this.curCoords.page, this.modifierStatuses);
+
+    Interaction.signals.fire('move-' + this.prepared.name, {
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
