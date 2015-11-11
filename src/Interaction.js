@@ -304,15 +304,7 @@ class Interaction {
 
       // if interacting, fire a 'move-{action}' signal
       if (this.interacting()) {
-        signals.fire('before-action-move', signalArg);
-
-        // move if snapping or restriction doesn't prevent it
-        if (!this._dontFireMove) {
-          Interaction.signals.fire('move-' + this.prepared.name, signalArg);
-        }
-
-        this._dontFireMove = false;
-
+        this.doMove(signalArg);
         this.checkAndPreventDefault(event);
       }
 
@@ -344,19 +336,19 @@ class Interaction {
    |     }
    |   });
    \*/
-  doMove (preEnd) {
-    const signalArg = {
-      dx: 0,
-      dy: 0,
-      preEnd,
+  doMove (signalArg) {
+    signalArg = utils.extend(signalArg || {}, {
       pointer: this.pointers[0],
       event: this.prevEvent,
       eventTarget: this._eventTarget,
       interaction: this,
-    };
+    });
 
     signals.fire('before-action-move', signalArg);
-    signals.fire('move-' + this.prepared.name, signalArg);
+
+    if (!this._dontFireMove) {
+      signals.fire('move-' + this.prepared.name, signalArg);
+    }
 
     this._dontFireMove = false;
   }

@@ -112,7 +112,7 @@ Interaction.signals.on('action-end', function ({ interaction }) {
     // if the endOnly option is true for any modifier
     if (modifiers[modifiers.names[i]].shouldDo(interaction.target, interaction.prepared.name, true, true)) {
       // fire a move event at the modified coordinates
-      interaction.doMove(true /* preEnd */);
+      interaction.doMove({ preEnd: true });
       break;
     }
   }
