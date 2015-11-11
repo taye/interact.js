@@ -399,6 +399,8 @@ Interactable.signals.on('unset', function ({ interactable }) {
   interactable.dropzone(false);
 });
 
+Interactable.settingsMethods.push('dropChecker');
+
 Interaction.signals.on('new', function (interaction) {
   interaction.dropTarget      = null; // the dropzone a drag target might be dropped into
   interaction.dropElement     = null; // the element at the time of checking

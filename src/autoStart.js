@@ -305,6 +305,11 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
+Interactable.settingsMethods.push('styleCursor');
+Interactable.settingsMethods.push('actionChecker');
+Interactable.settingsMethods.push('ignoreFrom');
+Interactable.settingsMethods.push('allowFrom');
+
 defaultOptions.base.actionChecker = null;
 defaultOptions.base.ignoreFrom = null;
 defaultOptions.base.allowFrom = null;

@@ -431,15 +431,7 @@ class Interactable {
       this[methodName](options[actionName]);
     }
 
-    const settings = [
-      'accept', 'actionChecker', 'allowFrom', 'deltaSource',
-      'dropChecker', 'ignoreFrom', 'origin', 'preventDefault',
-      'rectChecker', 'styleCursor',
-    ];
-
-    for (let i = 0, len = settings.length; i < len; i++) {
-      const setting = settings[i];
-
+    for (const setting of Interactable.settingsMethods) {
       this.options[setting] = scope.defaultOptions.base[setting];
 
       if (setting in options) {
@@ -501,5 +493,7 @@ class Interactable {
 }
 
 Interactable.signals = signals;
+
+Interactable.settingsMethods = [ 'deltaSource', 'origin', 'preventDefault', 'rectChecker' ];
 
 module.exports = Interactable;
