@@ -1,4 +1,4 @@
-const base = require('./base');
+const actions = require('./index');
 const utils = require('../utils');
 const browser = require('../utils/browser');
 const scope = require('../scope');
@@ -428,15 +428,15 @@ InteractEvent.signals.on('resize', function ({ interaction, iEvent }) {
   }
 });
 
-base.resize = resize;
-base.names.push('resize');
+actions.resize = resize;
+actions.names.push('resize');
 utils.merge(scope.eventTypes, [
   'resizestart',
   'resizemove',
   'resizeinertiastart',
   'resizeend',
 ]);
-base.methodDict.resize = 'resizable';
+actions.methodDict.resize = 'resizable';
 
 defaultOptions.resize = resize.defaults;
 

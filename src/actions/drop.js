@@ -1,4 +1,4 @@
-const base = require('./base');
+const actions = require('./index');
 const utils = require('../utils');
 const scope = require('../scope');
 const InteractEvent = require('../InteractEvent');
@@ -431,7 +431,7 @@ utils.merge(scope.eventTypes, [
   'dropmove',
   'drop',
 ]);
-base.methodDict.drop = 'dropzone';
+actions.methodDict.drop = 'dropzone';
 
 defaultOptions.drop = drop.defaults;
 

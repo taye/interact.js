@@ -1,4 +1,4 @@
-const base = require('./base');
+const actions = require('./index');
 const scope = require('../scope');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
@@ -125,15 +125,15 @@ Interactable.prototype.draggable = function (options) {
   return this.options.drag;
 };
 
-base.drag = drag;
-base.names.push('drag');
+actions.drag = drag;
+actions.names.push('drag');
 utils.merge(scope.eventTypes, [
   'dragstart',
   'dragmove',
   'draginertiastart',
   'dragend',
 ]);
-base.methodDict.drag = 'draggable';
+actions.methodDict.drag = 'draggable';
 
 defaultOptions.drag = drag.defaults;
 

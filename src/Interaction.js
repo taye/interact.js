@@ -436,7 +436,7 @@ class Interaction {
                 && pointerSpeed > inertiaOptions.minSpeed
                 && pointerSpeed > inertiaOptions.endSpeed);
 
-      const modifiers = (inertiaPossible? require('./modifiers/base') : null);
+      const modifiers = (inertiaPossible? require('./modifiers') : null);
 
       // smoothEnd
       if (inertiaPossible && !inertia) {

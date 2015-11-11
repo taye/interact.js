@@ -1,4 +1,4 @@
-const base = require('./base');
+const actions = require('./index');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
@@ -173,15 +173,15 @@ Interaction.signals.on('new', function (interaction) {
   };
 });
 
-base.gesture = gesture;
-base.names.push('gesture');
+actions.gesture = gesture;
+actions.names.push('gesture');
 utils.merge(scope.eventTypes, [
   'gesturestart',
   'gesturemove',
   'gestureinertiastart',
   'gestureend',
 ]);
-base.methodDict.gesture = 'gesturable';
+actions.methodDict.gesture = 'gesturable';
 
 defaultOptions.gesture = gesture.defaults;
 

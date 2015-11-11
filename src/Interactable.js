@@ -1,7 +1,7 @@
 const isType  = require('./utils/isType');
 const events  = require('./utils/events');
 const extend  = require('./utils/extend');
-const actions = require('./actions/base');
+const actions = require('./actions');
 const scope   = require('./scope');
 
 const { getElementRect }    = require('./utils/domUtils');

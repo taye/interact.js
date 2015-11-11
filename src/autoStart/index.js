@@ -1,6 +1,6 @@
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
-const actions        = require('../actions/base');
+const actions        = require('../actions');
 const defaultOptions = require('../defaultOptions');
 const browser        = require('../utils/browser');
 const scope          = require('../scope');
