@@ -81,7 +81,9 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
   }
 });
 
-Interaction.signals.on('before-move-drag', function ({ interaction }) {
+Interaction.signals.on('before-action-move', function ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const axis = interaction.prepared.axis;
 
   if (axis === 'x') {

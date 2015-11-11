@@ -334,7 +334,7 @@ class Interaction {
 
       // if interacting, fire a 'move-{action}' signal
       if (this.interacting()) {
-        signals.fire('before-move-' + this.prepared.name, signalArg);
+        signals.fire('before-action-move', signalArg);
 
         const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
 
@@ -384,11 +384,11 @@ class Interaction {
       interaction: this,
     };
 
-    signals.fire('before-move-' + this.prepared.name, signalArg);
+    signals.fire('before-action-move', signalArg);
 
     modifiers.setAll(this, this.curCoords.page, this.modifierStatuses);
 
-    Interaction.signals.fire('move-' + this.prepared.name, {
+    Interaction.signals.fire('move-' + this.prepared.name, signalArg);
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
