@@ -1,10 +1,10 @@
-const Interactable   = require('./Interactable');
-const Interaction    = require('./Interaction');
-const actions        = require('./actions/base');
-const defaultOptions = require('./defaultOptions');
-const browser        = require('./utils/browser');
-const scope          = require('./scope');
-const utils          = require('./utils');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
+const actions        = require('../actions/base');
+const defaultOptions = require('../defaultOptions');
+const browser        = require('../utils/browser');
+const scope          = require('../scope');
+const utils          = require('../utils');
 
 // mouse move cursor style
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {

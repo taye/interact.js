@@ -1,5 +1,5 @@
-const Interaction = require('./Interaction');
-const actions = require('./actions/base');
+const Interaction = require('../Interaction');
+const actions = require('../actions/base');
 
 Interaction.signals.on('new', function (interaction) {
   interaction.delayTimer = null;

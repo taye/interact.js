@@ -9,8 +9,6 @@ require('./actions/resize');
 require('./actions/drag');
 require('./actions/drop');
 
-require('./delay.js');
-
 // autoScroll
 require('./autoScroll');
 
@@ -22,7 +20,10 @@ require('./modifiers/snap');
 require('./modifiers/restrict');
 
 require('./Interaction');
+
+// autoStart
 require('./autoStart');
-require('./actions/autoDragAxis');
+require('./autoStart/drag');
+require('./autoStart/delay');
 
 module.exports = require('./interact');

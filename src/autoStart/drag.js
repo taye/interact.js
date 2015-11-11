@@ -1,4 +1,4 @@
-require('../autoStart');
+require('./index');
 
 const scope         = require('../scope');
 const InteractEvent = require('../InteractEvent');
