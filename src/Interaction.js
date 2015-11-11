@@ -169,27 +169,27 @@ class Interaction {
           this.inertiaStatus.active = false;
 
           this.redoMove();
-          return;
+          break;
         }
         element = utils.parentElement(element);
       }
     }
 
-    // do nothing more if interacting
-    if (this.interacting()) { return; }
+    if (!this.interacting()) {
 
-    this.pointerIsDown = true;
-    this.downEvent = event;
+      this.pointerIsDown = true;
+      this.downEvent = event;
 
-    this.downTimes[pointerIndex] = new Date().getTime();
-    this.downTargets[pointerIndex] = eventTarget;
+      this.downTimes[pointerIndex] = new Date().getTime();
+      this.downTargets[pointerIndex] = eventTarget;
 
-    this.pointerWasMoved = false;
+      this.pointerWasMoved = false;
 
-    this.checkAndPreventDefault(event, this.target, this.element);
+      utils.pointerExtend(this.downPointer, pointer);
+      utils.copyCoords(this.prevCoords, this.curCoords);
+    }
 
-    utils.pointerExtend(this.downPointer, pointer);
-    utils.copyCoords(this.prevCoords, this.curCoords);
+    this.checkAndPreventDefault(event);
   }
 
   setStartOffsets (action, interactable, element) {
@@ -324,10 +324,7 @@ class Interaction {
       interaction: this,
     };
 
-    if (duplicateMove && this.pointerWasMoved && !preEnd) {
-      this.checkAndPreventDefault(event, this.target, this.element);
-    }
-    else if (!duplicateMove) {
+    if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
       utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
@@ -346,7 +343,7 @@ class Interaction {
           Interaction.signals.fire('move-' + this.prepared.name, signalArg);
         }
 
-        this.checkAndPreventDefault(event, this.target, this.element);
+        this.checkAndPreventDefault(event);
       }
 
       if (this.pointerWasMoved) {
@@ -579,15 +576,9 @@ class Interaction {
     if (this._interacting) {
       signals.fire('stop-active', { interaction: this });
 
-      const target = this.target;
-
-      if (target.options.styleCursor) {
-        target._doc.documentElement.style.cursor = '';
-      }
-
       // prevent Default only if were previously interacting
       if (event && utils.isFunction(event.preventDefault)) {
-        this.checkAndPreventDefault(event, target, this.element);
+        this.checkAndPreventDefault(event);
       }
 
       signals.fire('stop-' + this.prepared.name, {
@@ -710,40 +701,43 @@ class Interaction {
     this.pointers[index] = pointer;
   }
 
-  checkAndPreventDefault (event, interactable, element) {
-    if (!(interactable = interactable || this.target)) { return; }
+  checkAndPreventDefault (event) {
+    const setting = this.target && this.target.options.preventDefault;
 
-    const options = interactable.options;
-    const prevent = options.preventDefault;
+    if (!this.target || setting === 'never') { return; }
 
-    if (prevent === 'auto' && element && !/^(input|select|textarea)$/i.test(event.target.nodeName)) {
-      const actionOptions = options[this.prepared.name];
-
-      // do not preventDefault on pointerdown if the prepared action is delayed
-      // or it is a drag and dragging can only start from a certain direction -
-      // this allows a touch to pan the viewport if a drag isn't in the right
-      // direction
-      if (/down|start/i.test(event.type)
-          && ((this.prepared.name === 'drag' && options.drag.startAxis !== 'xy')
-              || (actionOptions && actionOptions.delay > 0))) {
-
-        return;
-      }
-
-      // with manualStart, only preventDefault while interacting
-      if (actionOptions && actionOptions.manualStart
-          && !this.interacting()) {
-        return;
-      }
-
+    if (setting === 'always') {
       event.preventDefault();
       return;
     }
 
-    if (prevent === 'always') {
-      event.preventDefault();
+    // setting === 'auto'
+
+    // don't preventDefault on input elements
+    if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
       return;
     }
+
+    const actionOptions = this.target.options[this.prepared.name];
+
+    // Do not preventDefault on pointerdown if the prepared action is delayed
+    // or it is a drag and dragging can only start from a certain direction.
+    // This allows a touch to pan the viewport if the action doesn't actually
+    // start>
+    if (/down|start/i.test(event.type)
+        && ((this.prepared.name === 'drag' && actionOptions.startAxis !== 'xy')
+            || (actionOptions && actionOptions.delay > 0))) {
+
+      return;
+    }
+
+    // with manualStart, only preventDefault while interacting
+    if (actionOptions && actionOptions.manualStart
+        && !this.interacting()) {
+      return;
+    }
+
+    event.preventDefault();
   }
 
   calcInertia (status) {
@@ -895,7 +889,7 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
           && (interaction.element === event.target
               || utils.nodeContains(interaction.element, event.target))) {
 
-        interaction.checkAndPreventDefault(event, interaction.target, interaction.element);
+        interaction.checkAndPreventDefault(event);
         return;
       }
     }
