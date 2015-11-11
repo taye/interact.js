@@ -5,7 +5,6 @@ const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
-const modifiers      = require('./modifiers/base');
 const animationFrame = utils.raf;
 
 const signals = new (require('./utils/Signals'))();
@@ -102,10 +101,6 @@ class Interaction {
 
     this.prevEvent = null;      // previous action event
 
-    this.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
-    this.modifierOffsets  = {};
-    this.modifierStatuses = modifiers.resetStatuses({});
-
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
     this._interacting    = false;
@@ -192,26 +187,6 @@ class Interaction {
     this.checkAndPreventDefault(event);
   }
 
-  setStartOffsets (action, interactable, element) {
-    const rect = interactable.getRect(element);
-
-    if (rect) {
-      this.startOffset.left = this.startCoords.page.x - rect.left;
-      this.startOffset.top  = this.startCoords.page.y - rect.top;
-
-      this.startOffset.right  = rect.right  - this.startCoords.page.x;
-      this.startOffset.bottom = rect.bottom - this.startCoords.page.y;
-
-      if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
-      if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
-    }
-    else {
-      this.startOffset.left = this.startOffset.top = this.startOffset.right = this.startOffset.bottom = 0;
-    }
-
-    modifiers.setOffsets(this, interactable, element, rect, this.modifierOffsets);
-  }
-
   /*\
    * Interaction.start
    [ method ]
@@ -266,10 +241,7 @@ class Interaction {
     this.target         = interactable;
     this.element        = element;
 
-    this.setStartOffsets(action.name, interactable, element, this.modifierOffsets);
-
-    modifiers.resetStatuses(this.modifierStatuses);
-    modifiers.setAll(this, this.startCoords.page, this.modifierStatuses);
+    signals.fire('start', { interaction: this });
 
     signals.fire('start-' + this.prepared.name, {
       interaction: this,
@@ -277,7 +249,7 @@ class Interaction {
     });
   }
 
-  pointerMove (pointer, event, eventTarget, curEventTarget, preEnd) {
+  pointerMove (pointer, event, eventTarget) {
     if (this.inertiaStatus.active) {
       const pageUp   = this.inertiaStatus.upCoords.page;
       const clientUp = this.inertiaStatus.upCoords.client;
@@ -313,22 +285,20 @@ class Interaction {
       this.pointerWasMoved = utils.hypot(dx, dy) > scope.pointerMoveTolerance;
     }
 
-    const signalArg = {
-      pointer,
-      event,
-      eventTarget,
-      dx,
-      dy,
-      preEnd,
-      duplicate: duplicateMove,
-      interaction: this,
-    };
-
     if (!duplicateMove) {
+      const signalArg = {
+        pointer,
+        event,
+        eventTarget,
+        dx,
+        dy,
+        duplicate: duplicateMove,
+        interaction: this,
+        interactingBeforeMove: this.interacting(),
+      };
+
       // set pointer coordinate, time changes and speeds
       utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-
-      const interactingBeforeMove = this.interacting();
 
       signals.fire('move', signalArg);
 
@@ -336,12 +306,12 @@ class Interaction {
       if (this.interacting()) {
         signals.fire('before-action-move', signalArg);
 
-        const modifierResult = modifiers.setAll(this, this.curCoords.page, this.modifierStatuses, preEnd);
-
         // move if snapping or restriction doesn't prevent it
-        if (modifierResult.shouldMove || !interactingBeforeMove) {
+        if (!this._dontFireMove) {
           Interaction.signals.fire('move-' + this.prepared.name, signalArg);
         }
+
+        this._dontFireMove = false;
 
         this.checkAndPreventDefault(event);
       }
@@ -374,10 +344,11 @@ class Interaction {
    |     }
    |   });
    \*/
-  redoMove () {
+  redoMove (preEnd) {
     const signalArg = {
       dx: 0,
       dy: 0,
+      preEnd,
       pointer: this.pointers[0],
       event: this.prevEvent,
       eventTarget: this._eventTarget,
@@ -385,10 +356,9 @@ class Interaction {
     };
 
     signals.fire('before-action-move', signalArg);
+    signals.fire('move-' + this.prepared.name, signalArg);
 
-    modifiers.setAll(this, this.curCoords.page, this.modifierStatuses);
-
-    Interaction.signals.fire('move-' + this.prepared.name, signalArg);
+    this._dontFireMove = false;
   }
 
   pointerUp (pointer, event, eventTarget, curEventTarget) {
@@ -428,7 +398,7 @@ class Interaction {
   }
 
   // End interact move events and stop auto-scroll unless inertia is enabled
-  pointerEnd (pointer, event, eventTarget, curEventTarget) {
+  pointerEnd (pointer, event) {
     const target = this.target;
     const options = target && target.options;
     const inertiaOptions = options && this.prepared.name && options[this.prepared.name].inertia;
@@ -465,6 +435,8 @@ class Interaction {
                 && (now - this.curCoords.timeStamp) < 50
                 && pointerSpeed > inertiaOptions.minSpeed
                 && pointerSpeed > inertiaOptions.endSpeed);
+
+      const modifiers = (inertiaPossible? require('./modifiers/base') : null);
 
       // smoothEnd
       if (inertiaPossible && !inertia) {
@@ -520,15 +492,6 @@ class Interaction {
 
         inertiaStatus.active = true;
         return;
-      }
-
-      for (let i = 0; i < modifiers.names.length; i++) {
-        // if the endOnly option is true for any modifier
-        if (modifiers[modifiers.names[i]].shouldDo(target, this.prepared.name, true, true)) {
-          // fire a move event at the snapped coordinates
-          this.pointerMove(pointer, event, eventTarget, curEventTarget, true);
-          break;
-        }
       }
     }
 
@@ -598,8 +561,6 @@ class Interaction {
     this.pointerIsDown = this._interacting = false;
     this.prepared.name = this.prevEvent = null;
     this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
-
-    modifiers.resetStatuses(this.modifierStatuses);
   }
 
   inertiaFrame () {

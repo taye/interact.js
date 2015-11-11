@@ -1,8 +1,7 @@
-const hypot         = require('./utils/hypot');
-const extend        = require('./utils/extend');
-const getOriginXY   = require('./utils/getOriginXY');
-const modifiers     = require('./modifiers/base');
-const scope         = require('./scope');
+const hypot       = require('./utils/hypot');
+const extend      = require('./utils/extend');
+const getOriginXY = require('./utils/getOriginXY');
+const scope       = require('./scope');
 
 const signals = new (require('./utils/Signals'))();
 
@@ -41,12 +40,23 @@ class InteractEvent {
     this.interaction   = interaction;
     this.interactable  = target;
 
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
-      const modifier = modifiers[modifierName];
+    const signalArg = {
+      interaction,
+      event,
+      action,
+      phase,
+      element,
+      related,
+      page,
+      client,
+      coords,
+      starting,
+      ending,
+      deltaSource,
+      iEvent: this,
+    };
 
-      this[modifierName] = modifier.modifyCoords(page, client, target, interaction.modifierStatuses[modifierName], action, phase);
-    }
+    signals.fire('set-xy', signalArg);
 
     if (ending) {
       const prevEvent = interaction.prevEvent;
@@ -68,22 +78,6 @@ class InteractEvent {
     this.y0        = interaction.startCoords.page.y - origin.y;
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
-
-    const signalArg = {
-      interaction,
-      event,
-      action,
-      phase,
-      element,
-      related,
-      page,
-      client,
-      coords,
-      starting,
-      ending,
-      deltaSource,
-      iEvent: this,
-    };
 
     const inertiaStatus = interaction.inertiaStatus;
 
