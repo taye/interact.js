@@ -1,5 +1,4 @@
-require('./index');
-
+const autoStart     = require('./index');
 const scope         = require('../scope');
 const InteractEvent = require('../InteractEvent');
 const Interaction   = require('../Interaction');
@@ -8,7 +7,7 @@ const browser       = require('../utils/browser');
 const { isElement } = require('../utils/isType');
 const { matchesSelector, parentElement } = require('../utils/domUtils');
 
-Interaction.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
+autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);

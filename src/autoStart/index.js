@@ -6,6 +6,8 @@ const browser        = require('../utils/browser');
 const scope          = require('../scope');
 const utils          = require('../utils');
 
+const signals = new (require('../utils/Signals'))();
+
 // mouse move cursor style
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
   if (!interaction.mouse || interaction.pointerIsDown) { return; }
@@ -35,7 +37,7 @@ Interaction.signals.on('move', function (arg) {
     if (!interaction.interacting()) {
       utils.setEventDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
-      Interaction.signals.fire('before-start-' + interaction.prepared.name, arg);
+      signals.fire('before-start-' + interaction.prepared.name, arg);
     }
 
     const starting = !!interaction.prepared.name && !interaction.interacting();
@@ -143,7 +145,7 @@ function prepare (interaction, { action, target, element }) {
 
   interaction.setEventXY(interaction.startCoords, interaction.pointers);
 
-  Interaction.signals.fire('prepared', { interaction: interaction });
+  signals.fire('prepared', { interaction: interaction });
 }
 
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
@@ -315,3 +317,5 @@ defaultOptions.base.ignoreFrom = null;
 defaultOptions.base.allowFrom = null;
 defaultOptions.base.styleCursor = true;
 defaultOptions.perAction.manualStart = false;
+
+module.exports = { signals };
