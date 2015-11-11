@@ -1,7 +1,6 @@
 const autoStart     = require('./index');
 const scope         = require('../scope');
 const InteractEvent = require('../InteractEvent');
-const Interaction   = require('../Interaction');
 const browser       = require('../utils/browser');
 
 const { isElement } = require('../utils/isType');
@@ -78,21 +77,6 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
         element = parentElement(element);
       }
     }
-  }
-});
-
-Interaction.signals.on('before-action-move', function ({ interaction }) {
-  if (interaction.prepared.name !== 'drag') { return; }
-
-  const axis = interaction.prepared.axis;
-
-  if (axis === 'x') {
-    interaction.curCoords.page.y   = interaction.startCoords.page.y;
-    interaction.curCoords.client.y = interaction.startCoords.client.y;
-  }
-  else if (axis === 'y') {
-    interaction.curCoords.page.x   = interaction.startCoords.page.x;
-    interaction.curCoords.client.x = interaction.startCoords.client.x;
   }
 });
 

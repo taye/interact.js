@@ -45,6 +45,21 @@ Interaction.signals.on('start-drag', function ({ interaction, event }) {
   interaction.prevEvent = dragEvent;
 });
 
+Interaction.signals.on('before-action-move', function ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
+  const axis = interaction.prepared.axis;
+
+  if (axis === 'x') {
+    interaction.curCoords.page.y   = interaction.startCoords.page.y;
+    interaction.curCoords.client.y = interaction.startCoords.client.y;
+  }
+  else if (axis === 'y') {
+    interaction.curCoords.page.x   = interaction.startCoords.page.x;
+    interaction.curCoords.client.x = interaction.startCoords.client.x;
+  }
+});
+
 Interaction.signals.on('move-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
 
