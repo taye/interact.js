@@ -203,27 +203,9 @@ const pointerUtils = {
     const sourceX = deltaSource + 'X';
     const sourceY = deltaSource + 'Y';
     const touches = pointerUtils.getTouchPair(event);
-    const dx = touches[0][sourceX] - touches[1][sourceX];
-    const dy = touches[0][sourceY] - touches[1][sourceY];
-    let angle = 180 * Math.atan(dy / dx) / Math.PI;
-
-    if (isType.isNumber(prevAngle)) {
-      const dr = angle - prevAngle;
-      const drClamped = dr % 360;
-
-      if (drClamped > 315) {
-        angle -= 360 + (angle / 360)|0 * 360;
-      }
-      else if (drClamped > 135) {
-        angle -= 180 + (angle / 360)|0 * 360;
-      }
-      else if (drClamped < -315) {
-        angle += 360 + (angle / 360)|0 * 360;
-      }
-      else if (drClamped < -135) {
-        angle += 180 + (angle / 360)|0 * 360;
-      }
-    }
+    const dx = touches[1][sourceX] - touches[0][sourceX];
+    const dy = touches[1][sourceY] - touches[0][sourceY];
+    let angle = 180 * Math.atan2(dy , dx) / Math.PI;
 
     return  angle;
   },
