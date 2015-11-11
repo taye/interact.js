@@ -163,7 +163,7 @@ class Interaction {
           animationFrame.cancel(this.inertiaStatus.i);
           this.inertiaStatus.active = false;
 
-          this.redoMove();
+          this.doMove();
           break;
         }
         element = utils.parentElement(element);
@@ -325,7 +325,7 @@ class Interaction {
   }
 
   /*\
-   * Interaction.redoMove
+   * Interaction.doMove
    [ method ]
    *
    * Force a move of the current action at the same coordinates. Useful if
@@ -340,11 +340,11 @@ class Interaction {
    |       // change the snap settings
    |       event.interactable.draggable({ snap: { targets: [] }});
    |       // fire another move event with re-calculated snap
-   |       event.interaction.redoMove();
+   |       event.interaction.doMove();
    |     }
    |   });
    \*/
-  redoMove (preEnd) {
+  doMove (preEnd) {
     const signalArg = {
       dx: 0,
       dy: 0,
