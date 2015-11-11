@@ -11,8 +11,7 @@ const signals = new (require('./utils/Signals'))();
 
 const listeners   = {};
 const methodNames = [
-  'pointerDown', 'pointerMove',
-  'pointerUp', 'pointerCancel', 'pointerEnd',
+  'pointerDown', 'pointerMove', 'pointerUp',
   'addPointer', 'removePointer', 'recordPointer',
 ];
 
@@ -353,12 +352,13 @@ class Interaction {
     this._dontFireMove = false;
   }
 
+  // End interact move events and stop auto-scroll unless inertia is enabled
   pointerUp (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
 
-    signals.fire('up', {
+    signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
       event,
       eventTarget,
@@ -366,31 +366,6 @@ class Interaction {
       interaction: this,
     });
 
-
-    this.pointerEnd(pointer, event, eventTarget, curEventTarget);
-
-    this.removePointer(pointer);
-  }
-
-  pointerCancel (pointer, event, eventTarget, curEventTarget) {
-    const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
-
-    clearTimeout(this.holdTimers[pointerIndex]);
-
-    signals.fire('cancel', {
-      pointer,
-      event,
-      eventTarget,
-      interaction: this,
-    });
-
-    this.pointerEnd(pointer, event, eventTarget, curEventTarget);
-
-    this.removePointer(pointer);
-  }
-
-  // End interact move events and stop auto-scroll unless inertia is enabled
-  pointerEnd (pointer, event) {
     const target = this.target;
     const options = target && target.options;
     const inertiaOptions = options && this.prepared.name && options[this.prepared.name].inertia;
@@ -479,6 +454,7 @@ class Interaction {
     }
 
     this.end(event);
+    this.removePointer(pointer);
   }
 
   /*\
@@ -584,7 +560,7 @@ class Interaction {
 
       this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
-      this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+      this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
       inertiaStatus.active = inertiaStatus.ending = false;
     }
   }
@@ -609,7 +585,7 @@ class Interaction {
       inertiaStatus.sy = inertiaStatus.ye;
 
       this.pointerMove(inertiaStatus.startEvent, inertiaStatus.startEvent);
-      this.pointerEnd(inertiaStatus.startEvent, inertiaStatus.startEvent);
+      this.pointerUp(inertiaStatus.startEvent, inertiaStatus.startEvent);
 
       inertiaStatus.smoothEnd =
         inertiaStatus.active = inertiaStatus.ending = false;
@@ -797,7 +773,7 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
     events.add(doc, pEventTypes.move  , listeners.pointerHover );
     events.add(doc, pEventTypes.out   , listeners.pointerOut   );
     events.add(doc, pEventTypes.up    , listeners.pointerUp    );
-    events.add(doc, pEventTypes.cancel, listeners.pointerCancel);
+    events.add(doc, pEventTypes.cancel, listeners.pointerUp    );
   }
   else {
     events.add(doc, 'mousedown', listeners.pointerDown );
@@ -809,7 +785,7 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
     events.add(doc, 'touchstart' , listeners.pointerDown  );
     events.add(doc, 'touchmove'  , listeners.pointerMove  );
     events.add(doc, 'touchend'   , listeners.pointerUp    );
-    events.add(doc, 'touchcancel', listeners.pointerCancel);
+    events.add(doc, 'touchcancel', listeners.pointerUp    );
   }
 
   events.add(win, 'blur', scope.endAllInteractions);
@@ -819,11 +795,11 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
       const parentDoc = win.frameElement.ownerDocument;
       const parentWindow = parentDoc.defaultView;
 
-      events.add(parentDoc   , 'mouseup'      , listeners.pointerEnd);
-      events.add(parentDoc   , 'touchend'     , listeners.pointerEnd);
-      events.add(parentDoc   , 'touchcancel'  , listeners.pointerEnd);
-      events.add(parentDoc   , 'pointerup'    , listeners.pointerEnd);
-      events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerEnd);
+      events.add(parentDoc   , 'mouseup'      , listeners.pointerUp);
+      events.add(parentDoc   , 'touchend'     , listeners.pointerUp);
+      events.add(parentDoc   , 'touchcancel'  , listeners.pointerUp);
+      events.add(parentDoc   , 'pointerup'    , listeners.pointerUp);
+      events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerUp);
       events.add(parentWindow, 'blur'         , scope.endAllInteractions );
     }
   }

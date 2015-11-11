@@ -54,7 +54,7 @@ scope.withinInteractionLimit = function (interactable, element, action) {
 
 scope.endAllInteractions = function (event) {
   for (let i = 0; i < scope.interactions.length; i++) {
-    scope.interactions[i].pointerEnd(event, event);
+    scope.interactions[i].end(event);
   }
 };
 
