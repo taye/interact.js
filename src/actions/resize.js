@@ -279,7 +279,9 @@ Interaction.signals.on('move-resize', function ({ interaction, event }) {
   if (!interaction.interacting()) { return false; }
 });
 
-Interaction.signals.on('end-resize', function ({ interaction, event }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'resize') { return; }
+
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'end', interaction.element);
 
   interaction.target.fire(resizeEvent);

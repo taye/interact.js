@@ -559,7 +559,7 @@ class Interaction {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      signals.fire('end-' + this.prepared.name, {
+      signals.fire('action-end', {
         event,
         interaction: this,
       });

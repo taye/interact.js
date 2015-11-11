@@ -55,7 +55,9 @@ Interaction.signals.on('move-drag', function ({ interaction, event }) {
   if (!interaction.interacting()) { return false; }
 });
 
-Interaction.signals.on('end-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'end', interaction.element);
 
   interaction.target.fire(dragEvent);

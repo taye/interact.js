@@ -73,7 +73,9 @@ Interaction.signals.on('move-gesture', function ({ interaction, event }) {
   if (!interaction.interacting()) { return false; }
 });
 
-Interaction.signals.on('end-gesture', function ({ interaction, event }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
   const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
 
   interaction.target.fire(gestureEvent);

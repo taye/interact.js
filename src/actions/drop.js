@@ -51,8 +51,10 @@ Interaction.signals.on('move-drag', function ({ interaction }) {
   fireDropEvents(interaction, interaction.dropEvents);
 });
 
-Interaction.signals.on('end-drag', function ({ interaction }) {
-  fireDropEvents(interaction, interaction.dropEvents);
+Interaction.signals.on('action-end', function ({ interaction }) {
+  if (interaction.prepared.name === 'drag') {
+    fireDropEvents(interaction, interaction.dropEvents);
+  }
 });
 
 Interaction.signals.on('stop-drag', function ({ interaction }) {
