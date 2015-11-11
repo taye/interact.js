@@ -411,20 +411,11 @@ class Interaction {
       const now = new Date().getTime();
       const statuses = {};
       const page = utils.extend({}, this.curCoords.page);
-      let pointerSpeed;
+      const pointerSpeed = this.pointerDelta.client.speed;
       let inertiaPossible = false;
       let inertia = false;
       let smoothEnd = false;
       let modifierResult;
-
-      if (this.dragging) {
-        if      (options.drag.startAxis === 'x' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vx); }
-        else if (options.drag.startAxis === 'y' ) { pointerSpeed = Math.abs(this.pointerDelta.client.vy); }
-        else   /*options.drag.startAxis === 'xy'*/{ pointerSpeed = this.pointerDelta.client.speed; }
-      }
-      else {
-        pointerSpeed = this.pointerDelta.client.speed;
-      }
 
       // check if inertia should be started
       inertiaPossible = (inertiaOptions && inertiaOptions.enabled

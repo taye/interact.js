@@ -53,10 +53,20 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
   if (axis === 'x') {
     interaction.curCoords.page.y   = interaction.startCoords.page.y;
     interaction.curCoords.client.y = interaction.startCoords.client.y;
+
+    interaction.pointerDelta.page.speed   = Math.abs(interaction.pointerDelta.page.vx);
+    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vx);
+    interaction.pointerDelta.client.vy = 0;
+    interaction.pointerDelta.page.vy   = 0;
   }
   else if (axis === 'y') {
     interaction.curCoords.page.x   = interaction.startCoords.page.x;
     interaction.curCoords.client.x = interaction.startCoords.client.x;
+
+    interaction.pointerDelta.page.speed   = Math.abs(interaction.pointerDelta.page.vy);
+    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vy);
+    interaction.pointerDelta.client.vx = 0;
+    interaction.pointerDelta.page.vx   = 0;
   }
 });
 
