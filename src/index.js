@@ -9,6 +9,9 @@ require('./legacyBrowsers');
 // pointerEvents
 require('./pointerEvents');
 
+// inertia
+require('./inertia');
+
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
