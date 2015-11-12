@@ -286,12 +286,12 @@ class Interaction {
    |   });
    \*/
   doMove (signalArg) {
-    signalArg = utils.extend(signalArg || {}, {
+    signalArg = utils.extend({
       pointer: this.pointers[0],
       event: this.prevEvent,
       eventTarget: this._eventTarget,
       interaction: this,
-    });
+    }, signalArg || {});
 
     signals.fire('before-action-move', signalArg);
 
