@@ -81,8 +81,10 @@ const snap = {
     status.realX = page.x;
     status.realY = page.y;
 
-    page.x -= interaction.inertiaStatus.resumeDx;
-    page.y -= interaction.inertiaStatus.resumeDy;
+    if (interaction.simulation) {
+      page.x -= interaction.simulation.resumeDx;
+      page.y -= interaction.simulation.resumeDy;
+    }
 
     const offsets = interaction.modifierOffsets.snap;
     let len = snapOptions.targets? snapOptions.targets.length : 0;

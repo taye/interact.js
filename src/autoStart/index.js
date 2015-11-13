@@ -24,14 +24,14 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 });
 
 Interaction.signals.on('move', function (arg) {
-  const { interaction, pointer, event } = arg;
+  const { interaction, event } = arg;
 
   if (!(interaction.pointerIsDown && interaction.pointerWasMoved && interaction.prepared.name)) {
     return;
   }
 
-  // ignore movement while inertia is active
-  if (!interaction.inertiaStatus.active || /inertiastart/.test(pointer.type)) {
+  // ignore movement while simulation is active
+  if (!interaction.simulation) {
 
     // if just starting an action, calculate the pointer speed now
     if (!interaction.interacting()) {

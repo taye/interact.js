@@ -3,7 +3,7 @@ const utils = require('./index');
 const browser = require('./browser');
 
 const finder = {
-  methodOrder: [ 'inertiaResume', 'mouse', 'hasPointer', 'idle' ],
+  methodOrder: [ 'simulationResume', 'mouse', 'hasPointer', 'idle' ],
 
   search: function (pointer, eventType, eventTarget) {
     const mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
@@ -21,8 +21,8 @@ const finder = {
     }
   },
 
-  // try to resume inertia with a new pointer
-  inertiaResume: function ({ mouseEvent, eventType, eventTarget }) {
+  // try to resume simulation with a new pointer
+  simulationResume: function ({ mouseEvent, eventType, eventTarget }) {
     if (!/down|start/i.test(eventType)) {
       return null;
     }
@@ -30,7 +30,7 @@ const finder = {
     for (const interaction of scope.interactions) {
       let element = eventTarget;
 
-      if (interaction.inertiaStatus.active && interaction.target.options[interaction.prepared.name].inertia.allowResume
+      if (interaction.simulation && interaction.simulation.allowResume
           && (interaction.mouse === mouseEvent)) {
         while (element) {
           // if the element is the interaction element
@@ -53,18 +53,18 @@ const finder = {
 
     let firstNonActive;
 
-    // Find a mouse interaction that's not in inertia phase
     for (const interaction of scope.interactions) {
       if (interaction.mouse) {
-        if (!interaction.inertiaStatus.active) {
-          // if the interaction is active, return it immediately
-          if (interaction.interacting()) {
-            return interaction;
-          }
-          // otherwise save it and look for another active interaction
-          else if (!firstNonActive) {
-            firstNonActive = interaction;
-          }
+        // if it's a down event, skip interactions with running simulations
+        if (/down/i.test(eventType) && interaction.simulation) { continue; }
+
+        // if the interaction is active, return it immediately
+        if (interaction.interacting()) {
+          return interaction;
+        }
+        // otherwise save it and look for another active interaction
+        else if (!firstNonActive) {
+          firstNonActive = interaction;
         }
       }
     }
@@ -76,10 +76,10 @@ const finder = {
     }
 
     // Find any interaction specifically for mouse.
-    // If the eventType is a mousedown, and inertia is active
-    // ignore the interaction
+    // ignore the interaction if the eventType is a mousedown, and a simulation
+    // is active
     for (const interaction of scope.interactions) {
-      if (interaction.mouse && !(/down/.test(eventType) && interaction.inertiaStatus.active)) {
+      if (interaction.mouse && !(/down/.test(eventType) && interaction.simulation)) {
         return interaction;
       }
     }

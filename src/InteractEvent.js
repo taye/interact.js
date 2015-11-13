@@ -79,12 +79,6 @@ class InteractEvent {
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
 
-    const inertiaStatus = interaction.inertiaStatus;
-
-    if (inertiaStatus.active) {
-      this.detail = 'inertia';
-    }
-
     signals.fire('set-delta', signalArg);
     signals.fire(action, signalArg);
 
@@ -173,7 +167,7 @@ class InteractEvent {
   }
 }
 
-signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, starting,
+signals.on('set-delta', function ({ iEvent, interaction, ending, starting,
                                             page, client, deltaSource }) {
   // end event dx, dy is difference between start and end points
   if (ending) {
@@ -190,11 +184,6 @@ signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, 
     iEvent.dx = 0;
     iEvent.dy = 0;
   }
-  // copy properties from previousmove if starting inertia
-  else if (phase === 'inertiastart') {
-    iEvent.dx = interaction.prevEvent.dx;
-    iEvent.dy = interaction.prevEvent.dy;
-  }
   else {
     if (deltaSource === 'client') {
       iEvent.dx = client.x - interaction.prevEvent.clientX;
@@ -204,19 +193,6 @@ signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, 
       iEvent.dx = page.x - interaction.prevEvent.pageX;
       iEvent.dy = page.y - interaction.prevEvent.pageY;
     }
-  }
-
-  const options = interaction.target.options;
-  const inertiaStatus = interaction.inertiaStatus;
-
-  if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
-      && !inertiaStatus.active
-      && options[action].inertia && options[action].inertia.zeroResumeDelta) {
-
-    inertiaStatus.resumeDx += iEvent.dx;
-    inertiaStatus.resumeDy += iEvent.dy;
-
-    iEvent.dx = iEvent.dy = 0;
   }
 });
 

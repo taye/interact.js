@@ -49,8 +49,10 @@ const restrict = {
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
 
-    page.x -= interaction.inertiaStatus.resumeDx;
-    page.y -= interaction.inertiaStatus.resumeDy;
+    if (interaction.simulation) {
+      page.x -= interaction.simulation.resumeDx;
+      page.y -= interaction.simulation.resumeDy;
+    }
 
     status.dx = 0;
     status.dy = 0;

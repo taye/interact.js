@@ -199,18 +199,7 @@ class Interaction {
   }
 
   pointerMove (pointer, event, eventTarget) {
-    if (this.inertiaStatus && this.inertiaStatus.active) {
-      const pageUp   = this.inertiaStatus.upCoords.page;
-      const clientUp = this.inertiaStatus.upCoords.client;
-
-      this.setEventXY(this.curCoords, [ {
-        pageX  : pageUp.x   + this.inertiaStatus.sx,
-        pageY  : pageUp.y   + this.inertiaStatus.sy,
-        clientX: clientUp.x + this.inertiaStatus.sx,
-        clientY: clientUp.y + this.inertiaStatus.sy,
-      } ]);
-    }
-    else {
+    if (!this.simulation) {
       this.recordPointer(pointer);
       this.setEventXY(this.curCoords, this.pointers);
     }
@@ -235,6 +224,9 @@ class Interaction {
     }
 
     if (!duplicateMove) {
+      // set pointer coordinate, time changes and speeds
+      utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+
       const signalArg = {
         pointer,
         event,
@@ -245,9 +237,6 @@ class Interaction {
         interaction: this,
         interactingBeforeMove: this.interacting(),
       };
-
-      // set pointer coordinate, time changes and speeds
-      utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
       signals.fire('move', signalArg);
 
@@ -302,7 +291,7 @@ class Interaction {
     this._dontFireMove = false;
   }
 
-  // End interact move events and stop auto-scroll unless inertia is enabled
+  // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
@@ -316,10 +305,10 @@ class Interaction {
       interaction: this,
     });
 
-    if (this.inertiaStatus && this.inertiaStatus.active) { return; }
-
-    this.end(event);
-    this.removePointer(pointer);
+    if (!this.simulation) {
+      this.end(event);
+      this.removePointer(pointer);
+    }
   }
 
   /*\
@@ -384,7 +373,6 @@ class Interaction {
 
     this.pointerIsDown = this._interacting = false;
     this.prepared.name = this.prevEvent = null;
-    this.inertiaStatus.resumeDx = this.inertiaStatus.resumeDy = 0;
   }
 
   addPointer (pointer) {
@@ -459,24 +447,6 @@ class Interaction {
     }
 
     event.preventDefault();
-  }
-
-  calcInertia (status) {
-    const inertiaOptions = this.target.options[this.prepared.name].inertia;
-    const lambda = inertiaOptions.resistance;
-    const inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
-
-    status.x0 = this.prevEvent.pageX;
-    status.y0 = this.prevEvent.pageY;
-    status.t0 = status.startEvent.timeStamp / 1000;
-    status.sx = status.sy = 0;
-
-    status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-    status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-    status.te = inertiaDur;
-
-    status.lambda_v0 = lambda / status.v0;
-    status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
   }
 
   _updateEventTargets (target, currentTarget) {

@@ -72,7 +72,7 @@ const autoScroll = {
       return;
     }
 
-    if (interaction.inertiaStatus.active) {
+    if (interaction.simulation) {
       autoScroll.x = autoScroll.y = 0;
       return;
     }
