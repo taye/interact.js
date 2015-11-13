@@ -566,6 +566,20 @@ scope.signals.on('listen-to-document', function ({ doc, win }) {
       events.add(parentDoc   , 'pointerup'    , listeners.pointerUp);
       events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerUp);
       events.add(parentWindow, 'blur'         , scope.endAllInteractions );
+
+      // avoid overriding the existing win.onbeforeunload handler
+      const existingOnBeforeUnloadHandler = win.onbeforeunload;
+      win.onbeforeunload = function () {
+        // remove references to parentDoc before the iframe is unload
+        events.remove(parentDoc   , 'mouseup'      , listeners.pointerEnd);
+        events.remove(parentDoc   , 'touchend'     , listeners.pointerEnd);
+        events.remove(parentDoc   , 'touchcancel'  , listeners.pointerEnd);
+        events.remove(parentDoc   , 'pointerup'    , listeners.pointerEnd);
+        events.remove(parentDoc   , 'MSPointerUp'  , listeners.pointerEnd);
+        events.remove(parentWindow, 'blur'         , scope.endAllInteractions );
+
+        existingOnBeforeUnloadHandler();
+      };
     }
   }
   catch (error) {
