@@ -36,12 +36,18 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
 
         if (interactable === interaction.target) { return; }
 
+        let action = null;
+
         if (scope.inContext(interactable, eventTarget)
             && !interactable.options.drag.manualStart
             && !scope.testIgnore(interactable, element, eventTarget)
             && scope.testAllow(interactable, element, eventTarget)
-            && matchesSelector(element, selector, elements)
-            && interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
+            && matchesSelector(element, selector, elements)) {
+
+          action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+        }
+        if (action
+            && action.name === 'drag'
             && checkStartAxis(currentAxis, interactable)
             && scope.withinInteractionLimit(interactable, element, { name: 'drag' })) {
 
@@ -49,14 +55,20 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
         }
       };
 
+      let action = null;
+
       // check all interactables
       while (isElement(element)) {
         const elementInteractable = scope.interactables.get(element);
 
         if (elementInteractable
             && elementInteractable !== interaction.target
-            && !elementInteractable.options.drag.manualStart
-            && elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element).name === 'drag'
+            && !elementInteractable.options.drag.manualStart) {
+
+          action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+        }
+        if (action
+            && action.name === 'drag'
             && checkStartAxis(currentAxis, elementInteractable)) {
 
           interaction.prepared.name = 'drag';
@@ -77,19 +89,6 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
         element = parentElement(element);
       }
     }
-  }
-});
-
-InteractEvent.signals.on('new-drag', function ({ interaction, iEvent }) {
-  const axis = interaction.prepared.axis;
-
-  if (axis === 'x') {
-    iEvent.pageY   = interaction.startCoords.page.y;
-    iEvent.clientY = interaction.startCoords.client.y;
-  }
-  else if (axis === 'y') {
-    iEvent.pageX   = interaction.startCoords.page.x;
-    iEvent.clientX = interaction.startCoords.client.x;
   }
 });
 

@@ -73,6 +73,19 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
 Interaction.signals.on('move-drag', function ({ interaction, event }) {
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
 
+  const axis = interaction.prepared.axis;
+
+  if (axis === 'x') {
+    dragEvent.pageY   = interaction.startCoords.page.y;
+    dragEvent.clientY = interaction.startCoords.client.y;
+    dragEvent.dy = 0;
+  }
+  else if (axis === 'y') {
+    dragEvent.pageX   = interaction.startCoords.page.x;
+    dragEvent.clientX = interaction.startCoords.client.x;
+    dragEvent.dx = 0;
+  }
+
   interaction.target.fire(dragEvent);
   interaction.prevEvent = dragEvent;
 
