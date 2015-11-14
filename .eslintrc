@@ -16,6 +16,7 @@ rules:
   indent: [2, 2]
   linebreak-style: [2, unix]
   no-caller: 2
+  no-empty: 0
   no-extra-bind: 2
   no-self-compare: 2
   no-sequences: 2
