@@ -242,7 +242,6 @@ class Interaction {
       // if interacting, fire a 'move-{action}' signal
       if (this.interacting()) {
         this.doMove(signalArg);
-        this.checkAndPreventDefault(event);
       }
 
       if (this.pointerWasMoved) {
@@ -251,6 +250,8 @@ class Interaction {
 
       signals.fire('move-done', signalArg);
     }
+
+    this.checkAndPreventDefault(event);
   }
 
   /*\
@@ -292,6 +293,8 @@ class Interaction {
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
+    this.checkAndPreventDefault(event);
+
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
@@ -340,7 +343,7 @@ class Interaction {
       });
     }
 
-    this.stop(event);
+    this.stop();
   }
 
   currentAction () {
@@ -351,21 +354,12 @@ class Interaction {
     return this._interacting;
   }
 
-  stop (event) {
+  stop () {
     signals.fire('stop', { interaction: this });
 
     if (this._interacting) {
       signals.fire('stop-active', { interaction: this });
-
-      // prevent Default only if were previously interacting
-      if (event && utils.isFunction(event.preventDefault)) {
-        this.checkAndPreventDefault(event);
-      }
-
-      signals.fire('stop-' + this.prepared.name, {
-        event,
-        interaction: this,
-      });
+      signals.fire('stop-' + this.prepared.name, { interaction: this });
     }
 
     this.target = this.element = null;
@@ -410,9 +404,9 @@ class Interaction {
   }
 
   checkAndPreventDefault (event) {
-    const setting = this.target && this.target.options.preventDefault;
+    const setting = this.target? this.target.options.preventDefault : 'never';
 
-    if (!this.target || setting === 'never') { return; }
+    if (setting === 'never') { return; }
 
     if (setting === 'always') {
       event.preventDefault();
@@ -421,27 +415,13 @@ class Interaction {
 
     // setting === 'auto'
 
+    // don't preventDefault of pointerdown events
+    if (/down|start/i.test(event.type)) {
+      return;
+    }
+
     // don't preventDefault on input elements
     if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
-      return;
-    }
-
-    const actionOptions = this.target.options[this.prepared.name];
-
-    // Do not preventDefault on pointerdown if the prepared action is delayed
-    // or it is a drag and dragging can only start from a certain direction.
-    // This allows a touch to pan the viewport if the action doesn't actually
-    // start>
-    if (/down|start/i.test(event.type)
-        && ((this.prepared.name === 'drag' && actionOptions.startAxis !== 'xy')
-            || (actionOptions && actionOptions.delay > 0))) {
-
-      return;
-    }
-
-    // with manualStart, only preventDefault while interacting
-    if (actionOptions && actionOptions.manualStart
-        && !this.interacting()) {
       return;
     }
 
