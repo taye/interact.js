@@ -75,8 +75,6 @@ class Interaction {
     this.pointerWasMoved = false;
     this._interacting    = false;
 
-    this.allowIfDuplicateMove = false;
-
     this.mouse = false;
 
     signals.fire('new', this);
@@ -203,13 +201,10 @@ class Interaction {
       this.setEventXY(this.curCoords, this.pointers);
     }
 
-    const duplicateMove = !this.allowIfDuplicateMove
-      && (this.curCoords.page.x === this.prevCoords.page.x
-          && this.curCoords.page.y === this.prevCoords.page.y
-          && this.curCoords.client.x === this.prevCoords.client.x
-          && this.curCoords.client.y === this.prevCoords.client.y);
-
-    this.allowIfDuplicateMove = false;
+    const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
+                           && this.curCoords.page.y === this.prevCoords.page.y
+                           && this.curCoords.client.x === this.prevCoords.client.x
+                           && this.curCoords.client.y === this.prevCoords.client.y);
 
     let dx;
     let dy;
