@@ -4,7 +4,7 @@ const domObjects = require('./domObjects');
 
 const browser = {
   // Does the browser support touch input?
-  supportsTouch: !!(('ontouchstart' in win.window) || win.window.DocumentTouch
+  supportsTouch: !!(('ontouchstart' in win.window) || isType.isFunction(win.window.DocumentTouch)
                      && domObjects.document instanceof win.DocumentTouch),
 
   // Does the browser support PointerEvents
