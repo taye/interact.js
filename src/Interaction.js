@@ -522,77 +522,60 @@ function doOnInteractions (method) {
   });
 }
 
-scope.signals.on('listen-to-document', function ({ doc, win }) {
-  const pEventTypes = browser.pEventTypes;
+// prevent native HTML5 drag on interact.js target elements
+function preventNativeDrag (event) {
+  for (const interaction of scope.interactions) {
 
-  // add delegate event listener
+    if (interaction.element
+        && (interaction.element === event.target
+            || utils.nodeContains(interaction.element, event.target))) {
+
+      interaction.checkAndPreventDefault(event);
+      return;
+    }
+  }
+}
+
+const docEvents = { /* 'eventType': listenerFunc */ };
+const pEventTypes = browser.pEventTypes;
+
+if (scope.PointerEvent) {
+  docEvents[pEventTypes.down  ] = listeners.pointerDown;
+  docEvents[pEventTypes.move  ] = listeners.pointerMove;
+  docEvents[pEventTypes.up    ] = listeners.pointerUp;
+  docEvents[pEventTypes.cancel] = listeners.pointerUp;
+}
+else {
+  docEvents.mousedown   = listeners.pointerDown;
+  docEvents.mousemove   = listeners.pointerMove;
+  docEvents.mouseup     = listeners.pointerUp;
+
+  docEvents.touchstart  = listeners.pointerDown;
+  docEvents.touchmove   = listeners.pointerMove;
+  docEvents.touchend    = listeners.pointerUp;
+  docEvents.touchcancel = listeners.pointerUp;
+}
+
+docEvents.blur = scope.endAllInteractions;
+docEvents.dragstart = preventNativeDrag;
+
+function onDocSignal ({ doc }, signalName) {
+  const eventMethod = signalName.indexOf('add') === 0
+    ? events.add : events.remove;
+
+  // delegate event listener
   for (const eventType in scope.delegatedEvents) {
-    events.add(doc, eventType, events.delegateListener);
-    events.add(doc, eventType, events.delegateUseCapture, true);
+    eventMethod(doc, eventType, events.delegateListener);
+    eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
 
-  if (scope.PointerEvent) {
-    events.add(doc, pEventTypes.down  , listeners.pointerDown  );
-    events.add(doc, pEventTypes.move  , listeners.pointerMove  );
-    events.add(doc, pEventTypes.move  , listeners.pointerHover );
-    events.add(doc, pEventTypes.out   , listeners.pointerOut   );
-    events.add(doc, pEventTypes.up    , listeners.pointerUp    );
-    events.add(doc, pEventTypes.cancel, listeners.pointerUp    );
+  for (const eventType in docEvents) {
+    eventMethod(doc, eventType, docEvents[eventType]);
   }
-  else {
-    events.add(doc, 'mousedown', listeners.pointerDown );
-    events.add(doc, 'mousemove', listeners.pointerMove );
-    events.add(doc, 'mousemove', listeners.pointerHover);
-    events.add(doc, 'mouseup'  , listeners.pointerUp   );
-    events.add(doc, 'mouseout' , listeners.pointerOut  );
+}
 
-    events.add(doc, 'touchstart' , listeners.pointerDown  );
-    events.add(doc, 'touchmove'  , listeners.pointerMove  );
-    events.add(doc, 'touchend'   , listeners.pointerUp    );
-    events.add(doc, 'touchcancel', listeners.pointerUp    );
-  }
-
-  events.add(win, 'blur', scope.endAllInteractions);
-
-  try {
-    if (win.frameElement) {
-      const parentDoc = win.frameElement.ownerDocument;
-      const parentWindow = parentDoc.defaultView;
-
-      events.add(parentDoc   , 'mouseup'      , listeners.pointerUp);
-      events.add(parentDoc   , 'touchend'     , listeners.pointerUp);
-      events.add(parentDoc   , 'touchcancel'  , listeners.pointerUp);
-      events.add(parentDoc   , 'pointerup'    , listeners.pointerUp);
-      events.add(parentDoc   , 'MSPointerUp'  , listeners.pointerUp);
-      events.add(parentWindow, 'blur'         , scope.endAllInteractions );
-    }
-  }
-  catch (error) {
-    scope.windowParentError = error;
-  }
-
-  // prevent native HTML5 drag on interact.js target elements
-  events.add(doc, 'dragstart', function (event) {
-    for (const interaction of scope.interactions) {
-
-      if (interaction.element
-          && (interaction.element === event.target
-              || utils.nodeContains(interaction.element, event.target))) {
-
-        interaction.checkAndPreventDefault(event);
-        return;
-      }
-    }
-  });
-
-  scope.documents.push(doc);
-  events.documents.push(doc);
-});
-
-scope.signals.fire('listen-to-document', {
-  win: scope.window,
-  doc: scope.document,
-});
+scope.signals.on('add-document'   , onDocSignal);
+scope.signals.on('remove-document', onDocSignal);
 
 // Stop related interactions when an Interactable is unset
 Interactable.signals.on('unset', function ( {interactable} ) {

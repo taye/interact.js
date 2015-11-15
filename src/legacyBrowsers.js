@@ -40,20 +40,28 @@ function onIE8Dblclick (event) {
 }
 
 if (browser.isIE8) {
-  scope.signals.on('listen-to-document', function ({ doc }) {
-    // For IE's lack of Event#preventDefault
-    events.add(doc, 'selectstart', function (event) {
-      for (const interaction of scope.interactions) {
-        if (interaction.interacting()) {
-          interaction.checkAndPreventDefault(event);
-        }
+  const selectFix = function (event) {
+    for (const interaction of scope.interactions) {
+      if (interaction.interacting()) {
+        interaction.checkAndPreventDefault(event);
       }
-    });
+    }
+  };
+
+  const onDocIE8 = function onDocIE8 ({ doc, win }, signalName) {
+    const eventMethod = signalName.indexOf('listen') === 0
+      ? events.add : events.remove;
+
+    // For IE's lack of Event#preventDefault
+    eventMethod(doc, 'selectstart', selectFix);
 
     if (scope.pointerEvents) {
-      events.add(doc, 'dblclick', onIE8Dblclick);
+      eventMethod(doc, 'dblclick', onIE8Dblclick);
     }
-  });
+  };
+
+  scope.signals.on('add-document'   , onDocIE8);
+  scope.signals.on('remove-document', onDocIE8);
 }
 
 module.exports = null;

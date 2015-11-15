@@ -52,12 +52,7 @@ class Interactable {
       win: _window,
     });
 
-    if (this._doc !== scope.document) {
-      scope.signals.fire('listen-to-document', {
-        doc: this._doc,
-        win: _window,
-      });
-    }
+    scope.addDocument( this._doc, _window );
 
     scope.interactables.push(this);
 
