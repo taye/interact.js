@@ -5,8 +5,7 @@ const defaultOptions = require('../defaultOptions');
 const browser        = require('../utils/browser');
 const scope          = require('../scope');
 const utils          = require('../utils');
-
-const signals = new (require('../utils/Signals'))();
+const signals        = require('../utils/Signals').new();
 
 // mouse move cursor style
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {

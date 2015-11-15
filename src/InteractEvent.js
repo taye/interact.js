@@ -2,8 +2,7 @@ const hypot       = require('./utils/hypot');
 const extend      = require('./utils/extend');
 const getOriginXY = require('./utils/getOriginXY');
 const scope       = require('./scope');
-
-const signals = new (require('./utils/Signals'))();
+const signals     = require('./utils/Signals').new();
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {

@@ -4,8 +4,7 @@ const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
-
-const signals = new (require('./utils/Signals'))();
+const signals        = require('./utils/Signals').new();
 
 const listeners   = {};
 const methodNames = [

@@ -3,11 +3,10 @@ const events  = require('./utils/events');
 const extend  = require('./utils/extend');
 const actions = require('./actions');
 const scope   = require('./scope');
+const signals = require('./utils/Signals').new();
 
 const { getElementRect }    = require('./utils/domUtils');
 const { indexOf, contains } = require('./utils/arr');
-
-const signals = new (require('./utils/Signals'))();
 
 // all set interactables
 scope.interactables = [];
