@@ -1,7 +1,6 @@
-const autoStart     = require('./index');
-const scope         = require('../scope');
-const InteractEvent = require('../InteractEvent');
-const browser       = require('../utils/browser');
+const autoStart = require('./index');
+const scope     = require('../scope');
+const browser   = require('../utils/browser');
 
 const { isElement } = require('../utils/isType');
 const { matchesSelector, parentElement } = require('../utils/domUtils');
