@@ -129,7 +129,7 @@ const restrict = {
     const options = interactable.options[actionName].restrict;
     const elementRect = options && options.elementRect;
 
-    if (modifiers.restrict.shouldDo(interactable, actionName)
+    if (options && options.enabled
         && !(phase === 'start' && elementRect && status.locked)) {
 
       if (status.locked) {
