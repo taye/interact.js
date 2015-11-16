@@ -17,7 +17,7 @@ const isType = {
 
   isWindow   : function (thing) { return thing === win.window || isWindow(thing); },
 
-  isDocFrag  : function (thing) { return !!thing && thing instanceof domObjects.DocumentFragment; },
+  isDocFrag  : function (thing) { return isType.isObject(thing) && thing.nodeType === 11; },
 
   isObject   : function (thing) { return !!thing && (typeof thing === 'object'); },
 

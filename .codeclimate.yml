@@ -1,6 +1,11 @@
 engines:
   eslint:
     enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        - javascript
 
 ratings:
   paths:
@@ -11,3 +16,5 @@ exclude_paths:
  - "docs/*"
  - "gulp/*"
  - "test/*"
+ - "gulpfile.js"
+ - "karma.conf.js"

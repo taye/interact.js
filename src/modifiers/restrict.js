@@ -1,4 +1,4 @@
-const modifiers = require('./base');
+const modifiers = require('./index');
 const utils = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
@@ -49,8 +49,10 @@ const restrict = {
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
 
-    page.x -= interaction.inertiaStatus.resumeDx;
-    page.y -= interaction.inertiaStatus.resumeDy;
+    if (interaction.simulation) {
+      page.x -= interaction.simulation.resumeDx;
+      page.y -= interaction.simulation.resumeDy;
+    }
 
     status.dx = 0;
     status.dy = 0;
@@ -127,7 +129,7 @@ const restrict = {
     const options = interactable.options[actionName].restrict;
     const elementRect = options && options.elementRect;
 
-    if (modifiers.restrict.shouldDo(interactable, actionName)
+    if (options && options.enabled
         && !(phase === 'start' && elementRect && status.locked)) {
 
       if (status.locked) {

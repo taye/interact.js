@@ -1,10 +1,8 @@
-const hypot         = require('./utils/hypot');
-const extend        = require('./utils/extend');
-const getOriginXY   = require('./utils/getOriginXY');
-const modifiers     = require('./modifiers/base');
-const scope         = require('./scope');
-
-const signals = new (require('./utils/Signals'));
+const hypot       = require('./utils/hypot');
+const extend      = require('./utils/extend');
+const getOriginXY = require('./utils/getOriginXY');
+const scope       = require('./scope');
+const signals     = require('./utils/Signals').new();
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
@@ -41,23 +39,6 @@ class InteractEvent {
     this.interaction   = interaction;
     this.interactable  = target;
 
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
-      const modifier = modifiers[modifierName];
-
-      this[modifierName] = modifier.modifyCoords(page, client, target, interaction.modifierStatuses[modifierName], action, phase);
-    }
-
-    this.pageX     = page.x;
-    this.pageY     = page.y;
-    this.clientX   = client.x;
-    this.clientY   = client.y;
-
-    this.x0        = interaction.startCoords.page.x - origin.x;
-    this.y0        = interaction.startCoords.page.y - origin.y;
-    this.clientX0  = interaction.startCoords.client.x - origin.x;
-    this.clientY0  = interaction.startCoords.client.y - origin.y;
-
     const signalArg = {
       interaction,
       event,
@@ -74,11 +55,28 @@ class InteractEvent {
       iEvent: this,
     };
 
-    const inertiaStatus = interaction.inertiaStatus;
+    signals.fire('set-xy', signalArg);
 
-    if (inertiaStatus.active) {
-      this.detail = 'inertia';
+    if (ending) {
+      const prevEvent = interaction.prevEvent;
+
+      // use previous coords when ending
+      this.pageX = prevEvent.pageX;
+      this.pageY = prevEvent.pageY;
+      this.clientX = prevEvent.clientX;
+      this.clientY = prevEvent.clientY;
     }
+    else {
+      this.pageX     = page.x;
+      this.pageY     = page.y;
+      this.clientX   = client.x;
+      this.clientY   = client.y;
+    }
+
+    this.x0        = interaction.startCoords.page.x - origin.x;
+    this.y0        = interaction.startCoords.page.y - origin.y;
+    this.clientX0  = interaction.startCoords.client.x - origin.x;
+    this.clientY0  = interaction.startCoords.client.y - origin.y;
 
     signals.fire('set-delta', signalArg);
     signals.fire(action, signalArg);
@@ -168,7 +166,7 @@ class InteractEvent {
   }
 }
 
-signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, starting,
+signals.on('set-delta', function ({ iEvent, interaction, ending, starting,
                                             page, client, deltaSource }) {
   // end event dx, dy is difference between start and end points
   if (ending) {
@@ -185,11 +183,6 @@ signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, 
     iEvent.dx = 0;
     iEvent.dy = 0;
   }
-  // copy properties from previousmove if starting inertia
-  else if (phase === 'inertiastart') {
-    iEvent.dx = interaction.prevEvent.dx;
-    iEvent.dy = interaction.prevEvent.dy;
-  }
   else {
     if (deltaSource === 'client') {
       iEvent.dx = client.x - interaction.prevEvent.clientX;
@@ -199,19 +192,6 @@ signals.on('set-delta', function ({ iEvent, interaction, action, phase, ending, 
       iEvent.dx = page.x - interaction.prevEvent.pageX;
       iEvent.dy = page.y - interaction.prevEvent.pageY;
     }
-  }
-
-  const options = interaction.target.options;
-  const inertiaStatus = interaction.inertiaStatus;
-
-  if (interaction.prevEvent && interaction.prevEvent.detail === 'inertia'
-      && !inertiaStatus.active
-      && options[action].inertia && options[action].inertia.zeroResumeDelta) {
-
-    inertiaStatus.resumeDx += iEvent.dx;
-    inertiaStatus.resumeDy += iEvent.dy;
-
-    iEvent.dx = iEvent.dy = 0;
   }
 });
 

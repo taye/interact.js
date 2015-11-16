@@ -1,18 +1,13 @@
 module.exports = {
   base: {
     accept        : null,
-    actionChecker : null,
-    styleCursor   : true,
     preventDefault: 'auto',
     origin        : { x: 0, y: 0 },
     deltaSource   : 'page',
     allowFrom     : null,
-    ignoreFrom    : null,
-    checker       : null,
   },
 
   perAction: {
-    manualStart: false,
     max: Infinity,
     maxPerElement: 1,
 

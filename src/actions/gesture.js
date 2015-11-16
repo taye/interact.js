@@ -1,4 +1,4 @@
-const base = require('./base');
+const actions = require('./index');
 const utils = require('../utils');
 const InteractEvent = require('../InteractEvent');
 const Interactable = require('../Interactable');
@@ -73,7 +73,9 @@ Interaction.signals.on('move-gesture', function ({ interaction, event }) {
   if (!interaction.interacting()) { return false; }
 });
 
-Interaction.signals.on('end-gesture', function ({ interaction, event }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
   const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
 
   interaction.target.fire(gestureEvent);
@@ -124,7 +126,7 @@ Interactable.prototype.gesturable = function (options) {
 InteractEvent.signals.on('gesture', function (arg) {
   if (arg.action !== 'gesture') { return; }
 
-  const { interaction, iEvent, starting, ending, deltaSource } = arg;
+  const { interaction, iEvent, event, starting, ending, deltaSource } = arg;
   const pointers = interaction.pointers;
 
   iEvent.touches = [pointers[0], pointers[1]];
@@ -171,15 +173,15 @@ Interaction.signals.on('new', function (interaction) {
   };
 });
 
-base.gesture = gesture;
-base.names.push('gesture');
+actions.gesture = gesture;
+actions.names.push('gesture');
 utils.merge(scope.eventTypes, [
   'gesturestart',
   'gesturemove',
   'gestureinertiastart',
   'gestureend',
 ]);
-base.methodDict.gesture = 'gesturable';
+actions.methodDict.gesture = 'gesturable';
 
 defaultOptions.gesture = gesture.defaults;
 

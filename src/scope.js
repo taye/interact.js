@@ -1,10 +1,11 @@
 const scope   = {};
 const utils   = require('./utils');
+const signals = require('./utils/Signals').new();
 
 scope.defaultOptions = require('./defaultOptions');
 scope.events         = require('./utils/events');
 
-scope.signals        = new (require('./utils/Signals'));
+scope.signals        = signals;
 
 utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));
@@ -54,7 +55,7 @@ scope.withinInteractionLimit = function (interactable, element, action) {
 
 scope.endAllInteractions = function (event) {
   for (let i = 0; i < scope.interactions.length; i++) {
-    scope.interactions[i].pointerEnd(event, event);
+    scope.interactions[i].end(event);
   }
 };
 

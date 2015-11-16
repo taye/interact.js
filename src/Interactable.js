@@ -1,13 +1,12 @@
 const isType  = require('./utils/isType');
 const events  = require('./utils/events');
 const extend  = require('./utils/extend');
-const actions = require('./actions/base');
+const actions = require('./actions');
 const scope   = require('./scope');
+const signals = require('./utils/Signals').new();
 
 const { getElementRect }    = require('./utils/domUtils');
 const { indexOf, contains } = require('./utils/arr');
-
-const signals = new (require('./utils/Signals'));
 
 // all set interactables
 scope.interactables = [];
@@ -101,60 +100,6 @@ class Interactable {
     }
   }
 
-  getAction (pointer, event, interaction, element) {
-    const action = this.defaultActionChecker(pointer, event, interaction, element);
-
-    if (this.options.actionChecker) {
-      return this.options.actionChecker(pointer, event, action, this, element, interaction);
-    }
-
-    return action;
-  }
-
-  /*\
-   * Interactable.actionChecker
-   [ method ]
-   *
-   * Gets or sets the function used to check action to be performed on
-   * pointerDown
-   *
-   - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
-   = (Function | Interactable) The checker function or this Interactable
-   *
-   | interact('.resize-drag')
-   |   .resizable(true)
-   |   .draggable(true)
-   |   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
-   |
-   |   if (interact.matchesSelector(event.target, '.drag-handle') {
-   |     // force drag with handle target
-   |     action.name = drag;
-   |   }
-   |   else {
-   |     // resize from the top and right edges
-   |     action.name  = 'resize';
-   |     action.edges = { top: true, right: true };
-   |   }
-   |
-   |   return action;
-   | });
-  \*/
-  actionChecker (checker) {
-    if (isType.isFunction(checker)) {
-      this.options.actionChecker = checker;
-
-      return this;
-    }
-
-    if (checker === null) {
-      delete this.options.actionChecker;
-
-      return this;
-    }
-
-    return this.options.actionChecker;
-  }
-
   /*\
    * Interactable.getRect
    [ method ]
@@ -207,33 +152,6 @@ class Interactable {
     }
 
     return this.getRect;
-  }
-
-  /*\
-   * Interactable.styleCursor
-   [ method ]
-   *
-   * Returns or sets whether the action that would be performed when the
-   * mouse on the element are checked on `mousemove` so that the cursor
-   * may be styled appropriately
-   *
-   - newValue (boolean) #optional
-   = (boolean | Interactable) The current setting or this Interactable
-  \*/
-  styleCursor (newValue) {
-    if (isType.isBool(newValue)) {
-      this.options.styleCursor = newValue;
-
-      return this;
-    }
-
-    if (newValue === null) {
-      delete this.options.styleCursor;
-
-      return this;
-    }
-
-    return this.options.styleCursor;
   }
 
   /*\
@@ -320,64 +238,6 @@ class Interactable {
   \*/
   context () {
     return this._context;
-  }
-
-  /*\
-   * Interactable.ignoreFrom
-   [ method ]
-   *
-   * If the target of the `mousedown`, `pointerdown` or `touchstart`
-   * event or any of it's parents match the given CSS selector or
-   * Element, no drag/resize/gesture is started.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
-   = (string | Element | object) The current ignoreFrom value or this Interactable
-   **
-   | interact(element, { ignoreFrom: document.getElementById('no-action') });
-   | // or
-   | interact(element).ignoreFrom('input, textarea, a');
-  \*/
-  ignoreFrom (newValue) {
-    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
-      this.options.ignoreFrom = newValue;
-      return this;
-    }
-
-    if (isType.isElement(newValue)) {              // specific element
-      this.options.ignoreFrom = newValue;
-      return this;
-    }
-
-    return this.options.ignoreFrom;
-  }
-
-  /*\
-   * Interactable.allowFrom
-   [ method ]
-   *
-   * A drag/resize/gesture is started only If the target of the
-   * `mousedown`, `pointerdown` or `touchstart` event or any of it's
-   * parents match the given CSS selector or Element.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
-   = (string | Element | object) The current allowFrom value or this Interactable
-   **
-   | interact(element, { allowFrom: document.getElementById('drag-handle') });
-   | // or
-   | interact(element).allowFrom('.handle');
-  \*/
-  allowFrom (newValue) {
-    if (isType.trySelector(newValue)) {            // CSS selector to match event.target
-      this.options.allowFrom = newValue;
-      return this;
-    }
-
-    if (isType.isElement(newValue)) {              // specific element
-      this.options.allowFrom = newValue;
-      return this;
-    }
-
-    return this.options.allowFrom;
   }
 
   /*\
@@ -570,15 +430,7 @@ class Interactable {
       this[methodName](options[actionName]);
     }
 
-    const settings = [
-      'accept', 'actionChecker', 'allowFrom', 'deltaSource',
-      'dropChecker', 'ignoreFrom', 'origin', 'preventDefault',
-      'rectChecker', 'styleCursor',
-    ];
-
-    for (let i = 0, len = settings.length; i < len; i++) {
-      const setting = settings[i];
-
+    for (const setting of Interactable.settingsMethods) {
       this.options[setting] = scope.defaultOptions.base[setting];
 
       if (setting in options) {
@@ -629,9 +481,6 @@ class Interactable {
     }
     else {
       events.remove(this, 'all');
-      if (isType.isElement(this.target) && this.options.styleCursor) {
-        this.target.style.cursor = '';
-      }
     }
 
     signals.fire('unset', { interactable: this });
@@ -642,8 +491,8 @@ class Interactable {
   }
 }
 
-Interactable.prototype.defaultActionChecker = actions.defaultChecker;
-
 Interactable.signals = signals;
+
+Interactable.settingsMethods = [ 'deltaSource', 'origin', 'preventDefault', 'rectChecker' ];
 
 module.exports = Interactable;

@@ -1,11 +1,12 @@
-const Interaction = require('./Interaction');
-const actions = require('./actions/base');
+const autoStart   = require('./index');
+const Interaction = require('../Interaction');
+const actions     = require('../actions');
 
 Interaction.signals.on('new', function (interaction) {
   interaction.delayTimer = null;
 });
 
-Interaction.signals.on('prepared', function ({ interaction }) {
+autoStart.signals.on('prepared', function ({ interaction }) {
   const actionName = interaction.prepared.name;
 
   if (!actionName) { return; }
@@ -20,7 +21,7 @@ Interaction.signals.on('prepared', function ({ interaction }) {
 });
 
 for (const action of actions.names) {
-  Interaction.signals.on('before-start-' + action, preventImmediateMove);
+  autoStart.signals.on('before-start-' + action, preventImmediateMove);
 }
 
 Interaction.signals.on('move-done', function ({ interaction }) {

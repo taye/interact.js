@@ -43,10 +43,10 @@ if (browser.isIE8) {
   scope.signals.on('listen-to-document', function ({ doc }) {
     // For IE's lack of Event#preventDefault
     events.add(doc, 'selectstart', function (event) {
-      const interaction = scope.interactions[0];
-
-      if (interaction.currentAction()) {
-        interaction.checkAndPreventDefault(event);
+      for (const interaction of scope.interactions) {
+        if (interaction.interacting()) {
+          interaction.checkAndPreventDefault(event);
+        }
       }
     });
 
