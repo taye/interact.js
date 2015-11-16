@@ -228,7 +228,10 @@
 
         interact(canvas)
             .draggable({
-                inertia: { enabled: status.inertia.checked },
+                inertia: {
+                  enabled: status.inertia.checked,
+                  zeroResumeDelta: false
+                },
                 snap: {
                     targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
                     enabled: !status.offMode.checked,
