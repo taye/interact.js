@@ -175,7 +175,7 @@ const domUtils = {
   },
 
   matchesUpTo: function (element, selector, limit) {
-    while (domUtils.isElement(element)) {
+    while (isType.isElement(element)) {
       if (domUtils.matchesSelector(element, selector)) {
         return true;
       }
