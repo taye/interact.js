@@ -34,7 +34,7 @@ Interaction.signals.on('move', function (arg) {
 
     // if just starting an action, calculate the pointer speed now
     if (!interaction.interacting()) {
-      utils.setEventDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
+      utils.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
       signals.fire('before-start-' + interaction.prepared.name, arg);
     }
@@ -142,7 +142,7 @@ function prepare (interaction, { action, target, element }) {
     interaction.target._doc.documentElement.style.cursor = cursor;
   }
 
-  interaction.setEventXY(interaction.startCoords, interaction.pointers);
+  utils.setCoords(interaction.startCoords, interaction.pointers);
 
   signals.fire('prepared', { interaction: interaction });
 }

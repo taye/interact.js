@@ -362,6 +362,9 @@ interact.maxInteractions = function (newValue) {
   return scope.maxInteractions;
 };
 
+interact.addDocument    = scope.addDocument;
+interact.removeDocument = scope.removeDocument;
+
 scope.interact = interact;
 
 module.exports = interact;

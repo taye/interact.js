@@ -16,7 +16,7 @@ const pointerUtils = {
     dest.timeStamp = src.timeStamp;
   },
 
-  setEventDeltas: function (targetObj, prev, cur) {
+  setCoordDeltas: function (targetObj, prev, cur) {
     const now = new Date().getTime();
 
     targetObj.page.x    = cur.page.x   - prev.page.x;
@@ -85,6 +85,24 @@ const pointerUtils = {
 
   getPointerId: function (pointer) {
     return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+  },
+
+  setCoords: function (targetObj, pointers) {
+    const pointer = (pointers.length > 1
+                     ? pointerUtils.pointerAverage(pointers)
+                     : pointers[0]);
+
+    const tmpXY = {};
+
+    pointerUtils.getPageXY(pointer, tmpXY);
+    targetObj.page.x = tmpXY.x;
+    targetObj.page.y = tmpXY.y;
+
+    pointerUtils.getClientXY(pointer, tmpXY);
+    targetObj.client.x = tmpXY.x;
+    targetObj.client.y = tmpXY.y;
+
+    targetObj.timeStamp = new Date().getTime();
   },
 
   prefixedPropREs: {
