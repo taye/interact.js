@@ -9,7 +9,7 @@ const signals        = require('./utils/Signals').new();
 const listeners   = {};
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
-  'addPointer', 'removePointer', 'recordPointer',
+  'updatePointer', 'removePointer',
 ];
 
 // for ignoring browser's simulated mouse events
@@ -83,7 +83,7 @@ class Interaction {
   }
 
   pointerDown (pointer, event, eventTarget) {
-    const pointerIndex = this.addPointer(pointer);
+    const pointerIndex = this.updatePointer(pointer);
 
     this.pointerIsDown = true;
 
@@ -179,7 +179,7 @@ class Interaction {
 
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
-      this.recordPointer(pointer);
+      this.updatePointer(pointer);
       utils.setCoords(this.curCoords, this.pointers);
     }
 
@@ -351,7 +351,7 @@ class Interaction {
     this.prepared.name = this.prevEvent = null;
   }
 
-  addPointer (pointer) {
+  updatePointer (pointer) {
     const id = utils.getPointerId(pointer);
     let index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
@@ -376,14 +376,6 @@ class Interaction {
     this.downTargets.splice(index, 1);
     this.downTimes  .splice(index, 1);
     this.holdTimers .splice(index, 1);
-  }
-
-  recordPointer (pointer) {
-    const index = this.mouse? 0: utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
-
-    if (index === -1) { return; }
-
-    this.pointers[index] = pointer;
   }
 
   checkAndPreventDefault (event) {
