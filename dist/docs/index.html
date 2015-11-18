@@ -25,15 +25,7 @@
                           <ol id="dr-toc">
                               
                               <li class="dr-lvl0">
-                                  <a href="#Interactable" class="dr-property"><span>Interactable</span></a>
-                              </li>
-                              
-                              <li class="dr-lvl1">
-                                  <a href="#Interactable.actionChecker" class="dr-method"><span>Interactable.actionChecker()</span></a>
-                              </li>
-                              
-                              <li class="dr-lvl1">
-                                  <a href="#Interactable.allowFrom" class="dr-method"><span>Interactable.allowFrom()</span></a>
+                                  <a href="#Interactable" class="undefined"><span>Interactable</span></a>
                               </li>
                               
                               <li class="dr-lvl1">
@@ -65,10 +57,6 @@
                               </li>
                               
                               <li class="dr-lvl1">
-                                  <a href="#Interactable.ignoreFrom" class="dr-method"><span>Interactable.ignoreFrom()</span></a>
-                              </li>
-                              
-                              <li class="dr-lvl1">
                                   <a href="#Interactable.off" class="dr-method"><span>Interactable.off()</span></a>
                               </li>
                               
@@ -97,15 +85,15 @@
                               </li>
                               
                               <li class="dr-lvl1">
-                                  <a href="#Interactable.styleCursor" class="dr-method"><span>Interactable.styleCursor()</span></a>
-                              </li>
-                              
-                              <li class="dr-lvl1">
                                   <a href="#Interactable.unset" class="dr-method"><span>Interactable.unset()</span></a>
                               </li>
                               
                               <li class="dr-lvl0">
                                   <a href="#Interaction" class="undefined"><span>Interaction</span></a>
+                              </li>
+                              
+                              <li class="dr-lvl1">
+                                  <a href="#Interaction.doMove" class="dr-method"><span>Interaction.doMove()</span></a>
                               </li>
                               
                               <li class="dr-lvl1">
@@ -177,7 +165,7 @@
                       
                       <article id="Interactable.draggable">
                           <header>
-                              <h3 class="dr-method">Interactable.draggable([options])<a href="#Interactable.draggable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 169 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drag.js#L169">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.draggable([options])<a href="#Interactable.draggable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 141 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drag.js#L141">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.draggable-extra"></div>
@@ -284,7 +272,12 @@ Interactable
     // the axis in which the first movement must be
     // for the drag sequence to start
     // 'xy' by default - any direction
-    axis: 'x' || 'y' || 'xy',
+    startAxis: 'x' || 'y' || 'xy',
+
+    // 'xy' by default - don't restrict to one axis (move in any direction)
+    // 'x' or 'y' to restrict movement to either axis
+    // 'start' to restrict movement to the axis the drag started in
+    lockAxis: 'x' || 'y' || 'xy' || 'start',
 
     // max number of drags that can happen concurrently
     // with elements of this Interactable. Infinity by default
@@ -305,7 +298,7 @@ Interactable
                       
                       <article id="Interactable.dropzone">
                           <header>
-                              <h3 class="dr-method">Interactable.dropzone([options])<a href="#Interactable.dropzone" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 334 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drop.js#L334">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.dropzone([options])<a href="#Interactable.dropzone" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 310 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/drop.js#L310">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.dropzone-extra"></div>
@@ -432,7 +425,7 @@ element is over this Interactable.
                       
                       <article id="Interactable.resizable">
                           <header>
-                              <h3 class="dr-method">Interactable.resizable([options])<a href="#Interactable.resizable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 341 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/resize.js#L341">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.resizable([options])<a href="#Interactable.resizable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 335 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/resize.js#L335">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.resizable-extra"></div>
@@ -573,7 +566,7 @@ Interactable
                       
                       <article id="Interactable.gesturable">
                           <header>
-                              <h3 class="dr-method">Interactable.gesturable([options])<a href="#Interactable.gesturable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 106 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/gesture.js#L106">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.gesturable([options])<a href="#Interactable.gesturable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 108 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/actions/gesture.js#L108">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.gesturable-extra"></div>
@@ -693,7 +686,7 @@ Interactable&#39;s element
                       
                       <article id="Interactable">
                           <header>
-                              <h3 class="dr-property">Interactable<a href="#Interactable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 21 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L21">&#x27ad;</a></h3>
+                              <h3 class="dr-property">Interactable<a href="#Interactable" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 20 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L20">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable-extra"></div>
@@ -716,109 +709,9 @@ Interactable&#39;s element
                           </section>
                       </article>
                       
-                      <article id="Interactable.actionChecker">
-                          <header>
-                              <h3 class="dr-method">Interactable.actionChecker([checker])<a href="#Interactable.actionChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 142 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L142">&#x27ad;</a></h3>
-                          </header>
-                          <section>
-                              <div class="extra" id="Interactable.actionChecker-extra"></div>
-                              <div class="dr-method">
-                                  
-                                  
-                                  
-                                  
-                                  <p></p><p>Gets or sets the function used to check action to be performed on
-pointerDown
-</p><p></p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <div class="topcoat-list__container">
-                                      <h3 class="topcoat-list__header">Parameters</h3>
-                                      <ol class="topcoat-list">
-                                          <li class="topcoat-list__item"><span class="dr-param">checker</span>
-                                              <span class="dr-type"><em class="dr-type-function">function</em> <em class="dr-type-null">null</em> </span>
-                                              <span class="dr-description">A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property &#39;drag&#39; &#39;resize&#39; or &#39;gesture&#39; and optionally an <code>edges</code> object with boolean &#39;top&#39;, &#39;left&#39;, &#39;bottom&#39; and right props.</span></li>
-                                          
-                                      </ol>
-                                  </div>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <p class="dr-returns">
-                                      <strong class="dr-title">Returns:</strong>
-                                      
-                                      <em class="dr-type-Function">Function</em>
-                                      
-                                      <em class="dr-type-Interactable">Interactable</em>
-                                      
-                                      <span class="dr-description">The checker function or this Interactable</span>
-                                  </p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <p></p><p></p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact('.resize-drag')
-  .resizable(true)
-  .draggable(true)
-  .actionChecker(function (pointer, event, action, interactable, element, interaction) {
-
-  if (interact.matchesSelector(event.target, '.drag-handle') {
-    // force drag with handle target
-    action.name = drag;
-  }
-  else {
-    // resize from the top and right edges
-    action.name  = 'resize';
-    action.edges = { top: true, right: true };
-  }
-
-  return action;
-});</code></pre></section>
-                                  
-                                  
-                                  
-                                  
-                                  
-                              </div>
-                          </section>
-                      </article>
-                      
                       <article id="Interactable.getRect">
                           <header>
-                              <h3 class="dr-method">Interactable.getRect([element])<a href="#Interactable.getRect" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 176 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L176">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.getRect([element])<a href="#Interactable.getRect" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 116 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L116">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.getRect-extra"></div>
@@ -923,7 +816,7 @@ overridden using <a href="#Interactable.rectChecker" class="dr-link">Interactabl
                       
                       <article id="Interactable.rectChecker">
                           <header>
-                              <h3 class="dr-method">Interactable.rectChecker([checker])<a href="#Interactable.rectChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 196 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L196">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.rectChecker([checker])<a href="#Interactable.rectChecker" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 136 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L136">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.rectChecker-extra"></div>
@@ -984,73 +877,9 @@ element&#39;s rectangle
                           </section>
                       </article>
                       
-                      <article id="Interactable.styleCursor">
-                          <header>
-                              <h3 class="dr-method">Interactable.styleCursor([newValue])<a href="#Interactable.styleCursor" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 223 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L223">&#x27ad;</a></h3>
-                          </header>
-                          <section>
-                              <div class="extra" id="Interactable.styleCursor-extra"></div>
-                              <div class="dr-method">
-                                  
-                                  
-                                  
-                                  
-                                  <p></p><p>Returns or sets whether the action that would be performed when the
-mouse on the element are checked on <code>mousemove</code> so that the cursor
-may be styled appropriately
-</p><p></p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <div class="topcoat-list__container">
-                                      <h3 class="topcoat-list__header">Parameters</h3>
-                                      <ol class="topcoat-list">
-                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
-                                              <span class="dr-type"><em class="dr-type-boolean">boolean</em> </span>
-                                              <span class="dr-description"></span></li>
-                                          
-                                      </ol>
-                                  </div>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <p class="dr-returns">
-                                      <strong class="dr-title">Returns:</strong>
-                                      
-                                      <em class="dr-type-boolean">boolean</em>
-                                      
-                                      <em class="dr-type-Interactable">Interactable</em>
-                                      
-                                      <span class="dr-description">The current setting or this Interactable</span>
-                                  </p>
-                                  
-                                  
-                                  
-                                  
-                              </div>
-                          </section>
-                      </article>
-                      
                       <article id="Interactable.preventDefault">
                           <header>
-                              <h3 class="dr-method">Interactable.preventDefault([newValue])<a href="#Interactable.preventDefault" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 252 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L252">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.preventDefault([newValue])<a href="#Interactable.preventDefault" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 165 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L165">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.preventDefault-extra"></div>
@@ -1116,7 +945,7 @@ in response to pointer events. Can be set to:
                       
                       <article id="Interactable.origin">
                           <header>
-                              <h3 class="dr-method">Interactable.origin(…)<a href="#Interactable.origin" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 279 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L279">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.origin(…)<a href="#Interactable.origin" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 192 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L192">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.origin-extra"></div>
@@ -1206,7 +1035,7 @@ of the origin will be subtracted from action event coordinates.
                       
                       <article id="Interactable.deltaSource">
                           <header>
-                              <h3 class="dr-method">Interactable.deltaSource([newValue])<a href="#Interactable.deltaSource" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 302 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L302">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.deltaSource([newValue])<a href="#Interactable.deltaSource" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 215 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L215">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.deltaSource-extra"></div>
@@ -1269,7 +1098,7 @@ movement of the pointer.
                       
                       <article id="Interactable.context">
                           <header>
-                              <h3 class="dr-method">Interactable.context()<a href="#Interactable.context" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 321 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L321">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.context()<a href="#Interactable.context" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 234 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L234">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.context-extra"></div>
@@ -1309,167 +1138,9 @@ movement of the pointer.
                           </section>
                       </article>
                       
-                      <article id="Interactable.ignoreFrom">
-                          <header>
-                              <h3 class="dr-method">Interactable.ignoreFrom([newValue])<a href="#Interactable.ignoreFrom" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 340 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L340">&#x27ad;</a></h3>
-                          </header>
-                          <section>
-                              <div class="extra" id="Interactable.ignoreFrom-extra"></div>
-                              <div class="dr-method">
-                                  
-                                  
-                                  
-                                  
-                                  <p></p><p>If the target of the <code>mousedown</code>, <code>pointerdown</code> or <code>touchstart</code>
-event or any of it&#39;s parents match the given CSS selector or
-Element, no drag/resize/gesture is started.
-</p><p></p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <div class="topcoat-list__container">
-                                      <h3 class="topcoat-list__header">Parameters</h3>
-                                      <ol class="topcoat-list">
-                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
-                                              <span class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-Element">Element</em> <em class="dr-type-null">null</em> </span>
-                                              <span class="dr-description">a CSS selector string, an Element or <code>null</code> to not ignore any elements</span></li>
-                                          
-                                      </ol>
-                                  </div>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <p class="dr-returns">
-                                      <strong class="dr-title">Returns:</strong>
-                                      
-                                      <em class="dr-type-string">string</em>
-                                      
-                                      <em class="dr-type-Element">Element</em>
-                                      
-                                      <em class="dr-type-object">object</em>
-                                      
-                                      <span class="dr-description">The current ignoreFrom value or this Interactable</span>
-                                  </p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(element, { ignoreFrom: document.getElementById('no-action') });
-// or
-interact(element).ignoreFrom('input, textarea, a');</code></pre></section>
-                                  
-                                  
-                                  
-                                  
-                                  
-                              </div>
-                          </section>
-                      </article>
-                      
-                      <article id="Interactable.allowFrom">
-                          <header>
-                              <h3 class="dr-method">Interactable.allowFrom([newValue])<a href="#Interactable.allowFrom" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 369 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L369">&#x27ad;</a></h3>
-                          </header>
-                          <section>
-                              <div class="extra" id="Interactable.allowFrom-extra"></div>
-                              <div class="dr-method">
-                                  
-                                  
-                                  
-                                  
-                                  <p></p><p>A drag/resize/gesture is started only If the target of the
-<code>mousedown</code>, <code>pointerdown</code> or <code>touchstart</code> event or any of it&#39;s
-parents match the given CSS selector or Element.
-</p><p></p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <div class="topcoat-list__container">
-                                      <h3 class="topcoat-list__header">Parameters</h3>
-                                      <ol class="topcoat-list">
-                                          <li class="topcoat-list__item"><span class="dr-param">newValue</span>
-                                              <span class="dr-type"><em class="dr-type-string">string</em> <em class="dr-type-Element">Element</em> <em class="dr-type-null">null</em> </span>
-                                              <span class="dr-description">a CSS selector string, an Element or <code>null</code> to allow from any element</span></li>
-                                          
-                                      </ol>
-                                  </div>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <p class="dr-returns">
-                                      <strong class="dr-title">Returns:</strong>
-                                      
-                                      <em class="dr-type-string">string</em>
-                                      
-                                      <em class="dr-type-Element">Element</em>
-                                      
-                                      <em class="dr-type-object">object</em>
-                                      
-                                      <span class="dr-description">The current allowFrom value or this Interactable</span>
-                                  </p>
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  
-                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(element, { allowFrom: document.getElementById('drag-handle') });
-// or
-interact(element).allowFrom('.handle');</code></pre></section>
-                                  
-                                  
-                                  
-                                  
-                                  
-                              </div>
-                          </section>
-                      </article>
-                      
                       <article id="Interactable.fire">
                           <header>
-                              <h3 class="dr-method">Interactable.fire(iEvent)<a href="#Interactable.fire" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 393 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L393">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.fire(iEvent)<a href="#Interactable.fire" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 248 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L248">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.fire-extra"></div>
@@ -1530,7 +1201,7 @@ and directly to this Interactable
                       
                       <article id="Interactable.on">
                           <header>
-                              <h3 class="dr-method">Interactable.on(eventType, listener, [useCapture])<a href="#Interactable.on" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 437 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L437">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.on(eventType, listener, [useCapture])<a href="#Interactable.on" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 292 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L292">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.on-extra"></div>
@@ -1596,7 +1267,7 @@ and directly to this Interactable
                       
                       <article id="Interactable.off">
                           <header>
-                              <h3 class="dr-method">Interactable.off(eventType, listener, [useCapture])<a href="#Interactable.off" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 496 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L496">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.off(eventType, listener, [useCapture])<a href="#Interactable.off" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 351 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L351">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.off-extra"></div>
@@ -1662,7 +1333,7 @@ and directly to this Interactable
                       
                       <article id="Interactable.set">
                           <header>
-                              <h3 class="dr-method">Interactable.set(options)<a href="#Interactable.set" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 554 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L554">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.set(options)<a href="#Interactable.set" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 409 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L409">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.set-extra"></div>
@@ -1722,7 +1393,7 @@ and directly to this Interactable
                       
                       <article id="Interactable.unset">
                           <header>
-                              <h3 class="dr-method">Interactable.unset()<a href="#Interactable.unset" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 601 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L601">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interactable.unset()<a href="#Interactable.unset" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 448 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interactable.js#L448">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interactable.unset-extra"></div>
@@ -2420,7 +2091,7 @@ gesturable <code>&#39;max&#39;</code> and <code>&#39;maxPerElement&#39;</code> o
                       
                       <article id="Interaction.start">
                           <header>
-                              <h3 class="dr-method">Interaction.start(action, interactable, element)<a href="#Interaction.start" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 247 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L247">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interaction.start(action, interactable, element)<a href="#Interaction.start" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 150 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L150">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interaction.start-extra"></div>
@@ -2513,9 +2184,56 @@ of pointers must be held down - 1 for drag/resize, 2 for gesture.
                           </section>
                       </article>
                       
+                      <article id="Interaction.doMove">
+                          <header>
+                              <h3 class="dr-method">Interaction.doMove()<a href="#Interaction.doMove" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 254 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L254">&#x27ad;</a></h3>
+                          </header>
+                          <section>
+                              <div class="extra" id="Interaction.doMove-extra"></div>
+                              <div class="dr-method">
+                                  
+                                  
+                                  
+                                  
+                                  <p></p><p>Force a move of the current action at the same coordinates. Useful if
+snap/restrict has been changed and you want a movement with the new
+settings.
+</p><p></p>
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  
+                                  <section class="code"><pre class="javascript code"><code data-language="javascript" class="language-javascript">interact(target)
+  .draggable(true)
+  .on('dragmove', function (event) {
+    if (someCondition) {
+      // change the snap settings
+      event.interactable.draggable({ snap: { targets: [] }});
+      // fire another move event with re-calculated snap
+      event.interaction.doMove();
+    }
+  });</code></pre></section>
+                                  
+                                  
+                                  
+                                  
+                                  
+                              </div>
+                          </section>
+                      </article>
+                      
                       <article id="Interaction.end">
                           <header>
-                              <h3 class="dr-method">Interaction.end([event])<a href="#Interaction.end" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 522 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L522">&#x27ad;</a></h3>
+                              <h3 class="dr-method">Interaction.end([event])<a href="#Interaction.end" title="Link to this section" class="dr-hash">&#x2693;</a><a class="dr-sourceline" title="Go to line 313 in the source" href="https://github.com/taye/interact.js/blob/modularization/src/Interaction.js#L313">&#x27ad;</a></h3>
                           </header>
                           <section>
                               <div class="extra" id="Interaction.end-extra"></div>
