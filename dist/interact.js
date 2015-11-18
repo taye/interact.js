@@ -287,12 +287,7 @@ var Interactable = (function () {
       win: _window
     });
 
-    if (this._doc !== scope.document) {
-      scope.signals.fire('listen-to-document', {
-        doc: this._doc,
-        win: _window
-      });
-    }
+    scope.addDocument(this._doc, _window);
 
     scope.interactables.push(this);
 
@@ -770,7 +765,7 @@ var finder = require('./utils/interactionFinder');
 var signals = require('./utils/Signals')['new']();
 
 var listeners = {};
-var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'addPointer', 'removePointer', 'recordPointer'];
+var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer'];
 
 // for ignoring browser's simulated mouse events
 var prevTouchTime = 0;
@@ -847,29 +842,13 @@ var Interaction = (function () {
   // Check if the current target supports the action.
   // If so, return the validated action. Otherwise, return null
 
-  Interaction.prototype.setEventXY = function setEventXY(targetObj, pointers) {
-    var pointer = pointers.length > 1 ? utils.pointerAverage(pointers) : pointers[0];
-
-    var tmpXY = {};
-
-    utils.getPageXY(pointer, tmpXY, this);
-    targetObj.page.x = tmpXY.x;
-    targetObj.page.y = tmpXY.y;
-
-    utils.getClientXY(pointer, tmpXY, this);
-    targetObj.client.x = tmpXY.x;
-    targetObj.client.y = tmpXY.y;
-
-    targetObj.timeStamp = new Date().getTime();
-  };
-
   Interaction.prototype.pointerDown = function pointerDown(pointer, event, eventTarget) {
-    var pointerIndex = this.addPointer(pointer);
+    var pointerIndex = this.updatePointer(pointer);
 
     this.pointerIsDown = true;
 
     if (!this.interacting()) {
-      this.setEventXY(this.curCoords, this.pointers);
+      utils.setCoords(this.curCoords, this.pointers);
     }
 
     signals.fire('down', {
@@ -942,7 +921,7 @@ var Interaction = (function () {
 
     // set the startCoords if there was no prepared action
     if (!this.prepared.name) {
-      this.setEventXY(this.startCoords, this.pointers);
+      utils.setCoords(this.startCoords, this.pointers);
     }
 
     utils.copyAction(this.prepared, action);
@@ -959,8 +938,8 @@ var Interaction = (function () {
 
   Interaction.prototype.pointerMove = function pointerMove(pointer, event, eventTarget) {
     if (!this.simulation) {
-      this.recordPointer(pointer);
-      this.setEventXY(this.curCoords, this.pointers);
+      this.updatePointer(pointer);
+      utils.setCoords(this.curCoords, this.pointers);
     }
 
     var duplicateMove = this.curCoords.page.x === this.prevCoords.page.x && this.curCoords.page.y === this.prevCoords.page.y && this.curCoords.client.x === this.prevCoords.client.x && this.curCoords.client.y === this.prevCoords.client.y;
@@ -978,7 +957,7 @@ var Interaction = (function () {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
-      utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
       var signalArg = {
         pointer: pointer,
@@ -996,7 +975,6 @@ var Interaction = (function () {
       // if interacting, fire a 'move-{action}' signal
       if (this.interacting()) {
         this.doMove(signalArg);
-        this.checkAndPreventDefault(event);
       }
 
       if (this.pointerWasMoved) {
@@ -1005,6 +983,8 @@ var Interaction = (function () {
 
       signals.fire('move-done', signalArg);
     }
+
+    this.checkAndPreventDefault(event);
   };
 
   /*\
@@ -1048,6 +1028,8 @@ var Interaction = (function () {
   // End interact move events and stop auto-scroll unless simulation is running
 
   Interaction.prototype.pointerUp = function pointerUp(pointer, event, eventTarget, curEventTarget) {
+    this.checkAndPreventDefault(event);
+
     var pointerIndex = this.mouse ? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
@@ -1097,7 +1079,7 @@ var Interaction = (function () {
       });
     }
 
-    this.stop(event);
+    this.stop();
   };
 
   Interaction.prototype.currentAction = function currentAction() {
@@ -1108,21 +1090,12 @@ var Interaction = (function () {
     return this._interacting;
   };
 
-  Interaction.prototype.stop = function stop(event) {
+  Interaction.prototype.stop = function stop() {
     signals.fire('stop', { interaction: this });
 
     if (this._interacting) {
       signals.fire('stop-active', { interaction: this });
-
-      // prevent Default only if were previously interacting
-      if (event && utils.isFunction(event.preventDefault)) {
-        this.checkAndPreventDefault(event);
-      }
-
-      signals.fire('stop-' + this.prepared.name, {
-        event: event,
-        interaction: this
-      });
+      signals.fire('stop-' + this.prepared.name, { interaction: this });
     }
 
     this.target = this.element = null;
@@ -1131,7 +1104,7 @@ var Interaction = (function () {
     this.prepared.name = this.prevEvent = null;
   };
 
-  Interaction.prototype.addPointer = function addPointer(pointer) {
+  Interaction.prototype.updatePointer = function updatePointer(pointer) {
     var id = utils.getPointerId(pointer);
     var index = this.mouse ? 0 : utils.indexOf(this.pointerIds, id);
 
@@ -1160,20 +1133,10 @@ var Interaction = (function () {
     this.holdTimers.splice(index, 1);
   };
 
-  Interaction.prototype.recordPointer = function recordPointer(pointer) {
-    var index = this.mouse ? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
-
-    if (index === -1) {
-      return;
-    }
-
-    this.pointers[index] = pointer;
-  };
-
   Interaction.prototype.checkAndPreventDefault = function checkAndPreventDefault(event) {
-    var setting = this.target && this.target.options.preventDefault;
+    var setting = this.target ? this.target.options.preventDefault : 'never';
 
-    if (!this.target || setting === 'never') {
+    if (setting === 'never') {
       return;
     }
 
@@ -1184,24 +1147,13 @@ var Interaction = (function () {
 
     // setting === 'auto'
 
+    // don't preventDefault of pointerdown events
+    if (/down|start/i.test(event.type)) {
+      return;
+    }
+
     // don't preventDefault on input elements
     if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
-      return;
-    }
-
-    var actionOptions = this.target.options[this.prepared.name];
-
-    // Do not preventDefault on pointerdown if the prepared action is delayed
-    // or it is a drag and dragging can only start from a certain direction.
-    // This allows a touch to pan the viewport if the action doesn't actually
-    // start>
-    if (/down|start/i.test(event.type) && (this.prepared.name === 'drag' && actionOptions.startAxis !== 'xy' || actionOptions && actionOptions.delay > 0)) {
-
-      return;
-    }
-
-    // with manualStart, only preventDefault while interacting
-    if (actionOptions && actionOptions.manualStart && !this.interacting()) {
       return;
     }
 
@@ -1295,88 +1247,70 @@ function doOnInteractions(method) {
   };
 }
 
-scope.signals.on('listen-to-document', function (_ref4) {
+// prevent native HTML5 drag on interact.js target elements
+function preventNativeDrag(event) {
+  for (var _iterator2 = scope.interactions, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+    var _ref2;
+
+    if (_isArray2) {
+      if (_i2 >= _iterator2.length) break;
+      _ref2 = _iterator2[_i2++];
+    } else {
+      _i2 = _iterator2.next();
+      if (_i2.done) break;
+      _ref2 = _i2.value;
+    }
+
+    var interaction = _ref2;
+
+    if (interaction.element && (interaction.element === event.target || utils.nodeContains(interaction.element, event.target))) {
+
+      interaction.checkAndPreventDefault(event);
+      return;
+    }
+  }
+}
+
+var docEvents = {/* 'eventType': listenerFunc */};
+var pEventTypes = browser.pEventTypes;
+
+if (scope.PointerEvent) {
+  docEvents[pEventTypes.down] = listeners.pointerDown;
+  docEvents[pEventTypes.move] = listeners.pointerMove;
+  docEvents[pEventTypes.up] = listeners.pointerUp;
+  docEvents[pEventTypes.cancel] = listeners.pointerUp;
+} else {
+  docEvents.mousedown = listeners.pointerDown;
+  docEvents.mousemove = listeners.pointerMove;
+  docEvents.mouseup = listeners.pointerUp;
+
+  docEvents.touchstart = listeners.pointerDown;
+  docEvents.touchmove = listeners.pointerMove;
+  docEvents.touchend = listeners.pointerUp;
+  docEvents.touchcancel = listeners.pointerUp;
+}
+
+docEvents.blur = scope.endAllInteractions;
+docEvents.dragstart = preventNativeDrag;
+
+function onDocSignal(_ref4, signalName) {
   var doc = _ref4.doc;
-  var win = _ref4.win;
 
-  var pEventTypes = browser.pEventTypes;
+  var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
 
-  // add delegate event listener
+  // delegate event listener
   for (var eventType in scope.delegatedEvents) {
-    events.add(doc, eventType, events.delegateListener);
-    events.add(doc, eventType, events.delegateUseCapture, true);
+    eventMethod(doc, eventType, events.delegateListener);
+    eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
 
-  if (scope.PointerEvent) {
-    events.add(doc, pEventTypes.down, listeners.pointerDown);
-    events.add(doc, pEventTypes.move, listeners.pointerMove);
-    events.add(doc, pEventTypes.move, listeners.pointerHover);
-    events.add(doc, pEventTypes.out, listeners.pointerOut);
-    events.add(doc, pEventTypes.up, listeners.pointerUp);
-    events.add(doc, pEventTypes.cancel, listeners.pointerUp);
-  } else {
-    events.add(doc, 'mousedown', listeners.pointerDown);
-    events.add(doc, 'mousemove', listeners.pointerMove);
-    events.add(doc, 'mousemove', listeners.pointerHover);
-    events.add(doc, 'mouseup', listeners.pointerUp);
-    events.add(doc, 'mouseout', listeners.pointerOut);
-
-    events.add(doc, 'touchstart', listeners.pointerDown);
-    events.add(doc, 'touchmove', listeners.pointerMove);
-    events.add(doc, 'touchend', listeners.pointerUp);
-    events.add(doc, 'touchcancel', listeners.pointerUp);
+  for (var eventType in docEvents) {
+    eventMethod(doc, eventType, docEvents[eventType]);
   }
+}
 
-  events.add(win, 'blur', scope.endAllInteractions);
-
-  try {
-    if (win.frameElement) {
-      var parentDoc = win.frameElement.ownerDocument;
-      var parentWindow = parentDoc.defaultView;
-
-      events.add(parentDoc, 'mouseup', listeners.pointerUp);
-      events.add(parentDoc, 'touchend', listeners.pointerUp);
-      events.add(parentDoc, 'touchcancel', listeners.pointerUp);
-      events.add(parentDoc, 'pointerup', listeners.pointerUp);
-      events.add(parentDoc, 'MSPointerUp', listeners.pointerUp);
-      events.add(parentWindow, 'blur', scope.endAllInteractions);
-    }
-  } catch (error) {
-    scope.windowParentError = error;
-  }
-
-  // prevent native HTML5 drag on interact.js target elements
-  events.add(doc, 'dragstart', function (event) {
-    for (var _iterator2 = scope.interactions, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var interaction = _ref2;
-
-      if (interaction.element && (interaction.element === event.target || utils.nodeContains(interaction.element, event.target))) {
-
-        interaction.checkAndPreventDefault(event);
-        return;
-      }
-    }
-  });
-
-  scope.documents.push(doc);
-  events.documents.push(doc);
-});
-
-scope.signals.fire('listen-to-document', {
-  win: scope.window,
-  doc: scope.document
-});
+scope.signals.on('add-document', onDocSignal);
+scope.signals.on('remove-document', onDocSignal);
 
 // Stop related interactions when an Interactable is unset
 Interactable.signals.on('unset', function (_ref5) {
@@ -3092,7 +3026,7 @@ Interaction.signals.on('move', function (arg) {
 
     // if just starting an action, calculate the pointer speed now
     if (!interaction.interacting()) {
-      utils.setEventDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
+      utils.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
       signals.fire('before-start-' + interaction.prepared.name, arg);
     }
@@ -3195,7 +3129,7 @@ function prepare(interaction, _ref4) {
     interaction.target._doc.documentElement.style.cursor = cursor;
   }
 
-  interaction.setEventXY(interaction.startCoords, interaction.pointers);
+  utils.setCoords(interaction.startCoords, interaction.pointers);
 
   signals.fire('prepared', { interaction: interaction });
 }
@@ -3676,7 +3610,7 @@ function calcInertia(interaction, status) {
 
 function inertiaFrame() {
   updateInertiaCoords(this);
-  utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+  utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
   var status = this.inertiaStatus;
   var options = this.target.options[this.prepared.name].inertia;
@@ -3754,7 +3688,7 @@ function updateInertiaCoords(interaction) {
   var pageUp = status.upCoords.page;
   var clientUp = status.upCoords.client;
 
-  interaction.setEventXY(interaction.curCoords, [{
+  utils.setCoords(interaction.curCoords, [{
     pageX: pageUp.x + status.sx,
     pageY: pageUp.y + status.sy,
     clientX: clientUp.x + status.sx,
@@ -4152,6 +4086,9 @@ interact.maxInteractions = function (newValue) {
   return scope.maxInteractions;
 };
 
+interact.addDocument = scope.addDocument;
+interact.removeDocument = scope.removeDocument;
+
 scope.interact = interact;
 
 module.exports = interact;
@@ -4198,11 +4135,8 @@ function onIE8Dblclick(event) {
 }
 
 if (browser.isIE8) {
-  scope.signals.on('listen-to-document', function (_ref2) {
-    var doc = _ref2.doc;
-
-    // For IE's lack of Event#preventDefault
-    events.add(doc, 'selectstart', function (event) {
+  (function () {
+    var selectFix = function (event) {
       for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
         var _ref;
 
@@ -4221,12 +4155,25 @@ if (browser.isIE8) {
           interaction.checkAndPreventDefault(event);
         }
       }
-    });
+    };
 
-    if (scope.pointerEvents) {
-      events.add(doc, 'dblclick', onIE8Dblclick);
-    }
-  });
+    var onDocIE8 = function onDocIE8(_ref2, signalName) {
+      var doc = _ref2.doc;
+      var win = _ref2.win;
+
+      var eventMethod = signalName.indexOf('listen') === 0 ? events.add : events.remove;
+
+      // For IE's lack of Event#preventDefault
+      eventMethod(doc, 'selectstart', selectFix);
+
+      if (scope.pointerEvents) {
+        eventMethod(doc, 'dblclick', onIE8Dblclick);
+      }
+    };
+
+    scope.signals.on('add-document', onDocIE8);
+    scope.signals.on('remove-document', onDocIE8);
+  })();
 }
 
 module.exports = null;
@@ -5033,12 +4980,12 @@ module.exports = scope.pointerEvents = {
 },{"./InteractEvent":2,"./Interaction":4,"./scope":23,"./utils":33,"./utils/browser":26}],23:[function(require,module,exports){
 var scope = {};
 var utils = require('./utils');
+var events = require('./utils/events');
 var signals = require('./utils/Signals')['new']();
 
 scope.defaultOptions = require('./defaultOptions');
-scope.events = require('./utils/events');
-
 scope.signals = signals;
+scope.events = events;
 
 utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));
@@ -5098,15 +5045,46 @@ scope.endAllInteractions = function (event) {
 
 scope.prefixedPropREs = utils.prefixedPropREs;
 
-scope.signals.on('listen-to-document', function (_ref) {
-  var doc = _ref.doc;
-
-  // if document is already known
+scope.addDocument = function (doc, win) {
+  // do nothing if document is already known
   if (utils.contains(scope.documents, doc)) {
-    // don't call any further signal listeners
     return false;
   }
-});
+
+  win = win || scope.getWindow(doc);
+
+  scope.documents.push(doc);
+  events.documents.push(doc);
+
+  // don't add an unload event for the main document
+  // so that the page may be cached in browser history
+  if (doc !== scope.document) {
+    events.add(win, 'unload', scope.onWindowUnload);
+  }
+
+  signals.fire('add-document', { doc: doc, win: win });
+};
+
+scope.removeDocument = function (doc, win) {
+  var index = utils.indexOf(scope.documents, doc);
+
+  if (index === -1) {
+    return false;
+  }
+
+  win = win || scope.getWindow(doc);
+
+  events.remove(win, 'unload', scope.onWindowUnload);
+
+  scope.documents.splice(index, 1);
+  events.documents.splice(index, 1);
+
+  signals.fire('remove-document', { win: win, doc: doc });
+};
+
+scope.onWindowUnload = function () {
+  scope.removeDocument(this.document, this);
+};
 
 module.exports = scope;
 
@@ -5424,7 +5402,7 @@ var domUtils = {
   },
 
   matchesUpTo: function (element, selector, limit) {
-    while (domUtils.isElement(element)) {
+    while (isType.isElement(element)) {
       if (domUtils.matchesSelector(element, selector)) {
         return true;
       }
@@ -6239,7 +6217,7 @@ var pointerUtils = {
     dest.timeStamp = src.timeStamp;
   },
 
-  setEventDeltas: function (targetObj, prev, cur) {
+  setCoordDeltas: function (targetObj, prev, cur) {
     var now = new Date().getTime();
 
     targetObj.page.x = cur.page.x - prev.page.x;
@@ -6306,6 +6284,22 @@ var pointerUtils = {
 
   getPointerId: function (pointer) {
     return isType.isNumber(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
+  },
+
+  setCoords: function (targetObj, pointers) {
+    var pointer = pointers.length > 1 ? pointerUtils.pointerAverage(pointers) : pointers[0];
+
+    var tmpXY = {};
+
+    pointerUtils.getPageXY(pointer, tmpXY);
+    targetObj.page.x = tmpXY.x;
+    targetObj.page.y = tmpXY.y;
+
+    pointerUtils.getClientXY(pointer, tmpXY);
+    targetObj.client.x = tmpXY.x;
+    targetObj.client.y = tmpXY.y;
+
+    targetObj.timeStamp = new Date().getTime();
   },
 
   prefixedPropREs: {
