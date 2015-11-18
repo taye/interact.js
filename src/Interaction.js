@@ -82,31 +82,13 @@ class Interaction {
     scope.interactions.push(this);
   }
 
-  setEventXY (targetObj, pointers) {
-    const pointer = (pointers.length > 1
-                     ? utils.pointerAverage(pointers)
-                     : pointers[0]);
-
-    const tmpXY = {};
-
-    utils.getPageXY(pointer, tmpXY, this);
-    targetObj.page.x = tmpXY.x;
-    targetObj.page.y = tmpXY.y;
-
-    utils.getClientXY(pointer, tmpXY, this);
-    targetObj.client.x = tmpXY.x;
-    targetObj.client.y = tmpXY.y;
-
-    targetObj.timeStamp = new Date().getTime();
-  }
-
   pointerDown (pointer, event, eventTarget) {
     const pointerIndex = this.addPointer(pointer);
 
     this.pointerIsDown = true;
 
     if (!this.interacting()) {
-      this.setEventXY(this.curCoords, this.pointers);
+      utils.setCoords(this.curCoords, this.pointers);
     }
 
     signals.fire('down', {
@@ -180,7 +162,7 @@ class Interaction {
 
     // set the startCoords if there was no prepared action
     if (!this.prepared.name) {
-      this.setEventXY(this.startCoords, this.pointers);
+      utils.setCoords(this.startCoords, this.pointers);
     }
 
     utils.copyAction(this.prepared, action);
@@ -198,7 +180,7 @@ class Interaction {
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
       this.recordPointer(pointer);
-      this.setEventXY(this.curCoords, this.pointers);
+      utils.setCoords(this.curCoords, this.pointers);
     }
 
     const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
@@ -219,7 +201,7 @@ class Interaction {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
-      utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
       const signalArg = {
         pointer,

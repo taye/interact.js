@@ -202,7 +202,7 @@ function calcInertia (interaction, status) {
 
 function inertiaFrame () {
   updateInertiaCoords(this);
-  utils.setEventDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+  utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
   const status = this.inertiaStatus;
   const options = this.target.options[this.prepared.name].inertia;
@@ -287,7 +287,7 @@ function updateInertiaCoords (interaction) {
   const pageUp   = status.upCoords.page;
   const clientUp = status.upCoords.client;
 
-  interaction.setEventXY(interaction.curCoords, [ {
+  utils.setCoords(interaction.curCoords, [ {
     pageX  : pageUp.x   + status.sx,
     pageY  : pageUp.y   + status.sy,
     clientX: clientUp.x + status.sx,
