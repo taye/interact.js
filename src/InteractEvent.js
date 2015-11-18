@@ -33,6 +33,7 @@ class InteractEvent {
     this.button        = event.button;
     this.buttons       = event.buttons;
     this.target        = element;
+    this.currentTarget = element;
     this.relatedTarget = related || null;
     this.t0            = interaction.downTimes[interaction.downTimes.length - 1];
     this.type          = action + (phase || '');
