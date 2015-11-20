@@ -434,6 +434,7 @@ utils.merge(scope.eventTypes, [
   'resizestart',
   'resizemove',
   'resizeinertiastart',
+  'resizeinertiaresume',
   'resizeend',
 ]);
 actions.methodDict.resize = 'resizable';

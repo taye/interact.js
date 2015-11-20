@@ -169,6 +169,7 @@ utils.merge(scope.eventTypes, [
   'dragstart',
   'dragmove',
   'draginertiastart',
+  'draginertiaresume',
   'dragend',
 ]);
 actions.methodDict.drag = 'draggable';
