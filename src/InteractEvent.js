@@ -91,7 +91,6 @@ class InteractEvent {
     this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
 
     signals.fire('new', signalArg);
-    signals.fire('new-' + action, signalArg);
   }
 
   getSwipe () {
