@@ -17,13 +17,11 @@ const pointerUtils = {
   },
 
   setCoordDeltas: function (targetObj, prev, cur) {
-    const now = new Date().getTime();
-
-    targetObj.page.x    = cur.page.x   - prev.page.x;
-    targetObj.page.y    = cur.page.y   - prev.page.y;
-    targetObj.client.x  = cur.client.x - prev.client.x;
-    targetObj.client.y  = cur.client.y - prev.client.y;
-    targetObj.timeStamp = now          - prev.timeStamp;
+    targetObj.page.x    = cur.page.x    - prev.page.x;
+    targetObj.page.y    = cur.page.y    - prev.page.y;
+    targetObj.client.x  = cur.client.x  - prev.client.x;
+    targetObj.client.y  = cur.client.y  - prev.client.y;
+    targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
 
     // set pointer velocity
     const dt = Math.max(targetObj.timeStamp / 1000, 0.001);
@@ -87,7 +85,7 @@ const pointerUtils = {
     return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
   },
 
-  setCoords: function (targetObj, pointers) {
+  setCoords: function (targetObj, pointers, timeStamp) {
     const pointer = (pointers.length > 1
                      ? pointerUtils.pointerAverage(pointers)
                      : pointers[0]);
@@ -102,7 +100,7 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = new Date().getTime();
+    targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp :new Date().getTime();
   },
 
   prefixedPropREs: {
