@@ -103,7 +103,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))) {
+        && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
+        && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
         action,
@@ -115,7 +116,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
 
       const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
 
-      if (actionInfo.action) {
+      if (actionInfo.action
+          && !actionInfo.target.options[actionInfo.action.name].manualStart) {
         return actionInfo;
       }
     }
