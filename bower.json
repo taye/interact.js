@@ -39,7 +39,7 @@
     "ignore": [
         ".*",
         "test",
-        "demo",
+        "examples",
         "img",
         "docs"
     ]
