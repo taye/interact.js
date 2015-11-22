@@ -5,16 +5,16 @@ const extend        = require('../utils/extend');
 const modifiers = {
   names: [],
 
-  setStartOffsets: function (interaction) {
+  setOffsets: function (interaction, coords) {
     const { target, element } = interaction;
     const rect = target.getRect(element);
 
     if (rect) {
-      interaction.startOffset.left = interaction.startCoords.page.x - rect.left;
-      interaction.startOffset.top  = interaction.startCoords.page.y - rect.top;
+      interaction.startOffset.left = coords.page.x - rect.left;
+      interaction.startOffset.top  = coords.page.y - rect.top;
 
-      interaction.startOffset.right  = rect.right  - interaction.startCoords.page.x;
-      interaction.startOffset.bottom = rect.bottom - interaction.startCoords.page.y;
+      interaction.startOffset.right  = rect.right  - coords.page.x;
+      interaction.startOffset.bottom = rect.bottom - coords.page.y;
 
       if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
       if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
@@ -23,10 +23,10 @@ const modifiers = {
       interaction.startOffset.left = interaction.startOffset.top = interaction.startOffset.right = interaction.startOffset.bottom = 0;
     }
 
-    modifiers.setOffsets(interaction, target, element, rect, interaction.modifierOffsets);
+    modifiers.setModifierOffsets(interaction, target, element, rect, interaction.modifierOffsets);
   },
 
-  setOffsets: function (interaction, interactable, element, rect, offsets) {
+  setModifierOffsets: function (interaction, interactable, element, rect, offsets) {
     for (let i = 0; i < modifiers.names.length; i++) {
       const modifierName = modifiers.names[i];
 
@@ -82,6 +82,13 @@ const modifiers = {
 
     return statuses;
   },
+
+  start: function ({ interaction }, signalName) {
+    modifiers.setOffsets(interaction, signalName === 'resume'? interaction.curCoords : interaction.startCoords);
+
+    modifiers.resetStatuses(interaction.modifierStatuses);
+    modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
+  },
 };
 
 Interaction.signals.on('new', function (interaction) {
@@ -90,12 +97,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.modifierStatuses = modifiers.resetStatuses({});
 });
 
-Interaction.signals.on('start', function ({ interaction }) {
-  modifiers.setStartOffsets(interaction);
-
-  modifiers.resetStatuses(interaction.modifierStatuses);
-  modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
-});
+Interaction.signals.on('start' , modifiers.start);
+Interaction.signals.on('resume', modifiers.start);
 
 Interaction.signals.on('before-action-move', function ({ interaction, preEnd, interactingBeforeMove }) {
   const modifierResult = modifiers.setAll(interaction, interaction.curCoords.page, interaction.modifierStatuses, preEnd);
@@ -107,12 +110,12 @@ Interaction.signals.on('before-action-move', function ({ interaction, preEnd, in
   }
 });
 
-Interaction.signals.on('action-end', function ({ interaction }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
   for (let i = 0; i < modifiers.names.length; i++) {
     // if the endOnly option is true for any modifier
     if (modifiers[modifiers.names[i]].shouldDo(interaction.target, interaction.prepared.name, true, true)) {
       // fire a move event at the modified coordinates
-      interaction.doMove({ preEnd: true });
+      interaction.doMove({ event, preEnd: true });
       break;
     }
   }

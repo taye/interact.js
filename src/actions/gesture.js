@@ -178,7 +178,6 @@ actions.names.push('gesture');
 utils.merge(scope.eventTypes, [
   'gesturestart',
   'gesturemove',
-  'gestureinertiastart',
   'gestureend',
 ]);
 actions.methodDict.gesture = 'gesturable';

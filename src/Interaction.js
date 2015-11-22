@@ -88,7 +88,10 @@ class Interaction {
     this.pointerIsDown = true;
 
     if (!this.interacting()) {
-      utils.setCoords(this.curCoords, this.pointers);
+      utils.setCoords(this.startCoords, this.pointers);
+
+      utils.copyCoords(this.curCoords , this.startCoords);
+      utils.copyCoords(this.prevCoords, this.startCoords);
     }
 
     signals.fire('down', {

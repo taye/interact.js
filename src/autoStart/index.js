@@ -32,10 +32,7 @@ Interaction.signals.on('move', function (arg) {
   // ignore movement while simulation is active
   if (!interaction.simulation) {
 
-    // if just starting an action, calculate the pointer speed now
     if (!interaction.interacting()) {
-      utils.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
-
       signals.fire('before-start-' + interaction.prepared.name, arg);
     }
 
@@ -103,7 +100,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))) {
+        && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
+        && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
         action,
@@ -115,7 +113,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
 
       const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
 
-      if (actionInfo.action) {
+      if (actionInfo.action
+          && !actionInfo.target.options[actionInfo.action.name].manualStart) {
         return actionInfo;
       }
     }
@@ -141,8 +140,6 @@ function prepare (interaction, { action, target, element }) {
     const cursor = action? actions[action.name].getCursor(action) : '';
     interaction.target._doc.documentElement.style.cursor = cursor;
   }
-
-  utils.setCoords(interaction.startCoords, interaction.pointers);
 
   signals.fire('prepared', { interaction: interaction });
 }

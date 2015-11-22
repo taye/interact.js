@@ -81,11 +81,6 @@ const snap = {
     status.realX = page.x;
     status.realY = page.y;
 
-    if (interaction.simulation) {
-      page.x -= interaction.simulation.resumeDx;
-      page.y -= interaction.simulation.resumeDy;
-    }
-
     const offsets = interaction.modifierOffsets.snap;
     let len = snapOptions.targets? snapOptions.targets.length : 0;
 
@@ -222,6 +217,12 @@ const snap = {
 
 interact.createSnapGrid = function (grid) {
   return function (x, y) {
+    const limits = grid.limits || {
+      left  : -Infinity,
+      right :  Infinity,
+      top   : -Infinity,
+      bottom:  Infinity,
+    };
     let offsetX = 0;
     let offsetY = 0;
 
@@ -233,8 +234,8 @@ interact.createSnapGrid = function (grid) {
     const gridx = Math.round((x - offsetX) / grid.x);
     const gridy = Math.round((y - offsetY) / grid.y);
 
-    const newX = gridx * grid.x + offsetX;
-    const newY = gridy * grid.y + offsetY;
+    const newX = Math.max(limits.left, Math.min(limits.right , gridx * grid.x + offsetX));
+    const newY = Math.max(limits.top , Math.min(limits.bottom, gridy * grid.y + offsetY));
 
     return {
       x: newX,

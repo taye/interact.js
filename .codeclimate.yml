@@ -12,7 +12,7 @@ ratings:
     - "src/**"
 
 exclude_paths:
- - "demo/*"
+ - "examples/*"
  - "docs/*"
  - "gulp/*"
  - "test/*"

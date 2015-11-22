@@ -34,7 +34,7 @@ Interaction.signals.on('start-drag', function ({ interaction, event }) {
   }
 });
 
-InteractEvent.signals.on('new-drag', function ({ interaction, iEvent, event }) {
+InteractEvent.signals.on('new', function ({ interaction, iEvent, event }) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
 
   const draggableElement = interaction.element;

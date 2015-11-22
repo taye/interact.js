@@ -9,7 +9,6 @@ Interaction.signals.on('new', function (interaction) {
     active     : false,
     smoothEnd  : false,
     allowResume: false,
-    resumed    : false,
     ending     : false,
 
     startEvent: null,
@@ -22,9 +21,6 @@ Interaction.signals.on('new', function (interaction) {
     vx0: 0, vys: 0,
     duration: 0,
 
-    resumeDx: 0,
-    resumeDy: 0,
-
     lambda_v0: 0,
     one_ve_v0: 0,
     i  : null,
@@ -34,7 +30,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.boundSmoothEndFrame = () => smoothEndFrame.apply(interaction);
 });
 
-Interaction.signals.on('down', function ({ interaction, eventTarget }) {
+Interaction.signals.on('down', function ({ interaction, event, pointer, eventTarget }) {
   const status = interaction.inertiaStatus;
 
   // Check if the down event hits the current inertia target
@@ -46,15 +42,35 @@ Interaction.signals.on('down', function ({ interaction, eventTarget }) {
 
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
-
-        // stop inertia so that the next move will be a normal one
+        // stop inertia
         animationFrame.cancel(status.i);
         status.active = false;
-        status.resumed = true;
         interaction.simulation = null;
 
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer);
+        utils.setCoords(interaction.curCoords, interaction.pointers);
+
+        // fire appropriate signals
+        const signalArg = { interaction };
+        Interaction.signals.fire('before-action-move', signalArg);
+        Interaction.signals.fire('resume'            , signalArg);
+
+        // fire a reume event
+        const resumeEvent = new InteractEvent(interaction,
+                                              event,
+                                              interaction.prepared.name,
+                                              'inertiaresume',
+                                              interaction.element);
+
+        interaction.target.fire(resumeEvent);
+        interaction.prevEvent = resumeEvent;
+        modifiers.resetStatuses(interaction.modifierStatuses);
+
+        utils.copyCoords(interaction.prevCoords, interaction.curCoords);
         break;
       }
+
       element = utils.parentElement(element);
     }
   }
@@ -92,7 +108,7 @@ Interaction.signals.on('up', function ({ interaction, event }) {
   if (inertiaPossible && !inertia) {
     modifiers.resetStatuses(statuses);
 
-    modifierResult = modifiers.setAll(interaction, page, statuses, true);
+    modifierResult = modifiers.setAll(interaction, page, statuses, true, true);
 
     if (modifierResult.shouldMove && modifierResult.locked) {
       smoothEnd = true;
@@ -150,35 +166,9 @@ Interaction.signals.on('stop-active', function ({ interaction }) {
   const status = interaction.inertiaStatus;
 
   if (status.active) {
-    status.resumeDx = status.resumeDy = 0;
     animationFrame.cancel(status.i);
     status.active = status.ending = false;
     interaction.simulation = null;
-  }
-});
-
-InteractEvent.signals.on('set-delta', function ({ iEvent, phase, interaction, action: actionName }) {
-  const status = interaction.inertiaStatus;
-
-  if (!status.active) { return; }
-
-  // copy properties from previousmove if starting inertia
-  if (phase === 'inertiastart') {
-    iEvent.dx = interaction.prevEvent.dx;
-    iEvent.dy = interaction.prevEvent.dy;
-  }
-
-  iEvent.detail = 'inertia';
-
-  if (status.resumed) {
-    const inertiaOptions = interaction.target.options[actionName].inertia;
-
-    if (inertiaOptions.zeroResumeDelta) {
-      status.resumeDx += iEvent.dx;
-      status.resumeDy += iEvent.dy;
-
-      iEvent.dx = iEvent.dy = 0;
-    }
   }
 });
 
