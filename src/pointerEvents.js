@@ -1,5 +1,4 @@
 const scope = require('./scope');
-const InteractEvent = require('./InteractEvent');
 const Interaction = require('./Interaction');
 const utils = require('./utils');
 const browser = require('./utils/browser');
@@ -9,6 +8,14 @@ const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
 
 function preventOriginalDefault () {
   this.originalEvent.preventDefault();
+}
+
+function stopImmediatePropagation () {
+  this.immediatePropagationStopped = this.propagationStopped = true;
+}
+
+function stopPropagation () {
+  this.propagationStopped = true;
 }
 
 function firePointers (interaction, pointer, event, eventTarget, targets, elements, eventType) {
@@ -31,8 +38,8 @@ function firePointers (interaction, pointer, event, eventTarget, targets, elemen
     }
 
     pointerEvent.preventDefault           = preventOriginalDefault;
-    pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
-    pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+    pointerEvent.stopPropagation          = stopPropagation;
+    pointerEvent.stopImmediatePropagation = stopImmediatePropagation;
     pointerEvent.interaction              = interaction;
 
     pointerEvent.timeStamp     = new Date().getTime();
