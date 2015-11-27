@@ -1,6 +1,5 @@
 const scope          = require('./scope');
 const utils          = require('./utils');
-const Interactable   = require('./Interactable');
 const events         = require('./utils/events');
 const browser        = require('./utils/browser');
 const finder         = require('./utils/interactionFinder');
@@ -129,9 +128,9 @@ class Interaction {
    * Use it with `interactable.<action>able({ manualStart: false })` to always
    * [start actions manually](https://github.com/taye/interact.js/issues/114)
    *
-   - action       (object)  The action to be performed - drag, resize, etc.
-   - interactable (Interactable) The Interactable to target
-   - element      (Element) The DOM Element to target
+   - action  (object)  The action to be performed - drag, resize, etc.
+   - target  (Interactable) The Interactable to target
+   - element (Element) The DOM Element to target
    = (object) interact
    **
    | interact(target)
@@ -150,7 +149,7 @@ class Interaction {
    |     }
    | });
    \*/
-  start (action, interactable, element) {
+  start (action, target, element) {
     if (this.interacting()
         || !this.pointerIsDown
         || this.pointerIds.length < (action.name === 'gesture'? 2 : 1)) {
@@ -169,7 +168,7 @@ class Interaction {
     }
 
     utils.copyAction(this.prepared, action);
-    this.target         = interactable;
+    this.target         = target;
     this.element        = element;
 
     signals.fire('start', { interaction: this });
@@ -528,15 +527,6 @@ function onDocSignal ({ doc }, signalName) {
 
 scope.signals.on('add-document'   , onDocSignal);
 scope.signals.on('remove-document', onDocSignal);
-
-// Stop related interactions when an Interactable is unset
-Interactable.signals.on('unset', function ( {interactable} ) {
-  for (const interaction of scope.interactions) {
-    if (interaction.target === interactable && interaction.interacting()) {
-      interaction.end();
-    }
-  }
-});
 
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.withinLimit = scope.withinInteractionLimit;

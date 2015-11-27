@@ -482,6 +482,13 @@ class Interactable {
 
     scope.interactables.splice(indexOf(scope.interactables, this), 1);
 
+    // Stop related interactions when an Interactable is unset
+    for (const interaction of scope.interactions || []) {
+      if (interaction.target === this && interaction.interacting()) {
+        interaction.end();
+      }
+    }
+
     return scope.interact;
   }
 }
