@@ -1,5 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})
-({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
  * In a (windowless) server environment this file exports a factory function
  * that takes the window to use.
@@ -21,7 +20,6 @@ if (typeof window === 'undefined') {
 },{"./src/index":15,"./src/utils/window":39}],2:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var hypot = require('./utils/hypot');
 var extend = require('./utils/extend');
 var getOriginXY = require('./utils/getOriginXY');
 var scope = require('./scope');
@@ -33,8 +31,6 @@ var InteractEvent = (function () {
 
     var target = interaction.target;
     var deltaSource = (target && target.options || scope.defaultOptions).deltaSource;
-    var sourceX = deltaSource + 'X';
-    var sourceY = deltaSource + 'Y';
     var origin = getOriginXY(target, element);
     var starting = phase === 'start';
     var ending = phase === 'end';
@@ -58,6 +54,7 @@ var InteractEvent = (function () {
     this.button = event.button;
     this.buttons = event.buttons;
     this.target = element;
+    this.currentTarget = element;
     this.relatedTarget = related || null;
     this.t0 = interaction.downTimes[interaction.downTimes.length - 1];
     this.type = action + (phase || '');
@@ -105,75 +102,53 @@ var InteractEvent = (function () {
     signals.fire('set-delta', signalArg);
     signals.fire(action, signalArg);
 
-    if (starting) {
-      this.timeStamp = interaction.downTimes[0];
-      this.dt = 0;
-      this.duration = 0;
-      this.speed = 0;
-      this.velocityX = 0;
-      this.velocityY = 0;
-    } else if (phase === 'inertiastart') {
-      this.timeStamp = interaction.prevEvent.timeStamp;
-      this.dt = interaction.prevEvent.dt;
-      this.duration = interaction.prevEvent.duration;
-      this.speed = interaction.prevEvent.speed;
-      this.velocityX = interaction.prevEvent.velocityX;
-      this.velocityY = interaction.prevEvent.velocityY;
-    } else {
-      this.timeStamp = new Date().getTime();
-      this.dt = this.timeStamp - interaction.prevEvent.timeStamp;
-      this.duration = this.timeStamp - interaction.downTimes[0];
+    this.timeStamp = coords.timeStamp;
+    this.dt = interaction.pointerDelta.timeStamp;
+    this.duration = this.timeStamp - interaction.downTimes[0];
 
-      if (event instanceof InteractEvent) {
-        var dx = this[sourceX] - interaction.prevEvent[sourceX];
-        var dy = this[sourceY] - interaction.prevEvent[sourceY];
-        var dt = this.dt / 1000;
+    // speed and velocity in pixels per second
+    this.speed = interaction.pointerDelta[deltaSource].speed;
+    this.velocityX = interaction.pointerDelta[deltaSource].vx;
+    this.velocityY = interaction.pointerDelta[deltaSource].vy;
 
-        this.speed = hypot(dx, dy) / dt;
-        this.velocityX = dx / dt;
-        this.velocityY = dy / dt;
-      }
-      // if normal move or end event, use previous user event coords
-      else {
-          // speed and velocity in pixels per second
-          this.speed = interaction.pointerDelta[deltaSource].speed;
-          this.velocityX = interaction.pointerDelta[deltaSource].vx;
-          this.velocityY = interaction.pointerDelta[deltaSource].vy;
-        }
-    }
-
-    if ((ending || phase === 'inertiastart') && interaction.prevEvent.speed > 600 && this.timeStamp - interaction.prevEvent.timeStamp < 150) {
-
-      var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
-      var overlap = 22.5;
-
-      if (angle < 0) {
-        angle += 360;
-      }
-
-      var left = 135 - overlap <= angle && angle < 225 + overlap;
-      var up = 225 - overlap <= angle && angle < 315 + overlap;
-
-      var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
-      var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
-
-      this.swipe = {
-        up: up,
-        down: down,
-        left: left,
-        right: right,
-        angle: angle,
-        speed: interaction.prevEvent.speed,
-        velocity: {
-          x: interaction.prevEvent.velocityX,
-          y: interaction.prevEvent.velocityY
-        }
-      };
-    }
+    this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null;
 
     signals.fire('new', signalArg);
-    signals.fire('new-' + action, signalArg);
   }
+
+  InteractEvent.prototype.getSwipe = function getSwipe() {
+    var interaction = this.interaction;
+
+    if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
+      return null;
+    }
+
+    var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
+    var overlap = 22.5;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    var left = 135 - overlap <= angle && angle < 225 + overlap;
+    var up = 225 - overlap <= angle && angle < 315 + overlap;
+
+    var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
+    var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
+
+    return {
+      up: up,
+      down: down,
+      left: left,
+      right: right,
+      angle: angle,
+      speed: interaction.prevEvent.speed,
+      velocity: {
+        x: interaction.prevEvent.velocityX,
+        y: interaction.prevEvent.velocityY
+      }
+    };
+  };
 
   InteractEvent.prototype.preventDefault = function preventDefault() {};
 
@@ -193,38 +168,37 @@ signals.on('set-delta', function (_ref) {
   var interaction = _ref.interaction;
   var ending = _ref.ending;
   var starting = _ref.starting;
-  var page = _ref.page;
-  var client = _ref.client;
   var deltaSource = _ref.deltaSource;
 
-  // end event dx, dy is difference between start and end points
-  if (ending) {
-    if (deltaSource === 'client') {
-      iEvent.dx = client.x - interaction.startCoords.client.x;
-      iEvent.dy = client.y - interaction.startCoords.client.y;
-    } else {
-      iEvent.dx = page.x - interaction.startCoords.page.x;
-      iEvent.dy = page.y - interaction.startCoords.page.y;
-    }
-  } else if (starting) {
+  if (starting) {
     iEvent.dx = 0;
     iEvent.dy = 0;
-  } else {
-    if (deltaSource === 'client') {
-      iEvent.dx = client.x - interaction.prevEvent.clientX;
-      iEvent.dy = client.y - interaction.prevEvent.clientY;
-    } else {
-      iEvent.dx = page.x - interaction.prevEvent.pageX;
-      iEvent.dy = page.y - interaction.prevEvent.pageY;
-    }
   }
+  // end event dx, dy is difference between start and end points
+  else if (ending) {
+      if (deltaSource === 'client') {
+        iEvent.dx = iEvent.clientX - interaction.startCoords.client.x;
+        iEvent.dy = iEvent.clientY - interaction.startCoords.client.y;
+      } else {
+        iEvent.dx = iEvent.pageX - interaction.startCoords.page.x;
+        iEvent.dy = iEvent.pageY - interaction.startCoords.page.y;
+      }
+    } else {
+      if (deltaSource === 'client') {
+        iEvent.dx = iEvent.clientX - interaction.prevEvent.clientX;
+        iEvent.dy = iEvent.clientY - interaction.prevEvent.clientY;
+      } else {
+        iEvent.dx = iEvent.pageX - interaction.prevEvent.pageX;
+        iEvent.dy = iEvent.pageY - interaction.prevEvent.pageY;
+      }
+    }
 });
 
 InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./scope":23,"./utils/Signals":24,"./utils/extend":30,"./utils/getOriginXY":31,"./utils/hypot":32}],3:[function(require,module,exports){
+},{"./scope":23,"./utils/Signals":24,"./utils/extend":30,"./utils/getOriginXY":31}],3:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var isType = require('./utils/isType');
@@ -848,7 +822,10 @@ var Interaction = (function () {
     this.pointerIsDown = true;
 
     if (!this.interacting()) {
-      utils.setCoords(this.curCoords, this.pointers);
+      utils.setCoords(this.startCoords, this.pointers);
+
+      utils.copyCoords(this.curCoords, this.startCoords);
+      utils.copyCoords(this.prevCoords, this.startCoords);
     }
 
     signals.fire('down', {
@@ -1522,7 +1499,7 @@ Interactable.prototype.draggable = function (options) {
 
 actions.drag = drag;
 actions.names.push('drag');
-utils.merge(scope.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'dragend']);
+utils.merge(scope.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
 actions.methodDict.drag = 'draggable';
 
 defaultOptions.drag = drag.defaults;
@@ -1569,7 +1546,7 @@ Interaction.signals.on('start-drag', function (_ref2) {
   }
 });
 
-InteractEvent.signals.on('new-drag', function (_ref3) {
+InteractEvent.signals.on('new', function (_ref3) {
   var interaction = _ref3.interaction;
   var iEvent = _ref3.iEvent;
   var event = _ref3.event;
@@ -2191,7 +2168,7 @@ Interaction.signals.on('new', function (interaction) {
 // angle of the previous gesture event
 actions.gesture = gesture;
 actions.names.push('gesture');
-utils.merge(scope.eventTypes, ['gesturestart', 'gesturemove', 'gestureinertiastart', 'gestureend']);
+utils.merge(scope.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
 actions.methodDict.gesture = 'gesturable';
 
 defaultOptions.gesture = gesture.defaults;
@@ -2669,7 +2646,7 @@ InteractEvent.signals.on('resize', function (_ref4) {
 
 actions.resize = resize;
 actions.names.push('resize');
-utils.merge(scope.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeend']);
+utils.merge(scope.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
 actions.methodDict.resize = 'resizable';
 
 defaultOptions.resize = resize.defaults;
@@ -3024,10 +3001,7 @@ Interaction.signals.on('move', function (arg) {
   // ignore movement while simulation is active
   if (!interaction.simulation) {
 
-    // if just starting an action, calculate the pointer speed now
     if (!interaction.interacting()) {
-      utils.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
-
       signals.fire('before-start-' + interaction.prepared.name, arg);
     }
 
@@ -3087,7 +3061,7 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
 
     var elementInteractable = scope.interactables.get(element);
 
-    if (elementInteractable && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))) {
+    if (elementInteractable && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable)) && !elementInteractable.options[action.name].manualStart) {
       return {
         element: element,
         action: action,
@@ -3098,7 +3072,7 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
 
       var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
 
-      if (actionInfo.action) {
+      if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
         return actionInfo;
       }
     }
@@ -3128,8 +3102,6 @@ function prepare(interaction, _ref4) {
     var cursor = action ? actions[action.name].getCursor(action) : '';
     interaction.target._doc.documentElement.style.cursor = cursor;
   }
-
-  utils.setCoords(interaction.startCoords, interaction.pointers);
 
   signals.fire('prepared', { interaction: interaction });
 }
@@ -3345,7 +3317,6 @@ module.exports = {
       minSpeed: 100, // target speed must be above this for inertia to start
       endSpeed: 10, // the speed at which inertia is slow enough to stop
       allowResume: true, // allow resuming an action in inertia phase
-      zeroResumeDelta: true, // if an action is resumed after launch, set dx/dy to 0
       smoothEndDuration: 300 }
   },
 
@@ -3401,7 +3372,6 @@ Interaction.signals.on('new', function (interaction) {
     active: false,
     smoothEnd: false,
     allowResume: false,
-    resumed: false,
     ending: false,
 
     startEvent: null,
@@ -3413,9 +3383,6 @@ Interaction.signals.on('new', function (interaction) {
     t0: 0,
     vx0: 0, vys: 0,
     duration: 0,
-
-    resumeDx: 0,
-    resumeDy: 0,
 
     lambda_v0: 0,
     one_ve_v0: 0,
@@ -3432,6 +3399,8 @@ Interaction.signals.on('new', function (interaction) {
 
 Interaction.signals.on('down', function (_ref) {
   var interaction = _ref.interaction;
+  var event = _ref.event;
+  var pointer = _ref.pointer;
   var eventTarget = _ref.eventTarget;
 
   var status = interaction.inertiaStatus;
@@ -3445,15 +3414,31 @@ Interaction.signals.on('down', function (_ref) {
 
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
-
-        // stop inertia so that the next move will be a normal one
+        // stop inertia
         animationFrame.cancel(status.i);
         status.active = false;
-        status.resumed = true;
         interaction.simulation = null;
 
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer);
+        utils.setCoords(interaction.curCoords, interaction.pointers);
+
+        // fire appropriate signals
+        var signalArg = { interaction: interaction };
+        Interaction.signals.fire('before-action-move', signalArg);
+        Interaction.signals.fire('resume', signalArg);
+
+        // fire a reume event
+        var resumeEvent = new InteractEvent(interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
+
+        interaction.target.fire(resumeEvent);
+        interaction.prevEvent = resumeEvent;
+        modifiers.resetStatuses(interaction.modifierStatuses);
+
+        utils.copyCoords(interaction.prevCoords, interaction.curCoords);
         break;
       }
+
       element = utils.parentElement(element);
     }
   }
@@ -3491,7 +3476,7 @@ Interaction.signals.on('up', function (_ref2) {
   if (inertiaPossible && !inertia) {
     modifiers.resetStatuses(statuses);
 
-    modifierResult = modifiers.setAll(interaction, page, statuses, true);
+    modifierResult = modifiers.setAll(interaction, page, statuses, true, true);
 
     if (modifierResult.shouldMove && modifierResult.locked) {
       smoothEnd = true;
@@ -3551,42 +3536,9 @@ Interaction.signals.on('stop-active', function (_ref3) {
   var status = interaction.inertiaStatus;
 
   if (status.active) {
-    status.resumeDx = status.resumeDy = 0;
     animationFrame.cancel(status.i);
     status.active = status.ending = false;
     interaction.simulation = null;
-  }
-});
-
-InteractEvent.signals.on('set-delta', function (_ref4) {
-  var iEvent = _ref4.iEvent;
-  var phase = _ref4.phase;
-  var interaction = _ref4.interaction;
-  var actionName = _ref4.action;
-
-  var status = interaction.inertiaStatus;
-
-  if (!status.active) {
-    return;
-  }
-
-  // copy properties from previousmove if starting inertia
-  if (phase === 'inertiastart') {
-    iEvent.dx = interaction.prevEvent.dx;
-    iEvent.dy = interaction.prevEvent.dy;
-  }
-
-  iEvent.detail = 'inertia';
-
-  if (status.resumed) {
-    var inertiaOptions = interaction.target.options[actionName].inertia;
-
-    if (inertiaOptions.zeroResumeDelta) {
-      status.resumeDx += iEvent.dx;
-      status.resumeDy += iEvent.dy;
-
-      iEvent.dx = iEvent.dy = 0;
-    }
   }
 });
 
@@ -4186,18 +4138,18 @@ var extend = require('../utils/extend');
 var modifiers = {
   names: [],
 
-  setStartOffsets: function (interaction) {
+  setOffsets: function (interaction, coords) {
     var target = interaction.target;
     var element = interaction.element;
 
     var rect = target.getRect(element);
 
     if (rect) {
-      interaction.startOffset.left = interaction.startCoords.page.x - rect.left;
-      interaction.startOffset.top = interaction.startCoords.page.y - rect.top;
+      interaction.startOffset.left = coords.page.x - rect.left;
+      interaction.startOffset.top = coords.page.y - rect.top;
 
-      interaction.startOffset.right = rect.right - interaction.startCoords.page.x;
-      interaction.startOffset.bottom = rect.bottom - interaction.startCoords.page.y;
+      interaction.startOffset.right = rect.right - coords.page.x;
+      interaction.startOffset.bottom = rect.bottom - coords.page.y;
 
       if (!('width' in rect)) {
         rect.width = rect.right - rect.left;
@@ -4209,10 +4161,10 @@ var modifiers = {
       interaction.startOffset.left = interaction.startOffset.top = interaction.startOffset.right = interaction.startOffset.bottom = 0;
     }
 
-    modifiers.setOffsets(interaction, target, element, rect, interaction.modifierOffsets);
+    modifiers.setModifierOffsets(interaction, target, element, rect, interaction.modifierOffsets);
   },
 
-  setOffsets: function (interaction, interactable, element, rect, offsets) {
+  setModifierOffsets: function (interaction, interactable, element, rect, offsets) {
     for (var i = 0; i < modifiers.names.length; i++) {
       var modifierName = modifiers.names[i];
 
@@ -4292,6 +4244,15 @@ var modifiers = {
     }
 
     return statuses;
+  },
+
+  start: function (_ref3, signalName) {
+    var interaction = _ref3.interaction;
+
+    modifiers.setOffsets(interaction, signalName === 'resume' ? interaction.curCoords : interaction.startCoords);
+
+    modifiers.resetStatuses(interaction.modifierStatuses);
+    modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
   }
 };
 
@@ -4301,14 +4262,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.modifierStatuses = modifiers.resetStatuses({});
 });
 
-Interaction.signals.on('start', function (_ref3) {
-  var interaction = _ref3.interaction;
-
-  modifiers.setStartOffsets(interaction);
-
-  modifiers.resetStatuses(interaction.modifierStatuses);
-  modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
-});
+Interaction.signals.on('start', modifiers.start);
+Interaction.signals.on('resume', modifiers.start);
 
 Interaction.signals.on('before-action-move', function (_ref4) {
   var interaction = _ref4.interaction;
@@ -4326,12 +4281,13 @@ Interaction.signals.on('before-action-move', function (_ref4) {
 
 Interaction.signals.on('action-end', function (_ref5) {
   var interaction = _ref5.interaction;
+  var event = _ref5.event;
 
   for (var i = 0; i < modifiers.names.length; i++) {
     // if the endOnly option is true for any modifier
     if (modifiers[modifiers.names[i]].shouldDo(interaction.target, interaction.prepared.name, true, true)) {
       // fire a move event at the modified coordinates
-      interaction.doMove({ preEnd: true });
+      interaction.doMove({ event: event, preEnd: true });
       break;
     }
   }
@@ -4403,11 +4359,6 @@ var restrict = {
     }
 
     var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, pageCoords);
-
-    if (interaction.simulation) {
-      page.x -= interaction.simulation.resumeDx;
-      page.y -= interaction.simulation.resumeDy;
-    }
 
     status.dx = 0;
     status.dy = 0;
@@ -4599,11 +4550,6 @@ var snap = {
     status.realX = page.x;
     status.realY = page.y;
 
-    if (interaction.simulation) {
-      page.x -= interaction.simulation.resumeDx;
-      page.y -= interaction.simulation.resumeDy;
-    }
-
     var offsets = interaction.modifierOffsets.snap;
     var len = snapOptions.targets ? snapOptions.targets.length : 0;
 
@@ -4766,6 +4712,12 @@ var snap = {
 
 interact.createSnapGrid = function (grid) {
   return function (x, y) {
+    var limits = grid.limits || {
+      left: -Infinity,
+      right: Infinity,
+      top: -Infinity,
+      bottom: Infinity
+    };
     var offsetX = 0;
     var offsetY = 0;
 
@@ -4777,8 +4729,8 @@ interact.createSnapGrid = function (grid) {
     var gridx = Math.round((x - offsetX) / grid.x);
     var gridy = Math.round((y - offsetY) / grid.y);
 
-    var newX = gridx * grid.x + offsetX;
-    var newY = gridy * grid.y + offsetY;
+    var newX = Math.max(limits.left, Math.min(limits.right, gridx * grid.x + offsetX));
+    var newY = Math.max(limits.top, Math.min(limits.bottom, gridy * grid.y + offsetY));
 
     return {
       x: newX,
@@ -6218,13 +6170,11 @@ var pointerUtils = {
   },
 
   setCoordDeltas: function (targetObj, prev, cur) {
-    var now = new Date().getTime();
-
     targetObj.page.x = cur.page.x - prev.page.x;
     targetObj.page.y = cur.page.y - prev.page.y;
     targetObj.client.x = cur.client.x - prev.client.x;
     targetObj.client.y = cur.client.y - prev.client.y;
-    targetObj.timeStamp = now - prev.timeStamp;
+    targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
 
     // set pointer velocity
     var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
@@ -6286,7 +6236,7 @@ var pointerUtils = {
     return isType.isNumber(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
   },
 
-  setCoords: function (targetObj, pointers) {
+  setCoords: function (targetObj, pointers, timeStamp) {
     var pointer = pointers.length > 1 ? pointerUtils.pointerAverage(pointers) : pointers[0];
 
     var tmpXY = {};
@@ -6299,7 +6249,7 @@ var pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = new Date().getTime();
+    targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp : new Date().getTime();
   },
 
   prefixedPropREs: {
