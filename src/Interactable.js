@@ -493,7 +493,7 @@ class Interactable {
     // Stop related interactions when an Interactable is unset
     for (const interaction of scope.interactions || []) {
       if (interaction.target === this && interaction.interacting()) {
-        interaction.end();
+        interaction.stop();
       }
     }
 
