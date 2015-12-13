@@ -5,8 +5,11 @@ const actions = require('./actions');
 const scope   = require('./scope');
 const signals = require('./utils/Signals').new();
 
-const { getElementRect }    = require('./utils/domUtils');
-const { indexOf, contains } = require('./utils/arr');
+const { getElementRect, nodeContains } = require('./utils/domUtils');
+const { indexOf, contains }            = require('./utils/arr');
+const { wheelEvent }                   = require('./utils/browser');
+
+scope.globalEvents = {};
 
 // all set interactables
 scope.interactables = [];
@@ -235,6 +238,11 @@ class Interactable {
     return this._context;
   }
 
+  inContext (element) {
+    return (this._context === element.ownerDocument
+            || nodeContains(this._context, element));
+  }
+
   /*\
    * Interactable.fire
    [ method ]
@@ -311,7 +319,7 @@ class Interactable {
     }
 
     if (eventType === 'wheel') {
-      eventType = scope.wheelEvent;
+      eventType = wheelEvent;
     }
 
     // convert to boolean
@@ -374,7 +382,7 @@ class Interactable {
     useCapture = useCapture? true: false;
 
     if (eventType === 'wheel') {
-      eventType = scope.wheelEvent;
+      eventType = wheelEvent;
     }
 
     // if it is an action event type
@@ -492,6 +500,41 @@ class Interactable {
     return scope.interact;
   }
 }
+
+scope.interactables.indexOfElement = function indexOfElement (target, context) {
+  context = context || scope.document;
+
+  for (let i = 0; i < this.length; i++) {
+    const interactable = this[i];
+
+    if (interactable.target === target
+        && (!isType.isString(target) || (interactable._context === context))) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+scope.interactables.get = function interactableGet (element, options) {
+  return this[this.indexOfElement(element, options && options.context)];
+};
+
+scope.interactables.forEachSelector = function (callback) {
+  for (let i = 0; i < this.length; i++) {
+    const interactable = this[i];
+
+    // skip non CSS selector targets
+    if (!isType.isString(interactable.target)) {
+      continue;
+    }
+
+    const ret = callback(interactable, interactable.target, interactable._context, i, this);
+
+    if (ret !== undefined) {
+      return ret;
+    }
+  }
+};
 
 Interactable.signals = signals;
 

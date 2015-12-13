@@ -1,7 +1,7 @@
-const scope = require('./scope');
+const scope       = require('./scope');
 const Interaction = require('./Interaction');
-const utils = require('./utils');
-const browser = require('./utils/browser');
+const utils       = require('./utils');
+const browser     = require('./utils/browser');
 
 const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
 const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
@@ -115,9 +115,7 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
 
     if (interactable._iEvents[eventType]
         && utils.isElement(element)
-        && scope.inContext(interactable, element)
-        && !scope.testIgnore(interactable, element, eventTarget)
-        && scope.testAllow(interactable, element, eventTarget)
+        && interactable.inContext(element)
         && utils.matchesSelector(element, selector, els)) {
 
       targets.push(interactable);

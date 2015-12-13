@@ -1,9 +1,9 @@
-const actions = require('./index');
-const scope = require('../scope');
-const utils = require('../utils');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const scope          = require('../scope');
+const utils          = require('../utils');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drag = {

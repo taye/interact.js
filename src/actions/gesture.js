@@ -1,9 +1,9 @@
-const actions = require('./index');
-const utils = require('../utils');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
-const scope = require('../scope');
+const actions        = require('./index');
+const utils          = require('../utils');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
+const scope          = require('../scope');
 const defaultOptions = require('../defaultOptions');
 
 const gesture = {

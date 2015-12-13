@@ -1,9 +1,10 @@
-const actions = require('./index');
-const utils = require('../utils');
-const scope = require('../scope');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const utils          = require('../utils');
+const scope          = require('../scope');
+const interact       = require('../interact');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drop = {
@@ -13,6 +14,8 @@ const drop = {
     overlap: 'pointer',
   },
 };
+
+let dynamicDrop = false;
 
 Interaction.signals.on('start-drag', function ({ interaction, event }) {
   // reset active dropzones
@@ -144,7 +147,7 @@ function getDrop (dragEvent, event, dragElement) {
   const interaction = dragEvent.interaction;
   const validDrops = [];
 
-  if (scope.dynamicDrop) {
+  if (dynamicDrop) {
     setActiveDrops(interaction, dragElement);
   }
 
@@ -422,6 +425,30 @@ Interaction.signals.on('stop', function ({ interaction }) {
   interaction.dropTarget = interaction.dropElement =
     interaction.prevDropTarget = interaction.prevDropElement = null;
 });
+
+/*\
+ * interact.dynamicDrop
+ [ method ]
+ *
+ * Returns or sets whether the dimensions of dropzone elements are
+ * calculated on every dragmove or only on dragstart for the default
+ * dropChecker
+ *
+ - newValue (boolean) #optional True to check on each move. False to check only before start
+ = (boolean | interact) The current setting or interact
+\*/
+interact.dynamicDrop = function (newValue) {
+  if (utils.isBool(newValue)) {
+    //if (dragging && dynamicDrop !== newValue && !newValue) {
+      //calcRects(dropzones);
+    //}
+
+    dynamicDrop = newValue;
+
+    return interact;
+  }
+  return dynamicDrop;
+};
 
 utils.merge(scope.eventTypes, [
   'dragenter',

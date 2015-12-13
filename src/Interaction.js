@@ -1,9 +1,9 @@
-const scope          = require('./scope');
-const utils          = require('./utils');
-const events         = require('./utils/events');
-const browser        = require('./utils/browser');
-const finder         = require('./utils/interactionFinder');
-const signals        = require('./utils/Signals').new();
+const scope   = require('./scope');
+const utils   = require('./utils');
+const events  = require('./utils/events');
+const browser = require('./utils/browser');
+const finder  = require('./utils/interactionFinder');
+const signals = require('./utils/Signals').new();
 
 const listeners   = {};
 const methodNames = [
@@ -16,6 +16,8 @@ let prevTouchTime = 0;
 
 // all active and idle interactions
 scope.interactions = [];
+
+scope.pointerMoveTolerance = 1;
 
 class Interaction {
   constructor () {
@@ -473,6 +475,12 @@ function doOnInteractions (method) {
   });
 }
 
+function endAll (event) {
+  for (let i = 0; i < scope.interactions.length; i++) {
+    scope.interactions[i].end(event);
+  }
+}
+
 // prevent native HTML5 drag on interact.js target elements
 function preventNativeDrag (event) {
   for (const interaction of scope.interactions) {
@@ -507,7 +515,7 @@ else {
   docEvents.touchcancel = listeners.pointerUp;
 }
 
-docEvents.blur = scope.endAllInteractions;
+docEvents.blur = endAll;
 docEvents.dragstart = preventNativeDrag;
 
 function onDocSignal ({ doc }, signalName) {
@@ -529,8 +537,10 @@ scope.signals.on('add-document'   , onDocSignal);
 scope.signals.on('remove-document', onDocSignal);
 
 Interaction.doOnInteractions = doOnInteractions;
-Interaction.withinLimit = scope.withinInteractionLimit;
 Interaction.validateAction = validateAction;
+Interaction.endAll = endAll;
 Interaction.signals = signals;
+
+scope.endAllInteractions = endAll;
 
 module.exports = Interaction;

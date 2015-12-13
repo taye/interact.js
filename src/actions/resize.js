@@ -1,11 +1,14 @@
-const actions = require('./index');
-const utils = require('../utils');
-const browser = require('../utils/browser');
-const scope = require('../scope');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const utils          = require('../utils');
+const browser        = require('../utils/browser');
+const scope          = require('../scope');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
+
+// Less Precision with touch input
+const defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
 const resize = {
   defaults: {
@@ -58,7 +61,7 @@ const resize = {
                                               interaction._eventTarget,
                                               element,
                                               rect,
-                                              resizeOptions.margin || scope.margin);
+                                              resizeOptions.margin || defaultMargin);
         }
 
         resizeEdges.left = resizeEdges.left && !resizeEdges.right;
@@ -72,8 +75,8 @@ const resize = {
         }
       }
       else {
-        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - scope.margin);
-        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - scope.margin);
+        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - defaultMargin);
+        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - defaultMargin);
 
         if (right || bottom) {
           return {

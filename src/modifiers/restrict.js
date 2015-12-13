@@ -1,5 +1,5 @@
-const modifiers = require('./index');
-const utils = require('../utils');
+const modifiers      = require('./index');
+const utils          = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
 const restrict = {

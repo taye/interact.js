@@ -1,5 +1,5 @@
-const scope = require('../scope');
-const utils = require('./index');
+const scope   = require('../scope');
+const utils   = require('./index');
 const browser = require('./browser');
 
 const finder = {

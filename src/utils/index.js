@@ -1,6 +1,6 @@
-const utils = module.exports;
+const utils  = module.exports;
 const extend = require('./extend');
-const win = require('./window');
+const win    = require('./window');
 
 utils.blank = function () {};
 

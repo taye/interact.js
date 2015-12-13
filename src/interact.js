@@ -12,93 +12,6 @@ const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
 
-scope.dynamicDrop = false;
-
-// Less Precision with touch input
-scope.margin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
-
-scope.pointerMoveTolerance = 1;
-
-// Allow this many interactions to happen simultaneously
-scope.maxInteractions = Infinity;
-
-// because Webkit and Opera still use 'mousewheel' event type
-scope.wheelEvent = 'onmousewheel' in scope.document? 'mousewheel': 'wheel';
-
-scope.globalEvents = {};
-
-scope.inContext = function (interactable, element) {
-  return (interactable._context === element.ownerDocument
-          || utils.nodeContains(interactable._context, element));
-};
-
-scope.testIgnore = function (interactable, interactableElement, element) {
-  const ignoreFrom = interactable.options.ignoreFrom;
-
-  if (!ignoreFrom || !utils.isElement(element)) { return false; }
-
-  if (utils.isString(ignoreFrom)) {
-    return utils.matchesUpTo(element, ignoreFrom, interactableElement);
-  }
-  else if (utils.isElement(ignoreFrom)) {
-    return utils.nodeContains(ignoreFrom, element);
-  }
-
-  return false;
-};
-
-scope.testAllow = function (interactable, interactableElement, element) {
-  const allowFrom = interactable.options.allowFrom;
-
-  if (!allowFrom) { return true; }
-
-  if (!utils.isElement(element)) { return false; }
-
-  if (utils.isString(allowFrom)) {
-    return utils.matchesUpTo(element, allowFrom, interactableElement);
-  }
-  else if (utils.isElement(allowFrom)) {
-    return utils.nodeContains(allowFrom, element);
-  }
-
-  return false;
-};
-
-scope.interactables.indexOfElement = function indexOfElement (target, context) {
-  context = context || scope.document;
-
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
-    if (interactable.target === target
-        && (!utils.isString(target) || (interactable._context === context))) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-scope.interactables.get = function interactableGet (element, options) {
-  return this[this.indexOfElement(element, options && options.context)];
-};
-
-scope.interactables.forEachSelector = function (callback) {
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
-    // skip non CSS selector targets
-    if (!utils.isString(interactable.target)) {
-      continue;
-    }
-
-    const ret = callback(interactable, interactable.target, interactable._context, i, this);
-
-    if (ret !== undefined) {
-      return ret;
-    }
-  }
-};
-
 /*\
  * interact
  [ method ]
@@ -298,30 +211,6 @@ interact.stop = function (event) {
 };
 
 /*\
- * interact.dynamicDrop
- [ method ]
- *
- * Returns or sets whether the dimensions of dropzone elements are
- * calculated on every dragmove or only on dragstart for the default
- * dropChecker
- *
- - newValue (boolean) #optional True to check on each move. False to check only before start
- = (boolean | interact) The current setting or interact
-\*/
-interact.dynamicDrop = function (newValue) {
-  if (utils.isBool(newValue)) {
-    //if (dragging && dynamicDrop !== newValue && !newValue) {
-      //calcRects(dropzones);
-    //}
-
-    scope.dynamicDrop = newValue;
-
-    return interact;
-  }
-  return scope.dynamicDrop;
-};
-
-/*\
  * interact.pointerMoveTolerance
  [ method ]
  * Returns or sets the distance the pointer must be moved before an action
@@ -338,28 +227,6 @@ interact.pointerMoveTolerance = function (newValue) {
   }
 
   return scope.pointerMoveTolerance;
-};
-
-/*\
- * interact.maxInteractions
- [ method ]
- **
- * Returns or sets the maximum number of concurrent interactions allowed.
- * By default only 1 interaction is allowed at a time (for backwards
- * compatibility). To allow multiple interactions on the same Interactables
- * and elements, you need to enable it in the draggable, resizable and
- * gesturable `'max'` and `'maxPerElement'` options.
- **
- - newValue (number) #optional Any number. newValue <= 0 means no interactions.
-\*/
-interact.maxInteractions = function (newValue) {
-  if (utils.isNumber(newValue)) {
-    scope.maxInteractions = newValue;
-
-    return this;
-  }
-
-  return scope.maxInteractions;
 };
 
 interact.addDocument    = scope.addDocument;
