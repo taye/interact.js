@@ -324,7 +324,7 @@ Interactable.prototype.allowFrom = function (newValue) {
   return this.options.allowFrom;
 };
 
-Interaction.signals.on('stop-active', function ({ interaction }) {
+Interaction.signals.on('stop', function ({ interaction }) {
   const target = interaction.target;
 
   if (target.options.styleCursor) {
