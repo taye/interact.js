@@ -16,13 +16,11 @@ const domUtils = {
     return false;
   },
 
-  closest: function (child, selector) {
-    let parent = domUtils.parentElement(child);
+  closest: function (element, selector) {
+    while (isType.isElement(element)) {
+      if (domUtils.matchesSelector(element, selector)) { return element; }
 
-    while (isType.isElement(parent)) {
-      if (domUtils.matchesSelector(parent, selector)) { return parent; }
-
-      parent = domUtils.parentElement(parent);
+      element = domUtils.parentElement(element);
     }
 
     return null;
