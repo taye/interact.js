@@ -327,7 +327,7 @@ Interactable.prototype.allowFrom = function (newValue) {
 Interaction.signals.on('stop', function ({ interaction }) {
   const target = interaction.target;
 
-  if (target.options.styleCursor) {
+  if (target && target.options.styleCursor) {
     target._doc.documentElement.style.cursor = '';
   }
 });
