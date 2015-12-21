@@ -221,7 +221,7 @@ const pointerUtils = {
     const touches = pointerUtils.getTouchPair(event);
     const dx = touches[1][sourceX] - touches[0][sourceX];
     const dy = touches[1][sourceY] - touches[0][sourceY];
-    let angle = 180 * Math.atan2(dy , dx) / Math.PI;
+    const angle = 180 * Math.atan2(dy , dx) / Math.PI;
 
     return  angle;
   },
