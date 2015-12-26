@@ -12,10 +12,7 @@ const defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20:
 
 const resize = {
   defaults: {
-    enabled      : false,
-    manualStart  : false,
-    max          : Infinity,
-    maxPerElement: 1,
+    enabled   : false,
 
     snap      : null,
     restrict  : null,

@@ -15,6 +15,16 @@ const autoStart = {
   withinInteractionLimit,
   // Allow this many interactions to happen simultaneously
   maxInteractions: Infinity,
+  perActionDefaults: {
+    manualStart: false,
+    max: 0,
+    maxPerElement: 1,
+  },
+  setActionDefaults: function (actionName) {
+    const action = actions[actionName];
+
+    utils.extend(action.defaults, autoStart.perActionDefaults);
+  },
 };
 
 function testIgnore (interactable, interactableElement, element) {
@@ -416,6 +426,7 @@ defaultOptions.base.actionChecker = null;
 defaultOptions.base.ignoreFrom = null;
 defaultOptions.base.allowFrom = null;
 defaultOptions.base.styleCursor = true;
-defaultOptions.perAction.manualStart = false;
+
+utils.extend(defaultOptions.perAction, autoStart.perActionDefaults);
 
 module.exports = autoStart;

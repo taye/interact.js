@@ -8,11 +8,7 @@ const defaultOptions = require('../defaultOptions');
 
 const gesture = {
   defaults: {
-    manualStart  : false,
-    enabled      : false,
-    max          : Infinity,
-    maxPerElement: 1,
-
+    enabled : false,
     restrict: null,
   },
 

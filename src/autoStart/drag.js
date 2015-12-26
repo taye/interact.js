@@ -98,4 +98,3 @@ function checkStartAxis (startAxis, interactable) {
 
   return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis);
 }
-

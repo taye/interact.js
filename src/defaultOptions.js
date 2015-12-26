@@ -8,9 +8,6 @@ module.exports = {
   },
 
   perAction: {
-    max: Infinity,
-    maxPerElement: 1,
-
     inertia: {
       enabled          : false,
       resistance       : 10,    // the lambda in exponential decay

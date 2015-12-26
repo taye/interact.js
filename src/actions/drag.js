@@ -8,18 +8,15 @@ const defaultOptions = require('../defaultOptions');
 
 const drag = {
   defaults: {
-    enabled      : false,
-    manualStart  : true,
-    max          : Infinity,
-    maxPerElement: 1,
+    enabled   : false,
 
     snap      : null,
     restrict  : null,
     inertia   : null,
     autoScroll: null,
 
-    startAxis: 'xy',
-    lockAxis : 'xy',
+    startAxis : 'xy',
+    lockAxis  : 'xy',
   },
 
   checker: function (pointer, event, interactable) {
