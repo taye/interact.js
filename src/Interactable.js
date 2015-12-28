@@ -1,15 +1,14 @@
-const isType  = require('./utils/isType');
-const events  = require('./utils/events');
-const extend  = require('./utils/extend');
-const actions = require('./actions');
-const scope   = require('./scope');
-const signals = require('./utils/Signals').new();
+const isType    = require('./utils/isType');
+const events    = require('./utils/events');
+const extend    = require('./utils/extend');
+const actions   = require('./actions');
+const scope     = require('./scope');
+const Eventable = require('./Eventable');
+const signals   = require('./utils/Signals').new();
 
 const { getElementRect, nodeContains } = require('./utils/domUtils');
 const { indexOf, contains }            = require('./utils/arr');
 const { wheelEvent }                   = require('./utils/browser');
-
-scope.globalEvents = {};
 
 // all set interactables
 scope.interactables = [];
@@ -24,7 +23,7 @@ class Interactable {
   constructor (target, options) {
     this.target   = target;
     this._context = scope.document;
-    this._iEvents = this._iEvents || {};
+    this._iEvents = new Eventable();
 
     let _window;
 
@@ -65,10 +64,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (isType.isFunction(phases.onstart)       ) { this[onAction + 'start'        ] = phases.onstart         ; }
-    if (isType.isFunction(phases.onmove)        ) { this[onAction + 'move'         ] = phases.onmove          ; }
-    if (isType.isFunction(phases.onend)         ) { this[onAction + 'end'          ] = phases.onend           ; }
-    if (isType.isFunction(phases.oninertiastart)) { this[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (isType.isFunction(phases.onstart)       ) { this._iEvents[onAction + 'start'        ] = phases.onstart         ; }
+    if (isType.isFunction(phases.onmove)        ) { this._iEvents[onAction + 'move'         ] = phases.onmove          ; }
+    if (isType.isFunction(phases.onend)         ) { this._iEvents[onAction + 'end'          ] = phases.onend           ; }
+    if (isType.isFunction(phases.oninertiastart)) { this._iEvents[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -254,43 +253,42 @@ class Interactable {
    = (Interactable) this Interactable
   \*/
   fire (iEvent) {
-    if (!(iEvent && iEvent.type) || !contains(scope.eventTypes, iEvent.type)) {
+    if (!(iEvent && iEvent.type) || !contains(this._iEvents.types, iEvent.type)) {
       return this;
     }
 
-    let listeners;
-    const onEvent = 'on' + iEvent.type;
-
-    // Interactable#on() listeners
-    if (iEvent.type in this._iEvents) {
-      listeners = this._iEvents[iEvent.type];
-
-      for (let i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-        listeners[i](iEvent);
-      }
-    }
-
-    // interactable.onevent listener
-    if (isType.isFunction(this[onEvent])) {
-      this[onEvent](iEvent);
-    }
-
-    // interact.on() listeners
-    if (iEvent.type in scope.globalEvents && (listeners = scope.globalEvents[iEvent.type]))  {
-
-      for (let i = 0, len = listeners.length; i < len && !iEvent.immediatePropagationStopped; i++) {
-        listeners[i](iEvent);
-      }
-    }
+    this._iEvents.fire(iEvent);
 
     return this;
+  }
+
+  _onOffMultiple (method, eventType, listener, useCapture) {
+    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
+      eventType = eventType.trim().split(/ +/);
+    }
+
+    if (isType.isArray(eventType)) {
+      for (let i = 0; i < eventType.length; i++) {
+        this[method](eventType[i], listener, useCapture);
+      }
+
+      return true;
+    }
+
+    if (isType.isObject(eventType)) {
+      for (const prop in eventType) {
+        this[method](prop, eventType[prop], listener);
+      }
+
+      return true;
+    }
   }
 
   /*\
    * Interactable.on
    [ method ]
    *
-   * Binds a listener for an InteractEvent or DOM event.
+   * Binds a listener for an InteractEvent, pointerEvent or DOM event.
    *
    - eventType  (string | array | object) The types of events to listen for
    - listener   (function) The function event (s)
@@ -298,41 +296,17 @@ class Interactable {
    = (object) This Interactable
   \*/
   on (eventType, listener, useCapture) {
-    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
-      eventType = eventType.trim().split(/ +/);
-    }
-
-    if (isType.isArray(eventType)) {
-      for (let i = 0; i < eventType.length; i++) {
-        this.on(eventType[i], listener, useCapture);
-      }
-
-      return this;
-    }
-
-    if (isType.isObject(eventType)) {
-      for (const prop in eventType) {
-        this.on(prop, eventType[prop], listener);
-      }
-
-      return this;
-    }
-
-    if (eventType === 'wheel') {
-      eventType = wheelEvent;
-    }
-
     // convert to boolean
-    useCapture = useCapture? true: false;
+    useCapture = !!useCapture;
 
-    if (contains(scope.eventTypes, eventType)) {
-      // if this type of event was never bound to this Interactable
-      if (!(eventType in this._iEvents)) {
-        this._iEvents[eventType] = [listener];
-      }
-      else {
-        this._iEvents[eventType].push(listener);
-      }
+    if (this._onOffMultiple('on', eventType, listener, useCapture)) {
+      return this;
+    }
+
+    if (eventType === 'wheel') { eventType = wheelEvent; }
+
+    if (contains(this._iEvents.types, eventType)) {
+      this._iEvents.on(eventType, listener);
     }
     // delegated event for selector
     else if (isType.isString(this.target)) {
@@ -349,7 +323,7 @@ class Interactable {
    * Interactable.off
    [ method ]
    *
-   * Removes an InteractEvent or DOM event listener
+   * Removes an InteractEvent, pointerEvent or DOM event listener
    *
    - eventType  (string | array | object) The types of events that were listened for
    - listener   (function) The listener function to be removed
@@ -357,42 +331,18 @@ class Interactable {
    = (object) This Interactable
   \*/
   off (eventType, listener, useCapture) {
-    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
-      eventType = eventType.trim().split(/ +/);
-    }
-
-    if (isType.isArray(eventType)) {
-      for (let i = 0; i < eventType.length; i++) {
-        this.off(eventType[i], listener, useCapture);
-      }
-
-      return this;
-    }
-
-    if (isType.isObject(eventType)) {
-      for (const prop in eventType) {
-        this.off(prop, eventType[prop], listener);
-      }
-
-      return this;
-    }
-
-
     // convert to boolean
-    useCapture = useCapture? true: false;
+    useCapture = !!useCapture;
 
-    if (eventType === 'wheel') {
-      eventType = wheelEvent;
+    if (this._onOffMultiple('off', eventType, listener, useCapture)) {
+      return this;
     }
+
+    if (eventType === 'wheel') { eventType = wheelEvent; }
 
     // if it is an action event type
-    if (contains(scope.eventTypes, eventType)) {
-      const eventList = this._iEvents[eventType];
-      const index     = eventList? indexOf(eventList, listener) : -1;
-
-      if (index !== -1) {
-        this._iEvents[eventType].splice(index, 1);
-      }
+    if (contains(this._iEvents.types, eventType)) {
+      this._iEvents.on(eventType, listener);
     }
     // delegated event
     else if (isType.isString(this.target)) {

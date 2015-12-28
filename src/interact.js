@@ -11,6 +11,9 @@ const events       = require('./utils/events');
 const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
+const Eventable    = require('./Eventable');
+
+const globalEvents = {};
 
 /*\
  * interact
@@ -38,7 +41,14 @@ const Interactable = require('./Interactable');
  |     .autoScroll(true);
 \*/
 function interact (element, options) {
-  return scope.interactables.get(element, options) || new Interactable(element, options);
+  let interactable = scope.interactables.get(element, options);
+
+  if (!interactable) {
+    interactable = new Interactable(element, options);
+    interactable._iEvents.global = globalEvents;
+  }
+
+  return interactable;
 }
 
 /*\
@@ -87,13 +97,13 @@ interact.on = function (type, listener, useCapture) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(scope.eventTypes, type)) {
+  if (utils.contains(Eventable.prototype.types, type)) {
     // if this type of event was never bound
-    if (!scope.globalEvents[type]) {
-      scope.globalEvents[type] = [listener];
+    if (!globalEvents[type]) {
+      globalEvents[type] = [listener];
     }
     else {
-      scope.globalEvents[type].push(listener);
+      globalEvents[type].push(listener);
     }
   }
   // If non InteractEvent type, addEventListener to document
@@ -136,15 +146,15 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (!utils.contains(scope.eventTypes, type)) {
+  if (!utils.contains(Eventable.prototype.types, type)) {
     events.remove(scope.document, type, listener, useCapture);
   }
   else {
     let index;
 
-    if (type in scope.globalEvents
-        && (index = utils.indexOf(scope.globalEvents[type], listener)) !== -1) {
-      scope.globalEvents[type].splice(index, 1);
+    if (type in globalEvents
+        && (index = utils.indexOf(globalEvents[type], listener)) !== -1) {
+      globalEvents[type].splice(index, 1);
     }
   }
 

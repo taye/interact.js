@@ -11,7 +11,6 @@ utils.extend(scope, require('./utils/window'));
 utils.extend(scope, require('./utils/domObjects'));
 
 scope.documents  = [];  // all documents being listened to
-scope.eventTypes = [];  // all event types specific to interact.js
 
 scope.prefixedPropREs = utils.prefixedPropREs;
 

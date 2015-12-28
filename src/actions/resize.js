@@ -2,6 +2,7 @@ const actions        = require('./index');
 const utils          = require('../utils');
 const browser        = require('../utils/browser');
 const scope          = require('../scope');
+const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -430,7 +431,7 @@ InteractEvent.signals.on('resize', function ({ interaction, iEvent }) {
 
 actions.resize = resize;
 actions.names.push('resize');
-utils.merge(scope.eventTypes, [
+utils.merge(Eventable.prototype.types, [
   'resizestart',
   'resizemove',
   'resizeinertiastart',

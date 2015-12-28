@@ -2,6 +2,7 @@ const actions        = require('./index');
 const utils          = require('../utils');
 const scope          = require('../scope');
 const interact       = require('../interact');
+const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -314,12 +315,12 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isObject(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
 
-    if (utils.isFunction(options.ondrop)          ) { this.ondrop           = options.ondrop          ; }
-    if (utils.isFunction(options.ondropactivate)  ) { this.ondropactivate   = options.ondropactivate  ; }
-    if (utils.isFunction(options.ondropdeactivate)) { this.ondropdeactivate = options.ondropdeactivate; }
-    if (utils.isFunction(options.ondragenter)     ) { this.ondragenter      = options.ondragenter     ; }
-    if (utils.isFunction(options.ondragleave)     ) { this.ondragleave      = options.ondragleave     ; }
-    if (utils.isFunction(options.ondropmove)      ) { this.ondropmove       = options.ondropmove      ; }
+    if (utils.isFunction(options.ondrop)          ) { this._iEvents.ondrop           = options.ondrop          ; }
+    if (utils.isFunction(options.ondropactivate)  ) { this._iEvents.ondropactivate   = options.ondropactivate  ; }
+    if (utils.isFunction(options.ondropdeactivate)) { this._iEvents.ondropdeactivate = options.ondropdeactivate; }
+    if (utils.isFunction(options.ondragenter)     ) { this._iEvents.ondragenter      = options.ondragenter     ; }
+    if (utils.isFunction(options.ondragleave)     ) { this._iEvents.ondragleave      = options.ondragleave     ; }
+    if (utils.isFunction(options.ondropmove)      ) { this._iEvents.ondropmove       = options.ondropmove      ; }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
@@ -450,7 +451,7 @@ interact.dynamicDrop = function (newValue) {
   return dynamicDrop;
 };
 
-utils.merge(scope.eventTypes, [
+utils.merge(Eventable.prototype.types, [
   'dragenter',
   'dragleave',
   'dropactivate',
