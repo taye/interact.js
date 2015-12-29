@@ -8,6 +8,7 @@ require('./legacyBrowsers');
 
 // pointerEvents
 require('./pointerEvents');
+require('./pointerEvents/interactableTargets');
 
 // inertia
 require('./inertia');

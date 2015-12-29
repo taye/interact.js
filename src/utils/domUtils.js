@@ -231,6 +231,17 @@ const domUtils = {
 
     return clientRect;
   },
+
+  getPath: function (element) {
+    const path = [];
+
+    while (element) {
+      path.push(element);
+      element = domUtils.parentElement(element);
+    }
+
+    return path;
+  },
 };
 
 module.exports = domUtils;
