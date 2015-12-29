@@ -2,7 +2,7 @@ const InteractEvent  = require('./InteractEvent');
 const Interaction    = require('./Interaction');
 const modifiers      = require('./modifiers');
 const utils          = require('./utils');
-const animationFrame = utils.raf;
+const animationFrame = require('./utils/raf');
 
 Interaction.signals.on('new', function (interaction) {
   interaction.inertiaStatus = {

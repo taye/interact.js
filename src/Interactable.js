@@ -4,6 +4,7 @@ const extend    = require('./utils/extend');
 const actions   = require('./actions');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
+const defaults  = require('./defaultOptions');
 const signals   = require('./utils/Signals').new();
 
 const { getElementRect, nodeContains } = require('./utils/domUtils');
@@ -76,17 +77,17 @@ class Interactable {
     // for all the default per-action options
     for (const option in options) {
       // if this option exists for this action
-      if (option in scope.defaultOptions[action]) {
+      if (option in defaults[action]) {
         // if the option in the options arg is an object value
         if (isType.isObject(options[option])) {
           // duplicate the object
           this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
 
-          if (isType.isObject(scope.defaultOptions.perAction[option]) && 'enabled' in scope.defaultOptions.perAction[option]) {
+          if (isType.isObject(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false? false : true;
           }
         }
-        else if (isType.isBool(options[option]) && isType.isObject(scope.defaultOptions.perAction[option])) {
+        else if (isType.isBool(options[option]) && isType.isObject(defaults.perAction[option])) {
           this.options[action][option].enabled = options[option];
         }
         else if (options[option] !== undefined) {
@@ -369,14 +370,14 @@ class Interactable {
       options = {};
     }
 
-    this.options = extend({}, scope.defaultOptions.base);
+    this.options = extend({}, defaults.base);
 
-    const perActions = extend({}, scope.defaultOptions.perAction);
+    const perActions = extend({}, defaults.perAction);
 
     for (const actionName in actions.methodDict) {
       const methodName = actions.methodDict[actionName];
 
-      this.options[actionName] = extend({}, scope.defaultOptions[actionName]);
+      this.options[actionName] = extend({}, defaults[actionName]);
 
       this.setPerAction(actionName, perActions);
 
@@ -384,7 +385,7 @@ class Interactable {
     }
 
     for (const setting of Interactable.settingsMethods) {
-      this.options[setting] = scope.defaultOptions.base[setting];
+      this.options[setting] = defaults.base[setting];
 
       if (setting in options) {
         this[setting](options[setting]);

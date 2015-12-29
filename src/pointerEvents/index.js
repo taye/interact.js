@@ -3,6 +3,7 @@ const Interaction = require('../Interaction');
 const utils       = require('../utils');
 const browser     = require('../utils/browser');
 const Eventable   = require('../Eventable');
+const defaults    = require('../defaultOptions');
 const signals     = require('../utils/Signals').new();
 
 const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
@@ -170,7 +171,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
                         eventTarget,
                         'hold');
 
-  }, scope.defaultOptions._holdDuration);
+  }, defaults._holdDuration);
 });
 
 function createSignalListener (event) {

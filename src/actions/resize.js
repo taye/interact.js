@@ -1,7 +1,6 @@
 const actions        = require('./index');
 const utils          = require('../utils');
 const browser        = require('../utils/browser');
-const scope          = require('../scope');
 const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
@@ -343,7 +342,7 @@ Interactable.prototype.resizable = function (options) {
       this.options.resize.axis = options.axis;
     }
     else if (options.axis === null) {
-      this.options.resize.axis = scope.defaultOptions.resize.axis;
+      this.options.resize.axis = defaultOptions.resize.axis;
     }
 
     if (utils.isBool(options.preserveAspectRatio)) {

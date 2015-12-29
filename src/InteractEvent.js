@@ -1,12 +1,12 @@
 const extend      = require('./utils/extend');
 const getOriginXY = require('./utils/getOriginXY');
-const scope       = require('./scope');
+const defaults    = require('./defaultOptions');
 const signals     = require('./utils/Signals').new();
 
 class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
     const target      = interaction.target;
-    const deltaSource = (target && target.options || scope.defaultOptions).deltaSource;
+    const deltaSource = (target && target.options || defaults).deltaSource;
     const origin      = getOriginXY(target, element);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
