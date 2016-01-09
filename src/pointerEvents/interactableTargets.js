@@ -4,9 +4,7 @@ const isType        = require('../utils/isType');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
 
-pointerEvents.signals.on('collect-targets', function ({ targets, path, eventType }) {
-  let element;
-
+pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType }) {
   function collectSelectors (interactable, selector, context) {
     const els = browser.useMatchesSelectorPolyfill
         ? context.querySelectorAll(selector)
@@ -27,21 +25,19 @@ pointerEvents.signals.on('collect-targets', function ({ targets, path, eventType
     }
   }
 
-  for (element of path) {
-    const interactable = scope.interactables.get(element);
+  const interactable = scope.interactables.get(element);
 
-    if (interactable) {
-      const eventable = interactable._iEvents;
+  if (interactable) {
+    const eventable = interactable._iEvents;
 
-      if (eventable[eventType]) {
-        targets.push({
-          element,
-          eventable,
-          props: { interactable },
-        });
-      }
+    if (eventable[eventType]) {
+      targets.push({
+        element,
+        eventable,
+        props: { interactable },
+      });
     }
-
-    scope.interactables.forEachSelector(collectSelectors);
   }
+
+  scope.interactables.forEachSelector(collectSelectors);
 });

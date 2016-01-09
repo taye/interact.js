@@ -125,10 +125,8 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
   }
 
   const targets = [];
-
   const path = utils.getPath(eventTarget);
-
-  signals.fire('collect-targets', {
+  const signalArg = {
     targets,
     interaction,
     pointer,
@@ -136,7 +134,14 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
     eventTarget,
     eventType,
     path,
-  });
+    element: null,
+  };
+
+  for (const element of path) {
+    signalArg.element = element;
+
+    signals.fire('collect-targets', signalArg);
+  }
 
   // create the tap event even if there are no listeners so that
   // doubletap can still be created and fired
