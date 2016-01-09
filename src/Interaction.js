@@ -107,7 +107,7 @@ class Interaction {
       this.pointerIsDown = true;
       this.downEvent = event;
 
-      this.downTimes[pointerIndex] = new Date().getTime();
+      this.downTimes[pointerIndex] = this.curCoords.timeStamp;
       this.downTargets[pointerIndex] = eventTarget;
 
       this.pointerWasMoved = false;
