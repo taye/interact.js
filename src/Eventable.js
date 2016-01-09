@@ -4,6 +4,7 @@ class Eventable {
   fire (event) {
     let listeners;
     const onEvent = 'on' + event.type;
+    const global = this.global;
 
     // Interactable#on() listeners
     if (event.type in this) {
@@ -20,7 +21,7 @@ class Eventable {
     }
 
     // interact.on() listeners
-    if (event.type in this.global && (listeners = this.global[event.type]))  {
+    if (global && event.type in global && (listeners = global[event.type]))  {
 
       for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
         listeners[i](event);
