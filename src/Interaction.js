@@ -17,8 +17,6 @@ let prevTouchTime = 0;
 // all active and idle interactions
 scope.interactions = [];
 
-scope.pointerMoveTolerance = 1;
-
 class Interaction {
   constructor () {
     this.target        = null; // current interactable being interacted with
@@ -200,7 +198,7 @@ class Interaction {
       dx = this.curCoords.client.x - this.startCoords.client.x;
       dy = this.curCoords.client.y - this.startCoords.client.y;
 
-      this.pointerWasMoved = utils.hypot(dx, dy) > scope.pointerMoveTolerance;
+      this.pointerWasMoved = utils.hypot(dx, dy) > Interaction.pointerMoveTolerance;
     }
 
     if (!duplicateMove) {
@@ -536,6 +534,7 @@ function onDocSignal ({ doc }, signalName) {
 scope.signals.on('add-document'   , onDocSignal);
 scope.signals.on('remove-document', onDocSignal);
 
+Interaction.pointerMoveTolerance = 1;
 Interaction.doOnInteractions = doOnInteractions;
 Interaction.validateAction = validateAction;
 Interaction.endAll = endAll;

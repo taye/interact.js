@@ -11,6 +11,7 @@ const events       = require('./utils/events');
 const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
+const Interaction  = require('./Interaction');
 const Eventable    = require('./Eventable');
 
 const globalEvents = {};
@@ -231,12 +232,12 @@ interact.stop = function (event) {
 \*/
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.isNumber(newValue)) {
-    scope.pointerMoveTolerance = newValue;
+    Interaction.pointerMoveTolerance = newValue;
 
     return this;
   }
 
-  return scope.pointerMoveTolerance;
+  return Interaction.pointerMoveTolerance;
 };
 
 interact.addDocument    = scope.addDocument;
