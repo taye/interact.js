@@ -18,7 +18,9 @@ const drop = {
 
 let dynamicDrop = false;
 
-Interaction.signals.on('start-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   // reset active dropzones
   interaction.activeDrops.dropzones = [];
   interaction.activeDrops.elements  = [];
@@ -51,7 +53,9 @@ InteractEvent.signals.on('new', function ({ interaction, iEvent, event }) {
   interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 });
 
-Interaction.signals.on('move-drag', function ({ interaction }) {
+Interaction.signals.on('action-move', function ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   fireDropEvents(interaction, interaction.dropEvents);
 });
 

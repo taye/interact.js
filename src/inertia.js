@@ -54,7 +54,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
         // fire appropriate signals
         const signalArg = { interaction };
         Interaction.signals.fire('before-action-move', signalArg);
-        Interaction.signals.fire('resume'            , signalArg);
+        Interaction.signals.fire('action-resume'     , signalArg);
 
         // fire a reume event
         const resumeEvent = new InteractEvent(interaction,

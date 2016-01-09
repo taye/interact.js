@@ -25,7 +25,9 @@ const gesture = {
   },
 };
 
-Interaction.signals.on('start-gesture', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
   const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
 
   gestureEvent.ds = 0;
@@ -40,10 +42,8 @@ Interaction.signals.on('start-gesture', function ({ interaction, event }) {
   interaction.prevEvent = gestureEvent;
 });
 
-Interaction.signals.on('move-gesture', function ({ interaction, event }) {
-  if (!interaction.pointerIds.length) {
-    return interaction.prevEvent;
-  }
+Interaction.signals.on('action-move', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
 
   let gestureEvent;
 

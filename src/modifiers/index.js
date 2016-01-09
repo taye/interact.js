@@ -84,7 +84,7 @@ const modifiers = {
   },
 
   start: function ({ interaction }, signalName) {
-    modifiers.setOffsets(interaction, signalName === 'resume'? interaction.curCoords : interaction.startCoords);
+    modifiers.setOffsets(interaction, signalName === 'action-resume'? interaction.curCoords : interaction.startCoords);
 
     modifiers.resetStatuses(interaction.modifierStatuses);
     modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
@@ -97,8 +97,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.modifierStatuses = modifiers.resetStatuses({});
 });
 
-Interaction.signals.on('start' , modifiers.start);
-Interaction.signals.on('resume', modifiers.start);
+Interaction.signals.on('action-start' , modifiers.start);
+Interaction.signals.on('action-resume', modifiers.start);
 
 Interaction.signals.on('before-action-move', function ({ interaction, preEnd, interactingBeforeMove }) {
   const modifierResult = modifiers.setAll(interaction, interaction.curCoords.page, interaction.modifierStatuses, preEnd);

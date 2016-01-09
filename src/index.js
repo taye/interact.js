@@ -23,9 +23,6 @@ require('./actions/resize');
 require('./actions/drag');
 require('./actions/drop');
 
-// autoScroll
-require('./autoScroll');
-
 // autoStart
 const autoStart = require('./autoStart');
 require('./autoStart/drag');
@@ -33,6 +30,9 @@ require('./autoStart/delay');
 autoStart.setActionDefaults('drag');
 autoStart.setActionDefaults('resize');
 autoStart.setActionDefaults('gesture');
+
+// autoScroll
+require('./autoScroll');
 
 // export interact
 module.exports = require('./interact');

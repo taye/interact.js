@@ -117,7 +117,7 @@ Interaction.signals.on('stop-active', function () {
   autoScroll.stop();
 });
 
-Interaction.signals.on('move-done', autoScroll.onInteractionMove);
+Interaction.signals.on('action-move', autoScroll.onInteractionMove);
 
 defaultOptions.perAction.autoScroll = autoScroll.defaults;
 

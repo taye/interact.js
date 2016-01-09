@@ -34,7 +34,9 @@ const drag = {
   },
 };
 
-Interaction.signals.on('start-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
 
   interaction._interacting = true;
@@ -67,7 +69,9 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
   }
 });
 
-Interaction.signals.on('move-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-move', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
 
   const axis = interaction.prepared.axis;

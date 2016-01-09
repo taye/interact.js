@@ -91,6 +91,15 @@ class Interaction {
 
       utils.copyCoords(this.curCoords , this.startCoords);
       utils.copyCoords(this.prevCoords, this.startCoords);
+
+      this.downEvent = event;
+
+      this.downTimes[pointerIndex] = this.curCoords.timeStamp;
+      this.downTargets[pointerIndex] = eventTarget;
+
+      this.pointerWasMoved = false;
+
+      utils.pointerExtend(this.downPointer, pointer);
     }
 
     signals.fire('down', {
@@ -100,19 +109,6 @@ class Interaction {
       pointerIndex,
       interaction: this,
     });
-
-    if (!this.interacting()) {
-      this.pointerIsDown = true;
-      this.downEvent = event;
-
-      this.downTimes[pointerIndex] = this.curCoords.timeStamp;
-      this.downTargets[pointerIndex] = eventTarget;
-
-      this.pointerWasMoved = false;
-
-      utils.pointerExtend(this.downPointer, pointer);
-      utils.copyCoords(this.prevCoords, this.curCoords);
-    }
 
     this.checkAndPreventDefault(event);
   }
@@ -171,9 +167,7 @@ class Interaction {
     this.target         = target;
     this.element        = element;
 
-    signals.fire('start', { interaction: this });
-
-    signals.fire('start-' + this.prepared.name, {
+    signals.fire('action-start', {
       interaction: this,
       event: this.downEvent,
     });
@@ -201,24 +195,26 @@ class Interaction {
       this.pointerWasMoved = utils.hypot(dx, dy) > Interaction.pointerMoveTolerance;
     }
 
+    const signalArg = {
+      pointer,
+      event,
+      eventTarget,
+      dx,
+      dy,
+      duplicate: duplicateMove,
+      interaction: this,
+      interactingBeforeMove: this.interacting(),
+    };
+
     if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
       utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+    }
 
-      const signalArg = {
-        pointer,
-        event,
-        eventTarget,
-        dx,
-        dy,
-        duplicate: duplicateMove,
-        interaction: this,
-        interactingBeforeMove: this.interacting(),
-      };
+    signals.fire('move', signalArg);
 
-      signals.fire('move', signalArg);
-
-      // if interacting, fire a 'move-{action}' signal
+    if (!duplicateMove) {
+      // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
         this.doMove(signalArg);
       }
@@ -226,8 +222,6 @@ class Interaction {
       if (this.pointerWasMoved) {
         utils.copyCoords(this.prevCoords, this.curCoords);
       }
-
-      signals.fire('move-done', signalArg);
     }
 
     this.checkAndPreventDefault(event);
@@ -264,7 +258,7 @@ class Interaction {
     signals.fire('before-action-move', signalArg);
 
     if (!this._dontFireMove) {
-      signals.fire('move-' + this.prepared.name, signalArg);
+      signals.fire('action-move', signalArg);
     }
 
     this._dontFireMove = false;

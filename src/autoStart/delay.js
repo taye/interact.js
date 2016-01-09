@@ -24,8 +24,8 @@ for (const action of actions.names) {
   autoStart.signals.on('before-start-' + action, preventImmediateMove);
 }
 
-Interaction.signals.on('move-done', function ({ interaction }) {
-  if (interaction.pointerWasMoved) {
+Interaction.signals.on('move', function ({ interaction, duplicate }) {
+  if (interaction.pointerWasMoved && !duplicate) {
     clearTimeout(interaction.delayTimer);
   }
 });

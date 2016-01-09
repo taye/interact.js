@@ -134,7 +134,9 @@ const resize = {
   },
 };
 
-Interaction.signals.on('start-resize', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'resize') { return; }
+
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'start', interaction.element);
 
   if (interaction.prepared.edges) {
@@ -188,7 +190,9 @@ Interaction.signals.on('start-resize', function ({ interaction, event }) {
   interaction.prevEvent = resizeEvent;
 });
 
-Interaction.signals.on('move-resize', function ({ interaction, event }) {
+Interaction.signals.on('action-move', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'resize') { return; }
+
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'move', interaction.element);
   const resizeOptions = interaction.target.options.resize;
   const invert = resizeOptions.invert;
