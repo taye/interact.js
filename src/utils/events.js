@@ -295,7 +295,7 @@ function delegateListener (event, useCapture) {
       }
     }
 
-    element = domUtils.parentElement(element);
+    element = domUtils.parentNode(element);
   }
 }
 

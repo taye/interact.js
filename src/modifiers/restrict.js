@@ -59,7 +59,7 @@ const restrict = {
 
     if (utils.isString(restriction)) {
       if (restriction === 'parent') {
-        restriction = utils.parentElement(interaction.element);
+        restriction = utils.parentNode(interaction.element);
       }
       else if (restriction === 'self') {
         restriction = target.getRect(interaction.element);

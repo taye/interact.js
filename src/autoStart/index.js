@@ -171,7 +171,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       }
     }
 
-    element = utils.parentElement(element);
+    element = utils.parentNode(element);
   }
 
   return {};

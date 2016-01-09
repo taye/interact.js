@@ -71,7 +71,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
         break;
       }
 
-      element = utils.parentElement(element);
+      element = utils.parentNode(element);
     }
   }
 });

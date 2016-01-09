@@ -1,11 +1,11 @@
-const { closest, parentElement, getElementRect } = require('./domUtils');
-const { isElement, isFunction, trySelector }     = require('./isType');
+const { closest, parentNode, getElementRect } = require('./domUtils');
+const { isElement, isFunction, trySelector }  = require('./isType');
 
 module.exports = function (interactable, element) {
   let origin = interactable.options.origin;
 
   if (origin === 'parent') {
-    origin = parentElement(element);
+    origin = parentNode(element);
   }
   else if (origin === 'self') {
     origin = interactable.getRect(element);

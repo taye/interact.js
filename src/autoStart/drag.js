@@ -3,7 +3,7 @@ const scope     = require('../scope');
 const browser   = require('../utils/browser');
 
 const { isElement } = require('../utils/isType');
-const { matchesSelector, parentElement } = require('../utils/domUtils');
+const { matchesSelector, parentNode } = require('../utils/domUtils');
 
 autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
   // check if a drag is in the correct axis
@@ -85,7 +85,7 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
           break;
         }
 
-        element = parentElement(element);
+        element = parentNode(element);
       }
     }
   }

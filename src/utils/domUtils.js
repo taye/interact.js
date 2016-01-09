@@ -20,13 +20,13 @@ const domUtils = {
     while (isType.isElement(element)) {
       if (domUtils.matchesSelector(element, selector)) { return element; }
 
-      element = domUtils.parentElement(element);
+      element = domUtils.parentNode(element);
     }
 
     return null;
   },
 
-  parentElement: function (node) {
+  parentNode: function (node) {
     let parent = node.parentNode;
 
     if (isType.isDocFrag(parent)) {
@@ -178,7 +178,7 @@ const domUtils = {
         return true;
       }
 
-      element = domUtils.parentElement(element);
+      element = domUtils.parentNode(element);
 
       if (element === limit) {
         return domUtils.matchesSelector(element, selector);
@@ -237,7 +237,7 @@ const domUtils = {
 
     while (element) {
       path.push(element);
-      element = domUtils.parentElement(element);
+      element = domUtils.parentNode(element);
     }
 
     return path;

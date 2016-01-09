@@ -37,7 +37,7 @@ const finder = {
           if (element === interaction.element) {
             return interaction;
           }
-          element = utils.parentElement(element);
+          element = utils.parentNode(element);
         }
       }
     }
