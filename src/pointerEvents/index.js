@@ -90,7 +90,7 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
 
     if (pointerEvent.immediatePropagationStopped
         || (pointerEvent.propagationStopped
-            && targets[i + 1].element !== pointerEvent.currentTarget)) {
+            && (i + 1) < targets.length && targets[i + 1].element !== pointerEvent.currentTarget)) {
       break;
     }
   }
