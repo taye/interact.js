@@ -119,10 +119,9 @@ Interactable.prototype.gesturable = function (options) {
   return this.options.gesture;
 };
 
-InteractEvent.signals.on('gesture', function (arg) {
-  if (arg.action !== 'gesture') { return; }
+InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action, event, starting, ending, deltaSource }) {
+  if (action !== 'gesture') { return; }
 
-  const { interaction, iEvent, event, starting, ending, deltaSource } = arg;
   const pointers = interaction.pointers;
 
   iEvent.touches = [pointers[0], pointers[1]];

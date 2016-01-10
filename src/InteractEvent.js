@@ -77,7 +77,6 @@ class InteractEvent {
     this.clientY0  = interaction.startCoords.client.y - origin.y;
 
     signals.fire('set-delta', signalArg);
-    signals.fire(action, signalArg);
 
     this.timeStamp = coords.timeStamp;
     this.dt        = interaction.pointerDelta.timeStamp;
