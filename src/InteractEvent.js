@@ -138,31 +138,16 @@ class InteractEvent {
   }
 }
 
-signals.on('set-delta', function ({ iEvent, interaction, ending, starting, deltaSource }) {
-  if (starting) {
-    iEvent.dx = 0;
-    iEvent.dy = 0;
-  }
-  // end event dx, dy is difference between start and end points
-  else if (ending) {
-    if (deltaSource === 'client') {
-      iEvent.dx = iEvent.clientX - interaction.startCoords.client.x;
-      iEvent.dy = iEvent.clientY - interaction.startCoords.client.y;
-    }
-    else {
-      iEvent.dx = iEvent.pageX - interaction.startCoords.page.x;
-      iEvent.dy = iEvent.pageY - interaction.startCoords.page.y;
-    }
+signals.on('set-delta', function ({ iEvent, interaction, starting, deltaSource }) {
+  const prevEvent = starting? iEvent : interaction.prevEvent;
+
+  if (deltaSource === 'client') {
+    iEvent.dx = iEvent.clientX - prevEvent.clientX;
+    iEvent.dy = iEvent.clientY - prevEvent.clientY;
   }
   else {
-    if (deltaSource === 'client') {
-      iEvent.dx = iEvent.clientX - interaction.prevEvent.clientX;
-      iEvent.dy = iEvent.clientY - interaction.prevEvent.clientY;
-    }
-    else {
-      iEvent.dx = iEvent.pageX - interaction.prevEvent.pageX;
-      iEvent.dy = iEvent.pageY - interaction.prevEvent.pageY;
-    }
+    iEvent.dx = iEvent.pageX - prevEvent.pageX;
+    iEvent.dy = iEvent.pageY - prevEvent.pageY;
   }
 });
 
