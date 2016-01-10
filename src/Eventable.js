@@ -1,5 +1,11 @@
 const { indexOf } = require('./utils/arr');
 
+function fireUntilImmediateStopped (event, listeners) {
+  for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
+    listeners[i](event);
+  }
+}
+
 class Eventable {
   fire (event) {
     let listeners;
@@ -7,12 +13,8 @@ class Eventable {
     const global = this.global;
 
     // Interactable#on() listeners
-    if (event.type in this) {
-      listeners = this[event.type];
-
-      for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-        listeners[i](event);
-      }
+    if ((listeners = this[event.type])) {
+      fireUntilImmediateStopped(event, listeners);
     }
 
     // interactable.onevent listener
@@ -21,11 +23,8 @@ class Eventable {
     }
 
     // interact.on() listeners
-    if (global && event.type in global && (listeners = global[event.type]))  {
-
-      for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-        listeners[i](event);
-      }
+    if (!event.propagationStopped && global && (listeners = global[event.type]))  {
+      fireUntilImmediateStopped(event, listeners);
     }
   }
 
