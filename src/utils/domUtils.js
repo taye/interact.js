@@ -16,19 +16,17 @@ const domUtils = {
     return false;
   },
 
-  closest: function (child, selector) {
-    let parent = domUtils.parentElement(child);
+  closest: function (element, selector) {
+    while (isType.isElement(element)) {
+      if (domUtils.matchesSelector(element, selector)) { return element; }
 
-    while (isType.isElement(parent)) {
-      if (domUtils.matchesSelector(parent, selector)) { return parent; }
-
-      parent = domUtils.parentElement(parent);
+      element = domUtils.parentNode(element);
     }
 
     return null;
   },
 
-  parentElement: function (node) {
+  parentNode: function (node) {
     let parent = node.parentNode;
 
     if (isType.isDocFrag(parent)) {
@@ -180,7 +178,7 @@ const domUtils = {
         return true;
       }
 
-      element = domUtils.parentElement(element);
+      element = domUtils.parentNode(element);
 
       if (element === limit) {
         return domUtils.matchesSelector(element, selector);
@@ -232,6 +230,17 @@ const domUtils = {
     }
 
     return clientRect;
+  },
+
+  getPath: function (element) {
+    const path = [];
+
+    while (element) {
+      path.push(element);
+      element = domUtils.parentNode(element);
+    }
+
+    return path;
   },
 };
 

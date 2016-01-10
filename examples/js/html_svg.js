@@ -9,8 +9,7 @@
 
     var svg,
         svgNS = 'http://www.w3.org/2000/svg',
-        SVGElement = window.SVGElement,
-        eventTypes = interact.debug().eventTypes;
+        SVGElement = window.SVGElement;
 
     function DemoGraphic(id) {
             var width = window.innerWidth,
@@ -87,19 +86,17 @@
         textProp = 'textContent';
         nl = '\n';
 
-        if ( target.demo && indexOf(eventTypes, e.type) !== -1 ) {
-            target.text[textProp] = nl + e.type;
-            target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
-            target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
-            target.text[textProp] += nl + ' pageX, pageY: (' + e.pageX + ', ' + e.pageY + ')';
-            target.text[textProp] += nl + ' speed       :  ' + e.speed;
+        target.text[textProp] = nl + e.type;
+        target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
+        target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
+        target.text[textProp] += nl + ' pageX, pageY: (' + e.pageX + ', ' + e.pageY + ')';
+        target.text[textProp] += nl + ' speed       :  ' + e.speed;
 
-            if (indexOf(e.type, 'gesture') !== -1) {
-                target.text[textProp] += nl + ' distance: ' + e.distance;
-                target.text[textProp] += nl + ' scale   : ' + e.scale;
-                target.text[textProp] += nl + ' angle   : ' + e.angle;
-                target.text[textProp] += nl + ' rotation: ' + e.rotation;
-            }
+        if (indexOf(e.type, 'gesture') !== -1) {
+            target.text[textProp] += nl + ' distance: ' + e.distance;
+            target.text[textProp] += nl + ' scale   : ' + e.scale;
+            target.text[textProp] += nl + ' angle   : ' + e.angle;
+            target.text[textProp] += nl + ' rotation: ' + e.rotation;
         }
     }
 
@@ -261,15 +258,17 @@
     interact(window).on('addEventListener' in document? 'DOMContentLoaded': 'load', onReady);
 
     // Display event properties for debugging
-    interact.on('resizestart', nodeEventDebug);
-    interact.on('resizemove', nodeEventDebug);
-    interact.on('resizeend', nodeEventDebug);
-    interact.on('gesturestart', nodeEventDebug);
-    interact.on('gesturemove', nodeEventDebug);
-    interact.on('gestureend', nodeEventDebug);
-    interact.on('dragstart', nodeEventDebug);
-    interact.on('dragmove', nodeEventDebug);
-    interact.on('dragend', nodeEventDebug);
+    interact.on([
+        'resizestart',
+        'resizemove',
+        'resizeend',
+        'gesturestart',
+        'gesturemove',
+        'gestureend',
+        'dragstart',
+        'dragmove',
+        'dragend',
+    ], nodeEventDebug);
 
     interact.on('drop', dropNode);
 

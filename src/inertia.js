@@ -2,7 +2,7 @@ const InteractEvent  = require('./InteractEvent');
 const Interaction    = require('./Interaction');
 const modifiers      = require('./modifiers');
 const utils          = require('./utils');
-const animationFrame = utils.raf;
+const animationFrame = require('./utils/raf');
 
 Interaction.signals.on('new', function (interaction) {
   interaction.inertiaStatus = {
@@ -54,7 +54,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
         // fire appropriate signals
         const signalArg = { interaction };
         Interaction.signals.fire('before-action-move', signalArg);
-        Interaction.signals.fire('resume'            , signalArg);
+        Interaction.signals.fire('action-resume'     , signalArg);
 
         // fire a reume event
         const resumeEvent = new InteractEvent(interaction,
@@ -71,7 +71,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
         break;
       }
 
-      element = utils.parentElement(element);
+      element = utils.parentNode(element);
     }
   }
 });

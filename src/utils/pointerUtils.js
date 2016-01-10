@@ -1,7 +1,8 @@
-const hypot   = require('./hypot');
-const browser = require('./browser');
-const dom     = require('./domObjects');
-const isType  = require('./isType');
+const hypot         = require('./hypot');
+const browser       = require('./browser');
+const dom           = require('./domObjects');
+const isType        = require('./isType');
+const pointerExtend = require('./pointerExtend');
 
 const pointerUtils = {
   copyCoords: function (dest, src) {
@@ -103,29 +104,7 @@ const pointerUtils = {
     targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp :new Date().getTime();
   },
 
-  prefixedPropREs: {
-    webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
-  },
-
-  pointerExtend: function (dest, source) {
-    for (const prop in source) {
-      const prefixedPropREs = pointerUtils.prefixedPropREs;
-      let deprecated = false;
-
-      // skip deprecated prefixed properties
-      for (const vendor in prefixedPropREs) {
-        if (prop.indexOf(vendor) === 0 && prefixedPropREs[vendor].test(prop)) {
-          deprecated = true;
-          break;
-        }
-      }
-
-      if (!deprecated) {
-        dest[prop] = source[prop];
-      }
-    }
-    return dest;
-  },
+  pointerExtend: pointerExtend,
 
   getTouchPair: function (event) {
     const touches = [];
@@ -221,7 +200,7 @@ const pointerUtils = {
     const touches = pointerUtils.getTouchPair(event);
     const dx = touches[1][sourceX] - touches[0][sourceX];
     const dy = touches[1][sourceY] - touches[0][sourceY];
-    let angle = 180 * Math.atan2(dy , dx) / Math.PI;
+    const angle = 180 * Math.atan2(dy , dx) / Math.PI;
 
     return  angle;
   },

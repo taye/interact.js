@@ -1,9 +1,11 @@
-const actions = require('./index');
-const utils = require('../utils');
-const scope = require('../scope');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const utils          = require('../utils');
+const scope          = require('../scope');
+const interact       = require('../interact');
+const Eventable      = require('../Eventable');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drop = {
@@ -14,7 +16,11 @@ const drop = {
   },
 };
 
-Interaction.signals.on('start-drag', function ({ interaction, event }) {
+let dynamicDrop = false;
+
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   // reset active dropzones
   interaction.activeDrops.dropzones = [];
   interaction.activeDrops.elements  = [];
@@ -47,7 +53,9 @@ InteractEvent.signals.on('new', function ({ interaction, iEvent, event }) {
   interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 });
 
-Interaction.signals.on('move-drag', function ({ interaction }) {
+Interaction.signals.on('action-move', function ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   fireDropEvents(interaction, interaction.dropEvents);
 });
 
@@ -144,7 +152,7 @@ function getDrop (dragEvent, event, dragElement) {
   const interaction = dragEvent.interaction;
   const validDrops = [];
 
-  if (scope.dynamicDrop) {
+  if (dynamicDrop) {
     setActiveDrops(interaction, dragElement);
   }
 
@@ -311,12 +319,12 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isObject(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
 
-    if (utils.isFunction(options.ondrop)          ) { this.ondrop           = options.ondrop          ; }
-    if (utils.isFunction(options.ondropactivate)  ) { this.ondropactivate   = options.ondropactivate  ; }
-    if (utils.isFunction(options.ondropdeactivate)) { this.ondropdeactivate = options.ondropdeactivate; }
-    if (utils.isFunction(options.ondragenter)     ) { this.ondragenter      = options.ondragenter     ; }
-    if (utils.isFunction(options.ondragleave)     ) { this.ondragleave      = options.ondragleave     ; }
-    if (utils.isFunction(options.ondropmove)      ) { this.ondropmove       = options.ondropmove      ; }
+    if (utils.isFunction(options.ondrop)          ) { this._iEvents.ondrop           = options.ondrop          ; }
+    if (utils.isFunction(options.ondropactivate)  ) { this._iEvents.ondropactivate   = options.ondropactivate  ; }
+    if (utils.isFunction(options.ondropdeactivate)) { this._iEvents.ondropdeactivate = options.ondropdeactivate; }
+    if (utils.isFunction(options.ondragenter)     ) { this._iEvents.ondragenter      = options.ondragenter     ; }
+    if (utils.isFunction(options.ondragleave)     ) { this._iEvents.ondragleave      = options.ondragleave     ; }
+    if (utils.isFunction(options.ondropmove)      ) { this._iEvents.ondropmove       = options.ondropmove      ; }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
@@ -423,7 +431,31 @@ Interaction.signals.on('stop', function ({ interaction }) {
     interaction.prevDropTarget = interaction.prevDropElement = null;
 });
 
-utils.merge(scope.eventTypes, [
+/*\
+ * interact.dynamicDrop
+ [ method ]
+ *
+ * Returns or sets whether the dimensions of dropzone elements are
+ * calculated on every dragmove or only on dragstart for the default
+ * dropChecker
+ *
+ - newValue (boolean) #optional True to check on each move. False to check only before start
+ = (boolean | interact) The current setting or interact
+\*/
+interact.dynamicDrop = function (newValue) {
+  if (utils.isBool(newValue)) {
+    //if (dragging && dynamicDrop !== newValue && !newValue) {
+      //calcRects(dropzones);
+    //}
+
+    dynamicDrop = newValue;
+
+    return interact;
+  }
+  return dynamicDrop;
+};
+
+utils.merge(Eventable.prototype.types, [
   'dragenter',
   'dragleave',
   'dropactivate',

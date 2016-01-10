@@ -4,6 +4,7 @@ const domUtils  = require('./domUtils');
 const indexOf   = arr.indexOf;
 const contains  = arr.contains;
 const getWindow = require('./window').getWindow;
+const pExtend   = require('./pointerExtend');
 
 const useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window);
 const addEvent       = useAttachEvent?  'attachEvent': 'addEventListener';
@@ -267,9 +268,7 @@ function delegateListener (event, useCapture) {
   useCapture = useCapture? true: false;
 
   // duplicate the event so that currentTarget can be changed
-  for (const prop in event) {
-    fakeEvent[prop] = event[prop];
-  }
+  pExtend(fakeEvent, event);
 
   fakeEvent.originalEvent = event;
   fakeEvent.preventDefault = preventOriginalDefault;
@@ -296,7 +295,7 @@ function delegateListener (event, useCapture) {
       }
     }
 
-    element = domUtils.parentElement(element);
+    element = domUtils.parentNode(element);
   }
 }
 

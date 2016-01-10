@@ -1,5 +1,5 @@
-const modifiers = require('./index');
-const utils = require('../utils');
+const modifiers      = require('./index');
+const utils          = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
 const restrict = {
@@ -59,7 +59,7 @@ const restrict = {
 
     if (utils.isString(restriction)) {
       if (restriction === 'parent') {
-        restriction = utils.parentElement(interaction.element);
+        restriction = utils.parentNode(interaction.element);
       }
       else if (restriction === 'self') {
         restriction = target.getRect(interaction.element);

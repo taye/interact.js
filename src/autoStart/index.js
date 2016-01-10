@@ -1,3 +1,4 @@
+const interact       = require('../interact');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
 const actions        = require('../actions');
@@ -6,6 +7,57 @@ const browser        = require('../utils/browser');
 const scope          = require('../scope');
 const utils          = require('../utils');
 const signals        = require('../utils/Signals').new();
+
+const autoStart = {
+  signals,
+  testIgnore,
+  testAllow,
+  withinInteractionLimit,
+  // Allow this many interactions to happen simultaneously
+  maxInteractions: Infinity,
+  perActionDefaults: {
+    manualStart: false,
+    max: 0,
+    maxPerElement: 1,
+  },
+  setActionDefaults: function (actionName) {
+    const action = actions[actionName];
+
+    utils.extend(action.defaults, autoStart.perActionDefaults);
+  },
+};
+
+function testIgnore (interactable, interactableElement, element) {
+  const ignoreFrom = interactable.options.ignoreFrom;
+
+  if (!ignoreFrom || !utils.isElement(element)) { return false; }
+
+  if (utils.isString(ignoreFrom)) {
+    return utils.matchesUpTo(element, ignoreFrom, interactableElement);
+  }
+  else if (utils.isElement(ignoreFrom)) {
+    return utils.nodeContains(ignoreFrom, element);
+  }
+
+  return false;
+}
+
+function testAllow (interactable, interactableElement, element) {
+  const allowFrom = interactable.options.allowFrom;
+
+  if (!allowFrom) { return true; }
+
+  if (!utils.isElement(element)) { return false; }
+
+  if (utils.isString(allowFrom)) {
+    return utils.matchesUpTo(element, allowFrom, interactableElement);
+  }
+  else if (utils.isElement(allowFrom)) {
+    return utils.nodeContains(allowFrom, element);
+  }
+
+  return false;
+}
 
 // mouse move cursor style
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
@@ -40,7 +92,7 @@ Interaction.signals.on('move', function (arg) {
 
     if (starting
         && (interaction.target.options[interaction.prepared.name].manualStart
-        || !scope.withinInteractionLimit(interaction.target, interaction.element, interaction.prepared))) {
+        || !withinInteractionLimit(interaction.target, interaction.element, interaction.prepared))) {
       interaction.stop(event);
       return;
     }
@@ -53,13 +105,23 @@ Interaction.signals.on('move', function (arg) {
   }
 });
 
+// Check if the current target supports the action.
+// If so, return the validated action. Otherwise, return null
+function validateAction (action, interactable) {
+  if (utils.isObject(action) && interactable.options[action.name].enabled) {
+    return action;
+  }
+
+  return null;
+}
+
 function validateSelector (interaction, pointer, event, matches, matchElements) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i];
     const matchElement = matchElements[i];
-    const action = Interaction.validateAction(match.getAction(pointer, event, interaction, matchElement), match);
+    const action = validateAction(match.getAction(pointer, event, interaction, matchElement), match);
 
-    if (action && scope.withinInteractionLimit(match, matchElement, action)) {
+    if (action && withinInteractionLimit(match, matchElement, action)) {
       return {
         action,
         target: match,
@@ -83,9 +145,9 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       ? context.querySelectorAll(selector)
       : undefined);
 
-    if (scope.inContext(interactable, element)
-        && !scope.testIgnore(interactable, element, eventTarget)
-      && scope.testAllow(interactable, element, eventTarget)
+    if (interactable.inContext(element)
+        && !module.exports.testIgnore(interactable, element, eventTarget)
+      && module.exports.testAllow(interactable, element, eventTarget)
       && utils.matchesSelector(element, selector, elements)) {
 
       matches.push(interactable);
@@ -100,7 +162,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = Interaction.validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
+        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
         && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
@@ -119,7 +181,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       }
     }
 
-    element = utils.parentElement(element);
+    element = utils.parentNode(element);
   }
 
   return {};
@@ -282,10 +344,10 @@ Interactable.prototype.allowFrom = function (newValue) {
   return this.options.allowFrom;
 };
 
-Interaction.signals.on('stop-active', function ({ interaction }) {
+Interaction.signals.on('stop', function ({ interaction }) {
   const target = interaction.target;
 
-  if (target.options.styleCursor) {
+  if (target && target.options.styleCursor) {
     target._doc.documentElement.style.cursor = '';
   }
 });
@@ -303,6 +365,68 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
+function withinInteractionLimit (interactable, element, action) {
+  const options = interactable.options;
+  const maxActions = options[action.name].max;
+  const maxPerElement = options[action.name].maxPerElement;
+  let activeInteractions = 0;
+  let targetCount = 0;
+  let targetElementCount = 0;
+
+  for (let i = 0, len = scope.interactions.length; i < len; i++) {
+    const interaction = scope.interactions[i];
+    const otherAction = interaction.prepared.name;
+
+    if (!interaction.interacting()) { continue; }
+
+    activeInteractions++;
+
+    if (activeInteractions >= autoStart.maxInteractions) {
+      return false;
+    }
+
+    if (interaction.target !== interactable) { continue; }
+
+    targetCount += (otherAction === action.name)|0;
+
+    if (targetCount >= maxActions) {
+      return false;
+    }
+
+    if (interaction.element === element) {
+      targetElementCount++;
+
+      if (otherAction !== action.name || targetElementCount >= maxPerElement) {
+        return false;
+      }
+    }
+  }
+
+  return autoStart.maxInteractions > 0;
+}
+
+/*\
+ * interact.maxInteractions
+ [ method ]
+ **
+ * Returns or sets the maximum number of concurrent interactions allowed.
+ * By default only 1 interaction is allowed at a time (for backwards
+ * compatibility). To allow multiple interactions on the same Interactables
+ * and elements, you need to enable it in the draggable, resizable and
+ * gesturable `'max'` and `'maxPerElement'` options.
+ **
+ - newValue (number) #optional Any number. newValue <= 0 means no interactions.
+\*/
+interact.maxInteractions = function (newValue) {
+  if (utils.isNumber(newValue)) {
+    autoStart.maxInteractions = newValue;
+
+    return this;
+  }
+
+  return autoStart.maxInteractions;
+};
+
 Interactable.settingsMethods.push('styleCursor');
 Interactable.settingsMethods.push('actionChecker');
 Interactable.settingsMethods.push('ignoreFrom');
@@ -312,6 +436,7 @@ defaultOptions.base.actionChecker = null;
 defaultOptions.base.ignoreFrom = null;
 defaultOptions.base.allowFrom = null;
 defaultOptions.base.styleCursor = true;
-defaultOptions.perAction.manualStart = false;
 
-module.exports = { signals };
+utils.extend(defaultOptions.perAction, autoStart.perActionDefaults);
+
+module.exports = autoStart;

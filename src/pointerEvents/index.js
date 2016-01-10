@@ -1,8 +1,10 @@
-const scope = require('./scope');
-const InteractEvent = require('./InteractEvent');
-const Interaction = require('./Interaction');
-const utils = require('./utils');
-const browser = require('./utils/browser');
+const scope       = require('../scope');
+const Interaction = require('../Interaction');
+const utils       = require('../utils');
+const browser     = require('../utils/browser');
+const Eventable   = require('../Eventable');
+const defaults    = require('../defaultOptions');
+const signals     = require('../utils/Signals').new();
 
 const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
 const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
@@ -11,7 +13,15 @@ function preventOriginalDefault () {
   this.originalEvent.preventDefault();
 }
 
-function firePointers (interaction, pointer, event, eventTarget, targets, elements, eventType) {
+function stopImmediatePropagation () {
+  this.immediatePropagationStopped = this.propagationStopped = true;
+}
+
+function stopPropagation () {
+  this.propagationStopped = true;
+}
+
+function firePointers (interaction, pointer, event, eventTarget, targets, eventType) {
   const pointerIndex = interaction.mouse? 0 : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer));
   let pointerEvent = {};
   let i;
@@ -31,8 +41,8 @@ function firePointers (interaction, pointer, event, eventTarget, targets, elemen
     }
 
     pointerEvent.preventDefault           = preventOriginalDefault;
-    pointerEvent.stopPropagation          = InteractEvent.prototype.stopPropagation;
-    pointerEvent.stopImmediatePropagation = InteractEvent.prototype.stopImmediatePropagation;
+    pointerEvent.stopPropagation          = stopPropagation;
+    pointerEvent.stopImmediatePropagation = stopImmediatePropagation;
     pointerEvent.interaction              = interaction;
 
     pointerEvent.timeStamp     = new Date().getTime();
@@ -58,17 +68,34 @@ function firePointers (interaction, pointer, event, eventTarget, targets, elemen
     interaction.tapTime = pointerEvent.timeStamp;
   }
 
+  const signalArg = {
+    pointerEvent,
+    pointer,
+    event,
+    targets,
+  };
+
+  signals.fire('new', signalArg);
+
   for (i = 0; i < targets.length; i++) {
-    pointerEvent.currentTarget = elements[i];
-    pointerEvent.interactable = targets[i];
-    targets[i].fire(pointerEvent);
+    const target = targets[i];
+
+    pointerEvent.currentTarget = target.element;
+
+    for (const prop in target.props || {}) {
+      pointerEvent[prop] = target.props[prop];
+    }
+
+    target.eventable.fire(pointerEvent);
 
     if (pointerEvent.immediatePropagationStopped
         || (pointerEvent.propagationStopped
-            && elements[i + 1] !== pointerEvent.currentTarget)) {
+            && (i + 1) < targets.length && targets[i + 1].element !== pointerEvent.currentTarget)) {
       break;
     }
   }
+
+  signals.fire('fired', signalArg);
 
   if (createNewDoubleTap) {
     const doubleTap = {};
@@ -98,43 +125,28 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
   }
 
   const targets = [];
-  const elements = [];
-  let element = eventTarget;
+  const path = utils.getPath(eventTarget);
+  const signalArg = {
+    targets,
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    eventType,
+    path,
+    element: null,
+  };
 
-  function collectSelectors (interactable, selector, context) {
-    const els = browser.useMatchesSelectorPolyfill
-        ? context.querySelectorAll(selector)
-        : undefined;
+  for (const element of path) {
+    signalArg.element = element;
 
-    if (interactable._iEvents[eventType]
-        && utils.isElement(element)
-        && scope.inContext(interactable, element)
-        && !scope.testIgnore(interactable, element, eventTarget)
-        && scope.testAllow(interactable, element, eventTarget)
-        && utils.matchesSelector(element, selector, els)) {
-
-      targets.push(interactable);
-      elements.push(element);
-    }
-  }
-
-  const interact = scope.interact;
-
-  while (element) {
-    if (interact.isSet(element) && interact(element)._iEvents[eventType]) {
-      targets.push(interact(element));
-      elements.push(element);
-    }
-
-    scope.interactables.forEachSelector(collectSelectors);
-
-    element = utils.parentElement(element);
+    signals.fire('collect-targets', signalArg);
   }
 
   // create the tap event even if there are no listeners so that
   // doubletap can still be created and fired
   if (targets.length || eventType === 'tap') {
-    firePointers(interaction, pointer, event, eventTarget, targets, elements, eventType);
+    firePointers(interaction, pointer, event, eventTarget, targets, eventType);
   }
 }
 
@@ -164,7 +176,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
                         eventTarget,
                         'hold');
 
-  }, scope.defaultOptions._holdDuration);
+  }, defaults._holdDuration);
 });
 
 function createSignalListener (event) {
@@ -186,7 +198,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.tapTime = 0;     // time of the most recent tap event
 });
 
-utils.merge(scope.eventTypes, [
+utils.merge(Eventable.prototype.types, [
   'down',
   'move',
   'up',
@@ -200,4 +212,5 @@ module.exports = scope.pointerEvents = {
   firePointers,
   collectEventTargets,
   preventOriginalDefault,
+  signals,
 };

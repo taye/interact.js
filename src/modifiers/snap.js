@@ -1,6 +1,6 @@
-const modifiers = require('./index');
-const interact = require('../interact');
-const utils = require('../utils');
+const modifiers      = require('./index');
+const interact       = require('../interact');
+const utils          = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
 const snap = {

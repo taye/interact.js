@@ -1,5 +1,5 @@
-const scope = require('../scope');
-const utils = require('./index');
+const scope   = require('../scope');
+const utils   = require('./index');
 const browser = require('./browser');
 
 const finder = {
@@ -37,7 +37,7 @@ const finder = {
           if (element === interaction.element) {
             return interaction;
           }
-          element = utils.parentElement(element);
+          element = utils.parentNode(element);
         }
       }
     }

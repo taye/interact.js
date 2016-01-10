@@ -39,6 +39,10 @@ const browser = {
       : { up: 'pointerup', down: 'pointerdown', over: 'pointerover',
           out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' })
     : null),
+
+  // because Webkit and Opera still use 'mousewheel' event type
+  wheelEvent: 'onmousewheel' in domObjects.document? 'mousewheel': 'wheel',
+
 };
 
 browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);

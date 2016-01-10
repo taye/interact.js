@@ -3,7 +3,7 @@ const scope     = require('../scope');
 const browser   = require('../utils/browser');
 
 const { isElement } = require('../utils/isType');
-const { matchesSelector, parentElement } = require('../utils/domUtils');
+const { matchesSelector, parentNode } = require('../utils/domUtils');
 
 autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
   // check if a drag is in the correct axis
@@ -37,10 +37,10 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
 
         let action = null;
 
-        if (scope.inContext(interactable, eventTarget)
+        if (interactable.inContext(eventTarget)
             && !interactable.options.drag.manualStart
-            && !scope.testIgnore(interactable, element, eventTarget)
-            && scope.testAllow(interactable, element, eventTarget)
+            && !autoStart.testIgnore(interactable, element, eventTarget)
+            && autoStart.testAllow(interactable, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
           action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
@@ -48,7 +48,7 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
         if (action
             && action.name === 'drag'
             && checkStartAxis(currentAxis, interactable)
-            && scope.withinInteractionLimit(interactable, element, { name: 'drag' })) {
+            && autoStart.withinInteractionLimit(interactable, element, { name: 'drag' })) {
 
           return interactable;
         }
@@ -85,7 +85,7 @@ autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget,
           break;
         }
 
-        element = parentElement(element);
+        element = parentNode(element);
       }
     }
   }
@@ -98,4 +98,3 @@ function checkStartAxis (startAxis, interactable) {
 
   return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis);
 }
-

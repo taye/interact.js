@@ -1,25 +1,22 @@
-const actions = require('./index');
-const scope = require('../scope');
-const utils = require('../utils');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const utils          = require('../utils');
+const Eventable      = require('../Eventable');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
 
 const drag = {
   defaults: {
-    enabled      : false,
-    manualStart  : true,
-    max          : Infinity,
-    maxPerElement: 1,
+    enabled   : false,
 
     snap      : null,
     restrict  : null,
     inertia   : null,
     autoScroll: null,
 
-    startAxis: 'xy',
-    lockAxis : 'xy',
+    startAxis : 'xy',
+    lockAxis  : 'xy',
   },
 
   checker: function (pointer, event, interactable) {
@@ -37,7 +34,9 @@ const drag = {
   },
 };
 
-Interaction.signals.on('start-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
 
   interaction._interacting = true;
@@ -70,7 +69,9 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
   }
 });
 
-Interaction.signals.on('move-drag', function ({ interaction, event }) {
+Interaction.signals.on('action-move', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
 
   const axis = interaction.prepared.axis;
@@ -165,7 +166,7 @@ Interactable.prototype.draggable = function (options) {
 
 actions.drag = drag;
 actions.names.push('drag');
-utils.merge(scope.eventTypes, [
+utils.merge(Eventable.prototype.types, [
   'dragstart',
   'dragmove',
   'draginertiastart',

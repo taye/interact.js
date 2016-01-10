@@ -1,18 +1,18 @@
-const actions = require('./index');
-const utils = require('../utils');
-const browser = require('../utils/browser');
-const scope = require('../scope');
-const InteractEvent = require('../InteractEvent');
-const Interactable = require('../Interactable');
-const Interaction = require('../Interaction');
+const actions        = require('./index');
+const utils          = require('../utils');
+const browser        = require('../utils/browser');
+const Eventable      = require('../Eventable');
+const InteractEvent  = require('../InteractEvent');
+const Interactable   = require('../Interactable');
+const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
+
+// Less Precision with touch input
+const defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
 const resize = {
   defaults: {
-    enabled      : false,
-    manualStart  : false,
-    max          : Infinity,
-    maxPerElement: 1,
+    enabled   : false,
 
     snap      : null,
     restrict  : null,
@@ -58,7 +58,7 @@ const resize = {
                                               interaction._eventTarget,
                                               element,
                                               rect,
-                                              resizeOptions.margin || scope.margin);
+                                              resizeOptions.margin || defaultMargin);
         }
 
         resizeEdges.left = resizeEdges.left && !resizeEdges.right;
@@ -72,8 +72,8 @@ const resize = {
         }
       }
       else {
-        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - scope.margin);
-        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - scope.margin);
+        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - defaultMargin);
+        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - defaultMargin);
 
         if (right || bottom) {
           return {
@@ -134,7 +134,9 @@ const resize = {
   },
 };
 
-Interaction.signals.on('start-resize', function ({ interaction, event }) {
+Interaction.signals.on('action-start', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'resize') { return; }
+
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'start', interaction.element);
 
   if (interaction.prepared.edges) {
@@ -188,7 +190,9 @@ Interaction.signals.on('start-resize', function ({ interaction, event }) {
   interaction.prevEvent = resizeEvent;
 });
 
-Interaction.signals.on('move-resize', function ({ interaction, event }) {
+Interaction.signals.on('action-move', function ({ interaction, event }) {
+  if (interaction.prepared.name !== 'resize') { return; }
+
   const resizeEvent = new InteractEvent(interaction, event, 'resize', 'move', interaction.element);
   const resizeOptions = interaction.target.options.resize;
   const invert = resizeOptions.invert;
@@ -342,7 +346,7 @@ Interactable.prototype.resizable = function (options) {
       this.options.resize.axis = options.axis;
     }
     else if (options.axis === null) {
-      this.options.resize.axis = scope.defaultOptions.resize.axis;
+      this.options.resize.axis = defaultOptions.resize.axis;
     }
 
     if (utils.isBool(options.preserveAspectRatio)) {
@@ -402,8 +406,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.resizeAxes = 'xy';
 });
 
-InteractEvent.signals.on('resize', function ({ interaction, iEvent }) {
-  if (!interaction.resizeAxes) { return; }
+InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action }) {
+  if (action !== 'resize' || !interaction.resizeAxes) { return; }
 
   const options = interaction.target.options;
 
@@ -430,7 +434,7 @@ InteractEvent.signals.on('resize', function ({ interaction, iEvent }) {
 
 actions.resize = resize;
 actions.names.push('resize');
-utils.merge(scope.eventTypes, [
+utils.merge(Eventable.prototype.types, [
   'resizestart',
   'resizemove',
   'resizeinertiastart',
