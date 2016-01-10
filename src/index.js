@@ -1,8 +1,5 @@
 /* browser entry point */
 
-// Interaction
-require('./Interaction');
-
 // Legacy browser support
 require('./legacyBrowsers');
 
