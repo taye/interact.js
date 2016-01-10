@@ -368,16 +368,6 @@ class Interaction {
   }
 }
 
-// Check if the current target supports the action.
-// If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable) {
-  if (utils.isObject(action) && interactable.options[action.name].enabled) {
-    return action;
-  }
-
-  return null;
-}
-
 for (let i = 0, len = methodNames.length; i < len; i++) {
   const method = methodNames[i];
 
@@ -484,7 +474,6 @@ scope.signals.on('remove-document', onDocSignal);
 
 Interaction.pointerMoveTolerance = 1;
 Interaction.doOnInteractions = doOnInteractions;
-Interaction.validateAction = validateAction;
 Interaction.endAll = endAll;
 Interaction.signals = signals;
 Interaction.docEvents = docEvents;
