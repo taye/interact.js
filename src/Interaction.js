@@ -109,8 +109,6 @@ class Interaction {
       pointerIndex,
       interaction: this,
     });
-
-    this.checkAndPreventDefault(event);
   }
 
   /*\
@@ -223,8 +221,6 @@ class Interaction {
         utils.copyCoords(this.prevCoords, this.curCoords);
       }
     }
-
-    this.checkAndPreventDefault(event);
   }
 
   /*\
@@ -266,8 +262,6 @@ class Interaction {
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
-    this.checkAndPreventDefault(event);
-
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
     clearTimeout(this.holdTimers[pointerIndex]);
@@ -368,31 +362,6 @@ class Interaction {
     this.holdTimers .splice(index, 1);
   }
 
-  checkAndPreventDefault (event) {
-    const setting = this.target? this.target.options.preventDefault : 'never';
-
-    if (setting === 'never') { return; }
-
-    if (setting === 'always') {
-      event.preventDefault();
-      return;
-    }
-
-    // setting === 'auto'
-
-    // don't preventDefault of pointerdown events
-    if (/down|start/i.test(event.type)) {
-      return;
-    }
-
-    // don't preventDefault on input elements
-    if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
-      return;
-    }
-
-    event.preventDefault();
-  }
-
   _updateEventTargets (target, currentTarget) {
     this._eventTarget    = target;
     this._curEventTarget = currentTarget;
@@ -473,20 +442,6 @@ function endAll (event) {
   }
 }
 
-// prevent native HTML5 drag on interact.js target elements
-function preventNativeDrag (event) {
-  for (const interaction of scope.interactions) {
-
-    if (interaction.element
-        && (interaction.element === event.target
-            || utils.nodeContains(interaction.element, event.target))) {
-
-      interaction.checkAndPreventDefault(event);
-      return;
-    }
-  }
-}
-
 const docEvents = { /* 'eventType': listenerFunc */ };
 const pEventTypes = browser.pEventTypes;
 
@@ -508,7 +463,6 @@ else {
 }
 
 docEvents.blur = endAll;
-docEvents.dragstart = preventNativeDrag;
 
 function onDocSignal ({ doc }, signalName) {
   const eventMethod = signalName.indexOf('add') === 0
@@ -533,6 +487,7 @@ Interaction.doOnInteractions = doOnInteractions;
 Interaction.validateAction = validateAction;
 Interaction.endAll = endAll;
 Interaction.signals = signals;
+Interaction.docEvents = docEvents;
 
 scope.endAllInteractions = endAll;
 

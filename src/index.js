@@ -31,6 +31,9 @@ autoStart.setActionDefaults('drag');
 autoStart.setActionDefaults('resize');
 autoStart.setActionDefaults('gesture');
 
+// Interactable preventDefault setting
+require('./interactablePreventDefault.js');
+
 // autoScroll
 require('./autoScroll');
 

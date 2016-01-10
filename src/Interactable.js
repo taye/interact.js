@@ -153,33 +153,6 @@ class Interactable {
   }
 
   /*\
-   * Interactable.preventDefault
-   [ method ]
-   *
-   * Returns or sets whether to prevent the browser's default behaviour
-   * in response to pointer events. Can be set to:
-   *  - `'always'` to always prevent
-   *  - `'never'` to never prevent
-   *  - `'auto'` to let interact.js try to determine what would be best
-   *
-   - newValue (string) #optional `true`, `false` or `'auto'`
-   = (string | Interactable) The current setting or this Interactable
-  \*/
-  preventDefault (newValue) {
-    if (/^(always|never|auto)$/.test(newValue)) {
-      this.options.preventDefault = newValue;
-      return this;
-    }
-
-    if (isType.isBool(newValue)) {
-      this.options.preventDefault = newValue? 'always' : 'never';
-      return this;
-    }
-
-    return this.options.preventDefault;
-  }
-
-  /*\
    * Interactable.origin
    [ method ]
    *
