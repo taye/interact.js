@@ -1,6 +1,5 @@
 const actions        = require('./index');
 const utils          = require('../utils');
-const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -166,7 +165,7 @@ Interactable.prototype.draggable = function (options) {
 
 actions.drag = drag;
 actions.names.push('drag');
-utils.merge(Eventable.prototype.types, [
+utils.merge(Interactable.eventTypes, [
   'dragstart',
   'dragmove',
   'draginertiastart',

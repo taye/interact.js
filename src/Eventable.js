@@ -49,6 +49,4 @@ class Eventable {
   }
 }
 
-Eventable.prototype.types = [];
-
 module.exports = Eventable;

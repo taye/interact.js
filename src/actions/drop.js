@@ -2,7 +2,6 @@ const actions        = require('./index');
 const utils          = require('../utils');
 const scope          = require('../scope');
 const interact       = require('../interact');
-const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -455,7 +454,7 @@ interact.dynamicDrop = function (newValue) {
   return dynamicDrop;
 };
 
-utils.merge(Eventable.prototype.types, [
+utils.merge(Interactable.eventTypes, [
   'dragenter',
   'dragleave',
   'dropactivate',

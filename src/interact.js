@@ -12,7 +12,6 @@ const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
 const Interaction  = require('./Interaction');
-const Eventable    = require('./Eventable');
 
 const globalEvents = {};
 
@@ -98,7 +97,7 @@ interact.on = function (type, listener, useCapture) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Eventable.prototype.types, type)) {
+  if (utils.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -147,7 +146,7 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (!utils.contains(Eventable.prototype.types, type)) {
+  if (!utils.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, useCapture);
   }
   else {

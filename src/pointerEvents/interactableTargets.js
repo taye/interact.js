@@ -1,8 +1,10 @@
 const pointerEvents = require('./index');
+const Interactable  = require('../Interactable');
 const browser       = require('../utils/browser');
 const isType        = require('../utils/isType');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
+const { merge }     = require('../utils/arr');
 
 pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType }) {
   function collectSelectors (interactable, selector, context) {
@@ -41,3 +43,5 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
 
   scope.interactables.forEachSelector(collectSelectors);
 });
+
+merge(Interactable.eventTypes, pointerEvents.types);
