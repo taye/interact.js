@@ -1,3 +1,27 @@
+## Upcoming Changes
+
+Major refactor with [PR #231](https://github.com/taye/interact.js/pull/231).
+The API remains largely the same aside from the removel of some deprecated
+methods. Some workarounds that used `interact.debug()` may need to be modified
+to work again.
+
+Notable changes:
+
+ - removed deprecated methods:
+   - `Interactable` - `squareResize`, `snap`, `restrict`, `inertia`,
+     `autoScroll`, `accept`, `dropzone`
+   - `interact` - `enabbleDragging`, `enableResizing`, `enableGesturing`, `margin`
+ - new `delay` option for starting actions ([f688eba](https://github.com/taye/interact.js/commit/f688eba))
+ - new `interaction.end()` method ([df963b0](https://github.com/taye/interact.js/commit/df963b0))
+ - `snap.offset` `self` option ([issue #204](https://github.com/taye/interact.js/issues/204/#issuecomment-154879052))
+ - `interaction.doMove()` ([3489ee1](https://github.com/taye/interact.js/commit/3489ee1)) ([c5c658a](https://github.com/taye/interact.js/commit/c5c658a))
+ - snap grid limits ([d549672](https://github.com/taye/interact.js/commit/d549672))
+ - improved iframe support ([PR #313](https://github.com/taye/interact.js/pull/313))
+ - `actionend` event dx/dy are now `0`, not the difference between start and
+   end coords ([cbfaf00](https://github.com/taye/interact.js/commit/cbfaf00))
+
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.6...master).
+
 ## 1.2.6
 
 ### resize.preserveAspectRatio
