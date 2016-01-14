@@ -1,0 +1,10 @@
+extends: '../.eslintrc'
+
+env:
+  node: false
+
+rules:
+  no-console: 2
+  no-var: 2
+  prefer-const: 2
+  strict: [2, never]
