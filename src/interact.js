@@ -1,11 +1,3 @@
-/**
- * interact.js v1.2.5
- *
- * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
- * Open source under the MIT License.
- * https://raw.github.com/taye/interact.js/master/LICENSE
- */
-
 const browser      = require('./utils/browser');
 const events       = require('./utils/events');
 const utils        = require('./utils');
