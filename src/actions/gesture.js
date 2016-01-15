@@ -1,6 +1,5 @@
 const actions        = require('./index');
 const utils          = require('../utils');
-const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -170,7 +169,7 @@ Interaction.signals.on('new', function (interaction) {
 
 actions.gesture = gesture;
 actions.names.push('gesture');
-utils.merge(Eventable.prototype.types, [
+utils.merge(Interactable.eventTypes, [
   'gesturestart',
   'gesturemove',
   'gestureend',

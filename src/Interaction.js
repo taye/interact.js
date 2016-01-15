@@ -156,11 +156,6 @@ class Interaction {
       scope.interactions.push(this);
     }
 
-    // set the startCoords if there was no prepared action
-    if (!this.prepared.name) {
-      utils.setCoords(this.startCoords, this.pointers);
-    }
-
     utils.copyAction(this.prepared, action);
     this.target         = target;
     this.element        = element;

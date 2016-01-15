@@ -9,7 +9,6 @@ Interaction.signals.on('new', function (interaction) {
     active     : false,
     smoothEnd  : false,
     allowResume: false,
-    ending     : false,
 
     startEvent: null,
     upCoords  : {},
@@ -167,7 +166,7 @@ Interaction.signals.on('stop-active', function ({ interaction }) {
 
   if (status.active) {
     animationFrame.cancel(status.i);
-    status.active = status.ending = false;
+    status.active = false;
     interaction.simulation = null;
   }
 });
@@ -224,14 +223,12 @@ function inertiaFrame () {
     status.i = animationFrame.request(this.boundInertiaFrame);
   }
   else {
-    status.ending = true;
-
     status.sx = status.modifiedXe;
     status.sy = status.modifiedYe;
 
     this.doMove();
     this.end(status.startEvent);
-    status.active = status.ending = false;
+    status.active = false;
     this.simulation = null;
   }
 
@@ -254,8 +251,6 @@ function smoothEndFrame () {
     status.i = animationFrame.request(this.boundSmoothEndFrame);
   }
   else {
-    status.ending = true;
-
     status.sx = status.xe;
     status.sy = status.ye;
 
@@ -263,7 +258,7 @@ function smoothEndFrame () {
     this.end(status.startEvent);
 
     status.smoothEnd =
-      status.active = status.ending = false;
+      status.active = false;
     this.simulation = null;
   }
 }

@@ -1,18 +1,9 @@
-/**
- * interact.js v1.2.5
- *
- * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
- * Open source under the MIT License.
- * https://raw.github.com/taye/interact.js/master/LICENSE
- */
-
 const browser      = require('./utils/browser');
 const events       = require('./utils/events');
 const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
 const Interaction  = require('./Interaction');
-const Eventable    = require('./Eventable');
 
 const globalEvents = {};
 
@@ -31,15 +22,14 @@ const globalEvents = {};
  = (object) An @Interactable
  *
  > Usage
- | interact(document.getElementById('draggable')).draggable(true);
+ | interact('#draggable').draggable(true);
  |
  | var rectables = interact('rect');
  | rectables
  |     .gesturable(true)
  |     .on('gesturemove', function (event) {
- |         // something cool...
- |     })
- |     .autoScroll(true);
+ |         // ...
+ |     });
 \*/
 function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
@@ -98,7 +88,7 @@ interact.on = function (type, listener, useCapture) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Eventable.prototype.types, type)) {
+  if (utils.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -147,7 +137,7 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (!utils.contains(Eventable.prototype.types, type)) {
+  if (!utils.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, useCapture);
   }
   else {

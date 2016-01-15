@@ -2,7 +2,6 @@ const scope       = require('../scope');
 const Interaction = require('../Interaction');
 const utils       = require('../utils');
 const browser     = require('../utils/browser');
-const Eventable   = require('../Eventable');
 const defaults    = require('../defaultOptions');
 const signals     = require('../utils/Signals').new();
 
@@ -198,19 +197,18 @@ Interaction.signals.on('new', function (interaction) {
   interaction.tapTime = 0;     // time of the most recent tap event
 });
 
-utils.merge(Eventable.prototype.types, [
-  'down',
-  'move',
-  'up',
-  'cancel',
-  'tap',
-  'doubletap',
-  'hold',
-]);
-
 module.exports = scope.pointerEvents = {
   firePointers,
   collectEventTargets,
   preventOriginalDefault,
   signals,
+  types: [
+    'down',
+    'move',
+    'up',
+    'cancel',
+    'tap',
+    'doubletap',
+    'hold',
+  ],
 };

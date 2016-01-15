@@ -43,7 +43,7 @@ if (browser.isIE8) {
   const selectFix = function (event) {
     for (const interaction of scope.interactions) {
       if (interaction.interacting()) {
-        interaction.checkAndPreventDefault(event);
+        interaction.target.checkAndPreventDefault(event);
       }
     }
   };

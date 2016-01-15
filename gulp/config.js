@@ -1,4 +1,4 @@
-var dest = "./dist";
+var dest = './dist';
 var src = './src';
 
 module.exports = {
@@ -6,30 +6,29 @@ module.exports = {
   browserSync: {
     server: {
       // Serve up our build folder
-      baseDir: dest
-    }
+      baseDir: dest,
+    },
   },
   markup: {
-    src: src + "/htdocs/**",
-    dest: dest
+    src : src + '/htdocs/**',
+    dest: dest,
   },
   browserify: {
-    // A separate bundle will be generated for each
-    // bundle config in the list below
+    // A separate bundle will be generated for each bundle config below
     bundleConfigs: [
       {
-        entries: './index.js',
-        dest: dest,
-        debug: true,
-        outputName: 'interact.js',
+        entries      : 'index.js',
+        dest         : dest,
+        debug        : true,
+        outputName   : 'interact.js',
         outputNameMin: 'interact.min.js',
-        souremapComment: true,
+        headerFile   : 'src/header.js',
 
-        standalone: 'interact',
-        transform: [[ 'babelify', {} ]],
+        standalone   : 'interact',
+        transform    : [[ 'babelify', {} ]],
         // Additional file extentions to make optional
-        extensions: [],
+        extensions   : [],
       },
     ],
-  }
+  },
 };

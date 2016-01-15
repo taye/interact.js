@@ -227,10 +227,6 @@ class Interactable {
    = (Interactable) this Interactable
   \*/
   fire (iEvent) {
-    if (!(iEvent && iEvent.type) || !contains(this._iEvents.types, iEvent.type)) {
-      return this;
-    }
-
     this._iEvents.fire(iEvent);
 
     return this;
@@ -279,7 +275,7 @@ class Interactable {
 
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
-    if (contains(this._iEvents.types, eventType)) {
+    if (contains(Interactable.eventTypes, eventType)) {
       this._iEvents.on(eventType, listener);
     }
     // delegated event for selector
@@ -315,7 +311,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     // if it is an action event type
-    if (contains(this._iEvents.types, eventType)) {
+    if (contains(Interactable.eventTypes, eventType)) {
       this._iEvents.on(eventType, listener);
     }
     // delegated event
@@ -459,6 +455,9 @@ scope.interactables.forEachSelector = function (callback) {
     }
   }
 };
+
+// all interact.js eventTypes
+Interactable.eventTypes = scope.eventTypes = [];
 
 Interactable.signals = signals;
 

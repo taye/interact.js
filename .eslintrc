@@ -4,6 +4,7 @@ env:
   browser: true
   commonjs: true
   es6: true
+  node: true
 
 rules:
   comma-dangle: [2, always-multiline]
@@ -16,6 +17,7 @@ rules:
   indent: [2, 2]
   linebreak-style: [2, unix]
   no-caller: 2
+  no-console: 0
   no-empty: 0
   no-extra-bind: 2
   no-self-compare: 2
@@ -24,14 +26,11 @@ rules:
   no-shadow-restricted-names: 2
   no-trailing-spaces: 2
   no-unused-expressions: 2
-  no-var: 2
   one-var: [2, never]
-  prefer-const: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
   space-after-keywords: [2, always]
   space-before-function-paren: [2, always]
-  strict: [2, never]
 
 ecma-features:
   arrow-functions: true

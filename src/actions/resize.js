@@ -1,7 +1,6 @@
 const actions        = require('./index');
 const utils          = require('../utils');
 const browser        = require('../utils/browser');
-const Eventable      = require('../Eventable');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -434,7 +433,7 @@ InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action })
 
 actions.resize = resize;
 actions.names.push('resize');
-utils.merge(Eventable.prototype.types, [
+utils.merge(Interactable.eventTypes, [
   'resizestart',
   'resizemove',
   'resizeinertiastart',
