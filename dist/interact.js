@@ -1,3 +1,10 @@
+/**
+ * interact.js 1.2.6
+ *
+ * Copyright (c) 2012-2016 Taye Adeyemi <dev@taye.me>
+ * Open source under the MIT License.
+ * https://raw.github.com/taye/interact.js/master/LICENSE
+ */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*
  * In a (windowless) server environment this file exports a factory function
@@ -24,6 +31,12 @@ var _require = require('./utils/arr');
 
 var indexOf = _require.indexOf;
 
+function fireUntilImmediateStopped(event, listeners) {
+  for (var i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
+    listeners[i](event);
+  }
+}
+
 var Eventable = (function () {
   function Eventable() {
     _classCallCheck(this, Eventable);
@@ -35,12 +48,8 @@ var Eventable = (function () {
     var global = this.global;
 
     // Interactable#on() listeners
-    if (event.type in this) {
-      listeners = this[event.type];
-
-      for (var i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-        listeners[i](event);
-      }
+    if (listeners = this[event.type]) {
+      fireUntilImmediateStopped(event, listeners);
     }
 
     // interactable.onevent listener
@@ -49,11 +58,8 @@ var Eventable = (function () {
     }
 
     // interact.on() listeners
-    if (global && event.type in global && (listeners = global[event.type])) {
-
-      for (var i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-        listeners[i](event);
-      }
+    if (!event.propagationStopped && global && (listeners = global[event.type])) {
+      fireUntilImmediateStopped(event, listeners);
     }
   };
 
@@ -78,8 +84,6 @@ var Eventable = (function () {
 
   return Eventable;
 })();
-
-Eventable.prototype.types = [];
 
 module.exports = Eventable;
 
@@ -231,32 +235,18 @@ var InteractEvent = (function () {
 signals.on('set-delta', function (_ref) {
   var iEvent = _ref.iEvent;
   var interaction = _ref.interaction;
-  var ending = _ref.ending;
   var starting = _ref.starting;
   var deltaSource = _ref.deltaSource;
 
-  if (starting) {
-    iEvent.dx = 0;
-    iEvent.dy = 0;
+  var prevEvent = starting ? iEvent : interaction.prevEvent;
+
+  if (deltaSource === 'client') {
+    iEvent.dx = iEvent.clientX - prevEvent.clientX;
+    iEvent.dy = iEvent.clientY - prevEvent.clientY;
+  } else {
+    iEvent.dx = iEvent.pageX - prevEvent.pageX;
+    iEvent.dy = iEvent.pageY - prevEvent.pageY;
   }
-  // end event dx, dy is difference between start and end points
-  else if (ending) {
-      if (deltaSource === 'client') {
-        iEvent.dx = iEvent.clientX - interaction.startCoords.client.x;
-        iEvent.dy = iEvent.clientY - interaction.startCoords.client.y;
-      } else {
-        iEvent.dx = iEvent.pageX - interaction.startCoords.page.x;
-        iEvent.dy = iEvent.pageY - interaction.startCoords.page.y;
-      }
-    } else {
-      if (deltaSource === 'client') {
-        iEvent.dx = iEvent.clientX - interaction.prevEvent.clientX;
-        iEvent.dy = iEvent.clientY - interaction.prevEvent.clientY;
-      } else {
-        iEvent.dx = iEvent.pageX - interaction.prevEvent.pageX;
-        iEvent.dy = iEvent.pageY - interaction.prevEvent.pageY;
-      }
-    }
 });
 
 InteractEvent.signals = signals;
@@ -515,10 +505,6 @@ var Interactable = (function () {
   \*/
 
   Interactable.prototype.fire = function fire(iEvent) {
-    if (!(iEvent && iEvent.type) || !contains(this._iEvents.types, iEvent.type)) {
-      return this;
-    }
-
     this._iEvents.fire(iEvent);
 
     return this;
@@ -570,7 +556,7 @@ var Interactable = (function () {
       eventType = wheelEvent;
     }
 
-    if (contains(this._iEvents.types, eventType)) {
+    if (contains(Interactable.eventTypes, eventType)) {
       this._iEvents.on(eventType, listener);
     }
     // delegated event for selector
@@ -608,7 +594,7 @@ var Interactable = (function () {
     }
 
     // if it is an action event type
-    if (contains(this._iEvents.types, eventType)) {
+    if (contains(Interactable.eventTypes, eventType)) {
       this._iEvents.on(eventType, listener);
     }
     // delegated event
@@ -780,6 +766,9 @@ scope.interactables.forEachSelector = function (callback) {
   }
 };
 
+// all interact.js eventTypes
+Interactable.eventTypes = scope.eventTypes = [];
+
 Interactable.signals = signals;
 
 Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rectChecker'];
@@ -943,11 +932,6 @@ var Interaction = (function () {
     // add it back
     if (utils.indexOf(scope.interactions, this) === -1) {
       scope.interactions.push(this);
-    }
-
-    // set the startCoords if there was no prepared action
-    if (!this.prepared.name) {
-      utils.setCoords(this.startCoords, this.pointers);
     }
 
     utils.copyAction(this.prepared, action);
@@ -1291,7 +1275,6 @@ module.exports = Interaction;
 },{"./scope":26,"./utils":36,"./utils/Signals":27,"./utils/browser":29,"./utils/events":32,"./utils/interactionFinder":37}],6:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
-var Eventable = require('../Eventable');
 var InteractEvent = require('../InteractEvent');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -1472,19 +1455,18 @@ Interactable.prototype.draggable = function (options) {
 
 actions.drag = drag;
 actions.names.push('drag');
-utils.merge(Eventable.prototype.types, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
+utils.merge(Interactable.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
 actions.methodDict.drag = 'draggable';
 
 defaultOptions.drag = drag.defaults;
 
 module.exports = drag;
 
-},{"../Eventable":2,"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"./index":9}],7:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"./index":9}],7:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
 var scope = require('../scope');
 var interact = require('../interact');
-var Eventable = require('../Eventable');
 var InteractEvent = require('../InteractEvent');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -1976,17 +1958,16 @@ interact.dynamicDrop = function (newValue) {
   return dynamicDrop;
 };
 
-utils.merge(Eventable.prototype.types, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
+utils.merge(Interactable.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
 actions.methodDict.drop = 'dropzone';
 
 defaultOptions.drop = drop.defaults;
 
 module.exports = drop;
 
-},{"../Eventable":2,"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../interact":18,"../scope":26,"../utils":36,"./index":9}],8:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../interact":18,"../scope":26,"../utils":36,"./index":9}],8:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
-var Eventable = require('../Eventable');
 var InteractEvent = require('../InteractEvent');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -2178,14 +2159,14 @@ Interaction.signals.on('new', function (interaction) {
 // angle of the previous gesture event
 actions.gesture = gesture;
 actions.names.push('gesture');
-utils.merge(Eventable.prototype.types, ['gesturestart', 'gesturemove', 'gestureend']);
+utils.merge(Interactable.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
 actions.methodDict.gesture = 'gesturable';
 
 defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;
 
-},{"../Eventable":2,"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"./index":9}],9:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"./index":9}],9:[function(require,module,exports){
 var actions = {
   names: [],
   methodDict: {}
@@ -2197,7 +2178,6 @@ module.exports = actions;
 var actions = require('./index');
 var utils = require('../utils');
 var browser = require('../utils/browser');
-var Eventable = require('../Eventable');
 var InteractEvent = require('../InteractEvent');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -2665,14 +2645,14 @@ InteractEvent.signals.on('set-delta', function (_ref4) {
 
 actions.resize = resize;
 actions.names.push('resize');
-utils.merge(Eventable.prototype.types, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
+utils.merge(Interactable.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
 actions.methodDict.resize = 'resizable';
 
 defaultOptions.resize = resize.defaults;
 
 module.exports = resize;
 
-},{"../Eventable":2,"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"../utils/browser":29,"./index":9}],11:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":15,"../utils":36,"../utils/browser":29,"./index":9}],11:[function(require,module,exports){
 var raf = require('./utils/raf');
 var getWindow = require('./utils/window').getWindow;
 var isWindow = require('./utils/isType').isWindow;
@@ -3526,7 +3506,6 @@ Interaction.signals.on('new', function (interaction) {
     active: false,
     smoothEnd: false,
     allowResume: false,
-    ending: false,
 
     startEvent: null,
     upCoords: {},
@@ -3691,7 +3670,7 @@ Interaction.signals.on('stop-active', function (_ref3) {
 
   if (status.active) {
     animationFrame.cancel(status.i);
-    status.active = status.ending = false;
+    status.active = false;
     interaction.simulation = null;
   }
 });
@@ -3741,14 +3720,12 @@ function inertiaFrame() {
 
     status.i = animationFrame.request(this.boundInertiaFrame);
   } else {
-    status.ending = true;
-
     status.sx = status.modifiedXe;
     status.sy = status.modifiedYe;
 
     this.doMove();
     this.end(status.startEvent);
-    status.active = status.ending = false;
+    status.active = false;
     this.simulation = null;
   }
 
@@ -3770,15 +3747,13 @@ function smoothEndFrame() {
 
     status.i = animationFrame.request(this.boundSmoothEndFrame);
   } else {
-    status.ending = true;
-
     status.sx = status.xe;
     status.sy = status.ye;
 
     this.pointerMove(status.startEvent, status.startEvent);
     this.end(status.startEvent);
 
-    status.smoothEnd = status.active = status.ending = false;
+    status.smoothEnd = status.active = false;
     this.simulation = null;
   }
 }
@@ -3803,21 +3778,12 @@ function updateInertiaCoords(interaction) {
 }
 
 },{"./InteractEvent":3,"./Interaction":5,"./modifiers":21,"./utils":36,"./utils/raf":42}],18:[function(require,module,exports){
-/**
- * interact.js v1.2.5
- *
- * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
- * Open source under the MIT License.
- * https://raw.github.com/taye/interact.js/master/LICENSE
- */
-
 var browser = require('./utils/browser');
 var events = require('./utils/events');
 var utils = require('./utils');
 var scope = require('./scope');
 var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
-var Eventable = require('./Eventable');
 
 var globalEvents = {};
 
@@ -3836,15 +3802,14 @@ var globalEvents = {};
  = (object) An @Interactable
  *
  > Usage
- | interact(document.getElementById('draggable')).draggable(true);
+ | interact('#draggable').draggable(true);
  |
  | var rectables = interact('rect');
  | rectables
  |     .gesturable(true)
  |     .on('gesturemove', function (event) {
- |         // something cool...
- |     })
- |     .autoScroll(true);
+ |         // ...
+ |     });
 \*/
 function interact(element, options) {
   var interactable = scope.interactables.get(element, options);
@@ -3916,7 +3881,7 @@ interact.on = function (type, listener, useCapture) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Eventable.prototype.types, type)) {
+  if (utils.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -3977,7 +3942,7 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (!utils.contains(Eventable.prototype.types, type)) {
+  if (!utils.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, useCapture);
   } else {
     var index = undefined;
@@ -4075,7 +4040,7 @@ scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Eventable":2,"./Interactable":4,"./Interaction":5,"./scope":26,"./utils":36,"./utils/browser":29,"./utils/events":32}],19:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":26,"./utils":36,"./utils/browser":29,"./utils/events":32}],19:[function(require,module,exports){
 var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
 var scope = require('./scope');
@@ -4127,7 +4092,7 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   // setting === 'auto'
 
   // don't preventDefault of pointerdown events
-  if (/down|start/i.test(event.type)) {
+  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
     return;
   }
 
@@ -4172,7 +4137,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
 
     if (interaction.element && (interaction.element === event.target || nodeContains(interaction.element, event.target))) {
 
-      interaction.checkAndPreventDefault(event);
+      interaction.target.checkAndPreventDefault(event);
       return;
     }
   }
@@ -4237,7 +4202,7 @@ if (browser.isIE8) {
         var interaction = _ref;
 
         if (interaction.interacting()) {
-          interaction.checkAndPreventDefault(event);
+          interaction.target.checkAndPreventDefault(event);
         }
       }
     };
@@ -4885,7 +4850,6 @@ var scope = require('../scope');
 var Interaction = require('../Interaction');
 var utils = require('../utils');
 var browser = require('../utils/browser');
-var Eventable = require('../Eventable');
 var defaults = require('../defaultOptions');
 var signals = require('../utils/Signals')['new']();
 
@@ -5086,21 +5050,25 @@ Interaction.signals.on('new', function (interaction) {
   interaction.tapTime = 0; // time of the most recent tap event
 });
 
-utils.merge(Eventable.prototype.types, ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']);
-
 module.exports = scope.pointerEvents = {
   firePointers: firePointers,
   collectEventTargets: collectEventTargets,
   preventOriginalDefault: preventOriginalDefault,
-  signals: signals
+  signals: signals,
+  types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
 };
 
-},{"../Eventable":2,"../Interaction":5,"../defaultOptions":15,"../scope":26,"../utils":36,"../utils/Signals":27,"../utils/browser":29}],25:[function(require,module,exports){
+},{"../Interaction":5,"../defaultOptions":15,"../scope":26,"../utils":36,"../utils/Signals":27,"../utils/browser":29}],25:[function(require,module,exports){
 var pointerEvents = require('./index');
+var Interactable = require('../Interactable');
 var browser = require('../utils/browser');
 var isType = require('../utils/isType');
 var domUtils = require('../utils/domUtils');
 var scope = require('../scope');
+
+var _require = require('../utils/arr');
+
+var merge = _require.merge;
 
 pointerEvents.signals.on('collect-targets', function (_ref) {
   var targets = _ref.targets;
@@ -5139,7 +5107,9 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
   scope.interactables.forEachSelector(collectSelectors);
 });
 
-},{"../scope":26,"../utils/browser":29,"../utils/domUtils":31,"../utils/isType":38,"./index":24}],26:[function(require,module,exports){
+merge(Interactable.eventTypes, pointerEvents.types);
+
+},{"../Interactable":4,"../scope":26,"../utils/arr":28,"../utils/browser":29,"../utils/domUtils":31,"../utils/isType":38,"./index":24}],26:[function(require,module,exports){
 var utils = require('./utils');
 var extend = require('./utils/extend');
 var events = require('./utils/events');
