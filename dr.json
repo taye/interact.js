@@ -5,31 +5,39 @@
   "files": [
     {
       "url": "src/actions/drag.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/actions/drag.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/actions/drag.js"
     },
     {
       "url": "src/actions/drop.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/actions/drop.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/actions/drop.js"
     },
     {
       "url": "src/actions/resize.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/actions/resize.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/actions/resize.js"
     },
     {
       "url": "src/actions/gesture.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/actions/gesture.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/actions/gesture.js"
     },
     {
       "url": "src/Interactable.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/Interactable.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/Interactable.js"
+    },
+    {
+      "url": "src/autoStart/index.js",
+      "link": "https://github.com/taye/interact.js/blob/master/src/autoStart/index.js"
+    },
+    {
+      "url": "src/interactablePreventDefault.js",
+      "link": "https://github.com/taye/interact.js/blob/master/src/interactablePreventDefault.js"
     },
     {
       "url": "src/interact.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/interact.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/interact.js"
     },
     {
       "url": "src/Interaction.js",
-      "link": "https://github.com/taye/interact.js/blob/modularization/src/Interaction.js"
+      "link": "https://github.com/taye/interact.js/blob/master/src/Interaction.js"
     }
   ]
 }
