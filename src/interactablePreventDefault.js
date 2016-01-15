@@ -45,7 +45,7 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   // setting === 'auto'
 
   // don't preventDefault of pointerdown events
-  if (/down|start/i.test(event.type)) {
+  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
     return;
   }
 
@@ -75,7 +75,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag (event) {
         && (interaction.element === event.target
             || nodeContains(interaction.element, event.target))) {
 
-      interaction.checkAndPreventDefault(event);
+      interaction.target.checkAndPreventDefault(event);
       return;
     }
   }
