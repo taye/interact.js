@@ -25,11 +25,11 @@ module.exports = function (options) {
 
     combiner.addFile(headerOpts, { line: 1 });
     combiner.addFile({
-      sourceFile: 'dist/interact.js',
+      sourceFile: '',
       source: source,
     }, { line: headerLines });
 
-    this.push(combineSourceMap.removeComments(source) + combiner.comment());
+    this.push(combineSourceMap.removeComments(source) + combiner.comment() + '\n');
 
     done();
   }
