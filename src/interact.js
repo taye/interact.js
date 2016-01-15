@@ -22,15 +22,14 @@ const globalEvents = {};
  = (object) An @Interactable
  *
  > Usage
- | interact(document.getElementById('draggable')).draggable(true);
+ | interact('#draggable').draggable(true);
  |
  | var rectables = interact('rect');
  | rectables
  |     .gesturable(true)
  |     .on('gesturemove', function (event) {
- |         // something cool...
- |     })
- |     .autoScroll(true);
+ |         // ...
+ |     });
 \*/
 function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
