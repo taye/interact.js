@@ -5,7 +5,11 @@ const browser   = require('../utils/browser');
 const { isElement } = require('../utils/isType');
 const { matchesSelector, parentNode } = require('../utils/domUtils');
 
-autoStart.signals.on('before-start-drag',  function ({ interaction, eventTarget, dx, dy }) {
+require('./index').setActionDefaults(require('../actions/drag'));
+
+autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {
+  if (interaction.prepared.name !== 'drag') { return; }
+
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);

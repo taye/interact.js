@@ -1,6 +1,5 @@
 const autoStart   = require('./index');
 const Interaction = require('../Interaction');
-const actions     = require('../actions');
 
 Interaction.signals.on('new', function (interaction) {
   interaction.delayTimer = null;
@@ -20,17 +19,14 @@ autoStart.signals.on('prepared', function ({ interaction }) {
   }
 });
 
-for (const action of actions.names) {
-  autoStart.signals.on('before-start-' + action, preventImmediateMove);
-}
-
 Interaction.signals.on('move', function ({ interaction, duplicate }) {
   if (interaction.pointerWasMoved && !duplicate) {
     clearTimeout(interaction.delayTimer);
   }
 });
 
-function preventImmediateMove ({ interaction }) {
+// prevent regular down->move autoStart
+autoStart.signals.on('before-start', function ({ interaction }) {
   const actionName = interaction.prepared.name;
 
   if (!actionName) { return; }
@@ -40,4 +36,4 @@ function preventImmediateMove ({ interaction }) {
   if (delay > 0) {
     interaction.prepared.name = null;
   }
-}
+});

@@ -20,9 +20,7 @@ const autoStart = {
     max: 0,
     maxPerElement: 1,
   },
-  setActionDefaults: function (actionName) {
-    const action = actions[actionName];
-
+  setActionDefaults: function (action) {
     utils.extend(action.defaults, autoStart.perActionDefaults);
   },
 };
@@ -59,16 +57,17 @@ function testAllow (interactable, interactableElement, element) {
   return false;
 }
 
-// mouse move cursor style
-Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
-  if (!interaction.mouse || interaction.pointerIsDown) { return; }
+// set cursor style on mousedown
+Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
+  if (interaction.interacting()) { return; }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);
 });
 
-Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
-  if (interaction.interacting()) { return; }
+// set cursor style on mousemove
+Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
+  if (!interaction.mouse || interaction.pointerIsDown) { return; }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);
@@ -77,30 +76,25 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 Interaction.signals.on('move', function (arg) {
   const { interaction, event } = arg;
 
-  if (!(interaction.pointerIsDown && interaction.pointerWasMoved && interaction.prepared.name)) {
+  if (!interaction.pointerIsDown
+      || interaction.interacting()
+      || !interaction.pointerWasMoved
+      || !interaction.prepared.name) {
     return;
   }
 
-  // ignore movement while simulation is active
-  if (!interaction.simulation) {
+  signals.fire('before-start', arg);
 
-    if (!interaction.interacting()) {
-      signals.fire('before-start-' + interaction.prepared.name, arg);
-    }
+  const target = interaction.target;
 
-    const starting = !!interaction.prepared.name && !interaction.interacting();
-
-    if (starting
-        && (interaction.target.options[interaction.prepared.name].manualStart
-        || !withinInteractionLimit(interaction.target, interaction.element, interaction.prepared))) {
+  if (interaction.prepared.name && target) {
+    // check manualStart and interaction limit
+    if (target.options[interaction.prepared.name].manualStart
+        || !withinInteractionLimit(target, interaction.element, interaction.prepared)) {
       interaction.stop(event);
-      return;
     }
-
-    if (interaction.prepared.name && interaction.target) {
-      if (starting) {
-        interaction.start(interaction.prepared, interaction.target, interaction.element);
-      }
+    else {
+      interaction.start(interaction.prepared, target, interaction.element);
     }
   }
 });
