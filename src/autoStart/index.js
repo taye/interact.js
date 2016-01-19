@@ -17,7 +17,7 @@ const autoStart = {
   maxInteractions: Infinity,
   perActionDefaults: {
     manualStart: false,
-    max: 0,
+    max: Infinity,
     maxPerElement: 1,
   },
   setActionDefaults: function (action) {
@@ -366,6 +366,9 @@ function withinInteractionLimit (interactable, element, action) {
   let activeInteractions = 0;
   let targetCount = 0;
   let targetElementCount = 0;
+
+  // no actions if any of these values == 0
+  if (!(maxActions && maxPerElement && autoStart.maxInteractions)) { return; }
 
   for (let i = 0, len = scope.interactions.length; i < len; i++) {
     const interaction = scope.interactions[i];
