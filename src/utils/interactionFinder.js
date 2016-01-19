@@ -46,7 +46,7 @@ const finder = {
   },
 
   // if it's a mouse interaction
-  mouse: function ({ mouseEvent, eventType }) {
+  mouse: function ({ pointerId, mouseEvent, eventType }) {
     if (!mouseEvent && (browser.supportsTouch || browser.supportsPointerEvent)) {
       return null;
     }
@@ -56,7 +56,7 @@ const finder = {
     for (const interaction of scope.interactions) {
       if (interaction.mouse) {
         // if it's a down event, skip interactions with running simulations
-        if (/down/i.test(eventType) && interaction.simulation) { continue; }
+        if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) { continue; }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {

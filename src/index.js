@@ -14,19 +14,15 @@ require('./inertia');
 require('./modifiers/snap');
 require('./modifiers/restrict');
 
-// actions
-require('./actions/gesture');
-require('./actions/resize');
-require('./actions/drag');
-require('./actions/drop');
-
-// autoStart
-const autoStart = require('./autoStart');
-require('./autoStart/drag');
+// delay
 require('./autoStart/delay');
-autoStart.setActionDefaults('drag');
-autoStart.setActionDefaults('resize');
-autoStart.setActionDefaults('gesture');
+
+// actions
+require('./autoStart/gesture');
+require('./autoStart/resize');
+require('./autoStart/drag');
+
+require('./actions/drop');
 
 // Interactable preventDefault setting
 require('./interactablePreventDefault.js');
