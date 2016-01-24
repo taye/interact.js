@@ -225,6 +225,7 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
     dropEvents.drop = utils.extend({ type: 'drop' }, tmpl);
 
     dragEvent.dropzone = interaction.dropTarget;
+    dragEvent.relatedTarget = interaction.dropElement;
   }
   if (dragEvent.type === 'dragstart') {
     dropEvents.activate = utils.extend({ type: 'dropactivate' }, tmpl);
