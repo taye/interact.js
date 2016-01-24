@@ -75,7 +75,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
   }
 });
 
-Interaction.signals.on('up', function ({ interaction, pointer, event }) {
+Interaction.signals.on('up', function ({ interaction, event }) {
   const status = interaction.inertiaStatus;
 
   if (!interaction.interacting() || status.active) { return; }
@@ -159,8 +159,6 @@ Interaction.signals.on('up', function ({ interaction, pointer, event }) {
 
     status.i = animationFrame.request(interaction.boundSmoothEndFrame);
   }
-
-  interaction.removePointer(pointer);
 });
 
 Interaction.signals.on('stop-active', function ({ interaction }) {

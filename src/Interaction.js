@@ -271,8 +271,9 @@ class Interaction {
 
     if (!this.simulation) {
       this.end(event);
-      this.removePointer(pointer);
     }
+
+    this.removePointer(pointer);
   }
 
   /*\

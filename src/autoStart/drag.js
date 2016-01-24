@@ -18,7 +18,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
   const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
   interaction.prepared.axis = dragOptions.lockAxis === 'start'
-    ? currentAxis
+    ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
     : dragOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
