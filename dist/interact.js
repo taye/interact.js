@@ -1048,8 +1048,9 @@ var Interaction = (function () {
 
     if (!this.simulation) {
       this.end(event);
-      this.removePointer(pointer);
     }
+
+    this.removePointer(pointer);
   };
 
   /*\
@@ -1714,6 +1715,7 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
     dropEvents.drop = utils.extend({ type: 'drop' }, tmpl);
 
     dragEvent.dropzone = interaction.dropTarget;
+    dragEvent.relatedTarget = interaction.dropElement;
   }
   if (dragEvent.type === 'dragstart') {
     dropEvents.activate = utils.extend({ type: 'dropactivate' }, tmpl);
@@ -2863,7 +2865,8 @@ autoStart.signals.on('before-start', function (_ref) {
   var startAxis = dragOptions.startAxis;
   var currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy';
 
-  interaction.prepared.axis = dragOptions.lockAxis === 'start' ? currentAxis : dragOptions.lockAxis;
+  interaction.prepared.axis = dragOptions.lockAxis === 'start' ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
+  : dragOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
@@ -3566,7 +3569,6 @@ Interaction.signals.on('down', function (_ref) {
 
 Interaction.signals.on('up', function (_ref2) {
   var interaction = _ref2.interaction;
-  var pointer = _ref2.pointer;
   var event = _ref2.event;
 
   var status = interaction.inertiaStatus;
@@ -3649,8 +3651,6 @@ Interaction.signals.on('up', function (_ref2) {
 
     status.i = animationFrame.request(interaction.boundSmoothEndFrame);
   }
-
-  interaction.removePointer(pointer);
 });
 
 Interaction.signals.on('stop-active', function (_ref3) {
