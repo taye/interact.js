@@ -347,6 +347,10 @@ Interaction.signals.on('stop', function ({ interaction }) {
 });
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+  if (event.button !== 0) {
+    return null;
+  }
+
   const rect = this.getRect(element);
   let action = null;
 
