@@ -46,7 +46,16 @@ const resize = {
 
     if (options.resize.enabled) {
       const resizeOptions = options.resize;
-      const resizeEdges = { left: false, right: false, top: false, bottom: false };
+      const resizeEdges = {
+        left: false,
+        right: false,
+        top: false,
+        bottom: false,
+        topleft: false,
+        topright: false,
+        bottomleft: false,
+        bottomright: false,
+      };
 
       // if using resize.edges
       if (utils.isObject(resizeOptions.edges)) {
@@ -63,7 +72,8 @@ const resize = {
         resizeEdges.left = resizeEdges.left && !resizeEdges.right;
         resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom;
 
-        if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
+        if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom ||
+            resizeEdges.topleft || resizeEdges.topright || resizeEdges.bottomleft || resizeEdges.bottomright) {
           return {
             name: 'resize',
             edges: resizeEdges,
@@ -120,9 +130,9 @@ const resize = {
     }
     else if (action.edges) {
       let cursorKey = '';
-      const edgeNames = ['top', 'bottom', 'left', 'right'];
+      const edgeNames = ['top', 'bottom', 'left', 'right', 'topleft', 'bottomleft', 'topright', 'bottomright'];
 
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < edgeNames.length; i++) {
         if (action.edges[edgeNames[i]]) {
           cursorKey += edgeNames[i];
         }
@@ -227,10 +237,14 @@ Interaction.signals.on('action-move', function ({ interaction, event }) {
     }
 
     // update the 'current' rect without modifications
-    if (edges.top   ) { current.top    += dy; }
-    if (edges.bottom) { current.bottom += dy; }
-    if (edges.left  ) { current.left   += dx; }
-    if (edges.right ) { current.right  += dx; }
+    if (edges.top        ) { current.top    += dy; }
+    if (edges.bottom     ) { current.bottom += dy; }
+    if (edges.left       ) { current.left   += dx; }
+    if (edges.right      ) { current.right  += dx; }
+    if (edges.topleft    ) { current.left   += dx; current.top    += dy; }
+    if (edges.bottomleft ) { current.left   += dx; current.bottom += dy; }
+    if (edges.topright   ) { current.right  += dx; current.top    += dy; }
+    if (edges.bottomright) { current.right  += dx; current.bottom += dy; }
 
     if (invertible) {
       // if invertible, copy the current rect
@@ -372,8 +386,13 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width  = utils.isNumber(rect.width )? rect.width  : rect.right  - rect.left;
-    const height = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top ;
+    const width    = utils.isNumber(rect.width )? rect.width  : rect.right  - rect.left;
+    const height   = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top ;
+    // define if cursor is beyond resize edge
+    const isLeft   = page.x < ((width  >= 0 ? rect.left: rect.right ) + margin);
+    const isTop    = page.y < ((height >= 0 ? rect.top : rect.bottom) + margin);
+    const isRight  = page.x > ((width  >= 0 ? rect.right : rect.left) - margin);
+    const isBottom = page.y > ((height >= 0 ? rect.bottom: rect.top ) - margin);
 
     if (width < 0) {
       if      (name === 'left' ) { name = 'right'; }
@@ -384,11 +403,17 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
       else if (name === 'bottom') { name = 'top'   ; }
     }
 
-    if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
-    if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
+    if (name === 'left'       ) { return isLeft; }
+    if (name === 'top'        ) { return isTop; }
 
-    if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
-    if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
+    if (name === 'right'      ) { return isRight; }
+    if (name === 'bottom'     ) { return isBottom; }
+
+    if (name === 'topleft'    ) { return isLeft && isTop; }
+    if (name === 'topright'   ) { return isTop && isRight; }
+
+    if (name === 'bottomright') { return isRight && isBottom; }
+    if (name === 'bottomleft' ) { return isLeft && isBottom; }
   }
 
   // the remaining checks require an element
