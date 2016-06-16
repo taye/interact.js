@@ -229,8 +229,12 @@ Interaction.signals.on('action-move', function ({ interaction, event }) {
       edges = interaction.prepared._linkedEdges;
 
       if ((originalEdges.left && originalEdges.bottom)
-          || (originalEdges.right && originalEdges.top)) {
+          || (originalEdges.right && originalEdges.top)
+          || originalEdges.bottomleft || originalEdges.topright) {
         dy = -dx / startAspectRatio;
+      }
+      else if (originalEdges.bottomright || originalEdges.topleft) {
+        dx = dy / startAspectRatio;
       }
       else if (originalEdges.left || originalEdges.right ) { dy = dx / startAspectRatio; }
       else if (originalEdges.top  || originalEdges.bottom) { dx = dy * startAspectRatio; }
