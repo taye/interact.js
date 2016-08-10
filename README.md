@@ -11,7 +11,7 @@ Features include:
  - **multiple interactions**
  - cross browser and device, supporting the **desktop and mobile** versions of
    Chrome, Firefox and Opera as well as **Internet Explorer 8+**
- - interaction with [**SVG**](http://interactjs.io/repo/demo/star.svg) elements
+ - interaction with [**SVG**](http://interactjs.io/images/star.svg) elements
  - being **lightweight and standalone** (not _yet another_ jQuery plugin)
  - **not modifying the DOM** except to support IE8 and to change the cursor
    (but you can disable that)
