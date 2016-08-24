@@ -381,25 +381,21 @@ class Interactable {
       for (const type in events.delegatedEvents) {
         const delegated = events.delegatedEvents[type];
 
-        for (let i = 0; i < delegated.selectors.length; i++) {
-          if (delegated.selectors[i] === this.target
-              && delegated.contexts[i] === this._context) {
+        if (delegated.selectors[i] === this.target
+            && delegated.contexts[i] === this._context) {
 
-            delegated.selectors.splice(i, 1);
-            delegated.contexts .splice(i, 1);
-            delegated.listeners.splice(i, 1);
+          delegated.selectors.splice(i, 1);
+          delegated.contexts .splice(i, 1);
+          delegated.listeners.splice(i, 1);
 
-            // remove the arrays if they are empty
-            if (!delegated.selectors.length) {
-              delegated[type] = null;
-            }
+          // remove the arrays if they are empty
+          if (!delegated.selectors.length) {
+            delegated[type] = null;
           }
-
-          events.remove(this._context, type, events.delegateListener);
-          events.remove(this._context, type, events.delegateUseCapture, true);
-
-          break;
         }
+
+        events.remove(this._context, type, events.delegateListener);
+        events.remove(this._context, type, events.delegateUseCapture, true);
       }
     }
     else {
