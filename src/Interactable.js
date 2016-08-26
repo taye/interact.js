@@ -24,22 +24,19 @@ class Interactable {
   constructor (target, options) {
     this.target   = target;
     this._context = scope.document;
-    this._iEvents = new Eventable();
+    this.events = new Eventable();
 
     let _window;
+    const context = this._context = options && options.context || scope.document;
 
     if (isType.trySelector(target)) {
       this.target = target;
-
-      const context = options && options.context;
 
       _window = context? scope.getWindow(context) : scope.window;
 
       if (context && (_window.Node
         ? context instanceof _window.Node
         : (isType.isElement(context) || context === _window.document))) {
-
-        this._context = context;
       }
     }
     else {
@@ -65,10 +62,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (isType.isFunction(phases.onstart)       ) { this._iEvents[onAction + 'start'        ] = phases.onstart         ; }
-    if (isType.isFunction(phases.onmove)        ) { this._iEvents[onAction + 'move'         ] = phases.onmove          ; }
-    if (isType.isFunction(phases.onend)         ) { this._iEvents[onAction + 'end'          ] = phases.onend           ; }
-    if (isType.isFunction(phases.oninertiastart)) { this._iEvents[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (isType.isFunction(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
+    if (isType.isFunction(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
+    if (isType.isFunction(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
+    if (isType.isFunction(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -227,7 +224,7 @@ class Interactable {
    = (Interactable) this Interactable
   \*/
   fire (iEvent) {
-    this._iEvents.fire(iEvent);
+    this.events.fire(iEvent);
 
     return this;
   }
@@ -276,7 +273,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     if (contains(Interactable.eventTypes, eventType)) {
-      this._iEvents.on(eventType, listener);
+      this.events.on(eventType, listener);
     }
     // delegated event for selector
     else if (isType.isString(this.target)) {
@@ -312,7 +309,7 @@ class Interactable {
 
     // if it is an action event type
     if (contains(Interactable.eventTypes, eventType)) {
-      this._iEvents.on(eventType, listener);
+      this.events.on(eventType, listener);
     }
     // delegated event
     else if (isType.isString(this.target)) {

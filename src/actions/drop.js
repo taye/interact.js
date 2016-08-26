@@ -319,12 +319,12 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isObject(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
 
-    if (utils.isFunction(options.ondrop)          ) { this._iEvents.ondrop           = options.ondrop          ; }
-    if (utils.isFunction(options.ondropactivate)  ) { this._iEvents.ondropactivate   = options.ondropactivate  ; }
-    if (utils.isFunction(options.ondropdeactivate)) { this._iEvents.ondropdeactivate = options.ondropdeactivate; }
-    if (utils.isFunction(options.ondragenter)     ) { this._iEvents.ondragenter      = options.ondragenter     ; }
-    if (utils.isFunction(options.ondragleave)     ) { this._iEvents.ondragleave      = options.ondragleave     ; }
-    if (utils.isFunction(options.ondropmove)      ) { this._iEvents.ondropmove       = options.ondropmove      ; }
+    if (utils.isFunction(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
+    if (utils.isFunction(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
+    if (utils.isFunction(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
+    if (utils.isFunction(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
+    if (utils.isFunction(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
+    if (utils.isFunction(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;

@@ -36,7 +36,7 @@ function interact (element, options) {
 
   if (!interactable) {
     interactable = new Interactable(element, options);
-    interactable._iEvents.global = globalEvents;
+    interactable.events.global = globalEvents;
   }
 
   return interactable;

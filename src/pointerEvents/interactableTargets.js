@@ -12,7 +12,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
         ? context.querySelectorAll(selector)
         : undefined;
 
-    const eventable = interactable._iEvents;
+    const eventable = interactable.events;
 
     if (eventable[eventType]
         && isType.isElement(element)
@@ -30,7 +30,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
   const interactable = scope.interactables.get(element);
 
   if (interactable) {
-    const eventable = interactable._iEvents;
+    const eventable = interactable.events;
 
     if (eventable[eventType]) {
       targets.push({
