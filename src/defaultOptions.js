@@ -17,6 +17,4 @@ module.exports = {
       smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
     },
   },
-
-  _holdDuration: 600,
 };

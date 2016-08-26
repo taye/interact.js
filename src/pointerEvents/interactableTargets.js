@@ -4,6 +4,7 @@ const browser       = require('../utils/browser');
 const isType        = require('../utils/isType');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
+const extend        = require('../utils/extend');
 const { merge }     = require('../utils/arr');
 
 pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType }) {
@@ -45,3 +46,9 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
 });
 
 merge(Interactable.eventTypes, pointerEvents.types);
+
+Interactable.prototype.pointerEvents = function (options) {
+  extend(this.events.options, options);
+
+  return this;
+};

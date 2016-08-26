@@ -1,4 +1,5 @@
 const { indexOf } = require('./utils/arr');
+const extend = require('./utils/extend.js');
 
 function fireUntilImmediateStopped (event, listeners) {
   for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
@@ -7,6 +8,11 @@ function fireUntilImmediateStopped (event, listeners) {
 }
 
 class Eventable {
+
+  constructor (options) {
+    this.options = extend({}, options || {});
+  }
+
   fire (event) {
     let listeners;
     const onEvent = 'on' + event.type;

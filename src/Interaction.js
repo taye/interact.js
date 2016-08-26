@@ -259,8 +259,6 @@ class Interaction {
   pointerUp (pointer, event, eventTarget, curEventTarget) {
     const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
 
-    clearTimeout(this.holdTimers[pointerIndex]);
-
     signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
       event,
