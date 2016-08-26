@@ -1,6 +1,7 @@
 const isType    = require('./utils/isType');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
+const domUtils  = require('./utils/domUtils');
 const actions   = require('./actions');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
@@ -211,6 +212,39 @@ class Interactable {
   inContext (element) {
     return (this._context === element.ownerDocument
             || nodeContains(this._context, element));
+  }
+
+  testIgnore (ignoreFrom, interactableElement, element) {
+    if (!ignoreFrom || !isType.isElement(element)) { return false; }
+
+    if (isType.isString(ignoreFrom)) {
+      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
+    }
+    else if (isType.isElement(ignoreFrom)) {
+      return domUtils.nodeContains(ignoreFrom, element);
+    }
+
+    return false;
+  }
+
+  testAllow (allowFrom, interactableElement, element) {
+    if (!allowFrom) { return true; }
+
+    if (!isType.isElement(element)) { return false; }
+
+    if (isType.isString(allowFrom)) {
+      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+    }
+    else if (isType.isElement(allowFrom)) {
+      return domUtils.nodeContains(allowFrom, element);
+    }
+
+    return false;
+  }
+
+  testIgnoreAllow (options, interactableElement, element) {
+    return (!this.testIgnore(options.ignoreFrom, interactableElement, element)
+      && this.testAllow(options.allowFrom, interactableElement, element));
   }
 
   /*\

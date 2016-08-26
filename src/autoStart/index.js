@@ -10,8 +10,6 @@ const signals        = require('../utils/Signals').new();
 
 const autoStart = {
   signals,
-  testIgnore,
-  testAllow,
   withinInteractionLimit,
   // Allow this many interactions to happen simultaneously
   maxInteractions: Infinity,
@@ -24,38 +22,6 @@ const autoStart = {
     utils.extend(action.defaults, autoStart.perActionDefaults);
   },
 };
-
-function testIgnore (interactable, interactableElement, element) {
-  const ignoreFrom = interactable.options.ignoreFrom;
-
-  if (!ignoreFrom || !utils.isElement(element)) { return false; }
-
-  if (utils.isString(ignoreFrom)) {
-    return utils.matchesUpTo(element, ignoreFrom, interactableElement);
-  }
-  else if (utils.isElement(ignoreFrom)) {
-    return utils.nodeContains(ignoreFrom, element);
-  }
-
-  return false;
-}
-
-function testAllow (interactable, interactableElement, element) {
-  const allowFrom = interactable.options.allowFrom;
-
-  if (!allowFrom) { return true; }
-
-  if (!utils.isElement(element)) { return false; }
-
-  if (utils.isString(allowFrom)) {
-    return utils.matchesUpTo(element, allowFrom, interactableElement);
-  }
-  else if (utils.isElement(allowFrom)) {
-    return utils.nodeContains(allowFrom, element);
-  }
-
-  return false;
-}
 
 // set cursor style on mousedown
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
@@ -138,11 +104,11 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elements = (browser.useMatchesSelectorPolyfill
       ? context.querySelectorAll(selector)
       : undefined);
+    const options = interactable.options;
 
     if (interactable.inContext(element)
-        && !module.exports.testIgnore(interactable, element, eventTarget)
-      && module.exports.testAllow(interactable, element, eventTarget)
-      && utils.matchesSelector(element, selector, elements)) {
+        && interactable.testIgnoreAllow(options, element, eventTarget)
+        && utils.matchesSelector(element, selector, elements)) {
 
       matches.push(interactable);
       matchElements.push(element);

@@ -39,12 +39,12 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
 
         if (interactable === interaction.target) { return; }
 
+        const options = interactable.options;
         let action = null;
 
         if (interactable.inContext(eventTarget)
-            && !interactable.options.drag.manualStart
-            && !autoStart.testIgnore(interactable, element, eventTarget)
-            && autoStart.testAllow(interactable, element, eventTarget)
+            && !options.drag.manualStart
+            && !interactable.testIgnoreAllow(options, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
           action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
