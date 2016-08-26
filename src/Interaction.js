@@ -190,6 +190,7 @@ class Interaction {
 
     const signalArg = {
       pointer,
+      pointerIndex: this.getPointerIndex(pointer),
       event,
       eventTarget,
       dx,
@@ -261,6 +262,7 @@ class Interaction {
 
     signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
+      pointerIndex,
       event,
       eventTarget,
       curEventTarget,
