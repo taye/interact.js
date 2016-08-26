@@ -47,16 +47,16 @@
     ]
   },
   "devDependencies": {
-    "babel-eslint": "^4.1.1",
-    "babelify": "^6.3.0",
-    "browser-sync": "^2.9.1",
-    "browserify": "^11.0.1",
+    "babel-eslint": "^4.1.*",
+    "babelify": "^6.3.*",
+    "browser-sync": "^2.9.*",
+    "browserify": "^13.1.0",
     "chai": "^3.2.0",
     "combine-source-map": "^0.7.1",
-    "dr.js": "taye/dr.js",
-    "eslint": "^1.3.1",
+    "dr.js": "github:taye/dr.js",
+    "eslint": "^3.3.1",
     "exorcist": "^0.4.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.*",
     "gulp-changed": "^1.3.0",
     "gulp-eslint": "^1.0.0",
     "gulp-filesize": "0.0.6",
@@ -84,6 +84,6 @@
     "through2": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.4.0"
+    "watchify": "^3.7.0"
   }
 }
