@@ -257,7 +257,7 @@ class Interaction {
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
-    const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    const pointerIndex = this.getPointerIndex(pointer);
 
     signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
@@ -329,9 +329,13 @@ class Interaction {
     this.prepared.name = this.prevEvent = null;
   }
 
+  getPointerIndex (pointer) {
+    return this.mouse? 0 : utils.indexOf(this.pointerIds, id);
+  }
+
   updatePointer (pointer) {
     const id = utils.getPointerId(pointer);
-    let index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
+    let index = this.getPointerIndex(pointer);
 
     if (index === -1) {
       index = this.pointerIds.length;

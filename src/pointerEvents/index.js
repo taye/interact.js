@@ -22,7 +22,7 @@ function stopPropagation () {
 }
 
 function firePointers (interaction, pointer, event, eventTarget, targets, eventType) {
-  const pointerIndex = interaction.mouse? 0 : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer));
+  const pointerIndex = interaction.getPointerIndex(pointer);
   let pointerEvent = {};
   let i;
   // for tap events
@@ -115,7 +115,7 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
 }
 
 function collectEventTargets (interaction, pointer, event, eventTarget, eventType) {
-  const pointerIndex = interaction.mouse? 0 : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer));
+  const pointerIndex = interaction.getPointerIndex(pointer);
 
   // do not fire a tap event if the pointer was moved before being lifted
   if (eventType === 'tap' && (interaction.pointerWasMoved
@@ -158,9 +158,7 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
 }
 
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
-  const pointerIndex = (interaction.mouse
-    ? 0
-    : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer)));
+  const pointerIndex = interaction.getPointerIndex(pointer);
 
   if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
     if (interaction.pointerIsDown) {
