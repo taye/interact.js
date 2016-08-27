@@ -63,4 +63,16 @@ Interactable.prototype.pointerEvents = function (options) {
   return this;
 };
 
+const _origin = Interactable.prototype.origin;
+
+Interactable.prototype.origin = function (newValue) {
+  var ret = _origin.call(this, newValue);
+
+  if (ret === this) {
+    this.events.options.origin = newValue;
+  }
+
+  return ret;
+};
+
 Interactable.settingsMethods.push('pointerEvents');

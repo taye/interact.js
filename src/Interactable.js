@@ -164,12 +164,13 @@ class Interactable {
    = (object) The current origin or this Interactable
   \*/
   origin (newValue) {
-    if (isType.trySelector(newValue)) {
+    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
       this.options.origin = newValue;
-      return this;
-    }
-    else if (isType.isObject(newValue)) {
-      this.options.origin = newValue;
+
+      for (action of actions.names) {
+        this.options[action].origin = newValue;
+      }
+
       return this;
     }
 
