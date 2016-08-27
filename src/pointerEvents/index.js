@@ -252,6 +252,8 @@ Interaction.signals.on('new', function (interaction) {
 
 defaults.pointerEvents = {
   holdDuration: 600,
+  ignoreFrom  : null,
+  allowFrom   : null,
 };
 
 module.exports = scope.pointerEvents = {

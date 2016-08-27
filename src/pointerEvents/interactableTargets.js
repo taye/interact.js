@@ -7,18 +7,20 @@ const scope         = require('../scope');
 const extend        = require('../utils/extend');
 const { merge }     = require('../utils/arr');
 
-pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType }) {
+pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType, eventTarget }) {
   function collectSelectors (interactable, selector, context) {
     const els = browser.useMatchesSelectorPolyfill
         ? context.querySelectorAll(selector)
         : undefined;
 
     const eventable = interactable.events;
+    const options = eventable.options;
 
     if (eventable[eventType]
         && isType.isElement(element)
         && interactable.inContext(element)
-        && domUtils.matchesSelector(element, selector, els)) {
+        && domUtils.matchesSelector(element, selector, els)
+        && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({
         element,
@@ -32,8 +34,10 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
 
   if (interactable) {
     const eventable = interactable.events;
+    const options = eventable.options;
 
-    if (eventable[eventType]) {
+    if (eventable[eventType]
+        && interactable.testIgnoreAllow(options, element, eventTarget)) {
       targets.push({
         element,
         eventable,
