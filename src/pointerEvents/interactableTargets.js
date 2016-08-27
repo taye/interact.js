@@ -52,7 +52,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
 Interactable.signals.on('new', function ({ interactable }) {
   interactable.events.getRect = function (element) {
     return interactable.getRect(element);
-  }
+  };
 });
 
 merge(Interactable.eventTypes, pointerEvents.types);
@@ -66,7 +66,7 @@ Interactable.prototype.pointerEvents = function (options) {
 const _origin = Interactable.prototype.origin;
 
 Interactable.prototype.origin = function (newValue) {
-  var ret = _origin.call(this, newValue);
+  const ret = _origin.call(this, newValue);
 
   if (ret === this) {
     this.events.options.origin = newValue;

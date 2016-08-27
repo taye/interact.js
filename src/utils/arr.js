@@ -21,7 +21,7 @@ function merge (target, source) {
 }
 
 function filter (array, test) {
-  var result = [];
+  const result = [];
 
   for (let i = 0; i < array.length; i++) {
     if (test(array[i])) {

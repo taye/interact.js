@@ -167,7 +167,7 @@ class Interactable {
     if (isType.trySelector(newValue) || isType.isObject(newValue)) {
       this.options.origin = newValue;
 
-      for (action of actions.names) {
+      for (const action of actions.names) {
         this.options[action].origin = newValue;
       }
 
@@ -413,12 +413,12 @@ class Interactable {
       for (const type in events.delegatedEvents) {
         const delegated = events.delegatedEvents[type];
 
-        if (delegated.selectors[i] === this.target
-            && delegated.contexts[i] === this._context) {
+        if (delegated.selectors[0] === this.target
+            && delegated.contexts[0] === this._context) {
 
-          delegated.selectors.splice(i, 1);
-          delegated.contexts .splice(i, 1);
-          delegated.listeners.splice(i, 1);
+          delegated.selectors.splice(0, 1);
+          delegated.contexts .splice(0, 1);
+          delegated.listeners.splice(0, 1);
 
           // remove the arrays if they are empty
           if (!delegated.selectors.length) {

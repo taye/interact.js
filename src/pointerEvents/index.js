@@ -185,7 +185,6 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
   // copy event to be used in timeout for IE8
   const eventCopy = browser.isIE8? utils.extend({}, event) : event;
   const timers = interaction.holdTimers;
-  const timeoutIndex = timers.length;
 
   if (!timers[pointerIndex]) {
     timers[pointerIndex] = { duration: Infinity, timeout: null };

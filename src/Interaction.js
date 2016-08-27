@@ -332,7 +332,7 @@ class Interaction {
   }
 
   getPointerIndex (pointer) {
-    return this.mouse? 0 : utils.indexOf(this.pointerIds, id);
+    return this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   }
 
   updatePointer (pointer) {
