@@ -158,6 +158,10 @@ Interactable.prototype.draggable = function (options) {
   if (utils.isBool(options)) {
     this.options.drag.enabled = options;
 
+    if (!options) {
+      this.ondragstart = this.ondragstart = this.ondragend = null;
+    }
+
     return this;
   }
 

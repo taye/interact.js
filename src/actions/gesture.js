@@ -113,6 +113,10 @@ Interactable.prototype.gesturable = function (options) {
   if (utils.isBool(options)) {
     this.options.gesture.enabled = options;
 
+    if (!options) {
+      this.ongesturestart = this.ongesturestart = this.ongestureend = null;
+    }
+
     return this;
   }
 

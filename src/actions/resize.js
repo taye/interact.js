@@ -361,6 +361,10 @@ Interactable.prototype.resizable = function (options) {
   if (utils.isBool(options)) {
     this.options.resize.enabled = options;
 
+    if (!options) {
+      this.onresizestart = this.onresizestart = this.onresizeend = null;
+    }
+
     return this;
   }
   return this.options.resize;

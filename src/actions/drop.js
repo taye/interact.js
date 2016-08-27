@@ -346,6 +346,11 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isBool(options)) {
     this.options.drop.enabled = options;
 
+    if (!options) {
+      this.ondragenter = this.ondragleave = this.ondrop
+        = this.ondropactivate = this.ondropdeactivate = null;
+    }
+
     return this;
   }
 
