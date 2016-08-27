@@ -9,6 +9,7 @@ const drag = {
   defaults: {
     enabled   : false,
 
+    origin    : null,
     snap      : null,
     restrict  : null,
     inertia   : null,
