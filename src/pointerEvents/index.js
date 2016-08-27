@@ -86,7 +86,19 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
       pointerEvent[prop] = target.props[prop];
     }
 
+    const { x: originX, y: originY } = utils.getOriginXY(target.eventable, target.element);
+
+    pointerEvent.pageX   -= originX;
+    pointerEvent.pageY   -= originY;
+    pointerEvent.clientX -= originX;
+    pointerEvent.clientY -= originY;
+
     target.eventable.fire(pointerEvent);
+
+    pointerEvent.pageX   += originX;
+    pointerEvent.pageY   += originY;
+    pointerEvent.clientX += originX;
+    pointerEvent.clientY += originY;
 
     if (pointerEvent.immediatePropagationStopped
         || (pointerEvent.propagationStopped
@@ -254,6 +266,7 @@ defaults.pointerEvents = {
   holdDuration: 600,
   ignoreFrom  : null,
   allowFrom   : null,
+  origin      : { x: 0, y: 0 },
 };
 
 module.exports = scope.pointerEvents = {

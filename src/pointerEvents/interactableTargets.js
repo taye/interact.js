@@ -49,6 +49,12 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
   scope.interactables.forEachSelector(collectSelectors);
 });
 
+Interactable.signals.on('new', function ({ interactable }) {
+  interactable.events.getRect = function (element) {
+    return interactable.getRect(element);
+  }
+});
+
 merge(Interactable.eventTypes, pointerEvents.types);
 
 Interactable.prototype.pointerEvents = function (options) {
@@ -56,3 +62,5 @@ Interactable.prototype.pointerEvents = function (options) {
 
   return this;
 };
+
+Interactable.settingsMethods.push('pointerEvents');
