@@ -33,7 +33,9 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 
 // set cursor style on mousemove
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
-  if (!interaction.mouse || interaction.pointerIsDown) { return; }
+  if (!interaction.mouse
+      || interaction.pointerIsDown
+      || interaction.interacting()) { return; }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);

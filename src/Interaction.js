@@ -273,6 +273,7 @@ class Interaction {
       this.end(event);
     }
 
+    this.pointerIsDown = false;
     this.removePointer(pointer);
   }
 
