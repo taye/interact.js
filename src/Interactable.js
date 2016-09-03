@@ -150,6 +150,20 @@ class Interactable {
     return this.getRect;
   }
 
+  _backCompatOption (optionName, newValue) {
+    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
+      this.options[optionName] = newValue;
+
+      for (const action of actions.names) {
+        this.options[action][optionName] = newValue;
+      }
+
+      return this;
+    }
+
+    return this.options[optionName];
+  }
+
   /*\
    * Interactable.origin
    [ method ]
@@ -164,17 +178,7 @@ class Interactable {
    = (object) The current origin or this Interactable
   \*/
   origin (newValue) {
-    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
-      this.options.origin = newValue;
-
-      for (const action of actions.names) {
-        this.options[action].origin = newValue;
-      }
-
-      return this;
-    }
-
-    return this.options.origin;
+    return this._backCompatOption('origin', newValue);
   }
 
   /*\
@@ -213,6 +217,44 @@ class Interactable {
   inContext (element) {
     return (this._context === element.ownerDocument
             || nodeContains(this._context, element));
+  }
+
+  /*\
+   * Interactable.ignoreFrom
+   [ method ]
+   *
+   * If the target of the `mousedown`, `pointerdown` or `touchstart`
+   * event or any of it's parents match the given CSS selector or
+   * Element, no drag/resize/gesture is started.
+   *
+   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
+   = (string | Element | object) The current ignoreFrom value or this Interactable
+   **
+   | interact(element, { ignoreFrom: document.getElementById('no-action') });
+   | // or
+   | interact(element).ignoreFrom('input, textarea, a');
+  \*/
+  ignoreFrom (newValue) {
+    return this._backCompatOption('ignoreFrom', newValue);
+  }
+
+  /*\
+   * Interactable.allowFrom
+   [ method ]
+   *
+   * A drag/resize/gesture is started only If the target of the
+   * `mousedown`, `pointerdown` or `touchstart` event or any of it's
+   * parents match the given CSS selector or Element.
+   *
+   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
+   = (string | Element | object) The current allowFrom value or this Interactable
+   **
+   | interact(element, { allowFrom: document.getElementById('drag-handle') });
+   | // or
+   | interact(element).allowFrom('.handle');
+  \*/
+  allowFrom (newValue) {
+    return this._backCompatOption('allowFrom', newValue);
   }
 
   testIgnore (ignoreFrom, interactableElement, element) {

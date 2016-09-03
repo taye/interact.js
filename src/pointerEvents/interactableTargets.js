@@ -63,13 +63,13 @@ Interactable.prototype.pointerEvents = function (options) {
   return this;
 };
 
-const _origin = Interactable.prototype.origin;
+const __backCompatOption = Interactable.prototype._backCompatOption;
 
-Interactable.prototype.origin = function (newValue) {
-  const ret = _origin.call(this, newValue);
+Interactable.prototype._backCompatOption = function (optionName, newValue) {
+  const ret = __backCompatOption.call(this, optionName, newValue);
 
   if (ret === this) {
-    this.events.options.origin = newValue;
+    this.events.options[optionName] = newValue;
   }
 
   return ret;
