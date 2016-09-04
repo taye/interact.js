@@ -40,21 +40,24 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
         if (interactable === interaction.target) { return; }
 
         const options = interactable.options;
-        let action = null;
 
         if (interactable.inContext(eventTarget)
             && !options.drag.manualStart
             && !interactable.testIgnoreAllow(options, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
-          action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-        }
-        if (action
-            && action.name === 'drag'
-            && checkStartAxis(currentAxis, interactable)
-            && autoStart.withinInteractionLimit(interactable, element, { name: 'drag' })) {
+          const action = interactable.getAction(interaction.downPointer,
+                                                interaction.downEvent,
+                                                interaction,
+                                                element);
 
-          return interactable;
+          if (action
+              && action.name === 'drag'
+              && checkStartAxis(currentAxis, interactable)
+              && autoStart.validateAction(action, interactable, element)) {
+
+            return interactable;
+          }
         }
       };
 

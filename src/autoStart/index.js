@@ -69,8 +69,10 @@ Interaction.signals.on('move', function (arg) {
 
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable) {
-  if (utils.isObject(action) && interactable.options[action.name].enabled) {
+function validateAction (action, interactable, element) {
+  if (utils.isObject(action)
+      && interactable.options[action.name].enabled
+      && withinInteractionLimit(interactable, element, action)) {
     return action;
   }
 
@@ -81,9 +83,11 @@ function validateSelector (interaction, pointer, event, matches, matchElements) 
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i];
     const matchElement = matchElements[i];
-    const action = validateAction(match.getAction(pointer, event, interaction, matchElement), match);
+    const action = validateAction(match.getAction(pointer, event, interaction, matchElement),
+                                  match,
+                                  matchElement);
 
-    if (action && withinInteractionLimit(match, matchElement, action)) {
+    if (action) {
       return {
         action,
         target: match,
@@ -124,7 +128,9 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
+        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element),
+                                    elementInteractable,
+                                    element))
         && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
