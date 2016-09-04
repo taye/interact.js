@@ -373,14 +373,12 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
   if (dropOverlap === 'pointer') {
     const origin = utils.getOriginXY(draggable, draggableElement, 'drag');
     const page = utils.getPageXY(dragEvent);
-    let horizontal;
-    let vertical;
 
     page.x += origin.x;
     page.y += origin.y;
 
-    horizontal = (page.x > rect.left) && (page.x < rect.right);
-    vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
+    const horizontal = (page.x > rect.left) && (page.x < rect.right);
+    const vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
 
     dropped = horizontal && vertical;
   }

@@ -45,9 +45,8 @@ Interaction.signals.on('action-start', function ({ interaction, event }) {
 Interaction.signals.on('action-move', function ({ interaction, event }) {
   if (interaction.prepared.name !== 'gesture') { return; }
 
-  let gestureEvent;
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
 
-  gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
   gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
 
   interaction.target.fire(gestureEvent);

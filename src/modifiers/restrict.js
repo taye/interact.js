@@ -53,10 +53,6 @@ const restrict = {
     status.dy = 0;
     status.locked = false;
 
-    let rect;
-    let restrictedX;
-    let restrictedY;
-
     if (utils.isString(restriction)) {
       if (restriction === 'parent') {
         restriction = utils.parentNode(interaction.element);
@@ -79,7 +75,9 @@ const restrict = {
       restriction = utils.getElementRect(restriction);
     }
 
-    rect = restriction;
+    const rect = restriction;
+    let restrictedX;
+    let restrictedY;
 
     const offset = interaction.modifierOffsets.restrict;
 
