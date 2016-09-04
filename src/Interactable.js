@@ -420,6 +420,11 @@ class Interactable {
       }
     }
 
+    signals.fire('set', {
+      options,
+      interactable: this,
+    });
+
     return this;
   }
 
