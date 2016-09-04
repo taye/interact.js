@@ -18,7 +18,6 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
 
     if (eventable[eventType]
         && isType.isElement(element)
-        && interactable.inContext(element)
         && domUtils.matchesSelector(element, selector, els)
         && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
@@ -46,7 +45,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
     }
   }
 
-  scope.interactables.forEachSelector(collectSelectors);
+  scope.interactables.forEachSelector(collectSelectors, element);
 });
 
 Interactable.signals.on('new', function ({ interactable }) {

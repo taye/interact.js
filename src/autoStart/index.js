@@ -112,8 +112,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       : undefined);
     const options = interactable.options;
 
-    if (interactable.inContext(element)
-        && interactable.testIgnoreAllow(options, element, eventTarget)
+    if (interactable.testIgnoreAllow(options, element, eventTarget)
         && utils.matchesSelector(element, selector, elements)) {
 
       matches.push(interactable);
@@ -139,7 +138,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       };
     }
     else {
-      scope.interactables.forEachSelector(pushMatches);
+      scope.interactables.forEachSelector(pushMatches, element);
 
       const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
 

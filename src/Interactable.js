@@ -23,37 +23,22 @@ scope.interactables = [];
 \*/
 class Interactable {
   constructor (target, options) {
+    options = options || {};
+
     this.target   = target;
-    this._context = scope.document;
-    this.events = new Eventable();
-
-    let _window;
-    const context = this._context = options && options.context || scope.document;
-
-    if (isType.trySelector(target)) {
-      this.target = target;
-
-      _window = context? scope.getWindow(context) : scope.window;
-
-      if (context && (_window.Node
-        ? context instanceof _window.Node
-        : (isType.isElement(context) || context === _window.document))) {
-      }
-    }
-    else {
-      _window = scope.getWindow(target);
-    }
-
-    this._doc = _window.document;
+    this.events   = new Eventable();
+    this._context = options.context || scope.document;
+    this._win     = scope.getWindow(isType.trySelector(target)? this._context : target);
+    this._doc     = this._win.document;
 
     signals.fire('new', {
       target,
       options,
       interactable: this,
-      win: _window,
+      win: this._win,
     });
 
-    scope.addDocument( this._doc, _window );
+    scope.addDocument( this._doc, this._win );
 
     scope.interactables.push(this);
 
@@ -505,16 +490,19 @@ scope.interactables.indexOfElement = function indexOfElement (target, context) {
   return -1;
 };
 
-scope.interactables.get = function interactableGet (element, options) {
-  return this[this.indexOfElement(element, options && options.context)];
+scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
+  const ret = this[this.indexOfElement(element, options && options.context)];
+
+  return ret && (dontCheckInContext || ret.inContext(element))? ret : null;
 };
 
-scope.interactables.forEachSelector = function (callback) {
+scope.interactables.forEachSelector = function (callback, element) {
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
-    // skip non CSS selector targets
-    if (!isType.isString(interactable.target)) {
+    // skip non CSS selector targets and out of context elements
+    if (!isType.isString(interactable.target)
+        || (element && !interactable.inContext(element))) {
       continue;
     }
 

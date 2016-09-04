@@ -41,8 +41,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
 
         const options = interactable.options;
 
-        if (interactable.inContext(eventTarget)
-            && !options.drag.manualStart
+        if (!options.drag.manualStart
             && !interactable.testIgnoreAllow(options, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
@@ -83,7 +82,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
           break;
         }
 
-        const selectorInteractable = scope.interactables.forEachSelector(getDraggable);
+        const selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
 
         if (selectorInteractable) {
           interaction.prepared.name = 'drag';
