@@ -273,6 +273,7 @@ module.exports = scope.pointerEvents = {
   collectEventTargets,
   preventOriginalDefault,
   signals,
+  defaults: defaults.pointerEvents,
   types: [
     'down',
     'move',

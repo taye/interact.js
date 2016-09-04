@@ -54,6 +54,11 @@ Interactable.signals.on('new', function ({ interactable }) {
   };
 });
 
+Interactable.signals.on('set', function ({ interactable, options }) {
+  extend(interactable.events.options, pointerEvents.defaults);
+  extend(interactable.events.options, options);
+});
+
 merge(Interactable.eventTypes, pointerEvents.types);
 
 Interactable.prototype.pointerEvents = function (options) {
