@@ -10,8 +10,6 @@ const signals        = require('../utils/Signals').new();
 
 const autoStart = {
   signals,
-  testIgnore,
-  testAllow,
   withinInteractionLimit,
   // Allow this many interactions to happen simultaneously
   maxInteractions: Infinity,
@@ -25,38 +23,6 @@ const autoStart = {
   },
 };
 
-function testIgnore (interactable, interactableElement, element) {
-  const ignoreFrom = interactable.options.ignoreFrom;
-
-  if (!ignoreFrom || !utils.isElement(element)) { return false; }
-
-  if (utils.isString(ignoreFrom)) {
-    return utils.matchesUpTo(element, ignoreFrom, interactableElement);
-  }
-  else if (utils.isElement(ignoreFrom)) {
-    return utils.nodeContains(ignoreFrom, element);
-  }
-
-  return false;
-}
-
-function testAllow (interactable, interactableElement, element) {
-  const allowFrom = interactable.options.allowFrom;
-
-  if (!allowFrom) { return true; }
-
-  if (!utils.isElement(element)) { return false; }
-
-  if (utils.isString(allowFrom)) {
-    return utils.matchesUpTo(element, allowFrom, interactableElement);
-  }
-  else if (utils.isElement(allowFrom)) {
-    return utils.nodeContains(allowFrom, element);
-  }
-
-  return false;
-}
-
 // set cursor style on mousedown
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
   if (interaction.interacting()) { return; }
@@ -67,7 +33,9 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 
 // set cursor style on mousemove
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
-  if (!interaction.mouse || interaction.pointerIsDown) { return; }
+  if (!interaction.mouse
+      || interaction.pointerIsDown
+      || interaction.interacting()) { return; }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
   prepare(interaction, actionInfo);
@@ -101,8 +69,10 @@ Interaction.signals.on('move', function (arg) {
 
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable) {
-  if (utils.isObject(action) && interactable.options[action.name].enabled) {
+function validateAction (action, interactable, element) {
+  if (utils.isObject(action)
+      && interactable.options[action.name].enabled
+      && withinInteractionLimit(interactable, element, action)) {
     return action;
   }
 
@@ -113,9 +83,11 @@ function validateSelector (interaction, pointer, event, matches, matchElements) 
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i];
     const matchElement = matchElements[i];
-    const action = validateAction(match.getAction(pointer, event, interaction, matchElement), match);
+    const action = validateAction(match.getAction(pointer, event, interaction, matchElement),
+                                  match,
+                                  matchElement);
 
-    if (action && withinInteractionLimit(match, matchElement, action)) {
+    if (action) {
       return {
         action,
         target: match,
@@ -138,11 +110,10 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elements = (browser.useMatchesSelectorPolyfill
       ? context.querySelectorAll(selector)
       : undefined);
+    const options = interactable.options;
 
-    if (interactable.inContext(element)
-        && !module.exports.testIgnore(interactable, element, eventTarget)
-      && module.exports.testAllow(interactable, element, eventTarget)
-      && utils.matchesSelector(element, selector, elements)) {
+    if (interactable.testIgnoreAllow(options, element, eventTarget)
+        && utils.matchesSelector(element, selector, elements)) {
 
       matches.push(interactable);
       matchElements.push(element);
@@ -156,7 +127,9 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element), elementInteractable))
+        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element),
+                                    elementInteractable,
+                                    element))
         && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
@@ -165,7 +138,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
       };
     }
     else {
-      scope.interactables.forEachSelector(pushMatches);
+      scope.interactables.forEachSelector(pushMatches, element);
 
       const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
 
@@ -199,6 +172,14 @@ function prepare (interaction, { action, target, element }) {
 
   signals.fire('prepared', { interaction: interaction });
 }
+
+Interaction.signals.on('stop', function ({ interaction }) {
+  const target = interaction.target;
+
+  if (target && target.options.styleCursor) {
+    target._doc.documentElement.style.cursor = '';
+  }
+});
 
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
   const action = this.defaultActionChecker(pointer, event, interaction, element);
@@ -279,72 +260,6 @@ Interactable.prototype.styleCursor = function (newValue) {
 
   return this.options.styleCursor;
 };
-
-/*\
- * Interactable.ignoreFrom
- [ method ]
- *
- * If the target of the `mousedown`, `pointerdown` or `touchstart`
- * event or any of it's parents match the given CSS selector or
- * Element, no drag/resize/gesture is started.
- *
- - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
- = (string | Element | object) The current ignoreFrom value or this Interactable
- **
- | interact(element, { ignoreFrom: document.getElementById('no-action') });
- | // or
- | interact(element).ignoreFrom('input, textarea, a');
-\*/
-Interactable.prototype.ignoreFrom = function (newValue) {
-  if (utils.trySelector(newValue)) {            // CSS selector to match event.target
-    this.options.ignoreFrom = newValue;
-    return this;
-  }
-
-  if (utils.isElement(newValue)) {              // specific element
-    this.options.ignoreFrom = newValue;
-    return this;
-  }
-
-  return this.options.ignoreFrom;
-};
-
-/*\
- * Interactable.allowFrom
- [ method ]
- *
- * A drag/resize/gesture is started only If the target of the
- * `mousedown`, `pointerdown` or `touchstart` event or any of it's
- * parents match the given CSS selector or Element.
- *
- - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
- = (string | Element | object) The current allowFrom value or this Interactable
- **
- | interact(element, { allowFrom: document.getElementById('drag-handle') });
- | // or
- | interact(element).allowFrom('.handle');
-\*/
-Interactable.prototype.allowFrom = function (newValue) {
-  if (utils.trySelector(newValue)) {            // CSS selector to match event.target
-    this.options.allowFrom = newValue;
-    return this;
-  }
-
-  if (utils.isElement(newValue)) {              // specific element
-    this.options.allowFrom = newValue;
-    return this;
-  }
-
-  return this.options.allowFrom;
-};
-
-Interaction.signals.on('stop', function ({ interaction }) {
-  const target = interaction.target;
-
-  if (target && target.options.styleCursor) {
-    target._doc.documentElement.style.cursor = '';
-  }
-});
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
   const rect = this.getRect(element);

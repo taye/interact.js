@@ -8,6 +8,7 @@ const defaultOptions = require('../defaultOptions');
 const gesture = {
   defaults: {
     enabled : false,
+    origin  : null,
     restrict: null,
   },
 
@@ -44,9 +45,8 @@ Interaction.signals.on('action-start', function ({ interaction, event }) {
 Interaction.signals.on('action-move', function ({ interaction, event }) {
   if (interaction.prepared.name !== 'gesture') { return; }
 
-  let gestureEvent;
+  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
 
-  gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
   gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
 
   interaction.target.fire(gestureEvent);
@@ -111,6 +111,10 @@ Interactable.prototype.gesturable = function (options) {
 
   if (utils.isBool(options)) {
     this.options.gesture.enabled = options;
+
+    if (!options) {
+      this.ongesturestart = this.ongesturestart = this.ongestureend = null;
+    }
 
     return this;
   }

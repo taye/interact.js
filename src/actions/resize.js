@@ -13,6 +13,7 @@ const resize = {
   defaults: {
     enabled   : false,
 
+    origin    : null,
     snap      : null,
     restrict  : null,
     inertia   : null,
@@ -359,6 +360,10 @@ Interactable.prototype.resizable = function (options) {
   }
   if (utils.isBool(options)) {
     this.options.resize.enabled = options;
+
+    if (!options) {
+      this.onresizestart = this.onresizestart = this.onresizeend = null;
+    }
 
     return this;
   }

@@ -11,7 +11,7 @@ Features include:
  - **multiple interactions**
  - cross browser and device, supporting the **desktop and mobile** versions of
    Chrome, Firefox and Opera as well as **Internet Explorer 8+**
- - interaction with [**SVG**](http://interactjs.io/repo/demo/star.svg) elements
+ - interaction with [**SVG**](http://interactjs.io/images/star.svg) elements
  - being **lightweight and standalone** (not _yet another_ jQuery plugin)
  - **not modifying the DOM** except to support IE8 and to change the cursor
    (but you can disable that)
@@ -22,6 +22,10 @@ Installation
 * [Bower](http://bower.io/): `bower install interact`
 * [npm](https://www.npmjs.org/): `npm install interact.js`
 * Direct download the latest version: http://interactjs.io/#download
+  * **Rails 4** app development (using Rails Asset Pipeline)
+    * Download the file interact.js (development version) into a new sub-directory: app/vendor/assets/javascripts/interact
+    * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
+    * Restart the Rails server
 * [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
 * [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.6/interact.min.js"></script>`
 

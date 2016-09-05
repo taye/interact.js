@@ -2,12 +2,13 @@ module.exports = {
   base: {
     accept        : null,
     preventDefault: 'auto',
-    origin        : { x: 0, y: 0 },
     deltaSource   : 'page',
     allowFrom     : null,
   },
 
   perAction: {
+    origin: { x: 0, y: 0 },
+
     inertia: {
       enabled          : false,
       resistance       : 10,    // the lambda in exponential decay
@@ -17,6 +18,4 @@ module.exports = {
       smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
     },
   },
-
-  _holdDuration: 600,
 };

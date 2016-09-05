@@ -39,22 +39,24 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
 
         if (interactable === interaction.target) { return; }
 
-        let action = null;
+        const options = interactable.options;
 
-        if (interactable.inContext(eventTarget)
-            && !interactable.options.drag.manualStart
-            && !autoStart.testIgnore(interactable, element, eventTarget)
-            && autoStart.testAllow(interactable, element, eventTarget)
+        if (!options.drag.manualStart
+            && !interactable.testIgnoreAllow(options, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
-          action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-        }
-        if (action
-            && action.name === 'drag'
-            && checkStartAxis(currentAxis, interactable)
-            && autoStart.withinInteractionLimit(interactable, element, { name: 'drag' })) {
+          const action = interactable.getAction(interaction.downPointer,
+                                                interaction.downEvent,
+                                                interaction,
+                                                element);
 
-          return interactable;
+          if (action
+              && action.name === 'drag'
+              && checkStartAxis(currentAxis, interactable)
+              && autoStart.validateAction(action, interactable, element)) {
+
+            return interactable;
+          }
         }
       };
 
@@ -80,7 +82,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
           break;
         }
 
-        const selectorInteractable = scope.interactables.forEachSelector(getDraggable);
+        const selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
 
         if (selectorInteractable) {
           interaction.prepared.name = 'drag';

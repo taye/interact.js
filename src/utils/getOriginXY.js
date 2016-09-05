@@ -1,21 +1,23 @@
 const { closest, parentNode, getElementRect } = require('./domUtils');
 const { isElement, isFunction, trySelector }  = require('./isType');
 
-module.exports = function (interactable, element) {
-  let origin = interactable.options.origin;
+module.exports = function (target, element, action) {
+  let origin = (action
+                ? target.options[action].origin
+                : target.options.origin);
 
   if (origin === 'parent') {
     origin = parentNode(element);
   }
   else if (origin === 'self') {
-    origin = interactable.getRect(element);
+    origin = target.getRect(element);
   }
   else if (trySelector(origin)) {
     origin = closest(element, origin) || { x: 0, y: 0 };
   }
 
   if (isFunction(origin)) {
-    origin = origin(interactable && element);
+    origin = origin(target && element);
   }
 
   if (isElement(origin))  {

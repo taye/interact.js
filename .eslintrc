@@ -29,7 +29,7 @@ rules:
   one-var: [2, never]
   quotes: [2, single, avoid-escape]
   semi: [2, always]
-  space-after-keywords: [2, always]
+  keyword-spacing: [2, { before: true, after: true }]
   space-before-function-paren: [2, always]
 
 ecma-features:

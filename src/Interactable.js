@@ -1,6 +1,7 @@
 const isType    = require('./utils/isType');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
+const domUtils  = require('./utils/domUtils');
 const actions   = require('./actions');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
@@ -22,40 +23,22 @@ scope.interactables = [];
 \*/
 class Interactable {
   constructor (target, options) {
+    options = options || {};
+
     this.target   = target;
-    this._context = scope.document;
-    this._iEvents = new Eventable();
-
-    let _window;
-
-    if (isType.trySelector(target)) {
-      this.target = target;
-
-      const context = options && options.context;
-
-      _window = context? scope.getWindow(context) : scope.window;
-
-      if (context && (_window.Node
-        ? context instanceof _window.Node
-        : (isType.isElement(context) || context === _window.document))) {
-
-        this._context = context;
-      }
-    }
-    else {
-      _window = scope.getWindow(target);
-    }
-
-    this._doc = _window.document;
+    this.events   = new Eventable();
+    this._context = options.context || scope.document;
+    this._win     = scope.getWindow(isType.trySelector(target)? this._context : target);
+    this._doc     = this._win.document;
 
     signals.fire('new', {
       target,
       options,
       interactable: this,
-      win: _window,
+      win: this._win,
     });
 
-    scope.addDocument( this._doc, _window );
+    scope.addDocument( this._doc, this._win );
 
     scope.interactables.push(this);
 
@@ -65,10 +48,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (isType.isFunction(phases.onstart)       ) { this._iEvents[onAction + 'start'        ] = phases.onstart         ; }
-    if (isType.isFunction(phases.onmove)        ) { this._iEvents[onAction + 'move'         ] = phases.onmove          ; }
-    if (isType.isFunction(phases.onend)         ) { this._iEvents[onAction + 'end'          ] = phases.onend           ; }
-    if (isType.isFunction(phases.oninertiastart)) { this._iEvents[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (isType.isFunction(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
+    if (isType.isFunction(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
+    if (isType.isFunction(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
+    if (isType.isFunction(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -152,6 +135,20 @@ class Interactable {
     return this.getRect;
   }
 
+  _backCompatOption (optionName, newValue) {
+    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
+      this.options[optionName] = newValue;
+
+      for (const action of actions.names) {
+        this.options[action][optionName] = newValue;
+      }
+
+      return this;
+    }
+
+    return this.options[optionName];
+  }
+
   /*\
    * Interactable.origin
    [ method ]
@@ -166,16 +163,7 @@ class Interactable {
    = (object) The current origin or this Interactable
   \*/
   origin (newValue) {
-    if (isType.trySelector(newValue)) {
-      this.options.origin = newValue;
-      return this;
-    }
-    else if (isType.isObject(newValue)) {
-      this.options.origin = newValue;
-      return this;
-    }
-
-    return this.options.origin;
+    return this._backCompatOption('origin', newValue);
   }
 
   /*\
@@ -217,6 +205,77 @@ class Interactable {
   }
 
   /*\
+   * Interactable.ignoreFrom
+   [ method ]
+   *
+   * If the target of the `mousedown`, `pointerdown` or `touchstart`
+   * event or any of it's parents match the given CSS selector or
+   * Element, no drag/resize/gesture is started.
+   *
+   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
+   = (string | Element | object) The current ignoreFrom value or this Interactable
+   **
+   | interact(element, { ignoreFrom: document.getElementById('no-action') });
+   | // or
+   | interact(element).ignoreFrom('input, textarea, a');
+  \*/
+  ignoreFrom (newValue) {
+    return this._backCompatOption('ignoreFrom', newValue);
+  }
+
+  /*\
+   * Interactable.allowFrom
+   [ method ]
+   *
+   * A drag/resize/gesture is started only If the target of the
+   * `mousedown`, `pointerdown` or `touchstart` event or any of it's
+   * parents match the given CSS selector or Element.
+   *
+   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
+   = (string | Element | object) The current allowFrom value or this Interactable
+   **
+   | interact(element, { allowFrom: document.getElementById('drag-handle') });
+   | // or
+   | interact(element).allowFrom('.handle');
+  \*/
+  allowFrom (newValue) {
+    return this._backCompatOption('allowFrom', newValue);
+  }
+
+  testIgnore (ignoreFrom, interactableElement, element) {
+    if (!ignoreFrom || !isType.isElement(element)) { return false; }
+
+    if (isType.isString(ignoreFrom)) {
+      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
+    }
+    else if (isType.isElement(ignoreFrom)) {
+      return domUtils.nodeContains(ignoreFrom, element);
+    }
+
+    return false;
+  }
+
+  testAllow (allowFrom, interactableElement, element) {
+    if (!allowFrom) { return true; }
+
+    if (!isType.isElement(element)) { return false; }
+
+    if (isType.isString(allowFrom)) {
+      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+    }
+    else if (isType.isElement(allowFrom)) {
+      return domUtils.nodeContains(allowFrom, element);
+    }
+
+    return false;
+  }
+
+  testIgnoreAllow (options, interactableElement, element) {
+    return (!this.testIgnore(options.ignoreFrom, interactableElement, element)
+      && this.testAllow(options.allowFrom, interactableElement, element));
+  }
+
+  /*\
    * Interactable.fire
    [ method ]
    *
@@ -227,7 +286,7 @@ class Interactable {
    = (Interactable) this Interactable
   \*/
   fire (iEvent) {
-    this._iEvents.fire(iEvent);
+    this.events.fire(iEvent);
 
     return this;
   }
@@ -276,7 +335,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     if (contains(Interactable.eventTypes, eventType)) {
-      this._iEvents.on(eventType, listener);
+      this.events.on(eventType, listener);
     }
     // delegated event for selector
     else if (isType.isString(this.target)) {
@@ -312,7 +371,7 @@ class Interactable {
 
     // if it is an action event type
     if (contains(Interactable.eventTypes, eventType)) {
-      this._iEvents.on(eventType, listener);
+      this.events.on(eventType, listener);
     }
     // delegated event
     else if (isType.isString(this.target)) {
@@ -361,6 +420,11 @@ class Interactable {
       }
     }
 
+    signals.fire('set', {
+      options,
+      interactable: this,
+    });
+
     return this;
   }
 
@@ -381,25 +445,21 @@ class Interactable {
       for (const type in events.delegatedEvents) {
         const delegated = events.delegatedEvents[type];
 
-        for (let i = 0; i < delegated.selectors.length; i++) {
-          if (delegated.selectors[i] === this.target
-              && delegated.contexts[i] === this._context) {
+        if (delegated.selectors[0] === this.target
+            && delegated.contexts[0] === this._context) {
 
-            delegated.selectors.splice(i, 1);
-            delegated.contexts .splice(i, 1);
-            delegated.listeners.splice(i, 1);
+          delegated.selectors.splice(0, 1);
+          delegated.contexts .splice(0, 1);
+          delegated.listeners.splice(0, 1);
 
-            // remove the arrays if they are empty
-            if (!delegated.selectors.length) {
-              delegated[type] = null;
-            }
+          // remove the arrays if they are empty
+          if (!delegated.selectors.length) {
+            delegated[type] = null;
           }
-
-          events.remove(this._context, type, events.delegateListener);
-          events.remove(this._context, type, events.delegateUseCapture, true);
-
-          break;
         }
+
+        events.remove(this._context, type, events.delegateListener);
+        events.remove(this._context, type, events.delegateUseCapture, true);
       }
     }
     else {
@@ -435,16 +495,19 @@ scope.interactables.indexOfElement = function indexOfElement (target, context) {
   return -1;
 };
 
-scope.interactables.get = function interactableGet (element, options) {
-  return this[this.indexOfElement(element, options && options.context)];
+scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
+  const ret = this[this.indexOfElement(element, options && options.context)];
+
+  return ret && (dontCheckInContext || ret.inContext(element))? ret : null;
 };
 
-scope.interactables.forEachSelector = function (callback) {
+scope.interactables.forEachSelector = function (callback, element) {
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
-    // skip non CSS selector targets
-    if (!isType.isString(interactable.target)) {
+    // skip non CSS selector targets and out of context elements
+    if (!isType.isString(interactable.target)
+        || (element && !interactable.inContext(element))) {
       continue;
     }
 

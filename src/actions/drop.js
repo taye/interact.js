@@ -319,12 +319,12 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isObject(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
 
-    if (utils.isFunction(options.ondrop)          ) { this._iEvents.ondrop           = options.ondrop          ; }
-    if (utils.isFunction(options.ondropactivate)  ) { this._iEvents.ondropactivate   = options.ondropactivate  ; }
-    if (utils.isFunction(options.ondropdeactivate)) { this._iEvents.ondropdeactivate = options.ondropdeactivate; }
-    if (utils.isFunction(options.ondragenter)     ) { this._iEvents.ondragenter      = options.ondragenter     ; }
-    if (utils.isFunction(options.ondragleave)     ) { this._iEvents.ondragleave      = options.ondragleave     ; }
-    if (utils.isFunction(options.ondropmove)      ) { this._iEvents.ondropmove       = options.ondropmove      ; }
+    if (utils.isFunction(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
+    if (utils.isFunction(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
+    if (utils.isFunction(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
+    if (utils.isFunction(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
+    if (utils.isFunction(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
+    if (utils.isFunction(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
@@ -346,6 +346,11 @@ Interactable.prototype.dropzone = function (options) {
   if (utils.isBool(options)) {
     this.options.drop.enabled = options;
 
+    if (!options) {
+      this.ondragenter = this.ondragleave = this.ondrop
+        = this.ondropactivate = this.ondropdeactivate = null;
+    }
+
     return this;
   }
 
@@ -366,16 +371,14 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
   const dropOverlap = this.options.drop.overlap;
 
   if (dropOverlap === 'pointer') {
-    const origin = utils.getOriginXY(draggable, draggableElement);
+    const origin = utils.getOriginXY(draggable, draggableElement, 'drag');
     const page = utils.getPageXY(dragEvent);
-    let horizontal;
-    let vertical;
 
     page.x += origin.x;
     page.y += origin.y;
 
-    horizontal = (page.x > rect.left) && (page.x < rect.right);
-    vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
+    const horizontal = (page.x > rect.left) && (page.x < rect.right);
+    const vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
 
     dropped = horizontal && vertical;
   }

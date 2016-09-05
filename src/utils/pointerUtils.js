@@ -179,8 +179,6 @@ const pointerUtils = {
   },
 
   touchDistance: function (event, deltaSource) {
-    deltaSource = deltaSource;
-
     const sourceX = deltaSource + 'X';
     const sourceY = deltaSource + 'Y';
     const touches = pointerUtils.getTouchPair(event);
@@ -193,8 +191,6 @@ const pointerUtils = {
   },
 
   touchAngle: function (event, prevAngle, deltaSource) {
-    deltaSource = deltaSource;
-
     const sourceX = deltaSource + 'X';
     const sourceY = deltaSource + 'Y';
     const touches = pointerUtils.getTouchPair(event);

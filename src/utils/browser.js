@@ -21,7 +21,7 @@ const browser = {
   isIOS7: (/iP(hone|od|ad)/.test(navigator.platform)
            && /OS 7[^\d]/.test(navigator.appVersion)),
 
-  isIe9OrOlder: domObjects.document.all && !win.window.atob,
+  isIe9OrOlder: /MSIE (8|9)/.test(navigator.userAgent),
 
   // prefix matchesSelector
   prefixedMatchesSelector: 'matches' in Element.prototype

@@ -20,8 +20,21 @@ function merge (target, source) {
   return target;
 }
 
+function filter (array, test) {
+  const result = [];
+
+  for (let i = 0; i < array.length; i++) {
+    if (test(array[i])) {
+      result.push(array[i]);
+    }
+  }
+
+  return result;
+}
+
 module.exports = {
   indexOf,
   contains,
   merge,
+  filter,
 };

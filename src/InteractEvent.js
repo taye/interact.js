@@ -7,7 +7,7 @@ class InteractEvent {
   constructor (interaction, event, action, phase, element, related) {
     const target      = interaction.target;
     const deltaSource = (target && target.options || defaults).deltaSource;
-    const origin      = getOriginXY(target, element);
+    const origin      = getOriginXY(target, element, action);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
     const coords      = starting? interaction.startCoords : interaction.curCoords;

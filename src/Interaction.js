@@ -190,6 +190,7 @@ class Interaction {
 
     const signalArg = {
       pointer,
+      pointerIndex: this.getPointerIndex(pointer),
       event,
       eventTarget,
       dx,
@@ -257,12 +258,11 @@ class Interaction {
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
-    const pointerIndex = this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
-
-    clearTimeout(this.holdTimers[pointerIndex]);
+    const pointerIndex = this.getPointerIndex(pointer);
 
     signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
+      pointerIndex,
       event,
       eventTarget,
       curEventTarget,
@@ -273,6 +273,7 @@ class Interaction {
       this.end(event);
     }
 
+    this.pointerIsDown = false;
     this.removePointer(pointer);
   }
 
@@ -331,9 +332,13 @@ class Interaction {
     this.prepared.name = this.prevEvent = null;
   }
 
+  getPointerIndex (pointer) {
+    return this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+  }
+
   updatePointer (pointer) {
     const id = utils.getPointerId(pointer);
-    let index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
+    let index = this.getPointerIndex(pointer);
 
     if (index === -1) {
       index = this.pointerIds.length;

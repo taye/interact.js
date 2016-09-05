@@ -4,6 +4,7 @@ const utils       = require('../utils');
 const browser     = require('../utils/browser');
 const defaults    = require('../defaultOptions');
 const signals     = require('../utils/Signals').new();
+const { filter }  = require('../utils/arr');
 
 const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
 const simpleEvents = [ 'down', 'up', 'tap', 'cancel' ];
@@ -21,7 +22,7 @@ function stopPropagation () {
 }
 
 function firePointers (interaction, pointer, event, eventTarget, targets, eventType) {
-  const pointerIndex = interaction.mouse? 0 : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer));
+  const pointerIndex = interaction.getPointerIndex(pointer);
   let pointerEvent = {};
   let i;
   // for tap events
@@ -85,7 +86,19 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
       pointerEvent[prop] = target.props[prop];
     }
 
+    const { x: originX, y: originY } = utils.getOriginXY(target.eventable, target.element);
+
+    pointerEvent.pageX   -= originX;
+    pointerEvent.pageY   -= originY;
+    pointerEvent.clientX -= originX;
+    pointerEvent.clientY -= originY;
+
     target.eventable.fire(pointerEvent);
+
+    pointerEvent.pageX   += originX;
+    pointerEvent.pageY   += originY;
+    pointerEvent.clientX += originX;
+    pointerEvent.clientY += originY;
 
     if (pointerEvent.immediatePropagationStopped
         || (pointerEvent.propagationStopped
@@ -114,7 +127,7 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
 }
 
 function collectEventTargets (interaction, pointer, event, eventTarget, eventType) {
-  const pointerIndex = interaction.mouse? 0 : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer));
+  const pointerIndex = interaction.getPointerIndex(pointer);
 
   // do not fire a tap event if the pointer was moved before being lifted
   if (eventType === 'tap' && (interaction.pointerWasMoved
@@ -123,7 +136,7 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
     return;
   }
 
-  const targets = [];
+  let targets = [];
   const path = utils.getPath(eventTarget);
   const signalArg = {
     targets,
@@ -142,6 +155,13 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
     signals.fire('collect-targets', signalArg);
   }
 
+  if (eventType === 'hold') {
+    targets = filter(targets, function (target) {
+      return (target.eventable.options.holdDuration
+              === interaction.holdTimers[pointerIndex].duration);
+    });
+  }
+
   // create the tap event even if there are no listeners so that
   // doubletap can still be created and fired
   if (targets.length || eventType === 'tap') {
@@ -150,13 +170,11 @@ function collectEventTargets (interaction, pointer, event, eventTarget, eventTyp
 }
 
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
-  const pointerIndex = (interaction.mouse
-    ? 0
-    : utils.indexOf(interaction.pointerIds, utils.getPointerId(pointer)));
+  const pointerIndex = interaction.getPointerIndex(pointer);
 
   if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
     if (interaction.pointerIsDown) {
-      clearTimeout(interaction.holdTimers[pointerIndex]);
+      clearTimeout(interaction.holdTimers[pointerIndex].timeout);
     }
 
     collectEventTargets(interaction, pointer, event, eventTarget, 'move');
@@ -166,16 +184,62 @@ Interaction.signals.on('move', function ({ interaction, pointer, event, eventTar
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
   // copy event to be used in timeout for IE8
   const eventCopy = browser.isIE8? utils.extend({}, event) : event;
+  const timers = interaction.holdTimers;
 
-  interaction.holdTimers[pointerIndex] = setTimeout(function () {
+  if (!timers[pointerIndex]) {
+    timers[pointerIndex] = { duration: Infinity, timeout: null };
+  }
+
+  const timer = timers[pointerIndex];
+  const path = utils.getPath(eventTarget);
+  const signalArg = {
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    eventType: 'hold',
+    targets: [],
+    path,
+    element: null,
+  };
+
+  for (const element of path) {
+    signalArg.element = element;
+
+    signals.fire('collect-targets', signalArg);
+  }
+
+  if (!signalArg.targets.length) { return; }
+
+  let minDuration = Infinity;
+
+  for (let i = 0; i < signalArg.targets.length; i++) {
+    const target = signalArg.targets[i];
+    const holdDuration = target.eventable.options.holdDuration;
+
+    if (holdDuration < minDuration) {
+      minDuration = holdDuration;
+    }
+  }
+
+  timer.duration = minDuration;
+  timer.timeout = setTimeout(function () {
 
     collectEventTargets(interaction,
                         browser.isIE8? eventCopy : pointer,
                         eventCopy,
                         eventTarget,
-                        'hold');
+                        'hold',
+                        minDuration);
+  }, minDuration);
+});
 
-  }, defaults._holdDuration);
+['up', 'cancel'].forEach(function (signalName) {
+  Interaction.signals.on(signalName, function ({ interaction, pointerIndex }) {
+    if (interaction.holdTimers[pointerIndex]) {
+      clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+    }
+  });
 });
 
 function createSignalListener (event) {
@@ -197,11 +261,19 @@ Interaction.signals.on('new', function (interaction) {
   interaction.tapTime = 0;     // time of the most recent tap event
 });
 
+defaults.pointerEvents = {
+  holdDuration: 600,
+  ignoreFrom  : null,
+  allowFrom   : null,
+  origin      : { x: 0, y: 0 },
+};
+
 module.exports = scope.pointerEvents = {
   firePointers,
   collectEventTargets,
   preventOriginalDefault,
   signals,
+  defaults: defaults.pointerEvents,
   types: [
     'down',
     'move',
