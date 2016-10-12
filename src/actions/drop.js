@@ -255,6 +255,7 @@ function fireDropEvents (interaction, dropEvents) {
   if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
   if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
   if (dropEvents.drop ) {     interaction.dropTarget.fire(dropEvents.drop ); }
+  if (dropEvents.move ) {     interaction.dropTarget.fire(dropEvents.move ); }
   if (dropEvents.deactivate) {
     fireActiveDrops(interaction, dropEvents.deactivate);
   }
