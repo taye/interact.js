@@ -386,14 +386,14 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
 
   const dragRect = draggable.getRect(draggableElement);
 
-  if (dropOverlap === 'center') {
+  if (dragRect && dropOverlap === 'center') {
     const cx = dragRect.left + dragRect.width  / 2;
     const cy = dragRect.top  + dragRect.height / 2;
 
     dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
   }
 
-  if (utils.isNumber(dropOverlap)) {
+  if (dragRect && utils.isNumber(dropOverlap)) {
     const overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
                           * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top )));
 
