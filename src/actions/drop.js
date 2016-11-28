@@ -253,6 +253,7 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
 
 function fireDropEvents (interaction, dropEvents) {
   if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
+  if (dropEvents.move ) {     interaction.dropTarget.fire(dropEvents.move ); }
   if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
   if (dropEvents.drop ) {     interaction.dropTarget.fire(dropEvents.drop ); }
   if (dropEvents.deactivate) {
