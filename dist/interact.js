@@ -109,6 +109,7 @@ var InteractEvent = (function () {
     var starting = phase === 'start';
     var ending = phase === 'end';
     var coords = starting ? interaction.startCoords : interaction.curCoords;
+    var prevEvent = interaction.prevEvent;
 
     element = element || interaction.element;
 
@@ -130,10 +131,11 @@ var InteractEvent = (function () {
     this.target = element;
     this.currentTarget = element;
     this.relatedTarget = related || null;
-    this.t0 = interaction.downTimes[interaction.downTimes.length - 1];
     this.type = action + (phase || '');
     this.interaction = interaction;
     this.interactable = target;
+
+    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1] : prevEvent.t0;
 
     var signalArg = {
       interaction: interaction,
@@ -154,8 +156,6 @@ var InteractEvent = (function () {
     signals.fire('set-xy', signalArg);
 
     if (ending) {
-      var prevEvent = interaction.prevEvent;
-
       // use previous coords when ending
       this.pageX = prevEvent.pageX;
       this.pageY = prevEvent.pageY;
@@ -177,7 +177,7 @@ var InteractEvent = (function () {
 
     this.timeStamp = coords.timeStamp;
     this.dt = interaction.pointerDelta.timeStamp;
-    this.duration = this.timeStamp - interaction.downTimes[0];
+    this.duration = this.timeStamp - this.t0;
 
     // speed and velocity in pixels per second
     this.speed = interaction.pointerDelta[deltaSource].speed;
@@ -1377,6 +1377,7 @@ var defaultOptions = require('../defaultOptions');
 var drag = {
   defaults: {
     enabled: false,
+    mouseButtons: null,
 
     origin: null,
     snap: null,
@@ -1843,11 +1844,17 @@ function fireDropEvents(interaction, dropEvents) {
   if (dropEvents.leave) {
     interaction.prevDropTarget.fire(dropEvents.leave);
   }
+  if (dropEvents.move) {
+    interaction.dropTarget.fire(dropEvents.move);
+  }
   if (dropEvents.enter) {
     interaction.dropTarget.fire(dropEvents.enter);
   }
   if (dropEvents.drop) {
     interaction.dropTarget.fire(dropEvents.drop);
+  }
+  if (dropEvents.move) {
+    interaction.dropTarget.fire(dropEvents.move);
   }
   if (dropEvents.deactivate) {
     fireActiveDrops(interaction, dropEvents.deactivate);
@@ -1986,14 +1993,14 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
 
   var dragRect = draggable.getRect(draggableElement);
 
-  if (dropOverlap === 'center') {
+  if (dragRect && dropOverlap === 'center') {
     var cx = dragRect.left + dragRect.width / 2;
     var cy = dragRect.top + dragRect.height / 2;
 
     dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
   }
 
-  if (utils.isNumber(dropOverlap)) {
+  if (dragRect && utils.isNumber(dropOverlap)) {
     var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
 
     var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
@@ -2295,6 +2302,7 @@ var defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 :
 var resize = {
   defaults: {
     enabled: false,
+    mouseButtons: null,
 
     origin: null,
     snap: null,
@@ -3339,6 +3347,11 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
 
     var actionName = _ref;
 
+    // check mouseButton setting if the pointer is down
+    if (interaction.pointerIsDown && interaction.mouse && (event.buttons & this.options[actionName].mouseButtons) === 0) {
+      continue;
+    }
+
     action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
 
     if (action) {
@@ -3446,6 +3459,10 @@ module.exports = {
 
   perAction: {
     origin: { x: 0, y: 0 },
+
+    // only allow left button by default
+    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+    mouseButtons: 1,
 
     inertia: {
       enabled: false,
@@ -4049,6 +4066,7 @@ var isType = require('./utils/isType');
 var _require = require('./utils/domUtils');
 
 var nodeContains = _require.nodeContains;
+var matchesSelector = _require.matchesSelector;
 
 /*\
  * Interactable.preventDefault
@@ -4096,8 +4114,8 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
     return;
   }
 
-  // don't preventDefault on input elements
-  if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
+  // don't preventDefault on editable elements
+  if (matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 
