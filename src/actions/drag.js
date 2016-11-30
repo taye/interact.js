@@ -7,7 +7,8 @@ const defaultOptions = require('../defaultOptions');
 
 const drag = {
   defaults: {
-    enabled   : false,
+    enabled     : false,
+    mouseButtons: null,
 
     origin    : null,
     snap      : null,

@@ -11,7 +11,8 @@ const defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20:
 
 const resize = {
   defaults: {
-    enabled   : false,
+    enabled     : false,
+    mouseButtons: null,
 
     origin    : null,
     snap      : null,
