@@ -19,8 +19,8 @@ Features include:
 Installation
 ------------
 
-* [Bower](http://bower.io/): `bower install interact`
-* [npm](https://www.npmjs.org/): `npm install interact.js`
+* [Bower](http://bower.io/): `bower install interactjs`
+* [npm](https://www.npmjs.org/): `npm install interactjs`
 * Direct download the latest version: http://interactjs.io/#download
 * [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
 * [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.6/interact.min.js"></script>`
