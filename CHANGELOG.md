@@ -1,3 +1,7 @@
+## 1.2.7
+
+The bower and npm package names have been changed to `interactjs`. See [issue #399](https://github.com/taye/interact.js/issue/399)
+
 ## 1.2.6
 
 ### resize.preserveAspectRatio
