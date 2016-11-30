@@ -5,6 +5,7 @@ require('./legacyBrowsers');
 
 // pointerEvents
 require('./pointerEvents');
+require('./pointerEvents/holdRepeat');
 require('./pointerEvents/interactableTargets');
 
 // inertia

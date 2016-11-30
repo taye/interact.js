@@ -69,9 +69,11 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
   }
 
   const signalArg = {
+    interaction,
     pointerEvent,
     pointer,
     event,
+    eventTarget,
     targets,
   };
 
@@ -92,6 +94,8 @@ function firePointers (interaction, pointer, event, eventTarget, targets, eventT
     pointerEvent.pageY   -= originY;
     pointerEvent.clientX -= originX;
     pointerEvent.clientY -= originY;
+
+    pointerEvent.eventable = target.eventable;
 
     target.eventable.fire(pointerEvent);
 
@@ -229,8 +233,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
                         browser.isIE8? eventCopy : pointer,
                         eventCopy,
                         eventTarget,
-                        'hold',
-                        minDuration);
+                        'hold');
   }, minDuration);
 });
 
