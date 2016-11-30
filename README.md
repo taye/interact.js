@@ -19,8 +19,8 @@ Features include:
 Installation
 ------------
 
-* [Bower](http://bower.io/): `bower install interact`
-* [npm](https://www.npmjs.org/): `npm install interact.js`
+* [Bower](http://bower.io/): `bower install interactjs`
+* [npm](https://www.npmjs.org/): `npm install interactjs`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
     * Download the file interact.js (development version) into a new sub-directory: app/vendor/assets/javascripts/interact

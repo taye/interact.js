@@ -266,6 +266,13 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   let action = null;
 
   for (const actionName of actions.names) {
+    // check mouseButton setting if the pointer is down
+    if (interaction.pointerIsDown
+        && interaction.mouse
+        && (event.buttons & this.options[actionName].mouseButtons) === 0) {
+      continue;
+    }
+
     action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
 
     if (action) {

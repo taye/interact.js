@@ -3,7 +3,7 @@ const Interaction  = require('./Interaction');
 const scope        = require('./scope');
 const isType       = require('./utils/isType');
 
-const { nodeContains } = require('./utils/domUtils');
+const { nodeContains, matchesSelector } = require('./utils/domUtils');
 
 /*\
  * Interactable.preventDefault
@@ -49,8 +49,8 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
     return;
   }
 
-  // don't preventDefault on input elements
-  if (/^(input|select|textarea)$/i.test(event.target.nodeName)) {
+  // don't preventDefault on editable elements
+  if (matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 

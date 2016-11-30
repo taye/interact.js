@@ -11,6 +11,7 @@ class InteractEvent {
     const starting    = phase === 'start';
     const ending      = phase === 'end';
     const coords      = starting? interaction.startCoords : interaction.curCoords;
+    const prevEvent   = interaction.prevEvent;
 
     element = element || interaction.element;
 
@@ -32,10 +33,12 @@ class InteractEvent {
     this.target        = element;
     this.currentTarget = element;
     this.relatedTarget = related || null;
-    this.t0            = interaction.downTimes[interaction.downTimes.length - 1];
     this.type          = action + (phase || '');
     this.interaction   = interaction;
     this.interactable  = target;
+
+    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1]
+                       : prevEvent.t0;
 
     const signalArg = {
       interaction,
@@ -56,8 +59,6 @@ class InteractEvent {
     signals.fire('set-xy', signalArg);
 
     if (ending) {
-      const prevEvent = interaction.prevEvent;
-
       // use previous coords when ending
       this.pageX = prevEvent.pageX;
       this.pageY = prevEvent.pageY;
@@ -80,7 +81,7 @@ class InteractEvent {
 
     this.timeStamp = coords.timeStamp;
     this.dt        = interaction.pointerDelta.timeStamp;
-    this.duration  = this.timeStamp - interaction.downTimes[0];
+    this.duration  = this.timeStamp - this.t0;
 
     // speed and velocity in pixels per second
     this.speed = interaction.pointerDelta[deltaSource].speed;
