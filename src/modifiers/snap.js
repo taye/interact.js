@@ -14,14 +14,6 @@ const snap = {
     relativePoints: null,
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const snapOptions = interactable.options[actionName].snap;
-
-    return (snapOptions && snapOptions.enabled
-            && (preEnd || !snapOptions.endOnly)
-            && (!requireEndOnly || snapOptions.endOnly));
-  },
-
   setOffset: function (interaction, interactable, element, rect, startOffset) {
     const offsets = [];
     const origin = utils.getOriginXY(interactable, element, interaction.prepared.name);

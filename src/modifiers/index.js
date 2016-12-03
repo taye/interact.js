@@ -52,8 +52,9 @@ const modifiers = {
 
     for (const modifierName of modifiers.names) {
       const modifier = modifiers[modifierName];
+      const modifierOptions = target.options[interaction.prepared.name][modifierName];
 
-      if (!modifier.shouldDo(target, interaction.prepared.name, preEnd, requireEndOnly)) { continue; }
+      if (!shouldDo(modifierOptions, preEnd, requireEndOnly)) { continue; }
 
       currentStatus = modifier.set(coords, interaction, statuses[modifierName]);
 
@@ -112,8 +113,10 @@ Interaction.signals.on('before-action-move', function ({ interaction, preEnd, in
 
 Interaction.signals.on('action-end', function ({ interaction, event }) {
   for (let i = 0; i < modifiers.names.length; i++) {
+    const modifierOptions = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
+
     // if the endOnly option is true for any modifier
-    if (modifiers[modifiers.names[i]].shouldDo(interaction.target, interaction.prepared.name, true, true)) {
+    if (shouldDo(modifierOptions, true, true)) {
       // fire a move event at the modified coordinates
       interaction.doMove({ event, preEnd: true });
       break;
@@ -131,5 +134,11 @@ InteractEvent.signals.on('set-xy', function ({ iEvent, interaction, page, client
     iEvent[modifierName] = modifier.modifyCoords(page, client, target, interaction.modifierStatuses[modifierName], actionName, phase);
   }
 });
+
+function shouldDo (options, preEnd, requireEndOnly) {
+  return (options && options.enabled
+          && (preEnd || !options.endOnly)
+          && (!requireEndOnly || options.endOnly));
+}
 
 module.exports = modifiers;

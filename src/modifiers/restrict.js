@@ -10,14 +10,6 @@ const restrict = {
     elementRect: null,
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const restrictOptions = interactable.options[actionName].restrict;
-
-    return (restrictOptions && restrictOptions.enabled
-            && (preEnd || !restrictOptions.endOnly)
-            && (!requireEndOnly || restrictOptions.endOnly));
-  },
-
   setOffset: function (interaction, interactable, element, rect, startOffset) {
     const elementRect = interactable.options[interaction.prepared.name].restrict.elementRect;
     const offset = {};
