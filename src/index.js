@@ -14,6 +14,7 @@ require('./inertia');
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
+require('./modifiers/restrictEdges');
 
 // delay
 require('./autoStart/delay');
