@@ -1,5 +1,5 @@
 // This module adds the options.resize.restrictEdges setting which sets min and
-// max width and height for the target being resized.
+// max for the top, left, bottom and right edges of the target being resized.
 //
 // interact(target).resize({
 //   edges: { top: true, left: true },
@@ -39,38 +39,38 @@ const restrictEdges = {
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
-    const min = getRestrictionRect(options.min) || noMin;
-    const max = getRestrictionRect(options.max) || noMax;
+    const min = utils.xywhToTlbr(getRestrictionRect(options.min)) || noMin;
+    const max = utils.xywhToTlbr(getRestrictionRect(options.max)) || noMax;
     const offset = interaction.startOffset;
 
-    let restrictedX = page.x;
-    let restrictedY = page.y;
+    let modifiedX = page.x;
+    let modifiedY = page.y;
 
     status.dx = 0;
     status.dy = 0;
     status.locked = false;
 
     if (edges.left) {
-      restrictedX = Math.max(Math.min(max.left   - offset.left,   page.x), min.left   + offset.left);
+      modifiedX = Math.max(Math.min(max.left   - offset.left,   page.x), min.left   + offset.left);
     }
     else if (edges.right) {
-      restrictedX = Math.max(Math.min(max.right  - offset.right,  page.x), min.right  + offset.right);
+      modifiedX = Math.max(Math.min(max.right  - offset.right,  page.x), min.right  + offset.right);
     }
     if (edges.top) {
-      restrictedY = Math.max(Math.min(max.top    - offset.top,    page.y), min.top    + offset.top);
+      modifiedY = Math.max(Math.min(max.top    - offset.top,    page.y), min.top    + offset.top);
     }
     else if (edges.bottom) {
-      restrictedY = Math.max(Math.min(max.bottom - offset.bottom, page.y), min.bottom + offset.bottom);
+      modifiedY = Math.max(Math.min(max.bottom - offset.bottom, page.y), min.bottom + offset.bottom);
     }
 
-    status.dx = restrictedX - page.x;
-    status.dy = restrictedY - page.y;
+    status.dx = modifiedX - page.x;
+    status.dy = modifiedY - page.y;
 
-    status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+    status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
     status.locked = !!(status.dx || status.dy);
 
-    status.restrictedX = restrictedX;
-    status.restrictedY = restrictedY;
+    status.modifiedX = modifiedX;
+    status.modifiedY = modifiedY;
 
     return status;
 
@@ -85,7 +85,7 @@ const restrictEdges = {
         value = utils.getElementRect(value);
       }
 
-      return xywhToTlbr(value);
+      return value;
     }
   },
 
@@ -118,19 +118,6 @@ const restrictEdges = {
     }
   },
 };
-
-function xywhToTlbr (rect) {
-  if (rect && !('left' in rect && 'top' in rect)) {
-    rect = utils.extend({}, rect);
-
-    rect.left   = rect.x;
-    rect.top    = rect.y;
-    rect.right  = rect.x + rect.width;
-    rect.bottom = rect.y + rect.height;
-  }
-
-  return rect;
-}
 
 modifiers.restrictEdges = restrictEdges;
 modifiers.names.push('restrictEdges');

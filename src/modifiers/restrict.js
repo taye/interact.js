@@ -68,35 +68,35 @@ const restrict = {
     }
 
     const rect = restriction;
-    let restrictedX;
-    let restrictedY;
+    let modifiedX;
+    let modifiedY;
 
     const offset = interaction.modifierOffsets.restrict;
 
     if (!restriction) {
-      restrictedX = page.x;
-      restrictedY = page.y;
+      modifiedX = page.x;
+      modifiedY = page.y;
     }
     // object is assumed to have
     // x, y, width, height or
     // left, top, right, bottom
     else if ('x' in restriction && 'y' in restriction) {
-      restrictedX = Math.max(Math.min(rect.x + rect.width  - offset.right , page.x), rect.x + offset.left);
-      restrictedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top );
+      modifiedX = Math.max(Math.min(rect.x + rect.width  - offset.right , page.x), rect.x + offset.left);
+      modifiedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top );
     }
     else {
-      restrictedX = Math.max(Math.min(rect.right  - offset.right , page.x), rect.left + offset.left);
-      restrictedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
+      modifiedX = Math.max(Math.min(rect.right  - offset.right , page.x), rect.left + offset.left);
+      modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
     }
 
-    status.dx = restrictedX - page.x;
-    status.dy = restrictedY - page.y;
+    status.dx = modifiedX - page.x;
+    status.dy = modifiedY - page.y;
 
-    status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+    status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
     status.locked = !!(status.dx || status.dy);
 
-    status.restrictedX = restrictedX;
-    status.restrictedY = restrictedY;
+    status.modifiedX = modifiedX;
+    status.modifiedY = modifiedY;
 
     return status;
   },
