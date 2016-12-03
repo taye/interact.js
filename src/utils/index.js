@@ -60,19 +60,6 @@ const utils = {
     return value;
   },
 
-  xywhToTlbr: function (rect) {
-    if (rect && !('left' in rect && 'top' in rect)) {
-      rect = utils.extend({}, rect);
-
-      rect.left   = rect.x;
-      rect.top    = rect.y;
-      rect.right  = rect.x + rect.width;
-      rect.bottom = rect.y + rect.height;
-    }
-
-    return rect;
-  },
-
   extend     : extend,
   hypot      : require('./hypot'),
   getOriginXY: require('./getOriginXY'),

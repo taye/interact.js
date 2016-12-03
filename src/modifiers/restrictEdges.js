@@ -11,6 +11,7 @@
 
 const modifiers      = require('./index');
 const utils          = require('../utils');
+const rectUtils      = require('../utils/rect');
 const defaultOptions = require('../defaultOptions');
 const resize         = require('../actions/resize');
 
@@ -23,13 +24,37 @@ const restrictEdges = {
     endOnly: false,
     min: null,
     max: null,
+    offset: null,
   },
 
-  setOffset: function () {},
+  setOffset: function (interaction, interactable, element, rect, startOffset) {
+    const options = interactable.options[interaction.prepared.name].restrictEdges;
+
+    if (!options) {
+      return;
+    }
+
+    const offset = getRestrictionRect(offset, interaction);
+
+    if (offset) {
+      return {
+        top:    startOffset.top    + offset.y,
+        left:   startOffset.left   + offset.x,
+        bottom: startOffset.bottom + offset.y,
+        right:  startOffset.right  + offset.x,
+      };
+    }
+
+    return startOffset;
+  },
 
   set: function (pageCoords, interaction, status) {
+    if (!interaction.interacting()) {
+      return status;
+    }
+
     const target  = interaction.target;
-    const options = target && target.options[interaction.prepared.name].restrictEdges;
+    const options = status.options || target && target.options[interaction.prepared.name].restrictEdges;
     const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
     if (!options.enabled || !edges) {
@@ -39,9 +64,9 @@ const restrictEdges = {
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
-    const min = utils.xywhToTlbr(getRestrictionRect(options.min)) || noMin;
-    const max = utils.xywhToTlbr(getRestrictionRect(options.max)) || noMax;
-    const offset = interaction.startOffset;
+    const min = rectUtils.xywhToTlbr(getRestrictionRect(options.min, interaction)) || noMin;
+    const max = rectUtils.xywhToTlbr(getRestrictionRect(options.max, interaction)) || noMax;
+    const offset = interaction.modifierOffsets.restrictEdges;
 
     let modifiedX = page.x;
     let modifiedY = page.y;
@@ -50,17 +75,17 @@ const restrictEdges = {
     status.dy = 0;
     status.locked = false;
 
-    if (edges.left) {
-      modifiedX = Math.max(Math.min(max.left   - offset.left,   page.x), min.left   + offset.left);
-    }
-    else if (edges.right) {
-      modifiedX = Math.max(Math.min(max.right  - offset.right,  page.x), min.right  + offset.right);
-    }
     if (edges.top) {
-      modifiedY = Math.max(Math.min(max.top    - offset.top,    page.y), min.top    + offset.top);
+      modifiedY = Math.max(Math.min(max.top    + offset.top,    page.y), min.top    + offset.top);
     }
     else if (edges.bottom) {
-      modifiedY = Math.max(Math.min(max.bottom - offset.bottom, page.y), min.bottom + offset.bottom);
+      modifiedY = Math.max(Math.min(max.bottom - offset.bottom, page.y), min.bottom - offset.bottom);
+    }
+    if (edges.left) {
+      modifiedX = Math.max(Math.min(max.left   + offset.left,   page.x), min.left   + offset.left);
+    }
+    else if (edges.right) {
+      modifiedX = Math.max(Math.min(max.right  - offset.right,  page.x), min.right  - offset.right);
     }
 
     status.dx = modifiedX - page.x;
@@ -72,21 +97,9 @@ const restrictEdges = {
     status.modifiedX = modifiedX;
     status.modifiedY = modifiedY;
 
+    //console.log(status.dx, status.modifiedX, status.changed, status.locked);
+
     return status;
-
-    function getRestrictionRect (value) {
-      value = utils.getStringOptionResult(value, interaction.element) || value;
-
-      if (utils.isFunction(value)) {
-        value = value(interaction.resizeRects.inverted);
-      }
-
-      if (utils.isElement(value)) {
-        value = utils.getElementRect(value);
-      }
-
-      return value;
-    }
   },
 
   reset: function (status) {
@@ -94,12 +107,13 @@ const restrictEdges = {
     status.modifiedX = status.modifiedY = NaN;
     status.locked = false;
     status.changed = true;
+    status.options = null;
 
     return status;
   },
 
   modifyCoords: function (page, client, interactable, status, actionName, phase) {
-    const options = interactable.options[actionName].restrictEdges;
+    const options = status.options || interactable.options[actionName].restrictEdges;
 
     if (options && options.enabled
         && !(phase === 'start' && status.locked)) {
@@ -117,7 +131,25 @@ const restrictEdges = {
       }
     }
   },
+
+  noMin,
+  noMax,
+  getRestrictionRect,
 };
+
+function getRestrictionRect (value, interaction) {
+  value = utils.getStringOptionResult(value, interaction.element) || value;
+
+  if (utils.isFunction(value)) {
+    value = value(interaction.resizeRects.inverted);
+  }
+
+  if (utils.isElement(value)) {
+    value = utils.getElementRect(value);
+  }
+
+  return value;
+}
 
 modifiers.restrictEdges = restrictEdges;
 modifiers.names.push('restrictEdges');
