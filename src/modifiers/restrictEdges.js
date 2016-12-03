@@ -19,7 +19,7 @@ const noMax = { top: +Infinity, left: +Infinity, bottom: +Infinity, right: +Infi
 
 const restrictEdges = {
   defaults: {
-    enabled: true,
+    enabled: false,
     endOnly: false,
     min: null,
     max: null,
