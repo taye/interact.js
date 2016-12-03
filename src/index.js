@@ -14,7 +14,6 @@ require('./inertia');
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
-require('./modifiers/restrictEdges');
 
 // delay
 require('./autoStart/delay');
@@ -24,6 +23,10 @@ require('./actions/gesture');
 require('./actions/resize');
 require('./actions/drag');
 require('./actions/drop');
+
+// load these modifiers after resize is loaded
+require('./modifiers/restrictEdges');
+require('./modifiers/restrictSize');
 
 // autoStart actions
 require('./autoStart/gesture');
