@@ -1,12 +1,13 @@
 // This module adds the options.resize.restrictEdges setting which sets min and
 // max width and height for the target being resized.
 //
-//     interact(target).resizable({
-//       restrictEdges: {
-//         min: { width: -100, height: -100 },
-//         min: { width: -100, height: -100 },
-//       }
-//     });
+// interact(target).resize({
+//   edges: { top: true, left: true },
+//   restrictEdges: {
+//     min: { top:   0, left:   0, right: 100, bottom: 100 },
+//     max: { top: 500, left: 500, right: 600, bottom: 600 },
+//   },
+// });
 
 const modifiers      = require('./index');
 const utils          = require('../utils');
