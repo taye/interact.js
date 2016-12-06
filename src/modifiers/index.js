@@ -78,7 +78,14 @@ const modifiers = {
 
   resetStatuses: function (statuses) {
     for (const modifierName of modifiers.names) {
-      statuses[modifierName] = modifiers[modifierName].reset(statuses[modifierName] || {});
+      const status = statuses[modifierName] || {};
+
+      status.dx = status.dy = 0;
+      status.modifiedX = status.modifiedY = NaN;
+      status.locked = false;
+      status.changed = true;
+
+      statuses[modifierName] = status;
     }
 
     return statuses;

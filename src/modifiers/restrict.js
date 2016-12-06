@@ -101,15 +101,6 @@ const restrict = {
     return status;
   },
 
-  reset: function (status) {
-    status.dx = status.dy = 0;
-    status.modifiedX = status.modifiedY = NaN;
-    status.locked = false;
-    status.changed = true;
-
-    return status;
-  },
-
   modifyCoords: function (page, client, interactable, status, actionName, phase) {
     const options = interactable.options[actionName].restrict;
     const elementRect = options && options.elementRect;

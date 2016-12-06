@@ -74,8 +74,6 @@ const restrictSize = {
     return restrictEdges.set(pageCoords, interaction, status);
   },
 
-  reset: restrictEdges.reset,
-
   modifyCoords: restrictEdges.modifyCoords,
 };
 

@@ -102,16 +102,6 @@ const restrictEdges = {
     return status;
   },
 
-  reset: function (status) {
-    status.dx = status.dy = 0;
-    status.modifiedX = status.modifiedY = NaN;
-    status.locked = false;
-    status.changed = true;
-    status.options = null;
-
-    return status;
-  },
-
   modifyCoords: function (page, client, interactable, status, actionName, phase) {
     const options = status.options || interactable.options[actionName].restrictEdges;
 

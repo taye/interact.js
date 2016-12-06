@@ -170,15 +170,6 @@ const snap = {
     return status;
   },
 
-  reset: function (status) {
-    status.dx = status.dy = 0;
-    status.snappedX = status.snappedY = NaN;
-    status.locked = false;
-    status.changed = true;
-
-    return status;
-  },
-
   modifyCoords: function (page, client, interactable, status, actionName, phase) {
     const snapOptions = interactable.options[actionName].snap;
     const relativePoints = snapOptions && snapOptions.relativePoints;
