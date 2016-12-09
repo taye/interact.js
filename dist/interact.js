@@ -1,5 +1,5 @@
 /**
- * interact.js 1.2.6
+ * interact.js 1.3.0
  *
  * Copyright (c) 2012-2016 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -24,7 +24,7 @@ if (typeof window === 'undefined') {
   module.exports = require('./src/index');
 }
 
-},{"./src/index":18,"./src/utils/window":45}],2:[function(require,module,exports){
+},{"./src/index":18,"./src/utils/window":46}],2:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _require = require('./utils/arr');
@@ -91,7 +91,7 @@ var Eventable = (function () {
 
 module.exports = Eventable;
 
-},{"./utils/arr":30,"./utils/extend.js":35}],3:[function(require,module,exports){
+},{"./utils/arr":31,"./utils/extend.js":36}],3:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var extend = require('./utils/extend');
@@ -257,7 +257,7 @@ InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./defaultOptions":17,"./utils/Signals":29,"./utils/extend":35,"./utils/getOriginXY":36}],4:[function(require,module,exports){
+},{"./defaultOptions":17,"./utils/Signals":30,"./utils/extend":36,"./utils/getOriginXY":37}],4:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var isType = require('./utils/isType');
@@ -863,7 +863,7 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions":9,"./defaultOptions":17,"./scope":28,"./utils/Signals":29,"./utils/arr":30,"./utils/browser":31,"./utils/domUtils":33,"./utils/events":34,"./utils/extend":35,"./utils/isType":40}],5:[function(require,module,exports){
+},{"./Eventable":2,"./actions":9,"./defaultOptions":17,"./scope":29,"./utils/Signals":30,"./utils/arr":31,"./utils/browser":32,"./utils/domUtils":34,"./utils/events":35,"./utils/extend":36,"./utils/isType":41}],5:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var scope = require('./scope');
@@ -1312,7 +1312,10 @@ function doOnInteractions(method) {
 
 function endAll(event) {
   for (var i = 0; i < scope.interactions.length; i++) {
-    scope.interactions[i].end(event);
+    var interaction = scope.interactions[i];
+
+    interaction.end(event);
+    signals.fire('endall', { event: event, interaction: interaction });
   }
 }
 
@@ -1366,7 +1369,7 @@ scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":28,"./utils":38,"./utils/Signals":29,"./utils/browser":31,"./utils/events":34,"./utils/interactionFinder":39}],6:[function(require,module,exports){
+},{"./scope":29,"./utils":39,"./utils/Signals":30,"./utils/browser":32,"./utils/events":35,"./utils/interactionFinder":40}],6:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -1562,7 +1565,7 @@ defaultOptions.drag = drag.defaults;
 
 module.exports = drag;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":38,"./index":9}],7:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":39,"./index":9}],7:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
 var scope = require('../scope');
@@ -2074,7 +2077,7 @@ defaultOptions.drop = drop.defaults;
 
 module.exports = drop;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../interact":20,"../scope":28,"../utils":38,"./index":9}],8:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../interact":20,"../scope":29,"../utils":39,"./index":9}],8:[function(require,module,exports){
 var actions = require('./index');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -2279,7 +2282,7 @@ defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":38,"./index":9}],9:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":39,"./index":9}],9:[function(require,module,exports){
 var actions = {
   names: [],
   methodDict: {}
@@ -2771,7 +2774,7 @@ defaultOptions.resize = resize.defaults;
 
 module.exports = resize;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":38,"../utils/browser":31,"./index":9}],11:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":17,"../utils":39,"../utils/browser":32,"./index":9}],11:[function(require,module,exports){
 var raf = require('./utils/raf');
 var getWindow = require('./utils/window').getWindow;
 var isWindow = require('./utils/isType').isWindow;
@@ -2897,7 +2900,7 @@ defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;
 
-},{"./Interaction":5,"./defaultOptions":17,"./utils/domUtils":33,"./utils/isType":40,"./utils/raf":44,"./utils/window":45}],12:[function(require,module,exports){
+},{"./Interaction":5,"./defaultOptions":17,"./utils/domUtils":34,"./utils/isType":41,"./utils/raf":45,"./utils/window":46}],12:[function(require,module,exports){
 var autoStart = require('./index');
 var Interaction = require('../Interaction');
 
@@ -3061,7 +3064,7 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":6,"../scope":28,"../utils/browser":31,"../utils/domUtils":33,"../utils/isType":40,"./index":15}],14:[function(require,module,exports){
+},{"../actions/drag":6,"../scope":29,"../utils/browser":32,"../utils/domUtils":34,"../utils/isType":41,"./index":15}],14:[function(require,module,exports){
 require('./index').setActionDefaults(require('../actions/gesture'));
 
 },{"../actions/gesture":8,"./index":15}],15:[function(require,module,exports){
@@ -3331,6 +3334,12 @@ Interactable.prototype.styleCursor = function (newValue) {
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
   var rect = this.getRect(element);
+  var buttons = event.buttons || ({
+    0: 1,
+    1: 4,
+    3: 8,
+    4: 16
+  })[event.button];
   var action = null;
 
   for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -3348,7 +3357,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
     var actionName = _ref;
 
     // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown && interaction.mouse && (event.buttons & this.options[actionName].mouseButtons) === 0) {
+    if (interaction.pointerIsDown && interaction.mouse && (buttons & this.options[actionName].mouseButtons) === 0) {
       continue;
     }
 
@@ -3445,7 +3454,7 @@ utils.extend(defaultOptions.perAction, autoStart.perActionDefaults);
 
 module.exports = autoStart;
 
-},{"../Interactable":4,"../Interaction":5,"../actions":9,"../defaultOptions":17,"../interact":20,"../scope":28,"../utils":38,"../utils/Signals":29,"../utils/browser":31}],16:[function(require,module,exports){
+},{"../Interactable":4,"../Interaction":5,"../actions":9,"../defaultOptions":17,"../interact":20,"../scope":29,"../utils":39,"../utils/Signals":30,"../utils/browser":32}],16:[function(require,module,exports){
 require('./index').setActionDefaults(require('../actions/resize'));
 
 },{"../actions/resize":10,"./index":15}],17:[function(require,module,exports){
@@ -3483,6 +3492,7 @@ require('./legacyBrowsers');
 
 // pointerEvents
 require('./pointerEvents');
+require('./pointerEvents/holdRepeat');
 require('./pointerEvents/interactableTargets');
 
 // inertia
@@ -3496,11 +3506,15 @@ require('./modifiers/restrict');
 require('./autoStart/delay');
 
 // actions
+require('./actions/gesture');
+require('./actions/resize');
+require('./actions/drag');
+require('./actions/drop');
+
+// autoStart actions
 require('./autoStart/gesture');
 require('./autoStart/resize');
 require('./autoStart/drag');
-
-require('./actions/drop');
 
 // Interactable preventDefault setting
 require('./interactablePreventDefault.js');
@@ -3511,7 +3525,7 @@ require('./autoScroll');
 // export interact
 module.exports = require('./interact');
 
-},{"./actions/drop":7,"./autoScroll":11,"./autoStart/delay":12,"./autoStart/drag":13,"./autoStart/gesture":14,"./autoStart/resize":16,"./inertia":19,"./interact":20,"./interactablePreventDefault.js":21,"./legacyBrowsers":22,"./modifiers/restrict":24,"./modifiers/snap":25,"./pointerEvents":26,"./pointerEvents/interactableTargets":27}],19:[function(require,module,exports){
+},{"./actions/drag":6,"./actions/drop":7,"./actions/gesture":8,"./actions/resize":10,"./autoScroll":11,"./autoStart/delay":12,"./autoStart/drag":13,"./autoStart/gesture":14,"./autoStart/resize":16,"./inertia":19,"./interact":20,"./interactablePreventDefault.js":21,"./legacyBrowsers":22,"./modifiers/restrict":24,"./modifiers/snap":25,"./pointerEvents":27,"./pointerEvents/holdRepeat":26,"./pointerEvents/interactableTargets":28}],19:[function(require,module,exports){
 var InteractEvent = require('./InteractEvent');
 var Interaction = require('./Interaction');
 var modifiers = require('./modifiers');
@@ -3794,7 +3808,7 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers":23,"./utils":38,"./utils/raf":44}],20:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interaction":5,"./modifiers":23,"./utils":39,"./utils/raf":45}],20:[function(require,module,exports){
 var browser = require('./utils/browser');
 var events = require('./utils/events');
 var utils = require('./utils');
@@ -4057,7 +4071,7 @@ scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Interactable":4,"./Interaction":5,"./scope":28,"./utils":38,"./utils/browser":31,"./utils/events":34}],21:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":29,"./utils":39,"./utils/browser":32,"./utils/events":35}],21:[function(require,module,exports){
 var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
 var scope = require('./scope');
@@ -4161,7 +4175,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":28,"./utils/domUtils":33,"./utils/isType":40}],22:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":29,"./utils/domUtils":34,"./utils/isType":41}],22:[function(require,module,exports){
 var scope = require('./scope');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
@@ -4246,7 +4260,7 @@ if (browser.isIE8) {
 
 module.exports = null;
 
-},{"./scope":28,"./utils/browser":31,"./utils/events":34,"./utils/interactionFinder":39}],23:[function(require,module,exports){
+},{"./scope":29,"./utils/browser":32,"./utils/events":35,"./utils/interactionFinder":40}],23:[function(require,module,exports){
 var InteractEvent = require('../InteractEvent');
 var Interaction = require('../Interaction');
 var extend = require('../utils/extend');
@@ -4429,7 +4443,7 @@ InteractEvent.signals.on('set-xy', function (_ref6) {
 
 module.exports = modifiers;
 
-},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":35}],24:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":36}],24:[function(require,module,exports){
 var modifiers = require('./index');
 var utils = require('../utils');
 var defaultOptions = require('../defaultOptions');
@@ -4572,7 +4586,7 @@ defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 
-},{"../defaultOptions":17,"../utils":38,"./index":23}],25:[function(require,module,exports){
+},{"../defaultOptions":17,"../utils":39,"./index":23}],25:[function(require,module,exports){
 var modifiers = require('./index');
 var interact = require('../interact');
 var utils = require('../utils');
@@ -4861,7 +4875,62 @@ defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;
 
-},{"../defaultOptions":17,"../interact":20,"../utils":38,"./index":23}],26:[function(require,module,exports){
+},{"../defaultOptions":17,"../interact":20,"../utils":39,"./index":23}],26:[function(require,module,exports){
+var pointerEvents = require('./index.js');
+var Interaction = require('../Interaction');
+
+pointerEvents.signals.on('new', function (_ref) {
+  var pointerEvent = _ref.pointerEvent;
+
+  pointerEvent.count = (pointerEvent.count || 0) + 1;
+});
+
+pointerEvents.signals.on('fired', function (_ref2) {
+  var interaction = _ref2.interaction;
+  var pointerEvent = _ref2.pointerEvent;
+  var eventTarget = _ref2.eventTarget;
+  var targets = _ref2.targets;
+
+  if (pointerEvent.type !== 'hold') {
+    return;
+  }
+
+  // get the repeat interval from the first eventable
+  var interval = targets[0].eventable.options.holdRepeatInterval;
+
+  // don't repeat if the interval is 0 or less
+  if (interval <= 0) {
+    return;
+  }
+
+  // set a timeout to fire the holdrepeat event
+  interaction.holdIntervalHandle = setTimeout(function () {
+    pointerEvents.collectEventTargets(interaction, pointerEvent, pointerEvent, eventTarget, 'hold');
+  }, interval);
+});
+
+function endHoldRepeat(_ref3) {
+  var interaction = _ref3.interaction;
+
+  // set the interaction's holdStopTime property
+  // to stop further holdRepeat events
+  if (interaction.holdIntervalHandle) {
+    clearInterval(interaction.holdIntervalHandle);
+    interaction.holdIntervalHandle = null;
+  }
+}
+
+var _arr = ['move', 'up', 'cancel', 'endall'];
+for (var _i = 0; _i < _arr.length; _i++) {
+  var signal = _arr[_i];
+  Interaction.signals.on(signal, endHoldRepeat);
+}
+
+// don't repeat by default
+pointerEvents.defaults.holdRepeatInterval = 0;
+pointerEvents.types.push('holdrepeat');
+
+},{"../Interaction":5,"./index.js":27}],27:[function(require,module,exports){
 var scope = require('../scope');
 var Interaction = require('../Interaction');
 var utils = require('../utils');
@@ -4930,9 +4999,11 @@ function firePointers(interaction, pointer, event, eventTarget, targets, eventTy
   }
 
   var signalArg = {
+    interaction: interaction,
     pointerEvent: pointerEvent,
     pointer: pointer,
     event: event,
+    eventTarget: eventTarget,
     targets: targets
   };
 
@@ -4956,6 +5027,8 @@ function firePointers(interaction, pointer, event, eventTarget, targets, eventTy
     pointerEvent.pageY -= originY;
     pointerEvent.clientX -= originX;
     pointerEvent.clientY -= originY;
+
+    pointerEvent.eventable = target.eventable;
 
     target.eventable.fire(pointerEvent);
 
@@ -5125,7 +5198,7 @@ Interaction.signals.on('down', function (_ref4) {
   timer.duration = minDuration;
   timer.timeout = setTimeout(function () {
 
-    collectEventTargets(interaction, browser.isIE8 ? eventCopy : pointer, eventCopy, eventTarget, 'hold', minDuration);
+    collectEventTargets(interaction, browser.isIE8 ? eventCopy : pointer, eventCopy, eventTarget, 'hold');
   }, minDuration);
 });
 
@@ -5171,7 +5244,7 @@ module.exports = scope.pointerEvents = {
   types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
 };
 
-},{"../Interaction":5,"../defaultOptions":17,"../scope":28,"../utils":38,"../utils/Signals":29,"../utils/arr":30,"../utils/browser":31}],27:[function(require,module,exports){
+},{"../Interaction":5,"../defaultOptions":17,"../scope":29,"../utils":39,"../utils/Signals":30,"../utils/arr":31,"../utils/browser":32}],28:[function(require,module,exports){
 var pointerEvents = require('./index');
 var Interactable = require('../Interactable');
 var browser = require('../utils/browser');
@@ -5262,7 +5335,7 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":28,"../utils/arr":30,"../utils/browser":31,"../utils/domUtils":33,"../utils/extend":35,"../utils/isType":40,"./index":26}],28:[function(require,module,exports){
+},{"../Interactable":4,"../scope":29,"../utils/arr":31,"../utils/browser":32,"../utils/domUtils":34,"../utils/extend":36,"../utils/isType":41,"./index":27}],29:[function(require,module,exports){
 var utils = require('./utils');
 var extend = require('./utils/extend');
 var events = require('./utils/events');
@@ -5318,7 +5391,7 @@ extend(scope, require('./utils/domObjects'));
 
 module.exports = scope;
 
-},{"./utils":38,"./utils/Signals":29,"./utils/domObjects":32,"./utils/events":34,"./utils/extend":35,"./utils/window":45}],29:[function(require,module,exports){
+},{"./utils":39,"./utils/Signals":30,"./utils/domObjects":33,"./utils/events":35,"./utils/extend":36,"./utils/window":46}],30:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _require = require('./arr');
@@ -5378,7 +5451,7 @@ Signals['new'] = function () {
 
 module.exports = Signals;
 
-},{"./arr":30}],30:[function(require,module,exports){
+},{"./arr":31}],31:[function(require,module,exports){
 function indexOf(array, target) {
   for (var i = 0, len = array.length; i < len; i++) {
     if (array[i] === target) {
@@ -5420,7 +5493,7 @@ module.exports = {
   filter: filter
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var win = require('./window');
 var isType = require('./isType');
 var domObjects = require('./domObjects');
@@ -5447,9 +5520,21 @@ var browser = {
 
   useMatchesSelectorPolyfill: false,
 
-  pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === win.window.MSPointerEvent ? { up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-    out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' } : { up: 'pointerup', down: 'pointerdown', over: 'pointerover',
-    out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' } : null,
+  pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === win.window.MSPointerEvent ? {
+    up: 'MSPointerUp',
+    down: 'MSPointerDown',
+    over: 'mouseover',
+    out: 'mouseout',
+    move: 'MSPointerMove',
+    cancel: 'MSPointerCancel'
+  } : {
+    up: 'pointerup',
+    down: 'pointerdown',
+    over: 'pointerover',
+    out: 'pointerout',
+    move: 'pointermove',
+    cancel: 'pointercancel'
+  } : null,
 
   // because Webkit and Opera still use 'mousewheel' event type
   wheelEvent: 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'
@@ -5460,7 +5545,7 @@ browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browse
 
 module.exports = browser;
 
-},{"./domObjects":32,"./isType":40,"./window":45}],32:[function(require,module,exports){
+},{"./domObjects":33,"./isType":41,"./window":46}],33:[function(require,module,exports){
 var domObjects = {};
 var win = require('./window').window;
 
@@ -5479,7 +5564,7 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
 module.exports = domObjects;
 
-},{"./window":45}],33:[function(require,module,exports){
+},{"./window":46}],34:[function(require,module,exports){
 var win = require('./window');
 var browser = require('./browser');
 var isType = require('./isType');
@@ -5716,7 +5801,7 @@ var domUtils = {
 
 module.exports = domUtils;
 
-},{"./browser":31,"./domObjects":32,"./isType":40,"./window":45}],34:[function(require,module,exports){
+},{"./browser":32,"./domObjects":33,"./isType":41,"./window":46}],35:[function(require,module,exports){
 var arr = require('./arr');
 var isType = require('./isType');
 var domUtils = require('./domUtils');
@@ -6057,7 +6142,7 @@ module.exports = {
   _attachedListeners: attachedListeners
 };
 
-},{"./arr":30,"./domUtils":33,"./isType":40,"./pointerExtend":42,"./window":45}],35:[function(require,module,exports){
+},{"./arr":31,"./domUtils":34,"./isType":41,"./pointerExtend":43,"./window":46}],36:[function(require,module,exports){
 module.exports = function extend(dest, source) {
   for (var prop in source) {
     dest[prop] = source[prop];
@@ -6065,7 +6150,7 @@ module.exports = function extend(dest, source) {
   return dest;
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 var _require = require('./domUtils');
 
 var closest = _require.closest;
@@ -6103,12 +6188,12 @@ module.exports = function (target, element, action) {
   return origin;
 };
 
-},{"./domUtils":33,"./isType":40}],37:[function(require,module,exports){
+},{"./domUtils":34,"./isType":41}],38:[function(require,module,exports){
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var extend = require('./extend');
 var win = require('./window');
 
@@ -6153,6 +6238,22 @@ var utils = {
     return dest;
   },
 
+  getStringOptionResult: function (value, interactable, element) {
+    if (!utils.isString(value)) {
+      return null;
+    }
+
+    if (value === 'parent') {
+      value = utils.parentNode(element);
+    } else if (value === 'self') {
+      value = interactable.getRect(element);
+    } else {
+      value = utils.closest(element, value);
+    }
+
+    return value;
+  },
+
   extend: extend,
   hypot: require('./hypot'),
   getOriginXY: require('./getOriginXY')
@@ -6165,7 +6266,7 @@ extend(utils, require('./pointerUtils'));
 
 module.exports = utils;
 
-},{"./arr":30,"./domUtils":33,"./extend":35,"./getOriginXY":36,"./hypot":37,"./isType":40,"./pointerUtils":43,"./window":45}],39:[function(require,module,exports){
+},{"./arr":31,"./domUtils":34,"./extend":36,"./getOriginXY":37,"./hypot":38,"./isType":41,"./pointerUtils":44,"./window":46}],40:[function(require,module,exports){
 var scope = require('../scope');
 var utils = require('./index');
 var browser = require('./browser');
@@ -6383,7 +6484,7 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":28,"./browser":31,"./index":38}],40:[function(require,module,exports){
+},{"../scope":29,"./browser":32,"./index":39}],41:[function(require,module,exports){
 var win = require('./window');
 var isWindow = require('./isWindow');
 var domObjects = require('./domObjects');
@@ -6448,12 +6549,12 @@ isType.isArray = function (thing) {
 
 module.exports = isType;
 
-},{"./domObjects":32,"./isWindow":41,"./window":45}],41:[function(require,module,exports){
+},{"./domObjects":33,"./isWindow":42,"./window":46}],42:[function(require,module,exports){
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 function pointerExtend(dest, source) {
   for (var prop in source) {
     var prefixedPropREs = module.exports.prefixedPropREs;
@@ -6480,7 +6581,7 @@ pointerExtend.prefixedPropREs = {
 
 module.exports = pointerExtend;
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 var hypot = require('./hypot');
 var browser = require('./browser');
 var dom = require('./domObjects');
@@ -6693,7 +6794,7 @@ var pointerUtils = {
 
 module.exports = pointerUtils;
 
-},{"./browser":31,"./domObjects":32,"./hypot":37,"./isType":40,"./pointerExtend":42}],44:[function(require,module,exports){
+},{"./browser":32,"./domObjects":33,"./hypot":38,"./isType":41,"./pointerExtend":43}],45:[function(require,module,exports){
 var vendors = ['ms', 'moz', 'webkit', 'o'];
 var lastTime = 0;
 var request = undefined;
@@ -6728,7 +6829,7 @@ module.exports = {
   cancel: cancel
 };
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var win = module.exports;
 var isWindow = require('./isWindow');
 
@@ -6769,6 +6870,6 @@ win.getWindow = function getWindow(node) {
 
 win.init = init;
 
-},{"./isWindow":41}]},{},[1])(1)
+},{"./isWindow":42}]},{},[1])(1)
 });
 //# sourceMappingURL=interact.js.map
