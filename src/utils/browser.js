@@ -34,10 +34,22 @@ const browser = {
 
   pEventTypes: (domObjects.PointerEvent
     ? (domObjects.PointerEvent === win.window.MSPointerEvent
-      ? { up: 'MSPointerUp', down: 'MSPointerDown', over: 'mouseover',
-          out: 'mouseout', move: 'MSPointerMove', cancel: 'MSPointerCancel' }
-      : { up: 'pointerup', down: 'pointerdown', over: 'pointerover',
-          out: 'pointerout', move: 'pointermove', cancel: 'pointercancel' })
+      ? {
+        up:     'MSPointerUp',
+        down:   'MSPointerDown',
+        over:   'mouseover',
+        out:    'mouseout',
+        move:   'MSPointerMove',
+        cancel: 'MSPointerCancel',
+      }
+      : {
+        up:     'pointerup',
+        down:   'pointerdown',
+        over:   'pointerover',
+        out:    'pointerout',
+        move:   'pointermove',
+        cancel: 'pointercancel',
+      })
     : null),
 
   // because Webkit and Opera still use 'mousewheel' event type
