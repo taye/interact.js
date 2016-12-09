@@ -263,13 +263,19 @@ Interactable.prototype.styleCursor = function (newValue) {
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
   const rect = this.getRect(element);
+  const buttons = event.buttons || ({
+    0: 1,
+    1: 4,
+    3: 8,
+    4: 16,
+  })[event.button];
   let action = null;
 
   for (const actionName of actions.names) {
     // check mouseButton setting if the pointer is down
     if (interaction.pointerIsDown
         && interaction.mouse
-        && (event.buttons & this.options[actionName].mouseButtons) === 0) {
+        && (buttons & this.options[actionName].mouseButtons) === 0) {
       continue;
     }
 
