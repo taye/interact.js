@@ -42,6 +42,24 @@ const utils = {
     return dest;
   },
 
+  getStringOptionResult: function (value, interactable, element) {
+    if (!utils.isString(value)) {
+      return null;
+    }
+
+    if (value === 'parent') {
+      value = utils.parentNode(element);
+    }
+    else if (value === 'self') {
+      value = interactable.getRect(element);
+    }
+    else {
+      value = utils.closest(element, value);
+    }
+
+    return value;
+  },
+
   extend     : extend,
   hypot      : require('./hypot'),
   getOriginXY: require('./getOriginXY'),

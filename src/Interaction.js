@@ -429,7 +429,10 @@ function doOnInteractions (method) {
 
 function endAll (event) {
   for (let i = 0; i < scope.interactions.length; i++) {
-    scope.interactions[i].end(event);
+    const interaction = scope.interactions[i];
+
+    interaction.end(event);
+    signals.fire('endall', { event, interaction });
   }
 }
 
