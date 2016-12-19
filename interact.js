@@ -1748,7 +1748,7 @@
 
             // set the startCoords if there was no prepared action
             if (!this.prepared.name) {
-                this.setEventXY(this.startCoords);
+                this.setEventXY(this.startCoords, this.pointers);
             }
 
             this.prepared.name  = action.name;
