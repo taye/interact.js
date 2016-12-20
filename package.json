@@ -5,7 +5,15 @@
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
-  "main": "dist/interact.js",
+  "files": [
+    "dist/",
+    "src/",
+    "index.js",
+    "LICENSE",
+    "interact.d.ts",
+    "interact-test.ts"
+  ],
+  "main": "inex.js",
   "scripts": {
     "gulp": "./node_modules/.bin/gulp",
     "build": "./node_modules/.bin/gulp build"
