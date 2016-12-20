@@ -4,8 +4,7 @@
 */
 
 var gulp     = require('gulp');
-var config   = require('../config');
 
-gulp.task('watch', ['watchify', /* 'karma' */], function() {
-  gulp.watch('./src/**/*.js', ['lint']);
+gulp.task('watch', ['watchify'], function() {
+  gulp.watch('./{src,test}/**/*.js', ['lint']);
 });
