@@ -2,6 +2,7 @@ const Interaction   = require('../Interaction');
 const InteractEvent = require('../InteractEvent');
 
 const actions = {
+  firePrepared,
   names: [],
   methodDict: {},
 };

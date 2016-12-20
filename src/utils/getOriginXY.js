@@ -2,9 +2,9 @@ const { closest, parentNode, getElementRect } = require('./domUtils');
 const { isElement, isFunction, trySelector }  = require('./isType');
 
 module.exports = function (target, element, action) {
-  let origin = (action
-                ? target.options[action].origin
-                : target.options.origin);
+  const actionOptions = target.options[action];
+  const actionOrigin = actionOptions && actionOptions.origin;
+  let origin = actionOrigin || target.options.origin;
 
   if (origin === 'parent') {
     origin = parentNode(element);
