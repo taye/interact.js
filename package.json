@@ -45,15 +45,6 @@
     "SVG"
   ],
   "license": "MIT",
-  "spm": {
-    "main": "dist/interact.js",
-    "ignore": [
-      "test",
-      "demo",
-      "img",
-      "docs"
-    ]
-  },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "babelify": "^6.3.*",
