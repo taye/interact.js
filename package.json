@@ -5,6 +5,13 @@
         "type": "git",
         "url": "https://github.com/taye/interact.js.git"
     },
+    "files": [
+      "dist/",
+      "interact.js",
+      "LICENSE",
+      "interact.d.ts",
+      "interact-test.ts"
+    ],
     "main": "interact.js",
     "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
     "homepage": "http://interactjs.io",
@@ -30,14 +37,5 @@
         "autoscroll",
         "SVG"
     ],
-    "license"    : "MIT",
-    "spm": {
-        "main": "interact.js",
-        "ignore": [
-            "test",
-            "demo",
-            "img",
-            "docs"
-        ]
-    }
+    "license": "MIT"
 }
