@@ -413,7 +413,8 @@ function doOnInteractions (method) {
           interaction = new Interaction();
           interaction.mouse = (/mouse/i.test(event.pointerType || event.type)
                                // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                               || event.pointerType === 4);
+                               || event.pointerType === 4
+                               || !event.pointerType);
         }
 
         matches.push([event, interaction]);

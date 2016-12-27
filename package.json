@@ -5,10 +5,19 @@
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
-  "main": "dist/interact.js",
+  "files": [
+    "dist/",
+    "src/",
+    "index.js",
+    "LICENSE",
+    "interact.d.ts",
+    "interact-test.ts"
+  ],
+  "main": "inex.js",
   "scripts": {
     "gulp": "./node_modules/.bin/gulp",
-    "build": "./node_modules/.bin/gulp build"
+    "build": "./node_modules/.bin/gulp build",
+    "test": "./node_modules/.bin/tape tests/index.js | ./node_modules/.bin/tap-spec"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
@@ -37,21 +46,10 @@
     "SVG"
   ],
   "license": "MIT",
-  "spm": {
-    "main": "dist/interact.js",
-    "ignore": [
-      "test",
-      "demo",
-      "img",
-      "docs"
-    ]
-  },
   "devDependencies": {
     "babel-eslint": "^6.1.2",
     "babelify": "^6.3.*",
-    "browser-sync": "^2.9.*",
     "browserify": "^13.1.0",
-    "chai": "^3.2.0",
     "combine-source-map": "^0.7.1",
     "dr.js": "github:taye/dr.js",
     "eslint": "^3.4.0",
@@ -67,20 +65,13 @@
     "gulp-uglify": "^1.4.0",
     "gulp-util": "^3.0.6",
     "jshint-stylish": "^2.0.1",
-    "karma": "^0.13.9",
-    "karma-browserify": "^4.3.0",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-fixture": "^0.2.5",
-    "karma-html2js-preprocessor": "^0.1.0",
-    "karma-mocha": "^0.2.0",
-    "karma-nyan-reporter": "^0.2.2",
     "lodash": "^3.10.1",
     "merge-stream": "^1.0.0",
     "mkdirp": "^0.5.1",
-    "mocha": "^2.3.0",
+    "mock-browser": "^0.92.12",
     "pretty-hrtime": "^1.0.0",
-    "require-dir": "^0.3.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.6.3",
     "through2": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",

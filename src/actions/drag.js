@@ -35,16 +35,6 @@ const drag = {
   },
 };
 
-Interaction.signals.on('action-start', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'drag') { return; }
-
-  const dragEvent = new InteractEvent(interaction, event, 'drag', 'start', interaction.element);
-
-  interaction._interacting = true;
-  interaction.target.fire(dragEvent);
-  interaction.prevEvent = dragEvent;
-});
-
 Interaction.signals.on('before-action-move', function ({ interaction }) {
   if (interaction.prepared.name !== 'drag') { return; }
 
@@ -70,38 +60,22 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
   }
 });
 
-Interaction.signals.on('action-move', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'drag') { return; }
-
-  const dragEvent = new InteractEvent(interaction, event, 'drag', 'move', interaction.element);
+// dragmove
+InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
+  if (iEvent.type !== 'dragmove') { return; }
 
   const axis = interaction.prepared.axis;
 
   if (axis === 'x') {
-    dragEvent.pageY   = interaction.startCoords.page.y;
-    dragEvent.clientY = interaction.startCoords.client.y;
-    dragEvent.dy = 0;
+    iEvent.pageY   = interaction.startCoords.page.y;
+    iEvent.clientY = interaction.startCoords.client.y;
+    iEvent.dy = 0;
   }
   else if (axis === 'y') {
-    dragEvent.pageX   = interaction.startCoords.page.x;
-    dragEvent.clientX = interaction.startCoords.client.x;
-    dragEvent.dx = 0;
+    iEvent.pageX   = interaction.startCoords.page.x;
+    iEvent.clientX = interaction.startCoords.client.x;
+    iEvent.dx = 0;
   }
-
-  interaction.target.fire(dragEvent);
-  interaction.prevEvent = dragEvent;
-
-  // if the action was ended in a dragmove listener
-  if (!interaction.interacting()) { return false; }
-});
-
-Interaction.signals.on('action-end', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'drag') { return; }
-
-  const dragEvent = new InteractEvent(interaction, event, 'drag', 'end', interaction.element);
-
-  interaction.target.fire(dragEvent);
-  interaction.prevEvent = dragEvent;
 });
 
 /*\

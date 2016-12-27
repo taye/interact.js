@@ -25,56 +25,32 @@ const gesture = {
   },
 };
 
-Interaction.signals.on('action-start', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'gesture') { return; }
+InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
+  if (iEvent.type !== 'gesturestart') { return; }
+  iEvent.ds = 0;
 
-  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'start', interaction.element);
-
-  gestureEvent.ds = 0;
-
-  interaction.gesture.startDistance = interaction.gesture.prevDistance = gestureEvent.distance;
-  interaction.gesture.startAngle = interaction.gesture.prevAngle = gestureEvent.angle;
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
   interaction.gesture.scale = 1;
-
-  interaction._interacting = true;
-
-  interaction.target.fire(gestureEvent);
-  interaction.prevEvent = gestureEvent;
 });
 
-Interaction.signals.on('action-move', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'gesture') { return; }
+InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
+  if (iEvent.type !== 'gesturemove') { return; }
 
-  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'move', interaction.element);
+  iEvent.ds = iEvent.scale - interaction.gesture.scale;
 
-  gestureEvent.ds = gestureEvent.scale - interaction.gesture.scale;
+  interaction.target.fire(iEvent);
 
-  interaction.target.fire(gestureEvent);
+  interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.prevDistance = iEvent.distance;
 
-  interaction.gesture.prevAngle = gestureEvent.angle;
-  interaction.gesture.prevDistance = gestureEvent.distance;
+  if (iEvent.scale !== Infinity
+      && iEvent.scale !== null
+      && iEvent.scale !== undefined
+      && !isNaN(iEvent.scale)) {
 
-  if (gestureEvent.scale !== Infinity
-      && gestureEvent.scale !== null
-      && gestureEvent.scale !== undefined
-      && !isNaN(gestureEvent.scale)) {
-
-    interaction.gesture.scale = gestureEvent.scale;
+    interaction.gesture.scale = iEvent.scale;
   }
-
-  interaction.prevEvent = gestureEvent;
-
-  // if the action was ended in a gesturemove listener
-  if (!interaction.interacting()) { return false; }
-});
-
-Interaction.signals.on('action-end', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'gesture') { return; }
-
-  const gestureEvent = new InteractEvent(interaction, event, 'gesture', 'end', interaction.element);
-
-  interaction.target.fire(gestureEvent);
-  interaction.prevEvent = gestureEvent;
 });
 
 /*\

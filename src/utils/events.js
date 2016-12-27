@@ -1,10 +1,9 @@
-const arr       = require('./arr');
-const isType    = require('./isType');
-const domUtils  = require('./domUtils');
-const indexOf   = arr.indexOf;
-const contains  = arr.contains;
-const getWindow = require('./window').getWindow;
-const pExtend   = require('./pointerExtend');
+const isType   = require('./isType');
+const domUtils = require('./domUtils');
+const pExtend  = require('./pointerExtend');
+
+const { window, getWindow }  = require('./window');
+const { indexOf, contains } = require('./arr');
 
 const useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window);
 const addEvent       = useAttachEvent?  'attachEvent': 'addEventListener';

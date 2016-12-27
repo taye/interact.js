@@ -4,6 +4,7 @@ const browser = require('./utils/browser');
 const iFinder = require('./utils/interactionFinder');
 
 const toString = Object.prototype.toString;
+const window = scope.window;
 
 if (!window.Array.isArray) {
   window.Array.isArray = function (obj) {

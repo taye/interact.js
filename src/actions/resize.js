@@ -135,162 +135,137 @@ const resize = {
   },
 };
 
-Interaction.signals.on('action-start', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'resize') { return; }
-
-  const resizeEvent = new InteractEvent(interaction, event, 'resize', 'start', interaction.element);
-
-  if (interaction.prepared.edges) {
-    const startRect = interaction.target.getRect(interaction.element);
-    const resizeOptions = interaction.target.options.resize;
-
-    /*
-     * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
-     * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
-     * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
-     * on the active edges and the edge being interacted with.
-     */
-    if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-      const linkedEdges = utils.extend({}, interaction.prepared.edges);
-
-      linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom);
-      linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right );
-      linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top   );
-      linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left  );
-
-      interaction.prepared._linkedEdges = linkedEdges;
-    }
-    else {
-      interaction.prepared._linkedEdges = null;
-    }
-
-    // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
-    if (resizeOptions.preserveAspectRatio) {
-      interaction.resizeStartAspectRatio = startRect.width / startRect.height;
-    }
-
-    interaction.resizeRects = {
-      start     : startRect,
-      current   : utils.extend({}, startRect),
-      inverted  : utils.extend({}, startRect),
-      previous  : utils.extend({}, startRect),
-      delta     : {
-        left: 0, right : 0, width : 0,
-        top : 0, bottom: 0, height: 0,
-      },
-    };
-
-    resizeEvent.rect = interaction.resizeRects.inverted;
-    resizeEvent.deltaRect = interaction.resizeRects.delta;
+// resizestart
+InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
+  if (iEvent.type !== 'resizestart' || !interaction.prepared.edges) {
+    return;
   }
 
-  interaction.target.fire(resizeEvent);
+  const startRect = interaction.target.getRect(interaction.element);
+  const resizeOptions = interaction.target.options.resize;
 
-  interaction._interacting = true;
+  /*
+   * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
+   * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
+   * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
+   * on the active edges and the edge being interacted with.
+   */
+  if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
+    const linkedEdges = utils.extend({}, interaction.prepared.edges);
 
-  interaction.prevEvent = resizeEvent;
+    linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom);
+    linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right );
+    linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top   );
+    linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left  );
+
+    interaction.prepared._linkedEdges = linkedEdges;
+  }
+  else {
+    interaction.prepared._linkedEdges = null;
+  }
+
+  // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
+  if (resizeOptions.preserveAspectRatio) {
+    interaction.resizeStartAspectRatio = startRect.width / startRect.height;
+  }
+
+  interaction.resizeRects = {
+    start     : startRect,
+    current   : utils.extend({}, startRect),
+    inverted  : utils.extend({}, startRect),
+    previous  : utils.extend({}, startRect),
+    delta     : {
+      left: 0, right : 0, width : 0,
+      top : 0, bottom: 0, height: 0,
+    },
+  };
+
+  iEvent.rect = interaction.resizeRects.inverted;
+  iEvent.deltaRect = interaction.resizeRects.delta;
 });
 
-Interaction.signals.on('action-move', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'resize') { return; }
+// resizemove
+InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
+  if (phase !== 'move' || !interaction.prepared.edges) { return; }
 
-  const resizeEvent = new InteractEvent(interaction, event, 'resize', 'move', interaction.element);
   const resizeOptions = interaction.target.options.resize;
   const invert = resizeOptions.invert;
   const invertible = invert === 'reposition' || invert === 'negate';
 
   let edges = interaction.prepared.edges;
 
-  if (edges) {
-    const start      = interaction.resizeRects.start;
-    const current    = interaction.resizeRects.current;
-    const inverted   = interaction.resizeRects.inverted;
-    const delta      = interaction.resizeRects.delta;
-    const previous   = utils.extend(interaction.resizeRects.previous, inverted);
-    const originalEdges = edges;
+  const start      = interaction.resizeRects.start;
+  const current    = interaction.resizeRects.current;
+  const inverted   = interaction.resizeRects.inverted;
+  const delta      = interaction.resizeRects.delta;
+  const previous   = utils.extend(interaction.resizeRects.previous, inverted);
+  const originalEdges = edges;
 
-    let dx = resizeEvent.dx;
-    let dy = resizeEvent.dy;
+  let dx = iEvent.dx;
+  let dy = iEvent.dy;
 
-    if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
-      // `resize.preserveAspectRatio` takes precedence over `resize.square`
-      const startAspectRatio = resizeOptions.preserveAspectRatio
-        ? interaction.resizeStartAspectRatio
-        : 1;
+  if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
+    // `resize.preserveAspectRatio` takes precedence over `resize.square`
+    const startAspectRatio = resizeOptions.preserveAspectRatio
+      ? interaction.resizeStartAspectRatio
+      : 1;
 
-      edges = interaction.prepared._linkedEdges;
+    edges = interaction.prepared._linkedEdges;
 
-      if ((originalEdges.left && originalEdges.bottom)
-          || (originalEdges.right && originalEdges.top)) {
-        dy = -dx / startAspectRatio;
-      }
-      else if (originalEdges.left || originalEdges.right ) { dy = dx / startAspectRatio; }
-      else if (originalEdges.top  || originalEdges.bottom) { dx = dy * startAspectRatio; }
+    if ((originalEdges.left && originalEdges.bottom)
+        || (originalEdges.right && originalEdges.top)) {
+      dy = -dx / startAspectRatio;
     }
-
-    // update the 'current' rect without modifications
-    if (edges.top   ) { current.top    += dy; }
-    if (edges.bottom) { current.bottom += dy; }
-    if (edges.left  ) { current.left   += dx; }
-    if (edges.right ) { current.right  += dx; }
-
-    if (invertible) {
-      // if invertible, copy the current rect
-      utils.extend(inverted, current);
-
-      if (invert === 'reposition') {
-        // swap edge values if necessary to keep width/height positive
-        let swap;
-
-        if (inverted.top > inverted.bottom) {
-          swap = inverted.top;
-
-          inverted.top = inverted.bottom;
-          inverted.bottom = swap;
-        }
-        if (inverted.left > inverted.right) {
-          swap = inverted.left;
-
-          inverted.left = inverted.right;
-          inverted.right = swap;
-        }
-      }
-    }
-    else {
-      // if not invertible, restrict to minimum of 0x0 rect
-      inverted.top    = Math.min(current.top, start.bottom);
-      inverted.bottom = Math.max(current.bottom, start.top);
-      inverted.left   = Math.min(current.left, start.right);
-      inverted.right  = Math.max(current.right, start.left);
-    }
-
-    inverted.width  = inverted.right  - inverted.left;
-    inverted.height = inverted.bottom - inverted.top ;
-
-    for (const edge in inverted) {
-      delta[edge] = inverted[edge] - previous[edge];
-    }
-
-    resizeEvent.edges = interaction.prepared.edges;
-    resizeEvent.rect = inverted;
-    resizeEvent.deltaRect = delta;
+    else if (originalEdges.left || originalEdges.right ) { dy = dx / startAspectRatio; }
+    else if (originalEdges.top  || originalEdges.bottom) { dx = dy * startAspectRatio; }
   }
 
-  interaction.target.fire(resizeEvent);
+  // update the 'current' rect without modifications
+  if (edges.top   ) { current.top    += dy; }
+  if (edges.bottom) { current.bottom += dy; }
+  if (edges.left  ) { current.left   += dx; }
+  if (edges.right ) { current.right  += dx; }
 
-  interaction.prevEvent = resizeEvent;
+  if (invertible) {
+    // if invertible, copy the current rect
+    utils.extend(inverted, current);
 
-  // if the action was ended in a resizemove listener
-  if (!interaction.interacting()) { return false; }
-});
+    if (invert === 'reposition') {
+      // swap edge values if necessary to keep width/height positive
+      let swap;
 
-Interaction.signals.on('action-end', function ({ interaction, event }) {
-  if (interaction.prepared.name !== 'resize') { return; }
+      if (inverted.top > inverted.bottom) {
+        swap = inverted.top;
 
-  const resizeEvent = new InteractEvent(interaction, event, 'resize', 'end', interaction.element);
+        inverted.top = inverted.bottom;
+        inverted.bottom = swap;
+      }
+      if (inverted.left > inverted.right) {
+        swap = inverted.left;
 
-  interaction.target.fire(resizeEvent);
-  interaction.prevEvent = resizeEvent;
+        inverted.left = inverted.right;
+        inverted.right = swap;
+      }
+    }
+  }
+  else {
+    // if not invertible, restrict to minimum of 0x0 rect
+    inverted.top    = Math.min(current.top, start.bottom);
+    inverted.bottom = Math.max(current.bottom, start.top);
+    inverted.left   = Math.min(current.left, start.right);
+    inverted.right  = Math.max(current.right, start.left);
+  }
+
+  inverted.width  = inverted.right  - inverted.left;
+  inverted.height = inverted.bottom - inverted.top ;
+
+  for (const edge in inverted) {
+    delta[edge] = inverted[edge] - previous[edge];
+  }
+
+  iEvent.edges = interaction.prepared.edges;
+  iEvent.rect = inverted;
+  iEvent.deltaRect = delta;
 });
 
 /*\
