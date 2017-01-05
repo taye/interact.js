@@ -5291,6 +5291,8 @@
          = (object) @interact
         \*/
         unset: function () {
+            var i;
+
             events.remove(this._element, 'all');
 
             if (!isString(this.selector)) {
@@ -5304,7 +5306,7 @@
                 for (var type in delegatedEvents) {
                     var delegated = delegatedEvents[type];
 
-                    for (var i = 0; i < delegated.selectors.length; i++) {
+                    for (i = 0; i < delegated.selectors.length; i++) {
                         if (delegated.selectors[i] === this.selector
                             && delegated.contexts[i] === this._context) {
 
@@ -5327,6 +5329,20 @@
             }
 
             this.dropzone(false);
+
+            var indexesToRemove = [];
+
+            // find indexes of interactions related to this interactable
+            for (i = 0; i < interactions.length; i++) {
+                if (contains(interactions[i].matches, this)) {
+                    indexesToRemove.push(i);
+                }
+            }
+
+            // remove related interactions
+            for (i = 0; i < indexesToRemove.length; i++) {
+                interactions.splice(indexesToRemove[i], 1);
+            }
 
             interactables.splice(indexOf(interactables, this), 1);
 
