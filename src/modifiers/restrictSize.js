@@ -27,18 +27,15 @@ const restrictSize = {
     max: null,
   },
 
-  setOffset: function () {},
+  setOffset: function ({ interaction }) {
+    return interaction.startOffset;
+  },
 
-  set: function (pageCoords, interaction, status) {
-    if (!interaction.interacting()) {
-      return status;
-    }
-
-    const target  = interaction.target;
-    const options = target && target.options[interaction.prepared.name].restrictSize;
+  set: function (arg) {
+    const { interaction, status, options } = arg;
     const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-    if (!options.enabled || !edges) {
+    if (!interaction.interacting() || !edges) {
       return status;
     }
 
@@ -47,7 +44,7 @@ const restrictSize = {
     const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin;
     const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax;
 
-    status.options = {
+    arg.options = {
       enabled: options.enabled,
       endOnly: options.endOnly,
       min: utils.extend({}, restrictEdges.noMin),
@@ -55,23 +52,23 @@ const restrictSize = {
     };
 
     if (edges.top) {
-      status.options.min.top = rect.bottom - maxSize.height;
-      status.options.max.top = rect.bottom - minSize.height;
+      arg.options.min.top = rect.bottom - maxSize.height;
+      arg.options.max.top = rect.bottom - minSize.height;
     }
     else if (edges.bottom) {
-      status.options.min.bottom = rect.top + minSize.height;
-      status.options.max.bottom = rect.top + maxSize.height;
+      arg.options.min.bottom = rect.top + minSize.height;
+      arg.options.max.bottom = rect.top + maxSize.height;
     }
     if (edges.left) {
-      status.options.min.left = rect.right - maxSize.width;
-      status.options.max.left = rect.right - minSize.width;
+      arg.options.min.left = rect.right - maxSize.width;
+      arg.options.max.left = rect.right - minSize.width;
     }
     else if (edges.right) {
-      status.options.min.right = rect.left + minSize.width;
-      status.options.max.right = rect.left + maxSize.width;
+      arg.options.min.right = rect.left + minSize.width;
+      arg.options.max.right = rect.left + maxSize.width;
     }
 
-    return restrictEdges.set(pageCoords, interaction, status);
+    return restrictEdges.set(arg);
   },
 
   modifyCoords: restrictEdges.modifyCoords,
