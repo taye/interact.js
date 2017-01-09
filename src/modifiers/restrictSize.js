@@ -32,11 +32,11 @@ const restrictSize = {
   },
 
   set: function (arg) {
-    const { interaction, status, options } = arg;
+    const { interaction, options } = arg;
     const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
     if (!interaction.interacting() || !edges) {
-      return status;
+      return;
     }
 
     const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted);

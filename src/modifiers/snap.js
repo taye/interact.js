@@ -52,7 +52,7 @@ const snap = {
     return offsets;
   },
 
-  set: function ({ interaction, pageCoords, status, options }) {
+  set: function ({ interaction, pageCoords, status, options, offset: offsets }) {
     const targets = [];
     let target;
     let page;
@@ -73,7 +73,6 @@ const snap = {
     status.realX = page.x;
     status.realY = page.y;
 
-    const offsets = interaction.modifierOffsets.snap;
     let len = options.targets? options.targets.length : 0;
 
     for (const { x: offsetX, y: offsetY } of offsets) {
@@ -166,8 +165,6 @@ const snap = {
 
     status.changed = (snapChanged || (closest.inRange && !status.locked));
     status.locked = closest.inRange;
-
-    return status;
   },
 
   modifyCoords: function ({ page, client, status, phase, options }) {

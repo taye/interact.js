@@ -96,8 +96,6 @@ const restrict = {
 
     status.modifiedX = modifiedX;
     status.modifiedY = modifiedY;
-
-    return status;
   },
 
   modifyCoords: function ({ page, client, status, phase, options }) {

@@ -33,6 +33,10 @@ const modifiers = {
 
       arg.options = target.options[interaction.prepared.name][modifierName];
 
+      if (!arg.options) {
+        continue;
+      }
+
       interaction.modifierOffsets[modifierName] =
         modifiers[modifierName].setOffset(arg);
     }
@@ -49,34 +53,34 @@ const modifiers = {
       shouldMove: true,
     };
 
-    let currentStatus;
-
     for (const modifierName of modifiers.names) {
       const modifier = modifiers[modifierName];
       const options = interaction.target.options[interaction.prepared.name][modifierName];
 
       if (!shouldDo(options, preEnd, requireEndOnly)) { continue; }
 
-      arg.status = statuses[modifierName];
+      arg.status = arg.status = statuses[modifierName];
       arg.options = options;
       arg.offset = arg.interaction.modifierOffsets[modifierName];
 
-      currentStatus = modifier.set(arg);
+      modifier.set(arg);
 
-      if (currentStatus.locked) {
-        coords.x += currentStatus.dx;
-        coords.y += currentStatus.dy;
+      if (arg.status.locked) {
+        coords.x += arg.status.dx;
+        coords.y += arg.status.dy;
 
-        result.dx += currentStatus.dx;
-        result.dy += currentStatus.dy;
+        result.dx += arg.status.dx;
+        result.dy += arg.status.dy;
 
         result.locked = true;
       }
     }
 
-    // a move should be fired if the modified coords of
-    // the last modifier status that was calculated changes
-    result.shouldMove = !currentStatus || currentStatus.changed;
+    // a move should be fired if:
+    //  - there are no modifiers enabled,
+    //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
+    //  - the locked coords have changed since the last pointer move
+    result.shouldMove = !arg.status || !result.locked || arg.status.changed;
 
     return result;
   },
@@ -159,10 +163,15 @@ InteractEvent.signals.on('set-xy', function (arg) {
 
   for (let i = 0; i < modifiers.names.length; i++) {
     const modifierName = modifiers.names[i];
+    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    if (!modifierArg.options) {
+      continue;
+    }
+
     const modifier = modifiers[modifierName];
 
     modifierArg.status = interaction.modifierStatuses[modifierName];
-    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
 
     iEvent[modifierName] = modifier.modifyCoords(modifierArg);
   }

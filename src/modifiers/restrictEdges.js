@@ -50,7 +50,7 @@ const restrictEdges = {
     const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
     if (!interaction.interacting() || !edges) {
-      return status;
+      return;
     }
 
     const page = status.useStatusXY
@@ -89,8 +89,6 @@ const restrictEdges = {
     status.modifiedY = modifiedY;
 
     //console.log(status.dx, status.modifiedX, status.changed, status.locked);
-
-    return status;
   },
 
   modifyCoords: function ({ page, client, status, phase, options }) {
