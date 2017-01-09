@@ -8,6 +8,8 @@ const scope          = require('../scope');
 const utils          = require('../utils');
 const signals        = require('../utils/Signals').new();
 
+require('./InteractableMethods');
+
 const autoStart = {
   signals,
   withinInteractionLimit,
@@ -17,6 +19,8 @@ const autoStart = {
     manualStart: false,
     max: Infinity,
     maxPerElement: 1,
+    allowFrom:  null,
+    ignoreFrom: null,
   },
   setActionDefaults: function (action) {
     utils.extend(action.defaults, autoStart.perActionDefaults);
@@ -69,8 +73,9 @@ Interaction.signals.on('move', function (arg) {
 
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable, element) {
+function validateAction (action, interactable, element, eventTarget) {
   if (utils.isObject(action)
+      && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget)
       && interactable.options[action.name].enabled
       && withinInteractionLimit(interactable, element, action)) {
     return action;
@@ -79,13 +84,14 @@ function validateAction (action, interactable, element) {
   return null;
 }
 
-function validateSelector (interaction, pointer, event, matches, matchElements) {
+function validateSelector (interaction, pointer, event, matches, matchElements, eventTarget) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i];
     const matchElement = matchElements[i];
     const action = validateAction(match.getAction(pointer, event, interaction, matchElement),
                                   match,
-                                  matchElement);
+                                  matchElement,
+                                  eventTarget);
 
     if (action) {
       return {
@@ -110,10 +116,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elements = (browser.useMatchesSelectorPolyfill
       ? context.querySelectorAll(selector)
       : undefined);
-    const options = interactable.options;
 
-    if (interactable.testIgnoreAllow(options, element, eventTarget)
-        && utils.matchesSelector(element, selector, elements)) {
+    if (utils.matchesSelector(element, selector, elements)) {
 
       matches.push(interactable);
       matchElements.push(element);
@@ -127,9 +131,10 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     const elementInteractable = scope.interactables.get(element);
 
     if (elementInteractable
-        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element),
+        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element, eventTarget),
                                     elementInteractable,
-                                    element))
+                                    element,
+                                    eventTarget))
         && !elementInteractable.options[action.name].manualStart) {
       return {
         element,
@@ -140,7 +145,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     else {
       scope.interactables.forEachSelector(pushMatches, element);
 
-      const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements);
+      const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
 
       if (actionInfo.action
           && !actionInfo.target.options[actionInfo.action.name].manualStart) {
@@ -181,6 +186,7 @@ Interaction.signals.on('stop', function ({ interaction }) {
   }
 });
 
+<<<<<<< Updated upstream
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
   const action = this.defaultActionChecker(pointer, event, interaction, element);
 
@@ -287,6 +293,8 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
+=======
+>>>>>>> Stashed changes
 function withinInteractionLimit (interactable, element, action) {
   const options = interactable.options;
   const maxActions = options[action.name].max;

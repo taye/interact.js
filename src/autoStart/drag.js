@@ -13,13 +13,13 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
-  const dragOptions = interaction.target.options.drag;
-  const startAxis = dragOptions.startAxis;
+  const options = interaction.target.options.drag;
+  const startAxis = options.startAxis;
   const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
-  interaction.prepared.axis = dragOptions.lockAxis === 'start'
+  interaction.prepared.axis = options.lockAxis === 'start'
     ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
-    : dragOptions.lockAxis;
+    : options.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
@@ -39,9 +39,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
 
         if (interactable === interaction.target) { return; }
 
-        const options = interactable.options;
-
-        if (!options.drag.manualStart
+        if (!options.manualStart
             && !interactable.testIgnoreAllow(options, element, eventTarget)
             && matchesSelector(element, selector, elements)) {
 
@@ -53,7 +51,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
           if (action
               && action.name === 'drag'
               && checkStartAxis(currentAxis, interactable)
-              && autoStart.validateAction(action, interactable, element)) {
+              && autoStart.validateAction(action, interactable, element, eventTarget)) {
 
             return interactable;
           }

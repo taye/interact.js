@@ -153,15 +153,15 @@
     }
 
     function anchorDragStart (event) {
-        if (event.snap.locked) {
-            interact(canvas).snap(false);
-            draggingAnchor = event.snap.anchors.closest;
+        if (event.snap && event.snap.locked) {
+            //interact(canvas).draggable({ snap: false });
+            //draggingAnchor = event.snap.anchors.closest;
         }
     }
 
     function anchorDragMove (event) {
         if (draggingAnchor) {
-            var snap = interact(canvas).snap().drag;
+            var snap = interact(canvas).draggable().snap;
 
             draggingAnchor.x += event.dx;
             draggingAnchor.y += event.dy;

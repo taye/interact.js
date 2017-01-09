@@ -61,13 +61,13 @@
         this.element.className = 'demo-node';
         this.element.id = id;
         this.element.demo = true;
-        this.element.style.width  = '200px';
-        this.element.style.height = '200px';
+        this.element.style.width  = '220px';
+        this.element.style.height = '250px';
 
         this.element.text = this.element.appendChild(document.createElement('pre'));
         this.element.appendChild(document.createElement('br'));
-        this.element.style.left = Math.random()*((window.innerWidth || 800) - 200) + 'px';
-        this.element.style.top = Math.random()*((window.innerHeight || 800) - 200) + 'px';
+        this.element.style.left = 0;
+        this.element.style.top = 0;
 
         /*interact(this.element).set({
             draggable: true,
@@ -87,6 +87,7 @@
         nl = '\n';
 
         target.text[textProp] = nl + e.type;
+        target.text[textProp] += nl + ` szie        : ${target.clientWidth} x ${target.clientHeight}`
         target.text[textProp] += nl + ' x0, y0      : (' + e.x0 + ', ' + e.y0 + ')';
         target.text[textProp] += nl + ' dx, dy      : (' + e.dx + ', ' + e.dy + ')';
         target.text[textProp] += nl + ' pageX, pageY: (' + e.pageX + ', ' + e.pageY + ')';
@@ -219,26 +220,40 @@
             window.svg = svg;
 
             for (i = 0; i < 2; i++) {
-                new DemoGraphic('graphic' + i);
+                //new DemoGraphic('graphic' + i);
             }
         }
 
-        for (i = 0; i < 2; i++) {
+        for (i = 0; i < 1; i++) {
             new DemoNode('node' + i);
         }
 
-        interact('div.demo-node, .demo-node ellipse')
+        window.target = interact('div.demo-node, .demo-node ellipse')
+            .pointerEvents({ holdRepeatInterval: 500 })
+            .on('hold', e=> console.log(e.type, e.count))
             .draggable({
                 max: 2,
                 autoScroll: true,
-                inertia: true
+                inertia: true,
+              allowFrom: 'pre',
             })
             .gesturable({ max: 1 })
             .resizable({
-                max: 2,
-                autoScroll: { enabled: true },
-                inertia: { resistance: 40 },
-                edges: { left: true, right: true, top: true, bottom: true }
+              //restrictEdges: {
+                //min: { top: 0, left: 0, bottom: -Infinity, right: 200 },
+                //max: { top: 100, left: 100, bottom: Infinity, right: 500 },
+              //},
+              //restrictSize: {
+                //min: { width: 200, height: 250 },
+                //max: { width: 300, height: 300 },
+              //},
+              snapSize: {
+                targets: [interact.createSnapGrid({ x: 400, y: 400, range: 100 })],
+              },
+              max: 2,
+              autoScroll: { enabled: true },
+              inertia: { resistance: 40 },
+              edges: { left: true, right: true, top: true, bottom: true },
             })
             .dropzone(true);
     }
