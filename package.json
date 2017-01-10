@@ -13,7 +13,7 @@
     "interact.d.ts",
     "interact-test.ts"
   ],
-  "main": "inex.js",
+  "main": "index.js",
   "scripts": {
     "gulp": "./node_modules/.bin/gulp",
     "build": "./node_modules/.bin/gulp build",
