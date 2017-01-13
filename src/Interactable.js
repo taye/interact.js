@@ -299,7 +299,7 @@ class Interactable {
 
     // if it is an action event type
     if (contains(Interactable.eventTypes, eventType)) {
-      this.events.on(eventType, listener);
+      this.events.off(eventType, listener);
     }
     // delegated event
     else if (isType.isString(this.target)) {
