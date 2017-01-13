@@ -186,7 +186,6 @@ Interaction.signals.on('stop', function ({ interaction }) {
   }
 });
 
-<<<<<<< Updated upstream
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
   const action = this.defaultActionChecker(pointer, event, interaction, element);
 
@@ -293,8 +292,6 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
-=======
->>>>>>> Stashed changes
 function withinInteractionLimit (interactable, element, action) {
   const options = interactable.options;
   const maxActions = options[action.name].max;
