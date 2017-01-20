@@ -197,7 +197,7 @@
                 else {
                   vx = vy = options.speed
                 }
- 
+
                 sx = vx * dtx;
                 sy = vy * dty;
 
@@ -2064,8 +2064,12 @@
                     edges = this.prepared._linkedEdges;
 
                     if ((originalEdges.left && originalEdges.bottom)
-                        || (originalEdges.right && originalEdges.top)) {
+                        || (originalEdges.right && originalEdges.top)
+                        || originalEdges.bottomleft || originalEdges.topright) {
                         dy = -dx / resizeStartAspectRatio;
+                    }
+                    else if (originalEdges.bottomright || originalEdges.topleft) {
+                        dx = dy / resizeStartAspectRatio;
                     }
                     else if (originalEdges.left || originalEdges.right) { dy = dx / resizeStartAspectRatio; }
                     else if (originalEdges.top || originalEdges.bottom) { dx = dy * resizeStartAspectRatio; }
@@ -2086,6 +2090,10 @@
                 if (edges.bottom) { current.bottom += dy; }
                 if (edges.left  ) { current.left   += dx; }
                 if (edges.right ) { current.right  += dx; }
+                if (edges.topleft    ) { current.left   += dx; current.top    += dy; }
+                if (edges.bottomleft ) { current.left   += dx; current.bottom += dy; }
+                if (edges.topright   ) { current.right  += dx; current.top    += dy; }
+                if (edges.bottomright) { current.right  += dx; current.bottom += dy; }
 
                 if (invertible) {
                     // if invertible, copy the current rect
@@ -3631,9 +3639,9 @@
             }
             else if (action.edges) {
                 var cursorKey = 'resize',
-                    edgeNames = ['top', 'bottom', 'left', 'right'];
+                    edgeNames = ['top', 'bottom', 'left', 'right', 'topleft', 'bottomleft', 'topright', 'bottomright'];
 
-                for (var i = 0; i < 4; i++) {
+                for (var i = 0; i < edgeNames.length; i++) {
                     if (action.edges[edgeNames[i]]) {
                         cursorKey += edgeNames[i];
                     }
@@ -3654,7 +3662,11 @@
         if (value === true) {
             // if dimensions are negative, "switch" edges
             var width = isNumber(rect.width)? rect.width : rect.right - rect.left,
-                height = isNumber(rect.height)? rect.height : rect.bottom - rect.top;
+                height = isNumber(rect.height)? rect.height : rect.bottom - rect.top,
+                isLeft   = page.x < ((width  >= 0 ? rect.left: rect.right ) + margin),
+                isTop    = page.y < ((height >= 0 ? rect.top : rect.bottom) + margin),
+                isRight  = page.x > ((width  >= 0 ? rect.right : rect.left) - margin),
+                isBottom = page.y > ((height >= 0 ? rect.bottom: rect.top ) - margin);
 
             if (width < 0) {
                 if      (name === 'left' ) { name = 'right'; }
@@ -3665,11 +3677,14 @@
                 else if (name === 'bottom') { name = 'top'   ; }
             }
 
-            if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
-            if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
-
-            if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
-            if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
+            if (name === 'left'       ) { return isLeft; }
+            if (name === 'top'        ) { return isTop; }
+            if (name === 'right'      ) { return isRight; }
+            if (name === 'bottom'     ) { return isBottom; }
+            if (name === 'topleft'    ) { return isLeft && isTop; }
+            if (name === 'topright'   ) { return isTop && isRight; }
+            if (name === 'bottomright') { return isRight && isBottom; }
+            if (name === 'bottomleft' ) { return isLeft && isBottom; }
         }
 
         // the remaining checks require an element
@@ -3697,7 +3712,7 @@
             var resizeOptions = options.resize;
 
             resizeEdges = {
-                left: false, right: false, top: false, bottom: false
+                left: false, right: false, top: false, bottom: false, topleft: false, topright: false, bottomleft: false, bottomright: false
             };
 
             // if using resize.edges
@@ -3715,7 +3730,7 @@
                 resizeEdges.left = resizeEdges.left && !resizeEdges.right;
                 resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom;
 
-                shouldResize = resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom;
+                shouldResize = resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom || resizeEdges.topleft || resizeEdges.topright || resizeEdges.bottomleft || resizeEdges.bottomright;
             }
             else {
                 var right  = options.resize.axis !== 'y' && page.x > (rect.right  - margin),
@@ -4487,7 +4502,7 @@
          |     relativePoints: [
          |         { x: 0, y: 0 },  // snap relative to the top left of the element
          |         { x: 1, y: 1 },  // and also to the bottom right
-         |     ],  
+         |     ],
          |
          |     // offset the snap target coordinates
          |     // can be an object with x/y or 'startCoords'
