@@ -15,15 +15,17 @@ const autoStart = {
   withinInteractionLimit,
   // Allow this many interactions to happen simultaneously
   maxInteractions: Infinity,
-  perActionDefaults: {
-    manualStart: false,
-    max: Infinity,
-    maxPerElement: 1,
-    allowFrom:  null,
-    ignoreFrom: null,
+  defaults: {
+    perAction: {
+      manualStart: false,
+      max: Infinity,
+      maxPerElement: 1,
+      allowFrom:  null,
+      ignoreFrom: null,
+    },
   },
   setActionDefaults: function (action) {
-    utils.extend(action.defaults, autoStart.perActionDefaults);
+    utils.extend(action.defaults, autoStart.defaults.perAction);
   },
 };
 
@@ -363,10 +365,8 @@ Interactable.settingsMethods.push('ignoreFrom');
 Interactable.settingsMethods.push('allowFrom');
 
 defaultOptions.base.actionChecker = null;
-defaultOptions.base.ignoreFrom = null;
-defaultOptions.base.allowFrom = null;
 defaultOptions.base.styleCursor = true;
 
-utils.extend(defaultOptions.perAction, autoStart.perActionDefaults);
+utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
 
 module.exports = autoStart;
