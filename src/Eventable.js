@@ -52,9 +52,9 @@ class Eventable {
     if (index !== -1) {
       eventList.splice(index, 1);
     }
-    let undef;
-    if (eventList && eventList.length === 0 || undef === listener) {
-      this[eventType] = undef;
+
+    if (eventList && eventList.length === 0 || !listener) {
+      this[eventType] = listener;
     }
   }
 }
