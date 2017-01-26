@@ -17,7 +17,7 @@
   "scripts": {
     "gulp": "./node_modules/.bin/gulp",
     "build": "./node_modules/.bin/gulp build",
-    "test": "./node_modules/.bin/tape tests/index.js | ./node_modules/.bin/tap-spec"
+    "test": "gulp lint && tape tests/index.js | tap-spec"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
