@@ -7,11 +7,11 @@ div.demo-node {
     position        : absolute;
 	border-radius   : 10px;
 	border          : 5px solid #333333;
-	border          : none;
+	border          : 5px solid #333333;
 	width           : 200px;
 	height          : 200px;
-	padding         : 0;
-	margin          : 0;
+	padding         : 15px;
+	margin          : 15px;
 	overflow        : auto;
 	background-color: #2288FF;
 
