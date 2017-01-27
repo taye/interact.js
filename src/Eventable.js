@@ -36,11 +36,11 @@ class Eventable {
 
   on (eventType, listener) {
     // if this type of event was never bound
-    if (!(eventType in this)) {
-      this[eventType] = [listener];
+    if (this[eventType]) {
+      this[eventType].push(listener);
     }
     else {
-      this[eventType].push(listener);
+      this[eventType] = [listener];
     }
   }
 
@@ -50,7 +50,11 @@ class Eventable {
     const index     = eventList? indexOf(eventList, listener) : -1;
 
     if (index !== -1) {
-      this[eventType].splice(index, 1);
+      eventList.splice(index, 1);
+    }
+
+    if (eventList && eventList.length === 0 || !listener) {
+      this[eventType] = listener;
     }
   }
 }

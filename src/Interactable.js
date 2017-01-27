@@ -1,7 +1,6 @@
 const isType    = require('./utils/isType');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
-const domUtils  = require('./utils/domUtils');
 const actions   = require('./actions');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
@@ -205,77 +204,6 @@ class Interactable {
   }
 
   /*\
-   * Interactable.ignoreFrom
-   [ method ]
-   *
-   * If the target of the `mousedown`, `pointerdown` or `touchstart`
-   * event or any of it's parents match the given CSS selector or
-   * Element, no drag/resize/gesture is started.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
-   = (string | Element | object) The current ignoreFrom value or this Interactable
-   **
-   | interact(element, { ignoreFrom: document.getElementById('no-action') });
-   | // or
-   | interact(element).ignoreFrom('input, textarea, a');
-  \*/
-  ignoreFrom (newValue) {
-    return this._backCompatOption('ignoreFrom', newValue);
-  }
-
-  /*\
-   * Interactable.allowFrom
-   [ method ]
-   *
-   * A drag/resize/gesture is started only If the target of the
-   * `mousedown`, `pointerdown` or `touchstart` event or any of it's
-   * parents match the given CSS selector or Element.
-   *
-   - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
-   = (string | Element | object) The current allowFrom value or this Interactable
-   **
-   | interact(element, { allowFrom: document.getElementById('drag-handle') });
-   | // or
-   | interact(element).allowFrom('.handle');
-  \*/
-  allowFrom (newValue) {
-    return this._backCompatOption('allowFrom', newValue);
-  }
-
-  testIgnore (ignoreFrom, interactableElement, element) {
-    if (!ignoreFrom || !isType.isElement(element)) { return false; }
-
-    if (isType.isString(ignoreFrom)) {
-      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
-    }
-    else if (isType.isElement(ignoreFrom)) {
-      return domUtils.nodeContains(ignoreFrom, element);
-    }
-
-    return false;
-  }
-
-  testAllow (allowFrom, interactableElement, element) {
-    if (!allowFrom) { return true; }
-
-    if (!isType.isElement(element)) { return false; }
-
-    if (isType.isString(allowFrom)) {
-      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
-    }
-    else if (isType.isElement(allowFrom)) {
-      return domUtils.nodeContains(allowFrom, element);
-    }
-
-    return false;
-  }
-
-  testIgnoreAllow (options, interactableElement, element) {
-    return (!this.testIgnore(options.ignoreFrom, interactableElement, element)
-      && this.testAllow(options.allowFrom, interactableElement, element));
-  }
-
-  /*\
    * Interactable.fire
    [ method ]
    *
@@ -371,7 +299,7 @@ class Interactable {
 
     // if it is an action event type
     if (contains(Interactable.eventTypes, eventType)) {
-      this.events.on(eventType, listener);
+      this.events.off(eventType, listener);
     }
     // delegated event
     else if (isType.isString(this.target)) {

@@ -11,24 +11,24 @@
 
 'use strict';
 
-var browserify   = require('browserify');
-var watchify     = require('watchify');
-var gulp         = require('gulp');
-var gulpUtil     = require('gulp-util');
-var rename       = require('gulp-rename');
-var uglify       = require('gulp-uglify');
-var sourcemaps   = require('gulp-sourcemaps');
-var exorcist     = require('exorcist');
-var mergeStream  = require('merge-stream');
-var source       = require('vinyl-source-stream');
-var buffer       = require('vinyl-buffer');
-var path         = require('path');
-var fs           = require('fs');
-var _            = require('lodash');
-var bundleLogger = require('../util/bundleLogger');
-var bundleHeader = require('../util/bundle-header');
-var handleErrors = require('../util/handleErrors');
-var config       = require('../config').browserify;
+const browserify   = require('browserify');
+const watchify     = require('watchify');
+const gulp         = require('gulp');
+const gulpUtil     = require('gulp-util');
+const rename       = require('gulp-rename');
+const uglify       = require('gulp-uglify');
+const sourcemaps   = require('gulp-sourcemaps');
+const exorcist     = require('exorcist');
+const mergeStream  = require('merge-stream');
+const source       = require('vinyl-source-stream');
+const buffer       = require('vinyl-buffer');
+const path         = require('path');
+const fs           = require('fs');
+const _            = require('lodash');
+const bundleLogger = require('../util/bundleLogger');
+const bundleHeader = require('../util/bundle-header');
+const handleErrors = require('../util/handleErrors');
+const config       = require('../config').browserify;
 
 function browserifyTask (devMode) {
 
@@ -42,7 +42,7 @@ function browserifyTask (devMode) {
       packageCache: {},
     });
 
-    var b = browserify(bundleConfig);
+    const b = browserify(bundleConfig);
 
     if (devMode) {
       // Enable watchify plugin
@@ -59,12 +59,12 @@ function browserifyTask (devMode) {
       // Log when bundling starts
       bundleLogger.start(bundleConfig.outputName);
 
-      var bundleStream = b.bundle().on('error', handleErrors);
+      let bundleStream = b.bundle().on('error', handleErrors);
 
       // add header to bundle output and adjust source map
       if (bundleConfig.headerFile) {
-        var headerFile = bundleConfig.headerFile;
-        var headerSource = (bundleConfig.headerSource || fs.readFileSync(headerFile).toString())
+        const headerFile = bundleConfig.headerFile;
+        const headerSource = (bundleConfig.headerSource || fs.readFileSync(headerFile).toString())
                             .replace(/[{]VERSION[}]/g, devMode ? '[dev build]' : process.env.npm_package_version);
 
         bundleStream = bundleStream.pipe(bundleHeader({
@@ -74,7 +74,7 @@ function browserifyTask (devMode) {
       }
 
       // source map file name for exorcist output
-      var outputMapName = path.join(bundleConfig.dest, bundleConfig.outputName + '.map');
+      const outputMapName = path.join(bundleConfig.dest, bundleConfig.outputName + '.map');
 
       bundleStream = bundleStream
         // extract source map

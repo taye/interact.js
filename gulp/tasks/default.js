@@ -1,8 +1,9 @@
-var gulp = require('gulp');
-var mkdirp = require('mkdirp');
-var config = require('../config');
+const gulp = require('gulp');
+const mkdirp = require('mkdirp');
+const config = require('../config');
 
 gulp.task('mkdest', function () {
+  /* eslint no-octal: "off" */
   mkdirp.sync(config.dest, 0755);
 });
 

@@ -1,17 +1,17 @@
 'use strict';
 
-var combineSourceMap = require('combine-source-map');
-var through = require('through2');
-var fs = require('fs');
+const combineSourceMap = require('combine-source-map');
+const through = require('through2');
+const fs = require('fs');
 
 module.exports = function (options) {
-  var headerOpts = {
+  const headerOpts = {
     sourceFile: options.headerFile,
     source: options.headerSource || fs.readFileSync(options.headerFile).toString(),
   };
 
-  var headerLines = newlinesIn(headerOpts.source);
-  var source = headerOpts.source;
+  const headerLines = newlinesIn(headerOpts.source);
+  let source = headerOpts.source;
 
   return through(write, end);
 
@@ -21,7 +21,7 @@ module.exports = function (options) {
   }
 
   function end (done) {
-    var combiner = combineSourceMap.create();
+    const combiner = combineSourceMap.create();
 
     combiner.addFile(headerOpts, { line: 1 });
     combiner.addFile({
@@ -37,7 +37,7 @@ module.exports = function (options) {
 
 function newlinesIn (src) {
   if (!src) { return 0; }
-  var newlines = src.match(/\n/g);
+  const newlines = src.match(/\n/g);
 
   return newlines ? newlines.length : 0;
 }

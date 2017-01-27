@@ -3,7 +3,6 @@ module.exports = {
     accept        : null,
     preventDefault: 'auto',
     deltaSource   : 'page',
-    allowFrom     : null,
   },
 
   perAction: {
