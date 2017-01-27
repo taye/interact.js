@@ -5,7 +5,6 @@ gulp.task('lint', module.exports = function () {
   let sources;
 
   try {
-    const execSync = ;
     sources = require('child_process')
       .execSync('git ls-files "gulp/**.js" "src/**.js" "tests/**.js"')
       .toString().split('\n');
