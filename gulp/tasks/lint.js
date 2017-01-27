@@ -1,15 +1,17 @@
-var gulp   = require('gulp');
+const gulp   = require('gulp');
 
 gulp.task('lint', module.exports = function () {
-  var eslint = require('gulp-eslint');
+  const eslint = require('gulp-eslint');
   let sources;
 
   try {
-    var execSync = require('child_process').execSync;
-    sources = execSync('git ls-files "src/**.js"').toString().split('\n');
+    const execSync = ;
+    sources = require('child_process')
+      .execSync('git ls-files "gulp/**.js" "src/**.js" "tests/**.js"')
+      .toString().split('\n');
   }
   catch (e) {
-    sources = ['src/**/*.js'];
+    sources = ['gulp/**/*.js', 'src/**/*.js', 'tests/**/*.js'];
   }
 
   return gulp.src(sources)
