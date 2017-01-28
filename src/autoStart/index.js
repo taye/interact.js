@@ -269,6 +269,10 @@ Interactable.prototype.styleCursor = function (newValue) {
 };
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+  if (event.button !== 0) {
+    return null;
+  }
+
   const rect = this.getRect(element);
   const buttons = event.buttons || ({
     0: 1,
