@@ -112,7 +112,7 @@ const modifiers = {
     };
 
     modifiers.setOffsets(arg);
-    modifiers.resetStatuses(arg);
+    modifiers.resetStatuses(arg.statuses);
 
     arg.pageCoords = extend({}, interaction.startCoords.page);
     modifiers.setAll(arg);
