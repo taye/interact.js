@@ -17,9 +17,9 @@
   "scripts": {
     "gulp": "./node_modules/.bin/gulp",
     "build": "./node_modules/.bin/gulp build",
-    "test": "gulp lint && tape tests/index.js | tap-spec",
+    "test": "gulp lint && istanbul cover --print none tests/index.js | tap-spec && istanbul report text-summary",
     "precommit": "npm run gulp lint",
-    "prepush": "npm test"
+    "prepush": "npm test && istanbul check-coverage"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
@@ -67,6 +67,7 @@
     "gulp-uglify": "^1.4.0",
     "gulp-util": "^3.0.6",
     "husky": "^0.13.1",
+    "istanbul": "^0.4.5",
     "jshint-stylish": "^2.0.1",
     "lodash": "^3.10.1",
     "merge-stream": "^1.0.0",
