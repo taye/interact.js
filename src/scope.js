@@ -1,5 +1,4 @@
 const utils   = require('./utils');
-const extend  = require('./utils/extend');
 const events  = require('./utils/events');
 const signals = require('./utils/Signals').new();
 
@@ -8,7 +7,10 @@ const scope = {
   events,
   utils,
 
-  documents: [],  // all documents being listened to
+  // main document
+  document: require('./utils/domObjects').document,
+  // all documents being listened to
+  documents: [],
 
   addDocument: function (doc, win) {
     // do nothing if document is already known
@@ -45,8 +47,5 @@ const scope = {
     scope.removeDocument(this.document, this);
   },
 };
-
-extend(scope, require('./utils/window'));
-extend(scope, require('./utils/domObjects'));
 
 module.exports = scope;

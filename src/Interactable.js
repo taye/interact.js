@@ -7,6 +7,7 @@ const Eventable = require('./Eventable');
 const defaults  = require('./defaultOptions');
 const signals   = require('./utils/Signals').new();
 
+const { getWindow }                    = require('./utils/window');
 const { getElementRect, nodeContains } = require('./utils/domUtils');
 const { indexOf, contains }            = require('./utils/arr');
 const { wheelEvent }                   = require('./utils/browser');
@@ -27,7 +28,7 @@ class Interactable {
     this.target   = target;
     this.events   = new Eventable();
     this._context = options.context || scope.document;
-    this._win     = scope.getWindow(isType.trySelector(target)? this._context : target);
+    this._win     = getWindow(isType.trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
     signals.fire('new', {
