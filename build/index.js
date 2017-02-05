@@ -3,6 +3,7 @@
 const watchify = require('watchify');
 const errorify = require('errorify');
 const bundle = require('./bundle');
+const version = process.env.npm_package_version || require('../package.json').version;
 const b = bundle.b;
 
 const pwdRegex = new RegExp(`^${process.env.PWD}.`);
@@ -29,7 +30,7 @@ function update (ids) {
   }
 
   bundle.version = release
-    ? process.env.npm_package_version
+    ? version
     : (require('child_process')
       .execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"')
       .toString().trim());

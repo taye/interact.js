@@ -3,6 +3,7 @@
 const browserify   = require('browserify');
 const uglify       = require('uglify-js');
 const exorcist     = require('exorcist');
+const mkdirp       = require('mkdirp');
 const path         = require('path');
 const fs           = require('fs');
 const bundleHeader = require('./bundle-header');
@@ -33,6 +34,8 @@ const config = {
 };
 
 function write (bundleStream) {
+  mkdirp(destDir);
+
   const outDev = fs.createWriteStream(dests.dev);
 
   // add header to bundle output and adjust source map

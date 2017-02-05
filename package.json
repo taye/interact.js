@@ -61,6 +61,7 @@
     "husky": "^0.13.1",
     "istanbul": "^0.4.5",
     "lodash": "^3.10.1",
+    "mkdirp": "^0.5.1",
     "mock-browser": "^0.92.12",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
