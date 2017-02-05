@@ -30,7 +30,9 @@ function update (ids) {
 
   bundle.version = release
     ? process.env.npm_package_version
-    : require('child_process').execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"');
+    : (require('child_process')
+      .execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"')
+      .toString().trim());
 
   bundle.write(b.bundle());
 }
