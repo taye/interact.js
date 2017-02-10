@@ -1,35 +1,43 @@
 'use strict';
 
 const combineSourceMap = require('combine-source-map');
-const through = require('through2');
 const fs = require('fs');
 
-module.exports = function (options) {
-  options.source = options.source || fs.readFileSync(options.sourceFile).toString();
+module.exports = function combine (options) {
+  options.headerContent = options.headerContent
+    || fs.readFileSync(options.headerFilename).toString();
 
-  const headerLines = newlinesIn(options.source);
-  let source = options.source;
+  const headerContent = (options.replacements || [])
+    .reduce((header, [rx, str]) => header.replace(rx, str), options.headerContent);
 
-  return through(write, end);
+  const filename = options.filename;
+  const combiner = combineSourceMap.create();
+  const combinedCode = headerContent + options.code;
+  const offset = { line: newlinesIn(headerContent) };
 
-  function write (buf, enc, next) {
-    source += buf;
-    next();
+  combiner.addFile({
+    sourceFile: options.headerFilename,
+    source: headerContent,
+  }, { line: 1 });
+
+  if (options.map) {
+    combiner._addExistingMap('', combinedCode, options.map, offset);
   }
-
-  function end (done) {
-    const combiner = combineSourceMap.create();
-
-    combiner.addFile(options, { line: 1 });
+  else {
     combiner.addFile({
       sourceFile: '',
-      source: source,
-    }, { line: headerLines });
-
-    this.push(combineSourceMap.removeComments(source) + combiner.comment() + '\n');
-
-    done();
+      source: combinedCode,
+    }, offset);
   }
+
+  const newMap = combiner.generator.toJSON();
+  newMap.file = filename;
+
+  return {
+    filename,
+    code: `${combineSourceMap.removeComments(combinedCode)}\n//# sourceMappingURL=${filename}.map\n`,
+    map: newMap,
+  };
 };
 
 function newlinesIn (src) {

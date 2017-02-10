@@ -15,12 +15,16 @@
   ],
   "main": "index.js",
   "scripts": {
-    "docs": "dr.js dr.json && cp img/ijs-anim-sort.svg img/ijs-32.png dist/docs/img",
     "start": "node build --watch",
+    "build": "node build --release && npm run docs",
     "lint": "node build/lint",
     "test": "node build/lint --fail-on-error && istanbul cover --print none tests/index.js | tap-spec && istanbul report text-summary",
+    "docs": "dr.js dr.json && cp img/ijs-anim-short.svg img/ijs-32.png dist/docs/img",
     "precommit": "node build/lint --fail-on-error",
-    "prepush": "npm test && istanbul check-coverage"
+    "prepush": "npm test && istanbul check-coverage",
+    "preversion": "npm test",
+    "version": "rm -r dist && npm run build && git add -A dist",
+    "postversion": "git push && git push --tags"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
@@ -66,6 +70,7 @@
     "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
     "through2": "^2.0.0",
+    "uglify-js": "^2.7.5",
     "watchify": "^3.7.0"
   }
 }

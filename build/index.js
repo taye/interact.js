@@ -1,18 +1,28 @@
 'use strict';
 
-const watchify = require('watchify');
+const browserify   = require('browserify');
 const errorify = require('errorify');
-const bundle = require('./bundle');
-const version = process.env.npm_package_version || require('../package.json').version;
-const b = bundle.b;
+const bundleProcessor = require('./bundleProcessor');
+
+const config = {
+  debug: true,
+  entries: 'index.js',
+  standalone: 'interact',
+
+  transform: [[ 'babelify', {} ]],
+
+  cache: {},
+  packageCache: {},
+};
+
+const b = browserify(config);
 
 const pwdRegex = new RegExp(`^${process.env.PWD}.`);
 const release = process.argv.includes('--release');
+const watch = process.argv.includes('--watch');
 
-bundle.watch = process.argv.includes('--watch');
-
-if (bundle.watch) {
-  b.plugin(watchify);
+if (watch) {
+  b.plugin(require('watchify'));
   b.plugin(errorify);
 
   b.on('update', update);
@@ -29,13 +39,18 @@ function update (ids) {
     console.log('Bundling...');
   }
 
-  bundle.version = release
-    ? version
+  const version = release
+    ? process.env.npm_package_version || require('../package.json').version
     : (require('child_process')
       .execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"')
       .toString().trim());
 
-  bundle.write(b.bundle());
+  bundleProcessor({
+    bundleStream: b.bundle(),
+    headerFile: 'src/header.js',
+    minHeaderFile: 'src/minHeader.js',
+    version,
+  });
 }
 
 update();
