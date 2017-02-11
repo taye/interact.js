@@ -3,6 +3,7 @@
 const browserify   = require('browserify');
 const errorify = require('errorify');
 const bundleProcessor = require('./bundleProcessor');
+const getVersion = require('./getVersion');
 
 const config = {
   debug: true,
@@ -40,7 +41,7 @@ function update (ids) {
   }
 
   const version = release
-    ? process.env.npm_package_version || require('../package.json').version
+    ? getVersion()
     : (require('child_process')
       .execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"')
       .toString().trim());
