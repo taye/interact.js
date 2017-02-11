@@ -6,7 +6,7 @@ require('./Interaction');
 //require('./legacyBrowsers');
 
 // pointerEvents
-//require('./pointerEvents');
+//require('./pointerEvents/base');
 //require('./pointerEvents/holdRepeat');
 //require('./pointerEvents/interactableTargets');
 

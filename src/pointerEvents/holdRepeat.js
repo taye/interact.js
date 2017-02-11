@@ -1,4 +1,4 @@
-const pointerEvents = require('./index.js');
+const pointerEvents = require('./base');
 const Interaction   = require('../Interaction');
 
 pointerEvents.signals.on('new', function ({ pointerEvent }) {
