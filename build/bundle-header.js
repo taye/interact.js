@@ -1,5 +1,3 @@
-'use strict';
-
 const combineSourceMap = require('combine-source-map');
 const fs = require('fs');
 

@@ -1,5 +1,3 @@
-'use strict';
-
 const uglify       = require('uglify-js');
 const mkdirp       = require('mkdirp');
 const path         = require('path');

@@ -1,5 +1,3 @@
-'use strict';
-
 const browserify   = require('browserify');
 const errorify = require('errorify');
 const bundleProcessor = require('./bundleProcessor');
