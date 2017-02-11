@@ -3,6 +3,7 @@ const mkdirp       = require('mkdirp');
 const path         = require('path');
 const fs           = require('fs');
 const bundleHeader = require('./bundle-header');
+const replacer     = require('./replacer');
 
 const pwd = process.env.PWD;
 
@@ -14,7 +15,7 @@ const filenames = {
   minMap: 'interact.min.js.map',
 };
 
-function go ({ bundleStream, headerFile, minHeaderFile, version }) {
+function go ({ bundleStream, headerFile, minHeaderFile }) {
   mkdirp(destDir);
 
   let streamCode = '';
@@ -44,10 +45,7 @@ function go ({ bundleStream, headerFile, minHeaderFile, version }) {
       code,
       map,
       headerFilename,
-      replacements: [
-        [ /[{]VERSION[}]/g, version ],
-        [ /[{]YEAR[}]/g, new Date().getFullYear() ],
-      ],
+      replacer,
     };
   }
 }

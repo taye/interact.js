@@ -3,9 +3,7 @@ const mkdirp = require('mkdirp');
 
 mkdirp.sync('dist');
 
-const drjson = fs.readFileSync('dr.json')
-  .toString()
-  .replace(/[{]VERSION[}]/g, require('./getVersion')());
+const drjson = require('./replacer')(fs.readFileSync('dr.json').toString());
 
 fs.writeFileSync('_dr.json', drjson);
 

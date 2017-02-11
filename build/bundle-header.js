@@ -2,11 +2,8 @@ const combineSourceMap = require('combine-source-map');
 const fs = require('fs');
 
 module.exports = function combine (options) {
-  options.headerContent = options.headerContent
-    || fs.readFileSync(options.headerFilename).toString();
-
-  const headerContent = (options.replacements || [])
-    .reduce((header, [rx, str]) => header.replace(rx, str), options.headerContent);
+  const headerContent = (options.replacer || (s => s))(options.headerContent
+    || fs.readFileSync(options.headerFilename).toString());
 
   const filename = options.filename;
   const combiner = combineSourceMap.create();
