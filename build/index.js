@@ -1,7 +1,5 @@
 const browserify   = require('browserify');
-const errorify = require('errorify');
 const bundleProcessor = require('./bundleProcessor');
-const getVersion = require('./getVersion');
 
 const config = {
   debug: true,
@@ -22,7 +20,7 @@ const watch = process.argv.includes('--watch');
 
 if (watch) {
   b.plugin(require('watchify'));
-  b.plugin(errorify);
+  b.plugin(require('errorify'));
 
   b.on('update', update);
   b.on('log', msg => console.log(msg));
@@ -38,17 +36,11 @@ function update (ids) {
     console.log('Bundling...');
   }
 
-  const version = release
-    ? getVersion()
-    : (require('child_process')
-      .execSync('echo "@$(git rev-parse --short HEAD)$(git diff-index --quiet HEAD || echo -dirty)"')
-      .toString().trim());
-
   bundleProcessor({
+    release,
     bundleStream: b.bundle(),
     headerFile: 'src/header.js',
     minHeaderFile: 'src/minHeader.js',
-    version,
   });
 }
 

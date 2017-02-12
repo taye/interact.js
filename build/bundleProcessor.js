@@ -15,7 +15,7 @@ const filenames = {
   minMap: 'interact.min.js.map',
 };
 
-function go ({ bundleStream, headerFile, minHeaderFile }) {
+module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeaderFile, release }) {
   mkdirp(destDir);
 
   let streamCode = '';
@@ -45,10 +45,10 @@ function go ({ bundleStream, headerFile, minHeaderFile }) {
       code,
       map,
       headerFilename,
-      replacer,
+      replacer: input => replacer(input, { release }),
     };
   }
-}
+};
 
 function write ({ filename, code, map }) {
   map.sources = map.sources.map(source => path.relative(pwd, source));
@@ -60,5 +60,3 @@ function write ({ filename, code, map }) {
   codeStream.end(code);
   fs.createWriteStream(`${codeFilename}.map`).end(JSON.stringify(map));
 }
-
-module.exports = go;

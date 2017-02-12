@@ -1,9 +1,12 @@
 const fs = require('fs');
 const mkdirp = require('mkdirp');
+const replacer = require('./replacer');
 
 mkdirp.sync('dist');
 
-const drjson = require('./replacer')(fs.readFileSync('dr.json').toString());
+const drjson = replacer(fs.readFileSync('dr.json').toString(), {
+  decorate: false,
+});
 
 fs.writeFileSync('_dr.json', drjson);
 
