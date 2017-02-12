@@ -24,8 +24,8 @@
       "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/Interactable.js"
     },
     {
-      "url": "src/autoStart/index.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/autoStart/index.js"
+      "url": "src/autoStart/base.js",
+      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/autoStart/base.js"
     },
     {
       "url": "src/interactablePreventDefault.js",
