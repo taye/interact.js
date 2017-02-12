@@ -21,7 +21,7 @@ require('./Interaction');
 //require('./autoStart/delay');
 
 // actions
-require('./actions/index');
+require('./actions/base');
 //require('./actions/gesture');
 //require('./actions/resize');
 require('./actions/drag');

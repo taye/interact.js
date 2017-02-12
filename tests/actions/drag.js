@@ -1,7 +1,7 @@
 const test = require('tape');
 
 test('drag action setup', t => {
-  const actions      = require('../../src/actions/index');
+  const actions      = require('../../src/actions/base');
   const Interactable = require('../../src/Interactable');
   const utils        = require('../../src/utils');
   require('../../src/actions/drag');

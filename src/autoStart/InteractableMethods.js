@@ -1,5 +1,5 @@
 const Interactable = require('../Interactable');
-const actions      = require('../actions');
+const actions      = require('../actions/base');
 const isType       = require('../utils/isType');
 const domUtils     = require('../utils/domUtils');
 

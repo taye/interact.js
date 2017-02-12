@@ -1,4 +1,4 @@
-const actions        = require('./index');
+const actions        = require('./base');
 const utils          = require('../utils');
 const browser        = require('../utils/browser');
 const InteractEvent  = require('../InteractEvent');
