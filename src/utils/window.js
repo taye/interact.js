@@ -13,11 +13,10 @@ function init (window) {
   if (el.ownerDocument !== window.document
       && typeof window.wrap === 'function'
     && window.wrap(el) === el) {
-    // return wrapped window
-    win.window = window.wrap(window);
+    // use wrapped window
+    window = window.wrap(window);
   }
 
-  // no Shadow DOM polyfil or native implementation
   win.window = window;
 }
 

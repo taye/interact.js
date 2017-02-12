@@ -1,3 +1,5 @@
+const { window } = require('./window');
+
 const vendors = ['ms', 'moz', 'webkit', 'o'];
 let lastTime = 0;
 let request;

@@ -8,7 +8,8 @@ domObjects.DocumentFragment   = win.DocumentFragment   || blank;
 domObjects.SVGElement         = win.SVGElement         || blank;
 domObjects.SVGSVGElement      = win.SVGSVGElement      || blank;
 domObjects.SVGElementInstance = win.SVGElementInstance || blank;
-domObjects.HTMLElement        = win.HTMLElement        || win.Element;
+domObjects.Element            = win.Element            || blank;
+domObjects.HTMLElement        = win.HTMLElement        || domObjects.Element;
 
 domObjects.Event        = win.Event;
 domObjects.Touch        = win.Touch || blank;

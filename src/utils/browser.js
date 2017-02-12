@@ -2,6 +2,9 @@ const win        = require('./window');
 const isType     = require('./isType');
 const domObjects = require('./domObjects');
 
+const Element = domObjects.Element;
+const navigator  = win.window.navigator;
+
 const browser = {
   // Does the browser support touch input?
   supportsTouch: !!(('ontouchstart' in win.window) || isType.isFunction(win.window.DocumentTouch)

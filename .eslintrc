@@ -15,6 +15,7 @@ rules:
   eqeqeq: 2
   guard-for-in: 0
   indent: [2, 2]
+  keyword-spacing: [2, { before: true, after: true }]
   linebreak-style: [2, unix]
   no-caller: 2
   no-console: 0
@@ -22,14 +23,15 @@ rules:
   no-extra-bind: 2
   no-self-compare: 2
   no-sequences: 2
-  no-shadow: 2
   no-shadow-restricted-names: 2
+  no-shadow: 2
   no-trailing-spaces: 2
   no-unused-expressions: 2
+  no-var: 2
   one-var: [2, never]
+  prefer-const: 2
   quotes: [2, single, avoid-escape]
   semi: [2, always]
-  keyword-spacing: [2, { before: true, after: true }]
   space-before-function-paren: [2, always]
 
 ecma-features:

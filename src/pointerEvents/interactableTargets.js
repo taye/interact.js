@@ -1,4 +1,4 @@
-const pointerEvents = require('./index');
+const pointerEvents = require('./base');
 const Interactable  = require('../Interactable');
 const browser       = require('../utils/browser');
 const isType        = require('../utils/isType');

@@ -3,6 +3,8 @@ const events  = require('./utils/events');
 const browser = require('./utils/browser');
 const iFinder = require('./utils/interactionFinder');
 
+const { window } = require('./utils/window');
+
 const toString = Object.prototype.toString;
 
 if (!window.Array.isArray) {
