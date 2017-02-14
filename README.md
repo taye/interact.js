@@ -24,7 +24,7 @@ Installation
 * [npm](https://www.npmjs.org/): `npm install interactjs`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
-    * Download the file interact.js (development version) into a new sub-directory: app/vendor/assets/javascripts/interact
+    * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
     * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
     * Restart the Rails server
 * [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
