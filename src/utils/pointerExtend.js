@@ -11,7 +11,7 @@ function pointerExtend (dest, source) {
       }
     }
 
-    if (!deprecated) {
+    if (!deprecated && typeof source[prop] !== 'function') {
       dest[prop] = source[prop];
     }
   }
