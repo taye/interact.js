@@ -1,12 +1,10 @@
-require('./init');
-
 require('./Interaction');
 
 // Legacy browser support
 //require('./legacyBrowsers');
 
 // pointerEvents
-//require('./pointerEvents/base');
+require('./pointerEvents/base');
 //require('./pointerEvents/holdRepeat');
 //require('./pointerEvents/interactableTargets');
 

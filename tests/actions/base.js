@@ -1,4 +1,4 @@
-const test = require('tape');
+const test = require('../test');
 
 test('export', t => {
   const actions = require('../../src/actions/base');
