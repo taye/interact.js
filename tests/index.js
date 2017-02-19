@@ -5,7 +5,8 @@ require('./Interaction');
 
 // pointerEvents
 require('./pointerEvents/base');
-//require('./pointerEvents/holdRepeat');
+require('./pointerEvents/PointerEvent');
+require('./pointerEvents/holdRepeat');
 //require('./pointerEvents/interactableTargets');
 
 // inertia
