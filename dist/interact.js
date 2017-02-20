@@ -1,5 +1,5 @@
 /**
- * interact.js @69d2303-dirty
+ * interact.js @198c476-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -5134,7 +5134,7 @@ function collectEventTargets(_ref3) {
   if (type === 'tap' && (interaction.pointerWasMoved
   // or if the pointerup target is different to the pointerdown target
    || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
-    return;
+    return [];
   }
 
   var path = utils.getPath(eventTarget);
