@@ -102,7 +102,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
   if (type === 'tap' && (interaction.pointerWasMoved
       // or if the pointerup target is different to the pointerdown target
       || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
-    return;
+    return [];
   }
 
   const path = utils.getPath(eventTarget);
