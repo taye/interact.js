@@ -1,8 +1,6 @@
-const MockBrowser = require('mock-browser').mocks.MockBrowser;
-const mock = new MockBrowser();
+const { jsdom } = require('jsdom');
+const doc = jsdom('<!DOCTYPE html><html><body></body></html>');
 
-const window = mock.getWindow();
-
-require('../src/utils/window').init(window);
+require('../src/utils/window').init(doc.defaultView);
 
 module.exports = require('tape');
