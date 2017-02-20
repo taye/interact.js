@@ -3,17 +3,17 @@
 // Legacy browser support
 require('./legacyBrowsers');
 
-// pointerEvents
-require('./pointerEvents/base');
-require('./pointerEvents/holdRepeat');
-require('./pointerEvents/interactableTargets');
-
 // inertia
 require('./inertia');
 
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
+
+// pointerEvents
+require('./pointerEvents/base');
+require('./pointerEvents/holdRepeat');
+require('./pointerEvents/interactableTargets');
 
 // delay
 require('./autoStart/delay');
