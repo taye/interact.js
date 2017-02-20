@@ -1,12 +1,12 @@
-const tape = require('tape');
+const test = require('./test');
 const pointerUtils = require('../src/utils/pointerUtils');
 const helpers = require('./helpers');
 
-tape('Interaction', interactionTest => {
+test('Interaction', t => {
   const scope       = require('../src/scope');
   const Interaction = require('../src/Interaction');
 
-  const test = interactionTest.test;
+  const test = t.test;
 
   test('Interaction constructor', t => {
     const interaction = new Interaction();

@@ -200,6 +200,17 @@ const pointerUtils = {
 
     return  angle;
   },
+
+  getPointerType: function (pointer, interaction) {
+    // if the PointerEvent API isn't available, then the pointer must be ither
+    // a MouseEvent or TouchEvent
+    if (interaction.mouse)             { return 'mouse'; }
+    if (!browser.supportsPointerEvent) { return 'touch'; }
+
+    return isType.isString(pointer.pointerType)
+      ? pointer.pointerType
+      : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
+  },
 };
 
 module.exports = pointerUtils;
