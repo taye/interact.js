@@ -1,5 +1,5 @@
 /**
- * interact.js @a85421f-dirty
+ * interact.js @69d2303-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -24,7 +24,7 @@ if (typeof window === 'undefined') {
   module.exports = require('./src/index');
 }
 
-},{"./src/index":19,"./src/utils/window":47}],2:[function(require,module,exports){
+},{"./src/index":19,"./src/utils/window":48}],2:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _require = require('./utils/arr');
@@ -95,7 +95,7 @@ var Eventable = (function () {
 
 module.exports = Eventable;
 
-},{"./utils/arr":32,"./utils/extend.js":37}],3:[function(require,module,exports){
+},{"./utils/arr":33,"./utils/extend.js":38}],3:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var extend = require('./utils/extend');
@@ -261,7 +261,7 @@ InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./defaultOptions":18,"./utils/Signals":31,"./utils/extend":37,"./utils/getOriginXY":38}],4:[function(require,module,exports){
+},{"./defaultOptions":18,"./utils/Signals":32,"./utils/extend":38,"./utils/getOriginXY":39}],4:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var isType = require('./utils/isType');
@@ -794,7 +794,7 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":30,"./utils/Signals":31,"./utils/arr":32,"./utils/browser":33,"./utils/domUtils":35,"./utils/events":36,"./utils/extend":37,"./utils/isType":42,"./utils/window":47}],5:[function(require,module,exports){
+},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":31,"./utils/Signals":32,"./utils/arr":33,"./utils/browser":34,"./utils/domUtils":36,"./utils/events":37,"./utils/extend":38,"./utils/isType":43,"./utils/window":48}],5:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var scope = require('./scope');
@@ -1098,10 +1098,13 @@ var Interaction = (function () {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      signals.fire('action-end', {
+      var signalArg = {
         event: event,
         interaction: this
-      });
+      };
+
+      signals.fire('before-action-end', signalArg);
+      signals.fire('action-end', signalArg);
     }
 
     this.stop();
@@ -1300,7 +1303,7 @@ scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":30,"./utils":40,"./utils/Signals":31,"./utils/browser":33,"./utils/events":36,"./utils/interactionFinder":41}],6:[function(require,module,exports){
+},{"./scope":31,"./utils":41,"./utils/Signals":32,"./utils/browser":34,"./utils/events":37,"./utils/interactionFinder":42}],6:[function(require,module,exports){
 var Interaction = require('../Interaction');
 var InteractEvent = require('../InteractEvent');
 
@@ -1506,7 +1509,7 @@ defaultOptions.drag = drag.defaults;
 
 module.exports = drag;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":40,"./base":6}],8:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"./base":6}],8:[function(require,module,exports){
 var actions = require('./base');
 var utils = require('../utils');
 var scope = require('../scope');
@@ -2018,7 +2021,7 @@ defaultOptions.drop = drop.defaults;
 
 module.exports = drop;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":30,"../utils":40,"./base":6}],9:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":31,"../utils":41,"./base":6}],9:[function(require,module,exports){
 var actions = require('./base');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -2192,7 +2195,7 @@ defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":40,"./base":6}],10:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"./base":6}],10:[function(require,module,exports){
 var actions = require('./base');
 var utils = require('../utils');
 var browser = require('../utils/browser');
@@ -2643,7 +2646,7 @@ defaultOptions.resize = resize.defaults;
 
 module.exports = resize;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":40,"../utils/browser":33,"./base":6}],11:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"../utils/browser":34,"./base":6}],11:[function(require,module,exports){
 var raf = require('./utils/raf');
 var getWindow = require('./utils/window').getWindow;
 var isWindow = require('./utils/isType').isWindow;
@@ -2769,7 +2772,7 @@ defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;
 
-},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":35,"./utils/isType":42,"./utils/raf":46,"./utils/window":47}],12:[function(require,module,exports){
+},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":36,"./utils/isType":43,"./utils/raf":47,"./utils/window":48}],12:[function(require,module,exports){
 var Interactable = require('../Interactable');
 var actions = require('../actions/base');
 var isType = require('../utils/isType');
@@ -2960,7 +2963,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
-},{"../Interactable":4,"../actions/base":6,"../utils/domUtils":35,"../utils/isType":42}],13:[function(require,module,exports){
+},{"../Interactable":4,"../actions/base":6,"../utils/domUtils":36,"../utils/isType":43}],13:[function(require,module,exports){
 var interact = require('../interact');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -3350,7 +3353,7 @@ utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
 
 module.exports = autoStart;
 
-},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":30,"../utils":40,"../utils/Signals":31,"../utils/browser":33,"./InteractableMethods":12}],14:[function(require,module,exports){
+},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":31,"../utils":41,"../utils/Signals":32,"../utils/browser":34,"./InteractableMethods":12}],14:[function(require,module,exports){
 var autoStart = require('./base');
 var Interaction = require('../Interaction');
 
@@ -3512,7 +3515,7 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":30,"../utils/browser":33,"../utils/domUtils":35,"../utils/isType":42,"./base":13}],16:[function(require,module,exports){
+},{"../actions/drag":7,"../scope":31,"../utils/browser":34,"../utils/domUtils":36,"../utils/isType":43,"./base":13}],16:[function(require,module,exports){
 require('./base').setActionDefaults(require('../actions/gesture'));
 
 },{"../actions/gesture":9,"./base":13}],17:[function(require,module,exports){
@@ -3585,7 +3588,7 @@ require('./autoScroll');
 // export interact
 module.exports = require('./interact');
 
-},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/delay":14,"./autoStart/drag":15,"./autoStart/gesture":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/snap":26,"./pointerEvents/base":27,"./pointerEvents/holdRepeat":28,"./pointerEvents/interactableTargets":29}],20:[function(require,module,exports){
+},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/delay":14,"./autoStart/drag":15,"./autoStart/gesture":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/snap":26,"./pointerEvents/base":28,"./pointerEvents/holdRepeat":29,"./pointerEvents/interactableTargets":30}],20:[function(require,module,exports){
 var InteractEvent = require('./InteractEvent');
 var Interaction = require('./Interaction');
 var modifiers = require('./modifiers');
@@ -3868,7 +3871,7 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":40,"./utils/raf":46}],21:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":41,"./utils/raf":47}],21:[function(require,module,exports){
 var browser = require('./utils/browser');
 var events = require('./utils/events');
 var utils = require('./utils');
@@ -4131,7 +4134,7 @@ scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Interactable":4,"./Interaction":5,"./scope":30,"./utils":40,"./utils/browser":33,"./utils/events":36}],22:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":31,"./utils":41,"./utils/browser":34,"./utils/events":37}],22:[function(require,module,exports){
 var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
 var scope = require('./scope');
@@ -4235,11 +4238,12 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":30,"./utils/domUtils":35,"./utils/isType":42}],23:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":31,"./utils/domUtils":36,"./utils/isType":43}],23:[function(require,module,exports){
 var scope = require('./scope');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
 var iFinder = require('./utils/interactionFinder');
+var pointerEvents = require('./pointerEvents/base');
 
 var _require = require('./utils/window');
 
@@ -4265,18 +4269,25 @@ if (!String.prototype.trim) {
 // IE8 doesn't fire down event before dblclick.
 // This workaround tries to fire a tap and doubletap after dblclick
 function onIE8Dblclick(event) {
-  var interaction = iFinder.search(event, event.type, event.target);
+  var eventTarget = event.target;
+  var interaction = iFinder.search(event, event.type, eventTarget);
 
   if (!interaction) {
     return;
   }
 
-  if (interaction.prevTap && event.clientX === interaction.prevTap.clientX && event.clientY === interaction.prevTap.clientY && event.target === interaction.prevTap.target) {
+  if (interaction.prevTap && event.clientX === interaction.prevTap.clientX && event.clientY === interaction.prevTap.clientY && eventTarget === interaction.prevTap.target) {
 
-    interaction.downTargets[0] = event.target;
+    interaction.downTargets[0] = eventTarget;
     interaction.downTimes[0] = new Date().getTime();
 
-    scope.pointerEvents.collectEventTargets(interaction, event, event, event.target, 'tap');
+    pointerEvents.fire({
+      interaction: interaction,
+      event: event,
+      eventTarget: eventTarget,
+      pointer: event,
+      type: 'tap'
+    });
   }
 }
 
@@ -4312,7 +4323,7 @@ if (browser.isIE8) {
       // For IE's lack of Event#preventDefault
       eventMethod(doc, 'selectstart', selectFix);
 
-      if (scope.pointerEvents) {
+      if (pointerEvents) {
         eventMethod(doc, 'dblclick', onIE8Dblclick);
       }
     };
@@ -4324,7 +4335,7 @@ if (browser.isIE8) {
 
 module.exports = null;
 
-},{"./scope":30,"./utils/browser":33,"./utils/events":36,"./utils/interactionFinder":41,"./utils/window":47}],24:[function(require,module,exports){
+},{"./pointerEvents/base":28,"./scope":31,"./utils/browser":34,"./utils/events":37,"./utils/interactionFinder":42,"./utils/window":48}],24:[function(require,module,exports){
 var InteractEvent = require('../InteractEvent');
 var Interaction = require('../Interaction');
 var extend = require('../utils/extend');
@@ -4473,7 +4484,7 @@ Interaction.signals.on('before-action-move', function (_ref4) {
   }
 });
 
-Interaction.signals.on('action-end', function (_ref5) {
+Interaction.signals.on('before-action-end', function (_ref5) {
   var interaction = _ref5.interaction;
   var event = _ref5.event;
 
@@ -4507,7 +4518,7 @@ InteractEvent.signals.on('set-xy', function (_ref6) {
 
 module.exports = modifiers;
 
-},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":37}],25:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":38}],25:[function(require,module,exports){
 var modifiers = require('./index');
 var utils = require('../utils');
 var defaultOptions = require('../defaultOptions');
@@ -4650,7 +4661,7 @@ defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 
-},{"../defaultOptions":18,"../utils":40,"./index":24}],26:[function(require,module,exports){
+},{"../defaultOptions":18,"../utils":41,"./index":24}],26:[function(require,module,exports){
 var modifiers = require('./index');
 var interact = require('../interact');
 var utils = require('../utils');
@@ -4939,8 +4950,84 @@ defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;
 
-},{"../defaultOptions":18,"../interact":21,"../utils":40,"./index":24}],27:[function(require,module,exports){
-var scope = require('../scope');
+},{"../defaultOptions":18,"../interact":21,"../utils":41,"./index":24}],27:[function(require,module,exports){
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var pointerUtils = require('../utils/pointerUtils');
+
+module.exports = (function () {
+  function PointerEvent(type, pointer, event, eventTarget, interaction) {
+    _classCallCheck(this, PointerEvent);
+
+    pointerUtils.pointerExtend(this, event);
+
+    if (event !== pointer) {
+      pointerUtils.pointerExtend(this, pointer);
+    }
+
+    this.interaction = interaction;
+
+    this.timeStamp = new Date().getTime();
+    this.originalEvent = event;
+    this.type = type;
+    this.pointerId = pointerUtils.getPointerId(pointer);
+    this.pointerType = pointerUtils.getPointerType(pointer, interaction);
+    this.target = eventTarget;
+    this.currentTarget = null;
+
+    if (type === 'tap') {
+      var pointerIndex = interaction.getPointerIndex(pointer);
+      this.dt = this.timeStamp - interaction.downTimes[pointerIndex];
+
+      var interval = this.timeStamp - interaction.tapTime;
+
+      this.double = !!(interaction.prevTap && interaction.prevTap.type !== 'doubletap' && interaction.prevTap.target === this.target && interval < 500);
+    } else if (type === 'doubletap') {
+      this.dt = pointer.timeStamp - interaction.tapTime;
+    }
+  }
+
+  PointerEvent.prototype.subtractOrigin = function subtractOrigin(_ref) {
+    var originX = _ref.x;
+    var originY = _ref.y;
+
+    this.pageX -= originX;
+    this.pageY -= originY;
+    this.clientX -= originX;
+    this.clientY -= originY;
+
+    return this;
+  };
+
+  PointerEvent.prototype.addOrigin = function addOrigin(_ref2) {
+    var originX = _ref2.x;
+    var originY = _ref2.y;
+
+    this.pageX += originX;
+    this.pageY += originY;
+    this.clientX += originX;
+    this.clientY += originY;
+
+    return this;
+  };
+
+  PointerEvent.prototype.preventDefault = function preventDefault() {
+    this.originalEvent.preventDefault();
+  };
+
+  PointerEvent.prototype.stopPropagation = function stopPropagation() {
+    this.propagationStopped = true;
+  };
+
+  PointerEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  };
+
+  return PointerEvent;
+})();
+
+},{"../utils/pointerUtils":46}],28:[function(require,module,exports){
+var PointerEvent = require('./PointerEvent');
 var Interaction = require('../Interaction');
 var utils = require('../utils');
 var browser = require('../utils/browser');
@@ -4954,97 +5041,63 @@ var filter = _require.filter;
 var simpleSignals = ['down', 'up', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'tap', 'cancel'];
 
-function preventOriginalDefault() {
-  this.originalEvent.preventDefault();
-}
+var pointerEvents = {
+  PointerEvent: PointerEvent,
+  fire: fire,
+  collectEventTargets: collectEventTargets,
+  signals: signals,
+  defaults: {
+    holdDuration: 600,
+    ignoreFrom: null,
+    allowFrom: null,
+    origin: { x: 0, y: 0 }
+  },
+  types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
+};
 
-function stopImmediatePropagation() {
-  this.immediatePropagationStopped = this.propagationStopped = true;
-}
+function fire(arg) {
+  var interaction = arg.interaction;
+  var pointer = arg.pointer;
+  var event = arg.event;
+  var eventTarget = arg.eventTarget;
+  var type = arg.type;
+  var _arg$targets = arg.targets;
+  var targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets;
 
-function stopPropagation() {
-  this.propagationStopped = true;
-}
-
-function firePointers(interaction, pointer, event, eventTarget, targets, eventType) {
-  var pointerIndex = interaction.getPointerIndex(pointer);
-  var pointerEvent = {};
-  var i = undefined;
-  // for tap events
-  var interval = undefined;
-  var createNewDoubleTap = undefined;
-
-  // if it's a doubletap then the event properties would have been
-  // copied from the tap event and provided as the pointer argument
-  if (eventType === 'doubletap') {
-    pointerEvent = pointer;
-  } else {
-    utils.pointerExtend(pointerEvent, event);
-    if (event !== pointer) {
-      utils.pointerExtend(pointerEvent, pointer);
-    }
-
-    pointerEvent.preventDefault = preventOriginalDefault;
-    pointerEvent.stopPropagation = stopPropagation;
-    pointerEvent.stopImmediatePropagation = stopImmediatePropagation;
-    pointerEvent.interaction = interaction;
-
-    pointerEvent.timeStamp = new Date().getTime();
-    pointerEvent.originalEvent = event;
-    pointerEvent.type = eventType;
-    pointerEvent.pointerId = utils.getPointerId(pointer);
-    pointerEvent.pointerType = interaction.mouse ? 'mouse' : !browser.supportsPointerEvent ? 'touch' : utils.isString(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
+  // create the tap event even if there are no listeners so that
+  // doubletap can still be created and fired
+  if (!targets.length && type !== 'tap') {
+    return false;
   }
 
-  if (eventType === 'tap') {
-    pointerEvent.dt = pointerEvent.timeStamp - interaction.downTimes[pointerIndex];
-
-    interval = pointerEvent.timeStamp - interaction.tapTime;
-    createNewDoubleTap = !!(interaction.prevTap && interaction.prevTap.type !== 'doubletap' && interaction.prevTap.target === pointerEvent.target && interval < 500);
-
-    pointerEvent.double = createNewDoubleTap;
-
-    interaction.tapTime = pointerEvent.timeStamp;
-  }
+  var pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
 
   var signalArg = {
     interaction: interaction,
-    pointerEvent: pointerEvent,
     pointer: pointer,
     event: event,
     eventTarget: eventTarget,
-    targets: targets
+    targets: targets,
+    type: type,
+    pointerEvent: pointerEvent
   };
 
-  signals.fire('new', signalArg);
-
-  for (i = 0; i < targets.length; i++) {
+  for (var i = 0; i < targets.length; i++) {
     var target = targets[i];
-
-    pointerEvent.currentTarget = target.element;
 
     for (var prop in target.props || {}) {
       pointerEvent[prop] = target.props[prop];
     }
 
-    var _utils$getOriginXY = utils.getOriginXY(target.eventable, target.element);
+    var origin = utils.getOriginXY(target.eventable, target.element);
 
-    var originX = _utils$getOriginXY.x;
-    var originY = _utils$getOriginXY.y;
-
-    pointerEvent.pageX -= originX;
-    pointerEvent.pageY -= originY;
-    pointerEvent.clientX -= originX;
-    pointerEvent.clientY -= originY;
-
+    pointerEvent.subtractOrigin(origin);
     pointerEvent.eventable = target.eventable;
+    pointerEvent.currentTarget = target.element;
 
     target.eventable.fire(pointerEvent);
 
-    pointerEvent.pageX += originX;
-    pointerEvent.pageY += originY;
-    pointerEvent.clientX += originX;
-    pointerEvent.clientY += originY;
+    pointerEvent.addOrigin(origin);
 
     if (pointerEvent.immediatePropagationStopped || pointerEvent.propagationStopped && i + 1 < targets.length && targets[i + 1].element !== pointerEvent.currentTarget) {
       break;
@@ -5053,42 +5106,46 @@ function firePointers(interaction, pointer, event, eventTarget, targets, eventTy
 
   signals.fire('fired', signalArg);
 
-  if (createNewDoubleTap) {
-    var doubleTap = {};
+  if (type === 'tap') {
+    if (pointerEvent.double) {
+      fire({
+        interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
+        type: 'doubletap'
+      });
+    }
 
-    utils.extend(doubleTap, pointerEvent);
-
-    doubleTap.dt = interval;
-    doubleTap.type = 'doubletap';
-
-    collectEventTargets(interaction, doubleTap, event, eventTarget, 'doubletap');
-
-    interaction.prevTap = doubleTap;
-  } else if (eventType === 'tap') {
+    interaction.tapTime = pointer.timeStamp;
     interaction.prevTap = pointerEvent;
   }
+
+  return true;
 }
 
-function collectEventTargets(interaction, pointer, event, eventTarget, eventType) {
+function collectEventTargets(_ref3) {
+  var interaction = _ref3.interaction;
+  var pointer = _ref3.pointer;
+  var event = _ref3.event;
+  var eventTarget = _ref3.eventTarget;
+  var type = _ref3.type;
+
   var pointerIndex = interaction.getPointerIndex(pointer);
 
   // do not fire a tap event if the pointer was moved before being lifted
-  if (eventType === 'tap' && (interaction.pointerWasMoved
+  if (type === 'tap' && (interaction.pointerWasMoved
   // or if the pointerup target is different to the pointerdown target
    || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
     return;
   }
 
-  var targets = [];
   var path = utils.getPath(eventTarget);
   var signalArg = {
-    targets: targets,
     interaction: interaction,
     pointer: pointer,
     event: event,
     eventTarget: eventTarget,
-    eventType: eventType,
+    type: type,
     path: path,
+    targets: [],
     element: null
   };
 
@@ -5111,25 +5168,21 @@ function collectEventTargets(interaction, pointer, event, eventTarget, eventType
     signals.fire('collect-targets', signalArg);
   }
 
-  if (eventType === 'hold') {
-    targets = filter(targets, function (target) {
+  if (type === 'hold') {
+    signalArg.targets = filter(signalArg.targets, function (target) {
       return target.eventable.options.holdDuration === interaction.holdTimers[pointerIndex].duration;
     });
   }
 
-  // create the tap event even if there are no listeners so that
-  // doubletap can still be created and fired
-  if (targets.length || eventType === 'tap') {
-    firePointers(interaction, pointer, event, eventTarget, targets, eventType);
-  }
+  return signalArg.targets;
 }
 
-Interaction.signals.on('move', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var pointer = _ref3.pointer;
-  var event = _ref3.event;
-  var eventTarget = _ref3.eventTarget;
-  var duplicateMove = _ref3.duplicateMove;
+Interaction.signals.on('move', function (_ref4) {
+  var interaction = _ref4.interaction;
+  var pointer = _ref4.pointer;
+  var event = _ref4.event;
+  var eventTarget = _ref4.eventTarget;
+  var duplicateMove = _ref4.duplicateMove;
 
   var pointerIndex = interaction.getPointerIndex(pointer);
 
@@ -5138,16 +5191,19 @@ Interaction.signals.on('move', function (_ref3) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
     }
 
-    collectEventTargets(interaction, pointer, event, eventTarget, 'move');
+    fire({
+      interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
+      type: 'move'
+    });
   }
 });
 
-Interaction.signals.on('down', function (_ref4) {
-  var interaction = _ref4.interaction;
-  var pointer = _ref4.pointer;
-  var event = _ref4.event;
-  var eventTarget = _ref4.eventTarget;
-  var pointerIndex = _ref4.pointerIndex;
+Interaction.signals.on('down', function (_ref5) {
+  var interaction = _ref5.interaction;
+  var pointer = _ref5.pointer;
+  var event = _ref5.event;
+  var eventTarget = _ref5.eventTarget;
+  var pointerIndex = _ref5.pointerIndex;
 
   // copy event to be used in timeout for IE8
   var eventCopy = browser.isIE8 ? utils.extend({}, event) : event;
@@ -5164,7 +5220,7 @@ Interaction.signals.on('down', function (_ref4) {
     pointer: pointer,
     event: event,
     eventTarget: eventTarget,
-    eventType: 'hold',
+    type: 'hold',
     targets: [],
     path: path,
     element: null
@@ -5206,15 +5262,18 @@ Interaction.signals.on('down', function (_ref4) {
 
   timer.duration = minDuration;
   timer.timeout = setTimeout(function () {
-
-    collectEventTargets(interaction, browser.isIE8 ? eventCopy : pointer, eventCopy, eventTarget, 'hold');
+    fire({
+      interaction: interaction, eventCopy: eventCopy, eventTarget: eventTarget,
+      pointer: browser.isIE8 ? eventCopy : pointer,
+      type: 'hold'
+    });
   }, minDuration);
 });
 
 ['up', 'cancel'].forEach(function (signalName) {
-  Interaction.signals.on(signalName, function (_ref5) {
-    var interaction = _ref5.interaction;
-    var pointerIndex = _ref5.pointerIndex;
+  Interaction.signals.on(signalName, function (_ref6) {
+    var interaction = _ref6.interaction;
+    var pointerIndex = _ref6.pointerIndex;
 
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
@@ -5222,9 +5281,14 @@ Interaction.signals.on('down', function (_ref4) {
   });
 });
 
-function createSignalListener(event) {
-  return function (arg) {
-    collectEventTargets(arg.interaction, arg.pointer, arg.event, arg.eventTarget, event);
+function createSignalListener(type) {
+  return function (_ref7) {
+    var interaction = _ref7.interaction;
+    var pointer = _ref7.pointer;
+    var event = _ref7.event;
+    var eventTarget = _ref7.eventTarget;
+
+    fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: type });
   };
 }
 
@@ -5237,33 +5301,33 @@ Interaction.signals.on('new', function (interaction) {
   interaction.tapTime = 0; // time of the most recent tap event
 });
 
-defaults.pointerEvents = {
-  holdDuration: 600,
-  ignoreFrom: null,
-  allowFrom: null,
-  origin: { x: 0, y: 0 }
-};
+defaults.pointerEvents = pointerEvents.defaults;
+module.exports = pointerEvents;
 
-module.exports = scope.pointerEvents = {
-  firePointers: firePointers,
-  collectEventTargets: collectEventTargets,
-  preventOriginalDefault: preventOriginalDefault,
-  signals: signals,
-  defaults: defaults.pointerEvents,
-  types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
-};
-
-},{"../Interaction":5,"../defaultOptions":18,"../scope":30,"../utils":40,"../utils/Signals":31,"../utils/arr":32,"../utils/browser":33}],28:[function(require,module,exports){
+},{"../Interaction":5,"../defaultOptions":18,"../utils":41,"../utils/Signals":32,"../utils/arr":33,"../utils/browser":34,"./PointerEvent":27}],29:[function(require,module,exports){
 var pointerEvents = require('./base');
 var Interaction = require('../Interaction');
 
-pointerEvents.signals.on('new', function (_ref) {
+pointerEvents.signals.on('new', onNew);
+pointerEvents.signals.on('fired', onFired);
+
+var _arr = ['move', 'up', 'cancel', 'endall'];
+for (var _i = 0; _i < _arr.length; _i++) {
+  var signal = _arr[_i];
+  Interaction.signals.on(signal, endHoldRepeat);
+}
+
+function onNew(_ref) {
   var pointerEvent = _ref.pointerEvent;
 
-  pointerEvent.count = (pointerEvent.count || 0) + 1;
-});
+  if (pointerEvent.type !== 'hold') {
+    return;
+  }
 
-pointerEvents.signals.on('fired', function (_ref2) {
+  pointerEvent.count = (pointerEvent.count || 0) + 1;
+}
+
+function onFired(_ref2) {
   var interaction = _ref2.interaction;
   var pointerEvent = _ref2.pointerEvent;
   var eventTarget = _ref2.eventTarget;
@@ -5283,9 +5347,15 @@ pointerEvents.signals.on('fired', function (_ref2) {
 
   // set a timeout to fire the holdrepeat event
   interaction.holdIntervalHandle = setTimeout(function () {
-    pointerEvents.collectEventTargets(interaction, pointerEvent, pointerEvent, eventTarget, 'hold');
+    pointerEvents.fire({
+      interaction: interaction,
+      eventTarget: eventTarget,
+      type: 'hold',
+      pointer: pointerEvent,
+      event: pointerEvent
+    });
   }, interval);
-});
+}
 
 function endHoldRepeat(_ref3) {
   var interaction = _ref3.interaction;
@@ -5298,17 +5368,17 @@ function endHoldRepeat(_ref3) {
   }
 }
 
-var _arr = ['move', 'up', 'cancel', 'endall'];
-for (var _i = 0; _i < _arr.length; _i++) {
-  var signal = _arr[_i];
-  Interaction.signals.on(signal, endHoldRepeat);
-}
-
 // don't repeat by default
 pointerEvents.defaults.holdRepeatInterval = 0;
 pointerEvents.types.push('holdrepeat');
 
-},{"../Interaction":5,"./base":27}],29:[function(require,module,exports){
+module.exports = {
+  onNew: onNew,
+  onFired: onFired,
+  endHoldRepeat: endHoldRepeat
+};
+
+},{"../Interaction":5,"./base":28}],30:[function(require,module,exports){
 var pointerEvents = require('./base');
 var Interactable = require('../Interactable');
 var browser = require('../utils/browser');
@@ -5324,7 +5394,7 @@ var merge = _require.merge;
 pointerEvents.signals.on('collect-targets', function (_ref) {
   var targets = _ref.targets;
   var element = _ref.element;
-  var eventType = _ref.eventType;
+  var type = _ref.type;
   var eventTarget = _ref.eventTarget;
 
   function collectSelectors(interactable, selector, context) {
@@ -5333,7 +5403,7 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
     var eventable = interactable.events;
     var options = eventable.options;
 
-    if (eventable[eventType] && isType.isElement(element) && domUtils.matchesSelector(element, selector, els) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+    if (eventable[type] && isType.isElement(element) && domUtils.matchesSelector(element, selector, els) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({
         element: element,
@@ -5349,7 +5419,7 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
     var eventable = interactable.events;
     var options = eventable.options;
 
-    if (eventable[eventType] && interactable.testIgnoreAllow(options, element, eventTarget)) {
+    if (eventable[type] && interactable.testIgnoreAllow(options, element, eventTarget)) {
       targets.push({
         element: element,
         eventable: eventable,
@@ -5399,7 +5469,7 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":30,"../utils/arr":32,"../utils/browser":33,"../utils/domUtils":35,"../utils/extend":37,"../utils/isType":42,"./base":27}],30:[function(require,module,exports){
+},{"../Interactable":4,"../scope":31,"../utils/arr":33,"../utils/browser":34,"../utils/domUtils":36,"../utils/extend":38,"../utils/isType":43,"./base":28}],31:[function(require,module,exports){
 var utils = require('./utils');
 var events = require('./utils/events');
 var signals = require('./utils/Signals')['new']();
@@ -5454,7 +5524,7 @@ var scope = {
 
 module.exports = scope;
 
-},{"./utils":40,"./utils/Signals":31,"./utils/domObjects":34,"./utils/events":36}],31:[function(require,module,exports){
+},{"./utils":41,"./utils/Signals":32,"./utils/domObjects":35,"./utils/events":37}],32:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var _require = require('./arr');
@@ -5514,7 +5584,7 @@ Signals['new'] = function () {
 
 module.exports = Signals;
 
-},{"./arr":32}],32:[function(require,module,exports){
+},{"./arr":33}],33:[function(require,module,exports){
 function indexOf(array, target) {
   for (var i = 0, len = array.length; i < len; i++) {
     if (array[i] === target) {
@@ -5556,7 +5626,7 @@ module.exports = {
   filter: filter
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var win = require('./window');
 var isType = require('./isType');
 var domObjects = require('./domObjects');
@@ -5611,7 +5681,7 @@ browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browse
 
 module.exports = browser;
 
-},{"./domObjects":34,"./isType":42,"./window":47}],34:[function(require,module,exports){
+},{"./domObjects":35,"./isType":43,"./window":48}],35:[function(require,module,exports){
 var domObjects = {};
 var win = require('./window').window;
 
@@ -5631,7 +5701,7 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
 module.exports = domObjects;
 
-},{"./window":47}],35:[function(require,module,exports){
+},{"./window":48}],36:[function(require,module,exports){
 var win = require('./window');
 var browser = require('./browser');
 var isType = require('./isType');
@@ -5868,7 +5938,7 @@ var domUtils = {
 
 module.exports = domUtils;
 
-},{"./browser":33,"./domObjects":34,"./isType":42,"./window":47}],36:[function(require,module,exports){
+},{"./browser":34,"./domObjects":35,"./isType":43,"./window":48}],37:[function(require,module,exports){
 var isType = require('./isType');
 var domUtils = require('./domUtils');
 var pExtend = require('./pointerExtend');
@@ -6215,7 +6285,7 @@ module.exports = {
   _attachedListeners: attachedListeners
 };
 
-},{"./arr":32,"./domUtils":35,"./isType":42,"./pointerExtend":44,"./window":47}],37:[function(require,module,exports){
+},{"./arr":33,"./domUtils":36,"./isType":43,"./pointerExtend":45,"./window":48}],38:[function(require,module,exports){
 module.exports = function extend(dest, source) {
   for (var prop in source) {
     dest[prop] = source[prop];
@@ -6223,7 +6293,7 @@ module.exports = function extend(dest, source) {
   return dest;
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var _require = require('./domUtils');
 
 var closest = _require.closest;
@@ -6263,12 +6333,12 @@ module.exports = function (target, element, action) {
   return origin;
 };
 
-},{"./domUtils":35,"./isType":42}],39:[function(require,module,exports){
+},{"./domUtils":36,"./isType":43}],40:[function(require,module,exports){
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var extend = require('./extend');
 var win = require('./window');
 
@@ -6341,7 +6411,7 @@ extend(utils, require('./pointerUtils'));
 
 module.exports = utils;
 
-},{"./arr":32,"./domUtils":35,"./extend":37,"./getOriginXY":38,"./hypot":39,"./isType":42,"./pointerUtils":45,"./window":47}],41:[function(require,module,exports){
+},{"./arr":33,"./domUtils":36,"./extend":38,"./getOriginXY":39,"./hypot":40,"./isType":43,"./pointerUtils":46,"./window":48}],42:[function(require,module,exports){
 var scope = require('../scope');
 var utils = require('./index');
 var browser = require('./browser');
@@ -6559,7 +6629,7 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":30,"./browser":33,"./index":40}],42:[function(require,module,exports){
+},{"../scope":31,"./browser":34,"./index":41}],43:[function(require,module,exports){
 var win = require('./window');
 var isWindow = require('./isWindow');
 var domObjects = require('./domObjects');
@@ -6624,12 +6694,12 @@ isType.isArray = function (thing) {
 
 module.exports = isType;
 
-},{"./domObjects":34,"./isWindow":43,"./window":47}],43:[function(require,module,exports){
+},{"./domObjects":35,"./isWindow":44,"./window":48}],44:[function(require,module,exports){
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 function pointerExtend(dest, source) {
   for (var prop in source) {
     var prefixedPropREs = module.exports.prefixedPropREs;
@@ -6643,7 +6713,7 @@ function pointerExtend(dest, source) {
       }
     }
 
-    if (!deprecated) {
+    if (!deprecated && typeof source[prop] !== 'function') {
       dest[prop] = source[prop];
     }
   }
@@ -6656,7 +6726,7 @@ pointerExtend.prefixedPropREs = {
 
 module.exports = pointerExtend;
 
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 var hypot = require('./hypot');
 var browser = require('./browser');
 var dom = require('./domObjects');
@@ -6864,12 +6934,25 @@ var pointerUtils = {
     var angle = 180 * Math.atan2(dy, dx) / Math.PI;
 
     return angle;
+  },
+
+  getPointerType: function (pointer, interaction) {
+    // if the PointerEvent API isn't available, then the pointer must be ither
+    // a MouseEvent or TouchEvent
+    if (interaction.mouse) {
+      return 'mouse';
+    }
+    if (!browser.supportsPointerEvent) {
+      return 'touch';
+    }
+
+    return isType.isString(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
   }
 };
 
 module.exports = pointerUtils;
 
-},{"./browser":33,"./domObjects":34,"./hypot":39,"./isType":42,"./pointerExtend":44}],46:[function(require,module,exports){
+},{"./browser":34,"./domObjects":35,"./hypot":40,"./isType":43,"./pointerExtend":45}],47:[function(require,module,exports){
 var _require = require('./window');
 
 var window = _require.window;
@@ -6908,7 +6991,7 @@ module.exports = {
   cancel: cancel
 };
 
-},{"./window":47}],47:[function(require,module,exports){
+},{"./window":48}],48:[function(require,module,exports){
 var win = module.exports;
 var isWindow = require('./isWindow');
 
@@ -6948,7 +7031,7 @@ win.getWindow = function getWindow(node) {
 
 win.init = init;
 
-},{"./isWindow":43}]},{},[1])(1)
+},{"./isWindow":44}]},{},[1])(1)
 });
 
 
