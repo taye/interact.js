@@ -1,10 +1,14 @@
 const _ = require('lodash');
+const { window: { document } } = require('../src/utils/window');
 
 let counter = 0;
 
 const helpers = {
-  unique: () => (counter++),
-  uniqueProps: obj => {
+  unique () {
+    return (counter++);
+  },
+
+  uniqueProps (obj) {
     for (const prop in obj) {
       if (!obj.hasOwnProperty(prop)) { continue; }
 
@@ -17,7 +21,7 @@ const helpers = {
     }
   },
 
-  newCoordsSet: (n = 0) => {
+  newCoordsSet (n = 0) {
     return {
       start: {
         page     : { x: n++, y: n++ },
@@ -37,7 +41,7 @@ const helpers = {
     };
   },
 
-  newPointer: (n = 50) => {
+  newPointer (n = 50) {
     return {
       pointerId: n++,
       pageX: n++,
@@ -45,6 +49,20 @@ const helpers = {
       clientX: n++,
       clientY: n++,
     };
+  },
+
+  _,
+
+  $ (selector, context) {
+    return (context || document).querySelector(selector);
+  },
+
+  $$ (selector, context) {
+    return Array.from((context || document).querySelectorAll(selector));
+  },
+
+  createEl (name) {
+    return document.createElement(name);
   },
 };
 
