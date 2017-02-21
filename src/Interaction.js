@@ -301,13 +301,10 @@ class Interaction {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      const signalArg = {
+      signals.fire('action-end', {
         event,
         interaction: this,
-      };
-
-      signals.fire('before-action-end', signalArg);
-      signals.fire('action-end'       , signalArg);
+      });
     }
 
     this.stop();

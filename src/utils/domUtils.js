@@ -1,6 +1,6 @@
 const win        = require('./window');
 const browser    = require('./browser');
-const isType     = require('./isType');
+const is         = require('./is');
 const domObjects = require('./domObjects');
 
 const domUtils = {
@@ -17,7 +17,7 @@ const domUtils = {
   },
 
   closest: function (element, selector) {
-    while (isType.isElement(element)) {
+    while (is.element(element)) {
       if (domUtils.matchesSelector(element, selector)) { return element; }
 
       element = domUtils.parentNode(element);
@@ -29,9 +29,9 @@ const domUtils = {
   parentNode: function (node) {
     let parent = node.parentNode;
 
-    if (isType.isDocFrag(parent)) {
+    if (is.docFrag(parent)) {
       // skip past #shado-root fragments
-      while ((parent = parent.host) && isType.isDocFrag(parent)) {
+      while ((parent = parent.host) && is.docFrag(parent)) {
         continue;
       }
 
@@ -173,7 +173,7 @@ const domUtils = {
   },
 
   matchesUpTo: function (element, selector, limit) {
-    while (isType.isElement(element)) {
+    while (is.element(element)) {
       if (domUtils.matchesSelector(element, selector)) {
         return true;
       }
@@ -241,6 +241,14 @@ const domUtils = {
     }
 
     return path;
+  },
+
+  trySelector: value => {
+    if (!is.string(value)) { return false; }
+
+    // an exception will be raised if it is invalid
+    domObjects.document.querySelector(value);
+    return true;
   },
 };
 

@@ -67,11 +67,11 @@ interact.isSet = function (element, options) {
  = (object) interact
 \*/
 interact.on = function (type, listener, useCapture) {
-  if (utils.isString(type) && type.search(' ') !== -1) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (utils.isArray(type)) {
+  if (utils.is.array(type)) {
     for (const eventType of type) {
       interact.on(eventType, listener, useCapture);
     }
@@ -79,7 +79,7 @@ interact.on = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (utils.isObject(type)) {
+  if (utils.is.object(type)) {
     for (const prop in type) {
       interact.on(prop, type[prop], listener);
     }
@@ -117,11 +117,11 @@ interact.on = function (type, listener, useCapture) {
  = (object) interact
  \*/
 interact.off = function (type, listener, useCapture) {
-  if (utils.isString(type) && type.search(' ') !== -1) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (utils.isArray(type)) {
+  if (utils.is.array(type)) {
     for (const eventType of type) {
       interact.off(eventType, listener, useCapture);
     }
@@ -129,7 +129,7 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (utils.isObject(type)) {
+  if (utils.is.object(type)) {
     for (const prop in type) {
       interact.off(prop, type[prop], listener);
     }
@@ -221,7 +221,7 @@ interact.stop = function (event) {
  = (number | Interactable) The current setting or interact
 \*/
 interact.pointerMoveTolerance = function (newValue) {
-  if (utils.isNumber(newValue)) {
+  if (utils.is.number(newValue)) {
     Interaction.pointerMoveTolerance = newValue;
 
     return this;

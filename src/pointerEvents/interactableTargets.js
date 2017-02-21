@@ -1,7 +1,7 @@
 const pointerEvents = require('./base');
 const Interactable  = require('../Interactable');
 const browser       = require('../utils/browser');
-const isType        = require('../utils/isType');
+const is            = require('../utils/is');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
 const extend        = require('../utils/extend');
@@ -17,7 +17,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, type, 
     const options = eventable.options;
 
     if (eventable[type]
-        && isType.isElement(element)
+        && is.element(element)
         && domUtils.matchesSelector(element, selector, els)
         && interactable.testIgnoreAllow(options, element, eventTarget)) {
 

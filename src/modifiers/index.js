@@ -110,7 +110,7 @@ Interaction.signals.on('before-action-move', function ({ interaction, preEnd, in
   }
 });
 
-Interaction.signals.on('before-action-end', function ({ interaction, event }) {
+Interaction.signals.on('action-end', function ({ interaction, event }) {
   for (let i = 0; i < modifiers.names.length; i++) {
     // if the endOnly option is true for any modifier
     if (modifiers[modifiers.names[i]].shouldDo(interaction.target, interaction.prepared.name, true, true)) {

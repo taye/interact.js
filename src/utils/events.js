@@ -1,4 +1,4 @@
-const isType   = require('./isType');
+const is   = require('./is');
 const domUtils = require('./domUtils');
 const pExtend  = require('./pointerExtend');
 
@@ -18,14 +18,25 @@ const attachedListeners = [];
 //   type: {
 //     selectors: ['selector', ...],
 //     contexts : [document, ...],
-//     listeners: [[listener, useCapture], ...]
+//     listeners: [[listener, capture, passive], ...]
 //   }
 //  }
 const delegatedEvents = {};
 
 const documents = [];
 
-function add (element, type, listener, useCapture) {
+const supportsOptions = !useAttachEvent && (() => {
+  let supported = false;
+
+  window.document.createElement('div').addEventListener('test', null, {
+    get capture () { supported = true; },
+  });
+
+  return supported;
+})();
+
+function add (element, type, listener, optionalArg) {
+  const options = getOptions(optionalArg);
   let elementIndex = indexOf(elements, element);
   let target = targets[elementIndex];
 
@@ -38,11 +49,13 @@ function add (element, type, listener, useCapture) {
     elementIndex = elements.push(element) - 1;
     targets.push(target);
 
-    attachedListeners.push((useAttachEvent ? {
-      supplied: [],
-      wrapped : [],
-      useCount: [],
-    } : null));
+    attachedListeners.push(useAttachEvent
+      ? {
+        supplied: [],
+        wrapped : [],
+        useCount: [],
+      }
+      : null);
   }
 
   if (!target.events[type]) {
@@ -75,7 +88,7 @@ function add (element, type, listener, useCapture) {
         }
       };
 
-      ret = element[addEvent](on + type, wrappedListener, !!useCapture);
+      ret = element[addEvent](on + type, wrappedListener, !!options.capture);
 
       if (listenerIndex === -1) {
         supplied.push(listener);
@@ -87,7 +100,7 @@ function add (element, type, listener, useCapture) {
       }
     }
     else {
-      ret = element[addEvent](type, listener, !!useCapture);
+      ret = element[addEvent](type, listener, supportsOptions? options : !!options.capture);
     }
     target.events[type].push(listener);
 
@@ -95,7 +108,8 @@ function add (element, type, listener, useCapture) {
   }
 }
 
-function remove (element, type, listener, useCapture) {
+function remove (element, type, listener, optionalArg) {
+  const options = getOptions(optionalArg);
   const elementIndex = indexOf(elements, element);
   const target = targets[elementIndex];
 
@@ -127,14 +141,14 @@ function remove (element, type, listener, useCapture) {
 
     if (listener === 'all') {
       for (let i = 0; i < len; i++) {
-        remove(element, type, target.events[type][i], !!useCapture);
+        remove(element, type, target.events[type][i], options);
       }
       return;
     }
     else {
       for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element[removeEvent](on + type, wrappedListener, !!useCapture);
+          element[removeEvent](on + type, wrappedListener, supportsOptions? options : !!options.capture);
           target.events[type].splice(i, 1);
 
           if (useAttachEvent && listeners) {
@@ -164,7 +178,8 @@ function remove (element, type, listener, useCapture) {
   }
 }
 
-function addDelegate (selector, context, type, listener, useCapture) {
+function addDelegate (selector, context, type, listener, optionalArg) {
+  const options = getOptions(optionalArg);
   if (!delegatedEvents[type]) {
     delegatedEvents[type] = {
       selectors: [],
@@ -197,11 +212,12 @@ function addDelegate (selector, context, type, listener, useCapture) {
     delegated.listeners.push([]);
   }
 
-  // keep listener and useCapture flag
-  delegated.listeners[index].push([listener, useCapture]);
+  // keep listener and capture and passive flags
+  delegated.listeners[index].push([listener, !!options.capture, options.passive]);
 }
 
-function removeDelegate (selector, context, type, listener, useCapture) {
+function removeDelegate (selector, context, type, listener, optionalArg) {
+  const options = getOptions(optionalArg);
   const delegated = delegatedEvents[type];
   let matchFound = false;
   let index;
@@ -216,13 +232,12 @@ function removeDelegate (selector, context, type, listener, useCapture) {
 
       const listeners = delegated.listeners[index];
 
-      // each item of the listeners array is an array: [function, useCaptureFlag]
+      // each item of the listeners array is an array: [function, capture, passive]
       for (let i = listeners.length - 1; i >= 0; i--) {
-        const fn = listeners[i][0];
-        const useCap = listeners[i][1];
+        const [fn, capture, passive] = listeners[i];
 
-        // check if the listener functions and useCapture flags match
-        if (fn === listener && useCap === useCapture) {
+        // check if the listener functions and capture and passive flags match
+        if (fn === listener && capture === !!options.capture && passive === options.passive) {
           // remove the listener from the array of listeners
           listeners.splice(i, 1);
 
@@ -256,15 +271,14 @@ function removeDelegate (selector, context, type, listener, useCapture) {
 
 // bound to the interactable context when a DOM event
 // listener is added to a selector interactable
-function delegateListener (event, useCapture) {
+function delegateListener (event, optionalArg) {
+  const options = getOptions(optionalArg);
   const fakeEvent = {};
   const delegated = delegatedEvents[event.type];
   const eventTarget = (domUtils.getActualElement(event.path
     ? event.path[0]
     : event.target));
   let element = eventTarget;
-
-  useCapture = useCapture? true: false;
 
   // duplicate the event so that currentTarget can be changed
   pExtend(fakeEvent, event);
@@ -273,7 +287,7 @@ function delegateListener (event, useCapture) {
   fakeEvent.preventDefault = preventOriginalDefault;
 
   // climb up document tree looking for selector matches
-  while (isType.isElement(element)) {
+  while (is.element(element)) {
     for (let i = 0; i < delegated.selectors.length; i++) {
       const selector = delegated.selectors[i];
       const context = delegated.contexts[i];
@@ -287,8 +301,10 @@ function delegateListener (event, useCapture) {
         fakeEvent.currentTarget = element;
 
         for (let j = 0; j < listeners.length; j++) {
-          if (listeners[j][1] === useCapture) {
-            listeners[j][0](fakeEvent);
+          const [fn, capture, passive] = listeners[j];
+
+          if (capture === !!options.capture && passive === options.passive) {
+            fn(fakeEvent);
           }
         }
       }
@@ -319,6 +335,10 @@ function stopImmProp () {
   this.immediatePropagationStopped = true;
 }
 
+function getOptions (param) {
+  return is.object(param)? param : { capture: param };
+}
+
 module.exports = {
   add,
   remove,
@@ -332,6 +352,7 @@ module.exports = {
   documents,
 
   useAttachEvent,
+  supportsOptions,
 
   _elements: elements,
   _targets: targets,

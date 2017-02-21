@@ -76,7 +76,7 @@ Interaction.signals.on('move', function (arg) {
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable, element, eventTarget) {
-  if (utils.isObject(action)
+  if (utils.is.object(action)
       && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget)
       && interactable.options[action.name].enabled
       && withinInteractionLimit(interactable, element, action)) {
@@ -126,7 +126,7 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
     }
   }
 
-  while (utils.isElement(element)) {
+  while (utils.is.element(element)) {
     matches = [];
     matchElements = [];
 
@@ -227,7 +227,7 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
  | });
 \*/
 Interactable.prototype.actionChecker = function (checker) {
-  if (utils.isFunction(checker)) {
+  if (utils.is.function(checker)) {
     this.options.actionChecker = checker;
 
     return this;
@@ -253,7 +253,7 @@ Interactable.prototype.actionChecker = function (checker) {
  = (boolean | Interactable) The current setting or this Interactable
 \*/
 Interactable.prototype.styleCursor = function (newValue) {
-  if (utils.isBool(newValue)) {
+  if (utils.is.bool(newValue)) {
     this.options.styleCursor = newValue;
 
     return this;
@@ -350,7 +350,7 @@ function withinInteractionLimit (interactable, element, action) {
  - newValue (number) #optional Any number. newValue <= 0 means no interactions.
 \*/
 interact.maxInteractions = function (newValue) {
-  if (utils.isNumber(newValue)) {
+  if (utils.is.number(newValue)) {
     autoStart.maxInteractions = newValue;
 
     return this;

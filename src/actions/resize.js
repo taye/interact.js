@@ -51,7 +51,7 @@ const resize = {
       const resizeEdges = { left: false, right: false, top: false, bottom: false };
 
       // if using resize.edges
-      if (utils.isObject(resizeOptions.edges)) {
+      if (utils.is.object(resizeOptions.edges)) {
         for (const edge in resizeEdges) {
           resizeEdges[edge] = checkResizeEdge(edge,
                                               resizeOptions.edges[edge],
@@ -313,7 +313,7 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
    | });
   \*/
 Interactable.prototype.resizable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.resize.enabled = options.enabled === false? false: true;
     this.setPerAction('resize', options);
     this.setOnEvents('resize', options);
@@ -325,16 +325,16 @@ Interactable.prototype.resizable = function (options) {
       this.options.resize.axis = defaultOptions.resize.axis;
     }
 
-    if (utils.isBool(options.preserveAspectRatio)) {
+    if (utils.is.bool(options.preserveAspectRatio)) {
       this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
     }
-    else if (utils.isBool(options.square)) {
+    else if (utils.is.bool(options.square)) {
       this.options.resize.square = options.square;
     }
 
     return this;
   }
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.resize.enabled = options;
 
     if (!options) {
@@ -353,8 +353,8 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width  = utils.isNumber(rect.width )? rect.width  : rect.right  - rect.left;
-    const height = utils.isNumber(rect.height)? rect.height : rect.bottom - rect.top ;
+    const width  = utils.is.number(rect.width )? rect.width  : rect.right  - rect.left;
+    const height = utils.is.number(rect.height)? rect.height : rect.bottom - rect.top ;
 
     if (width < 0) {
       if      (name === 'left' ) { name = 'right'; }
@@ -373,9 +373,9 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   }
 
   // the remaining checks require an element
-  if (!utils.isElement(element)) { return false; }
+  if (!utils.is.element(element)) { return false; }
 
-  return utils.isElement(value)
+  return utils.is.element(value)
   // the value is an element to use as a resize handle
     ? value === element
     // otherwise check if element matches value as selector

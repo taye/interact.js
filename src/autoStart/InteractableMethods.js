@@ -1,6 +1,6 @@
 const Interactable = require('../Interactable');
 const actions      = require('../actions/base');
-const isType       = require('../utils/isType');
+const is           = require('../utils/is');
 const domUtils     = require('../utils/domUtils');
 
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
@@ -52,12 +52,12 @@ Interactable.prototype.allowFrom = function (newValue) {
 };
 
 Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
-  if (!ignoreFrom || !isType.isElement(element)) { return false; }
+  if (!ignoreFrom || !is.element(element)) { return false; }
 
-  if (isType.isString(ignoreFrom)) {
+  if (is.string(ignoreFrom)) {
     return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
   }
-  else if (isType.isElement(ignoreFrom)) {
+  else if (is.element(ignoreFrom)) {
     return domUtils.nodeContains(ignoreFrom, element);
   }
 
@@ -67,12 +67,12 @@ Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, e
 Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
   if (!allowFrom) { return true; }
 
-  if (!isType.isElement(element)) { return false; }
+  if (!is.element(element)) { return false; }
 
-  if (isType.isString(allowFrom)) {
+  if (is.string(allowFrom)) {
     return domUtils.matchesUpTo(element, allowFrom, interactableElement);
   }
-  else if (isType.isElement(allowFrom)) {
+  else if (is.element(allowFrom)) {
     return domUtils.nodeContains(allowFrom, element);
   }
 
@@ -113,7 +113,7 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
  | });
 \*/
 Interactable.prototype.actionChecker = function (checker) {
-  if (isType.isFunction(checker)) {
+  if (is.function(checker)) {
     this.options.actionChecker = checker;
 
     return this;
@@ -139,7 +139,7 @@ Interactable.prototype.actionChecker = function (checker) {
  = (boolean | Interactable) The current setting or this Interactable
 \*/
 Interactable.prototype.styleCursor = function (newValue) {
-  if (isType.isBool(newValue)) {
+  if (is.bool(newValue)) {
     this.options.styleCursor = newValue;
 
     return this;

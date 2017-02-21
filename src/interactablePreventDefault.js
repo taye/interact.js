@@ -1,7 +1,7 @@
 const Interactable = require('./Interactable');
 const Interaction  = require('./Interaction');
 const scope        = require('./scope');
-const isType       = require('./utils/isType');
+const is           = require('./utils/is');
 
 const { nodeContains, matchesSelector } = require('./utils/domUtils');
 
@@ -24,7 +24,7 @@ Interactable.prototype.preventDefault = function (newValue) {
     return this;
   }
 
-  if (isType.isBool(newValue)) {
+  if (is.bool(newValue)) {
     this.options.preventDefault = newValue? 'always' : 'never';
     return this;
   }

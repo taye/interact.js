@@ -21,6 +21,7 @@ test('pointerEvents.types', t => {
 test('fire', t => {
   const pointerEvents = require('../../src/pointerEvents/base');
   const Eventable     = require('../../src/Eventable');
+  const Interaction   = require('../../src/Interaction');
 
   const eventable = new Eventable(pointerEvents.defaults);
   const type = 'TEST';
@@ -55,6 +56,28 @@ test('fire', t => {
     'Fired event target is correct');
   t.equal(firedEvent.TEST_PROP, TEST_PROP,
     'Fired event has props from target.props');
+
+  const tapTime = 500;
+  const interaction = Object.assign(new Interaction(), {
+    tapTime: -1,
+    prevTap: null,
+  });
+  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
+    timeStamp: tapTime,
+  });
+
+  pointerEvents.fire({
+    pointerEvent: tapEvent,
+    interaction,
+    targets: [{
+      eventable,
+      element,
+    }]});
+
+  t.equal(interaction.tapTime, tapTime,
+    'interaction.tapTime is updated');
+  t.equal(interaction.prevTap, tapEvent,
+    'interaction.prevTap is updated');
 
   t.end();
 });

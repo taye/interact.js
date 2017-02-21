@@ -33,7 +33,8 @@ const pointerEvents = {
 
 function fire (arg) {
   const {
-    interaction, pointer, event, eventTarget, type,
+    interaction, pointer, event, eventTarget,
+    type = arg.pointerEvent.type,
     targets = collectEventTargets(arg),
   } = arg;
   // create the tap event even if there are no listeners so that
@@ -42,7 +43,9 @@ function fire (arg) {
     return false;
   }
 
-  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
+  const {
+    pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction),
+  } = arg;
 
   const signalArg = {
     interaction,
@@ -88,8 +91,8 @@ function fire (arg) {
       });
     }
 
-    interaction.tapTime = pointer.timeStamp;
     interaction.prevTap = pointerEvent;
+    interaction.tapTime = pointerEvent.timeStamp;
   }
 
   return true;
