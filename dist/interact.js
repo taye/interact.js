@@ -1,11 +1,13 @@
 /**
- * interact.js @198c476-dirty
+ * interact.js @76a8083-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
 /*
  * In a (windowless) server environment this file exports a factory function
  * that takes the window to use.
@@ -25,11 +27,12 @@ if (typeof window === 'undefined') {
 }
 
 },{"./src/index":19,"./src/utils/window":48}],2:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+'use strict';
 
-var _require = require('./utils/arr');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var indexOf = _require.indexOf;
+var _require = require('./utils/arr'),
+    indexOf = _require.indexOf;
 
 var extend = require('./utils/extend.js');
 
@@ -39,7 +42,7 @@ function fireUntilImmediateStopped(event, listeners) {
   }
 }
 
-var Eventable = (function () {
+var Eventable = function () {
   function Eventable(options) {
     _classCallCheck(this, Eventable);
 
@@ -47,7 +50,7 @@ var Eventable = (function () {
   }
 
   Eventable.prototype.fire = function fire(event) {
-    var listeners = undefined;
+    var listeners = void 0;
     var onEvent = 'on' + event.type;
     var global = this.global;
 
@@ -91,19 +94,21 @@ var Eventable = (function () {
   };
 
   return Eventable;
-})();
+}();
 
 module.exports = Eventable;
 
 },{"./utils/arr":33,"./utils/extend.js":38}],3:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var extend = require('./utils/extend');
 var getOriginXY = require('./utils/getOriginXY');
 var defaults = require('./defaultOptions');
-var signals = require('./utils/Signals')['new']();
+var signals = require('./utils/Signals').new();
 
-var InteractEvent = (function () {
+var InteractEvent = function () {
   function InteractEvent(interaction, event, action, phase, element, related) {
     _classCallCheck(this, InteractEvent);
 
@@ -238,13 +243,13 @@ var InteractEvent = (function () {
   };
 
   return InteractEvent;
-})();
+}();
 
 signals.on('set-delta', function (_ref) {
-  var iEvent = _ref.iEvent;
-  var interaction = _ref.interaction;
-  var starting = _ref.starting;
-  var deltaSource = _ref.deltaSource;
+  var iEvent = _ref.iEvent,
+      interaction = _ref.interaction,
+      starting = _ref.starting,
+      deltaSource = _ref.deltaSource;
 
   var prevEvent = starting ? iEvent : interaction.prevEvent;
 
@@ -262,36 +267,37 @@ InteractEvent.signals = signals;
 module.exports = InteractEvent;
 
 },{"./defaultOptions":18,"./utils/Signals":32,"./utils/extend":38,"./utils/getOriginXY":39}],4:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+'use strict';
 
-var isType = require('./utils/isType');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var is = require('./utils/is');
 var events = require('./utils/events');
 var extend = require('./utils/extend');
 var actions = require('./actions/base');
 var scope = require('./scope');
 var Eventable = require('./Eventable');
 var defaults = require('./defaultOptions');
-var signals = require('./utils/Signals')['new']();
+var signals = require('./utils/Signals').new();
 
-var _require = require('./utils/window');
+var _require = require('./utils/domUtils'),
+    getElementRect = _require.getElementRect,
+    nodeContains = _require.nodeContains,
+    trySelector = _require.trySelector;
 
-var getWindow = _require.getWindow;
+var _require2 = require('./utils/window'),
+    getWindow = _require2.getWindow;
 
-var _require2 = require('./utils/domUtils');
+var _require3 = require('./utils/arr'),
+    indexOf = _require3.indexOf,
+    contains = _require3.contains;
 
-var getElementRect = _require2.getElementRect;
-var nodeContains = _require2.nodeContains;
-
-var _require3 = require('./utils/arr');
-
-var indexOf = _require3.indexOf;
-var contains = _require3.contains;
-
-var _require4 = require('./utils/browser');
-
-var wheelEvent = _require4.wheelEvent;
+var _require4 = require('./utils/browser'),
+    wheelEvent = _require4.wheelEvent;
 
 // all set interactables
+
+
 scope.interactables = [];
 
 /*\
@@ -301,7 +307,7 @@ scope.interactables = [];
  * Object type returned by @interact
 \*/
 
-var Interactable = (function () {
+var Interactable = function () {
   function Interactable(target, options) {
     _classCallCheck(this, Interactable);
 
@@ -310,7 +316,7 @@ var Interactable = (function () {
     this.target = target;
     this.events = new Eventable();
     this._context = options.context || scope.document;
-    this._win = getWindow(isType.trySelector(target) ? this._context : target);
+    this._win = getWindow(trySelector(target) ? this._context : target);
     this._doc = this._win.document;
 
     signals.fire('new', {
@@ -330,16 +336,16 @@ var Interactable = (function () {
   Interactable.prototype.setOnEvents = function setOnEvents(action, phases) {
     var onAction = 'on' + action;
 
-    if (isType.isFunction(phases.onstart)) {
+    if (is.function(phases.onstart)) {
       this.events[onAction + 'start'] = phases.onstart;
     }
-    if (isType.isFunction(phases.onmove)) {
+    if (is.function(phases.onmove)) {
       this.events[onAction + 'move'] = phases.onmove;
     }
-    if (isType.isFunction(phases.onend)) {
+    if (is.function(phases.onend)) {
       this.events[onAction + 'end'] = phases.onend;
     }
-    if (isType.isFunction(phases.oninertiastart)) {
+    if (is.function(phases.oninertiastart)) {
       this.events[onAction + 'inertiastart'] = phases.oninertiastart;
     }
 
@@ -352,14 +358,14 @@ var Interactable = (function () {
       // if this option exists for this action
       if (option in defaults[action]) {
         // if the option in the options arg is an object value
-        if (isType.isObject(options[option])) {
+        if (is.object(options[option])) {
           // duplicate the object
           this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
 
-          if (isType.isObject(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
+          if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false ? false : true;
           }
-        } else if (isType.isBool(options[option]) && isType.isObject(defaults.perAction[option])) {
+        } else if (is.bool(options[option]) && is.object(defaults.perAction[option])) {
           this.options[action][option].enabled = options[option];
         } else if (options[option] !== undefined) {
           // or if it's not undefined, do a plain assignment
@@ -388,10 +394,11 @@ var Interactable = (function () {
    o }
   \*/
 
+
   Interactable.prototype.getRect = function getRect(element) {
     element = element || this.target;
 
-    if (isType.isString(this.target) && !isType.isElement(element)) {
+    if (is.string(this.target) && !is.element(element)) {
       element = this._context.querySelector(this.target);
     }
 
@@ -409,8 +416,9 @@ var Interactable = (function () {
    = (function | object) The checker function or this Interactable
   \*/
 
+
   Interactable.prototype.rectChecker = function rectChecker(checker) {
-    if (isType.isFunction(checker)) {
+    if (is.function(checker)) {
       this.getRect = checker;
 
       return this;
@@ -426,7 +434,7 @@ var Interactable = (function () {
   };
 
   Interactable.prototype._backCompatOption = function _backCompatOption(optionName, newValue) {
-    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
+    if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
       for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -466,6 +474,7 @@ var Interactable = (function () {
    = (object) The current origin or this Interactable
   \*/
 
+
   Interactable.prototype.origin = function origin(newValue) {
     return this._backCompatOption('origin', newValue);
   };
@@ -480,6 +489,7 @@ var Interactable = (function () {
    - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
    = (string | object) The current deltaSource or this Interactable
   \*/
+
 
   Interactable.prototype.deltaSource = function deltaSource(newValue) {
     if (newValue === 'page' || newValue === 'client') {
@@ -501,6 +511,7 @@ var Interactable = (function () {
    **
   \*/
 
+
   Interactable.prototype.context = function context() {
     return this._context;
   };
@@ -520,6 +531,7 @@ var Interactable = (function () {
    = (Interactable) this Interactable
   \*/
 
+
   Interactable.prototype.fire = function fire(iEvent) {
     this.events.fire(iEvent);
 
@@ -527,11 +539,11 @@ var Interactable = (function () {
   };
 
   Interactable.prototype._onOffMultiple = function _onOffMultiple(method, eventType, listener, useCapture) {
-    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
+    if (is.string(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
-    if (isType.isArray(eventType)) {
+    if (is.array(eventType)) {
       for (var i = 0; i < eventType.length; i++) {
         this[method](eventType[i], listener, useCapture);
       }
@@ -539,7 +551,7 @@ var Interactable = (function () {
       return true;
     }
 
-    if (isType.isObject(eventType)) {
+    if (is.object(eventType)) {
       for (var prop in eventType) {
         this[method](prop, eventType[prop], listener);
       }
@@ -560,6 +572,7 @@ var Interactable = (function () {
    = (object) This Interactable
   \*/
 
+
   Interactable.prototype.on = function on(eventType, listener, useCapture) {
     // convert to boolean
     useCapture = !!useCapture;
@@ -576,7 +589,7 @@ var Interactable = (function () {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
-    else if (isType.isString(this.target)) {
+    else if (is.string(this.target)) {
         events.addDelegate(this.target, this._context, eventType, listener, useCapture);
       } else {
         events.add(this.target, eventType, listener, useCapture);
@@ -597,6 +610,7 @@ var Interactable = (function () {
    = (object) This Interactable
   \*/
 
+
   Interactable.prototype.off = function off(eventType, listener, useCapture) {
     // convert to boolean
     useCapture = !!useCapture;
@@ -614,7 +628,7 @@ var Interactable = (function () {
       this.events.off(eventType, listener);
     }
     // delegated event
-    else if (isType.isString(this.target)) {
+    else if (is.string(this.target)) {
         events.removeDelegate(this.target, this._context, eventType, listener, useCapture);
       }
       // remove listener from this Interatable's element
@@ -634,8 +648,9 @@ var Interactable = (function () {
    = (object) This Interactable
   \*/
 
+
   Interactable.prototype.set = function set(options) {
-    if (!isType.isObject(options)) {
+    if (!is.object(options)) {
       options = {};
     }
 
@@ -692,10 +707,11 @@ var Interactable = (function () {
    = (object) @interact
   \*/
 
+
   Interactable.prototype.unset = function unset() {
     events.remove(this.target, 'all');
 
-    if (isType.isString(this.target)) {
+    if (is.string(this.target)) {
       // remove delegated events
       for (var type in events.delegatedEvents) {
         var delegated = events.delegatedEvents[type];
@@ -747,7 +763,7 @@ var Interactable = (function () {
   };
 
   return Interactable;
-})();
+}();
 
 scope.interactables.indexOfElement = function indexOfElement(target, context) {
   context = context || scope.document;
@@ -755,7 +771,7 @@ scope.interactables.indexOfElement = function indexOfElement(target, context) {
   for (var i = 0; i < this.length; i++) {
     var interactable = this[i];
 
-    if (interactable.target === target && (!isType.isString(target) || interactable._context === context)) {
+    if (interactable.target === target && (!is.string(target) || interactable._context === context)) {
       return i;
     }
   }
@@ -773,7 +789,7 @@ scope.interactables.forEachSelector = function (callback, element) {
     var interactable = this[i];
 
     // skip non CSS selector targets and out of context elements
-    if (!isType.isString(interactable.target) || element && !interactable.inContext(element)) {
+    if (!is.string(interactable.target) || element && !interactable.inContext(element)) {
       continue;
     }
 
@@ -794,15 +810,17 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":31,"./utils/Signals":32,"./utils/arr":33,"./utils/browser":34,"./utils/domUtils":36,"./utils/events":37,"./utils/extend":38,"./utils/isType":43,"./utils/window":48}],5:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":31,"./utils/Signals":32,"./utils/arr":33,"./utils/browser":34,"./utils/domUtils":36,"./utils/events":37,"./utils/extend":38,"./utils/is":43,"./utils/window":48}],5:[function(require,module,exports){
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var scope = require('./scope');
 var utils = require('./utils');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
 var finder = require('./utils/interactionFinder');
-var signals = require('./utils/Signals')['new']();
+var signals = require('./utils/Signals').new();
 
 var listeners = {};
 var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer'];
@@ -813,7 +831,7 @@ var prevTouchTime = 0;
 // all active and idle interactions
 scope.interactions = [];
 
-var Interaction = (function () {
+var Interaction = function () {
   function Interaction() {
     _classCallCheck(this, Interaction);
 
@@ -942,6 +960,7 @@ var Interaction = (function () {
    | });
    \*/
 
+
   Interaction.prototype.start = function start(action, target, element) {
     if (this.interacting() || !this.pointerIsDown || this.pointerIds.length < (action.name === 'gesture' ? 2 : 1)) {
       return;
@@ -971,8 +990,8 @@ var Interaction = (function () {
 
     var duplicateMove = this.curCoords.page.x === this.prevCoords.page.x && this.curCoords.page.y === this.prevCoords.page.y && this.curCoords.client.x === this.prevCoords.client.x && this.curCoords.client.y === this.prevCoords.client.y;
 
-    var dx = undefined;
-    var dy = undefined;
+    var dx = void 0;
+    var dy = void 0;
 
     // register movement greater than pointerMoveTolerance
     if (this.pointerIsDown && !this.pointerWasMoved) {
@@ -1034,6 +1053,7 @@ var Interaction = (function () {
    |   });
    \*/
 
+
   Interaction.prototype.doMove = function doMove(signalArg) {
     signalArg = utils.extend({
       pointer: this.pointers[0],
@@ -1052,6 +1072,7 @@ var Interaction = (function () {
   };
 
   // End interact move events and stop auto-scroll unless simulation is running
+
 
   Interaction.prototype.pointerUp = function pointerUp(pointer, event, eventTarget, curEventTarget) {
     var pointerIndex = this.getPointerIndex(pointer);
@@ -1094,17 +1115,15 @@ var Interaction = (function () {
    |   });
    \*/
 
+
   Interaction.prototype.end = function end(event) {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      var signalArg = {
+      signals.fire('action-end', {
         event: event,
         interaction: this
-      };
-
-      signals.fire('before-action-end', signalArg);
-      signals.fire('action-end', signalArg);
+      });
     }
 
     this.stop();
@@ -1171,7 +1190,7 @@ var Interaction = (function () {
   };
 
   return Interaction;
-})();
+}();
 
 for (var i = 0, len = methodNames.length; i < len; i++) {
   var method = methodNames[i];
@@ -1188,8 +1207,8 @@ function doOnInteractions(method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (var i = 0; i < event.changedTouches.length; i++) {
-        var pointer = event.changedTouches[i];
+      for (var _i = 0; _i < event.changedTouches.length; _i++) {
+        var pointer = event.changedTouches[_i];
         var interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction()]);
@@ -1199,8 +1218,8 @@ function doOnInteractions(method) {
 
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
-        for (var i = 0; i < scope.interactions.length && !invalidPointer; i++) {
-          invalidPointer = !scope.interactions[i].mouse && scope.interactions[i].pointerIsDown;
+        for (var _i2 = 0; _i2 < scope.interactions.length && !invalidPointer; _i2++) {
+          invalidPointer = !scope.interactions[_i2].mouse && scope.interactions[_i2].pointerIsDown;
         }
 
         // try to ignore mouse events that are simulated by the browser
@@ -1209,44 +1228,45 @@ function doOnInteractions(method) {
       }
 
       if (!invalidPointer) {
-        var interaction = finder.search(event, event.type, eventTarget);
+        var _interaction = finder.search(event, event.type, eventTarget);
 
-        if (!interaction) {
+        if (!_interaction) {
 
-          interaction = new Interaction();
-          interaction.mouse = /mouse/i.test(event.pointerType || event.type)
+          _interaction = new Interaction();
+          _interaction.mouse = /mouse/i.test(event.pointerType || event.type)
           // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-           || event.pointerType === 4 || !event.pointerType;
+          || event.pointerType === 4 || !event.pointerType;
         }
 
-        matches.push([event, interaction]);
+        matches.push([event, _interaction]);
       }
     }
 
-    for (var _iterator = matches, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    for (var _iterator = matches, _isArray = Array.isArray(_iterator), _i3 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
 
       if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
+        if (_i3 >= _iterator.length) break;
+        _ref = _iterator[_i3++];
       } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
+        _i3 = _iterator.next();
+        if (_i3.done) break;
+        _ref = _i3.value;
       }
 
-      var pointer = _ref[0];
-      var interaction = _ref[1];
+      var _ref2 = _ref,
+          _pointer = _ref2[0],
+          _interaction2 = _ref2[1];
 
-      interaction._updateEventTargets(eventTarget, curEventTarget);
-      interaction[method](pointer, event, eventTarget, curEventTarget);
+      _interaction2._updateEventTargets(eventTarget, curEventTarget);
+      _interaction2[method](_pointer, event, eventTarget, curEventTarget);
     }
   };
 }
 
 function endAll(event) {
-  for (var i = 0; i < scope.interactions.length; i++) {
-    var interaction = scope.interactions[i];
+  for (var _i4 = 0; _i4 < scope.interactions.length; _i4++) {
+    var interaction = scope.interactions[_i4];
 
     interaction.end(event);
     signals.fire('endall', { event: event, interaction: interaction });
@@ -1274,8 +1294,8 @@ if (scope.PointerEvent) {
 
 docEvents.blur = endAll;
 
-function onDocSignal(_ref2, signalName) {
-  var doc = _ref2.doc;
+function onDocSignal(_ref3, signalName) {
+  var doc = _ref3.doc;
 
   var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
 
@@ -1285,8 +1305,8 @@ function onDocSignal(_ref2, signalName) {
     eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
 
-  for (var eventType in docEvents) {
-    eventMethod(doc, eventType, docEvents[eventType]);
+  for (var _eventType in docEvents) {
+    eventMethod(doc, _eventType, docEvents[_eventType]);
   }
 }
 
@@ -1304,6 +1324,8 @@ scope.endAllInteractions = endAll;
 module.exports = Interaction;
 
 },{"./scope":31,"./utils":41,"./utils/Signals":32,"./utils/browser":34,"./utils/events":37,"./utils/interactionFinder":42}],6:[function(require,module,exports){
+'use strict';
+
 var Interaction = require('../Interaction');
 var InteractEvent = require('../InteractEvent');
 
@@ -1314,16 +1336,16 @@ var actions = {
 };
 
 Interaction.signals.on('action-start', function (_ref) {
-  var interaction = _ref.interaction;
-  var event = _ref.event;
+  var interaction = _ref.interaction,
+      event = _ref.event;
 
   firePrepared(interaction, event, 'start');
   interaction._interacting = true;
 });
 
 Interaction.signals.on('action-move', function (_ref2) {
-  var interaction = _ref2.interaction;
-  var event = _ref2.event;
+  var interaction = _ref2.interaction,
+      event = _ref2.event;
 
   firePrepared(interaction, event, 'move');
 
@@ -1334,8 +1356,8 @@ Interaction.signals.on('action-move', function (_ref2) {
 });
 
 Interaction.signals.on('action-end', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var event = _ref3.event;
+  var interaction = _ref3.interaction,
+      event = _ref3.event;
 
   firePrepared(interaction, event, 'end');
 });
@@ -1352,6 +1374,8 @@ function firePrepared(interaction, event, phase) {
 module.exports = actions;
 
 },{"../InteractEvent":3,"../Interaction":5}],7:[function(require,module,exports){
+'use strict';
+
 var actions = require('./base');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -1374,13 +1398,13 @@ var drag = {
     lockAxis: 'xy'
   },
 
-  checker: function (pointer, event, interactable) {
+  checker: function checker(pointer, event, interactable) {
     var dragOptions = interactable.options.drag;
 
     return dragOptions.enabled ? { name: 'drag', axis: dragOptions.lockAxis === 'start' ? dragOptions.startAxis : dragOptions.lockAxis } : null;
   },
 
-  getCursor: function () {
+  getCursor: function getCursor() {
     return 'move';
   }
 };
@@ -1415,8 +1439,8 @@ Interaction.signals.on('before-action-move', function (_ref) {
 
 // dragmove
 InteractEvent.signals.on('new', function (_ref2) {
-  var iEvent = _ref2.iEvent;
-  var interaction = _ref2.interaction;
+  var iEvent = _ref2.iEvent,
+      interaction = _ref2.interaction;
 
   if (iEvent.type !== 'dragmove') {
     return;
@@ -1472,7 +1496,7 @@ InteractEvent.signals.on('new', function (_ref2) {
  | });
 \*/
 Interactable.prototype.draggable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.drag.enabled = options.enabled === false ? false : true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
@@ -1487,7 +1511,7 @@ Interactable.prototype.draggable = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.drag.enabled = options;
 
     if (!options) {
@@ -1510,6 +1534,8 @@ defaultOptions.drag = drag.defaults;
 module.exports = drag;
 
 },{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"./base":6}],8:[function(require,module,exports){
+'use strict';
+
 var actions = require('./base');
 var utils = require('../utils');
 var scope = require('../scope');
@@ -1529,9 +1555,9 @@ var drop = {
 
 var dynamicDrop = false;
 
-Interaction.signals.on('action-start', function (_ref2) {
-  var interaction = _ref2.interaction;
-  var event = _ref2.event;
+Interaction.signals.on('action-start', function (_ref) {
+  var interaction = _ref.interaction,
+      event = _ref.event;
 
   if (interaction.prepared.name !== 'drag') {
     return;
@@ -1556,10 +1582,10 @@ Interaction.signals.on('action-start', function (_ref2) {
   }
 });
 
-InteractEvent.signals.on('new', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var iEvent = _ref3.iEvent;
-  var event = _ref3.event;
+InteractEvent.signals.on('new', function (_ref2) {
+  var interaction = _ref2.interaction,
+      iEvent = _ref2.iEvent,
+      event = _ref2.event;
 
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') {
     return;
@@ -1575,8 +1601,8 @@ InteractEvent.signals.on('new', function (_ref3) {
   interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 });
 
-Interaction.signals.on('action-move', function (_ref4) {
-  var interaction = _ref4.interaction;
+Interaction.signals.on('action-move', function (_ref3) {
+  var interaction = _ref3.interaction;
 
   if (interaction.prepared.name !== 'drag') {
     return;
@@ -1585,16 +1611,16 @@ Interaction.signals.on('action-move', function (_ref4) {
   fireDropEvents(interaction, interaction.dropEvents);
 });
 
-Interaction.signals.on('action-end', function (_ref5) {
-  var interaction = _ref5.interaction;
+Interaction.signals.on('action-end', function (_ref4) {
+  var interaction = _ref4.interaction;
 
   if (interaction.prepared.name === 'drag') {
     fireDropEvents(interaction, interaction.dropEvents);
   }
 });
 
-Interaction.signals.on('stop-drag', function (_ref6) {
-  var interaction = _ref6.interaction;
+Interaction.signals.on('stop-drag', function (_ref5) {
+  var interaction = _ref5.interaction;
 
   interaction.activeDrops.dropzones = interaction.activeDrops.elements = interaction.activeDrops.rects = interaction.dropEvents = null;
 });
@@ -1607,18 +1633,18 @@ function collectDrops(interaction, element) {
 
   // collect all dropzones and their elements which qualify for a drop
   for (var _iterator = scope.interactables, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
+    var _ref6;
 
     if (_isArray) {
       if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
+      _ref6 = _iterator[_i++];
     } else {
       _i = _iterator.next();
       if (_i.done) break;
-      _ref = _i.value;
+      _ref6 = _i.value;
     }
 
-    var current = _ref;
+    var current = _ref6;
 
     if (!current.options.drop.enabled) {
       continue;
@@ -1627,13 +1653,13 @@ function collectDrops(interaction, element) {
     var accept = current.options.drop.accept;
 
     // test the draggable element against the dropzone's accept setting
-    if (utils.isElement(accept) && accept !== element || utils.isString(accept) && !utils.matchesSelector(element, accept)) {
+    if (utils.is.element(accept) && accept !== element || utils.is.string(accept) && !utils.matchesSelector(element, accept)) {
 
       continue;
     }
 
     // query for new elements if necessary
-    var dropElements = utils.isString(current.target) ? current._context.querySelectorAll(current.target) : [current.target];
+    var dropElements = utils.is.string(current.target) ? current._context.querySelectorAll(current.target) : [current.target];
 
     for (var i = 0; i < dropElements.length; i++) {
       var currentElement = dropElements[i];
@@ -1652,7 +1678,7 @@ function collectDrops(interaction, element) {
 }
 
 function fireActiveDrops(interaction, event) {
-  var prevElement = undefined;
+  var prevElement = void 0;
 
   // loop through all active dropzones and trigger event
   for (var i = 0; i < interaction.activeDrops.dropzones.length; i++) {
@@ -1864,31 +1890,31 @@ function fireDropEvents(interaction, dropEvents) {
  = (boolean | object) The current setting or this Interactable
 \*/
 Interactable.prototype.dropzone = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.drop.enabled = options.enabled === false ? false : true;
 
-    if (utils.isFunction(options.ondrop)) {
+    if (utils.is.function(options.ondrop)) {
       this.events.ondrop = options.ondrop;
     }
-    if (utils.isFunction(options.ondropactivate)) {
+    if (utils.is.function(options.ondropactivate)) {
       this.events.ondropactivate = options.ondropactivate;
     }
-    if (utils.isFunction(options.ondropdeactivate)) {
+    if (utils.is.function(options.ondropdeactivate)) {
       this.events.ondropdeactivate = options.ondropdeactivate;
     }
-    if (utils.isFunction(options.ondragenter)) {
+    if (utils.is.function(options.ondragenter)) {
       this.events.ondragenter = options.ondragenter;
     }
-    if (utils.isFunction(options.ondragleave)) {
+    if (utils.is.function(options.ondragleave)) {
       this.events.ondragleave = options.ondragleave;
     }
-    if (utils.isFunction(options.ondropmove)) {
+    if (utils.is.function(options.ondropmove)) {
       this.events.ondropmove = options.ondropmove;
     }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
-    } else if (utils.isNumber(options.overlap)) {
+    } else if (utils.is.number(options.overlap)) {
       this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
     }
     if ('accept' in options) {
@@ -1901,7 +1927,7 @@ Interactable.prototype.dropzone = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.drop.enabled = options;
 
     if (!options) {
@@ -1947,7 +1973,7 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
     dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
   }
 
-  if (dragRect && utils.isNumber(dropOverlap)) {
+  if (dragRect && utils.is.number(dropOverlap)) {
     var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
 
     var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
@@ -1983,7 +2009,6 @@ Interaction.signals.on('new', function (interaction) {
     rects: [] };
 });
 
-// the rects of the elements mentioned above
 Interaction.signals.on('stop', function (_ref8) {
   var interaction = _ref8.interaction;
 
@@ -2002,7 +2027,7 @@ Interaction.signals.on('stop', function (_ref8) {
  = (boolean | interact) The current setting or interact
 \*/
 interact.dynamicDrop = function (newValue) {
-  if (utils.isBool(newValue)) {
+  if (utils.is.bool(newValue)) {
     //if (dragging && dynamicDrop !== newValue && !newValue) {
     //calcRects(dropzones);
     //}
@@ -2022,6 +2047,8 @@ defaultOptions.drop = drop.defaults;
 module.exports = drop;
 
 },{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":31,"../utils":41,"./base":6}],9:[function(require,module,exports){
+'use strict';
+
 var actions = require('./base');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -2036,7 +2063,7 @@ var gesture = {
     restrict: null
   },
 
-  checker: function (pointer, event, interactable, element, interaction) {
+  checker: function checker(pointer, event, interactable, element, interaction) {
     if (interaction.pointerIds.length >= 2) {
       return { name: 'gesture' };
     }
@@ -2044,14 +2071,14 @@ var gesture = {
     return null;
   },
 
-  getCursor: function () {
+  getCursor: function getCursor() {
     return '';
   }
 };
 
 InteractEvent.signals.on('new', function (_ref) {
-  var iEvent = _ref.iEvent;
-  var interaction = _ref.interaction;
+  var iEvent = _ref.iEvent,
+      interaction = _ref.interaction;
 
   if (iEvent.type !== 'gesturestart') {
     return;
@@ -2064,8 +2091,8 @@ InteractEvent.signals.on('new', function (_ref) {
 });
 
 InteractEvent.signals.on('new', function (_ref2) {
-  var iEvent = _ref2.iEvent;
-  var interaction = _ref2.interaction;
+  var iEvent = _ref2.iEvent,
+      interaction = _ref2.interaction;
 
   if (iEvent.type !== 'gesturemove') {
     return;
@@ -2108,7 +2135,7 @@ InteractEvent.signals.on('new', function (_ref2) {
  | });
 \*/
 Interactable.prototype.gesturable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.gesture.enabled = options.enabled === false ? false : true;
     this.setPerAction('gesture', options);
     this.setOnEvents('gesture', options);
@@ -2116,7 +2143,7 @@ Interactable.prototype.gesturable = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.gesture.enabled = options;
 
     if (!options) {
@@ -2130,13 +2157,13 @@ Interactable.prototype.gesturable = function (options) {
 };
 
 InteractEvent.signals.on('set-delta', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var iEvent = _ref3.iEvent;
-  var action = _ref3.action;
-  var event = _ref3.event;
-  var starting = _ref3.starting;
-  var ending = _ref3.ending;
-  var deltaSource = _ref3.deltaSource;
+  var interaction = _ref3.interaction,
+      iEvent = _ref3.iEvent,
+      action = _ref3.action,
+      event = _ref3.event,
+      starting = _ref3.starting,
+      ending = _ref3.ending,
+      deltaSource = _ref3.deltaSource;
 
   if (action !== 'gesture') {
     return;
@@ -2185,7 +2212,6 @@ Interaction.signals.on('new', function (interaction) {
     prevAngle: 0 };
 });
 
-// angle of the previous gesture event
 actions.gesture = gesture;
 actions.names.push('gesture');
 utils.merge(Interactable.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
@@ -2196,6 +2222,8 @@ defaultOptions.gesture = gesture.defaults;
 module.exports = gesture;
 
 },{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"./base":6}],10:[function(require,module,exports){
+'use strict';
+
 var actions = require('./base');
 var utils = require('../utils');
 var browser = require('../utils/browser');
@@ -2238,7 +2266,7 @@ var resize = {
     invert: 'none'
   },
 
-  checker: function (pointer, event, interactable, element, interaction, rect) {
+  checker: function checker(pointer, event, interactable, element, interaction, rect) {
     if (!rect) {
       return null;
     }
@@ -2251,7 +2279,7 @@ var resize = {
       var resizeEdges = { left: false, right: false, top: false, bottom: false };
 
       // if using resize.edges
-      if (utils.isObject(resizeOptions.edges)) {
+      if (utils.is.object(resizeOptions.edges)) {
         for (var edge in resizeEdges) {
           resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._eventTarget, element, rect, resizeOptions.margin || defaultMargin);
         }
@@ -2309,7 +2337,7 @@ var resize = {
     bottomleft: 'nesw-resize'
   },
 
-  getCursor: function (action) {
+  getCursor: function getCursor(action) {
     if (action.axis) {
       return resize.cursors[action.name + action.axis];
     } else if (action.edges) {
@@ -2329,8 +2357,8 @@ var resize = {
 
 // resizestart
 InteractEvent.signals.on('new', function (_ref) {
-  var iEvent = _ref.iEvent;
-  var interaction = _ref.interaction;
+  var iEvent = _ref.iEvent,
+      interaction = _ref.interaction;
 
   if (iEvent.type !== 'resizestart' || !interaction.prepared.edges) {
     return;
@@ -2380,9 +2408,9 @@ InteractEvent.signals.on('new', function (_ref) {
 
 // resizemove
 InteractEvent.signals.on('new', function (_ref2) {
-  var iEvent = _ref2.iEvent;
-  var phase = _ref2.phase;
-  var interaction = _ref2.interaction;
+  var iEvent = _ref2.iEvent,
+      phase = _ref2.phase,
+      interaction = _ref2.interaction;
 
   if (phase !== 'move' || !interaction.prepared.edges) {
     return;
@@ -2439,7 +2467,7 @@ InteractEvent.signals.on('new', function (_ref2) {
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
-      var swap = undefined;
+      var swap = void 0;
 
       if (restricted.top > restricted.bottom) {
         swap = restricted.top;
@@ -2519,7 +2547,7 @@ InteractEvent.signals.on('new', function (_ref2) {
    | });
   \*/
 Interactable.prototype.resizable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.resize.enabled = options.enabled === false ? false : true;
     this.setPerAction('resize', options);
     this.setOnEvents('resize', options);
@@ -2530,15 +2558,15 @@ Interactable.prototype.resizable = function (options) {
       this.options.resize.axis = defaultOptions.resize.axis;
     }
 
-    if (utils.isBool(options.preserveAspectRatio)) {
+    if (utils.is.bool(options.preserveAspectRatio)) {
       this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
-    } else if (utils.isBool(options.square)) {
+    } else if (utils.is.bool(options.square)) {
       this.options.resize.square = options.square;
     }
 
     return this;
   }
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.resize.enabled = options;
 
     if (!options) {
@@ -2559,8 +2587,8 @@ function checkResizeEdge(name, value, page, element, interactableElement, rect, 
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    var width = utils.isNumber(rect.width) ? rect.width : rect.right - rect.left;
-    var height = utils.isNumber(rect.height) ? rect.height : rect.bottom - rect.top;
+    var width = utils.is.number(rect.width) ? rect.width : rect.right - rect.left;
+    var height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
 
     if (width < 0) {
       if (name === 'left') {
@@ -2593,11 +2621,11 @@ function checkResizeEdge(name, value, page, element, interactableElement, rect, 
   }
 
   // the remaining checks require an element
-  if (!utils.isElement(element)) {
+  if (!utils.is.element(element)) {
     return false;
   }
 
-  return utils.isElement(value)
+  return utils.is.element(value)
   // the value is an element to use as a resize handle
   ? value === element
   // otherwise check if element matches value as selector
@@ -2609,9 +2637,9 @@ Interaction.signals.on('new', function (interaction) {
 });
 
 InteractEvent.signals.on('set-delta', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var iEvent = _ref3.iEvent;
-  var action = _ref3.action;
+  var interaction = _ref3.interaction,
+      iEvent = _ref3.iEvent,
+      action = _ref3.action;
 
   if (action !== 'resize' || !interaction.resizeAxes) {
     return;
@@ -2647,9 +2675,11 @@ defaultOptions.resize = resize.defaults;
 module.exports = resize;
 
 },{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":41,"../utils/browser":34,"./base":6}],11:[function(require,module,exports){
+'use strict';
+
 var raf = require('./utils/raf');
 var getWindow = require('./utils/window').getWindow;
-var isWindow = require('./utils/isType').isWindow;
+var is = require('./utils/is');
 var domUtils = require('./utils/domUtils');
 var Interaction = require('./Interaction');
 var defaultOptions = require('./defaultOptions');
@@ -2661,7 +2691,6 @@ var autoScroll = {
     margin: 60,
     speed: 300 },
 
-  // the scroll speed in pixels per second
   interaction: null,
   i: null, // the handle returned by window.setInterval
   x: 0, y: 0, // Direction each pulse is to scroll in
@@ -2669,7 +2698,7 @@ var autoScroll = {
   isScrolling: false,
   prevTime: 0,
 
-  start: function (interaction) {
+  start: function start(interaction) {
     autoScroll.isScrolling = true;
     raf.cancel(autoScroll.i);
 
@@ -2678,13 +2707,13 @@ var autoScroll = {
     autoScroll.i = raf.request(autoScroll.scroll);
   },
 
-  stop: function () {
+  stop: function stop() {
     autoScroll.isScrolling = false;
     raf.cancel(autoScroll.i);
   },
 
   // scroll the window by the values in scroll.x/y
-  scroll: function () {
+  scroll: function scroll() {
     var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll;
     var container = options.container || getWindow(autoScroll.interaction.element);
     var now = new Date().getTime();
@@ -2694,7 +2723,7 @@ var autoScroll = {
     var s = options.speed * dt;
 
     if (s >= 1) {
-      if (isWindow(container)) {
+      if (is.window(container)) {
         container.scrollBy(autoScroll.x * s, autoScroll.y * s);
       } else if (container) {
         container.scrollLeft += autoScroll.x * s;
@@ -2709,14 +2738,14 @@ var autoScroll = {
       autoScroll.i = raf.request(autoScroll.scroll);
     }
   },
-  check: function (interactable, actionName) {
+  check: function check(interactable, actionName) {
     var options = interactable.options;
 
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function (_ref) {
-    var interaction = _ref.interaction;
-    var pointer = _ref.pointer;
+  onInteractionMove: function onInteractionMove(_ref) {
+    var interaction = _ref.interaction,
+        pointer = _ref.pointer;
 
     if (!(interaction.interacting() && autoScroll.check(interaction.target, interaction.prepared.name))) {
       return;
@@ -2727,15 +2756,15 @@ var autoScroll = {
       return;
     }
 
-    var top = undefined;
-    var right = undefined;
-    var bottom = undefined;
-    var left = undefined;
+    var top = void 0;
+    var right = void 0;
+    var bottom = void 0;
+    var left = void 0;
 
     var options = interaction.target.options[interaction.prepared.name].autoScroll;
     var container = options.container || getWindow(interaction.element);
 
-    if (isWindow(container)) {
+    if (is.window(container)) {
       left = pointer.clientX < autoScroll.margin;
       top = pointer.clientY < autoScroll.margin;
       right = pointer.clientX > container.innerWidth - autoScroll.margin;
@@ -2772,10 +2801,12 @@ defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;
 
-},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":36,"./utils/isType":43,"./utils/raf":47,"./utils/window":48}],12:[function(require,module,exports){
+},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":36,"./utils/is":43,"./utils/raf":47,"./utils/window":48}],12:[function(require,module,exports){
+'use strict';
+
 var Interactable = require('../Interactable');
 var actions = require('../actions/base');
-var isType = require('../utils/isType');
+var is = require('../utils/is');
 var domUtils = require('../utils/domUtils');
 
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
@@ -2827,13 +2858,13 @@ Interactable.prototype.allowFrom = function (newValue) {
 };
 
 Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
-  if (!ignoreFrom || !isType.isElement(element)) {
+  if (!ignoreFrom || !is.element(element)) {
     return false;
   }
 
-  if (isType.isString(ignoreFrom)) {
+  if (is.string(ignoreFrom)) {
     return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
-  } else if (isType.isElement(ignoreFrom)) {
+  } else if (is.element(ignoreFrom)) {
     return domUtils.nodeContains(ignoreFrom, element);
   }
 
@@ -2845,13 +2876,13 @@ Interactable.prototype.testAllow = function (allowFrom, interactableElement, ele
     return true;
   }
 
-  if (!isType.isElement(element)) {
+  if (!is.element(element)) {
     return false;
   }
 
-  if (isType.isString(allowFrom)) {
+  if (is.string(allowFrom)) {
     return domUtils.matchesUpTo(element, allowFrom, interactableElement);
-  } else if (isType.isElement(allowFrom)) {
+  } else if (is.element(allowFrom)) {
     return domUtils.nodeContains(allowFrom, element);
   }
 
@@ -2891,7 +2922,7 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
  | });
 \*/
 Interactable.prototype.actionChecker = function (checker) {
-  if (isType.isFunction(checker)) {
+  if (is.function(checker)) {
     this.options.actionChecker = checker;
 
     return this;
@@ -2917,7 +2948,7 @@ Interactable.prototype.actionChecker = function (checker) {
  = (boolean | Interactable) The current setting or this Interactable
 \*/
 Interactable.prototype.styleCursor = function (newValue) {
-  if (isType.isBool(newValue)) {
+  if (is.bool(newValue)) {
     this.options.styleCursor = newValue;
 
     return this;
@@ -2963,7 +2994,9 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
-},{"../Interactable":4,"../actions/base":6,"../utils/domUtils":36,"../utils/isType":43}],13:[function(require,module,exports){
+},{"../Interactable":4,"../actions/base":6,"../utils/domUtils":36,"../utils/is":43}],13:[function(require,module,exports){
+'use strict';
+
 var interact = require('../interact');
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
@@ -2972,7 +3005,7 @@ var defaultOptions = require('../defaultOptions');
 var browser = require('../utils/browser');
 var scope = require('../scope');
 var utils = require('../utils');
-var signals = require('../utils/Signals')['new']();
+var signals = require('../utils/Signals').new();
 
 require('./InteractableMethods');
 
@@ -2990,17 +3023,17 @@ var autoStart = {
       ignoreFrom: null
     }
   },
-  setActionDefaults: function (action) {
+  setActionDefaults: function setActionDefaults(action) {
     utils.extend(action.defaults, autoStart.defaults.perAction);
   }
 };
 
 // set cursor style on mousedown
-Interaction.signals.on('down', function (_ref2) {
-  var interaction = _ref2.interaction;
-  var pointer = _ref2.pointer;
-  var event = _ref2.event;
-  var eventTarget = _ref2.eventTarget;
+Interaction.signals.on('down', function (_ref) {
+  var interaction = _ref.interaction,
+      pointer = _ref.pointer,
+      event = _ref.event,
+      eventTarget = _ref.eventTarget;
 
   if (interaction.interacting()) {
     return;
@@ -3011,11 +3044,11 @@ Interaction.signals.on('down', function (_ref2) {
 });
 
 // set cursor style on mousemove
-Interaction.signals.on('move', function (_ref3) {
-  var interaction = _ref3.interaction;
-  var pointer = _ref3.pointer;
-  var event = _ref3.event;
-  var eventTarget = _ref3.eventTarget;
+Interaction.signals.on('move', function (_ref2) {
+  var interaction = _ref2.interaction,
+      pointer = _ref2.pointer,
+      event = _ref2.event,
+      eventTarget = _ref2.eventTarget;
 
   if (!interaction.mouse || interaction.pointerIsDown || interaction.interacting()) {
     return;
@@ -3026,8 +3059,9 @@ Interaction.signals.on('move', function (_ref3) {
 });
 
 Interaction.signals.on('move', function (arg) {
-  var interaction = arg.interaction;
-  var event = arg.event;
+  var interaction = arg.interaction,
+      event = arg.event;
+
 
   if (!interaction.pointerIsDown || interaction.interacting() || !interaction.pointerWasMoved || !interaction.prepared.name) {
     return;
@@ -3050,7 +3084,7 @@ Interaction.signals.on('move', function (arg) {
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction(action, interactable, element, eventTarget) {
-  if (utils.isObject(action) && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action)) {
+  if (utils.is.object(action) && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action)) {
     return action;
   }
 
@@ -3092,7 +3126,7 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
     }
   }
 
-  while (utils.isElement(element)) {
+  while (utils.is.element(element)) {
     matches = [];
     matchElements = [];
 
@@ -3120,10 +3154,10 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
   return {};
 }
 
-function prepare(interaction, _ref4) {
-  var action = _ref4.action;
-  var target = _ref4.target;
-  var element = _ref4.element;
+function prepare(interaction, _ref3) {
+  var action = _ref3.action,
+      target = _ref3.target,
+      element = _ref3.element;
 
   action = action || {};
 
@@ -3143,8 +3177,8 @@ function prepare(interaction, _ref4) {
   signals.fire('prepared', { interaction: interaction });
 }
 
-Interaction.signals.on('stop', function (_ref5) {
-  var interaction = _ref5.interaction;
+Interaction.signals.on('stop', function (_ref4) {
+  var interaction = _ref4.interaction;
 
   var target = interaction.target;
 
@@ -3192,7 +3226,7 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
  | });
 \*/
 Interactable.prototype.actionChecker = function (checker) {
-  if (utils.isFunction(checker)) {
+  if (utils.is.function(checker)) {
     this.options.actionChecker = checker;
 
     return this;
@@ -3218,7 +3252,7 @@ Interactable.prototype.actionChecker = function (checker) {
  = (boolean | Interactable) The current setting or this Interactable
 \*/
 Interactable.prototype.styleCursor = function (newValue) {
-  if (utils.isBool(newValue)) {
+  if (utils.is.bool(newValue)) {
     this.options.styleCursor = newValue;
 
     return this;
@@ -3235,27 +3269,27 @@ Interactable.prototype.styleCursor = function (newValue) {
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
   var rect = this.getRect(element);
-  var buttons = event.buttons || ({
+  var buttons = event.buttons || {
     0: 1,
     1: 4,
     3: 8,
     4: 16
-  })[event.button];
+  }[event.button];
   var action = null;
 
   for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
+    var _ref5;
 
     if (_isArray) {
       if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
+      _ref5 = _iterator[_i++];
     } else {
       _i = _iterator.next();
       if (_i.done) break;
-      _ref = _i.value;
+      _ref5 = _i.value;
     }
 
-    var actionName = _ref;
+    var actionName = _ref5;
 
     // check mouseButton setting if the pointer is down
     if (interaction.pointerIsDown && interaction.mouse && (buttons & this.options[actionName].mouseButtons) === 0) {
@@ -3332,7 +3366,7 @@ function withinInteractionLimit(interactable, element, action) {
  - newValue (number) #optional Any number. newValue <= 0 means no interactions.
 \*/
 interact.maxInteractions = function (newValue) {
-  if (utils.isNumber(newValue)) {
+  if (utils.is.number(newValue)) {
     autoStart.maxInteractions = newValue;
 
     return this;
@@ -3354,6 +3388,8 @@ utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
 module.exports = autoStart;
 
 },{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":31,"../utils":41,"../utils/Signals":32,"../utils/browser":34,"./InteractableMethods":12}],14:[function(require,module,exports){
+'use strict';
+
 var autoStart = require('./base');
 var Interaction = require('../Interaction');
 
@@ -3380,8 +3416,8 @@ autoStart.signals.on('prepared', function (_ref) {
 });
 
 Interaction.signals.on('move', function (_ref2) {
-  var interaction = _ref2.interaction;
-  var duplicate = _ref2.duplicate;
+  var interaction = _ref2.interaction,
+      duplicate = _ref2.duplicate;
 
   if (interaction.pointerWasMoved && !duplicate) {
     clearTimeout(interaction.delayTimer);
@@ -3406,26 +3442,24 @@ autoStart.signals.on('before-start', function (_ref3) {
 });
 
 },{"../Interaction":5,"./base":13}],15:[function(require,module,exports){
+'use strict';
+
 var autoStart = require('./base');
 var scope = require('../scope');
 var browser = require('../utils/browser');
+var is = require('../utils/is');
 
-var _require = require('../utils/isType');
-
-var isElement = _require.isElement;
-
-var _require2 = require('../utils/domUtils');
-
-var matchesSelector = _require2.matchesSelector;
-var parentNode = _require2.parentNode;
+var _require = require('../utils/domUtils'),
+    matchesSelector = _require.matchesSelector,
+    parentNode = _require.parentNode;
 
 autoStart.setActionDefaults(require('../actions/drag'));
 
 autoStart.signals.on('before-start', function (_ref) {
-  var interaction = _ref.interaction;
-  var eventTarget = _ref.eventTarget;
-  var dx = _ref.dx;
-  var dy = _ref.dy;
+  var interaction = _ref.interaction,
+      eventTarget = _ref.eventTarget,
+      dx = _ref.dx,
+      dy = _ref.dy;
 
   if (interaction.prepared.name !== 'drag') {
     return;
@@ -3449,58 +3483,56 @@ autoStart.signals.on('before-start', function (_ref) {
     // then try to get a drag from another ineractable
 
     if (!interaction.prepared.name) {
-      (function () {
 
-        var element = eventTarget;
+      var element = eventTarget;
 
-        var getDraggable = function (interactable, selector, context) {
-          var elements = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
+      var getDraggable = function getDraggable(interactable, selector, context) {
+        var elements = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
 
-          if (interactable === interaction.target) {
-            return;
-          }
-
-          if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector, elements)) {
-
-            var _action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-
-            if (_action && _action.name === 'drag' && checkStartAxis(currentAxis, interactable) && autoStart.validateAction(_action, interactable, element, eventTarget)) {
-
-              return interactable;
-            }
-          }
-        };
-
-        var action = null;
-
-        // check all interactables
-        while (isElement(element)) {
-          var elementInteractable = scope.interactables.get(element);
-
-          if (elementInteractable && elementInteractable !== interaction.target && !elementInteractable.options.drag.manualStart) {
-
-            action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-          }
-          if (action && action.name === 'drag' && checkStartAxis(currentAxis, elementInteractable)) {
-
-            interaction.prepared.name = 'drag';
-            interaction.target = elementInteractable;
-            interaction.element = element;
-            break;
-          }
-
-          var selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
-
-          if (selectorInteractable) {
-            interaction.prepared.name = 'drag';
-            interaction.target = selectorInteractable;
-            interaction.element = element;
-            break;
-          }
-
-          element = parentNode(element);
+        if (interactable === interaction.target) {
+          return;
         }
-      })();
+
+        if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector, elements)) {
+
+          var _action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+
+          if (_action && _action.name === 'drag' && checkStartAxis(currentAxis, interactable) && autoStart.validateAction(_action, interactable, element, eventTarget)) {
+
+            return interactable;
+          }
+        }
+      };
+
+      var action = null;
+
+      // check all interactables
+      while (is.element(element)) {
+        var elementInteractable = scope.interactables.get(element);
+
+        if (elementInteractable && elementInteractable !== interaction.target && !elementInteractable.options.drag.manualStart) {
+
+          action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+        }
+        if (action && action.name === 'drag' && checkStartAxis(currentAxis, elementInteractable)) {
+
+          interaction.prepared.name = 'drag';
+          interaction.target = elementInteractable;
+          interaction.element = element;
+          break;
+        }
+
+        var selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
+
+        if (selectorInteractable) {
+          interaction.prepared.name = 'drag';
+          interaction.target = selectorInteractable;
+          interaction.element = element;
+          break;
+        }
+
+        element = parentNode(element);
+      }
     }
   }
 });
@@ -3515,13 +3547,19 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":31,"../utils/browser":34,"../utils/domUtils":36,"../utils/isType":43,"./base":13}],16:[function(require,module,exports){
+},{"../actions/drag":7,"../scope":31,"../utils/browser":34,"../utils/domUtils":36,"../utils/is":43,"./base":13}],16:[function(require,module,exports){
+'use strict';
+
 require('./base').setActionDefaults(require('../actions/gesture'));
 
 },{"../actions/gesture":9,"./base":13}],17:[function(require,module,exports){
+'use strict';
+
 require('./base').setActionDefaults(require('../actions/resize'));
 
 },{"../actions/resize":10,"./base":13}],18:[function(require,module,exports){
+'use strict';
+
 module.exports = {
   base: {
     accept: null,
@@ -3545,18 +3583,14 @@ module.exports = {
       smoothEndDuration: 300 }
   }
 };
-// animate to snap/restrict endOnly if there's no inertia
 
 },{}],19:[function(require,module,exports){
+'use strict';
+
 /* browser entry point */
 
 // Legacy browser support
 require('./legacyBrowsers');
-
-// pointerEvents
-require('./pointerEvents/base');
-require('./pointerEvents/holdRepeat');
-require('./pointerEvents/interactableTargets');
 
 // inertia
 require('./inertia');
@@ -3564,6 +3598,11 @@ require('./inertia');
 // modifiers
 require('./modifiers/snap');
 require('./modifiers/restrict');
+
+// pointerEvents
+require('./pointerEvents/base');
+require('./pointerEvents/holdRepeat');
+require('./pointerEvents/interactableTargets');
 
 // delay
 require('./autoStart/delay');
@@ -3589,6 +3628,8 @@ require('./autoScroll');
 module.exports = require('./interact');
 
 },{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/delay":14,"./autoStart/drag":15,"./autoStart/gesture":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/snap":26,"./pointerEvents/base":28,"./pointerEvents/holdRepeat":29,"./pointerEvents/interactableTargets":30}],20:[function(require,module,exports){
+'use strict';
+
 var InteractEvent = require('./InteractEvent');
 var Interaction = require('./Interaction');
 var modifiers = require('./modifiers');
@@ -3625,10 +3666,10 @@ Interaction.signals.on('new', function (interaction) {
 });
 
 Interaction.signals.on('down', function (_ref) {
-  var interaction = _ref.interaction;
-  var event = _ref.event;
-  var pointer = _ref.pointer;
-  var eventTarget = _ref.eventTarget;
+  var interaction = _ref.interaction,
+      event = _ref.event,
+      pointer = _ref.pointer,
+      eventTarget = _ref.eventTarget;
 
   var status = interaction.inertiaStatus;
 
@@ -3637,7 +3678,7 @@ Interaction.signals.on('down', function (_ref) {
     var element = eventTarget;
 
     // climb up the DOM tree from the event target
-    while (utils.isElement(element)) {
+    while (utils.is.element(element)) {
 
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
@@ -3672,8 +3713,8 @@ Interaction.signals.on('down', function (_ref) {
 });
 
 Interaction.signals.on('up', function (_ref2) {
-  var interaction = _ref2.interaction;
-  var event = _ref2.event;
+  var interaction = _ref2.interaction,
+      event = _ref2.event;
 
   var status = interaction.inertiaStatus;
 
@@ -3692,7 +3733,7 @@ Interaction.signals.on('up', function (_ref2) {
   var inertiaPossible = false;
   var inertia = false;
   var smoothEnd = false;
-  var modifierResult = undefined;
+  var modifierResult = void 0;
 
   // check if inertia should be started
   inertiaPossible = inertiaOptions && inertiaOptions.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
@@ -3872,6 +3913,8 @@ function updateInertiaCoords(interaction) {
 }
 
 },{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":41,"./utils/raf":47}],21:[function(require,module,exports){
+'use strict';
+
 var browser = require('./utils/browser');
 var events = require('./utils/events');
 var utils = require('./utils');
@@ -3941,11 +3984,11 @@ interact.isSet = function (element, options) {
  = (object) interact
 \*/
 interact.on = function (type, listener, useCapture) {
-  if (utils.isString(type) && type.search(' ') !== -1) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (utils.isArray(type)) {
+  if (utils.is.array(type)) {
     for (var _iterator = type, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
 
@@ -3966,7 +4009,7 @@ interact.on = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (utils.isObject(type)) {
+  if (utils.is.object(type)) {
     for (var prop in type) {
       interact.on(prop, type[prop], listener);
     }
@@ -4003,11 +4046,11 @@ interact.on = function (type, listener, useCapture) {
  = (object) interact
  \*/
 interact.off = function (type, listener, useCapture) {
-  if (utils.isString(type) && type.search(' ') !== -1) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (utils.isArray(type)) {
+  if (utils.is.array(type)) {
     for (var _iterator2 = type, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
       var _ref2;
 
@@ -4028,7 +4071,7 @@ interact.off = function (type, listener, useCapture) {
     return interact;
   }
 
-  if (utils.isObject(type)) {
+  if (utils.is.object(type)) {
     for (var prop in type) {
       interact.off(prop, type[prop], listener);
     }
@@ -4039,7 +4082,7 @@ interact.off = function (type, listener, useCapture) {
   if (!utils.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, useCapture);
   } else {
-    var index = undefined;
+    var index = void 0;
 
     if (type in globalEvents && (index = utils.indexOf(globalEvents[type], listener)) !== -1) {
       globalEvents[type].splice(index, 1);
@@ -4118,7 +4161,7 @@ interact.stop = function (event) {
  = (number | Interactable) The current setting or interact
 \*/
 interact.pointerMoveTolerance = function (newValue) {
-  if (utils.isNumber(newValue)) {
+  if (utils.is.number(newValue)) {
     Interaction.pointerMoveTolerance = newValue;
 
     return this;
@@ -4135,15 +4178,16 @@ scope.interact = interact;
 module.exports = interact;
 
 },{"./Interactable":4,"./Interaction":5,"./scope":31,"./utils":41,"./utils/browser":34,"./utils/events":37}],22:[function(require,module,exports){
+'use strict';
+
 var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
 var scope = require('./scope');
-var isType = require('./utils/isType');
+var is = require('./utils/is');
 
-var _require = require('./utils/domUtils');
-
-var nodeContains = _require.nodeContains;
-var matchesSelector = _require.matchesSelector;
+var _require = require('./utils/domUtils'),
+    nodeContains = _require.nodeContains,
+    matchesSelector = _require.matchesSelector;
 
 /*\
  * Interactable.preventDefault
@@ -4158,13 +4202,15 @@ var matchesSelector = _require.matchesSelector;
  - newValue (string) #optional `true`, `false` or `'auto'`
  = (string | Interactable) The current setting or this Interactable
 \*/
+
+
 Interactable.prototype.preventDefault = function (newValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue;
     return this;
   }
 
-  if (isType.isBool(newValue)) {
+  if (is.bool(newValue)) {
     this.options.preventDefault = newValue ? 'always' : 'never';
     return this;
   }
@@ -4199,9 +4245,9 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   event.preventDefault();
 };
 
-function onInteractionEvent(_ref2) {
-  var interaction = _ref2.interaction;
-  var event = _ref2.event;
+function onInteractionEvent(_ref) {
+  var interaction = _ref.interaction,
+      event = _ref.event;
 
   if (interaction.target) {
     interaction.target.checkAndPreventDefault(event);
@@ -4217,18 +4263,19 @@ for (var _i = 0; _i < _arr.length; _i++) {
 // prevent native HTML5 drag on interact.js target elements
 Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
+    var _ref2;
 
     if (_isArray) {
       if (_i2 >= _iterator.length) break;
-      _ref = _iterator[_i2++];
+      _ref2 = _iterator[_i2++];
     } else {
       _i2 = _iterator.next();
       if (_i2.done) break;
-      _ref = _i2.value;
+      _ref2 = _i2.value;
     }
 
-    var interaction = _ref;
+    var interaction = _ref2;
+
 
     if (interaction.element && (interaction.element === event.target || nodeContains(interaction.element, event.target))) {
 
@@ -4238,16 +4285,17 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":31,"./utils/domUtils":36,"./utils/isType":43}],23:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":31,"./utils/domUtils":36,"./utils/is":43}],23:[function(require,module,exports){
+'use strict';
+
 var scope = require('./scope');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
 var iFinder = require('./utils/interactionFinder');
 var pointerEvents = require('./pointerEvents/base');
 
-var _require = require('./utils/window');
-
-var window = _require.window;
+var _require = require('./utils/window'),
+    window = _require.window;
 
 var toString = Object.prototype.toString;
 
@@ -4292,50 +4340,50 @@ function onIE8Dblclick(event) {
 }
 
 if (browser.isIE8) {
-  (function () {
-    var selectFix = function (event) {
-      for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
+  var selectFix = function selectFix(event) {
+    for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+      var _ref;
 
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var interaction = _ref;
-
-        if (interaction.interacting()) {
-          interaction.target.checkAndPreventDefault(event);
-        }
+      if (_isArray) {
+        if (_i >= _iterator.length) break;
+        _ref = _iterator[_i++];
+      } else {
+        _i = _iterator.next();
+        if (_i.done) break;
+        _ref = _i.value;
       }
-    };
 
-    var onDocIE8 = function onDocIE8(_ref2, signalName) {
-      var doc = _ref2.doc;
-      var win = _ref2.win;
+      var interaction = _ref;
 
-      var eventMethod = signalName.indexOf('listen') === 0 ? events.add : events.remove;
-
-      // For IE's lack of Event#preventDefault
-      eventMethod(doc, 'selectstart', selectFix);
-
-      if (pointerEvents) {
-        eventMethod(doc, 'dblclick', onIE8Dblclick);
+      if (interaction.interacting()) {
+        interaction.target.checkAndPreventDefault(event);
       }
-    };
+    }
+  };
 
-    scope.signals.on('add-document', onDocIE8);
-    scope.signals.on('remove-document', onDocIE8);
-  })();
+  var onDocIE8 = function onDocIE8(_ref2, signalName) {
+    var doc = _ref2.doc,
+        win = _ref2.win;
+
+    var eventMethod = signalName.indexOf('listen') === 0 ? events.add : events.remove;
+
+    // For IE's lack of Event#preventDefault
+    eventMethod(doc, 'selectstart', selectFix);
+
+    if (pointerEvents) {
+      eventMethod(doc, 'dblclick', onIE8Dblclick);
+    }
+  };
+
+  scope.signals.on('add-document', onDocIE8);
+  scope.signals.on('remove-document', onDocIE8);
 }
 
 module.exports = null;
 
 },{"./pointerEvents/base":28,"./scope":31,"./utils/browser":34,"./utils/events":37,"./utils/interactionFinder":42,"./utils/window":48}],24:[function(require,module,exports){
+'use strict';
+
 var InteractEvent = require('../InteractEvent');
 var Interaction = require('../Interaction');
 var extend = require('../utils/extend');
@@ -4343,9 +4391,9 @@ var extend = require('../utils/extend');
 var modifiers = {
   names: [],
 
-  setOffsets: function (interaction, coords) {
-    var target = interaction.target;
-    var element = interaction.element;
+  setOffsets: function setOffsets(interaction, coords) {
+    var target = interaction.target,
+        element = interaction.element;
 
     var rect = target.getRect(element);
 
@@ -4369,7 +4417,7 @@ var modifiers = {
     modifiers.setModifierOffsets(interaction, target, element, rect, interaction.modifierOffsets);
   },
 
-  setModifierOffsets: function (interaction, interactable, element, rect, offsets) {
+  setModifierOffsets: function setModifierOffsets(interaction, interactable, element, rect, offsets) {
     for (var i = 0; i < modifiers.names.length; i++) {
       var modifierName = modifiers.names[i];
 
@@ -4377,7 +4425,7 @@ var modifiers = {
     }
   },
 
-  setAll: function (interaction, coordsArg, statuses, preEnd, requireEndOnly) {
+  setAll: function setAll(interaction, coordsArg, statuses, preEnd, requireEndOnly) {
     var result = {
       dx: 0,
       dy: 0,
@@ -4388,7 +4436,7 @@ var modifiers = {
     var target = interaction.target;
     var coords = extend({}, coordsArg);
 
-    var currentStatus = undefined;
+    var currentStatus = void 0;
 
     for (var _iterator = modifiers.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
@@ -4430,7 +4478,7 @@ var modifiers = {
     return result;
   },
 
-  resetStatuses: function (statuses) {
+  resetStatuses: function resetStatuses(statuses) {
     for (var _iterator2 = modifiers.names, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
       var _ref2;
 
@@ -4451,7 +4499,7 @@ var modifiers = {
     return statuses;
   },
 
-  start: function (_ref3, signalName) {
+  start: function start(_ref3, signalName) {
     var interaction = _ref3.interaction;
 
     modifiers.setOffsets(interaction, signalName === 'action-resume' ? interaction.curCoords : interaction.startCoords);
@@ -4471,9 +4519,9 @@ Interaction.signals.on('action-start', modifiers.start);
 Interaction.signals.on('action-resume', modifiers.start);
 
 Interaction.signals.on('before-action-move', function (_ref4) {
-  var interaction = _ref4.interaction;
-  var preEnd = _ref4.preEnd;
-  var interactingBeforeMove = _ref4.interactingBeforeMove;
+  var interaction = _ref4.interaction,
+      preEnd = _ref4.preEnd,
+      interactingBeforeMove = _ref4.interactingBeforeMove;
 
   var modifierResult = modifiers.setAll(interaction, interaction.curCoords.page, interaction.modifierStatuses, preEnd);
 
@@ -4484,9 +4532,9 @@ Interaction.signals.on('before-action-move', function (_ref4) {
   }
 });
 
-Interaction.signals.on('before-action-end', function (_ref5) {
-  var interaction = _ref5.interaction;
-  var event = _ref5.event;
+Interaction.signals.on('action-end', function (_ref5) {
+  var interaction = _ref5.interaction,
+      event = _ref5.event;
 
   for (var i = 0; i < modifiers.names.length; i++) {
     // if the endOnly option is true for any modifier
@@ -4499,12 +4547,12 @@ Interaction.signals.on('before-action-end', function (_ref5) {
 });
 
 InteractEvent.signals.on('set-xy', function (_ref6) {
-  var iEvent = _ref6.iEvent;
-  var interaction = _ref6.interaction;
-  var page = _ref6.page;
-  var client = _ref6.client;
-  var phase = _ref6.phase;
-  var actionName = _ref6.action;
+  var iEvent = _ref6.iEvent,
+      interaction = _ref6.interaction,
+      page = _ref6.page,
+      client = _ref6.client,
+      phase = _ref6.phase,
+      actionName = _ref6.action;
 
   var target = interaction.target;
 
@@ -4519,6 +4567,8 @@ InteractEvent.signals.on('set-xy', function (_ref6) {
 module.exports = modifiers;
 
 },{"../InteractEvent":3,"../Interaction":5,"../utils/extend":38}],25:[function(require,module,exports){
+'use strict';
+
 var modifiers = require('./index');
 var utils = require('../utils');
 var defaultOptions = require('../defaultOptions');
@@ -4531,13 +4581,13 @@ var restrict = {
     elementRect: null
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
+  shouldDo: function shouldDo(interactable, actionName, preEnd, requireEndOnly) {
     var restrictOptions = interactable.options[actionName].restrict;
 
     return restrictOptions && restrictOptions.enabled && (preEnd || !restrictOptions.endOnly) && (!requireEndOnly || restrictOptions.endOnly);
   },
 
-  setOffset: function (interaction, interactable, element, rect, startOffset) {
+  setOffset: function setOffset(interaction, interactable, element, rect, startOffset) {
     var elementRect = interactable.options[interaction.prepared.name].restrict.elementRect;
     var offset = {};
 
@@ -4554,7 +4604,7 @@ var restrict = {
     return offset;
   },
 
-  set: function (pageCoords, interaction, status) {
+  set: function set(pageCoords, interaction, status) {
     var target = interaction.target;
     var restrictOptions = target && target.options[interaction.prepared.name].restrict;
     var restriction = restrictOptions && restrictOptions.restriction;
@@ -4569,7 +4619,7 @@ var restrict = {
     status.dy = 0;
     status.locked = false;
 
-    if (utils.isString(restriction)) {
+    if (utils.is.string(restriction)) {
       if (restriction === 'parent') {
         restriction = utils.parentNode(interaction.element);
       } else if (restriction === 'self') {
@@ -4583,17 +4633,17 @@ var restrict = {
       }
     }
 
-    if (utils.isFunction(restriction)) {
+    if (utils.is.function(restriction)) {
       restriction = restriction(page.x, page.y, interaction.element);
     }
 
-    if (utils.isElement(restriction)) {
+    if (utils.is.element(restriction)) {
       restriction = utils.getElementRect(restriction);
     }
 
     var rect = restriction;
-    var restrictedX = undefined;
-    var restrictedY = undefined;
+    var restrictedX = void 0;
+    var restrictedY = void 0;
 
     var offset = interaction.modifierOffsets.restrict;
 
@@ -4624,7 +4674,7 @@ var restrict = {
     return status;
   },
 
-  reset: function (status) {
+  reset: function reset(status) {
     status.dx = status.dy = 0;
     status.modifiedX = status.modifiedY = NaN;
     status.locked = false;
@@ -4633,7 +4683,7 @@ var restrict = {
     return status;
   },
 
-  modifyCoords: function (page, client, interactable, status, actionName, phase) {
+  modifyCoords: function modifyCoords(page, client, interactable, status, actionName, phase) {
     var options = interactable.options[actionName].restrict;
     var elementRect = options && options.elementRect;
 
@@ -4662,6 +4712,8 @@ defaultOptions.perAction.restrict = restrict.defaults;
 module.exports = restrict;
 
 },{"../defaultOptions":18,"../utils":41,"./index":24}],26:[function(require,module,exports){
+'use strict';
+
 var modifiers = require('./index');
 var interact = require('../interact');
 var utils = require('../utils');
@@ -4678,17 +4730,17 @@ var snap = {
     relativePoints: null
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
+  shouldDo: function shouldDo(interactable, actionName, preEnd, requireEndOnly) {
     var snapOptions = interactable.options[actionName].snap;
 
     return snapOptions && snapOptions.enabled && (preEnd || !snapOptions.endOnly) && (!requireEndOnly || snapOptions.endOnly);
   },
 
-  setOffset: function (interaction, interactable, element, rect, startOffset) {
+  setOffset: function setOffset(interaction, interactable, element, rect, startOffset) {
     var offsets = [];
     var origin = utils.getOriginXY(interactable, element, interaction.prepared.name);
     var snapOptions = interactable.options[interaction.prepared.name].snap || {};
-    var snapOffset = undefined;
+    var snapOffset = void 0;
 
     if (snapOptions.offset === 'startCoords') {
       snapOffset = {
@@ -4717,8 +4769,9 @@ var snap = {
           _ref = _i.value;
         }
 
-        var relativeX = _ref.x;
-        var relativeY = _ref.y;
+        var _ref2 = _ref,
+            relativeX = _ref2.x,
+            relativeY = _ref2.y;
 
         offsets.push({
           x: startOffset.left - rect.width * relativeX + snapOffset.x,
@@ -4732,12 +4785,12 @@ var snap = {
     return offsets;
   },
 
-  set: function (pageCoords, interaction, status) {
+  set: function set(pageCoords, interaction, status) {
     var snapOptions = interaction.target.options[interaction.prepared.name].snap;
     var targets = [];
-    var target = undefined;
-    var page = undefined;
-    var i = undefined;
+    var target = void 0;
+    var page = void 0;
+    var i = void 0;
 
     if (status.useStatusXY) {
       page = { x: status.x, y: status.y };
@@ -4757,38 +4810,39 @@ var snap = {
     var len = snapOptions.targets ? snapOptions.targets.length : 0;
 
     for (var _iterator2 = offsets, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+      var _ref3;
 
       if (_isArray2) {
         if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
+        _ref3 = _iterator2[_i2++];
       } else {
         _i2 = _iterator2.next();
         if (_i2.done) break;
-        _ref2 = _i2.value;
+        _ref3 = _i2.value;
       }
 
-      var offsetX = _ref2.x;
-      var offsetY = _ref2.y;
+      var _ref4 = _ref3,
+          offsetX = _ref4.x,
+          offsetY = _ref4.y;
 
       var relativeX = page.x - offsetX;
       var relativeY = page.y - offsetY;
 
       for (var _iterator3 = snapOptions.targets, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-        var _ref3;
+        var _ref5;
 
         if (_isArray3) {
           if (_i3 >= _iterator3.length) break;
-          _ref3 = _iterator3[_i3++];
+          _ref5 = _iterator3[_i3++];
         } else {
           _i3 = _iterator3.next();
           if (_i3.done) break;
-          _ref3 = _i3.value;
+          _ref5 = _i3.value;
         }
 
-        var snapTarget = _ref3;
+        var snapTarget = _ref5;
 
-        if (utils.isFunction(snapTarget)) {
+        if (utils.is.function(snapTarget)) {
           target = snapTarget(relativeX, relativeY, interaction);
         } else {
           target = snapTarget;
@@ -4799,10 +4853,10 @@ var snap = {
         }
 
         targets.push({
-          x: utils.isNumber(target.x) ? target.x + offsetX : relativeX,
-          y: utils.isNumber(target.y) ? target.y + offsetY : relativeY,
+          x: utils.is.number(target.x) ? target.x + offsetX : relativeX,
+          y: utils.is.number(target.y) ? target.y + offsetY : relativeY,
 
-          range: utils.isNumber(target.range) ? target.range : snapOptions.range
+          range: utils.is.number(target.range) ? target.range : snapOptions.range
         });
       }
     }
@@ -4854,7 +4908,7 @@ var snap = {
       }
     }
 
-    var snapChanged = undefined;
+    var snapChanged = void 0;
 
     if (closest.target) {
       snapChanged = status.snappedX !== closest.target.x || status.snappedY !== closest.target.y;
@@ -4877,7 +4931,7 @@ var snap = {
     return status;
   },
 
-  reset: function (status) {
+  reset: function reset(status) {
     status.dx = status.dy = 0;
     status.snappedX = status.snappedY = NaN;
     status.locked = false;
@@ -4886,7 +4940,7 @@ var snap = {
     return status;
   },
 
-  modifyCoords: function (page, client, interactable, status, actionName, phase) {
+  modifyCoords: function modifyCoords(page, client, interactable, status, actionName, phase) {
     var snapOptions = interactable.options[actionName].snap;
     var relativePoints = snapOptions && snapOptions.relativePoints;
 
@@ -4924,7 +4978,7 @@ interact.createSnapGrid = function (grid) {
     var offsetX = 0;
     var offsetY = 0;
 
-    if (utils.isObject(grid.offset)) {
+    if (utils.is.object(grid.offset)) {
       offsetX = grid.offset.x;
       offsetY = grid.offset.y;
     }
@@ -4951,11 +5005,13 @@ defaultOptions.perAction.snap = snap.defaults;
 module.exports = snap;
 
 },{"../defaultOptions":18,"../interact":21,"../utils":41,"./index":24}],27:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var pointerUtils = require('../utils/pointerUtils');
 
-module.exports = (function () {
+module.exports = function () {
   function PointerEvent(type, pointer, event, eventTarget, interaction) {
     _classCallCheck(this, PointerEvent);
 
@@ -4988,8 +5044,8 @@ module.exports = (function () {
   }
 
   PointerEvent.prototype.subtractOrigin = function subtractOrigin(_ref) {
-    var originX = _ref.x;
-    var originY = _ref.y;
+    var originX = _ref.x,
+        originY = _ref.y;
 
     this.pageX -= originX;
     this.pageY -= originY;
@@ -5000,8 +5056,8 @@ module.exports = (function () {
   };
 
   PointerEvent.prototype.addOrigin = function addOrigin(_ref2) {
-    var originX = _ref2.x;
-    var originY = _ref2.y;
+    var originX = _ref2.x,
+        originY = _ref2.y;
 
     this.pageX += originX;
     this.pageY += originY;
@@ -5024,19 +5080,20 @@ module.exports = (function () {
   };
 
   return PointerEvent;
-})();
+}();
 
 },{"../utils/pointerUtils":46}],28:[function(require,module,exports){
+'use strict';
+
 var PointerEvent = require('./PointerEvent');
 var Interaction = require('../Interaction');
 var utils = require('../utils');
 var browser = require('../utils/browser');
 var defaults = require('../defaultOptions');
-var signals = require('../utils/Signals')['new']();
+var signals = require('../utils/Signals').new();
 
-var _require = require('../utils/arr');
-
-var filter = _require.filter;
+var _require = require('../utils/arr'),
+    filter = _require.filter;
 
 var simpleSignals = ['down', 'up', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'tap', 'cancel'];
@@ -5056,21 +5113,24 @@ var pointerEvents = {
 };
 
 function fire(arg) {
-  var interaction = arg.interaction;
-  var pointer = arg.pointer;
-  var event = arg.event;
-  var eventTarget = arg.eventTarget;
-  var type = arg.type;
-  var _arg$targets = arg.targets;
-  var targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets;
-
+  var interaction = arg.interaction,
+      pointer = arg.pointer,
+      event = arg.event,
+      eventTarget = arg.eventTarget,
+      _arg$type = arg.type,
+      type = _arg$type === undefined ? arg.pointerEvent.type : _arg$type,
+      _arg$targets = arg.targets,
+      targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets;
   // create the tap event even if there are no listeners so that
   // doubletap can still be created and fired
+
   if (!targets.length && type !== 'tap') {
     return false;
   }
 
-  var pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
+  var _arg$pointerEvent = arg.pointerEvent,
+      pointerEvent = _arg$pointerEvent === undefined ? new PointerEvent(type, pointer, event, eventTarget, interaction) : _arg$pointerEvent;
+
 
   var signalArg = {
     interaction: interaction,
@@ -5114,26 +5174,26 @@ function fire(arg) {
       });
     }
 
-    interaction.tapTime = pointer.timeStamp;
     interaction.prevTap = pointerEvent;
+    interaction.tapTime = pointerEvent.timeStamp;
   }
 
   return true;
 }
 
-function collectEventTargets(_ref3) {
-  var interaction = _ref3.interaction;
-  var pointer = _ref3.pointer;
-  var event = _ref3.event;
-  var eventTarget = _ref3.eventTarget;
-  var type = _ref3.type;
+function collectEventTargets(_ref) {
+  var interaction = _ref.interaction,
+      pointer = _ref.pointer,
+      event = _ref.event,
+      eventTarget = _ref.eventTarget,
+      type = _ref.type;
 
   var pointerIndex = interaction.getPointerIndex(pointer);
 
   // do not fire a tap event if the pointer was moved before being lifted
   if (type === 'tap' && (interaction.pointerWasMoved
   // or if the pointerup target is different to the pointerdown target
-   || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
+  || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
     return [];
   }
 
@@ -5150,18 +5210,18 @@ function collectEventTargets(_ref3) {
   };
 
   for (var _iterator = path, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref;
+    var _ref2;
 
     if (_isArray) {
       if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
+      _ref2 = _iterator[_i++];
     } else {
       _i = _iterator.next();
       if (_i.done) break;
-      _ref = _i.value;
+      _ref2 = _i.value;
     }
 
-    var element = _ref;
+    var element = _ref2;
 
     signalArg.element = element;
 
@@ -5177,12 +5237,12 @@ function collectEventTargets(_ref3) {
   return signalArg.targets;
 }
 
-Interaction.signals.on('move', function (_ref4) {
-  var interaction = _ref4.interaction;
-  var pointer = _ref4.pointer;
-  var event = _ref4.event;
-  var eventTarget = _ref4.eventTarget;
-  var duplicateMove = _ref4.duplicateMove;
+Interaction.signals.on('move', function (_ref3) {
+  var interaction = _ref3.interaction,
+      pointer = _ref3.pointer,
+      event = _ref3.event,
+      eventTarget = _ref3.eventTarget,
+      duplicateMove = _ref3.duplicateMove;
 
   var pointerIndex = interaction.getPointerIndex(pointer);
 
@@ -5198,12 +5258,12 @@ Interaction.signals.on('move', function (_ref4) {
   }
 });
 
-Interaction.signals.on('down', function (_ref5) {
-  var interaction = _ref5.interaction;
-  var pointer = _ref5.pointer;
-  var event = _ref5.event;
-  var eventTarget = _ref5.eventTarget;
-  var pointerIndex = _ref5.pointerIndex;
+Interaction.signals.on('down', function (_ref4) {
+  var interaction = _ref4.interaction,
+      pointer = _ref4.pointer,
+      event = _ref4.event,
+      eventTarget = _ref4.eventTarget,
+      pointerIndex = _ref4.pointerIndex;
 
   // copy event to be used in timeout for IE8
   var eventCopy = browser.isIE8 ? utils.extend({}, event) : event;
@@ -5227,18 +5287,18 @@ Interaction.signals.on('down', function (_ref5) {
   };
 
   for (var _iterator2 = path, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-    var _ref2;
+    var _ref5;
 
     if (_isArray2) {
       if (_i2 >= _iterator2.length) break;
-      _ref2 = _iterator2[_i2++];
+      _ref5 = _iterator2[_i2++];
     } else {
       _i2 = _iterator2.next();
       if (_i2.done) break;
-      _ref2 = _i2.value;
+      _ref5 = _i2.value;
     }
 
-    var element = _ref2;
+    var element = _ref5;
 
     signalArg.element = element;
 
@@ -5272,8 +5332,8 @@ Interaction.signals.on('down', function (_ref5) {
 
 ['up', 'cancel'].forEach(function (signalName) {
   Interaction.signals.on(signalName, function (_ref6) {
-    var interaction = _ref6.interaction;
-    var pointerIndex = _ref6.pointerIndex;
+    var interaction = _ref6.interaction,
+        pointerIndex = _ref6.pointerIndex;
 
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
@@ -5283,10 +5343,10 @@ Interaction.signals.on('down', function (_ref5) {
 
 function createSignalListener(type) {
   return function (_ref7) {
-    var interaction = _ref7.interaction;
-    var pointer = _ref7.pointer;
-    var event = _ref7.event;
-    var eventTarget = _ref7.eventTarget;
+    var interaction = _ref7.interaction,
+        pointer = _ref7.pointer,
+        event = _ref7.event,
+        eventTarget = _ref7.eventTarget;
 
     fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: type });
   };
@@ -5305,6 +5365,8 @@ defaults.pointerEvents = pointerEvents.defaults;
 module.exports = pointerEvents;
 
 },{"../Interaction":5,"../defaultOptions":18,"../utils":41,"../utils/Signals":32,"../utils/arr":33,"../utils/browser":34,"./PointerEvent":27}],29:[function(require,module,exports){
+'use strict';
+
 var pointerEvents = require('./base');
 var Interaction = require('../Interaction');
 
@@ -5328,10 +5390,10 @@ function onNew(_ref) {
 }
 
 function onFired(_ref2) {
-  var interaction = _ref2.interaction;
-  var pointerEvent = _ref2.pointerEvent;
-  var eventTarget = _ref2.eventTarget;
-  var targets = _ref2.targets;
+  var interaction = _ref2.interaction,
+      pointerEvent = _ref2.pointerEvent,
+      eventTarget = _ref2.eventTarget,
+      targets = _ref2.targets;
 
   if (pointerEvent.type !== 'hold') {
     return;
@@ -5379,23 +5441,24 @@ module.exports = {
 };
 
 },{"../Interaction":5,"./base":28}],30:[function(require,module,exports){
+'use strict';
+
 var pointerEvents = require('./base');
 var Interactable = require('../Interactable');
 var browser = require('../utils/browser');
-var isType = require('../utils/isType');
+var is = require('../utils/is');
 var domUtils = require('../utils/domUtils');
 var scope = require('../scope');
 var extend = require('../utils/extend');
 
-var _require = require('../utils/arr');
-
-var merge = _require.merge;
+var _require = require('../utils/arr'),
+    merge = _require.merge;
 
 pointerEvents.signals.on('collect-targets', function (_ref) {
-  var targets = _ref.targets;
-  var element = _ref.element;
-  var type = _ref.type;
-  var eventTarget = _ref.eventTarget;
+  var targets = _ref.targets,
+      element = _ref.element,
+      type = _ref.type,
+      eventTarget = _ref.eventTarget;
 
   function collectSelectors(interactable, selector, context) {
     var els = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
@@ -5403,7 +5466,7 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
     var eventable = interactable.events;
     var options = eventable.options;
 
-    if (eventable[type] && isType.isElement(element) && domUtils.matchesSelector(element, selector, els) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+    if (eventable[type] && is.element(element) && domUtils.matchesSelector(element, selector, els) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({
         element: element,
@@ -5440,8 +5503,8 @@ Interactable.signals.on('new', function (_ref2) {
 });
 
 Interactable.signals.on('set', function (_ref3) {
-  var interactable = _ref3.interactable;
-  var options = _ref3.options;
+  var interactable = _ref3.interactable,
+      options = _ref3.options;
 
   extend(interactable.events.options, pointerEvents.defaults);
   extend(interactable.events.options, options);
@@ -5469,10 +5532,12 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":31,"../utils/arr":33,"../utils/browser":34,"../utils/domUtils":36,"../utils/extend":38,"../utils/isType":43,"./base":28}],31:[function(require,module,exports){
+},{"../Interactable":4,"../scope":31,"../utils/arr":33,"../utils/browser":34,"../utils/domUtils":36,"../utils/extend":38,"../utils/is":43,"./base":28}],31:[function(require,module,exports){
+'use strict';
+
 var utils = require('./utils');
 var events = require('./utils/events');
-var signals = require('./utils/Signals')['new']();
+var signals = require('./utils/Signals').new();
 
 var scope = {
   signals: signals,
@@ -5484,7 +5549,7 @@ var scope = {
   // all documents being listened to
   documents: [],
 
-  addDocument: function (doc, win) {
+  addDocument: function addDocument(doc, win) {
     // do nothing if document is already known
     if (utils.contains(scope.documents, doc)) {
       return false;
@@ -5504,7 +5569,7 @@ var scope = {
     signals.fire('add-document', { doc: doc, win: win });
   },
 
-  removeDocument: function (doc, win) {
+  removeDocument: function removeDocument(doc, win) {
     var index = utils.indexOf(scope.documents, doc);
 
     win = win || scope.getWindow(doc);
@@ -5517,7 +5582,7 @@ var scope = {
     signals.fire('remove-document', { win: win, doc: doc });
   },
 
-  onWindowUnload: function () {
+  onWindowUnload: function onWindowUnload() {
     scope.removeDocument(this.document, this);
   }
 };
@@ -5525,13 +5590,14 @@ var scope = {
 module.exports = scope;
 
 },{"./utils":41,"./utils/Signals":32,"./utils/domObjects":35,"./utils/events":37}],32:[function(require,module,exports){
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+'use strict';
 
-var _require = require('./arr');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var indexOf = _require.indexOf;
+var _require = require('./arr'),
+    indexOf = _require.indexOf;
 
-var Signals = (function () {
+var Signals = function () {
   function Signals() {
     _classCallCheck(this, Signals);
 
@@ -5576,15 +5642,17 @@ var Signals = (function () {
   };
 
   return Signals;
-})();
+}();
 
-Signals['new'] = function () {
+Signals.new = function () {
   return new Signals();
 };
 
 module.exports = Signals;
 
 },{"./arr":33}],33:[function(require,module,exports){
+"use strict";
+
 function indexOf(array, target) {
   for (var i = 0, len = array.length; i < len; i++) {
     if (array[i] === target) {
@@ -5627,21 +5695,25 @@ module.exports = {
 };
 
 },{}],34:[function(require,module,exports){
-var win = require('./window');
-var isType = require('./isType');
+'use strict';
+
+var _require = require('./window'),
+    window = _require.window;
+
+var is = require('./is');
 var domObjects = require('./domObjects');
 
 var Element = domObjects.Element;
-var navigator = win.window.navigator;
+var navigator = window.navigator;
 
 var browser = {
   // Does the browser support touch input?
-  supportsTouch: !!('ontouchstart' in win.window || isType.isFunction(win.window.DocumentTouch) && domObjects.document instanceof win.DocumentTouch),
+  supportsTouch: !!('ontouchstart' in window || is.function(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch),
 
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
 
-  isIE8: 'attachEvent' in win.window && !('addEventListener' in win.window),
+  isIE8: 'attachEvent' in window && !('addEventListener' in window),
 
   // Opera Mobile must be handled differently
   isOperaMobile: navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto'),
@@ -5656,7 +5728,7 @@ var browser = {
 
   useMatchesSelectorPolyfill: false,
 
-  pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === win.window.MSPointerEvent ? {
+  pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === window.MSPointerEvent ? {
     up: 'MSPointerUp',
     down: 'MSPointerDown',
     over: 'mouseover',
@@ -5677,11 +5749,13 @@ var browser = {
 
 };
 
-browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);
+browser.useMatchesSelectorPolyfill = !is.function(Element.prototype[browser.prefixedMatchesSelector]);
 
 module.exports = browser;
 
-},{"./domObjects":35,"./isType":43,"./window":48}],35:[function(require,module,exports){
+},{"./domObjects":35,"./is":43,"./window":48}],35:[function(require,module,exports){
+'use strict';
+
 var domObjects = {};
 var win = require('./window').window;
 
@@ -5702,13 +5776,15 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 module.exports = domObjects;
 
 },{"./window":48}],36:[function(require,module,exports){
+'use strict';
+
 var win = require('./window');
 var browser = require('./browser');
-var isType = require('./isType');
+var is = require('./is');
 var domObjects = require('./domObjects');
 
 var domUtils = {
-  nodeContains: function (parent, child) {
+  nodeContains: function nodeContains(parent, child) {
     while (child) {
       if (child === parent) {
         return true;
@@ -5720,8 +5796,8 @@ var domUtils = {
     return false;
   },
 
-  closest: function (element, selector) {
-    while (isType.isElement(element)) {
+  closest: function closest(element, selector) {
+    while (is.element(element)) {
       if (domUtils.matchesSelector(element, selector)) {
         return element;
       }
@@ -5732,12 +5808,12 @@ var domUtils = {
     return null;
   },
 
-  parentNode: function (node) {
+  parentNode: function parentNode(node) {
     var parent = node.parentNode;
 
-    if (isType.isDocFrag(parent)) {
+    if (is.docFrag(parent)) {
       // skip past #shado-root fragments
-      while ((parent = parent.host) && isType.isDocFrag(parent)) {
+      while ((parent = parent.host) && is.docFrag(parent)) {
         continue;
       }
 
@@ -5760,7 +5836,7 @@ var domUtils = {
     return false;
   } : null,
 
-  matchesSelector: function (element, selector, nodeList) {
+  matchesSelector: function matchesSelector(element, selector, nodeList) {
     if (browser.useMatchesSelectorPolyfill) {
       return domUtils.matchesSelectorPolyfill(element, selector, nodeList);
     }
@@ -5774,16 +5850,16 @@ var domUtils = {
   },
 
   // Test for the element that's "above" all other qualifiers
-  indexOfDeepestElement: function (elements) {
+  indexOfDeepestElement: function indexOfDeepestElement(elements) {
     var deepestZoneParents = [];
     var dropzoneParents = [];
-    var dropzone = undefined;
+    var dropzone = void 0;
     var deepestZone = elements[0];
     var index = deepestZone ? 0 : -1;
-    var parent = undefined;
-    var child = undefined;
-    var i = undefined;
-    var n = undefined;
+    var parent = void 0;
+    var child = void 0;
+    var i = void 0;
+    var n = void 0;
 
     for (i = 1; i < elements.length; i++) {
       dropzone = elements[i];
@@ -5868,8 +5944,8 @@ var domUtils = {
     return index;
   },
 
-  matchesUpTo: function (element, selector, limit) {
-    while (isType.isElement(element)) {
+  matchesUpTo: function matchesUpTo(element, selector, limit) {
+    while (is.element(element)) {
       if (domUtils.matchesSelector(element, selector)) {
         return true;
       }
@@ -5884,11 +5960,11 @@ var domUtils = {
     return false;
   },
 
-  getActualElement: function (element) {
+  getActualElement: function getActualElement(element) {
     return element instanceof domObjects.SVGElementInstance ? element.correspondingUseElement : element;
   },
 
-  getScrollXY: function (relevantWindow) {
+  getScrollXY: function getScrollXY(relevantWindow) {
     relevantWindow = relevantWindow || win.window;
     return {
       x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
@@ -5896,7 +5972,7 @@ var domUtils = {
     };
   },
 
-  getElementClientRect: function (element) {
+  getElementClientRect: function getElementClientRect(element) {
     var clientRect = element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
 
     return clientRect && {
@@ -5909,22 +5985,22 @@ var domUtils = {
     };
   },
 
-  getElementRect: function (element) {
+  getElementRect: function getElementRect(element) {
     var clientRect = domUtils.getElementClientRect(element);
 
     if (!browser.isIOS7 && clientRect) {
-      var _scroll = domUtils.getScrollXY(win.getWindow(element));
+      var scroll = domUtils.getScrollXY(win.getWindow(element));
 
-      clientRect.left += _scroll.x;
-      clientRect.right += _scroll.x;
-      clientRect.top += _scroll.y;
-      clientRect.bottom += _scroll.y;
+      clientRect.left += scroll.x;
+      clientRect.right += scroll.x;
+      clientRect.top += scroll.y;
+      clientRect.bottom += scroll.y;
     }
 
     return clientRect;
   },
 
-  getPath: function (element) {
+  getPath: function getPath(element) {
     var path = [];
 
     while (element) {
@@ -5933,25 +6009,35 @@ var domUtils = {
     }
 
     return path;
+  },
+
+  trySelector: function trySelector(value) {
+    if (!is.string(value)) {
+      return false;
+    }
+
+    // an exception will be raised if it is invalid
+    domObjects.document.querySelector(value);
+    return true;
   }
 };
 
 module.exports = domUtils;
 
-},{"./browser":34,"./domObjects":35,"./isType":43,"./window":48}],37:[function(require,module,exports){
-var isType = require('./isType');
+},{"./browser":34,"./domObjects":35,"./is":43,"./window":48}],37:[function(require,module,exports){
+'use strict';
+
+var is = require('./is');
 var domUtils = require('./domUtils');
 var pExtend = require('./pointerExtend');
 
-var _require = require('./window');
+var _require = require('./window'),
+    window = _require.window,
+    getWindow = _require.getWindow;
 
-var window = _require.window;
-var getWindow = _require.getWindow;
-
-var _require2 = require('./arr');
-
-var indexOf = _require2.indexOf;
-var contains = _require2.contains;
+var _require2 = require('./arr'),
+    indexOf = _require2.indexOf,
+    contains = _require2.contains;
 
 var useAttachEvent = 'attachEvent' in window && !('addEventListener' in window);
 var addEvent = useAttachEvent ? 'attachEvent' : 'addEventListener';
@@ -5966,14 +6052,27 @@ var attachedListeners = [];
 //   type: {
 //     selectors: ['selector', ...],
 //     contexts : [document, ...],
-//     listeners: [[listener, useCapture], ...]
+//     listeners: [[listener, capture, passive], ...]
 //   }
 //  }
 var delegatedEvents = {};
 
 var documents = [];
 
-function add(element, type, listener, useCapture) {
+var supportsOptions = !useAttachEvent && function () {
+  var supported = false;
+
+  window.document.createElement('div').addEventListener('test', null, {
+    get capture() {
+      supported = true;
+    }
+  });
+
+  return supported;
+}();
+
+function add(element, type, listener, optionalArg) {
+  var options = getOptions(optionalArg);
   var elementIndex = indexOf(elements, element);
   var target = targets[elementIndex];
 
@@ -5999,13 +6098,13 @@ function add(element, type, listener, useCapture) {
   }
 
   if (!contains(target.events[type], listener)) {
-    var ret = undefined;
+    var ret = void 0;
 
     if (useAttachEvent) {
-      var _attachedListeners$elementIndex = attachedListeners[elementIndex];
-      var supplied = _attachedListeners$elementIndex.supplied;
-      var wrapped = _attachedListeners$elementIndex.wrapped;
-      var useCount = _attachedListeners$elementIndex.useCount;
+      var _attachedListeners$el = attachedListeners[elementIndex],
+          supplied = _attachedListeners$el.supplied,
+          wrapped = _attachedListeners$el.wrapped,
+          useCount = _attachedListeners$el.useCount;
 
       var listenerIndex = indexOf(supplied, listener);
 
@@ -6027,7 +6126,7 @@ function add(element, type, listener, useCapture) {
         }
       };
 
-      ret = element[addEvent](on + type, wrappedListener, !!useCapture);
+      ret = element[addEvent](on + type, wrappedListener, !!options.capture);
 
       if (listenerIndex === -1) {
         supplied.push(listener);
@@ -6037,7 +6136,7 @@ function add(element, type, listener, useCapture) {
         useCount[listenerIndex]++;
       }
     } else {
-      ret = element[addEvent](type, listener, !!useCapture);
+      ret = element[addEvent](type, listener, supportsOptions ? options : !!options.capture);
     }
     target.events[type].push(listener);
 
@@ -6045,7 +6144,8 @@ function add(element, type, listener, useCapture) {
   }
 }
 
-function remove(element, type, listener, useCapture) {
+function remove(element, type, listener, optionalArg) {
+  var options = getOptions(optionalArg);
   var elementIndex = indexOf(elements, element);
   var target = targets[elementIndex];
 
@@ -6054,8 +6154,8 @@ function remove(element, type, listener, useCapture) {
   }
 
   var wrappedListener = listener;
-  var listeners = undefined;
-  var listenerIndex = undefined;
+  var listeners = void 0;
+  var listenerIndex = void 0;
 
   if (useAttachEvent) {
     listeners = attachedListeners[elementIndex];
@@ -6077,14 +6177,14 @@ function remove(element, type, listener, useCapture) {
 
     if (listener === 'all') {
       for (var i = 0; i < len; i++) {
-        remove(element, type, target.events[type][i], !!useCapture);
+        remove(element, type, target.events[type][i], options);
       }
       return;
     } else {
-      for (var i = 0; i < len; i++) {
-        if (target.events[type][i] === listener) {
-          element[removeEvent](on + type, wrappedListener, !!useCapture);
-          target.events[type].splice(i, 1);
+      for (var _i = 0; _i < len; _i++) {
+        if (target.events[type][_i] === listener) {
+          element[removeEvent](on + type, wrappedListener, supportsOptions ? options : !!options.capture);
+          target.events[type].splice(_i, 1);
 
           if (useAttachEvent && listeners) {
             listeners.useCount[listenerIndex]--;
@@ -6113,7 +6213,8 @@ function remove(element, type, listener, useCapture) {
   }
 }
 
-function addDelegate(selector, context, type, listener, useCapture) {
+function addDelegate(selector, context, type, listener, optionalArg) {
+  var options = getOptions(optionalArg);
   if (!delegatedEvents[type]) {
     delegatedEvents[type] = {
       selectors: [],
@@ -6129,7 +6230,7 @@ function addDelegate(selector, context, type, listener, useCapture) {
   }
 
   var delegated = delegatedEvents[type];
-  var index = undefined;
+  var index = void 0;
 
   for (index = delegated.selectors.length - 1; index >= 0; index--) {
     if (delegated.selectors[index] === selector && delegated.contexts[index] === context) {
@@ -6145,14 +6246,15 @@ function addDelegate(selector, context, type, listener, useCapture) {
     delegated.listeners.push([]);
   }
 
-  // keep listener and useCapture flag
-  delegated.listeners[index].push([listener, useCapture]);
+  // keep listener and capture and passive flags
+  delegated.listeners[index].push([listener, !!options.capture, options.passive]);
 }
 
-function removeDelegate(selector, context, type, listener, useCapture) {
+function removeDelegate(selector, context, type, listener, optionalArg) {
+  var options = getOptions(optionalArg);
   var delegated = delegatedEvents[type];
   var matchFound = false;
-  var index = undefined;
+  var index = void 0;
 
   if (!delegated) {
     return;
@@ -6165,13 +6267,16 @@ function removeDelegate(selector, context, type, listener, useCapture) {
 
       var listeners = delegated.listeners[index];
 
-      // each item of the listeners array is an array: [function, useCaptureFlag]
+      // each item of the listeners array is an array: [function, capture, passive]
       for (var i = listeners.length - 1; i >= 0; i--) {
-        var fn = listeners[i][0];
-        var useCap = listeners[i][1];
+        var _listeners$i = listeners[i],
+            fn = _listeners$i[0],
+            capture = _listeners$i[1],
+            passive = _listeners$i[2];
 
-        // check if the listener functions and useCapture flags match
-        if (fn === listener && useCap === useCapture) {
+        // check if the listener functions and capture and passive flags match
+
+        if (fn === listener && capture === !!options.capture && passive === options.passive) {
           // remove the listener from the array of listeners
           listeners.splice(i, 1);
 
@@ -6207,13 +6312,12 @@ function removeDelegate(selector, context, type, listener, useCapture) {
 
 // bound to the interactable context when a DOM event
 // listener is added to a selector interactable
-function delegateListener(event, useCapture) {
+function delegateListener(event, optionalArg) {
+  var options = getOptions(optionalArg);
   var fakeEvent = {};
   var delegated = delegatedEvents[event.type];
   var eventTarget = domUtils.getActualElement(event.path ? event.path[0] : event.target);
   var element = eventTarget;
-
-  useCapture = useCapture ? true : false;
 
   // duplicate the event so that currentTarget can be changed
   pExtend(fakeEvent, event);
@@ -6222,7 +6326,7 @@ function delegateListener(event, useCapture) {
   fakeEvent.preventDefault = preventOriginalDefault;
 
   // climb up document tree looking for selector matches
-  while (isType.isElement(element)) {
+  while (is.element(element)) {
     for (var i = 0; i < delegated.selectors.length; i++) {
       var selector = delegated.selectors[i];
       var context = delegated.contexts[i];
@@ -6234,8 +6338,14 @@ function delegateListener(event, useCapture) {
         fakeEvent.currentTarget = element;
 
         for (var j = 0; j < listeners.length; j++) {
-          if (listeners[j][1] === useCapture) {
-            listeners[j][0](fakeEvent);
+          var _listeners$j = listeners[j],
+              fn = _listeners$j[0],
+              capture = _listeners$j[1],
+              passive = _listeners$j[2];
+
+
+          if (capture === !!options.capture && passive === options.passive) {
+            fn(fakeEvent);
           }
         }
       }
@@ -6266,6 +6376,10 @@ function stopImmProp() {
   this.immediatePropagationStopped = true;
 }
 
+function getOptions(param) {
+  return is.object(param) ? param : { capture: param };
+}
+
 module.exports = {
   add: add,
   remove: remove,
@@ -6279,13 +6393,16 @@ module.exports = {
   documents: documents,
 
   useAttachEvent: useAttachEvent,
+  supportsOptions: supportsOptions,
 
   _elements: elements,
   _targets: targets,
   _attachedListeners: attachedListeners
 };
 
-},{"./arr":33,"./domUtils":36,"./isType":43,"./pointerExtend":45,"./window":48}],38:[function(require,module,exports){
+},{"./arr":33,"./domUtils":36,"./is":43,"./pointerExtend":45,"./window":48}],38:[function(require,module,exports){
+"use strict";
+
 module.exports = function extend(dest, source) {
   for (var prop in source) {
     dest[prop] = source[prop];
@@ -6294,17 +6411,15 @@ module.exports = function extend(dest, source) {
 };
 
 },{}],39:[function(require,module,exports){
-var _require = require('./domUtils');
+'use strict';
 
-var closest = _require.closest;
-var parentNode = _require.parentNode;
-var getElementRect = _require.getElementRect;
+var is = require('./is');
 
-var _require2 = require('./isType');
-
-var isElement = _require2.isElement;
-var isFunction = _require2.isFunction;
-var trySelector = _require2.trySelector;
+var _require = require('./domUtils'),
+    closest = _require.closest,
+    parentNode = _require.parentNode,
+    getElementRect = _require.getElementRect,
+    trySelector = _require.trySelector;
 
 module.exports = function (target, element, action) {
   var actionOptions = target.options[action];
@@ -6319,11 +6434,11 @@ module.exports = function (target, element, action) {
     origin = closest(element, origin) || { x: 0, y: 0 };
   }
 
-  if (isFunction(origin)) {
+  if (is.function(origin)) {
     origin = origin(target && element);
   }
 
-  if (isElement(origin)) {
+  if (is.element(origin)) {
     origin = getElementRect(origin);
   }
 
@@ -6333,17 +6448,21 @@ module.exports = function (target, element, action) {
   return origin;
 };
 
-},{"./domUtils":36,"./isType":43}],40:[function(require,module,exports){
+},{"./domUtils":36,"./is":43}],40:[function(require,module,exports){
+"use strict";
+
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
 },{}],41:[function(require,module,exports){
+'use strict';
+
 var extend = require('./extend');
 var win = require('./window');
 
 var utils = {
-  warnOnce: function (method, message) {
+  warnOnce: function warnOnce(method, message) {
     var warned = false;
 
     return function () {
@@ -6357,12 +6476,12 @@ var utils = {
   },
 
   // http://stackoverflow.com/a/5634528/2280888
-  _getQBezierValue: function (t, p1, p2, p3) {
+  _getQBezierValue: function _getQBezierValue(t, p1, p2, p3) {
     var iT = 1 - t;
     return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
   },
 
-  getQuadraticCurvePoint: function (startX, startY, cpX, cpY, endX, endY, position) {
+  getQuadraticCurvePoint: function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
     return {
       x: utils._getQBezierValue(position, startX, cpX, endX),
       y: utils._getQBezierValue(position, startY, cpY, endY)
@@ -6370,12 +6489,12 @@ var utils = {
   },
 
   // http://gizma.com/easing/
-  easeOutQuad: function (t, b, c, d) {
+  easeOutQuad: function easeOutQuad(t, b, c, d) {
     t /= d;
     return -c * t * (t - 2) + b;
   },
 
-  copyAction: function (dest, src) {
+  copyAction: function copyAction(dest, src) {
     dest.name = src.name;
     dest.axis = src.axis;
     dest.edges = src.edges;
@@ -6383,8 +6502,8 @@ var utils = {
     return dest;
   },
 
-  getStringOptionResult: function (value, interactable, element) {
-    if (!utils.isString(value)) {
+  getStringOptionResult: function getStringOptionResult(value, interactable, element) {
+    if (!utils.is.string(value)) {
       return null;
     }
 
@@ -6399,19 +6518,21 @@ var utils = {
     return value;
   },
 
+  is: require('./is'),
   extend: extend,
   hypot: require('./hypot'),
   getOriginXY: require('./getOriginXY')
 };
 
 extend(utils, require('./arr'));
-extend(utils, require('./isType'));
 extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));
 
 module.exports = utils;
 
-},{"./arr":33,"./domUtils":36,"./extend":38,"./getOriginXY":39,"./hypot":40,"./isType":43,"./pointerUtils":46,"./window":48}],42:[function(require,module,exports){
+},{"./arr":33,"./domUtils":36,"./extend":38,"./getOriginXY":39,"./hypot":40,"./is":43,"./pointerUtils":46,"./window":48}],42:[function(require,module,exports){
+'use strict';
+
 var scope = require('../scope');
 var utils = require('./index');
 var browser = require('./browser');
@@ -6419,10 +6540,10 @@ var browser = require('./browser');
 var finder = {
   methodOrder: ['simulationResume', 'mouse', 'hasPointer', 'idle'],
 
-  search: function (pointer, eventType, eventTarget) {
+  search: function search(pointer, eventType, eventTarget) {
     var mouseEvent = /mouse/i.test(pointer.pointerType || eventType)
     // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-     || pointer.pointerType === 4;
+    || pointer.pointerType === 4;
     var pointerId = utils.getPointerId(pointer);
     var details = { pointer: pointer, pointerId: pointerId, mouseEvent: mouseEvent, eventType: eventType, eventTarget: eventTarget };
 
@@ -6449,28 +6570,28 @@ var finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume: function (_ref7) {
-    var mouseEvent = _ref7.mouseEvent;
-    var eventType = _ref7.eventType;
-    var eventTarget = _ref7.eventTarget;
+  simulationResume: function simulationResume(_ref2) {
+    var mouseEvent = _ref2.mouseEvent,
+        eventType = _ref2.eventType,
+        eventTarget = _ref2.eventTarget;
 
     if (!/down|start/i.test(eventType)) {
       return null;
     }
 
     for (var _iterator2 = scope.interactions, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+      var _ref3;
 
       if (_isArray2) {
         if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
+        _ref3 = _iterator2[_i2++];
       } else {
         _i2 = _iterator2.next();
         if (_i2.done) break;
-        _ref2 = _i2.value;
+        _ref3 = _i2.value;
       }
 
-      var interaction = _ref2;
+      var interaction = _ref3;
 
       var element = eventTarget;
 
@@ -6489,30 +6610,30 @@ var finder = {
   },
 
   // if it's a mouse interaction
-  mouse: function (_ref8) {
-    var pointerId = _ref8.pointerId;
-    var mouseEvent = _ref8.mouseEvent;
-    var eventType = _ref8.eventType;
+  mouse: function mouse(_ref4) {
+    var pointerId = _ref4.pointerId,
+        mouseEvent = _ref4.mouseEvent,
+        eventType = _ref4.eventType;
 
     if (!mouseEvent && (browser.supportsTouch || browser.supportsPointerEvent)) {
       return null;
     }
 
-    var firstNonActive = undefined;
+    var firstNonActive = void 0;
 
     for (var _iterator3 = scope.interactions, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-      var _ref3;
+      var _ref5;
 
       if (_isArray3) {
         if (_i3 >= _iterator3.length) break;
-        _ref3 = _iterator3[_i3++];
+        _ref5 = _iterator3[_i3++];
       } else {
         _i3 = _iterator3.next();
         if (_i3.done) break;
-        _ref3 = _i3.value;
+        _ref5 = _i3.value;
       }
 
-      var interaction = _ref3;
+      var interaction = _ref5;
 
       if (interaction.mouse) {
         // if it's a down event, skip interactions with running simulations
@@ -6541,21 +6662,21 @@ var finder = {
     // ignore the interaction if the eventType is a mousedown, and a simulation
     // is active
     for (var _iterator4 = scope.interactions, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
-      var _ref4;
+      var _ref6;
 
       if (_isArray4) {
         if (_i4 >= _iterator4.length) break;
-        _ref4 = _iterator4[_i4++];
+        _ref6 = _iterator4[_i4++];
       } else {
         _i4 = _iterator4.next();
         if (_i4.done) break;
-        _ref4 = _i4.value;
+        _ref6 = _i4.value;
       }
 
-      var interaction = _ref4;
+      var _interaction = _ref6;
 
-      if (interaction.mouse && !(/down/.test(eventType) && interaction.simulation)) {
-        return interaction;
+      if (_interaction.mouse && !(/down/.test(eventType) && _interaction.simulation)) {
+        return _interaction;
       }
     }
 
@@ -6563,22 +6684,22 @@ var finder = {
   },
 
   // get interaction that has this pointer
-  hasPointer: function (_ref9) {
-    var pointerId = _ref9.pointerId;
+  hasPointer: function hasPointer(_ref7) {
+    var pointerId = _ref7.pointerId;
 
     for (var _iterator5 = scope.interactions, _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
-      var _ref5;
+      var _ref8;
 
       if (_isArray5) {
         if (_i5 >= _iterator5.length) break;
-        _ref5 = _iterator5[_i5++];
+        _ref8 = _iterator5[_i5++];
       } else {
         _i5 = _iterator5.next();
         if (_i5.done) break;
-        _ref5 = _i5.value;
+        _ref8 = _i5.value;
       }
 
-      var interaction = _ref5;
+      var interaction = _ref8;
 
       if (utils.contains(interaction.pointerIds, pointerId)) {
         return interaction;
@@ -6587,22 +6708,22 @@ var finder = {
   },
 
   // get first idle interaction
-  idle: function (_ref10) {
-    var mouseEvent = _ref10.mouseEvent;
+  idle: function idle(_ref9) {
+    var mouseEvent = _ref9.mouseEvent;
 
     for (var _iterator6 = scope.interactions, _isArray6 = Array.isArray(_iterator6), _i6 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
-      var _ref6;
+      var _ref10;
 
       if (_isArray6) {
         if (_i6 >= _iterator6.length) break;
-        _ref6 = _iterator6[_i6++];
+        _ref10 = _iterator6[_i6++];
       } else {
         _i6 = _iterator6.next();
         if (_i6.done) break;
-        _ref6 = _i6.value;
+        _ref10 = _i6.value;
       }
 
-      var interaction = _ref6;
+      var interaction = _ref10;
 
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {
@@ -6630,76 +6751,73 @@ var finder = {
 module.exports = finder;
 
 },{"../scope":31,"./browser":34,"./index":41}],43:[function(require,module,exports){
+'use strict';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var win = require('./window');
 var isWindow = require('./isWindow');
-var domObjects = require('./domObjects');
 
-var isType = {
-  isElement: function (o) {
-    if (!o || typeof o !== 'object') {
-      return false;
-    }
+var is = {
+  array: function array() {},
 
-    var _window = win.getWindow(o) || win.window;
-
-    return (/object|function/.test(typeof _window.Element) ? o instanceof _window.Element //DOM2
-      : o.nodeType === 1 && typeof o.nodeName === 'string'
-    );
-  },
-
-  isArray: null,
-
-  isWindow: function (thing) {
+  window: function window(thing) {
     return thing === win.window || isWindow(thing);
   },
 
-  isDocFrag: function (thing) {
-    return isType.isObject(thing) && thing.nodeType === 11;
+  docFrag: function docFrag(thing) {
+    return is.object(thing) && thing.nodeType === 11;
   },
 
-  isObject: function (thing) {
-    return !!thing && typeof thing === 'object';
+  object: function object(thing) {
+    return !!thing && (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) === 'object';
   },
 
-  isFunction: function (thing) {
+  function: function _function(thing) {
     return typeof thing === 'function';
   },
 
-  isNumber: function (thing) {
+  number: function number(thing) {
     return typeof thing === 'number';
   },
 
-  isBool: function (thing) {
+  bool: function bool(thing) {
     return typeof thing === 'boolean';
   },
 
-  isString: function (thing) {
+  string: function string(thing) {
     return typeof thing === 'string';
   },
 
-  trySelector: function (value) {
-    if (!isType.isString(value)) {
+  element: function element(thing) {
+    if (!thing || (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) !== 'object') {
       return false;
     }
 
-    // an exception will be raised if it is invalid
-    domObjects.document.querySelector(value);
-    return true;
+    var _window = win.getWindow(thing) || win.window;
+
+    return (/object|function/.test(_typeof(_window.Element)) ? thing instanceof _window.Element //DOM2
+      : thing.nodeType === 1 && typeof thing.nodeName === 'string'
+    );
   }
 };
 
-isType.isArray = function (thing) {
-  return isType.isObject(thing) && typeof thing.length !== 'undefined' && isType.isFunction(thing.splice);
+is.array = function (thing) {
+  return is.object(thing) && typeof thing.length !== 'undefined' && is.function(thing.splice);
 };
 
-module.exports = isType;
+module.exports = is;
 
-},{"./domObjects":35,"./isWindow":44,"./window":48}],44:[function(require,module,exports){
+},{"./isWindow":44,"./window":48}],44:[function(require,module,exports){
+"use strict";
+
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
 },{}],45:[function(require,module,exports){
+'use strict';
+
 function pointerExtend(dest, source) {
   for (var prop in source) {
     var prefixedPropREs = module.exports.prefixedPropREs;
@@ -6727,14 +6845,16 @@ pointerExtend.prefixedPropREs = {
 module.exports = pointerExtend;
 
 },{}],46:[function(require,module,exports){
+'use strict';
+
 var hypot = require('./hypot');
 var browser = require('./browser');
 var dom = require('./domObjects');
-var isType = require('./isType');
+var is = require('./is');
 var pointerExtend = require('./pointerExtend');
 
 var pointerUtils = {
-  copyCoords: function (dest, src) {
+  copyCoords: function copyCoords(dest, src) {
     dest.page = dest.page || {};
     dest.page.x = src.page.x;
     dest.page.y = src.page.y;
@@ -6746,7 +6866,7 @@ var pointerUtils = {
     dest.timeStamp = src.timeStamp;
   },
 
-  setCoordDeltas: function (targetObj, prev, cur) {
+  setCoordDeltas: function setCoordDeltas(targetObj, prev, cur) {
     targetObj.page.x = cur.page.x - prev.page.x;
     targetObj.page.y = cur.page.y - prev.page.y;
     targetObj.client.x = cur.client.x - prev.client.x;
@@ -6765,12 +6885,12 @@ var pointerUtils = {
     targetObj.client.vy = targetObj.client.y / dt;
   },
 
-  isNativePointer: function (pointer) {
+  isNativePointer: function isNativePointer(pointer) {
     return pointer instanceof dom.Event || pointer instanceof dom.Touch;
   },
 
   // Get specified X/Y coords for mouse or event.touches[0]
-  getXY: function (type, pointer, xy) {
+  getXY: function getXY(type, pointer, xy) {
     xy = xy || {};
     type = type || 'page';
 
@@ -6780,7 +6900,7 @@ var pointerUtils = {
     return xy;
   },
 
-  getPageXY: function (pointer, page) {
+  getPageXY: function getPageXY(pointer, page) {
     page = page || {};
 
     // Opera Mobile handles the viewport and scrolling oddly
@@ -6796,7 +6916,7 @@ var pointerUtils = {
     return page;
   },
 
-  getClientXY: function (pointer, client) {
+  getClientXY: function getClientXY(pointer, client) {
     client = client || {};
 
     if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
@@ -6809,11 +6929,11 @@ var pointerUtils = {
     return client;
   },
 
-  getPointerId: function (pointer) {
-    return isType.isNumber(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
+  getPointerId: function getPointerId(pointer) {
+    return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
   },
 
-  setCoords: function (targetObj, pointers, timeStamp) {
+  setCoords: function setCoords(targetObj, pointers, timeStamp) {
     var pointer = pointers.length > 1 ? pointerUtils.pointerAverage(pointers) : pointers[0];
 
     var tmpXY = {};
@@ -6826,16 +6946,16 @@ var pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp : new Date().getTime();
+    targetObj.timeStamp = is.number(timeStamp) ? timeStamp : new Date().getTime();
   },
 
   pointerExtend: pointerExtend,
 
-  getTouchPair: function (event) {
+  getTouchPair: function getTouchPair(event) {
     var touches = [];
 
     // array of touches is supplied
-    if (isType.isArray(event)) {
+    if (is.array(event)) {
       touches[0] = event[0];
       touches[1] = event[1];
     }
@@ -6858,7 +6978,7 @@ var pointerUtils = {
     return touches;
   },
 
-  pointerAverage: function (pointers) {
+  pointerAverage: function pointerAverage(pointers) {
     var average = {
       pageX: 0,
       pageY: 0,
@@ -6882,8 +7002,8 @@ var pointerUtils = {
 
       var pointer = _ref;
 
-      for (var prop in average) {
-        average[prop] += pointer[prop];
+      for (var _prop in average) {
+        average[_prop] += pointer[_prop];
       }
     }
     for (var prop in average) {
@@ -6893,7 +7013,7 @@ var pointerUtils = {
     return average;
   },
 
-  touchBBox: function (event) {
+  touchBBox: function touchBBox(event) {
     if (!event.length && !(event.touches && event.touches.length > 1)) {
       return;
     }
@@ -6914,7 +7034,7 @@ var pointerUtils = {
     };
   },
 
-  touchDistance: function (event, deltaSource) {
+  touchDistance: function touchDistance(event, deltaSource) {
     var sourceX = deltaSource + 'X';
     var sourceY = deltaSource + 'Y';
     var touches = pointerUtils.getTouchPair(event);
@@ -6925,7 +7045,7 @@ var pointerUtils = {
     return hypot(dx, dy);
   },
 
-  touchAngle: function (event, prevAngle, deltaSource) {
+  touchAngle: function touchAngle(event, prevAngle, deltaSource) {
     var sourceX = deltaSource + 'X';
     var sourceY = deltaSource + 'Y';
     var touches = pointerUtils.getTouchPair(event);
@@ -6936,7 +7056,7 @@ var pointerUtils = {
     return angle;
   },
 
-  getPointerType: function (pointer, interaction) {
+  getPointerType: function getPointerType(pointer, interaction) {
     // if the PointerEvent API isn't available, then the pointer must be ither
     // a MouseEvent or TouchEvent
     if (interaction.mouse) {
@@ -6946,21 +7066,22 @@ var pointerUtils = {
       return 'touch';
     }
 
-    return isType.isString(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
+    return is.string(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
   }
 };
 
 module.exports = pointerUtils;
 
-},{"./browser":34,"./domObjects":35,"./hypot":40,"./isType":43,"./pointerExtend":45}],47:[function(require,module,exports){
-var _require = require('./window');
+},{"./browser":34,"./domObjects":35,"./hypot":40,"./is":43,"./pointerExtend":45}],47:[function(require,module,exports){
+'use strict';
 
-var window = _require.window;
+var _require = require('./window'),
+    window = _require.window;
 
 var vendors = ['ms', 'moz', 'webkit', 'o'];
 var lastTime = 0;
-var request = undefined;
-var cancel = undefined;
+var request = void 0;
+var cancel = void 0;
 
 for (var x = 0; x < vendors.length && !window.requestAnimationFrame; x++) {
   request = window[vendors[x] + 'RequestAnimationFrame'];
@@ -6968,7 +7089,7 @@ for (var x = 0; x < vendors.length && !window.requestAnimationFrame; x++) {
 }
 
 if (!request) {
-  request = function (callback) {
+  request = function request(callback) {
     var currTime = new Date().getTime();
     var timeToCall = Math.max(0, 16 - (currTime - lastTime));
     var id = setTimeout(function () {
@@ -6981,7 +7102,7 @@ if (!request) {
 }
 
 if (!cancel) {
-  cancel = function (id) {
+  cancel = function cancel(id) {
     clearTimeout(id);
   };
 }
@@ -6992,6 +7113,8 @@ module.exports = {
 };
 
 },{"./window":48}],48:[function(require,module,exports){
+'use strict';
+
 var win = module.exports;
 var isWindow = require('./isWindow');
 
