@@ -1,5 +1,5 @@
 const { window } = require('./window');
-const isType     = require('./isType');
+const is     = require('./is');
 const domObjects = require('./domObjects');
 
 const Element = domObjects.Element;
@@ -7,7 +7,7 @@ const navigator  = window.navigator;
 
 const browser = {
   // Does the browser support touch input?
-  supportsTouch: !!(('ontouchstart' in window) || isType.isFunction(window.DocumentTouch)
+  supportsTouch: !!(('ontouchstart' in window) || is.function(window.DocumentTouch)
                      && domObjects.document instanceof window.DocumentTouch),
 
   // Does the browser support PointerEvents
@@ -60,6 +60,6 @@ const browser = {
 
 };
 
-browser.useMatchesSelectorPolyfill = !isType.isFunction(Element.prototype[browser.prefixedMatchesSelector]);
+browser.useMatchesSelectorPolyfill = !is.function(Element.prototype[browser.prefixedMatchesSelector]);
 
 module.exports = browser;

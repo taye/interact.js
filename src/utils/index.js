@@ -43,7 +43,7 @@ const utils = {
   },
 
   getStringOptionResult: function (value, interactable, element) {
-    if (!utils.isString(value)) {
+    if (!utils.is.string(value)) {
       return null;
     }
 
@@ -60,13 +60,13 @@ const utils = {
     return value;
   },
 
+  is         : require('./is'),
   extend     : extend,
   hypot      : require('./hypot'),
   getOriginXY: require('./getOriginXY'),
 };
 
 extend(utils, require('./arr'));
-extend(utils, require('./isType'));
 extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));
 

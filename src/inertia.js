@@ -37,7 +37,7 @@ Interaction.signals.on('down', function ({ interaction, event, pointer, eventTar
     let element = eventTarget;
 
     // climb up the DOM tree from the event target
-    while (utils.isElement(element)) {
+    while (utils.is.element(element)) {
 
       // if interaction element is the current inertia target element
       if (element === interaction.element) {

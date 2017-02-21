@@ -84,15 +84,15 @@ function collectDrops (interaction, element) {
     const accept = current.options.drop.accept;
 
     // test the draggable element against the dropzone's accept setting
-    if ((utils.isElement(accept) && accept !== element)
-        || (utils.isString(accept)
+    if ((utils.is.element(accept) && accept !== element)
+        || (utils.is.string(accept)
         && !utils.matchesSelector(element, accept))) {
 
       continue;
     }
 
     // query for new elements if necessary
-    const dropElements = utils.isString(current.target)
+    const dropElements = utils.is.string(current.target)
       ? current._context.querySelectorAll(current.target)
       : [current.target];
 
@@ -318,20 +318,20 @@ function fireDropEvents (interaction, dropEvents) {
  = (boolean | object) The current setting or this Interactable
 \*/
 Interactable.prototype.dropzone = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
 
-    if (utils.isFunction(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
-    if (utils.isFunction(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
-    if (utils.isFunction(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
-    if (utils.isFunction(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
-    if (utils.isFunction(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
-    if (utils.isFunction(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
+    if (utils.is.function(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
+    if (utils.is.function(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
+    if (utils.is.function(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
+    if (utils.is.function(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
+    if (utils.is.function(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
+    if (utils.is.function(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
 
     if (/^(pointer|center)$/.test(options.overlap)) {
       this.options.drop.overlap = options.overlap;
     }
-    else if (utils.isNumber(options.overlap)) {
+    else if (utils.is.number(options.overlap)) {
       this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
     }
     if ('accept' in options) {
@@ -345,7 +345,7 @@ Interactable.prototype.dropzone = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.drop.enabled = options;
 
     if (!options) {
@@ -394,7 +394,7 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
     dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
   }
 
-  if (dragRect && utils.isNumber(dropOverlap)) {
+  if (dragRect && utils.is.number(dropOverlap)) {
     const overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
                           * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top )));
 
@@ -448,7 +448,7 @@ Interaction.signals.on('stop', function ({ interaction }) {
  = (boolean | interact) The current setting or interact
 \*/
 interact.dynamicDrop = function (newValue) {
-  if (utils.isBool(newValue)) {
+  if (utils.is.bool(newValue)) {
     //if (dragging && dynamicDrop !== newValue && !newValue) {
       //calcRects(dropzones);
     //}

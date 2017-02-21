@@ -1,4 +1,4 @@
-const isType   = require('./isType');
+const is   = require('./is');
 const domUtils = require('./domUtils');
 const pExtend  = require('./pointerExtend');
 
@@ -287,7 +287,7 @@ function delegateListener (event, optionalArg) {
   fakeEvent.preventDefault = preventOriginalDefault;
 
   // climb up document tree looking for selector matches
-  while (isType.isElement(element)) {
+  while (is.element(element)) {
     for (let i = 0; i < delegated.selectors.length; i++) {
       const selector = delegated.selectors[i];
       const context = delegated.contexts[i];
@@ -336,7 +336,7 @@ function stopImmProp () {
 }
 
 function getOptions (param) {
-  return isType.isObject(param)? param : { capture: param };
+  return is.object(param)? param : { capture: param };
 }
 
 module.exports = {

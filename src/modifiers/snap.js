@@ -89,7 +89,7 @@ const snap = {
       const relativeY = page.y - offsetY;
 
       for (const snapTarget of snapOptions.targets) {
-        if (utils.isFunction(snapTarget)) {
+        if (utils.is.function(snapTarget)) {
           target = snapTarget(relativeX, relativeY, interaction);
         }
         else {
@@ -99,10 +99,10 @@ const snap = {
         if (!target) { continue; }
 
         targets.push({
-          x: utils.isNumber(target.x) ? (target.x + offsetX) : relativeX,
-          y: utils.isNumber(target.y) ? (target.y + offsetY) : relativeY,
+          x: utils.is.number(target.x) ? (target.x + offsetX) : relativeX,
+          y: utils.is.number(target.y) ? (target.y + offsetY) : relativeY,
 
-          range: utils.isNumber(target.range)? target.range: snapOptions.range,
+          range: utils.is.number(target.range)? target.range: snapOptions.range,
         });
       }
     }
@@ -226,7 +226,7 @@ interact.createSnapGrid = function (grid) {
     let offsetX = 0;
     let offsetY = 0;
 
-    if (utils.isObject(grid.offset)) {
+    if (utils.is.object(grid.offset)) {
       offsetX = grid.offset.x;
       offsetY = grid.offset.y;
     }

@@ -1,4 +1,4 @@
-const isType    = require('./utils/isType');
+const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
 const actions   = require('./actions/base');
@@ -7,10 +7,14 @@ const Eventable = require('./Eventable');
 const defaults  = require('./defaultOptions');
 const signals   = require('./utils/Signals').new();
 
-const { getWindow }                    = require('./utils/window');
-const { getElementRect, nodeContains } = require('./utils/domUtils');
-const { indexOf, contains }            = require('./utils/arr');
-const { wheelEvent }                   = require('./utils/browser');
+const {
+  getElementRect,
+  nodeContains,
+  trySelector,
+}                           = require('./utils/domUtils');
+const { getWindow }         = require('./utils/window');
+const { indexOf, contains } = require('./utils/arr');
+const { wheelEvent }        = require('./utils/browser');
 
 // all set interactables
 scope.interactables = [];
@@ -28,7 +32,7 @@ class Interactable {
     this.target   = target;
     this.events   = new Eventable();
     this._context = options.context || scope.document;
-    this._win     = getWindow(isType.trySelector(target)? this._context : target);
+    this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
     signals.fire('new', {
@@ -48,10 +52,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (isType.isFunction(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
-    if (isType.isFunction(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
-    if (isType.isFunction(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
-    if (isType.isFunction(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (is.function(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
+    if (is.function(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
+    if (is.function(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
+    if (is.function(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -62,15 +66,15 @@ class Interactable {
       // if this option exists for this action
       if (option in defaults[action]) {
         // if the option in the options arg is an object value
-        if (isType.isObject(options[option])) {
+        if (is.object(options[option])) {
           // duplicate the object
           this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
 
-          if (isType.isObject(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
+          if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false? false : true;
           }
         }
-        else if (isType.isBool(options[option]) && isType.isObject(defaults.perAction[option])) {
+        else if (is.bool(options[option]) && is.object(defaults.perAction[option])) {
           this.options[action][option].enabled = options[option];
         }
         else if (options[option] !== undefined) {
@@ -102,7 +106,7 @@ class Interactable {
   getRect (element) {
     element = element || this.target;
 
-    if (isType.isString(this.target) && !(isType.isElement(element))) {
+    if (is.string(this.target) && !(is.element(element))) {
       element = this._context.querySelector(this.target);
     }
 
@@ -120,7 +124,7 @@ class Interactable {
    = (function | object) The checker function or this Interactable
   \*/
   rectChecker (checker) {
-    if (isType.isFunction(checker)) {
+    if (is.function(checker)) {
       this.getRect = checker;
 
       return this;
@@ -136,7 +140,7 @@ class Interactable {
   }
 
   _backCompatOption (optionName, newValue) {
-    if (isType.trySelector(newValue) || isType.isObject(newValue)) {
+    if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
       for (const action of actions.names) {
@@ -221,11 +225,11 @@ class Interactable {
   }
 
   _onOffMultiple (method, eventType, listener, useCapture) {
-    if (isType.isString(eventType) && eventType.search(' ') !== -1) {
+    if (is.string(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
-    if (isType.isArray(eventType)) {
+    if (is.array(eventType)) {
       for (let i = 0; i < eventType.length; i++) {
         this[method](eventType[i], listener, useCapture);
       }
@@ -233,7 +237,7 @@ class Interactable {
       return true;
     }
 
-    if (isType.isObject(eventType)) {
+    if (is.object(eventType)) {
       for (const prop in eventType) {
         this[method](prop, eventType[prop], listener);
       }
@@ -267,7 +271,7 @@ class Interactable {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
-    else if (isType.isString(this.target)) {
+    else if (is.string(this.target)) {
       events.addDelegate(this.target, this._context, eventType, listener, useCapture);
     }
     else {
@@ -303,7 +307,7 @@ class Interactable {
       this.events.off(eventType, listener);
     }
     // delegated event
-    else if (isType.isString(this.target)) {
+    else if (is.string(this.target)) {
       events.removeDelegate(this.target, this._context, eventType, listener, useCapture);
     }
     // remove listener from this Interatable's element
@@ -323,7 +327,7 @@ class Interactable {
    = (object) This Interactable
   \*/
   set (options) {
-    if (!isType.isObject(options)) {
+    if (!is.object(options)) {
       options = {};
     }
 
@@ -369,7 +373,7 @@ class Interactable {
   unset () {
     events.remove(this.target, 'all');
 
-    if (isType.isString(this.target)) {
+    if (is.string(this.target)) {
       // remove delegated events
       for (const type in events.delegatedEvents) {
         const delegated = events.delegatedEvents[type];
@@ -417,7 +421,7 @@ scope.interactables.indexOfElement = function indexOfElement (target, context) {
     const interactable = this[i];
 
     if (interactable.target === target
-        && (!isType.isString(target) || (interactable._context === context))) {
+        && (!is.string(target) || (interactable._context === context))) {
       return i;
     }
   }
@@ -435,7 +439,7 @@ scope.interactables.forEachSelector = function (callback, element) {
     const interactable = this[i];
 
     // skip non CSS selector targets and out of context elements
-    if (!isType.isString(interactable.target)
+    if (!is.string(interactable.target)
         || (element && !interactable.inContext(element))) {
       continue;
     }

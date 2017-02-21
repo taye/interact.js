@@ -1,7 +1,7 @@
 const hypot         = require('./hypot');
 const browser       = require('./browser');
 const dom           = require('./domObjects');
-const isType        = require('./isType');
+const is            = require('./is');
 const pointerExtend = require('./pointerExtend');
 
 const pointerUtils = {
@@ -83,7 +83,7 @@ const pointerUtils = {
   },
 
   getPointerId: function (pointer) {
-    return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    return is.number(pointer.pointerId)? pointer.pointerId : pointer.identifier;
   },
 
   setCoords: function (targetObj, pointers, timeStamp) {
@@ -101,7 +101,7 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp :new Date().getTime();
+    targetObj.timeStamp = is.number(timeStamp) ? timeStamp :new Date().getTime();
   },
 
   pointerExtend: pointerExtend,
@@ -110,7 +110,7 @@ const pointerUtils = {
     const touches = [];
 
     // array of touches is supplied
-    if (isType.isArray(event)) {
+    if (is.array(event)) {
       touches[0] = event[0];
       touches[1] = event[1];
     }
@@ -207,7 +207,7 @@ const pointerUtils = {
     if (interaction.mouse)             { return 'mouse'; }
     if (!browser.supportsPointerEvent) { return 'touch'; }
 
-    return isType.isString(pointer.pointerType)
+    return is.string(pointer.pointerType)
       ? pointer.pointerType
       : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
   },

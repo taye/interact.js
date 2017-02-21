@@ -77,7 +77,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
  | });
 \*/
 Interactable.prototype.gesturable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.gesture.enabled = options.enabled === false? false: true;
     this.setPerAction('gesture', options);
     this.setOnEvents('gesture', options);
@@ -85,7 +85,7 @@ Interactable.prototype.gesturable = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.gesture.enabled = options;
 
     if (!options) {
