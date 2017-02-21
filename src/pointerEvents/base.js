@@ -6,8 +6,8 @@ const defaults     = require('../defaultOptions');
 const signals      = require('../utils/Signals').new();
 const { filter }   = require('../utils/arr');
 
-const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
-const simpleEvents  = [ 'down', 'up', 'tap', 'cancel' ];
+const simpleSignals = [ 'down', 'up', 'cancel' ];
+const simpleEvents  = [ 'down', 'up', 'cancel' ];
 
 const pointerEvents = {
   PointerEvent,
@@ -198,6 +198,12 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
       type: 'hold',
     });
   }, minDuration);
+});
+
+Interaction.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
+  if (!interaction.pointerWasMoved) {
+    fire({ interaction, eventTarget, pointer, event, type: 'tap' });
+  }
 });
 
 ['up', 'cancel'].forEach(function (signalName) {
