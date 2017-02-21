@@ -1,19 +1,19 @@
-const win        = require('./window');
+const { window } = require('./window');
 const isType     = require('./isType');
 const domObjects = require('./domObjects');
 
 const Element = domObjects.Element;
-const navigator  = win.window.navigator;
+const navigator  = window.navigator;
 
 const browser = {
   // Does the browser support touch input?
-  supportsTouch: !!(('ontouchstart' in win.window) || isType.isFunction(win.window.DocumentTouch)
-                     && domObjects.document instanceof win.DocumentTouch),
+  supportsTouch: !!(('ontouchstart' in window) || isType.isFunction(window.DocumentTouch)
+                     && domObjects.document instanceof window.DocumentTouch),
 
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
 
-  isIE8: ('attachEvent' in win.window) && !('addEventListener' in win.window),
+  isIE8: ('attachEvent' in window) && !('addEventListener' in window),
 
   // Opera Mobile must be handled differently
   isOperaMobile: (navigator.appName === 'Opera'
@@ -36,7 +36,7 @@ const browser = {
   useMatchesSelectorPolyfill: false,
 
   pEventTypes: (domObjects.PointerEvent
-    ? (domObjects.PointerEvent === win.window.MSPointerEvent
+    ? (domObjects.PointerEvent === window.MSPointerEvent
       ? {
         up:     'MSPointerUp',
         down:   'MSPointerDown',
