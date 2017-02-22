@@ -328,7 +328,7 @@ class Interaction {
 
     this.target = this.element = null;
 
-    this.pointerIsDown = this._interacting = false;
+    this._interacting = false;
     this.prepared.name = this.prevEvent = null;
   }
 
