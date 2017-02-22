@@ -342,7 +342,10 @@ class Interaction {
 
     if (index === -1) {
       index = this.pointerIds.length;
+      this.holdTimers[index] = { duration: Infinity, timeout: null };
     }
+
+    this.pointerIsDown = this.pointerIsDown || pointer.type === 'down';
 
     this.pointerIds[index] = id;
     this.pointers[index] = pointer;

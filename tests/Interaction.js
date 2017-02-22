@@ -140,13 +140,13 @@ test('Interaction', t => {
       { id: 1, remain: [       ], message: 'final' },
     ];
 
-    pointerIds.forEach(id => {
+    pointerIds.forEach((id, index) => {
       interaction.updatePointer({ pointerId: id });
 
-      // push the ids just for testing
-      interaction.downTimes.push(id);
-      interaction.downTargets.push(id);
-      interaction.holdTimers.push(id);
+      // use the ids in these arrays for this test
+      interaction.downTimes  [index] = id;
+      interaction.downTargets[index] = id;
+      interaction.holdTimers [index] = id;
     });
 
     for (const removal of removals) {

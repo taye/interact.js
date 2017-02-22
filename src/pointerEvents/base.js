@@ -152,13 +152,8 @@ Interaction.signals.on('move', function ({ interaction, pointer, event, eventTar
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
   // copy event to be used in timeout for IE8
   const eventCopy = browser.isIE8? utils.extend({}, event) : event;
-  const timers = interaction.holdTimers;
 
-  if (!timers[pointerIndex]) {
-    timers[pointerIndex] = { duration: Infinity, timeout: null };
-  }
-
-  const timer = timers[pointerIndex];
+  const timer = interaction.holdTimers[pointerIndex];
   const path = utils.getPath(eventTarget);
   const signalArg = {
     interaction,
