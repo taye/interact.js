@@ -4,7 +4,7 @@ const defaults    = require('./defaultOptions');
 const signals     = require('./utils/Signals').new();
 
 class InteractEvent {
-  constructor (interaction, event, action, phase, element, related) {
+  constructor (interaction, event, action, phase, element, related, preEnd = false) {
     const target      = interaction.target;
     const deltaSource = (target && target.options || defaults).deltaSource;
     const origin      = getOriginXY(target, element, action);
@@ -33,6 +33,7 @@ class InteractEvent {
     this.target        = element;
     this.currentTarget = element;
     this.relatedTarget = related || null;
+    this.preEnd        = preEnd;
     this.type          = action + (phase || '');
     this.interaction   = interaction;
     this.interactable  = target;
