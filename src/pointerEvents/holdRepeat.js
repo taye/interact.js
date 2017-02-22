@@ -15,7 +15,7 @@ function onNew ({ pointerEvent }) {
 }
 
 function onFired ({ interaction, pointerEvent, eventTarget, targets }) {
-  if (pointerEvent.type !== 'hold') { return; }
+  if (pointerEvent.type !== 'hold' || !targets.length) { return; }
 
   // get the repeat interval from the first eventable
   const interval = targets[0].eventable.options.holdRepeatInterval;

@@ -36,14 +36,6 @@ function fire (arg) {
     interaction, pointer, event, eventTarget,
     type = arg.pointerEvent.type,
     targets = collectEventTargets(arg),
-  } = arg;
-  // create the tap event even if there are no listeners so that
-  // doubletap can still be created and fired
-  if (!targets.length && type !== 'tap') {
-    return false;
-  }
-
-  const {
     pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction),
   } = arg;
 
@@ -84,18 +76,20 @@ function fire (arg) {
   signals.fire('fired', signalArg);
 
   if (type === 'tap') {
-    if (pointerEvent.double) {
-      fire({
+    // if pointerEvent should make a double tap, create and fire a doubletap
+    // PointerEvent and use that as the prevTap
+    const prevTap = pointerEvent.double
+      ? fire({
         interaction, pointer, event, eventTarget,
         type: 'doubletap',
-      });
-    }
+      })
+      : pointerEvent;
 
-    interaction.prevTap = pointerEvent;
-    interaction.tapTime = pointerEvent.timeStamp;
+    interaction.prevTap = prevTap;
+    interaction.tapTime = prevTap.timeStamp;
   }
 
-  return true;
+  return pointerEvent;
 }
 
 function collectEventTargets ({ interaction, pointer, event, eventTarget, type }) {
