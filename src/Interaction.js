@@ -314,7 +314,7 @@ class Interaction {
   }
 
   getPointerIndex (pointer) {
-    return this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   }
 
   updatePointer (pointer, event, down = event && /(down|start)$/i.test(event.type)) {
