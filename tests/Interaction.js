@@ -36,7 +36,7 @@ test('Interaction', t => {
       'interaction.pointerDelta set to zero');
 
     // array properties
-    for (const prop of 'pointers pointerIds downTargets downTimes holdTimers'.split(' ')) {
+    for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
       t.ok(interaction[prop],
         `interaction.${prop} is an array`);
       t.equal(interaction[prop].length, 0,
@@ -131,7 +131,7 @@ test('Interaction', t => {
 
   test('Interaction.removePointer', t => {
     const interaction = new Interaction();
-    const pointerIdArrays = 'pointerIds downTargets downTimes holdTimers'.split(' ');
+    const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
     const pointerIds = [0, 1, 2, 3];
     const removals = [
       { id: 0, remain: [1, 2, 3], message: 'first of 4' },
@@ -146,7 +146,6 @@ test('Interaction', t => {
       // use the ids in these arrays for this test
       interaction.downTimes  [index] = id;
       interaction.downTargets[index] = id;
-      interaction.holdTimers [index] = id;
     });
 
     for (const removal of removals) {
@@ -167,8 +166,11 @@ test('Interaction', t => {
   test('Interaction.pointerDown', t => {
     const interaction = new Interaction();
     const coords = helpers.newCoordsSet();
-    const event = {};
     const eventTarget = {};
+    const event = {
+      type: 'down',
+      target: eventTarget,
+    };
     const pointer = helpers.newPointer();
     let signalArg;
 
@@ -217,6 +219,7 @@ test('Interaction', t => {
     // reset signalArg object
     signalArg = undefined;
 
+    interaction.removePointer(pointer);
     interaction.pointerDown(pointer, event, eventTarget);
 
     // timeStamp is assigned with new Date.getTime()

@@ -128,6 +128,14 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
   return signalArg.targets;
 }
 
+Interaction.signals.on('update-pointer-down', function ({ interaction, pointerIndex }) {
+  interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
+});
+
+Interaction.signals.on('remove-pointer', function ({ interaction, pointerIndex }) {
+  interaction.holdTimers.splice(pointerIndex, 1);
+});
+
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
   const pointerIndex = interaction.getPointerIndex(pointer);
 
@@ -214,8 +222,9 @@ for (let i = 0; i < simpleSignals.length; i++) {
 }
 
 Interaction.signals.on('new', function (interaction) {
-  interaction.prevTap = null;  // the most recent tap event on this interaction
-  interaction.tapTime = 0;     // time of the most recent tap event
+  interaction.prevTap    = null;  // the most recent tap event on this interaction
+  interaction.tapTime    = 0;     // time of the most recent tap event
+  interaction.holdTimers = [];    // [{ duration, timeout }]
 });
 
 defaults.pointerEvents = pointerEvents.defaults;

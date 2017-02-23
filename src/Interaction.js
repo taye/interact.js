@@ -33,7 +33,6 @@ class Interaction {
     this.pointerIds  = [];
     this.downTargets = [];
     this.downTimes   = [];
-    this.holdTimers  = [];
 
     // Previous native pointer move event coordinates
     this.prevCoords = {
@@ -82,25 +81,7 @@ class Interaction {
   }
 
   pointerDown (pointer, event, eventTarget) {
-    const pointerIndex = this.updatePointer(pointer);
-
-    this.pointerIsDown = true;
-
-    if (!this.interacting()) {
-      utils.setCoords(this.startCoords, this.pointers);
-
-      utils.copyCoords(this.curCoords , this.startCoords);
-      utils.copyCoords(this.prevCoords, this.startCoords);
-
-      this.downEvent = event;
-
-      this.downTimes[pointerIndex] = this.curCoords.timeStamp;
-      this.downTargets[pointerIndex] = eventTarget;
-
-      this.pointerWasMoved = false;
-
-      utils.pointerExtend(this.downPointer, pointer);
-    }
+    const pointerIndex = this.updatePointer(pointer, event, true);
 
     signals.fire('down', {
       pointer,
@@ -274,7 +255,7 @@ class Interaction {
     }
 
     this.pointerIsDown = false;
-    this.removePointer(pointer);
+    this.removePointer(pointer, event);
   }
 
   /*\
@@ -336,34 +317,48 @@ class Interaction {
     return this.mouse? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   }
 
-  updatePointer (pointer) {
+  updatePointer (pointer, event, down = event && /(down|start)$/i.test(event.type)) {
     const id = utils.getPointerId(pointer);
     let index = this.getPointerIndex(pointer);
 
     if (index === -1) {
       index = this.pointerIds.length;
-      this.holdTimers[index] = { duration: Infinity, timeout: null };
+      this.pointerIds[index] = id;
     }
 
-    this.pointerIsDown = this.pointerIsDown || pointer.type === 'down';
+    if (down) {
+      signals.fire('update-pointer-down', {
+        pointer,
+        event,
+        down,
+        pointerId: id,
+        pointerIndex: index,
+        interaction: this,
+      });
+    }
 
-    this.pointerIds[index] = id;
     this.pointers[index] = pointer;
 
     return index;
   }
 
-  removePointer (pointer) {
+  removePointer (pointer, event) {
     const id = utils.getPointerId(pointer);
     const index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
 
     if (index === -1) { return; }
 
+    signals.fire('remove-pointer', {
+      pointer,
+      event,
+      pointerIndex: index,
+      interaction: this,
+    });
+
     this.pointers   .splice(index, 1);
     this.pointerIds .splice(index, 1);
     this.downTargets.splice(index, 1);
     this.downTimes  .splice(index, 1);
-    this.holdTimers .splice(index, 1);
   }
 
   _updateEventTargets (target, currentTarget) {
@@ -380,8 +375,7 @@ for (let i = 0, len = methodNames.length; i < len; i++) {
 
 function doOnInteractions (method) {
   return (function (event) {
-    const eventTarget = utils.getActualElement(event.path ? event.path[0] : event.target);
-    const curEventTarget = utils.getActualElement(event.currentTarget);
+    const [eventTarget, curEventTarget] = utils.getEventTargets(event);
     const matches = []; // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
@@ -476,6 +470,29 @@ function onDocSignal ({ doc }, signalName) {
     eventMethod(doc, eventType, docEvents[eventType]);
   }
 }
+
+signals.on('update-pointer-down', ({ interaction, pointer, pointerId, pointerIndex, event, eventTarget, down }) => {
+  interaction.pointerIds[pointerIndex] = pointerId;
+  interaction.pointers[pointerIndex] = pointer;
+
+  if (down) {
+    interaction.pointerIsDown = true;
+  }
+
+  if (!interaction.interacting()) {
+    utils.setCoords(interaction.startCoords, interaction.pointers);
+
+    utils.copyCoords(interaction.curCoords , interaction.startCoords);
+    utils.copyCoords(interaction.prevCoords, interaction.startCoords);
+
+    interaction.downEvent                 = event;
+    interaction.downTimes[pointerIndex]   = interaction.curCoords.timeStamp;
+    interaction.downTargets[pointerIndex] = eventTarget || event && utils.getEventTargets(event)[0];
+    interaction.pointerWasMoved           = false;
+
+    utils.pointerExtend(interaction.downPointer, pointer);
+  }
+});
 
 scope.signals.on('add-document'   , onDocSignal);
 scope.signals.on('remove-document', onDocSignal);
