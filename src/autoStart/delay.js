@@ -1,4 +1,4 @@
-const autoStart   = require('./index');
+const autoStart   = require('./base');
 const Interaction = require('../Interaction');
 
 Interaction.signals.on('new', function (interaction) {

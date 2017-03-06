@@ -1,6 +1,6 @@
 const raf            = require('./utils/raf');
 const getWindow      = require('./utils/window').getWindow;
-const isWindow       = require('./utils/isType').isWindow;
+const is             = require('./utils/is');
 const domUtils       = require('./utils/domUtils');
 const Interaction    = require('./Interaction');
 const defaultOptions = require('./defaultOptions');
@@ -45,7 +45,7 @@ const autoScroll = {
     const s = options.speed * dt;
 
     if (s >= 1) {
-      if (isWindow(container)) {
+      if (is.window(container)) {
         container.scrollBy(autoScroll.x * s, autoScroll.y * s);
       }
       else if (container) {
@@ -85,7 +85,7 @@ const autoScroll = {
     const options = interaction.target.options[interaction.prepared.name].autoScroll;
     const container = options.container || getWindow(interaction.element);
 
-    if (isWindow(container)) {
+    if (is.window(container)) {
       left   = pointer.clientX < autoScroll.margin;
       top    = pointer.clientY < autoScroll.margin;
       right  = pointer.clientX > container.innerWidth  - autoScroll.margin;

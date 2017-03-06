@@ -1,1 +1,1 @@
-require('./index').setActionDefaults(require('../actions/resize'));
+require('./base').setActionDefaults(require('../actions/resize'));

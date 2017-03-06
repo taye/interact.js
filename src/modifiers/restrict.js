@@ -44,7 +44,7 @@ const restrict = {
     status.dy = 0;
     status.locked = false;
 
-    if (utils.isString(restriction)) {
+    if (utils.is.string(restriction)) {
       if (restriction === 'parent') {
         restriction = utils.parentNode(interaction.element);
       }
@@ -58,11 +58,11 @@ const restrict = {
       if (!restriction) { return status; }
     }
 
-    if (utils.isFunction(restriction)) {
+    if (utils.is.function(restriction)) {
       restriction = restriction(page.x, page.y, interaction.element);
     }
 
-    if (utils.isElement(restriction)) {
+    if (utils.is.element(restriction)) {
       restriction = utils.getElementRect(restriction);
     }
 

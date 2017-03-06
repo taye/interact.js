@@ -1,10 +1,12 @@
-const scope   = require('./scope');
-const events  = require('./utils/events');
-const browser = require('./utils/browser');
-const iFinder = require('./utils/interactionFinder');
+const scope         = require('./scope');
+const events        = require('./utils/events');
+const browser       = require('./utils/browser');
+const iFinder       = require('./utils/interactionFinder');
+const pointerEvents = require('./pointerEvents/base');
+
+const { window } = require('./utils/window');
 
 const toString = Object.prototype.toString;
-const window = scope.window;
 
 if (!window.Array.isArray) {
   window.Array.isArray = function (obj) {
@@ -24,19 +26,26 @@ if (!String.prototype.trim) {
 // IE8 doesn't fire down event before dblclick.
 // This workaround tries to fire a tap and doubletap after dblclick
 function onIE8Dblclick (event) {
-  const interaction = iFinder.search(event, event.type, event.target);
+  const eventTarget = event.target;
+  const interaction = iFinder.search(event, event.type, eventTarget);
 
   if (!interaction) { return; }
 
   if (interaction.prevTap
       && event.clientX === interaction.prevTap.clientX
       && event.clientY === interaction.prevTap.clientY
-      && event.target  === interaction.prevTap.target) {
+      && eventTarget   === interaction.prevTap.target) {
 
-    interaction.downTargets[0] = event.target;
+    interaction.downTargets[0] = eventTarget;
     interaction.downTimes  [0] = new Date().getTime();
 
-    scope.pointerEvents.collectEventTargets(interaction, event, event, event.target, 'tap');
+    pointerEvents.fire({
+      interaction,
+      event,
+      eventTarget,
+      pointer: event,
+      type: 'tap',
+    });
   }
 }
 
@@ -56,7 +65,7 @@ if (browser.isIE8) {
     // For IE's lack of Event#preventDefault
     eventMethod(doc, 'selectstart', selectFix);
 
-    if (scope.pointerEvents) {
+    if (pointerEvents) {
       eventMethod(doc, 'dblclick', onIE8Dblclick);
     }
   };

@@ -1,7 +1,8 @@
 const hypot         = require('./hypot');
 const browser       = require('./browser');
 const dom           = require('./domObjects');
-const isType        = require('./isType');
+const domUtils      = require('./domUtils');
+const is            = require('./is');
 const pointerExtend = require('./pointerExtend');
 
 const pointerUtils = {
@@ -83,7 +84,7 @@ const pointerUtils = {
   },
 
   getPointerId: function (pointer) {
-    return isType.isNumber(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+    return is.number(pointer.pointerId)? pointer.pointerId : pointer.identifier;
   },
 
   setCoords: function (targetObj, pointers, timeStamp) {
@@ -101,7 +102,7 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = isType.isNumber(timeStamp) ? timeStamp :new Date().getTime();
+    targetObj.timeStamp = is.number(timeStamp) ? timeStamp :new Date().getTime();
   },
 
   pointerExtend: pointerExtend,
@@ -110,7 +111,7 @@ const pointerUtils = {
     const touches = [];
 
     // array of touches is supplied
-    if (isType.isArray(event)) {
+    if (is.array(event)) {
       touches[0] = event[0];
       touches[1] = event[1];
     }
@@ -199,6 +200,25 @@ const pointerUtils = {
     const angle = 180 * Math.atan2(dy , dx) / Math.PI;
 
     return  angle;
+  },
+
+  getPointerType: function (pointer, interaction) {
+    // if the PointerEvent API isn't available, then the pointer must be ither
+    // a MouseEvent or TouchEvent
+    if (interaction.mouse)             { return 'mouse'; }
+    if (!browser.supportsPointerEvent) { return 'touch'; }
+
+    return is.string(pointer.pointerType)
+      ? pointer.pointerType
+      : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
+  },
+
+  // [ event.target, event.currentTarget ]
+  getEventTargets: function (event) {
+    return [
+      domUtils.getActualElement(event.path ? event.path[0] : event.target),
+      domUtils.getActualElement(event.currentTarget),
+    ];
   },
 };
 

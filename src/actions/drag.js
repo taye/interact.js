@@ -1,4 +1,4 @@
-const actions        = require('./index');
+const actions        = require('./base');
 const utils          = require('../utils');
 const InteractEvent  = require('../InteractEvent');
 const Interactable   = require('../Interactable');
@@ -115,7 +115,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
  | });
 \*/
 Interactable.prototype.draggable = function (options) {
-  if (utils.isObject(options)) {
+  if (utils.is.object(options)) {
     this.options.drag.enabled = options.enabled === false? false: true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
@@ -130,7 +130,7 @@ Interactable.prototype.draggable = function (options) {
     return this;
   }
 
-  if (utils.isBool(options)) {
+  if (utils.is.bool(options)) {
     this.options.drag.enabled = options;
 
     if (!options) {

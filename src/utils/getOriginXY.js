@@ -1,5 +1,10 @@
-const { closest, parentNode, getElementRect } = require('./domUtils');
-const { isElement, isFunction, trySelector }  = require('./isType');
+const is = require('./is');
+const {
+  closest,
+  parentNode,
+  getElementRect,
+  trySelector,
+} = require('./domUtils');
 
 module.exports = function (target, element, action) {
   const actionOptions = target.options[action];
@@ -16,11 +21,11 @@ module.exports = function (target, element, action) {
     origin = closest(element, origin) || { x: 0, y: 0 };
   }
 
-  if (isFunction(origin)) {
+  if (is.function(origin)) {
     origin = origin(target && element);
   }
 
-  if (isElement(origin))  {
+  if (is.element(origin))  {
     origin = getElementRect(origin);
   }
 

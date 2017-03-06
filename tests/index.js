@@ -1,13 +1,12 @@
-require('./init');
-
 require('./Interaction');
 
 // Legacy browser support
 //require('./legacyBrowsers');
 
 // pointerEvents
-//require('./pointerEvents');
-//require('./pointerEvents/holdRepeat');
+require('./pointerEvents/base');
+require('./pointerEvents/PointerEvent');
+require('./pointerEvents/holdRepeat');
 //require('./pointerEvents/interactableTargets');
 
 // inertia
@@ -21,7 +20,7 @@ require('./Interaction');
 //require('./autoStart/delay');
 
 // actions
-require('./actions/index');
+require('./actions/base');
 //require('./actions/gesture');
 //require('./actions/resize');
 require('./actions/drag');

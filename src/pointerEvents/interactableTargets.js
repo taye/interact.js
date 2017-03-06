@@ -1,13 +1,13 @@
-const pointerEvents = require('./index');
+const pointerEvents = require('./base');
 const Interactable  = require('../Interactable');
 const browser       = require('../utils/browser');
-const isType        = require('../utils/isType');
+const is            = require('../utils/is');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
 const extend        = require('../utils/extend');
 const { merge }     = require('../utils/arr');
 
-pointerEvents.signals.on('collect-targets', function ({ targets, element, eventType, eventTarget }) {
+pointerEvents.signals.on('collect-targets', function ({ targets, element, type, eventTarget }) {
   function collectSelectors (interactable, selector, context) {
     const els = browser.useMatchesSelectorPolyfill
         ? context.querySelectorAll(selector)
@@ -16,8 +16,8 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
     const eventable = interactable.events;
     const options = eventable.options;
 
-    if (eventable[eventType]
-        && isType.isElement(element)
+    if (eventable[type]
+        && is.element(element)
         && domUtils.matchesSelector(element, selector, els)
         && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
@@ -35,7 +35,7 @@ pointerEvents.signals.on('collect-targets', function ({ targets, element, eventT
     const eventable = interactable.events;
     const options = eventable.options;
 
-    if (eventable[eventType]
+    if (eventable[type]
         && interactable.testIgnoreAllow(options, element, eventTarget)) {
       targets.push({
         element,

@@ -1,11 +1,11 @@
-const autoStart = require('./index');
+const autoStart = require('./base');
 const scope     = require('../scope');
 const browser   = require('../utils/browser');
+const is        = require('../utils/is');
 
-const { isElement } = require('../utils/isType');
 const { matchesSelector, parentNode } = require('../utils/domUtils');
 
-require('./index').setActionDefaults(require('../actions/drag'));
+autoStart.setActionDefaults(require('../actions/drag'));
 
 autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {
   if (interaction.prepared.name !== 'drag') { return; }
@@ -61,7 +61,7 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
       let action = null;
 
       // check all interactables
-      while (isElement(element)) {
+      while (is.element(element)) {
         const elementInteractable = scope.interactables.get(element);
 
         if (elementInteractable

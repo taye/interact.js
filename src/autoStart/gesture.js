@@ -1,1 +1,1 @@
-require('./index').setActionDefaults(require('../actions/gesture'));
+require('./base').setActionDefaults(require('../actions/gesture'));

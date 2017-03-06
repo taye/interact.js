@@ -37,8 +37,7 @@ const modifiers = {
         continue;
       }
 
-      interaction.modifierOffsets[modifierName] =
-        modifiers[modifierName].setOffset(arg);
+      interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
     }
   },
 
@@ -115,7 +114,7 @@ const modifiers = {
     modifiers.resetStatuses(arg.statuses);
 
     arg.pageCoords = extend({}, interaction.startCoords.page);
-    modifiers.setAll(arg);
+    interaction.modifierResult = modifiers.setAll(arg);
   },
 };
 
@@ -123,6 +122,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
   interaction.modifierOffsets  = {};
   interaction.modifierStatuses = modifiers.resetStatuses({});
+  interaction.modifierResult   = null;
 });
 
 Interaction.signals.on('action-start' , modifiers.start);
@@ -142,6 +142,8 @@ Interaction.signals.on('before-action-move', function ({ interaction, preEnd, in
   if (!modifierResult.shouldMove && interactingBeforeMove) {
     interaction._dontFireMove = true;
   }
+
+  interaction.modifierResult = modifierResult;
 });
 
 Interaction.signals.on('action-end', function ({ interaction, event }) {

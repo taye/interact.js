@@ -1,12 +1,12 @@
-const tape = require('tape');
+const test = require('./test');
 const pointerUtils = require('../src/utils/pointerUtils');
 const helpers = require('./helpers');
 
-tape('Interaction', interactionTest => {
+test('Interaction', t => {
   const scope       = require('../src/scope');
   const Interaction = require('../src/Interaction');
 
-  const test = interactionTest.test;
+  const test = t.test;
 
   test('Interaction constructor', t => {
     const interaction = new Interaction();
@@ -36,7 +36,7 @@ tape('Interaction', interactionTest => {
       'interaction.pointerDelta set to zero');
 
     // array properties
-    for (const prop of 'pointers pointerIds downTargets downTimes holdTimers'.split(' ')) {
+    for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
       t.ok(interaction[prop],
         `interaction.${prop} is an array`);
       t.equal(interaction[prop].length, 0,
@@ -131,7 +131,7 @@ tape('Interaction', interactionTest => {
 
   test('Interaction.removePointer', t => {
     const interaction = new Interaction();
-    const pointerIdArrays = 'pointerIds downTargets downTimes holdTimers'.split(' ');
+    const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
     const pointerIds = [0, 1, 2, 3];
     const removals = [
       { id: 0, remain: [1, 2, 3], message: 'first of 4' },
@@ -140,13 +140,12 @@ tape('Interaction', interactionTest => {
       { id: 1, remain: [       ], message: 'final' },
     ];
 
-    pointerIds.forEach(id => {
+    pointerIds.forEach((id, index) => {
       interaction.updatePointer({ pointerId: id });
 
-      // push the ids just for testing
-      interaction.downTimes.push(id);
-      interaction.downTargets.push(id);
-      interaction.holdTimers.push(id);
+      // use the ids in these arrays for this test
+      interaction.downTimes  [index] = id;
+      interaction.downTargets[index] = id;
     });
 
     for (const removal of removals) {
@@ -167,8 +166,11 @@ tape('Interaction', interactionTest => {
   test('Interaction.pointerDown', t => {
     const interaction = new Interaction();
     const coords = helpers.newCoordsSet();
-    const event = {};
     const eventTarget = {};
+    const event = {
+      type: 'down',
+      target: eventTarget,
+    };
     const pointer = helpers.newPointer();
     let signalArg;
 
@@ -217,6 +219,7 @@ tape('Interaction', interactionTest => {
     // reset signalArg object
     signalArg = undefined;
 
+    interaction.removePointer(pointer);
     interaction.pointerDown(pointer, event, eventTarget);
 
     // timeStamp is assigned with new Date.getTime()
