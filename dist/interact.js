@@ -1,5 +1,5 @@
 /**
- * interact.js @76a8083-dirty
+ * interact.js @332e9a2-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -110,6 +110,8 @@ var signals = require('./utils/Signals').new();
 
 var InteractEvent = function () {
   function InteractEvent(interaction, event, action, phase, element, related) {
+    var preEnd = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
+
     _classCallCheck(this, InteractEvent);
 
     var target = interaction.target;
@@ -140,6 +142,7 @@ var InteractEvent = function () {
     this.target = element;
     this.currentTarget = element;
     this.relatedTarget = related || null;
+    this.preEnd = preEnd;
     this.type = action + (phase || '');
     this.interaction = interaction;
     this.interactable = target;
@@ -849,7 +852,6 @@ var Interaction = function () {
     this.pointerIds = [];
     this.downTargets = [];
     this.downTimes = [];
-    this.holdTimers = [];
 
     // Previous native pointer move event coordinates
     this.prevCoords = {
@@ -898,25 +900,7 @@ var Interaction = function () {
   }
 
   Interaction.prototype.pointerDown = function pointerDown(pointer, event, eventTarget) {
-    var pointerIndex = this.updatePointer(pointer);
-
-    this.pointerIsDown = true;
-
-    if (!this.interacting()) {
-      utils.setCoords(this.startCoords, this.pointers);
-
-      utils.copyCoords(this.curCoords, this.startCoords);
-      utils.copyCoords(this.prevCoords, this.startCoords);
-
-      this.downEvent = event;
-
-      this.downTimes[pointerIndex] = this.curCoords.timeStamp;
-      this.downTargets[pointerIndex] = eventTarget;
-
-      this.pointerWasMoved = false;
-
-      utils.pointerExtend(this.downPointer, pointer);
-    }
+    var pointerIndex = this.updatePointer(pointer, event, true);
 
     signals.fire('down', {
       pointer: pointer,
@@ -1091,7 +1075,7 @@ var Interaction = function () {
     }
 
     this.pointerIsDown = false;
-    this.removePointer(pointer);
+    this.removePointer(pointer, event);
   };
 
   /*\
@@ -1147,29 +1131,42 @@ var Interaction = function () {
 
     this.target = this.element = null;
 
-    this.pointerIsDown = this._interacting = false;
+    this._interacting = false;
     this.prepared.name = this.prevEvent = null;
   };
 
   Interaction.prototype.getPointerIndex = function getPointerIndex(pointer) {
-    return this.mouse ? 0 : utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   };
 
-  Interaction.prototype.updatePointer = function updatePointer(pointer) {
+  Interaction.prototype.updatePointer = function updatePointer(pointer, event) {
+    var down = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : event && /(down|start)$/i.test(event.type);
+
     var id = utils.getPointerId(pointer);
     var index = this.getPointerIndex(pointer);
 
     if (index === -1) {
       index = this.pointerIds.length;
+      this.pointerIds[index] = id;
     }
 
-    this.pointerIds[index] = id;
+    if (down) {
+      signals.fire('update-pointer-down', {
+        pointer: pointer,
+        event: event,
+        down: down,
+        pointerId: id,
+        pointerIndex: index,
+        interaction: this
+      });
+    }
+
     this.pointers[index] = pointer;
 
     return index;
   };
 
-  Interaction.prototype.removePointer = function removePointer(pointer) {
+  Interaction.prototype.removePointer = function removePointer(pointer, event) {
     var id = utils.getPointerId(pointer);
     var index = this.mouse ? 0 : utils.indexOf(this.pointerIds, id);
 
@@ -1177,11 +1174,17 @@ var Interaction = function () {
       return;
     }
 
+    signals.fire('remove-pointer', {
+      pointer: pointer,
+      event: event,
+      pointerIndex: index,
+      interaction: this
+    });
+
     this.pointers.splice(index, 1);
     this.pointerIds.splice(index, 1);
     this.downTargets.splice(index, 1);
     this.downTimes.splice(index, 1);
-    this.holdTimers.splice(index, 1);
   };
 
   Interaction.prototype._updateEventTargets = function _updateEventTargets(target, currentTarget) {
@@ -1200,8 +1203,10 @@ for (var i = 0, len = methodNames.length; i < len; i++) {
 
 function doOnInteractions(method) {
   return function (event) {
-    var eventTarget = utils.getActualElement(event.path ? event.path[0] : event.target);
-    var curEventTarget = utils.getActualElement(event.currentTarget);
+    var _utils$getEventTarget = utils.getEventTargets(event),
+        eventTarget = _utils$getEventTarget[0],
+        curEventTarget = _utils$getEventTarget[1];
+
     var matches = []; // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
@@ -1224,7 +1229,9 @@ function doOnInteractions(method) {
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        invalidPointer = invalidPointer || new Date().getTime() - prevTouchTime < 500;
+        invalidPointer = invalidPointer || new Date().getTime() - prevTouchTime < 500
+        // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
+        || event.timeStamp === 0;
       }
 
       if (!invalidPointer) {
@@ -1310,6 +1317,37 @@ function onDocSignal(_ref3, signalName) {
   }
 }
 
+signals.on('update-pointer-down', function (_ref4) {
+  var interaction = _ref4.interaction,
+      pointer = _ref4.pointer,
+      pointerId = _ref4.pointerId,
+      pointerIndex = _ref4.pointerIndex,
+      event = _ref4.event,
+      eventTarget = _ref4.eventTarget,
+      down = _ref4.down;
+
+  interaction.pointerIds[pointerIndex] = pointerId;
+  interaction.pointers[pointerIndex] = pointer;
+
+  if (down) {
+    interaction.pointerIsDown = true;
+  }
+
+  if (!interaction.interacting()) {
+    utils.setCoords(interaction.startCoords, interaction.pointers);
+
+    utils.copyCoords(interaction.curCoords, interaction.startCoords);
+    utils.copyCoords(interaction.prevCoords, interaction.startCoords);
+
+    interaction.downEvent = event;
+    interaction.downTimes[pointerIndex] = interaction.curCoords.timeStamp;
+    interaction.downTargets[pointerIndex] = eventTarget || event && utils.getEventTargets(event)[0];
+    interaction.pointerWasMoved = false;
+
+    utils.pointerExtend(interaction.downPointer, pointer);
+  }
+});
+
 scope.signals.on('add-document', onDocSignal);
 scope.signals.on('remove-document', onDocSignal);
 
@@ -1345,9 +1383,10 @@ Interaction.signals.on('action-start', function (_ref) {
 
 Interaction.signals.on('action-move', function (_ref2) {
   var interaction = _ref2.interaction,
-      event = _ref2.event;
+      event = _ref2.event,
+      preEnd = _ref2.preEnd;
 
-  firePrepared(interaction, event, 'move');
+  firePrepared(interaction, event, 'move', preEnd);
 
   // if the action was ended in a listener
   if (!interaction.interacting()) {
@@ -1362,10 +1401,10 @@ Interaction.signals.on('action-end', function (_ref3) {
   firePrepared(interaction, event, 'end');
 });
 
-function firePrepared(interaction, event, phase) {
+function firePrepared(interaction, event, phase, preEnd) {
   var actionName = interaction.prepared.name;
 
-  var newEvent = new InteractEvent(interaction, event, actionName, phase, interaction.element);
+  var newEvent = new InteractEvent(interaction, event, actionName, phase, interaction.element, null, preEnd);
 
   interaction.target.fire(newEvent);
   interaction.prevEvent = newEvent;
@@ -4421,7 +4460,7 @@ var modifiers = {
     for (var i = 0; i < modifiers.names.length; i++) {
       var modifierName = modifiers.names[i];
 
-      offsets[modifierName] = modifiers[modifiers.names[i]].setOffset(interaction, interactable, element, rect, interaction.startOffset);
+      offsets[modifierName] = modifiers[modifierName].setOffset(interaction, interactable, element, rect, interaction.startOffset);
     }
   },
 
@@ -4505,7 +4544,7 @@ var modifiers = {
     modifiers.setOffsets(interaction, signalName === 'action-resume' ? interaction.curCoords : interaction.startCoords);
 
     modifiers.resetStatuses(interaction.modifierStatuses);
-    modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
+    interaction.modifierResult = modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
   }
 };
 
@@ -4513,6 +4552,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
   interaction.modifierOffsets = {};
   interaction.modifierStatuses = modifiers.resetStatuses({});
+  interaction.modifierResult = null;
 });
 
 Interaction.signals.on('action-start', modifiers.start);
@@ -4530,6 +4570,8 @@ Interaction.signals.on('before-action-move', function (_ref4) {
   if (!modifierResult.shouldMove && interactingBeforeMove) {
     interaction._dontFireMove = true;
   }
+
+  interaction.modifierResult = modifierResult;
 });
 
 Interaction.signals.on('action-end', function (_ref5) {
@@ -5095,8 +5137,8 @@ var signals = require('../utils/Signals').new();
 var _require = require('../utils/arr'),
     filter = _require.filter;
 
-var simpleSignals = ['down', 'up', 'up', 'cancel'];
-var simpleEvents = ['down', 'up', 'tap', 'cancel'];
+var simpleSignals = ['down', 'up', 'cancel'];
+var simpleEvents = ['down', 'up', 'cancel'];
 
 var pointerEvents = {
   PointerEvent: PointerEvent,
@@ -5120,15 +5162,8 @@ function fire(arg) {
       _arg$type = arg.type,
       type = _arg$type === undefined ? arg.pointerEvent.type : _arg$type,
       _arg$targets = arg.targets,
-      targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets;
-  // create the tap event even if there are no listeners so that
-  // doubletap can still be created and fired
-
-  if (!targets.length && type !== 'tap') {
-    return false;
-  }
-
-  var _arg$pointerEvent = arg.pointerEvent,
+      targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets,
+      _arg$pointerEvent = arg.pointerEvent,
       pointerEvent = _arg$pointerEvent === undefined ? new PointerEvent(type, pointer, event, eventTarget, interaction) : _arg$pointerEvent;
 
 
@@ -5167,18 +5202,18 @@ function fire(arg) {
   signals.fire('fired', signalArg);
 
   if (type === 'tap') {
-    if (pointerEvent.double) {
-      fire({
-        interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
-        type: 'doubletap'
-      });
-    }
+    // if pointerEvent should make a double tap, create and fire a doubletap
+    // PointerEvent and use that as the prevTap
+    var prevTap = pointerEvent.double ? fire({
+      interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
+      type: 'doubletap'
+    }) : pointerEvent;
 
-    interaction.prevTap = pointerEvent;
-    interaction.tapTime = pointerEvent.timeStamp;
+    interaction.prevTap = prevTap;
+    interaction.tapTime = prevTap.timeStamp;
   }
 
-  return true;
+  return pointerEvent;
 }
 
 function collectEventTargets(_ref) {
@@ -5237,12 +5272,26 @@ function collectEventTargets(_ref) {
   return signalArg.targets;
 }
 
-Interaction.signals.on('move', function (_ref3) {
+Interaction.signals.on('update-pointer-down', function (_ref3) {
   var interaction = _ref3.interaction,
-      pointer = _ref3.pointer,
-      event = _ref3.event,
-      eventTarget = _ref3.eventTarget,
-      duplicateMove = _ref3.duplicateMove;
+      pointerIndex = _ref3.pointerIndex;
+
+  interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
+});
+
+Interaction.signals.on('remove-pointer', function (_ref4) {
+  var interaction = _ref4.interaction,
+      pointerIndex = _ref4.pointerIndex;
+
+  interaction.holdTimers.splice(pointerIndex, 1);
+});
+
+Interaction.signals.on('move', function (_ref5) {
+  var interaction = _ref5.interaction,
+      pointer = _ref5.pointer,
+      event = _ref5.event,
+      eventTarget = _ref5.eventTarget,
+      duplicateMove = _ref5.duplicateMove;
 
   var pointerIndex = interaction.getPointerIndex(pointer);
 
@@ -5258,22 +5307,17 @@ Interaction.signals.on('move', function (_ref3) {
   }
 });
 
-Interaction.signals.on('down', function (_ref4) {
-  var interaction = _ref4.interaction,
-      pointer = _ref4.pointer,
-      event = _ref4.event,
-      eventTarget = _ref4.eventTarget,
-      pointerIndex = _ref4.pointerIndex;
+Interaction.signals.on('down', function (_ref6) {
+  var interaction = _ref6.interaction,
+      pointer = _ref6.pointer,
+      event = _ref6.event,
+      eventTarget = _ref6.eventTarget,
+      pointerIndex = _ref6.pointerIndex;
 
   // copy event to be used in timeout for IE8
   var eventCopy = browser.isIE8 ? utils.extend({}, event) : event;
-  var timers = interaction.holdTimers;
 
-  if (!timers[pointerIndex]) {
-    timers[pointerIndex] = { duration: Infinity, timeout: null };
-  }
-
-  var timer = timers[pointerIndex];
+  var timer = interaction.holdTimers[pointerIndex];
   var path = utils.getPath(eventTarget);
   var signalArg = {
     interaction: interaction,
@@ -5287,18 +5331,18 @@ Interaction.signals.on('down', function (_ref4) {
   };
 
   for (var _iterator2 = path, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-    var _ref5;
+    var _ref7;
 
     if (_isArray2) {
       if (_i2 >= _iterator2.length) break;
-      _ref5 = _iterator2[_i2++];
+      _ref7 = _iterator2[_i2++];
     } else {
       _i2 = _iterator2.next();
       if (_i2.done) break;
-      _ref5 = _i2.value;
+      _ref7 = _i2.value;
     }
 
-    var element = _ref5;
+    var element = _ref7;
 
     signalArg.element = element;
 
@@ -5330,10 +5374,21 @@ Interaction.signals.on('down', function (_ref4) {
   }, minDuration);
 });
 
+Interaction.signals.on('up', function (_ref8) {
+  var interaction = _ref8.interaction,
+      pointer = _ref8.pointer,
+      event = _ref8.event,
+      eventTarget = _ref8.eventTarget;
+
+  if (!interaction.pointerWasMoved) {
+    fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: 'tap' });
+  }
+});
+
 ['up', 'cancel'].forEach(function (signalName) {
-  Interaction.signals.on(signalName, function (_ref6) {
-    var interaction = _ref6.interaction,
-        pointerIndex = _ref6.pointerIndex;
+  Interaction.signals.on(signalName, function (_ref9) {
+    var interaction = _ref9.interaction,
+        pointerIndex = _ref9.pointerIndex;
 
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
@@ -5342,11 +5397,11 @@ Interaction.signals.on('down', function (_ref4) {
 });
 
 function createSignalListener(type) {
-  return function (_ref7) {
-    var interaction = _ref7.interaction,
-        pointer = _ref7.pointer,
-        event = _ref7.event,
-        eventTarget = _ref7.eventTarget;
+  return function (_ref10) {
+    var interaction = _ref10.interaction,
+        pointer = _ref10.pointer,
+        event = _ref10.event,
+        eventTarget = _ref10.eventTarget;
 
     fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: type });
   };
@@ -5359,6 +5414,7 @@ for (var i = 0; i < simpleSignals.length; i++) {
 Interaction.signals.on('new', function (interaction) {
   interaction.prevTap = null; // the most recent tap event on this interaction
   interaction.tapTime = 0; // time of the most recent tap event
+  interaction.holdTimers = []; // [{ duration, timeout }]
 });
 
 defaults.pointerEvents = pointerEvents.defaults;
@@ -5395,7 +5451,7 @@ function onFired(_ref2) {
       eventTarget = _ref2.eventTarget,
       targets = _ref2.targets;
 
-  if (pointerEvent.type !== 'hold') {
+  if (pointerEvent.type !== 'hold' || !targets.length) {
     return;
   }
 
@@ -6739,7 +6795,7 @@ var finder = {
           continue;
         }
 
-      if (!interaction.interacting() && !(!mouseEvent && interaction.mouse)) {
+      if (!interaction.interacting() && mouseEvent === interaction.mouse) {
         return interaction;
       }
     }
@@ -6850,6 +6906,7 @@ module.exports = pointerExtend;
 var hypot = require('./hypot');
 var browser = require('./browser');
 var dom = require('./domObjects');
+var domUtils = require('./domUtils');
 var is = require('./is');
 var pointerExtend = require('./pointerExtend');
 
@@ -7067,12 +7124,17 @@ var pointerUtils = {
     }
 
     return is.string(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
+  },
+
+  // [ event.target, event.currentTarget ]
+  getEventTargets: function getEventTargets(event) {
+    return [domUtils.getActualElement(event.path ? event.path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
   }
 };
 
 module.exports = pointerUtils;
 
-},{"./browser":34,"./domObjects":35,"./hypot":40,"./is":43,"./pointerExtend":45}],47:[function(require,module,exports){
+},{"./browser":34,"./domObjects":35,"./domUtils":36,"./hypot":40,"./is":43,"./pointerExtend":45}],47:[function(require,module,exports){
 'use strict';
 
 var _require = require('./window'),
