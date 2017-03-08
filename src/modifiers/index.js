@@ -31,7 +31,7 @@ const modifiers = {
       const modifierName = modifiers.names[i];
 
       offsets[modifierName] =
-        modifiers[modifiers.names[i]].setOffset(interaction,
+        modifiers[modifierName].setOffset(interaction,
                                                 interactable, element, rect,
                                                 interaction.startOffset);
     }
@@ -87,7 +87,7 @@ const modifiers = {
     modifiers.setOffsets(interaction, signalName === 'action-resume'? interaction.curCoords : interaction.startCoords);
 
     modifiers.resetStatuses(interaction.modifierStatuses);
-    modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
+    interaction.modifierResult = modifiers.setAll(interaction, interaction.startCoords.page, interaction.modifierStatuses);
   },
 };
 
@@ -95,6 +95,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
   interaction.modifierOffsets  = {};
   interaction.modifierStatuses = modifiers.resetStatuses({});
+  interaction.modifierResult   = null;
 });
 
 Interaction.signals.on('action-start' , modifiers.start);
@@ -108,6 +109,8 @@ Interaction.signals.on('before-action-move', function ({ interaction, preEnd, in
   if (!modifierResult.shouldMove && interactingBeforeMove) {
     interaction._dontFireMove = true;
   }
+
+  interaction.modifierResult = modifierResult;
 });
 
 Interaction.signals.on('action-end', function ({ interaction, event }) {

@@ -6,8 +6,8 @@ const defaults     = require('../defaultOptions');
 const signals      = require('../utils/Signals').new();
 const { filter }   = require('../utils/arr');
 
-const simpleSignals = [ 'down', 'up', 'up', 'cancel' ];
-const simpleEvents  = [ 'down', 'up', 'tap', 'cancel' ];
+const simpleSignals = [ 'down', 'up', 'cancel' ];
+const simpleEvents  = [ 'down', 'up', 'cancel' ];
 
 const pointerEvents = {
   PointerEvent,
@@ -36,14 +36,6 @@ function fire (arg) {
     interaction, pointer, event, eventTarget,
     type = arg.pointerEvent.type,
     targets = collectEventTargets(arg),
-  } = arg;
-  // create the tap event even if there are no listeners so that
-  // doubletap can still be created and fired
-  if (!targets.length && type !== 'tap') {
-    return false;
-  }
-
-  const {
     pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction),
   } = arg;
 
@@ -84,18 +76,20 @@ function fire (arg) {
   signals.fire('fired', signalArg);
 
   if (type === 'tap') {
-    if (pointerEvent.double) {
-      fire({
+    // if pointerEvent should make a double tap, create and fire a doubletap
+    // PointerEvent and use that as the prevTap
+    const prevTap = pointerEvent.double
+      ? fire({
         interaction, pointer, event, eventTarget,
         type: 'doubletap',
-      });
-    }
+      })
+      : pointerEvent;
 
-    interaction.prevTap = pointerEvent;
-    interaction.tapTime = pointerEvent.timeStamp;
+    interaction.prevTap = prevTap;
+    interaction.tapTime = prevTap.timeStamp;
   }
 
-  return true;
+  return pointerEvent;
 }
 
 function collectEventTargets ({ interaction, pointer, event, eventTarget, type }) {
@@ -134,6 +128,14 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
   return signalArg.targets;
 }
 
+Interaction.signals.on('update-pointer-down', function ({ interaction, pointerIndex }) {
+  interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
+});
+
+Interaction.signals.on('remove-pointer', function ({ interaction, pointerIndex }) {
+  interaction.holdTimers.splice(pointerIndex, 1);
+});
+
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
   const pointerIndex = interaction.getPointerIndex(pointer);
 
@@ -152,13 +154,8 @@ Interaction.signals.on('move', function ({ interaction, pointer, event, eventTar
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
   // copy event to be used in timeout for IE8
   const eventCopy = browser.isIE8? utils.extend({}, event) : event;
-  const timers = interaction.holdTimers;
 
-  if (!timers[pointerIndex]) {
-    timers[pointerIndex] = { duration: Infinity, timeout: null };
-  }
-
-  const timer = timers[pointerIndex];
+  const timer = interaction.holdTimers[pointerIndex];
   const path = utils.getPath(eventTarget);
   const signalArg = {
     interaction,
@@ -200,6 +197,12 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
   }, minDuration);
 });
 
+Interaction.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
+  if (!interaction.pointerWasMoved) {
+    fire({ interaction, eventTarget, pointer, event, type: 'tap' });
+  }
+});
+
 ['up', 'cancel'].forEach(function (signalName) {
   Interaction.signals.on(signalName, function ({ interaction, pointerIndex }) {
     if (interaction.holdTimers[pointerIndex]) {
@@ -219,8 +222,9 @@ for (let i = 0; i < simpleSignals.length; i++) {
 }
 
 Interaction.signals.on('new', function (interaction) {
-  interaction.prevTap = null;  // the most recent tap event on this interaction
-  interaction.tapTime = 0;     // time of the most recent tap event
+  interaction.prevTap    = null;  // the most recent tap event on this interaction
+  interaction.tapTime    = 0;     // time of the most recent tap event
+  interaction.holdTimers = [];    // [{ duration, timeout }]
 });
 
 defaults.pointerEvents = pointerEvents.defaults;

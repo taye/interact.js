@@ -1,6 +1,7 @@
 const hypot         = require('./hypot');
 const browser       = require('./browser');
 const dom           = require('./domObjects');
+const domUtils      = require('./domUtils');
 const is            = require('./is');
 const pointerExtend = require('./pointerExtend');
 
@@ -210,6 +211,14 @@ const pointerUtils = {
     return is.string(pointer.pointerType)
       ? pointer.pointerType
       : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
+  },
+
+  // [ event.target, event.currentTarget ]
+  getEventTargets: function (event) {
+    return [
+      domUtils.getActualElement(event.path ? event.path[0] : event.target),
+      domUtils.getActualElement(event.currentTarget),
+    ];
   },
 };
 

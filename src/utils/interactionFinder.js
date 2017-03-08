@@ -113,7 +113,7 @@ const finder = {
         continue;
       }
 
-      if (!interaction.interacting() && !(!mouseEvent && interaction.mouse)) {
+      if (!interaction.interacting() && (mouseEvent === interaction.mouse)) {
         return interaction;
       }
     }

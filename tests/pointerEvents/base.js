@@ -1,4 +1,5 @@
 const test = require('../test');
+const helpers = require('../helpers');
 
 test('pointerEvents.types', t => {
   const pointerEvents = require('../../src/pointerEvents/base');
@@ -18,7 +19,7 @@ test('pointerEvents.types', t => {
   t.end();
 });
 
-test('fire', t => {
+test('pointerEvents.fire', t => {
   const pointerEvents = require('../../src/pointerEvents/base');
   const Eventable     = require('../../src/Eventable');
   const Interaction   = require('../../src/Interaction');
@@ -82,7 +83,7 @@ test('fire', t => {
   t.end();
 });
 
-test('collectEventTargets', t => {
+test('pointerEvents.collectEventTargets', t => {
   const pointerEvents = require('../../src/pointerEvents/base');
   const Interaction = require('../../src/Interaction');
   const Eventable = require('../../src/Eventable');
@@ -112,6 +113,51 @@ test('collectEventTargets', t => {
   t.deepEqual(collectedTargets, [target]);
 
   pointerEvents.signals.off('collect-targets', onCollect);
+
+  t.end();
+});
+
+test('pointerEvents Interaction update-pointer-down signal', t => {
+  const Interaction  = require('../../src/Interaction');
+  const interaction  = new Interaction();
+  const initialTimer = { duration: Infinity, timeout: null };
+  const event = { type: 'down' };
+
+  interaction.updatePointer(helpers.newPointer(0), event);
+  t.deepEqual(interaction.holdTimers, [initialTimer]);
+
+  interaction.updatePointer(helpers.newPointer(5), event);
+  t.deepEqual(interaction.holdTimers, [initialTimer, initialTimer]);
+
+  t.end();
+});
+
+test('pointerEvents Interaction remove-pointer signal', t => {
+  const Interaction = require('../../src/Interaction');
+  const interaction = new Interaction();
+  const pointerIds  = [0, 1, 2, 3];
+  const removals    = [
+    { id: 0, remain: [1, 2, 3], message: 'first of 4'  },
+    { id: 2, remain: [1,    3], message: 'middle of 3' },
+    { id: 3, remain: [1      ], message: 'last of 2'   },
+    { id: 1, remain: [       ], message: 'final'       },
+  ];
+
+  for (const id of pointerIds) {
+    const index = interaction.updatePointer({ pointerId: id }, null, true);
+    // use the ids in the holdTimers array for this test
+    interaction.holdTimers[index] = id;
+  }
+
+  for (const removal of removals) {
+    interaction.removePointer({ pointerId: removal.id });
+
+    t.deepEqual(interaction.pointers.map(p => p.pointerId), removal.remain,
+      `${removal.message} - remaining interaction.pointers is correct`);
+
+    t.deepEqual(interaction.holdTimers, removal.remain,
+      `${removal.message} - remaining interaction.holdTimers is correct`);
+  }
 
   t.end();
 });
