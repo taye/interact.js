@@ -399,7 +399,10 @@ function doOnInteractions (method) {
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        invalidPointer = invalidPointer || (new Date().getTime() - prevTouchTime < 500);
+        invalidPointer = invalidPointer
+          || (new Date().getTime() - prevTouchTime < 500)
+          // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
+          || event.timeStamp === 0;
       }
 
       if (!invalidPointer) {
