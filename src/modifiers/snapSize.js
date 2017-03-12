@@ -50,7 +50,7 @@ const snapSize = {
     for (const snapTarget of options.targets) {
       let target;
 
-      if (utils.isFunction(snapTarget)) {
+      if (utils.is.function(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction);
       }
       else {
