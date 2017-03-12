@@ -29,57 +29,30 @@ const restrict = {
   },
 
   set: function ({ pageCoords, interaction, status, options }) {
-    const target    = interaction.target;
-    let restriction = options && options.restriction;
-
-    if (!restriction) {
-      return status;
-    }
+    if (!options) { return status; }
 
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
 
+    const restriction = getRestrictionRect(options.restriction, interaction, page);
+
+    if (!restriction) { return status; }
+
     status.dx = 0;
     status.dy = 0;
     status.locked = false;
 
-    if (utils.is.string(restriction)) {
-      if (restriction === 'parent') {
-        restriction = utils.parentNode(interaction.element);
-      }
-      else if (restriction === 'self') {
-        restriction = target.getRect(interaction.element);
-      }
-      else {
-        restriction = utils.closest(interaction.element, restriction);
-      }
-
-      if (!restriction) { return status; }
-    }
-
-    if (utils.is.function(restriction)) {
-      restriction = restriction(page.x, page.y, interaction.element);
-    }
-
-    if (utils.is.element(restriction)) {
-      restriction = utils.getElementRect(restriction);
-    }
-
     const rect = restriction;
-    let modifiedX;
-    let modifiedY;
+    let modifiedX = page.x;
+    let modifiedY = page.y;
 
     const offset = interaction.modifierOffsets.restrict;
 
-    if (!restriction) {
-      modifiedX = page.x;
-      modifiedY = page.y;
-    }
     // object is assumed to have
     // x, y, width, height or
     // left, top, right, bottom
-    else if ('x' in restriction && 'y' in restriction) {
+    if ('x' in restriction && 'y' in restriction) {
       modifiedX = Math.max(Math.min(rect.x + rect.width  - offset.right , page.x), rect.x + offset.left);
       modifiedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top );
     }
@@ -117,7 +90,23 @@ const restrict = {
       }
     }
   },
+
+  getRestrictionRect,
 };
+
+function getRestrictionRect (value, interaction, page) {
+  value = utils.getStringOptionResult(value, interaction.target, interaction.element) || value;
+
+  if (utils.is.function(value)) {
+    value = value(page.x, page.y, interaction);
+  }
+
+  if (utils.is.element(value)) {
+    value = utils.getElementRect(value);
+  }
+
+  return value;
+}
 
 modifiers.restrict = restrict;
 modifiers.names.push('restrict');

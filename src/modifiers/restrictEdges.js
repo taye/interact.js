@@ -15,6 +15,8 @@ const rectUtils      = require('../utils/rect');
 const defaultOptions = require('../defaultOptions');
 const resize         = require('../actions/resize');
 
+const { getRestrictionRect } = require('./restrict');
+
 const noMin = { top: -Infinity, left: -Infinity, bottom: -Infinity, right: -Infinity };
 const noMax = { top: +Infinity, left: +Infinity, bottom: +Infinity, right: +Infinity };
 
@@ -32,7 +34,7 @@ const restrictEdges = {
       return utils.extend({}, startOffset);
     }
 
-    const offset = getRestrictionRect(offset, interaction);
+    const offset = getRestrictionRect(offset, interaction, interaction.startCoords.page);
 
     if (offset) {
       return {
@@ -56,8 +58,8 @@ const restrictEdges = {
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
-    const min = rectUtils.xywhToTlbr(getRestrictionRect(options.min, interaction)) || noMin;
-    const max = rectUtils.xywhToTlbr(getRestrictionRect(options.max, interaction)) || noMax;
+    const min = rectUtils.xywhToTlbr(getRestrictionRect(options.min, interaction), page) || noMin;
+    const max = rectUtils.xywhToTlbr(getRestrictionRect(options.max, interaction), page) || noMax;
 
     let modifiedX = page.x;
     let modifiedY = page.y;
@@ -111,22 +113,7 @@ const restrictEdges = {
 
   noMin,
   noMax,
-  getRestrictionRect,
 };
-
-function getRestrictionRect (value, interaction) {
-  value = utils.getStringOptionResult(value, interaction.element) || value;
-
-  if (utils.isFunction(value)) {
-    value = value(interaction.resizeRects.inverted);
-  }
-
-  if (utils.isElement(value)) {
-    value = utils.getElementRect(value);
-  }
-
-  return value;
-}
 
 modifiers.restrictEdges = restrictEdges;
 modifiers.names.push('restrictEdges');
