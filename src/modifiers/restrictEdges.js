@@ -4,8 +4,8 @@
 // interact(target).resize({
 //   edges: { top: true, left: true },
 //   restrictEdges: {
-//     min: { top:   0, left:   0, right: 100, bottom: 100 },
-//     max: { top: 500, left: 500, right: 600, bottom: 600 },
+//     inner: { top: 200, left: 200, right: 400, bottom: 400 },
+//     outer: { top:   0, left:   0, right: 600, bottom: 600 },
 //   },
 // });
 
@@ -17,8 +17,8 @@ const resize         = require('../actions/resize');
 
 const { getRestrictionRect } = require('./restrict');
 
-const noMin = { top: -Infinity, left: -Infinity, bottom: -Infinity, right: -Infinity };
-const noMax = { top: +Infinity, left: +Infinity, bottom: +Infinity, right: +Infinity };
+const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
+const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
 
 const restrictEdges = {
   defaults: {
@@ -34,7 +34,7 @@ const restrictEdges = {
       return utils.extend({}, startOffset);
     }
 
-    const offset = getRestrictionRect(offset, interaction, interaction.startCoords.page);
+    const offset = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
 
     if (offset) {
       return {
@@ -58,8 +58,8 @@ const restrictEdges = {
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
-    const min = rectUtils.xywhToTlbr(getRestrictionRect(options.min, interaction), page) || noMin;
-    const max = rectUtils.xywhToTlbr(getRestrictionRect(options.max, interaction), page) || noMax;
+    const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction), page) || noInner;
+    const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction), page) || noOuter;
 
     let modifiedX = page.x;
     let modifiedY = page.y;
@@ -69,16 +69,16 @@ const restrictEdges = {
     status.locked = false;
 
     if (edges.top) {
-      modifiedY = Math.max(Math.min(max.top    + offset.top,    page.y), min.top    + offset.top);
+      modifiedY = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
     }
     else if (edges.bottom) {
-      modifiedY = Math.max(Math.min(max.bottom - offset.bottom, page.y), min.bottom - offset.bottom);
+      modifiedY = Math.max(Math.min(outer.bottom - offset.bottom, page.y), inner.bottom - offset.bottom);
     }
     if (edges.left) {
-      modifiedX = Math.max(Math.min(max.left   + offset.left,   page.x), min.left   + offset.left);
+      modifiedX = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left);
     }
     else if (edges.right) {
-      modifiedX = Math.max(Math.min(max.right  - offset.right,  page.x), min.right  - offset.right);
+      modifiedX = Math.max(Math.min(outer.right  - offset.right,  page.x), inner.right  - offset.right);
     }
 
     status.dx = modifiedX - page.x;
@@ -89,8 +89,6 @@ const restrictEdges = {
 
     status.modifiedX = modifiedX;
     status.modifiedY = modifiedY;
-
-    //console.log(status.dx, status.modifiedX, status.changed, status.locked);
   },
 
   modifyCoords: function ({ page, client, status, phase, options }) {
@@ -111,8 +109,8 @@ const restrictEdges = {
     }
   },
 
-  noMin,
-  noMax,
+  noInner,
+  noOuter,
 };
 
 modifiers.restrictEdges = restrictEdges;
