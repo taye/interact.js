@@ -27,8 +27,8 @@ Installation
     * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
     * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
     * Restart the Rails server
-* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
-* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.6/interact.min.js"></script>`
+* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.8/interact.min.js"></script>`
+* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>`
 
 Documentation
 -------------
