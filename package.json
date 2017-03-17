@@ -64,6 +64,7 @@
     "dr.js": "github:taye/dr.js",
     "errorify": "^0.3.1",
     "eslint": "^3.16.0",
+    "eslint-plugin-require-path-exists": "^1.1.5",
     "husky": "^0.13.1",
     "istanbul": "^0.4.5",
     "jsdom": "^9.11.0",

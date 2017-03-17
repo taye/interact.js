@@ -5,6 +5,9 @@ env:
   es6: true
   node: true
 
+plugins:
+  - require-path-exists
+
 rules:
   comma-dangle: [2, always-multiline]
   comma-style: [2, last]
@@ -30,6 +33,8 @@ rules:
   one-var: [2, never]
   prefer-const: 2
   quotes: [2, single, avoid-escape]
+  require-path-exists/exists: 2
+  require-path-exists/notEmpty: 2
   semi: [2, always]
   space-before-function-paren: [2, always]
 
