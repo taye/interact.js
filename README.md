@@ -5,6 +5,7 @@ snapping for modern browsers (and also IE8+).
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js)
 [![Build Status](https://travis-ci.org/taye/interact.js.svg?branch=master)](https://travis-ci.org/taye/interact.js)
+[![Test Coverage](https://codeclimate.com/github/taye/interact.js/badges/coverage.svg)](https://codeclimate.com/github/taye/interact.js/coverage)
 
 Features include:
 
