@@ -24,6 +24,11 @@ require('./actions/resize');
 require('./actions/drag');
 require('./actions/drop');
 
+// load these modifiers after resize is loaded
+require('./modifiers/snapSize');
+require('./modifiers/restrictEdges');
+require('./modifiers/restrictSize');
+
 // autoStart actions
 require('./autoStart/gesture');
 require('./autoStart/resize');

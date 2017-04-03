@@ -10,16 +10,8 @@ const restrict = {
     elementRect: null,
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const restrictOptions = interactable.options[actionName].restrict;
-
-    return (restrictOptions && restrictOptions.enabled
-            && (preEnd || !restrictOptions.endOnly)
-            && (!requireEndOnly || restrictOptions.endOnly));
-  },
-
-  setOffset: function (interaction, interactable, element, rect, startOffset) {
-    const elementRect = interactable.options[interaction.prepared.name].restrict.elementRect;
+  setOffset: function ({ rect, startOffset, options }) {
+    const elementRect = options && options.elementRect;
     const offset = {};
 
     if (rect && elementRect) {
@@ -36,90 +28,50 @@ const restrict = {
     return offset;
   },
 
-  set: function (pageCoords, interaction, status) {
-    const target    = interaction.target;
-    const restrictOptions  = target && target.options[interaction.prepared.name].restrict;
-    let restriction = restrictOptions && restrictOptions.restriction;
-
-    if (!restriction) {
-      return status;
-    }
+  set: function ({ pageCoords, interaction, status, options }) {
+    if (!options) { return status; }
 
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
 
+    const restriction = getRestrictionRect(options.restriction, interaction, page);
+
+    if (!restriction) { return status; }
+
     status.dx = 0;
     status.dy = 0;
     status.locked = false;
 
-    if (utils.is.string(restriction)) {
-      if (restriction === 'parent') {
-        restriction = utils.parentNode(interaction.element);
-      }
-      else if (restriction === 'self') {
-        restriction = target.getRect(interaction.element);
-      }
-      else {
-        restriction = utils.closest(interaction.element, restriction);
-      }
-
-      if (!restriction) { return status; }
-    }
-
-    if (utils.is.function(restriction)) {
-      restriction = restriction(page.x, page.y, interaction.element);
-    }
-
-    if (utils.is.element(restriction)) {
-      restriction = utils.getElementRect(restriction);
-    }
-
     const rect = restriction;
-    let restrictedX;
-    let restrictedY;
+    let modifiedX = page.x;
+    let modifiedY = page.y;
 
     const offset = interaction.modifierOffsets.restrict;
 
-    if (!restriction) {
-      restrictedX = page.x;
-      restrictedY = page.y;
-    }
     // object is assumed to have
     // x, y, width, height or
     // left, top, right, bottom
-    else if ('x' in restriction && 'y' in restriction) {
-      restrictedX = Math.max(Math.min(rect.x + rect.width  - offset.right , page.x), rect.x + offset.left);
-      restrictedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top );
+    if ('x' in restriction && 'y' in restriction) {
+      modifiedX = Math.max(Math.min(rect.x + rect.width  - offset.right , page.x), rect.x + offset.left);
+      modifiedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top );
     }
     else {
-      restrictedX = Math.max(Math.min(rect.right  - offset.right , page.x), rect.left + offset.left);
-      restrictedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
+      modifiedX = Math.max(Math.min(rect.right  - offset.right , page.x), rect.left + offset.left);
+      modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
     }
 
-    status.dx = restrictedX - page.x;
-    status.dy = restrictedY - page.y;
+    status.dx = modifiedX - page.x;
+    status.dy = modifiedY - page.y;
 
-    status.changed = status.restrictedX !== restrictedX || status.restrictedY !== restrictedY;
+    status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
     status.locked = !!(status.dx || status.dy);
 
-    status.restrictedX = restrictedX;
-    status.restrictedY = restrictedY;
-
-    return status;
+    status.modifiedX = modifiedX;
+    status.modifiedY = modifiedY;
   },
 
-  reset: function (status) {
-    status.dx = status.dy = 0;
-    status.modifiedX = status.modifiedY = NaN;
-    status.locked = false;
-    status.changed = true;
-
-    return status;
-  },
-
-  modifyCoords: function (page, client, interactable, status, actionName, phase) {
-    const options = interactable.options[actionName].restrict;
+  modifyCoords: function ({ page, client, status, phase, options }) {
     const elementRect = options && options.elementRect;
 
     if (options && options.enabled
@@ -138,7 +90,23 @@ const restrict = {
       }
     }
   },
+
+  getRestrictionRect,
 };
+
+function getRestrictionRect (value, interaction, page) {
+  value = utils.getStringOptionResult(value, interaction.target, interaction.element) || value;
+
+  if (utils.is.function(value)) {
+    value = value(page.x, page.y, interaction);
+  }
+
+  if (utils.is.element(value)) {
+    value = utils.getElementRect(value);
+  }
+
+  return value;
+}
 
 modifiers.restrict = restrict;
 modifiers.names.push('restrict');

@@ -5,6 +5,7 @@ snapping for modern browsers (and also IE8+).
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js)
 [![Build Status](https://travis-ci.org/taye/interact.js.svg?branch=master)](https://travis-ci.org/taye/interact.js)
+[![Test Coverage](https://codeclimate.com/github/taye/interact.js/badges/coverage.svg)](https://codeclimate.com/github/taye/interact.js/coverage)
 
 Features include:
 
@@ -24,11 +25,11 @@ Installation
 * [npm](https://www.npmjs.org/): `npm install interactjs`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
-    * Download the file interact.js (development version) into a new sub-directory: app/vendor/assets/javascripts/interact
+    * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
     * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
     * Restart the Rails server
-* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.6/interact.min.js"></script>`
-* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.6/interact.min.js"></script>`
+* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/interact.js/1.2.8/interact.min.js"></script>`
+* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>`
 
 Documentation
 -------------

@@ -103,11 +103,19 @@ Interaction.signals.on('up', function ({ interaction, event }) {
             && pointerSpeed > inertiaOptions.minSpeed
             && pointerSpeed > inertiaOptions.endSpeed);
 
+  const modifierArg = {
+    interaction,
+    page,
+    statuses,
+    preEnd: true,
+    requireEndOnly: true,
+  };
+
   // smoothEnd
   if (inertiaPossible && !inertia) {
     modifiers.resetStatuses(statuses);
 
-    modifierResult = modifiers.setAll(interaction, page, statuses, true, true);
+    modifierResult = modifiers.setAll(modifierArg);
 
     if (modifierResult.shouldMove && modifierResult.locked) {
       smoothEnd = true;
@@ -143,7 +151,7 @@ Interaction.signals.on('up', function ({ interaction, event }) {
 
     modifiers.resetStatuses(statuses);
 
-    modifierResult = modifiers.setAll(interaction, page, statuses, true, true);
+    modifierResult = modifiers.setAll(modifierArg);
 
     status.modifiedXe += modifierResult.dx;
     status.modifiedYe += modifierResult.dy;

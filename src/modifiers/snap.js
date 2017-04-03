@@ -14,38 +14,31 @@ const snap = {
     relativePoints: null,
   },
 
-  shouldDo: function (interactable, actionName, preEnd, requireEndOnly) {
-    const snapOptions = interactable.options[actionName].snap;
-
-    return (snapOptions && snapOptions.enabled
-            && (preEnd || !snapOptions.endOnly)
-            && (!requireEndOnly || snapOptions.endOnly));
-  },
-
-  setOffset: function (interaction, interactable, element, rect, startOffset) {
+  setOffset: function ({ interaction, interactable, element, rect, startOffset, options }) {
     const offsets = [];
-    const origin = utils.getOriginXY(interactable, element, interaction.prepared.name);
-    const snapOptions = interactable.options[interaction.prepared.name].snap || {};
+    const origin = options.origin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+    options = options || interactable.options[interaction.prepared.name].snap || {};
+
     let snapOffset;
 
-    if (snapOptions.offset === 'startCoords') {
+    if (options.offset === 'startCoords') {
       snapOffset = {
         x: interaction.startCoords.page.x - origin.x,
         y: interaction.startCoords.page.y - origin.y,
       };
     }
-    else if (snapOptions.offset === 'self') {
+    else if (options.offset === 'self') {
       snapOffset = {
         x: rect.left - origin.x,
         y: rect.top - origin.y,
       };
     }
     else {
-      snapOffset = snapOptions.offset || { x: 0, y: 0 };
+      snapOffset = options.offset || { x: 0, y: 0 };
     }
 
-    if (rect && snapOptions.relativePoints && snapOptions.relativePoints.length) {
-      for (const { x: relativeX, y: relativeY } of snapOptions.relativePoints) {
+    if (rect && options.relativePoints && options.relativePoints.length) {
+      for (const { x: relativeX, y: relativeY } of options.relativePoints) {
         offsets.push({
           x: startOffset.left - (rect.width  * relativeX) + snapOffset.x,
           y: startOffset.top  - (rect.height * relativeY) + snapOffset.y,
@@ -59,8 +52,7 @@ const snap = {
     return offsets;
   },
 
-  set: function (pageCoords, interaction, status) {
-    const snapOptions = interaction.target.options[interaction.prepared.name].snap;
+  set: function ({ interaction, pageCoords, status, options, offset: offsets }) {
     const targets = [];
     let target;
     let page;
@@ -81,14 +73,13 @@ const snap = {
     status.realX = page.x;
     status.realY = page.y;
 
-    const offsets = interaction.modifierOffsets.snap;
-    let len = snapOptions.targets? snapOptions.targets.length : 0;
+    let len = options.targets? options.targets.length : 0;
 
     for (const { x: offsetX, y: offsetY } of offsets) {
       const relativeX = page.x - offsetX;
       const relativeY = page.y - offsetY;
 
-      for (const snapTarget of snapOptions.targets) {
+      for (const snapTarget of options.targets) {
         if (utils.is.function(snapTarget)) {
           target = snapTarget(relativeX, relativeY, interaction);
         }
@@ -102,7 +93,7 @@ const snap = {
           x: utils.is.number(target.x) ? (target.x + offsetX) : relativeX,
           y: utils.is.number(target.y) ? (target.y + offsetY) : relativeY,
 
-          range: utils.is.number(target.range)? target.range: snapOptions.range,
+          range: utils.is.number(target.range)? target.range: options.range,
         });
       }
     }
@@ -157,16 +148,16 @@ const snap = {
     let snapChanged;
 
     if (closest.target) {
-      snapChanged = (status.snappedX !== closest.target.x || status.snappedY !== closest.target.y);
+      snapChanged = (status.modifiedX !== closest.target.x || status.modifiedY !== closest.target.y);
 
-      status.snappedX = closest.target.x;
-      status.snappedY = closest.target.y;
+      status.modifiedX = closest.target.x;
+      status.modifiedY = closest.target.y;
     }
     else {
       snapChanged = true;
 
-      status.snappedX = NaN;
-      status.snappedY = NaN;
+      status.modifiedX = NaN;
+      status.modifiedY = NaN;
     }
 
     status.dx = closest.dx;
@@ -174,24 +165,12 @@ const snap = {
 
     status.changed = (snapChanged || (closest.inRange && !status.locked));
     status.locked = closest.inRange;
-
-    return status;
   },
 
-  reset: function (status) {
-    status.dx = status.dy = 0;
-    status.snappedX = status.snappedY = NaN;
-    status.locked = false;
-    status.changed = true;
+  modifyCoords: function ({ page, client, status, phase, options }) {
+    const relativePoints = options && options.relativePoints;
 
-    return status;
-  },
-
-  modifyCoords: function (page, client, interactable, status, actionName, phase) {
-    const snapOptions = interactable.options[actionName].snap;
-    const relativePoints = snapOptions && snapOptions.relativePoints;
-
-    if (snapOptions && snapOptions.enabled
+    if (options && options.enabled
         && !(phase === 'start' && relativePoints && relativePoints.length)) {
 
       if (status.locked) {
@@ -204,8 +183,8 @@ const snap = {
       return {
         range  : status.range,
         locked : status.locked,
-        x      : status.snappedX,
-        y      : status.snappedY,
+        x      : status.modifiedX,
+        y      : status.modifiedY,
         realX  : status.realX,
         realY  : status.realY,
         dx     : status.dx,

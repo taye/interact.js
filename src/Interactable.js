@@ -420,8 +420,7 @@ scope.interactables.indexOfElement = function indexOfElement (target, context) {
   for (let i = 0; i < this.length; i++) {
     const interactable = this[i];
 
-    if (interactable.target === target
-        && (!is.string(target) || (interactable._context === context))) {
+    if (interactable.target === target && interactable._context === context) {
       return i;
     }
   }
@@ -431,7 +430,7 @@ scope.interactables.indexOfElement = function indexOfElement (target, context) {
 scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
   const ret = this[this.indexOfElement(element, options && options.context)];
 
-  return ret && (dontCheckInContext || ret.inContext(element))? ret : null;
+  return ret && (is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
 };
 
 scope.interactables.forEachSelector = function (callback, element) {

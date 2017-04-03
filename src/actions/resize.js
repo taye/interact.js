@@ -172,7 +172,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
   interaction.resizeRects = {
     start     : startRect,
     current   : utils.extend({}, startRect),
-    restricted: utils.extend({}, startRect),
+    inverted  : utils.extend({}, startRect),
     previous  : utils.extend({}, startRect),
     delta     : {
       left: 0, right : 0, width : 0,
@@ -180,7 +180,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
     },
   };
 
-  iEvent.rect = interaction.resizeRects.restricted;
+  iEvent.rect = interaction.resizeRects.inverted;
   iEvent.deltaRect = interaction.resizeRects.delta;
 });
 
@@ -196,9 +196,9 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
 
   const start      = interaction.resizeRects.start;
   const current    = interaction.resizeRects.current;
-  const restricted = interaction.resizeRects.restricted;
+  const inverted   = interaction.resizeRects.inverted;
   const delta      = interaction.resizeRects.delta;
-  const previous   = utils.extend(interaction.resizeRects.previous, restricted);
+  const previous   = utils.extend(interaction.resizeRects.previous, inverted);
   const originalEdges = edges;
 
   let dx = iEvent.dx;
@@ -228,43 +228,43 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
 
   if (invertible) {
     // if invertible, copy the current rect
-    utils.extend(restricted, current);
+    utils.extend(inverted, current);
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
       let swap;
 
-      if (restricted.top > restricted.bottom) {
-        swap = restricted.top;
+      if (inverted.top > inverted.bottom) {
+        swap = inverted.top;
 
-        restricted.top = restricted.bottom;
-        restricted.bottom = swap;
+        inverted.top = inverted.bottom;
+        inverted.bottom = swap;
       }
-      if (restricted.left > restricted.right) {
-        swap = restricted.left;
+      if (inverted.left > inverted.right) {
+        swap = inverted.left;
 
-        restricted.left = restricted.right;
-        restricted.right = swap;
+        inverted.left = inverted.right;
+        inverted.right = swap;
       }
     }
   }
   else {
     // if not invertible, restrict to minimum of 0x0 rect
-    restricted.top    = Math.min(current.top, start.bottom);
-    restricted.bottom = Math.max(current.bottom, start.top);
-    restricted.left   = Math.min(current.left, start.right);
-    restricted.right  = Math.max(current.right, start.left);
+    inverted.top    = Math.min(current.top, start.bottom);
+    inverted.bottom = Math.max(current.bottom, start.top);
+    inverted.left   = Math.min(current.left, start.right);
+    inverted.right  = Math.max(current.right, start.left);
   }
 
-  restricted.width  = restricted.right  - restricted.left;
-  restricted.height = restricted.bottom - restricted.top ;
+  inverted.width  = inverted.right  - inverted.left;
+  inverted.height = inverted.bottom - inverted.top ;
 
-  for (const edge in restricted) {
-    delta[edge] = restricted[edge] - previous[edge];
+  for (const edge in inverted) {
+    delta[edge] = inverted[edge] - previous[edge];
   }
 
   iEvent.edges = interaction.prepared.edges;
-  iEvent.rect = restricted;
+  iEvent.rect = inverted;
   iEvent.deltaRect = delta;
 });
 
