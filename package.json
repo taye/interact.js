@@ -26,7 +26,7 @@
     "preversion": "npm test && istanbul check-coverage",
     "version": "git clean -fx dist && npm run build -- --release && git add -A dist",
     "postversion": "git push && git push --tags",
-    "unstable": "git checkout -f unstable && git merge --no-ff --no-edit master && git clean -fx && npm run build && git commit -m 'dist: bundle js and generate docs' -- dist"
+    "unstable": "git clean -ix && git checkout -f unstable && git merge --no-ff --no-edit master && git clean -fx && npm run build && git commit -m 'dist: bundle js and generate docs' -- dist"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
