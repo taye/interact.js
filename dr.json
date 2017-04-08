@@ -5,39 +5,39 @@
   "files": [
     {
       "url": "src/actions/drag.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/actions/drag.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/actions/drag.js"
     },
     {
       "url": "src/actions/drop.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/actions/drop.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/actions/drop.js"
     },
     {
       "url": "src/actions/resize.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/actions/resize.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/actions/resize.js"
     },
     {
       "url": "src/actions/gesture.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/actions/gesture.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/actions/gesture.js"
     },
     {
       "url": "src/Interactable.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/Interactable.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/Interactable.js"
     },
     {
       "url": "src/autoStart/base.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/autoStart/base.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/autoStart/base.js"
     },
     {
       "url": "src/interactablePreventDefault.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/interactablePreventDefault.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/interactablePreventDefault.js"
     },
     {
       "url": "src/interact.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/interact.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/interact.js"
     },
     {
       "url": "src/Interaction.js",
-      "link": "https://github.com/taye/interact.js/blob/{VERSION}/src/Interaction.js"
+      "link": "https://github.com/taye/interact.js/blob/{GIT_REV}/src/Interaction.js"
     }
   ]
 }

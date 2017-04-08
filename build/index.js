@@ -1,4 +1,4 @@
-const browserify   = require('browserify');
+const browserify      = require('browserify');
 const bundleProcessor = require('./bundleProcessor');
 
 const config = {
@@ -15,9 +15,9 @@ const config = {
 const b = browserify(config);
 
 const pwdRegex = new RegExp(`^${process.env.PWD}.`);
-const release = process.argv.includes('--release');
-const watch = process.argv.includes('--watch');
-const docs = process.argv.includes('--docs')? require('./docs') : null;
+const release  = process.argv.includes('--release');
+const watch    = process.argv.includes('--watch');
+const docs     = process.argv.includes('--docs')? require('./docs') : null;
 
 if (watch) {
   b.plugin(require('watchify'));
@@ -35,7 +35,6 @@ else {
 function update (ids) {
   if (docs) {
     docs({
-      release,
       stdio: ['ignore', 'ignore', 'inherit'],
     });
   }

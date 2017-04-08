@@ -45,7 +45,7 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
       code,
       map,
       headerFilename,
-      replacer: input => replacer(input, { release }),
+      replacer: input => replacer(input, { updateMetadata: !release }),
     };
   }
 };
