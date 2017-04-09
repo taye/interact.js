@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.3.0",
+  "version": "1.3.0-alpha",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -24,9 +24,11 @@
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
     "preversion": "npm test && istanbul check-coverage",
-    "version": "git clean -fx dist && npm run build -- --release && git add -A dist",
-    "postversion": "git push && git push --tags",
-    "unstable": "git clean -ix && git checkout -f unstable && git merge --no-ff --no-edit master && git clean -fx && npm run build && git commit -m 'dist: bundle js and generate docs' -- dist"
+    "version": "git clean -fx dist && git add -- package.json && npm run build -- --no-metadata && git add -A -- dist",
+    "postversion": "",
+    "release": "npm version --no-git-tag-version -m 'v%s'",
+    "pre-release": "git clean -fx dist/* && git diff-index HEAD --stat --exit-code && git merge --no-ff --no-edit master && NEW_VERSION=$(node build/bump prerelease) && git add package.json && npm run preversion && npm run build && git commit -m \"v$NEW_VERSION\" -- package.json dist",
+    "bump": "node build/bump $@"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
@@ -71,6 +73,7 @@
     "jsdom": "^9.11.0",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
+    "semver": "^5.3.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
     "through2": "^2.0.0",

@@ -2,14 +2,11 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const replacer = require('./replacer');
 
-module.exports = ({ release = process.argv.includes('--release'), stdio = 'inherit' } = {}) => {
+module.exports = ({ stdio = 'inherit' } = {}) => {
   process.stdout.write('Docs...');
   mkdirp.sync('dist');
 
-  const drjson = replacer(fs.readFileSync('dr.json').toString(), {
-    release,
-    decorate: false,
-  });
+  const drjson = replacer(fs.readFileSync('dr.json').toString());
 
   fs.writeFileSync('_dr.json', drjson);
 

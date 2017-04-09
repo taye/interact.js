@@ -15,7 +15,7 @@ const filenames = {
   minMap: 'interact.min.js.map',
 };
 
-module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeaderFile, release }) {
+module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeaderFile, noMetadata }) {
   mkdirp(destDir);
 
   let streamCode = '';
@@ -45,7 +45,7 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
       code,
       map,
       headerFilename,
-      replacer: input => replacer(input, { release }),
+      replacer: input => replacer(input, { updateMetadata: !noMetadata }),
     };
   }
 };
