@@ -23,11 +23,12 @@
     "_dr.js": "dr.js _dr.json && cp img/ijs-anim-short.svg img/ijs-32.png dist/docs/img",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
-    "preversion": "npm test && istanbul check-coverage",
-    "version": "git clean -fx dist && git add -- package.json && npm run build -- --release && git add -A -- dist",
+    "preversion": "echo $npm_package_version",
+    "version": "git clean -fx dist && git add -- package.json && npm run build -- --no-metadata && git add -A -- dist",
     "postversion": "",
-    "unstable": "rm -r dist/*; git checkout -f unstable && git merge --no-ff --no-edit master && node build/bump prerelease alpha --commit false && git add package.json && npm run preversion && npm run build && git commit -m '*: update version' -- dist package.json",
-    "bump": "node build/bump"
+    "release": "npm version --no-git-tag-version -m 'v%s'",
+    "pre-release": "git clean -fx dist/* && git diff-index HEAD --stat --exit-code && git merge --no-ff --no-edit master && NEW_VERSION=$(node build/bump prerelease) && git add package.json && npm run preversion && npm run build && git commit -m \"v$NEW_VERSION\" -- package.json dist",
+    "bump": "node build/bump $@"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
   "homepage": "http://interactjs.io",
@@ -77,7 +78,6 @@
     "tape": "^4.6.3",
     "through2": "^2.0.0",
     "uglify-js": "^2.7.5",
-    "watchify": "^3.9.0",
-    "yargs": "^7.0.2"
+    "watchify": "^3.9.0"
   }
 }

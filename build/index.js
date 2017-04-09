@@ -14,10 +14,10 @@ const config = {
 
 const b = browserify(config);
 
-const pwdRegex = new RegExp(`^${process.env.PWD}.`);
-const release  = process.argv.includes('--release');
-const watch    = process.argv.includes('--watch');
-const docs     = process.argv.includes('--docs')? require('./docs') : null;
+const pwdRegex   = new RegExp(`^${process.env.PWD}.`);
+const noMetadata = process.argv.includes('--no-metadata');
+const watch      = process.argv.includes('--watch');
+const docs       = process.argv.includes('--docs')? require('./docs') : null;
 
 if (watch) {
   b.plugin(require('watchify'));
@@ -53,7 +53,7 @@ function update (ids) {
   }
 
   bundleProcessor({
-    release,
+    noMetadata,
     bundleStream: b.bundle(),
     headerFile: 'src/header.js',
     minHeaderFile: 'src/minHeader.js',

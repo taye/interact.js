@@ -13,9 +13,9 @@ const version = {
       git diff --quiet -- . ':!dist' ||
       echo -dirty`).toString().trim();
     const matchedMetadata = parsed.raw.match(/[+].*$/);
-    const newMetadata = !updateMetadata
-      ? matchedMetadata? matchedMetadata[0] : ''
-      : `+sha.${gitRev.short()}`.trim();
+    const newMetadata = updateMetadata
+      ? `+sha.${gitRev.short()}`.trim()
+      : matchedMetadata? matchedMetadata[0] : '';
 
     return `v${parsed.version}${newMetadata}${dirty}`;
   },
@@ -24,7 +24,6 @@ const version = {
     version: prev = version.get(),
     release = 'minor',
     prereleaseId,
-    write = false,
   }) {
     const semverArgs = [prev, release, prereleaseId];
 
@@ -36,10 +35,6 @@ const version = {
 
     if (release === 'prerelease') {
       newVersion += `+sha.${gitRev.short()}`;
-    }
-
-    if (write) {
-      version.write(newVersion);
     }
 
     return newVersion;
