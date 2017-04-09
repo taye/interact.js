@@ -6,7 +6,7 @@ const config = {
   entries: 'index.js',
   standalone: 'interact',
 
-  transform: [[ 'babelify', {} ]],
+  transform: [[ 'babelify', { compact: false } ]],
 
   cache: {},
   packageCache: {},
