@@ -23,7 +23,7 @@
     "_dr.js": "dr.js _dr.json && cp img/ijs-anim-short.svg img/ijs-32.png dist/docs/img",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
-    "preversion": "echo $npm_package_version",
+    "preversion": "npm test && istanbul check-coverage",
     "version": "git clean -fx dist && git add -- package.json && npm run build -- --no-metadata && git add -A -- dist",
     "postversion": "",
     "release": "npm version --no-git-tag-version -m 'v%s'",
