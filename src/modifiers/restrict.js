@@ -95,17 +95,7 @@ const restrict = {
 };
 
 function getRestrictionRect (value, interaction, page) {
-  value = utils.getStringOptionResult(value, interaction.target, interaction.element) || value;
-
-  if (utils.is.function(value)) {
-    value = value(page.x, page.y, interaction);
-  }
-
-  if (utils.is.element(value)) {
-    value = utils.getElementRect(value);
-  }
-
-  return value;
+  return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
 }
 
 modifiers.restrict = restrict;

@@ -27,14 +27,12 @@ const snap = {
         y: interaction.startCoords.page.y - origin.y,
       };
     }
-    else if (options.offset === 'self') {
-      snapOffset = {
-        x: rect.left - origin.x,
-        y: rect.top - origin.y,
-      };
-    }
-    else {
-      snapOffset = options.offset || { x: 0, y: 0 };
+    else  {
+      const offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
+
+      snapOffset = offsetRect
+        ? utils.rectToXY(offsetRect)
+        : { x: 0, y: 0 };
     }
 
     if (rect && options.relativePoints && options.relativePoints.length) {
