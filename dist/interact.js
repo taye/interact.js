@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.0+sha.4c9dfbf
+ * interact.js v1.3.0-alpha.1+sha.3b5033b
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -1377,8 +1377,8 @@ Interaction.signals.on('action-start', function (_ref) {
   var interaction = _ref.interaction,
       event = _ref.event;
 
-  firePrepared(interaction, event, 'start');
   interaction._interacting = true;
+  firePrepared(interaction, event, 'start');
 });
 
 Interaction.signals.on('action-move', function (_ref2) {
@@ -4786,17 +4786,7 @@ var restrict = {
 };
 
 function getRestrictionRect(value, interaction, page) {
-  value = utils.getStringOptionResult(value, interaction.target, interaction.element) || value;
-
-  if (utils.is.function(value)) {
-    value = value(page.x, page.y, interaction);
-  }
-
-  if (utils.is.element(value)) {
-    value = utils.getElementRect(value);
-  }
-
-  return value;
+  return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
 }
 
 modifiers.restrict = restrict;
@@ -5061,7 +5051,8 @@ var snap = {
         options = _ref.options;
 
     var offsets = [];
-    var origin = options.origin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+    var optionsOrigin = utils.rectToXY(utils.resolveRectLike(options.origin));
+    var origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
     options = options || interactable.options[interaction.prepared.name].snap || {};
 
     var snapOffset = void 0;
@@ -5071,13 +5062,10 @@ var snap = {
         x: interaction.startCoords.page.x - origin.x,
         y: interaction.startCoords.page.y - origin.y
       };
-    } else if (options.offset === 'self') {
-      snapOffset = {
-        x: rect.left - origin.x,
-        y: rect.top - origin.y
-      };
     } else {
-      snapOffset = options.offset || { x: 0, y: 0 };
+      var offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
+
+      snapOffset = utils.rectToXY(offsetRect) || { x: 0, y: 0 };
     }
 
     if (rect && options.relativePoints && options.relativePoints.length) {
@@ -6866,42 +6854,21 @@ module.exports = function extend(dest, source) {
 },{}],42:[function(require,module,exports){
 'use strict';
 
-var is = require('./is');
-
-var _require = require('./domUtils'),
-    closest = _require.closest,
-    parentNode = _require.parentNode,
-    getElementRect = _require.getElementRect,
-    trySelector = _require.trySelector;
+var _require = require('./rect'),
+    resolveRectLike = _require.resolveRectLike,
+    rectToXY = _require.rectToXY;
 
 module.exports = function (target, element, action) {
   var actionOptions = target.options[action];
   var actionOrigin = actionOptions && actionOptions.origin;
   var origin = actionOrigin || target.options.origin;
 
-  if (origin === 'parent') {
-    origin = parentNode(element);
-  } else if (origin === 'self') {
-    origin = target.getRect(element);
-  } else if (trySelector(origin)) {
-    origin = closest(element, origin) || { x: 0, y: 0 };
-  }
+  var originRect = resolveRectLike(origin, target, element, [target && element]);
 
-  if (is.function(origin)) {
-    origin = origin(target && element);
-  }
-
-  if (is.element(origin)) {
-    origin = getElementRect(origin);
-  }
-
-  origin.x = 'x' in origin ? origin.x : origin.left;
-  origin.y = 'y' in origin ? origin.y : origin.top;
-
-  return origin;
+  return rectToXY(originRect) || { x: 0, y: 0 };
 };
 
-},{"./domUtils":39,"./is":46}],43:[function(require,module,exports){
+},{"./rect":51}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function (x, y) {
@@ -6955,22 +6922,6 @@ var utils = {
     return dest;
   },
 
-  getStringOptionResult: function getStringOptionResult(value, interactable, element) {
-    if (!utils.is.string(value)) {
-      return null;
-    }
-
-    if (value === 'parent') {
-      value = utils.parentNode(element);
-    } else if (value === 'self') {
-      value = interactable.getRect(element);
-    } else {
-      value = utils.closest(element, value);
-    }
-
-    return value;
-  },
-
   is: require('./is'),
   extend: extend,
   hypot: require('./hypot'),
@@ -6980,10 +6931,11 @@ var utils = {
 extend(utils, require('./arr'));
 extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));
+extend(utils, require('./rect'));
 
 module.exports = utils;
 
-},{"./arr":36,"./domUtils":39,"./extend":41,"./getOriginXY":42,"./hypot":43,"./is":46,"./pointerUtils":49,"./window":52}],45:[function(require,module,exports){
+},{"./arr":36,"./domUtils":39,"./extend":41,"./getOriginXY":42,"./hypot":43,"./is":46,"./pointerUtils":49,"./rect":51,"./window":52}],45:[function(require,module,exports){
 'use strict';
 
 var scope = require('../scope');
@@ -7575,8 +7527,51 @@ module.exports = {
 'use strict';
 
 var extend = require('./extend');
+var is = require('./is');
 
-module.exports = {
+var _require = require('./domUtils'),
+    closest = _require.closest,
+    parentNode = _require.parentNode,
+    getElementRect = _require.getElementRect;
+
+var rectUtils = {
+  getStringOptionResult: function getStringOptionResult(value, interactable, element) {
+    if (!is.string(value)) {
+      return null;
+    }
+
+    if (value === 'parent') {
+      value = parentNode(element);
+    } else if (value === 'self') {
+      value = interactable.getRect(element);
+    } else {
+      value = closest(element, value);
+    }
+
+    return value;
+  },
+
+  resolveRectLike: function resolveRectLike(value, interactable, element, functionArgs) {
+    value = rectUtils.getStringOptionResult(value, interactable, element) || value;
+
+    if (is.function(value)) {
+      value = value.apply(null, functionArgs);
+    }
+
+    if (is.element(value)) {
+      value = getElementRect(value);
+    }
+
+    return value;
+  },
+
+  rectToXY: function rectToXY(rect) {
+    return rect && {
+      x: 'x' in rect ? rect.x : rect.left,
+      y: 'y' in rect ? rect.y : rect.top
+    };
+  },
+
   xywhToTlbr: function xywhToTlbr(rect) {
     if (rect && !('left' in rect && 'top' in rect)) {
       rect = extend({}, rect);
@@ -7604,7 +7599,9 @@ module.exports = {
   }
 };
 
-},{"./extend":41}],52:[function(require,module,exports){
+module.exports = rectUtils;
+
+},{"./domUtils":39,"./extend":41,"./is":46}],52:[function(require,module,exports){
 'use strict';
 
 var win = module.exports;
