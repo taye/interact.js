@@ -1,7 +1,7 @@
 const {
   resolveRectLike,
   rectToXY,
-} = require('./rectUtils');
+} = require('./rect');
 
 module.exports = function (target, element, action) {
   const actionOptions = target.options[action];

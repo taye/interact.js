@@ -51,6 +51,6 @@ const utils = {
 extend(utils, require('./arr'));
 extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));
-extend(utils, require('./rectUtils'));
+extend(utils, require('./rect'));
 
 module.exports = utils;
