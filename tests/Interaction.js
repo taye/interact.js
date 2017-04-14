@@ -296,3 +296,55 @@ test('Interaction.start', t => {
 
   t.end();
 });
+
+test('action-{start,move,end} signal listeners', t => {
+  const Interactable  = require('../src/Interactable');
+  const Interaction   = require('../src/Interaction');
+
+  const interaction = new Interaction();
+  const element = {};
+  const interactable = new Interactable('TEST', { context: {} });
+
+  let interactingInStartListener = null;
+
+  interaction.target = interactable;
+  interaction.element = element;
+  interaction.prepared = { name: 'TEST' };
+
+  interactable.events.on('TESTstart', event => {
+    interactingInStartListener = event.interaction.interacting();
+  });
+
+  Interaction.signals.fire('action-start', { interaction, event: {} });
+
+  t.ok(interactingInStartListener, 'start event was fired correctly');
+
+  interactable.unset();
+
+  t.end();
+});
+
+test('stop interaction from start event', t => {
+  const Interactable  = require('../src/Interactable');
+  const Interaction   = require('../src/Interaction');
+
+  const interaction = new Interaction();
+  const element = {};
+  const interactable = new Interactable('TEST', { context: {} });
+
+  interaction.target = interactable;
+  interaction.element = element;
+  interaction.prepared = { name: 'TEST' };
+
+  interactable.events.on('TESTstart', event => {
+    event.interaction.stop();
+  });
+
+  Interaction.signals.fire('action-start', { interaction, event: {} });
+
+  t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener');
+
+  interactable.unset();
+
+  t.end();
+});

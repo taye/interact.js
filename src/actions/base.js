@@ -8,8 +8,8 @@ const actions = {
 };
 
 Interaction.signals.on('action-start', function ({ interaction, event }) {
-  firePrepared(interaction, event, 'start');
   interaction._interacting = true;
+  firePrepared(interaction, event, 'start');
 });
 
 Interaction.signals.on('action-move', function ({ interaction, event, preEnd }) {
