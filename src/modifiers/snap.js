@@ -16,7 +16,8 @@ const snap = {
 
   setOffset: function ({ interaction, interactable, element, rect, startOffset, options }) {
     const offsets = [];
-    const origin = options.origin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+    const optionsOrigin = utils.rectToXY(utils.resolveRectLike(options.origin));
+    const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
     options = options || interactable.options[interaction.prepared.name].snap || {};
 
     let snapOffset;
