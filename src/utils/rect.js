@@ -40,7 +40,7 @@ const rectUtils = {
   },
 
   rectToXY: function (rect) {
-    return {
+    return  rect && {
       x: 'x' in rect ? rect.x : rect.left,
       y: 'y' in rect ? rect.y : rect.top,
     };

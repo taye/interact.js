@@ -30,9 +30,7 @@ const snap = {
     else  {
       const offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
 
-      snapOffset = offsetRect
-        ? utils.rectToXY(offsetRect)
-        : { x: 0, y: 0 };
+      snapOffset = utils.rectToXY(offsetRect) || { x: 0, y: 0 };
     }
 
     if (rect && options.relativePoints && options.relativePoints.length) {

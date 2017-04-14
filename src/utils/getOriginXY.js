@@ -10,7 +10,5 @@ module.exports = function (target, element, action) {
 
   const originRect = resolveRectLike(origin, target, element, [target && element]);
 
-  return originRect
-    ? rectToXY(originRect)
-    : { x: 0, y: 0 };
+  return rectToXY(originRect) || { x: 0, y: 0 };
 };
