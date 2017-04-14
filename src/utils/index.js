@@ -42,24 +42,6 @@ const utils = {
     return dest;
   },
 
-  getStringOptionResult: function (value, interactable, element) {
-    if (!utils.is.string(value)) {
-      return null;
-    }
-
-    if (value === 'parent') {
-      value = utils.parentNode(element);
-    }
-    else if (value === 'self') {
-      value = interactable.getRect(element);
-    }
-    else {
-      value = utils.closest(element, value);
-    }
-
-    return value;
-  },
-
   is         : require('./is'),
   extend     : extend,
   hypot      : require('./hypot'),
@@ -69,5 +51,6 @@ const utils = {
 extend(utils, require('./arr'));
 extend(utils, require('./domUtils'));
 extend(utils, require('./pointerUtils'));
+extend(utils, require('./rect'));
 
 module.exports = utils;

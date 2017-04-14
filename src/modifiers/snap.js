@@ -16,7 +16,8 @@ const snap = {
 
   setOffset: function ({ interaction, interactable, element, rect, startOffset, options }) {
     const offsets = [];
-    const origin = options.origin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+    const optionsOrigin = utils.rectToXY(utils.resolveRectLike(options.origin));
+    const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
     options = options || interactable.options[interaction.prepared.name].snap || {};
 
     let snapOffset;
@@ -27,14 +28,10 @@ const snap = {
         y: interaction.startCoords.page.y - origin.y,
       };
     }
-    else if (options.offset === 'self') {
-      snapOffset = {
-        x: rect.left - origin.x,
-        y: rect.top - origin.y,
-      };
-    }
-    else {
-      snapOffset = options.offset || { x: 0, y: 0 };
+    else  {
+      const offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
+
+      snapOffset = utils.rectToXY(offsetRect) || { x: 0, y: 0 };
     }
 
     if (rect && options.relativePoints && options.relativePoints.length) {

@@ -50,5 +50,7 @@ test('firePrepared function', t => {
   t.equal(event.target, element,
     'event.target');
 
+  interactable.unset();
+
   t.end();
 });
