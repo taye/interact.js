@@ -18,7 +18,7 @@ test('firePrepared function', t => {
   const interaction = new Interaction();
   const element = {};
   const interactable = new Interactable(element, { origin: { x: 0, y: 0 } });
-  const action = { name: 'TEST' };
+  const action = { name: 'resize' };
   const phase = 'TEST_PHASE';
 
   let event = null;
