@@ -58,8 +58,8 @@ const restrictEdges = {
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
       : utils.extend({}, pageCoords);
-    const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction), page) || noInner;
-    const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction), page) || noOuter;
+    const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
+    const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
 
     let modifiedX = page.x;
     let modifiedY = page.y;
@@ -111,6 +111,7 @@ const restrictEdges = {
 
   noInner,
   noOuter,
+  getRestrictionRect,
 };
 
 modifiers.restrictEdges = restrictEdges;

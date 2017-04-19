@@ -47,28 +47,28 @@ const restrictSize = {
     arg.options = {
       enabled: options.enabled,
       endOnly: options.endOnly,
-      min: utils.extend({}, restrictEdges.noMin),
-      max: utils.extend({}, restrictEdges.noMax),
+      inner: utils.extend({}, restrictEdges.noInner),
+      outer: utils.extend({}, restrictEdges.noOuter),
     };
 
     if (edges.top) {
-      arg.options.min.top = rect.bottom - maxSize.height;
-      arg.options.max.top = rect.bottom - minSize.height;
+      arg.options.inner.top = rect.bottom - minSize.height;
+      arg.options.outer.top = rect.bottom - maxSize.height;
     }
     else if (edges.bottom) {
-      arg.options.min.bottom = rect.top + minSize.height;
-      arg.options.max.bottom = rect.top + maxSize.height;
+      arg.options.inner.bottom = rect.top + minSize.height;
+      arg.options.outer.bottom = rect.top + maxSize.height;
     }
     if (edges.left) {
-      arg.options.min.left = rect.right - maxSize.width;
-      arg.options.max.left = rect.right - minSize.width;
+      arg.options.inner.left = rect.right - minSize.width;
+      arg.options.outer.left = rect.right - maxSize.width;
     }
     else if (edges.right) {
-      arg.options.min.right = rect.left + minSize.width;
-      arg.options.max.right = rect.left + maxSize.width;
+      arg.options.inner.right = rect.left + minSize.width;
+      arg.options.outer.right = rect.left + maxSize.width;
     }
 
-    return restrictEdges.set(arg);
+    restrictEdges.set(arg);
   },
 
   modifyCoords: restrictEdges.modifyCoords,
