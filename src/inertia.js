@@ -88,24 +88,23 @@ Interaction.signals.on('up', function ({ interaction, event }) {
   const statuses = {};
   const page = utils.extend({}, interaction.curCoords.page);
   const pointerSpeed = interaction.pointerDelta.client.speed;
-  let inertiaPossible = false;
-  let inertia = false;
+
   let smoothEnd = false;
   let modifierResult;
 
   // check if inertia should be started
-  inertiaPossible = (inertiaOptions && inertiaOptions.enabled
+  const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
                      && interaction.prepared.name !== 'gesture'
                      && event !== status.startEvent);
 
-  inertia = (inertiaPossible
-            && (now - interaction.curCoords.timeStamp) < 50
-            && pointerSpeed > inertiaOptions.minSpeed
-            && pointerSpeed > inertiaOptions.endSpeed);
+  const inertia = (inertiaPossible
+    && (now - interaction.curCoords.timeStamp) < 50
+    && pointerSpeed > inertiaOptions.minSpeed
+    && pointerSpeed > inertiaOptions.endSpeed);
 
   const modifierArg = {
     interaction,
-    page,
+    pageCoords: page,
     statuses,
     preEnd: true,
     requireEndOnly: true,
