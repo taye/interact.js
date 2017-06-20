@@ -23,6 +23,7 @@ Installation
 
 * [Bower](http://bower.io/): `bower install interactjs`
 * [npm](https://www.npmjs.org/): `npm install interactjs`
+* [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.bower" % "interact.js" % "1.2.8")`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
     * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
