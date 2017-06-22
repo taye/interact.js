@@ -13,7 +13,7 @@
     "interact.d.ts",
     "interact-test.ts"
   ],
-  "main": "index.js",
+  "main": "dist/interact.js",
   "scripts": {
     "start": "node build --watch",
     "build": "node build --docs",
