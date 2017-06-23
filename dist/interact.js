@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.1+sha.3b5033b
+ * interact.js v1.3.0-alpha.2+sha.e6a7fe3
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -1864,9 +1864,6 @@ function fireDropEvents(interaction, dropEvents) {
   }
   if (dropEvents.drop) {
     interaction.dropTarget.fire(dropEvents.drop);
-  }
-  if (dropEvents.move) {
-    interaction.dropTarget.fire(dropEvents.move);
   }
   if (dropEvents.deactivate) {
     fireActiveDrops(interaction, dropEvents.deactivate);
@@ -3774,19 +3771,18 @@ Interaction.signals.on('up', function (_ref2) {
   var statuses = {};
   var page = utils.extend({}, interaction.curCoords.page);
   var pointerSpeed = interaction.pointerDelta.client.speed;
-  var inertiaPossible = false;
-  var inertia = false;
+
   var smoothEnd = false;
   var modifierResult = void 0;
 
   // check if inertia should be started
-  inertiaPossible = inertiaOptions && inertiaOptions.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
+  var inertiaPossible = inertiaOptions && inertiaOptions.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
 
-  inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > inertiaOptions.minSpeed && pointerSpeed > inertiaOptions.endSpeed;
+  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > inertiaOptions.minSpeed && pointerSpeed > inertiaOptions.endSpeed;
 
   var modifierArg = {
     interaction: interaction,
-    page: page,
+    pageCoords: page,
     statuses: statuses,
     preEnd: true,
     requireEndOnly: true
@@ -4786,7 +4782,11 @@ var restrict = {
 };
 
 function getRestrictionRect(value, interaction, page) {
-  return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
+  if (utils.is.function(value)) {
+    return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
+  } else {
+    return utils.resolveRectLike(value, interaction.target, interaction.element);
+  }
 }
 
 modifiers.restrict = restrict;
@@ -4868,8 +4868,8 @@ var restrictEdges = {
     }
 
     var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, pageCoords);
-    var inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction), page) || noInner;
-    var outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction), page) || noOuter;
+    var inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
+    var outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
 
     var modifiedX = page.x;
     var modifiedY = page.y;
@@ -4923,7 +4923,8 @@ var restrictEdges = {
   },
 
   noInner: noInner,
-  noOuter: noOuter
+  noOuter: noOuter,
+  getRestrictionRect: getRestrictionRect
 };
 
 modifiers.restrictEdges = restrictEdges;
@@ -4990,26 +4991,26 @@ var restrictSize = {
     arg.options = {
       enabled: options.enabled,
       endOnly: options.endOnly,
-      min: utils.extend({}, restrictEdges.noMin),
-      max: utils.extend({}, restrictEdges.noMax)
+      inner: utils.extend({}, restrictEdges.noInner),
+      outer: utils.extend({}, restrictEdges.noOuter)
     };
 
     if (edges.top) {
-      arg.options.min.top = rect.bottom - maxSize.height;
-      arg.options.max.top = rect.bottom - minSize.height;
+      arg.options.inner.top = rect.bottom - minSize.height;
+      arg.options.outer.top = rect.bottom - maxSize.height;
     } else if (edges.bottom) {
-      arg.options.min.bottom = rect.top + minSize.height;
-      arg.options.max.bottom = rect.top + maxSize.height;
+      arg.options.inner.bottom = rect.top + minSize.height;
+      arg.options.outer.bottom = rect.top + maxSize.height;
     }
     if (edges.left) {
-      arg.options.min.left = rect.right - maxSize.width;
-      arg.options.max.left = rect.right - minSize.width;
+      arg.options.inner.left = rect.right - minSize.width;
+      arg.options.outer.left = rect.right - maxSize.width;
     } else if (edges.right) {
-      arg.options.min.right = rect.left + minSize.width;
-      arg.options.max.right = rect.left + maxSize.width;
+      arg.options.inner.right = rect.left + minSize.width;
+      arg.options.outer.right = rect.left + maxSize.width;
     }
 
-    return restrictEdges.set(arg);
+    restrictEdges.set(arg);
   },
 
   modifyCoords: restrictEdges.modifyCoords
