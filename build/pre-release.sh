@@ -5,5 +5,5 @@ git clean -fx dist/* &&
   git add package.json &&
   npm run preversion &&
   npm run build &&
-  git commit -m \"v$NEW_VERSION\" -- package.json dist &&
-  git tag \"v$NEW_VERSION\"
+  git commit -m "v$NEW_VERSION" -- package.json dist &&
+  git tag $(echo "v$NEW_VERSION" | sed 's/[+].*//')
