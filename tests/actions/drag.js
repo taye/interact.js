@@ -63,10 +63,15 @@ test('Interactable.draggable method', t => {
 
 test('drag axis', t => {
   const Interaction   = require('../../src/Interaction');
+  const Interactable = require('../../src/Interactable');
   const InteractEvent = require('../../src/InteractEvent');
 
   const opposites = { x: 'y', y: 'x' };
   const interaction = new Interaction();
+  const element = {};
+  const interactable = new Interactable(element, { origin: { x: 0, y: 0 } });
+  interaction.target = interactable;
+
   const iEvent = { type: 'dragmove' };
   const eventCoords = {
     pageX:   -1, pageY:   -2,

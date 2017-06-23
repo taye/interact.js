@@ -15,6 +15,7 @@ require('./pointerEvents/holdRepeat');
 // modifiers
 //require('./modifiers/snap');
 //require('./modifiers/restrict');
+require('./modifiers/restrictSize');
 
 // delay
 //require('./autoStart/delay');
