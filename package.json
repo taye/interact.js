@@ -27,7 +27,7 @@
     "version": "git clean -fx dist && git add -- package.json && npm run build -- --no-metadata && git add -A -- dist",
     "postversion": "",
     "release": "npm version --no-git-tag-version -m 'v%s'",
-    "pre-release": "git clean -fx dist/* && git diff-index HEAD --stat --exit-code && git merge --no-ff --no-edit master && NEW_VERSION=$(node build/bump prerelease) && git add package.json && npm run preversion && npm run build && git commit -m \"v$NEW_VERSION\" -- package.json dist",
+    "pre-release": "git clean -fx dist/* && git diff-index HEAD --stat --exit-code && git merge --no-ff --no-edit master && NEW_VERSION=$(node build/bump prerelease) && git add package.json && npm run preversion && npm run build && git commit -m \"v$NEW_VERSION\" -- package.json dist && git tag \"v$NEW_VERSION\"",
     "bump": "node build/bump $@"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
