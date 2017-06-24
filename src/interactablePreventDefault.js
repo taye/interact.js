@@ -50,7 +50,8 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   }
 
   // don't preventDefault on editable elements
-  if (matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (is.element(event.target)
+      && matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 
