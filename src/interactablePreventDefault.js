@@ -2,6 +2,7 @@ const Interactable = require('./Interactable');
 const Interaction  = require('./Interaction');
 const scope        = require('./scope');
 const is           = require('./utils/is');
+const events       = require('./utils/events');
 
 const { nodeContains, matchesSelector } = require('./utils/domUtils');
 
@@ -44,13 +45,20 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // setting === 'auto'
 
+  // don't preventDefault if the browser supports passiveEvents
+  // CSS touch-action and user-selecct should be used instead
+  if (events.supportsOptions) {
+    return;
+  }
+
   // don't preventDefault of pointerdown events
   if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
     return;
   }
 
   // don't preventDefault on editable elements
-  if (matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (is.element(event.target)
+      && matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 

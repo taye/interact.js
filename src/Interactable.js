@@ -224,14 +224,14 @@ class Interactable {
     return this;
   }
 
-  _onOffMultiple (method, eventType, listener, useCapture) {
+  _onOffMultiple (method, eventType, listener, options) {
     if (is.string(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
     if (is.array(eventType)) {
       for (let i = 0; i < eventType.length; i++) {
-        this[method](eventType[i], listener, useCapture);
+        this[method](eventType[i], listener, options);
       }
 
       return true;
@@ -254,14 +254,11 @@ class Interactable {
    *
    - eventType  (string | array | object) The types of events to listen for
    - listener   (function) The function event (s)
-   - useCapture (boolean) #optional useCapture flag for addEventListener
+   - options    (object | boolean) #optional options object or useCapture flag for addEventListener
    = (object) This Interactable
   \*/
-  on (eventType, listener, useCapture) {
-    // convert to boolean
-    useCapture = !!useCapture;
-
-    if (this._onOffMultiple('on', eventType, listener, useCapture)) {
+  on (eventType, listener, options) {
+    if (this._onOffMultiple('on', eventType, listener, options)) {
       return this;
     }
 
@@ -272,10 +269,10 @@ class Interactable {
     }
     // delegated event for selector
     else if (is.string(this.target)) {
-      events.addDelegate(this.target, this._context, eventType, listener, useCapture);
+      events.addDelegate(this.target, this._context, eventType, listener, options);
     }
     else {
-      events.add(this.target, eventType, listener, useCapture);
+      events.add(this.target, eventType, listener, options);
     }
 
     return this;
@@ -289,14 +286,11 @@ class Interactable {
    *
    - eventType  (string | array | object) The types of events that were listened for
    - listener   (function) The listener function to be removed
-   - useCapture (boolean) #optional useCapture flag for removeEventListener
+   - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
    = (object) This Interactable
   \*/
-  off (eventType, listener, useCapture) {
-    // convert to boolean
-    useCapture = !!useCapture;
-
-    if (this._onOffMultiple('off', eventType, listener, useCapture)) {
+  off (eventType, listener, options) {
+    if (this._onOffMultiple('off', eventType, listener, options)) {
       return this;
     }
 
@@ -308,11 +302,11 @@ class Interactable {
     }
     // delegated event
     else if (is.string(this.target)) {
-      events.removeDelegate(this.target, this._context, eventType, listener, useCapture);
+      events.removeDelegate(this.target, this._context, eventType, listener, options);
     }
     // remove listener from this Interatable's element
     else {
-      events.remove(this.target, eventType, listener, useCapture);
+      events.remove(this.target, eventType, listener, options);
     }
 
     return this;

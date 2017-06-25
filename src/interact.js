@@ -63,17 +63,17 @@ interact.isSet = function (element, options) {
  *
  - type       (string | array | object) The types of events to listen for
  - listener   (function) The function event (s)
- - useCapture (boolean) #optional useCapture flag for addEventListener
+ - options    (object | boolean) #optional options object or useCapture flag for addEventListener
  = (object) interact
 \*/
-interact.on = function (type, listener, useCapture) {
+interact.on = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
   if (utils.is.array(type)) {
     for (const eventType of type) {
-      interact.on(eventType, listener, useCapture);
+      interact.on(eventType, listener, options);
     }
 
     return interact;
@@ -99,7 +99,7 @@ interact.on = function (type, listener, useCapture) {
   }
   // If non InteractEvent type, addEventListener to document
   else {
-    events.add(scope.document, type, listener, useCapture);
+    events.add(scope.document, type, listener, { options });
   }
 
   return interact;
@@ -113,17 +113,17 @@ interact.on = function (type, listener, useCapture) {
  *
  - type       (string | array | object) The types of events that were listened for
  - listener   (function) The listener function to be removed
- - useCapture (boolean) #optional useCapture flag for removeEventListener
+ - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
  = (object) interact
  \*/
-interact.off = function (type, listener, useCapture) {
+interact.off = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
   if (utils.is.array(type)) {
     for (const eventType of type) {
-      interact.off(eventType, listener, useCapture);
+      interact.off(eventType, listener, options);
     }
 
     return interact;
@@ -138,7 +138,7 @@ interact.off = function (type, listener, useCapture) {
   }
 
   if (!utils.contains(Interactable.eventTypes, type)) {
-    events.remove(scope.document, type, listener, useCapture);
+    events.remove(scope.document, type, listener, options);
   }
   else {
     let index;
