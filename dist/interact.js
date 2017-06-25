@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.2+sha.e6a7fe3
+ * interact.js v1.3.0-alpha.3+sha.9595c40
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -541,14 +541,14 @@ var Interactable = function () {
     return this;
   };
 
-  Interactable.prototype._onOffMultiple = function _onOffMultiple(method, eventType, listener, useCapture) {
+  Interactable.prototype._onOffMultiple = function _onOffMultiple(method, eventType, listener, options) {
     if (is.string(eventType) && eventType.search(' ') !== -1) {
       eventType = eventType.trim().split(/ +/);
     }
 
     if (is.array(eventType)) {
       for (var i = 0; i < eventType.length; i++) {
-        this[method](eventType[i], listener, useCapture);
+        this[method](eventType[i], listener, options);
       }
 
       return true;
@@ -571,16 +571,13 @@ var Interactable = function () {
    *
    - eventType  (string | array | object) The types of events to listen for
    - listener   (function) The function event (s)
-   - useCapture (boolean) #optional useCapture flag for addEventListener
+   - options    (object | boolean) #optional options object or useCapture flag for addEventListener
    = (object) This Interactable
   \*/
 
 
-  Interactable.prototype.on = function on(eventType, listener, useCapture) {
-    // convert to boolean
-    useCapture = !!useCapture;
-
-    if (this._onOffMultiple('on', eventType, listener, useCapture)) {
+  Interactable.prototype.on = function on(eventType, listener, options) {
+    if (this._onOffMultiple('on', eventType, listener, options)) {
       return this;
     }
 
@@ -593,9 +590,9 @@ var Interactable = function () {
     }
     // delegated event for selector
     else if (is.string(this.target)) {
-        events.addDelegate(this.target, this._context, eventType, listener, useCapture);
+        events.addDelegate(this.target, this._context, eventType, listener, options);
       } else {
-        events.add(this.target, eventType, listener, useCapture);
+        events.add(this.target, eventType, listener, options);
       }
 
     return this;
@@ -609,16 +606,13 @@ var Interactable = function () {
    *
    - eventType  (string | array | object) The types of events that were listened for
    - listener   (function) The listener function to be removed
-   - useCapture (boolean) #optional useCapture flag for removeEventListener
+   - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
    = (object) This Interactable
   \*/
 
 
-  Interactable.prototype.off = function off(eventType, listener, useCapture) {
-    // convert to boolean
-    useCapture = !!useCapture;
-
-    if (this._onOffMultiple('off', eventType, listener, useCapture)) {
+  Interactable.prototype.off = function off(eventType, listener, options) {
+    if (this._onOffMultiple('off', eventType, listener, options)) {
       return this;
     }
 
@@ -632,11 +626,11 @@ var Interactable = function () {
     }
     // delegated event
     else if (is.string(this.target)) {
-        events.removeDelegate(this.target, this._context, eventType, listener, useCapture);
+        events.removeDelegate(this.target, this._context, eventType, listener, options);
       }
       // remove listener from this Interatable's element
       else {
-          events.remove(this.target, eventType, listener, useCapture);
+          events.remove(this.target, eventType, listener, options);
         }
 
     return this;
@@ -2042,7 +2036,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.activeDrops = {
     dropzones: [], // the dropzones that are mentioned below
     elements: [], // elements of dropzones that accept the target draggable
-    rects: [] };
+    rects: [] // the rects of the elements mentioned above
+  };
 });
 
 Interaction.signals.on('stop', function (_ref8) {
@@ -2245,7 +2240,8 @@ Interaction.signals.on('new', function (interaction) {
     scale: 1, // gesture.distance / gesture.startDistance
 
     startAngle: 0, // angle of line joining two touches
-    prevAngle: 0 };
+    prevAngle: 0 // angle of the previous gesture event
+  };
 });
 
 actions.gesture = gesture;
@@ -2725,7 +2721,8 @@ var autoScroll = {
     enabled: false,
     container: null, // the item that is scrolled (Window or HTMLElement)
     margin: 60,
-    speed: 300 },
+    speed: 300 // the scroll speed in pixels per second
+  },
 
   interaction: null,
   i: null, // the handle returned by window.setInterval
@@ -3616,7 +3613,8 @@ module.exports = {
       minSpeed: 100, // target speed must be above this for inertia to start
       endSpeed: 10, // the speed at which inertia is slow enough to stop
       allowResume: true, // allow resuming an action in inertia phase
-      smoothEndDuration: 300 }
+      smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
+    }
   }
 };
 
@@ -4028,10 +4026,10 @@ interact.isSet = function (element, options) {
  *
  - type       (string | array | object) The types of events to listen for
  - listener   (function) The function event (s)
- - useCapture (boolean) #optional useCapture flag for addEventListener
+ - options    (object | boolean) #optional options object or useCapture flag for addEventListener
  = (object) interact
 \*/
-interact.on = function (type, listener, useCapture) {
+interact.on = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
@@ -4051,7 +4049,7 @@ interact.on = function (type, listener, useCapture) {
 
       var eventType = _ref;
 
-      interact.on(eventType, listener, useCapture);
+      interact.on(eventType, listener, options);
     }
 
     return interact;
@@ -4076,7 +4074,7 @@ interact.on = function (type, listener, useCapture) {
   }
   // If non InteractEvent type, addEventListener to document
   else {
-      events.add(scope.document, type, listener, useCapture);
+      events.add(scope.document, type, listener, { options: options });
     }
 
   return interact;
@@ -4090,10 +4088,10 @@ interact.on = function (type, listener, useCapture) {
  *
  - type       (string | array | object) The types of events that were listened for
  - listener   (function) The listener function to be removed
- - useCapture (boolean) #optional useCapture flag for removeEventListener
+ - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
  = (object) interact
  \*/
-interact.off = function (type, listener, useCapture) {
+interact.off = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
@@ -4113,7 +4111,7 @@ interact.off = function (type, listener, useCapture) {
 
       var eventType = _ref2;
 
-      interact.off(eventType, listener, useCapture);
+      interact.off(eventType, listener, options);
     }
 
     return interact;
@@ -4128,7 +4126,7 @@ interact.off = function (type, listener, useCapture) {
   }
 
   if (!utils.contains(Interactable.eventTypes, type)) {
-    events.remove(scope.document, type, listener, useCapture);
+    events.remove(scope.document, type, listener, options);
   } else {
     var index = void 0;
 
@@ -4232,6 +4230,7 @@ var Interactable = require('./Interactable');
 var Interaction = require('./Interaction');
 var scope = require('./scope');
 var is = require('./utils/is');
+var events = require('./utils/events');
 
 var _require = require('./utils/domUtils'),
     nodeContains = _require.nodeContains,
@@ -4280,13 +4279,19 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // setting === 'auto'
 
+  // don't preventDefault if the browser supports passiveEvents
+  // CSS touch-action and user-selecct should be used instead
+  if (events.supportsOptions) {
+    return;
+  }
+
   // don't preventDefault of pointerdown events
   if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
     return;
   }
 
   // don't preventDefault on editable elements
-  if (matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (is.element(event.target) && matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 
@@ -4333,7 +4338,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":34,"./utils/domUtils":39,"./utils/is":46}],23:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":34,"./utils/domUtils":39,"./utils/events":40,"./utils/is":46}],23:[function(require,module,exports){
 'use strict';
 
 var scope = require('./scope');
