@@ -6,4 +6,5 @@ git clean -fx dist/* &&
   npm run preversion &&
   npm run build &&
   git commit -m "v$NEW_VERSION" -- package.json dist &&
-  git tag $(echo "v$NEW_VERSION" | sed 's/[+].*//')
+  git tag $(echo "v$NEW_VERSION" | sed 's/[+].*//') &&
+  git tag --force next
