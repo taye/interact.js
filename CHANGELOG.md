@@ -1,6 +1,14 @@
+## 1.2.9
+
+Fix a bug involving 'mouseover' targeting the document. See [issue #525](https://github.com/taye/interact.js/issues/525)
+
+## 1.2.8
+
+Avoid native PointerEvents on Chrome
+
 ## 1.2.7
 
-The bower and npm package names have been changed to `interactjs`. See [issue #399](https://github.com/taye/interact.js/issue/399)
+The bower and npm package names have been changed to `interactjs`. See [issue #399](https://github.com/taye/interact.js/issues/399)
 
 ## 1.2.6
 
