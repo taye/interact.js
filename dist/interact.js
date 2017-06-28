@@ -1,5 +1,5 @@
 /**
- * interact.js v1.2.6
+ * interact.js v1.2.9
  *
  * Copyright (c) 2012-2015 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -1353,6 +1353,7 @@
 
             function pushCurMatches (interactable, selector) {
                 if (interactable
+                    && isElement(eventTarget)
                     && inContext(interactable, eventTarget)
                     && !testIgnore(interactable, eventTarget, eventTarget)
                     && testAllow(interactable, eventTarget, eventTarget)
