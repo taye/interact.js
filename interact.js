@@ -1353,6 +1353,7 @@
 
             function pushCurMatches (interactable, selector) {
                 if (interactable
+                    && isElement(eventTarget)
                     && inContext(interactable, eventTarget)
                     && !testIgnore(interactable, eventTarget, eventTarget)
                     && testAllow(interactable, eventTarget, eventTarget)
