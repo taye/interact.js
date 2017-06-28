@@ -13,6 +13,10 @@
       "interact-test.ts"
     ],
     "main": "interact.js",
+    "scripts": {
+        "write-min-header": "echo -n \"/* interact.js v${npm_package_version} | https://raw.github.com/taye/interact.js/master/LICENSE */\" > dist/interact.min.js",
+        "build": "npm run write-min-header && cp interact.js dist/ && cd dist && closure-compiler --create_source_map interact.min.js.map interact.js >> interact.min.js && echo '//# sourceMappingURL=interact.min.js.map' >> interact.min.js"
+    },
     "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE8+)",
     "homepage": "http://interactjs.io",
     "authors": [{
