@@ -29,7 +29,7 @@ test('PointerEvent constructor', t => {
 
   t.equal(pointerEvent.type, type,
     'type is set correctly');
-  t.equal(pointerEvent.pointerType, pointerUtils.getPointerType(pointer, interaction),
+  t.equal(pointerEvent.pointerType, pointerUtils.getPointerType(pointer),
     'pointerType is set correctly');
   t.equal(pointerEvent.pointerId, pointerId,
     'pointerId is set correctly');

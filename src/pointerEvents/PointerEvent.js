@@ -14,7 +14,7 @@ module.exports = class PointerEvent {
     this.originalEvent = event;
     this.type          = type;
     this.pointerId     = pointerUtils.getPointerId(pointer);
-    this.pointerType   = pointerUtils.getPointerType(pointer, interaction);
+    this.pointerType   = pointerUtils.getPointerType(pointer);
     this.target        = eventTarget;
     this.currentTarget = null;
 
