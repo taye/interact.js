@@ -1,9 +1,10 @@
-const scope   = require('./scope');
-const utils   = require('./utils');
-const events  = require('./utils/events');
-const browser = require('./utils/browser');
-const finder  = require('./utils/interactionFinder');
-const signals = require('./utils/Signals').new();
+const scope      = require('./scope');
+const utils      = require('./utils');
+const events     = require('./utils/events');
+const browser    = require('./utils/browser');
+const domObjects = require('./utils/domObjects');
+const finder     = require('./utils/interactionFinder');
+const signals    = require('./utils/Signals').new();
 
 const listeners   = {};
 const methodNames = [
@@ -440,7 +441,7 @@ function endAll (event) {
 const docEvents = { /* 'eventType': listenerFunc */ };
 const pEventTypes = browser.pEventTypes;
 
-if (scope.PointerEvent) {
+if (domObjects.PointerEvent) {
   docEvents[pEventTypes.down  ] = listeners.pointerDown;
   docEvents[pEventTypes.move  ] = listeners.pointerMove;
   docEvents[pEventTypes.up    ] = listeners.pointerUp;
