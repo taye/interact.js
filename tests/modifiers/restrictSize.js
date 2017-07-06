@@ -4,7 +4,7 @@ test('restrictSize', t => {
   const RestrictSize = require('../../src/modifiers/restrictSize');
   const Interaction = require('../../src/Interaction');
 
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   interaction.prepared = {};
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true };
   interaction.resizeRects = {};

@@ -15,7 +15,7 @@ test('firePrepared function', t => {
   const InteractEvent = require('../../src/InteractEvent');
   const actions       = require('../../src/actions/base');
 
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const element = {};
   const interactable = new Interactable(element, { origin: { x: 0, y: 0 } });
   const action = { name: 'resize' };

@@ -25,7 +25,7 @@ test('holdRepeat onFired', t => {
   const Interaction = require('../../src/Interaction');
   require('../../src/pointerEvents/holdRepeat');
 
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const pointerEvent = {
     type: 'hold',
   };
