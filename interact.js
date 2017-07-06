@@ -2844,10 +2844,13 @@
                 pointerEvent.originalPointer = pointer;
                 pointerEvent.type            = eventType;
                 pointerEvent.pointerId       = getPointerId(pointer);
-                pointerEvent.pointerType     = this.mouse? 'mouse' : !supportsPointerEvent? 'touch'
-                                                    : isString(pointer.pointerType)
-                                                        ? pointer.pointerType
-                                                        : [,,'touch', 'pen', 'mouse'][pointer.pointerType];
+                pointerEvent.pointerType     = isString(pointer.pointerType)
+                                                ? pointer.pointerType
+                                                : isNumber(pointer.pointerType)
+                                                  ? [,,'touch', 'pen', 'mouse'][pointer.pointerType]
+                                                    : this.mouse
+                                                      ? 'mouse'
+                                                      : 'touch';
             }
 
             if (eventType === 'tap') {
@@ -3221,9 +3224,10 @@
 
     function getInteractionFromPointer (pointer, eventType, eventTarget) {
         var i = 0, len = interactions.length,
-            mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
-                          // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                          || pointer.pointerType === 4),
+            // pen interactions are treated as mouse interactions for simplicity
+            mouseEvent = (/mouse|pen/i.test(pointer.pointerType || eventType)
+                          // MSPointerEvent.MSPOINTER_TYPE_{PEN,MOUSE}
+                          || pointer.pointerType >= 3),
             interaction;
 
         var id = getPointerId(pointer);
