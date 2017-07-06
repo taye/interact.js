@@ -19,7 +19,7 @@ let prevTouchTime = 0;
 scope.interactions = [];
 
 class Interaction {
-  constructor () {
+  constructor ({ pointerType }) {
     this.target        = null; // current interactable being interacted with
     this.element       = null; // the target element of the interactable
 
@@ -74,7 +74,7 @@ class Interaction {
     this.pointerWasMoved = false;
     this._interacting    = false;
 
-    this.mouse = false;
+    this.pointerType = pointerType;
 
     signals.fire('new', this);
 
@@ -315,6 +315,11 @@ class Interaction {
   }
 
   getPointerIndex (pointer) {
+    // mouse and pen interactions may have only one pointer
+    if (this.pointerType === 'mouse' || this.pointerType === 'pen') {
+      return 0;
+    }
+
     return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   }
 
@@ -344,8 +349,7 @@ class Interaction {
   }
 
   removePointer (pointer, event) {
-    const id = utils.getPointerId(pointer);
-    const index = this.mouse? 0 : utils.indexOf(this.pointerIds, id);
+    const index = this.getPointerIndex(pointer);
 
     if (index === -1) { return; }
 
@@ -376,6 +380,7 @@ for (let i = 0, len = methodNames.length; i < len; i++) {
 
 function doOnInteractions (method) {
   return (function (event) {
+    const pointerType = utils.getPointerType(event);
     const [eventTarget, curEventTarget] = utils.getEventTargets(event);
     const matches = []; // [ [pointer, interaction], ...]
 
@@ -386,7 +391,7 @@ function doOnInteractions (method) {
         const pointer = event.changedTouches[i];
         const interaction = finder.search(pointer, event.type, eventTarget);
 
-        matches.push([pointer, interaction || new Interaction()]);
+        matches.push([pointer, interaction || new Interaction({ pointerType })]);
       }
     }
     else {
@@ -395,7 +400,7 @@ function doOnInteractions (method) {
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
         for (let i = 0; i < scope.interactions.length && !invalidPointer; i++) {
-          invalidPointer = !scope.interactions[i].mouse && scope.interactions[i].pointerIsDown;
+          invalidPointer = scope.interactions[i].pointerType !== 'mouse' && scope.interactions[i].pointerIsDown;
         }
 
         // try to ignore mouse events that are simulated by the browser
@@ -410,12 +415,7 @@ function doOnInteractions (method) {
         let interaction = finder.search(event, event.type, eventTarget);
 
         if (!interaction) {
-
-          interaction = new Interaction();
-          interaction.mouse = (/mouse/i.test(event.pointerType || event.type)
-                               // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                               || event.pointerType === 4
-                               || !event.pointerType);
+          interaction = new Interaction({ pointerType });
         }
 
         matches.push([event, interaction]);

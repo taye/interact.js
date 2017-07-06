@@ -3,9 +3,10 @@ const pointerUtils = require('../src/utils/pointerUtils');
 const helpers = require('./helpers');
 
 test('Interaction constructor', t => {
+  const testType = 'test';
   const scope = require('../src/scope');
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({ pointertype: testType });
   const zeroCoords = {
     page     : { x: 0, y: 0 },
     client   : { x: 0, y: 0 },
@@ -30,6 +31,9 @@ test('Interaction constructor', t => {
     'interaction.startCoords set to zero');
   t.deepEqual(interaction.pointerDelta, zeroDelta,
     'interaction.pointerDelta set to zero');
+
+  t.equal(interaction.pointerType, testType,
+    'interaction.pointerType is set');
 
   // array properties
   for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
