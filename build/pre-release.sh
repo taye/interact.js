@@ -45,8 +45,9 @@ git tag $NEW_TAG
 
 # push branch and tags to git origin and publish to npm
 git tag --force next &&
-  git push &&
-  git push origin $NEW_TAG next &&
+  git push --no-verify &&
+  git push --no-verify origin $NEW_TAG &&
+  git push --no-verify -f origin next &&
   npm publish --tag next
 
 # leave the "unstable" branch
