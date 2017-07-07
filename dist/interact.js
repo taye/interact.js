@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.3+sha.9595c40
+ * interact.js v1.3.0-alpha.4+sha.7970416-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -816,6 +816,7 @@ var scope = require('./scope');
 var utils = require('./utils');
 var events = require('./utils/events');
 var browser = require('./utils/browser');
+var domObjects = require('./utils/domObjects');
 var finder = require('./utils/interactionFinder');
 var signals = require('./utils/Signals').new();
 
@@ -829,7 +830,9 @@ var prevTouchTime = 0;
 scope.interactions = [];
 
 var Interaction = function () {
-  function Interaction() {
+  function Interaction(_ref) {
+    var pointerType = _ref.pointerType;
+
     _classCallCheck(this, Interaction);
 
     this.target = null; // current interactable being interacted with
@@ -886,7 +889,7 @@ var Interaction = function () {
     this.pointerWasMoved = false;
     this._interacting = false;
 
-    this.mouse = false;
+    this.pointerType = pointerType;
 
     signals.fire('new', this);
 
@@ -1130,6 +1133,11 @@ var Interaction = function () {
   };
 
   Interaction.prototype.getPointerIndex = function getPointerIndex(pointer) {
+    // mouse and pen interactions may have only one pointer
+    if (this.pointerType === 'mouse' || this.pointerType === 'pen') {
+      return 0;
+    }
+
     return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
   };
 
@@ -1161,8 +1169,7 @@ var Interaction = function () {
   };
 
   Interaction.prototype.removePointer = function removePointer(pointer, event) {
-    var id = utils.getPointerId(pointer);
-    var index = this.mouse ? 0 : utils.indexOf(this.pointerIds, id);
+    var index = this.getPointerIndex(pointer);
 
     if (index === -1) {
       return;
@@ -1197,6 +1204,8 @@ for (var i = 0, len = methodNames.length; i < len; i++) {
 
 function doOnInteractions(method) {
   return function (event) {
+    var pointerType = utils.getPointerType(event);
+
     var _utils$getEventTarget = utils.getEventTargets(event),
         eventTarget = _utils$getEventTarget[0],
         curEventTarget = _utils$getEventTarget[1];
@@ -1210,7 +1219,7 @@ function doOnInteractions(method) {
         var pointer = event.changedTouches[_i];
         var interaction = finder.search(pointer, event.type, eventTarget);
 
-        matches.push([pointer, interaction || new Interaction()]);
+        matches.push([pointer, interaction || new Interaction({ pointerType: pointerType })]);
       }
     } else {
       var invalidPointer = false;
@@ -1218,7 +1227,7 @@ function doOnInteractions(method) {
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
         for (var _i2 = 0; _i2 < scope.interactions.length && !invalidPointer; _i2++) {
-          invalidPointer = !scope.interactions[_i2].mouse && scope.interactions[_i2].pointerIsDown;
+          invalidPointer = scope.interactions[_i2].pointerType !== 'mouse' && scope.interactions[_i2].pointerIsDown;
         }
 
         // try to ignore mouse events that are simulated by the browser
@@ -1232,11 +1241,7 @@ function doOnInteractions(method) {
         var _interaction = finder.search(event, event.type, eventTarget);
 
         if (!_interaction) {
-
-          _interaction = new Interaction();
-          _interaction.mouse = /mouse/i.test(event.pointerType || event.type)
-          // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-          || event.pointerType === 4 || !event.pointerType;
+          _interaction = new Interaction({ pointerType: pointerType });
         }
 
         matches.push([event, _interaction]);
@@ -1244,20 +1249,20 @@ function doOnInteractions(method) {
     }
 
     for (var _iterator = matches, _isArray = Array.isArray(_iterator), _i3 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
+      var _ref2;
 
       if (_isArray) {
         if (_i3 >= _iterator.length) break;
-        _ref = _iterator[_i3++];
+        _ref2 = _iterator[_i3++];
       } else {
         _i3 = _iterator.next();
         if (_i3.done) break;
-        _ref = _i3.value;
+        _ref2 = _i3.value;
       }
 
-      var _ref2 = _ref,
-          _pointer = _ref2[0],
-          _interaction2 = _ref2[1];
+      var _ref3 = _ref2,
+          _pointer = _ref3[0],
+          _interaction2 = _ref3[1];
 
       _interaction2._updateEventTargets(eventTarget, curEventTarget);
       _interaction2[method](_pointer, event, eventTarget, curEventTarget);
@@ -1277,7 +1282,7 @@ function endAll(event) {
 var docEvents = {/* 'eventType': listenerFunc */};
 var pEventTypes = browser.pEventTypes;
 
-if (scope.PointerEvent) {
+if (domObjects.PointerEvent) {
   docEvents[pEventTypes.down] = listeners.pointerDown;
   docEvents[pEventTypes.move] = listeners.pointerMove;
   docEvents[pEventTypes.up] = listeners.pointerUp;
@@ -1295,8 +1300,8 @@ if (scope.PointerEvent) {
 
 docEvents.blur = endAll;
 
-function onDocSignal(_ref3, signalName) {
-  var doc = _ref3.doc;
+function onDocSignal(_ref4, signalName) {
+  var doc = _ref4.doc;
 
   var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
 
@@ -1311,14 +1316,14 @@ function onDocSignal(_ref3, signalName) {
   }
 }
 
-signals.on('update-pointer-down', function (_ref4) {
-  var interaction = _ref4.interaction,
-      pointer = _ref4.pointer,
-      pointerId = _ref4.pointerId,
-      pointerIndex = _ref4.pointerIndex,
-      event = _ref4.event,
-      eventTarget = _ref4.eventTarget,
-      down = _ref4.down;
+signals.on('update-pointer-down', function (_ref5) {
+  var interaction = _ref5.interaction,
+      pointer = _ref5.pointer,
+      pointerId = _ref5.pointerId,
+      pointerIndex = _ref5.pointerIndex,
+      event = _ref5.event,
+      eventTarget = _ref5.eventTarget,
+      down = _ref5.down;
 
   interaction.pointerIds[pointerIndex] = pointerId;
   interaction.pointers[pointerIndex] = pointer;
@@ -1355,7 +1360,7 @@ scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":34,"./utils":44,"./utils/Signals":35,"./utils/browser":37,"./utils/events":40,"./utils/interactionFinder":45}],6:[function(require,module,exports){
+},{"./scope":34,"./utils":44,"./utils/Signals":35,"./utils/browser":37,"./utils/domObjects":38,"./utils/events":40,"./utils/interactionFinder":45}],6:[function(require,module,exports){
 'use strict';
 
 var Interaction = require('../Interaction');
@@ -5460,7 +5465,7 @@ module.exports = function () {
     this.originalEvent = event;
     this.type = type;
     this.pointerId = pointerUtils.getPointerId(pointer);
-    this.pointerType = pointerUtils.getPointerType(pointer, interaction);
+    this.pointerType = pointerUtils.getPointerType(pointer);
     this.target = eventTarget;
     this.currentTarget = null;
 
@@ -5758,8 +5763,10 @@ Interaction.signals.on('down', function (_ref6) {
   timer.duration = minDuration;
   timer.timeout = setTimeout(function () {
     fire({
-      interaction: interaction, eventCopy: eventCopy, eventTarget: eventTarget,
+      interaction: interaction,
+      eventTarget: eventTarget,
       pointer: browser.isIE8 ? eventCopy : pointer,
+      event: eventCopy,
       type: 'hold'
     });
   }, minDuration);
@@ -6946,17 +6953,14 @@ module.exports = utils;
 
 var scope = require('../scope');
 var utils = require('./index');
-var browser = require('./browser');
 
 var finder = {
-  methodOrder: ['simulationResume', 'mouse', 'hasPointer', 'idle'],
+  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
 
   search: function search(pointer, eventType, eventTarget) {
-    var mouseEvent = /mouse/i.test(pointer.pointerType || eventType)
-    // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-    || pointer.pointerType === 4;
+    var pointerType = utils.getPointerType(pointer);
     var pointerId = utils.getPointerId(pointer);
-    var details = { pointer: pointer, pointerId: pointerId, mouseEvent: mouseEvent, eventType: eventType, eventTarget: eventTarget };
+    var details = { pointer: pointer, pointerId: pointerId, pointerType: pointerType, eventType: eventType, eventTarget: eventTarget };
 
     for (var _iterator = finder.methodOrder, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
@@ -6982,7 +6986,7 @@ var finder = {
 
   // try to resume simulation with a new pointer
   simulationResume: function simulationResume(_ref2) {
-    var mouseEvent = _ref2.mouseEvent,
+    var pointerType = _ref2.pointerType,
         eventType = _ref2.eventType,
         eventTarget = _ref2.eventTarget;
 
@@ -7006,7 +7010,7 @@ var finder = {
 
       var element = eventTarget;
 
-      if (interaction.simulation && interaction.simulation.allowResume && interaction.mouse === mouseEvent) {
+      if (interaction.simulation && interaction.simulation.allowResume && interaction.pointerType === pointerType) {
         while (element) {
           // if the element is the interaction element
           if (element === interaction.element) {
@@ -7020,13 +7024,13 @@ var finder = {
     return null;
   },
 
-  // if it's a mouse interaction
-  mouse: function mouse(_ref4) {
+  // if it's a mouse or pen interaction
+  mouseOrPen: function mouseOrPen(_ref4) {
     var pointerId = _ref4.pointerId,
-        mouseEvent = _ref4.mouseEvent,
+        pointerType = _ref4.pointerType,
         eventType = _ref4.eventType;
 
-    if (!mouseEvent && (browser.supportsTouch || browser.supportsPointerEvent)) {
+    if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null;
     }
 
@@ -7046,7 +7050,7 @@ var finder = {
 
       var interaction = _ref5;
 
-      if (interaction.mouse) {
+      if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
         if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) {
           continue;
@@ -7069,8 +7073,8 @@ var finder = {
       return firstNonActive;
     }
 
-    // Find any interaction specifically for mouse.
-    // ignore the interaction if the eventType is a mousedown, and a simulation
+    // find any mouse or pen interaction.
+    // ignore the interaction if the eventType is a *down, and a simulation
     // is active
     for (var _iterator4 = scope.interactions, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
       var _ref6;
@@ -7086,7 +7090,7 @@ var finder = {
 
       var _interaction = _ref6;
 
-      if (_interaction.mouse && !(/down/.test(eventType) && _interaction.simulation)) {
+      if (_interaction.pointerType === pointerType && !(/down/i.test(eventType) && _interaction.simulation)) {
         return _interaction;
       }
     }
@@ -7118,9 +7122,9 @@ var finder = {
     }
   },
 
-  // get first idle interaction
+  // get first idle interaction with a matching pointerType
   idle: function idle(_ref9) {
-    var mouseEvent = _ref9.mouseEvent;
+    var pointerType = _ref9.pointerType;
 
     for (var _iterator6 = scope.interactions, _isArray6 = Array.isArray(_iterator6), _i6 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
       var _ref10;
@@ -7150,7 +7154,7 @@ var finder = {
           continue;
         }
 
-      if (!interaction.interacting() && mouseEvent === interaction.mouse) {
+      if (!interaction.interacting() && pointerType === interaction.pointerType) {
         return interaction;
       }
     }
@@ -7161,7 +7165,7 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":34,"./browser":37,"./index":44}],46:[function(require,module,exports){
+},{"../scope":34,"./index":44}],46:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -7262,6 +7266,7 @@ var hypot = require('./hypot');
 var browser = require('./browser');
 var dom = require('./domObjects');
 var domUtils = require('./domUtils');
+var domObjects = require('./domObjects');
 var is = require('./is');
 var pointerExtend = require('./pointerExtend');
 
@@ -7468,17 +7473,11 @@ var pointerUtils = {
     return angle;
   },
 
-  getPointerType: function getPointerType(pointer, interaction) {
-    // if the PointerEvent API isn't available, then the pointer must be ither
-    // a MouseEvent or TouchEvent
-    if (interaction.mouse) {
-      return 'mouse';
-    }
-    if (!browser.supportsPointerEvent) {
-      return 'touch';
-    }
-
-    return is.string(pointer.pointerType) ? pointer.pointerType : [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType];
+  getPointerType: function getPointerType(pointer) {
+    return is.string(pointer.pointerType) ? pointer.pointerType : is.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]
+    // if the PointerEvent API isn't available, then the "pointer" must
+    // be either a MouseEvent, TouchEvent, or Touch object
+    : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch ? 'touch' : 'mouse';
   },
 
   // [ event.target, event.currentTarget ]
