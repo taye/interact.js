@@ -190,8 +190,10 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
   timer.duration = minDuration;
   timer.timeout = setTimeout(function () {
     fire({
-      interaction, eventCopy, eventTarget,
+      interaction,
+      eventTarget,
       pointer: browser.isIE8? eventCopy : pointer,
+      event: eventCopy,
       type: 'hold',
     });
   }, minDuration);

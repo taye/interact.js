@@ -59,7 +59,7 @@ test('pointerEvents.fire', t => {
     'Fired event has props from target.props');
 
   const tapTime = 500;
-  const interaction = Object.assign(new Interaction(), {
+  const interaction = Object.assign(new Interaction({}), {
     tapTime: -1,
     prevTap: null,
   });
@@ -103,7 +103,7 @@ test('pointerEvents.collectEventTargets', t => {
 
   pointerEvents.signals.on('collect-targets', onCollect);
   pointerEvents.collectEventTargets({
-    interaction: new Interaction(),
+    interaction: new Interaction({}),
     pointer: {},
     event: {},
     eventTarget: {},
@@ -119,7 +119,7 @@ test('pointerEvents.collectEventTargets', t => {
 
 test('pointerEvents Interaction update-pointer-down signal', t => {
   const Interaction  = require('../../src/Interaction');
-  const interaction  = new Interaction();
+  const interaction  = new Interaction({});
   const initialTimer = { duration: Infinity, timeout: null };
   const event = { type: 'down' };
 
@@ -134,7 +134,7 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
 
 test('pointerEvents Interaction remove-pointer signal', t => {
   const Interaction = require('../../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const pointerIds  = [0, 1, 2, 3];
   const removals    = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4'  },

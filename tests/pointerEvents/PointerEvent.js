@@ -18,7 +18,7 @@ test('PointerEvent constructor', t => {
   const event = {
     testEventProp,
   };
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const eventTarget = {};
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
 
@@ -29,7 +29,7 @@ test('PointerEvent constructor', t => {
 
   t.equal(pointerEvent.type, type,
     'type is set correctly');
-  t.equal(pointerEvent.pointerType, pointerUtils.getPointerType(pointer, interaction),
+  t.equal(pointerEvent.pointerType, pointerUtils.getPointerType(pointer),
     'pointerType is set correctly');
   t.equal(pointerEvent.pointerId, pointerId,
     'pointerId is set correctly');

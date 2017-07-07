@@ -3,9 +3,10 @@ const pointerUtils = require('../src/utils/pointerUtils');
 const helpers = require('./helpers');
 
 test('Interaction constructor', t => {
+  const testType = 'test';
   const scope = require('../src/scope');
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({ pointerType: testType });
   const zeroCoords = {
     page     : { x: 0, y: 0 },
     client   : { x: 0, y: 0 },
@@ -31,6 +32,9 @@ test('Interaction constructor', t => {
   t.deepEqual(interaction.pointerDelta, zeroDelta,
     'interaction.pointerDelta set to zero');
 
+  t.equal(interaction.pointerType, testType,
+    'interaction.pointerType is set');
+
   // array properties
   for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
     t.ok(interaction[prop],
@@ -54,7 +58,7 @@ test('Interaction constructor', t => {
 
 test('Interaction.getPointerIndex', t => {
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
 
   interaction.pointerIds = [2, 4, 5, 0, -1];
 
@@ -69,7 +73,7 @@ test('Interaction.updatePointer', t => {
   const Interaction = require('../src/Interaction');
 
   t.test('no existing pointers', st => {
-    const interaction = new Interaction();
+    const interaction = new Interaction({});
     const pointer = { pointerId: 10 };
 
     const ret = interaction.updatePointer(pointer);
@@ -85,7 +89,7 @@ test('Interaction.updatePointer', t => {
   });
 
   t.test('new pointer with exisiting pointer', st => {
-    const interaction = new Interaction();
+    const interaction = new Interaction({});
     const existing = { pointerId: 0 };
 
     interaction.updatePointer(existing);
@@ -103,7 +107,7 @@ test('Interaction.updatePointer', t => {
   });
 
   t.test('update existing pointers', st => {
-    const interaction = new Interaction();
+    const interaction = new Interaction({});
 
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }));
     const newPointers = oldPointers.map(({ pointerId }) => ({ pointerId }));
@@ -129,7 +133,7 @@ test('Interaction.updatePointer', t => {
 
 test('Interaction.removePointer', t => {
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
   const pointerIds = [0, 1, 2, 3];
   const removals = [
@@ -164,7 +168,7 @@ test('Interaction.removePointer', t => {
 
 test('Interaction.pointerDown', t => {
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const coords = helpers.newCoordsSet();
   const eventTarget = {};
   const event = {
@@ -247,7 +251,7 @@ test('Interaction.pointerDown', t => {
 test('Interaction.start', t => {
   const scope = require('../src/scope');
   const Interaction = require('../src/Interaction');
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const action = { name: 'TEST' };
   const target = {};
   const element = {};
@@ -301,7 +305,7 @@ test('action-{start,move,end} signal listeners', t => {
   const Interactable  = require('../src/Interactable');
   const Interaction   = require('../src/Interaction');
 
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const element = {};
   const interactable = new Interactable('TEST', { context: {} });
 
@@ -328,7 +332,7 @@ test('stop interaction from start event', t => {
   const Interactable  = require('../src/Interactable');
   const Interaction   = require('../src/Interaction');
 
-  const interaction = new Interaction();
+  const interaction = new Interaction({});
   const element = {};
   const interactable = new Interactable('TEST', { context: {} });
 

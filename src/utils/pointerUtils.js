@@ -2,6 +2,7 @@ const hypot         = require('./hypot');
 const browser       = require('./browser');
 const dom           = require('./domObjects');
 const domUtils      = require('./domUtils');
+const domObjects    = require('./domObjects');
 const is            = require('./is');
 const pointerExtend = require('./pointerExtend');
 
@@ -202,15 +203,16 @@ const pointerUtils = {
     return  angle;
   },
 
-  getPointerType: function (pointer, interaction) {
-    // if the PointerEvent API isn't available, then the pointer must be ither
-    // a MouseEvent or TouchEvent
-    if (interaction.mouse)             { return 'mouse'; }
-    if (!browser.supportsPointerEvent) { return 'touch'; }
-
+  getPointerType: function (pointer) {
     return is.string(pointer.pointerType)
       ? pointer.pointerType
-      : [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType];
+      : is.number(pointer.pointerType)
+        ? [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType]
+          // if the PointerEvent API isn't available, then the "pointer" must
+          // be either a MouseEvent, TouchEvent, or Touch object
+          : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch
+            ? 'touch'
+            : 'mouse';
   },
 
   // [ event.target, event.currentTarget ]

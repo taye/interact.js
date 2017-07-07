@@ -1,16 +1,13 @@
 const scope   = require('../scope');
 const utils   = require('./index');
-const browser = require('./browser');
 
 const finder = {
-  methodOrder: [ 'simulationResume', 'mouse', 'hasPointer', 'idle' ],
+  methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
   search: function (pointer, eventType, eventTarget) {
-    const mouseEvent = (/mouse/i.test(pointer.pointerType || eventType)
-                        // MSPointerEvent.MSPOINTER_TYPE_MOUSE
-                        || pointer.pointerType === 4);
+    const pointerType = utils.getPointerType(pointer);
     const pointerId = utils.getPointerId(pointer);
-    const details = { pointer, pointerId, mouseEvent, eventType, eventTarget };
+    const details = { pointer, pointerId, pointerType, eventType, eventTarget };
 
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details);
@@ -22,7 +19,7 @@ const finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume: function ({ mouseEvent, eventType, eventTarget }) {
+  simulationResume: function ({ pointerType, eventType, eventTarget }) {
     if (!/down|start/i.test(eventType)) {
       return null;
     }
@@ -31,7 +28,7 @@ const finder = {
       let element = eventTarget;
 
       if (interaction.simulation && interaction.simulation.allowResume
-          && (interaction.mouse === mouseEvent)) {
+          && (interaction.pointerType === pointerType)) {
         while (element) {
           // if the element is the interaction element
           if (element === interaction.element) {
@@ -45,16 +42,16 @@ const finder = {
     return null;
   },
 
-  // if it's a mouse interaction
-  mouse: function ({ pointerId, mouseEvent, eventType }) {
-    if (!mouseEvent && (browser.supportsTouch || browser.supportsPointerEvent)) {
+  // if it's a mouse or pen interaction
+  mouseOrPen: function ({ pointerId, pointerType, eventType }) {
+    if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null;
     }
 
     let firstNonActive;
 
     for (const interaction of scope.interactions) {
-      if (interaction.mouse) {
+      if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
         if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) { continue; }
 
@@ -75,11 +72,11 @@ const finder = {
       return firstNonActive;
     }
 
-    // Find any interaction specifically for mouse.
-    // ignore the interaction if the eventType is a mousedown, and a simulation
+    // find any mouse or pen interaction.
+    // ignore the interaction if the eventType is a *down, and a simulation
     // is active
     for (const interaction of scope.interactions) {
-      if (interaction.mouse && !(/down/.test(eventType) && interaction.simulation)) {
+      if (interaction.pointerType === pointerType && !(/down/i.test(eventType) && interaction.simulation)) {
         return interaction;
       }
     }
@@ -96,8 +93,8 @@ const finder = {
     }
   },
 
-  // get first idle interaction
-  idle: function ({ mouseEvent }) {
+  // get first idle interaction with a matching pointerType
+  idle: function ({ pointerType }) {
     for (const interaction of scope.interactions) {
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {
@@ -113,7 +110,7 @@ const finder = {
         continue;
       }
 
-      if (!interaction.interacting() && (mouseEvent === interaction.mouse)) {
+      if (!interaction.interacting() && (pointerType === interaction.pointerType)) {
         return interaction;
       }
     }
