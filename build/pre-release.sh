@@ -1,17 +1,13 @@
-if [ $(git rev-parse --abbrev-ref HEAD) != 'unstable' ]; then
-  echo "This script should be run on the unstable branch";
-fi
-
 # make sure the repo is clean
 git clean -fx dist/*
 git diff-index HEAD --stat --exit-code || exit $?
 
-git merge --no-ff --no-edit master
-# if this script was changed in the merge, start again
-git diff --quiet HEAD@{1} -- $0 || {
-  source $0
-  exit
-}
+INITIAL_REV=$(git rev-parse --abbrev-ref HEAD)
+
+echo 'checking out the "unstable" branch'
+git checkout unstable || exit $?
+
+git merge --no-ff --no-edit $INITIAL_REV || exit $?
 
 # preversion tests must pass
 npm run preversion || exit $?
@@ -36,3 +32,6 @@ else
   git reset HEAD@{1}
   exit $err
 fi
+
+# leave the "unstable" branch
+git checkout $INITIAI_REV
