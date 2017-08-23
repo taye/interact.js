@@ -86,7 +86,7 @@ declare namespace interact {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
-    restrict?: ResizableOptions
+    restrict?: RestrictOption;
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
     axis?: 'x' | 'y'
@@ -101,7 +101,7 @@ declare namespace interact {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
-    restrict?: ResizableOptions
+    restrict?: RestrictOption;
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
 
