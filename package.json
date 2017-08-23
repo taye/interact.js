@@ -10,7 +10,7 @@
     "src/",
     "index.js",
     "LICENSE",
-    "interact.d.ts",
+    "index.d.ts",
     "interact-test.ts"
   ],
   "main": "index.js",
