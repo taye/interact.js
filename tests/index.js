@@ -3,6 +3,8 @@ require('./Interaction');
 // Legacy browser support
 //require('./legacyBrowsers');
 
+require('./Eventable');
+
 // pointerEvents
 require('./pointerEvents/base');
 require('./pointerEvents/PointerEvent');
