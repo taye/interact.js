@@ -1469,7 +1469,8 @@
                     // if this element is the current inertia target element
                     if (element === this.element
                         // and the prospective action is the same as the ongoing one
-                        && validateAction(this.target.getAction(pointer, event, this, this.element), this.target).name === this.prepared.name) {
+                        && (action = validateAction(this.target.getAction(pointer, event, this, this.element), this.target))
+                        && action.name === this.prepared.name) {
 
                         // stop inertia so that the next move will be a normal one
                         cancelFrame(this.inertiaStatus.i);
@@ -1506,6 +1507,8 @@
             // update pointer coords for defaultActionChecker to use
             this.setEventXY(this.curCoords, [pointer]);
             this.downEvent = event;
+
+            action = null;
 
             while (isElement(element) && !action) {
                 this.matches = [];
@@ -1560,7 +1563,7 @@
             if (this.pointerIds.length > 1 && this.target._element === this.element) {
                 var newAction = validateAction(forceAction || this.target.getAction(pointer, event, this, this.element), this.target);
 
-                if (withinInteractionLimit(this.target, this.element, newAction)) {
+                if (newAction && withinInteractionLimit(this.target, this.element, newAction)) {
                     action = newAction;
                 }
 
@@ -1619,7 +1622,8 @@
             // if inertia is active try to resume action
             else if (this.inertiaStatus.active
                 && curEventTarget === this.element
-                && validateAction(target.getAction(pointer, event, this, this.element), target).name === this.prepared.name) {
+                && (action = validateAction(target.getAction(pointer, event, this, this.element), target))
+                && action.name === this.prepared.name) {
 
                 cancelFrame(this.inertiaStatus.i);
                 this.inertiaStatus.active = false;
@@ -1833,7 +1837,8 @@
                         var absX = Math.abs(dx),
                             absY = Math.abs(dy),
                             targetAxis = this.target.options.drag.axis,
-                            axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
+                            axis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy'),
+                            action;
 
                         // if the movement isn't in the axis of the interactable
                         if (axis !== 'xy' && targetAxis !== 'xy' && targetAxis !== axis) {
@@ -1851,7 +1856,8 @@
                                 if (elementInteractable
                                     && elementInteractable !== this.target
                                     && !elementInteractable.options.drag.manualStart
-                                    && elementInteractable.getAction(this.downPointer, this.downEvent, this, element).name === 'drag'
+                                    && (action = elementInteractable.getAction(this.downPointer, this.downEvent, this, element))
+                                    && action.name === 'drag'
                                     && checkAxis(axis, elementInteractable)) {
 
                                     this.prepared.name = 'drag';
@@ -1880,7 +1886,8 @@
                                         && !testIgnore(interactable, element, eventTarget)
                                         && testAllow(interactable, element, eventTarget)
                                         && matchesSelector(element, selector, elements)
-                                        && interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element).name === 'drag'
+                                        && (action = interactable.getAction(thisInteraction.downPointer, thisInteraction.downEvent, thisInteraction, element))
+                                        && action.name === 'drag'
                                         && checkAxis(axis, interactable)
                                         && withinInteractionLimit(interactable, element, 'drag')) {
 
