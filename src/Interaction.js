@@ -93,38 +93,36 @@ class Interaction {
     });
   }
 
-  /*\
-   * Interaction.start
-   [ method ]
-   *
+  /**
    * Start an action with the given Interactable and Element as tartgets. The
-   * action must be enabled for the target Interactable and an appropriate number
-   * of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
    *
    * Use it with `interactable.<action>able({ manualStart: false })` to always
    * [start actions manually](https://github.com/taye/interact.js/issues/114)
    *
-   - action  (object)  The action to be performed - drag, resize, etc.
-   - target  (Interactable) The Interactable to target
-   - element (Element) The DOM Element to target
-   = (object) interact
-   **
-   | interact(target)
-   |   .draggable({
-   |     // disable the default drag start by down->move
-   |     manualStart: true
-   |   })
-   |   // start dragging after the user holds the pointer down
-   |   .on('hold', function (event) {
-   |     var interaction = event.interaction;
-   |
-   |     if (!interaction.interacting()) {
-   |       interaction.start({ name: 'drag' },
-   |                         event.interactable,
-   |                         event.currentTarget);
-   |     }
-   | });
-   \*/
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {object} interact
+   *
+   * @example
+   * interact(target)
+   *   .draggable({
+   *     // disable the default drag start by down->move
+   *     manualStart: true
+   *   })
+   *   // start dragging after the user holds the pointer down
+   *   .on('hold', function (event) {
+   *     var interaction = event.interaction;
+   *
+   *     if (!interaction.interacting()) {
+   *       interaction.start({ name: 'drag' },
+   *                         event.interactable,
+   *                         event.currentTarget);
+   *     }
+   * });
+   */
   start (action, target, element) {
     if (this.interacting()
         || !this.pointerIsDown
@@ -201,26 +199,23 @@ class Interaction {
     }
   }
 
-  /*\
-   * Interaction.doMove
-   [ method ]
-   *
+  /**
    * Force a move of the current action at the same coordinates. Useful if
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    *
-   **
-   | interact(target)
-   |   .draggable(true)
-   |   .on('dragmove', function (event) {
-   |     if (someCondition) {
-   |       // change the snap settings
-   |       event.interactable.draggable({ snap: { targets: [] }});
-   |       // fire another move event with re-calculated snap
-   |       event.interaction.doMove();
-   |     }
-   |   });
-   \*/
+   * @example
+   * interact(target)
+   *   .draggable(true)
+   *   .on('dragmove', function (event) {
+   *     if (someCondition) {
+   *       // change the snap settings
+   *       event.interactable.draggable({ snap: { targets: [] }});
+   *       // fire another move event with re-calculated snap
+   *       event.interaction.doMove();
+   *     }
+   *   });
+   */
   doMove (signalArg) {
     signalArg = utils.extend({
       pointer: this.pointers[0],
@@ -259,26 +254,24 @@ class Interaction {
     this.removePointer(pointer, event);
   }
 
-  /*\
-   * Interaction.end
-   [ method ]
-   *
+  /**
    * Stop the current action and fire an end event. Inertial movement does
    * not happen.
    *
-   - event (PointerEvent) #optional
-   **
-   | interact(target)
-   |   .draggable(true)
-   |   .on('move', function (event) {
-   |     if (event.pageX > 1000) {
-   |       // end the current action
-   |       event.interaction.end();
-   |       // stop all further listeners from being called
-   |       event.stopImmediatePropagation();
-   |     }
-   |   });
-   \*/
+   * @param {PointerEvent} [event]
+   *
+   * @example
+   * interact(target)
+   *   .draggable(true)
+   *   .on('move', function (event) {
+   *     if (event.pageX > 1000) {
+   *       // end the current action
+   *       event.interaction.end();
+   *       // stop all further listeners from being called
+   *       event.stopImmediatePropagation();
+   *     }
+   *   });
+   */
   end (event) {
     event = event || this.prevEvent;
 

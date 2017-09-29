@@ -1,3 +1,5 @@
+/** @module */
+
 const interact       = require('../interact');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
@@ -231,23 +233,22 @@ function withinInteractionLimit (interactable, element, action) {
   return autoStart.maxInteractions > 0;
 }
 
-/*\
- * interact.maxInteractions
- [ method ]
- **
- * Returns or sets the maximum number of concurrent interactions allowed.
- * By default only 1 interaction is allowed at a time (for backwards
- * compatibility). To allow multiple interactions on the same Interactables
- * and elements, you need to enable it in the draggable, resizable and
- * gesturable `'max'` and `'maxPerElement'` options.
- **
- - newValue (number) #optional Any number. newValue <= 0 means no interactions.
-\*/
+/**
+ * Returns or sets the maximum number of concurrent interactions allowed.  By
+ * default only 1 interaction is allowed at a time (for backwards
+ * compatibility). To allow multiple interactions on the same Interactables and
+ * elements, you need to enable it in the draggable, resizable and gesturable
+ * `'max'` and `'maxPerElement'` options.
+ *
+ * @alias module:interact.maxInteractions
+ *
+ * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
+ */
 interact.maxInteractions = function (newValue) {
   if (utils.is.number(newValue)) {
     autoStart.maxInteractions = newValue;
 
-    return this;
+    return interact;
   }
 
   return autoStart.maxInteractions;

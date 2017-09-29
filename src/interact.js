@@ -1,3 +1,5 @@
+/** @module */
+
 const browser      = require('./utils/browser');
 const events       = require('./utils/events');
 const utils        = require('./utils');
@@ -7,30 +9,30 @@ const Interaction  = require('./Interaction');
 
 const globalEvents = {};
 
-/*\
- * interact
- [ method ]
- *
- * The methods of this variable can be used to set elements as
- * interactables and also to change various default settings.
+/**
+ * The methods of this variable can be used to set elements as interactables
+ * and also to change various default settings.
  *
  * Calling it as a function and passing an element or a valid CSS selector
- * string returns an Interactable object which has various methods to
- * configure it.
+ * string returns an Interactable object which has various methods to configure
+ * it.
  *
- - element (Element | string) The HTML or SVG Element to interact with or CSS selector
- = (object) An @Interactable
+ * @global
  *
- > Usage
- | interact('#draggable').draggable(true);
- |
- | var rectables = interact('rect');
- | rectables
- |     .gesturable(true)
- |     .on('gesturemove', function (event) {
- |         // ...
- |     });
-\*/
+ * @param {Element | string} element The HTML or SVG Element to interact with
+ * or CSS selector
+ * @return {Interactable}
+ *
+ * @example
+ * interact('#draggable').draggable(true);
+ *
+ * var rectables = interact('rect');
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   });
+ */
 function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
 
@@ -42,30 +44,31 @@ function interact (element, options) {
   return interactable;
 }
 
-/*\
- * interact.isSet
- [ method ]
+/**
+ * Check if an element or selector has been set with the {@link interact}
+ * function
  *
- * Check if an element has been set
- - element (Element) The Element being searched for
- = (boolean) Indicates if the element or CSS selector was previously passed to interact
-\*/
+ * @alias module:interact.isSet
+ *
+ * @param {Element} element The Element being searched for
+ * @return {boolean} Indicates if the element or CSS selector was previously
+ * passed to interact
+*/
 interact.isSet = function (element, options) {
   return scope.interactables.indexOfElement(element, options && options.context) !== -1;
 };
 
-/*\
- * interact.on
- [ method ]
+/**
+ * Add a global listener for an InteractEvent or adds a DOM event to `document`
  *
- * Adds a global listener for an InteractEvent or adds a DOM event to
- * `document`
+ * @alias module:interact.on
  *
- - type       (string | array | object) The types of events to listen for
- - listener   (function) The function event (s)
- - options    (object | boolean) #optional options object or useCapture flag for addEventListener
- = (object) interact
-\*/
+ * @param {string | array | object} type The types of events to listen for
+ * @param {function} listener The function event (s)
+ * @param {object | boolean} [options] object or useCapture flag for
+ * addEventListener
+ * @return {object} interact
+ */
 interact.on = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
@@ -105,17 +108,18 @@ interact.on = function (type, listener, options) {
   return interact;
 };
 
-/*\
- * interact.off
- [ method ]
- *
+/**
  * Removes a global InteractEvent listener or DOM event from `document`
  *
- - type       (string | array | object) The types of events that were listened for
- - listener   (function) The listener function to be removed
- - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
- = (object) interact
- \*/
+ * @alias module:interact.off
+ *
+ * @param {string | array | object} type The types of events that were listened
+ * for
+ * @param {function} listener The listener function to be removed
+ * @param {object | boolean} options [options] object or useCapture flag for
+ * removeEventListener
+ * @return {object} interact
+ */
 interact.off = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
@@ -152,13 +156,14 @@ interact.off = function (type, listener, options) {
   return interact;
 };
 
-/*\
- * interact.debug
- [ method ]
- *
+/**
  * Returns an object which exposes internal data
- = (object) An object with properties that outline the current state and expose internal functions and variables
-\*/
+
+ * @alias module:interact.debug
+ *
+ * @return {object} An object with properties that outline the current state
+ * and expose internal functions and variables
+ */
 interact.debug = function () {
   return scope;
 };
@@ -174,35 +179,32 @@ interact.getElementClientRect = utils.getElementClientRect;
 interact.matchesSelector      = utils.matchesSelector;
 interact.closest              = utils.closest;
 
-/*\
- * interact.supportsTouch
- [ method ]
+/**
+ * @alias module:interact.supportsTouch
  *
- = (boolean) Whether or not the browser supports touch input
-\*/
+ * @return {boolean} Whether or not the browser supports touch input
+ */
 interact.supportsTouch = function () {
   return browser.supportsTouch;
 };
 
-/*\
- * interact.supportsPointerEvent
- [ method ]
+/**
+ * @alias module:interact.supportsPointerEvent
  *
- = (boolean) Whether or not the browser supports PointerEvents
-\*/
+ * @return {boolean} Whether or not the browser supports PointerEvents
+ */
 interact.supportsPointerEvent = function () {
   return browser.supportsPointerEvent;
 };
 
-/*\
- * interact.stop
- [ method ]
- *
+/**
  * Cancels all interactions (end events are not fired)
  *
- - event (Event) An event on which to call preventDefault()
- = (object) interact
-\*/
+ * @alias module:interact.stop
+ *
+ * @param {Event} event An event on which to call preventDefault()
+ * @return {object} interact
+ */
 interact.stop = function (event) {
   for (let i = scope.interactions.length - 1; i >= 0; i--) {
     scope.interactions[i].stop(event);
@@ -211,20 +213,20 @@ interact.stop = function (event) {
   return interact;
 };
 
-/*\
- * interact.pointerMoveTolerance
- [ method ]
+/**
  * Returns or sets the distance the pointer must be moved before an action
  * sequence occurs. This also affects tolerance for tap events.
  *
- - newValue (number) #optional The movement from the start position must be greater than this value
- = (number | Interactable) The current setting or interact
-\*/
+ * @alias module:interact.pointerMoveTolerance
+ *
+ * @param {number} [newValue] The movement from the start position must be greater than this value
+ * @return {interact | number}
+ */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
     Interaction.pointerMoveTolerance = newValue;
 
-    return this;
+    return interact;
   }
 
   return Interaction.pointerMoveTolerance;

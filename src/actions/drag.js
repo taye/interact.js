@@ -1,6 +1,9 @@
+/** @module */
+
 const actions        = require('./base');
 const utils          = require('../utils');
 const InteractEvent  = require('../InteractEvent');
+/** @lends Interactable */
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
@@ -78,42 +81,42 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
   }
 });
 
-/*\
- * Interactable.draggable
- [ method ]
+/**
+ * Get or set whether drag actions can be performed on the target
  *
- * Gets or sets whether drag actions can be performed on the
- * Interactable
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
  *
- = (boolean) Indicates if this can be the target of drag events
- | var isDraggable = interact('ul li').draggable();
- * or
- - options (boolean | object) #optional true/false or An object with event listeners to be fired on drag events (object makes the Interactable draggable)
- = (object) This Interactable
- | interact(element).draggable({
- |     onstart: function (event) {},
- |     onmove : function (event) {},
- |     onend  : function (event) {},
- |
- |     // the axis in which the first movement must be
- |     // for the drag sequence to start
- |     // 'xy' by default - any direction
- |     startAxis: 'x' || 'y' || 'xy',
- |
- |     // 'xy' by default - don't restrict to one axis (move in any direction)
- |     // 'x' or 'y' to restrict movement to either axis
- |     // 'start' to restrict movement to the axis the drag started in
- |     lockAxis: 'x' || 'y' || 'xy' || 'start',
- |
- |     // max number of drags that can happen concurrently
- |     // with elements of this Interactable. Infinity by default
- |     max: Infinity,
- |
- |     // max number of drags that can target the same element+Interactable
- |     // 1 by default
- |     maxPerElement: 2
- | });
-\*/
+ * @example
+ * interact(element).draggable({
+ *     onstart: function (event) {},
+ *     onmove : function (event) {},
+ *     onend  : function (event) {},
+ *
+ *     // the axis in which the first movement must be
+ *     // for the drag sequence to start
+ *     // 'xy' by default - any direction
+ *     startAxis: 'x' || 'y' || 'xy',
+ *
+ *     // 'xy' by default - don't restrict to one axis (move in any direction)
+ *     // 'x' or 'y' to restrict movement to either axis
+ *     // 'start' to restrict movement to the axis the drag started in
+ *     lockAxis: 'x' || 'y' || 'xy' || 'start',
+ *
+ *     // max number of drags that can happen concurrently
+ *     // with elements of this Interactable. Infinity by default
+ *     max: Infinity,
+ *
+ *     // max number of drags that can target the same element+Interactable
+ *     // 1 by default
+ *     maxPerElement: 2
+ * });
+ *
+ * var isDraggable = interact('element').draggable(); // true
+ */
 Interactable.prototype.draggable = function (options) {
   if (utils.is.object(options)) {
     this.options.drag.enabled = options.enabled === false? false: true;

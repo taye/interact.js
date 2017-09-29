@@ -19,12 +19,9 @@ const { wheelEvent }        = require('./utils/browser');
 // all set interactables
 scope.interactables = [];
 
-/*\
- * Interactable
- [ property ]
- **
- * Object type returned by @interact
-\*/
+/**
+ * Object type returned by {@link interact}
+ */
 class Interactable {
   constructor (target, options) {
     options = options || {};
@@ -85,24 +82,13 @@ class Interactable {
     }
   }
 
-  /*\
-   * Interactable.getRect
-   [ method ]
-   *
+  /**
    * The default function to get an Interactables bounding rect. Can be
-   * overridden using @Interactable.rectChecker.
+   * overridden using {@link Interactable.rectChecker}.
    *
-   - element (Element) #optional The element to measure.
-   = (object) The object's bounding rectangle.
-   o {
-   o     top   : 0,
-   o     left  : 0,
-   o     bottom: 0,
-   o     right : 0,
-   o     width : 0,
-   o     height: 0
-   o }
-  \*/
+   * @param {Element} [element] The element to measure.
+   * @return {object} The object's bounding rectangle.
+   */
   getRect (element) {
     element = element || this.target;
 
@@ -113,16 +99,14 @@ class Interactable {
     return getElementRect(element);
   }
 
-  /*\
-   * Interactable.rectChecker
-   [ method ]
-   *
+  /**
    * Returns or sets the function used to calculate the interactable's
    * element's rectangle
    *
-   - checker (function) #optional A function which returns this Interactable's bounding rectangle. See @Interactable.getRect
-   = (function | object) The checker function or this Interactable
-  \*/
+   * @param {function} [checker] A function which returns this Interactable's
+   * bounding rectangle. See {@link Interactable.getRect}
+   * @return {function | object} The checker function or this Interactable
+   */
   rectChecker (checker) {
     if (is.function(checker)) {
       this.getRect = checker;
@@ -153,33 +137,28 @@ class Interactable {
     return this.options[optionName];
   }
 
-  /*\
-   * Interactable.origin
-   [ method ]
-   *
+  /**
    * Gets or sets the origin of the Interactable's element.  The x and y
    * of the origin will be subtracted from action event coordinates.
    *
-   - origin (object | string) #optional An object eg. { x: 0, y: 0 } or string 'parent', 'self' or any CSS selector
-   * OR
-   - origin (Element) #optional An HTML or SVG Element whose rect will be used
-   **
-   = (object) The current origin or this Interactable
-  \*/
+   * @param {Element | object | string} [origin] An HTML or SVG Element whose
+   * rect will be used, an object eg. { x: 0, y: 0 } or string 'parent', 'self'
+   * or any CSS selector
+   *
+   * @return {object} The current origin or this Interactable
+   */
   origin (newValue) {
     return this._backCompatOption('origin', newValue);
   }
 
-  /*\
-   * Interactable.deltaSource
-   [ method ]
-   *
+  /**
    * Returns or sets the mouse coordinate types used to calculate the
    * movement of the pointer.
    *
-   - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
-   = (string | object) The current deltaSource or this Interactable
-  \*/
+   * @param {string} [newValue] Use 'client' if you will be scrolling while
+   * interacting; Use 'page' if you want autoScroll to work
+   * @return {string | object} The current deltaSource or this Interactable
+   */
   deltaSource (newValue) {
     if (newValue === 'page' || newValue === 'client') {
       this.options.deltaSource = newValue;
@@ -190,15 +169,12 @@ class Interactable {
     return this.options.deltaSource;
   }
 
-  /*\
-   * Interactable.context
-   [ method ]
+  /**
+   * Gets the selector context Node of the Interactable. The default is
+   * `window.document`.
    *
-   * Gets the selector context Node of the Interactable. The default is `window.document`.
-   *
-   = (Node) The context Node of this Interactable
-   **
-  \*/
+   * @return {Node} The context Node of this Interactable
+   */
   context () {
     return this._context;
   }
@@ -208,16 +184,14 @@ class Interactable {
             || nodeContains(this._context, element));
   }
 
-  /*\
-   * Interactable.fire
-   [ method ]
-   *
+  /**
    * Calls listeners for the given InteractEvent type bound globally
    * and directly to this Interactable
    *
-   - iEvent (InteractEvent) The InteractEvent object to be fired on this Interactable
-   = (Interactable) this Interactable
-  \*/
+   * @param {InteractEvent} iEvent The InteractEvent object to be fired on this
+   * Interactable
+   * @return {Interactable} this Interactable
+   */
   fire (iEvent) {
     this.events.fire(iEvent);
 
@@ -246,17 +220,16 @@ class Interactable {
     }
   }
 
-  /*\
-   * Interactable.on
-   [ method ]
-   *
+  /**
    * Binds a listener for an InteractEvent, pointerEvent or DOM event.
    *
-   - eventType  (string | array | object) The types of events to listen for
-   - listener   (function) The function event (s)
-   - options    (object | boolean) #optional options object or useCapture flag for addEventListener
-   = (object) This Interactable
-  \*/
+   * @param {string | array | object} eventType  The types of events to listen
+   * for
+   * @param {function} listener   The function event (s)
+   * @param {object | boolean} [options]    options object or useCapture flag
+   * for addEventListener
+   * @return {object} This Interactable
+   */
   on (eventType, listener, options) {
     if (this._onOffMultiple('on', eventType, listener, options)) {
       return this;
@@ -278,17 +251,16 @@ class Interactable {
     return this;
   }
 
-  /*\
-   * Interactable.off
-   [ method ]
-   *
+  /**
    * Removes an InteractEvent, pointerEvent or DOM event listener
    *
-   - eventType  (string | array | object) The types of events that were listened for
-   - listener   (function) The listener function to be removed
-   - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
-   = (object) This Interactable
-  \*/
+   * @param {string | array | object} eventType The types of events that were
+   * listened for
+   * @param {function} listener The listener function to be removed
+   * @param {object | boolean} [options] options object or useCapture flag for
+   * removeEventListener
+   * @return {object} This Interactable
+   */
   off (eventType, listener, options) {
     if (this._onOffMultiple('off', eventType, listener, options)) {
       return this;
@@ -312,14 +284,12 @@ class Interactable {
     return this;
   }
 
-  /*\
-   * Interactable.set
-   [ method ]
-   *
+  /**
    * Reset the options of this Interactable
-   - options (object) The new settings to apply
-   = (object) This Interactable
-  \*/
+   *
+   * @param {object} options The new settings to apply
+   * @return {object} This Interactable
+   */
   set (options) {
     if (!is.object(options)) {
       options = {};
@@ -355,15 +325,12 @@ class Interactable {
     return this;
   }
 
-  /*\
-   * Interactable.unset
-   [ method ]
+  /**
+   * Remove this interactable from the list of interactables and remove it's
+   * action capabilities and event listeners
    *
-   * Remove this interactable from the list of interactables and remove
-   * it's action capabilities and event listeners
-   *
-   = (object) @interact
-  \*/
+   * @return {interact}
+   */
   unset () {
     events.remove(this.target, 'all');
 
