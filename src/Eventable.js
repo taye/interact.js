@@ -54,7 +54,7 @@ class Eventable {
     }
 
     if (eventList && eventList.length === 0 || !listener) {
-      this[eventType] = listener;
+      this[eventType] = undefined;
     }
   }
 }

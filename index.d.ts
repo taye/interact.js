@@ -3,7 +3,7 @@
 // Definitions by: Gaspard Bucher <feature-space.com>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare module "interact.js/interact" {
+declare namespace interact {
   interface Position {
     x: number
     y: number
@@ -86,7 +86,7 @@ declare module "interact.js/interact" {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
-    restrict?: ResizableOptions
+    restrict?: RestrictOption;
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
     axis?: 'x' | 'y'
@@ -101,7 +101,7 @@ declare module "interact.js/interact" {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
-    restrict?: ResizableOptions
+    restrict?: RestrictOption;
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
 
@@ -280,13 +280,13 @@ declare module "interact.js/interact" {
     context: DOMElement
   }
 
-  interface interact {
+  interface InteractStatic {
     ( el: DOMElement | CSSSelector, opts?: InteractOptions ): Interactable
     on ( opt: OnEvent | OnEventFunctions, listener?: Listener ) : Interactable
     supportsTouch () : boolean
     supportsPointerEvent () : boolean
-    stop ( event: any ) : interact
-    pointerMoveTolerance ( tol?: number ) : number | interact
+    stop ( event: any ) : InteractStatic
+    pointerMoveTolerance ( tol?: number ) : number | InteractStatic
     // TODO
     isSet ( any ) : any
     off ( any ) : any
@@ -294,6 +294,8 @@ declare module "interact.js/interact" {
     addDocument ( any ) : any
     removeDocument ( any ) : any
   }
-
-  export var interact : interact
 }
+
+declare var interact:interact.InteractStatic;
+export as namespace interact;
+export = interact;

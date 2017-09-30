@@ -15,11 +15,6 @@ const browser = {
 
   isIE8: ('attachEvent' in window) && !('addEventListener' in window),
 
-  // Opera Mobile must be handled differently
-  isOperaMobile: (navigator.appName === 'Opera'
-      && browser.supportsTouch
-      && navigator.userAgent.match('Presto')),
-
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: (/iP(hone|od|ad)/.test(navigator.platform)
            && /OS 7[^\d]/.test(navigator.appVersion)),
@@ -61,5 +56,10 @@ const browser = {
 };
 
 browser.useMatchesSelectorPolyfill = !is.function(Element.prototype[browser.prefixedMatchesSelector]);
+
+// Opera Mobile must be handled differently
+browser.isOperaMobile = (navigator.appName === 'Opera'
+  && browser.supportsTouch
+  && navigator.userAgent.match('Presto'));
 
 module.exports = browser;

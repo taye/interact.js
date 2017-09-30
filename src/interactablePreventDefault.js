@@ -6,19 +6,16 @@ const events       = require('./utils/events');
 
 const { nodeContains, matchesSelector } = require('./utils/domUtils');
 
-/*\
- * Interactable.preventDefault
- [ method ]
- *
- * Returns or sets whether to prevent the browser's default behaviour
- * in response to pointer events. Can be set to:
+/**
+ * Returns or sets whether to prevent the browser's default behaviour in
+ * response to pointer events. Can be set to:
  *  - `'always'` to always prevent
  *  - `'never'` to never prevent
  *  - `'auto'` to let interact.js try to determine what would be best
  *
- - newValue (string) #optional `true`, `false` or `'auto'`
- = (string | Interactable) The current setting or this Interactable
-\*/
+ * @param {string} [newValue] `true`, `false` or `'auto'`
+ * @return {string | Interactable} The current setting or this Interactable
+ */
 Interactable.prototype.preventDefault = function (newValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
     this.options.preventDefault = newValue;

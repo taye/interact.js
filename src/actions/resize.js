@@ -2,6 +2,7 @@ const actions        = require('./base');
 const utils          = require('../utils');
 const browser        = require('../utils/browser');
 const InteractEvent  = require('../InteractEvent');
+/** @lends Interactable */
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
@@ -268,50 +269,50 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
   iEvent.deltaRect = delta;
 });
 
-/*\
- * Interactable.resizable
- [ method ]
+/**
+ * Gets or sets whether resize actions can be performed on the target
  *
- * Gets or sets whether resize actions can be performed on the
- * Interactable
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on resize events (object makes the Interactable
+ * resizable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of resize elements, or this Interactable
  *
- = (boolean) Indicates if this can be the target of resize elements
-   | var isResizeable = interact('input[type=text]').resizable();
- * or
- - options (boolean | object) #optional true/false or An object with event listeners to be fired on resize events (object makes the Interactable resizable)
- = (object) This Interactable
-   | interact(element).resizable({
-   |   onstart: function (event) {},
-   |   onmove : function (event) {},
-   |   onend  : function (event) {},
-   |
-   |   edges: {
-   |     top   : true,       // Use pointer coords to check for resize.
-   |     left  : false,      // Disable resizing from left edge.
-   |     bottom: '.resize-s',// Resize if pointer target matches selector
-   |     right : handleEl    // Resize if pointer target is the given Element
-   |   },
-   |
-   |     // Width and height can be adjusted independently. When `true`, width and
-   |     // height are adjusted at a 1:1 ratio.
-   |     square: false,
-   |
-   |     // Width and height can be adjusted independently. When `true`, width and
-   |     // height maintain the aspect ratio they had when resizing started.
-   |     preserveAspectRatio: false,
-   |
-   |   // a value of 'none' will limit the resize rect to a minimum of 0x0
-   |   // 'negate' will allow the rect to have negative width/height
-   |   // 'reposition' will keep the width/height positive by swapping
-   |   // the top and bottom edges and/or swapping the left and right edges
-   |   invert: 'none' || 'negate' || 'reposition'
-   |
-   |   // limit multiple resizes.
-   |   // See the explanation in the @Interactable.draggable example
-   |   max: Infinity,
-   |   maxPerElement: 1,
-   | });
-  \*/
+ * @example
+ * interact(element).resizable({
+ *   onstart: function (event) {},
+ *   onmove : function (event) {},
+ *   onend  : function (event) {},
+ *
+ *   edges: {
+ *     top   : true,       // Use pointer coords to check for resize.
+ *     left  : false,      // Disable resizing from left edge.
+ *     bottom: '.resize-s',// Resize if pointer target matches selector
+ *     right : handleEl    // Resize if pointer target is the given Element
+ *   },
+ *
+ *     // Width and height can be adjusted independently. When `true`, width and
+ *     // height are adjusted at a 1:1 ratio.
+ *     square: false,
+ *
+ *     // Width and height can be adjusted independently. When `true`, width and
+ *     // height maintain the aspect ratio they had when resizing started.
+ *     preserveAspectRatio: false,
+ *
+ *   // a value of 'none' will limit the resize rect to a minimum of 0x0
+ *   // 'negate' will allow the rect to have negative width/height
+ *   // 'reposition' will keep the width/height positive by swapping
+ *   // the top and bottom edges and/or swapping the left and right edges
+ *   invert: 'none' || 'negate' || 'reposition'
+ *
+ *   // limit multiple resizes.
+ *   // See the explanation in the {@link Interactable.draggable} example
+ *   max: Infinity,
+ *   maxPerElement: 1,
+ * });
+ *
+ * var isResizeable = interact(element).resizable();
+ */
 Interactable.prototype.resizable = function (options) {
   if (utils.is.object(options)) {
     this.options.resize.enabled = options.enabled === false? false: true;

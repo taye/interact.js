@@ -1,20 +1,16 @@
-const fs = require('fs');
-const mkdirp = require('mkdirp');
-const replacer = require('./replacer');
+const fs = require('fs-extra');
+const destination = require('../jsdoc.conf').opts.destination;
 
 module.exports = ({ stdio = 'inherit' } = {}) => {
   process.stdout.write('Docs...');
-  mkdirp.sync('dist');
 
-  const drjson = replacer(fs.readFileSync('dr.json').toString());
+  fs.removeSync(destination);
+  fs.copySync('img', `${destination}/img`);
 
-  fs.writeFileSync('_dr.json', drjson);
-
-  require('child_process').spawnSync('npm', ['run', '_dr.js'], {
+  require('child_process').spawnSync('jsdoc', ['-c', 'jsdoc.conf.js'], {
     stdio,
   });
 
-  fs.unlinkSync('_dr.json');
   console.log(' done.');
 };
 

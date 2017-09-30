@@ -1,8 +1,10 @@
 const actions        = require('./base');
 const utils          = require('../utils');
 const scope          = require('../scope');
+/** @lends module:interact */
 const interact       = require('../interact');
 const InteractEvent  = require('../InteractEvent');
+/** @lends Interactable */
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
 const defaultOptions = require('../defaultOptions');
@@ -264,12 +266,9 @@ function fireDropEvents (interaction, dropEvents) {
   interaction.prevDropElement = interaction.dropElement;
 }
 
-/*\
- * Interactable.dropzone
- [ method ]
- *
- * Returns or sets whether elements can be dropped onto this
- * Interactable to trigger drop events
+/**
+ * Returns or sets whether draggables can be dropped onto this target to
+ * trigger drop events
  *
  * Dropzones can receive the following events:
  *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
@@ -293,29 +292,31 @@ function fireDropEvents (interaction, dropEvents) {
  *   e.g. `0.5` for drop to happen when half of the area of the draggable is
  *   over the dropzone
  *
- * Use the `checker` option to specify a function to check if a dragged
- * element is over this Interactable.
+ * Use the `checker` option to specify a function to check if a dragged element
+ * is over this Interactable.
  *
- | interact(target)
- | .dropChecker(function(dragEvent,         // related dragmove or dragend event
- |                       event,             // TouchEvent/PointerEvent/MouseEvent
- |                       dropped,           // bool result of the default checker
- |                       dropzone,          // dropzone Interactable
- |                       dropElement,       // dropzone elemnt
- |                       draggable,         // draggable Interactable
- |                       draggableElement) {// draggable element
- |
- |   return dropped && event.target.hasAttribute('allow-drop');
- | }
+ * @param {boolean | object | null} [options] The new options to be set.
+ * @return {boolean | Interactable} The current setting or this Interactable
  *
+ * @example
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
  *
- - options (boolean | object | null) #optional The new value to be set.
- | interact('.drop').dropzone({
- |   accept: '.can-drop' || document.getElementById('single-drop'),
- |   overlap: 'pointer' || 'center' || zeroToOne
- | }
- = (boolean | object) The current setting or this Interactable
-\*/
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ *
+ * @example
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ */
 Interactable.prototype.dropzone = function (options) {
   if (utils.is.object(options)) {
     this.options.drop.enabled = options.enabled === false? false: true;
@@ -435,17 +436,14 @@ Interaction.signals.on('stop', function ({ interaction }) {
     interaction.prevDropTarget = interaction.prevDropElement = null;
 });
 
-/*\
- * interact.dynamicDrop
- [ method ]
+/**
+ * Returns or sets whether the dimensions of dropzone elements are calculated
+ * on every dragmove or only on dragstart for the default dropChecker
  *
- * Returns or sets whether the dimensions of dropzone elements are
- * calculated on every dragmove or only on dragstart for the default
- * dropChecker
- *
- - newValue (boolean) #optional True to check on each move. False to check only before start
- = (boolean | interact) The current setting or interact
-\*/
+ * @param {boolean} [newValue] True to check on each move. False to check only
+ * before start
+ * @return {boolean | interact} The current setting or interact
+ */
 interact.dynamicDrop = function (newValue) {
   if (utils.is.bool(newValue)) {
     //if (dragging && dynamicDrop !== newValue && !newValue) {
