@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.4+sha.7970416-dirty
+ * interact.js v1.3.0-alpha.5+sha.8579d3f-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -89,7 +89,7 @@ var Eventable = function () {
     }
 
     if (eventList && eventList.length === 0 || !listener) {
-      this[eventType] = listener;
+      this[eventType] = undefined;
     }
   };
 
@@ -303,12 +303,9 @@ var _require4 = require('./utils/browser'),
 
 scope.interactables = [];
 
-/*\
- * Interactable
- [ property ]
- **
- * Object type returned by @interact
-\*/
+/**
+ * Object type returned by {@link interact}
+ */
 
 var Interactable = function () {
   function Interactable(target, options) {
@@ -378,24 +375,13 @@ var Interactable = function () {
     }
   };
 
-  /*\
-   * Interactable.getRect
-   [ method ]
-   *
+  /**
    * The default function to get an Interactables bounding rect. Can be
-   * overridden using @Interactable.rectChecker.
+   * overridden using {@link Interactable.rectChecker}.
    *
-   - element (Element) #optional The element to measure.
-   = (object) The object's bounding rectangle.
-   o {
-   o     top   : 0,
-   o     left  : 0,
-   o     bottom: 0,
-   o     right : 0,
-   o     width : 0,
-   o     height: 0
-   o }
-  \*/
+   * @param {Element} [element] The element to measure.
+   * @return {object} The object's bounding rectangle.
+   */
 
 
   Interactable.prototype.getRect = function getRect(element) {
@@ -408,16 +394,14 @@ var Interactable = function () {
     return getElementRect(element);
   };
 
-  /*\
-   * Interactable.rectChecker
-   [ method ]
-   *
+  /**
    * Returns or sets the function used to calculate the interactable's
    * element's rectangle
    *
-   - checker (function) #optional A function which returns this Interactable's bounding rectangle. See @Interactable.getRect
-   = (function | object) The checker function or this Interactable
-  \*/
+   * @param {function} [checker] A function which returns this Interactable's
+   * bounding rectangle. See {@link Interactable.getRect}
+   * @return {function | object} The checker function or this Interactable
+   */
 
 
   Interactable.prototype.rectChecker = function rectChecker(checker) {
@@ -463,35 +447,30 @@ var Interactable = function () {
     return this.options[optionName];
   };
 
-  /*\
-   * Interactable.origin
-   [ method ]
-   *
+  /**
    * Gets or sets the origin of the Interactable's element.  The x and y
    * of the origin will be subtracted from action event coordinates.
    *
-   - origin (object | string) #optional An object eg. { x: 0, y: 0 } or string 'parent', 'self' or any CSS selector
-   * OR
-   - origin (Element) #optional An HTML or SVG Element whose rect will be used
-   **
-   = (object) The current origin or this Interactable
-  \*/
+   * @param {Element | object | string} [origin] An HTML or SVG Element whose
+   * rect will be used, an object eg. { x: 0, y: 0 } or string 'parent', 'self'
+   * or any CSS selector
+   *
+   * @return {object} The current origin or this Interactable
+   */
 
 
   Interactable.prototype.origin = function origin(newValue) {
     return this._backCompatOption('origin', newValue);
   };
 
-  /*\
-   * Interactable.deltaSource
-   [ method ]
-   *
+  /**
    * Returns or sets the mouse coordinate types used to calculate the
    * movement of the pointer.
    *
-   - newValue (string) #optional Use 'client' if you will be scrolling while interacting; Use 'page' if you want autoScroll to work
-   = (string | object) The current deltaSource or this Interactable
-  \*/
+   * @param {string} [newValue] Use 'client' if you will be scrolling while
+   * interacting; Use 'page' if you want autoScroll to work
+   * @return {string | object} The current deltaSource or this Interactable
+   */
 
 
   Interactable.prototype.deltaSource = function deltaSource(newValue) {
@@ -504,15 +483,12 @@ var Interactable = function () {
     return this.options.deltaSource;
   };
 
-  /*\
-   * Interactable.context
-   [ method ]
+  /**
+   * Gets the selector context Node of the Interactable. The default is
+   * `window.document`.
    *
-   * Gets the selector context Node of the Interactable. The default is `window.document`.
-   *
-   = (Node) The context Node of this Interactable
-   **
-  \*/
+   * @return {Node} The context Node of this Interactable
+   */
 
 
   Interactable.prototype.context = function context() {
@@ -523,16 +499,14 @@ var Interactable = function () {
     return this._context === element.ownerDocument || nodeContains(this._context, element);
   };
 
-  /*\
-   * Interactable.fire
-   [ method ]
-   *
+  /**
    * Calls listeners for the given InteractEvent type bound globally
    * and directly to this Interactable
    *
-   - iEvent (InteractEvent) The InteractEvent object to be fired on this Interactable
-   = (Interactable) this Interactable
-  \*/
+   * @param {InteractEvent} iEvent The InteractEvent object to be fired on this
+   * Interactable
+   * @return {Interactable} this Interactable
+   */
 
 
   Interactable.prototype.fire = function fire(iEvent) {
@@ -563,17 +537,16 @@ var Interactable = function () {
     }
   };
 
-  /*\
-   * Interactable.on
-   [ method ]
-   *
+  /**
    * Binds a listener for an InteractEvent, pointerEvent or DOM event.
    *
-   - eventType  (string | array | object) The types of events to listen for
-   - listener   (function) The function event (s)
-   - options    (object | boolean) #optional options object or useCapture flag for addEventListener
-   = (object) This Interactable
-  \*/
+   * @param {string | array | object} eventType  The types of events to listen
+   * for
+   * @param {function} listener   The function event (s)
+   * @param {object | boolean} [options]    options object or useCapture flag
+   * for addEventListener
+   * @return {object} This Interactable
+   */
 
 
   Interactable.prototype.on = function on(eventType, listener, options) {
@@ -598,17 +571,16 @@ var Interactable = function () {
     return this;
   };
 
-  /*\
-   * Interactable.off
-   [ method ]
-   *
+  /**
    * Removes an InteractEvent, pointerEvent or DOM event listener
    *
-   - eventType  (string | array | object) The types of events that were listened for
-   - listener   (function) The listener function to be removed
-   - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
-   = (object) This Interactable
-  \*/
+   * @param {string | array | object} eventType The types of events that were
+   * listened for
+   * @param {function} listener The listener function to be removed
+   * @param {object | boolean} [options] options object or useCapture flag for
+   * removeEventListener
+   * @return {object} This Interactable
+   */
 
 
   Interactable.prototype.off = function off(eventType, listener, options) {
@@ -636,14 +608,12 @@ var Interactable = function () {
     return this;
   };
 
-  /*\
-   * Interactable.set
-   [ method ]
-   *
+  /**
    * Reset the options of this Interactable
-   - options (object) The new settings to apply
-   = (object) This Interactable
-  \*/
+   *
+   * @param {object} options The new settings to apply
+   * @return {object} This Interactable
+   */
 
 
   Interactable.prototype.set = function set(options) {
@@ -694,15 +664,12 @@ var Interactable = function () {
     return this;
   };
 
-  /*\
-   * Interactable.unset
-   [ method ]
+  /**
+   * Remove this interactable from the list of interactables and remove it's
+   * action capabilities and event listeners
    *
-   * Remove this interactable from the list of interactables and remove
-   * it's action capabilities and event listeners
-   *
-   = (object) @interact
-  \*/
+   * @return {interact}
+   */
 
 
   Interactable.prototype.unset = function unset() {
@@ -908,38 +875,36 @@ var Interaction = function () {
     });
   };
 
-  /*\
-   * Interaction.start
-   [ method ]
-   *
+  /**
    * Start an action with the given Interactable and Element as tartgets. The
-   * action must be enabled for the target Interactable and an appropriate number
-   * of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
    *
    * Use it with `interactable.<action>able({ manualStart: false })` to always
    * [start actions manually](https://github.com/taye/interact.js/issues/114)
    *
-   - action  (object)  The action to be performed - drag, resize, etc.
-   - target  (Interactable) The Interactable to target
-   - element (Element) The DOM Element to target
-   = (object) interact
-   **
-   | interact(target)
-   |   .draggable({
-   |     // disable the default drag start by down->move
-   |     manualStart: true
-   |   })
-   |   // start dragging after the user holds the pointer down
-   |   .on('hold', function (event) {
-   |     var interaction = event.interaction;
-   |
-   |     if (!interaction.interacting()) {
-   |       interaction.start({ name: 'drag' },
-   |                         event.interactable,
-   |                         event.currentTarget);
-   |     }
-   | });
-   \*/
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {object} interact
+   *
+   * @example
+   * interact(target)
+   *   .draggable({
+   *     // disable the default drag start by down->move
+   *     manualStart: true
+   *   })
+   *   // start dragging after the user holds the pointer down
+   *   .on('hold', function (event) {
+   *     var interaction = event.interaction;
+   *
+   *     if (!interaction.interacting()) {
+   *       interaction.start({ name: 'drag' },
+   *                         event.interactable,
+   *                         event.currentTarget);
+   *     }
+   * });
+   */
 
 
   Interaction.prototype.start = function start(action, target, element) {
@@ -1013,26 +978,23 @@ var Interaction = function () {
     }
   };
 
-  /*\
-   * Interaction.doMove
-   [ method ]
-   *
+  /**
    * Force a move of the current action at the same coordinates. Useful if
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    *
-   **
-   | interact(target)
-   |   .draggable(true)
-   |   .on('dragmove', function (event) {
-   |     if (someCondition) {
-   |       // change the snap settings
-   |       event.interactable.draggable({ snap: { targets: [] }});
-   |       // fire another move event with re-calculated snap
-   |       event.interaction.doMove();
-   |     }
-   |   });
-   \*/
+   * @example
+   * interact(target)
+   *   .draggable(true)
+   *   .on('dragmove', function (event) {
+   *     if (someCondition) {
+   *       // change the snap settings
+   *       event.interactable.draggable({ snap: { targets: [] }});
+   *       // fire another move event with re-calculated snap
+   *       event.interaction.doMove();
+   *     }
+   *   });
+   */
 
 
   Interaction.prototype.doMove = function doMove(signalArg) {
@@ -1075,26 +1037,24 @@ var Interaction = function () {
     this.removePointer(pointer, event);
   };
 
-  /*\
-   * Interaction.end
-   [ method ]
-   *
+  /**
    * Stop the current action and fire an end event. Inertial movement does
    * not happen.
    *
-   - event (PointerEvent) #optional
-   **
-   | interact(target)
-   |   .draggable(true)
-   |   .on('move', function (event) {
-   |     if (event.pageX > 1000) {
-   |       // end the current action
-   |       event.interaction.end();
-   |       // stop all further listeners from being called
-   |       event.stopImmediatePropagation();
-   |     }
-   |   });
-   \*/
+   * @param {PointerEvent} [event]
+   *
+   * @example
+   * interact(target)
+   *   .draggable(true)
+   *   .on('move', function (event) {
+   *     if (event.pageX > 1000) {
+   *       // end the current action
+   *       event.interaction.end();
+   *       // stop all further listeners from being called
+   *       event.stopImmediatePropagation();
+   *     }
+   *   });
+   */
 
 
   Interaction.prototype.end = function end(event) {
@@ -1414,9 +1374,12 @@ module.exports = actions;
 },{"../InteractEvent":3,"../Interaction":5}],7:[function(require,module,exports){
 'use strict';
 
+/** @module */
+
 var actions = require('./base');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
+/** @lends Interactable */
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
 var defaultOptions = require('../defaultOptions');
@@ -1497,42 +1460,42 @@ InteractEvent.signals.on('new', function (_ref2) {
   }
 });
 
-/*\
- * Interactable.draggable
- [ method ]
+/**
+ * Get or set whether drag actions can be performed on the target
  *
- * Gets or sets whether drag actions can be performed on the
- * Interactable
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
  *
- = (boolean) Indicates if this can be the target of drag events
- | var isDraggable = interact('ul li').draggable();
- * or
- - options (boolean | object) #optional true/false or An object with event listeners to be fired on drag events (object makes the Interactable draggable)
- = (object) This Interactable
- | interact(element).draggable({
- |     onstart: function (event) {},
- |     onmove : function (event) {},
- |     onend  : function (event) {},
- |
- |     // the axis in which the first movement must be
- |     // for the drag sequence to start
- |     // 'xy' by default - any direction
- |     startAxis: 'x' || 'y' || 'xy',
- |
- |     // 'xy' by default - don't restrict to one axis (move in any direction)
- |     // 'x' or 'y' to restrict movement to either axis
- |     // 'start' to restrict movement to the axis the drag started in
- |     lockAxis: 'x' || 'y' || 'xy' || 'start',
- |
- |     // max number of drags that can happen concurrently
- |     // with elements of this Interactable. Infinity by default
- |     max: Infinity,
- |
- |     // max number of drags that can target the same element+Interactable
- |     // 1 by default
- |     maxPerElement: 2
- | });
-\*/
+ * @example
+ * interact(element).draggable({
+ *     onstart: function (event) {},
+ *     onmove : function (event) {},
+ *     onend  : function (event) {},
+ *
+ *     // the axis in which the first movement must be
+ *     // for the drag sequence to start
+ *     // 'xy' by default - any direction
+ *     startAxis: 'x' || 'y' || 'xy',
+ *
+ *     // 'xy' by default - don't restrict to one axis (move in any direction)
+ *     // 'x' or 'y' to restrict movement to either axis
+ *     // 'start' to restrict movement to the axis the drag started in
+ *     lockAxis: 'x' || 'y' || 'xy' || 'start',
+ *
+ *     // max number of drags that can happen concurrently
+ *     // with elements of this Interactable. Infinity by default
+ *     max: Infinity,
+ *
+ *     // max number of drags that can target the same element+Interactable
+ *     // 1 by default
+ *     maxPerElement: 2
+ * });
+ *
+ * var isDraggable = interact('element').draggable(); // true
+ */
 Interactable.prototype.draggable = function (options) {
   if (utils.is.object(options)) {
     this.options.drag.enabled = options.enabled === false ? false : true;
@@ -1577,8 +1540,10 @@ module.exports = drag;
 var actions = require('./base');
 var utils = require('../utils');
 var scope = require('../scope');
+/** @lends module:interact */
 var interact = require('../interact');
 var InteractEvent = require('../InteractEvent');
+/** @lends Interactable */
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
 var defaultOptions = require('../defaultOptions');
@@ -1872,12 +1837,9 @@ function fireDropEvents(interaction, dropEvents) {
   interaction.prevDropElement = interaction.dropElement;
 }
 
-/*\
- * Interactable.dropzone
- [ method ]
- *
- * Returns or sets whether elements can be dropped onto this
- * Interactable to trigger drop events
+/**
+ * Returns or sets whether draggables can be dropped onto this target to
+ * trigger drop events
  *
  * Dropzones can receive the following events:
  *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
@@ -1901,29 +1863,31 @@ function fireDropEvents(interaction, dropEvents) {
  *   e.g. `0.5` for drop to happen when half of the area of the draggable is
  *   over the dropzone
  *
- * Use the `checker` option to specify a function to check if a dragged
- * element is over this Interactable.
+ * Use the `checker` option to specify a function to check if a dragged element
+ * is over this Interactable.
  *
- | interact(target)
- | .dropChecker(function(dragEvent,         // related dragmove or dragend event
- |                       event,             // TouchEvent/PointerEvent/MouseEvent
- |                       dropped,           // bool result of the default checker
- |                       dropzone,          // dropzone Interactable
- |                       dropElement,       // dropzone elemnt
- |                       draggable,         // draggable Interactable
- |                       draggableElement) {// draggable element
- |
- |   return dropped && event.target.hasAttribute('allow-drop');
- | }
+ * @param {boolean | object | null} [options] The new options to be set.
+ * @return {boolean | Interactable} The current setting or this Interactable
  *
+ * @example
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
  *
- - options (boolean | object | null) #optional The new value to be set.
- | interact('.drop').dropzone({
- |   accept: '.can-drop' || document.getElementById('single-drop'),
- |   overlap: 'pointer' || 'center' || zeroToOne
- | }
- = (boolean | object) The current setting or this Interactable
-\*/
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ *
+ * @example
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ */
 Interactable.prototype.dropzone = function (options) {
   if (utils.is.object(options)) {
     this.options.drop.enabled = options.enabled === false ? false : true;
@@ -2041,8 +2005,7 @@ Interaction.signals.on('new', function (interaction) {
   interaction.activeDrops = {
     dropzones: [], // the dropzones that are mentioned below
     elements: [], // elements of dropzones that accept the target draggable
-    rects: [] // the rects of the elements mentioned above
-  };
+    rects: [] };
 });
 
 Interaction.signals.on('stop', function (_ref8) {
@@ -2051,17 +2014,14 @@ Interaction.signals.on('stop', function (_ref8) {
   interaction.dropTarget = interaction.dropElement = interaction.prevDropTarget = interaction.prevDropElement = null;
 });
 
-/*\
- * interact.dynamicDrop
- [ method ]
+/**
+ * Returns or sets whether the dimensions of dropzone elements are calculated
+ * on every dragmove or only on dragstart for the default dropChecker
  *
- * Returns or sets whether the dimensions of dropzone elements are
- * calculated on every dragmove or only on dragstart for the default
- * dropChecker
- *
- - newValue (boolean) #optional True to check on each move. False to check only before start
- = (boolean | interact) The current setting or interact
-\*/
+ * @param {boolean} [newValue] True to check on each move. False to check only
+ * before start
+ * @return {boolean | interact} The current setting or interact
+ */
 interact.dynamicDrop = function (newValue) {
   if (utils.is.bool(newValue)) {
     //if (dragging && dynamicDrop !== newValue && !newValue) {
@@ -2147,29 +2107,28 @@ InteractEvent.signals.on('new', function (_ref2) {
   }
 });
 
-/*\
- * Interactable.gesturable
- [ method ]
+/**
+ * Gets or sets whether multitouch gestures can be performed on the target
  *
- * Gets or sets whether multitouch gestures can be performed on the
- * Interactable's element
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on gesture events (makes the Interactable gesturable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of gesture events, or this Interactable
  *
- = (boolean) Indicates if this can be the target of gesture events
-   | var isGestureable = interact(element).gesturable();
- * or
- - options (boolean | object) #optional true/false or An object with event listeners to be fired on gesture events (makes the Interactable gesturable)
- = (object) this Interactable
- | interact(element).gesturable({
- |     onstart: function (event) {},
- |     onmove : function (event) {},
- |     onend  : function (event) {},
- |
- |     // limit multiple gestures.
- |     // See the explanation in @Interactable.draggable example
- |     max: Infinity,
- |     maxPerElement: 1,
- | });
-\*/
+ * @example
+ * interact(element).gesturable({
+ *     onstart: function (event) {},
+ *     onmove : function (event) {},
+ *     onend  : function (event) {},
+ *
+ *     // limit multiple gestures.
+ *     // See the explanation in {@link Interactable.draggable} example
+ *     max: Infinity,
+ *     maxPerElement: 1,
+ * });
+ *
+ * var isGestureable = interact(element).gesturable();
+ */
 Interactable.prototype.gesturable = function (options) {
   if (utils.is.object(options)) {
     this.options.gesture.enabled = options.enabled === false ? false : true;
@@ -2245,8 +2204,7 @@ Interaction.signals.on('new', function (interaction) {
     scale: 1, // gesture.distance / gesture.startDistance
 
     startAngle: 0, // angle of line joining two touches
-    prevAngle: 0 // angle of the previous gesture event
-  };
+    prevAngle: 0 };
 });
 
 actions.gesture = gesture;
@@ -2265,6 +2223,7 @@ var actions = require('./base');
 var utils = require('../utils');
 var browser = require('../utils/browser');
 var InteractEvent = require('../InteractEvent');
+/** @lends Interactable */
 var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
 var defaultOptions = require('../defaultOptions');
@@ -2539,50 +2498,50 @@ InteractEvent.signals.on('new', function (_ref2) {
   iEvent.deltaRect = delta;
 });
 
-/*\
- * Interactable.resizable
- [ method ]
+/**
+ * Gets or sets whether resize actions can be performed on the target
  *
- * Gets or sets whether resize actions can be performed on the
- * Interactable
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on resize events (object makes the Interactable
+ * resizable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of resize elements, or this Interactable
  *
- = (boolean) Indicates if this can be the target of resize elements
-   | var isResizeable = interact('input[type=text]').resizable();
- * or
- - options (boolean | object) #optional true/false or An object with event listeners to be fired on resize events (object makes the Interactable resizable)
- = (object) This Interactable
-   | interact(element).resizable({
-   |   onstart: function (event) {},
-   |   onmove : function (event) {},
-   |   onend  : function (event) {},
-   |
-   |   edges: {
-   |     top   : true,       // Use pointer coords to check for resize.
-   |     left  : false,      // Disable resizing from left edge.
-   |     bottom: '.resize-s',// Resize if pointer target matches selector
-   |     right : handleEl    // Resize if pointer target is the given Element
-   |   },
-   |
-   |     // Width and height can be adjusted independently. When `true`, width and
-   |     // height are adjusted at a 1:1 ratio.
-   |     square: false,
-   |
-   |     // Width and height can be adjusted independently. When `true`, width and
-   |     // height maintain the aspect ratio they had when resizing started.
-   |     preserveAspectRatio: false,
-   |
-   |   // a value of 'none' will limit the resize rect to a minimum of 0x0
-   |   // 'negate' will allow the rect to have negative width/height
-   |   // 'reposition' will keep the width/height positive by swapping
-   |   // the top and bottom edges and/or swapping the left and right edges
-   |   invert: 'none' || 'negate' || 'reposition'
-   |
-   |   // limit multiple resizes.
-   |   // See the explanation in the @Interactable.draggable example
-   |   max: Infinity,
-   |   maxPerElement: 1,
-   | });
-  \*/
+ * @example
+ * interact(element).resizable({
+ *   onstart: function (event) {},
+ *   onmove : function (event) {},
+ *   onend  : function (event) {},
+ *
+ *   edges: {
+ *     top   : true,       // Use pointer coords to check for resize.
+ *     left  : false,      // Disable resizing from left edge.
+ *     bottom: '.resize-s',// Resize if pointer target matches selector
+ *     right : handleEl    // Resize if pointer target is the given Element
+ *   },
+ *
+ *     // Width and height can be adjusted independently. When `true`, width and
+ *     // height are adjusted at a 1:1 ratio.
+ *     square: false,
+ *
+ *     // Width and height can be adjusted independently. When `true`, width and
+ *     // height maintain the aspect ratio they had when resizing started.
+ *     preserveAspectRatio: false,
+ *
+ *   // a value of 'none' will limit the resize rect to a minimum of 0x0
+ *   // 'negate' will allow the rect to have negative width/height
+ *   // 'reposition' will keep the width/height positive by swapping
+ *   // the top and bottom edges and/or swapping the left and right edges
+ *   invert: 'none' || 'negate' || 'reposition'
+ *
+ *   // limit multiple resizes.
+ *   // See the explanation in the {@link Interactable.draggable} example
+ *   max: Infinity,
+ *   maxPerElement: 1,
+ * });
+ *
+ * var isResizeable = interact(element).resizable();
+ */
 Interactable.prototype.resizable = function (options) {
   if (utils.is.object(options)) {
     this.options.resize.enabled = options.enabled === false ? false : true;
@@ -2726,8 +2685,7 @@ var autoScroll = {
     enabled: false,
     container: null, // the item that is scrolled (Window or HTMLElement)
     margin: 60,
-    speed: 300 // the scroll speed in pixels per second
-  },
+    speed: 300 },
 
   interaction: null,
   i: null, // the handle returned by window.setInterval
@@ -2842,6 +2800,9 @@ module.exports = autoScroll;
 },{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":39,"./utils/is":46,"./utils/raf":50,"./utils/window":52}],12:[function(require,module,exports){
 'use strict';
 
+/** @module */
+
+/** @lends Interactable */
 var Interactable = require('../Interactable');
 var actions = require('../actions/base');
 var is = require('../utils/is');
@@ -2857,40 +2818,40 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
   return action;
 };
 
-/*\
- * Interactable.ignoreFrom
- [ method ]
+/**
+ * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
+ * of it's parents match the given CSS selector or Element, no
+ * drag/resize/gesture is started.
  *
- * If the target of the `mousedown`, `pointerdown` or `touchstart`
- * event or any of it's parents match the given CSS selector or
- * Element, no drag/resize/gesture is started.
+ * @param {string | Element | null} [newValue] a CSS selector string, an
+ * Element or `null` to not ignore any elements
+ * @return {string | Element | object} The current ignoreFrom value or this
+ * Interactable
  *
- - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to not ignore any elements
- = (string | Element | object) The current ignoreFrom value or this Interactable
- **
- | interact(element, { ignoreFrom: document.getElementById('no-action') });
- | // or
- | interact(element).ignoreFrom('input, textarea, a');
-\*/
+ * @example
+ * interact(element, { ignoreFrom: document.getElementById('no-action') });
+ * // or
+ * interact(element).ignoreFrom('input, textarea, a');
+ */
 Interactable.prototype.ignoreFrom = function (newValue) {
   return this._backCompatOption('ignoreFrom', newValue);
 };
 
-/*\
- * Interactable.allowFrom
- [ method ]
+/**
+ * A drag/resize/gesture is started only If the target of the `mousedown`,
+ * `pointerdown` or `touchstart` event or any of it's parents match the given
+ * CSS selector or Element.
  *
- * A drag/resize/gesture is started only If the target of the
- * `mousedown`, `pointerdown` or `touchstart` event or any of it's
- * parents match the given CSS selector or Element.
+ * @param {string | Element | null} [newValue] a CSS selector string, an
+ * Element or `null` to allow from any element
+ * @return {string | Element | object} The current allowFrom value or this
+ * Interactable
  *
- - newValue (string | Element | null) #optional a CSS selector string, an Element or `null` to allow from any element
- = (string | Element | object) The current allowFrom value or this Interactable
- **
- | interact(element, { allowFrom: document.getElementById('drag-handle') });
- | // or
- | interact(element).allowFrom('.handle');
-\*/
+ * @example
+ * interact(element, { allowFrom: document.getElementById('drag-handle') });
+ * // or
+ * interact(element).allowFrom('.handle');
+ */
 Interactable.prototype.allowFrom = function (newValue) {
   return this._backCompatOption('allowFrom', newValue);
 };
@@ -2931,34 +2892,36 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
   return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
 };
 
-/*\
- * Interactable.actionChecker
- [ method ]
- *
+/**
  * Gets or sets the function used to check action to be performed on
  * pointerDown
  *
- - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
- = (Function | Interactable) The checker function or this Interactable
+ * @param {function | null} [checker] A function which takes a pointer event,
+ * defaultAction string, interactable, element and interaction as parameters
+ * and returns an object with name property 'drag' 'resize' or 'gesture' and
+ * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+ * props.
+ * @return {Function | Interactable} The checker function or this Interactable
  *
- | interact('.resize-drag')
- |   .resizable(true)
- |   .draggable(true)
- |   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
- |
- |   if (interact.matchesSelector(event.target, '.drag-handle') {
- |     // force drag with handle target
- |     action.name = drag;
- |   }
- |   else {
- |     // resize from the top and right edges
- |     action.name  = 'resize';
- |     action.edges = { top: true, right: true };
- |   }
- |
- |   return action;
- | });
-\*/
+ * @example
+ * interact('.resize-drag')
+ *   .resizable(true)
+ *   .draggable(true)
+ *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+ *
+ *   if (interact.matchesSelector(event.target, '.drag-handle') {
+ *     // force drag with handle target
+ *     action.name = drag;
+ *   }
+ *   else {
+ *     // resize from the top and right edges
+ *     action.name  = 'resize';
+ *     action.edges = { top: true, right: true };
+ *   }
+ *
+ *   return action;
+ * });
+ */
 Interactable.prototype.actionChecker = function (checker) {
   if (is.function(checker)) {
     this.options.actionChecker = checker;
@@ -2975,16 +2938,13 @@ Interactable.prototype.actionChecker = function (checker) {
   return this.options.actionChecker;
 };
 
-/*\
- * Interactable.styleCursor
- [ method ]
- *
+/**
  * Returns or sets whether the the cursor should be changed depending on the
  * action that would be performed if the mouse were pressed and dragged.
  *
- - newValue (boolean) #optional
- = (boolean | Interactable) The current setting or this Interactable
-\*/
+ * @param {boolean} [newValue]
+ * @return {boolean | Interactable} The current setting or this Interactable
+ */
 Interactable.prototype.styleCursor = function (newValue) {
   if (is.bool(newValue)) {
     this.options.styleCursor = newValue;
@@ -3003,6 +2963,12 @@ Interactable.prototype.styleCursor = function (newValue) {
 
 Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
   var rect = this.getRect(element);
+  var buttons = event.buttons || {
+    0: 1,
+    1: 4,
+    3: 8,
+    4: 16
+  }[event.button];
   var action = null;
 
   for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
@@ -3020,7 +2986,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
     var actionName = _ref;
 
     // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown && interaction.mouse && (event.buttons & this.options[actionName].mouseButtons) === 0) {
+    if (interaction.pointerIsDown && interaction.mouse && (buttons & this.options[actionName].mouseButtons) === 0) {
       continue;
     }
 
@@ -3034,6 +3000,8 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
 
 },{"../Interactable":4,"../actions/base":6,"../utils/domUtils":39,"../utils/is":46}],13:[function(require,module,exports){
 'use strict';
+
+/** @module */
 
 var interact = require('../interact');
 var Interactable = require('../Interactable');
@@ -3225,123 +3193,6 @@ Interaction.signals.on('stop', function (_ref4) {
   }
 });
 
-Interactable.prototype.getAction = function (pointer, event, interaction, element) {
-  var action = this.defaultActionChecker(pointer, event, interaction, element);
-
-  if (this.options.actionChecker) {
-    return this.options.actionChecker(pointer, event, action, this, element, interaction);
-  }
-
-  return action;
-};
-
-/*\
- * Interactable.actionChecker
- [ method ]
- *
- * Gets or sets the function used to check action to be performed on
- * pointerDown
- *
- - checker (function | null) #optional A function which takes a pointer event, defaultAction string, interactable, element and interaction as parameters and returns an object with name property 'drag' 'resize' or 'gesture' and optionally an `edges` object with boolean 'top', 'left', 'bottom' and right props.
- = (Function | Interactable) The checker function or this Interactable
- *
- | interact('.resize-drag')
- |   .resizable(true)
- |   .draggable(true)
- |   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
- |
- |   if (interact.matchesSelector(event.target, '.drag-handle') {
- |     // force drag with handle target
- |     action.name = drag;
- |   }
- |   else {
- |     // resize from the top and right edges
- |     action.name  = 'resize';
- |     action.edges = { top: true, right: true };
- |   }
- |
- |   return action;
- | });
-\*/
-Interactable.prototype.actionChecker = function (checker) {
-  if (utils.is.function(checker)) {
-    this.options.actionChecker = checker;
-
-    return this;
-  }
-
-  if (checker === null) {
-    delete this.options.actionChecker;
-
-    return this;
-  }
-
-  return this.options.actionChecker;
-};
-
-/*\
- * Interactable.styleCursor
- [ method ]
- *
- * Returns or sets whether the the cursor should be changed depending on the
- * action that would be performed if the mouse were pressed and dragged.
- *
- - newValue (boolean) #optional
- = (boolean | Interactable) The current setting or this Interactable
-\*/
-Interactable.prototype.styleCursor = function (newValue) {
-  if (utils.is.bool(newValue)) {
-    this.options.styleCursor = newValue;
-
-    return this;
-  }
-
-  if (newValue === null) {
-    delete this.options.styleCursor;
-
-    return this;
-  }
-
-  return this.options.styleCursor;
-};
-
-Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
-  var rect = this.getRect(element);
-  var buttons = event.buttons || {
-    0: 1,
-    1: 4,
-    3: 8,
-    4: 16
-  }[event.button];
-  var action = null;
-
-  for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-    var _ref5;
-
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref5 = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref5 = _i.value;
-    }
-
-    var actionName = _ref5;
-
-    // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown && interaction.mouse && (buttons & this.options[actionName].mouseButtons) === 0) {
-      continue;
-    }
-
-    action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
-
-    if (action) {
-      return action;
-    }
-  }
-};
-
 function withinInteractionLimit(interactable, element, action) {
   var options = interactable.options;
   var maxActions = options[action.name].max;
@@ -3391,23 +3242,22 @@ function withinInteractionLimit(interactable, element, action) {
   return autoStart.maxInteractions > 0;
 }
 
-/*\
- * interact.maxInteractions
- [ method ]
- **
- * Returns or sets the maximum number of concurrent interactions allowed.
- * By default only 1 interaction is allowed at a time (for backwards
- * compatibility). To allow multiple interactions on the same Interactables
- * and elements, you need to enable it in the draggable, resizable and
- * gesturable `'max'` and `'maxPerElement'` options.
- **
- - newValue (number) #optional Any number. newValue <= 0 means no interactions.
-\*/
+/**
+ * Returns or sets the maximum number of concurrent interactions allowed.  By
+ * default only 1 interaction is allowed at a time (for backwards
+ * compatibility). To allow multiple interactions on the same Interactables and
+ * elements, you need to enable it in the draggable, resizable and gesturable
+ * `'max'` and `'maxPerElement'` options.
+ *
+ * @alias module:interact.maxInteractions
+ *
+ * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
+ */
 interact.maxInteractions = function (newValue) {
   if (utils.is.number(newValue)) {
     autoStart.maxInteractions = newValue;
 
-    return this;
+    return interact;
   }
 
   return autoStart.maxInteractions;
@@ -3618,8 +3468,7 @@ module.exports = {
       minSpeed: 100, // target speed must be above this for inertia to start
       endSpeed: 10, // the speed at which inertia is slow enough to stop
       allowResume: true, // allow resuming an action in inertia phase
-      smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
-    }
+      smoothEndDuration: 300 }
   }
 };
 
@@ -3966,6 +3815,8 @@ function updateInertiaCoords(interaction) {
 },{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
 'use strict';
 
+/** @module */
+
 var browser = require('./utils/browser');
 var events = require('./utils/events');
 var utils = require('./utils');
@@ -3975,30 +3826,30 @@ var Interaction = require('./Interaction');
 
 var globalEvents = {};
 
-/*\
- * interact
- [ method ]
- *
- * The methods of this variable can be used to set elements as
- * interactables and also to change various default settings.
+/**
+ * The methods of this variable can be used to set elements as interactables
+ * and also to change various default settings.
  *
  * Calling it as a function and passing an element or a valid CSS selector
- * string returns an Interactable object which has various methods to
- * configure it.
+ * string returns an Interactable object which has various methods to configure
+ * it.
  *
- - element (Element | string) The HTML or SVG Element to interact with or CSS selector
- = (object) An @Interactable
+ * @global
  *
- > Usage
- | interact('#draggable').draggable(true);
- |
- | var rectables = interact('rect');
- | rectables
- |     .gesturable(true)
- |     .on('gesturemove', function (event) {
- |         // ...
- |     });
-\*/
+ * @param {Element | string} element The HTML or SVG Element to interact with
+ * or CSS selector
+ * @return {Interactable}
+ *
+ * @example
+ * interact('#draggable').draggable(true);
+ *
+ * var rectables = interact('rect');
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   });
+ */
 function interact(element, options) {
   var interactable = scope.interactables.get(element, options);
 
@@ -4010,30 +3861,31 @@ function interact(element, options) {
   return interactable;
 }
 
-/*\
- * interact.isSet
- [ method ]
+/**
+ * Check if an element or selector has been set with the {@link interact}
+ * function
  *
- * Check if an element has been set
- - element (Element) The Element being searched for
- = (boolean) Indicates if the element or CSS selector was previously passed to interact
-\*/
+ * @alias module:interact.isSet
+ *
+ * @param {Element} element The Element being searched for
+ * @return {boolean} Indicates if the element or CSS selector was previously
+ * passed to interact
+*/
 interact.isSet = function (element, options) {
   return scope.interactables.indexOfElement(element, options && options.context) !== -1;
 };
 
-/*\
- * interact.on
- [ method ]
+/**
+ * Add a global listener for an InteractEvent or adds a DOM event to `document`
  *
- * Adds a global listener for an InteractEvent or adds a DOM event to
- * `document`
+ * @alias module:interact.on
  *
- - type       (string | array | object) The types of events to listen for
- - listener   (function) The function event (s)
- - options    (object | boolean) #optional options object or useCapture flag for addEventListener
- = (object) interact
-\*/
+ * @param {string | array | object} type The types of events to listen for
+ * @param {function} listener The function event (s)
+ * @param {object | boolean} [options] object or useCapture flag for
+ * addEventListener
+ * @return {object} interact
+ */
 interact.on = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
@@ -4085,17 +3937,18 @@ interact.on = function (type, listener, options) {
   return interact;
 };
 
-/*\
- * interact.off
- [ method ]
- *
+/**
  * Removes a global InteractEvent listener or DOM event from `document`
  *
- - type       (string | array | object) The types of events that were listened for
- - listener   (function) The listener function to be removed
- - options    (object | boolean) #optional options object or useCapture flag for removeEventListener
- = (object) interact
- \*/
+ * @alias module:interact.off
+ *
+ * @param {string | array | object} type The types of events that were listened
+ * for
+ * @param {function} listener The listener function to be removed
+ * @param {object | boolean} options [options] object or useCapture flag for
+ * removeEventListener
+ * @return {object} interact
+ */
 interact.off = function (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
@@ -4143,13 +3996,14 @@ interact.off = function (type, listener, options) {
   return interact;
 };
 
-/*\
- * interact.debug
- [ method ]
- *
+/**
  * Returns an object which exposes internal data
- = (object) An object with properties that outline the current state and expose internal functions and variables
-\*/
+
+ * @alias module:interact.debug
+ *
+ * @return {object} An object with properties that outline the current state
+ * and expose internal functions and variables
+ */
 interact.debug = function () {
   return scope;
 };
@@ -4165,35 +4019,32 @@ interact.getElementClientRect = utils.getElementClientRect;
 interact.matchesSelector = utils.matchesSelector;
 interact.closest = utils.closest;
 
-/*\
- * interact.supportsTouch
- [ method ]
+/**
+ * @alias module:interact.supportsTouch
  *
- = (boolean) Whether or not the browser supports touch input
-\*/
+ * @return {boolean} Whether or not the browser supports touch input
+ */
 interact.supportsTouch = function () {
   return browser.supportsTouch;
 };
 
-/*\
- * interact.supportsPointerEvent
- [ method ]
+/**
+ * @alias module:interact.supportsPointerEvent
  *
- = (boolean) Whether or not the browser supports PointerEvents
-\*/
+ * @return {boolean} Whether or not the browser supports PointerEvents
+ */
 interact.supportsPointerEvent = function () {
   return browser.supportsPointerEvent;
 };
 
-/*\
- * interact.stop
- [ method ]
- *
+/**
  * Cancels all interactions (end events are not fired)
  *
- - event (Event) An event on which to call preventDefault()
- = (object) interact
-\*/
+ * @alias module:interact.stop
+ *
+ * @param {Event} event An event on which to call preventDefault()
+ * @return {object} interact
+ */
 interact.stop = function (event) {
   for (var i = scope.interactions.length - 1; i >= 0; i--) {
     scope.interactions[i].stop(event);
@@ -4202,20 +4053,20 @@ interact.stop = function (event) {
   return interact;
 };
 
-/*\
- * interact.pointerMoveTolerance
- [ method ]
+/**
  * Returns or sets the distance the pointer must be moved before an action
  * sequence occurs. This also affects tolerance for tap events.
  *
- - newValue (number) #optional The movement from the start position must be greater than this value
- = (number | Interactable) The current setting or interact
-\*/
+ * @alias module:interact.pointerMoveTolerance
+ *
+ * @param {number} [newValue] The movement from the start position must be greater than this value
+ * @return {interact | number}
+ */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
     Interaction.pointerMoveTolerance = newValue;
 
-    return this;
+    return interact;
   }
 
   return Interaction.pointerMoveTolerance;
@@ -4241,19 +4092,16 @@ var _require = require('./utils/domUtils'),
     nodeContains = _require.nodeContains,
     matchesSelector = _require.matchesSelector;
 
-/*\
- * Interactable.preventDefault
- [ method ]
- *
- * Returns or sets whether to prevent the browser's default behaviour
- * in response to pointer events. Can be set to:
+/**
+ * Returns or sets whether to prevent the browser's default behaviour in
+ * response to pointer events. Can be set to:
  *  - `'always'` to always prevent
  *  - `'never'` to never prevent
  *  - `'auto'` to let interact.js try to determine what would be best
  *
- - newValue (string) #optional `true`, `false` or `'auto'`
- = (string | Interactable) The current setting or this Interactable
-\*/
+ * @param {string} [newValue] `true`, `false` or `'auto'`
+ * @return {string | Interactable} The current setting or this Interactable
+ */
 
 
 Interactable.prototype.preventDefault = function (newValue) {
@@ -6169,9 +6017,6 @@ var browser = {
 
   isIE8: 'attachEvent' in window && !('addEventListener' in window),
 
-  // Opera Mobile must be handled differently
-  isOperaMobile: navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto'),
-
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion),
 
@@ -6204,6 +6049,9 @@ var browser = {
 };
 
 browser.useMatchesSelectorPolyfill = !is.function(Element.prototype[browser.prefixedMatchesSelector]);
+
+// Opera Mobile must be handled differently
+browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto');
 
 module.exports = browser;
 
