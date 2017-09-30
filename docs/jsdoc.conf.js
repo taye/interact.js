@@ -1,13 +1,13 @@
 module.exports = {
   source: {
-    include: ['src'],
+    include: ['../src'],
   },
 
   opts: {
-    destination: 'dist/docs/',
-    readme: 'jsdoc-index.md',
+    destination: '../dist/docs/',
+    readme: 'index.md',
     recurse: true,
-    template: 'node_modules/minami',
+    template: '../node_modules/minami',
   },
 
   plugins: ['plugins/markdown'],
