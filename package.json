@@ -8,9 +8,7 @@
     "files": [
       "dist/",
       "interact.js",
-      "LICENSE",
-      "interact.d.ts",
-      "interact-test.ts"
+      "LICENSE"
     ],
     "main": "interact.js",
     "scripts": {
