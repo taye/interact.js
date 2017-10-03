@@ -7,7 +7,7 @@ module.exports = {
     destination: '../dist/docs/',
     readme: 'index.md',
     recurse: true,
-    template: '../node_modules/minami',
+    template: '../node_modules/jsdoc-stale',
   },
 
   plugins: ['plugins/markdown'],
