@@ -94,19 +94,7 @@ class Interaction {
   }
 
   /**
-   * Start an action with the given Interactable and Element as tartgets. The
-   * action must be enabled for the target Interactable and an appropriate
-   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
-   *
-   * Use it with `interactable.<action>able({ manualStart: false })` to always
-   * [start actions manually](https://github.com/taye/interact.js/issues/114)
-   *
-   * @param {object} action   The action to be performed - drag, resize, etc.
-   * @param {Interactable} target  The Interactable to target
-   * @param {Element} element The DOM Element to target
-   * @return {object} interact
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable({
    *     // disable the default drag start by down->move
@@ -122,6 +110,19 @@ class Interaction {
    *                         event.currentTarget);
    *     }
    * });
+   * ```
+   *
+   * Start an action with the given Interactable and Element as tartgets. The
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   *
+   * Use it with `interactable.<action>able({ manualStart: false })` to always
+   * [start actions manually](https://github.com/taye/interact.js/issues/114)
+   *
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {object} interact
    */
   start (action, target, element) {
     if (this.interacting()
@@ -200,11 +201,7 @@ class Interaction {
   }
 
   /**
-   * Force a move of the current action at the same coordinates. Useful if
-   * snap/restrict has been changed and you want a movement with the new
-   * settings.
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable(true)
    *   .on('dragmove', function (event) {
@@ -215,6 +212,11 @@ class Interaction {
    *       event.interaction.doMove();
    *     }
    *   });
+   * ```
+   *
+   * Force a move of the current action at the same coordinates. Useful if
+   * snap/restrict has been changed and you want a movement with the new
+   * settings.
    */
   doMove (signalArg) {
     signalArg = utils.extend({
@@ -255,12 +257,7 @@ class Interaction {
   }
 
   /**
-   * Stop the current action and fire an end event. Inertial movement does
-   * not happen.
-   *
-   * @param {PointerEvent} [event]
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable(true)
    *   .on('move', function (event) {
@@ -271,6 +268,12 @@ class Interaction {
    *       event.stopImmediatePropagation();
    *     }
    *   });
+   * ```
+   *
+   * Stop the current action and fire an end event. Inertial movement does
+   * not happen.
+   *
+   * @param {PointerEvent} [event]
    */
   end (event) {
     event = event || this.prevEvent;

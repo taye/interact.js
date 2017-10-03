@@ -10,6 +10,17 @@ const Interaction  = require('./Interaction');
 const globalEvents = {};
 
 /**
+ * ```js
+ * interact('#draggable').draggable(true);
+ *
+ * var rectables = interact('rect');
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   });
+ * ```
+ *
  * The methods of this variable can be used to set elements as interactables
  * and also to change various default settings.
  *
@@ -22,16 +33,6 @@ const globalEvents = {};
  * @param {Element | string} element The HTML or SVG Element to interact with
  * or CSS selector
  * @return {Interactable}
- *
- * @example
- * interact('#draggable').draggable(true);
- *
- * var rectables = interact('rect');
- * rectables
- *   .gesturable(true)
- *   .on('gesturemove', function (event) {
- *       // ...
- *   });
  */
 function interact (element, options) {
   let interactable = scope.interactables.get(element, options);

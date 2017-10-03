@@ -17,6 +17,12 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
 };
 
 /**
+ * ```js
+ * interact(element, { ignoreFrom: document.getElementById('no-action') });
+ * // or
+ * interact(element).ignoreFrom('input, textarea, a');
+ * ```
+ *
  * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
  * of it's parents match the given CSS selector or Element, no
  * drag/resize/gesture is started.
@@ -25,17 +31,18 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
  * Element or `null` to not ignore any elements
  * @return {string | Element | object} The current ignoreFrom value or this
  * Interactable
- *
- * @example
- * interact(element, { ignoreFrom: document.getElementById('no-action') });
- * // or
- * interact(element).ignoreFrom('input, textarea, a');
  */
 Interactable.prototype.ignoreFrom = function (newValue) {
   return this._backCompatOption('ignoreFrom', newValue);
 };
 
 /**
+ * ```js
+ * interact(element, { allowFrom: document.getElementById('drag-handle') });
+ * // or
+ * interact(element).allowFrom('.handle');
+ * ```
+ *
  * A drag/resize/gesture is started only If the target of the `mousedown`,
  * `pointerdown` or `touchstart` event or any of it's parents match the given
  * CSS selector or Element.
@@ -44,11 +51,6 @@ Interactable.prototype.ignoreFrom = function (newValue) {
  * Element or `null` to allow from any element
  * @return {string | Element | object} The current allowFrom value or this
  * Interactable
- *
- * @example
- * interact(element, { allowFrom: document.getElementById('drag-handle') });
- * // or
- * interact(element).allowFrom('.handle');
  */
 Interactable.prototype.allowFrom = function (newValue) {
   return this._backCompatOption('allowFrom', newValue);
@@ -88,17 +90,7 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
 };
 
 /**
- * Gets or sets the function used to check action to be performed on
- * pointerDown
- *
- * @param {function | null} [checker] A function which takes a pointer event,
- * defaultAction string, interactable, element and interaction as parameters
- * and returns an object with name property 'drag' 'resize' or 'gesture' and
- * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
- * props.
- * @return {Function | Interactable} The checker function or this Interactable
- *
- * @example
+ * ```js
  * interact('.resize-drag')
  *   .resizable(true)
  *   .draggable(true)
@@ -116,6 +108,17 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
  *
  *   return action;
  * });
+ * ```
+ *
+ * Gets or sets the function used to check action to be performed on
+ * pointerDown
+ *
+ * @param {function | null} [checker] A function which takes a pointer event,
+ * defaultAction string, interactable, element and interaction as parameters
+ * and returns an object with name property 'drag' 'resize' or 'gesture' and
+ * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+ * props.
+ * @return {Function | Interactable} The checker function or this Interactable
  */
 Interactable.prototype.actionChecker = function (checker) {
   if (is.function(checker)) {

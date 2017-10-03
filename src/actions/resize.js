@@ -270,15 +270,7 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
 });
 
 /**
- * Gets or sets whether resize actions can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on resize events (object makes the Interactable
- * resizable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of resize elements, or this Interactable
- *
- * @example
+ * ```js
  * interact(element).resizable({
  *   onstart: function (event) {},
  *   onmove : function (event) {},
@@ -312,6 +304,15 @@ InteractEvent.signals.on('new', function ({ iEvent, phase, interaction }) {
  * });
  *
  * var isResizeable = interact(element).resizable();
+ * ```
+ *
+ * Gets or sets whether resize actions can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on resize events (object makes the Interactable
+ * resizable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of resize elements, or this Interactable
  */
 Interactable.prototype.resizable = function (options) {
   if (utils.is.object(options)) {
