@@ -217,8 +217,10 @@ const pointerUtils = {
 
   // [ event.target, event.currentTarget ]
   getEventTargets: function (event) {
+    const path = is.function(event.composedPath) ? event.composedPath() : event.path;
+
     return [
-      domUtils.getActualElement(event.path ? event.path[0] : event.target),
+      domUtils.getActualElement(path ? path[0] : event.target),
       domUtils.getActualElement(event.currentTarget),
     ];
   },
