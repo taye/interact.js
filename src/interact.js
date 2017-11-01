@@ -1,4 +1,4 @@
-/** @module */
+/** @module interact */
 
 const browser      = require('./utils/browser');
 const events       = require('./utils/events');

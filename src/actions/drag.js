@@ -1,5 +1,3 @@
-/** @module */
-
 const actions        = require('./base');
 const utils          = require('../utils');
 const InteractEvent  = require('../InteractEvent');

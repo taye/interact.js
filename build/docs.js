@@ -1,5 +1,8 @@
 const fs = require('fs-extra');
-const destination = require('../docs/jsdoc.conf').opts.destination;
+const path = require('path');
+
+const confPath = require.resolve('../docs/jsdoc.conf');
+const destination = path.join(confPath, '..', require(confPath).opts.destination);
 
 module.exports = ({ stdio = 'inherit' } = {}) => {
   process.stdout.write('Docs...');

@@ -19,6 +19,7 @@ let prevTouchTime = 0;
 scope.interactions = [];
 
 class Interaction {
+  /** */
   constructor ({ pointerType }) {
     this.target        = null; // current interactable being interacted with
     this.element       = null; // the target element of the interactable
@@ -296,6 +297,7 @@ class Interaction {
     return this._interacting;
   }
 
+  /** */
   stop () {
     signals.fire('stop', { interaction: this });
 

@@ -1,5 +1,3 @@
-/** @module */
-
 /** @lends Interactable */
 const Interactable = require('../Interactable');
 const actions      = require('../actions/base');

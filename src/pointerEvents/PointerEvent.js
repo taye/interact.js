@@ -1,6 +1,7 @@
 const pointerUtils = require('../utils/pointerUtils');
 
 module.exports = class PointerEvent {
+  /** */
   constructor (type, pointer, event, eventTarget, interaction) {
     pointerUtils.pointerExtend(this, event);
 
@@ -52,14 +53,17 @@ module.exports = class PointerEvent {
     return this;
   }
 
+  /** */
   preventDefault () {
     this.originalEvent.preventDefault();
   }
 
+  /** */
   stopPropagation () {
     this.propagationStopped = true;
   }
 
+  /** */
   stopImmediatePropagation () {
     this.immediatePropagationStopped = this.propagationStopped = true;
   }

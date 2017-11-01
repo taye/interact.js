@@ -5,16 +5,19 @@ module.exports = {
 
   opts: {
     destination: '../dist/docs/',
-    readme: 'index.md',
     recurse: true,
-    template: '../node_modules/jsdoc-stale',
   },
 
-  plugins: ['plugins/markdown'],
+  plugins: [
+    'plugins/markdown',
+    'jsdoc-stale',
+  ],
 
   markdown: {
     idInHeadings: true,
   },
+
+  articles: ['**/*.md'],
 
   templates: {
     cleverLinks: true,

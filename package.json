@@ -70,7 +70,7 @@
     "fs-extra": "^4.0.2",
     "husky": "^0.13.1",
     "istanbul": "^0.4.5",
-    "jsdoc": "taye/jsdoc#master",
+    "jsdoc": "github:taye/jsdoc#master",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "^9.11.0",
     "lodash": "^3.10.1",
