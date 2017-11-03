@@ -1,6 +1,8 @@
 const autoStart   = require('./base');
 const Interaction = require('../Interaction');
 
+autoStart.defaults.perAction.delay = 0;
+
 Interaction.signals.on('new', function (interaction) {
   interaction.delayTimer = null;
 });
