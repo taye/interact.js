@@ -1,4 +1,4 @@
-## Upcoming Changes
+## v1.3.0
 
 Most notably:
 
