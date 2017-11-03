@@ -9,8 +9,7 @@ Most notably:
    - `Interactable` - `squareResize`, `snap`, `restrict`, `inertia`,
      `autoScroll`, `accept`, `dropzone` - `interact` - `enabbleDragging`,
      `enableResizing`, `enableGesturing`, `margin`
- - new `delay` option for starting actions
-   ([f688eba](https://github.com/taye/interact.js/commit/f688eba))
+ - new `hold` option for starting actions
  - new `interaction.end()` method
    ([df963b0](https://github.com/taye/interact.js/commit/df963b0))
  - `snap.offset` `self` option ([issue

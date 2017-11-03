@@ -15,8 +15,8 @@ require('./pointerEvents/base');
 require('./pointerEvents/holdRepeat');
 require('./pointerEvents/interactableTargets');
 
-// delay
-require('./autoStart/delay');
+// autoStart hold
+require('./autoStart/hold');
 
 // actions
 require('./actions/gesture');

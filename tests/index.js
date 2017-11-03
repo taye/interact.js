@@ -19,8 +19,8 @@ require('./pointerEvents/holdRepeat');
 //require('./modifiers/restrict');
 require('./modifiers/restrictSize');
 
-// delay
-//require('./autoStart/delay');
+// autoStart hold
+require('./autoStart/hold');
 
 // actions
 require('./actions/base');
