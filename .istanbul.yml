@@ -1,9 +1,9 @@
 check:
   global:
-    statements: 50
-    lines: 30
+    statements: 48
+    lines: 40
     branches: 25
-    functions: 40
+    functions: 45
     excludes: []
     each:
       statements: 0
