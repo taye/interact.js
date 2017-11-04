@@ -40,7 +40,7 @@ fi
 npm run build || exit $?
 
 # commit and add new version tag
-git add -- package.json distc
+git add -- package.json dist
 git commit -m "v$NEW_VERSION"
 git tag $NEW_TAG
 
