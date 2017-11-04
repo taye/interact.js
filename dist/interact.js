@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-alpha.5+sha.8579d3f-dirty
+ * interact.js v1.3.0-alpha.5+sha.c3e9da1
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -109,6 +109,7 @@ var defaults = require('./defaultOptions');
 var signals = require('./utils/Signals').new();
 
 var InteractEvent = function () {
+  /** */
   function InteractEvent(interaction, event, action, phase, element, related) {
     var preEnd = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
 
@@ -237,9 +238,15 @@ var InteractEvent = function () {
 
   InteractEvent.prototype.preventDefault = function preventDefault() {};
 
+  /** */
+
+
   InteractEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true;
   };
+
+  /** */
+
 
   InteractEvent.prototype.stopPropagation = function stopPropagation() {
     this.propagationStopped = true;
@@ -303,11 +310,8 @@ var _require4 = require('./utils/browser'),
 
 scope.interactables = [];
 
-/**
- * Object type returned by {@link interact}
- */
-
 var Interactable = function () {
+  /** */
   function Interactable(target, options) {
     _classCallCheck(this, Interactable);
 
@@ -797,6 +801,7 @@ var prevTouchTime = 0;
 scope.interactions = [];
 
 var Interaction = function () {
+  /** */
   function Interaction(_ref) {
     var pointerType = _ref.pointerType;
 
@@ -876,19 +881,7 @@ var Interaction = function () {
   };
 
   /**
-   * Start an action with the given Interactable and Element as tartgets. The
-   * action must be enabled for the target Interactable and an appropriate
-   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
-   *
-   * Use it with `interactable.<action>able({ manualStart: false })` to always
-   * [start actions manually](https://github.com/taye/interact.js/issues/114)
-   *
-   * @param {object} action   The action to be performed - drag, resize, etc.
-   * @param {Interactable} target  The Interactable to target
-   * @param {Element} element The DOM Element to target
-   * @return {object} interact
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable({
    *     // disable the default drag start by down->move
@@ -904,6 +897,19 @@ var Interaction = function () {
    *                         event.currentTarget);
    *     }
    * });
+   * ```
+   *
+   * Start an action with the given Interactable and Element as tartgets. The
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   *
+   * Use it with `interactable.<action>able({ manualStart: false })` to always
+   * [start actions manually](https://github.com/taye/interact.js/issues/114)
+   *
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {object} interact
    */
 
 
@@ -979,11 +985,7 @@ var Interaction = function () {
   };
 
   /**
-   * Force a move of the current action at the same coordinates. Useful if
-   * snap/restrict has been changed and you want a movement with the new
-   * settings.
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable(true)
    *   .on('dragmove', function (event) {
@@ -994,6 +996,11 @@ var Interaction = function () {
    *       event.interaction.doMove();
    *     }
    *   });
+   * ```
+   *
+   * Force a move of the current action at the same coordinates. Useful if
+   * snap/restrict has been changed and you want a movement with the new
+   * settings.
    */
 
 
@@ -1038,12 +1045,7 @@ var Interaction = function () {
   };
 
   /**
-   * Stop the current action and fire an end event. Inertial movement does
-   * not happen.
-   *
-   * @param {PointerEvent} [event]
-   *
-   * @example
+   * ```js
    * interact(target)
    *   .draggable(true)
    *   .on('move', function (event) {
@@ -1054,6 +1056,12 @@ var Interaction = function () {
    *       event.stopImmediatePropagation();
    *     }
    *   });
+   * ```
+   *
+   * Stop the current action and fire an end event. Inertial movement does
+   * not happen.
+   *
+   * @param {PointerEvent} [event]
    */
 
 
@@ -1077,6 +1085,9 @@ var Interaction = function () {
   Interaction.prototype.interacting = function interacting() {
     return this._interacting;
   };
+
+  /** */
+
 
   Interaction.prototype.stop = function stop() {
     signals.fire('stop', { interaction: this });
@@ -1374,8 +1385,6 @@ module.exports = actions;
 },{"../InteractEvent":3,"../Interaction":5}],7:[function(require,module,exports){
 'use strict';
 
-/** @module */
-
 var actions = require('./base');
 var utils = require('../utils');
 var InteractEvent = require('../InteractEvent');
@@ -1461,15 +1470,7 @@ InteractEvent.signals.on('new', function (_ref2) {
 });
 
 /**
- * Get or set whether drag actions can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on drag events (object makes the Interactable
- * draggable)
- * @return {boolean | Interactable} boolean indicating if this can be the
- * target of drag events, or this Interctable
- *
- * @example
+ * ```js
  * interact(element).draggable({
  *     onstart: function (event) {},
  *     onmove : function (event) {},
@@ -1495,6 +1496,15 @@ InteractEvent.signals.on('new', function (_ref2) {
  * });
  *
  * var isDraggable = interact('element').draggable(); // true
+ * ```
+ *
+ * Get or set whether drag actions can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
  */
 Interactable.prototype.draggable = function (options) {
   if (utils.is.object(options)) {
@@ -1838,6 +1848,27 @@ function fireDropEvents(interaction, dropEvents) {
 }
 
 /**
+ * ```js
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
+ *
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ * ```
+ *
+ * ```js
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ * ```
+ *
  * Returns or sets whether draggables can be dropped onto this target to
  * trigger drop events
  *
@@ -1868,25 +1899,6 @@ function fireDropEvents(interaction, dropEvents) {
  *
  * @param {boolean | object | null} [options] The new options to be set.
  * @return {boolean | Interactable} The current setting or this Interactable
- *
- * @example
- * interact(target)
- * .dropChecker(function(dragEvent,         // related dragmove or dragend event
- *                       event,             // TouchEvent/PointerEvent/MouseEvent
- *                       dropped,           // bool result of the default checker
- *                       dropzone,          // dropzone Interactable
- *                       dropElement,       // dropzone elemnt
- *                       draggable,         // draggable Interactable
- *                       draggableElement) {// draggable element
- *
- *   return dropped && event.target.hasAttribute('allow-drop');
- * }
- *
- * @example
- * interact('.drop').dropzone({
- *   accept: '.can-drop' || document.getElementById('single-drop'),
- *   overlap: 'pointer' || 'center' || zeroToOne
- * }
  */
 Interactable.prototype.dropzone = function (options) {
   if (utils.is.object(options)) {
@@ -2005,7 +2017,8 @@ Interaction.signals.on('new', function (interaction) {
   interaction.activeDrops = {
     dropzones: [], // the dropzones that are mentioned below
     elements: [], // elements of dropzones that accept the target draggable
-    rects: [] };
+    rects: [] // the rects of the elements mentioned above
+  };
 });
 
 Interaction.signals.on('stop', function (_ref8) {
@@ -2108,14 +2121,7 @@ InteractEvent.signals.on('new', function (_ref2) {
 });
 
 /**
- * Gets or sets whether multitouch gestures can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on gesture events (makes the Interactable gesturable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of gesture events, or this Interactable
- *
- * @example
+ * ```js
  * interact(element).gesturable({
  *     onstart: function (event) {},
  *     onmove : function (event) {},
@@ -2128,6 +2134,14 @@ InteractEvent.signals.on('new', function (_ref2) {
  * });
  *
  * var isGestureable = interact(element).gesturable();
+ * ```
+ *
+ * Gets or sets whether multitouch gestures can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on gesture events (makes the Interactable gesturable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of gesture events, or this Interactable
  */
 Interactable.prototype.gesturable = function (options) {
   if (utils.is.object(options)) {
@@ -2204,7 +2218,8 @@ Interaction.signals.on('new', function (interaction) {
     scale: 1, // gesture.distance / gesture.startDistance
 
     startAngle: 0, // angle of line joining two touches
-    prevAngle: 0 };
+    prevAngle: 0 // angle of the previous gesture event
+  };
 });
 
 actions.gesture = gesture;
@@ -2499,15 +2514,7 @@ InteractEvent.signals.on('new', function (_ref2) {
 });
 
 /**
- * Gets or sets whether resize actions can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on resize events (object makes the Interactable
- * resizable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of resize elements, or this Interactable
- *
- * @example
+ * ```js
  * interact(element).resizable({
  *   onstart: function (event) {},
  *   onmove : function (event) {},
@@ -2541,6 +2548,15 @@ InteractEvent.signals.on('new', function (_ref2) {
  * });
  *
  * var isResizeable = interact(element).resizable();
+ * ```
+ *
+ * Gets or sets whether resize actions can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on resize events (object makes the Interactable
+ * resizable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of resize elements, or this Interactable
  */
 Interactable.prototype.resizable = function (options) {
   if (utils.is.object(options)) {
@@ -2685,7 +2701,8 @@ var autoScroll = {
     enabled: false,
     container: null, // the item that is scrolled (Window or HTMLElement)
     margin: 60,
-    speed: 300 },
+    speed: 300 // the scroll speed in pixels per second
+  },
 
   interaction: null,
   i: null, // the handle returned by window.setInterval
@@ -2800,8 +2817,6 @@ module.exports = autoScroll;
 },{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":39,"./utils/is":46,"./utils/raf":50,"./utils/window":52}],12:[function(require,module,exports){
 'use strict';
 
-/** @module */
-
 /** @lends Interactable */
 var Interactable = require('../Interactable');
 var actions = require('../actions/base');
@@ -2819,6 +2834,12 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
 };
 
 /**
+ * ```js
+ * interact(element, { ignoreFrom: document.getElementById('no-action') });
+ * // or
+ * interact(element).ignoreFrom('input, textarea, a');
+ * ```
+ *
  * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
  * of it's parents match the given CSS selector or Element, no
  * drag/resize/gesture is started.
@@ -2827,17 +2848,18 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
  * Element or `null` to not ignore any elements
  * @return {string | Element | object} The current ignoreFrom value or this
  * Interactable
- *
- * @example
- * interact(element, { ignoreFrom: document.getElementById('no-action') });
- * // or
- * interact(element).ignoreFrom('input, textarea, a');
  */
 Interactable.prototype.ignoreFrom = function (newValue) {
   return this._backCompatOption('ignoreFrom', newValue);
 };
 
 /**
+ * ```js
+ * interact(element, { allowFrom: document.getElementById('drag-handle') });
+ * // or
+ * interact(element).allowFrom('.handle');
+ * ```
+ *
  * A drag/resize/gesture is started only If the target of the `mousedown`,
  * `pointerdown` or `touchstart` event or any of it's parents match the given
  * CSS selector or Element.
@@ -2846,11 +2868,6 @@ Interactable.prototype.ignoreFrom = function (newValue) {
  * Element or `null` to allow from any element
  * @return {string | Element | object} The current allowFrom value or this
  * Interactable
- *
- * @example
- * interact(element, { allowFrom: document.getElementById('drag-handle') });
- * // or
- * interact(element).allowFrom('.handle');
  */
 Interactable.prototype.allowFrom = function (newValue) {
   return this._backCompatOption('allowFrom', newValue);
@@ -2893,17 +2910,7 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
 };
 
 /**
- * Gets or sets the function used to check action to be performed on
- * pointerDown
- *
- * @param {function | null} [checker] A function which takes a pointer event,
- * defaultAction string, interactable, element and interaction as parameters
- * and returns an object with name property 'drag' 'resize' or 'gesture' and
- * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
- * props.
- * @return {Function | Interactable} The checker function or this Interactable
- *
- * @example
+ * ```js
  * interact('.resize-drag')
  *   .resizable(true)
  *   .draggable(true)
@@ -2921,6 +2928,17 @@ Interactable.prototype.testIgnoreAllow = function (options, interactableElement,
  *
  *   return action;
  * });
+ * ```
+ *
+ * Gets or sets the function used to check action to be performed on
+ * pointerDown
+ *
+ * @param {function | null} [checker] A function which takes a pointer event,
+ * defaultAction string, interactable, element and interaction as parameters
+ * and returns an object with name property 'drag' 'resize' or 'gesture' and
+ * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+ * props.
+ * @return {Function | Interactable} The checker function or this Interactable
  */
 Interactable.prototype.actionChecker = function (checker) {
   if (is.function(checker)) {
@@ -3000,8 +3018,6 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
 
 },{"../Interactable":4,"../actions/base":6,"../utils/domUtils":39,"../utils/is":46}],13:[function(require,module,exports){
 'use strict';
-
-/** @module */
 
 var interact = require('../interact');
 var Interactable = require('../Interactable');
@@ -3279,60 +3295,6 @@ module.exports = autoStart;
 'use strict';
 
 var autoStart = require('./base');
-var Interaction = require('../Interaction');
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.delayTimer = null;
-});
-
-autoStart.signals.on('prepared', function (_ref) {
-  var interaction = _ref.interaction;
-
-  var actionName = interaction.prepared.name;
-
-  if (!actionName) {
-    return;
-  }
-
-  var delay = interaction.target.options[actionName].delay;
-
-  if (delay > 0) {
-    interaction.delayTimer = setTimeout(function () {
-      interaction.start(interaction.prepared, interaction.target, interaction.element);
-    }, delay);
-  }
-});
-
-Interaction.signals.on('move', function (_ref2) {
-  var interaction = _ref2.interaction,
-      duplicate = _ref2.duplicate;
-
-  if (interaction.pointerWasMoved && !duplicate) {
-    clearTimeout(interaction.delayTimer);
-  }
-});
-
-// prevent regular down->move autoStart
-autoStart.signals.on('before-start', function (_ref3) {
-  var interaction = _ref3.interaction;
-
-  var actionName = interaction.prepared.name;
-
-  if (!actionName) {
-    return;
-  }
-
-  var delay = interaction.target.options[actionName].delay;
-
-  if (delay > 0) {
-    interaction.prepared.name = null;
-  }
-});
-
-},{"../Interaction":5,"./base":13}],15:[function(require,module,exports){
-'use strict';
-
-var autoStart = require('./base');
 var scope = require('../scope');
 var browser = require('../utils/browser');
 var is = require('../utils/is');
@@ -3435,12 +3397,73 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":34,"../utils/browser":37,"../utils/domUtils":39,"../utils/is":46,"./base":13}],16:[function(require,module,exports){
+},{"../actions/drag":7,"../scope":34,"../utils/browser":37,"../utils/domUtils":39,"../utils/is":46,"./base":13}],15:[function(require,module,exports){
 'use strict';
 
 require('./base').setActionDefaults(require('../actions/gesture'));
 
-},{"../actions/gesture":9,"./base":13}],17:[function(require,module,exports){
+},{"../actions/gesture":9,"./base":13}],16:[function(require,module,exports){
+'use strict';
+
+var autoStart = require('./base');
+var Interaction = require('../Interaction');
+
+autoStart.defaults.perAction.hold = 0;
+autoStart.defaults.perAction.delay = 0;
+
+Interaction.signals.on('new', function (interaction) {
+  interaction.autoStartHoldTimer = null;
+});
+
+autoStart.signals.on('prepared', function (_ref) {
+  var interaction = _ref.interaction;
+
+  var hold = getHoldDuration(interaction);
+
+  if (hold > 0) {
+    interaction.autoStartHoldTimer = setTimeout(function () {
+      interaction.start(interaction.prepared, interaction.target, interaction.element);
+    }, hold);
+  }
+});
+
+Interaction.signals.on('move', function (_ref2) {
+  var interaction = _ref2.interaction,
+      duplicate = _ref2.duplicate;
+
+  if (interaction.pointerWasMoved && !duplicate) {
+    clearTimeout(interaction.autoStartHoldTimer);
+  }
+});
+
+// prevent regular down->move autoStart
+autoStart.signals.on('before-start', function (_ref3) {
+  var interaction = _ref3.interaction;
+
+  var hold = getHoldDuration(interaction);
+
+  if (hold > 0) {
+    interaction.prepared.name = null;
+  }
+});
+
+function getHoldDuration(interaction) {
+  var actionName = interaction.prepared && interaction.prepared.name;
+
+  if (!actionName) {
+    return null;
+  }
+
+  var options = interaction.target.options;
+
+  return options[actionName].hold || options[actionName].delay;
+}
+
+module.exports = {
+  getHoldDuration: getHoldDuration
+};
+
+},{"../Interaction":5,"./base":13}],17:[function(require,module,exports){
 'use strict';
 
 require('./base').setActionDefaults(require('../actions/resize'));
@@ -3468,7 +3491,8 @@ module.exports = {
       minSpeed: 100, // target speed must be above this for inertia to start
       endSpeed: 10, // the speed at which inertia is slow enough to stop
       allowResume: true, // allow resuming an action in inertia phase
-      smoothEndDuration: 300 }
+      smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
+    }
   }
 };
 
@@ -3492,8 +3516,8 @@ require('./pointerEvents/base');
 require('./pointerEvents/holdRepeat');
 require('./pointerEvents/interactableTargets');
 
-// delay
-require('./autoStart/delay');
+// autoStart hold
+require('./autoStart/hold');
 
 // actions
 require('./actions/gesture');
@@ -3520,7 +3544,7 @@ require('./autoScroll');
 // export interact
 module.exports = require('./interact');
 
-},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/delay":14,"./autoStart/drag":15,"./autoStart/gesture":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/restrictEdges":26,"./modifiers/restrictSize":27,"./modifiers/snap":28,"./modifiers/snapSize":29,"./pointerEvents/base":31,"./pointerEvents/holdRepeat":32,"./pointerEvents/interactableTargets":33}],20:[function(require,module,exports){
+},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/drag":14,"./autoStart/gesture":15,"./autoStart/hold":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/restrictEdges":26,"./modifiers/restrictSize":27,"./modifiers/snap":28,"./modifiers/snapSize":29,"./pointerEvents/base":31,"./pointerEvents/holdRepeat":32,"./pointerEvents/interactableTargets":33}],20:[function(require,module,exports){
 'use strict';
 
 var InteractEvent = require('./InteractEvent');
@@ -3815,7 +3839,7 @@ function updateInertiaCoords(interaction) {
 },{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
 'use strict';
 
-/** @module */
+/** @module interact */
 
 var browser = require('./utils/browser');
 var events = require('./utils/events');
@@ -3827,6 +3851,17 @@ var Interaction = require('./Interaction');
 var globalEvents = {};
 
 /**
+ * ```js
+ * interact('#draggable').draggable(true);
+ *
+ * var rectables = interact('rect');
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   });
+ * ```
+ *
  * The methods of this variable can be used to set elements as interactables
  * and also to change various default settings.
  *
@@ -3839,16 +3874,6 @@ var globalEvents = {};
  * @param {Element | string} element The HTML or SVG Element to interact with
  * or CSS selector
  * @return {Interactable}
- *
- * @example
- * interact('#draggable').draggable(true);
- *
- * var rectables = interact('rect');
- * rectables
- *   .gesturable(true)
- *   .on('gesturemove', function (event) {
- *       // ...
- *   });
  */
 function interact(element, options) {
   var interactable = scope.interactables.get(element, options);
@@ -5298,6 +5323,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var pointerUtils = require('../utils/pointerUtils');
 
 module.exports = function () {
+  /** */
   function PointerEvent(type, pointer, event, eventTarget, interaction) {
     _classCallCheck(this, PointerEvent);
 
@@ -5353,13 +5379,22 @@ module.exports = function () {
     return this;
   };
 
+  /** */
+
+
   PointerEvent.prototype.preventDefault = function preventDefault() {
     this.originalEvent.preventDefault();
   };
 
+  /** */
+
+
   PointerEvent.prototype.stopPropagation = function stopPropagation() {
     this.propagationStopped = true;
   };
+
+  /** */
+
 
   PointerEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
     this.immediatePropagationStopped = this.propagationStopped = true;
@@ -6331,6 +6366,7 @@ module.exports = domUtils;
 
 var is = require('./is');
 var domUtils = require('./domUtils');
+var pointerUtils = require('./pointerUtils');
 var pExtend = require('./pointerExtend');
 
 var _require = require('./window'),
@@ -6618,7 +6654,10 @@ function delegateListener(event, optionalArg) {
   var options = getOptions(optionalArg);
   var fakeEvent = {};
   var delegated = delegatedEvents[event.type];
-  var eventTarget = domUtils.getActualElement(event.path ? event.path[0] : event.target);
+
+  var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
+      eventTarget = _pointerUtils$getEven[0];
+
   var element = eventTarget;
 
   // duplicate the event so that currentTarget can be changed
@@ -6702,7 +6741,7 @@ module.exports = {
   _attachedListeners: attachedListeners
 };
 
-},{"./arr":36,"./domUtils":39,"./is":46,"./pointerExtend":48,"./window":52}],41:[function(require,module,exports){
+},{"./arr":36,"./domUtils":39,"./is":46,"./pointerExtend":48,"./pointerUtils":49,"./window":52}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function extend(dest, source) {
@@ -7330,7 +7369,9 @@ var pointerUtils = {
 
   // [ event.target, event.currentTarget ]
   getEventTargets: function getEventTargets(event) {
-    return [domUtils.getActualElement(event.path ? event.path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
+    var path = is.function(event.composedPath) ? event.composedPath() : event.path;
+
+    return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
   }
 };
 

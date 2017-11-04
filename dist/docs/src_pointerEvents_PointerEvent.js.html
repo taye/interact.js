@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>API Reference - Documentation</title>
+    <title>src/pointerEvents/PointerEvent.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,19 +31,92 @@
 
 <div id="main">
     
-    <h1 class="page-title">API Reference</h1>
+    <h1 class="page-title">src/pointerEvents/PointerEvent.js</h1>
     
 
+    
+
+
+
+    
     <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const pointerUtils = require('../utils/pointerUtils');
 
-<article class="article">
-    <p><img
-  style="background-color: #272822; display: block; margin: auto; max-height: 8em; width: 100%"
-  alt="interact.js"
-  src="img/ijs-anim-short.svg"></p>
-</article>
+module.exports = class PointerEvent {
+  /** */
+  constructor (type, pointer, event, eventTarget, interaction) {
+    pointerUtils.pointerExtend(this, event);
 
-</section>
+    if (event !== pointer) {
+      pointerUtils.pointerExtend(this, pointer);
+    }
+
+    this.interaction = interaction;
+
+    this.timeStamp     = new Date().getTime();
+    this.originalEvent = event;
+    this.type          = type;
+    this.pointerId     = pointerUtils.getPointerId(pointer);
+    this.pointerType   = pointerUtils.getPointerType(pointer);
+    this.target        = eventTarget;
+    this.currentTarget = null;
+
+    if (type === 'tap') {
+      const pointerIndex = interaction.getPointerIndex(pointer);
+      this.dt = this.timeStamp - interaction.downTimes[pointerIndex];
+
+      const interval = this.timeStamp - interaction.tapTime;
+
+      this.double = !!(interaction.prevTap
+        &amp;&amp; interaction.prevTap.type !== 'doubletap'
+        &amp;&amp; interaction.prevTap.target === this.target
+        &amp;&amp; interval &lt; 500);
+    }
+    else if (type === 'doubletap') {
+      this.dt = pointer.timeStamp - interaction.tapTime;
+    }
+  }
+
+  subtractOrigin ({ x: originX, y: originY }) {
+    this.pageX   -= originX;
+    this.pageY   -= originY;
+    this.clientX -= originX;
+    this.clientY -= originY;
+
+    return this;
+  }
+
+  addOrigin ({ x: originX, y: originY }) {
+    this.pageX   += originX;
+    this.pageY   += originY;
+    this.clientX += originX;
+    this.clientY += originY;
+
+    return this;
+  }
+
+  /** */
+  preventDefault () {
+    this.originalEvent.preventDefault();
+  }
+
+  /** */
+  stopPropagation () {
+    this.propagationStopped = true;
+  }
+
+  /** */
+  stopImmediatePropagation () {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
 
 </div>
 

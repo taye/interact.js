@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>API Reference - Documentation</title>
+    <title>Global - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,19 +31,274 @@
 
 <div id="main">
     
-    <h1 class="page-title">API Reference</h1>
+    <h1 class="page-title">Global</h1>
     
 
-    <section>
+    
 
-<article class="article">
-    <p><img
-  style="background-color: #272822; display: block; margin: auto; max-height: 8em; width: 100%"
-  alt="interact.js"
-  src="img/ijs-anim-short.svg"></p>
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="interact"><span class="type-signature"></span>interact<span class="signature">(element)</span><span class="type-signature"> &rarr; {<a href="Interactable.html">Interactable</a>}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <pre class="prettyprint source lang-js"><code>interact('#draggable').draggable(true);
+
+var rectables = interact('rect');
+rectables
+  .gesturable(true)
+  .on('gesturemove', function (event) {
+      // ...
+  });
+</code></pre>
+<p>The methods of this variable can be used to set elements as interactables
+and also to change various default settings.</p>
+<p>Calling it as a function and passing an element or a valid CSS selector
+string returns an Interactable object which has various methods to configure
+it.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_interact.js.html">src/interact.js</a>, <a href="src_interact.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Element</code></span>
+|
+
+<span class="param-type"><code>string</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="param-description last">
+                <p>The HTML or SVG Element to interact with
+or CSS selector</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
+
+
+    </dd>
+</dl>
+
+
+    
+</div>
+
+
+
+</div>
+
+        
+    
+
+    
+
+    
 </article>
 
 </section>
+
+
+
 
 </div>
 
