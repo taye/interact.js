@@ -4,6 +4,7 @@ const defaults    = require('./defaultOptions');
 const signals     = require('./utils/Signals').new();
 
 class InteractEvent {
+  /** */
   constructor (interaction, event, action, phase, element, related, preEnd = false) {
     const target      = interaction.target;
     const deltaSource = (target && target.options || defaults).deltaSource;
@@ -131,10 +132,12 @@ class InteractEvent {
 
   preventDefault () {}
 
+  /** */
   stopImmediatePropagation () {
     this.immediatePropagationStopped = this.propagationStopped = true;
   }
 
+  /** */
   stopPropagation () {
     this.propagationStopped = true;
   }

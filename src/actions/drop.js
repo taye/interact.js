@@ -267,6 +267,27 @@ function fireDropEvents (interaction, dropEvents) {
 }
 
 /**
+ * ```js
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
+ *
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ * ```
+ *
+ * ```js
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ * ```
+ *
  * Returns or sets whether draggables can be dropped onto this target to
  * trigger drop events
  *
@@ -297,25 +318,6 @@ function fireDropEvents (interaction, dropEvents) {
  *
  * @param {boolean | object | null} [options] The new options to be set.
  * @return {boolean | Interactable} The current setting or this Interactable
- *
- * @example
- * interact(target)
- * .dropChecker(function(dragEvent,         // related dragmove or dragend event
- *                       event,             // TouchEvent/PointerEvent/MouseEvent
- *                       dropped,           // bool result of the default checker
- *                       dropzone,          // dropzone Interactable
- *                       dropElement,       // dropzone elemnt
- *                       draggable,         // draggable Interactable
- *                       draggableElement) {// draggable element
- *
- *   return dropped && event.target.hasAttribute('allow-drop');
- * }
- *
- * @example
- * interact('.drop').dropzone({
- *   accept: '.can-drop' || document.getElementById('single-drop'),
- *   overlap: 'pointer' || 'center' || zeroToOne
- * }
  */
 Interactable.prototype.dropzone = function (options) {
   if (utils.is.object(options)) {

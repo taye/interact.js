@@ -19,10 +19,8 @@ const { wheelEvent }        = require('./utils/browser');
 // all set interactables
 scope.interactables = [];
 
-/**
- * Object type returned by {@link interact}
- */
 class Interactable {
+  /** */
   constructor (target, options) {
     options = options || {};
 

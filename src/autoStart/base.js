@@ -1,5 +1,3 @@
-/** @module */
-
 const interact       = require('../interact');
 const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');

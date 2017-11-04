@@ -1,5 +1,3 @@
-/** @module */
-
 const actions        = require('./base');
 const utils          = require('../utils');
 const InteractEvent  = require('../InteractEvent');
@@ -82,15 +80,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
 });
 
 /**
- * Get or set whether drag actions can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on drag events (object makes the Interactable
- * draggable)
- * @return {boolean | Interactable} boolean indicating if this can be the
- * target of drag events, or this Interctable
- *
- * @example
+ * ```js
  * interact(element).draggable({
  *     onstart: function (event) {},
  *     onmove : function (event) {},
@@ -116,6 +106,15 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
  * });
  *
  * var isDraggable = interact('element').draggable(); // true
+ * ```
+ *
+ * Get or set whether drag actions can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
  */
 Interactable.prototype.draggable = function (options) {
   if (utils.is.object(options)) {

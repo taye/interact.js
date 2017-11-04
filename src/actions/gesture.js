@@ -54,14 +54,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
 });
 
 /**
- * Gets or sets whether multitouch gestures can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on gesture events (makes the Interactable gesturable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of gesture events, or this Interactable
- *
- * @example
+ * ```js
  * interact(element).gesturable({
  *     onstart: function (event) {},
  *     onmove : function (event) {},
@@ -74,6 +67,14 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
  * });
  *
  * var isGestureable = interact(element).gesturable();
+ * ```
+ *
+ * Gets or sets whether multitouch gestures can be performed on the target
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on gesture events (makes the Interactable gesturable)
+ * @return {boolean | Interactable} A boolean indicating if this can be the
+ * target of gesture events, or this Interactable
  */
 Interactable.prototype.gesturable = function (options) {
   if (utils.is.object(options)) {

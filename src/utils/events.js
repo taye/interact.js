@@ -1,5 +1,6 @@
 const is   = require('./is');
 const domUtils = require('./domUtils');
+const pointerUtils = require('./pointerUtils');
 const pExtend  = require('./pointerExtend');
 
 const { window, getWindow }  = require('./window');
@@ -275,9 +276,7 @@ function delegateListener (event, optionalArg) {
   const options = getOptions(optionalArg);
   const fakeEvent = {};
   const delegated = delegatedEvents[event.type];
-  const eventTarget = (domUtils.getActualElement(event.path
-    ? event.path[0]
-    : event.target));
+  const [eventTarget] = (pointerUtils.getEventTargets(event));
   let element = eventTarget;
 
   // duplicate the event so that currentTarget can be changed
