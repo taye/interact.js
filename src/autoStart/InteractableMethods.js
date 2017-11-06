@@ -4,6 +4,8 @@ const actions      = require('../actions/base');
 const is           = require('../utils/is');
 const domUtils     = require('../utils/domUtils');
 
+const { warnOnce } = require('../utils');
+
 Interactable.prototype.getAction = function (pointer, event, interaction, element) {
   const action = this.defaultActionChecker(pointer, event, interaction, element);
 
@@ -20,39 +22,59 @@ Interactable.prototype.getAction = function (pointer, event, interaction, elemen
  * // or
  * interact(element).ignoreFrom('input, textarea, a');
  * ```
- *
+ * @deprecated
  * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
  * of it's parents match the given CSS selector or Element, no
  * drag/resize/gesture is started.
+ *
+ * Don't use this method. Instead set the `ignoreFrom` option for each action
+ * or for `pointerEvents`
+ *
+ * @example
+ * interact(targett)
+ *   .draggable({
+ *     ignoreFrom: 'input, textarea, a[href]'',
+ *   })
+ *   .pointerEvents({
+ *     ignoreFrom: '[no-pointer]',
+ *   });
  *
  * @param {string | Element | null} [newValue] a CSS selector string, an
  * Element or `null` to not ignore any elements
  * @return {string | Element | object} The current ignoreFrom value or this
  * Interactable
  */
-Interactable.prototype.ignoreFrom = function (newValue) {
+Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
   return this._backCompatOption('ignoreFrom', newValue);
-};
+}, 'Interactable.ignoreForm() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
 
 /**
  * ```js
- * interact(element, { allowFrom: document.getElementById('drag-handle') });
- * // or
- * interact(element).allowFrom('.handle');
- * ```
  *
+ * @deprecated
  * A drag/resize/gesture is started only If the target of the `mousedown`,
  * `pointerdown` or `touchstart` event or any of it's parents match the given
  * CSS selector or Element.
+ *
+ * Don't use this method. Instead set the `allowFrom` option for each action
+ * or for `pointerEvents`
+ *
+ * @example
+ * interact(targett)
+ *   .resizable({
+ *     allowFrom: '.resize-handle',
+ *   .pointerEvents({
+ *     allowFrom: '.handle',,
+ *   });
  *
  * @param {string | Element | null} [newValue] a CSS selector string, an
  * Element or `null` to allow from any element
  * @return {string | Element | object} The current allowFrom value or this
  * Interactable
  */
-Interactable.prototype.allowFrom = function (newValue) {
+Interactable.prototype.allowFrom = warnOnce(function (newValue) {
   return this._backCompatOption('allowFrom', newValue);
-};
+}, 'Interactable.allowForm() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
 
 Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
   if (!ignoreFrom || !is.element(element)) { return false; }
