@@ -48,7 +48,7 @@ const restrictEdges = {
     return startOffset;
   },
 
-  set: function ({ pageCoords, interaction, status, offset, options }) {
+  set: function ({ modifiedCoords, interaction, status, offset, options }) {
     const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
     if (!interaction.interacting() || !edges) {
@@ -57,7 +57,7 @@ const restrictEdges = {
 
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
-      : utils.extend({}, pageCoords);
+      : utils.extend({}, modifiedCoords);
     const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
     const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
 

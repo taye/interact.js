@@ -43,7 +43,6 @@ const modifiers = {
 
   setAll: function (arg) {
     const { interaction, statuses, preEnd, requireEndOnly } = arg;
-    const coords = extend({}, arg.pageCoords);
     const result = {
       dx: 0,
       dy: 0,
@@ -51,6 +50,8 @@ const modifiers = {
       locked: false,
       shouldMove: true,
     };
+
+    arg.modifiedCoords = extend({}, arg.pageCoords);
 
     for (const modifierName of modifiers.names) {
       const modifier = modifiers[modifierName];
@@ -65,8 +66,8 @@ const modifiers = {
       modifier.set(arg);
 
       if (arg.status.locked) {
-        coords.x += arg.status.dx;
-        coords.y += arg.status.dy;
+        arg.modifiedCoords.x += arg.status.dx;
+        arg.modifiedCoords.y += arg.status.dy;
 
         result.dx += arg.status.dx;
         result.dy += arg.status.dy;

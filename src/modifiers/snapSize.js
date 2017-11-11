@@ -39,8 +39,8 @@ const snapSize = {
   },
 
   set: function (arg) {
-    const { interaction, options, offset, pageCoords } = arg;
-    const page = utils.extend({}, pageCoords);
+    const { interaction, options, offset, modifiedCoords } = arg;
+    const page = utils.extend({}, modifiedCoords);
     const relativeX = page.x - offset[0].x;
     const relativeY = page.y - offset[0].y;
 
