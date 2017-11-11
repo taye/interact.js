@@ -8,10 +8,6 @@ module.exports = {
   perAction: {
     origin: { x: 0, y: 0 },
 
-    // only allow left button by default
-    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-    mouseButtons: 1,
-
     inertia: {
       enabled          : false,
       resistance       : 10,    // the lambda in exponential decay
