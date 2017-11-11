@@ -15,6 +15,9 @@
   ],
   "main": "dist/interact.js",
   "jsdelivr": "dist/interact.min.js",
+  "jspm": {
+    "main": "index"
+  },
   "scripts": {
     "start": "node build --watch",
     "build": "node build --docs",
