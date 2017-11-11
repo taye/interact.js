@@ -1,7 +1,7 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const snap           = require('./snap');
 const defaultOptions = require('../defaultOptions');
 const resize         = require('../actions/resize');
@@ -39,8 +39,8 @@ const snapSize = {
   },
 
   set: function (arg) {
-    const { interaction, options, offset, pageCoords } = arg;
-    const page = utils.extend({}, pageCoords);
+    const { interaction, options, offset, modifiedCoords } = arg;
+    const page = utils.extend({}, modifiedCoords);
     const relativeX = page.x - offset[0].x;
     const relativeY = page.y - offset[0].y;
 

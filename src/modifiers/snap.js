@@ -1,4 +1,4 @@
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const interact       = require('../interact');
 const utils          = require('../utils');
 const defaultOptions = require('../defaultOptions');
@@ -49,7 +49,7 @@ const snap = {
     return offsets;
   },
 
-  set: function ({ interaction, pageCoords, status, options, offset: offsets }) {
+  set: function ({ interaction, modifiedCoords, status, options, offset: offsets }) {
     const targets = [];
     let target;
     let page;
@@ -61,7 +61,7 @@ const snap = {
     else {
       const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
 
-      page = utils.extend({}, pageCoords);
+      page = utils.extend({}, modifiedCoords);
 
       page.x -= origin.x;
       page.y -= origin.y;

@@ -9,7 +9,7 @@
 //   },
 // });
 
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const restrictEdges  = require('./restrictEdges');
 const utils          = require('../utils');
 const rectUtils      = require('../utils/rect');

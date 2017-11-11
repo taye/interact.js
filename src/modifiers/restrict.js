@@ -1,4 +1,4 @@
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const utils          = require('../utils');
 const defaultOptions = require('../defaultOptions');
 
@@ -28,12 +28,12 @@ const restrict = {
     return offset;
   },
 
-  set: function ({ pageCoords, interaction, status, options }) {
+  set: function ({ modifiedCoords, interaction, status, options }) {
     if (!options) { return status; }
 
     const page = status.useStatusXY
       ? { x: status.x, y: status.y }
-      : utils.extend({}, pageCoords);
+      : utils.extend({}, modifiedCoords);
 
     const restriction = getRestrictionRect(options.restriction, interaction, page);
 

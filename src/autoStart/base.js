@@ -22,6 +22,10 @@ const autoStart = {
       maxPerElement: 1,
       allowFrom:  null,
       ignoreFrom: null,
+
+      // only allow left button by default
+      // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+      mouseButtons: 1,
     },
   },
   setActionDefaults: function (action) {
@@ -39,7 +43,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 
 // set cursor style on mousemove
 Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
-  if (!interaction.mouse
+  if (interaction.pointerType !== 'mouse'
       || interaction.pointerIsDown
       || interaction.interacting()) { return; }
 
