@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-rc.1+sha.9d11f0a-dirty
+ * interact.js v1.3.0-rc.2+sha.e250a64-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
