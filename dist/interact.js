@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-rc.0+sha.e73f113-dirty
+ * interact.js v1.3.0-rc.1+sha.9d11f0a-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -3027,7 +3027,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
     var actionName = _ref;
 
     // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown && interaction.mouse && (buttons & this.options[actionName].mouseButtons) === 0) {
+    if (interaction.pointerIsDown && /mouse|pointer/.test(interaction.pointerType) && (buttons & this.options[actionName].mouseButtons) === 0) {
       continue;
     }
 
@@ -3065,7 +3065,11 @@ var autoStart = {
       max: Infinity,
       maxPerElement: 1,
       allowFrom: null,
-      ignoreFrom: null
+      ignoreFrom: null,
+
+      // only allow left button by default
+      // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+      mouseButtons: 1
     }
   },
   setActionDefaults: function setActionDefaults(action) {
@@ -3095,7 +3099,7 @@ Interaction.signals.on('move', function (_ref2) {
       event = _ref2.event,
       eventTarget = _ref2.eventTarget;
 
-  if (!interaction.mouse || interaction.pointerIsDown || interaction.interacting()) {
+  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) {
     return;
   }
 
@@ -3504,10 +3508,6 @@ module.exports = {
   perAction: {
     origin: { x: 0, y: 0 },
 
-    // only allow left button by default
-    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-    mouseButtons: 1,
-
     inertia: {
       enabled: false,
       resistance: 10, // the lambda in exponential decay
@@ -3572,7 +3572,7 @@ module.exports = require('./interact');
 
 var InteractEvent = require('./InteractEvent');
 var Interaction = require('./Interaction');
-var modifiers = require('./modifiers');
+var modifiers = require('./modifiers/base');
 var utils = require('./utils');
 var animationFrame = require('./utils/raf');
 
@@ -3859,7 +3859,7 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers":24,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":24,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
 'use strict';
 
 /** @module interact */
@@ -4394,7 +4394,6 @@ var modifiers = {
         preEnd = arg.preEnd,
         requireEndOnly = arg.requireEndOnly;
 
-    var coords = extend({}, arg.pageCoords);
     var result = {
       dx: 0,
       dy: 0,
@@ -4402,6 +4401,8 @@ var modifiers = {
       locked: false,
       shouldMove: true
     };
+
+    arg.modifiedCoords = extend({}, arg.pageCoords);
 
     for (var _iterator = modifiers.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
       var _ref;
@@ -4431,8 +4432,8 @@ var modifiers = {
       modifier.set(arg);
 
       if (arg.status.locked) {
-        coords.x += arg.status.dx;
-        coords.y += arg.status.dy;
+        arg.modifiedCoords.x += arg.status.dx;
+        arg.modifiedCoords.y += arg.status.dy;
 
         result.dx += arg.status.dx;
         result.dy += arg.status.dy;
@@ -4495,6 +4496,66 @@ var modifiers = {
 
     arg.pageCoords = extend({}, interaction.startCoords.page);
     interaction.modifierResult = modifiers.setAll(arg);
+  },
+
+  beforeMove: function beforeMove(_ref4) {
+    var interaction = _ref4.interaction,
+        preEnd = _ref4.preEnd,
+        interactingBeforeMove = _ref4.interactingBeforeMove;
+
+    var modifierResult = modifiers.setAll({
+      interaction: interaction,
+      preEnd: preEnd,
+      pageCoords: interaction.curCoords.page,
+      statuses: interaction.modifierStatuses,
+      requireEndOnly: false
+    });
+
+    // don't fire an action move if a modifier would keep the event in the same
+    // cordinates as before
+    if (!modifierResult.shouldMove && interactingBeforeMove) {
+      interaction._dontFireMove = true;
+    }
+
+    interaction.modifierResult = modifierResult;
+  },
+
+  end: function end(_ref5) {
+    var interaction = _ref5.interaction,
+        event = _ref5.event;
+
+    for (var i = 0; i < modifiers.names.length; i++) {
+      var options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
+
+      // if the endOnly option is true for any modifier
+      if (shouldDo(options, true, true)) {
+        // fire a move event at the modified coordinates
+        interaction.doMove({ event: event, preEnd: true });
+        break;
+      }
+    }
+  },
+
+  setXY: function setXY(arg) {
+    var iEvent = arg.iEvent,
+        interaction = arg.interaction;
+
+    var modifierArg = extend({}, arg);
+
+    for (var i = 0; i < modifiers.names.length; i++) {
+      var modifierName = modifiers.names[i];
+      modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+
+      if (!modifierArg.options) {
+        continue;
+      }
+
+      var modifier = modifiers[modifierName];
+
+      modifierArg.status = interaction.modifierStatuses[modifierName];
+
+      iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+    }
   }
 };
 
@@ -4507,66 +4568,10 @@ Interaction.signals.on('new', function (interaction) {
 
 Interaction.signals.on('action-start', modifiers.start);
 Interaction.signals.on('action-resume', modifiers.start);
+Interaction.signals.on('before-action-move', modifiers.beforeMove);
+Interaction.signals.on('action-end', modifiers.end);
 
-Interaction.signals.on('before-action-move', function (_ref4) {
-  var interaction = _ref4.interaction,
-      preEnd = _ref4.preEnd,
-      interactingBeforeMove = _ref4.interactingBeforeMove;
-
-  var modifierResult = modifiers.setAll({
-    interaction: interaction,
-    preEnd: preEnd,
-    pageCoords: interaction.curCoords.page,
-    statuses: interaction.modifierStatuses,
-    requireEndOnly: false
-  });
-
-  // don't fire an action move if a modifier would keep the event in the same
-  // cordinates as before
-  if (!modifierResult.shouldMove && interactingBeforeMove) {
-    interaction._dontFireMove = true;
-  }
-
-  interaction.modifierResult = modifierResult;
-});
-
-Interaction.signals.on('action-end', function (_ref5) {
-  var interaction = _ref5.interaction,
-      event = _ref5.event;
-
-  for (var i = 0; i < modifiers.names.length; i++) {
-    var options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
-
-    // if the endOnly option is true for any modifier
-    if (shouldDo(options, true, true)) {
-      // fire a move event at the modified coordinates
-      interaction.doMove({ event: event, preEnd: true });
-      break;
-    }
-  }
-});
-
-InteractEvent.signals.on('set-xy', function (arg) {
-  var iEvent = arg.iEvent,
-      interaction = arg.interaction;
-
-  var modifierArg = extend({}, arg);
-
-  for (var i = 0; i < modifiers.names.length; i++) {
-    var modifierName = modifiers.names[i];
-    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
-
-    if (!modifierArg.options) {
-      continue;
-    }
-
-    var modifier = modifiers[modifierName];
-
-    modifierArg.status = interaction.modifierStatuses[modifierName];
-
-    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
-  }
-});
+InteractEvent.signals.on('set-xy', modifiers.setXY);
 
 function shouldDo(options, preEnd, requireEndOnly) {
   return options && options.enabled && (preEnd || !options.endOnly) && (!requireEndOnly || options.endOnly);
@@ -4577,7 +4582,7 @@ module.exports = modifiers;
 },{"../InteractEvent":3,"../Interaction":5,"../utils/extend":41}],25:[function(require,module,exports){
 'use strict';
 
-var modifiers = require('./index');
+var modifiers = require('./base');
 var utils = require('../utils');
 var defaultOptions = require('../defaultOptions');
 
@@ -4611,7 +4616,7 @@ var restrict = {
   },
 
   set: function set(_ref2) {
-    var pageCoords = _ref2.pageCoords,
+    var modifiedCoords = _ref2.modifiedCoords,
         interaction = _ref2.interaction,
         status = _ref2.status,
         options = _ref2.options;
@@ -4620,7 +4625,7 @@ var restrict = {
       return status;
     }
 
-    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, pageCoords);
+    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, modifiedCoords);
 
     var restriction = getRestrictionRect(options.restriction, interaction, page);
 
@@ -4702,7 +4707,7 @@ defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 
-},{"../defaultOptions":18,"../utils":44,"./index":24}],26:[function(require,module,exports){
+},{"../defaultOptions":18,"../utils":44,"./base":24}],26:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictEdges setting which sets min and
@@ -4716,7 +4721,7 @@ module.exports = restrict;
 //   },
 // });
 
-var modifiers = require('./index');
+var modifiers = require('./base');
 var utils = require('../utils');
 var rectUtils = require('../utils/rect');
 var defaultOptions = require('../defaultOptions');
@@ -4761,7 +4766,7 @@ var restrictEdges = {
   },
 
   set: function set(_ref2) {
-    var pageCoords = _ref2.pageCoords,
+    var modifiedCoords = _ref2.modifiedCoords,
         interaction = _ref2.interaction,
         status = _ref2.status,
         offset = _ref2.offset,
@@ -4773,7 +4778,7 @@ var restrictEdges = {
       return;
     }
 
-    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, pageCoords);
+    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, modifiedCoords);
     var inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
     var outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
 
@@ -4841,7 +4846,7 @@ resize.defaults.restrictEdges = restrictEdges.defaults;
 
 module.exports = restrictEdges;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./index":24,"./restrict":25}],27:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":24,"./restrict":25}],27:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictSize setting which sets min and
@@ -4855,7 +4860,7 @@ module.exports = restrictEdges;
 //   },
 // });
 
-var modifiers = require('./index');
+var modifiers = require('./base');
 var restrictEdges = require('./restrictEdges');
 var utils = require('../utils');
 var rectUtils = require('../utils/rect');
@@ -4930,10 +4935,10 @@ resize.defaults.restrictSize = restrictSize.defaults;
 
 module.exports = restrictSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./index":24,"./restrictEdges":26}],28:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":24,"./restrictEdges":26}],28:[function(require,module,exports){
 'use strict';
 
-var modifiers = require('./index');
+var modifiers = require('./base');
 var interact = require('../interact');
 var utils = require('../utils');
 var defaultOptions = require('../defaultOptions');
@@ -5006,7 +5011,7 @@ var snap = {
 
   set: function set(_ref4) {
     var interaction = _ref4.interaction,
-        pageCoords = _ref4.pageCoords,
+        modifiedCoords = _ref4.modifiedCoords,
         status = _ref4.status,
         options = _ref4.options,
         offsets = _ref4.offset;
@@ -5021,7 +5026,7 @@ var snap = {
     } else {
       var origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
 
-      page = utils.extend({}, pageCoords);
+      page = utils.extend({}, modifiedCoords);
 
       page.x -= origin.x;
       page.y -= origin.y;
@@ -5221,13 +5226,13 @@ defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;
 
-},{"../defaultOptions":18,"../interact":21,"../utils":44,"./index":24}],29:[function(require,module,exports){
+},{"../defaultOptions":18,"../interact":21,"../utils":44,"./base":24}],29:[function(require,module,exports){
 'use strict';
 
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-var modifiers = require('./index');
+var modifiers = require('./base');
 var snap = require('./snap');
 var defaultOptions = require('../defaultOptions');
 var resize = require('../actions/resize');
@@ -5272,9 +5277,9 @@ var snapSize = {
     var interaction = arg.interaction,
         options = arg.options,
         offset = arg.offset,
-        pageCoords = arg.pageCoords;
+        modifiedCoords = arg.modifiedCoords;
 
-    var page = utils.extend({}, pageCoords);
+    var page = utils.extend({}, modifiedCoords);
     var relativeX = page.x - offset[0].x;
     var relativeY = page.y - offset[0].y;
 
@@ -5338,7 +5343,7 @@ resize.defaults.snapSize = snapSize.defaults;
 
 module.exports = snapSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils/":44,"./index":24,"./snap":28}],30:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils/":44,"./base":24,"./snap":28}],30:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
