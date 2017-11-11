@@ -1,7 +1,7 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const snap           = require('./snap');
 const defaultOptions = require('../defaultOptions');
 const resize         = require('../actions/resize');

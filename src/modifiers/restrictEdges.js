@@ -9,7 +9,7 @@
 //   },
 // });
 
-const modifiers      = require('./index');
+const modifiers      = require('./base');
 const utils          = require('../utils');
 const rectUtils      = require('../utils/rect');
 const defaultOptions = require('../defaultOptions');

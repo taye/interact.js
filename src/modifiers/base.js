@@ -116,6 +116,57 @@ const modifiers = {
     arg.pageCoords = extend({}, interaction.startCoords.page);
     interaction.modifierResult = modifiers.setAll(arg);
   },
+
+  beforeMove: function ({ interaction, preEnd, interactingBeforeMove }) {
+    const modifierResult = modifiers.setAll({
+      interaction,
+      preEnd,
+      pageCoords: interaction.curCoords.page,
+      statuses: interaction.modifierStatuses,
+      requireEndOnly: false,
+    });
+
+    // don't fire an action move if a modifier would keep the event in the same
+    // cordinates as before
+    if (!modifierResult.shouldMove && interactingBeforeMove) {
+      interaction._dontFireMove = true;
+    }
+
+    interaction.modifierResult = modifierResult;
+  },
+
+  end: function ({ interaction, event }) {
+    for (let i = 0; i < modifiers.names.length; i++) {
+      const options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
+
+      // if the endOnly option is true for any modifier
+      if (shouldDo(options, true, true)) {
+        // fire a move event at the modified coordinates
+        interaction.doMove({ event, preEnd: true });
+        break;
+      }
+    }
+  },
+
+  setXY: function (arg) {
+    const { iEvent, interaction } = arg;
+    const modifierArg = extend({}, arg);
+
+    for (let i = 0; i < modifiers.names.length; i++) {
+      const modifierName = modifiers.names[i];
+      modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+
+      if (!modifierArg.options) {
+        continue;
+      }
+
+      const modifier = modifiers[modifierName];
+
+      modifierArg.status = interaction.modifierStatuses[modifierName];
+
+      iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+    }
+  },
 };
 
 Interaction.signals.on('new', function (interaction) {
@@ -127,57 +178,10 @@ Interaction.signals.on('new', function (interaction) {
 
 Interaction.signals.on('action-start' , modifiers.start);
 Interaction.signals.on('action-resume', modifiers.start);
+Interaction.signals.on('before-action-move', modifiers.beforeMove);
+Interaction.signals.on('action-end', modifiers.end);
 
-Interaction.signals.on('before-action-move', function ({ interaction, preEnd, interactingBeforeMove }) {
-  const modifierResult = modifiers.setAll({
-    interaction,
-    preEnd,
-    pageCoords: interaction.curCoords.page,
-    statuses: interaction.modifierStatuses,
-    requireEndOnly: false,
-  });
-
-  // don't fire an action move if a modifier would keep the event in the same
-  // cordinates as before
-  if (!modifierResult.shouldMove && interactingBeforeMove) {
-    interaction._dontFireMove = true;
-  }
-
-  interaction.modifierResult = modifierResult;
-});
-
-Interaction.signals.on('action-end', function ({ interaction, event }) {
-  for (let i = 0; i < modifiers.names.length; i++) {
-    const options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
-
-    // if the endOnly option is true for any modifier
-    if (shouldDo(options, true, true)) {
-      // fire a move event at the modified coordinates
-      interaction.doMove({ event, preEnd: true });
-      break;
-    }
-  }
-});
-
-InteractEvent.signals.on('set-xy', function (arg) {
-  const { iEvent, interaction } = arg;
-  const modifierArg = extend({}, arg);
-
-  for (let i = 0; i < modifiers.names.length; i++) {
-    const modifierName = modifiers.names[i];
-    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
-
-    if (!modifierArg.options) {
-      continue;
-    }
-
-    const modifier = modifiers[modifierName];
-
-    modifierArg.status = interaction.modifierStatuses[modifierName];
-
-    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
-  }
-});
+InteractEvent.signals.on('set-xy', modifiers.setXY);
 
 function shouldDo (options, preEnd, requireEndOnly) {
   return (options && options.enabled

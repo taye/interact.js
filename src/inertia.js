@@ -1,6 +1,6 @@
 const InteractEvent  = require('./InteractEvent');
 const Interaction    = require('./Interaction');
-const modifiers      = require('./modifiers');
+const modifiers      = require('./modifiers/base');
 const utils          = require('./utils');
 const animationFrame = require('./utils/raf');
 
