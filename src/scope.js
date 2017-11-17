@@ -31,7 +31,7 @@ const scope = {
   },
 
   removeDocument: function (doc, win) {
-    const index = utils.indexOf(scope.documents, doc);
+    const index = scope.documents.indexOf(doc);
 
     win = win || scope.getWindow(doc);
 

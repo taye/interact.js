@@ -1,7 +1,7 @@
 <a href="http://interactjs.io"><img alt="interact.js" src="https://c4d6f7d727e094887e93-4ea74b676357550bd514a6a5b344c625.ssl.cf2.rackcdn.com/ijs-anim.svg" height="131px" width="100%"></a>
 
 JavaScript drag and drop, resizing and multi-touch gestures with inertia and
-snapping for modern browsers (and also IE8+).
+snapping for modern browsers (and also IE9+).
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js)
 [![Build Status](https://travis-ci.org/taye/interact.js.svg?branch=master)](https://travis-ci.org/taye/interact.js)
@@ -12,11 +12,11 @@ Features include:
  - **inertia** and **snapping**
  - **multiple interactions**
  - cross browser and device, supporting the **desktop and mobile** versions of
-   Chrome, Firefox and Opera as well as **Internet Explorer 8+**
+   Chrome, Firefox and Opera as well as **Internet Explorer 9+**
  - interaction with [**SVG**](http://interactjs.io/images/star.svg) elements
  - being **lightweight and standalone** (not _yet another_ jQuery plugin)
- - **not modifying the DOM** except to support IE8 and to change the cursor
-   (but you can disable that)
+ - **not modifying the DOM** except to change the cursor (but you can disable
+   that)
 
 Installation
 ------------

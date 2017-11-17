@@ -1,8 +1,5 @@
 /* browser entry point */
 
-// Legacy browser support
-require('./legacyBrowsers');
-
 // inertia
 require('./inertia');
 

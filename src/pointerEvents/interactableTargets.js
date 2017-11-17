@@ -1,6 +1,5 @@
 const pointerEvents = require('./base');
 const Interactable  = require('../Interactable');
-const browser       = require('../utils/browser');
 const is            = require('../utils/is');
 const domUtils      = require('../utils/domUtils');
 const scope         = require('../scope');
@@ -8,17 +7,13 @@ const extend        = require('../utils/extend');
 const { merge }     = require('../utils/arr');
 
 pointerEvents.signals.on('collect-targets', function ({ targets, element, type, eventTarget }) {
-  function collectSelectors (interactable, selector, context) {
-    const els = browser.useMatchesSelectorPolyfill
-        ? context.querySelectorAll(selector)
-        : undefined;
-
+  function collectSelectors (interactable, selector) {
     const eventable = interactable.events;
     const options = eventable.options;
 
     if (eventable[type]
         && is.element(element)
-        && domUtils.matchesSelector(element, selector, els)
+        && domUtils.matchesSelector(element, selector)
         && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({

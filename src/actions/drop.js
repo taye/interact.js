@@ -98,9 +98,7 @@ function collectDrops (interaction, element) {
       ? current._context.querySelectorAll(current.target)
       : [current.target];
 
-    for (let i = 0; i < dropElements.length; i++) {
-      const currentElement = dropElements[i];
-
+    for (const currentElement of dropElements) {
       if (currentElement !== element) {
         drops.push(current);
         elements.push(currentElement);

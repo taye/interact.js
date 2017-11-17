@@ -1,5 +1,3 @@
-const { indexOf } = require('./arr');
-
 class Signals {
   constructor () {
     this.listeners = {
@@ -19,7 +17,7 @@ class Signals {
   off (name, listener) {
     if (!this.listeners[name]) { return; }
 
-    const index = indexOf(this.listeners[name], listener);
+    const index = this.listeners[name].indexOf(listener);
 
     if (index !== -1) {
       this.listeners[name].splice(index, 1);
@@ -31,8 +29,8 @@ class Signals {
 
     if (!targetListeners) { return; }
 
-    for (let i = 0; i < targetListeners.length; i++) {
-      if (targetListeners[i](arg, name) === false) {
+    for (const listener of targetListeners) {
+      if (listener(arg, name) === false) {
         return;
       }
     }

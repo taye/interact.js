@@ -3,7 +3,6 @@ const Interactable   = require('../Interactable');
 const Interaction    = require('../Interaction');
 const actions        = require('../actions/base');
 const defaultOptions = require('../defaultOptions');
-const browser        = require('../utils/browser');
 const scope          = require('../scope');
 const utils          = require('../utils');
 const signals        = require('../utils/Signals').new();
@@ -118,12 +117,8 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
   let element = eventTarget;
   let action = null;
 
-  function pushMatches (interactable, selector, context) {
-    const elements = (browser.useMatchesSelectorPolyfill
-      ? context.querySelectorAll(selector)
-      : undefined);
-
-    if (utils.matchesSelector(element, selector, elements)) {
+  function pushMatches (interactable, selector) {
+    if (utils.matchesSelector(element, selector)) {
 
       matches.push(interactable);
       matchElements.push(element);
@@ -203,8 +198,7 @@ function withinInteractionLimit (interactable, element, action) {
   // no actions if any of these values == 0
   if (!(maxActions && maxPerElement && autoStart.maxInteractions)) { return; }
 
-  for (let i = 0, len = scope.interactions.length; i < len; i++) {
-    const interaction = scope.interactions[i];
+  for (const interaction of scope.interactions) {
     const otherAction = interaction.prepared.name;
 
     if (!interaction.interacting()) { continue; }

@@ -1,10 +1,8 @@
 const PointerEvent = require('./PointerEvent');
 const Interaction  = require('../Interaction');
 const utils        = require('../utils');
-const browser      = require('../utils/browser');
 const defaults     = require('../defaultOptions');
 const signals      = require('../utils/Signals').new();
-const { filter }   = require('../utils/arr');
 
 const simpleSignals = [ 'down', 'up', 'cancel' ];
 const simpleEvents  = [ 'down', 'up', 'cancel' ];
@@ -121,7 +119,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
   }
 
   if (type === 'hold') {
-    signalArg.targets = filter(signalArg.targets, target =>
+    signalArg.targets = signalArg.targets.filter(target =>
       target.eventable.options.holdDuration === interaction.holdTimers[pointerIndex].duration);
   }
 
@@ -152,9 +150,6 @@ Interaction.signals.on('move', function ({ interaction, pointer, event, eventTar
 });
 
 Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
-  // copy event to be used in timeout for IE8
-  const eventCopy = browser.isIE8? utils.extend({}, event) : event;
-
   const timer = interaction.holdTimers[pointerIndex];
   const path = utils.getPath(eventTarget);
   const signalArg = {
@@ -178,8 +173,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 
   let minDuration = Infinity;
 
-  for (let i = 0; i < signalArg.targets.length; i++) {
-    const target = signalArg.targets[i];
+  for (const target of signalArg.targets) {
     const holdDuration = target.eventable.options.holdDuration;
 
     if (holdDuration < minDuration) {
@@ -192,8 +186,8 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
     fire({
       interaction,
       eventTarget,
-      pointer: browser.isIE8? eventCopy : pointer,
-      event: eventCopy,
+      pointer,
+      event,
       type: 'hold',
     });
   }, minDuration);
@@ -205,13 +199,13 @@ Interaction.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
   }
 });
 
-['up', 'cancel'].forEach(function (signalName) {
+for (const signalName of ['up', 'cancel']) {
   Interaction.signals.on(signalName, function ({ interaction, pointerIndex }) {
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
     }
   });
-});
+}
 
 function createSignalListener (type) {
   return function ({ interaction, pointer, event, eventTarget }) {

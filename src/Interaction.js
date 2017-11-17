@@ -134,7 +134,7 @@ class Interaction {
 
     // if this interaction had been removed after stopping
     // add it back
-    if (utils.indexOf(scope.interactions, this) === -1) {
+    if (scope.interactions.indexOf(this) === -1) {
       scope.interactions.push(this);
     }
 
@@ -318,7 +318,7 @@ class Interaction {
       return 0;
     }
 
-    return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    return this.pointerIds.indexOf(utils.getPointerId(pointer));
   }
 
   updatePointer (pointer, event, down = event && /(down|start)$/i.test(event.type)) {
@@ -370,9 +370,7 @@ class Interaction {
   }
 }
 
-for (let i = 0, len = methodNames.length; i < len; i++) {
-  const method = methodNames[i];
-
+for (const method of methodNames) {
   listeners[method] = doOnInteractions(method);
 }
 
@@ -385,8 +383,8 @@ function doOnInteractions (method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (let i = 0; i < event.changedTouches.length; i++) {
-        const pointer = event.changedTouches[i];
+      for (const changedTouch of event.changedTouches) {
+        const pointer = changedTouch;
         const interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction({ pointerType })]);
@@ -428,9 +426,7 @@ function doOnInteractions (method) {
 }
 
 function endAll (event) {
-  for (let i = 0; i < scope.interactions.length; i++) {
-    const interaction = scope.interactions[i];
-
+  for (const interaction of scope.interactions) {
     interaction.end(event);
     signals.fire('endall', { event, interaction });
   }

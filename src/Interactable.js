@@ -11,10 +11,10 @@ const {
   getElementRect,
   nodeContains,
   trySelector,
-}                           = require('./utils/domUtils');
-const { getWindow }         = require('./utils/window');
-const { indexOf, contains } = require('./utils/arr');
-const { wheelEvent }        = require('./utils/browser');
+}                    = require('./utils/domUtils');
+const { getWindow }  = require('./utils/window');
+const { contains }   = require('./utils/arr');
+const { wheelEvent } = require('./utils/browser');
 
 // all set interactables
 scope.interactables = [];
@@ -202,8 +202,8 @@ class Interactable {
     }
 
     if (is.array(eventType)) {
-      for (let i = 0; i < eventType.length; i++) {
-        this[method](eventType[i], listener, options);
+      for (const type of eventType) {
+        this[method](type, listener, options);
       }
 
       return true;
@@ -360,7 +360,7 @@ class Interactable {
 
     signals.fire('unset', { interactable: this });
 
-    scope.interactables.splice(indexOf(scope.interactables, this), 1);
+    scope.interactables.splice(scope.interactables.indexOf(this), 1);
 
     // Stop related interactions when an Interactable is unset
     for (const interaction of scope.interactions || []) {
@@ -393,16 +393,14 @@ scope.interactables.get = function interactableGet (element, options, dontCheckI
 };
 
 scope.interactables.forEachSelector = function (callback, element) {
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
+  for (const interactable of this) {
     // skip non CSS selector targets and out of context elements
     if (!is.string(interactable.target)
         || (element && !interactable.inContext(element))) {
       continue;
     }
 
-    const ret = callback(interactable, interactable.target, interactable._context, i, this);
+    const ret = callback(interactable, interactable.target);
 
     if (ret !== undefined) {
       return ret;
