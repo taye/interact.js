@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-rc.2+sha.e250a64-dirty
+ * interact.js v1.3.0-rc.3+sha.072b984-dirty
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -26,19 +26,25 @@ if (typeof window === 'undefined') {
   module.exports = require('./src/index');
 }
 
-},{"./src/index":19,"./src/utils/window":52}],2:[function(require,module,exports){
+},{"./src/index":19,"./src/utils/window":51}],2:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _require = require('./utils/arr'),
-    indexOf = _require.indexOf;
-
 var extend = require('./utils/extend.js');
 
 function fireUntilImmediateStopped(event, listeners) {
-  for (var i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-    listeners[i](event);
+  for (var _i = 0; _i < listeners.length; _i++) {
+    var _ref;
+
+    _ref = listeners[_i];
+    var listener = _ref;
+
+    if (event.immediatePropagationStopped) {
+      break;
+    }
+
+    listener(event);
   }
 }
 
@@ -82,7 +88,7 @@ var Eventable = function () {
   Eventable.prototype.off = function off(eventType, listener) {
     // if it is an action event type
     var eventList = this[eventType];
-    var index = eventList ? indexOf(eventList, listener) : -1;
+    var index = eventList ? eventList.indexOf(listener) : -1;
 
     if (index !== -1) {
       eventList.splice(index, 1);
@@ -98,7 +104,7 @@ var Eventable = function () {
 
 module.exports = Eventable;
 
-},{"./utils/arr":36,"./utils/extend.js":41}],3:[function(require,module,exports){
+},{"./utils/extend.js":40}],3:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -276,7 +282,7 @@ InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./defaultOptions":18,"./utils/Signals":35,"./utils/extend":41,"./utils/getOriginXY":42}],4:[function(require,module,exports){
+},{"./defaultOptions":18,"./utils/Signals":34,"./utils/extend":40,"./utils/getOriginXY":41}],4:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -299,7 +305,6 @@ var _require2 = require('./utils/window'),
     getWindow = _require2.getWindow;
 
 var _require3 = require('./utils/arr'),
-    indexOf = _require3.indexOf,
     contains = _require3.contains;
 
 var _require4 = require('./utils/browser'),
@@ -428,18 +433,10 @@ var Interactable = function () {
     if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+      for (var _i = 0; _i < actions.names.length; _i++) {
         var _ref;
 
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
+        _ref = actions.names[_i];
         var action = _ref;
 
         this.options[action][optionName] = newValue;
@@ -525,8 +522,13 @@ var Interactable = function () {
     }
 
     if (is.array(eventType)) {
-      for (var i = 0; i < eventType.length; i++) {
-        this[method](eventType[i], listener, options);
+      for (var _i2 = 0; _i2 < eventType.length; _i2++) {
+        var _ref2;
+
+        _ref2 = eventType[_i2];
+        var type = _ref2;
+
+        this[method](type, listener, options);
       }
 
       return true;
@@ -639,19 +641,11 @@ var Interactable = function () {
       this[methodName](options[actionName]);
     }
 
-    for (var _iterator2 = Interactable.settingsMethods, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+    for (var _i3 = 0; _i3 < Interactable.settingsMethods.length; _i3++) {
+      var _ref3;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var setting = _ref2;
+      _ref3 = Interactable.settingsMethods[_i3];
+      var setting = _ref3;
 
       this.options[setting] = defaults.base[setting];
 
@@ -705,22 +699,14 @@ var Interactable = function () {
 
     signals.fire('unset', { interactable: this });
 
-    scope.interactables.splice(indexOf(scope.interactables, this), 1);
+    scope.interactables.splice(scope.interactables.indexOf(this), 1);
 
     // Stop related interactions when an Interactable is unset
-    for (var _iterator3 = scope.interactions || [], _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
-      var _ref3;
+    for (var _i4 = 0; _i4 < (scope.interactions || []).length; _i4++) {
+      var _ref4;
 
-      if (_isArray3) {
-        if (_i3 >= _iterator3.length) break;
-        _ref3 = _iterator3[_i3++];
-      } else {
-        _i3 = _iterator3.next();
-        if (_i3.done) break;
-        _ref3 = _i3.value;
-      }
-
-      var interaction = _ref3;
+      _ref4 = (scope.interactions || [])[_i4];
+      var interaction = _ref4;
 
       if (interaction.target === this && interaction.interacting()) {
         interaction.stop();
@@ -753,15 +739,18 @@ scope.interactables.get = function interactableGet(element, options, dontCheckIn
 };
 
 scope.interactables.forEachSelector = function (callback, element) {
-  for (var i = 0; i < this.length; i++) {
-    var interactable = this[i];
+  for (var _i5 = 0; _i5 < this.length; _i5++) {
+    var _ref5;
+
+    _ref5 = this[_i5];
+    var interactable = _ref5;
 
     // skip non CSS selector targets and out of context elements
     if (!is.string(interactable.target) || element && !interactable.inContext(element)) {
       continue;
     }
 
-    var ret = callback(interactable, interactable.target, interactable._context, i, this);
+    var ret = callback(interactable, interactable.target);
 
     if (ret !== undefined) {
       return ret;
@@ -778,7 +767,7 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":34,"./utils/Signals":35,"./utils/arr":36,"./utils/browser":37,"./utils/domUtils":39,"./utils/events":40,"./utils/extend":41,"./utils/is":46,"./utils/window":52}],5:[function(require,module,exports){
+},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":33,"./utils/Signals":34,"./utils/arr":35,"./utils/browser":36,"./utils/domUtils":38,"./utils/events":39,"./utils/extend":40,"./utils/is":45,"./utils/window":51}],5:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -920,7 +909,7 @@ var Interaction = function () {
 
     // if this interaction had been removed after stopping
     // add it back
-    if (utils.indexOf(scope.interactions, this) === -1) {
+    if (scope.interactions.indexOf(this) === -1) {
       scope.interactions.push(this);
     }
 
@@ -1109,7 +1098,7 @@ var Interaction = function () {
       return 0;
     }
 
-    return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    return this.pointerIds.indexOf(utils.getPointerId(pointer));
   };
 
   Interaction.prototype.updatePointer = function updatePointer(pointer, event) {
@@ -1167,9 +1156,8 @@ var Interaction = function () {
   return Interaction;
 }();
 
-for (var i = 0, len = methodNames.length; i < len; i++) {
-  var method = methodNames[i];
-
+for (var _i = 0; _i < methodNames.length; _i++) {
+  var method = methodNames[_i];
   listeners[method] = doOnInteractions(method);
 }
 
@@ -1186,8 +1174,13 @@ function doOnInteractions(method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (var _i = 0; _i < event.changedTouches.length; _i++) {
-        var pointer = event.changedTouches[_i];
+      for (var _i2 = 0; _i2 < event.changedTouches.length; _i2++) {
+        var _ref2;
+
+        _ref2 = event.changedTouches[_i2];
+        var changedTouch = _ref2;
+
+        var pointer = changedTouch;
         var interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction({ pointerType: pointerType })]);
@@ -1197,8 +1190,8 @@ function doOnInteractions(method) {
 
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
-        for (var _i2 = 0; _i2 < scope.interactions.length && !invalidPointer; _i2++) {
-          invalidPointer = scope.interactions[_i2].pointerType !== 'mouse' && scope.interactions[_i2].pointerIsDown;
+        for (var i = 0; i < scope.interactions.length && !invalidPointer; i++) {
+          invalidPointer = scope.interactions[i].pointerType !== 'mouse' && scope.interactions[i].pointerIsDown;
         }
 
         // try to ignore mouse events that are simulated by the browser
@@ -1219,21 +1212,10 @@ function doOnInteractions(method) {
       }
     }
 
-    for (var _iterator = matches, _isArray = Array.isArray(_iterator), _i3 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref2;
-
-      if (_isArray) {
-        if (_i3 >= _iterator.length) break;
-        _ref2 = _iterator[_i3++];
-      } else {
-        _i3 = _iterator.next();
-        if (_i3.done) break;
-        _ref2 = _i3.value;
-      }
-
-      var _ref3 = _ref2,
-          _pointer = _ref3[0],
-          _interaction2 = _ref3[1];
+    for (var _i3 = 0; _i3 < matches.length; _i3++) {
+      var _ref3 = matches[_i3];
+      var _pointer = _ref3[0];
+      var _interaction2 = _ref3[1];
 
       _interaction2._updateEventTargets(eventTarget, curEventTarget);
       _interaction2[method](_pointer, event, eventTarget, curEventTarget);
@@ -1243,7 +1225,10 @@ function doOnInteractions(method) {
 
 function endAll(event) {
   for (var _i4 = 0; _i4 < scope.interactions.length; _i4++) {
-    var interaction = scope.interactions[_i4];
+    var _ref4;
+
+    _ref4 = scope.interactions[_i4];
+    var interaction = _ref4;
 
     interaction.end(event);
     signals.fire('endall', { event: event, interaction: interaction });
@@ -1271,8 +1256,8 @@ if (domObjects.PointerEvent) {
 
 docEvents.blur = endAll;
 
-function onDocSignal(_ref4, signalName) {
-  var doc = _ref4.doc;
+function onDocSignal(_ref5, signalName) {
+  var doc = _ref5.doc;
 
   var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
 
@@ -1287,14 +1272,14 @@ function onDocSignal(_ref4, signalName) {
   }
 }
 
-signals.on('update-pointer-down', function (_ref5) {
-  var interaction = _ref5.interaction,
-      pointer = _ref5.pointer,
-      pointerId = _ref5.pointerId,
-      pointerIndex = _ref5.pointerIndex,
-      event = _ref5.event,
-      eventTarget = _ref5.eventTarget,
-      down = _ref5.down;
+signals.on('update-pointer-down', function (_ref6) {
+  var interaction = _ref6.interaction,
+      pointer = _ref6.pointer,
+      pointerId = _ref6.pointerId,
+      pointerIndex = _ref6.pointerIndex,
+      event = _ref6.event,
+      eventTarget = _ref6.eventTarget,
+      down = _ref6.down;
 
   interaction.pointerIds[pointerIndex] = pointerId;
   interaction.pointers[pointerIndex] = pointer;
@@ -1331,7 +1316,7 @@ scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":34,"./utils":44,"./utils/Signals":35,"./utils/browser":37,"./utils/domObjects":38,"./utils/events":40,"./utils/interactionFinder":45}],6:[function(require,module,exports){
+},{"./scope":33,"./utils":43,"./utils/Signals":34,"./utils/browser":36,"./utils/domObjects":37,"./utils/events":39,"./utils/interactionFinder":44}],6:[function(require,module,exports){
 'use strict';
 
 var Interaction = require('../Interaction');
@@ -1544,7 +1529,7 @@ defaultOptions.drag = drag.defaults;
 
 module.exports = drag;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"./base":6}],8:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],8:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -1645,18 +1630,10 @@ function collectDrops(interaction, element) {
   element = element || interaction.element;
 
   // collect all dropzones and their elements which qualify for a drop
-  for (var _iterator = scope.interactables, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+  for (var _i = 0; _i < scope.interactables.length; _i++) {
     var _ref6;
 
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref6 = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref6 = _i.value;
-    }
-
+    _ref6 = scope.interactables[_i];
     var current = _ref6;
 
     if (!current.options.drop.enabled) {
@@ -1674,8 +1651,11 @@ function collectDrops(interaction, element) {
     // query for new elements if necessary
     var dropElements = utils.is.string(current.target) ? current._context.querySelectorAll(current.target) : [current.target];
 
-    for (var i = 0; i < dropElements.length; i++) {
-      var currentElement = dropElements[i];
+    for (var _i2 = 0; _i2 < dropElements.length; _i2++) {
+      var _ref7;
+
+      _ref7 = dropElements[_i2];
+      var currentElement = _ref7;
 
       if (currentElement !== element) {
         drops.push(current);
@@ -1999,8 +1979,8 @@ Interactable.prototype.dropCheck = function (dragEvent, event, draggable, dragga
   return dropped;
 };
 
-Interactable.signals.on('unset', function (_ref7) {
-  var interactable = _ref7.interactable;
+Interactable.signals.on('unset', function (_ref8) {
+  var interactable = _ref8.interactable;
 
   interactable.dropzone(false);
 });
@@ -2021,8 +2001,8 @@ Interaction.signals.on('new', function (interaction) {
   };
 });
 
-Interaction.signals.on('stop', function (_ref8) {
-  var interaction = _ref8.interaction;
+Interaction.signals.on('stop', function (_ref9) {
+  var interaction = _ref9.interaction;
 
   interaction.dropTarget = interaction.dropElement = interaction.prevDropTarget = interaction.prevDropElement = null;
 });
@@ -2055,7 +2035,7 @@ defaultOptions.drop = drop.defaults;
 
 module.exports = drop;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":34,"../utils":44,"./base":6}],9:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"./base":6}],9:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -2231,7 +2211,7 @@ defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"./base":6}],10:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],10:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -2320,7 +2300,7 @@ var resize = {
     return null;
   },
 
-  cursors: browser.isIe9OrOlder ? {
+  cursors: browser.isIe9 ? {
     x: 'e-resize',
     y: 's-resize',
     xy: 'se-resize',
@@ -2686,7 +2666,7 @@ defaultOptions.resize = resize.defaults;
 
 module.exports = resize;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"../utils/browser":37,"./base":6}],11:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/browser":36,"./base":6}],11:[function(require,module,exports){
 'use strict';
 
 var raf = require('./utils/raf');
@@ -2814,7 +2794,7 @@ defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;
 
-},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":39,"./utils/is":46,"./utils/raf":50,"./utils/window":52}],12:[function(require,module,exports){
+},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":38,"./utils/is":45,"./utils/raf":49,"./utils/window":51}],12:[function(require,module,exports){
 'use strict';
 
 /** @lends Interactable */
@@ -3012,18 +2992,10 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }[event.button];
   var action = null;
 
-  for (var _iterator = actions.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+  for (var _i = 0; _i < actions.names.length; _i++) {
     var _ref;
 
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref = _i.value;
-    }
-
+    _ref = actions.names[_i];
     var actionName = _ref;
 
     // check mouseButton setting if the pointer is down
@@ -3039,7 +3011,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
-},{"../Interactable":4,"../actions/base":6,"../utils":44,"../utils/domUtils":39,"../utils/is":46}],13:[function(require,module,exports){
+},{"../Interactable":4,"../actions/base":6,"../utils":43,"../utils/domUtils":38,"../utils/is":45}],13:[function(require,module,exports){
 'use strict';
 
 var interact = require('../interact');
@@ -3047,7 +3019,6 @@ var Interactable = require('../Interactable');
 var Interaction = require('../Interaction');
 var actions = require('../actions/base');
 var defaultOptions = require('../defaultOptions');
-var browser = require('../utils/browser');
 var scope = require('../scope');
 var utils = require('../utils');
 var signals = require('../utils/Signals').new();
@@ -3165,10 +3136,8 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
   var element = eventTarget;
   var action = null;
 
-  function pushMatches(interactable, selector, context) {
-    var elements = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
-
-    if (utils.matchesSelector(element, selector, elements)) {
+  function pushMatches(interactable, selector) {
+    if (utils.matchesSelector(element, selector)) {
 
       matches.push(interactable);
       matchElements.push(element);
@@ -3249,8 +3218,12 @@ function withinInteractionLimit(interactable, element, action) {
     return;
   }
 
-  for (var i = 0, len = scope.interactions.length; i < len; i++) {
-    var interaction = scope.interactions[i];
+  for (var _i = 0; _i < scope.interactions.length; _i++) {
+    var _ref5;
+
+    _ref5 = scope.interactions[_i];
+    var interaction = _ref5;
+
     var otherAction = interaction.prepared.name;
 
     if (!interaction.interacting()) {
@@ -3318,12 +3291,11 @@ utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
 
 module.exports = autoStart;
 
-},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":34,"../utils":44,"../utils/Signals":35,"../utils/browser":37,"./InteractableMethods":12}],14:[function(require,module,exports){
+},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"../utils/Signals":34,"./InteractableMethods":12}],14:[function(require,module,exports){
 'use strict';
 
 var autoStart = require('./base');
 var scope = require('../scope');
-var browser = require('../utils/browser');
 var is = require('../utils/is');
 
 var _require = require('../utils/domUtils'),
@@ -3363,14 +3335,12 @@ autoStart.signals.on('before-start', function (_ref) {
 
       var element = eventTarget;
 
-      var getDraggable = function getDraggable(interactable, selector, context) {
-        var elements = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
-
+      var getDraggable = function getDraggable(interactable, selector) {
         if (interactable === interaction.target) {
           return;
         }
 
-        if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector, elements)) {
+        if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector)) {
 
           var _action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
 
@@ -3424,7 +3394,7 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":34,"../utils/browser":37,"../utils/domUtils":39,"../utils/is":46,"./base":13}],15:[function(require,module,exports){
+},{"../actions/drag":7,"../scope":33,"../utils/domUtils":38,"../utils/is":45,"./base":13}],15:[function(require,module,exports){
 'use strict';
 
 require('./base').setActionDefaults(require('../actions/gesture'));
@@ -3524,9 +3494,6 @@ module.exports = {
 
 /* browser entry point */
 
-// Legacy browser support
-require('./legacyBrowsers');
-
 // inertia
 require('./inertia');
 
@@ -3567,7 +3534,7 @@ require('./autoScroll');
 // export interact
 module.exports = require('./interact');
 
-},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/drag":14,"./autoStart/gesture":15,"./autoStart/hold":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./legacyBrowsers":23,"./modifiers/restrict":25,"./modifiers/restrictEdges":26,"./modifiers/restrictSize":27,"./modifiers/snap":28,"./modifiers/snapSize":29,"./pointerEvents/base":31,"./pointerEvents/holdRepeat":32,"./pointerEvents/interactableTargets":33}],20:[function(require,module,exports){
+},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/drag":14,"./autoStart/gesture":15,"./autoStart/hold":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./modifiers/restrict":24,"./modifiers/restrictEdges":25,"./modifiers/restrictSize":26,"./modifiers/snap":27,"./modifiers/snapSize":28,"./pointerEvents/base":30,"./pointerEvents/holdRepeat":31,"./pointerEvents/interactableTargets":32}],20:[function(require,module,exports){
 'use strict';
 
 var InteractEvent = require('./InteractEvent');
@@ -3859,7 +3826,7 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":24,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":23,"./utils":43,"./utils/raf":49}],21:[function(require,module,exports){
 'use strict';
 
 /** @module interact */
@@ -3940,18 +3907,10 @@ interact.on = function (type, listener, options) {
   }
 
   if (utils.is.array(type)) {
-    for (var _iterator = type, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    for (var _i = 0; _i < type.length; _i++) {
       var _ref;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
+      _ref = type[_i];
       var eventType = _ref;
 
       interact.on(eventType, listener, options);
@@ -4003,18 +3962,10 @@ interact.off = function (type, listener, options) {
   }
 
   if (utils.is.array(type)) {
-    for (var _iterator2 = type, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+    for (var _i2 = 0; _i2 < type.length; _i2++) {
       var _ref2;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
+      _ref2 = type[_i2];
       var eventType = _ref2;
 
       interact.off(eventType, listener, options);
@@ -4036,7 +3987,7 @@ interact.off = function (type, listener, options) {
   } else {
     var index = void 0;
 
-    if (type in globalEvents && (index = utils.indexOf(globalEvents[type], listener)) !== -1) {
+    if (type in globalEvents && (index = globalEvents[type].indexOf(listener)) !== -1) {
       globalEvents[type].splice(index, 1);
     }
   }
@@ -4127,7 +4078,7 @@ scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Interactable":4,"./Interaction":5,"./scope":34,"./utils":44,"./utils/browser":37,"./utils/events":40}],22:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils":43,"./utils/browser":36,"./utils/events":39}],22:[function(require,module,exports){
 'use strict';
 
 var Interactable = require('./Interactable');
@@ -4216,18 +4167,10 @@ for (var _i = 0; _i < _arr.length; _i++) {
 
 // prevent native HTML5 drag on interact.js target elements
 Interaction.docEvents.dragstart = function preventNativeDrag(event) {
-  for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i2 = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+  for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
     var _ref2;
 
-    if (_isArray) {
-      if (_i2 >= _iterator.length) break;
-      _ref2 = _iterator[_i2++];
-    } else {
-      _i2 = _iterator.next();
-      if (_i2.done) break;
-      _ref2 = _i2.value;
-    }
-
+    _ref2 = scope.interactions[_i2];
     var interaction = _ref2;
 
 
@@ -4239,103 +4182,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":34,"./utils/domUtils":39,"./utils/events":40,"./utils/is":46}],23:[function(require,module,exports){
-'use strict';
-
-var scope = require('./scope');
-var events = require('./utils/events');
-var browser = require('./utils/browser');
-var iFinder = require('./utils/interactionFinder');
-var pointerEvents = require('./pointerEvents/base');
-
-var _require = require('./utils/window'),
-    window = _require.window;
-
-var toString = Object.prototype.toString;
-
-if (!window.Array.isArray) {
-  window.Array.isArray = function (obj) {
-    return toString.call(obj) === '[object Array]';
-  };
-}
-
-if (!String.prototype.trim) {
-  String.prototype.trim = function () {
-    return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-  };
-}
-
-// http://www.quirksmode.org/dom/events/click.html
-// >Events leading to dblclick
-//
-// IE8 doesn't fire down event before dblclick.
-// This workaround tries to fire a tap and doubletap after dblclick
-function onIE8Dblclick(event) {
-  var eventTarget = event.target;
-  var interaction = iFinder.search(event, event.type, eventTarget);
-
-  if (!interaction) {
-    return;
-  }
-
-  if (interaction.prevTap && event.clientX === interaction.prevTap.clientX && event.clientY === interaction.prevTap.clientY && eventTarget === interaction.prevTap.target) {
-
-    interaction.downTargets[0] = eventTarget;
-    interaction.downTimes[0] = new Date().getTime();
-
-    pointerEvents.fire({
-      interaction: interaction,
-      event: event,
-      eventTarget: eventTarget,
-      pointer: event,
-      type: 'tap'
-    });
-  }
-}
-
-if (browser.isIE8) {
-  var selectFix = function selectFix(event) {
-    for (var _iterator = scope.interactions, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
-
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var interaction = _ref;
-
-      if (interaction.interacting()) {
-        interaction.target.checkAndPreventDefault(event);
-      }
-    }
-  };
-
-  var onDocIE8 = function onDocIE8(_ref2, signalName) {
-    var doc = _ref2.doc,
-        win = _ref2.win;
-
-    var eventMethod = signalName.indexOf('listen') === 0 ? events.add : events.remove;
-
-    // For IE's lack of Event#preventDefault
-    eventMethod(doc, 'selectstart', selectFix);
-
-    if (pointerEvents) {
-      eventMethod(doc, 'dblclick', onIE8Dblclick);
-    }
-  };
-
-  scope.signals.on('add-document', onDocIE8);
-  scope.signals.on('remove-document', onDocIE8);
-}
-
-module.exports = null;
-
-},{"./pointerEvents/base":31,"./scope":34,"./utils/browser":37,"./utils/events":40,"./utils/interactionFinder":45,"./utils/window":52}],24:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45}],23:[function(require,module,exports){
 'use strict';
 
 var InteractEvent = require('../InteractEvent');
@@ -4375,8 +4222,11 @@ var modifiers = {
     arg.interactable = target;
     arg.element = element;
 
-    for (var i = 0; i < modifiers.names.length; i++) {
-      var modifierName = modifiers.names[i];
+    for (var _i = 0; _i < modifiers.names.length; _i++) {
+      var _ref;
+
+      _ref = modifiers.names[_i];
+      var modifierName = _ref;
 
       arg.options = target.options[interaction.prepared.name][modifierName];
 
@@ -4404,19 +4254,11 @@ var modifiers = {
 
     arg.modifiedCoords = extend({}, arg.pageCoords);
 
-    for (var _iterator = modifiers.names, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-      var _ref;
+    for (var _i2 = 0; _i2 < modifiers.names.length; _i2++) {
+      var _ref2;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
-      var modifierName = _ref;
+      _ref2 = modifiers.names[_i2];
+      var modifierName = _ref2;
 
       var modifier = modifiers[modifierName];
       var options = interaction.target.options[interaction.prepared.name][modifierName];
@@ -4452,19 +4294,11 @@ var modifiers = {
   },
 
   resetStatuses: function resetStatuses(statuses) {
-    for (var _iterator2 = modifiers.names, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref2;
+    for (var _i3 = 0; _i3 < modifiers.names.length; _i3++) {
+      var _ref3;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref2 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref2 = _i2.value;
-      }
-
-      var modifierName = _ref2;
+      _ref3 = modifiers.names[_i3];
+      var modifierName = _ref3;
 
       var status = statuses[modifierName] || {};
 
@@ -4479,8 +4313,8 @@ var modifiers = {
     return statuses;
   },
 
-  start: function start(_ref3, signalName) {
-    var interaction = _ref3.interaction;
+  start: function start(_ref4, signalName) {
+    var interaction = _ref4.interaction;
 
     var arg = {
       interaction: interaction,
@@ -4498,10 +4332,10 @@ var modifiers = {
     interaction.modifierResult = modifiers.setAll(arg);
   },
 
-  beforeMove: function beforeMove(_ref4) {
-    var interaction = _ref4.interaction,
-        preEnd = _ref4.preEnd,
-        interactingBeforeMove = _ref4.interactingBeforeMove;
+  beforeMove: function beforeMove(_ref5) {
+    var interaction = _ref5.interaction,
+        preEnd = _ref5.preEnd,
+        interactingBeforeMove = _ref5.interactingBeforeMove;
 
     var modifierResult = modifiers.setAll({
       interaction: interaction,
@@ -4520,12 +4354,17 @@ var modifiers = {
     interaction.modifierResult = modifierResult;
   },
 
-  end: function end(_ref5) {
-    var interaction = _ref5.interaction,
-        event = _ref5.event;
+  end: function end(_ref6) {
+    var interaction = _ref6.interaction,
+        event = _ref6.event;
 
-    for (var i = 0; i < modifiers.names.length; i++) {
-      var options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
+    for (var _i4 = 0; _i4 < modifiers.names.length; _i4++) {
+      var _ref7;
+
+      _ref7 = modifiers.names[_i4];
+      var modifierName = _ref7;
+
+      var options = interaction.target.options[interaction.prepared.name][modifierName];
 
       // if the endOnly option is true for any modifier
       if (shouldDo(options, true, true)) {
@@ -4579,7 +4418,7 @@ function shouldDo(options, preEnd, requireEndOnly) {
 
 module.exports = modifiers;
 
-},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":41}],25:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":40}],24:[function(require,module,exports){
 'use strict';
 
 var modifiers = require('./base');
@@ -4707,7 +4546,7 @@ defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 
-},{"../defaultOptions":18,"../utils":44,"./base":24}],26:[function(require,module,exports){
+},{"../defaultOptions":18,"../utils":43,"./base":23}],25:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictEdges setting which sets min and
@@ -4846,7 +4685,7 @@ resize.defaults.restrictEdges = restrictEdges.defaults;
 
 module.exports = restrictEdges;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":24,"./restrict":25}],27:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrict":24}],26:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictSize setting which sets min and
@@ -4935,7 +4774,7 @@ resize.defaults.restrictSize = restrictSize.defaults;
 
 module.exports = restrictSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":24,"./restrictEdges":26}],28:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrictEdges":25}],27:[function(require,module,exports){
 'use strict';
 
 var modifiers = require('./base');
@@ -4981,21 +4820,13 @@ var snap = {
     }
 
     if (rect && options.relativePoints && options.relativePoints.length) {
-      for (var _iterator = options.relativePoints, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref2;
+      for (var _i = 0; _i < options.relativePoints.length; _i++) {
+        var _ref3;
 
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref2 = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref2 = _i.value;
-        }
-
-        var _ref3 = _ref2,
-            relativeX = _ref3.x,
-            relativeY = _ref3.y;
+        _ref3 = options.relativePoints[_i];
+        var _ref2 = _ref3;
+        var relativeX = _ref2.x;
+        var relativeY = _ref2.y;
 
         offsets.push({
           x: startOffset.left - rect.width * relativeX + snapOffset.x,
@@ -5037,37 +4868,21 @@ var snap = {
 
     var len = options.targets ? options.targets.length : 0;
 
-    for (var _iterator2 = offsets, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
-      var _ref5;
+    for (var _i2 = 0; _i2 < offsets.length; _i2++) {
+      var _ref6;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref5 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref5 = _i2.value;
-      }
-
-      var _ref6 = _ref5,
-          offsetX = _ref6.x,
-          offsetY = _ref6.y;
+      _ref6 = offsets[_i2];
+      var _ref5 = _ref6;
+      var offsetX = _ref5.x;
+      var offsetY = _ref5.y;
 
       var relativeX = page.x - offsetX;
       var relativeY = page.y - offsetY;
 
-      for (var _iterator3 = options.targets, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+      for (var _i3 = 0; _i3 < options.targets.length; _i3++) {
         var _ref7;
 
-        if (_isArray3) {
-          if (_i3 >= _iterator3.length) break;
-          _ref7 = _iterator3[_i3++];
-        } else {
-          _i3 = _iterator3.next();
-          if (_i3.done) break;
-          _ref7 = _i3.value;
-        }
-
+        _ref7 = options.targets[_i3];
         var snapTarget = _ref7;
 
         if (utils.is.function(snapTarget)) {
@@ -5226,7 +5041,7 @@ defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;
 
-},{"../defaultOptions":18,"../interact":21,"../utils":44,"./base":24}],29:[function(require,module,exports){
+},{"../defaultOptions":18,"../interact":21,"../utils":43,"./base":23}],28:[function(require,module,exports){
 'use strict';
 
 // This module allows snapping of the size of targets during resize
@@ -5286,18 +5101,10 @@ var snapSize = {
     arg.options = utils.extend({}, options);
     arg.options.targets = [];
 
-    for (var _iterator = options.targets, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    for (var _i = 0; _i < options.targets.length; _i++) {
       var _ref;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
+      _ref = options.targets[_i];
       var snapTarget = _ref;
 
       var target = void 0;
@@ -5343,7 +5150,7 @@ resize.defaults.snapSize = snapSize.defaults;
 
 module.exports = snapSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils/":44,"./base":24,"./snap":28}],30:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils/":43,"./base":23,"./snap":27}],29:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5431,18 +5238,14 @@ module.exports = function () {
   return PointerEvent;
 }();
 
-},{"../utils/pointerUtils":49}],31:[function(require,module,exports){
+},{"../utils/pointerUtils":48}],30:[function(require,module,exports){
 'use strict';
 
 var PointerEvent = require('./PointerEvent');
 var Interaction = require('../Interaction');
 var utils = require('../utils');
-var browser = require('../utils/browser');
 var defaults = require('../defaultOptions');
 var signals = require('../utils/Signals').new();
-
-var _require = require('../utils/arr'),
-    filter = _require.filter;
 
 var simpleSignals = ['down', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'cancel'];
@@ -5551,18 +5354,10 @@ function collectEventTargets(_ref) {
     element: null
   };
 
-  for (var _iterator = path, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+  for (var _i = 0; _i < path.length; _i++) {
     var _ref2;
 
-    if (_isArray) {
-      if (_i >= _iterator.length) break;
-      _ref2 = _iterator[_i++];
-    } else {
-      _i = _iterator.next();
-      if (_i.done) break;
-      _ref2 = _i.value;
-    }
-
+    _ref2 = path[_i];
     var element = _ref2;
 
     signalArg.element = element;
@@ -5571,7 +5366,7 @@ function collectEventTargets(_ref) {
   }
 
   if (type === 'hold') {
-    signalArg.targets = filter(signalArg.targets, function (target) {
+    signalArg.targets = signalArg.targets.filter(function (target) {
       return target.eventable.options.holdDuration === interaction.holdTimers[pointerIndex].duration;
     });
   }
@@ -5621,9 +5416,6 @@ Interaction.signals.on('down', function (_ref6) {
       eventTarget = _ref6.eventTarget,
       pointerIndex = _ref6.pointerIndex;
 
-  // copy event to be used in timeout for IE8
-  var eventCopy = browser.isIE8 ? utils.extend({}, event) : event;
-
   var timer = interaction.holdTimers[pointerIndex];
   var path = utils.getPath(eventTarget);
   var signalArg = {
@@ -5637,18 +5429,10 @@ Interaction.signals.on('down', function (_ref6) {
     element: null
   };
 
-  for (var _iterator2 = path, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+  for (var _i2 = 0; _i2 < path.length; _i2++) {
     var _ref7;
 
-    if (_isArray2) {
-      if (_i2 >= _iterator2.length) break;
-      _ref7 = _iterator2[_i2++];
-    } else {
-      _i2 = _iterator2.next();
-      if (_i2.done) break;
-      _ref7 = _i2.value;
-    }
-
+    _ref7 = path[_i2];
     var element = _ref7;
 
     signalArg.element = element;
@@ -5662,8 +5446,12 @@ Interaction.signals.on('down', function (_ref6) {
 
   var minDuration = Infinity;
 
-  for (var i = 0; i < signalArg.targets.length; i++) {
-    var target = signalArg.targets[i];
+  for (var _i3 = 0; _i3 < signalArg.targets.length; _i3++) {
+    var _ref8;
+
+    _ref8 = signalArg.targets[_i3];
+    var target = _ref8;
+
     var holdDuration = target.eventable.options.holdDuration;
 
     if (holdDuration < minDuration) {
@@ -5676,34 +5464,36 @@ Interaction.signals.on('down', function (_ref6) {
     fire({
       interaction: interaction,
       eventTarget: eventTarget,
-      pointer: browser.isIE8 ? eventCopy : pointer,
-      event: eventCopy,
+      pointer: pointer,
+      event: event,
       type: 'hold'
     });
   }, minDuration);
 });
 
-Interaction.signals.on('up', function (_ref8) {
-  var interaction = _ref8.interaction,
-      pointer = _ref8.pointer,
-      event = _ref8.event,
-      eventTarget = _ref8.eventTarget;
+Interaction.signals.on('up', function (_ref9) {
+  var interaction = _ref9.interaction,
+      pointer = _ref9.pointer,
+      event = _ref9.event,
+      eventTarget = _ref9.eventTarget;
 
   if (!interaction.pointerWasMoved) {
     fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: 'tap' });
   }
 });
 
-['up', 'cancel'].forEach(function (signalName) {
-  Interaction.signals.on(signalName, function (_ref9) {
-    var interaction = _ref9.interaction,
-        pointerIndex = _ref9.pointerIndex;
+var _arr = ['up', 'cancel'];
+for (var _i4 = 0; _i4 < _arr.length; _i4++) {
+  var signalName = _arr[_i4];
+  Interaction.signals.on(signalName, function (_ref11) {
+    var interaction = _ref11.interaction,
+        pointerIndex = _ref11.pointerIndex;
 
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
     }
   });
-});
+}
 
 function createSignalListener(type) {
   return function (_ref10) {
@@ -5729,7 +5519,7 @@ Interaction.signals.on('new', function (interaction) {
 defaults.pointerEvents = pointerEvents.defaults;
 module.exports = pointerEvents;
 
-},{"../Interaction":5,"../defaultOptions":18,"../utils":44,"../utils/Signals":35,"../utils/arr":36,"../utils/browser":37,"./PointerEvent":30}],32:[function(require,module,exports){
+},{"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/Signals":34,"./PointerEvent":29}],31:[function(require,module,exports){
 'use strict';
 
 var pointerEvents = require('./base');
@@ -5805,12 +5595,11 @@ module.exports = {
   endHoldRepeat: endHoldRepeat
 };
 
-},{"../Interaction":5,"./base":31}],33:[function(require,module,exports){
+},{"../Interaction":5,"./base":30}],32:[function(require,module,exports){
 'use strict';
 
 var pointerEvents = require('./base');
 var Interactable = require('../Interactable');
-var browser = require('../utils/browser');
 var is = require('../utils/is');
 var domUtils = require('../utils/domUtils');
 var scope = require('../scope');
@@ -5825,13 +5614,11 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
       type = _ref.type,
       eventTarget = _ref.eventTarget;
 
-  function collectSelectors(interactable, selector, context) {
-    var els = browser.useMatchesSelectorPolyfill ? context.querySelectorAll(selector) : undefined;
-
+  function collectSelectors(interactable, selector) {
     var eventable = interactable.events;
     var options = eventable.options;
 
-    if (eventable[type] && is.element(element) && domUtils.matchesSelector(element, selector, els) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+    if (eventable[type] && is.element(element) && domUtils.matchesSelector(element, selector) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({
         element: element,
@@ -5897,7 +5684,7 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":34,"../utils/arr":36,"../utils/browser":37,"../utils/domUtils":39,"../utils/extend":41,"../utils/is":46,"./base":31}],34:[function(require,module,exports){
+},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/domUtils":38,"../utils/extend":40,"../utils/is":45,"./base":30}],33:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -5935,7 +5722,7 @@ var scope = {
   },
 
   removeDocument: function removeDocument(doc, win) {
-    var index = utils.indexOf(scope.documents, doc);
+    var index = scope.documents.indexOf(doc);
 
     win = win || scope.getWindow(doc);
 
@@ -5954,13 +5741,10 @@ var scope = {
 
 module.exports = scope;
 
-},{"./utils":44,"./utils/Signals":35,"./utils/domObjects":38,"./utils/events":40}],35:[function(require,module,exports){
-'use strict';
+},{"./utils":43,"./utils/Signals":34,"./utils/domObjects":37,"./utils/events":39}],34:[function(require,module,exports){
+"use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var _require = require('./arr'),
-    indexOf = _require.indexOf;
 
 var Signals = function () {
   function Signals() {
@@ -5985,7 +5769,7 @@ var Signals = function () {
       return;
     }
 
-    var index = indexOf(this.listeners[name], listener);
+    var index = this.listeners[name].indexOf(listener);
 
     if (index !== -1) {
       this.listeners[name].splice(index, 1);
@@ -5999,8 +5783,13 @@ var Signals = function () {
       return;
     }
 
-    for (var i = 0; i < targetListeners.length; i++) {
-      if (targetListeners[i](arg, name) === false) {
+    for (var _i = 0; _i < targetListeners.length; _i++) {
+      var _ref;
+
+      _ref = targetListeners[_i];
+      var listener = _ref;
+
+      if (listener(arg, name) === false) {
         return;
       }
     }
@@ -6015,51 +5804,32 @@ Signals.new = function () {
 
 module.exports = Signals;
 
-},{"./arr":36}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
-function indexOf(array, target) {
-  for (var i = 0, len = array.length; i < len; i++) {
-    if (array[i] === target) {
-      return i;
-    }
-  }
-
-  return -1;
-}
-
 function contains(array, target) {
-  return indexOf(array, target) !== -1;
+  return array.indexOf(target) !== -1;
 }
 
 function merge(target, source) {
-  for (var i = 0; i < source.length; i++) {
-    target.push(source[i]);
+  for (var _i = 0; _i < source.length; _i++) {
+    var _ref;
+
+    _ref = source[_i];
+    var item = _ref;
+
+    target.push(item);
   }
 
   return target;
 }
 
-function filter(array, test) {
-  var result = [];
-
-  for (var i = 0; i < array.length; i++) {
-    if (test(array[i])) {
-      result.push(array[i]);
-    }
-  }
-
-  return result;
-}
-
 module.exports = {
-  indexOf: indexOf,
   contains: contains,
-  merge: merge,
-  filter: filter
+  merge: merge
 };
 
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 var _require = require('./window'),
@@ -6078,17 +5848,13 @@ var browser = {
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
 
-  isIE8: 'attachEvent' in window && !('addEventListener' in window),
-
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion),
 
-  isIe9OrOlder: /MSIE (8|9)/.test(navigator.userAgent),
+  isIe9: /MSIE 9/.test(navigator.userAgent),
 
   // prefix matchesSelector
   prefixedMatchesSelector: 'matches' in Element.prototype ? 'matches' : 'webkitMatchesSelector' in Element.prototype ? 'webkitMatchesSelector' : 'mozMatchesSelector' in Element.prototype ? 'mozMatchesSelector' : 'oMatchesSelector' in Element.prototype ? 'oMatchesSelector' : 'msMatchesSelector',
-
-  useMatchesSelectorPolyfill: false,
 
   pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === window.MSPointerEvent ? {
     up: 'MSPointerUp',
@@ -6111,14 +5877,12 @@ var browser = {
 
 };
 
-browser.useMatchesSelectorPolyfill = !is.function(Element.prototype[browser.prefixedMatchesSelector]);
-
 // Opera Mobile must be handled differently
 browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto');
 
 module.exports = browser;
 
-},{"./domObjects":38,"./is":46,"./window":52}],38:[function(require,module,exports){
+},{"./domObjects":37,"./is":45,"./window":51}],37:[function(require,module,exports){
 'use strict';
 
 var domObjects = {};
@@ -6140,7 +5904,7 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
 module.exports = domObjects;
 
-},{"./window":52}],39:[function(require,module,exports){
+},{"./window":51}],38:[function(require,module,exports){
 'use strict';
 
 var win = require('./window');
@@ -6188,24 +5952,7 @@ var domUtils = {
     return parent;
   },
 
-  // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-  matchesSelectorPolyfill: browser.useMatchesSelectorPolyfill ? function (element, selector, elems) {
-    elems = elems || element.parentNode.querySelectorAll(selector);
-
-    for (var i = 0, len = elems.length; i < len; i++) {
-      if (elems[i] === element) {
-        return true;
-      }
-    }
-
-    return false;
-  } : null,
-
-  matchesSelector: function matchesSelector(element, selector, nodeList) {
-    if (browser.useMatchesSelectorPolyfill) {
-      return domUtils.matchesSelectorPolyfill(element, selector, nodeList);
-    }
-
+  matchesSelector: function matchesSelector(element, selector) {
     // remove /deep/ from selectors if shadowDOM polyfill is used
     if (win.window !== win.realWindow) {
       selector = selector.replace(/\/deep\//g, ' ');
@@ -6389,7 +6136,7 @@ var domUtils = {
 
 module.exports = domUtils;
 
-},{"./browser":37,"./domObjects":38,"./is":46,"./window":52}],40:[function(require,module,exports){
+},{"./browser":36,"./domObjects":37,"./is":45,"./window":51}],39:[function(require,module,exports){
 'use strict';
 
 var is = require('./is');
@@ -6398,21 +6145,13 @@ var pointerUtils = require('./pointerUtils');
 var pExtend = require('./pointerExtend');
 
 var _require = require('./window'),
-    window = _require.window,
-    getWindow = _require.getWindow;
+    window = _require.window;
 
 var _require2 = require('./arr'),
-    indexOf = _require2.indexOf,
     contains = _require2.contains;
-
-var useAttachEvent = 'attachEvent' in window && !('addEventListener' in window);
-var addEvent = useAttachEvent ? 'attachEvent' : 'addEventListener';
-var removeEvent = useAttachEvent ? 'detachEvent' : 'removeEventListener';
-var on = useAttachEvent ? 'on' : '';
 
 var elements = [];
 var targets = [];
-var attachedListeners = [];
 
 // {
 //   type: {
@@ -6422,10 +6161,9 @@ var attachedListeners = [];
 //   }
 //  }
 var delegatedEvents = {};
-
 var documents = [];
 
-var supportsOptions = !useAttachEvent && function () {
+var supportsOptions = function () {
   var supported = false;
 
   window.document.createElement('div').addEventListener('test', null, {
@@ -6439,7 +6177,7 @@ var supportsOptions = !useAttachEvent && function () {
 
 function add(element, type, listener, optionalArg) {
   var options = getOptions(optionalArg);
-  var elementIndex = indexOf(elements, element);
+  var elementIndex = elements.indexOf(element);
   var target = targets[elementIndex];
 
   if (!target) {
@@ -6450,12 +6188,6 @@ function add(element, type, listener, optionalArg) {
 
     elementIndex = elements.push(element) - 1;
     targets.push(target);
-
-    attachedListeners.push(useAttachEvent ? {
-      supplied: [],
-      wrapped: [],
-      useCount: []
-    } : null);
   }
 
   if (!target.events[type]) {
@@ -6464,69 +6196,18 @@ function add(element, type, listener, optionalArg) {
   }
 
   if (!contains(target.events[type], listener)) {
-    var ret = void 0;
-
-    if (useAttachEvent) {
-      var _attachedListeners$el = attachedListeners[elementIndex],
-          supplied = _attachedListeners$el.supplied,
-          wrapped = _attachedListeners$el.wrapped,
-          useCount = _attachedListeners$el.useCount;
-
-      var listenerIndex = indexOf(supplied, listener);
-
-      var wrappedListener = wrapped[listenerIndex] || function (event) {
-        if (!event.immediatePropagationStopped) {
-          event.target = event.srcElement;
-          event.currentTarget = element;
-
-          event.preventDefault = event.preventDefault || preventDef;
-          event.stopPropagation = event.stopPropagation || stopProp;
-          event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
-
-          if (/mouse|click/.test(event.type)) {
-            event.pageX = event.clientX + getWindow(element).document.documentElement.scrollLeft;
-            event.pageY = event.clientY + getWindow(element).document.documentElement.scrollTop;
-          }
-
-          listener(event);
-        }
-      };
-
-      ret = element[addEvent](on + type, wrappedListener, !!options.capture);
-
-      if (listenerIndex === -1) {
-        supplied.push(listener);
-        wrapped.push(wrappedListener);
-        useCount.push(1);
-      } else {
-        useCount[listenerIndex]++;
-      }
-    } else {
-      ret = element[addEvent](type, listener, supportsOptions ? options : !!options.capture);
-    }
+    element.addEventListener(type, listener, supportsOptions ? options : !!options.capture);
     target.events[type].push(listener);
-
-    return ret;
   }
 }
 
 function remove(element, type, listener, optionalArg) {
   var options = getOptions(optionalArg);
-  var elementIndex = indexOf(elements, element);
+  var elementIndex = elements.indexOf(element);
   var target = targets[elementIndex];
 
   if (!target || !target.events) {
     return;
-  }
-
-  var wrappedListener = listener;
-  var listeners = void 0;
-  var listenerIndex = void 0;
-
-  if (useAttachEvent) {
-    listeners = attachedListeners[elementIndex];
-    listenerIndex = indexOf(listeners.supplied, listener);
-    wrappedListener = listeners.wrapped[listenerIndex];
   }
 
   if (type === 'all') {
@@ -6549,17 +6230,8 @@ function remove(element, type, listener, optionalArg) {
     } else {
       for (var _i = 0; _i < len; _i++) {
         if (target.events[type][_i] === listener) {
-          element[removeEvent](on + type, wrappedListener, supportsOptions ? options : !!options.capture);
+          element.removeEventListener('on' + type, listener, supportsOptions ? options : !!options.capture);
           target.events[type].splice(_i, 1);
-
-          if (useAttachEvent && listeners) {
-            listeners.useCount[listenerIndex]--;
-            if (listeners.useCount[listenerIndex] === 0) {
-              listeners.supplied.splice(listenerIndex, 1);
-              listeners.wrapped.splice(listenerIndex, 1);
-              listeners.useCount.splice(listenerIndex, 1);
-            }
-          }
 
           break;
         }
@@ -6575,7 +6247,6 @@ function remove(element, type, listener, optionalArg) {
   if (!target.typeCount) {
     targets.splice(elementIndex, 1);
     elements.splice(elementIndex, 1);
-    attachedListeners.splice(elementIndex, 1);
   }
 }
 
@@ -6589,9 +6260,10 @@ function addDelegate(selector, context, type, listener, optionalArg) {
     };
 
     // add delegate listener functions
-    for (var i = 0; i < documents.length; i++) {
-      add(documents[i], type, delegateListener);
-      add(documents[i], type, delegateUseCapture, true);
+    for (var _i2 = 0; _i2 < documents.length; _i2++) {
+      var doc = documents[_i2];
+      add(doc, type, delegateListener);
+      add(doc, type, delegateUseCapture, true);
     }
   }
 
@@ -6728,21 +6400,8 @@ function delegateUseCapture(event) {
   return delegateListener.call(this, event, true);
 }
 
-function preventDef() {
-  this.returnValue = false;
-}
-
 function preventOriginalDefault() {
   this.originalEvent.preventDefault();
-}
-
-function stopProp() {
-  this.cancelBubble = true;
-}
-
-function stopImmProp() {
-  this.cancelBubble = true;
-  this.immediatePropagationStopped = true;
 }
 
 function getOptions(param) {
@@ -6761,15 +6420,13 @@ module.exports = {
   delegatedEvents: delegatedEvents,
   documents: documents,
 
-  useAttachEvent: useAttachEvent,
   supportsOptions: supportsOptions,
 
   _elements: elements,
-  _targets: targets,
-  _attachedListeners: attachedListeners
+  _targets: targets
 };
 
-},{"./arr":36,"./domUtils":39,"./is":46,"./pointerExtend":48,"./pointerUtils":49,"./window":52}],41:[function(require,module,exports){
+},{"./arr":35,"./domUtils":38,"./is":45,"./pointerExtend":47,"./pointerUtils":48,"./window":51}],40:[function(require,module,exports){
 "use strict";
 
 module.exports = function extend(dest, source) {
@@ -6779,7 +6436,7 @@ module.exports = function extend(dest, source) {
   return dest;
 };
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict';
 
 var _require = require('./rect'),
@@ -6796,14 +6453,14 @@ module.exports = function (target, element, action) {
   return rectToXY(originRect) || { x: 0, y: 0 };
 };
 
-},{"./rect":51}],43:[function(require,module,exports){
+},{"./rect":50}],42:[function(require,module,exports){
 "use strict";
 
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 var extend = require('./extend');
@@ -6863,7 +6520,7 @@ extend(utils, require('./rect'));
 
 module.exports = utils;
 
-},{"./arr":36,"./domUtils":39,"./extend":41,"./getOriginXY":42,"./hypot":43,"./is":46,"./pointerUtils":49,"./rect":51,"./window":52}],45:[function(require,module,exports){
+},{"./arr":35,"./domUtils":38,"./extend":40,"./getOriginXY":41,"./hypot":42,"./is":45,"./pointerUtils":48,"./rect":50,"./window":51}],44:[function(require,module,exports){
 'use strict';
 
 var scope = require('../scope');
@@ -6877,18 +6534,10 @@ var finder = {
     var pointerId = utils.getPointerId(pointer);
     var details = { pointer: pointer, pointerId: pointerId, pointerType: pointerType, eventType: eventType, eventTarget: eventTarget };
 
-    for (var _iterator = finder.methodOrder, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    for (var _i = 0; _i < finder.methodOrder.length; _i++) {
       var _ref;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
+      _ref = finder.methodOrder[_i];
       var method = _ref;
 
       var interaction = finder[method](details);
@@ -6909,18 +6558,10 @@ var finder = {
       return null;
     }
 
-    for (var _iterator2 = scope.interactions, _isArray2 = Array.isArray(_iterator2), _i2 = 0, _iterator2 = _isArray2 ? _iterator2 : _iterator2[Symbol.iterator]();;) {
+    for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
       var _ref3;
 
-      if (_isArray2) {
-        if (_i2 >= _iterator2.length) break;
-        _ref3 = _iterator2[_i2++];
-      } else {
-        _i2 = _iterator2.next();
-        if (_i2.done) break;
-        _ref3 = _i2.value;
-      }
-
+      _ref3 = scope.interactions[_i2];
       var interaction = _ref3;
 
       var element = eventTarget;
@@ -6951,18 +6592,10 @@ var finder = {
 
     var firstNonActive = void 0;
 
-    for (var _iterator3 = scope.interactions, _isArray3 = Array.isArray(_iterator3), _i3 = 0, _iterator3 = _isArray3 ? _iterator3 : _iterator3[Symbol.iterator]();;) {
+    for (var _i3 = 0; _i3 < scope.interactions.length; _i3++) {
       var _ref5;
 
-      if (_isArray3) {
-        if (_i3 >= _iterator3.length) break;
-        _ref5 = _iterator3[_i3++];
-      } else {
-        _i3 = _iterator3.next();
-        if (_i3.done) break;
-        _ref5 = _i3.value;
-      }
-
+      _ref5 = scope.interactions[_i3];
       var interaction = _ref5;
 
       if (interaction.pointerType === pointerType) {
@@ -6991,18 +6624,10 @@ var finder = {
     // find any mouse or pen interaction.
     // ignore the interaction if the eventType is a *down, and a simulation
     // is active
-    for (var _iterator4 = scope.interactions, _isArray4 = Array.isArray(_iterator4), _i4 = 0, _iterator4 = _isArray4 ? _iterator4 : _iterator4[Symbol.iterator]();;) {
+    for (var _i4 = 0; _i4 < scope.interactions.length; _i4++) {
       var _ref6;
 
-      if (_isArray4) {
-        if (_i4 >= _iterator4.length) break;
-        _ref6 = _iterator4[_i4++];
-      } else {
-        _i4 = _iterator4.next();
-        if (_i4.done) break;
-        _ref6 = _i4.value;
-      }
-
+      _ref6 = scope.interactions[_i4];
       var _interaction = _ref6;
 
       if (_interaction.pointerType === pointerType && !(/down/i.test(eventType) && _interaction.simulation)) {
@@ -7017,18 +6642,10 @@ var finder = {
   hasPointer: function hasPointer(_ref7) {
     var pointerId = _ref7.pointerId;
 
-    for (var _iterator5 = scope.interactions, _isArray5 = Array.isArray(_iterator5), _i5 = 0, _iterator5 = _isArray5 ? _iterator5 : _iterator5[Symbol.iterator]();;) {
+    for (var _i5 = 0; _i5 < scope.interactions.length; _i5++) {
       var _ref8;
 
-      if (_isArray5) {
-        if (_i5 >= _iterator5.length) break;
-        _ref8 = _iterator5[_i5++];
-      } else {
-        _i5 = _iterator5.next();
-        if (_i5.done) break;
-        _ref8 = _i5.value;
-      }
-
+      _ref8 = scope.interactions[_i5];
       var interaction = _ref8;
 
       if (utils.contains(interaction.pointerIds, pointerId)) {
@@ -7041,18 +6658,10 @@ var finder = {
   idle: function idle(_ref9) {
     var pointerType = _ref9.pointerType;
 
-    for (var _iterator6 = scope.interactions, _isArray6 = Array.isArray(_iterator6), _i6 = 0, _iterator6 = _isArray6 ? _iterator6 : _iterator6[Symbol.iterator]();;) {
+    for (var _i6 = 0; _i6 < scope.interactions.length; _i6++) {
       var _ref10;
 
-      if (_isArray6) {
-        if (_i6 >= _iterator6.length) break;
-        _ref10 = _iterator6[_i6++];
-      } else {
-        _i6 = _iterator6.next();
-        if (_i6.done) break;
-        _ref10 = _i6.value;
-      }
-
+      _ref10 = scope.interactions[_i6];
       var interaction = _ref10;
 
       // if there's already a pointer held down
@@ -7080,7 +6689,7 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":34,"./index":44}],46:[function(require,module,exports){
+},{"../scope":33,"./index":43}],45:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -7138,14 +6747,14 @@ is.array = function (thing) {
 
 module.exports = is;
 
-},{"./isWindow":47,"./window":52}],47:[function(require,module,exports){
+},{"./isWindow":46,"./window":51}],46:[function(require,module,exports){
 "use strict";
 
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 function pointerExtend(dest, source) {
@@ -7174,7 +6783,7 @@ pointerExtend.prefixedPropREs = {
 
 module.exports = pointerExtend;
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 var hypot = require('./hypot');
@@ -7320,18 +6929,10 @@ var pointerUtils = {
       screenY: 0
     };
 
-    for (var _iterator = pointers, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+    for (var _i = 0; _i < pointers.length; _i++) {
       var _ref;
 
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref = _i.value;
-      }
-
+      _ref = pointers[_i];
       var pointer = _ref;
 
       for (var _prop in average) {
@@ -7405,7 +7006,7 @@ var pointerUtils = {
 
 module.exports = pointerUtils;
 
-},{"./browser":37,"./domObjects":38,"./domUtils":39,"./hypot":43,"./is":46,"./pointerExtend":48}],50:[function(require,module,exports){
+},{"./browser":36,"./domObjects":37,"./domUtils":38,"./hypot":42,"./is":45,"./pointerExtend":47}],49:[function(require,module,exports){
 'use strict';
 
 var _require = require('./window'),
@@ -7445,7 +7046,7 @@ module.exports = {
   cancel: cancel
 };
 
-},{"./window":52}],51:[function(require,module,exports){
+},{"./window":51}],50:[function(require,module,exports){
 'use strict';
 
 var extend = require('./extend');
@@ -7523,7 +7124,7 @@ var rectUtils = {
 
 module.exports = rectUtils;
 
-},{"./domUtils":39,"./extend":41,"./is":46}],52:[function(require,module,exports){
+},{"./domUtils":38,"./extend":40,"./is":45}],51:[function(require,module,exports){
 'use strict';
 
 var win = module.exports;
@@ -7565,7 +7166,7 @@ win.getWindow = function getWindow(node) {
 
 win.init = init;
 
-},{"./isWindow":47}]},{},[1])(1)
+},{"./isWindow":46}]},{},[1])(1)
 });
 
 
