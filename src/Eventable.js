@@ -1,8 +1,10 @@
 const extend = require('./utils/extend.js');
 
 function fireUntilImmediateStopped (event, listeners) {
-  for (let i = 0, len = listeners.length; i < len && !event.immediatePropagationStopped; i++) {
-    listeners[i](event);
+  for (const listener of listeners) {
+    if (event.immediatePropagationStopped) { break; }
+
+    listener(event);
   }
 }
 

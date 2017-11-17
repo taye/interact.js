@@ -198,8 +198,7 @@ function withinInteractionLimit (interactable, element, action) {
   // no actions if any of these values == 0
   if (!(maxActions && maxPerElement && autoStart.maxInteractions)) { return; }
 
-  for (let i = 0, len = scope.interactions.length; i < len; i++) {
-    const interaction = scope.interactions[i];
+  for (const interaction of scope.interactions) {
     const otherAction = interaction.prepared.name;
 
     if (!interaction.interacting()) { continue; }

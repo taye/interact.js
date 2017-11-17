@@ -29,8 +29,8 @@ class Signals {
 
     if (!targetListeners) { return; }
 
-    for (let i = 0; i < targetListeners.length; i++) {
-      if (targetListeners[i](arg, name) === false) {
+    for (const listener of targetListeners) {
+      if (listener(arg, name) === false) {
         return;
       }
     }

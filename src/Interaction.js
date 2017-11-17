@@ -370,9 +370,7 @@ class Interaction {
   }
 }
 
-for (let i = 0, len = methodNames.length; i < len; i++) {
-  const method = methodNames[i];
-
+for (const method of methodNames) {
   listeners[method] = doOnInteractions(method);
 }
 
@@ -385,8 +383,8 @@ function doOnInteractions (method) {
     if (browser.supportsTouch && /touch/.test(event.type)) {
       prevTouchTime = new Date().getTime();
 
-      for (let i = 0; i < event.changedTouches.length; i++) {
-        const pointer = event.changedTouches[i];
+      for (const changedTouch of event.changedTouches) {
+        const pointer = changedTouch;
         const interaction = finder.search(pointer, event.type, eventTarget);
 
         matches.push([pointer, interaction || new Interaction({ pointerType })]);
@@ -428,9 +426,7 @@ function doOnInteractions (method) {
 }
 
 function endAll (event) {
-  for (let i = 0; i < scope.interactions.length; i++) {
-    const interaction = scope.interactions[i];
-
+  for (const interaction of scope.interactions) {
     interaction.end(event);
     signals.fire('endall', { event, interaction });
   }

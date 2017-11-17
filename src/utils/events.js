@@ -115,9 +115,9 @@ function addDelegate (selector, context, type, listener, optionalArg) {
     };
 
     // add delegate listener functions
-    for (let i = 0; i < documents.length; i++) {
-      add(documents[i], type, delegateListener);
-      add(documents[i], type, delegateUseCapture, true);
+    for (const doc of documents) {
+      add(doc, type, delegateListener);
+      add(doc, type, delegateUseCapture, true);
     }
   }
 

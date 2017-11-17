@@ -173,8 +173,7 @@ Interaction.signals.on('down', function ({ interaction, pointer, event, eventTar
 
   let minDuration = Infinity;
 
-  for (let i = 0; i < signalArg.targets.length; i++) {
-    const target = signalArg.targets[i];
+  for (const target of signalArg.targets) {
     const holdDuration = target.eventable.options.holdDuration;
 
     if (holdDuration < minDuration) {
@@ -200,13 +199,13 @@ Interaction.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
   }
 });
 
-['up', 'cancel'].forEach(function (signalName) {
+for (const signalName of ['up', 'cancel']) {
   Interaction.signals.on(signalName, function ({ interaction, pointerIndex }) {
     if (interaction.holdTimers[pointerIndex]) {
       clearTimeout(interaction.holdTimers[pointerIndex].timeout);
     }
   });
-});
+}
 
 function createSignalListener (type) {
   return function ({ interaction, pointer, event, eventTarget }) {

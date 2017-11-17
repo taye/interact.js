@@ -28,9 +28,7 @@ const modifiers = {
     arg.interactable = target;
     arg.element = element;
 
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
-
+    for (const modifierName of modifiers.names) {
       arg.options = target.options[interaction.prepared.name][modifierName];
 
       if (!arg.options) {
@@ -137,8 +135,8 @@ const modifiers = {
   },
 
   end: function ({ interaction, event }) {
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const options = interaction.target.options[interaction.prepared.name][modifiers.names[i]];
+    for (const modifierName of modifiers.names) {
+      const options = interaction.target.options[interaction.prepared.name][modifierName];
 
       // if the endOnly option is true for any modifier
       if (shouldDo(options, true, true)) {

@@ -3,8 +3,8 @@ function contains (array, target) {
 }
 
 function merge (target, source) {
-  for (let i = 0; i < source.length; i++) {
-    target.push(source[i]);
+  for (const item of source) {
+    target.push(item);
   }
 
   return target;

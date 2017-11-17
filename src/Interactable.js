@@ -202,8 +202,8 @@ class Interactable {
     }
 
     if (is.array(eventType)) {
-      for (let i = 0; i < eventType.length; i++) {
-        this[method](eventType[i], listener, options);
+      for (const type of eventType) {
+        this[method](type, listener, options);
       }
 
       return true;
@@ -393,16 +393,14 @@ scope.interactables.get = function interactableGet (element, options, dontCheckI
 };
 
 scope.interactables.forEachSelector = function (callback, element) {
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
+  for (const interactable of this) {
     // skip non CSS selector targets and out of context elements
     if (!is.string(interactable.target)
         || (element && !interactable.inContext(element))) {
       continue;
     }
 
-    const ret = callback(interactable, interactable.target, i, this);
+    const ret = callback(interactable, interactable.target);
 
     if (ret !== undefined) {
       return ret;
