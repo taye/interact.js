@@ -134,7 +134,7 @@ class Interaction {
 
     // if this interaction had been removed after stopping
     // add it back
-    if (utils.indexOf(scope.interactions, this) === -1) {
+    if (scope.interactions.indexOf(this) === -1) {
       scope.interactions.push(this);
     }
 
@@ -318,7 +318,7 @@ class Interaction {
       return 0;
     }
 
-    return utils.indexOf(this.pointerIds, utils.getPointerId(pointer));
+    return this.pointerIds.indexOf(utils.getPointerId(pointer));
   }
 
   updatePointer (pointer, event, down = event && /(down|start)$/i.test(event.type)) {

@@ -41,26 +41,7 @@ const domUtils = {
     return parent;
   },
 
-  // taken from http://tanalin.com/en/blog/2012/12/matches-selector-ie8/ and modified
-  matchesSelectorPolyfill: browser.useMatchesSelectorPolyfill
-    ? function (element, selector, elems) {
-      elems = elems || element.parentNode.querySelectorAll(selector);
-
-      for (let i = 0, len = elems.length; i < len; i++) {
-        if (elems[i] === element) {
-          return true;
-        }
-      }
-
-      return false;
-    }
-    : null,
-
-  matchesSelector: function (element, selector, nodeList) {
-    if (browser.useMatchesSelectorPolyfill) {
-      return domUtils.matchesSelectorPolyfill(element, selector, nodeList);
-    }
-
+  matchesSelector: function (element, selector) {
     // remove /deep/ from selectors if shadowDOM polyfill is used
     if (win.window !== win.realWindow) {
       selector = selector.replace(/\/deep\//g, ' ');

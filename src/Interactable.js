@@ -11,10 +11,10 @@ const {
   getElementRect,
   nodeContains,
   trySelector,
-}                           = require('./utils/domUtils');
-const { getWindow }         = require('./utils/window');
-const { indexOf, contains } = require('./utils/arr');
-const { wheelEvent }        = require('./utils/browser');
+}                    = require('./utils/domUtils');
+const { getWindow }  = require('./utils/window');
+const { contains }   = require('./utils/arr');
+const { wheelEvent } = require('./utils/browser');
 
 // all set interactables
 scope.interactables = [];
@@ -360,7 +360,7 @@ class Interactable {
 
     signals.fire('unset', { interactable: this });
 
-    scope.interactables.splice(indexOf(scope.interactables, this), 1);
+    scope.interactables.splice(scope.interactables.indexOf(this), 1);
 
     // Stop related interactions when an Interactable is unset
     for (const interaction of scope.interactions || []) {
@@ -402,7 +402,7 @@ scope.interactables.forEachSelector = function (callback, element) {
       continue;
     }
 
-    const ret = callback(interactable, interactable.target, interactable._context, i, this);
+    const ret = callback(interactable, interactable.target, i, this);
 
     if (ret !== undefined) {
       return ret;

@@ -1,19 +1,13 @@
-const is   = require('./is');
-const domUtils = require('./domUtils');
+const is           = require('./is');
+const domUtils     = require('./domUtils');
 const pointerUtils = require('./pointerUtils');
-const pExtend  = require('./pointerExtend');
+const pExtend      = require('./pointerExtend');
 
-const { window, getWindow }  = require('./window');
-const { indexOf, contains } = require('./arr');
+const { window }   = require('./window');
+const { contains } = require('./arr');
 
-const useAttachEvent = ('attachEvent' in window) && !('addEventListener' in window);
-const addEvent       = useAttachEvent?  'attachEvent': 'addEventListener';
-const removeEvent    = useAttachEvent?  'detachEvent': 'removeEventListener';
-const on             = useAttachEvent? 'on': '';
-
-const elements          = [];
-const targets           = [];
-const attachedListeners = [];
+const elements = [];
+const targets  = [];
 
 // {
 //   type: {
@@ -23,10 +17,9 @@ const attachedListeners = [];
 //   }
 //  }
 const delegatedEvents = {};
+const documents       = [];
 
-const documents = [];
-
-const supportsOptions = !useAttachEvent && (() => {
+const supportsOptions = (() => {
   let supported = false;
 
   window.document.createElement('div').addEventListener('test', null, {
@@ -38,7 +31,7 @@ const supportsOptions = !useAttachEvent && (() => {
 
 function add (element, type, listener, optionalArg) {
   const options = getOptions(optionalArg);
-  let elementIndex = indexOf(elements, element);
+  let elementIndex = elements.indexOf(element);
   let target = targets[elementIndex];
 
   if (!target) {
@@ -49,14 +42,6 @@ function add (element, type, listener, optionalArg) {
 
     elementIndex = elements.push(element) - 1;
     targets.push(target);
-
-    attachedListeners.push(useAttachEvent
-      ? {
-        supplied: [],
-        wrapped : [],
-        useCount: [],
-      }
-      : null);
   }
 
   if (!target.events[type]) {
@@ -65,67 +50,18 @@ function add (element, type, listener, optionalArg) {
   }
 
   if (!contains(target.events[type], listener)) {
-    let ret;
-
-    if (useAttachEvent) {
-      const { supplied, wrapped, useCount } = attachedListeners[elementIndex];
-      const listenerIndex = indexOf(supplied, listener);
-
-      const wrappedListener = wrapped[listenerIndex] || function (event) {
-        if (!event.immediatePropagationStopped) {
-          event.target = event.srcElement;
-          event.currentTarget = element;
-
-          event.preventDefault           = event.preventDefault           || preventDef;
-          event.stopPropagation          = event.stopPropagation          || stopProp;
-          event.stopImmediatePropagation = event.stopImmediatePropagation || stopImmProp;
-
-          if (/mouse|click/.test(event.type)) {
-            event.pageX = event.clientX + getWindow(element).document.documentElement.scrollLeft;
-            event.pageY = event.clientY + getWindow(element).document.documentElement.scrollTop;
-          }
-
-          listener(event);
-        }
-      };
-
-      ret = element[addEvent](on + type, wrappedListener, !!options.capture);
-
-      if (listenerIndex === -1) {
-        supplied.push(listener);
-        wrapped.push(wrappedListener);
-        useCount.push(1);
-      }
-      else {
-        useCount[listenerIndex]++;
-      }
-    }
-    else {
-      ret = element[addEvent](type, listener, supportsOptions? options : !!options.capture);
-    }
+    element.addEventListener(type, listener, supportsOptions? options : !!options.capture);
     target.events[type].push(listener);
-
-    return ret;
   }
 }
 
 function remove (element, type, listener, optionalArg) {
   const options = getOptions(optionalArg);
-  const elementIndex = indexOf(elements, element);
+  const elementIndex = elements.indexOf(element);
   const target = targets[elementIndex];
 
   if (!target || !target.events) {
     return;
-  }
-
-  let wrappedListener = listener;
-  let listeners;
-  let listenerIndex;
-
-  if (useAttachEvent) {
-    listeners = attachedListeners[elementIndex];
-    listenerIndex = indexOf(listeners.supplied, listener);
-    wrappedListener = listeners.wrapped[listenerIndex];
   }
 
   if (type === 'all') {
@@ -149,17 +85,8 @@ function remove (element, type, listener, optionalArg) {
     else {
       for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element[removeEvent](on + type, wrappedListener, supportsOptions? options : !!options.capture);
+          element.removeEventListener(`on${type}`, listener, supportsOptions? options : !!options.capture);
           target.events[type].splice(i, 1);
-
-          if (useAttachEvent && listeners) {
-            listeners.useCount[listenerIndex]--;
-            if (listeners.useCount[listenerIndex] === 0) {
-              listeners.supplied.splice(listenerIndex, 1);
-              listeners.wrapped.splice(listenerIndex, 1);
-              listeners.useCount.splice(listenerIndex, 1);
-            }
-          }
 
           break;
         }
@@ -175,7 +102,6 @@ function remove (element, type, listener, optionalArg) {
   if (!target.typeCount) {
     targets.splice(elementIndex, 1);
     elements.splice(elementIndex, 1);
-    attachedListeners.splice(elementIndex, 1);
   }
 }
 
@@ -317,21 +243,8 @@ function delegateUseCapture (event) {
   return delegateListener.call(this, event, true);
 }
 
-function preventDef () {
-  this.returnValue = false;
-}
-
 function preventOriginalDefault () {
   this.originalEvent.preventDefault();
-}
-
-function stopProp () {
-  this.cancelBubble = true;
-}
-
-function stopImmProp () {
-  this.cancelBubble = true;
-  this.immediatePropagationStopped = true;
 }
 
 function getOptions (param) {
@@ -350,10 +263,8 @@ module.exports = {
   delegatedEvents,
   documents,
 
-  useAttachEvent,
   supportsOptions,
 
   _elements: elements,
   _targets: targets,
-  _attachedListeners: attachedListeners,
 };

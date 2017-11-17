@@ -89,7 +89,7 @@ const resize = {
     return null;
   },
 
-  cursors: (browser.isIe9OrOlder ? {
+  cursors: (browser.isIe9 ? {
     x : 'e-resize',
     y : 's-resize',
     xy: 'se-resize',

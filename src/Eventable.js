@@ -1,4 +1,3 @@
-const { indexOf } = require('./utils/arr');
 const extend = require('./utils/extend.js');
 
 function fireUntilImmediateStopped (event, listeners) {
@@ -47,7 +46,7 @@ class Eventable {
   off (eventType, listener) {
     // if it is an action event type
     const eventList = this[eventType];
-    const index     = eventList? indexOf(eventList, listener) : -1;
+    const index     = eventList? eventList.indexOf(listener) : -1;
 
     if (index !== -1) {
       eventList.splice(index, 1);

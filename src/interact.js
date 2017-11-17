@@ -149,7 +149,7 @@ interact.off = function (type, listener, options) {
     let index;
 
     if (type in globalEvents
-        && (index = utils.indexOf(globalEvents[type], listener)) !== -1) {
+        && (index = globalEvents[type].indexOf(listener)) !== -1) {
       globalEvents[type].splice(index, 1);
     }
   }

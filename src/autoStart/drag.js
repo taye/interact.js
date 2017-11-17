@@ -1,6 +1,5 @@
 const autoStart = require('./base');
 const scope     = require('../scope');
-const browser   = require('../utils/browser');
 const is        = require('../utils/is');
 
 const { matchesSelector, parentNode } = require('../utils/domUtils');
@@ -32,16 +31,12 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
 
       let element = eventTarget;
 
-      const getDraggable = function (interactable, selector, context) {
-        const elements = browser.useMatchesSelectorPolyfill
-            ? context.querySelectorAll(selector)
-            : undefined;
-
+      const getDraggable = function (interactable, selector) {
         if (interactable === interaction.target) { return; }
 
         if (!options.manualStart
             && !interactable.testIgnoreAllow(options, element, eventTarget)
-            && matchesSelector(element, selector, elements)) {
+            && matchesSelector(element, selector)) {
 
           const action = interactable.getAction(interaction.downPointer,
                                                 interaction.downEvent,
