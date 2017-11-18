@@ -1,6 +1,6 @@
 main() {
   ensure_clean_index
-  merge_unstable_to_matser
+  merge_to_unstable
   run_preversion_tests
   bump_version
   run_build
@@ -21,7 +21,7 @@ ensure_clean_index() {
   fi
 }
 
-merge_unstable_to_matser() {
+merge_to_unstable() {
   echo_funcname
 
   INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
