@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0-rc.3+sha.072b984-dirty
+ * interact.js v1.3.0-rc.4+sha.2ba54f2
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Open source under the MIT License.
@@ -5691,6 +5691,9 @@ var utils = require('./utils');
 var events = require('./utils/events');
 var signals = require('./utils/Signals').new();
 
+var _require = require('./utils/window'),
+    getWindow = _require.getWindow;
+
 var scope = {
   signals: signals,
   events: events,
@@ -5707,7 +5710,7 @@ var scope = {
       return false;
     }
 
-    win = win || scope.getWindow(doc);
+    win = win || getWindow(doc);
 
     scope.documents.push(doc);
     events.documents.push(doc);
@@ -5724,7 +5727,7 @@ var scope = {
   removeDocument: function removeDocument(doc, win) {
     var index = scope.documents.indexOf(doc);
 
-    win = win || scope.getWindow(doc);
+    win = win || getWindow(doc);
 
     events.remove(win, 'unload', scope.onWindowUnload);
 
@@ -5741,7 +5744,7 @@ var scope = {
 
 module.exports = scope;
 
-},{"./utils":43,"./utils/Signals":34,"./utils/domObjects":37,"./utils/events":39}],34:[function(require,module,exports){
+},{"./utils":43,"./utils/Signals":34,"./utils/domObjects":37,"./utils/events":39,"./utils/window":51}],34:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
