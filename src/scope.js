@@ -2,6 +2,8 @@ const utils   = require('./utils');
 const events  = require('./utils/events');
 const signals = require('./utils/Signals').new();
 
+const { getWindow } = require('./utils/window');
+
 const scope = {
   signals,
   events,
@@ -16,7 +18,7 @@ const scope = {
     // do nothing if document is already known
     if (utils.contains(scope.documents, doc)) { return false; }
 
-    win = win || scope.getWindow(doc);
+    win = win || getWindow(doc);
 
     scope.documents.push(doc);
     events.documents.push(doc);
@@ -33,7 +35,7 @@ const scope = {
   removeDocument: function (doc, win) {
     const index = scope.documents.indexOf(doc);
 
-    win = win || scope.getWindow(doc);
+    win = win || getWindow(doc);
 
     events.remove(win, 'unload', scope.onWindowUnload);
 
