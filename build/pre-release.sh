@@ -1,6 +1,6 @@
 main() {
   ensure_clean_index
-  merge_unstable_to_matser
+  merge_to_unstable
   run_preversion_tests
   bump_version
   run_build
@@ -21,7 +21,7 @@ ensure_clean_index() {
   fi
 }
 
-merge_unstable_to_matser() {
+merge_to_unstable() {
   echo_funcname
 
   INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -46,10 +46,13 @@ bump_version() {
   NEW_VERSION=$(node build/bump prerelease)
   NEW_TAG=$(echo "v$NEW_VERSION" | sed 's/[+].*//')
 
-  #if the version tag already exists
+  # if the version tag already exists
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
     quit "$NEW_TAG tag already exists" 1
   fi
+
+  # add package.json version change
+  git add package.json
 }
 
 run_build() {
