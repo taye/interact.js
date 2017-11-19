@@ -46,10 +46,13 @@ bump_version() {
   NEW_VERSION=$(node build/bump prerelease)
   NEW_TAG=$(echo "v$NEW_VERSION" | sed 's/[+].*//')
 
-  #if the version tag already exists
+  # if the version tag already exists
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
     quit "$NEW_TAG tag already exists" 1
   fi
+
+  # add package.json version change
+  git add package.json
 }
 
 run_build() {
