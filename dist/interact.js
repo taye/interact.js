@@ -1,8 +1,8 @@
 /**
- * interact.js v1.3.0-rc.4+sha.2ba54f2
+ * interact.js v1.3.0
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
- * Open source under the MIT License.
+ * Released under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
@@ -299,7 +299,8 @@ var signals = require('./utils/Signals').new();
 var _require = require('./utils/domUtils'),
     getElementRect = _require.getElementRect,
     nodeContains = _require.nodeContains,
-    trySelector = _require.trySelector;
+    trySelector = _require.trySelector,
+    matchesSelector = _require.matchesSelector;
 
 var _require2 = require('./utils/window'),
     getWindow = _require2.getWindow;
@@ -738,19 +739,24 @@ scope.interactables.get = function interactableGet(element, options, dontCheckIn
   return ret && (is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
 };
 
-scope.interactables.forEachSelector = function (callback, element) {
+scope.interactables.forEachMatch = function (element, callback) {
   for (var _i5 = 0; _i5 < this.length; _i5++) {
     var _ref5;
 
     _ref5 = this[_i5];
     var interactable = _ref5;
 
-    // skip non CSS selector targets and out of context elements
-    if (!is.string(interactable.target) || element && !interactable.inContext(element)) {
-      continue;
-    }
+    var ret = void 0;
 
-    var ret = callback(interactable, interactable.target);
+    if ((is.string(interactable.target)
+    // target is a selector and the element matches
+    ? is.element(element) && matchesSelector(element, interactable.target) :
+    // target is the element
+    element === interactable.target) &&
+    // the element is in context
+    interactable.inContext(element)) {
+      ret = callback(interactable);
+    }
 
     if (ret !== undefined) {
       return ret;
@@ -3045,7 +3051,8 @@ var autoStart = {
   },
   setActionDefaults: function setActionDefaults(action) {
     utils.extend(action.defaults, autoStart.defaults.perAction);
-  }
+  },
+  validateAction: validateAction
 };
 
 // set cursor style on mousedown
@@ -3134,36 +3141,22 @@ function getActionInfo(interaction, pointer, event, eventTarget) {
   var matchElements = [];
 
   var element = eventTarget;
-  var action = null;
 
-  function pushMatches(interactable, selector) {
-    if (utils.matchesSelector(element, selector)) {
-
-      matches.push(interactable);
-      matchElements.push(element);
-    }
+  function pushMatches(interactable) {
+    matches.push(interactable);
+    matchElements.push(element);
   }
 
   while (utils.is.element(element)) {
     matches = [];
     matchElements = [];
 
-    var elementInteractable = scope.interactables.get(element);
+    scope.interactables.forEachMatch(element, pushMatches);
 
-    if (elementInteractable && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element, eventTarget), elementInteractable, element, eventTarget)) && !elementInteractable.options[action.name].manualStart) {
-      return {
-        element: element,
-        action: action,
-        target: elementInteractable
-      };
-    } else {
-      scope.interactables.forEachSelector(pushMatches, element);
+    var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
 
-      var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
-
-      if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
-        return actionInfo;
-      }
+    if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
+      return actionInfo;
     }
 
     element = utils.parentNode(element);
@@ -3299,7 +3292,6 @@ var scope = require('../scope');
 var is = require('../utils/is');
 
 var _require = require('../utils/domUtils'),
-    matchesSelector = _require.matchesSelector,
     parentNode = _require.parentNode;
 
 autoStart.setActionDefaults(require('../actions/drag'));
@@ -3317,12 +3309,12 @@ autoStart.signals.on('before-start', function (_ref) {
   // check if a drag is in the correct axis
   var absX = Math.abs(dx);
   var absY = Math.abs(dy);
-  var options = interaction.target.options.drag;
-  var startAxis = options.startAxis;
+  var targetOptions = interaction.target.options.drag;
+  var startAxis = targetOptions.startAxis;
   var currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy';
 
-  interaction.prepared.axis = options.lockAxis === 'start' ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
-  : options.lockAxis;
+  interaction.prepared.axis = targetOptions.lockAxis === 'start' ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
+  : targetOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
@@ -3330,56 +3322,38 @@ autoStart.signals.on('before-start', function (_ref) {
     interaction.prepared.name = null;
 
     // then try to get a drag from another ineractable
+    var element = eventTarget;
 
-    if (!interaction.prepared.name) {
-
-      var element = eventTarget;
-
-      var getDraggable = function getDraggable(interactable, selector) {
-        if (interactable === interaction.target) {
-          return;
-        }
-
-        if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector)) {
-
-          var _action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-
-          if (_action && _action.name === 'drag' && checkStartAxis(currentAxis, interactable) && autoStart.validateAction(_action, interactable, element, eventTarget)) {
-
-            return interactable;
-          }
-        }
-      };
-
-      var action = null;
-
-      // check all interactables
-      while (is.element(element)) {
-        var elementInteractable = scope.interactables.get(element);
-
-        if (elementInteractable && elementInteractable !== interaction.target && !elementInteractable.options.drag.manualStart) {
-
-          action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-        }
-        if (action && action.name === 'drag' && checkStartAxis(currentAxis, elementInteractable)) {
-
-          interaction.prepared.name = 'drag';
-          interaction.target = elementInteractable;
-          interaction.element = element;
-          break;
-        }
-
-        var selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
-
-        if (selectorInteractable) {
-          interaction.prepared.name = 'drag';
-          interaction.target = selectorInteractable;
-          interaction.element = element;
-          break;
-        }
-
-        element = parentNode(element);
+    var getDraggable = function getDraggable(interactable) {
+      if (interactable === interaction.target) {
+        return;
       }
+
+      var options = interaction.target.options.drag;
+
+      if (!options.manualStart && interactable.testIgnoreAllow(options, element, eventTarget)) {
+
+        var action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+
+        if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && autoStart.validateAction(action, interactable, element, eventTarget)) {
+
+          return interactable;
+        }
+      }
+    };
+
+    // check all interactables
+    while (is.element(element)) {
+      var interactable = scope.interactables.forEachMatch(element, getDraggable);
+
+      if (interactable) {
+        interaction.prepared.name = 'drag';
+        interaction.target = interactable;
+        interaction.element = element;
+        break;
+      }
+
+      element = parentNode(element);
     }
   }
 });
@@ -4131,9 +4105,9 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // setting === 'auto'
 
-  // don't preventDefault if the browser supports passiveEvents
-  // CSS touch-action and user-selecct should be used instead
-  if (events.supportsOptions) {
+  // don't preventDefault of touch{start,move} events if the browser supports passive
+  // events listeners. CSS touch-action and user-selecct should be used instead
+  if (events.supportsOptions && /^touch(start|move)$/.test(event.type)) {
     return;
   }
 
@@ -5601,7 +5575,6 @@ module.exports = {
 var pointerEvents = require('./base');
 var Interactable = require('../Interactable');
 var is = require('../utils/is');
-var domUtils = require('../utils/domUtils');
 var scope = require('../scope');
 var extend = require('../utils/extend');
 
@@ -5614,11 +5587,11 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
       type = _ref.type,
       eventTarget = _ref.eventTarget;
 
-  function collectSelectors(interactable, selector) {
+  scope.interactables.forEachMatch(element, function (interactable) {
     var eventable = interactable.events;
     var options = eventable.options;
 
-    if (eventable[type] && is.element(element) && domUtils.matchesSelector(element, selector) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+    if (eventable[type] && is.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
       targets.push({
         element: element,
@@ -5626,24 +5599,7 @@ pointerEvents.signals.on('collect-targets', function (_ref) {
         props: { interactable: interactable }
       });
     }
-  }
-
-  var interactable = scope.interactables.get(element);
-
-  if (interactable) {
-    var eventable = interactable.events;
-    var options = eventable.options;
-
-    if (eventable[type] && interactable.testIgnoreAllow(options, element, eventTarget)) {
-      targets.push({
-        element: element,
-        eventable: eventable,
-        props: { interactable: interactable }
-      });
-    }
-  }
-
-  scope.interactables.forEachSelector(collectSelectors, element);
+  });
 });
 
 Interactable.signals.on('new', function (_ref2) {
@@ -5684,7 +5640,7 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/domUtils":38,"../utils/extend":40,"../utils/is":45,"./base":30}],33:[function(require,module,exports){
+},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/extend":40,"../utils/is":45,"./base":30}],33:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
