@@ -30,6 +30,7 @@ const autoStart = {
   setActionDefaults: function (action) {
     utils.extend(action.defaults, autoStart.defaults.perAction);
   },
+  validateAction,
 };
 
 // set cursor style on mousedown
@@ -115,43 +116,23 @@ function getActionInfo (interaction, pointer, event, eventTarget) {
   let matchElements = [];
 
   let element = eventTarget;
-  let action = null;
 
-  function pushMatches (interactable, selector) {
-    if (utils.matchesSelector(element, selector)) {
-
-      matches.push(interactable);
-      matchElements.push(element);
-    }
+  function pushMatches (interactable) {
+    matches.push(interactable);
+    matchElements.push(element);
   }
 
   while (utils.is.element(element)) {
     matches = [];
     matchElements = [];
 
-    const elementInteractable = scope.interactables.get(element);
+    scope.interactables.forEachMatch(element, pushMatches);
 
-    if (elementInteractable
-        && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element, eventTarget),
-                                    elementInteractable,
-                                    element,
-                                    eventTarget))
-        && !elementInteractable.options[action.name].manualStart) {
-      return {
-        element,
-        action,
-        target: elementInteractable,
-      };
-    }
-    else {
-      scope.interactables.forEachSelector(pushMatches, element);
+    const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
 
-      const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
-
-      if (actionInfo.action
-          && !actionInfo.target.options[actionInfo.action.name].manualStart) {
-        return actionInfo;
-      }
+    if (actionInfo.action
+      && !actionInfo.target.options[actionInfo.action.name].manualStart) {
+      return actionInfo;
     }
 
     element = utils.parentNode(element);

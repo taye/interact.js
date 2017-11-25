@@ -2,7 +2,7 @@ const autoStart = require('./base');
 const scope     = require('../scope');
 const is        = require('../utils/is');
 
-const { matchesSelector, parentNode } = require('../utils/domUtils');
+const { parentNode } = require('../utils/domUtils');
 
 autoStart.setActionDefaults(require('../actions/drag'));
 
@@ -12,13 +12,13 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
   // check if a drag is in the correct axis
   const absX = Math.abs(dx);
   const absY = Math.abs(dy);
-  const options = interaction.target.options.drag;
-  const startAxis = options.startAxis;
+  const targetOptions = interaction.target.options.drag;
+  const startAxis = targetOptions.startAxis;
   const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy');
 
-  interaction.prepared.axis = options.lockAxis === 'start'
+  interaction.prepared.axis = targetOptions.lockAxis === 'start'
     ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
-    : options.lockAxis;
+    : targetOptions.lockAxis;
 
   // if the movement isn't in the startAxis of the interactable
   if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
@@ -26,66 +26,41 @@ autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, 
     interaction.prepared.name = null;
 
     // then try to get a drag from another ineractable
+    let element = eventTarget;
 
-    if (!interaction.prepared.name) {
+    const getDraggable = function (interactable) {
+      if (interactable === interaction.target) { return; }
 
-      let element = eventTarget;
+      const options = interaction.target.options.drag;
 
-      const getDraggable = function (interactable, selector) {
-        if (interactable === interaction.target) { return; }
+      if (!options.manualStart
+          && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
-        if (!options.manualStart
-            && !interactable.testIgnoreAllow(options, element, eventTarget)
-            && matchesSelector(element, selector)) {
+        const action = interactable.getAction(
+          interaction.downPointer, interaction.downEvent, interaction, element);
 
-          const action = interactable.getAction(interaction.downPointer,
-                                                interaction.downEvent,
-                                                interaction,
-                                                element);
-
-          if (action
-              && action.name === 'drag'
-              && checkStartAxis(currentAxis, interactable)
-              && autoStart.validateAction(action, interactable, element, eventTarget)) {
-
-            return interactable;
-          }
-        }
-      };
-
-      let action = null;
-
-      // check all interactables
-      while (is.element(element)) {
-        const elementInteractable = scope.interactables.get(element);
-
-        if (elementInteractable
-            && elementInteractable !== interaction.target
-            && !elementInteractable.options.drag.manualStart) {
-
-          action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-        }
         if (action
             && action.name === 'drag'
-            && checkStartAxis(currentAxis, elementInteractable)) {
+            && checkStartAxis(currentAxis, interactable)
+            && autoStart.validateAction(action, interactable, element, eventTarget)) {
 
-          interaction.prepared.name = 'drag';
-          interaction.target = elementInteractable;
-          interaction.element = element;
-          break;
+          return interactable;
         }
-
-        const selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
-
-        if (selectorInteractable) {
-          interaction.prepared.name = 'drag';
-          interaction.target = selectorInteractable;
-          interaction.element = element;
-          break;
-        }
-
-        element = parentNode(element);
       }
+    };
+
+    // check all interactables
+    while (is.element(element)) {
+      const interactable = scope.interactables.forEachMatch(element, getDraggable);
+
+      if (interactable) {
+        interaction.prepared.name = 'drag';
+        interaction.target = interactable;
+        interaction.element = element;
+        break;
+      }
+
+      element = parentNode(element);
     }
   }
 });

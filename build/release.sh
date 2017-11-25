@@ -1,6 +1,15 @@
+NEW_VERSION=$1
+RELEASE_BRANCH="stable"
+BUILD_ARG="--no-metadata"
+
+if [[ $NEW_VERSION == "prerelease" ]]; then
+  RELEASE_BRANCH="unstable"
+  BUILD_ARG=""
+fi
+
 main() {
   ensure_clean_index
-  merge_to_unstable
+  merge_to_release
   run_preversion_tests
   bump_version
   run_build
@@ -21,13 +30,13 @@ ensure_clean_index() {
   fi
 }
 
-merge_to_unstable() {
+merge_to_release() {
   echo_funcname
 
   INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-  echo "checking out the 'unstable' branch"
-  git checkout unstable || exit $?
+  echo "checking out the '$RELEASE_BRANCH' branch"
+  git checkout $RELEASE_BRANCH || exit $?
 
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
 }
@@ -43,7 +52,7 @@ bump_version() {
   echo_funcname
 
   # bump the version in package.json
-  NEW_VERSION=$(node build/bump prerelease)
+  NEW_VERSION=$(node build/bump $NEW_VERSION)
   NEW_TAG=$(echo "v$NEW_VERSION" | sed 's/[+].*//')
 
   # if the version tag already exists
@@ -51,21 +60,21 @@ bump_version() {
     quit "$NEW_TAG tag already exists" 1
   fi
 
-  # add package.json version change
-  git add package.json
+  # add package version change
+  git add package.json package-lock.json
 }
 
 run_build() {
   echo_funcname
 
-  npm run build || exit $?
+  npm run build -- $BUILD_ARG || exit $?
 }
 
 commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- package.json dist
+  git add -- package.json package-lock.json dist
   git commit -m "v$NEW_VERSION"
   git tag $NEW_TAG
 }
@@ -82,9 +91,7 @@ push_and_publish() {
 }
 
 echo_funcname() {
-  echo
-  echo "==== ${FUNCNAME[1]} ===="
-  echo
+  echo -e "\n==== ${FUNCNAME[1]} ====\n"
 }
 
 quit() {

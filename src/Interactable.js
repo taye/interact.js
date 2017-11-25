@@ -11,6 +11,7 @@ const {
   getElementRect,
   nodeContains,
   trySelector,
+  matchesSelector,
 }                    = require('./utils/domUtils');
 const { getWindow }  = require('./utils/window');
 const { contains }   = require('./utils/arr');
@@ -392,15 +393,19 @@ scope.interactables.get = function interactableGet (element, options, dontCheckI
   return ret && (is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
 };
 
-scope.interactables.forEachSelector = function (callback, element) {
+scope.interactables.forEachMatch = function (element, callback) {
   for (const interactable of this) {
-    // skip non CSS selector targets and out of context elements
-    if (!is.string(interactable.target)
-        || (element && !interactable.inContext(element))) {
-      continue;
-    }
+    let ret;
 
-    const ret = callback(interactable, interactable.target);
+    if ((is.string(interactable.target)
+        // target is a selector and the element matches
+        ? (is.element(element) && matchesSelector(element, interactable.target))
+        // target is the element
+        : element === interactable.target)
+        // the element is in context
+      && (interactable.inContext(element))) {
+      ret = callback(interactable);
+    }
 
     if (ret !== undefined) {
       return ret;

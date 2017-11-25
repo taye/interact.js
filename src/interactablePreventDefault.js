@@ -42,9 +42,9 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // setting === 'auto'
 
-  // don't preventDefault if the browser supports passiveEvents
-  // CSS touch-action and user-selecct should be used instead
-  if (events.supportsOptions) {
+  // don't preventDefault of touch{start,move} events if the browser supports passive
+  // events listeners. CSS touch-action and user-selecct should be used instead
+  if (events.supportsOptions && /^touch(start|move)$/.test(event.type)) {
     return;
   }
 
