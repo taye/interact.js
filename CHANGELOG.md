@@ -1,14 +1,52 @@
-## 1.2.9
+## v1.3.0
 
-Fix a bug involving 'mouseover' targeting the document. See [issue #525](https://github.com/taye/interact.js/issues/525)
+Most notably:
 
-## 1.2.8
+ - changed the npm and bower package names to "interactjs" ([issue
+   #399](https://github.com/taye/interact.js/issues/399)
+ - major refactor with [PR #231](https://github.com/taye/interact.js/pull/231).
+ - removed deprecated methods:
+   - `Interactable`: `squareResize`, `snap`, `restrict`, `inertia`,
+     `autoScroll`, `accept`
+   - `interact`: `enabbleDragging`, `enableResizing`, `enableGesturing`,
+     `margin`
+ - new `hold` option for starting actions
+ - new `interaction.end()` method
+   ([df963b0](https://github.com/taye/interact.js/commit/df963b0))
+ - `snap.offset` `self` option ([issue
+   #204](https://github.com/taye/interact.js/issues/204/#issuecomment-154879052))
+ - `interaction.doMove()`
+   ([3489ee1](https://github.com/taye/interact.js/commit/3489ee1))
+   ([c5c658a](https://github.com/taye/interact.js/commit/c5c658a))
+ - snap grid limits
+   ([d549672](https://github.com/taye/interact.js/commit/d549672))
+ - improved iframe support ([PR
+   #313](https://github.com/taye/interact.js/pull/313))
+ - `actionend` event dx/dy are now `0`, not the difference between start and
+   end coords ([cbfaf00](https://github.com/taye/interact.js/commit/cbfaf00))
+ - replaced drag `axis` option with `startAxis` and `lockAxis`
+ - added pointerEvents options:
+   - `holdDuration`
+     ([1c58f92](https://github.com/taye/interact.js/commit/1c58f927)),
+   - `ignoreFrom` and `allowFrom`
+     ([6cbaad6](https://github.com/taye/interact.js/commit/6cbaad6d))
+   - `origin` ([7823bb9](https://github.com/taye/interact.js/commit/7823bb95))
+ - action events set with action method options (eg.
+   `target.draggable({onmove})` are removed when that action is disabled with a
+   method call ([cca4e26](https://github.com/taye/interact.js/commit/cca4e260))
+ - `context` option now works for Element targets
+   ([8f64a7a](https://github.com/taye/interact.js/commit/8f64a7a4))
+ - added an action `mouseButtons` option and allowed actions only with the left
+   mouse button by default
+   ([54ebdc3](https://github.com/taye/interact.js/commit/54ebdc3e))
+ - added repeating `hold` events
+   ([fe11a8e](https://github.com/taye/interact.js/commit/fe11a8e5))
+ - fixed `Interactable.off` ([PR
+   #477](https://github.com/taye/interact.js/pull/477))
+ - added `restrictEdges`, `restrictSize` and `snapSize` resize modifiers ([PR
+   #455](https://github.com/taye/interact.js/pull/455))
 
-Avoid native PointerEvents on Chrome
-
-## 1.2.7
-
-The bower and npm package names have been changed to `interactjs`. See [issue #399](https://github.com/taye/interact.js/issues/399)
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.2.6...master).
 
 ## 1.2.6
 

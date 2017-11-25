@@ -1,0 +1,6 @@
+extends: '../.eslintrc'
+
+rules:
+  no-console: 2
+  strict: [2, never]
+  no-shadow: 0

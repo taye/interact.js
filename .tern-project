@@ -1,0 +1,11 @@
+{
+  "libs": [
+    "browser"
+  ],
+  "loadEagerly": [
+    "./src/**/*.js"
+  ],
+  "plugins": {
+    "node": {}
+  }
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>src/InteractEvent.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#actionChecker">actionChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#preventDefault">preventDefault</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#styleCursor">styleCursor</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent.html">InteractEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopImmediatePropagation">stopImmediatePropagation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopPropagation">stopPropagation</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction.html">Interaction</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#doMove">doMove</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#end">end</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#start">start</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#stop">stop</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.dynamicDrop">dynamicDrop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">src/InteractEvent.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const extend      = require('./utils/extend');
+const getOriginXY = require('./utils/getOriginXY');
+const defaults    = require('./defaultOptions');
+const signals     = require('./utils/Signals').new();
+
+class InteractEvent {
+  /** */
+  constructor (interaction, event, action, phase, element, related, preEnd = false) {
+    const target      = interaction.target;
+    const deltaSource = (target &amp;&amp; target.options || defaults).deltaSource;
+    const origin      = getOriginXY(target, element, action);
+    const starting    = phase === 'start';
+    const ending      = phase === 'end';
+    const coords      = starting? interaction.startCoords : interaction.curCoords;
+    const prevEvent   = interaction.prevEvent;
+
+    element = element || interaction.element;
+
+    const page   = extend({}, coords.page);
+    const client = extend({}, coords.client);
+
+    page.x -= origin.x;
+    page.y -= origin.y;
+
+    client.x -= origin.x;
+    client.y -= origin.y;
+
+    this.ctrlKey       = event.ctrlKey;
+    this.altKey        = event.altKey;
+    this.shiftKey      = event.shiftKey;
+    this.metaKey       = event.metaKey;
+    this.button        = event.button;
+    this.buttons       = event.buttons;
+    this.target        = element;
+    this.currentTarget = element;
+    this.relatedTarget = related || null;
+    this.preEnd        = preEnd;
+    this.type          = action + (phase || '');
+    this.interaction   = interaction;
+    this.interactable  = target;
+
+    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1]
+                       : prevEvent.t0;
+
+    const signalArg = {
+      interaction,
+      event,
+      action,
+      phase,
+      element,
+      related,
+      page,
+      client,
+      coords,
+      starting,
+      ending,
+      deltaSource,
+      iEvent: this,
+    };
+
+    signals.fire('set-xy', signalArg);
+
+    if (ending) {
+      // use previous coords when ending
+      this.pageX = prevEvent.pageX;
+      this.pageY = prevEvent.pageY;
+      this.clientX = prevEvent.clientX;
+      this.clientY = prevEvent.clientY;
+    }
+    else {
+      this.pageX     = page.x;
+      this.pageY     = page.y;
+      this.clientX   = client.x;
+      this.clientY   = client.y;
+    }
+
+    this.x0        = interaction.startCoords.page.x - origin.x;
+    this.y0        = interaction.startCoords.page.y - origin.y;
+    this.clientX0  = interaction.startCoords.client.x - origin.x;
+    this.clientY0  = interaction.startCoords.client.y - origin.y;
+
+    signals.fire('set-delta', signalArg);
+
+    this.timeStamp = coords.timeStamp;
+    this.dt        = interaction.pointerDelta.timeStamp;
+    this.duration  = this.timeStamp - this.t0;
+
+    // speed and velocity in pixels per second
+    this.speed = interaction.pointerDelta[deltaSource].speed;
+    this.velocityX = interaction.pointerDelta[deltaSource].vx;
+    this.velocityY = interaction.pointerDelta[deltaSource].vy;
+
+    this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
+
+    signals.fire('new', signalArg);
+  }
+
+  getSwipe () {
+    const interaction = this.interaction;
+
+    if (interaction.prevEvent.speed &lt; 600
+        || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
+      return null;
+    }
+
+    let angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
+    const overlap = 22.5;
+
+    if (angle &lt; 0) {
+      angle += 360;
+    }
+
+    const left = 135 - overlap &lt;= angle &amp;&amp; angle &lt; 225 + overlap;
+    const up   = 225 - overlap &lt;= angle &amp;&amp; angle &lt; 315 + overlap;
+
+    const right = !left &amp;&amp; (315 - overlap &lt;= angle || angle &lt;  45 + overlap);
+    const down  = !up   &amp;&amp;   45 - overlap &lt;= angle &amp;&amp; angle &lt; 135 + overlap;
+
+    return {
+      up,
+      down,
+      left,
+      right,
+      angle,
+      speed: interaction.prevEvent.speed,
+      velocity: {
+        x: interaction.prevEvent.velocityX,
+        y: interaction.prevEvent.velocityY,
+      },
+    };
+  }
+
+  preventDefault () {}
+
+  /** */
+  stopImmediatePropagation () {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  }
+
+  /** */
+  stopPropagation () {
+    this.propagationStopped = true;
+  }
+}
+
+signals.on('set-delta', function ({ iEvent, interaction, starting, deltaSource }) {
+  const prevEvent = starting? iEvent : interaction.prevEvent;
+
+  if (deltaSource === 'client') {
+    iEvent.dx = iEvent.clientX - prevEvent.clientX;
+    iEvent.dy = iEvent.clientY - prevEvent.clientY;
+  }
+  else {
+    iEvent.dx = iEvent.pageX - prevEvent.pageX;
+    iEvent.dy = iEvent.pageY - prevEvent.pageY;
+  }
+});
+
+InteractEvent.signals = signals;
+
+module.exports = InteractEvent;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,9 +1,0 @@
-{
-    "title": "interact.js",
-    "output": "index.html",
-    "template": "template.dot",
-    "files": [{
-        "url": "../interact.js",
-        "link": "https://github.com/taye/interact.js/blob/3ddcd9f/interact.js"
-    }]
-}

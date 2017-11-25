@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>src/autoStart/InteractableMethods.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#actionChecker">actionChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#preventDefault">preventDefault</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#styleCursor">styleCursor</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent.html">InteractEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopImmediatePropagation">stopImmediatePropagation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopPropagation">stopPropagation</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction.html">Interaction</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#doMove">doMove</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#end">end</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#start">start</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#stop">stop</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.dynamicDrop">dynamicDrop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">src/autoStart/InteractableMethods.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/** @lends Interactable */
+const Interactable = require('../Interactable');
+const actions      = require('../actions/base');
+const is           = require('../utils/is');
+const domUtils     = require('../utils/domUtils');
+
+const { warnOnce } = require('../utils');
+
+Interactable.prototype.getAction = function (pointer, event, interaction, element) {
+  const action = this.defaultActionChecker(pointer, event, interaction, element);
+
+  if (this.options.actionChecker) {
+    return this.options.actionChecker(pointer, event, action, this, element, interaction);
+  }
+
+  return action;
+};
+
+/**
+ * ```js
+ * interact(element, { ignoreFrom: document.getElementById('no-action') });
+ * // or
+ * interact(element).ignoreFrom('input, textarea, a');
+ * ```
+ * @deprecated
+ * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
+ * of it's parents match the given CSS selector or Element, no
+ * drag/resize/gesture is started.
+ *
+ * Don't use this method. Instead set the `ignoreFrom` option for each action
+ * or for `pointerEvents`
+ *
+ * @example
+ * interact(targett)
+ *   .draggable({
+ *     ignoreFrom: 'input, textarea, a[href]'',
+ *   })
+ *   .pointerEvents({
+ *     ignoreFrom: '[no-pointer]',
+ *   });
+ *
+ * @param {string | Element | null} [newValue] a CSS selector string, an
+ * Element or `null` to not ignore any elements
+ * @return {string | Element | object} The current ignoreFrom value or this
+ * Interactable
+ */
+Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
+  return this._backCompatOption('ignoreFrom', newValue);
+}, 'Interactable.ignoreForm() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
+
+/**
+ * ```js
+ *
+ * @deprecated
+ * A drag/resize/gesture is started only If the target of the `mousedown`,
+ * `pointerdown` or `touchstart` event or any of it's parents match the given
+ * CSS selector or Element.
+ *
+ * Don't use this method. Instead set the `allowFrom` option for each action
+ * or for `pointerEvents`
+ *
+ * @example
+ * interact(targett)
+ *   .resizable({
+ *     allowFrom: '.resize-handle',
+ *   .pointerEvents({
+ *     allowFrom: '.handle',,
+ *   });
+ *
+ * @param {string | Element | null} [newValue] a CSS selector string, an
+ * Element or `null` to allow from any element
+ * @return {string | Element | object} The current allowFrom value or this
+ * Interactable
+ */
+Interactable.prototype.allowFrom = warnOnce(function (newValue) {
+  return this._backCompatOption('allowFrom', newValue);
+}, 'Interactable.allowForm() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
+
+Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
+  if (!ignoreFrom || !is.element(element)) { return false; }
+
+  if (is.string(ignoreFrom)) {
+    return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
+  }
+  else if (is.element(ignoreFrom)) {
+    return domUtils.nodeContains(ignoreFrom, element);
+  }
+
+  return false;
+};
+
+Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
+  if (!allowFrom) { return true; }
+
+  if (!is.element(element)) { return false; }
+
+  if (is.string(allowFrom)) {
+    return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+  }
+  else if (is.element(allowFrom)) {
+    return domUtils.nodeContains(allowFrom, element);
+  }
+
+  return false;
+};
+
+Interactable.prototype.testIgnoreAllow = function (options, interactableElement, eventTarget) {
+  return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget)
+    &amp;&amp; this.testAllow(options.allowFrom, interactableElement, eventTarget));
+};
+
+/**
+ * ```js
+ * interact('.resize-drag')
+ *   .resizable(true)
+ *   .draggable(true)
+ *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+ *
+ *   if (interact.matchesSelector(event.target, '.drag-handle') {
+ *     // force drag with handle target
+ *     action.name = drag;
+ *   }
+ *   else {
+ *     // resize from the top and right edges
+ *     action.name  = 'resize';
+ *     action.edges = { top: true, right: true };
+ *   }
+ *
+ *   return action;
+ * });
+ * ```
+ *
+ * Gets or sets the function used to check action to be performed on
+ * pointerDown
+ *
+ * @param {function | null} [checker] A function which takes a pointer event,
+ * defaultAction string, interactable, element and interaction as parameters
+ * and returns an object with name property 'drag' 'resize' or 'gesture' and
+ * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+ * props.
+ * @return {Function | Interactable} The checker function or this Interactable
+ */
+Interactable.prototype.actionChecker = function (checker) {
+  if (is.function(checker)) {
+    this.options.actionChecker = checker;
+
+    return this;
+  }
+
+  if (checker === null) {
+    delete this.options.actionChecker;
+
+    return this;
+  }
+
+  return this.options.actionChecker;
+};
+
+/**
+ * Returns or sets whether the the cursor should be changed depending on the
+ * action that would be performed if the mouse were pressed and dragged.
+ *
+ * @param {boolean} [newValue]
+ * @return {boolean | Interactable} The current setting or this Interactable
+ */
+Interactable.prototype.styleCursor = function (newValue) {
+  if (is.bool(newValue)) {
+    this.options.styleCursor = newValue;
+
+    return this;
+  }
+
+  if (newValue === null) {
+    delete this.options.styleCursor;
+
+    return this;
+  }
+
+  return this.options.styleCursor;
+};
+
+Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+  const rect = this.getRect(element);
+  const buttons = event.buttons || ({
+    0: 1,
+    1: 4,
+    3: 8,
+    4: 16,
+  })[event.button];
+  let action = null;
+
+  for (const actionName of actions.names) {
+    // check mouseButton setting if the pointer is down
+    if (interaction.pointerIsDown
+        &amp;&amp; /mouse|pointer/.test(interaction.pointerType)
+        &amp;&amp; (buttons &amp; this.options[actionName].mouseButtons) === 0) {
+      continue;
+    }
+
+    action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
+
+    if (action) {
+      return action;
+    }
+  }
+};
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

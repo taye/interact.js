@@ -1,0 +1,13 @@
+check:
+  global:
+    statements: 48
+    lines: 40
+    branches: 25
+    functions: 45
+    excludes: []
+    each:
+      statements: 0
+      lines: 0
+      branches: 0
+      functions: 0
+      excludes: []
