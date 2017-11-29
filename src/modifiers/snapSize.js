@@ -47,7 +47,7 @@ const snapSize = {
     arg.options = utils.extend({}, options);
     arg.options.targets = [];
 
-    for (const snapTarget of options.targets) {
+    for (const snapTarget of (options.targets || [])) {
       let target;
 
       if (utils.is.function(snapTarget)) {
