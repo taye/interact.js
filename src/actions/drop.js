@@ -30,14 +30,14 @@ Interaction.signals.on('action-start', function ({ interaction, event }) {
   interaction.dropEvents = null;
 
   if (!interaction.dynamicDrop) {
-    setActiveDrops(interaction, interaction.element);
+    setActiveDrops(interaction.activeDrops, interaction.element);
   }
 
   const dragEvent = interaction.prevEvent;
   const dropEvents = getDropEvents(interaction, event, dragEvent);
 
   if (dropEvents.activate) {
-    fireActiveDrops(interaction, dropEvents.activate);
+    fireActiveDrops(interaction.activeDrops, dropEvents.activate);
   }
 });
 
@@ -67,17 +67,18 @@ Interaction.signals.on('action-end', function ({ interaction }) {
 });
 
 Interaction.signals.on('stop-drag', function ({ interaction }) {
-  interaction.activeDrops.dropzones =
-    interaction.activeDrops.elements =
-    interaction.activeDrops.rects =
-    interaction.dropEvents = null;
+  interaction.activeDrops = {
+    dropzones: null,
+    elements: null,
+    rects: null,
+  };
+
+  interaction.dropEvents = null;
 });
 
-function collectDrops (interaction, element) {
+function collectDrops (activeDrops, element) {
   const drops = [];
   const elements = [];
-
-  element = element || interaction.element;
 
   // collect all dropzones and their elements which qualify for a drop
   for (const current of scope.interactables) {
@@ -112,13 +113,13 @@ function collectDrops (interaction, element) {
   };
 }
 
-function fireActiveDrops (interaction, event) {
+function fireActiveDrops (activeDrops, event) {
   let prevElement;
 
   // loop through all active dropzones and trigger event
-  for (let i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    const current = interaction.activeDrops.dropzones[i];
-    const currentElement = interaction.activeDrops.elements [i];
+  for (let i = 0; i < activeDrops.dropzones.length; i++) {
+    const current = activeDrops.dropzones[i];
+    const currentElement = activeDrops.elements [i];
 
     // prevent trigger of duplicate events on same element
     if (currentElement !== prevElement) {
@@ -133,17 +134,16 @@ function fireActiveDrops (interaction, event) {
 // Collect a new set of possible drops and save them in activeDrops.
 // setActiveDrops should always be called when a drag has just started or a
 // drag event happens while dynamicDrop is true
-function setActiveDrops (interaction, dragElement) {
+function setActiveDrops (activeDrops, dragElement) {
   // get dropzones and their elements that could receive the draggable
-  const possibleDrops = collectDrops(interaction, dragElement, true);
+  const possibleDrops = collectDrops(activeDrops, dragElement);
 
-  interaction.activeDrops.dropzones = possibleDrops.dropzones;
-  interaction.activeDrops.elements  = possibleDrops.elements;
-  interaction.activeDrops.rects     = [];
+  activeDrops.dropzones = possibleDrops.dropzones;
+  activeDrops.elements  = possibleDrops.elements;
+  activeDrops.rects     = [];
 
-  for (let i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    interaction.activeDrops.rects[i] =
-      interaction.activeDrops.dropzones[i].getRect(interaction.activeDrops.elements[i]);
+  for (let i = 0; i < activeDrops.dropzones.length; i++) {
+    activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
   }
 }
 
@@ -152,7 +152,7 @@ function getDrop (dragEvent, event, dragElement) {
   const validDrops = [];
 
   if (dynamicDrop) {
-    setActiveDrops(interaction, dragElement);
+    setActiveDrops(interaction.activeDrops, dragElement);
   }
 
   // collect all dropzones and their elements which qualify for a drop
@@ -252,16 +252,23 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
 }
 
 function fireDropEvents (interaction, dropEvents) {
-  if (dropEvents.leave) { interaction.prevDropTarget.fire(dropEvents.leave); }
-  if (dropEvents.move ) {     interaction.dropTarget.fire(dropEvents.move ); }
-  if (dropEvents.enter) {     interaction.dropTarget.fire(dropEvents.enter); }
-  if (dropEvents.drop ) {     interaction.dropTarget.fire(dropEvents.drop ); }
+  const {
+    activeDrops,
+    prevDropTarget,
+    dropTarget,
+    dropElement,
+  } = interaction;
+
+  if (dropEvents.leave) { prevDropTarget.fire(dropEvents.leave); }
+  if (dropEvents.move ) {     dropTarget.fire(dropEvents.move ); }
+  if (dropEvents.enter) {     dropTarget.fire(dropEvents.enter); }
+  if (dropEvents.drop ) {     dropTarget.fire(dropEvents.drop ); }
   if (dropEvents.deactivate) {
-    fireActiveDrops(interaction, dropEvents.deactivate);
+    fireActiveDrops(activeDrops, dropEvents.deactivate);
   }
 
-  interaction.prevDropTarget  = interaction.dropTarget;
-  interaction.prevDropElement = interaction.dropElement;
+  interaction.prevDropTarget  = dropTarget;
+  interaction.prevDropElement = dropElement;
 }
 
 /**

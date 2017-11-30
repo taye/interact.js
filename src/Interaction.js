@@ -74,6 +74,7 @@ class Interaction {
     this.pointerIsDown   = false;
     this.pointerWasMoved = false;
     this._interacting    = false;
+    this._ending         = false;
 
     this.pointerType = pointerType;
 
@@ -277,6 +278,8 @@ class Interaction {
    * @param {PointerEvent} [event]
    */
   end (event) {
+    this._ending = true;
+
     event = event || this.prevEvent;
 
     if (this.interacting()) {
@@ -287,6 +290,7 @@ class Interaction {
     }
 
     this.stop();
+    this._ending = false;
   }
 
   currentAction () {
