@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.0
+ * interact.js v1.3.1
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -709,7 +709,7 @@ var Interactable = function () {
       _ref4 = (scope.interactions || [])[_i4];
       var interaction = _ref4;
 
-      if (interaction.target === this && interaction.interacting()) {
+      if (interaction.target === this && interaction.interacting() && !interaction._ending) {
         interaction.stop();
       }
     }
@@ -855,6 +855,7 @@ var Interaction = function () {
     this.pointerIsDown = false;
     this.pointerWasMoved = false;
     this._interacting = false;
+    this._ending = false;
 
     this.pointerType = pointerType;
 
@@ -1061,6 +1062,8 @@ var Interaction = function () {
 
 
   Interaction.prototype.end = function end(event) {
+    this._ending = true;
+
     event = event || this.prevEvent;
 
     if (this.interacting()) {
@@ -1071,6 +1074,7 @@ var Interaction = function () {
     }
 
     this.stop();
+    this._ending = false;
   };
 
   Interaction.prototype.currentAction = function currentAction() {
@@ -1575,14 +1579,14 @@ Interaction.signals.on('action-start', function (_ref) {
   interaction.dropEvents = null;
 
   if (!interaction.dynamicDrop) {
-    setActiveDrops(interaction, interaction.element);
+    setActiveDrops(interaction.activeDrops, interaction.element);
   }
 
   var dragEvent = interaction.prevEvent;
   var dropEvents = getDropEvents(interaction, event, dragEvent);
 
   if (dropEvents.activate) {
-    fireActiveDrops(interaction, dropEvents.activate);
+    fireActiveDrops(interaction.activeDrops, dropEvents.activate);
   }
 });
 
@@ -1626,14 +1630,18 @@ Interaction.signals.on('action-end', function (_ref4) {
 Interaction.signals.on('stop-drag', function (_ref5) {
   var interaction = _ref5.interaction;
 
-  interaction.activeDrops.dropzones = interaction.activeDrops.elements = interaction.activeDrops.rects = interaction.dropEvents = null;
+  interaction.activeDrops = {
+    dropzones: null,
+    elements: null,
+    rects: null
+  };
+
+  interaction.dropEvents = null;
 });
 
-function collectDrops(interaction, element) {
+function collectDrops(activeDrops, element) {
   var drops = [];
   var elements = [];
-
-  element = element || interaction.element;
 
   // collect all dropzones and their elements which qualify for a drop
   for (var _i = 0; _i < scope.interactables.length; _i++) {
@@ -1676,13 +1684,13 @@ function collectDrops(interaction, element) {
   };
 }
 
-function fireActiveDrops(interaction, event) {
+function fireActiveDrops(activeDrops, event) {
   var prevElement = void 0;
 
   // loop through all active dropzones and trigger event
-  for (var i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    var current = interaction.activeDrops.dropzones[i];
-    var currentElement = interaction.activeDrops.elements[i];
+  for (var i = 0; i < activeDrops.dropzones.length; i++) {
+    var current = activeDrops.dropzones[i];
+    var currentElement = activeDrops.elements[i];
 
     // prevent trigger of duplicate events on same element
     if (currentElement !== prevElement) {
@@ -1697,16 +1705,16 @@ function fireActiveDrops(interaction, event) {
 // Collect a new set of possible drops and save them in activeDrops.
 // setActiveDrops should always be called when a drag has just started or a
 // drag event happens while dynamicDrop is true
-function setActiveDrops(interaction, dragElement) {
+function setActiveDrops(activeDrops, dragElement) {
   // get dropzones and their elements that could receive the draggable
-  var possibleDrops = collectDrops(interaction, dragElement, true);
+  var possibleDrops = collectDrops(activeDrops, dragElement);
 
-  interaction.activeDrops.dropzones = possibleDrops.dropzones;
-  interaction.activeDrops.elements = possibleDrops.elements;
-  interaction.activeDrops.rects = [];
+  activeDrops.dropzones = possibleDrops.dropzones;
+  activeDrops.elements = possibleDrops.elements;
+  activeDrops.rects = [];
 
-  for (var i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    interaction.activeDrops.rects[i] = interaction.activeDrops.dropzones[i].getRect(interaction.activeDrops.elements[i]);
+  for (var i = 0; i < activeDrops.dropzones.length; i++) {
+    activeDrops.rects[i] = activeDrops.dropzones[i].getRect(activeDrops.elements[i]);
   }
 }
 
@@ -1715,7 +1723,7 @@ function getDrop(dragEvent, event, dragElement) {
   var validDrops = [];
 
   if (dynamicDrop) {
-    setActiveDrops(interaction, dragElement);
+    setActiveDrops(interaction.activeDrops, dragElement);
   }
 
   // collect all dropzones and their elements which qualify for a drop
@@ -1813,24 +1821,30 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
 }
 
 function fireDropEvents(interaction, dropEvents) {
+  var activeDrops = interaction.activeDrops,
+      prevDropTarget = interaction.prevDropTarget,
+      dropTarget = interaction.dropTarget,
+      dropElement = interaction.dropElement;
+
+
   if (dropEvents.leave) {
-    interaction.prevDropTarget.fire(dropEvents.leave);
+    prevDropTarget.fire(dropEvents.leave);
   }
   if (dropEvents.move) {
-    interaction.dropTarget.fire(dropEvents.move);
+    dropTarget.fire(dropEvents.move);
   }
   if (dropEvents.enter) {
-    interaction.dropTarget.fire(dropEvents.enter);
+    dropTarget.fire(dropEvents.enter);
   }
   if (dropEvents.drop) {
-    interaction.dropTarget.fire(dropEvents.drop);
+    dropTarget.fire(dropEvents.drop);
   }
   if (dropEvents.deactivate) {
-    fireActiveDrops(interaction, dropEvents.deactivate);
+    fireActiveDrops(activeDrops, dropEvents.deactivate);
   }
 
-  interaction.prevDropTarget = interaction.dropTarget;
-  interaction.prevDropElement = interaction.dropElement;
+  interaction.prevDropTarget = dropTarget;
+  interaction.prevDropElement = dropElement;
 }
 
 /**
@@ -4853,10 +4867,10 @@ var snap = {
       var relativeX = page.x - offsetX;
       var relativeY = page.y - offsetY;
 
-      for (var _i3 = 0; _i3 < options.targets.length; _i3++) {
+      for (var _i3 = 0; _i3 < (options.targets || []).length; _i3++) {
         var _ref7;
 
-        _ref7 = options.targets[_i3];
+        _ref7 = (options.targets || [])[_i3];
         var snapTarget = _ref7;
 
         if (utils.is.function(snapTarget)) {
@@ -5075,10 +5089,10 @@ var snapSize = {
     arg.options = utils.extend({}, options);
     arg.options.targets = [];
 
-    for (var _i = 0; _i < options.targets.length; _i++) {
+    for (var _i = 0; _i < (options.targets || []).length; _i++) {
       var _ref;
 
-      _ref = options.targets[_i];
+      _ref = (options.targets || [])[_i];
       var snapTarget = _ref;
 
       var target = void 0;
