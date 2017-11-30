@@ -76,7 +76,7 @@ const snap = {
       const relativeX = page.x - offsetX;
       const relativeY = page.y - offsetY;
 
-      for (const snapTarget of options.targets) {
+      for (const snapTarget of (options.targets || [])) {
         if (utils.is.function(snapTarget)) {
           target = snapTarget(relativeX, relativeY, interaction);
         }

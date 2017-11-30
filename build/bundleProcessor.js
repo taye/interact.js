@@ -22,7 +22,22 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
 
   bundleStream.on('data', chunk => streamCode += chunk);
   bundleStream.on('end', function () {
-    const raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode));
+    let raw;
+
+    try {
+      raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode));
+    }
+    catch (e) {
+      for (const name in filenames) {
+        write({
+          filename: filenames[name],
+          code: streamCode,
+          map: { sources: [] },
+        });
+      }
+
+      return;
+    }
 
     write(raw);
 
