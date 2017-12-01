@@ -35,7 +35,7 @@ win.getWindow = function getWindow (node) {
 
   const rootNode = (node.ownerDocument || node);
 
-  return rootNode.defaultView || rootNode.parentWindow || win.window;
+  return rootNode.defaultView || win.window;
 };
 
 win.init = init;
