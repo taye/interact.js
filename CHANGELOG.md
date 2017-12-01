@@ -1,3 +1,9 @@
+## v1.3.1
+ - allowed calling `draggable.unset()` during `dragend` and `drop` event
+   listeners ([issue #560](https://github.com/taye/interact.js/issues/560))
+ - allowed snap to be enabled with falsey targets value [issue
+   #562](https://github.com/taye/interact.js/issues/562)
+
 ## v1.3.0
 
 Most notably:
