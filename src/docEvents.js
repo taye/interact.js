@@ -114,7 +114,7 @@ function newInteraction (options, scope) {
   return interaction;
 }
 
-function onDocSignal ({ doc, scope }, signalName) {
+function onDocSignal ({ doc, scope, options }, signalName) {
   const { delegatedEvents, eventMap } = scope.docEvents;
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
@@ -125,8 +125,10 @@ function onDocSignal ({ doc, scope }, signalName) {
     eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
 
+  const eventOptions = options && options.events;
+
   for (const eventType in eventMap) {
-    eventMethod(doc, eventType, eventMap[eventType]);
+    eventMethod(doc, eventType, eventMap[eventType], eventOptions);
   }
 }
 

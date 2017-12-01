@@ -22,15 +22,15 @@ const scope = {
   // main document
   document: require('./utils/domObjects').document,
   // all documents being listened to
-  documents: [],
+  documents: [/* { doc, options } */],
 
-  addDocument: function (doc, win) {
+  addDocument (doc, options) {
     // do nothing if document is already known
-    if (utils.contains(scope.documents, doc)) { return false; }
+    if (scope.getDocIndex(doc) !== -1) { return false; }
 
-    win = win || getWindow(doc);
+    const win = getWindow(doc);
 
-    scope.documents.push(doc);
+    scope.documents.push({ doc, options });
     events.documents.push(doc);
 
     // don't add an unload event for the main document
@@ -39,24 +39,35 @@ const scope = {
       events.add(win, 'unload', scope.onWindowUnload);
     }
 
-    scope.signals.fire('add-document', { doc, win, scope });
+    scope.signals.fire('add-document', { doc, win, scope, options });
   },
 
-  removeDocument: function (doc, win) {
-    const index = scope.documents.indexOf(doc);
+  removeDocument (doc) {
+    const index = scope.getDocIndex(doc);
 
-    win = win || getWindow(doc);
+    const win = getWindow(doc);
+    const options = scope.documents[index].options;
 
     events.remove(win, 'unload', scope.onWindowUnload);
 
     scope.documents.splice(index, 1);
     events.documents.splice(index, 1);
 
-    scope.signals.fire('remove-document', { win, doc, scope });
+    scope.signals.fire('remove-document', { doc, win, scope, options });
   },
 
-  onWindowUnload: function () {
-    scope.removeDocument(this.document, this);
+  onWindowUnload (event) {
+    scope.removeDocument(event.target.document);
+  },
+
+  getDocIndex (doc) {
+    for (let i = 0; i < scope.documents.length; i++) {
+      if (scope.documents[i].doc === doc) {
+        return i;
+      }
+    }
+
+    return -1;
   },
 };
 

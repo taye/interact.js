@@ -29,14 +29,14 @@ class Interactable {
     this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
-    scope.addDocument(this._doc, this._win);
-
     this._signals.fire('new', {
       target,
       options,
       interactable: this,
       win: this._win,
     });
+
+    scope.addDocument(this._doc);
 
     scope.interactables.push(this);
 

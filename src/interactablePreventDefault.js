@@ -4,6 +4,7 @@ const is           = require('./utils/is');
 const events       = require('./utils/events');
 
 const { nodeContains, matchesSelector } = require('./utils/domUtils');
+const { getWindow } = require('./utils/window');
 
 /**
  * Returns or sets whether to prevent the browser's default behaviour in
@@ -44,7 +45,11 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   // don't preventDefault of touch{start,move} events if the browser supports passive
   // events listeners. CSS touch-action and user-selecct should be used instead
   if (events.supportsOptions && /^touch(start|move)$/.test(event.type)) {
-    return;
+    const docOptions = scope.getDocIndex(getWindow(event.target).document);
+
+    if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
+      return;
+    }
   }
 
   // don't preventDefault of pointerdown events
