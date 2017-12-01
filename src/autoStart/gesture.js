@@ -1,1 +1,3 @@
-require('./base').setActionDefaults(require('../actions/gesture'));
+module.exports = ({ autoStart, actions }) => {
+  autoStart.setActionDefaults(actions.gesture);
+};

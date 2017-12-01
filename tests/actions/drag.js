@@ -1,23 +1,47 @@
 const test = require('../test');
+const helpers = require('../helpers');
+const Signals = require('../../src/utils/Signals');
 
-test('drag action setup', t => {
-  const actions      = require('../../src/actions/base');
-  const Interactable = require('../../src/Interactable');
-  const utils        = require('../../src/utils');
-  require('../../src/actions/drag');
+const drag = require('../../src/actions/drag');
 
-  t.ok(utils.contains(actions.names, 'drag'), '"drag" in actions.names');
-  t.equal(actions.methodDict.drag, 'draggable');
-  t.equal(typeof Interactable.prototype.draggable, 'function');
+function mockScope () {
+  return helpers.mockScope({
+    actions: {
+      names: [],
+      methodDict: {},
+    },
+    InteractEvent: { signals: Signals.new() },
+    Interactable: {
+      prototype: {},
+      signals: Signals.new(),
+      eventTypes: [],
+    },
+  });
+}
+
+test('drag action init', t => {
+  const scope = mockScope();
+
+  drag.init(scope);
+
+  t.ok(scope.actions.names.includes('drag'), '"drag" in actions.names');
+  t.equal(scope.actions.methodDict.drag, 'draggable');
+  t.equal(typeof scope.Interactable.prototype.draggable, 'function');
 
   t.end();
 });
 
 test('Interactable.draggable method', t => {
-  require('../../src/actions/drag');
-
-  const Interactable = require('../../src/Interactable');
-  const interactable = new Interactable({});
+  const interactable = {
+    options: {
+      drag: {},
+    },
+    draggable: drag.draggable,
+    setPerAction: () => calledSetPerAction = true,
+    setOnEvents: () => calledSetOnEvents = true,
+  };
+  let calledSetPerAction = false;
+  let calledSetOnEvents = false;
 
   t.equal(interactable.draggable(), interactable.options.drag,
     'interactable.draggable() returns interactable.options.drag object');
@@ -33,6 +57,11 @@ test('Interactable.draggable method', t => {
   interactable.draggable({});
   t.ok(interactable.options.drag.enabled,
     'calling `interactable.draggable({})` enables dragging');
+  t.ok(calledSetOnEvents,
+    'calling `interactable.draggable({})` calls this.setOnEvents');
+  t.ok(calledSetPerAction,
+    'calling `interactable.draggable({})` calls this.setPerAction');
+
 
   interactable.draggable({ enabled: false });
   t.notOk(interactable.options.drag.enabled,
@@ -62,17 +91,23 @@ test('Interactable.draggable method', t => {
 });
 
 test('drag axis', t => {
-  const Interaction   = require('../../src/Interaction');
-  const Interactable = require('../../src/Interactable');
-  const InteractEvent = require('../../src/InteractEvent');
+  const scope = mockScope();
+  const Interaction = require('../../src/Interaction');
+
+  Interaction.init(scope);
+  drag.init(scope);
+
+  const interaction = scope.Interaction.new({});
+  const element = {};
+  const interactable = {
+    options: {
+      drag: {},
+    },
+    target: element,
+  };
+  const iEvent = { type: 'dragmove' };
 
   const opposites = { x: 'y', y: 'x' };
-  const interaction = new Interaction({});
-  const element = {};
-  const interactable = new Interactable(element, { origin: { x: 0, y: 0 } });
-  interaction.target = interactable;
-
-  const iEvent = { type: 'dragmove' };
   const eventCoords = {
     pageX:   -1, pageY:   -2,
     clientX: -3, clientY: -4,
@@ -85,9 +120,10 @@ test('drag axis', t => {
 
   resetCoords();
   interaction.prepared = { name: 'drag', axis: 'xy' };
+  interaction.target = interactable;
 
   t.test('xy (any direction)', tt => {
-    Interaction.signals.fire('before-action-move', { interaction });
+    scope.Interaction.signals.fire('before-action-move', { interaction });
 
     tt.deepEqual(interaction.startCoords.page, startPage,
       'startCoords.page is not modified');
@@ -98,7 +134,7 @@ test('drag axis', t => {
     tt.deepEqual(interaction.pointerDelta.client, deltaClient,
       'pointerDelta.client is not modified');
 
-    InteractEvent.signals.fire('new', { iEvent, interaction });
+    scope.InteractEvent.signals.fire('new', { iEvent, interaction });
 
     tt.equal(iEvent.pageX, eventCoords.pageX, 'pageX is not modified');
     tt.equal(iEvent.pageY, eventCoords.pageY, 'pageY is not modified');
@@ -118,7 +154,7 @@ test('drag axis', t => {
       resetCoords();
       interaction.prepared.axis = axis;
 
-      InteractEvent.signals.fire('new', { iEvent, interaction });
+      scope.InteractEvent.signals.fire('new', { iEvent, interaction });
 
       tt.equal(iEvent['d' + opposite], 0,
         'd' + opposite + ' is zero');

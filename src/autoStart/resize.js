@@ -1,1 +1,3 @@
-require('./base').setActionDefaults(require('../actions/resize'));
+module.exports = ({ autoStart, actions }) => {
+  autoStart.setActionDefaults(actions.resize);
+};

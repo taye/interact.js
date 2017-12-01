@@ -1,182 +1,187 @@
-const InteractEvent  = require('./InteractEvent');
-const Interaction    = require('./Interaction');
 const modifiers      = require('./modifiers/base');
 const utils          = require('./utils');
 const animationFrame = require('./utils/raf');
 
-Interaction.signals.on('new', function (interaction) {
-  interaction.inertiaStatus = {
-    active     : false,
-    smoothEnd  : false,
-    allowResume: false,
+function init (scope) {
+  const {
+    InteractEvent,
+    Interaction,
+  } = scope;
 
-    startEvent: null,
-    upCoords  : {},
+  Interaction.signals.on('new', function (interaction) {
+    interaction.inertiaStatus = {
+      active     : false,
+      smoothEnd  : false,
+      allowResume: false,
 
-    xe: 0, ye: 0,
-    sx: 0, sy: 0,
+      startEvent: null,
+      upCoords  : {},
 
-    t0: 0,
-    vx0: 0, vys: 0,
-    duration: 0,
+      xe: 0, ye: 0,
+      sx: 0, sy: 0,
 
-    lambda_v0: 0,
-    one_ve_v0: 0,
-    i  : null,
-  };
+      t0: 0,
+      vx0: 0, vys: 0,
+      duration: 0,
 
-  interaction.boundInertiaFrame   = () => inertiaFrame  .apply(interaction);
-  interaction.boundSmoothEndFrame = () => smoothEndFrame.apply(interaction);
-});
+      lambda_v0: 0,
+      one_ve_v0: 0,
+      i  : null,
+    };
 
-Interaction.signals.on('down', function ({ interaction, event, pointer, eventTarget }) {
-  const status = interaction.inertiaStatus;
+    interaction.boundInertiaFrame   = () => inertiaFrame  .apply(interaction);
+    interaction.boundSmoothEndFrame = () => smoothEndFrame.apply(interaction);
+  });
 
-  // Check if the down event hits the current inertia target
-  if (status.active) {
-    let element = eventTarget;
+  Interaction.signals.on('down', function ({ interaction, event, pointer, eventTarget }) {
+    const status = interaction.inertiaStatus;
 
-    // climb up the DOM tree from the event target
-    while (utils.is.element(element)) {
+    // Check if the down event hits the current inertia target
+    if (status.active) {
+      let element = eventTarget;
 
-      // if interaction element is the current inertia target element
-      if (element === interaction.element) {
-        // stop inertia
-        animationFrame.cancel(status.i);
-        status.active = false;
-        interaction.simulation = null;
+      // climb up the DOM tree from the event target
+      while (utils.is.element(element)) {
 
-        // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer);
-        utils.setCoords(interaction.curCoords, interaction.pointers);
+        // if interaction element is the current inertia target element
+        if (element === interaction.element) {
+          // stop inertia
+          animationFrame.cancel(status.i);
+          status.active = false;
+          interaction.simulation = null;
 
-        // fire appropriate signals
-        const signalArg = { interaction };
-        Interaction.signals.fire('before-action-move', signalArg);
-        Interaction.signals.fire('action-resume'     , signalArg);
+          // update pointers to the down event's coordinates
+          interaction.updatePointer(pointer, event, eventTarget, true);
+          utils.setCoords(interaction.curCoords, interaction.pointers);
 
-        // fire a reume event
-        const resumeEvent = new InteractEvent(interaction,
-                                              event,
-                                              interaction.prepared.name,
-                                              'inertiaresume',
-                                              interaction.element);
+          // fire appropriate signals
+          const signalArg = { interaction };
+          Interaction.signals.fire('before-action-move', signalArg);
+          Interaction.signals.fire('action-resume'     , signalArg);
 
-        interaction.target.fire(resumeEvent);
-        interaction.prevEvent = resumeEvent;
-        modifiers.resetStatuses(interaction.modifierStatuses);
+          // fire a reume event
+          const resumeEvent = new InteractEvent(interaction,
+                                                event,
+                                                interaction.prepared.name,
+                                                'inertiaresume',
+                                                interaction.element);
 
-        utils.copyCoords(interaction.prevCoords, interaction.curCoords);
-        break;
+          interaction.target.fire(resumeEvent);
+          interaction.prevEvent = resumeEvent;
+          modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
+
+          utils.copyCoords(interaction.prevCoords, interaction.curCoords);
+          break;
+        }
+
+        element = utils.parentNode(element);
       }
-
-      element = utils.parentNode(element);
     }
-  }
-});
+  });
 
-Interaction.signals.on('up', function ({ interaction, event }) {
-  const status = interaction.inertiaStatus;
+  Interaction.signals.on('up', function ({ interaction, event }) {
+    const status = interaction.inertiaStatus;
 
-  if (!interaction.interacting() || status.active) { return; }
+    if (!interaction.interacting() || status.active) { return; }
 
-  const target = interaction.target;
-  const options = target && target.options;
-  const inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
+    const target = interaction.target;
+    const options = target && target.options;
+    const inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
 
-  const now = new Date().getTime();
-  const statuses = {};
-  const page = utils.extend({}, interaction.curCoords.page);
-  const pointerSpeed = interaction.pointerDelta.client.speed;
+    const now = new Date().getTime();
+    const statuses = {};
+    const page = utils.extend({}, interaction.curCoords.page);
+    const pointerSpeed = interaction.pointerDelta.client.speed;
 
-  let smoothEnd = false;
-  let modifierResult;
+    let smoothEnd = false;
+    let modifierResult;
 
-  // check if inertia should be started
-  const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
-                     && interaction.prepared.name !== 'gesture'
-                     && event !== status.startEvent);
+    // check if inertia should be started
+    const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
+                       && interaction.prepared.name !== 'gesture'
+                       && event !== status.startEvent);
 
-  const inertia = (inertiaPossible
-    && (now - interaction.curCoords.timeStamp) < 50
-    && pointerSpeed > inertiaOptions.minSpeed
-    && pointerSpeed > inertiaOptions.endSpeed);
+    const inertia = (inertiaPossible
+      && (now - interaction.curCoords.timeStamp) < 50
+      && pointerSpeed > inertiaOptions.minSpeed
+      && pointerSpeed > inertiaOptions.endSpeed);
 
-  const modifierArg = {
-    interaction,
-    pageCoords: page,
-    statuses,
-    preEnd: true,
-    requireEndOnly: true,
-  };
+    const modifierArg = {
+      interaction,
+      pageCoords: page,
+      statuses,
+      preEnd: true,
+      requireEndOnly: true,
+    };
 
-  // smoothEnd
-  if (inertiaPossible && !inertia) {
-    modifiers.resetStatuses(statuses);
+    // smoothEnd
+    if (inertiaPossible && !inertia) {
+      modifiers.resetStatuses(statuses, scope.modifiers);
 
-    modifierResult = modifiers.setAll(modifierArg);
+      modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
-    if (modifierResult.shouldMove && modifierResult.locked) {
-      smoothEnd = true;
+      if (modifierResult.shouldMove && modifierResult.locked) {
+        smoothEnd = true;
+      }
     }
-  }
 
-  if (!(inertia || smoothEnd)) { return; }
+    if (!(inertia || smoothEnd)) { return; }
 
-  utils.copyCoords(status.upCoords, interaction.curCoords);
+    utils.copyCoords(status.upCoords, interaction.curCoords);
 
-  interaction.pointers[0] = status.startEvent =
-    new InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+    interaction.pointers[0] = status.startEvent =
+      new InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
 
-  status.t0 = now;
+    status.t0 = now;
 
-  status.active = true;
-  status.allowResume = inertiaOptions.allowResume;
-  interaction.simulation = status;
+    status.active = true;
+    status.allowResume = inertiaOptions.allowResume;
+    interaction.simulation = status;
 
-  target.fire(status.startEvent);
+    target.fire(status.startEvent);
 
-  if (inertia) {
-    status.vx0 = interaction.pointerDelta.client.vx;
-    status.vy0 = interaction.pointerDelta.client.vy;
-    status.v0 = pointerSpeed;
+    if (inertia) {
+      status.vx0 = interaction.pointerDelta.client.vx;
+      status.vy0 = interaction.pointerDelta.client.vy;
+      status.v0 = pointerSpeed;
 
-    calcInertia(interaction, status);
+      calcInertia(interaction, status);
 
-    utils.extend(page, interaction.curCoords.page);
+      utils.extend(page, interaction.curCoords.page);
 
-    page.x += status.xe;
-    page.y += status.ye;
+      page.x += status.xe;
+      page.y += status.ye;
 
-    modifiers.resetStatuses(statuses);
+      modifiers.resetStatuses(statuses, scope.modifiers);
 
-    modifierResult = modifiers.setAll(modifierArg);
+      modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
-    status.modifiedXe += modifierResult.dx;
-    status.modifiedYe += modifierResult.dy;
+      status.modifiedXe += modifierResult.dx;
+      status.modifiedYe += modifierResult.dy;
 
-    status.i = animationFrame.request(interaction.boundInertiaFrame);
-  }
-  else {
-    status.smoothEnd = true;
-    status.xe = modifierResult.dx;
-    status.ye = modifierResult.dy;
+      status.i = animationFrame.request(interaction.boundInertiaFrame);
+    }
+    else {
+      status.smoothEnd = true;
+      status.xe = modifierResult.dx;
+      status.ye = modifierResult.dy;
 
-    status.sx = status.sy = 0;
+      status.sx = status.sy = 0;
 
-    status.i = animationFrame.request(interaction.boundSmoothEndFrame);
-  }
-});
+      status.i = animationFrame.request(interaction.boundSmoothEndFrame);
+    }
+  });
 
-Interaction.signals.on('stop-active', function ({ interaction }) {
-  const status = interaction.inertiaStatus;
+  Interaction.signals.on('stop-active', function ({ interaction }) {
+    const status = interaction.inertiaStatus;
 
-  if (status.active) {
-    animationFrame.cancel(status.i);
-    status.active = false;
-    interaction.simulation = null;
-  }
-});
+    if (status.active) {
+      animationFrame.cancel(status.i);
+      status.active = false;
+      interaction.simulation = null;
+    }
+  });
+}
 
 function calcInertia (interaction, status) {
   const inertiaOptions = interaction.target.options[interaction.prepared.name].inertia;
@@ -286,3 +291,11 @@ function updateInertiaCoords (interaction) {
     clientY: clientUp.y + status.sy,
   } ]);
 }
+
+module.exports = {
+  init,
+  calcInertia,
+  inertiaFrame,
+  smoothEndFrame,
+  updateInertiaCoords,
+};

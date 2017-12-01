@@ -1,36 +1,48 @@
 const test = require('../test');
+const helpers = require('../helpers');
+
+function mockScope () {
+  return helpers.mockScope({
+    pointerEvents: {
+      defaults: {},
+      signals: require('../../src/utils/Signals').new(),
+      types: [],
+      fire: () => {},
+    },
+  });
+}
 
 test('holdRepeat count', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
-  require('../../src/pointerEvents/holdRepeat');
-
+  const scope = mockScope();
   const pointerEvent = {
     type: 'hold',
   };
 
-  pointerEvents.signals.fire('new', { pointerEvent });
+  require('../../src/pointerEvents/holdRepeat').init(scope);
+
+  scope.pointerEvents.signals.fire('new', { pointerEvent });
   t.equal(pointerEvent.count, 1, 'first hold count is 1 with count previously undefined');
 
   const count = 20;
   pointerEvent.count = count;
-  pointerEvents.signals.fire('new', { pointerEvent });
+  scope.pointerEvents.signals.fire('new', { pointerEvent });
   t.equal(pointerEvent.count, count + 1, 'existing hold count is incremented');
 
   t.end();
 });
 
 test('holdRepeat onFired', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
+  const scope = mockScope();
   const Eventable = require('../../src/Eventable');
-  const Interaction = require('../../src/Interaction');
-  require('../../src/pointerEvents/holdRepeat');
+  require('../../src/Interaction').init(scope);
+  require('../../src/pointerEvents/holdRepeat').init(scope);
 
-  const interaction = new Interaction({});
+  const interaction = scope.Interaction.new({});
   const pointerEvent = {
     type: 'hold',
   };
   const eventTarget = {};
-  const eventable = new Eventable(Object.assign({}, pointerEvents.defaults, {
+  const eventable = new Eventable(Object.assign({}, scope.pointerEvents.defaults, {
     holdRepeatInterval: 0,
   }));
   const signalArg = {
@@ -42,18 +54,20 @@ test('holdRepeat onFired', t => {
     }],
   };
 
-  pointerEvents.signals.fire('fired', signalArg);
+  scope.pointerEvents.signals.fire('fired', signalArg);
   t.notOk('holdIntervalHandle' in interaction,
     'interaction interval handle was not saved with 0 holdRepeatInterval');
 
   eventable.options.holdRepeatInterval = 10;
-  pointerEvents.signals.fire('fired', signalArg);
+  scope.pointerEvents.signals.fire('fired', signalArg);
   t.ok('holdIntervalHandle' in interaction,
     'interaction interval handle was saved with interval > 0');
 
+  clearInterval(interaction.holdIntervalHandle);
+
   pointerEvent.type = 'NOT_HOLD';
   delete interaction.holdIntervalHandle;
-  pointerEvents.signals.fire('fired', signalArg);
+  scope.pointerEvents.signals.fire('fired', signalArg);
   t.notOk('holdIntervalHandle' in interaction,
     'interaction interval handle is not saved if pointerEvent.type is not "hold"');
 

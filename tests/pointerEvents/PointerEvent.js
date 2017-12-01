@@ -5,6 +5,7 @@ test('PointerEvent constructor', t => {
   const PointerEvent = require('../../src/pointerEvents/PointerEvent');
   const pointerUtils = require('../../src/utils/pointerUtils');
   const Interaction = require('../../src/Interaction');
+  const Signals = require('../../src/utils/Signals');
 
   const type = 'TEST_EVENT';
   const pointerId = -100;
@@ -18,7 +19,7 @@ test('PointerEvent constructor', t => {
   const event = {
     testEventProp,
   };
-  const interaction = new Interaction({});
+  const interaction = new Interaction.Interaction({ signals: Signals.new() });
   const eventTarget = {};
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
 
@@ -50,9 +51,9 @@ test('PointerEvent methods', t => {
 
   const methodContexts = {};
   const event = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
-    .reduce((event, methodName) => {
-      event[methodName] = function () { methodContexts[methodName] = this; };
-      return event;
+    .reduce((acc, methodName) => {
+      acc[methodName] = function () { methodContexts[methodName] = this; };
+      return acc;
     }, helpers.newPointer());
   const pointerEvent = new PointerEvent('TEST', {}, event, null, {});
 

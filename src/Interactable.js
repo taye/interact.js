@@ -1,7 +1,6 @@
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
-const actions   = require('./actions/base');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
 const defaults  = require('./defaultOptions');
@@ -23,22 +22,21 @@ scope.interactables = [];
 class Interactable {
   /** */
   constructor (target, options) {
-    options = options || {};
-
+    this._signals = options.signals || Interactable.signals;
     this.target   = target;
     this.events   = new Eventable();
     this._context = options.context || scope.document;
     this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
-    signals.fire('new', {
+    scope.addDocument(this._doc, this._win);
+
+    this._signals.fire('new', {
       target,
       options,
       interactable: this,
       win: this._win,
     });
-
-    scope.addDocument( this._doc, this._win );
 
     scope.interactables.push(this);
 
@@ -126,7 +124,7 @@ class Interactable {
     if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (const action of actions.names) {
+      for (const action of scope.actions.names) {
         this.options[action][optionName] = newValue;
       }
 
@@ -298,8 +296,8 @@ class Interactable {
 
     const perActions = extend({}, defaults.perAction);
 
-    for (const actionName in actions.methodDict) {
-      const methodName = actions.methodDict[actionName];
+    for (const actionName in scope.actions.methodDict) {
+      const methodName = scope.actions.methodDict[actionName];
 
       this.options[actionName] = extend({}, defaults[actionName]);
 
@@ -316,7 +314,7 @@ class Interactable {
       }
     }
 
-    signals.fire('set', {
+    this._signals.fire('set', {
       options,
       interactable: this,
     });
@@ -359,13 +357,13 @@ class Interactable {
       events.remove(this, 'all');
     }
 
-    signals.fire('unset', { interactable: this });
+    this._signals.fire('unset', { interactable: this });
 
     scope.interactables.splice(scope.interactables.indexOf(this), 1);
 
     // Stop related interactions when an Interactable is unset
     for (const interaction of scope.interactions || []) {
-      if (interaction.target === this && interaction.interacting() && !interaction._ending) {
+      if (interaction.target === this && interaction.interacting() && interaction._ending) {
         interaction.stop();
       }
     }
@@ -414,7 +412,7 @@ scope.interactables.forEachMatch = function (element, callback) {
 };
 
 // all interact.js eventTypes
-Interactable.eventTypes = scope.eventTypes = [];
+Interactable.eventTypes = [];
 
 Interactable.signals = signals;
 

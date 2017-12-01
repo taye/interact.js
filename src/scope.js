@@ -1,13 +1,23 @@
-const utils   = require('./utils');
-const events  = require('./utils/events');
-const signals = require('./utils/Signals').new();
+const Eventable = require('./Eventable');
+const defaults  = require('./defaultOptions');
+const utils     = require('./utils');
+const browser   = require('./utils/browser');
+const events    = require('./utils/events');
+const Signals   = require('./utils/Signals');
 
 const { getWindow } = require('./utils/window');
 
 const scope = {
-  signals,
+  Signals,
+  signals: new Signals(),
+  browser,
   events,
   utils,
+  defaults,
+  Eventable,
+
+  // all active and idle interactions
+  interactions: [],
 
   // main document
   document: require('./utils/domObjects').document,
@@ -29,7 +39,7 @@ const scope = {
       events.add(win, 'unload', scope.onWindowUnload);
     }
 
-    signals.fire('add-document', { doc, win });
+    scope.signals.fire('add-document', { doc, win, scope });
   },
 
   removeDocument: function (doc, win) {
@@ -42,7 +52,7 @@ const scope = {
     scope.documents.splice(index, 1);
     events.documents.splice(index, 1);
 
-    signals.fire('remove-document', { win, doc });
+    scope.signals.fire('remove-document', { win, doc, scope });
   },
 
   onWindowUnload: function () {
@@ -51,3 +61,6 @@ const scope = {
 };
 
 module.exports = scope;
+
+require('./Interaction').init(scope);
+require('./docEvents').init(scope);

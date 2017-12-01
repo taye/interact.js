@@ -64,6 +64,52 @@ const helpers = {
   createEl (name) {
     return document.createElement(name);
   },
+
+  mockScope (options) {
+    return Object.assign({
+      documents: [],
+      defaults: {},
+      interactions: [],
+      signals: require('../src/utils/Signals').new(),
+      Interaction: {
+        signals: require('../src/utils/Signals').new(),
+        new () {
+          return {};
+        },
+      },
+      InteractEvent: {
+        signals: require('../src/utils/Signals').new(),
+      },
+      Interactable: {
+        signals: require('../src/utils/Signals').new(),
+      },
+    }, options);
+  },
+
+  mockSignals () {
+    return {
+      on () {},
+      off () {},
+      fire () {},
+    };
+  },
+
+  mockInteractable (props) {
+    const Eventable = require('../src/Eventable');
+
+    return Object.assign(
+      {
+        options: {
+          deltaSource: 'page',
+        },
+        target: {},
+        events: new Eventable(),
+        fire (event) {
+          this.events.fire(event);
+        },
+      },
+      props);
+  },
 };
 
 module.exports = helpers;

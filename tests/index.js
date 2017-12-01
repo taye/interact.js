@@ -1,4 +1,5 @@
 require('./Interaction');
+require('./docEvents');
 
 // Legacy browser support
 //require('./legacyBrowsers');
@@ -23,7 +24,6 @@ require('./modifiers/restrictSize');
 require('./autoStart/hold');
 
 // actions
-require('./actions/base');
 //require('./actions/gesture');
 //require('./actions/resize');
 require('./actions/drag');

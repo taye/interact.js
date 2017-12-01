@@ -1,13 +1,12 @@
-const scope   = require('../scope');
 const utils   = require('./index');
 
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
-  search: function (pointer, eventType, eventTarget) {
+  search: function (pointer, eventType, eventTarget, scope) {
     const pointerType = utils.getPointerType(pointer);
     const pointerId = utils.getPointerId(pointer);
-    const details = { pointer, pointerId, pointerType, eventType, eventTarget };
+    const details = { pointer, pointerId, pointerType, eventType, eventTarget, scope };
 
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details);
@@ -19,7 +18,7 @@ const finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume: function ({ pointerType, eventType, eventTarget }) {
+  simulationResume: function ({ pointerType, eventType, eventTarget, scope }) {
     if (!/down|start/i.test(eventType)) {
       return null;
     }
@@ -43,7 +42,7 @@ const finder = {
   },
 
   // if it's a mouse or pen interaction
-  mouseOrPen: function ({ pointerId, pointerType, eventType }) {
+  mouseOrPen: function ({ pointerId, pointerType, eventType, scope }) {
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null;
     }
@@ -85,7 +84,7 @@ const finder = {
   },
 
   // get interaction that has this pointer
-  hasPointer: function ({ pointerId }) {
+  hasPointer: function ({ pointerId, scope }) {
     for (const interaction of scope.interactions) {
       if (utils.contains(interaction.pointerIds, pointerId)) {
         return interaction;
@@ -94,7 +93,7 @@ const finder = {
   },
 
   // get first idle interaction with a matching pointerType
-  idle: function ({ pointerType }) {
+  idle: function ({ pointerType, scope }) {
     for (const interaction of scope.interactions) {
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {

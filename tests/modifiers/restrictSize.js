@@ -1,10 +1,11 @@
 const test = require('../test');
+const { mockSignals } = require('../helpers');
 
 test('restrictSize', t => {
   const RestrictSize = require('../../src/modifiers/restrictSize');
   const Interaction = require('../../src/Interaction');
 
-  const interaction = new Interaction({});
+  const interaction = new Interaction.Interaction({ signals: mockSignals() });
   interaction.prepared = {};
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true };
   interaction.resizeRects = {};

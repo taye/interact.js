@@ -1,5 +1,4 @@
 const Interactable = require('./Interactable');
-const Interaction  = require('./Interaction');
 const scope        = require('./scope');
 const is           = require('./utils/is');
 const events       = require('./utils/events');
@@ -69,11 +68,11 @@ function onInteractionEvent ({ interaction, event }) {
 }
 
 for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
-  Interaction.signals.on(eventSignal, onInteractionEvent);
+  scope.Interaction.signals.on(eventSignal, onInteractionEvent);
 }
 
 // prevent native HTML5 drag on interact.js target elements
-Interaction.docEvents.dragstart = function preventNativeDrag (event) {
+scope.docEvents.eventMap.dragstart = function preventNativeDrag (event) {
   for (const interaction of scope.interactions) {
 
     if (interaction.element

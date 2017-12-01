@@ -5,7 +5,6 @@ const events       = require('./utils/events');
 const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
-const Interaction  = require('./Interaction');
 
 const globalEvents = {};
 
@@ -38,12 +37,31 @@ function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options);
+    interactable = new Interactable(element, options || {});
     interactable.events.global = globalEvents;
   }
 
   return interactable;
 }
+
+/**
+ * Use a plugin
+ *
+ * @alias module:interact.use
+ *
+ * @param {...function | ...array} plugins
+ * @return {interact}
+*/
+interact.use = function (...plugins) {
+  for (const plugin of plugins) {
+    if (utils.is.array(plugin)) {
+      interact.use(...plugin);
+    }
+    else {
+      (plugin.init || plugin)(scope);
+    }
+  }
+};
 
 /**
  * Check if an element or selector has been set with the {@link interact}
@@ -225,12 +243,12 @@ interact.stop = function (event) {
  */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
-    Interaction.pointerMoveTolerance = newValue;
+    scope.Interaction.pointerMoveTolerance = newValue;
 
     return interact;
   }
 
-  return Interaction.pointerMoveTolerance;
+  return scope.Interaction.pointerMoveTolerance;
 };
 
 interact.addDocument    = scope.addDocument;
