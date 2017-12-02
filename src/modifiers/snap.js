@@ -189,42 +189,11 @@ function modifyCoords ({ page, client, status, phase, options }) {
   }
 }
 
-function createSnapGrid (grid) {
-  return function (x, y) {
-    const limits = grid.limits || {
-      left  : -Infinity,
-      right :  Infinity,
-      top   : -Infinity,
-      bottom:  Infinity,
-    };
-    let offsetX = 0;
-    let offsetY = 0;
-
-    if (utils.is.object(grid.offset)) {
-      offsetX = grid.offset.x;
-      offsetY = grid.offset.y;
-    }
-
-    const gridx = Math.round((x - offsetX) / grid.x);
-    const gridy = Math.round((y - offsetY) / grid.y);
-
-    const newX = Math.max(limits.left, Math.min(limits.right , gridx * grid.x + offsetX));
-    const newY = Math.max(limits.top , Math.min(limits.bottom, gridy * grid.y + offsetY));
-
-    return {
-      x: newX,
-      y: newY,
-      range: grid.range,
-    };
-  };
-}
-
 module.exports = {
   init,
   setOffset,
   set,
   modifyCoords,
-  createSnapGrid,
   defaults: {
     enabled: false,
     endOnly: false,

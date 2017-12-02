@@ -13,6 +13,9 @@ interact.use(require('./modifiers/base'));
 interact.use(require('./modifiers/snap'));
 interact.use(require('./modifiers/restrict'));
 
+interact.snappers = require('./utils/snappers');
+interact.createSnapGrid = interact.snappers.grid;
+
 // inertia
 interact.use(require('./inertia'));
 
