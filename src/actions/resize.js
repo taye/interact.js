@@ -1,7 +1,8 @@
+const utils = require('../utils');
+
 function init (scope) {
   const {
     actions,
-    utils,
     browser,
     InteractEvent,
     /** @lends Interactable */
@@ -384,7 +385,7 @@ function init (scope) {
     // the value is an element to use as a resize handle
       ? value === element
       // otherwise check if element matches value as selector
-      : utils.matchesUpTo(element, value, interactableElement);
+      : utils.dom.matchesUpTo(element, value, interactableElement);
   }
 
   Interaction.signals.on('new', function (interaction) {
@@ -419,7 +420,7 @@ function init (scope) {
 
   actions.resize = resize;
   actions.names.push('resize');
-  utils.merge(Interactable.eventTypes, [
+  utils.arr.merge(Interactable.eventTypes, [
     'resizestart',
     'resizemove',
     'resizeinertiastart',

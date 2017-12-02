@@ -161,7 +161,7 @@ function getActionInfo (interaction, pointer, event, eventTarget, scope) {
       return actionInfo;
     }
 
-    element = utils.parentNode(element);
+    element = utils.dom.parentNode(element);
   }
 
   return {};

@@ -52,7 +52,7 @@ function init (scope) {
 
           // update pointers to the down event's coordinates
           interaction.updatePointer(pointer, event, eventTarget, true);
-          utils.setCoords(interaction.curCoords, interaction.pointers);
+          utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
 
           // fire appropriate signals
           const signalArg = { interaction };
@@ -70,11 +70,11 @@ function init (scope) {
           interaction.prevEvent = resumeEvent;
           modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
 
-          utils.copyCoords(interaction.prevCoords, interaction.curCoords);
+          utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
           break;
         }
 
-        element = utils.parentNode(element);
+        element = utils.dom.parentNode(element);
       }
     }
   });
@@ -127,7 +127,7 @@ function init (scope) {
 
     if (!(inertia || smoothEnd)) { return; }
 
-    utils.copyCoords(status.upCoords, interaction.curCoords);
+    utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
 
     interaction.pointers[0] = status.startEvent =
       new InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
@@ -203,7 +203,7 @@ function calcInertia (interaction, status) {
 
 function inertiaFrame () {
   updateInertiaCoords(this);
-  utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+  utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
   const status = this.inertiaStatus;
   const options = this.target.options[this.prepared.name].inertia;
@@ -244,7 +244,7 @@ function inertiaFrame () {
     this.simulation = null;
   }
 
-  utils.copyCoords(this.prevCoords, this.curCoords);
+  utils.pointer.copyCoords(this.prevCoords, this.curCoords);
 }
 
 function smoothEndFrame () {
@@ -284,7 +284,7 @@ function updateInertiaCoords (interaction) {
   const pageUp   = status.upCoords.page;
   const clientUp = status.upCoords.client;
 
-  utils.setCoords(interaction.curCoords, [ {
+  utils.pointer.setCoords(interaction.curCoords, [ {
     pageX  : pageUp.x   + status.sx,
     pageY  : pageUp.y   + status.sy,
     clientX: clientUp.x + status.sx,

@@ -110,11 +110,11 @@ function init (scope) {
     iEvent.touches = [pointers[0], pointers[1]];
 
     if (starting) {
-      iEvent.distance = utils.touchDistance(pointers, deltaSource);
-      iEvent.box      = utils.touchBBox(pointers);
+      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+      iEvent.box      = utils.pointer.touchBBox(pointers);
       iEvent.scale    = 1;
       iEvent.ds       = 0;
-      iEvent.angle    = utils.touchAngle(pointers, undefined, deltaSource);
+      iEvent.angle    = utils.pointer.touchAngle(pointers, undefined, deltaSource);
       iEvent.da       = 0;
     }
     else if (ending || event instanceof InteractEvent) {
@@ -126,10 +126,10 @@ function init (scope) {
       iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
     }
     else {
-      iEvent.distance = utils.touchDistance(pointers, deltaSource);
-      iEvent.box      = utils.touchBBox(pointers);
+      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+      iEvent.box      = utils.pointer.touchBBox(pointers);
       iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
-      iEvent.angle    = utils.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+      iEvent.angle    = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
 
       iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
       iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
@@ -153,7 +153,7 @@ function init (scope) {
 
   actions.gesture = gesture;
   actions.names.push('gesture');
-  utils.merge(Interactable.eventTypes, [
+  utils.arr.merge(Interactable.eventTypes, [
     'gesturestart',
     'gesturemove',
     'gestureend',

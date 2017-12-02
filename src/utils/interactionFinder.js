@@ -1,11 +1,11 @@
-const utils   = require('./index');
+const utils = require('./index');
 
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
   search: function (pointer, eventType, eventTarget, scope) {
-    const pointerType = utils.getPointerType(pointer);
-    const pointerId = utils.getPointerId(pointer);
+    const pointerType = utils.pointer.getPointerType(pointer);
+    const pointerId = utils.pointer.getPointerId(pointer);
     const details = { pointer, pointerId, pointerType, eventType, eventTarget, scope };
 
     for (const method of finder.methodOrder) {
@@ -33,7 +33,7 @@ const finder = {
           if (element === interaction.element) {
             return interaction;
           }
-          element = utils.parentNode(element);
+          element = utils.dom.parentNode(element);
         }
       }
     }
@@ -52,7 +52,7 @@ const finder = {
     for (const interaction of scope.interactions) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) { continue; }
+        if (interaction.simulation && !utils.arr.contains(interaction.pointerIds, pointerId)) { continue; }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {
@@ -86,7 +86,7 @@ const finder = {
   // get interaction that has this pointer
   hasPointer: function ({ pointerId, scope }) {
     for (const interaction of scope.interactions) {
-      if (utils.contains(interaction.pointerIds, pointerId)) {
+      if (utils.arr.contains(interaction.pointerIds, pointerId)) {
         return interaction;
       }
     }

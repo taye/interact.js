@@ -1,4 +1,3 @@
-const extend = require('./extend');
 const win    = require('./window');
 
 const utils = {
@@ -42,15 +41,15 @@ const utils = {
     return dest;
   },
 
-  is         : require('./is'),
-  extend     : extend,
-  hypot      : require('./hypot'),
+  Signals    : require('./Signals'),
+  arr        : require('./arr'),
+  dom        : require('./domUtils'),
+  extend     : require('./extend'),
   getOriginXY: require('./getOriginXY'),
+  hypot      : require('./hypot'),
+  is         : require('./is'),
+  pointer    : require('./pointerUtils'),
+  rect       : require('./rect'),
 };
-
-extend(utils, require('./arr'));
-extend(utils, require('./domUtils'));
-extend(utils, require('./pointerUtils'));
-extend(utils, require('./rect'));
 
 module.exports = utils;

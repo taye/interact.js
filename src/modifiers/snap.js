@@ -3,7 +3,6 @@ const utils = require('../utils');
 function init (scope) {
   const {
     modifiers,
-    interact,
     defaults,
   } = scope;
 
@@ -11,13 +10,12 @@ function init (scope) {
   modifiers.snap = module.exports;
   modifiers.names.push('snap');
 
-  interact.createSnapGrid = createSnapGrid;
   defaults.perAction.snap = module.exports.defaults;
 }
 
 function setOffset ({ interaction, interactable, element, rect, startOffset, options }) {
   const offsets = [];
-  const optionsOrigin = utils.rectToXY(utils.resolveRectLike(options.origin));
+  const optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin));
   const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
   options = options || interactable.options[interaction.prepared.name].snap || {};
 
@@ -30,9 +28,9 @@ function setOffset ({ interaction, interactable, element, rect, startOffset, opt
     };
   }
   else  {
-    const offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
+    const offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
 
-    snapOffset = utils.rectToXY(offsetRect) || { x: 0, y: 0 };
+    snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 };
   }
 
   if (rect && options.relativePoints && options.relativePoints.length) {

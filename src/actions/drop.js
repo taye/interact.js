@@ -176,7 +176,7 @@ function init (scope) {
 
     if (dropOverlap === 'pointer') {
       const origin = utils.getOriginXY(draggable, draggableElement, 'drag');
-      const page = utils.getPageXY(dragEvent);
+      const page = utils.pointer.getPageXY(dragEvent);
 
       page.x += origin.x;
       page.y += origin.y;
@@ -253,7 +253,7 @@ function init (scope) {
     return dynamicDrop;
   };
 
-  utils.merge(Interactable.eventTypes, [
+  utils.arr.merge(Interactable.eventTypes, [
     'dragenter',
     'dragleave',
     'dropactivate',
@@ -278,7 +278,7 @@ function collectDrops ({ interactables }, draggableElement) {
     // test the draggable draggableElement against the dropzone's accept setting
     if ((utils.is.element(accept) && accept !== draggableElement)
         || (utils.is.string(accept)
-        && !utils.matchesSelector(draggableElement, accept))) {
+        && !utils.dom.matchesSelector(draggableElement, accept))) {
 
       continue;
     }
@@ -344,7 +344,7 @@ function getDrop ({ activeDrops, target: draggable, element: dragElement }, drag
   }
 
   // get the most appropriate dropzone based on DOM depth and order
-  const dropIndex = utils.indexOfDeepestElement(validDrops);
+  const dropIndex = utils.dom.indexOfDeepestElement(validDrops);
 
   return interaction.activeDrops[dropIndex] || null;
 }

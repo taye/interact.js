@@ -110,7 +110,7 @@ interact.on = function (type, listener, options) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Interactable.eventTypes, type)) {
+  if (utils.arr.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -160,7 +160,7 @@ interact.off = function (type, listener, options) {
     return interact;
   }
 
-  if (!utils.contains(Interactable.eventTypes, type)) {
+  if (!utils.arr.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, options);
   }
   else {
@@ -188,15 +188,15 @@ interact.debug = function () {
 };
 
 // expose the functions used to calculate multi-touch properties
-interact.getPointerAverage  = utils.pointerAverage;
-interact.getTouchBBox       = utils.touchBBox;
-interact.getTouchDistance   = utils.touchDistance;
-interact.getTouchAngle      = utils.touchAngle;
+interact.getPointerAverage  = utils.pointer.pointerAverage;
+interact.getTouchBBox       = utils.pointer.touchBBox;
+interact.getTouchDistance   = utils.pointer.touchDistance;
+interact.getTouchAngle      = utils.pointer.touchAngle;
 
-interact.getElementRect       = utils.getElementRect;
-interact.getElementClientRect = utils.getElementClientRect;
-interact.matchesSelector      = utils.matchesSelector;
-interact.closest              = utils.closest;
+interact.getElementRect       = utils.dom.getElementRect;
+interact.getElementClientRect = utils.dom.getElementClientRect;
+interact.matchesSelector      = utils.dom.matchesSelector;
+interact.closest              = utils.dom.closest;
 
 /**
  * @alias module:interact.supportsTouch

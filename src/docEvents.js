@@ -1,8 +1,8 @@
-const utils        = require('./utils');
 const events       = require('./utils/events');
 const finder       = require('./utils/interactionFinder');
 const browser      = require('./utils/browser');
 const domObjects   = require('./utils/domObjects');
+const pointerUtils = require('./utils/pointerUtils');
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -58,8 +58,8 @@ function doOnInteractions (method, scope) {
   return (function (event) {
     const { interactions } = scope;
 
-    const pointerType = utils.getPointerType(event);
-    const [eventTarget, curEventTarget] = utils.getEventTargets(event);
+    const pointerType = pointerUtils.getPointerType(event);
+    const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event);
     const matches = []; // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {

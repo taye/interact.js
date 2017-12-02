@@ -1,4 +1,5 @@
-const utils = require('../utils');
+const is  = require('../utils/is');
+const arr = require('../utils/arr');
 
 function init (scope) {
   const {
@@ -18,7 +19,7 @@ function init (scope) {
 
   actions.drag = module.exports;
   actions.names.push('drag');
-  utils.merge(Interactable.eventTypes, [
+  arr.merge(Interactable.eventTypes, [
     'dragstart',
     'dragmove',
     'draginertiastart',
@@ -112,7 +113,7 @@ function newInteractEvent ({ iEvent, interaction }) {
  * target of drag events, or this Interctable
  */
 function draggable (options) {
-  if (utils.is.object(options)) {
+  if (is.object(options)) {
     this.options.drag.enabled = options.enabled === false? false: true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
@@ -127,7 +128,7 @@ function draggable (options) {
     return this;
   }
 
-  if (utils.is.bool(options)) {
+  if (is.bool(options)) {
     this.options.drag.enabled = options;
 
     if (!options) {

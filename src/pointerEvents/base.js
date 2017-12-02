@@ -1,7 +1,7 @@
 const utils        = require('../utils');
 const PointerEvent = require('./PointerEvent');
-const signals      = require('../utils/Signals').new();
 
+const signals       = utils.Signals.new();
 const simpleSignals = [ 'down', 'up', 'cancel' ];
 const simpleEvents  = [ 'down', 'up', 'cancel' ];
 
@@ -100,7 +100,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
     return [];
   }
 
-  const path = utils.getPath(eventTarget);
+  const path = utils.dom.getPath(eventTarget);
   const signalArg = {
     interaction,
     pointer,
@@ -165,7 +165,7 @@ function init (scope) {
 
   Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
     const timer = interaction.holdTimers[pointerIndex];
-    const path = utils.getPath(eventTarget);
+    const path = utils.dom.getPath(eventTarget);
     const signalArg = {
       interaction,
       pointer,

@@ -1,4 +1,6 @@
-const utils = require('../utils');
+const is        = require('../utils/is');
+const extend    = require('../utils/extend');
+const rectUtils = require('../utils/rect');
 
 function init (scope) {
   const {
@@ -35,7 +37,7 @@ function set ({ modifiedCoords, interaction, status, options }) {
 
   const page = status.useStatusXY
     ? { x: status.x, y: status.y }
-    : utils.extend({}, modifiedCoords);
+    : extend({}, modifiedCoords);
 
   const restriction = getRestrictionRect(options.restriction, interaction, page);
 
@@ -94,10 +96,10 @@ function modifyCoords ({ page, client, status, phase, options }) {
 }
 
 function getRestrictionRect (value, interaction, page) {
-  if (utils.is.function(value)) {
-    return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
+  if (is.function(value)) {
+    return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
   } else {
-    return utils.resolveRectLike(value, interaction.target, interaction.element);
+    return rectUtils.resolveRectLike(value, interaction.target, interaction.element);
   }
 }
 

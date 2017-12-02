@@ -1,7 +1,7 @@
 const utils = require('./utils');
 
 function init (scope) {
-  const signals = require('./utils/Signals').new();
+  const signals = utils.Signals.new();
 
   scope.Interaction = {
     signals,
@@ -173,7 +173,7 @@ class Interaction {
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false);
-      utils.setCoords(this.curCoords, this.pointers);
+      utils.pointer.setCoords(this.curCoords, this.pointers);
     }
 
     const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
@@ -206,7 +206,7 @@ class Interaction {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
-      utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
     }
 
     this._signals.fire('move', signalArg);
@@ -218,7 +218,7 @@ class Interaction {
       }
 
       if (this.pointerWasMoved) {
-        utils.copyCoords(this.prevCoords, this.curCoords);
+        utils.pointer.copyCoords(this.prevCoords, this.curCoords);
       }
     }
   }
@@ -347,11 +347,11 @@ class Interaction {
       return 0;
     }
 
-    return this.pointerIds.indexOf(utils.getPointerId(pointer));
+    return this.pointerIds.indexOf(utils.pointer.getPointerId(pointer));
   }
 
   updatePointer (pointer, event, eventTarget, down = event && /(down|start)$/i.test(event.type)) {
-    const id = utils.getPointerId(pointer);
+    const id = utils.pointer.getPointerId(pointer);
     let index = this.getPointerIndex(pointer);
 
     if (index === -1) {
@@ -365,17 +365,17 @@ class Interaction {
       this.pointerIsDown     = true;
 
       if (!this.interacting()) {
-        utils.setCoords(this.startCoords, this.pointers);
+        utils.pointer.setCoords(this.startCoords, this.pointers);
 
-        utils.copyCoords(this.curCoords , this.startCoords);
-        utils.copyCoords(this.prevCoords, this.startCoords);
+        utils.pointer.copyCoords(this.curCoords , this.startCoords);
+        utils.pointer.copyCoords(this.prevCoords, this.startCoords);
 
         this.downEvent          = event;
         this.downTimes[index]   = this.curCoords.timeStamp;
         this.downTargets[index] = eventTarget;
         this.pointerWasMoved    = false;
 
-        utils.pointerExtend(this.downPointer, pointer);
+        utils.pointer.pointerExtend(this.downPointer, pointer);
       }
 
       this._signals.fire('update-pointer-down', {
