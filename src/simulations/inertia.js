@@ -37,259 +37,259 @@ function init (scope) {
   Interaction.signals.on('stop-active', arg => stop   (arg, scope));
 }
 
-  function resume ({ interaction, event, pointer, eventTarget }, scope) {
-    const status = interaction.simulations.inertia;
+function resume ({ interaction, event, pointer, eventTarget }, scope) {
+  const status = interaction.simulations.inertia;
 
-    // Check if the down event hits the current inertia target
-    if (status.active) {
-      let element = eventTarget;
+  // Check if the down event hits the current inertia target
+  if (status.active) {
+    let element = eventTarget;
 
-      // climb up the DOM tree from the event target
-      while (utils.is.element(element)) {
+    // climb up the DOM tree from the event target
+    while (utils.is.element(element)) {
 
-        // if interaction element is the current inertia target element
-        if (element === interaction.element) {
-          // stop inertia
-          animationFrame.cancel(status.i);
-          status.active = false;
-          interaction.simulation = null;
+      // if interaction element is the current inertia target element
+      if (element === interaction.element) {
+        // stop inertia
+        animationFrame.cancel(status.i);
+        status.active = false;
+        interaction.simulation = null;
 
-          // update pointers to the down event's coordinates
-          interaction.updatePointer(pointer, event, eventTarget, true);
-          utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer, event, eventTarget, true);
+        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
 
-          // fire appropriate signals
-          const signalArg = { interaction };
-          scope.Interaction.signals.fire('before-action-move', signalArg);
-          scope.Interaction.signals.fire('action-resume'     , signalArg);
+        // fire appropriate signals
+        const signalArg = { interaction };
+        scope.Interaction.signals.fire('before-action-move', signalArg);
+        scope.Interaction.signals.fire('action-resume'     , signalArg);
 
-          // fire a reume event
-          const resumeEvent = new scope.InteractEvent(
-            interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
+        // fire a reume event
+        const resumeEvent = new scope.InteractEvent(
+          interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
 
-          interaction.target.fire(resumeEvent);
-          interaction.prevEvent = resumeEvent;
-          modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
+        interaction.target.fire(resumeEvent);
+        interaction.prevEvent = resumeEvent;
+        modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
 
-          utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
-          break;
-        }
-
-        element = utils.dom.parentNode(element);
+        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+        break;
       }
+
+      element = utils.dom.parentNode(element);
+    }
+  }
+}
+
+function release ({ interaction, event }, scope) {
+  const status = interaction.simulations.inertia;
+
+  if (!interaction.interacting() || status.active) { return; }
+
+  const target = interaction.target;
+  const options = target && target.options;
+  const inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
+
+  const now = new Date().getTime();
+  const statuses = {};
+  const page = utils.extend({}, interaction.curCoords.page);
+  const pointerSpeed = interaction.pointerDelta.client.speed;
+
+  let smoothEnd = false;
+  let modifierResult;
+
+  // check if inertia should be started
+  const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
+                     && interaction.prepared.name !== 'gesture'
+                     && event !== status.startEvent);
+
+  const inertia = (inertiaPossible
+    && (now - interaction.curCoords.timeStamp) < 50
+    && pointerSpeed > inertiaOptions.minSpeed
+    && pointerSpeed > inertiaOptions.endSpeed);
+
+  const modifierArg = {
+    interaction,
+    pageCoords: page,
+    statuses,
+    preEnd: true,
+    requireEndOnly: true,
+  };
+
+  // smoothEnd
+  if (inertiaPossible && !inertia) {
+    modifiers.resetStatuses(statuses, scope.modifiers);
+
+    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+
+    if (modifierResult.shouldMove && modifierResult.locked) {
+      smoothEnd = true;
     }
   }
 
-  function release ({ interaction, event }, scope) {
-    const status = interaction.simulations.inertia;
+  if (!(inertia || smoothEnd)) { return; }
 
-    if (!interaction.interacting() || status.active) { return; }
+  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
 
-    const target = interaction.target;
-    const options = target && target.options;
-    const inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
+  interaction.pointers[0] = status.startEvent = new scope.InteractEvent(
+    interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
 
-    const now = new Date().getTime();
-    const statuses = {};
-    const page = utils.extend({}, interaction.curCoords.page);
-    const pointerSpeed = interaction.pointerDelta.client.speed;
+  status.t0 = now;
 
-    let smoothEnd = false;
-    let modifierResult;
+  status.active = true;
+  status.allowResume = inertiaOptions.allowResume;
+  interaction.simulation = status;
 
-    // check if inertia should be started
-    const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
-                       && interaction.prepared.name !== 'gesture'
-                       && event !== status.startEvent);
+  target.fire(status.startEvent);
 
-    const inertia = (inertiaPossible
-      && (now - interaction.curCoords.timeStamp) < 50
-      && pointerSpeed > inertiaOptions.minSpeed
-      && pointerSpeed > inertiaOptions.endSpeed);
+  if (inertia) {
+    status.vx0 = interaction.pointerDelta.client.vx;
+    status.vy0 = interaction.pointerDelta.client.vy;
+    status.v0 = pointerSpeed;
 
-    const modifierArg = {
-      interaction,
-      pageCoords: page,
-      statuses,
-      preEnd: true,
-      requireEndOnly: true,
-    };
+    calcInertia(interaction, status);
 
-    // smoothEnd
-    if (inertiaPossible && !inertia) {
-      modifiers.resetStatuses(statuses, scope.modifiers);
+    utils.extend(page, interaction.curCoords.page);
 
-      modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+    page.x += status.xe;
+    page.y += status.ye;
 
-      if (modifierResult.shouldMove && modifierResult.locked) {
-        smoothEnd = true;
-      }
-    }
+    modifiers.resetStatuses(statuses, scope.modifiers);
 
-    if (!(inertia || smoothEnd)) { return; }
+    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
-    utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
+    status.modifiedXe += modifierResult.dx;
+    status.modifiedYe += modifierResult.dy;
 
-    interaction.pointers[0] = status.startEvent = new scope.InteractEvent(
-      interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
-
-    status.t0 = now;
-
-    status.active = true;
-    status.allowResume = inertiaOptions.allowResume;
-    interaction.simulation = status;
-
-    target.fire(status.startEvent);
-
-    if (inertia) {
-      status.vx0 = interaction.pointerDelta.client.vx;
-      status.vy0 = interaction.pointerDelta.client.vy;
-      status.v0 = pointerSpeed;
-
-      calcInertia(interaction, status);
-
-      utils.extend(page, interaction.curCoords.page);
-
-      page.x += status.xe;
-      page.y += status.ye;
-
-      modifiers.resetStatuses(statuses, scope.modifiers);
-
-      modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
-
-      status.modifiedXe += modifierResult.dx;
-      status.modifiedYe += modifierResult.dy;
-
-      status.i = animationFrame.request(interaction.boundInertiaFrame);
-    }
-    else {
-      status.smoothEnd = true;
-      status.xe = modifierResult.dx;
-      status.ye = modifierResult.dy;
-
-      status.sx = status.sy = 0;
-
-      status.i = animationFrame.request(interaction.boundSmoothEndFrame);
-    }
+    status.i = animationFrame.request(interaction.boundInertiaFrame);
   }
+  else {
+    status.smoothEnd = true;
+    status.xe = modifierResult.dx;
+    status.ye = modifierResult.dy;
 
-  function stop ({ interaction }) {
-    const status = interaction.simulations.inertia;
-
-    if (status.active) {
-      animationFrame.cancel(status.i);
-      status.active = false;
-      interaction.simulation = null;
-    }
-  }
-
-  function calcInertia (interaction, status) {
-    const inertiaOptions = interaction.target.options[interaction.prepared.name].inertia;
-    const lambda = inertiaOptions.resistance;
-    const inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
-
-    status.x0 = interaction.prevEvent.pageX;
-    status.y0 = interaction.prevEvent.pageY;
-    status.t0 = status.startEvent.timeStamp / 1000;
     status.sx = status.sy = 0;
 
-    status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-    status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-    status.te = inertiaDur;
-
-    status.lambda_v0 = lambda / status.v0;
-    status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+    status.i = animationFrame.request(interaction.boundSmoothEndFrame);
   }
+}
 
-  function inertiaFrame () {
-    updateInertiaCoords(this);
-    utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+function stop ({ interaction }) {
+  const status = interaction.simulations.inertia;
 
-    const status = this.simulations.inertia;
-    const options = this.target.options[this.prepared.name].inertia;
-    const lambda = options.resistance;
-    const t = new Date().getTime() / 1000 - status.t0;
+  if (status.active) {
+    animationFrame.cancel(status.i);
+    status.active = false;
+    interaction.simulation = null;
+  }
+}
 
-    if (t < status.te) {
+function calcInertia (interaction, status) {
+  const inertiaOptions = interaction.target.options[interaction.prepared.name].inertia;
+  const lambda = inertiaOptions.resistance;
+  const inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
 
-      const progress =  1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+  status.x0 = interaction.prevEvent.pageX;
+  status.y0 = interaction.prevEvent.pageY;
+  status.t0 = status.startEvent.timeStamp / 1000;
+  status.sx = status.sy = 0;
 
-      if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
-        status.sx = status.xe * progress;
-        status.sy = status.ye * progress;
-      }
-      else {
-        const quadPoint = utils.getQuadraticCurvePoint(
-          0, 0,
-          status.xe, status.ye,
-          status.modifiedXe, status.modifiedYe,
-          progress);
+  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+  status.te = inertiaDur;
 
-        status.sx = quadPoint.x;
-        status.sy = quadPoint.y;
-      }
+  status.lambda_v0 = lambda / status.v0;
+  status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+}
 
-      this.doMove();
+function inertiaFrame () {
+  updateInertiaCoords(this);
+  utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
 
-      status.i = animationFrame.request(this.boundInertiaFrame);
+  const status = this.simulations.inertia;
+  const options = this.target.options[this.prepared.name].inertia;
+  const lambda = options.resistance;
+  const t = new Date().getTime() / 1000 - status.t0;
+
+  if (t < status.te) {
+
+    const progress =  1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+
+    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
+      status.sx = status.xe * progress;
+      status.sy = status.ye * progress;
     }
     else {
-      status.sx = status.modifiedXe;
-      status.sy = status.modifiedYe;
+      const quadPoint = utils.getQuadraticCurvePoint(
+        0, 0,
+        status.xe, status.ye,
+        status.modifiedXe, status.modifiedYe,
+        progress);
 
-      this.doMove();
-      this.end(status.startEvent);
+      status.sx = quadPoint.x;
+      status.sy = quadPoint.y;
+    }
+
+    this.doMove();
+
+    status.i = animationFrame.request(this.boundInertiaFrame);
+  }
+  else {
+    status.sx = status.modifiedXe;
+    status.sy = status.modifiedYe;
+
+    this.doMove();
+    this.end(status.startEvent);
+    status.active = false;
+    this.simulation = null;
+  }
+
+  utils.pointer.copyCoords(this.prevCoords, this.curCoords);
+}
+
+function smoothEndFrame () {
+  updateInertiaCoords(this);
+
+  const status = this.simulations.inertia;
+  const t = new Date().getTime() - status.t0;
+  const duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
+
+  if (t < duration) {
+    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
+    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
+
+    this.pointerMove(status.startEvent, status.startEvent);
+
+    status.i = animationFrame.request(this.boundSmoothEndFrame);
+  }
+  else {
+    status.sx = status.xe;
+    status.sy = status.ye;
+
+    this.pointerMove(status.startEvent, status.startEvent);
+    this.end(status.startEvent);
+
+    status.smoothEnd =
       status.active = false;
-      this.simulation = null;
-    }
-
-    utils.pointer.copyCoords(this.prevCoords, this.curCoords);
+    this.simulation = null;
   }
+}
 
-  function smoothEndFrame () {
-    updateInertiaCoords(this);
+function updateInertiaCoords (interaction) {
+  const status = interaction.simulations.inertia;
 
-    const status = this.simulations.inertia;
-    const t = new Date().getTime() - status.t0;
-    const duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
+  // return if inertia isn't running
+  if (!status.active) { return; }
 
-    if (t < duration) {
-      status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
-      status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
+  const pageUp   = status.upCoords.page;
+  const clientUp = status.upCoords.client;
 
-      this.pointerMove(status.startEvent, status.startEvent);
-
-      status.i = animationFrame.request(this.boundSmoothEndFrame);
-    }
-    else {
-      status.sx = status.xe;
-      status.sy = status.ye;
-
-      this.pointerMove(status.startEvent, status.startEvent);
-      this.end(status.startEvent);
-
-      status.smoothEnd =
-        status.active = false;
-      this.simulation = null;
-    }
-  }
-
-  function updateInertiaCoords (interaction) {
-    const status = interaction.simulations.inertia;
-
-    // return if inertia isn't running
-    if (!status.active) { return; }
-
-    const pageUp   = status.upCoords.page;
-    const clientUp = status.upCoords.client;
-
-    utils.pointer.setCoords(interaction.curCoords, [ {
-      pageX  : pageUp.x   + status.sx,
-      pageY  : pageUp.y   + status.sy,
-      clientX: clientUp.x + status.sx,
-      clientY: clientUp.y + status.sy,
-    } ]);
-  }
+  utils.pointer.setCoords(interaction.curCoords, [ {
+    pageX  : pageUp.x   + status.sx,
+    pageY  : pageUp.y   + status.sy,
+    clientX: clientUp.x + status.sx,
+    clientY: clientUp.y + status.sy,
+  } ]);
+}
 
 module.exports = {
   init,
