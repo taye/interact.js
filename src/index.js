@@ -28,7 +28,7 @@ interact.use(require('./pointerEvents/interactableTargets'));
 // autoStart hold
 interact.use(require('./autoStart/base'));
 interact.use(require('./autoStart/hold'));
-interact.use(require('./autoStart/drag'));
+interact.use(require('./autoStart/dragAxis'));
 
 // actions
 interact.use(require('./actions/gesture'));
