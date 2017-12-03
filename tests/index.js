@@ -40,8 +40,7 @@ require('./actions/drag');
 // autoScroll
 //require('./autoScroll');
 
-// export interact
-//require('./interact');
+require('./interact');
 
 //const index = require('../src/index');
 //const test = require('tape');

@@ -68,7 +68,7 @@ const helpers = {
   mockScope (options) {
     return Object.assign({
       documents: [],
-      defaults: {},
+      defaults: require('../src/defaultOptions'),
       interactions: [],
       signals: require('../src/utils/Signals').new(),
       Interaction: {

@@ -10,22 +10,18 @@ const {
   getElementRect,
   nodeContains,
   trySelector,
-  matchesSelector,
 }                    = require('./utils/domUtils');
 const { getWindow }  = require('./utils/window');
 const { contains }   = require('./utils/arr');
 const { wheelEvent } = require('./utils/browser');
 
-// all set interactables
-scope.interactables = [];
-
 class Interactable {
   /** */
-  constructor (target, options) {
+  constructor (target, options, defaultContext) {
     this._signals = options.signals || Interactable.signals;
     this.target   = target;
     this.events   = new Eventable();
-    this._context = options.context || scope.document;
+    this._context = options.context || defaultContext;
     this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
@@ -35,10 +31,6 @@ class Interactable {
       interactable: this,
       win: this._win,
     });
-
-    scope.addDocument(this._doc);
-
-    scope.interactables.push(this);
 
     this.set(options);
   }
@@ -299,7 +291,6 @@ class Interactable {
       const methodName = scope.actions.methodDict[actionName];
 
       this.options[actionName] = extend({}, defaults.perAction);
-
       this.setPerAction(actionName, defaults[actionName]);
 
       this[methodName](options[actionName]);
@@ -358,57 +349,9 @@ class Interactable {
 
     this._signals.fire('unset', { interactable: this });
 
-    scope.interactables.splice(scope.interactables.indexOf(this), 1);
-
-    // Stop related interactions when an Interactable is unset
-    for (const interaction of scope.interactions || []) {
-      if (interaction.target === this && interaction.interacting() && interaction._ending) {
-        interaction.stop();
-      }
-    }
-
     return scope.interact;
   }
 }
-
-scope.interactables.indexOfElement = function indexOfElement (target, context) {
-  context = context || scope.document;
-
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
-    if (interactable.target === target && interactable._context === context) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
-  const ret = this[this.indexOfElement(element, options && options.context)];
-
-  return ret && (is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
-};
-
-scope.interactables.forEachMatch = function (element, callback) {
-  for (const interactable of this) {
-    let ret;
-
-    if ((is.string(interactable.target)
-        // target is a selector and the element matches
-        ? (is.element(element) && matchesSelector(element, interactable.target))
-        // target is the element
-        : element === interactable.target)
-        // the element is in context
-      && (interactable.inContext(element))) {
-      ret = callback(interactable);
-    }
-
-    if (ret !== undefined) {
-      return ret;
-    }
-  }
-};
 
 // all interact.js eventTypes
 Interactable.eventTypes = [];

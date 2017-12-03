@@ -37,8 +37,12 @@ function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options || {});
+    interactable = new Interactable(element, options || {}, scope.document);
     interactable.events.global = globalEvents;
+
+    scope.addDocument(interactable._doc);
+
+    scope.interactables.push(interactable);
   }
 
   return interactable;
@@ -246,8 +250,60 @@ interact.pointerMoveTolerance = function (newValue) {
   return scope.Interaction.pointerMoveTolerance;
 };
 
+Interactable.signals.on('unset', ({ interactable }) => {
+  scope.interactables.splice(scope.interactables.indexOf(interactable), 1);
+
+  // Stop related interactions when an Interactable is unset
+  for (const interaction of scope.interactions) {
+    if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
+      interaction.stop();
+    }
+  }
+});
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
+
+// all set interactables
+scope.interactables = [];
+
+scope.interactables.indexOfElement = function indexOfElement (target, context) {
+  context = context || scope.document;
+
+  for (let i = 0; i < this.length; i++) {
+    const interactable = this[i];
+
+    if (interactable.target === target && interactable._context === context) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
+  const ret = this[this.indexOfElement(element, options && options.context)];
+
+  return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
+};
+
+scope.interactables.forEachMatch = function (element, callback) {
+  for (const interactable of this) {
+    let ret;
+
+    if ((utils.is.string(interactable.target)
+        // target is a selector and the element matches
+        ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
+        // target is the element
+        : element === interactable.target)
+        // the element is in context
+      && (interactable.inContext(element))) {
+      ret = callback(interactable);
+    }
+
+    if (ret !== undefined) {
+      return ret;
+    }
+  }
+};
 
 scope.interact = interact;
 
