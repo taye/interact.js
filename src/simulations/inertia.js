@@ -71,8 +71,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           iEvent: resumeEvent,
         };
 
-        scope.Interaction.signals.fire('before-action-move', signalArg);
-        scope.Interaction.signals.fire('action-resume'     , signalArg);
+        scope.Interaction.signals.fire('action-resume', signalArg);
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(

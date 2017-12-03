@@ -11,6 +11,7 @@ function init (scope) {
   } = scope;
 
   Interaction.signals.on('before-action-move', beforeMove);
+  Interaction.signals.on('action-resume', beforeMove);
 
   // dragmove
   InteractEvent.signals.on('new', newInteractEvent);

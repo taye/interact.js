@@ -18,8 +18,10 @@ function init (scope) {
   Interaction.signals.on('action-start' , arg =>
     start(arg, scope.modifiers, arg.interaction.startCoords.page));
 
-  Interaction.signals.on('action-resume', arg =>
-    start(arg, scope.modifiers, arg.interaction.curCoords.page));
+  Interaction.signals.on('action-resume', arg => {
+    beforeMove(arg, scope.modifiers);
+    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+  });
 
   Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
   Interaction.signals.on('action-end', arg => end(arg, scope.modifiers));
