@@ -49,22 +49,14 @@ function setOffset ({ interaction, interactable, element, rect, startOffset, opt
 }
 
 function set ({ interaction, modifiedCoords, status, options, offset: offsets }) {
+  const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
+  const page = utils.extend({}, modifiedCoords);
   const targets = [];
   let target;
-  let page;
   let i;
 
-  if (status.useStatusXY) {
-    page = { x: status.x, y: status.y };
-  }
-  else {
-    const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
-
-    page = utils.extend({}, modifiedCoords);
-
-    page.x -= origin.x;
-    page.y -= origin.y;
-  }
+  page.x -= origin.x;
+  page.y -= origin.y;
 
   status.realX = page.x;
   status.realY = page.y;

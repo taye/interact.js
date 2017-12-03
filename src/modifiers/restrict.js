@@ -35,9 +35,7 @@ function setOffset ({ rect, startOffset, options }) {
 function set ({ modifiedCoords, interaction, status, options }) {
   if (!options) { return status; }
 
-  const page = status.useStatusXY
-    ? { x: status.x, y: status.y }
-    : extend({}, modifiedCoords);
+  const page = extend({}, modifiedCoords);
 
   const restriction = getRestrictionRect(options.restriction, interaction, page);
 

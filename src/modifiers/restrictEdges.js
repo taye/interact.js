@@ -59,9 +59,7 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
     return;
   }
 
-  const page = status.useStatusXY
-    ? { x: status.x, y: status.y }
-    : extend({}, modifiedCoords);
+  const page = extend({}, modifiedCoords);
   const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
   const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
 
