@@ -198,10 +198,6 @@ function init (scope) {
     return dropped;
   };
 
-  Interactable.signals.on('unset', function ({ interactable }) {
-    interactable.dropzone(false);
-  });
-
   Interactable.settingsMethods.push('dropChecker');
 
   Interaction.signals.on('new', function (interaction) {
