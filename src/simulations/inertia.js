@@ -28,9 +28,6 @@ function init (scope) {
       one_ve_v0: 0,
       i  : null,
     };
-
-    interaction.boundInertiaFrame   = () => inertiaFrame  .apply(interaction);
-    interaction.boundSmoothEndFrame = () => smoothEndFrame.apply(interaction);
   });
 
   Interaction.signals.on('up'         , arg => release(arg, scope));
@@ -174,7 +171,7 @@ function release ({ interaction, event }, scope) {
     status.modifiedXe += modifierResult.dx;
     status.modifiedYe += modifierResult.dy;
 
-    status.i = animationFrame.request(interaction.boundInertiaFrame);
+    status.i = animationFrame.request(() => inertiaTick(interaction));
   }
   else {
     status.smoothEnd = true;
@@ -183,7 +180,7 @@ function release ({ interaction, event }, scope) {
 
     status.sx = status.sy = 0;
 
-    status.i = animationFrame.request(interaction.boundSmoothEndFrame);
+    status.i = animationFrame.request(() => smothEndTick(interaction));
   }
 }
 
@@ -215,12 +212,12 @@ function calcInertia (interaction, status) {
   status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
 }
 
-function inertiaFrame () {
-  updateInertiaCoords(this);
-  utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+function inertiaTick (interaction) {
+  updateInertiaCoords(interaction);
+  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
-  const status = this.simulations.inertia;
-  const options = this.target.options[this.prepared.name].inertia;
+  const status = interaction.simulations.inertia;
+  const options = interaction.target.options[interaction.prepared.name].inertia;
   const lambda = options.resistance;
   const t = new Date().getTime() / 1000 - status.t0;
 
@@ -243,48 +240,48 @@ function inertiaFrame () {
       status.sy = quadPoint.y;
     }
 
-    this.doMove();
+    interaction.doMove();
 
-    status.i = animationFrame.request(this.boundInertiaFrame);
+    status.i = animationFrame.request(() => inertiaTick(interaction));
   }
   else {
     status.sx = status.modifiedXe;
     status.sy = status.modifiedYe;
 
-    this.doMove();
-    this.end(status.startEvent);
+    interaction.doMove();
+    interaction.end(status.startEvent);
     status.active = false;
-    this.simulation = null;
+    interaction.simulation = null;
   }
 
-  utils.pointer.copyCoords(this.prevCoords, this.curCoords);
+  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
 }
 
-function smoothEndFrame () {
-  updateInertiaCoords(this);
+function smothEndTick (interaction) {
+  updateInertiaCoords(interaction);
 
-  const status = this.simulations.inertia;
+  const status = interaction.simulations.inertia;
   const t = new Date().getTime() - status.t0;
-  const duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
+  const duration = interaction.target.options[interaction.prepared.name].inertia.smoothEndDuration;
 
   if (t < duration) {
     status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
     status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
 
-    this.pointerMove(status.startEvent, status.startEvent);
+    interaction.pointerMove(status.startEvent, status.startEvent);
 
-    status.i = animationFrame.request(this.boundSmoothEndFrame);
+    status.i = animationFrame.request(() => smothEndTick(interaction));
   }
   else {
     status.sx = status.xe;
     status.sy = status.ye;
 
-    this.pointerMove(status.startEvent, status.startEvent);
-    this.end(status.startEvent);
+    interaction.pointerMove(status.startEvent, status.startEvent);
+    interaction.end(status.startEvent);
 
     status.smoothEnd =
       status.active = false;
-    this.simulation = null;
+    interaction.simulation = null;
   }
 }
 
@@ -308,7 +305,7 @@ function updateInertiaCoords (interaction) {
 module.exports = {
   init,
   calcInertia,
-  inertiaFrame,
-  smoothEndFrame,
+  inertiaTick,
+  smothEndTick,
   updateInertiaCoords,
 };
