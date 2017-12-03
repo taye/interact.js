@@ -59,7 +59,11 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
         utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
 
         // fire appropriate signals
-        const signalArg = { interaction };
+        const signalArg = {
+          interaction,
+          iEvent: resumeEvent,
+        };
+
         scope.Interaction.signals.fire('before-action-move', signalArg);
         scope.Interaction.signals.fire('action-resume'     , signalArg);
 

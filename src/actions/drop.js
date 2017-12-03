@@ -5,7 +5,6 @@ function init (scope) {
     actions,
     /** @lends module:interact */
     interact,
-    InteractEvent,
     /** @lends Interactable */
     Interactable,
     Interaction,
@@ -14,7 +13,7 @@ function init (scope) {
 
   let dynamicDrop = false;
 
-  Interaction.signals.on('action-start', function ({ interaction, event }) {
+  Interaction.signals.on('after-action-start', function ({ interaction, event }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     // reset active dropzones
@@ -33,29 +32,16 @@ function init (scope) {
     }
   });
 
-  InteractEvent.signals.on('new', function ({ interaction, iEvent, event }) {
-    if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
+  Interaction.signals.on('action-move', arg => onEventCreated(arg, scope, dynamicDrop));
+  Interaction.signals.on('action-end' , arg => onEventCreated(arg, scope, dynamicDrop));
 
-    if (dynamicDrop) {
-      interaction.activeDrops = getActiveDrops(scope, interaction.element);
-    }
-
-    const dragEvent = iEvent;
-    const dropResult = getDrop(interaction, dragEvent, event);
-
-    interaction.dropTarget  = dropResult && dropResult.dropzone;
-    interaction.dropElement = dropResult && dropResult.element;
-
-    interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
-  });
-
-  Interaction.signals.on('action-move', function ({ interaction }) {
+  Interaction.signals.on('after-action-move', function ({ interaction }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     fireDropEvents(interaction, interaction.dropEvents);
   });
 
-  Interaction.signals.on('action-end', function ({ interaction }) {
+  Interaction.signals.on('after-action-end', function ({ interaction }) {
     if (interaction.prepared.name === 'drag') {
       fireDropEvents(interaction, interaction.dropEvents);
     }
@@ -444,6 +430,22 @@ function fireDropEvents (interaction, dropEvents) {
 
   interaction.prevDropTarget  = dropTarget;
   interaction.prevDropElement = dropElement;
+}
+
+function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
+  if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
+
+  if (dynamicDrop) {
+    interaction.activeDrops = getActiveDrops(scope, interaction.element);
+  }
+
+  const dragEvent = iEvent;
+  const dropResult = getDrop(interaction, dragEvent, event);
+
+  interaction.dropTarget  = dropResult && dropResult.dropzone;
+  interaction.dropElement = dropResult && dropResult.element;
+
+  interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 }
 
 module.exports = {

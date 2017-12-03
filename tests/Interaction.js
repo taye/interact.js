@@ -249,7 +249,7 @@ test('Interaction.pointerDown', t => {
 test('Interaction.start', t => {
   const interaction = makeInteractionAndSignals();
   const action = { name: 'TEST' };
-  const target = {};
+  const target = helpers.mockInteractable();
   const element = {};
   const pointer = helpers.newPointer();
   const event = {};
@@ -271,8 +271,10 @@ test('Interaction.start', t => {
   interaction._interacting = false;
 
   let signalArg;
+  let interactingInStartListener;
   const signalListener = arg => {
     signalArg = arg;
+    interactingInStartListener = arg.interaction.interacting();
   };
 
   interaction._signals.on('action-start', signalListener);
@@ -282,6 +284,7 @@ test('Interaction.start', t => {
   t.equal(interaction.target, target, 'interaction.target is updated');
   t.equal(interaction.element, element, 'interaction.element is updated');
 
+  t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg');
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg');
 
@@ -289,30 +292,6 @@ test('Interaction.start', t => {
 
   // interaction.start(action, target, element);
   // t.deepEqual(scope.interactions, [interaction], 'interaction is added back to scope');
-
-  t.end();
-});
-
-test('action-{start,move,end} signal listeners', t => {
-  const scope = {};
-
-  Interaction.init(scope);
-  const interaction = scope.Interaction.new({});
-  const interactable = helpers.mockInteractable();
-
-  let interactingInStartListener = null;
-
-  interaction.target = interactable;
-  interaction.element = interactable.element;
-  interaction.prepared = { name: 'TEST' };
-
-  interactable.events.on('TESTstart', event => {
-    interactingInStartListener = event.interaction.interacting();
-  });
-
-  interaction._signals.fire('action-start', { interaction, event: {} });
-
-  t.ok(interactingInStartListener, 'start event was fired correctly');
 
   t.end();
 });
@@ -358,50 +337,58 @@ test('init', t => {
   t.end();
 });
 
-test('firePrepared function', t => {
+test('Interaction createPreparedEvent', t => {
   const InteractEvent = require('../src/InteractEvent');
   const scope = {};
 
   Interaction.init(scope);
 
   const interaction = scope.Interaction.new({});
-  const interactable = helpers.mockInteractable({
-    options: {
-      origin: { x: 0, y: 0 },
-      deltaSource: 'page',
-    },
-  });
+  const interactable = helpers.mockInteractable();
   const action = { name: 'resize' };
   const phase = 'TEST_PHASE';
-
-  let event = null;
 
   interaction.prepared = action;
   interaction.target = interactable;
   interaction.element = interactable.element;
   interaction.prevEvent = {};
 
-  // this method should be called from actions.firePrepared
-  interactable.fire = firedEvent => {
-    event = firedEvent;
-  };
+  const iEvent = interaction._createPreparedEvent({}, phase);
 
-  scope.actions.firePrepared(interaction, {}, phase);
-
-  t.ok(event instanceof InteractEvent,
+  t.ok(iEvent instanceof InteractEvent,
     'InteractEvent is fired');
 
-  t.equal(event.type, action.name + phase,
+  t.equal(iEvent.type, action.name + phase,
     'event type');
 
-  t.equal(event, interaction.prevEvent,
-    'interaction.prevEvent is updated');
-
-  t.equal(event.interactable, interactable,
+  t.equal(iEvent.interactable, interactable,
     'event.interactable');
 
-  t.equal(event.target, interactable.element,
+  t.equal(iEvent.target, interactable.element,
     'event.target');
+
+  t.end();
+});
+
+test('Interaction fireEvent', t => {
+  const interaction = new Interaction.Interaction({ signals: helpers.mockSignals() });
+  const interactable = helpers.mockInteractable();
+  const iEvent = {};
+  let firedEvent;
+
+  // this method should be called from actions.firePrepared
+  interactable.fire = event => {
+    firedEvent = event;
+  };
+
+  interaction.target = interactable;
+  interaction._fireEvent(iEvent);
+
+  t.equal(firedEvent, iEvent,
+    'target interactable\'s fire method is called');
+
+  t.equal(interaction.prevEvent, iEvent,
+    'interaction.prevEvent is updated');
 
   t.end();
 });

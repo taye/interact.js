@@ -1,4 +1,5 @@
-const utils = require('./utils');
+const InteractEvent = require('./InteractEvent');
+const utils         = require('./utils');
 
 function init (scope) {
   const signals = utils.Signals.new();
@@ -12,35 +13,7 @@ function init (scope) {
     },
   };
 
-  scope.InteractEvent = require('./InteractEvent');
-
-  signals.on('action-start', function ({ interaction, event }) {
-    interaction._interacting = true;
-    firePrepared(interaction, event, 'start');
-  });
-
-  signals.on('action-move', function ({ interaction, event, preEnd }) {
-    firePrepared(interaction, event, 'move', preEnd);
-
-    // if the action was ended in a listener
-    if (!interaction.interacting()) { return false; }
-  });
-
-  signals.on('action-end', function ({ interaction, event }) {
-    firePrepared(interaction, event, 'end');
-  });
-
-  function firePrepared (interaction, event, phase, preEnd) {
-    const actionName = interaction.prepared.name;
-
-    const newEvent = new scope.InteractEvent(interaction, event, actionName, phase, interaction.element, null, preEnd);
-
-    interaction.target.fire(newEvent);
-    interaction.prevEvent = newEvent;
-  }
-
   scope.actions = {
-    firePrepared,
     names: [],
     methodDict: {},
   };
@@ -164,10 +137,19 @@ class Interaction {
     this.target         = target;
     this.element        = element;
 
-    this._signals.fire('action-start', {
+    this._interacting = true;
+    const startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
+    const signalArg = {
       interaction: this,
       event: this.downEvent,
-    });
+      iEvent: startEvent,
+    };
+
+    this._signals.fire('action-start', signalArg);
+
+    this._fireEvent(startEvent);
+
+    this._signals.fire('after-action-start', signalArg);
   }
 
   pointerMove (pointer, event, eventTarget) {
@@ -252,7 +234,14 @@ class Interaction {
     this._signals.fire('before-action-move', signalArg);
 
     if (!this._dontFireMove) {
+      const moveEvent = signalArg.iEvent =
+        this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
+
       this._signals.fire('action-move', signalArg);
+
+      this._fireEvent(moveEvent);
+
+      this._signals.fire('after-action-move', signalArg);
     }
 
     this._dontFireMove = false;
@@ -308,10 +297,18 @@ class Interaction {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      this._signals.fire('action-end', {
+      const endEvent = this._createPreparedEvent(event, 'end', false);
+      const signalArg = {
         event,
+        iEvent: endEvent,
         interaction: this,
-      });
+      };
+
+      this._signals.fire('action-end', signalArg);
+
+      this._fireEvent(endEvent);
+
+      this._signals.fire('after-action-end', signalArg);
     }
 
     this._ending = false;
@@ -415,6 +412,17 @@ class Interaction {
   _updateEventTargets (target, currentTarget) {
     this._eventTarget    = target;
     this._curEventTarget = currentTarget;
+  }
+
+  _createPreparedEvent (event, phase, preEnd) {
+    const actionName = this.prepared.name;
+
+    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd);
+  }
+
+  _fireEvent (iEvent) {
+    this.target.fire(iEvent);
+    this.prevEvent = iEvent;
   }
 }
 
