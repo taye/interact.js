@@ -73,7 +73,17 @@ function init (scope) {
   defaults.base.actionChecker = null;
   defaults.base.styleCursor = true;
 
-  utils.extend(defaults.perAction, autoStart.defaults.perAction);
+  utils.extend(defaults.perAction, {
+    manualStart: false,
+    max: Infinity,
+    maxPerElement: 1,
+    allowFrom:  null,
+    ignoreFrom: null,
+
+    // only allow left button by default
+    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+    mouseButtons: 1,
+  });
 
   /**
    * Returns or sets the maximum number of concurrent interactions allowed.  By
@@ -87,17 +97,11 @@ function init (scope) {
    * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
    */
   interact.maxInteractions = newValue => maxInteractions(newValue, scope);
+
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
     signals: Signals.new(),
-    defaults: {
-      base: utils.extend({}, module.exports.defaults.base),
-      perAction: utils.extend({}, module.exports.defaults.perAction),
-    },
-    setActionDefaults: function (action) {
-      utils.extend(action.defaults, autoStart.defaults.perAction);
-    },
   };
 }
 
@@ -239,22 +243,9 @@ function maxInteractions (newValue, scope) {
   return scope.autoStart.maxInteractions;
 }
 
-const autoStart = module.exports = {
+module.exports = {
   init,
   maxInteractions,
   withinInteractionLimit,
-  defaults: {
-    perAction: {
-      manualStart: false,
-      max: Infinity,
-      maxPerElement: 1,
-      allowFrom:  null,
-      ignoreFrom: null,
-
-      // only allow left button by default
-      // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-      mouseButtons: 1,
-    },
-  },
   validateAction,
 };

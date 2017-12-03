@@ -28,6 +28,7 @@ interact.use(require('./pointerEvents/interactableTargets'));
 // autoStart hold
 interact.use(require('./autoStart/base'));
 interact.use(require('./autoStart/hold'));
+interact.use(require('./autoStart/drag'));
 
 // actions
 interact.use(require('./actions/gesture'));
@@ -39,11 +40,6 @@ interact.use(require('./actions/drop'));
 interact.use(require('./modifiers/snapSize'));
 interact.use(require('./modifiers/restrictEdges'));
 interact.use(require('./modifiers/restrictSize'));
-
-// autoStart actions
-interact.use(require('./autoStart/gesture'));
-interact.use(require('./autoStart/resize'));
-interact.use(require('./autoStart/drag'));
 
 // autoScroll
 interact.use(require('./autoScroll'));

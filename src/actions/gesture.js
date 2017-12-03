@@ -11,9 +11,6 @@ function init (scope) {
 
   const gesture = {
     defaults: {
-      enabled : false,
-      origin  : null,
-      restrict: null,
     },
 
     checker: function (pointer, event, interactable, element, interaction) {

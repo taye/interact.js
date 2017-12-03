@@ -54,27 +54,28 @@ class Interactable {
     return this;
   }
 
-  setPerAction (action, options) {
+  setPerAction (actionName, options) {
     // for all the default per-action options
-    for (const option in options) {
-      // if this option exists for this action
-      if (option in defaults[action]) {
-        // if the option in the options arg is an object value
-        if (is.object(options[option])) {
-          // duplicate the object
-          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+    for (const optionName in options) {
+      const actionOptions = this.options[actionName];
 
-          if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
-            this.options[action][option].enabled = options[option].enabled === false? false : true;
-          }
+      // if the option in the options arg is an object value
+      if (is.object(options[optionName])) {
+        // copy the object
+        actionOptions[optionName] = extend(
+          actionOptions[optionName] || {},
+          options[optionName]);
+
+        if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
+          actionOptions[optionName].enabled = options[optionName].enabled === false? false : true;
         }
-        else if (is.bool(options[option]) && is.object(defaults.perAction[option])) {
-          this.options[action][option].enabled = options[option];
-        }
-        else if (options[option] !== undefined) {
-          // or if it's not undefined, do a plain assignment
-          this.options[action][option] = options[option];
-        }
+      }
+      else if (is.bool(options[optionName]) && is.object(defaults.perAction[optionName])) {
+        actionOptions[optionName].enabled = options[optionName];
+      }
+      else if (options[optionName] !== undefined) {
+        // or if it's not undefined, do a plain assignment
+        actionOptions[optionName] = options[optionName];
       }
     }
   }
@@ -294,14 +295,12 @@ class Interactable {
 
     this.options = extend({}, defaults.base);
 
-    const perActions = extend({}, defaults.perAction);
-
     for (const actionName in scope.actions.methodDict) {
       const methodName = scope.actions.methodDict[actionName];
 
-      this.options[actionName] = extend({}, defaults[actionName]);
+      this.options[actionName] = extend({}, defaults.perAction);
 
-      this.setPerAction(actionName, perActions);
+      this.setPerAction(actionName, defaults[actionName]);
 
       this[methodName](options[actionName]);
     }

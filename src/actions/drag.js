@@ -147,15 +147,6 @@ module.exports = {
   beforeMove,
   newInteractEvent,
   defaults: {
-    enabled     : false,
-    mouseButtons: null,
-
-    origin    : null,
-    snap      : null,
-    restrict  : null,
-    inertia   : null,
-    autoScroll: null,
-
     startAxis : 'xy',
     lockAxis  : 'xy',
   },

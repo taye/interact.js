@@ -5,6 +5,7 @@ const animationFrame = require('../utils/raf');
 function init (scope) {
   const {
     Interaction,
+    defaults,
   } = scope;
 
   Interaction.signals.on('new', function (interaction) {
@@ -35,6 +36,15 @@ function init (scope) {
   Interaction.signals.on('up'         , arg => release(arg, scope));
   Interaction.signals.on('down'       , arg => resume (arg, scope));
   Interaction.signals.on('stop-active', arg => stop   (arg, scope));
+
+  defaults.perAction.inertia = {
+    enabled          : false,
+    resistance       : 10,    // the lambda in exponential decay
+    minSpeed         : 100,   // target speed must be above this for inertia to start
+    endSpeed         : 10,    // the speed at which inertia is slow enough to stop
+    allowResume      : true,  // allow resuming an action in inertia phase
+    smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
+  };
 }
 
 function resume ({ interaction, event, pointer, eventTarget }, scope) {

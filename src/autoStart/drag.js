@@ -1,15 +1,9 @@
 const is = require('../utils/is');
-const autoStart = require('./base');
+const { validateAction } = require('./base');
 
 const { parentNode } = require('../utils/domUtils');
 
 function init (scope) {
-  const {
-    actions,
-  } = scope;
-
-  scope.autoStart.setActionDefaults(actions.drag);
-
   scope.autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
@@ -46,7 +40,7 @@ function init (scope) {
           if (action
               && action.name === 'drag'
               && checkStartAxis(currentAxis, interactable)
-              && autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
+              && validateAction(action, interactable, element, eventTarget, scope)) {
 
             return interactable;
           }

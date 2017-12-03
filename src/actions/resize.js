@@ -16,15 +16,6 @@ function init (scope) {
 
   const resize = {
     defaults: {
-      enabled     : false,
-      mouseButtons: null,
-
-      origin    : null,
-      snap      : null,
-      restrict  : null,
-      inertia   : null,
-      autoScroll: null,
-
       square: false,
       preserveAspectRatio: false,
       axis: 'xy',

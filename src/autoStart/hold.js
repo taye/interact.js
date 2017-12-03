@@ -2,10 +2,11 @@ function init (scope) {
   const {
     autoStart,
     Interaction,
+    defaults,
   } = scope;
 
-  autoStart.defaults.perAction.hold = 0;
-  autoStart.defaults.perAction.delay = 0;
+  defaults.perAction.hold = 0;
+  defaults.perAction.delay = 0;
 
   Interaction.signals.on('new', function (interaction) {
     interaction.autoStartHoldTimer = null;
