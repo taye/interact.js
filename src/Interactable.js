@@ -1,6 +1,7 @@
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
+const arr       = require('./utils/arr');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
 const defaults  = require('./defaultOptions');
@@ -12,7 +13,6 @@ const {
   trySelector,
 }                    = require('./utils/domUtils');
 const { getWindow }  = require('./utils/window');
-const { contains }   = require('./utils/arr');
 const { wheelEvent } = require('./utils/browser');
 
 class Interactable {
@@ -50,24 +50,32 @@ class Interactable {
     // for all the default per-action options
     for (const optionName in options) {
       const actionOptions = this.options[actionName];
+      const optionValue = options[optionName];
+      const isArray = is.array(optionValue);
 
-      // if the option in the options arg is an object value
-      if (is.object(options[optionName])) {
+      // if the option value is an array
+      if (isArray) {
+        actionOptions[optionName] = arr.from(optionValue);
+      }
+      // if the option value is an object
+      else if (!isArray && is.object(optionValue)) {
         // copy the object
         actionOptions[optionName] = extend(
           actionOptions[optionName] || {},
-          options[optionName]);
+          optionValue);
 
+        // set anabled field to true if it exists in the defaults
         if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
-          actionOptions[optionName].enabled = options[optionName].enabled === false? false : true;
+          actionOptions[optionName].enabled = optionValue.enabled === false? false : true;
         }
       }
-      else if (is.bool(options[optionName]) && is.object(defaults.perAction[optionName])) {
-        actionOptions[optionName].enabled = options[optionName];
+      // if the option value is a boolean and the default is an object
+      else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
+        actionOptions[optionName].enabled = optionValue;
       }
-      else if (options[optionName] !== undefined) {
-        // or if it's not undefined, do a plain assignment
-        actionOptions[optionName] = options[optionName];
+      // if it's anything else, do a plain assignment
+      else {
+        actionOptions[optionName] = optionValue;
       }
     }
   }
@@ -227,7 +235,7 @@ class Interactable {
 
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
@@ -259,7 +267,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     // if it is an action event type
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.off(eventType, listener);
     }
     // delegated event
@@ -290,8 +298,8 @@ class Interactable {
     for (const actionName in scope.actions.methodDict) {
       const methodName = scope.actions.methodDict[actionName];
 
-      this.options[actionName] = extend({}, defaults.perAction);
-      this.setPerAction(actionName, defaults[actionName]);
+      this.options[actionName] = {};
+      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
 
       this[methodName](options[actionName]);
     }
