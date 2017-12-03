@@ -49,18 +49,13 @@ function interact (element, options) {
  *
  * @alias module:interact.use
  *
- * @param {...function | ...array} plugins
+ * @param {Object} plugin
+ * @param {function} plugin.init
  * @return {interact}
 */
-interact.use = function (...plugins) {
-  for (const plugin of plugins) {
-    if (utils.is.array(plugin)) {
-      interact.use(...plugin);
-    }
-    else {
-      (plugin.init || plugin)(scope);
-    }
-  }
+interact.use = function (plugin) {
+  plugin.init(scope);
+  return interact;
 };
 
 /**
