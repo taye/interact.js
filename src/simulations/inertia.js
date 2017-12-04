@@ -1,6 +1,6 @@
-const modifiers      = require('../modifiers/base');
-const utils          = require('../utils');
-const animationFrame = require('../utils/raf');
+const modifiers = require('../modifiers/base');
+const utils     = require('../utils');
+const raf       = require('../utils/raf');
 
 function init (scope) {
   const {
@@ -57,7 +57,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        animationFrame.cancel(status.i);
+        raf.cancel(status.i);
         status.active = false;
         interaction.simulation = null;
 
@@ -93,41 +93,39 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 function release ({ interaction, event }, scope) {
   const status = interaction.simulations.inertia;
 
-  if (!interaction.interacting() || status.active) { return; }
+  if (!interaction.interacting() || (interaction.simulation && interaction.simulation.active)) {
+    return;
+  }
 
-  const target = interaction.target;
-  const options = target && target.options;
-  const inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
+  const options = getOptions(interaction);
 
   const now = new Date().getTime();
-  const statuses = {};
-  const page = utils.extend({}, interaction.curCoords.page);
   const pointerSpeed = interaction.pointerDelta.client.speed;
 
   let smoothEnd = false;
   let modifierResult;
 
   // check if inertia should be started
-  const inertiaPossible = (inertiaOptions && inertiaOptions.enabled
+  const inertiaPossible = (options && options.enabled
                      && interaction.prepared.name !== 'gesture'
                      && event !== status.startEvent);
 
   const inertia = (inertiaPossible
     && (now - interaction.curCoords.timeStamp) < 50
-    && pointerSpeed > inertiaOptions.minSpeed
-    && pointerSpeed > inertiaOptions.endSpeed);
+    && pointerSpeed > options.minSpeed
+    && pointerSpeed > options.endSpeed);
 
   const modifierArg = {
     interaction,
-    pageCoords: page,
-    statuses,
+    pageCoords: utils.extend({}, interaction.curCoords.page),
+    statuses: {},
     preEnd: true,
     requireEndOnly: true,
   };
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifiers.resetStatuses(statuses, scope.modifiers);
+    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
 
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
@@ -146,10 +144,10 @@ function release ({ interaction, event }, scope) {
   status.t0 = now;
 
   status.active = true;
-  status.allowResume = inertiaOptions.allowResume;
+  status.allowResume = options.allowResume;
   interaction.simulation = status;
 
-  target.fire(status.startEvent);
+  interaction.target.fire(status.startEvent);
 
   if (inertia) {
     status.vx0 = interaction.pointerDelta.client.vx;
@@ -158,19 +156,19 @@ function release ({ interaction, event }, scope) {
 
     calcInertia(interaction, status);
 
-    utils.extend(page, interaction.curCoords.page);
+    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
 
-    page.x += status.xe;
-    page.y += status.ye;
+    modifierArg.pageCoords.x += status.xe;
+    modifierArg.pageCoords.y += status.ye;
 
-    modifiers.resetStatuses(statuses, scope.modifiers);
+    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
 
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
     status.modifiedXe += modifierResult.dx;
     status.modifiedYe += modifierResult.dy;
 
-    status.i = animationFrame.request(() => inertiaTick(interaction));
+    status.i = raf.request(() => inertiaTick(interaction));
   }
   else {
     status.smoothEnd = true;
@@ -179,7 +177,7 @@ function release ({ interaction, event }, scope) {
 
     status.sx = status.sy = 0;
 
-    status.i = animationFrame.request(() => smothEndTick(interaction));
+    status.i = raf.request(() => smothEndTick(interaction));
   }
 }
 
@@ -187,16 +185,16 @@ function stop ({ interaction }) {
   const status = interaction.simulations.inertia;
 
   if (status.active) {
-    animationFrame.cancel(status.i);
+    raf.cancel(status.i);
     status.active = false;
     interaction.simulation = null;
   }
 }
 
 function calcInertia (interaction, status) {
-  const inertiaOptions = interaction.target.options[interaction.prepared.name].inertia;
-  const lambda = inertiaOptions.resistance;
-  const inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
+  const options = getOptions(interaction);
+  const lambda = options.resistance;
+  const inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
 
   status.x0 = interaction.prevEvent.pageX;
   status.y0 = interaction.prevEvent.pageY;
@@ -208,7 +206,7 @@ function calcInertia (interaction, status) {
   status.te = inertiaDur;
 
   status.lambda_v0 = lambda / status.v0;
-  status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
+  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
 }
 
 function inertiaTick (interaction) {
@@ -216,7 +214,7 @@ function inertiaTick (interaction) {
   utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
   const status = interaction.simulations.inertia;
-  const options = interaction.target.options[interaction.prepared.name].inertia;
+  const options = getOptions(interaction);
   const lambda = options.resistance;
   const t = new Date().getTime() / 1000 - status.t0;
 
@@ -241,7 +239,7 @@ function inertiaTick (interaction) {
 
     interaction.doMove();
 
-    status.i = animationFrame.request(() => inertiaTick(interaction));
+    status.i = raf.request(() => inertiaTick(interaction));
   }
   else {
     status.sx = status.modifiedXe;
@@ -261,7 +259,7 @@ function smothEndTick (interaction) {
 
   const status = interaction.simulations.inertia;
   const t = new Date().getTime() - status.t0;
-  const duration = interaction.target.options[interaction.prepared.name].inertia.smoothEndDuration;
+  const { smoothEndDuration: duration } = getOptions(interaction);
 
   if (t < duration) {
     status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
@@ -269,7 +267,7 @@ function smothEndTick (interaction) {
 
     interaction.pointerMove(status.startEvent, status.startEvent);
 
-    status.i = animationFrame.request(() => smothEndTick(interaction));
+    status.i = raf.request(() => smothEndTick(interaction));
   }
   else {
     status.sx = status.xe;
@@ -299,6 +297,10 @@ function updateInertiaCoords (interaction) {
     clientX: clientUp.x + status.sx,
     clientY: clientUp.y + status.sy,
   } ]);
+}
+
+function getOptions ({ target, prepared }) {
+  return target && target.options && prepared.name && target.options[prepared.name].inertia;
 }
 
 module.exports = {
