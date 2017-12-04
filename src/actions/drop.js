@@ -47,7 +47,7 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('stop-drag', function ({ interaction }) {
+  Interaction.signals.on('stop', function ({ interaction }) {
     interaction.activeDrops = null;
     interaction.dropEvents = null;
   });

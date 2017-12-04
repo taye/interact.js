@@ -30,9 +30,9 @@ function init (scope) {
     };
   });
 
-  Interaction.signals.on('up'         , arg => release(arg, scope));
-  Interaction.signals.on('down'       , arg => resume (arg, scope));
-  Interaction.signals.on('stop-active', arg => stop   (arg, scope));
+  Interaction.signals.on('up'  , arg => release(arg, scope));
+  Interaction.signals.on('down', arg => resume (arg, scope));
+  Interaction.signals.on('stop', arg => stop   (arg, scope));
 
   defaults.perAction.inertia = {
     enabled          : false,

@@ -117,9 +117,7 @@ function init (scope) {
     },
   };
 
-  Interaction.signals.on('stop-active', function () {
-    autoScroll.stop();
-  });
+  Interaction.signals.on('stop', autoScroll.stop);
 
   Interaction.signals.on('action-move', autoScroll.onInteractionMove);
 

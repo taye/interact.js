@@ -327,11 +327,6 @@ class Interaction {
   stop () {
     this._signals.fire('stop', { interaction: this });
 
-    if (this._interacting) {
-      this._signals.fire('stop-active', { interaction: this });
-      this._signals.fire('stop-' + this.prepared.name, { interaction: this });
-    }
-
     this.target = this.element = null;
 
     this._interacting = false;
