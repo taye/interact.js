@@ -265,7 +265,7 @@ function smothEndTick (interaction) {
     status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
     status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
 
-    interaction.pointerMove(status.startEvent, status.startEvent);
+    interaction.doMove();
 
     status.i = raf.request(() => smothEndTick(interaction));
   }
@@ -273,7 +273,7 @@ function smothEndTick (interaction) {
     status.sx = status.xe;
     status.sy = status.ye;
 
-    interaction.pointerMove(status.startEvent, status.startEvent);
+    interaction.doMove();
     interaction.end(status.startEvent);
 
     status.smoothEnd =
