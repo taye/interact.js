@@ -231,9 +231,9 @@ class Interaction {
       interaction: this,
     }, signalArg || {});
 
-    this._signals.fire('before-action-move', signalArg);
+    const beforeMoveResult = this._signals.fire('before-action-move', signalArg);
 
-    if (!this._dontFireMove) {
+    if (beforeMoveResult !== false) {
       const moveEvent = signalArg.iEvent =
         this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
 
@@ -243,8 +243,6 @@ class Interaction {
 
       this._signals.fire('after-action-move', signalArg);
     }
-
-    this._dontFireMove = false;
   }
 
   // End interact move events and stop auto-scroll unless simulation is running

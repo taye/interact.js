@@ -149,13 +149,13 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
       requireEndOnly: false,
     }, modifiers);
 
+  interaction.modifierResult = modifierResult;
+
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
   if (!modifierResult.shouldMove && interactingBeforeMove) {
-    interaction._dontFireMove = true;
+    return false;
   }
-
-  interaction.modifierResult = modifierResult;
 }
 
 function end ({ interaction, event }, modifiers) {
