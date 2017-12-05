@@ -285,9 +285,6 @@ class Interaction {
    *   });
    * ```
    *
-   * Stop the current action and fire an end event. Inertial movement does
-   * not happen.
-   *
    * @param {PointerEvent} [event]
    */
   end (event) {
@@ -301,6 +298,13 @@ class Interaction {
         iEvent: endEvent,
         interaction: this,
       };
+
+      const beforeEndResult = this._signals.fire('before-action-end', signalArg);
+
+      if (beforeEndResult === false) {
+        this._ending = false;
+        return;
+      }
 
       this._signals.fire('action-end', signalArg);
 
