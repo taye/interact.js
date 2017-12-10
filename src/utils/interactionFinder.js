@@ -3,11 +3,7 @@ const utils = require('./index');
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
-  search: function (pointer, eventType, eventTarget, scope) {
-    const pointerType = utils.pointer.getPointerType(pointer);
-    const pointerId = utils.pointer.getPointerId(pointer);
-    const details = { pointer, pointerId, pointerType, eventType, eventTarget, scope };
-
+  search: function (details) {
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details);
 

@@ -67,9 +67,17 @@ function doOnInteractions (method, scope) {
 
       for (const changedTouch of event.changedTouches) {
         const pointer = changedTouch;
-        const interaction = finder.search(pointer, event.type, eventTarget, scope);
+        const pointerId = pointerUtils.getPointerId(pointer);
+        const interaction = getInteraction({
+          pointer,
+          pointerId,
+          pointerType,
+          eventType: event.type,
+          eventTarget,
+          scope,
+        });
 
-        matches.push([pointer, interaction || newInteraction({ pointerType }, scope)]);
+        matches.push([pointer, interaction]);
       }
     }
     else {
@@ -90,11 +98,14 @@ function doOnInteractions (method, scope) {
       }
 
       if (!invalidPointer) {
-        let interaction = finder.search(event, event.type, eventTarget, scope);
-
-        if (!interaction) {
-          interaction = newInteraction({ pointerType }, scope);
-        }
+        const interaction = getInteraction({
+          pointer: event,
+          pointerId: pointerUtils.getPointerId(event),
+          pointerType,
+          eventType: event.type,
+          eventTarget,
+          scope,
+        });
 
         matches.push([event, interaction]);
       }
@@ -105,6 +116,17 @@ function doOnInteractions (method, scope) {
       interaction[method](pointer, event, eventTarget, curEventTarget);
     }
   });
+}
+
+function getInteraction (searchDetails) {
+  const { pointerType, scope } = searchDetails;
+
+  const foundInteraction = finder.search(searchDetails);
+  const signalArg = { interaction: foundInteraction, searchDetails };
+
+  scope.Interaction.signals.fire('find', signalArg);
+
+  return signalArg.interaction || newInteraction({ pointerType }, scope);
 }
 
 function newInteraction (options, scope) {
