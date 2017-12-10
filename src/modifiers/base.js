@@ -24,7 +24,7 @@ function init (scope) {
   });
 
   Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
-  Interaction.signals.on('action-end', arg => end(arg, scope.modifiers));
+  Interaction.signals.on('action-end', arg => beforeEnd(arg, scope.modifiers));
 
   InteractEvent.signals.on('set-xy', arg => setXY(arg, scope.modifiers));
 }
@@ -158,7 +158,7 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
   }
 }
 
-function end ({ interaction, event }, modifiers) {
+function beforeEnd ({ interaction, event }, modifiers) {
   for (const modifierName of modifiers.names) {
     const options = interaction.target.options[interaction.prepared.name][modifierName];
 
@@ -204,6 +204,6 @@ module.exports = {
   resetStatuses,
   start,
   beforeMove,
-  end,
+  beforeEnd,
   shouldDo,
 };
