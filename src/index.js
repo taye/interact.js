@@ -2,6 +2,8 @@
 
 const scope = require('./scope');
 
+require('./interactions').init(scope);
+
 scope.Interactable = require('./Interactable');
 scope.InteractEvent = require('./InteractEvent');
 require('./interactablePreventDefault.js');

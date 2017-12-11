@@ -1,5 +1,5 @@
 require('./Interaction');
-require('./docEvents');
+require('./interactions');
 
 // Legacy browser support
 //require('./legacyBrowsers');

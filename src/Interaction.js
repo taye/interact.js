@@ -1,24 +1,6 @@
 const InteractEvent = require('./InteractEvent');
 const utils         = require('./utils');
 
-function init (scope) {
-  const signals = utils.Signals.new();
-
-  scope.Interaction = {
-    signals,
-    new (options) {
-      options.signals = signals;
-
-      return new Interaction(options);
-    },
-  };
-
-  scope.actions = {
-    names: [],
-    methodDict: {},
-  };
-}
-
 class Interaction {
   /** */
   constructor ({ pointerType, signals }) {
@@ -425,7 +407,4 @@ class Interaction {
 
 Interaction.pointerMoveTolerance = 1;
 
-module.exports = {
-  Interaction,
-  init,
-};
+module.exports = Interaction;

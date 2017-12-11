@@ -1,10 +1,12 @@
 const test = require('./test');
 const interact = require('../src/interact');
 const scope = require('../src/scope');
+const interactions = require('../src/interactions');
 const { jsdom } = require('jsdom');
 
 test('interact export', t => {
   const Interactable = require('../src/Interactable');
+  interactions.init(scope);
 
   const interactable1 = interact('selector');
   t.assert(interactable1 instanceof Interactable,

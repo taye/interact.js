@@ -34,7 +34,7 @@ test('holdRepeat count', t => {
 test('holdRepeat onFired', t => {
   const scope = mockScope();
   const Eventable = require('../../src/Eventable');
-  require('../../src/Interaction').init(scope);
+  require('../../src/interactions').init(scope);
   require('../../src/pointerEvents/holdRepeat').init(scope);
 
   const interaction = scope.Interaction.new({});

@@ -5,12 +5,12 @@ const helpers = require('./helpers');
 const Interaction = require('../src/Interaction');
 const Signals = require('../src/utils/Signals');
 
-const makeInteractionAndSignals = () => new Interaction.Interaction({ signals: Signals.new() });
+const makeInteractionAndSignals = () => new Interaction({ signals: Signals.new() });
 
 test('Interaction constructor', t => {
   const testType = 'test';
   const signals = Signals.new();
-  const interaction = new Interaction.Interaction({
+  const interaction = new Interaction({
     pointerType: testType,
     signals,
   });
@@ -297,9 +297,9 @@ test('Interaction.start', t => {
 });
 
 test('stop interaction from start event', t => {
-  const scope = {};
+  const scope = helpers.mockScope();
 
-  Interaction.init(scope);
+  require('../src/interactions').init(scope);
   const interaction = scope.Interaction.new({});
   const interactable = helpers.mockInteractable();
 
@@ -318,30 +318,11 @@ test('stop interaction from start event', t => {
   t.end();
 });
 
-test('init', t => {
-  const scope = {};
-
-  Interaction.init(scope);
-  const newInteraction = scope.Interaction.new({});
-
-  t.assert(typeof scope.Interaction === 'object');
-  t.assert(scope.Interaction.signals instanceof Signals);
-  t.assert(typeof scope.Interaction.new === 'function');
-  t.assert(newInteraction instanceof Interaction.Interaction);
-  t.equal(newInteraction._signals, scope.Interaction.signals);
-
-  t.assert(typeof scope.actions === 'object');
-  t.deepEqual(scope.actions.names, []);
-  t.deepEqual(scope.actions.methodDict, {});
-
-  t.end();
-});
-
 test('Interaction createPreparedEvent', t => {
   const InteractEvent = require('../src/InteractEvent');
-  const scope = {};
+  const scope = helpers.mockScope();
 
-  Interaction.init(scope);
+  require('../src/interactions').init(scope);
 
   const interaction = scope.Interaction.new({});
   const interactable = helpers.mockInteractable();
@@ -371,7 +352,7 @@ test('Interaction createPreparedEvent', t => {
 });
 
 test('Interaction fireEvent', t => {
-  const interaction = new Interaction.Interaction({ signals: helpers.mockSignals() });
+  const interaction = new Interaction({ signals: helpers.mockSignals() });
   const interactable = helpers.mockInteractable();
   const iEvent = {};
   let firedEvent;

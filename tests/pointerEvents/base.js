@@ -1,5 +1,6 @@
 const test = require('../test');
 const helpers = require('../helpers');
+const interactions = require('../../src/interactions');
 
 const Interaction = require('../../src/Interaction');
 
@@ -61,7 +62,7 @@ test('pointerEvents.fire', t => {
 
   const tapTime = 500;
   const interaction = Object.assign(
-    new Interaction.Interaction({ signals: require('../../src/utils/Signals').new() }),
+    new Interaction({ signals: require('../../src/utils/Signals').new() }),
     { tapTime: -1, prevTap: null });
   const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
     timeStamp: tapTime,
@@ -102,7 +103,7 @@ test('pointerEvents.collectEventTargets', t => {
 
   pointerEvents.signals.on('collect-targets', onCollect);
   pointerEvents.collectEventTargets({
-    interaction: new Interaction.Interaction({ signals: helpers.mockSignals() }),
+    interaction: new Interaction({ signals: helpers.mockSignals() }),
     pointer: {},
     event: {},
     eventTarget: {},
@@ -120,7 +121,7 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
   const scope = helpers.mockScope();
   const pointerEvents = require('../../src/pointerEvents/base');
 
-  Interaction.init(scope);
+  interactions.init(scope);
   pointerEvents.init(scope);
 
   const interaction = scope.Interaction.new({});
@@ -140,7 +141,7 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   const pointerEvents = require('../../src/pointerEvents/base');
   const scope = helpers.mockScope();
 
-  Interaction.init(scope);
+  interactions.init(scope);
   pointerEvents.init(scope);
 
   const interaction = scope.Interaction.new({});

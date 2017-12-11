@@ -1,8 +1,10 @@
+const Interaction  = require('./Interaction');
 const events       = require('./utils/events');
 const finder       = require('./utils/interactionFinder');
 const browser      = require('./utils/browser');
 const domObjects   = require('./utils/domObjects');
 const pointerUtils = require('./utils/pointerUtils');
+const Signals      = require('./utils/Signals');
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -10,6 +12,8 @@ const methodNames = [
 ];
 
 function init (scope) {
+  const signals = Signals.new();
+
   const listeners = {};
 
   for (const method of methodNames) {
@@ -48,9 +52,23 @@ function init (scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  scope.docEvents = {
+  // all active and idle interactions
+  scope.interactions = [];
+  scope.Interaction = {
+    signals,
+    Interaction,
+    new (options) {
+      options.signals = signals;
+
+      return new Interaction(options);
+    },
     listeners,
     eventMap,
+  };
+
+  scope.actions = {
+    names: [],
+    methodDict: {},
   };
 }
 
@@ -137,7 +155,7 @@ function newInteraction (options, scope) {
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { delegatedEvents, eventMap } = scope.docEvents;
+  const { delegatedEvents, eventMap } = scope.Interaction;
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
 

@@ -77,7 +77,7 @@ for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
 }
 
 // prevent native HTML5 drag on interact.js target elements
-scope.docEvents.eventMap.dragstart = function preventNativeDrag (event) {
+scope.Interaction.eventMap.dragstart = function preventNativeDrag (event) {
   for (const interaction of scope.interactions) {
 
     if (interaction.element

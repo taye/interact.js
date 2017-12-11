@@ -16,9 +16,6 @@ const scope = {
   defaults,
   Eventable,
 
-  // all active and idle interactions
-  interactions: [],
-
   // main document
   document: require('./utils/domObjects').document,
   // all documents being listened to
@@ -72,6 +69,3 @@ const scope = {
 };
 
 module.exports = scope;
-
-require('./Interaction').init(scope);
-require('./docEvents').init(scope);

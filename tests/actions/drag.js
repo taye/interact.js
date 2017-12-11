@@ -1,7 +1,7 @@
 const test = require('../test');
 const helpers = require('../helpers');
 const Signals = require('../../src/utils/Signals');
-
+const interactions = require('../../src/interactions');
 const drag = require('../../src/actions/drag');
 
 function mockScope () {
@@ -92,9 +92,8 @@ test('Interactable.draggable method', t => {
 
 test('drag axis', t => {
   const scope = mockScope();
-  const Interaction = require('../../src/Interaction');
 
-  Interaction.init(scope);
+  interactions.init(scope);
   drag.init(scope);
 
   const interaction = scope.Interaction.new({});
