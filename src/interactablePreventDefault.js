@@ -2,6 +2,7 @@ const Interactable = require('./Interactable');
 const scope        = require('./scope');
 const is           = require('./utils/is');
 const events       = require('./utils/events');
+const browser      = require('./utils/browser');
 
 const { nodeContains, matchesSelector } = require('./utils/domUtils');
 const { getWindow } = require('./utils/window');
@@ -44,7 +45,9 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // don't preventDefault of touch{start,move} events if the browser supports passive
   // events listeners. CSS touch-action and user-selecct should be used instead
-  if (events.supportsOptions && /^touch(start|move)$/.test(event.type)) {
+  if (events.supportsPassive
+    && /^touch(start|move)$/.test(event.type)
+    && !browser.isIOS) {
     const docOptions = scope.getDocIndex(getWindow(event.target).document);
 
     if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
