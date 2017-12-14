@@ -53,7 +53,7 @@ bump_version() {
 
   # bump the version in package.json
   NEW_VERSION=$(node build/bump $NEW_VERSION)
-  NEW_TAG=$(echo "v$NEW_VERSION" | sed 's/[+].*//')
+  NEW_TAG="v$(semver clean $NEW_VERSION)"
 
   # if the version tag already exists
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
