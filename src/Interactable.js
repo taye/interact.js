@@ -1,3 +1,4 @@
+const clone     = require('./utils/clone');
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
@@ -63,8 +64,9 @@ class Interactable {
       if (option in defaults[action]) {
         // if the option in the options arg is an object value
         if (is.object(options[option])) {
-          // duplicate the object
-          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+          // duplicate the object and merge
+          this.options[action][option] = clone(this.options[action][option] || {});
+          extend(this.options[action][option], options[option]);
 
           if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false? false : true;
@@ -294,14 +296,14 @@ class Interactable {
       options = {};
     }
 
-    this.options = extend({}, defaults.base);
+    this.options = clone(defaults.base);
 
-    const perActions = extend({}, defaults.perAction);
+    const perActions = clone(defaults.perAction);
 
     for (const actionName in actions.methodDict) {
       const methodName = actions.methodDict[actionName];
 
-      this.options[actionName] = extend({}, defaults[actionName]);
+      this.options[actionName] = clone(defaults[actionName]);
 
       this.setPerAction(actionName, perActions);
 
