@@ -1,3 +1,4 @@
+require('./Interactable');
 require('./Interaction');
 require('./interactions');
 

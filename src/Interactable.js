@@ -1,3 +1,4 @@
+const clone     = require('./utils/clone');
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
@@ -62,7 +63,7 @@ class Interactable {
         // copy the object
         actionOptions[optionName] = extend(
           actionOptions[optionName] || {},
-          optionValue);
+          clone(optionValue));
 
         // set anabled field to true if it exists in the defaults
         if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
