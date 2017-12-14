@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.1
+ * interact.js v1.3.2
  *
  * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -4074,6 +4074,7 @@ var Interaction = require('./Interaction');
 var scope = require('./scope');
 var is = require('./utils/is');
 var events = require('./utils/events');
+var browser = require('./utils/browser');
 
 var _require = require('./utils/domUtils'),
     nodeContains = _require.nodeContains,
@@ -4121,7 +4122,7 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // don't preventDefault of touch{start,move} events if the browser supports passive
   // events listeners. CSS touch-action and user-selecct should be used instead
-  if (events.supportsOptions && /^touch(start|move)$/.test(event.type)) {
+  if (events.supportsPassive && /^touch(start|move)$/.test(event.type) && !browser.isIOS) {
     return;
   }
 
@@ -4170,7 +4171,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45}],23:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/browser":36,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45}],23:[function(require,module,exports){
 'use strict';
 
 var InteractEvent = require('../InteractEvent');
@@ -5820,6 +5821,8 @@ var browser = {
 
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
+
+  isIOS: /iP(hone|od|ad)/.test(navigator.platform),
 
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion),
