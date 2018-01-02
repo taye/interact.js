@@ -59,7 +59,7 @@ class Interactable {
         actionOptions[optionName] = arr.from(optionValue);
       }
       // if the option value is an object
-      else if (!isArray && is.object(optionValue)) {
+      else if (!isArray && is.plainObject(optionValue)) {
         // copy the object
         actionOptions[optionName] = extend(
           actionOptions[optionName] || {},
