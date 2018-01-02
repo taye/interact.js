@@ -1,3 +1,18 @@
+## v1.3.2
+ - fixed issues with action options ([PR
+   #567](https://github.com/taye/interact.js/pull/567), [issue
+   #570](https://github.com/taye/interact.js/issues/570))
+
+## v1.3.1
+ - fixed iOS preventDefault passive event issue ([issue
+   #561](https://github.com/taye/interact.js/issues/561))
+
+## v1.3.1
+ - allowed calling `draggable.unset()` during `dragend` and `drop` event
+   listeners ([issue #560](https://github.com/taye/interact.js/issues/560))
+ - allowed snap to be enabled with falsey targets value [issue
+   #562](https://github.com/taye/interact.js/issues/562)
+
 ## v1.3.0
 
 Most notably:

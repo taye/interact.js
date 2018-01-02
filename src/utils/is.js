@@ -27,6 +27,8 @@ const is = {
       ? thing instanceof _window.Element //DOM2
       : thing.nodeType === 1 && typeof thing.nodeName === 'string');
   },
+
+  plainObject: thing => is.object(thing) && thing.constructor.name === 'Object',
 };
 
 is.array = thing => (is.object(thing)
