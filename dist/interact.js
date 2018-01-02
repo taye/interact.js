@@ -1,7 +1,7 @@
 /**
- * interact.js v1.3.2
+ * interact.js v1.3.3
  *
- * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
+ * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
@@ -26,7 +26,7 @@ if (typeof window === 'undefined') {
   module.exports = require('./src/index');
 }
 
-},{"./src/index":19,"./src/utils/window":51}],2:[function(require,module,exports){
+},{"./src/index":19,"./src/utils/window":52}],2:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -104,7 +104,7 @@ var Eventable = function () {
 
 module.exports = Eventable;
 
-},{"./utils/extend.js":40}],3:[function(require,module,exports){
+},{"./utils/extend.js":41}],3:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -282,11 +282,12 @@ InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./defaultOptions":18,"./utils/Signals":34,"./utils/extend":40,"./utils/getOriginXY":41}],4:[function(require,module,exports){
+},{"./defaultOptions":18,"./utils/Signals":34,"./utils/extend":41,"./utils/getOriginXY":42}],4:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var clone = require('./utils/clone');
 var is = require('./utils/is');
 var events = require('./utils/events');
 var extend = require('./utils/extend');
@@ -369,8 +370,9 @@ var Interactable = function () {
       if (option in defaults[action]) {
         // if the option in the options arg is an object value
         if (is.object(options[option])) {
-          // duplicate the object
-          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+          // duplicate the object and merge
+          this.options[action][option] = clone(this.options[action][option] || {});
+          extend(this.options[action][option], options[option]);
 
           if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
             this.options[action][option].enabled = options[option].enabled === false ? false : true;
@@ -628,14 +630,14 @@ var Interactable = function () {
       options = {};
     }
 
-    this.options = extend({}, defaults.base);
+    this.options = clone(defaults.base);
 
-    var perActions = extend({}, defaults.perAction);
+    var perActions = clone(defaults.perAction);
 
     for (var actionName in actions.methodDict) {
       var methodName = actions.methodDict[actionName];
 
-      this.options[actionName] = extend({}, defaults[actionName]);
+      this.options[actionName] = clone(defaults[actionName]);
 
       this.setPerAction(actionName, perActions);
 
@@ -773,7 +775,7 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":33,"./utils/Signals":34,"./utils/arr":35,"./utils/browser":36,"./utils/domUtils":38,"./utils/events":39,"./utils/extend":40,"./utils/is":45,"./utils/window":51}],5:[function(require,module,exports){
+},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":33,"./utils/Signals":34,"./utils/arr":35,"./utils/browser":36,"./utils/clone":37,"./utils/domUtils":39,"./utils/events":40,"./utils/extend":41,"./utils/is":46,"./utils/window":52}],5:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1326,7 +1328,7 @@ scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":33,"./utils":43,"./utils/Signals":34,"./utils/browser":36,"./utils/domObjects":37,"./utils/events":39,"./utils/interactionFinder":44}],6:[function(require,module,exports){
+},{"./scope":33,"./utils":44,"./utils/Signals":34,"./utils/browser":36,"./utils/domObjects":38,"./utils/events":40,"./utils/interactionFinder":45}],6:[function(require,module,exports){
 'use strict';
 
 var Interaction = require('../Interaction');
@@ -1539,7 +1541,7 @@ defaultOptions.drag = drag.defaults;
 
 module.exports = drag;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],8:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"./base":6}],8:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -2055,7 +2057,7 @@ defaultOptions.drop = drop.defaults;
 
 module.exports = drop;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"./base":6}],9:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":44,"./base":6}],9:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -2231,7 +2233,7 @@ defaultOptions.gesture = gesture.defaults;
 
 module.exports = gesture;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],10:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"./base":6}],10:[function(require,module,exports){
 'use strict';
 
 var actions = require('./base');
@@ -2686,7 +2688,7 @@ defaultOptions.resize = resize.defaults;
 
 module.exports = resize;
 
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/browser":36,"./base":6}],11:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":44,"../utils/browser":36,"./base":6}],11:[function(require,module,exports){
 'use strict';
 
 var raf = require('./utils/raf');
@@ -2814,7 +2816,7 @@ defaultOptions.perAction.autoScroll = autoScroll.defaults;
 
 module.exports = autoScroll;
 
-},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":38,"./utils/is":45,"./utils/raf":49,"./utils/window":51}],12:[function(require,module,exports){
+},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":39,"./utils/is":46,"./utils/raf":50,"./utils/window":52}],12:[function(require,module,exports){
 'use strict';
 
 /** @lends Interactable */
@@ -3031,7 +3033,7 @@ Interactable.prototype.defaultActionChecker = function (pointer, event, interact
   }
 };
 
-},{"../Interactable":4,"../actions/base":6,"../utils":43,"../utils/domUtils":38,"../utils/is":45}],13:[function(require,module,exports){
+},{"../Interactable":4,"../actions/base":6,"../utils":44,"../utils/domUtils":39,"../utils/is":46}],13:[function(require,module,exports){
 'use strict';
 
 var interact = require('../interact');
@@ -3298,7 +3300,7 @@ utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
 
 module.exports = autoStart;
 
-},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"../utils/Signals":34,"./InteractableMethods":12}],14:[function(require,module,exports){
+},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":44,"../utils/Signals":34,"./InteractableMethods":12}],14:[function(require,module,exports){
 'use strict';
 
 var autoStart = require('./base');
@@ -3382,7 +3384,7 @@ function checkStartAxis(startAxis, interactable) {
   return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":33,"../utils/domUtils":38,"../utils/is":45,"./base":13}],15:[function(require,module,exports){
+},{"../actions/drag":7,"../scope":33,"../utils/domUtils":39,"../utils/is":46,"./base":13}],15:[function(require,module,exports){
 'use strict';
 
 require('./base').setActionDefaults(require('../actions/gesture'));
@@ -3814,7 +3816,7 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":23,"./utils":43,"./utils/raf":49}],21:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":23,"./utils":44,"./utils/raf":50}],21:[function(require,module,exports){
 'use strict';
 
 /** @module interact */
@@ -4066,7 +4068,7 @@ scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils":43,"./utils/browser":36,"./utils/events":39}],22:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils":44,"./utils/browser":36,"./utils/events":40}],22:[function(require,module,exports){
 'use strict';
 
 var Interactable = require('./Interactable');
@@ -4171,7 +4173,7 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/browser":36,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45}],23:[function(require,module,exports){
+},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/browser":36,"./utils/domUtils":39,"./utils/events":40,"./utils/is":46}],23:[function(require,module,exports){
 'use strict';
 
 var InteractEvent = require('../InteractEvent');
@@ -4407,7 +4409,7 @@ function shouldDo(options, preEnd, requireEndOnly) {
 
 module.exports = modifiers;
 
-},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":40}],24:[function(require,module,exports){
+},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":41}],24:[function(require,module,exports){
 'use strict';
 
 var modifiers = require('./base');
@@ -4535,7 +4537,7 @@ defaultOptions.perAction.restrict = restrict.defaults;
 
 module.exports = restrict;
 
-},{"../defaultOptions":18,"../utils":43,"./base":23}],25:[function(require,module,exports){
+},{"../defaultOptions":18,"../utils":44,"./base":23}],25:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictEdges setting which sets min and
@@ -4674,7 +4676,7 @@ resize.defaults.restrictEdges = restrictEdges.defaults;
 
 module.exports = restrictEdges;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrict":24}],26:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":23,"./restrict":24}],26:[function(require,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictSize setting which sets min and
@@ -4763,7 +4765,7 @@ resize.defaults.restrictSize = restrictSize.defaults;
 
 module.exports = restrictSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrictEdges":25}],27:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils":44,"../utils/rect":51,"./base":23,"./restrictEdges":25}],27:[function(require,module,exports){
 'use strict';
 
 var modifiers = require('./base');
@@ -5030,7 +5032,7 @@ defaultOptions.perAction.snap = snap.defaults;
 
 module.exports = snap;
 
-},{"../defaultOptions":18,"../interact":21,"../utils":43,"./base":23}],28:[function(require,module,exports){
+},{"../defaultOptions":18,"../interact":21,"../utils":44,"./base":23}],28:[function(require,module,exports){
 'use strict';
 
 // This module allows snapping of the size of targets during resize
@@ -5139,7 +5141,7 @@ resize.defaults.snapSize = snapSize.defaults;
 
 module.exports = snapSize;
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils/":43,"./base":23,"./snap":27}],29:[function(require,module,exports){
+},{"../actions/resize":10,"../defaultOptions":18,"../utils/":44,"./base":23,"./snap":27}],29:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5227,7 +5229,7 @@ module.exports = function () {
   return PointerEvent;
 }();
 
-},{"../utils/pointerUtils":48}],30:[function(require,module,exports){
+},{"../utils/pointerUtils":49}],30:[function(require,module,exports){
 'use strict';
 
 var PointerEvent = require('./PointerEvent');
@@ -5508,7 +5510,7 @@ Interaction.signals.on('new', function (interaction) {
 defaults.pointerEvents = pointerEvents.defaults;
 module.exports = pointerEvents;
 
-},{"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/Signals":34,"./PointerEvent":29}],31:[function(require,module,exports){
+},{"../Interaction":5,"../defaultOptions":18,"../utils":44,"../utils/Signals":34,"./PointerEvent":29}],31:[function(require,module,exports){
 'use strict';
 
 var pointerEvents = require('./base');
@@ -5655,7 +5657,7 @@ Interactable.prototype._backCompatOption = function (optionName, newValue) {
 
 Interactable.settingsMethods.push('pointerEvents');
 
-},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/extend":40,"../utils/is":45,"./base":30}],33:[function(require,module,exports){
+},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/extend":41,"../utils/is":46,"./base":30}],33:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -5715,7 +5717,7 @@ var scope = {
 
 module.exports = scope;
 
-},{"./utils":43,"./utils/Signals":34,"./utils/domObjects":37,"./utils/events":39,"./utils/window":51}],34:[function(require,module,exports){
+},{"./utils":44,"./utils/Signals":34,"./utils/domObjects":38,"./utils/events":40,"./utils/window":52}],34:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5858,7 +5860,24 @@ browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch &
 
 module.exports = browser;
 
-},{"./domObjects":37,"./is":45,"./window":51}],37:[function(require,module,exports){
+},{"./domObjects":38,"./is":46,"./window":52}],37:[function(require,module,exports){
+'use strict';
+
+var is = require('./is');
+
+module.exports = function clone(source) {
+  var dest = {};
+  for (var prop in source) {
+    if (is.plainObject(source[prop])) {
+      dest[prop] = clone(source[prop]);
+    } else {
+      dest[prop] = source[prop];
+    }
+  }
+  return dest;
+};
+
+},{"./is":46}],38:[function(require,module,exports){
 'use strict';
 
 var domObjects = {};
@@ -5880,7 +5899,7 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
 module.exports = domObjects;
 
-},{"./window":51}],38:[function(require,module,exports){
+},{"./window":52}],39:[function(require,module,exports){
 'use strict';
 
 var win = require('./window');
@@ -6112,7 +6131,7 @@ var domUtils = {
 
 module.exports = domUtils;
 
-},{"./browser":36,"./domObjects":37,"./is":45,"./window":51}],39:[function(require,module,exports){
+},{"./browser":36,"./domObjects":38,"./is":46,"./window":52}],40:[function(require,module,exports){
 'use strict';
 
 var is = require('./is');
@@ -6402,7 +6421,7 @@ module.exports = {
   _targets: targets
 };
 
-},{"./arr":35,"./domUtils":38,"./is":45,"./pointerExtend":47,"./pointerUtils":48,"./window":51}],40:[function(require,module,exports){
+},{"./arr":35,"./domUtils":39,"./is":46,"./pointerExtend":48,"./pointerUtils":49,"./window":52}],41:[function(require,module,exports){
 "use strict";
 
 module.exports = function extend(dest, source) {
@@ -6412,7 +6431,7 @@ module.exports = function extend(dest, source) {
   return dest;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 var _require = require('./rect'),
@@ -6429,14 +6448,14 @@ module.exports = function (target, element, action) {
   return rectToXY(originRect) || { x: 0, y: 0 };
 };
 
-},{"./rect":50}],42:[function(require,module,exports){
+},{"./rect":51}],43:[function(require,module,exports){
 "use strict";
 
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict';
 
 var extend = require('./extend');
@@ -6496,7 +6515,7 @@ extend(utils, require('./rect'));
 
 module.exports = utils;
 
-},{"./arr":35,"./domUtils":38,"./extend":40,"./getOriginXY":41,"./hypot":42,"./is":45,"./pointerUtils":48,"./rect":50,"./window":51}],44:[function(require,module,exports){
+},{"./arr":35,"./domUtils":39,"./extend":41,"./getOriginXY":42,"./hypot":43,"./is":46,"./pointerUtils":49,"./rect":51,"./window":52}],45:[function(require,module,exports){
 'use strict';
 
 var scope = require('../scope');
@@ -6665,7 +6684,7 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":33,"./index":43}],45:[function(require,module,exports){
+},{"../scope":33,"./index":44}],46:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -6714,6 +6733,10 @@ var is = {
     return (/object|function/.test(_typeof(_window.Element)) ? thing instanceof _window.Element //DOM2
       : thing.nodeType === 1 && typeof thing.nodeName === 'string'
     );
+  },
+
+  plainObject: function plainObject(thing) {
+    return is.object(thing) && thing.constructor.name === 'Object';
   }
 };
 
@@ -6723,14 +6746,14 @@ is.array = function (thing) {
 
 module.exports = is;
 
-},{"./isWindow":46,"./window":51}],46:[function(require,module,exports){
+},{"./isWindow":47,"./window":52}],47:[function(require,module,exports){
 "use strict";
 
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 function pointerExtend(dest, source) {
@@ -6759,7 +6782,7 @@ pointerExtend.prefixedPropREs = {
 
 module.exports = pointerExtend;
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 var hypot = require('./hypot');
@@ -6982,7 +7005,7 @@ var pointerUtils = {
 
 module.exports = pointerUtils;
 
-},{"./browser":36,"./domObjects":37,"./domUtils":38,"./hypot":42,"./is":45,"./pointerExtend":47}],49:[function(require,module,exports){
+},{"./browser":36,"./domObjects":38,"./domUtils":39,"./hypot":43,"./is":46,"./pointerExtend":48}],50:[function(require,module,exports){
 'use strict';
 
 var _require = require('./window'),
@@ -7022,7 +7045,7 @@ module.exports = {
   cancel: cancel
 };
 
-},{"./window":51}],50:[function(require,module,exports){
+},{"./window":52}],51:[function(require,module,exports){
 'use strict';
 
 var extend = require('./extend');
@@ -7100,7 +7123,7 @@ var rectUtils = {
 
 module.exports = rectUtils;
 
-},{"./domUtils":38,"./extend":40,"./is":45}],51:[function(require,module,exports){
+},{"./domUtils":39,"./extend":41,"./is":46}],52:[function(require,module,exports){
 'use strict';
 
 var win = module.exports;
@@ -7142,7 +7165,7 @@ win.getWindow = function getWindow(node) {
 
 win.init = init;
 
-},{"./isWindow":46}]},{},[1])(1)
+},{"./isWindow":47}]},{},[1])(1)
 });
 
 
