@@ -50,7 +50,7 @@ function init (scope) {
    */
   Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
     return this._backCompatOption('ignoreFrom', newValue);
-  }, 'Interactable.ignoreForm() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
+  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
 
   /**
    * ```js
@@ -78,7 +78,7 @@ function init (scope) {
    */
   Interactable.prototype.allowFrom = warnOnce(function (newValue) {
     return this._backCompatOption('allowFrom', newValue);
-  }, 'Interactable.allowForm() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
+  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
 
   Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
     if (!ignoreFrom || !is.element(element)) { return false; }
