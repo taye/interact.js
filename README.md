@@ -95,4 +95,7 @@ License
 interact.js is released under the [MIT License](http://taye.mit-license.org).
 
 [ijs-twitter]: https://twitter.com/interactjs
-[upcoming-changes]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#upcoming-changes
+[upcoming-changes]: https://github.com/taye/interact.js/blob/master/CHANGELOG.md#upcoming-change
+
+interact.js is released under the [MIT License](http://taye.mit-license.org).
+s
