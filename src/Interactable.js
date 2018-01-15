@@ -1,3 +1,4 @@
+const clone     = require('./utils/clone');
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
@@ -58,11 +59,11 @@ class Interactable {
         actionOptions[optionName] = arr.from(optionValue);
       }
       // if the option value is an object
-      else if (!isArray && is.object(optionValue)) {
+      else if (!isArray && is.plainObject(optionValue)) {
         // copy the object
         actionOptions[optionName] = extend(
           actionOptions[optionName] || {},
-          optionValue);
+          clone(optionValue));
 
         // set anabled field to true if it exists in the defaults
         if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
