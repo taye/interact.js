@@ -82,6 +82,7 @@ declare namespace interact {
   }
 
   interface DraggableOptions {
+    enabled?: boolean
     max?: number
     maxPerElement?: number
     manualStart?: boolean
