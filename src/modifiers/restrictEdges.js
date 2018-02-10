@@ -61,8 +61,11 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
   }
 
   const page = extend({}, modifiedCoords);
-  const inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
-  const outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
+  const inner = getRestrictionRect(options.inner, interaction, page) || {};
+  const outer = getRestrictionRect(options.outer, interaction, page) || {};
+
+  fixRect(inner, noInner);
+  fixRect(outer, noOuter);
 
   let modifiedX = page.x;
   let modifiedY = page.y;
@@ -109,6 +112,16 @@ function modifyCoords ({ page, client, status, phase, options }) {
       };
     }
   }
+}
+
+function fixRect (rect, defaults) {
+  for (const edge of ['top', 'left', 'bottom', 'right']) {
+    if (!(edge in rect)) {
+      rect[edge] = defaults[edge];
+    }
+  }
+
+  return rect;
 }
 
 module.exports = {
