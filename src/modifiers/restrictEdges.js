@@ -33,23 +33,24 @@ function init (scope) {
   resize.defaults.restrictEdges = module.exports.defaults;
 }
 
-function setOffset ({ interaction, startOffset, options }) {
-  if (!options) {
-    return extend({}, startOffset);
+function setOffset ({ interaction, options }) {
+  const startOffset = interaction.startOffset;
+  let offset;
+
+  if (options) {
+    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+
+    offset = rectUtils.rectToXY(offsetRect);
   }
 
-  const offset = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+  offset = offset || { x: 0, y: 0 };
 
-  if (offset) {
-    return {
-      top:    startOffset.top    + offset.y,
-      left:   startOffset.left   + offset.x,
-      bottom: startOffset.bottom + offset.y,
-      right:  startOffset.right  + offset.x,
-    };
-  }
-
-  return startOffset;
+  return {
+    top:    offset.y + startOffset.top,
+    left:   offset.x + startOffset.left,
+    bottom: offset.y - startOffset.bottom,
+    right:  offset.x - startOffset.right,
+  };
 }
 
 function set ({ modifiedCoords, interaction, status, offset, options }) {
@@ -74,13 +75,13 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
     modifiedY = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
   }
   else if (edges.bottom) {
-    modifiedY = Math.max(Math.min(outer.bottom - offset.bottom, page.y), inner.bottom - offset.bottom);
+    modifiedY = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom);
   }
   if (edges.left) {
     modifiedX = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left);
   }
   else if (edges.right) {
-    modifiedX = Math.max(Math.min(outer.right  - offset.right,  page.x), inner.right  - offset.right);
+    modifiedX = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right);
   }
 
   status.dx = modifiedX - page.x;
@@ -94,8 +95,7 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
 }
 
 function modifyCoords ({ page, client, status, phase, options }) {
-  if (options && options.enabled
-      && !(phase === 'start' && status.locked)) {
+  if (options && options.enabled && phase !== 'start') {
 
     if (status.locked) {
       page.x += status.dx;
@@ -122,8 +122,8 @@ module.exports = {
   defaults: {
     enabled: false,
     endOnly: false,
-    min: null,
-    max: null,
+    inner: null,
+    outer: null,
     offset: null,
   },
 };
