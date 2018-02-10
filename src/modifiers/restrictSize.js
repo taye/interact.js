@@ -33,7 +33,7 @@ function init (scope) {
 }
 
 function setOffset ({ interaction }) {
-  return interaction.startOffset;
+  return restrictEdges.setOffset({ interaction });
 }
 
 function set (arg) {
