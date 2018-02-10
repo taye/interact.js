@@ -66,6 +66,7 @@
     "babelify": "^7.3.0",
     "browserify": "^16.0.0",
     "combine-source-map": "^0.7.1",
+    "derequire": "^2.0.6",
     "domator": "^2.0.0",
     "errorify": "^0.3.1",
     "eslint": "^3.16.0",
