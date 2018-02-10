@@ -2,11 +2,18 @@ const test = require('./test');
 const pointerUtils = require('../src/utils/pointerUtils');
 const helpers = require('./helpers');
 
+const Interaction = require('../src/Interaction');
+const Signals = require('../src/utils/Signals');
+
+const makeInteractionAndSignals = () => new Interaction({ signals: Signals.new() });
+
 test('Interaction constructor', t => {
   const testType = 'test';
-  const scope = require('../src/scope');
-  const Interaction = require('../src/Interaction');
-  const interaction = new Interaction({ pointerType: testType });
+  const signals = Signals.new();
+  const interaction = new Interaction({
+    pointerType: testType,
+    signals,
+  });
   const zeroCoords = {
     page     : { x: 0, y: 0 },
     client   : { x: 0, y: 0 },
@@ -17,6 +24,9 @@ test('Interaction constructor', t => {
     client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
     timeStamp: 0,
   };
+
+  t.equal(interaction._signals, signals,
+    'signals option is set assigned to interaction._signals');
 
   t.ok(interaction.prepared instanceof Object,
     'interaction.prepared is an object');
@@ -48,17 +58,11 @@ test('Interaction constructor', t => {
     t.notOk(interaction[prop], `interaction.${prop} is false`);
   }
 
-  const last = scope.interactions.length - 1;
-
-  t.equal(scope.interactions[last], interaction,
-    'new Interaction is pushed to scope.interactions');
-
   t.end();
 });
 
 test('Interaction.getPointerIndex', t => {
-  const Interaction = require('../src/Interaction');
-  const interaction = new Interaction({});
+  const interaction = makeInteractionAndSignals();
 
   interaction.pointerIds = [2, 4, 5, 0, -1];
 
@@ -70,10 +74,8 @@ test('Interaction.getPointerIndex', t => {
 });
 
 test('Interaction.updatePointer', t => {
-  const Interaction = require('../src/Interaction');
-
   t.test('no existing pointers', st => {
-    const interaction = new Interaction({});
+    const interaction = makeInteractionAndSignals();
     const pointer = { pointerId: 10 };
 
     const ret = interaction.updatePointer(pointer);
@@ -89,7 +91,7 @@ test('Interaction.updatePointer', t => {
   });
 
   t.test('new pointer with exisiting pointer', st => {
-    const interaction = new Interaction({});
+    const interaction = makeInteractionAndSignals();
     const existing = { pointerId: 0 };
 
     interaction.updatePointer(existing);
@@ -107,7 +109,7 @@ test('Interaction.updatePointer', t => {
   });
 
   t.test('update existing pointers', st => {
-    const interaction = new Interaction({});
+    const interaction = makeInteractionAndSignals();
 
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }));
     const newPointers = oldPointers.map(({ pointerId }) => ({ pointerId }));
@@ -132,8 +134,7 @@ test('Interaction.updatePointer', t => {
 });
 
 test('Interaction.removePointer', t => {
-  const Interaction = require('../src/Interaction');
-  const interaction = new Interaction({});
+  const interaction = makeInteractionAndSignals();
   const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
   const pointerIds = [0, 1, 2, 3];
   const removals = [
@@ -167,8 +168,7 @@ test('Interaction.removePointer', t => {
 });
 
 test('Interaction.pointerDown', t => {
-  const Interaction = require('../src/Interaction');
-  const interaction = new Interaction({});
+  const interaction = makeInteractionAndSignals();
   const coords = helpers.newCoordsSet();
   const eventTarget = {};
   const event = {
@@ -182,7 +182,7 @@ test('Interaction.pointerDown', t => {
     signalArg = arg;
   };
 
-  Interaction.signals.on('down', signalListener);
+  interaction._signals.on('down', signalListener);
 
   const pointerCoords = { page: {}, client: {} };
   pointerUtils.setCoords(pointerCoords, [pointer]);
@@ -243,17 +243,13 @@ test('Interaction.pointerDown', t => {
   t.ok(interaction.pointerIsDown, 'pointerIsDown');
   t.notOk(interaction.pointerWasMoved, 'pointerWasMoved should always change to false');
 
-  Interaction.signals.off('down', signalListener);
-
   t.end();
 });
 
 test('Interaction.start', t => {
-  const scope = require('../src/scope');
-  const Interaction = require('../src/Interaction');
-  const interaction = new Interaction({});
+  const interaction = makeInteractionAndSignals();
   const action = { name: 'TEST' };
-  const target = {};
+  const target = helpers.mockInteractable();
   const element = {};
   const pointer = helpers.newPointer();
   const event = {};
@@ -275,80 +271,105 @@ test('Interaction.start', t => {
   interaction._interacting = false;
 
   let signalArg;
+  let interactingInStartListener;
   const signalListener = arg => {
     signalArg = arg;
+    interactingInStartListener = arg.interaction.interacting();
   };
 
-  Interaction.signals.on('action-start', signalListener);
+  interaction._signals.on('action-start', signalListener);
   interaction.start(action, target, element);
 
   t.equal(interaction.prepared.name, action.name, 'action is prepared');
   t.equal(interaction.target, target, 'interaction.target is updated');
   t.equal(interaction.element, element, 'interaction.element is updated');
 
+  t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg');
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg');
 
-  scope.interactions.splice(0);
-
   interaction._interacting = false;
 
-  interaction.start(action, target, element);
-  t.deepEqual(scope.interactions, [interaction], 'interaction is added back to scope');
-
-  Interaction.signals.off('action-start', signalListener);
-
-  t.end();
-});
-
-test('action-{start,move,end} signal listeners', t => {
-  const Interactable  = require('../src/Interactable');
-  const Interaction   = require('../src/Interaction');
-
-  const interaction = new Interaction({});
-  const element = {};
-  const interactable = new Interactable('TEST', { context: {} });
-
-  let interactingInStartListener = null;
-
-  interaction.target = interactable;
-  interaction.element = element;
-  interaction.prepared = { name: 'TEST' };
-
-  interactable.events.on('TESTstart', event => {
-    interactingInStartListener = event.interaction.interacting();
-  });
-
-  Interaction.signals.fire('action-start', { interaction, event: {} });
-
-  t.ok(interactingInStartListener, 'start event was fired correctly');
-
-  interactable.unset();
+  // interaction.start(action, target, element);
+  // t.deepEqual(scope.interactions, [interaction], 'interaction is added back to scope');
 
   t.end();
 });
 
 test('stop interaction from start event', t => {
-  const Interactable  = require('../src/Interactable');
-  const Interaction   = require('../src/Interaction');
+  const scope = helpers.mockScope();
 
-  const interaction = new Interaction({});
-  const element = {};
-  const interactable = new Interactable('TEST', { context: {} });
+  require('../src/interactions').init(scope);
+  const interaction = scope.Interaction.new({});
+  const interactable = helpers.mockInteractable();
 
   interaction.target = interactable;
-  interaction.element = element;
+  interaction.element = interactable.element;
   interaction.prepared = { name: 'TEST' };
 
   interactable.events.on('TESTstart', event => {
     event.interaction.stop();
   });
 
-  Interaction.signals.fire('action-start', { interaction, event: {} });
+  interaction._signals.fire('action-start', { interaction, event: {} });
 
   t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener');
 
-  interactable.unset();
+  t.end();
+});
+
+test('Interaction createPreparedEvent', t => {
+  const InteractEvent = require('../src/InteractEvent');
+  const scope = helpers.mockScope();
+
+  require('../src/interactions').init(scope);
+
+  const interaction = scope.Interaction.new({});
+  const interactable = helpers.mockInteractable();
+  const action = { name: 'resize' };
+  const phase = 'TEST_PHASE';
+
+  interaction.prepared = action;
+  interaction.target = interactable;
+  interaction.element = interactable.element;
+  interaction.prevEvent = {};
+
+  const iEvent = interaction._createPreparedEvent({}, phase);
+
+  t.ok(iEvent instanceof InteractEvent,
+    'InteractEvent is fired');
+
+  t.equal(iEvent.type, action.name + phase,
+    'event type');
+
+  t.equal(iEvent.interactable, interactable,
+    'event.interactable');
+
+  t.equal(iEvent.target, interactable.element,
+    'event.target');
+
+  t.end();
+});
+
+test('Interaction fireEvent', t => {
+  const interaction = new Interaction({ signals: helpers.mockSignals() });
+  const interactable = helpers.mockInteractable();
+  const iEvent = {};
+  let firedEvent;
+
+  // this method should be called from actions.firePrepared
+  interactable.fire = event => {
+    firedEvent = event;
+  };
+
+  interaction.target = interactable;
+  interaction._fireEvent(iEvent);
+
+  t.equal(firedEvent, iEvent,
+    'target interactable\'s fire method is called');
+
+  t.equal(interaction.prevEvent, iEvent,
+    'interaction.prevEvent is updated');
 
   t.end();
 });

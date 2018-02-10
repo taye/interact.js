@@ -1,37 +1,42 @@
-const autoStart   = require('./base');
-const Interaction = require('../Interaction');
+function init (scope) {
+  const {
+    autoStart,
+    Interaction,
+    defaults,
+  } = scope;
 
-autoStart.defaults.perAction.hold = 0;
-autoStart.defaults.perAction.delay = 0;
+  defaults.perAction.hold = 0;
+  defaults.perAction.delay = 0;
 
-Interaction.signals.on('new', function (interaction) {
-  interaction.autoStartHoldTimer = null;
-});
+  Interaction.signals.on('new', function (interaction) {
+    interaction.autoStartHoldTimer = null;
+  });
 
-autoStart.signals.on('prepared', function ({ interaction }) {
-  const hold = getHoldDuration(interaction);
+  autoStart.signals.on('prepared', function ({ interaction }) {
+    const hold = getHoldDuration(interaction);
 
-  if (hold > 0) {
-    interaction.autoStartHoldTimer = setTimeout(() => {
-      interaction.start(interaction.prepared, interaction.target, interaction.element);
-    }, hold);
-  }
-});
+    if (hold > 0) {
+      interaction.autoStartHoldTimer = setTimeout(() => {
+        interaction.start(interaction.prepared, interaction.target, interaction.element);
+      }, hold);
+    }
+  });
 
-Interaction.signals.on('move', function ({ interaction, duplicate }) {
-  if (interaction.pointerWasMoved && !duplicate) {
-    clearTimeout(interaction.autoStartHoldTimer);
-  }
-});
+  Interaction.signals.on('move', function ({ interaction, duplicate }) {
+    if (interaction.pointerWasMoved && !duplicate) {
+      clearTimeout(interaction.autoStartHoldTimer);
+    }
+  });
 
-// prevent regular down->move autoStart
-autoStart.signals.on('before-start', function ({ interaction }) {
-  const hold = getHoldDuration(interaction);
+  // prevent regular down->move autoStart
+  autoStart.signals.on('before-start', function ({ interaction }) {
+    const hold = getHoldDuration(interaction);
 
-  if (hold > 0) {
-    interaction.prepared.name = null;
-  }
-});
+    if (hold > 0) {
+      interaction.prepared.name = null;
+    }
+  });
+}
 
 function getHoldDuration (interaction) {
   const actionName = interaction.prepared && interaction.prepared.name;
@@ -44,5 +49,6 @@ function getHoldDuration (interaction) {
 }
 
 module.exports = {
+  init,
   getHoldDuration,
 };

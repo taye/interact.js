@@ -31,7 +31,7 @@ class Signals {
 
     for (const listener of targetListeners) {
       if (listener(arg, name) === false) {
-        return;
+        return false;
       }
     }
   }

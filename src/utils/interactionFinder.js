@@ -1,14 +1,9 @@
-const scope   = require('../scope');
-const utils   = require('./index');
+const utils = require('./index');
 
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
-  search: function (pointer, eventType, eventTarget) {
-    const pointerType = utils.getPointerType(pointer);
-    const pointerId = utils.getPointerId(pointer);
-    const details = { pointer, pointerId, pointerType, eventType, eventTarget };
-
+  search: function (details) {
     for (const method of finder.methodOrder) {
       const interaction = finder[method](details);
 
@@ -19,7 +14,7 @@ const finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume: function ({ pointerType, eventType, eventTarget }) {
+  simulationResume: function ({ pointerType, eventType, eventTarget, scope }) {
     if (!/down|start/i.test(eventType)) {
       return null;
     }
@@ -34,7 +29,7 @@ const finder = {
           if (element === interaction.element) {
             return interaction;
           }
-          element = utils.parentNode(element);
+          element = utils.dom.parentNode(element);
         }
       }
     }
@@ -43,7 +38,7 @@ const finder = {
   },
 
   // if it's a mouse or pen interaction
-  mouseOrPen: function ({ pointerId, pointerType, eventType }) {
+  mouseOrPen: function ({ pointerId, pointerType, eventType, scope }) {
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null;
     }
@@ -53,7 +48,7 @@ const finder = {
     for (const interaction of scope.interactions) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) { continue; }
+        if (interaction.simulation && !utils.arr.contains(interaction.pointerIds, pointerId)) { continue; }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {
@@ -85,16 +80,16 @@ const finder = {
   },
 
   // get interaction that has this pointer
-  hasPointer: function ({ pointerId }) {
+  hasPointer: function ({ pointerId, scope }) {
     for (const interaction of scope.interactions) {
-      if (utils.contains(interaction.pointerIds, pointerId)) {
+      if (utils.arr.contains(interaction.pointerIds, pointerId)) {
         return interaction;
       }
     }
   },
 
   // get first idle interaction with a matching pointerType
-  idle: function ({ pointerType }) {
+  idle: function ({ pointerType, scope }) {
     for (const interaction of scope.interactions) {
       // if there's already a pointer held down
       if (interaction.pointerIds.length === 1) {

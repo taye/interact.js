@@ -1,34 +1,33 @@
 const { window } = require('./window');
 
-const vendors = ['ms', 'moz', 'webkit', 'o'];
 let lastTime = 0;
-let request;
-let cancel;
+let request = window.requestAnimationFrame;
+let cancel = window.cancelAnimationFrame;
 
-for (let x = 0; x < vendors.length && !window.requestAnimationFrame; x++) {
-  request = window[vendors[x] + 'RequestAnimationFrame'];
-  cancel = window[vendors[x] +'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+if (!request) {
+  const vendors = ['ms', 'moz', 'webkit', 'o'];
+
+  for (const vendor of vendors) {
+    request = window[`${vendor}RequestAnimationFrame`];
+    cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`];
+  }
 }
 
 if (!request) {
-  request = function (callback) {
+  request = callback => {
     const currTime = new Date().getTime();
     const timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    const id = setTimeout(function () { callback(currTime + timeToCall); },
+    const token = setTimeout(function () { callback(currTime + timeToCall); },
                           timeToCall);
 
     lastTime = currTime + timeToCall;
-    return id;
+    return token;
   };
-}
 
-if (!cancel) {
-  cancel = function (id) {
-    clearTimeout(id);
-  };
+  cancel = token => clearTimeout(token);
 }
 
 module.exports = {
-  request,
-  cancel,
+  request: callback => request(callback),
+  cancel: token => cancel(token),
 };

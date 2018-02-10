@@ -13,6 +13,8 @@ const browser = {
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
 
+  isIOS: (/iP(hone|od|ad)/.test(navigator.platform)),
+
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: (/iP(hone|od|ad)/.test(navigator.platform)
            && /OS 7[^\d]/.test(navigator.appVersion)),

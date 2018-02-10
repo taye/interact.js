@@ -1,4 +1,6 @@
+require('./Interactable');
 require('./Interaction');
+require('./interactions');
 
 // Legacy browser support
 //require('./legacyBrowsers');
@@ -18,12 +20,12 @@ require('./pointerEvents/holdRepeat');
 //require('./modifiers/snap');
 //require('./modifiers/restrict');
 require('./modifiers/restrictSize');
+require('./modifiers/restrictEdges');
 
 // autoStart hold
 require('./autoStart/hold');
 
 // actions
-require('./actions/base');
 //require('./actions/gesture');
 //require('./actions/resize');
 require('./actions/drag');
@@ -40,8 +42,7 @@ require('./actions/drag');
 // autoScroll
 //require('./autoScroll');
 
-// export interact
-//require('./interact');
+require('./interact');
 
 //const index = require('../src/index');
 //const test = require('tape');

@@ -1,191 +1,209 @@
-const InteractEvent = require('../InteractEvent');
-const Interaction   = require('../Interaction');
-const extend        = require('../utils/extend');
+const extend = require('../utils/extend');
 
-const modifiers = {
-  names: [],
+function init (scope) {
+  const {
+    InteractEvent,
+    Interaction,
+  } = scope;
 
-  setOffsets: function (arg) {
-    const { interaction, pageCoords: page } = arg;
-    const { target, element, startOffset } = interaction;
-    const rect = target.getRect(element);
+  scope.modifiers = { names: [] };
 
-    if (rect) {
-      startOffset.left = page.x - rect.left;
-      startOffset.top  = page.y - rect.top;
+  Interaction.signals.on('new', function (interaction) {
+    interaction.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
+    interaction.modifierOffsets  = {};
+    interaction.modifierStatuses = resetStatuses({}, scope.modifiers);
+    interaction.modifierResult   = null;
+  });
 
-      startOffset.right  = rect.right  - page.x;
-      startOffset.bottom = rect.bottom - page.y;
+  Interaction.signals.on('action-start' , arg =>
+    start(arg, scope.modifiers, arg.interaction.startCoords.page));
 
-      if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
-      if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
-    }
-    else {
-      startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
-    }
+  Interaction.signals.on('action-resume', arg => {
+    beforeMove(arg, scope.modifiers);
+    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+  });
 
-    arg.rect = rect;
-    arg.interactable = target;
-    arg.element = element;
+  Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
+  Interaction.signals.on('action-end', arg => beforeEnd(arg, scope.modifiers));
 
-    for (const modifierName of modifiers.names) {
-      arg.options = target.options[interaction.prepared.name][modifierName];
+  InteractEvent.signals.on('set-xy', arg => setXY(arg, scope.modifiers));
+}
 
-      if (!arg.options) {
-        continue;
-      }
+function setOffsets (arg, modifiers) {
+  const { interaction, pageCoords: page } = arg;
+  const { target, element, startOffset } = interaction;
+  const rect = target.getRect(element);
 
-      interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
-    }
-  },
+  if (rect) {
+    startOffset.left = page.x - rect.left;
+    startOffset.top  = page.y - rect.top;
 
-  setAll: function (arg) {
-    const { interaction, statuses, preEnd, requireEndOnly } = arg;
-    const result = {
-      dx: 0,
-      dy: 0,
-      changed: false,
-      locked: false,
-      shouldMove: true,
-    };
+    startOffset.right  = rect.right  - page.x;
+    startOffset.bottom = rect.bottom - page.y;
 
-    arg.modifiedCoords = extend({}, arg.pageCoords);
+    if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
+    if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
+  }
+  else {
+    startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
+  }
 
-    for (const modifierName of modifiers.names) {
-      const modifier = modifiers[modifierName];
-      const options = interaction.target.options[interaction.prepared.name][modifierName];
+  arg.rect = rect;
+  arg.interactable = target;
+  arg.element = element;
 
-      if (!shouldDo(options, preEnd, requireEndOnly)) { continue; }
+  for (const modifierName of modifiers.names) {
+    arg.options = target.options[interaction.prepared.name][modifierName];
 
-      arg.status = arg.status = statuses[modifierName];
-      arg.options = options;
-      arg.offset = arg.interaction.modifierOffsets[modifierName];
-
-      modifier.set(arg);
-
-      if (arg.status.locked) {
-        arg.modifiedCoords.x += arg.status.dx;
-        arg.modifiedCoords.y += arg.status.dy;
-
-        result.dx += arg.status.dx;
-        result.dy += arg.status.dy;
-
-        result.locked = true;
-      }
+    if (!arg.options) {
+      continue;
     }
 
-    // a move should be fired if:
-    //  - there are no modifiers enabled,
-    //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
-    //  - the locked coords have changed since the last pointer move
-    result.shouldMove = !arg.status || !result.locked || arg.status.changed;
+    interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
+  }
+}
 
-    return result;
-  },
+function setAll (arg, modifiers) {
+  const { interaction, statuses, preEnd, requireEndOnly } = arg;
+  const result = {
+    dx: 0,
+    dy: 0,
+    changed: false,
+    locked: false,
+    shouldMove: true,
+  };
 
-  resetStatuses: function (statuses) {
-    for (const modifierName of modifiers.names) {
-      const status = statuses[modifierName] || {};
+  arg.modifiedCoords = extend({}, arg.pageCoords);
 
-      status.dx = status.dy = 0;
-      status.modifiedX = status.modifiedY = NaN;
-      status.locked = false;
-      status.changed = true;
+  for (const modifierName of modifiers.names) {
+    const modifier = modifiers[modifierName];
+    const options = interaction.target.options[interaction.prepared.name][modifierName];
 
-      statuses[modifierName] = status;
+    if (!shouldDo(options, preEnd, requireEndOnly)) { continue; }
+
+    arg.status = arg.status = statuses[modifierName];
+    arg.options = options;
+    arg.offset = arg.interaction.modifierOffsets[modifierName];
+
+    modifier.set(arg);
+
+    if (arg.status.locked) {
+      arg.modifiedCoords.x += arg.status.dx;
+      arg.modifiedCoords.y += arg.status.dy;
+
+      result.dx += arg.status.dx;
+      result.dy += arg.status.dy;
+
+      result.locked = true;
     }
+  }
 
-    return statuses;
-  },
+  // a move should be fired if:
+  //  - there are no modifiers enabled,
+  //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
+  //  - the locked coords have changed since the last pointer move
+  result.shouldMove = !arg.status || !result.locked || arg.status.changed;
 
-  start: function ({ interaction }, signalName) {
-    const arg = {
-      interaction,
-      pageCoords: (signalName === 'action-resume' ?
-                   interaction.curCoords : interaction.startCoords).page,
-      startOffset: interaction.startOffset,
-      statuses: interaction.modifierStatuses,
-      preEnd: false,
-      requireEndOnly: false,
-    };
+  return result;
+}
 
-    modifiers.setOffsets(arg);
-    modifiers.resetStatuses(arg.statuses);
+function resetStatuses (statuses, modifiers) {
+  for (const modifierName of modifiers.names) {
+    const status = statuses[modifierName] || {};
 
-    arg.pageCoords = extend({}, interaction.startCoords.page);
-    interaction.modifierResult = modifiers.setAll(arg);
-  },
+    status.dx = status.dy = 0;
+    status.modifiedX = status.modifiedY = NaN;
+    status.locked = false;
+    status.changed = true;
 
-  beforeMove: function ({ interaction, preEnd, interactingBeforeMove }) {
-    const modifierResult = modifiers.setAll({
+    statuses[modifierName] = status;
+  }
+
+  return statuses;
+}
+
+function start ({ interaction }, modifiers, pageCoords) {
+  const arg = {
+    interaction,
+    pageCoords,
+    startOffset: interaction.startOffset,
+    statuses: interaction.modifierStatuses,
+    preEnd: false,
+    requireEndOnly: false,
+  };
+
+  setOffsets(arg, modifiers);
+  resetStatuses(arg.statuses, modifiers);
+
+  arg.pageCoords = extend({}, interaction.startCoords.page);
+  interaction.modifierResult = setAll(arg, modifiers);
+}
+
+function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) {
+  const modifierResult = setAll(
+    {
       interaction,
       preEnd,
       pageCoords: interaction.curCoords.page,
       statuses: interaction.modifierStatuses,
       requireEndOnly: false,
-    });
+    }, modifiers);
 
-    // don't fire an action move if a modifier would keep the event in the same
-    // cordinates as before
-    if (!modifierResult.shouldMove && interactingBeforeMove) {
-      interaction._dontFireMove = true;
+  interaction.modifierResult = modifierResult;
+
+  // don't fire an action move if a modifier would keep the event in the same
+  // cordinates as before
+  if (!modifierResult.shouldMove && interactingBeforeMove) {
+    return false;
+  }
+}
+
+function beforeEnd ({ interaction, event }, modifiers) {
+  for (const modifierName of modifiers.names) {
+    const options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    // if the endOnly option is true for any modifier
+    if (shouldDo(options, true, true)) {
+      // fire a move event at the modified coordinates
+      interaction.doMove({ event, preEnd: true });
+      break;
+    }
+  }
+}
+
+function setXY (arg, modifiers) {
+  const { iEvent, interaction } = arg;
+  const modifierArg = extend({}, arg);
+
+  for (let i = 0; i < modifiers.names.length; i++) {
+    const modifierName = modifiers.names[i];
+    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    if (!modifierArg.options) {
+      continue;
     }
 
-    interaction.modifierResult = modifierResult;
-  },
+    const modifier = modifiers[modifierName];
 
-  end: function ({ interaction, event }) {
-    for (const modifierName of modifiers.names) {
-      const options = interaction.target.options[interaction.prepared.name][modifierName];
+    modifierArg.status = interaction.modifierStatuses[modifierName];
 
-      // if the endOnly option is true for any modifier
-      if (shouldDo(options, true, true)) {
-        // fire a move event at the modified coordinates
-        interaction.doMove({ event, preEnd: true });
-        break;
-      }
-    }
-  },
-
-  setXY: function (arg) {
-    const { iEvent, interaction } = arg;
-    const modifierArg = extend({}, arg);
-
-    for (let i = 0; i < modifiers.names.length; i++) {
-      const modifierName = modifiers.names[i];
-      modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
-
-      if (!modifierArg.options) {
-        continue;
-      }
-
-      const modifier = modifiers[modifierName];
-
-      modifierArg.status = interaction.modifierStatuses[modifierName];
-
-      iEvent[modifierName] = modifier.modifyCoords(modifierArg);
-    }
-  },
-};
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
-  interaction.modifierOffsets  = {};
-  interaction.modifierStatuses = modifiers.resetStatuses({});
-  interaction.modifierResult   = null;
-});
-
-Interaction.signals.on('action-start' , modifiers.start);
-Interaction.signals.on('action-resume', modifiers.start);
-Interaction.signals.on('before-action-move', modifiers.beforeMove);
-Interaction.signals.on('action-end', modifiers.end);
-
-InteractEvent.signals.on('set-xy', modifiers.setXY);
+    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+  }
+}
 
 function shouldDo (options, preEnd, requireEndOnly) {
   return (options && options.enabled
-          && (preEnd || !options.endOnly)
-          && (!requireEndOnly || options.endOnly));
+    && (preEnd || !options.endOnly)
+    && (!requireEndOnly || options.endOnly));
 }
 
-module.exports = modifiers;
+module.exports = {
+  init,
+  setOffsets,
+  setAll,
+  resetStatuses,
+  start,
+  beforeMove,
+  beforeEnd,
+  shouldDo,
+};

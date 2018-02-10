@@ -1,42 +1,38 @@
-const actions        = require('./base');
-const utils          = require('../utils');
-const InteractEvent  = require('../InteractEvent');
-/** @lends Interactable */
-const Interactable   = require('../Interactable');
-const Interaction    = require('../Interaction');
-const defaultOptions = require('../defaultOptions');
+const is  = require('../utils/is');
+const arr = require('../utils/arr');
 
-const drag = {
-  defaults: {
-    enabled     : false,
-    mouseButtons: null,
+function init (scope) {
+  const {
+    actions,
+    InteractEvent,
+    Interactable,
+    Interaction,
+    defaults,
+  } = scope;
 
-    origin    : null,
-    snap      : null,
-    restrict  : null,
-    inertia   : null,
-    autoScroll: null,
+  Interaction.signals.on('before-action-move', beforeMove);
+  Interaction.signals.on('action-resume', beforeMove);
 
-    startAxis : 'xy',
-    lockAxis  : 'xy',
-  },
+  // dragmove
+  InteractEvent.signals.on('new', newInteractEvent);
 
-  checker: function (pointer, event, interactable) {
-    const dragOptions = interactable.options.drag;
+  Interactable.prototype.draggable = module.exports.draggable;
 
-    return dragOptions.enabled
-      ? { name: 'drag', axis: (dragOptions.lockAxis === 'start'
-                               ? dragOptions.startAxis
-                               : dragOptions.lockAxis)}
-      : null;
-  },
+  actions.drag = module.exports;
+  actions.names.push('drag');
+  arr.merge(Interactable.eventTypes, [
+    'dragstart',
+    'dragmove',
+    'draginertiastart',
+    'draginertiaresume',
+    'dragend',
+  ]);
+  actions.methodDict.drag = 'draggable';
 
-  getCursor: function () {
-    return 'move';
-  },
-};
+  defaults.drag = module.exports.defaults;
+}
 
-Interaction.signals.on('before-action-move', function ({ interaction }) {
+function beforeMove ({ interaction }) {
   if (interaction.prepared.name !== 'drag') { return; }
 
   const axis = interaction.prepared.axis;
@@ -59,10 +55,9 @@ Interaction.signals.on('before-action-move', function ({ interaction }) {
     interaction.pointerDelta.client.vx = 0;
     interaction.pointerDelta.page.vx   = 0;
   }
-});
+}
 
-// dragmove
-InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
+function newInteractEvent ({ iEvent, interaction }) {
   if (iEvent.type !== 'dragmove') { return; }
 
   const axis = interaction.prepared.axis;
@@ -77,7 +72,7 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
     iEvent.clientX = interaction.startCoords.client.x;
     iEvent.dx = 0;
   }
-});
+}
 
 /**
  * ```js
@@ -110,14 +105,16 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
  *
  * Get or set whether drag actions can be performed on the target
  *
+ * @alias Interactable.prototype.draggable
+ *
  * @param {boolean | object} [options] true/false or An object with event
  * listeners to be fired on drag events (object makes the Interactable
  * draggable)
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-Interactable.prototype.draggable = function (options) {
-  if (utils.is.object(options)) {
+function draggable (options) {
+  if (is.object(options)) {
     this.options.drag.enabled = options.enabled === false? false: true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
@@ -132,7 +129,7 @@ Interactable.prototype.draggable = function (options) {
     return this;
   }
 
-  if (utils.is.bool(options)) {
+  if (is.bool(options)) {
     this.options.drag.enabled = options;
 
     if (!options) {
@@ -143,19 +140,32 @@ Interactable.prototype.draggable = function (options) {
   }
 
   return this.options.drag;
+}
+
+module.exports = {
+  init,
+  draggable,
+  beforeMove,
+  newInteractEvent,
+  defaults: {
+    startAxis : 'xy',
+    lockAxis  : 'xy',
+  },
+
+  checker (pointer, event, interactable) {
+    const dragOptions = interactable.options.drag;
+
+    return dragOptions.enabled
+      ? {
+        name: 'drag',
+        axis: (dragOptions.lockAxis === 'start'
+          ? dragOptions.startAxis
+          : dragOptions.lockAxis),
+      }
+      : null;
+  },
+
+  getCursor () {
+    return 'move';
+  },
 };
-
-actions.drag = drag;
-actions.names.push('drag');
-utils.merge(Interactable.eventTypes, [
-  'dragstart',
-  'dragmove',
-  'draginertiastart',
-  'draginertiaresume',
-  'dragend',
-]);
-actions.methodDict.drag = 'draggable';
-
-defaultOptions.drag = drag.defaults;
-
-module.exports = drag;

@@ -2,6 +2,7 @@ const uglify       = require('uglify-js');
 const mkdirp       = require('mkdirp');
 const path         = require('path');
 const fs           = require('fs');
+const derequire    = require('derequire');
 const bundleHeader = require('./bundle-header');
 const replacer     = require('./replacer');
 
@@ -22,7 +23,22 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
 
   bundleStream.on('data', chunk => streamCode += chunk);
   bundleStream.on('end', function () {
-    const raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode));
+    let raw;
+
+    try {
+      raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode));
+    }
+    catch (e) {
+      for (const name in filenames) {
+        write({
+          filename: filenames[name],
+          code: streamCode,
+          map: { sources: [] },
+        });
+      }
+
+      return;
+    }
 
     write(raw);
 
@@ -57,6 +73,6 @@ function write ({ filename, code, map }) {
   const codeFilename = path.join(destDir, filename);
   const codeStream = fs.createWriteStream(codeFilename);
 
-  codeStream.end(code);
+  codeStream.end(derequire(code));
   fs.createWriteStream(`${codeFilename}.map`).end(JSON.stringify(map));
 }

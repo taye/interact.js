@@ -1,11 +1,20 @@
 const test = require('../test');
+const helpers = require('../helpers');
 
 test('autoStart/hold', t => {
-  const autoStart = require('../../src/autoStart/base');
+  const scope = helpers.mockScope({
+    autoStart: {
+      defaults: {
+        perAction: {},
+      },
+      signals: require('../../src/utils/Signals').new(),
+    },
+  });
   const autoStartHold = require('../../src/autoStart/hold');
+  autoStartHold.init(scope);
 
-  t.equal(autoStart.defaults.perAction.hold, 0, 'sets autoStart.defaults.perAction.hold');
-  t.equal(autoStart.defaults.perAction.delay, 0, 'backwards compatible "delay" alias.');
+  t.equal(scope.defaults.perAction.hold, 0, 'sets scope.defaults.perAction.hold');
+  t.equal(scope.defaults.perAction.delay, 0, 'backwards compatible "delay" alias.');
 
   const holdDuration = 1000;
   const actionName = 'TEST_ACTION';

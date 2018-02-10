@@ -10,7 +10,12 @@ function merge (target, source) {
   return target;
 }
 
+function from (source) {
+  return module.exports.merge([], source);
+}
+
 module.exports = {
   contains,
   merge,
+  from,
 };

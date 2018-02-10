@@ -1,7 +1,8 @@
+const clone     = require('./utils/clone');
 const is        = require('./utils/is');
 const events    = require('./utils/events');
 const extend    = require('./utils/extend');
-const actions   = require('./actions/base');
+const arr       = require('./utils/arr');
 const scope     = require('./scope');
 const Eventable = require('./Eventable');
 const defaults  = require('./defaultOptions');
@@ -11,36 +12,26 @@ const {
   getElementRect,
   nodeContains,
   trySelector,
-  matchesSelector,
 }                    = require('./utils/domUtils');
 const { getWindow }  = require('./utils/window');
-const { contains }   = require('./utils/arr');
 const { wheelEvent } = require('./utils/browser');
-
-// all set interactables
-scope.interactables = [];
 
 class Interactable {
   /** */
-  constructor (target, options) {
-    options = options || {};
-
+  constructor (target, options, defaultContext) {
+    this._signals = options.signals || Interactable.signals;
     this.target   = target;
     this.events   = new Eventable();
-    this._context = options.context || scope.document;
+    this._context = options.context || defaultContext;
     this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
 
-    signals.fire('new', {
+    this._signals.fire('new', {
       target,
       options,
       interactable: this,
       win: this._win,
     });
-
-    scope.addDocument( this._doc, this._win );
-
-    scope.interactables.push(this);
 
     this.set(options);
   }
@@ -56,27 +47,36 @@ class Interactable {
     return this;
   }
 
-  setPerAction (action, options) {
+  setPerAction (actionName, options) {
     // for all the default per-action options
-    for (const option in options) {
-      // if this option exists for this action
-      if (option in defaults[action]) {
-        // if the option in the options arg is an object value
-        if (is.object(options[option])) {
-          // duplicate the object
-          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+    for (const optionName in options) {
+      const actionOptions = this.options[actionName];
+      const optionValue = options[optionName];
+      const isArray = is.array(optionValue);
 
-          if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
-            this.options[action][option].enabled = options[option].enabled === false? false : true;
-          }
+      // if the option value is an array
+      if (isArray) {
+        actionOptions[optionName] = arr.from(optionValue);
+      }
+      // if the option value is an object
+      else if (!isArray && is.plainObject(optionValue)) {
+        // copy the object
+        actionOptions[optionName] = extend(
+          actionOptions[optionName] || {},
+          clone(optionValue));
+
+        // set anabled field to true if it exists in the defaults
+        if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
+          actionOptions[optionName].enabled = optionValue.enabled === false? false : true;
         }
-        else if (is.bool(options[option]) && is.object(defaults.perAction[option])) {
-          this.options[action][option].enabled = options[option];
-        }
-        else if (options[option] !== undefined) {
-          // or if it's not undefined, do a plain assignment
-          this.options[action][option] = options[option];
-        }
+      }
+      // if the option value is a boolean and the default is an object
+      else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
+        actionOptions[optionName].enabled = optionValue;
+      }
+      // if it's anything else, do a plain assignment
+      else {
+        actionOptions[optionName] = optionValue;
       }
     }
   }
@@ -126,7 +126,7 @@ class Interactable {
     if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (const action of actions.names) {
+      for (const action of scope.actions.names) {
         this.options[action][optionName] = newValue;
       }
 
@@ -236,7 +236,7 @@ class Interactable {
 
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
@@ -268,7 +268,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     // if it is an action event type
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.off(eventType, listener);
     }
     // delegated event
@@ -296,14 +296,11 @@ class Interactable {
 
     this.options = extend({}, defaults.base);
 
-    const perActions = extend({}, defaults.perAction);
+    for (const actionName in scope.actions.methodDict) {
+      const methodName = scope.actions.methodDict[actionName];
 
-    for (const actionName in actions.methodDict) {
-      const methodName = actions.methodDict[actionName];
-
-      this.options[actionName] = extend({}, defaults[actionName]);
-
-      this.setPerAction(actionName, perActions);
+      this.options[actionName] = {};
+      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
 
       this[methodName](options[actionName]);
     }
@@ -316,7 +313,7 @@ class Interactable {
       }
     }
 
-    signals.fire('set', {
+    this._signals.fire('set', {
       options,
       interactable: this,
     });
@@ -359,62 +356,14 @@ class Interactable {
       events.remove(this, 'all');
     }
 
-    signals.fire('unset', { interactable: this });
-
-    scope.interactables.splice(scope.interactables.indexOf(this), 1);
-
-    // Stop related interactions when an Interactable is unset
-    for (const interaction of scope.interactions || []) {
-      if (interaction.target === this && interaction.interacting()) {
-        interaction.stop();
-      }
-    }
+    this._signals.fire('unset', { interactable: this });
 
     return scope.interact;
   }
 }
 
-scope.interactables.indexOfElement = function indexOfElement (target, context) {
-  context = context || scope.document;
-
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
-
-    if (interactable.target === target && interactable._context === context) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
-  const ret = this[this.indexOfElement(element, options && options.context)];
-
-  return ret && (is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
-};
-
-scope.interactables.forEachMatch = function (element, callback) {
-  for (const interactable of this) {
-    let ret;
-
-    if ((is.string(interactable.target)
-        // target is a selector and the element matches
-        ? (is.element(element) && matchesSelector(element, interactable.target))
-        // target is the element
-        : element === interactable.target)
-        // the element is in context
-      && (interactable.inContext(element))) {
-      ret = callback(interactable);
-    }
-
-    if (ret !== undefined) {
-      return ret;
-    }
-  }
-};
-
 // all interact.js eventTypes
-Interactable.eventTypes = scope.eventTypes = [];
+Interactable.eventTypes = [];
 
 Interactable.signals = signals;
 

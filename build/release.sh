@@ -53,7 +53,7 @@ bump_version() {
 
   # bump the version in package.json
   NEW_VERSION=$(node build/bump $NEW_VERSION)
-  NEW_TAG=$(echo "v$NEW_VERSION" | sed 's/[+].*//')
+  NEW_TAG="v$(semver clean $NEW_VERSION)"
 
   # if the version tag already exists
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
@@ -82,12 +82,18 @@ commit_and_tag() {
 push_and_publish() {
   echo_funcname
 
-  # push branch and tags to git origin and publish to npm
-  git tag --force next &&
-    git push --no-verify &&
-    git push --no-verify origin $NEW_TAG &&
-    git push --no-verify -f origin next &&
-    npm publish --tag next
+  # push branch and tags to git origin
+  git push --no-verify && git push --no-verify origin $NEW_TAG &&
+
+  if [[ $NEW_VERSION == "prerelease" ]]; then
+    # publish to npm with "next" tag
+    git tag --force next &&
+      git push --no-verify -f origin next &&
+      npm publish --tag next
+  else
+    # publish with default "latest" tag
+    npm publish
+  fi
 }
 
 echo_funcname() {

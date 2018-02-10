@@ -5,7 +5,6 @@ const events       = require('./utils/events');
 const utils        = require('./utils');
 const scope        = require('./scope');
 const Interactable = require('./Interactable');
-const Interaction  = require('./Interaction');
 
 const globalEvents = {};
 
@@ -38,12 +37,30 @@ function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options);
+    interactable = new Interactable(element, options || {}, scope.document);
     interactable.events.global = globalEvents;
+
+    scope.addDocument(interactable._doc);
+
+    scope.interactables.push(interactable);
   }
 
   return interactable;
 }
+
+/**
+ * Use a plugin
+ *
+ * @alias module:interact.use
+ *
+ * @param {Object} plugin
+ * @param {function} plugin.init
+ * @return {interact}
+*/
+interact.use = function (plugin) {
+  plugin.init(scope);
+  return interact;
+};
 
 /**
  * Check if an element or selector has been set with the {@link interact}
@@ -92,7 +109,7 @@ interact.on = function (type, listener, options) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Interactable.eventTypes, type)) {
+  if (utils.arr.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -142,7 +159,7 @@ interact.off = function (type, listener, options) {
     return interact;
   }
 
-  if (!utils.contains(Interactable.eventTypes, type)) {
+  if (!utils.arr.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, options);
   }
   else {
@@ -170,15 +187,15 @@ interact.debug = function () {
 };
 
 // expose the functions used to calculate multi-touch properties
-interact.getPointerAverage  = utils.pointerAverage;
-interact.getTouchBBox       = utils.touchBBox;
-interact.getTouchDistance   = utils.touchDistance;
-interact.getTouchAngle      = utils.touchAngle;
+interact.getPointerAverage  = utils.pointer.pointerAverage;
+interact.getTouchBBox       = utils.pointer.touchBBox;
+interact.getTouchDistance   = utils.pointer.touchDistance;
+interact.getTouchAngle      = utils.pointer.touchAngle;
 
-interact.getElementRect       = utils.getElementRect;
-interact.getElementClientRect = utils.getElementClientRect;
-interact.matchesSelector      = utils.matchesSelector;
-interact.closest              = utils.closest;
+interact.getElementRect       = utils.dom.getElementRect;
+interact.getElementClientRect = utils.dom.getElementClientRect;
+interact.matchesSelector      = utils.dom.matchesSelector;
+interact.closest              = utils.dom.closest;
 
 /**
  * @alias module:interact.supportsTouch
@@ -225,16 +242,68 @@ interact.stop = function (event) {
  */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
-    Interaction.pointerMoveTolerance = newValue;
+    scope.Interaction.pointerMoveTolerance = newValue;
 
     return interact;
   }
 
-  return Interaction.pointerMoveTolerance;
+  return scope.Interaction.pointerMoveTolerance;
 };
 
+Interactable.signals.on('unset', ({ interactable }) => {
+  scope.interactables.splice(scope.interactables.indexOf(interactable), 1);
+
+  // Stop related interactions when an Interactable is unset
+  for (const interaction of scope.interactions) {
+    if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
+      interaction.stop();
+    }
+  }
+});
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
+
+// all set interactables
+scope.interactables = [];
+
+scope.interactables.indexOfElement = function indexOfElement (target, context) {
+  context = context || scope.document;
+
+  for (let i = 0; i < this.length; i++) {
+    const interactable = this[i];
+
+    if (interactable.target === target && interactable._context === context) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
+  const ret = this[this.indexOfElement(element, options && options.context)];
+
+  return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
+};
+
+scope.interactables.forEachMatch = function (element, callback) {
+  for (const interactable of this) {
+    let ret;
+
+    if ((utils.is.string(interactable.target)
+        // target is a selector and the element matches
+        ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
+        // target is the element
+        : element === interactable.target)
+        // the element is in context
+      && (interactable.inContext(element))) {
+      ret = callback(interactable);
+    }
+
+    if (ret !== undefined) {
+      return ret;
+    }
+  }
+};
 
 scope.interact = interact;
 
