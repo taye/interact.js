@@ -1,11 +1,11 @@
 /**
- * interact.js v1.3.0-rc.4+sha.2ba54f2
+ * interact.js v1.4.0-alpha.0+sha.33d59dd
  *
- * Copyright (c) 2012-2017 Taye Adeyemi <dev@taye.me>
- * Open source under the MIT License.
+ * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
+ * Released under the MIT License.
  * https://raw.github.com/taye/interact.js/master/LICENSE
  */
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 'use strict';
 
 /*
@@ -18,20 +18,20 @@
  */
 if (typeof window === 'undefined') {
   module.exports = function (window) {
-    require('./src/utils/window').init(window);
+    _dereq_('./src/utils/window').init(window);
 
-    return require('./src/index');
+    return _dereq_('./src/index');
   };
 } else {
-  module.exports = require('./src/index');
+  module.exports = _dereq_('./src/index');
 }
 
-},{"./src/index":19,"./src/utils/window":51}],2:[function(require,module,exports){
+},{"./src/index":16,"./src/utils/window":53}],2:[function(_dereq_,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var extend = require('./utils/extend.js');
+var extend = _dereq_('./utils/extend.js');
 
 function fireUntilImmediateStopped(event, listeners) {
   for (var _i = 0; _i < listeners.length; _i++) {
@@ -104,15 +104,15 @@ var Eventable = function () {
 
 module.exports = Eventable;
 
-},{"./utils/extend.js":40}],3:[function(require,module,exports){
+},{"./utils/extend.js":40}],3:[function(_dereq_,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var extend = require('./utils/extend');
-var getOriginXY = require('./utils/getOriginXY');
-var defaults = require('./defaultOptions');
-var signals = require('./utils/Signals').new();
+var extend = _dereq_('./utils/extend');
+var getOriginXY = _dereq_('./utils/getOriginXY');
+var defaults = _dereq_('./defaultOptions');
+var signals = _dereq_('./utils/Signals').new();
 
 var InteractEvent = function () {
   /** */
@@ -282,62 +282,50 @@ InteractEvent.signals = signals;
 
 module.exports = InteractEvent;
 
-},{"./defaultOptions":18,"./utils/Signals":34,"./utils/extend":40,"./utils/getOriginXY":41}],4:[function(require,module,exports){
+},{"./defaultOptions":15,"./utils/Signals":33,"./utils/extend":40,"./utils/getOriginXY":41}],4:[function(_dereq_,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var is = require('./utils/is');
-var events = require('./utils/events');
-var extend = require('./utils/extend');
-var actions = require('./actions/base');
-var scope = require('./scope');
-var Eventable = require('./Eventable');
-var defaults = require('./defaultOptions');
-var signals = require('./utils/Signals').new();
+var clone = _dereq_('./utils/clone');
+var is = _dereq_('./utils/is');
+var events = _dereq_('./utils/events');
+var extend = _dereq_('./utils/extend');
+var arr = _dereq_('./utils/arr');
+var scope = _dereq_('./scope');
+var Eventable = _dereq_('./Eventable');
+var defaults = _dereq_('./defaultOptions');
+var signals = _dereq_('./utils/Signals').new();
 
-var _require = require('./utils/domUtils'),
+var _require = _dereq_('./utils/domUtils'),
     getElementRect = _require.getElementRect,
     nodeContains = _require.nodeContains,
     trySelector = _require.trySelector;
 
-var _require2 = require('./utils/window'),
+var _require2 = _dereq_('./utils/window'),
     getWindow = _require2.getWindow;
 
-var _require3 = require('./utils/arr'),
-    contains = _require3.contains;
-
-var _require4 = require('./utils/browser'),
-    wheelEvent = _require4.wheelEvent;
-
-// all set interactables
-
-
-scope.interactables = [];
+var _require3 = _dereq_('./utils/browser'),
+    wheelEvent = _require3.wheelEvent;
 
 var Interactable = function () {
   /** */
-  function Interactable(target, options) {
+  function Interactable(target, options, defaultContext) {
     _classCallCheck(this, Interactable);
 
-    options = options || {};
-
+    this._signals = options.signals || Interactable.signals;
     this.target = target;
     this.events = new Eventable();
-    this._context = options.context || scope.document;
+    this._context = options.context || defaultContext;
     this._win = getWindow(trySelector(target) ? this._context : target);
     this._doc = this._win.document;
 
-    signals.fire('new', {
+    this._signals.fire('new', {
       target: target,
       options: options,
       interactable: this,
       win: this._win
     });
-
-    scope.addDocument(this._doc, this._win);
-
-    scope.interactables.push(this);
 
     this.set(options);
   }
@@ -361,26 +349,35 @@ var Interactable = function () {
     return this;
   };
 
-  Interactable.prototype.setPerAction = function setPerAction(action, options) {
+  Interactable.prototype.setPerAction = function setPerAction(actionName, options) {
     // for all the default per-action options
-    for (var option in options) {
-      // if this option exists for this action
-      if (option in defaults[action]) {
-        // if the option in the options arg is an object value
-        if (is.object(options[option])) {
-          // duplicate the object
-          this.options[action][option] = extend(this.options[action][option] || {}, options[option]);
+    for (var optionName in options) {
+      var actionOptions = this.options[actionName];
+      var optionValue = options[optionName];
+      var isArray = is.array(optionValue);
 
-          if (is.object(defaults.perAction[option]) && 'enabled' in defaults.perAction[option]) {
-            this.options[action][option].enabled = options[option].enabled === false ? false : true;
-          }
-        } else if (is.bool(options[option]) && is.object(defaults.perAction[option])) {
-          this.options[action][option].enabled = options[option];
-        } else if (options[option] !== undefined) {
-          // or if it's not undefined, do a plain assignment
-          this.options[action][option] = options[option];
-        }
+      // if the option value is an array
+      if (isArray) {
+        actionOptions[optionName] = arr.from(optionValue);
       }
+      // if the option value is an object
+      else if (!isArray && is.plainObject(optionValue)) {
+          // copy the object
+          actionOptions[optionName] = extend(actionOptions[optionName] || {}, clone(optionValue));
+
+          // set anabled field to true if it exists in the defaults
+          if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
+            actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
+          }
+        }
+        // if the option value is a boolean and the default is an object
+        else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
+            actionOptions[optionName].enabled = optionValue;
+          }
+          // if it's anything else, do a plain assignment
+          else {
+              actionOptions[optionName] = optionValue;
+            }
     }
   };
 
@@ -433,10 +430,10 @@ var Interactable = function () {
     if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (var _i = 0; _i < actions.names.length; _i++) {
+      for (var _i = 0; _i < scope.actions.names.length; _i++) {
         var _ref;
 
-        _ref = actions.names[_i];
+        _ref = scope.actions.names[_i];
         var action = _ref;
 
         this.options[action][optionName] = newValue;
@@ -564,7 +561,7 @@ var Interactable = function () {
       eventType = wheelEvent;
     }
 
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
@@ -599,7 +596,7 @@ var Interactable = function () {
     }
 
     // if it is an action event type
-    if (contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(Interactable.eventTypes, eventType)) {
       this.events.off(eventType, listener);
     }
     // delegated event
@@ -629,14 +626,11 @@ var Interactable = function () {
 
     this.options = extend({}, defaults.base);
 
-    var perActions = extend({}, defaults.perAction);
+    for (var actionName in scope.actions.methodDict) {
+      var methodName = scope.actions.methodDict[actionName];
 
-    for (var actionName in actions.methodDict) {
-      var methodName = actions.methodDict[actionName];
-
-      this.options[actionName] = extend({}, defaults[actionName]);
-
-      this.setPerAction(actionName, perActions);
+      this.options[actionName] = {};
+      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
 
       this[methodName](options[actionName]);
     }
@@ -654,7 +648,7 @@ var Interactable = function () {
       }
     }
 
-    signals.fire('set', {
+    this._signals.fire('set', {
       options: options,
       interactable: this
     });
@@ -697,21 +691,7 @@ var Interactable = function () {
       events.remove(this, 'all');
     }
 
-    signals.fire('unset', { interactable: this });
-
-    scope.interactables.splice(scope.interactables.indexOf(this), 1);
-
-    // Stop related interactions when an Interactable is unset
-    for (var _i4 = 0; _i4 < (scope.interactions || []).length; _i4++) {
-      var _ref4;
-
-      _ref4 = (scope.interactions || [])[_i4];
-      var interaction = _ref4;
-
-      if (interaction.target === this && interaction.interacting()) {
-        interaction.stop();
-      }
-    }
+    this._signals.fire('unset', { interactable: this });
 
     return scope.interact;
   };
@@ -719,47 +699,10 @@ var Interactable = function () {
   return Interactable;
 }();
 
-scope.interactables.indexOfElement = function indexOfElement(target, context) {
-  context = context || scope.document;
-
-  for (var i = 0; i < this.length; i++) {
-    var interactable = this[i];
-
-    if (interactable.target === target && interactable._context === context) {
-      return i;
-    }
-  }
-  return -1;
-};
-
-scope.interactables.get = function interactableGet(element, options, dontCheckInContext) {
-  var ret = this[this.indexOfElement(element, options && options.context)];
-
-  return ret && (is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
-};
-
-scope.interactables.forEachSelector = function (callback, element) {
-  for (var _i5 = 0; _i5 < this.length; _i5++) {
-    var _ref5;
-
-    _ref5 = this[_i5];
-    var interactable = _ref5;
-
-    // skip non CSS selector targets and out of context elements
-    if (!is.string(interactable.target) || element && !interactable.inContext(element)) {
-      continue;
-    }
-
-    var ret = callback(interactable, interactable.target);
-
-    if (ret !== undefined) {
-      return ret;
-    }
-  }
-};
-
 // all interact.js eventTypes
-Interactable.eventTypes = scope.eventTypes = [];
+
+
+Interactable.eventTypes = [];
 
 Interactable.signals = signals;
 
@@ -767,38 +710,26 @@ Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rect
 
 module.exports = Interactable;
 
-},{"./Eventable":2,"./actions/base":6,"./defaultOptions":18,"./scope":33,"./utils/Signals":34,"./utils/arr":35,"./utils/browser":36,"./utils/domUtils":38,"./utils/events":39,"./utils/extend":40,"./utils/is":45,"./utils/window":51}],5:[function(require,module,exports){
+},{"./Eventable":2,"./defaultOptions":15,"./scope":30,"./utils/Signals":33,"./utils/arr":34,"./utils/browser":35,"./utils/clone":36,"./utils/domUtils":38,"./utils/events":39,"./utils/extend":40,"./utils/is":45,"./utils/window":53}],5:[function(_dereq_,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var scope = require('./scope');
-var utils = require('./utils');
-var events = require('./utils/events');
-var browser = require('./utils/browser');
-var domObjects = require('./utils/domObjects');
-var finder = require('./utils/interactionFinder');
-var signals = require('./utils/Signals').new();
-
-var listeners = {};
-var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer'];
-
-// for ignoring browser's simulated mouse events
-var prevTouchTime = 0;
-
-// all active and idle interactions
-scope.interactions = [];
+var InteractEvent = _dereq_('./InteractEvent');
+var utils = _dereq_('./utils');
 
 var Interaction = function () {
   /** */
   function Interaction(_ref) {
-    var pointerType = _ref.pointerType;
+    var pointerType = _ref.pointerType,
+        signals = _ref.signals;
 
     _classCallCheck(this, Interaction);
 
+    this._signals = signals;
+
     this.target = null; // current interactable being interacted with
     this.element = null; // the target element of the interactable
-
     this.prepared = { // action that's ready to be fired on next move event
       name: null,
       axis: null,
@@ -849,18 +780,17 @@ var Interaction = function () {
     this.pointerIsDown = false;
     this.pointerWasMoved = false;
     this._interacting = false;
+    this._ending = false;
 
     this.pointerType = pointerType;
 
-    signals.fire('new', this);
-
-    scope.interactions.push(this);
+    this._signals.fire('new', this);
   }
 
   Interaction.prototype.pointerDown = function pointerDown(pointer, event, eventTarget) {
-    var pointerIndex = this.updatePointer(pointer, event, true);
+    var pointerIndex = this.updatePointer(pointer, event, eventTarget, true);
 
-    signals.fire('down', {
+    this._signals.fire('down', {
       pointer: pointer,
       event: event,
       eventTarget: eventTarget,
@@ -907,26 +837,29 @@ var Interaction = function () {
       return;
     }
 
-    // if this interaction had been removed after stopping
-    // add it back
-    if (scope.interactions.indexOf(this) === -1) {
-      scope.interactions.push(this);
-    }
-
     utils.copyAction(this.prepared, action);
     this.target = target;
     this.element = element;
 
-    signals.fire('action-start', {
+    this._interacting = true;
+    var startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
+    var signalArg = {
       interaction: this,
-      event: this.downEvent
-    });
+      event: this.downEvent,
+      iEvent: startEvent
+    };
+
+    this._signals.fire('action-start', signalArg);
+
+    this._fireEvent(startEvent);
+
+    this._signals.fire('after-action-start', signalArg);
   };
 
   Interaction.prototype.pointerMove = function pointerMove(pointer, event, eventTarget) {
     if (!this.simulation) {
-      this.updatePointer(pointer);
-      utils.setCoords(this.curCoords, this.pointers);
+      this.updatePointer(pointer, event, eventTarget, false);
+      utils.pointer.setCoords(this.curCoords, this.pointers);
     }
 
     var duplicateMove = this.curCoords.page.x === this.prevCoords.page.x && this.curCoords.page.y === this.prevCoords.page.y && this.curCoords.client.x === this.prevCoords.client.x && this.curCoords.client.y === this.prevCoords.client.y;
@@ -956,10 +889,10 @@ var Interaction = function () {
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and speeds
-      utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
     }
 
-    signals.fire('move', signalArg);
+    this._signals.fire('move', signalArg);
 
     if (!duplicateMove) {
       // if interacting, fire an 'action-move' signal etc
@@ -968,7 +901,7 @@ var Interaction = function () {
       }
 
       if (this.pointerWasMoved) {
-        utils.copyCoords(this.prevCoords, this.curCoords);
+        utils.pointer.copyCoords(this.prevCoords, this.curCoords);
       }
     }
   };
@@ -1001,13 +934,17 @@ var Interaction = function () {
       interaction: this
     }, signalArg || {});
 
-    signals.fire('before-action-move', signalArg);
+    var beforeMoveResult = this._signals.fire('before-action-move', signalArg);
 
-    if (!this._dontFireMove) {
-      signals.fire('action-move', signalArg);
+    if (beforeMoveResult !== false) {
+      var moveEvent = signalArg.iEvent = this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
+
+      this._signals.fire('action-move', signalArg);
+
+      this._fireEvent(moveEvent);
+
+      this._signals.fire('after-action-move', signalArg);
     }
-
-    this._dontFireMove = false;
   };
 
   // End interact move events and stop auto-scroll unless simulation is running
@@ -1016,7 +953,7 @@ var Interaction = function () {
   Interaction.prototype.pointerUp = function pointerUp(pointer, event, eventTarget, curEventTarget) {
     var pointerIndex = this.getPointerIndex(pointer);
 
-    signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
+    this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
       pointer: pointer,
       pointerIndex: pointerIndex,
       event: event,
@@ -1033,6 +970,11 @@ var Interaction = function () {
     this.removePointer(pointer, event);
   };
 
+  Interaction.prototype.documentBlur = function documentBlur(event) {
+    this.end(event);
+    this._signals.fire('blur', { event: event, interaction: this });
+  };
+
   /**
    * ```js
    * interact(target)
@@ -1047,23 +989,37 @@ var Interaction = function () {
    *   });
    * ```
    *
-   * Stop the current action and fire an end event. Inertial movement does
-   * not happen.
-   *
    * @param {PointerEvent} [event]
    */
 
 
   Interaction.prototype.end = function end(event) {
+    this._ending = true;
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      signals.fire('action-end', {
+      var endEvent = this._createPreparedEvent(event, 'end', false);
+      var signalArg = {
         event: event,
+        iEvent: endEvent,
         interaction: this
-      });
+      };
+
+      var beforeEndResult = this._signals.fire('before-action-end', signalArg);
+
+      if (beforeEndResult === false) {
+        this._ending = false;
+        return;
+      }
+
+      this._signals.fire('action-end', signalArg);
+
+      this._fireEvent(endEvent);
+
+      this._signals.fire('after-action-end', signalArg);
     }
 
+    this._ending = false;
     this.stop();
   };
 
@@ -1079,12 +1035,7 @@ var Interaction = function () {
 
 
   Interaction.prototype.stop = function stop() {
-    signals.fire('stop', { interaction: this });
-
-    if (this._interacting) {
-      signals.fire('stop-active', { interaction: this });
-      signals.fire('stop-' + this.prepared.name, { interaction: this });
-    }
+    this._signals.fire('stop', { interaction: this });
 
     this.target = this.element = null;
 
@@ -1098,13 +1049,13 @@ var Interaction = function () {
       return 0;
     }
 
-    return this.pointerIds.indexOf(utils.getPointerId(pointer));
+    return this.pointerIds.indexOf(utils.pointer.getPointerId(pointer));
   };
 
-  Interaction.prototype.updatePointer = function updatePointer(pointer, event) {
-    var down = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : event && /(down|start)$/i.test(event.type);
+  Interaction.prototype.updatePointer = function updatePointer(pointer, event, eventTarget) {
+    var down = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : event && /(down|start)$/i.test(event.type);
 
-    var id = utils.getPointerId(pointer);
+    var id = utils.pointer.getPointerId(pointer);
     var index = this.getPointerIndex(pointer);
 
     if (index === -1) {
@@ -1113,9 +1064,28 @@ var Interaction = function () {
     }
 
     if (down) {
-      signals.fire('update-pointer-down', {
+      this.pointerIds[index] = id;
+      this.pointers[index] = pointer;
+      this.pointerIsDown = true;
+
+      if (!this.interacting()) {
+        utils.pointer.setCoords(this.startCoords, this.pointers);
+
+        utils.pointer.copyCoords(this.curCoords, this.startCoords);
+        utils.pointer.copyCoords(this.prevCoords, this.startCoords);
+
+        this.downEvent = event;
+        this.downTimes[index] = this.curCoords.timeStamp;
+        this.downTargets[index] = eventTarget;
+        this.pointerWasMoved = false;
+
+        utils.pointer.pointerExtend(this.downPointer, pointer);
+      }
+
+      this._signals.fire('update-pointer-down', {
         pointer: pointer,
         event: event,
+        eventTarget: eventTarget,
         down: down,
         pointerId: id,
         pointerIndex: index,
@@ -1135,7 +1105,7 @@ var Interaction = function () {
       return;
     }
 
-    signals.fire('remove-pointer', {
+    this._signals.fire('remove-pointer', {
       pointer: pointer,
       event: event,
       pointerIndex: index,
@@ -1153,258 +1123,55 @@ var Interaction = function () {
     this._curEventTarget = currentTarget;
   };
 
+  Interaction.prototype._createPreparedEvent = function _createPreparedEvent(event, phase, preEnd) {
+    var actionName = this.prepared.name;
+
+    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd);
+  };
+
+  Interaction.prototype._fireEvent = function _fireEvent(iEvent) {
+    this.target.fire(iEvent);
+    this.prevEvent = iEvent;
+  };
+
   return Interaction;
 }();
 
-for (var _i = 0; _i < methodNames.length; _i++) {
-  var method = methodNames[_i];
-  listeners[method] = doOnInteractions(method);
-}
-
-function doOnInteractions(method) {
-  return function (event) {
-    var pointerType = utils.getPointerType(event);
-
-    var _utils$getEventTarget = utils.getEventTargets(event),
-        eventTarget = _utils$getEventTarget[0],
-        curEventTarget = _utils$getEventTarget[1];
-
-    var matches = []; // [ [pointer, interaction], ...]
-
-    if (browser.supportsTouch && /touch/.test(event.type)) {
-      prevTouchTime = new Date().getTime();
-
-      for (var _i2 = 0; _i2 < event.changedTouches.length; _i2++) {
-        var _ref2;
-
-        _ref2 = event.changedTouches[_i2];
-        var changedTouch = _ref2;
-
-        var pointer = changedTouch;
-        var interaction = finder.search(pointer, event.type, eventTarget);
-
-        matches.push([pointer, interaction || new Interaction({ pointerType: pointerType })]);
-      }
-    } else {
-      var invalidPointer = false;
-
-      if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
-        // ignore mouse events while touch interactions are active
-        for (var i = 0; i < scope.interactions.length && !invalidPointer; i++) {
-          invalidPointer = scope.interactions[i].pointerType !== 'mouse' && scope.interactions[i].pointerIsDown;
-        }
-
-        // try to ignore mouse events that are simulated by the browser
-        // after a touch event
-        invalidPointer = invalidPointer || new Date().getTime() - prevTouchTime < 500
-        // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
-        || event.timeStamp === 0;
-      }
-
-      if (!invalidPointer) {
-        var _interaction = finder.search(event, event.type, eventTarget);
-
-        if (!_interaction) {
-          _interaction = new Interaction({ pointerType: pointerType });
-        }
-
-        matches.push([event, _interaction]);
-      }
-    }
-
-    for (var _i3 = 0; _i3 < matches.length; _i3++) {
-      var _ref3 = matches[_i3];
-      var _pointer = _ref3[0];
-      var _interaction2 = _ref3[1];
-
-      _interaction2._updateEventTargets(eventTarget, curEventTarget);
-      _interaction2[method](_pointer, event, eventTarget, curEventTarget);
-    }
-  };
-}
-
-function endAll(event) {
-  for (var _i4 = 0; _i4 < scope.interactions.length; _i4++) {
-    var _ref4;
-
-    _ref4 = scope.interactions[_i4];
-    var interaction = _ref4;
-
-    interaction.end(event);
-    signals.fire('endall', { event: event, interaction: interaction });
-  }
-}
-
-var docEvents = {/* 'eventType': listenerFunc */};
-var pEventTypes = browser.pEventTypes;
-
-if (domObjects.PointerEvent) {
-  docEvents[pEventTypes.down] = listeners.pointerDown;
-  docEvents[pEventTypes.move] = listeners.pointerMove;
-  docEvents[pEventTypes.up] = listeners.pointerUp;
-  docEvents[pEventTypes.cancel] = listeners.pointerUp;
-} else {
-  docEvents.mousedown = listeners.pointerDown;
-  docEvents.mousemove = listeners.pointerMove;
-  docEvents.mouseup = listeners.pointerUp;
-
-  docEvents.touchstart = listeners.pointerDown;
-  docEvents.touchmove = listeners.pointerMove;
-  docEvents.touchend = listeners.pointerUp;
-  docEvents.touchcancel = listeners.pointerUp;
-}
-
-docEvents.blur = endAll;
-
-function onDocSignal(_ref5, signalName) {
-  var doc = _ref5.doc;
-
-  var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
-
-  // delegate event listener
-  for (var eventType in scope.delegatedEvents) {
-    eventMethod(doc, eventType, events.delegateListener);
-    eventMethod(doc, eventType, events.delegateUseCapture, true);
-  }
-
-  for (var _eventType in docEvents) {
-    eventMethod(doc, _eventType, docEvents[_eventType]);
-  }
-}
-
-signals.on('update-pointer-down', function (_ref6) {
-  var interaction = _ref6.interaction,
-      pointer = _ref6.pointer,
-      pointerId = _ref6.pointerId,
-      pointerIndex = _ref6.pointerIndex,
-      event = _ref6.event,
-      eventTarget = _ref6.eventTarget,
-      down = _ref6.down;
-
-  interaction.pointerIds[pointerIndex] = pointerId;
-  interaction.pointers[pointerIndex] = pointer;
-
-  if (down) {
-    interaction.pointerIsDown = true;
-  }
-
-  if (!interaction.interacting()) {
-    utils.setCoords(interaction.startCoords, interaction.pointers);
-
-    utils.copyCoords(interaction.curCoords, interaction.startCoords);
-    utils.copyCoords(interaction.prevCoords, interaction.startCoords);
-
-    interaction.downEvent = event;
-    interaction.downTimes[pointerIndex] = interaction.curCoords.timeStamp;
-    interaction.downTargets[pointerIndex] = eventTarget || event && utils.getEventTargets(event)[0];
-    interaction.pointerWasMoved = false;
-
-    utils.pointerExtend(interaction.downPointer, pointer);
-  }
-});
-
-scope.signals.on('add-document', onDocSignal);
-scope.signals.on('remove-document', onDocSignal);
-
 Interaction.pointerMoveTolerance = 1;
-Interaction.doOnInteractions = doOnInteractions;
-Interaction.endAll = endAll;
-Interaction.signals = signals;
-Interaction.docEvents = docEvents;
-
-scope.endAllInteractions = endAll;
 
 module.exports = Interaction;
 
-},{"./scope":33,"./utils":43,"./utils/Signals":34,"./utils/browser":36,"./utils/domObjects":37,"./utils/events":39,"./utils/interactionFinder":44}],6:[function(require,module,exports){
+},{"./InteractEvent":3,"./utils":43}],6:[function(_dereq_,module,exports){
 'use strict';
 
-var Interaction = require('../Interaction');
-var InteractEvent = require('../InteractEvent');
+var is = _dereq_('../utils/is');
+var arr = _dereq_('../utils/arr');
 
-var actions = {
-  firePrepared: firePrepared,
-  names: [],
-  methodDict: {}
-};
+function init(scope) {
+  var actions = scope.actions,
+      InteractEvent = scope.InteractEvent,
+      Interactable = scope.Interactable,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults;
 
-Interaction.signals.on('action-start', function (_ref) {
-  var interaction = _ref.interaction,
-      event = _ref.event;
 
-  interaction._interacting = true;
-  firePrepared(interaction, event, 'start');
-});
+  Interaction.signals.on('before-action-move', beforeMove);
+  Interaction.signals.on('action-resume', beforeMove);
 
-Interaction.signals.on('action-move', function (_ref2) {
-  var interaction = _ref2.interaction,
-      event = _ref2.event,
-      preEnd = _ref2.preEnd;
+  // dragmove
+  InteractEvent.signals.on('new', newInteractEvent);
 
-  firePrepared(interaction, event, 'move', preEnd);
+  Interactable.prototype.draggable = module.exports.draggable;
 
-  // if the action was ended in a listener
-  if (!interaction.interacting()) {
-    return false;
-  }
-});
+  actions.drag = module.exports;
+  actions.names.push('drag');
+  arr.merge(Interactable.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
+  actions.methodDict.drag = 'draggable';
 
-Interaction.signals.on('action-end', function (_ref3) {
-  var interaction = _ref3.interaction,
-      event = _ref3.event;
-
-  firePrepared(interaction, event, 'end');
-});
-
-function firePrepared(interaction, event, phase, preEnd) {
-  var actionName = interaction.prepared.name;
-
-  var newEvent = new InteractEvent(interaction, event, actionName, phase, interaction.element, null, preEnd);
-
-  interaction.target.fire(newEvent);
-  interaction.prevEvent = newEvent;
+  defaults.drag = module.exports.defaults;
 }
 
-module.exports = actions;
-
-},{"../InteractEvent":3,"../Interaction":5}],7:[function(require,module,exports){
-'use strict';
-
-var actions = require('./base');
-var utils = require('../utils');
-var InteractEvent = require('../InteractEvent');
-/** @lends Interactable */
-var Interactable = require('../Interactable');
-var Interaction = require('../Interaction');
-var defaultOptions = require('../defaultOptions');
-
-var drag = {
-  defaults: {
-    enabled: false,
-    mouseButtons: null,
-
-    origin: null,
-    snap: null,
-    restrict: null,
-    inertia: null,
-    autoScroll: null,
-
-    startAxis: 'xy',
-    lockAxis: 'xy'
-  },
-
-  checker: function checker(pointer, event, interactable) {
-    var dragOptions = interactable.options.drag;
-
-    return dragOptions.enabled ? { name: 'drag', axis: dragOptions.lockAxis === 'start' ? dragOptions.startAxis : dragOptions.lockAxis } : null;
-  },
-
-  getCursor: function getCursor() {
-    return 'move';
-  }
-};
-
-Interaction.signals.on('before-action-move', function (_ref) {
+function beforeMove(_ref) {
   var interaction = _ref.interaction;
 
   if (interaction.prepared.name !== 'drag') {
@@ -1430,10 +1197,9 @@ Interaction.signals.on('before-action-move', function (_ref) {
     interaction.pointerDelta.client.vx = 0;
     interaction.pointerDelta.page.vx = 0;
   }
-});
+}
 
-// dragmove
-InteractEvent.signals.on('new', function (_ref2) {
+function newInteractEvent(_ref2) {
   var iEvent = _ref2.iEvent,
       interaction = _ref2.interaction;
 
@@ -1452,7 +1218,7 @@ InteractEvent.signals.on('new', function (_ref2) {
     iEvent.clientX = interaction.startCoords.client.x;
     iEvent.dx = 0;
   }
-});
+}
 
 /**
  * ```js
@@ -1485,14 +1251,16 @@ InteractEvent.signals.on('new', function (_ref2) {
  *
  * Get or set whether drag actions can be performed on the target
  *
+ * @alias Interactable.prototype.draggable
+ *
  * @param {boolean | object} [options] true/false or An object with event
  * listeners to be fired on drag events (object makes the Interactable
  * draggable)
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-Interactable.prototype.draggable = function (options) {
-  if (utils.is.object(options)) {
+function draggable(options) {
+  if (is.object(options)) {
     this.options.drag.enabled = options.enabled === false ? false : true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
@@ -1507,7 +1275,7 @@ Interactable.prototype.draggable = function (options) {
     return this;
   }
 
-  if (utils.is.bool(options)) {
+  if (is.bool(options)) {
     this.options.drag.enabled = options;
 
     if (!options) {
@@ -1518,216 +1286,411 @@ Interactable.prototype.draggable = function (options) {
   }
 
   return this.options.drag;
+}
+
+module.exports = {
+  init: init,
+  draggable: draggable,
+  beforeMove: beforeMove,
+  newInteractEvent: newInteractEvent,
+  defaults: {
+    startAxis: 'xy',
+    lockAxis: 'xy'
+  },
+
+  checker: function checker(pointer, event, interactable) {
+    var dragOptions = interactable.options.drag;
+
+    return dragOptions.enabled ? {
+      name: 'drag',
+      axis: dragOptions.lockAxis === 'start' ? dragOptions.startAxis : dragOptions.lockAxis
+    } : null;
+  },
+  getCursor: function getCursor() {
+    return 'move';
+  }
 };
 
-actions.drag = drag;
-actions.names.push('drag');
-utils.merge(Interactable.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
-actions.methodDict.drag = 'draggable';
-
-defaultOptions.drag = drag.defaults;
-
-module.exports = drag;
-
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],8:[function(require,module,exports){
+},{"../utils/arr":34,"../utils/is":45}],7:[function(_dereq_,module,exports){
 'use strict';
 
-var actions = require('./base');
-var utils = require('../utils');
-var scope = require('../scope');
-/** @lends module:interact */
-var interact = require('../interact');
-var InteractEvent = require('../InteractEvent');
-/** @lends Interactable */
-var Interactable = require('../Interactable');
-var Interaction = require('../Interaction');
-var defaultOptions = require('../defaultOptions');
+var utils = _dereq_('../utils');
 
-var drop = {
-  defaults: {
-    enabled: false,
-    accept: null,
-    overlap: 'pointer'
-  }
-};
+function init(scope) {
+  var actions = scope.actions,
+      interact = scope.interact,
+      Interactable = scope.Interactable,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults;
 
-var dynamicDrop = false;
 
-Interaction.signals.on('action-start', function (_ref) {
-  var interaction = _ref.interaction,
-      event = _ref.event;
+  var dynamicDrop = false;
 
-  if (interaction.prepared.name !== 'drag') {
-    return;
-  }
+  Interaction.signals.on('after-action-start', function (_ref) {
+    var interaction = _ref.interaction,
+        event = _ref.event;
 
-  // reset active dropzones
-  interaction.activeDrops.dropzones = [];
-  interaction.activeDrops.elements = [];
-  interaction.activeDrops.rects = [];
+    if (interaction.prepared.name !== 'drag') {
+      return;
+    }
 
-  interaction.dropEvents = null;
+    // reset active dropzones
+    interaction.activeDrops = null;
+    interaction.dropEvents = null;
 
-  if (!interaction.dynamicDrop) {
-    setActiveDrops(interaction, interaction.element);
-  }
+    if (!interaction.dynamicDrop) {
+      interaction.activeDrops = getActiveDrops(scope, interaction.element);
+    }
 
-  var dragEvent = interaction.prevEvent;
-  var dropEvents = getDropEvents(interaction, event, dragEvent);
+    var dragEvent = interaction.prevEvent;
+    var dropEvents = getDropEvents(interaction, event, dragEvent);
 
-  if (dropEvents.activate) {
-    fireActiveDrops(interaction, dropEvents.activate);
-  }
-});
+    if (dropEvents.activate) {
+      fireActivationEvents(interaction.activeDrops, dropEvents.activate);
+    }
+  });
 
-InteractEvent.signals.on('new', function (_ref2) {
-  var interaction = _ref2.interaction,
-      iEvent = _ref2.iEvent,
-      event = _ref2.event;
+  Interaction.signals.on('action-move', function (arg) {
+    return onEventCreated(arg, scope, dynamicDrop);
+  });
+  Interaction.signals.on('action-end', function (arg) {
+    return onEventCreated(arg, scope, dynamicDrop);
+  });
 
-  if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') {
-    return;
-  }
+  Interaction.signals.on('after-action-move', function (_ref2) {
+    var interaction = _ref2.interaction;
 
-  var draggableElement = interaction.element;
-  var dragEvent = iEvent;
-  var dropResult = getDrop(dragEvent, event, draggableElement);
+    if (interaction.prepared.name !== 'drag') {
+      return;
+    }
 
-  interaction.dropTarget = dropResult.dropzone;
-  interaction.dropElement = dropResult.element;
-
-  interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
-});
-
-Interaction.signals.on('action-move', function (_ref3) {
-  var interaction = _ref3.interaction;
-
-  if (interaction.prepared.name !== 'drag') {
-    return;
-  }
-
-  fireDropEvents(interaction, interaction.dropEvents);
-});
-
-Interaction.signals.on('action-end', function (_ref4) {
-  var interaction = _ref4.interaction;
-
-  if (interaction.prepared.name === 'drag') {
     fireDropEvents(interaction, interaction.dropEvents);
-  }
-});
+  });
 
-Interaction.signals.on('stop-drag', function (_ref5) {
-  var interaction = _ref5.interaction;
+  Interaction.signals.on('after-action-end', function (_ref3) {
+    var interaction = _ref3.interaction;
 
-  interaction.activeDrops.dropzones = interaction.activeDrops.elements = interaction.activeDrops.rects = interaction.dropEvents = null;
-});
+    if (interaction.prepared.name === 'drag') {
+      fireDropEvents(interaction, interaction.dropEvents);
+    }
+  });
 
-function collectDrops(interaction, element) {
+  Interaction.signals.on('stop', function (_ref4) {
+    var interaction = _ref4.interaction;
+
+    interaction.activeDrops = null;
+    interaction.dropEvents = null;
+  });
+
+  /**
+   * ```js
+   * interact(target)
+   * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+   *                       event,             // TouchEvent/PointerEvent/MouseEvent
+   *                       dropped,           // bool result of the default checker
+   *                       dropzone,          // dropzone Interactable
+   *                       dropElement,       // dropzone elemnt
+   *                       draggable,         // draggable Interactable
+   *                       draggableElement) {// draggable element
+   *
+   *   return dropped && event.target.hasAttribute('allow-drop');
+   * }
+   * ```
+   *
+   * ```js
+   * interact('.drop').dropzone({
+   *   accept: '.can-drop' || document.getElementById('single-drop'),
+   *   overlap: 'pointer' || 'center' || zeroToOne
+   * }
+   * ```
+   *
+   * Returns or sets whether draggables can be dropped onto this target to
+   * trigger drop events
+   *
+   * Dropzones can receive the following events:
+   *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
+   *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+   *  - `dragmove` when a draggable that has entered the dropzone is moved
+   *  - `drop` when a draggable is dropped into this dropzone
+   *
+   * Use the `accept` option to allow only elements that match the given CSS
+   * selector or element. The value can be:
+   *
+   *  - **an Element** - only that element can be dropped into this dropzone.
+   *  - **a string**, - the element being dragged must match it as a CSS selector.
+   *  - **`null`** - accept options is cleared - it accepts any element.
+   *
+   * Use the `overlap` option to set how drops are checked for. The allowed
+   * values are:
+   *
+   *   - `'pointer'`, the pointer must be over the dropzone (default)
+   *   - `'center'`, the draggable element's center must be over the dropzone
+   *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
+   *   e.g. `0.5` for drop to happen when half of the area of the draggable is
+   *   over the dropzone
+   *
+   * Use the `checker` option to specify a function to check if a dragged element
+   * is over this Interactable.
+   *
+   * @param {boolean | object | null} [options] The new options to be set.
+   * @return {boolean | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.dropzone = function (options) {
+    if (utils.is.object(options)) {
+      this.options.drop.enabled = options.enabled === false ? false : true;
+
+      if (utils.is.function(options.ondrop)) {
+        this.events.ondrop = options.ondrop;
+      }
+      if (utils.is.function(options.ondropactivate)) {
+        this.events.ondropactivate = options.ondropactivate;
+      }
+      if (utils.is.function(options.ondropdeactivate)) {
+        this.events.ondropdeactivate = options.ondropdeactivate;
+      }
+      if (utils.is.function(options.ondragenter)) {
+        this.events.ondragenter = options.ondragenter;
+      }
+      if (utils.is.function(options.ondragleave)) {
+        this.events.ondragleave = options.ondragleave;
+      }
+      if (utils.is.function(options.ondropmove)) {
+        this.events.ondropmove = options.ondropmove;
+      }
+
+      if (/^(pointer|center)$/.test(options.overlap)) {
+        this.options.drop.overlap = options.overlap;
+      } else if (utils.is.number(options.overlap)) {
+        this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
+      }
+      if ('accept' in options) {
+        this.options.drop.accept = options.accept;
+      }
+      if ('checker' in options) {
+        this.options.drop.checker = options.checker;
+      }
+
+      return this;
+    }
+
+    if (utils.is.bool(options)) {
+      this.options.drop.enabled = options;
+
+      if (!options) {
+        this.ondragenter = this.ondragleave = this.ondrop = this.ondropactivate = this.ondropdeactivate = null;
+      }
+
+      return this;
+    }
+
+    return this.options.drop;
+  };
+
+  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
+    var dropped = false;
+
+    // if the dropzone has no rect (eg. display: none)
+    // call the custom dropChecker or just return false
+    if (!(rect = rect || this.getRect(dropElement))) {
+      return this.options.drop.checker ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement) : false;
+    }
+
+    var dropOverlap = this.options.drop.overlap;
+
+    if (dropOverlap === 'pointer') {
+      var origin = utils.getOriginXY(draggable, draggableElement, 'drag');
+      var page = utils.pointer.getPageXY(dragEvent);
+
+      page.x += origin.x;
+      page.y += origin.y;
+
+      var horizontal = page.x > rect.left && page.x < rect.right;
+      var vertical = page.y > rect.top && page.y < rect.bottom;
+
+      dropped = horizontal && vertical;
+    }
+
+    var dragRect = draggable.getRect(draggableElement);
+
+    if (dragRect && dropOverlap === 'center') {
+      var cx = dragRect.left + dragRect.width / 2;
+      var cy = dragRect.top + dragRect.height / 2;
+
+      dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
+    }
+
+    if (dragRect && utils.is.number(dropOverlap)) {
+      var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
+
+      var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
+
+      dropped = overlapRatio >= dropOverlap;
+    }
+
+    if (this.options.drop.checker) {
+      dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
+    }
+
+    return dropped;
+  };
+
+  Interactable.settingsMethods.push('dropChecker');
+
+  Interaction.signals.on('new', function (interaction) {
+    interaction.dropTarget = null; // the dropzone a drag target might be dropped into
+    interaction.dropElement = null; // the element at the time of checking
+    interaction.prevDropTarget = null; // the dropzone that was recently dragged away from
+    interaction.prevDropElement = null; // the element at the time of checking
+    interaction.dropEvents = null; // the dropEvents related to the current drag event
+    interaction.activeDrops = null; // an array of { dropzone, element, rect }
+  });
+
+  Interaction.signals.on('stop', function (_ref5) {
+    var interaction = _ref5.interaction;
+
+    interaction.dropTarget = interaction.dropElement = interaction.prevDropTarget = interaction.prevDropElement = null;
+  });
+
+  /**
+   * Returns or sets whether the dimensions of dropzone elements are calculated
+   * on every dragmove or only on dragstart for the default dropChecker
+   *
+   * @param {boolean} [newValue] True to check on each move. False to check only
+   * before start
+   * @return {boolean | interact} The current setting or interact
+   */
+  interact.dynamicDrop = function (newValue) {
+    if (utils.is.bool(newValue)) {
+      //if (dragging && dynamicDrop !== newValue && !newValue) {
+      //calcRects(dropzones);
+      //}
+
+      dynamicDrop = newValue;
+
+      return interact;
+    }
+    return dynamicDrop;
+  };
+
+  utils.arr.merge(Interactable.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
+  actions.methodDict.drop = 'dropzone';
+
+  defaults.drop = module.exports.defaults;
+}
+
+function collectDrops(_ref6, draggableElement) {
+  var interactables = _ref6.interactables;
+
   var drops = [];
-  var elements = [];
-
-  element = element || interaction.element;
 
   // collect all dropzones and their elements which qualify for a drop
-  for (var _i = 0; _i < scope.interactables.length; _i++) {
-    var _ref6;
+  for (var _i = 0; _i < interactables.length; _i++) {
+    var _ref7;
 
-    _ref6 = scope.interactables[_i];
-    var current = _ref6;
+    _ref7 = interactables[_i];
+    var dropzone = _ref7;
 
-    if (!current.options.drop.enabled) {
+    if (!dropzone.options.drop.enabled) {
       continue;
     }
 
-    var accept = current.options.drop.accept;
+    var accept = dropzone.options.drop.accept;
 
-    // test the draggable element against the dropzone's accept setting
-    if (utils.is.element(accept) && accept !== element || utils.is.string(accept) && !utils.matchesSelector(element, accept)) {
+    // test the draggable draggableElement against the dropzone's accept setting
+    if (utils.is.element(accept) && accept !== draggableElement || utils.is.string(accept) && !utils.dom.matchesSelector(draggableElement, accept)) {
 
       continue;
     }
 
     // query for new elements if necessary
-    var dropElements = utils.is.string(current.target) ? current._context.querySelectorAll(current.target) : [current.target];
+    var dropElements = utils.is.string(dropzone.target) ? dropzone._context.querySelectorAll(dropzone.target) : [dropzone.target];
 
     for (var _i2 = 0; _i2 < dropElements.length; _i2++) {
-      var _ref7;
+      var _ref8;
 
-      _ref7 = dropElements[_i2];
-      var currentElement = _ref7;
+      _ref8 = dropElements[_i2];
+      var dropzoneElement = _ref8;
 
-      if (currentElement !== element) {
-        drops.push(current);
-        elements.push(currentElement);
+      if (dropzoneElement !== draggableElement) {
+        drops.push({
+          dropzone: dropzone,
+          element: dropzoneElement
+        });
       }
     }
   }
 
-  return {
-    elements: elements,
-    dropzones: drops
-  };
+  return drops;
 }
 
-function fireActiveDrops(interaction, event) {
+function fireActivationEvents(activeDrops, event) {
   var prevElement = void 0;
 
   // loop through all active dropzones and trigger event
-  for (var i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    var current = interaction.activeDrops.dropzones[i];
-    var currentElement = interaction.activeDrops.elements[i];
+  for (var _i3 = 0; _i3 < activeDrops.length; _i3++) {
+    var _ref10;
+
+    _ref10 = activeDrops[_i3];
+    var _ref9 = _ref10;
+    var dropzone = _ref9.dropzone;
+    var element = _ref9.element;
+
 
     // prevent trigger of duplicate events on same element
-    if (currentElement !== prevElement) {
+    if (element !== prevElement) {
       // set current element as event target
-      event.target = currentElement;
-      current.fire(event);
+      event.target = element;
+      dropzone.fire(event);
     }
-    prevElement = currentElement;
+    prevElement = element;
   }
 }
 
-// Collect a new set of possible drops and save them in activeDrops.
-// setActiveDrops should always be called when a drag has just started or a
-// drag event happens while dynamicDrop is true
-function setActiveDrops(interaction, dragElement) {
+// return a new array of possible drops. getActiveDrops should always be
+// called when a drag has just started or a drag event happens while
+// dynamicDrop is true
+function getActiveDrops(scope, dragElement) {
   // get dropzones and their elements that could receive the draggable
-  var possibleDrops = collectDrops(interaction, dragElement, true);
+  var activeDrops = collectDrops(scope, dragElement);
 
-  interaction.activeDrops.dropzones = possibleDrops.dropzones;
-  interaction.activeDrops.elements = possibleDrops.elements;
-  interaction.activeDrops.rects = [];
+  for (var _i4 = 0; _i4 < activeDrops.length; _i4++) {
+    var _ref11;
 
-  for (var i = 0; i < interaction.activeDrops.dropzones.length; i++) {
-    interaction.activeDrops.rects[i] = interaction.activeDrops.dropzones[i].getRect(interaction.activeDrops.elements[i]);
+    _ref11 = activeDrops[_i4];
+    var activeDrop = _ref11;
+
+    activeDrop.rect = activeDrop.dropzone.getRect(activeDrop.element);
   }
+
+  return activeDrops;
 }
 
-function getDrop(dragEvent, event, dragElement) {
+function getDrop(_ref12, dragEvent, pointerEvent) {
+  var activeDrops = _ref12.activeDrops,
+      draggable = _ref12.target,
+      dragElement = _ref12.element;
   var interaction = dragEvent.interaction;
+
+
   var validDrops = [];
 
-  if (dynamicDrop) {
-    setActiveDrops(interaction, dragElement);
-  }
-
   // collect all dropzones and their elements which qualify for a drop
-  for (var j = 0; j < interaction.activeDrops.dropzones.length; j++) {
-    var current = interaction.activeDrops.dropzones[j];
-    var currentElement = interaction.activeDrops.elements[j];
-    var rect = interaction.activeDrops.rects[j];
+  for (var _i5 = 0; _i5 < activeDrops.length; _i5++) {
+    var _ref14;
 
-    validDrops.push(current.dropCheck(dragEvent, event, interaction.target, dragElement, currentElement, rect) ? currentElement : null);
+    _ref14 = activeDrops[_i5];
+    var _ref13 = _ref14;
+    var dropzone = _ref13.dropzone;
+    var dropzoneElement = _ref13.element;
+    var rect = _ref13.rect;
+
+    validDrops.push(dropzone.dropCheck(dragEvent, pointerEvent, draggable, dragElement, dropzoneElement, rect) ? dropzoneElement : null);
   }
 
   // get the most appropriate dropzone based on DOM depth and order
-  var dropIndex = utils.indexOfDeepestElement(validDrops);
+  var dropIndex = utils.dom.indexOfDeepestElement(validDrops);
 
-  return {
-    dropzone: interaction.activeDrops.dropzones[dropIndex] || null,
-    element: interaction.activeDrops.elements[dropIndex] || null
-  };
+  return interaction.activeDrops[dropIndex] || null;
 }
 
 function getDropEvents(interaction, pointerEvent, dragEvent) {
@@ -1807,1315 +1770,1182 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
 }
 
 function fireDropEvents(interaction, dropEvents) {
+  var activeDrops = interaction.activeDrops,
+      prevDropTarget = interaction.prevDropTarget,
+      dropTarget = interaction.dropTarget,
+      dropElement = interaction.dropElement;
+
+
   if (dropEvents.leave) {
-    interaction.prevDropTarget.fire(dropEvents.leave);
+    prevDropTarget.fire(dropEvents.leave);
   }
   if (dropEvents.move) {
-    interaction.dropTarget.fire(dropEvents.move);
+    dropTarget.fire(dropEvents.move);
   }
   if (dropEvents.enter) {
-    interaction.dropTarget.fire(dropEvents.enter);
+    dropTarget.fire(dropEvents.enter);
   }
   if (dropEvents.drop) {
-    interaction.dropTarget.fire(dropEvents.drop);
+    dropTarget.fire(dropEvents.drop);
   }
+
   if (dropEvents.deactivate) {
-    fireActiveDrops(interaction, dropEvents.deactivate);
+    fireActivationEvents(activeDrops, dropEvents.deactivate);
   }
 
-  interaction.prevDropTarget = interaction.dropTarget;
-  interaction.prevDropElement = interaction.dropElement;
+  interaction.prevDropTarget = dropTarget;
+  interaction.prevDropElement = dropElement;
 }
 
-/**
- * ```js
- * interact(target)
- * .dropChecker(function(dragEvent,         // related dragmove or dragend event
- *                       event,             // TouchEvent/PointerEvent/MouseEvent
- *                       dropped,           // bool result of the default checker
- *                       dropzone,          // dropzone Interactable
- *                       dropElement,       // dropzone elemnt
- *                       draggable,         // draggable Interactable
- *                       draggableElement) {// draggable element
- *
- *   return dropped && event.target.hasAttribute('allow-drop');
- * }
- * ```
- *
- * ```js
- * interact('.drop').dropzone({
- *   accept: '.can-drop' || document.getElementById('single-drop'),
- *   overlap: 'pointer' || 'center' || zeroToOne
- * }
- * ```
- *
- * Returns or sets whether draggables can be dropped onto this target to
- * trigger drop events
- *
- * Dropzones can receive the following events:
- *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
- *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
- *  - `dragmove` when a draggable that has entered the dropzone is moved
- *  - `drop` when a draggable is dropped into this dropzone
- *
- * Use the `accept` option to allow only elements that match the given CSS
- * selector or element. The value can be:
- *
- *  - **an Element** - only that element can be dropped into this dropzone.
- *  - **a string**, - the element being dragged must match it as a CSS selector.
- *  - **`null`** - accept options is cleared - it accepts any element.
- *
- * Use the `overlap` option to set how drops are checked for. The allowed
- * values are:
- *
- *   - `'pointer'`, the pointer must be over the dropzone (default)
- *   - `'center'`, the draggable element's center must be over the dropzone
- *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
- *   e.g. `0.5` for drop to happen when half of the area of the draggable is
- *   over the dropzone
- *
- * Use the `checker` option to specify a function to check if a dragged element
- * is over this Interactable.
- *
- * @param {boolean | object | null} [options] The new options to be set.
- * @return {boolean | Interactable} The current setting or this Interactable
- */
-Interactable.prototype.dropzone = function (options) {
-  if (utils.is.object(options)) {
-    this.options.drop.enabled = options.enabled === false ? false : true;
+function onEventCreated(_ref15, scope, dynamicDrop) {
+  var interaction = _ref15.interaction,
+      iEvent = _ref15.iEvent,
+      event = _ref15.event;
 
-    if (utils.is.function(options.ondrop)) {
-      this.events.ondrop = options.ondrop;
-    }
-    if (utils.is.function(options.ondropactivate)) {
-      this.events.ondropactivate = options.ondropactivate;
-    }
-    if (utils.is.function(options.ondropdeactivate)) {
-      this.events.ondropdeactivate = options.ondropdeactivate;
-    }
-    if (utils.is.function(options.ondragenter)) {
-      this.events.ondragenter = options.ondragenter;
-    }
-    if (utils.is.function(options.ondragleave)) {
-      this.events.ondragleave = options.ondragleave;
-    }
-    if (utils.is.function(options.ondropmove)) {
-      this.events.ondropmove = options.ondropmove;
-    }
-
-    if (/^(pointer|center)$/.test(options.overlap)) {
-      this.options.drop.overlap = options.overlap;
-    } else if (utils.is.number(options.overlap)) {
-      this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
-    }
-    if ('accept' in options) {
-      this.options.drop.accept = options.accept;
-    }
-    if ('checker' in options) {
-      this.options.drop.checker = options.checker;
-    }
-
-    return this;
+  if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') {
+    return;
   }
 
-  if (utils.is.bool(options)) {
-    this.options.drop.enabled = options;
-
-    if (!options) {
-      this.ondragenter = this.ondragleave = this.ondrop = this.ondropactivate = this.ondropdeactivate = null;
-    }
-
-    return this;
+  if (dynamicDrop) {
+    interaction.activeDrops = getActiveDrops(scope, interaction.element);
   }
 
-  return this.options.drop;
-};
+  var dragEvent = iEvent;
+  var dropResult = getDrop(interaction, dragEvent, event);
 
-Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
-  var dropped = false;
+  interaction.dropTarget = dropResult && dropResult.dropzone;
+  interaction.dropElement = dropResult && dropResult.element;
 
-  // if the dropzone has no rect (eg. display: none)
-  // call the custom dropChecker or just return false
-  if (!(rect = rect || this.getRect(dropElement))) {
-    return this.options.drop.checker ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement) : false;
-  }
+  interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
+}
 
-  var dropOverlap = this.options.drop.overlap;
-
-  if (dropOverlap === 'pointer') {
-    var origin = utils.getOriginXY(draggable, draggableElement, 'drag');
-    var page = utils.getPageXY(dragEvent);
-
-    page.x += origin.x;
-    page.y += origin.y;
-
-    var horizontal = page.x > rect.left && page.x < rect.right;
-    var vertical = page.y > rect.top && page.y < rect.bottom;
-
-    dropped = horizontal && vertical;
-  }
-
-  var dragRect = draggable.getRect(draggableElement);
-
-  if (dragRect && dropOverlap === 'center') {
-    var cx = dragRect.left + dragRect.width / 2;
-    var cy = dragRect.top + dragRect.height / 2;
-
-    dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
-  }
-
-  if (dragRect && utils.is.number(dropOverlap)) {
-    var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
-
-    var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
-
-    dropped = overlapRatio >= dropOverlap;
-  }
-
-  if (this.options.drop.checker) {
-    dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
-  }
-
-  return dropped;
-};
-
-Interactable.signals.on('unset', function (_ref8) {
-  var interactable = _ref8.interactable;
-
-  interactable.dropzone(false);
-});
-
-Interactable.settingsMethods.push('dropChecker');
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.dropTarget = null; // the dropzone a drag target might be dropped into
-  interaction.dropElement = null; // the element at the time of checking
-  interaction.prevDropTarget = null; // the dropzone that was recently dragged away from
-  interaction.prevDropElement = null; // the element at the time of checking
-  interaction.dropEvents = null; // the dropEvents related to the current drag event
-
-  interaction.activeDrops = {
-    dropzones: [], // the dropzones that are mentioned below
-    elements: [], // elements of dropzones that accept the target draggable
-    rects: [] // the rects of the elements mentioned above
-  };
-});
-
-Interaction.signals.on('stop', function (_ref9) {
-  var interaction = _ref9.interaction;
-
-  interaction.dropTarget = interaction.dropElement = interaction.prevDropTarget = interaction.prevDropElement = null;
-});
-
-/**
- * Returns or sets whether the dimensions of dropzone elements are calculated
- * on every dragmove or only on dragstart for the default dropChecker
- *
- * @param {boolean} [newValue] True to check on each move. False to check only
- * before start
- * @return {boolean | interact} The current setting or interact
- */
-interact.dynamicDrop = function (newValue) {
-  if (utils.is.bool(newValue)) {
-    //if (dragging && dynamicDrop !== newValue && !newValue) {
-    //calcRects(dropzones);
-    //}
-
-    dynamicDrop = newValue;
-
-    return interact;
-  }
-  return dynamicDrop;
-};
-
-utils.merge(Interactable.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
-actions.methodDict.drop = 'dropzone';
-
-defaultOptions.drop = drop.defaults;
-
-module.exports = drop;
-
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"./base":6}],9:[function(require,module,exports){
-'use strict';
-
-var actions = require('./base');
-var utils = require('../utils');
-var InteractEvent = require('../InteractEvent');
-var Interactable = require('../Interactable');
-var Interaction = require('../Interaction');
-var defaultOptions = require('../defaultOptions');
-
-var gesture = {
+module.exports = {
+  init: init,
+  getActiveDrops: getActiveDrops,
+  getDrop: getDrop,
+  getDropEvents: getDropEvents,
+  fireDropEvents: fireDropEvents,
   defaults: {
     enabled: false,
-    origin: null,
-    restrict: null
-  },
-
-  checker: function checker(pointer, event, interactable, element, interaction) {
-    if (interaction.pointerIds.length >= 2) {
-      return { name: 'gesture' };
-    }
-
-    return null;
-  },
-
-  getCursor: function getCursor() {
-    return '';
+    accept: null,
+    overlap: 'pointer'
   }
 };
 
-InteractEvent.signals.on('new', function (_ref) {
-  var iEvent = _ref.iEvent,
-      interaction = _ref.interaction;
-
-  if (iEvent.type !== 'gesturestart') {
-    return;
-  }
-  iEvent.ds = 0;
-
-  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
-  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
-  interaction.gesture.scale = 1;
-});
-
-InteractEvent.signals.on('new', function (_ref2) {
-  var iEvent = _ref2.iEvent,
-      interaction = _ref2.interaction;
-
-  if (iEvent.type !== 'gesturemove') {
-    return;
-  }
-
-  iEvent.ds = iEvent.scale - interaction.gesture.scale;
-
-  interaction.target.fire(iEvent);
-
-  interaction.gesture.prevAngle = iEvent.angle;
-  interaction.gesture.prevDistance = iEvent.distance;
-
-  if (iEvent.scale !== Infinity && iEvent.scale !== null && iEvent.scale !== undefined && !isNaN(iEvent.scale)) {
-
-    interaction.gesture.scale = iEvent.scale;
-  }
-});
-
-/**
- * ```js
- * interact(element).gesturable({
- *     onstart: function (event) {},
- *     onmove : function (event) {},
- *     onend  : function (event) {},
- *
- *     // limit multiple gestures.
- *     // See the explanation in {@link Interactable.draggable} example
- *     max: Infinity,
- *     maxPerElement: 1,
- * });
- *
- * var isGestureable = interact(element).gesturable();
- * ```
- *
- * Gets or sets whether multitouch gestures can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on gesture events (makes the Interactable gesturable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of gesture events, or this Interactable
- */
-Interactable.prototype.gesturable = function (options) {
-  if (utils.is.object(options)) {
-    this.options.gesture.enabled = options.enabled === false ? false : true;
-    this.setPerAction('gesture', options);
-    this.setOnEvents('gesture', options);
-
-    return this;
-  }
-
-  if (utils.is.bool(options)) {
-    this.options.gesture.enabled = options;
-
-    if (!options) {
-      this.ongesturestart = this.ongesturestart = this.ongestureend = null;
-    }
-
-    return this;
-  }
-
-  return this.options.gesture;
-};
-
-InteractEvent.signals.on('set-delta', function (_ref3) {
-  var interaction = _ref3.interaction,
-      iEvent = _ref3.iEvent,
-      action = _ref3.action,
-      event = _ref3.event,
-      starting = _ref3.starting,
-      ending = _ref3.ending,
-      deltaSource = _ref3.deltaSource;
-
-  if (action !== 'gesture') {
-    return;
-  }
-
-  var pointers = interaction.pointers;
-
-  iEvent.touches = [pointers[0], pointers[1]];
-
-  if (starting) {
-    iEvent.distance = utils.touchDistance(pointers, deltaSource);
-    iEvent.box = utils.touchBBox(pointers);
-    iEvent.scale = 1;
-    iEvent.ds = 0;
-    iEvent.angle = utils.touchAngle(pointers, undefined, deltaSource);
-    iEvent.da = 0;
-  } else if (ending || event instanceof InteractEvent) {
-    iEvent.distance = interaction.prevEvent.distance;
-    iEvent.box = interaction.prevEvent.box;
-    iEvent.scale = interaction.prevEvent.scale;
-    iEvent.ds = iEvent.scale - 1;
-    iEvent.angle = interaction.prevEvent.angle;
-    iEvent.da = iEvent.angle - interaction.gesture.startAngle;
-  } else {
-    iEvent.distance = utils.touchDistance(pointers, deltaSource);
-    iEvent.box = utils.touchBBox(pointers);
-    iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
-    iEvent.angle = utils.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
-
-    iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
-    iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
-  }
-});
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.gesture = {
-    start: { x: 0, y: 0 },
-
-    startDistance: 0, // distance between two touches of touchStart
-    prevDistance: 0,
-    distance: 0,
-
-    scale: 1, // gesture.distance / gesture.startDistance
-
-    startAngle: 0, // angle of line joining two touches
-    prevAngle: 0 // angle of the previous gesture event
-  };
-});
-
-actions.gesture = gesture;
-actions.names.push('gesture');
-utils.merge(Interactable.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
-actions.methodDict.gesture = 'gesturable';
-
-defaultOptions.gesture = gesture.defaults;
-
-module.exports = gesture;
-
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"./base":6}],10:[function(require,module,exports){
+},{"../utils":43}],8:[function(_dereq_,module,exports){
 'use strict';
 
-var actions = require('./base');
-var utils = require('../utils');
-var browser = require('../utils/browser');
-var InteractEvent = require('../InteractEvent');
-/** @lends Interactable */
-var Interactable = require('../Interactable');
-var Interaction = require('../Interaction');
-var defaultOptions = require('../defaultOptions');
+var utils = _dereq_('../utils');
 
-// Less Precision with touch input
-var defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10;
+function init(scope) {
+  var actions = scope.actions,
+      InteractEvent = scope.InteractEvent,
+      Interactable = scope.Interactable,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults;
 
-var resize = {
-  defaults: {
-    enabled: false,
-    mouseButtons: null,
 
-    origin: null,
-    snap: null,
-    restrict: null,
-    inertia: null,
-    autoScroll: null,
+  var gesture = {
+    defaults: {},
 
-    square: false,
-    preserveAspectRatio: false,
-    axis: 'xy',
+    checker: function checker(pointer, event, interactable, element, interaction) {
+      if (interaction.pointerIds.length >= 2) {
+        return { name: 'gesture' };
+      }
 
-    // use default margin
-    margin: NaN,
-
-    // object with props left, right, top, bottom which are
-    // true/false values to resize when the pointer is over that edge,
-    // CSS selectors to match the handles for each direction
-    // or the Elements for each handle
-    edges: null,
-
-    // a value of 'none' will limit the resize rect to a minimum of 0x0
-    // 'negate' will alow the rect to have negative width/height
-    // 'reposition' will keep the width/height positive by swapping
-    // the top and bottom edges and/or swapping the left and right edges
-    invert: 'none'
-  },
-
-  checker: function checker(pointer, event, interactable, element, interaction, rect) {
-    if (!rect) {
       return null;
-    }
+    },
 
-    var page = utils.extend({}, interaction.curCoords.page);
-    var options = interactable.options;
-
-    if (options.resize.enabled) {
-      var resizeOptions = options.resize;
-      var resizeEdges = { left: false, right: false, top: false, bottom: false };
-
-      // if using resize.edges
-      if (utils.is.object(resizeOptions.edges)) {
-        for (var edge in resizeEdges) {
-          resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._eventTarget, element, rect, resizeOptions.margin || defaultMargin);
-        }
-
-        resizeEdges.left = resizeEdges.left && !resizeEdges.right;
-        resizeEdges.top = resizeEdges.top && !resizeEdges.bottom;
-
-        if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
-          return {
-            name: 'resize',
-            edges: resizeEdges
-          };
-        }
-      } else {
-        var right = options.resize.axis !== 'y' && page.x > rect.right - defaultMargin;
-        var bottom = options.resize.axis !== 'x' && page.y > rect.bottom - defaultMargin;
-
-        if (right || bottom) {
-          return {
-            name: 'resize',
-            axes: (right ? 'x' : '') + (bottom ? 'y' : '')
-          };
-        }
-      }
-    }
-
-    return null;
-  },
-
-  cursors: browser.isIe9 ? {
-    x: 'e-resize',
-    y: 's-resize',
-    xy: 'se-resize',
-
-    top: 'n-resize',
-    left: 'w-resize',
-    bottom: 's-resize',
-    right: 'e-resize',
-    topleft: 'se-resize',
-    bottomright: 'se-resize',
-    topright: 'ne-resize',
-    bottomleft: 'ne-resize'
-  } : {
-    x: 'ew-resize',
-    y: 'ns-resize',
-    xy: 'nwse-resize',
-
-    top: 'ns-resize',
-    left: 'ew-resize',
-    bottom: 'ns-resize',
-    right: 'ew-resize',
-    topleft: 'nwse-resize',
-    bottomright: 'nwse-resize',
-    topright: 'nesw-resize',
-    bottomleft: 'nesw-resize'
-  },
-
-  getCursor: function getCursor(action) {
-    if (action.axis) {
-      return resize.cursors[action.name + action.axis];
-    } else if (action.edges) {
-      var cursorKey = '';
-      var edgeNames = ['top', 'bottom', 'left', 'right'];
-
-      for (var i = 0; i < 4; i++) {
-        if (action.edges[edgeNames[i]]) {
-          cursorKey += edgeNames[i];
-        }
-      }
-
-      return resize.cursors[cursorKey];
-    }
-  }
-};
-
-// resizestart
-InteractEvent.signals.on('new', function (_ref) {
-  var iEvent = _ref.iEvent,
-      interaction = _ref.interaction;
-
-  if (iEvent.type !== 'resizestart' || !interaction.prepared.edges) {
-    return;
-  }
-
-  var startRect = interaction.target.getRect(interaction.element);
-  var resizeOptions = interaction.target.options.resize;
-
-  /*
-   * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
-   * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
-   * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
-   * on the active edges and the edge being interacted with.
-   */
-  if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-    var linkedEdges = utils.extend({}, interaction.prepared.edges);
-
-    linkedEdges.top = linkedEdges.top || linkedEdges.left && !linkedEdges.bottom;
-    linkedEdges.left = linkedEdges.left || linkedEdges.top && !linkedEdges.right;
-    linkedEdges.bottom = linkedEdges.bottom || linkedEdges.right && !linkedEdges.top;
-    linkedEdges.right = linkedEdges.right || linkedEdges.bottom && !linkedEdges.left;
-
-    interaction.prepared._linkedEdges = linkedEdges;
-  } else {
-    interaction.prepared._linkedEdges = null;
-  }
-
-  // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
-  if (resizeOptions.preserveAspectRatio) {
-    interaction.resizeStartAspectRatio = startRect.width / startRect.height;
-  }
-
-  interaction.resizeRects = {
-    start: startRect,
-    current: utils.extend({}, startRect),
-    inverted: utils.extend({}, startRect),
-    previous: utils.extend({}, startRect),
-    delta: {
-      left: 0, right: 0, width: 0,
-      top: 0, bottom: 0, height: 0
+    getCursor: function getCursor() {
+      return '';
     }
   };
 
-  iEvent.rect = interaction.resizeRects.inverted;
-  iEvent.deltaRect = interaction.resizeRects.delta;
-});
+  InteractEvent.signals.on('new', function (_ref) {
+    var iEvent = _ref.iEvent,
+        interaction = _ref.interaction;
 
-// resizemove
-InteractEvent.signals.on('new', function (_ref2) {
-  var iEvent = _ref2.iEvent,
-      phase = _ref2.phase,
-      interaction = _ref2.interaction;
-
-  if (phase !== 'move' || !interaction.prepared.edges) {
-    return;
-  }
-
-  var resizeOptions = interaction.target.options.resize;
-  var invert = resizeOptions.invert;
-  var invertible = invert === 'reposition' || invert === 'negate';
-
-  var edges = interaction.prepared.edges;
-
-  var start = interaction.resizeRects.start;
-  var current = interaction.resizeRects.current;
-  var inverted = interaction.resizeRects.inverted;
-  var delta = interaction.resizeRects.delta;
-  var previous = utils.extend(interaction.resizeRects.previous, inverted);
-  var originalEdges = edges;
-
-  var dx = iEvent.dx;
-  var dy = iEvent.dy;
-
-  if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
-    // `resize.preserveAspectRatio` takes precedence over `resize.square`
-    var startAspectRatio = resizeOptions.preserveAspectRatio ? interaction.resizeStartAspectRatio : 1;
-
-    edges = interaction.prepared._linkedEdges;
-
-    if (originalEdges.left && originalEdges.bottom || originalEdges.right && originalEdges.top) {
-      dy = -dx / startAspectRatio;
-    } else if (originalEdges.left || originalEdges.right) {
-      dy = dx / startAspectRatio;
-    } else if (originalEdges.top || originalEdges.bottom) {
-      dx = dy * startAspectRatio;
+    if (iEvent.type !== 'gesturestart') {
+      return;
     }
-  }
+    iEvent.ds = 0;
 
-  // update the 'current' rect without modifications
-  if (edges.top) {
-    current.top += dy;
-  }
-  if (edges.bottom) {
-    current.bottom += dy;
-  }
-  if (edges.left) {
-    current.left += dx;
-  }
-  if (edges.right) {
-    current.right += dx;
-  }
+    interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
+    interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
+    interaction.gesture.scale = 1;
+  });
 
-  if (invertible) {
-    // if invertible, copy the current rect
-    utils.extend(inverted, current);
+  InteractEvent.signals.on('new', function (_ref2) {
+    var iEvent = _ref2.iEvent,
+        interaction = _ref2.interaction;
 
-    if (invert === 'reposition') {
-      // swap edge values if necessary to keep width/height positive
-      var swap = void 0;
+    if (iEvent.type !== 'gesturemove') {
+      return;
+    }
 
-      if (inverted.top > inverted.bottom) {
-        swap = inverted.top;
+    iEvent.ds = iEvent.scale - interaction.gesture.scale;
 
-        inverted.top = inverted.bottom;
-        inverted.bottom = swap;
+    interaction.target.fire(iEvent);
+
+    interaction.gesture.prevAngle = iEvent.angle;
+    interaction.gesture.prevDistance = iEvent.distance;
+
+    if (iEvent.scale !== Infinity && iEvent.scale !== null && iEvent.scale !== undefined && !isNaN(iEvent.scale)) {
+
+      interaction.gesture.scale = iEvent.scale;
+    }
+  });
+
+  /**
+   * ```js
+   * interact(element).gesturable({
+   *     onstart: function (event) {},
+   *     onmove : function (event) {},
+   *     onend  : function (event) {},
+   *
+   *     // limit multiple gestures.
+   *     // See the explanation in {@link Interactable.draggable} example
+   *     max: Infinity,
+   *     maxPerElement: 1,
+   * });
+   *
+   * var isGestureable = interact(element).gesturable();
+   * ```
+   *
+   * Gets or sets whether multitouch gestures can be performed on the target
+   *
+   * @param {boolean | object} [options] true/false or An object with event
+   * listeners to be fired on gesture events (makes the Interactable gesturable)
+   * @return {boolean | Interactable} A boolean indicating if this can be the
+   * target of gesture events, or this Interactable
+   */
+  Interactable.prototype.gesturable = function (options) {
+    if (utils.is.object(options)) {
+      this.options.gesture.enabled = options.enabled === false ? false : true;
+      this.setPerAction('gesture', options);
+      this.setOnEvents('gesture', options);
+
+      return this;
+    }
+
+    if (utils.is.bool(options)) {
+      this.options.gesture.enabled = options;
+
+      if (!options) {
+        this.ongesturestart = this.ongesturestart = this.ongestureend = null;
       }
-      if (inverted.left > inverted.right) {
-        swap = inverted.left;
 
-        inverted.left = inverted.right;
-        inverted.right = swap;
-      }
-    }
-  } else {
-    // if not invertible, restrict to minimum of 0x0 rect
-    inverted.top = Math.min(current.top, start.bottom);
-    inverted.bottom = Math.max(current.bottom, start.top);
-    inverted.left = Math.min(current.left, start.right);
-    inverted.right = Math.max(current.right, start.left);
-  }
-
-  inverted.width = inverted.right - inverted.left;
-  inverted.height = inverted.bottom - inverted.top;
-
-  for (var edge in inverted) {
-    delta[edge] = inverted[edge] - previous[edge];
-  }
-
-  iEvent.edges = interaction.prepared.edges;
-  iEvent.rect = inverted;
-  iEvent.deltaRect = delta;
-});
-
-/**
- * ```js
- * interact(element).resizable({
- *   onstart: function (event) {},
- *   onmove : function (event) {},
- *   onend  : function (event) {},
- *
- *   edges: {
- *     top   : true,       // Use pointer coords to check for resize.
- *     left  : false,      // Disable resizing from left edge.
- *     bottom: '.resize-s',// Resize if pointer target matches selector
- *     right : handleEl    // Resize if pointer target is the given Element
- *   },
- *
- *     // Width and height can be adjusted independently. When `true`, width and
- *     // height are adjusted at a 1:1 ratio.
- *     square: false,
- *
- *     // Width and height can be adjusted independently. When `true`, width and
- *     // height maintain the aspect ratio they had when resizing started.
- *     preserveAspectRatio: false,
- *
- *   // a value of 'none' will limit the resize rect to a minimum of 0x0
- *   // 'negate' will allow the rect to have negative width/height
- *   // 'reposition' will keep the width/height positive by swapping
- *   // the top and bottom edges and/or swapping the left and right edges
- *   invert: 'none' || 'negate' || 'reposition'
- *
- *   // limit multiple resizes.
- *   // See the explanation in the {@link Interactable.draggable} example
- *   max: Infinity,
- *   maxPerElement: 1,
- * });
- *
- * var isResizeable = interact(element).resizable();
- * ```
- *
- * Gets or sets whether resize actions can be performed on the target
- *
- * @param {boolean | object} [options] true/false or An object with event
- * listeners to be fired on resize events (object makes the Interactable
- * resizable)
- * @return {boolean | Interactable} A boolean indicating if this can be the
- * target of resize elements, or this Interactable
- */
-Interactable.prototype.resizable = function (options) {
-  if (utils.is.object(options)) {
-    this.options.resize.enabled = options.enabled === false ? false : true;
-    this.setPerAction('resize', options);
-    this.setOnEvents('resize', options);
-
-    if (/^x$|^y$|^xy$/.test(options.axis)) {
-      this.options.resize.axis = options.axis;
-    } else if (options.axis === null) {
-      this.options.resize.axis = defaultOptions.resize.axis;
+      return this;
     }
 
-    if (utils.is.bool(options.preserveAspectRatio)) {
-      this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
-    } else if (utils.is.bool(options.square)) {
-      this.options.resize.square = options.square;
+    return this.options.gesture;
+  };
+
+  InteractEvent.signals.on('set-delta', function (_ref3) {
+    var interaction = _ref3.interaction,
+        iEvent = _ref3.iEvent,
+        action = _ref3.action,
+        event = _ref3.event,
+        starting = _ref3.starting,
+        ending = _ref3.ending,
+        deltaSource = _ref3.deltaSource;
+
+    if (action !== 'gesture') {
+      return;
     }
 
-    return this;
-  }
-  if (utils.is.bool(options)) {
-    this.options.resize.enabled = options;
+    var pointers = interaction.pointers;
 
-    if (!options) {
-      this.onresizestart = this.onresizestart = this.onresizeend = null;
+    iEvent.touches = [pointers[0], pointers[1]];
+
+    if (starting) {
+      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+      iEvent.box = utils.pointer.touchBBox(pointers);
+      iEvent.scale = 1;
+      iEvent.ds = 0;
+      iEvent.angle = utils.pointer.touchAngle(pointers, undefined, deltaSource);
+      iEvent.da = 0;
+    } else if (ending || event instanceof InteractEvent) {
+      iEvent.distance = interaction.prevEvent.distance;
+      iEvent.box = interaction.prevEvent.box;
+      iEvent.scale = interaction.prevEvent.scale;
+      iEvent.ds = iEvent.scale - 1;
+      iEvent.angle = interaction.prevEvent.angle;
+      iEvent.da = iEvent.angle - interaction.gesture.startAngle;
+    } else {
+      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+      iEvent.box = utils.pointer.touchBBox(pointers);
+      iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
+      iEvent.angle = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+
+      iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+      iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
     }
+  });
 
-    return this;
-  }
-  return this.options.resize;
-};
+  Interaction.signals.on('new', function (interaction) {
+    interaction.gesture = {
+      start: { x: 0, y: 0 },
 
-function checkResizeEdge(name, value, page, element, interactableElement, rect, margin) {
-  // false, '', undefined, null
-  if (!value) {
-    return false;
-  }
+      startDistance: 0, // distance between two touches of touchStart
+      prevDistance: 0,
+      distance: 0,
 
-  // true value, use pointer coords and element rect
-  if (value === true) {
-    // if dimensions are negative, "switch" edges
-    var width = utils.is.number(rect.width) ? rect.width : rect.right - rect.left;
-    var height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
+      scale: 1, // gesture.distance / gesture.startDistance
 
-    if (width < 0) {
-      if (name === 'left') {
-        name = 'right';
-      } else if (name === 'right') {
-        name = 'left';
-      }
-    }
-    if (height < 0) {
-      if (name === 'top') {
-        name = 'bottom';
-      } else if (name === 'bottom') {
-        name = 'top';
-      }
-    }
+      startAngle: 0, // angle of line joining two touches
+      prevAngle: 0 // angle of the previous gesture event
+    };
+  });
 
-    if (name === 'left') {
-      return page.x < (width >= 0 ? rect.left : rect.right) + margin;
-    }
-    if (name === 'top') {
-      return page.y < (height >= 0 ? rect.top : rect.bottom) + margin;
-    }
+  actions.gesture = gesture;
+  actions.names.push('gesture');
+  utils.arr.merge(Interactable.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
+  actions.methodDict.gesture = 'gesturable';
 
-    if (name === 'right') {
-      return page.x > (width >= 0 ? rect.right : rect.left) - margin;
-    }
-    if (name === 'bottom') {
-      return page.y > (height >= 0 ? rect.bottom : rect.top) - margin;
-    }
-  }
-
-  // the remaining checks require an element
-  if (!utils.is.element(element)) {
-    return false;
-  }
-
-  return utils.is.element(value)
-  // the value is an element to use as a resize handle
-  ? value === element
-  // otherwise check if element matches value as selector
-  : utils.matchesUpTo(element, value, interactableElement);
+  defaults.gesture = gesture.defaults;
 }
 
-Interaction.signals.on('new', function (interaction) {
-  interaction.resizeAxes = 'xy';
-});
+module.exports = { init: init };
 
-InteractEvent.signals.on('set-delta', function (_ref3) {
-  var interaction = _ref3.interaction,
-      iEvent = _ref3.iEvent,
-      action = _ref3.action;
-
-  if (action !== 'resize' || !interaction.resizeAxes) {
-    return;
-  }
-
-  var options = interaction.target.options;
-
-  if (options.resize.square) {
-    if (interaction.resizeAxes === 'y') {
-      iEvent.dx = iEvent.dy;
-    } else {
-      iEvent.dy = iEvent.dx;
-    }
-    iEvent.axes = 'xy';
-  } else {
-    iEvent.axes = interaction.resizeAxes;
-
-    if (interaction.resizeAxes === 'x') {
-      iEvent.dy = 0;
-    } else if (interaction.resizeAxes === 'y') {
-      iEvent.dx = 0;
-    }
-  }
-});
-
-actions.resize = resize;
-actions.names.push('resize');
-utils.merge(Interactable.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
-actions.methodDict.resize = 'resizable';
-
-defaultOptions.resize = resize.defaults;
-
-module.exports = resize;
-
-},{"../InteractEvent":3,"../Interactable":4,"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/browser":36,"./base":6}],11:[function(require,module,exports){
+},{"../utils":43}],9:[function(_dereq_,module,exports){
 'use strict';
 
-var raf = require('./utils/raf');
-var getWindow = require('./utils/window').getWindow;
-var is = require('./utils/is');
-var domUtils = require('./utils/domUtils');
-var Interaction = require('./Interaction');
-var defaultOptions = require('./defaultOptions');
+var utils = _dereq_('../utils');
 
-var autoScroll = {
-  defaults: {
-    enabled: false,
-    container: null, // the item that is scrolled (Window or HTMLElement)
-    margin: 60,
-    speed: 300 // the scroll speed in pixels per second
-  },
+function init(scope) {
+  var actions = scope.actions,
+      browser = scope.browser,
+      InteractEvent = scope.InteractEvent,
+      Interactable = scope.Interactable,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults;
 
-  interaction: null,
-  i: null, // the handle returned by window.setInterval
-  x: 0, y: 0, // Direction each pulse is to scroll in
+  // Less Precision with touch input
 
-  isScrolling: false,
-  prevTime: 0,
+  var defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10;
 
-  start: function start(interaction) {
-    autoScroll.isScrolling = true;
-    raf.cancel(autoScroll.i);
+  var resize = {
+    defaults: {
+      square: false,
+      preserveAspectRatio: false,
+      axis: 'xy',
 
-    autoScroll.interaction = interaction;
-    autoScroll.prevTime = new Date().getTime();
-    autoScroll.i = raf.request(autoScroll.scroll);
-  },
+      // use default margin
+      margin: NaN,
 
-  stop: function stop() {
-    autoScroll.isScrolling = false;
-    raf.cancel(autoScroll.i);
-  },
+      // object with props left, right, top, bottom which are
+      // true/false values to resize when the pointer is over that edge,
+      // CSS selectors to match the handles for each direction
+      // or the Elements for each handle
+      edges: null,
 
-  // scroll the window by the values in scroll.x/y
-  scroll: function scroll() {
-    var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll;
-    var container = options.container || getWindow(autoScroll.interaction.element);
-    var now = new Date().getTime();
-    // change in time in seconds
-    var dt = (now - autoScroll.prevTime) / 1000;
-    // displacement
-    var s = options.speed * dt;
+      // a value of 'none' will limit the resize rect to a minimum of 0x0
+      // 'negate' will alow the rect to have negative width/height
+      // 'reposition' will keep the width/height positive by swapping
+      // the top and bottom edges and/or swapping the left and right edges
+      invert: 'none'
+    },
 
-    if (s >= 1) {
-      if (is.window(container)) {
-        container.scrollBy(autoScroll.x * s, autoScroll.y * s);
-      } else if (container) {
-        container.scrollLeft += autoScroll.x * s;
-        container.scrollTop += autoScroll.y * s;
+    checker: function checker(pointer, event, interactable, element, interaction, rect) {
+      if (!rect) {
+        return null;
       }
 
-      autoScroll.prevTime = now;
+      var page = utils.extend({}, interaction.curCoords.page);
+      var options = interactable.options;
+
+      if (options.resize.enabled) {
+        var resizeOptions = options.resize;
+        var resizeEdges = { left: false, right: false, top: false, bottom: false };
+
+        // if using resize.edges
+        if (utils.is.object(resizeOptions.edges)) {
+          for (var edge in resizeEdges) {
+            resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._eventTarget, element, rect, resizeOptions.margin || defaultMargin);
+          }
+
+          resizeEdges.left = resizeEdges.left && !resizeEdges.right;
+          resizeEdges.top = resizeEdges.top && !resizeEdges.bottom;
+
+          if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
+            return {
+              name: 'resize',
+              edges: resizeEdges
+            };
+          }
+        } else {
+          var right = options.resize.axis !== 'y' && page.x > rect.right - defaultMargin;
+          var bottom = options.resize.axis !== 'x' && page.y > rect.bottom - defaultMargin;
+
+          if (right || bottom) {
+            return {
+              name: 'resize',
+              axes: (right ? 'x' : '') + (bottom ? 'y' : '')
+            };
+          }
+        }
+      }
+
+      return null;
+    },
+
+    cursors: browser.isIe9 ? {
+      x: 'e-resize',
+      y: 's-resize',
+      xy: 'se-resize',
+
+      top: 'n-resize',
+      left: 'w-resize',
+      bottom: 's-resize',
+      right: 'e-resize',
+      topleft: 'se-resize',
+      bottomright: 'se-resize',
+      topright: 'ne-resize',
+      bottomleft: 'ne-resize'
+    } : {
+      x: 'ew-resize',
+      y: 'ns-resize',
+      xy: 'nwse-resize',
+
+      top: 'ns-resize',
+      left: 'ew-resize',
+      bottom: 'ns-resize',
+      right: 'ew-resize',
+      topleft: 'nwse-resize',
+      bottomright: 'nwse-resize',
+      topright: 'nesw-resize',
+      bottomleft: 'nesw-resize'
+    },
+
+    getCursor: function getCursor(action) {
+      if (action.axis) {
+        return resize.cursors[action.name + action.axis];
+      } else if (action.edges) {
+        var cursorKey = '';
+        var edgeNames = ['top', 'bottom', 'left', 'right'];
+
+        for (var i = 0; i < 4; i++) {
+          if (action.edges[edgeNames[i]]) {
+            cursorKey += edgeNames[i];
+          }
+        }
+
+        return resize.cursors[cursorKey];
+      }
     }
+  };
 
-    if (autoScroll.isScrolling) {
-      raf.cancel(autoScroll.i);
-      autoScroll.i = raf.request(autoScroll.scroll);
-    }
-  },
-  check: function check(interactable, actionName) {
-    var options = interactable.options;
+  // resizestart
+  InteractEvent.signals.on('new', function (_ref) {
+    var iEvent = _ref.iEvent,
+        interaction = _ref.interaction;
 
-    return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
-  },
-  onInteractionMove: function onInteractionMove(_ref) {
-    var interaction = _ref.interaction,
-        pointer = _ref.pointer;
-
-    if (!(interaction.interacting() && autoScroll.check(interaction.target, interaction.prepared.name))) {
+    if (iEvent.type !== 'resizestart' || !interaction.prepared.edges) {
       return;
     }
 
-    if (interaction.simulation) {
-      autoScroll.x = autoScroll.y = 0;
-      return;
-    }
+    var startRect = interaction.target.getRect(interaction.element);
+    var resizeOptions = interaction.target.options.resize;
 
-    var top = void 0;
-    var right = void 0;
-    var bottom = void 0;
-    var left = void 0;
+    /*
+     * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
+     * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
+     * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
+     * on the active edges and the edge being interacted with.
+     */
+    if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
+      var linkedEdges = utils.extend({}, interaction.prepared.edges);
 
-    var options = interaction.target.options[interaction.prepared.name].autoScroll;
-    var container = options.container || getWindow(interaction.element);
+      linkedEdges.top = linkedEdges.top || linkedEdges.left && !linkedEdges.bottom;
+      linkedEdges.left = linkedEdges.left || linkedEdges.top && !linkedEdges.right;
+      linkedEdges.bottom = linkedEdges.bottom || linkedEdges.right && !linkedEdges.top;
+      linkedEdges.right = linkedEdges.right || linkedEdges.bottom && !linkedEdges.left;
 
-    if (is.window(container)) {
-      left = pointer.clientX < autoScroll.margin;
-      top = pointer.clientY < autoScroll.margin;
-      right = pointer.clientX > container.innerWidth - autoScroll.margin;
-      bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
+      interaction.prepared._linkedEdges = linkedEdges;
     } else {
-      var rect = domUtils.getElementClientRect(container);
-
-      left = pointer.clientX < rect.left + autoScroll.margin;
-      top = pointer.clientY < rect.top + autoScroll.margin;
-      right = pointer.clientX > rect.right - autoScroll.margin;
-      bottom = pointer.clientY > rect.bottom - autoScroll.margin;
+      interaction.prepared._linkedEdges = null;
     }
 
-    autoScroll.x = right ? 1 : left ? -1 : 0;
-    autoScroll.y = bottom ? 1 : top ? -1 : 0;
-
-    if (!autoScroll.isScrolling) {
-      // set the autoScroll properties to those of the target
-      autoScroll.margin = options.margin;
-      autoScroll.speed = options.speed;
-
-      autoScroll.start(interaction);
+    // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
+    if (resizeOptions.preserveAspectRatio) {
+      interaction.resizeStartAspectRatio = startRect.width / startRect.height;
     }
+
+    interaction.resizeRects = {
+      start: startRect,
+      current: utils.extend({}, startRect),
+      inverted: utils.extend({}, startRect),
+      previous: utils.extend({}, startRect),
+      delta: {
+        left: 0, right: 0, width: 0,
+        top: 0, bottom: 0, height: 0
+      }
+    };
+
+    iEvent.rect = interaction.resizeRects.inverted;
+    iEvent.deltaRect = interaction.resizeRects.delta;
+  });
+
+  // resizemove
+  InteractEvent.signals.on('new', function (_ref2) {
+    var iEvent = _ref2.iEvent,
+        phase = _ref2.phase,
+        interaction = _ref2.interaction;
+
+    if (phase !== 'move' || !interaction.prepared.edges) {
+      return;
+    }
+
+    var resizeOptions = interaction.target.options.resize;
+    var invert = resizeOptions.invert;
+    var invertible = invert === 'reposition' || invert === 'negate';
+
+    var edges = interaction.prepared.edges;
+
+    var start = interaction.resizeRects.start;
+    var current = interaction.resizeRects.current;
+    var inverted = interaction.resizeRects.inverted;
+    var delta = interaction.resizeRects.delta;
+    var previous = utils.extend(interaction.resizeRects.previous, inverted);
+    var originalEdges = edges;
+
+    var dx = iEvent.dx;
+    var dy = iEvent.dy;
+
+    if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
+      // `resize.preserveAspectRatio` takes precedence over `resize.square`
+      var startAspectRatio = resizeOptions.preserveAspectRatio ? interaction.resizeStartAspectRatio : 1;
+
+      edges = interaction.prepared._linkedEdges;
+
+      if (originalEdges.left && originalEdges.bottom || originalEdges.right && originalEdges.top) {
+        dy = -dx / startAspectRatio;
+      } else if (originalEdges.left || originalEdges.right) {
+        dy = dx / startAspectRatio;
+      } else if (originalEdges.top || originalEdges.bottom) {
+        dx = dy * startAspectRatio;
+      }
+    }
+
+    // update the 'current' rect without modifications
+    if (edges.top) {
+      current.top += dy;
+    }
+    if (edges.bottom) {
+      current.bottom += dy;
+    }
+    if (edges.left) {
+      current.left += dx;
+    }
+    if (edges.right) {
+      current.right += dx;
+    }
+
+    if (invertible) {
+      // if invertible, copy the current rect
+      utils.extend(inverted, current);
+
+      if (invert === 'reposition') {
+        // swap edge values if necessary to keep width/height positive
+        var swap = void 0;
+
+        if (inverted.top > inverted.bottom) {
+          swap = inverted.top;
+
+          inverted.top = inverted.bottom;
+          inverted.bottom = swap;
+        }
+        if (inverted.left > inverted.right) {
+          swap = inverted.left;
+
+          inverted.left = inverted.right;
+          inverted.right = swap;
+        }
+      }
+    } else {
+      // if not invertible, restrict to minimum of 0x0 rect
+      inverted.top = Math.min(current.top, start.bottom);
+      inverted.bottom = Math.max(current.bottom, start.top);
+      inverted.left = Math.min(current.left, start.right);
+      inverted.right = Math.max(current.right, start.left);
+    }
+
+    inverted.width = inverted.right - inverted.left;
+    inverted.height = inverted.bottom - inverted.top;
+
+    for (var edge in inverted) {
+      delta[edge] = inverted[edge] - previous[edge];
+    }
+
+    iEvent.edges = interaction.prepared.edges;
+    iEvent.rect = inverted;
+    iEvent.deltaRect = delta;
+  });
+
+  /**
+   * ```js
+   * interact(element).resizable({
+   *   onstart: function (event) {},
+   *   onmove : function (event) {},
+   *   onend  : function (event) {},
+   *
+   *   edges: {
+   *     top   : true,       // Use pointer coords to check for resize.
+   *     left  : false,      // Disable resizing from left edge.
+   *     bottom: '.resize-s',// Resize if pointer target matches selector
+   *     right : handleEl    // Resize if pointer target is the given Element
+   *   },
+   *
+   *     // Width and height can be adjusted independently. When `true`, width and
+   *     // height are adjusted at a 1:1 ratio.
+   *     square: false,
+   *
+   *     // Width and height can be adjusted independently. When `true`, width and
+   *     // height maintain the aspect ratio they had when resizing started.
+   *     preserveAspectRatio: false,
+   *
+   *   // a value of 'none' will limit the resize rect to a minimum of 0x0
+   *   // 'negate' will allow the rect to have negative width/height
+   *   // 'reposition' will keep the width/height positive by swapping
+   *   // the top and bottom edges and/or swapping the left and right edges
+   *   invert: 'none' || 'negate' || 'reposition'
+   *
+   *   // limit multiple resizes.
+   *   // See the explanation in the {@link Interactable.draggable} example
+   *   max: Infinity,
+   *   maxPerElement: 1,
+   * });
+   *
+   * var isResizeable = interact(element).resizable();
+   * ```
+   *
+   * Gets or sets whether resize actions can be performed on the target
+   *
+   * @param {boolean | object} [options] true/false or An object with event
+   * listeners to be fired on resize events (object makes the Interactable
+   * resizable)
+   * @return {boolean | Interactable} A boolean indicating if this can be the
+   * target of resize elements, or this Interactable
+   */
+  Interactable.prototype.resizable = function (options) {
+    if (utils.is.object(options)) {
+      this.options.resize.enabled = options.enabled === false ? false : true;
+      this.setPerAction('resize', options);
+      this.setOnEvents('resize', options);
+
+      if (/^x$|^y$|^xy$/.test(options.axis)) {
+        this.options.resize.axis = options.axis;
+      } else if (options.axis === null) {
+        this.options.resize.axis = defaults.resize.axis;
+      }
+
+      if (utils.is.bool(options.preserveAspectRatio)) {
+        this.options.resize.preserveAspectRatio = options.preserveAspectRatio;
+      } else if (utils.is.bool(options.square)) {
+        this.options.resize.square = options.square;
+      }
+
+      return this;
+    }
+    if (utils.is.bool(options)) {
+      this.options.resize.enabled = options;
+
+      if (!options) {
+        this.onresizestart = this.onresizestart = this.onresizeend = null;
+      }
+
+      return this;
+    }
+    return this.options.resize;
+  };
+
+  function checkResizeEdge(name, value, page, element, interactableElement, rect, margin) {
+    // false, '', undefined, null
+    if (!value) {
+      return false;
+    }
+
+    // true value, use pointer coords and element rect
+    if (value === true) {
+      // if dimensions are negative, "switch" edges
+      var width = utils.is.number(rect.width) ? rect.width : rect.right - rect.left;
+      var height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
+
+      if (width < 0) {
+        if (name === 'left') {
+          name = 'right';
+        } else if (name === 'right') {
+          name = 'left';
+        }
+      }
+      if (height < 0) {
+        if (name === 'top') {
+          name = 'bottom';
+        } else if (name === 'bottom') {
+          name = 'top';
+        }
+      }
+
+      if (name === 'left') {
+        return page.x < (width >= 0 ? rect.left : rect.right) + margin;
+      }
+      if (name === 'top') {
+        return page.y < (height >= 0 ? rect.top : rect.bottom) + margin;
+      }
+
+      if (name === 'right') {
+        return page.x > (width >= 0 ? rect.right : rect.left) - margin;
+      }
+      if (name === 'bottom') {
+        return page.y > (height >= 0 ? rect.bottom : rect.top) - margin;
+      }
+    }
+
+    // the remaining checks require an element
+    if (!utils.is.element(element)) {
+      return false;
+    }
+
+    return utils.is.element(value)
+    // the value is an element to use as a resize handle
+    ? value === element
+    // otherwise check if element matches value as selector
+    : utils.dom.matchesUpTo(element, value, interactableElement);
   }
-};
 
-Interaction.signals.on('stop-active', function () {
-  autoScroll.stop();
-});
+  Interaction.signals.on('new', function (interaction) {
+    interaction.resizeAxes = 'xy';
+  });
 
-Interaction.signals.on('action-move', autoScroll.onInteractionMove);
+  InteractEvent.signals.on('set-delta', function (_ref3) {
+    var interaction = _ref3.interaction,
+        iEvent = _ref3.iEvent,
+        action = _ref3.action;
 
-defaultOptions.perAction.autoScroll = autoScroll.defaults;
+    if (action !== 'resize' || !interaction.resizeAxes) {
+      return;
+    }
 
-module.exports = autoScroll;
+    var options = interaction.target.options;
 
-},{"./Interaction":5,"./defaultOptions":18,"./utils/domUtils":38,"./utils/is":45,"./utils/raf":49,"./utils/window":51}],12:[function(require,module,exports){
+    if (options.resize.square) {
+      if (interaction.resizeAxes === 'y') {
+        iEvent.dx = iEvent.dy;
+      } else {
+        iEvent.dy = iEvent.dx;
+      }
+      iEvent.axes = 'xy';
+    } else {
+      iEvent.axes = interaction.resizeAxes;
+
+      if (interaction.resizeAxes === 'x') {
+        iEvent.dy = 0;
+      } else if (interaction.resizeAxes === 'y') {
+        iEvent.dx = 0;
+      }
+    }
+  });
+
+  actions.resize = resize;
+  actions.names.push('resize');
+  utils.arr.merge(Interactable.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
+  actions.methodDict.resize = 'resizable';
+
+  defaults.resize = resize.defaults;
+}
+
+module.exports = { init: init };
+
+},{"../utils":43}],10:[function(_dereq_,module,exports){
 'use strict';
 
-/** @lends Interactable */
-var Interactable = require('../Interactable');
-var actions = require('../actions/base');
-var is = require('../utils/is');
-var domUtils = require('../utils/domUtils');
+var raf = _dereq_('./utils/raf');
+var getWindow = _dereq_('./utils/window').getWindow;
+var is = _dereq_('./utils/is');
+var domUtils = _dereq_('./utils/domUtils');
 
-var _require = require('../utils'),
+function init(scope) {
+  var Interaction = scope.Interaction,
+      defaults = scope.defaults;
+
+
+  var autoScroll = scope.autoScroll = {
+    defaults: {
+      enabled: false,
+      container: null, // the item that is scrolled (Window or HTMLElement)
+      margin: 60,
+      speed: 300 // the scroll speed in pixels per second
+    },
+
+    interaction: null,
+    i: null, // the handle returned by window.setInterval
+    x: 0, y: 0, // Direction each pulse is to scroll in
+
+    isScrolling: false,
+    prevTime: 0,
+
+    start: function start(interaction) {
+      autoScroll.isScrolling = true;
+      raf.cancel(autoScroll.i);
+
+      autoScroll.interaction = interaction;
+      autoScroll.prevTime = new Date().getTime();
+      autoScroll.i = raf.request(autoScroll.scroll);
+    },
+
+    stop: function stop() {
+      autoScroll.isScrolling = false;
+      raf.cancel(autoScroll.i);
+    },
+
+    // scroll the window by the values in scroll.x/y
+    scroll: function scroll() {
+      var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll;
+      var container = options.container || getWindow(autoScroll.interaction.element);
+      var now = new Date().getTime();
+      // change in time in seconds
+      var dt = (now - autoScroll.prevTime) / 1000;
+      // displacement
+      var s = options.speed * dt;
+
+      if (s >= 1) {
+        if (is.window(container)) {
+          container.scrollBy(autoScroll.x * s, autoScroll.y * s);
+        } else if (container) {
+          container.scrollLeft += autoScroll.x * s;
+          container.scrollTop += autoScroll.y * s;
+        }
+
+        autoScroll.prevTime = now;
+      }
+
+      if (autoScroll.isScrolling) {
+        raf.cancel(autoScroll.i);
+        autoScroll.i = raf.request(autoScroll.scroll);
+      }
+    },
+    check: function check(interactable, actionName) {
+      var options = interactable.options;
+
+      return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
+    },
+    onInteractionMove: function onInteractionMove(_ref) {
+      var interaction = _ref.interaction,
+          pointer = _ref.pointer;
+
+      if (!(interaction.interacting() && autoScroll.check(interaction.target, interaction.prepared.name))) {
+        return;
+      }
+
+      if (interaction.simulation) {
+        autoScroll.x = autoScroll.y = 0;
+        return;
+      }
+
+      var top = void 0;
+      var right = void 0;
+      var bottom = void 0;
+      var left = void 0;
+
+      var options = interaction.target.options[interaction.prepared.name].autoScroll;
+      var container = options.container || getWindow(interaction.element);
+
+      if (is.window(container)) {
+        left = pointer.clientX < autoScroll.margin;
+        top = pointer.clientY < autoScroll.margin;
+        right = pointer.clientX > container.innerWidth - autoScroll.margin;
+        bottom = pointer.clientY > container.innerHeight - autoScroll.margin;
+      } else {
+        var rect = domUtils.getElementClientRect(container);
+
+        left = pointer.clientX < rect.left + autoScroll.margin;
+        top = pointer.clientY < rect.top + autoScroll.margin;
+        right = pointer.clientX > rect.right - autoScroll.margin;
+        bottom = pointer.clientY > rect.bottom - autoScroll.margin;
+      }
+
+      autoScroll.x = right ? 1 : left ? -1 : 0;
+      autoScroll.y = bottom ? 1 : top ? -1 : 0;
+
+      if (!autoScroll.isScrolling) {
+        // set the autoScroll properties to those of the target
+        autoScroll.margin = options.margin;
+        autoScroll.speed = options.speed;
+
+        autoScroll.start(interaction);
+      }
+    }
+  };
+
+  Interaction.signals.on('stop', autoScroll.stop);
+
+  Interaction.signals.on('action-move', autoScroll.onInteractionMove);
+
+  defaults.perAction.autoScroll = autoScroll.defaults;
+}
+
+module.exports = { init: init };
+
+},{"./utils/domUtils":38,"./utils/is":45,"./utils/raf":49,"./utils/window":53}],11:[function(_dereq_,module,exports){
+'use strict';
+
+var is = _dereq_('../utils/is');
+var domUtils = _dereq_('../utils/domUtils');
+
+var _require = _dereq_('../utils'),
     warnOnce = _require.warnOnce;
 
-Interactable.prototype.getAction = function (pointer, event, interaction, element) {
-  var action = this.defaultActionChecker(pointer, event, interaction, element);
+function init(scope) {
+  var Interactable = scope.Interactable,
+      actions = scope.actions;
 
-  if (this.options.actionChecker) {
-    return this.options.actionChecker(pointer, event, action, this, element, interaction);
-  }
 
-  return action;
-};
+  Interactable.prototype.getAction = function (pointer, event, interaction, element) {
+    var action = this.defaultActionChecker(pointer, event, interaction, element);
 
-/**
- * ```js
- * interact(element, { ignoreFrom: document.getElementById('no-action') });
- * // or
- * interact(element).ignoreFrom('input, textarea, a');
- * ```
- * @deprecated
- * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
- * of it's parents match the given CSS selector or Element, no
- * drag/resize/gesture is started.
- *
- * Don't use this method. Instead set the `ignoreFrom` option for each action
- * or for `pointerEvents`
- *
- * @example
- * interact(targett)
- *   .draggable({
- *     ignoreFrom: 'input, textarea, a[href]'',
- *   })
- *   .pointerEvents({
- *     ignoreFrom: '[no-pointer]',
- *   });
- *
- * @param {string | Element | null} [newValue] a CSS selector string, an
- * Element or `null` to not ignore any elements
- * @return {string | Element | object} The current ignoreFrom value or this
- * Interactable
- */
-Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
-  return this._backCompatOption('ignoreFrom', newValue);
-}, 'Interactable.ignoreForm() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
-
-/**
- * ```js
- *
- * @deprecated
- * A drag/resize/gesture is started only If the target of the `mousedown`,
- * `pointerdown` or `touchstart` event or any of it's parents match the given
- * CSS selector or Element.
- *
- * Don't use this method. Instead set the `allowFrom` option for each action
- * or for `pointerEvents`
- *
- * @example
- * interact(targett)
- *   .resizable({
- *     allowFrom: '.resize-handle',
- *   .pointerEvents({
- *     allowFrom: '.handle',,
- *   });
- *
- * @param {string | Element | null} [newValue] a CSS selector string, an
- * Element or `null` to allow from any element
- * @return {string | Element | object} The current allowFrom value or this
- * Interactable
- */
-Interactable.prototype.allowFrom = warnOnce(function (newValue) {
-  return this._backCompatOption('allowFrom', newValue);
-}, 'Interactable.allowForm() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
-
-Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
-  if (!ignoreFrom || !is.element(element)) {
-    return false;
-  }
-
-  if (is.string(ignoreFrom)) {
-    return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
-  } else if (is.element(ignoreFrom)) {
-    return domUtils.nodeContains(ignoreFrom, element);
-  }
-
-  return false;
-};
-
-Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
-  if (!allowFrom) {
-    return true;
-  }
-
-  if (!is.element(element)) {
-    return false;
-  }
-
-  if (is.string(allowFrom)) {
-    return domUtils.matchesUpTo(element, allowFrom, interactableElement);
-  } else if (is.element(allowFrom)) {
-    return domUtils.nodeContains(allowFrom, element);
-  }
-
-  return false;
-};
-
-Interactable.prototype.testIgnoreAllow = function (options, interactableElement, eventTarget) {
-  return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
-};
-
-/**
- * ```js
- * interact('.resize-drag')
- *   .resizable(true)
- *   .draggable(true)
- *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
- *
- *   if (interact.matchesSelector(event.target, '.drag-handle') {
- *     // force drag with handle target
- *     action.name = drag;
- *   }
- *   else {
- *     // resize from the top and right edges
- *     action.name  = 'resize';
- *     action.edges = { top: true, right: true };
- *   }
- *
- *   return action;
- * });
- * ```
- *
- * Gets or sets the function used to check action to be performed on
- * pointerDown
- *
- * @param {function | null} [checker] A function which takes a pointer event,
- * defaultAction string, interactable, element and interaction as parameters
- * and returns an object with name property 'drag' 'resize' or 'gesture' and
- * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
- * props.
- * @return {Function | Interactable} The checker function or this Interactable
- */
-Interactable.prototype.actionChecker = function (checker) {
-  if (is.function(checker)) {
-    this.options.actionChecker = checker;
-
-    return this;
-  }
-
-  if (checker === null) {
-    delete this.options.actionChecker;
-
-    return this;
-  }
-
-  return this.options.actionChecker;
-};
-
-/**
- * Returns or sets whether the the cursor should be changed depending on the
- * action that would be performed if the mouse were pressed and dragged.
- *
- * @param {boolean} [newValue]
- * @return {boolean | Interactable} The current setting or this Interactable
- */
-Interactable.prototype.styleCursor = function (newValue) {
-  if (is.bool(newValue)) {
-    this.options.styleCursor = newValue;
-
-    return this;
-  }
-
-  if (newValue === null) {
-    delete this.options.styleCursor;
-
-    return this;
-  }
-
-  return this.options.styleCursor;
-};
-
-Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
-  var rect = this.getRect(element);
-  var buttons = event.buttons || {
-    0: 1,
-    1: 4,
-    3: 8,
-    4: 16
-  }[event.button];
-  var action = null;
-
-  for (var _i = 0; _i < actions.names.length; _i++) {
-    var _ref;
-
-    _ref = actions.names[_i];
-    var actionName = _ref;
-
-    // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown && /mouse|pointer/.test(interaction.pointerType) && (buttons & this.options[actionName].mouseButtons) === 0) {
-      continue;
+    if (this.options.actionChecker) {
+      return this.options.actionChecker(pointer, event, action, this, element, interaction);
     }
 
-    action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
+    return action;
+  };
 
-    if (action) {
-      return action;
+  /**
+   * ```js
+   * interact(element, { ignoreFrom: document.getElementById('no-action') });
+   * // or
+   * interact(element).ignoreFrom('input, textarea, a');
+   * ```
+   * @deprecated
+   * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
+   * of it's parents match the given CSS selector or Element, no
+   * drag/resize/gesture is started.
+   *
+   * Don't use this method. Instead set the `ignoreFrom` option for each action
+   * or for `pointerEvents`
+   *
+   * @example
+   * interact(targett)
+   *   .draggable({
+   *     ignoreFrom: 'input, textarea, a[href]'',
+   *   })
+   *   .pointerEvents({
+   *     ignoreFrom: '[no-pointer]',
+   *   });
+   *
+   * @param {string | Element | null} [newValue] a CSS selector string, an
+   * Element or `null` to not ignore any elements
+   * @return {string | Element | object} The current ignoreFrom value or this
+   * Interactable
+   */
+  Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
+    return this._backCompatOption('ignoreFrom', newValue);
+  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
+
+  /**
+   * ```js
+   *
+   * @deprecated
+   * A drag/resize/gesture is started only If the target of the `mousedown`,
+   * `pointerdown` or `touchstart` event or any of it's parents match the given
+   * CSS selector or Element.
+   *
+   * Don't use this method. Instead set the `allowFrom` option for each action
+   * or for `pointerEvents`
+   *
+   * @example
+   * interact(targett)
+   *   .resizable({
+   *     allowFrom: '.resize-handle',
+   *   .pointerEvents({
+   *     allowFrom: '.handle',,
+   *   });
+   *
+   * @param {string | Element | null} [newValue] a CSS selector string, an
+   * Element or `null` to allow from any element
+   * @return {string | Element | object} The current allowFrom value or this
+   * Interactable
+   */
+  Interactable.prototype.allowFrom = warnOnce(function (newValue) {
+    return this._backCompatOption('allowFrom', newValue);
+  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
+
+  Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
+    if (!ignoreFrom || !is.element(element)) {
+      return false;
     }
-  }
-};
 
-},{"../Interactable":4,"../actions/base":6,"../utils":43,"../utils/domUtils":38,"../utils/is":45}],13:[function(require,module,exports){
+    if (is.string(ignoreFrom)) {
+      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
+    } else if (is.element(ignoreFrom)) {
+      return domUtils.nodeContains(ignoreFrom, element);
+    }
+
+    return false;
+  };
+
+  Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
+    if (!allowFrom) {
+      return true;
+    }
+
+    if (!is.element(element)) {
+      return false;
+    }
+
+    if (is.string(allowFrom)) {
+      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+    } else if (is.element(allowFrom)) {
+      return domUtils.nodeContains(allowFrom, element);
+    }
+
+    return false;
+  };
+
+  Interactable.prototype.testIgnoreAllow = function (options, interactableElement, eventTarget) {
+    return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
+  };
+
+  /**
+   * ```js
+   * interact('.resize-drag')
+   *   .resizable(true)
+   *   .draggable(true)
+   *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+   *
+   *   if (interact.matchesSelector(event.target, '.drag-handle') {
+   *     // force drag with handle target
+   *     action.name = drag;
+   *   }
+   *   else {
+   *     // resize from the top and right edges
+   *     action.name  = 'resize';
+   *     action.edges = { top: true, right: true };
+   *   }
+   *
+   *   return action;
+   * });
+   * ```
+   *
+   * Gets or sets the function used to check action to be performed on
+   * pointerDown
+   *
+   * @param {function | null} [checker] A function which takes a pointer event,
+   * defaultAction string, interactable, element and interaction as parameters
+   * and returns an object with name property 'drag' 'resize' or 'gesture' and
+   * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+   * props.
+   * @return {Function | Interactable} The checker function or this Interactable
+   */
+  Interactable.prototype.actionChecker = function (checker) {
+    if (is.function(checker)) {
+      this.options.actionChecker = checker;
+
+      return this;
+    }
+
+    if (checker === null) {
+      delete this.options.actionChecker;
+
+      return this;
+    }
+
+    return this.options.actionChecker;
+  };
+
+  /**
+   * Returns or sets whether the the cursor should be changed depending on the
+   * action that would be performed if the mouse were pressed and dragged.
+   *
+   * @param {boolean} [newValue]
+   * @return {boolean | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.styleCursor = function (newValue) {
+    if (is.bool(newValue)) {
+      this.options.styleCursor = newValue;
+
+      return this;
+    }
+
+    if (newValue === null) {
+      delete this.options.styleCursor;
+
+      return this;
+    }
+
+    return this.options.styleCursor;
+  };
+
+  Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+    var rect = this.getRect(element);
+    var buttons = event.buttons || {
+      0: 1,
+      1: 4,
+      3: 8,
+      4: 16
+    }[event.button];
+    var action = null;
+
+    for (var _i = 0; _i < actions.names.length; _i++) {
+      var _ref;
+
+      _ref = actions.names[_i];
+      var actionName = _ref;
+
+      // check mouseButton setting if the pointer is down
+      if (interaction.pointerIsDown && /mouse|pointer/.test(interaction.pointerType) && (buttons & this.options[actionName].mouseButtons) === 0) {
+        continue;
+      }
+
+      action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
+
+      if (action) {
+        return action;
+      }
+    }
+  };
+}
+
+module.exports = { init: init };
+
+},{"../utils":43,"../utils/domUtils":38,"../utils/is":45}],12:[function(_dereq_,module,exports){
 'use strict';
 
-var interact = require('../interact');
-var Interactable = require('../Interactable');
-var Interaction = require('../Interaction');
-var actions = require('../actions/base');
-var defaultOptions = require('../defaultOptions');
-var scope = require('../scope');
-var utils = require('../utils');
-var signals = require('../utils/Signals').new();
+var utils = _dereq_('../utils');
 
-require('./InteractableMethods');
+function init(scope) {
+  var interact = scope.interact,
+      Interactable = scope.Interactable,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults,
+      Signals = scope.Signals;
 
-var autoStart = {
-  signals: signals,
-  withinInteractionLimit: withinInteractionLimit,
-  // Allow this many interactions to happen simultaneously
-  maxInteractions: Infinity,
-  defaults: {
-    perAction: {
-      manualStart: false,
-      max: Infinity,
-      maxPerElement: 1,
-      allowFrom: null,
-      ignoreFrom: null,
 
-      // only allow left button by default
-      // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-      mouseButtons: 1
+  interact.use(_dereq_('./InteractableMethods'));
+
+  // set cursor style on mousedown
+  Interaction.signals.on('down', function (_ref) {
+    var interaction = _ref.interaction,
+        pointer = _ref.pointer,
+        event = _ref.event,
+        eventTarget = _ref.eventTarget;
+
+    if (interaction.interacting()) {
+      return;
     }
-  },
-  setActionDefaults: function setActionDefaults(action) {
-    utils.extend(action.defaults, autoStart.defaults.perAction);
-  }
-};
 
-// set cursor style on mousedown
-Interaction.signals.on('down', function (_ref) {
-  var interaction = _ref.interaction,
-      pointer = _ref.pointer,
-      event = _ref.event,
-      eventTarget = _ref.eventTarget;
+    var actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
+    prepare(interaction, actionInfo, scope);
+  });
 
-  if (interaction.interacting()) {
-    return;
-  }
+  // set cursor style on mousemove
+  Interaction.signals.on('move', function (_ref2) {
+    var interaction = _ref2.interaction,
+        pointer = _ref2.pointer,
+        event = _ref2.event,
+        eventTarget = _ref2.eventTarget;
 
-  var actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
-  prepare(interaction, actionInfo);
-});
-
-// set cursor style on mousemove
-Interaction.signals.on('move', function (_ref2) {
-  var interaction = _ref2.interaction,
-      pointer = _ref2.pointer,
-      event = _ref2.event,
-      eventTarget = _ref2.eventTarget;
-
-  if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) {
-    return;
-  }
-
-  var actionInfo = getActionInfo(interaction, pointer, event, eventTarget);
-  prepare(interaction, actionInfo);
-});
-
-Interaction.signals.on('move', function (arg) {
-  var interaction = arg.interaction,
-      event = arg.event;
-
-
-  if (!interaction.pointerIsDown || interaction.interacting() || !interaction.pointerWasMoved || !interaction.prepared.name) {
-    return;
-  }
-
-  signals.fire('before-start', arg);
-
-  var target = interaction.target;
-
-  if (interaction.prepared.name && target) {
-    // check manualStart and interaction limit
-    if (target.options[interaction.prepared.name].manualStart || !withinInteractionLimit(target, interaction.element, interaction.prepared)) {
-      interaction.stop(event);
-    } else {
-      interaction.start(interaction.prepared, target, interaction.element);
+    if (interaction.pointerType !== 'mouse' || interaction.pointerIsDown || interaction.interacting()) {
+      return;
     }
-  }
-});
+
+    var actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
+    prepare(interaction, actionInfo, scope);
+  });
+
+  Interaction.signals.on('move', function (arg) {
+    var interaction = arg.interaction,
+        event = arg.event;
+
+
+    if (!interaction.pointerIsDown || interaction.interacting() || !interaction.pointerWasMoved || !interaction.prepared.name) {
+      return;
+    }
+
+    scope.autoStart.signals.fire('before-start', arg);
+
+    var target = interaction.target;
+
+    if (interaction.prepared.name && target) {
+      // check manualStart and interaction limit
+      if (target.options[interaction.prepared.name].manualStart || !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
+        interaction.stop(event);
+      } else {
+        interaction.start(interaction.prepared, target, interaction.element);
+      }
+    }
+  });
+
+  Interaction.signals.on('stop', function (_ref3) {
+    var interaction = _ref3.interaction;
+
+    var target = interaction.target;
+
+    if (target && target.options.styleCursor) {
+      target._doc.documentElement.style.cursor = '';
+    }
+  });
+
+  interact.maxInteractions = maxInteractions;
+
+  Interactable.settingsMethods.push('styleCursor');
+  Interactable.settingsMethods.push('actionChecker');
+  Interactable.settingsMethods.push('ignoreFrom');
+  Interactable.settingsMethods.push('allowFrom');
+
+  defaults.base.actionChecker = null;
+  defaults.base.styleCursor = true;
+
+  utils.extend(defaults.perAction, {
+    manualStart: false,
+    max: Infinity,
+    maxPerElement: 1,
+    allowFrom: null,
+    ignoreFrom: null,
+
+    // only allow left button by default
+    // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
+    mouseButtons: 1
+  });
+
+  /**
+   * Returns or sets the maximum number of concurrent interactions allowed.  By
+   * default only 1 interaction is allowed at a time (for backwards
+   * compatibility). To allow multiple interactions on the same Interactables and
+   * elements, you need to enable it in the draggable, resizable and gesturable
+   * `'max'` and `'maxPerElement'` options.
+   *
+   * @alias module:interact.maxInteractions
+   *
+   * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
+   */
+  interact.maxInteractions = function (newValue) {
+    return maxInteractions(newValue, scope);
+  };
+
+  scope.autoStart = {
+    // Allow this many interactions to happen simultaneously
+    maxInteractions: Infinity,
+    signals: Signals.new()
+  };
+}
 
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction(action, interactable, element, eventTarget) {
-  if (utils.is.object(action) && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action)) {
+function validateAction(action, interactable, element, eventTarget, scope) {
+  if (utils.is.object(action) && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action, scope)) {
     return action;
   }
 
   return null;
 }
 
-function validateSelector(interaction, pointer, event, matches, matchElements, eventTarget) {
+function validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope) {
   for (var i = 0, len = matches.length; i < len; i++) {
     var match = matches[i];
     var matchElement = matchElements[i];
-    var action = validateAction(match.getAction(pointer, event, interaction, matchElement), match, matchElement, eventTarget);
+    var action = validateAction(match.getAction(pointer, event, interaction, matchElement), match, matchElement, eventTarget, scope);
 
     if (action) {
       return {
@@ -3129,53 +2959,39 @@ function validateSelector(interaction, pointer, event, matches, matchElements, e
   return {};
 }
 
-function getActionInfo(interaction, pointer, event, eventTarget) {
+function getActionInfo(interaction, pointer, event, eventTarget, scope) {
   var matches = [];
   var matchElements = [];
 
   var element = eventTarget;
-  var action = null;
 
-  function pushMatches(interactable, selector) {
-    if (utils.matchesSelector(element, selector)) {
-
-      matches.push(interactable);
-      matchElements.push(element);
-    }
+  function pushMatches(interactable) {
+    matches.push(interactable);
+    matchElements.push(element);
   }
 
   while (utils.is.element(element)) {
     matches = [];
     matchElements = [];
 
-    var elementInteractable = scope.interactables.get(element);
+    scope.interactables.forEachMatch(element, pushMatches);
 
-    if (elementInteractable && (action = validateAction(elementInteractable.getAction(pointer, event, interaction, element, eventTarget), elementInteractable, element, eventTarget)) && !elementInteractable.options[action.name].manualStart) {
-      return {
-        element: element,
-        action: action,
-        target: elementInteractable
-      };
-    } else {
-      scope.interactables.forEachSelector(pushMatches, element);
+    var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope);
 
-      var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget);
-
-      if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
-        return actionInfo;
-      }
+    if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
+      return actionInfo;
     }
 
-    element = utils.parentNode(element);
+    element = utils.dom.parentNode(element);
   }
 
   return {};
 }
 
-function prepare(interaction, _ref3) {
-  var action = _ref3.action,
-      target = _ref3.target,
-      element = _ref3.element;
+function prepare(interaction, _ref4, scope) {
+  var action = _ref4.action,
+      target = _ref4.target,
+      element = _ref4.element;
 
   action = action || {};
 
@@ -3188,33 +3004,24 @@ function prepare(interaction, _ref3) {
   utils.copyAction(interaction.prepared, action);
 
   if (target && target.options.styleCursor) {
-    var cursor = action ? actions[action.name].getCursor(action) : '';
+    var cursor = action ? scope.actions[action.name].getCursor(action) : '';
     interaction.target._doc.documentElement.style.cursor = cursor;
   }
 
-  signals.fire('prepared', { interaction: interaction });
+  scope.autoStart.signals.fire('prepared', { interaction: interaction });
 }
 
-Interaction.signals.on('stop', function (_ref4) {
-  var interaction = _ref4.interaction;
-
-  var target = interaction.target;
-
-  if (target && target.options.styleCursor) {
-    target._doc.documentElement.style.cursor = '';
-  }
-});
-
-function withinInteractionLimit(interactable, element, action) {
+function withinInteractionLimit(interactable, element, action, scope) {
   var options = interactable.options;
   var maxActions = options[action.name].max;
   var maxPerElement = options[action.name].maxPerElement;
+  var autoStartMax = scope.autoStart.maxInteractions;
   var activeInteractions = 0;
   var targetCount = 0;
   var targetElementCount = 0;
 
   // no actions if any of these values == 0
-  if (!(maxActions && maxPerElement && autoStart.maxInteractions)) {
+  if (!(maxActions && maxPerElement && autoStartMax)) {
     return;
   }
 
@@ -3232,7 +3039,7 @@ function withinInteractionLimit(interactable, element, action) {
 
     activeInteractions++;
 
-    if (activeInteractions >= autoStart.maxInteractions) {
+    if (activeInteractions >= autoStartMax) {
       return false;
     }
 
@@ -3255,125 +3062,91 @@ function withinInteractionLimit(interactable, element, action) {
     }
   }
 
-  return autoStart.maxInteractions > 0;
+  return autoStartMax > 0;
 }
 
-/**
- * Returns or sets the maximum number of concurrent interactions allowed.  By
- * default only 1 interaction is allowed at a time (for backwards
- * compatibility). To allow multiple interactions on the same Interactables and
- * elements, you need to enable it in the draggable, resizable and gesturable
- * `'max'` and `'maxPerElement'` options.
- *
- * @alias module:interact.maxInteractions
- *
- * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
- */
-interact.maxInteractions = function (newValue) {
+function maxInteractions(newValue, scope) {
   if (utils.is.number(newValue)) {
-    autoStart.maxInteractions = newValue;
+    scope.autoStart.maxInteractions = newValue;
 
-    return interact;
+    return this;
   }
 
-  return autoStart.maxInteractions;
+  return scope.autoStart.maxInteractions;
+}
+
+module.exports = {
+  init: init,
+  maxInteractions: maxInteractions,
+  withinInteractionLimit: withinInteractionLimit,
+  validateAction: validateAction
 };
 
-Interactable.settingsMethods.push('styleCursor');
-Interactable.settingsMethods.push('actionChecker');
-Interactable.settingsMethods.push('ignoreFrom');
-Interactable.settingsMethods.push('allowFrom');
-
-defaultOptions.base.actionChecker = null;
-defaultOptions.base.styleCursor = true;
-
-utils.extend(defaultOptions.perAction, autoStart.defaults.perAction);
-
-module.exports = autoStart;
-
-},{"../Interactable":4,"../Interaction":5,"../actions/base":6,"../defaultOptions":18,"../interact":21,"../scope":33,"../utils":43,"../utils/Signals":34,"./InteractableMethods":12}],14:[function(require,module,exports){
+},{"../utils":43,"./InteractableMethods":11}],13:[function(_dereq_,module,exports){
 'use strict';
 
-var autoStart = require('./base');
-var scope = require('../scope');
-var is = require('../utils/is');
+var is = _dereq_('../utils/is');
 
-var _require = require('../utils/domUtils'),
-    matchesSelector = _require.matchesSelector,
-    parentNode = _require.parentNode;
+var _require = _dereq_('./base'),
+    validateAction = _require.validateAction;
 
-autoStart.setActionDefaults(require('../actions/drag'));
+var _require2 = _dereq_('../utils/domUtils'),
+    parentNode = _require2.parentNode;
 
-autoStart.signals.on('before-start', function (_ref) {
-  var interaction = _ref.interaction,
-      eventTarget = _ref.eventTarget,
-      dx = _ref.dx,
-      dy = _ref.dy;
+function init(scope) {
+  scope.autoStart.signals.on('before-start', function (_ref) {
+    var interaction = _ref.interaction,
+        eventTarget = _ref.eventTarget,
+        dx = _ref.dx,
+        dy = _ref.dy;
 
-  if (interaction.prepared.name !== 'drag') {
-    return;
-  }
+    if (interaction.prepared.name !== 'drag') {
+      return;
+    }
 
-  // check if a drag is in the correct axis
-  var absX = Math.abs(dx);
-  var absY = Math.abs(dy);
-  var options = interaction.target.options.drag;
-  var startAxis = options.startAxis;
-  var currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy';
+    // check if a drag is in the correct axis
+    var absX = Math.abs(dx);
+    var absY = Math.abs(dy);
+    var targetOptions = interaction.target.options.drag;
+    var startAxis = targetOptions.startAxis;
+    var currentAxis = absX > absY ? 'x' : absX < absY ? 'y' : 'xy';
 
-  interaction.prepared.axis = options.lockAxis === 'start' ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
-  : options.lockAxis;
+    interaction.prepared.axis = targetOptions.lockAxis === 'start' ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
+    : targetOptions.lockAxis;
 
-  // if the movement isn't in the startAxis of the interactable
-  if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
-    // cancel the prepared action
-    interaction.prepared.name = null;
+    // if the movement isn't in the startAxis of the interactable
+    if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
+      // cancel the prepared action
+      interaction.prepared.name = null;
 
-    // then try to get a drag from another ineractable
-
-    if (!interaction.prepared.name) {
-
+      // then try to get a drag from another ineractable
       var element = eventTarget;
 
-      var getDraggable = function getDraggable(interactable, selector) {
+      var getDraggable = function getDraggable(interactable) {
         if (interactable === interaction.target) {
           return;
         }
 
-        if (!options.manualStart && !interactable.testIgnoreAllow(options, element, eventTarget) && matchesSelector(element, selector)) {
+        var options = interaction.target.options.drag;
 
-          var _action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+        if (!options.manualStart && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
-          if (_action && _action.name === 'drag' && checkStartAxis(currentAxis, interactable) && autoStart.validateAction(_action, interactable, element, eventTarget)) {
+          var action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
+
+          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && validateAction(action, interactable, element, eventTarget, scope)) {
 
             return interactable;
           }
         }
       };
 
-      var action = null;
-
       // check all interactables
       while (is.element(element)) {
-        var elementInteractable = scope.interactables.get(element);
+        var interactable = scope.interactables.forEachMatch(element, getDraggable);
 
-        if (elementInteractable && elementInteractable !== interaction.target && !elementInteractable.options.drag.manualStart) {
-
-          action = elementInteractable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-        }
-        if (action && action.name === 'drag' && checkStartAxis(currentAxis, elementInteractable)) {
-
+        if (interactable) {
           interaction.prepared.name = 'drag';
-          interaction.target = elementInteractable;
-          interaction.element = element;
-          break;
-        }
-
-        var selectorInteractable = scope.interactables.forEachSelector(getDraggable, element);
-
-        if (selectorInteractable) {
-          interaction.prepared.name = 'drag';
-          interaction.target = selectorInteractable;
+          interaction.target = interactable;
           interaction.element = element;
           break;
         }
@@ -3381,68 +3154,69 @@ autoStart.signals.on('before-start', function (_ref) {
         element = parentNode(element);
       }
     }
+  });
+
+  function checkStartAxis(startAxis, interactable) {
+    if (!interactable) {
+      return false;
+    }
+
+    var thisAxis = interactable.options.drag.startAxis;
+
+    return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
   }
-});
-
-function checkStartAxis(startAxis, interactable) {
-  if (!interactable) {
-    return false;
-  }
-
-  var thisAxis = interactable.options.drag.startAxis;
-
-  return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
 }
 
-},{"../actions/drag":7,"../scope":33,"../utils/domUtils":38,"../utils/is":45,"./base":13}],15:[function(require,module,exports){
+module.exports = { init: init };
+
+},{"../utils/domUtils":38,"../utils/is":45,"./base":12}],14:[function(_dereq_,module,exports){
 'use strict';
 
-require('./base').setActionDefaults(require('../actions/gesture'));
+function init(scope) {
+  var autoStart = scope.autoStart,
+      Interaction = scope.Interaction,
+      defaults = scope.defaults;
 
-},{"../actions/gesture":9,"./base":13}],16:[function(require,module,exports){
-'use strict';
 
-var autoStart = require('./base');
-var Interaction = require('../Interaction');
+  defaults.perAction.hold = 0;
+  defaults.perAction.delay = 0;
 
-autoStart.defaults.perAction.hold = 0;
-autoStart.defaults.perAction.delay = 0;
+  Interaction.signals.on('new', function (interaction) {
+    interaction.autoStartHoldTimer = null;
+  });
 
-Interaction.signals.on('new', function (interaction) {
-  interaction.autoStartHoldTimer = null;
-});
+  autoStart.signals.on('prepared', function (_ref) {
+    var interaction = _ref.interaction;
 
-autoStart.signals.on('prepared', function (_ref) {
-  var interaction = _ref.interaction;
+    var hold = getHoldDuration(interaction);
 
-  var hold = getHoldDuration(interaction);
+    if (hold > 0) {
+      interaction.autoStartHoldTimer = setTimeout(function () {
+        interaction.start(interaction.prepared, interaction.target, interaction.element);
+      }, hold);
+    }
+  });
 
-  if (hold > 0) {
-    interaction.autoStartHoldTimer = setTimeout(function () {
-      interaction.start(interaction.prepared, interaction.target, interaction.element);
-    }, hold);
-  }
-});
+  Interaction.signals.on('move', function (_ref2) {
+    var interaction = _ref2.interaction,
+        duplicate = _ref2.duplicate;
 
-Interaction.signals.on('move', function (_ref2) {
-  var interaction = _ref2.interaction,
-      duplicate = _ref2.duplicate;
+    if (interaction.pointerWasMoved && !duplicate) {
+      clearTimeout(interaction.autoStartHoldTimer);
+    }
+  });
 
-  if (interaction.pointerWasMoved && !duplicate) {
-    clearTimeout(interaction.autoStartHoldTimer);
-  }
-});
+  // prevent regular down->move autoStart
+  autoStart.signals.on('before-start', function (_ref3) {
+    var interaction = _ref3.interaction;
 
-// prevent regular down->move autoStart
-autoStart.signals.on('before-start', function (_ref3) {
-  var interaction = _ref3.interaction;
+    var hold = getHoldDuration(interaction);
 
-  var hold = getHoldDuration(interaction);
-
-  if (hold > 0) {
-    interaction.prepared.name = null;
-  }
-});
+    if (hold > 0) {
+      interaction.prepared.name = null;
+    }
+  });
+}
 
 function getHoldDuration(interaction) {
   var actionName = interaction.prepared && interaction.prepared.name;
@@ -3457,386 +3231,89 @@ function getHoldDuration(interaction) {
 }
 
 module.exports = {
+  init: init,
   getHoldDuration: getHoldDuration
 };
 
-},{"../Interaction":5,"./base":13}],17:[function(require,module,exports){
-'use strict';
-
-require('./base').setActionDefaults(require('../actions/resize'));
-
-},{"../actions/resize":10,"./base":13}],18:[function(require,module,exports){
+},{}],15:[function(_dereq_,module,exports){
 'use strict';
 
 module.exports = {
   base: {
-    accept: null,
     preventDefault: 'auto',
     deltaSource: 'page'
   },
 
   perAction: {
-    origin: { x: 0, y: 0 },
-
-    inertia: {
-      enabled: false,
-      resistance: 10, // the lambda in exponential decay
-      minSpeed: 100, // target speed must be above this for inertia to start
-      endSpeed: 10, // the speed at which inertia is slow enough to stop
-      allowResume: true, // allow resuming an action in inertia phase
-      smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
-    }
+    enabled: false,
+    origin: { x: 0, y: 0 }
   }
 };
 
-},{}],19:[function(require,module,exports){
+},{}],16:[function(_dereq_,module,exports){
 'use strict';
 
 /* browser entry point */
 
-// inertia
-require('./inertia');
+var scope = _dereq_('./scope');
+
+_dereq_('./interactions').init(scope);
+
+scope.Interactable = _dereq_('./Interactable');
+scope.InteractEvent = _dereq_('./InteractEvent');
+_dereq_('./interactablePreventDefault.js');
+
+var interact = _dereq_('./interact');
 
 // modifiers
-require('./modifiers/snap');
-require('./modifiers/restrict');
+interact.use(_dereq_('./modifiers/base'));
+interact.use(_dereq_('./modifiers/snap'));
+interact.use(_dereq_('./modifiers/restrict'));
+
+interact.snappers = _dereq_('./utils/snappers');
+interact.createSnapGrid = interact.snappers.grid;
+
+// inertia
+interact.use(_dereq_('./simulations/base'));
+interact.use(_dereq_('./simulations/inertia'));
 
 // pointerEvents
-require('./pointerEvents/base');
-require('./pointerEvents/holdRepeat');
-require('./pointerEvents/interactableTargets');
+interact.use(_dereq_('./pointerEvents/base'));
+interact.use(_dereq_('./pointerEvents/holdRepeat'));
+interact.use(_dereq_('./pointerEvents/interactableTargets'));
 
 // autoStart hold
-require('./autoStart/hold');
+interact.use(_dereq_('./autoStart/base'));
+interact.use(_dereq_('./autoStart/hold'));
+interact.use(_dereq_('./autoStart/dragAxis'));
 
 // actions
-require('./actions/gesture');
-require('./actions/resize');
-require('./actions/drag');
-require('./actions/drop');
+interact.use(_dereq_('./actions/gesture'));
+interact.use(_dereq_('./actions/resize'));
+interact.use(_dereq_('./actions/drag'));
+interact.use(_dereq_('./actions/drop'));
 
 // load these modifiers after resize is loaded
-require('./modifiers/snapSize');
-require('./modifiers/restrictEdges');
-require('./modifiers/restrictSize');
-
-// autoStart actions
-require('./autoStart/gesture');
-require('./autoStart/resize');
-require('./autoStart/drag');
-
-// Interactable preventDefault setting
-require('./interactablePreventDefault.js');
+interact.use(_dereq_('./modifiers/snapSize'));
+interact.use(_dereq_('./modifiers/restrictEdges'));
+interact.use(_dereq_('./modifiers/restrictSize'));
 
 // autoScroll
-require('./autoScroll');
+interact.use(_dereq_('./autoScroll'));
 
 // export interact
-module.exports = require('./interact');
+module.exports = interact;
 
-},{"./actions/drag":7,"./actions/drop":8,"./actions/gesture":9,"./actions/resize":10,"./autoScroll":11,"./autoStart/drag":14,"./autoStart/gesture":15,"./autoStart/hold":16,"./autoStart/resize":17,"./inertia":20,"./interact":21,"./interactablePreventDefault.js":22,"./modifiers/restrict":24,"./modifiers/restrictEdges":25,"./modifiers/restrictSize":26,"./modifiers/snap":27,"./modifiers/snapSize":28,"./pointerEvents/base":30,"./pointerEvents/holdRepeat":31,"./pointerEvents/interactableTargets":32}],20:[function(require,module,exports){
-'use strict';
-
-var InteractEvent = require('./InteractEvent');
-var Interaction = require('./Interaction');
-var modifiers = require('./modifiers/base');
-var utils = require('./utils');
-var animationFrame = require('./utils/raf');
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.inertiaStatus = {
-    active: false,
-    smoothEnd: false,
-    allowResume: false,
-
-    startEvent: null,
-    upCoords: {},
-
-    xe: 0, ye: 0,
-    sx: 0, sy: 0,
-
-    t0: 0,
-    vx0: 0, vys: 0,
-    duration: 0,
-
-    lambda_v0: 0,
-    one_ve_v0: 0,
-    i: null
-  };
-
-  interaction.boundInertiaFrame = function () {
-    return inertiaFrame.apply(interaction);
-  };
-  interaction.boundSmoothEndFrame = function () {
-    return smoothEndFrame.apply(interaction);
-  };
-});
-
-Interaction.signals.on('down', function (_ref) {
-  var interaction = _ref.interaction,
-      event = _ref.event,
-      pointer = _ref.pointer,
-      eventTarget = _ref.eventTarget;
-
-  var status = interaction.inertiaStatus;
-
-  // Check if the down event hits the current inertia target
-  if (status.active) {
-    var element = eventTarget;
-
-    // climb up the DOM tree from the event target
-    while (utils.is.element(element)) {
-
-      // if interaction element is the current inertia target element
-      if (element === interaction.element) {
-        // stop inertia
-        animationFrame.cancel(status.i);
-        status.active = false;
-        interaction.simulation = null;
-
-        // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer);
-        utils.setCoords(interaction.curCoords, interaction.pointers);
-
-        // fire appropriate signals
-        var signalArg = { interaction: interaction };
-        Interaction.signals.fire('before-action-move', signalArg);
-        Interaction.signals.fire('action-resume', signalArg);
-
-        // fire a reume event
-        var resumeEvent = new InteractEvent(interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
-
-        interaction.target.fire(resumeEvent);
-        interaction.prevEvent = resumeEvent;
-        modifiers.resetStatuses(interaction.modifierStatuses);
-
-        utils.copyCoords(interaction.prevCoords, interaction.curCoords);
-        break;
-      }
-
-      element = utils.parentNode(element);
-    }
-  }
-});
-
-Interaction.signals.on('up', function (_ref2) {
-  var interaction = _ref2.interaction,
-      event = _ref2.event;
-
-  var status = interaction.inertiaStatus;
-
-  if (!interaction.interacting() || status.active) {
-    return;
-  }
-
-  var target = interaction.target;
-  var options = target && target.options;
-  var inertiaOptions = options && interaction.prepared.name && options[interaction.prepared.name].inertia;
-
-  var now = new Date().getTime();
-  var statuses = {};
-  var page = utils.extend({}, interaction.curCoords.page);
-  var pointerSpeed = interaction.pointerDelta.client.speed;
-
-  var smoothEnd = false;
-  var modifierResult = void 0;
-
-  // check if inertia should be started
-  var inertiaPossible = inertiaOptions && inertiaOptions.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
-
-  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > inertiaOptions.minSpeed && pointerSpeed > inertiaOptions.endSpeed;
-
-  var modifierArg = {
-    interaction: interaction,
-    pageCoords: page,
-    statuses: statuses,
-    preEnd: true,
-    requireEndOnly: true
-  };
-
-  // smoothEnd
-  if (inertiaPossible && !inertia) {
-    modifiers.resetStatuses(statuses);
-
-    modifierResult = modifiers.setAll(modifierArg);
-
-    if (modifierResult.shouldMove && modifierResult.locked) {
-      smoothEnd = true;
-    }
-  }
-
-  if (!(inertia || smoothEnd)) {
-    return;
-  }
-
-  utils.copyCoords(status.upCoords, interaction.curCoords);
-
-  interaction.pointers[0] = status.startEvent = new InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
-
-  status.t0 = now;
-
-  status.active = true;
-  status.allowResume = inertiaOptions.allowResume;
-  interaction.simulation = status;
-
-  target.fire(status.startEvent);
-
-  if (inertia) {
-    status.vx0 = interaction.pointerDelta.client.vx;
-    status.vy0 = interaction.pointerDelta.client.vy;
-    status.v0 = pointerSpeed;
-
-    calcInertia(interaction, status);
-
-    utils.extend(page, interaction.curCoords.page);
-
-    page.x += status.xe;
-    page.y += status.ye;
-
-    modifiers.resetStatuses(statuses);
-
-    modifierResult = modifiers.setAll(modifierArg);
-
-    status.modifiedXe += modifierResult.dx;
-    status.modifiedYe += modifierResult.dy;
-
-    status.i = animationFrame.request(interaction.boundInertiaFrame);
-  } else {
-    status.smoothEnd = true;
-    status.xe = modifierResult.dx;
-    status.ye = modifierResult.dy;
-
-    status.sx = status.sy = 0;
-
-    status.i = animationFrame.request(interaction.boundSmoothEndFrame);
-  }
-});
-
-Interaction.signals.on('stop-active', function (_ref3) {
-  var interaction = _ref3.interaction;
-
-  var status = interaction.inertiaStatus;
-
-  if (status.active) {
-    animationFrame.cancel(status.i);
-    status.active = false;
-    interaction.simulation = null;
-  }
-});
-
-function calcInertia(interaction, status) {
-  var inertiaOptions = interaction.target.options[interaction.prepared.name].inertia;
-  var lambda = inertiaOptions.resistance;
-  var inertiaDur = -Math.log(inertiaOptions.endSpeed / status.v0) / lambda;
-
-  status.x0 = interaction.prevEvent.pageX;
-  status.y0 = interaction.prevEvent.pageY;
-  status.t0 = status.startEvent.timeStamp / 1000;
-  status.sx = status.sy = 0;
-
-  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-  status.te = inertiaDur;
-
-  status.lambda_v0 = lambda / status.v0;
-  status.one_ve_v0 = 1 - inertiaOptions.endSpeed / status.v0;
-}
-
-function inertiaFrame() {
-  updateInertiaCoords(this);
-  utils.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-
-  var status = this.inertiaStatus;
-  var options = this.target.options[this.prepared.name].inertia;
-  var lambda = options.resistance;
-  var t = new Date().getTime() / 1000 - status.t0;
-
-  if (t < status.te) {
-
-    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
-
-    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
-      status.sx = status.xe * progress;
-      status.sy = status.ye * progress;
-    } else {
-      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
-
-      status.sx = quadPoint.x;
-      status.sy = quadPoint.y;
-    }
-
-    this.doMove();
-
-    status.i = animationFrame.request(this.boundInertiaFrame);
-  } else {
-    status.sx = status.modifiedXe;
-    status.sy = status.modifiedYe;
-
-    this.doMove();
-    this.end(status.startEvent);
-    status.active = false;
-    this.simulation = null;
-  }
-
-  utils.copyCoords(this.prevCoords, this.curCoords);
-}
-
-function smoothEndFrame() {
-  updateInertiaCoords(this);
-
-  var status = this.inertiaStatus;
-  var t = new Date().getTime() - status.t0;
-  var duration = this.target.options[this.prepared.name].inertia.smoothEndDuration;
-
-  if (t < duration) {
-    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
-    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
-
-    this.pointerMove(status.startEvent, status.startEvent);
-
-    status.i = animationFrame.request(this.boundSmoothEndFrame);
-  } else {
-    status.sx = status.xe;
-    status.sy = status.ye;
-
-    this.pointerMove(status.startEvent, status.startEvent);
-    this.end(status.startEvent);
-
-    status.smoothEnd = status.active = false;
-    this.simulation = null;
-  }
-}
-
-function updateInertiaCoords(interaction) {
-  var status = interaction.inertiaStatus;
-
-  // return if inertia isn't running
-  if (!status.active) {
-    return;
-  }
-
-  var pageUp = status.upCoords.page;
-  var clientUp = status.upCoords.client;
-
-  utils.setCoords(interaction.curCoords, [{
-    pageX: pageUp.x + status.sx,
-    pageY: pageUp.y + status.sy,
-    clientX: clientUp.x + status.sx,
-    clientY: clientUp.y + status.sy
-  }]);
-}
-
-},{"./InteractEvent":3,"./Interaction":5,"./modifiers/base":23,"./utils":43,"./utils/raf":49}],21:[function(require,module,exports){
+},{"./InteractEvent":3,"./Interactable":4,"./actions/drag":6,"./actions/drop":7,"./actions/gesture":8,"./actions/resize":9,"./autoScroll":10,"./autoStart/base":12,"./autoStart/dragAxis":13,"./autoStart/hold":14,"./interact":17,"./interactablePreventDefault.js":18,"./interactions":19,"./modifiers/base":20,"./modifiers/restrict":21,"./modifiers/restrictEdges":22,"./modifiers/restrictSize":23,"./modifiers/snap":24,"./modifiers/snapSize":25,"./pointerEvents/base":27,"./pointerEvents/holdRepeat":28,"./pointerEvents/interactableTargets":29,"./scope":30,"./simulations/base":31,"./simulations/inertia":32,"./utils/snappers":52}],17:[function(_dereq_,module,exports){
 'use strict';
 
 /** @module interact */
 
-var browser = require('./utils/browser');
-var events = require('./utils/events');
-var utils = require('./utils');
-var scope = require('./scope');
-var Interactable = require('./Interactable');
-var Interaction = require('./Interaction');
+var browser = _dereq_('./utils/browser');
+var events = _dereq_('./utils/events');
+var utils = _dereq_('./utils');
+var scope = _dereq_('./scope');
+var Interactable = _dereq_('./Interactable');
 
 var globalEvents = {};
 
@@ -3869,12 +3346,30 @@ function interact(element, options) {
   var interactable = scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options);
+    interactable = new Interactable(element, options || {}, scope.document);
     interactable.events.global = globalEvents;
+
+    scope.addDocument(interactable._doc);
+
+    scope.interactables.push(interactable);
   }
 
   return interactable;
 }
+
+/**
+ * Use a plugin
+ *
+ * @alias module:interact.use
+ *
+ * @param {Object} plugin
+ * @param {function} plugin.init
+ * @return {interact}
+*/
+interact.use = function (plugin) {
+  plugin.init(scope);
+  return interact;
+};
 
 /**
  * Check if an element or selector has been set with the {@link interact}
@@ -3928,7 +3423,7 @@ interact.on = function (type, listener, options) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.contains(Interactable.eventTypes, type)) {
+  if (utils.arr.contains(Interactable.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -3982,7 +3477,7 @@ interact.off = function (type, listener, options) {
     return interact;
   }
 
-  if (!utils.contains(Interactable.eventTypes, type)) {
+  if (!utils.arr.contains(Interactable.eventTypes, type)) {
     events.remove(scope.document, type, listener, options);
   } else {
     var index = void 0;
@@ -4008,15 +3503,15 @@ interact.debug = function () {
 };
 
 // expose the functions used to calculate multi-touch properties
-interact.getPointerAverage = utils.pointerAverage;
-interact.getTouchBBox = utils.touchBBox;
-interact.getTouchDistance = utils.touchDistance;
-interact.getTouchAngle = utils.touchAngle;
+interact.getPointerAverage = utils.pointer.pointerAverage;
+interact.getTouchBBox = utils.pointer.touchBBox;
+interact.getTouchDistance = utils.pointer.touchDistance;
+interact.getTouchAngle = utils.pointer.touchAngle;
 
-interact.getElementRect = utils.getElementRect;
-interact.getElementClientRect = utils.getElementClientRect;
-interact.matchesSelector = utils.matchesSelector;
-interact.closest = utils.closest;
+interact.getElementRect = utils.dom.getElementRect;
+interact.getElementClientRect = utils.dom.getElementClientRect;
+interact.matchesSelector = utils.dom.matchesSelector;
+interact.closest = utils.dom.closest;
 
 /**
  * @alias module:interact.supportsTouch
@@ -4063,33 +3558,100 @@ interact.stop = function (event) {
  */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
-    Interaction.pointerMoveTolerance = newValue;
+    scope.Interaction.pointerMoveTolerance = newValue;
 
     return interact;
   }
 
-  return Interaction.pointerMoveTolerance;
+  return scope.Interaction.pointerMoveTolerance;
 };
 
+Interactable.signals.on('unset', function (_ref3) {
+  var interactable = _ref3.interactable;
+
+  scope.interactables.splice(scope.interactables.indexOf(interactable), 1);
+
+  // Stop related interactions when an Interactable is unset
+  for (var _i3 = 0; _i3 < scope.interactions.length; _i3++) {
+    var _ref4;
+
+    _ref4 = scope.interactions[_i3];
+    var interaction = _ref4;
+
+    if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
+      interaction.stop();
+    }
+  }
+});
 interact.addDocument = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
+
+// all set interactables
+scope.interactables = [];
+
+scope.interactables.indexOfElement = function indexOfElement(target, context) {
+  context = context || scope.document;
+
+  for (var i = 0; i < this.length; i++) {
+    var interactable = this[i];
+
+    if (interactable.target === target && interactable._context === context) {
+      return i;
+    }
+  }
+  return -1;
+};
+
+scope.interactables.get = function interactableGet(element, options, dontCheckInContext) {
+  var ret = this[this.indexOfElement(element, options && options.context)];
+
+  return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
+};
+
+scope.interactables.forEachMatch = function (element, callback) {
+  for (var _i4 = 0; _i4 < this.length; _i4++) {
+    var _ref5;
+
+    _ref5 = this[_i4];
+    var interactable = _ref5;
+
+    var ret = void 0;
+
+    if ((utils.is.string(interactable.target)
+    // target is a selector and the element matches
+    ? utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target) :
+    // target is the element
+    element === interactable.target) &&
+    // the element is in context
+    interactable.inContext(element)) {
+      ret = callback(interactable);
+    }
+
+    if (ret !== undefined) {
+      return ret;
+    }
+  }
+};
 
 scope.interact = interact;
 
 module.exports = interact;
 
-},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils":43,"./utils/browser":36,"./utils/events":39}],22:[function(require,module,exports){
+},{"./Interactable":4,"./scope":30,"./utils":43,"./utils/browser":35,"./utils/events":39}],18:[function(_dereq_,module,exports){
 'use strict';
 
-var Interactable = require('./Interactable');
-var Interaction = require('./Interaction');
-var scope = require('./scope');
-var is = require('./utils/is');
-var events = require('./utils/events');
+var Interactable = _dereq_('./Interactable');
+var scope = _dereq_('./scope');
+var is = _dereq_('./utils/is');
+var events = _dereq_('./utils/events');
+var browser = _dereq_('./utils/browser');
 
-var _require = require('./utils/domUtils'),
+var _require = _dereq_('./utils/domUtils'),
     nodeContains = _require.nodeContains,
     matchesSelector = _require.matchesSelector;
+
+var _require2 = _dereq_('./utils/window'),
+    getWindow = _require2.getWindow;
 
 /**
  * Returns or sets whether to prevent the browser's default behaviour in
@@ -4131,10 +3693,14 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // setting === 'auto'
 
-  // don't preventDefault if the browser supports passiveEvents
-  // CSS touch-action and user-selecct should be used instead
-  if (events.supportsOptions) {
-    return;
+  // don't preventDefault of touch{start,move} events if the browser supports passive
+  // events listeners. CSS touch-action and user-selecct should be used instead
+  if (events.supportsPassive && /^touch(start|move)$/.test(event.type) && !browser.isIOS) {
+    var docOptions = scope.getDocIndex(getWindow(event.target).document);
+
+    if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
+      return;
+    }
   }
 
   // don't preventDefault of pointerdown events
@@ -4162,11 +3728,11 @@ function onInteractionEvent(_ref) {
 var _arr = ['down', 'move', 'up', 'cancel'];
 for (var _i = 0; _i < _arr.length; _i++) {
   var eventSignal = _arr[_i];
-  Interaction.signals.on(eventSignal, onInteractionEvent);
+  scope.Interaction.signals.on(eventSignal, onInteractionEvent);
 }
 
 // prevent native HTML5 drag on interact.js target elements
-Interaction.docEvents.dragstart = function preventNativeDrag(event) {
+scope.Interaction.eventMap.dragstart = function preventNativeDrag(event) {
   for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
     var _ref2;
 
@@ -4182,371 +3748,607 @@ Interaction.docEvents.dragstart = function preventNativeDrag(event) {
   }
 };
 
-},{"./Interactable":4,"./Interaction":5,"./scope":33,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45}],23:[function(require,module,exports){
+},{"./Interactable":4,"./scope":30,"./utils/browser":35,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45,"./utils/window":53}],19:[function(_dereq_,module,exports){
 'use strict';
 
-var InteractEvent = require('../InteractEvent');
-var Interaction = require('../Interaction');
-var extend = require('../utils/extend');
+var Interaction = _dereq_('./Interaction');
+var events = _dereq_('./utils/events');
+var finder = _dereq_('./utils/interactionFinder');
+var browser = _dereq_('./utils/browser');
+var domObjects = _dereq_('./utils/domObjects');
+var pointerUtils = _dereq_('./utils/pointerUtils');
+var Signals = _dereq_('./utils/Signals');
 
-var modifiers = {
-  names: [],
+var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer', 'windowBlur'];
 
-  setOffsets: function setOffsets(arg) {
-    var interaction = arg.interaction,
-        page = arg.pageCoords;
-    var target = interaction.target,
-        element = interaction.element,
-        startOffset = interaction.startOffset;
+function init(scope) {
+  var signals = Signals.new();
 
-    var rect = target.getRect(element);
+  var listeners = {};
 
-    if (rect) {
-      startOffset.left = page.x - rect.left;
-      startOffset.top = page.y - rect.top;
+  for (var _i = 0; _i < methodNames.length; _i++) {
+    var method = methodNames[_i];
+    listeners[method] = doOnInteractions(method, scope);
+  }
 
-      startOffset.right = rect.right - page.x;
-      startOffset.bottom = rect.bottom - page.y;
+  var eventMap = {/* 'eventType': listenerFunc */};
+  var pEventTypes = browser.pEventTypes;
 
-      if (!('width' in rect)) {
-        rect.width = rect.right - rect.left;
-      }
-      if (!('height' in rect)) {
-        rect.height = rect.bottom - rect.top;
-      }
-    } else {
-      startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
-    }
+  if (domObjects.PointerEvent) {
+    eventMap[pEventTypes.down] = listeners.pointerDown;
+    eventMap[pEventTypes.move] = listeners.pointerMove;
+    eventMap[pEventTypes.up] = listeners.pointerUp;
+    eventMap[pEventTypes.cancel] = listeners.pointerUp;
+  } else {
+    eventMap.mousedown = listeners.pointerDown;
+    eventMap.mousemove = listeners.pointerMove;
+    eventMap.mouseup = listeners.pointerUp;
 
-    arg.rect = rect;
-    arg.interactable = target;
-    arg.element = element;
+    eventMap.touchstart = listeners.pointerDown;
+    eventMap.touchmove = listeners.pointerMove;
+    eventMap.touchend = listeners.pointerUp;
+    eventMap.touchcancel = listeners.pointerUp;
+  }
 
-    for (var _i = 0; _i < modifiers.names.length; _i++) {
+  eventMap.blur = function (event) {
+    for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
       var _ref;
 
-      _ref = modifiers.names[_i];
-      var modifierName = _ref;
+      _ref = scope.interactions[_i2];
+      var interaction = _ref;
 
-      arg.options = target.options[interaction.prepared.name][modifierName];
+      interaction.documentBlur(event);
+    }
+  };
 
-      if (!arg.options) {
-        continue;
+  scope.signals.on('add-document', onDocSignal);
+  scope.signals.on('remove-document', onDocSignal);
+
+  // for ignoring browser's simulated mouse events
+  scope.prevTouchTime = 0;
+
+  // all active and idle interactions
+  scope.interactions = [];
+  scope.Interaction = {
+    signals: signals,
+    Interaction: Interaction,
+    new: function _new(options) {
+      options.signals = signals;
+
+      return new Interaction(options);
+    },
+
+    listeners: listeners,
+    eventMap: eventMap
+  };
+
+  scope.actions = {
+    names: [],
+    methodDict: {}
+  };
+}
+
+function doOnInteractions(method, scope) {
+  return function (event) {
+    var interactions = scope.interactions;
+
+
+    var pointerType = pointerUtils.getPointerType(event);
+
+    var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
+        eventTarget = _pointerUtils$getEven[0],
+        curEventTarget = _pointerUtils$getEven[1];
+
+    var matches = []; // [ [pointer, interaction], ...]
+
+    if (browser.supportsTouch && /touch/.test(event.type)) {
+      scope.prevTouchTime = new Date().getTime();
+
+      for (var _i3 = 0; _i3 < event.changedTouches.length; _i3++) {
+        var _ref2;
+
+        _ref2 = event.changedTouches[_i3];
+        var changedTouch = _ref2;
+
+        var pointer = changedTouch;
+        var pointerId = pointerUtils.getPointerId(pointer);
+        var interaction = getInteraction({
+          pointer: pointer,
+          pointerId: pointerId,
+          pointerType: pointerType,
+          eventType: event.type,
+          eventTarget: eventTarget,
+          scope: scope
+        });
+
+        matches.push([pointer, interaction]);
+      }
+    } else {
+      var invalidPointer = false;
+
+      if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
+        // ignore mouse events while touch interactions are active
+        for (var i = 0; i < interactions.length && !invalidPointer; i++) {
+          invalidPointer = interactions[i].pointerType !== 'mouse' && interactions[i].pointerIsDown;
+        }
+
+        // try to ignore mouse events that are simulated by the browser
+        // after a touch event
+        invalidPointer = invalidPointer || new Date().getTime() - scope.prevTouchTime < 500
+        // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
+        || event.timeStamp === 0;
       }
 
-      interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
-    }
-  },
+      if (!invalidPointer) {
+        var _interaction = getInteraction({
+          pointer: event,
+          pointerId: pointerUtils.getPointerId(event),
+          pointerType: pointerType,
+          eventType: event.type,
+          eventTarget: eventTarget,
+          scope: scope
+        });
 
-  setAll: function setAll(arg) {
-    var interaction = arg.interaction,
-        statuses = arg.statuses,
-        preEnd = arg.preEnd,
-        requireEndOnly = arg.requireEndOnly;
-
-    var result = {
-      dx: 0,
-      dy: 0,
-      changed: false,
-      locked: false,
-      shouldMove: true
-    };
-
-    arg.modifiedCoords = extend({}, arg.pageCoords);
-
-    for (var _i2 = 0; _i2 < modifiers.names.length; _i2++) {
-      var _ref2;
-
-      _ref2 = modifiers.names[_i2];
-      var modifierName = _ref2;
-
-      var modifier = modifiers[modifierName];
-      var options = interaction.target.options[interaction.prepared.name][modifierName];
-
-      if (!shouldDo(options, preEnd, requireEndOnly)) {
-        continue;
-      }
-
-      arg.status = arg.status = statuses[modifierName];
-      arg.options = options;
-      arg.offset = arg.interaction.modifierOffsets[modifierName];
-
-      modifier.set(arg);
-
-      if (arg.status.locked) {
-        arg.modifiedCoords.x += arg.status.dx;
-        arg.modifiedCoords.y += arg.status.dy;
-
-        result.dx += arg.status.dx;
-        result.dy += arg.status.dy;
-
-        result.locked = true;
+        matches.push([event, _interaction]);
       }
     }
 
-    // a move should be fired if:
-    //  - there are no modifiers enabled,
-    //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
-    //  - the locked coords have changed since the last pointer move
-    result.shouldMove = !arg.status || !result.locked || arg.status.changed;
+    for (var _i4 = 0; _i4 < matches.length; _i4++) {
+      var _ref3 = matches[_i4];
+      var _pointer = _ref3[0];
+      var _interaction2 = _ref3[1];
 
-    return result;
-  },
-
-  resetStatuses: function resetStatuses(statuses) {
-    for (var _i3 = 0; _i3 < modifiers.names.length; _i3++) {
-      var _ref3;
-
-      _ref3 = modifiers.names[_i3];
-      var modifierName = _ref3;
-
-      var status = statuses[modifierName] || {};
-
-      status.dx = status.dy = 0;
-      status.modifiedX = status.modifiedY = NaN;
-      status.locked = false;
-      status.changed = true;
-
-      statuses[modifierName] = status;
+      _interaction2._updateEventTargets(eventTarget, curEventTarget);
+      _interaction2[method](_pointer, event, eventTarget, curEventTarget);
     }
+  };
+}
 
-    return statuses;
-  },
+function getInteraction(searchDetails) {
+  var pointerType = searchDetails.pointerType,
+      scope = searchDetails.scope;
 
-  start: function start(_ref4, signalName) {
-    var interaction = _ref4.interaction;
 
-    var arg = {
-      interaction: interaction,
-      pageCoords: (signalName === 'action-resume' ? interaction.curCoords : interaction.startCoords).page,
-      startOffset: interaction.startOffset,
-      statuses: interaction.modifierStatuses,
-      preEnd: false,
-      requireEndOnly: false
-    };
+  var foundInteraction = finder.search(searchDetails);
+  var signalArg = { interaction: foundInteraction, searchDetails: searchDetails };
 
-    modifiers.setOffsets(arg);
-    modifiers.resetStatuses(arg.statuses);
+  scope.Interaction.signals.fire('find', signalArg);
 
-    arg.pageCoords = extend({}, interaction.startCoords.page);
-    interaction.modifierResult = modifiers.setAll(arg);
-  },
+  return signalArg.interaction || newInteraction({ pointerType: pointerType }, scope);
+}
 
-  beforeMove: function beforeMove(_ref5) {
-    var interaction = _ref5.interaction,
-        preEnd = _ref5.preEnd,
-        interactingBeforeMove = _ref5.interactingBeforeMove;
+function newInteraction(options, scope) {
+  var interaction = scope.Interaction.new(options);
 
-    var modifierResult = modifiers.setAll({
-      interaction: interaction,
-      preEnd: preEnd,
-      pageCoords: interaction.curCoords.page,
-      statuses: interaction.modifierStatuses,
-      requireEndOnly: false
-    });
+  scope.interactions.push(interaction);
+  return interaction;
+}
 
-    // don't fire an action move if a modifier would keep the event in the same
-    // cordinates as before
-    if (!modifierResult.shouldMove && interactingBeforeMove) {
-      interaction._dontFireMove = true;
-    }
+function onDocSignal(_ref4, signalName) {
+  var doc = _ref4.doc,
+      scope = _ref4.scope,
+      options = _ref4.options;
+  var eventMap = scope.Interaction.eventMap;
 
-    interaction.modifierResult = modifierResult;
-  },
+  var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
 
-  end: function end(_ref6) {
-    var interaction = _ref6.interaction,
-        event = _ref6.event;
-
-    for (var _i4 = 0; _i4 < modifiers.names.length; _i4++) {
-      var _ref7;
-
-      _ref7 = modifiers.names[_i4];
-      var modifierName = _ref7;
-
-      var options = interaction.target.options[interaction.prepared.name][modifierName];
-
-      // if the endOnly option is true for any modifier
-      if (shouldDo(options, true, true)) {
-        // fire a move event at the modified coordinates
-        interaction.doMove({ event: event, preEnd: true });
-        break;
-      }
-    }
-  },
-
-  setXY: function setXY(arg) {
-    var iEvent = arg.iEvent,
-        interaction = arg.interaction;
-
-    var modifierArg = extend({}, arg);
-
-    for (var i = 0; i < modifiers.names.length; i++) {
-      var modifierName = modifiers.names[i];
-      modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
-
-      if (!modifierArg.options) {
-        continue;
-      }
-
-      var modifier = modifiers[modifierName];
-
-      modifierArg.status = interaction.modifierStatuses[modifierName];
-
-      iEvent[modifierName] = modifier.modifyCoords(modifierArg);
-    }
+  // delegate event listener
+  for (var eventType in events.delegatedEvents) {
+    eventMethod(doc, eventType, events.delegateListener);
+    eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
+
+  var eventOptions = options && options.events;
+
+  for (var _eventType in eventMap) {
+    eventMethod(doc, _eventType, eventMap[_eventType], eventOptions);
+  }
+}
+
+module.exports = {
+  init: init,
+  onDocSignal: onDocSignal,
+  doOnInteractions: doOnInteractions,
+  newInteraction: newInteraction,
+  methodNames: methodNames
 };
 
-Interaction.signals.on('new', function (interaction) {
-  interaction.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
-  interaction.modifierOffsets = {};
-  interaction.modifierStatuses = modifiers.resetStatuses({});
-  interaction.modifierResult = null;
-});
+},{"./Interaction":5,"./utils/Signals":33,"./utils/browser":35,"./utils/domObjects":37,"./utils/events":39,"./utils/interactionFinder":44,"./utils/pointerUtils":48}],20:[function(_dereq_,module,exports){
+'use strict';
 
-Interaction.signals.on('action-start', modifiers.start);
-Interaction.signals.on('action-resume', modifiers.start);
-Interaction.signals.on('before-action-move', modifiers.beforeMove);
-Interaction.signals.on('action-end', modifiers.end);
+var extend = _dereq_('../utils/extend');
 
-InteractEvent.signals.on('set-xy', modifiers.setXY);
+function init(scope) {
+  var InteractEvent = scope.InteractEvent,
+      Interaction = scope.Interaction;
+
+
+  scope.modifiers = { names: [] };
+
+  Interaction.signals.on('new', function (interaction) {
+    interaction.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
+    interaction.modifierOffsets = {};
+    interaction.modifierStatuses = resetStatuses({}, scope.modifiers);
+    interaction.modifierResult = null;
+  });
+
+  Interaction.signals.on('action-start', function (arg) {
+    return start(arg, scope.modifiers, arg.interaction.startCoords.page);
+  });
+
+  Interaction.signals.on('action-resume', function (arg) {
+    beforeMove(arg, scope.modifiers);
+    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+  });
+
+  Interaction.signals.on('before-action-move', function (arg) {
+    return beforeMove(arg, scope.modifiers);
+  });
+  Interaction.signals.on('action-end', function (arg) {
+    return beforeEnd(arg, scope.modifiers);
+  });
+
+  InteractEvent.signals.on('set-xy', function (arg) {
+    return setXY(arg, scope.modifiers);
+  });
+}
+
+function setOffsets(arg, modifiers) {
+  var interaction = arg.interaction,
+      page = arg.pageCoords;
+  var target = interaction.target,
+      element = interaction.element,
+      startOffset = interaction.startOffset;
+
+  var rect = target.getRect(element);
+
+  if (rect) {
+    startOffset.left = page.x - rect.left;
+    startOffset.top = page.y - rect.top;
+
+    startOffset.right = rect.right - page.x;
+    startOffset.bottom = rect.bottom - page.y;
+
+    if (!('width' in rect)) {
+      rect.width = rect.right - rect.left;
+    }
+    if (!('height' in rect)) {
+      rect.height = rect.bottom - rect.top;
+    }
+  } else {
+    startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
+  }
+
+  arg.rect = rect;
+  arg.interactable = target;
+  arg.element = element;
+
+  for (var _i = 0; _i < modifiers.names.length; _i++) {
+    var _ref;
+
+    _ref = modifiers.names[_i];
+    var modifierName = _ref;
+
+    arg.options = target.options[interaction.prepared.name][modifierName];
+
+    if (!arg.options) {
+      continue;
+    }
+
+    interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
+  }
+}
+
+function setAll(arg, modifiers) {
+  var interaction = arg.interaction,
+      statuses = arg.statuses,
+      preEnd = arg.preEnd,
+      requireEndOnly = arg.requireEndOnly;
+
+  var result = {
+    dx: 0,
+    dy: 0,
+    changed: false,
+    locked: false,
+    shouldMove: true
+  };
+
+  arg.modifiedCoords = extend({}, arg.pageCoords);
+
+  for (var _i2 = 0; _i2 < modifiers.names.length; _i2++) {
+    var _ref2;
+
+    _ref2 = modifiers.names[_i2];
+    var modifierName = _ref2;
+
+    var modifier = modifiers[modifierName];
+    var options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    if (!shouldDo(options, preEnd, requireEndOnly)) {
+      continue;
+    }
+
+    arg.status = arg.status = statuses[modifierName];
+    arg.options = options;
+    arg.offset = arg.interaction.modifierOffsets[modifierName];
+
+    modifier.set(arg);
+
+    if (arg.status.locked) {
+      arg.modifiedCoords.x += arg.status.dx;
+      arg.modifiedCoords.y += arg.status.dy;
+
+      result.dx += arg.status.dx;
+      result.dy += arg.status.dy;
+
+      result.locked = true;
+    }
+  }
+
+  // a move should be fired if:
+  //  - there are no modifiers enabled,
+  //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
+  //  - the locked coords have changed since the last pointer move
+  result.shouldMove = !arg.status || !result.locked || arg.status.changed;
+
+  return result;
+}
+
+function resetStatuses(statuses, modifiers) {
+  for (var _i3 = 0; _i3 < modifiers.names.length; _i3++) {
+    var _ref3;
+
+    _ref3 = modifiers.names[_i3];
+    var modifierName = _ref3;
+
+    var status = statuses[modifierName] || {};
+
+    status.dx = status.dy = 0;
+    status.modifiedX = status.modifiedY = NaN;
+    status.locked = false;
+    status.changed = true;
+
+    statuses[modifierName] = status;
+  }
+
+  return statuses;
+}
+
+function start(_ref4, modifiers, pageCoords) {
+  var interaction = _ref4.interaction;
+
+  var arg = {
+    interaction: interaction,
+    pageCoords: pageCoords,
+    startOffset: interaction.startOffset,
+    statuses: interaction.modifierStatuses,
+    preEnd: false,
+    requireEndOnly: false
+  };
+
+  setOffsets(arg, modifiers);
+  resetStatuses(arg.statuses, modifiers);
+
+  arg.pageCoords = extend({}, interaction.startCoords.page);
+  interaction.modifierResult = setAll(arg, modifiers);
+}
+
+function beforeMove(_ref5, modifiers) {
+  var interaction = _ref5.interaction,
+      preEnd = _ref5.preEnd,
+      interactingBeforeMove = _ref5.interactingBeforeMove;
+
+  var modifierResult = setAll({
+    interaction: interaction,
+    preEnd: preEnd,
+    pageCoords: interaction.curCoords.page,
+    statuses: interaction.modifierStatuses,
+    requireEndOnly: false
+  }, modifiers);
+
+  interaction.modifierResult = modifierResult;
+
+  // don't fire an action move if a modifier would keep the event in the same
+  // cordinates as before
+  if (!modifierResult.shouldMove && interactingBeforeMove) {
+    return false;
+  }
+}
+
+function beforeEnd(_ref6, modifiers) {
+  var interaction = _ref6.interaction,
+      event = _ref6.event;
+
+  for (var _i4 = 0; _i4 < modifiers.names.length; _i4++) {
+    var _ref7;
+
+    _ref7 = modifiers.names[_i4];
+    var modifierName = _ref7;
+
+    var options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    // if the endOnly option is true for any modifier
+    if (shouldDo(options, true, true)) {
+      // fire a move event at the modified coordinates
+      interaction.doMove({ event: event, preEnd: true });
+      break;
+    }
+  }
+}
+
+function setXY(arg, modifiers) {
+  var iEvent = arg.iEvent,
+      interaction = arg.interaction;
+
+  var modifierArg = extend({}, arg);
+
+  for (var i = 0; i < modifiers.names.length; i++) {
+    var modifierName = modifiers.names[i];
+    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+
+    if (!modifierArg.options) {
+      continue;
+    }
+
+    var modifier = modifiers[modifierName];
+
+    modifierArg.status = interaction.modifierStatuses[modifierName];
+
+    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+  }
+}
 
 function shouldDo(options, preEnd, requireEndOnly) {
   return options && options.enabled && (preEnd || !options.endOnly) && (!requireEndOnly || options.endOnly);
 }
 
-module.exports = modifiers;
+module.exports = {
+  init: init,
+  setOffsets: setOffsets,
+  setAll: setAll,
+  resetStatuses: resetStatuses,
+  start: start,
+  beforeMove: beforeMove,
+  beforeEnd: beforeEnd,
+  shouldDo: shouldDo
+};
 
-},{"../InteractEvent":3,"../Interaction":5,"../utils/extend":40}],24:[function(require,module,exports){
+},{"../utils/extend":40}],21:[function(_dereq_,module,exports){
 'use strict';
 
-var modifiers = require('./base');
-var utils = require('../utils');
-var defaultOptions = require('../defaultOptions');
+var is = _dereq_('../utils/is');
+var extend = _dereq_('../utils/extend');
+var rectUtils = _dereq_('../utils/rect');
 
-var restrict = {
+function init(scope) {
+  var modifiers = scope.modifiers,
+      defaults = scope.defaults;
+
+
+  modifiers.restrict = module.exports;
+  modifiers.names.push('restrict');
+
+  defaults.perAction.restrict = module.exports.defaults;
+}
+
+function setOffset(_ref) {
+  var rect = _ref.rect,
+      startOffset = _ref.startOffset,
+      options = _ref.options;
+
+  var elementRect = options && options.elementRect;
+  var offset = {};
+
+  if (rect && elementRect) {
+    offset.left = startOffset.left - rect.width * elementRect.left;
+    offset.top = startOffset.top - rect.height * elementRect.top;
+
+    offset.right = startOffset.right - rect.width * (1 - elementRect.right);
+    offset.bottom = startOffset.bottom - rect.height * (1 - elementRect.bottom);
+  } else {
+    offset.left = offset.top = offset.right = offset.bottom = 0;
+  }
+
+  return offset;
+}
+
+function set(_ref2) {
+  var modifiedCoords = _ref2.modifiedCoords,
+      interaction = _ref2.interaction,
+      status = _ref2.status,
+      options = _ref2.options;
+
+  if (!options) {
+    return status;
+  }
+
+  var page = extend({}, modifiedCoords);
+
+  var restriction = getRestrictionRect(options.restriction, interaction, page);
+
+  if (!restriction) {
+    return status;
+  }
+
+  status.dx = 0;
+  status.dy = 0;
+  status.locked = false;
+
+  var rect = restriction;
+  var modifiedX = page.x;
+  var modifiedY = page.y;
+
+  var offset = interaction.modifierOffsets.restrict;
+
+  // object is assumed to have
+  // x, y, width, height or
+  // left, top, right, bottom
+  if ('x' in restriction && 'y' in restriction) {
+    modifiedX = Math.max(Math.min(rect.x + rect.width - offset.right, page.x), rect.x + offset.left);
+    modifiedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top);
+  } else {
+    modifiedX = Math.max(Math.min(rect.right - offset.right, page.x), rect.left + offset.left);
+    modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top + offset.top);
+  }
+
+  status.dx = modifiedX - page.x;
+  status.dy = modifiedY - page.y;
+
+  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
+  status.locked = !!(status.dx || status.dy);
+
+  status.modifiedX = modifiedX;
+  status.modifiedY = modifiedY;
+}
+
+function modifyCoords(_ref3) {
+  var page = _ref3.page,
+      client = _ref3.client,
+      status = _ref3.status,
+      phase = _ref3.phase,
+      options = _ref3.options;
+
+  var elementRect = options && options.elementRect;
+
+  if (options && options.enabled && !(phase === 'start' && elementRect && status.locked)) {
+
+    if (status.locked) {
+      page.x += status.dx;
+      page.y += status.dy;
+      client.x += status.dx;
+      client.y += status.dy;
+
+      return {
+        dx: status.dx,
+        dy: status.dy
+      };
+    }
+  }
+}
+
+function getRestrictionRect(value, interaction, page) {
+  if (is.function(value)) {
+    return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
+  } else {
+    return rectUtils.resolveRectLike(value, interaction.target, interaction.element);
+  }
+}
+
+module.exports = {
+  init: init,
+  setOffset: setOffset,
+  set: set,
+  modifyCoords: modifyCoords,
+  getRestrictionRect: getRestrictionRect,
   defaults: {
     enabled: false,
     endOnly: false,
     restriction: null,
     elementRect: null
-  },
-
-  setOffset: function setOffset(_ref) {
-    var rect = _ref.rect,
-        startOffset = _ref.startOffset,
-        options = _ref.options;
-
-    var elementRect = options && options.elementRect;
-    var offset = {};
-
-    if (rect && elementRect) {
-      offset.left = startOffset.left - rect.width * elementRect.left;
-      offset.top = startOffset.top - rect.height * elementRect.top;
-
-      offset.right = startOffset.right - rect.width * (1 - elementRect.right);
-      offset.bottom = startOffset.bottom - rect.height * (1 - elementRect.bottom);
-    } else {
-      offset.left = offset.top = offset.right = offset.bottom = 0;
-    }
-
-    return offset;
-  },
-
-  set: function set(_ref2) {
-    var modifiedCoords = _ref2.modifiedCoords,
-        interaction = _ref2.interaction,
-        status = _ref2.status,
-        options = _ref2.options;
-
-    if (!options) {
-      return status;
-    }
-
-    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, modifiedCoords);
-
-    var restriction = getRestrictionRect(options.restriction, interaction, page);
-
-    if (!restriction) {
-      return status;
-    }
-
-    status.dx = 0;
-    status.dy = 0;
-    status.locked = false;
-
-    var rect = restriction;
-    var modifiedX = page.x;
-    var modifiedY = page.y;
-
-    var offset = interaction.modifierOffsets.restrict;
-
-    // object is assumed to have
-    // x, y, width, height or
-    // left, top, right, bottom
-    if ('x' in restriction && 'y' in restriction) {
-      modifiedX = Math.max(Math.min(rect.x + rect.width - offset.right, page.x), rect.x + offset.left);
-      modifiedY = Math.max(Math.min(rect.y + rect.height - offset.bottom, page.y), rect.y + offset.top);
-    } else {
-      modifiedX = Math.max(Math.min(rect.right - offset.right, page.x), rect.left + offset.left);
-      modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top + offset.top);
-    }
-
-    status.dx = modifiedX - page.x;
-    status.dy = modifiedY - page.y;
-
-    status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-    status.locked = !!(status.dx || status.dy);
-
-    status.modifiedX = modifiedX;
-    status.modifiedY = modifiedY;
-  },
-
-  modifyCoords: function modifyCoords(_ref3) {
-    var page = _ref3.page,
-        client = _ref3.client,
-        status = _ref3.status,
-        phase = _ref3.phase,
-        options = _ref3.options;
-
-    var elementRect = options && options.elementRect;
-
-    if (options && options.enabled && !(phase === 'start' && elementRect && status.locked)) {
-
-      if (status.locked) {
-        page.x += status.dx;
-        page.y += status.dy;
-        client.x += status.dx;
-        client.y += status.dy;
-
-        return {
-          dx: status.dx,
-          dy: status.dy
-        };
-      }
-    }
-  },
-
-  getRestrictionRect: getRestrictionRect
+  }
 };
 
-function getRestrictionRect(value, interaction, page) {
-  if (utils.is.function(value)) {
-    return utils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
-  } else {
-    return utils.resolveRectLike(value, interaction.target, interaction.element);
-  }
-}
-
-modifiers.restrict = restrict;
-modifiers.names.push('restrict');
-
-defaultOptions.perAction.restrict = restrict.defaults;
-
-module.exports = restrict;
-
-},{"../defaultOptions":18,"../utils":43,"./base":23}],25:[function(require,module,exports){
+},{"../utils/extend":40,"../utils/is":45,"../utils/rect":50}],22:[function(_dereq_,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictEdges setting which sets min and
@@ -4560,132 +4362,154 @@ module.exports = restrict;
 //   },
 // });
 
-var modifiers = require('./base');
-var utils = require('../utils');
-var rectUtils = require('../utils/rect');
-var defaultOptions = require('../defaultOptions');
-var resize = require('../actions/resize');
+var extend = _dereq_('../utils/extend');
+var rectUtils = _dereq_('../utils/rect');
+var restrict = _dereq_('./restrict');
 
-var _require = require('./restrict'),
-    getRestrictionRect = _require.getRestrictionRect;
+var getRestrictionRect = restrict.getRestrictionRect;
 
 var noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
 var noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
 
-var restrictEdges = {
+function init(scope) {
+  var modifiers = scope.modifiers,
+      defaults = scope.defaults,
+      actions = scope.actions;
+  var resize = actions.resize;
+
+
+  modifiers.restrictEdges = module.exports;
+  modifiers.names.push('restrictEdges');
+
+  defaults.perAction.restrictEdges = module.exports.defaults;
+  resize.defaults.restrictEdges = module.exports.defaults;
+}
+
+function setOffset(_ref) {
+  var interaction = _ref.interaction,
+      options = _ref.options;
+
+  var startOffset = interaction.startOffset;
+  var offset = void 0;
+
+  if (options) {
+    var offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+
+    offset = rectUtils.rectToXY(offsetRect);
+  }
+
+  offset = offset || { x: 0, y: 0 };
+
+  return {
+    top: offset.y + startOffset.top,
+    left: offset.x + startOffset.left,
+    bottom: offset.y - startOffset.bottom,
+    right: offset.x - startOffset.right
+  };
+}
+
+function set(_ref2) {
+  var modifiedCoords = _ref2.modifiedCoords,
+      interaction = _ref2.interaction,
+      status = _ref2.status,
+      offset = _ref2.offset,
+      options = _ref2.options;
+
+  var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
+
+  if (!interaction.interacting() || !edges) {
+    return;
+  }
+
+  var page = extend({}, modifiedCoords);
+  var inner = getRestrictionRect(options.inner, interaction, page) || {};
+  var outer = getRestrictionRect(options.outer, interaction, page) || {};
+
+  fixRect(inner, noInner);
+  fixRect(outer, noOuter);
+
+  var modifiedX = page.x;
+  var modifiedY = page.y;
+
+  status.dx = 0;
+  status.dy = 0;
+  status.locked = false;
+
+  if (edges.top) {
+    modifiedY = Math.min(Math.max(outer.top + offset.top, page.y), inner.top + offset.top);
+  } else if (edges.bottom) {
+    modifiedY = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom);
+  }
+  if (edges.left) {
+    modifiedX = Math.min(Math.max(outer.left + offset.left, page.x), inner.left + offset.left);
+  } else if (edges.right) {
+    modifiedX = Math.max(Math.min(outer.right + offset.right, page.x), inner.right + offset.right);
+  }
+
+  status.dx = modifiedX - page.x;
+  status.dy = modifiedY - page.y;
+
+  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
+  status.locked = !!(status.dx || status.dy);
+
+  status.modifiedX = modifiedX;
+  status.modifiedY = modifiedY;
+}
+
+function modifyCoords(_ref3) {
+  var page = _ref3.page,
+      client = _ref3.client,
+      status = _ref3.status,
+      phase = _ref3.phase,
+      options = _ref3.options;
+
+  if (options && options.enabled && phase !== 'start') {
+
+    if (status.locked) {
+      page.x += status.dx;
+      page.y += status.dy;
+      client.x += status.dx;
+      client.y += status.dy;
+
+      return {
+        dx: status.dx,
+        dy: status.dy
+      };
+    }
+  }
+}
+
+function fixRect(rect, defaults) {
+  var _arr = ['top', 'left', 'bottom', 'right'];
+
+  for (var _i = 0; _i < _arr.length; _i++) {
+    var edge = _arr[_i];
+    if (!(edge in rect)) {
+      rect[edge] = defaults[edge];
+    }
+  }
+
+  return rect;
+}
+
+module.exports = {
+  init: init,
+  noInner: noInner,
+  noOuter: noOuter,
+  getRestrictionRect: getRestrictionRect,
+  setOffset: setOffset,
+  set: set,
+  modifyCoords: modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
-    min: null,
-    max: null,
+    inner: null,
+    outer: null,
     offset: null
-  },
-
-  setOffset: function setOffset(_ref) {
-    var interaction = _ref.interaction,
-        startOffset = _ref.startOffset,
-        options = _ref.options;
-
-    if (!options) {
-      return utils.extend({}, startOffset);
-    }
-
-    var offset = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
-
-    if (offset) {
-      return {
-        top: startOffset.top + offset.y,
-        left: startOffset.left + offset.x,
-        bottom: startOffset.bottom + offset.y,
-        right: startOffset.right + offset.x
-      };
-    }
-
-    return startOffset;
-  },
-
-  set: function set(_ref2) {
-    var modifiedCoords = _ref2.modifiedCoords,
-        interaction = _ref2.interaction,
-        status = _ref2.status,
-        offset = _ref2.offset,
-        options = _ref2.options;
-
-    var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
-
-    if (!interaction.interacting() || !edges) {
-      return;
-    }
-
-    var page = status.useStatusXY ? { x: status.x, y: status.y } : utils.extend({}, modifiedCoords);
-    var inner = rectUtils.xywhToTlbr(getRestrictionRect(options.inner, interaction, page)) || noInner;
-    var outer = rectUtils.xywhToTlbr(getRestrictionRect(options.outer, interaction, page)) || noOuter;
-
-    var modifiedX = page.x;
-    var modifiedY = page.y;
-
-    status.dx = 0;
-    status.dy = 0;
-    status.locked = false;
-
-    if (edges.top) {
-      modifiedY = Math.min(Math.max(outer.top + offset.top, page.y), inner.top + offset.top);
-    } else if (edges.bottom) {
-      modifiedY = Math.max(Math.min(outer.bottom - offset.bottom, page.y), inner.bottom - offset.bottom);
-    }
-    if (edges.left) {
-      modifiedX = Math.min(Math.max(outer.left + offset.left, page.x), inner.left + offset.left);
-    } else if (edges.right) {
-      modifiedX = Math.max(Math.min(outer.right - offset.right, page.x), inner.right - offset.right);
-    }
-
-    status.dx = modifiedX - page.x;
-    status.dy = modifiedY - page.y;
-
-    status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-    status.locked = !!(status.dx || status.dy);
-
-    status.modifiedX = modifiedX;
-    status.modifiedY = modifiedY;
-  },
-
-  modifyCoords: function modifyCoords(_ref3) {
-    var page = _ref3.page,
-        client = _ref3.client,
-        status = _ref3.status,
-        phase = _ref3.phase,
-        options = _ref3.options;
-
-    if (options && options.enabled && !(phase === 'start' && status.locked)) {
-
-      if (status.locked) {
-        page.x += status.dx;
-        page.y += status.dy;
-        client.x += status.dx;
-        client.y += status.dy;
-
-        return {
-          dx: status.dx,
-          dy: status.dy
-        };
-      }
-    }
-  },
-
-  noInner: noInner,
-  noOuter: noOuter,
-  getRestrictionRect: getRestrictionRect
+  }
 };
 
-modifiers.restrictEdges = restrictEdges;
-modifiers.names.push('restrictEdges');
-
-defaultOptions.perAction.restrictEdges = restrictEdges.defaults;
-resize.defaults.restrictEdges = restrictEdges.defaults;
-
-module.exports = restrictEdges;
-
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrict":24}],26:[function(require,module,exports){
+},{"../utils/extend":40,"../utils/rect":50,"./restrict":21}],23:[function(_dereq_,module,exports){
 'use strict';
 
 // This module adds the options.resize.restrictSize setting which sets min and
@@ -4699,415 +4523,186 @@ module.exports = restrictEdges;
 //   },
 // });
 
-var modifiers = require('./base');
-var restrictEdges = require('./restrictEdges');
-var utils = require('../utils');
-var rectUtils = require('../utils/rect');
-var defaultOptions = require('../defaultOptions');
-var resize = require('../actions/resize');
+var extend = _dereq_('../utils/extend');
+var rectUtils = _dereq_('../utils/rect');
+var restrictEdges = _dereq_('./restrictEdges');
 
 var noMin = { width: -Infinity, height: -Infinity };
 var noMax = { width: +Infinity, height: +Infinity };
 
-var restrictSize = {
+function init(scope) {
+  var actions = scope.actions,
+      modifiers = scope.modifiers,
+      defaults = scope.defaults;
+  var resize = actions.resize;
+
+
+  modifiers.restrictSize = module.exports;
+  modifiers.names.push('restrictSize');
+
+  defaults.perAction.restrictSize = module.exports.defaults;
+  resize.defaults.restrictSize = module.exports.defaults;
+}
+
+function setOffset(_ref) {
+  var interaction = _ref.interaction;
+
+  return restrictEdges.setOffset({ interaction: interaction });
+}
+
+function set(arg) {
+  var interaction = arg.interaction,
+      options = arg.options;
+
+  var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
+
+  if (!interaction.interacting() || !edges) {
+    return;
+  }
+
+  var rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted);
+
+  var minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin;
+  var maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax;
+
+  arg.options = {
+    enabled: options.enabled,
+    endOnly: options.endOnly,
+    inner: extend({}, restrictEdges.noInner),
+    outer: extend({}, restrictEdges.noOuter)
+  };
+
+  if (edges.top) {
+    arg.options.inner.top = rect.bottom - minSize.height;
+    arg.options.outer.top = rect.bottom - maxSize.height;
+  } else if (edges.bottom) {
+    arg.options.inner.bottom = rect.top + minSize.height;
+    arg.options.outer.bottom = rect.top + maxSize.height;
+  }
+  if (edges.left) {
+    arg.options.inner.left = rect.right - minSize.width;
+    arg.options.outer.left = rect.right - maxSize.width;
+  } else if (edges.right) {
+    arg.options.inner.right = rect.left + minSize.width;
+    arg.options.outer.right = rect.left + maxSize.width;
+  }
+
+  restrictEdges.set(arg);
+}
+
+module.exports = {
+  init: init,
+  setOffset: setOffset,
+  set: set,
+  modifyCoords: restrictEdges.modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
     min: null,
     max: null
-  },
-
-  setOffset: function setOffset(_ref) {
-    var interaction = _ref.interaction;
-
-    return interaction.startOffset;
-  },
-
-  set: function set(arg) {
-    var interaction = arg.interaction,
-        options = arg.options;
-
-    var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
-
-    if (!interaction.interacting() || !edges) {
-      return;
-    }
-
-    var rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted);
-
-    var minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin;
-    var maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax;
-
-    arg.options = {
-      enabled: options.enabled,
-      endOnly: options.endOnly,
-      inner: utils.extend({}, restrictEdges.noInner),
-      outer: utils.extend({}, restrictEdges.noOuter)
-    };
-
-    if (edges.top) {
-      arg.options.inner.top = rect.bottom - minSize.height;
-      arg.options.outer.top = rect.bottom - maxSize.height;
-    } else if (edges.bottom) {
-      arg.options.inner.bottom = rect.top + minSize.height;
-      arg.options.outer.bottom = rect.top + maxSize.height;
-    }
-    if (edges.left) {
-      arg.options.inner.left = rect.right - minSize.width;
-      arg.options.outer.left = rect.right - maxSize.width;
-    } else if (edges.right) {
-      arg.options.inner.right = rect.left + minSize.width;
-      arg.options.outer.right = rect.left + maxSize.width;
-    }
-
-    restrictEdges.set(arg);
-  },
-
-  modifyCoords: restrictEdges.modifyCoords
-};
-
-modifiers.restrictSize = restrictSize;
-modifiers.names.push('restrictSize');
-
-defaultOptions.perAction.restrictSize = restrictSize.defaults;
-resize.defaults.restrictSize = restrictSize.defaults;
-
-module.exports = restrictSize;
-
-},{"../actions/resize":10,"../defaultOptions":18,"../utils":43,"../utils/rect":50,"./base":23,"./restrictEdges":25}],27:[function(require,module,exports){
-'use strict';
-
-var modifiers = require('./base');
-var interact = require('../interact');
-var utils = require('../utils');
-var defaultOptions = require('../defaultOptions');
-
-var snap = {
-  defaults: {
-    enabled: false,
-    endOnly: false,
-    range: Infinity,
-    targets: null,
-    offsets: null,
-
-    relativePoints: null
-  },
-
-  setOffset: function setOffset(_ref) {
-    var interaction = _ref.interaction,
-        interactable = _ref.interactable,
-        element = _ref.element,
-        rect = _ref.rect,
-        startOffset = _ref.startOffset,
-        options = _ref.options;
-
-    var offsets = [];
-    var optionsOrigin = utils.rectToXY(utils.resolveRectLike(options.origin));
-    var origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
-    options = options || interactable.options[interaction.prepared.name].snap || {};
-
-    var snapOffset = void 0;
-
-    if (options.offset === 'startCoords') {
-      snapOffset = {
-        x: interaction.startCoords.page.x - origin.x,
-        y: interaction.startCoords.page.y - origin.y
-      };
-    } else {
-      var offsetRect = utils.resolveRectLike(options.offset, interactable, element, [interaction]);
-
-      snapOffset = utils.rectToXY(offsetRect) || { x: 0, y: 0 };
-    }
-
-    if (rect && options.relativePoints && options.relativePoints.length) {
-      for (var _i = 0; _i < options.relativePoints.length; _i++) {
-        var _ref3;
-
-        _ref3 = options.relativePoints[_i];
-        var _ref2 = _ref3;
-        var relativeX = _ref2.x;
-        var relativeY = _ref2.y;
-
-        offsets.push({
-          x: startOffset.left - rect.width * relativeX + snapOffset.x,
-          y: startOffset.top - rect.height * relativeY + snapOffset.y
-        });
-      }
-    } else {
-      offsets.push(snapOffset);
-    }
-
-    return offsets;
-  },
-
-  set: function set(_ref4) {
-    var interaction = _ref4.interaction,
-        modifiedCoords = _ref4.modifiedCoords,
-        status = _ref4.status,
-        options = _ref4.options,
-        offsets = _ref4.offset;
-
-    var targets = [];
-    var target = void 0;
-    var page = void 0;
-    var i = void 0;
-
-    if (status.useStatusXY) {
-      page = { x: status.x, y: status.y };
-    } else {
-      var origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
-
-      page = utils.extend({}, modifiedCoords);
-
-      page.x -= origin.x;
-      page.y -= origin.y;
-    }
-
-    status.realX = page.x;
-    status.realY = page.y;
-
-    var len = options.targets ? options.targets.length : 0;
-
-    for (var _i2 = 0; _i2 < offsets.length; _i2++) {
-      var _ref6;
-
-      _ref6 = offsets[_i2];
-      var _ref5 = _ref6;
-      var offsetX = _ref5.x;
-      var offsetY = _ref5.y;
-
-      var relativeX = page.x - offsetX;
-      var relativeY = page.y - offsetY;
-
-      for (var _i3 = 0; _i3 < options.targets.length; _i3++) {
-        var _ref7;
-
-        _ref7 = options.targets[_i3];
-        var snapTarget = _ref7;
-
-        if (utils.is.function(snapTarget)) {
-          target = snapTarget(relativeX, relativeY, interaction);
-        } else {
-          target = snapTarget;
-        }
-
-        if (!target) {
-          continue;
-        }
-
-        targets.push({
-          x: utils.is.number(target.x) ? target.x + offsetX : relativeX,
-          y: utils.is.number(target.y) ? target.y + offsetY : relativeY,
-
-          range: utils.is.number(target.range) ? target.range : options.range
-        });
-      }
-    }
-
-    var closest = {
-      target: null,
-      inRange: false,
-      distance: 0,
-      range: 0,
-      dx: 0,
-      dy: 0
-    };
-
-    for (i = 0, len = targets.length; i < len; i++) {
-      target = targets[i];
-
-      var range = target.range;
-      var dx = target.x - page.x;
-      var dy = target.y - page.y;
-      var distance = utils.hypot(dx, dy);
-      var inRange = distance <= range;
-
-      // Infinite targets count as being out of range
-      // compared to non infinite ones that are in range
-      if (range === Infinity && closest.inRange && closest.range !== Infinity) {
-        inRange = false;
-      }
-
-      if (!closest.target || (inRange
-      // is the closest target in range?
-      ? closest.inRange && range !== Infinity
-      // the pointer is relatively deeper in this target
-      ? distance / range < closest.distance / closest.range
-      // this target has Infinite range and the closest doesn't
-      : range === Infinity && closest.range !== Infinity ||
-      // OR this target is closer that the previous closest
-      distance < closest.distance :
-      // The other is not in range and the pointer is closer to this target
-      !closest.inRange && distance < closest.distance)) {
-
-        closest.target = target;
-        closest.distance = distance;
-        closest.range = range;
-        closest.inRange = inRange;
-        closest.dx = dx;
-        closest.dy = dy;
-
-        status.range = range;
-      }
-    }
-
-    var snapChanged = void 0;
-
-    if (closest.target) {
-      snapChanged = status.modifiedX !== closest.target.x || status.modifiedY !== closest.target.y;
-
-      status.modifiedX = closest.target.x;
-      status.modifiedY = closest.target.y;
-    } else {
-      snapChanged = true;
-
-      status.modifiedX = NaN;
-      status.modifiedY = NaN;
-    }
-
-    status.dx = closest.dx;
-    status.dy = closest.dy;
-
-    status.changed = snapChanged || closest.inRange && !status.locked;
-    status.locked = closest.inRange;
-  },
-
-  modifyCoords: function modifyCoords(_ref8) {
-    var page = _ref8.page,
-        client = _ref8.client,
-        status = _ref8.status,
-        phase = _ref8.phase,
-        options = _ref8.options;
-
-    var relativePoints = options && options.relativePoints;
-
-    if (options && options.enabled && !(phase === 'start' && relativePoints && relativePoints.length)) {
-
-      if (status.locked) {
-        page.x += status.dx;
-        page.y += status.dy;
-        client.x += status.dx;
-        client.y += status.dy;
-      }
-
-      return {
-        range: status.range,
-        locked: status.locked,
-        x: status.modifiedX,
-        y: status.modifiedY,
-        realX: status.realX,
-        realY: status.realY,
-        dx: status.dx,
-        dy: status.dy
-      };
-    }
   }
 };
 
-interact.createSnapGrid = function (grid) {
-  return function (x, y) {
-    var limits = grid.limits || {
-      left: -Infinity,
-      right: Infinity,
-      top: -Infinity,
-      bottom: Infinity
-    };
-    var offsetX = 0;
-    var offsetY = 0;
-
-    if (utils.is.object(grid.offset)) {
-      offsetX = grid.offset.x;
-      offsetY = grid.offset.y;
-    }
-
-    var gridx = Math.round((x - offsetX) / grid.x);
-    var gridy = Math.round((y - offsetY) / grid.y);
-
-    var newX = Math.max(limits.left, Math.min(limits.right, gridx * grid.x + offsetX));
-    var newY = Math.max(limits.top, Math.min(limits.bottom, gridy * grid.y + offsetY));
-
-    return {
-      x: newX,
-      y: newY,
-      range: grid.range
-    };
-  };
-};
-
-modifiers.snap = snap;
-modifiers.names.push('snap');
-
-defaultOptions.perAction.snap = snap.defaults;
-
-module.exports = snap;
-
-},{"../defaultOptions":18,"../interact":21,"../utils":43,"./base":23}],28:[function(require,module,exports){
+},{"../utils/extend":40,"../utils/rect":50,"./restrictEdges":22}],24:[function(_dereq_,module,exports){
 'use strict';
 
-// This module allows snapping of the size of targets during resize
-// interactions.
+var utils = _dereq_('../utils');
 
-var modifiers = require('./base');
-var snap = require('./snap');
-var defaultOptions = require('../defaultOptions');
-var resize = require('../actions/resize');
-var utils = require('../utils/');
+function init(scope) {
+  var modifiers = scope.modifiers,
+      defaults = scope.defaults;
 
-var snapSize = {
-  defaults: {
-    enabled: false,
-    endOnly: false,
-    range: Infinity,
-    targets: null,
-    offsets: null
-  },
 
-  setOffset: function setOffset(arg) {
-    var interaction = arg.interaction,
-        options = arg.options;
+  modifiers.snap = module.exports;
+  modifiers.names.push('snap');
 
-    var edges = interaction.prepared.edges;
+  defaults.perAction.snap = module.exports.defaults;
+}
 
-    if (!edges) {
-      return;
-    }
+function setOffset(_ref) {
+  var interaction = _ref.interaction,
+      interactable = _ref.interactable,
+      element = _ref.element,
+      rect = _ref.rect,
+      startOffset = _ref.startOffset,
+      options = _ref.options;
 
-    arg.options = {
-      relativePoints: [{
-        x: edges.left ? 0 : 1,
-        y: edges.top ? 0 : 1
-      }],
-      origin: { x: 0, y: 0 },
-      offset: 'self',
-      range: options.range
+  var offsets = [];
+  var optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin));
+  var origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+  options = options || interactable.options[interaction.prepared.name].snap || {};
+
+  var snapOffset = void 0;
+
+  if (options.offset === 'startCoords') {
+    snapOffset = {
+      x: interaction.startCoords.page.x - origin.x,
+      y: interaction.startCoords.page.y - origin.y
     };
+  } else {
+    var offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
 
-    var offsets = snap.setOffset(arg);
-    arg.options = options;
+    snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 };
+  }
 
-    return offsets;
-  },
+  if (rect && options.relativePoints && options.relativePoints.length) {
+    for (var _i = 0; _i < (options.relativePoints || []).length; _i++) {
+      var _ref3;
 
-  set: function set(arg) {
-    var interaction = arg.interaction,
-        options = arg.options,
-        offset = arg.offset,
-        modifiedCoords = arg.modifiedCoords;
+      _ref3 = (options.relativePoints || [])[_i];
+      var _ref2 = _ref3;
+      var relativeX = _ref2.x;
+      var relativeY = _ref2.y;
 
-    var page = utils.extend({}, modifiedCoords);
-    var relativeX = page.x - offset[0].x;
-    var relativeY = page.y - offset[0].y;
+      offsets.push({
+        x: startOffset.left - rect.width * relativeX + snapOffset.x,
+        y: startOffset.top - rect.height * relativeY + snapOffset.y
+      });
+    }
+  } else {
+    offsets.push(snapOffset);
+  }
 
-    arg.options = utils.extend({}, options);
-    arg.options.targets = [];
+  return offsets;
+}
 
-    for (var _i = 0; _i < options.targets.length; _i++) {
-      var _ref;
+function set(_ref4) {
+  var interaction = _ref4.interaction,
+      modifiedCoords = _ref4.modifiedCoords,
+      status = _ref4.status,
+      options = _ref4.options,
+      offsets = _ref4.offset;
 
-      _ref = options.targets[_i];
-      var snapTarget = _ref;
+  var origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
+  var page = utils.extend({}, modifiedCoords);
+  var targets = [];
+  var target = void 0;
+  var i = void 0;
 
-      var target = void 0;
+  page.x -= origin.x;
+  page.y -= origin.y;
+
+  status.realX = page.x;
+  status.realY = page.y;
+
+  var len = options.targets ? options.targets.length : 0;
+
+  for (var _i2 = 0; _i2 < offsets.length; _i2++) {
+    var _ref6;
+
+    _ref6 = offsets[_i2];
+    var _ref5 = _ref6;
+    var offsetX = _ref5.x;
+    var offsetY = _ref5.y;
+
+    var relativeX = page.x - offsetX;
+    var relativeY = page.y - offsetY;
+
+    for (var _i3 = 0; _i3 < options.targets.length; _i3++) {
+      var _ref7;
+
+      _ref7 = options.targets[_i3];
+      var snapTarget = _ref7;
 
       if (utils.is.function(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction);
@@ -5119,43 +4714,252 @@ var snapSize = {
         continue;
       }
 
-      if ('width' in target && 'height' in target) {
-        target.x = target.width;
-        target.y = target.height;
-      }
+      targets.push({
+        x: utils.is.number(target.x) ? target.x + offsetX : relativeX,
+        y: utils.is.number(target.y) ? target.y + offsetY : relativeY,
 
-      arg.options.targets.push(target);
+        range: utils.is.number(target.range) ? target.range : options.range
+      });
+    }
+  }
+
+  var closest = {
+    target: null,
+    inRange: false,
+    distance: 0,
+    range: 0,
+    dx: 0,
+    dy: 0
+  };
+
+  for (i = 0, len = targets.length; i < len; i++) {
+    target = targets[i];
+
+    var range = target.range;
+    var dx = target.x - page.x;
+    var dy = target.y - page.y;
+    var distance = utils.hypot(dx, dy);
+    var inRange = distance <= range;
+
+    // Infinite targets count as being out of range
+    // compared to non infinite ones that are in range
+    if (range === Infinity && closest.inRange && closest.range !== Infinity) {
+      inRange = false;
     }
 
-    snap.set(arg);
-  },
+    if (!closest.target || (inRange
+    // is the closest target in range?
+    ? closest.inRange && range !== Infinity
+    // the pointer is relatively deeper in this target
+    ? distance / range < closest.distance / closest.range
+    // this target has Infinite range and the closest doesn't
+    : range === Infinity && closest.range !== Infinity ||
+    // OR this target is closer that the previous closest
+    distance < closest.distance :
+    // The other is not in range and the pointer is closer to this target
+    !closest.inRange && distance < closest.distance)) {
 
-  modifyCoords: function modifyCoords(arg) {
-    var options = arg.options;
+      closest.target = target;
+      closest.distance = distance;
+      closest.range = range;
+      closest.inRange = inRange;
+      closest.dx = dx;
+      closest.dy = dy;
 
+      status.range = range;
+    }
+  }
 
-    arg.options = utils.extend({}, options);
-    arg.options.enabled = options.enabled;
-    arg.options.relativePoints = [null];
+  var snapChanged = void 0;
 
-    snap.modifyCoords(arg);
+  if (closest.target) {
+    snapChanged = status.modifiedX !== closest.target.x || status.modifiedY !== closest.target.y;
+
+    status.modifiedX = closest.target.x;
+    status.modifiedY = closest.target.y;
+  } else {
+    snapChanged = true;
+
+    status.modifiedX = NaN;
+    status.modifiedY = NaN;
+  }
+
+  status.dx = closest.dx;
+  status.dy = closest.dy;
+
+  status.changed = snapChanged || closest.inRange && !status.locked;
+  status.locked = closest.inRange;
+}
+
+function modifyCoords(_ref8) {
+  var page = _ref8.page,
+      client = _ref8.client,
+      status = _ref8.status,
+      phase = _ref8.phase,
+      options = _ref8.options;
+
+  var relativePoints = options && options.relativePoints;
+
+  if (options && options.enabled && !(phase === 'start' && relativePoints && relativePoints.length)) {
+
+    if (status.locked) {
+      page.x += status.dx;
+      page.y += status.dy;
+      client.x += status.dx;
+      client.y += status.dy;
+    }
+
+    return {
+      range: status.range,
+      locked: status.locked,
+      x: status.modifiedX,
+      y: status.modifiedY,
+      realX: status.realX,
+      realY: status.realY,
+      dx: status.dx,
+      dy: status.dy
+    };
+  }
+}
+
+module.exports = {
+  init: init,
+  setOffset: setOffset,
+  set: set,
+  modifyCoords: modifyCoords,
+  defaults: {
+    enabled: false,
+    endOnly: false,
+    range: Infinity,
+    targets: null,
+    offsets: null,
+
+    relativePoints: null
   }
 };
 
-modifiers.snapSize = snapSize;
-modifiers.names.push('snapSize');
+},{"../utils":43}],25:[function(_dereq_,module,exports){
+'use strict';
 
-defaultOptions.perAction.snapSize = snapSize.defaults;
-resize.defaults.snapSize = snapSize.defaults;
+// This module allows snapping of the size of targets during resize
+// interactions.
 
-module.exports = snapSize;
+var extend = _dereq_('../utils/extend');
+var is = _dereq_('../utils/is');
+var snap = _dereq_('./snap');
 
-},{"../actions/resize":10,"../defaultOptions":18,"../utils/":43,"./base":23,"./snap":27}],29:[function(require,module,exports){
+function init(scope) {
+  var modifiers = scope.modifiers,
+      defaults = scope.defaults,
+      actions = scope.actions;
+
+
+  modifiers.snapSize = module.exports;
+  modifiers.names.push('snapSize');
+
+  defaults.perAction.snapSize = module.exports.defaults;
+  actions.resize.defaults.snapSize = module.exports.defaults;
+}
+
+function setOffset(arg) {
+  var interaction = arg.interaction,
+      options = arg.options;
+
+  var edges = interaction.prepared.edges;
+
+  if (!edges) {
+    return;
+  }
+
+  arg.options = {
+    relativePoints: [{
+      x: edges.left ? 0 : 1,
+      y: edges.top ? 0 : 1
+    }],
+    origin: { x: 0, y: 0 },
+    offset: 'self',
+    range: options.range
+  };
+
+  var offsets = snap.setOffset(arg);
+  arg.options = options;
+
+  return offsets;
+}
+
+function set(arg) {
+  var interaction = arg.interaction,
+      options = arg.options,
+      offset = arg.offset,
+      modifiedCoords = arg.modifiedCoords;
+
+  var page = extend({}, modifiedCoords);
+  var relativeX = page.x - offset[0].x;
+  var relativeY = page.y - offset[0].y;
+
+  arg.options = extend({}, options);
+  arg.options.targets = [];
+
+  for (var _i = 0; _i < (options.targets || []).length; _i++) {
+    var _ref;
+
+    _ref = (options.targets || [])[_i];
+    var snapTarget = _ref;
+
+    var target = void 0;
+
+    if (is.function(snapTarget)) {
+      target = snapTarget(relativeX, relativeY, interaction);
+    } else {
+      target = snapTarget;
+    }
+
+    if (!target) {
+      continue;
+    }
+
+    if ('width' in target && 'height' in target) {
+      target.x = target.width;
+      target.y = target.height;
+    }
+
+    arg.options.targets.push(target);
+  }
+
+  snap.set(arg);
+}
+
+function modifyCoords(arg) {
+  var options = arg.options;
+
+
+  arg.options = extend({}, options);
+  arg.options.enabled = options.enabled;
+  arg.options.relativePoints = [null];
+
+  snap.modifyCoords(arg);
+}
+
+module.exports = {
+  init: init,
+  setOffset: setOffset,
+  set: set,
+  modifyCoords: modifyCoords,
+  defaults: {
+    enabled: false,
+    endOnly: false,
+    range: Infinity,
+    targets: null,
+    offsets: null
+  }
+};
+
+},{"../utils/extend":40,"../utils/is":45,"./snap":24}],26:[function(_dereq_,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var pointerUtils = require('../utils/pointerUtils');
+var pointerUtils = _dereq_('../utils/pointerUtils');
 
 module.exports = function () {
   /** */
@@ -5238,23 +5042,23 @@ module.exports = function () {
   return PointerEvent;
 }();
 
-},{"../utils/pointerUtils":48}],30:[function(require,module,exports){
+},{"../utils/pointerUtils":48}],27:[function(_dereq_,module,exports){
 'use strict';
 
-var PointerEvent = require('./PointerEvent');
-var Interaction = require('../Interaction');
-var utils = require('../utils');
-var defaults = require('../defaultOptions');
-var signals = require('../utils/Signals').new();
+var utils = _dereq_('../utils');
+var PointerEvent = _dereq_('./PointerEvent');
 
+var signals = utils.Signals.new();
 var simpleSignals = ['down', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'cancel'];
 
-var pointerEvents = {
+var pointerEvents = module.exports = {
+  init: init,
+  signals: signals,
   PointerEvent: PointerEvent,
   fire: fire,
   collectEventTargets: collectEventTargets,
-  signals: signals,
+  createSignalListener: createSignalListener,
   defaults: {
     holdDuration: 600,
     ignoreFrom: null,
@@ -5342,7 +5146,7 @@ function collectEventTargets(_ref) {
     return [];
   }
 
-  var path = utils.getPath(eventTarget);
+  var path = utils.dom.getPath(eventTarget);
   var signalArg = {
     interaction: interaction,
     pointer: pointer,
@@ -5374,164 +5178,184 @@ function collectEventTargets(_ref) {
   return signalArg.targets;
 }
 
-Interaction.signals.on('update-pointer-down', function (_ref3) {
-  var interaction = _ref3.interaction,
-      pointerIndex = _ref3.pointerIndex;
+function init(scope) {
+  var Interaction = scope.Interaction;
 
-  interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
-});
 
-Interaction.signals.on('remove-pointer', function (_ref4) {
-  var interaction = _ref4.interaction,
-      pointerIndex = _ref4.pointerIndex;
+  scope.pointerEvents = pointerEvents;
+  scope.defaults.pointerEvents = pointerEvents.defaults;
 
-  interaction.holdTimers.splice(pointerIndex, 1);
-});
+  Interaction.signals.on('new', function (interaction) {
+    interaction.prevTap = null; // the most recent tap event on this interaction
+    interaction.tapTime = 0; // time of the most recent tap event
+    interaction.holdTimers = []; // [{ duration, timeout }]
+  });
 
-Interaction.signals.on('move', function (_ref5) {
-  var interaction = _ref5.interaction,
-      pointer = _ref5.pointer,
-      event = _ref5.event,
-      eventTarget = _ref5.eventTarget,
-      duplicateMove = _ref5.duplicateMove;
+  Interaction.signals.on('update-pointer-down', function (_ref3) {
+    var interaction = _ref3.interaction,
+        pointerIndex = _ref3.pointerIndex;
 
-  var pointerIndex = interaction.getPointerIndex(pointer);
+    interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
+  });
 
-  if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
-    if (interaction.pointerIsDown) {
-      clearTimeout(interaction.holdTimers[pointerIndex].timeout);
-    }
+  Interaction.signals.on('remove-pointer', function (_ref4) {
+    var interaction = _ref4.interaction,
+        pointerIndex = _ref4.pointerIndex;
 
-    fire({
-      interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
-      type: 'move'
-    });
-  }
-});
+    interaction.holdTimers.splice(pointerIndex, 1);
+  });
 
-Interaction.signals.on('down', function (_ref6) {
-  var interaction = _ref6.interaction,
-      pointer = _ref6.pointer,
-      event = _ref6.event,
-      eventTarget = _ref6.eventTarget,
-      pointerIndex = _ref6.pointerIndex;
+  Interaction.signals.on('move', function (_ref5) {
+    var interaction = _ref5.interaction,
+        pointer = _ref5.pointer,
+        event = _ref5.event,
+        eventTarget = _ref5.eventTarget,
+        duplicateMove = _ref5.duplicateMove;
 
-  var timer = interaction.holdTimers[pointerIndex];
-  var path = utils.getPath(eventTarget);
-  var signalArg = {
-    interaction: interaction,
-    pointer: pointer,
-    event: event,
-    eventTarget: eventTarget,
-    type: 'hold',
-    targets: [],
-    path: path,
-    element: null
-  };
+    var pointerIndex = interaction.getPointerIndex(pointer);
 
-  for (var _i2 = 0; _i2 < path.length; _i2++) {
-    var _ref7;
+    if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
+      if (interaction.pointerIsDown) {
+        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+      }
 
-    _ref7 = path[_i2];
-    var element = _ref7;
-
-    signalArg.element = element;
-
-    signals.fire('collect-targets', signalArg);
-  }
-
-  if (!signalArg.targets.length) {
-    return;
-  }
-
-  var minDuration = Infinity;
-
-  for (var _i3 = 0; _i3 < signalArg.targets.length; _i3++) {
-    var _ref8;
-
-    _ref8 = signalArg.targets[_i3];
-    var target = _ref8;
-
-    var holdDuration = target.eventable.options.holdDuration;
-
-    if (holdDuration < minDuration) {
-      minDuration = holdDuration;
-    }
-  }
-
-  timer.duration = minDuration;
-  timer.timeout = setTimeout(function () {
-    fire({
-      interaction: interaction,
-      eventTarget: eventTarget,
-      pointer: pointer,
-      event: event,
-      type: 'hold'
-    });
-  }, minDuration);
-});
-
-Interaction.signals.on('up', function (_ref9) {
-  var interaction = _ref9.interaction,
-      pointer = _ref9.pointer,
-      event = _ref9.event,
-      eventTarget = _ref9.eventTarget;
-
-  if (!interaction.pointerWasMoved) {
-    fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: 'tap' });
-  }
-});
-
-var _arr = ['up', 'cancel'];
-for (var _i4 = 0; _i4 < _arr.length; _i4++) {
-  var signalName = _arr[_i4];
-  Interaction.signals.on(signalName, function (_ref11) {
-    var interaction = _ref11.interaction,
-        pointerIndex = _ref11.pointerIndex;
-
-    if (interaction.holdTimers[pointerIndex]) {
-      clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+      fire({
+        interaction: interaction, pointer: pointer, event: event, eventTarget: eventTarget,
+        type: 'move'
+      });
     }
   });
+
+  Interaction.signals.on('down', function (_ref6) {
+    var interaction = _ref6.interaction,
+        pointer = _ref6.pointer,
+        event = _ref6.event,
+        eventTarget = _ref6.eventTarget,
+        pointerIndex = _ref6.pointerIndex;
+
+    var timer = interaction.holdTimers[pointerIndex];
+    var path = utils.dom.getPath(eventTarget);
+    var signalArg = {
+      interaction: interaction,
+      pointer: pointer,
+      event: event,
+      eventTarget: eventTarget,
+      type: 'hold',
+      targets: [],
+      path: path,
+      element: null
+    };
+
+    for (var _i2 = 0; _i2 < path.length; _i2++) {
+      var _ref7;
+
+      _ref7 = path[_i2];
+      var element = _ref7;
+
+      signalArg.element = element;
+
+      signals.fire('collect-targets', signalArg);
+    }
+
+    if (!signalArg.targets.length) {
+      return;
+    }
+
+    var minDuration = Infinity;
+
+    for (var _i3 = 0; _i3 < signalArg.targets.length; _i3++) {
+      var _ref8;
+
+      _ref8 = signalArg.targets[_i3];
+      var target = _ref8;
+
+      var holdDuration = target.eventable.options.holdDuration;
+
+      if (holdDuration < minDuration) {
+        minDuration = holdDuration;
+      }
+    }
+
+    timer.duration = minDuration;
+    timer.timeout = setTimeout(function () {
+      fire({
+        interaction: interaction,
+        eventTarget: eventTarget,
+        pointer: pointer,
+        event: event,
+        type: 'hold'
+      });
+    }, minDuration);
+  });
+
+  Interaction.signals.on('up', function (_ref9) {
+    var interaction = _ref9.interaction,
+        pointer = _ref9.pointer,
+        event = _ref9.event,
+        eventTarget = _ref9.eventTarget;
+
+    if (!interaction.pointerWasMoved) {
+      fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: 'tap' });
+    }
+  });
+
+  var _arr = ['up', 'cancel'];
+  for (var _i4 = 0; _i4 < _arr.length; _i4++) {
+    var signalName = _arr[_i4];
+    Interaction.signals.on(signalName, function (_ref10) {
+      var interaction = _ref10.interaction,
+          pointerIndex = _ref10.pointerIndex;
+
+      if (interaction.holdTimers[pointerIndex]) {
+        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+      }
+    });
+  }
+
+  for (var i = 0; i < simpleSignals.length; i++) {
+    Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
+  }
 }
 
 function createSignalListener(type) {
-  return function (_ref10) {
-    var interaction = _ref10.interaction,
-        pointer = _ref10.pointer,
-        event = _ref10.event,
-        eventTarget = _ref10.eventTarget;
+  return function (_ref11) {
+    var interaction = _ref11.interaction,
+        pointer = _ref11.pointer,
+        event = _ref11.event,
+        eventTarget = _ref11.eventTarget;
 
     fire({ interaction: interaction, eventTarget: eventTarget, pointer: pointer, event: event, type: type });
   };
 }
 
-for (var i = 0; i < simpleSignals.length; i++) {
-  Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
-}
-
-Interaction.signals.on('new', function (interaction) {
-  interaction.prevTap = null; // the most recent tap event on this interaction
-  interaction.tapTime = 0; // time of the most recent tap event
-  interaction.holdTimers = []; // [{ duration, timeout }]
-});
-
-defaults.pointerEvents = pointerEvents.defaults;
-module.exports = pointerEvents;
-
-},{"../Interaction":5,"../defaultOptions":18,"../utils":43,"../utils/Signals":34,"./PointerEvent":29}],31:[function(require,module,exports){
+},{"../utils":43,"./PointerEvent":26}],28:[function(_dereq_,module,exports){
 'use strict';
 
-var pointerEvents = require('./base');
-var Interaction = require('../Interaction');
+var holdRepeat = {
+  init: init
+};
 
-pointerEvents.signals.on('new', onNew);
-pointerEvents.signals.on('fired', onFired);
+function init(scope) {
+  var pointerEvents = scope.pointerEvents,
+      Interaction = scope.Interaction;
 
-var _arr = ['move', 'up', 'cancel', 'endall'];
-for (var _i = 0; _i < _arr.length; _i++) {
-  var signal = _arr[_i];
-  Interaction.signals.on(signal, endHoldRepeat);
+
+  pointerEvents.signals.on('new', onNew);
+  pointerEvents.signals.on('fired', function (arg) {
+    return onFired(arg, pointerEvents);
+  });
+
+  var _arr = ['move', 'up', 'cancel', 'endall'];
+  for (var _i = 0; _i < _arr.length; _i++) {
+    var signal = _arr[_i];
+    Interaction.signals.on(signal, endHoldRepeat);
+  }
+
+  // don't repeat by default
+  pointerEvents.defaults.holdRepeatInterval = 0;
+  pointerEvents.types.push('holdrepeat');
+
+  pointerEvents.holdRepeat = holdRepeat;
 }
 
 function onNew(_ref) {
@@ -5544,7 +5368,7 @@ function onNew(_ref) {
   pointerEvent.count = (pointerEvent.count || 0) + 1;
 }
 
-function onFired(_ref2) {
+function onFired(_ref2, pointerEvents) {
   var interaction = _ref2.interaction,
       pointerEvent = _ref2.pointerEvent,
       eventTarget = _ref2.eventTarget,
@@ -5585,134 +5409,122 @@ function endHoldRepeat(_ref3) {
   }
 }
 
-// don't repeat by default
-pointerEvents.defaults.holdRepeatInterval = 0;
-pointerEvents.types.push('holdrepeat');
+module.exports = holdRepeat;
 
-module.exports = {
-  onNew: onNew,
-  onFired: onFired,
-  endHoldRepeat: endHoldRepeat
-};
-
-},{"../Interaction":5,"./base":30}],32:[function(require,module,exports){
+},{}],29:[function(_dereq_,module,exports){
 'use strict';
 
-var pointerEvents = require('./base');
-var Interactable = require('../Interactable');
-var is = require('../utils/is');
-var domUtils = require('../utils/domUtils');
-var scope = require('../scope');
-var extend = require('../utils/extend');
+var is = _dereq_('../utils/is');
+var extend = _dereq_('../utils/extend');
 
-var _require = require('../utils/arr'),
+var _require = _dereq_('../utils/arr'),
     merge = _require.merge;
 
-pointerEvents.signals.on('collect-targets', function (_ref) {
-  var targets = _ref.targets,
-      element = _ref.element,
-      type = _ref.type,
-      eventTarget = _ref.eventTarget;
+function init(scope) {
+  var pointerEvents = scope.pointerEvents,
+      Interactable = scope.Interactable;
 
-  function collectSelectors(interactable, selector) {
-    var eventable = interactable.events;
-    var options = eventable.options;
 
-    if (eventable[type] && is.element(element) && domUtils.matchesSelector(element, selector) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+  pointerEvents.signals.on('collect-targets', function (_ref) {
+    var targets = _ref.targets,
+        element = _ref.element,
+        type = _ref.type,
+        eventTarget = _ref.eventTarget;
 
-      targets.push({
-        element: element,
-        eventable: eventable,
-        props: { interactable: interactable }
-      });
-    }
-  }
+    scope.interactables.forEachMatch(element, function (interactable) {
+      var eventable = interactable.events;
+      var options = eventable.options;
 
-  var interactable = scope.interactables.get(element);
+      if (eventable[type] && is.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
-  if (interactable) {
-    var eventable = interactable.events;
-    var options = eventable.options;
+        targets.push({
+          element: element,
+          eventable: eventable,
+          props: { interactable: interactable }
+        });
+      }
+    });
+  });
 
-    if (eventable[type] && interactable.testIgnoreAllow(options, element, eventTarget)) {
-      targets.push({
-        element: element,
-        eventable: eventable,
-        props: { interactable: interactable }
-      });
-    }
-  }
+  Interactable.signals.on('new', function (_ref2) {
+    var interactable = _ref2.interactable;
 
-  scope.interactables.forEachSelector(collectSelectors, element);
-});
+    interactable.events.getRect = function (element) {
+      return interactable.getRect(element);
+    };
+  });
 
-Interactable.signals.on('new', function (_ref2) {
-  var interactable = _ref2.interactable;
+  Interactable.signals.on('set', function (_ref3) {
+    var interactable = _ref3.interactable,
+        options = _ref3.options;
 
-  interactable.events.getRect = function (element) {
-    return interactable.getRect(element);
+    extend(interactable.events.options, pointerEvents.defaults);
+    extend(interactable.events.options, options);
+  });
+
+  merge(Interactable.eventTypes, pointerEvents.types);
+
+  Interactable.prototype.pointerEvents = function (options) {
+    extend(this.events.options, options);
+
+    return this;
   };
-});
 
-Interactable.signals.on('set', function (_ref3) {
-  var interactable = _ref3.interactable,
-      options = _ref3.options;
+  var __backCompatOption = Interactable.prototype._backCompatOption;
 
-  extend(interactable.events.options, pointerEvents.defaults);
-  extend(interactable.events.options, options);
-});
+  Interactable.prototype._backCompatOption = function (optionName, newValue) {
+    var ret = __backCompatOption.call(this, optionName, newValue);
 
-merge(Interactable.eventTypes, pointerEvents.types);
+    if (ret === this) {
+      this.events.options[optionName] = newValue;
+    }
 
-Interactable.prototype.pointerEvents = function (options) {
-  extend(this.events.options, options);
+    return ret;
+  };
 
-  return this;
+  Interactable.settingsMethods.push('pointerEvents');
+}
+
+module.exports = {
+  init: init
 };
 
-var __backCompatOption = Interactable.prototype._backCompatOption;
-
-Interactable.prototype._backCompatOption = function (optionName, newValue) {
-  var ret = __backCompatOption.call(this, optionName, newValue);
-
-  if (ret === this) {
-    this.events.options[optionName] = newValue;
-  }
-
-  return ret;
-};
-
-Interactable.settingsMethods.push('pointerEvents');
-
-},{"../Interactable":4,"../scope":33,"../utils/arr":35,"../utils/domUtils":38,"../utils/extend":40,"../utils/is":45,"./base":30}],33:[function(require,module,exports){
+},{"../utils/arr":34,"../utils/extend":40,"../utils/is":45}],30:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = require('./utils');
-var events = require('./utils/events');
-var signals = require('./utils/Signals').new();
+var Eventable = _dereq_('./Eventable');
+var defaults = _dereq_('./defaultOptions');
+var utils = _dereq_('./utils');
+var browser = _dereq_('./utils/browser');
+var events = _dereq_('./utils/events');
+var Signals = _dereq_('./utils/Signals');
 
-var _require = require('./utils/window'),
+var _require = _dereq_('./utils/window'),
     getWindow = _require.getWindow;
 
 var scope = {
-  signals: signals,
+  Signals: Signals,
+  signals: new Signals(),
+  browser: browser,
   events: events,
   utils: utils,
+  defaults: defaults,
+  Eventable: Eventable,
 
   // main document
-  document: require('./utils/domObjects').document,
+  document: _dereq_('./utils/domObjects').document,
   // all documents being listened to
-  documents: [],
+  documents: [/* { doc, options } */],
 
-  addDocument: function addDocument(doc, win) {
+  addDocument: function addDocument(doc, options) {
     // do nothing if document is already known
-    if (utils.contains(scope.documents, doc)) {
+    if (scope.getDocIndex(doc) !== -1) {
       return false;
     }
 
-    win = win || getWindow(doc);
+    var win = getWindow(doc);
 
-    scope.documents.push(doc);
+    scope.documents.push({ doc: doc, options: options });
     events.documents.push(doc);
 
     // don't add an unload event for the main document
@@ -5721,30 +5533,386 @@ var scope = {
       events.add(win, 'unload', scope.onWindowUnload);
     }
 
-    signals.fire('add-document', { doc: doc, win: win });
+    scope.signals.fire('add-document', { doc: doc, win: win, scope: scope, options: options });
   },
+  removeDocument: function removeDocument(doc) {
+    var index = scope.getDocIndex(doc);
 
-  removeDocument: function removeDocument(doc, win) {
-    var index = scope.documents.indexOf(doc);
-
-    win = win || getWindow(doc);
+    var win = getWindow(doc);
+    var options = scope.documents[index].options;
 
     events.remove(win, 'unload', scope.onWindowUnload);
 
     scope.documents.splice(index, 1);
     events.documents.splice(index, 1);
 
-    signals.fire('remove-document', { win: win, doc: doc });
+    scope.signals.fire('remove-document', { doc: doc, win: win, scope: scope, options: options });
   },
+  onWindowUnload: function onWindowUnload(event) {
+    scope.removeDocument(event.target.document);
+  },
+  getDocIndex: function getDocIndex(doc) {
+    for (var i = 0; i < scope.documents.length; i++) {
+      if (scope.documents[i].doc === doc) {
+        return i;
+      }
+    }
 
-  onWindowUnload: function onWindowUnload() {
-    scope.removeDocument(this.document, this);
+    return -1;
   }
 };
 
 module.exports = scope;
 
-},{"./utils":43,"./utils/Signals":34,"./utils/domObjects":37,"./utils/events":39,"./utils/window":51}],34:[function(require,module,exports){
+},{"./Eventable":2,"./defaultOptions":15,"./utils":43,"./utils/Signals":33,"./utils/browser":35,"./utils/domObjects":37,"./utils/events":39,"./utils/window":53}],31:[function(_dereq_,module,exports){
+'use strict';
+
+function init(scope) {
+  var Interaction = scope.Interaction;
+
+
+  Interaction.signals.on('new', function (interaction) {
+    interaction.simulations = {};
+  });
+}
+
+module.exports = {
+  init: init
+};
+
+},{}],32:[function(_dereq_,module,exports){
+'use strict';
+
+var modifiers = _dereq_('../modifiers/base');
+var utils = _dereq_('../utils');
+var raf = _dereq_('../utils/raf');
+
+function init(scope) {
+  var Interaction = scope.Interaction,
+      defaults = scope.defaults;
+
+
+  Interaction.signals.on('new', function (interaction) {
+    interaction.simulations.inertia = {
+      active: false,
+      smoothEnd: false,
+      allowResume: false,
+
+      startEvent: null,
+      upCoords: {},
+
+      xe: 0, ye: 0,
+      sx: 0, sy: 0,
+
+      t0: 0,
+      vx0: 0, vys: 0,
+      duration: 0,
+
+      lambda_v0: 0,
+      one_ve_v0: 0,
+      i: null
+    };
+  });
+
+  Interaction.signals.on('up', function (arg) {
+    return release(arg, scope);
+  });
+  Interaction.signals.on('down', function (arg) {
+    return resume(arg, scope);
+  });
+  Interaction.signals.on('stop', function (arg) {
+    return stop(arg, scope);
+  });
+
+  defaults.perAction.inertia = {
+    enabled: false,
+    resistance: 10, // the lambda in exponential decay
+    minSpeed: 100, // target speed must be above this for inertia to start
+    endSpeed: 10, // the speed at which inertia is slow enough to stop
+    allowResume: true, // allow resuming an action in inertia phase
+    smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
+  };
+}
+
+function resume(_ref, scope) {
+  var interaction = _ref.interaction,
+      event = _ref.event,
+      pointer = _ref.pointer,
+      eventTarget = _ref.eventTarget;
+
+  var status = interaction.simulations.inertia;
+
+  // Check if the down event hits the current inertia target
+  if (status.active) {
+    var element = eventTarget;
+
+    // climb up the DOM tree from the event target
+    while (utils.is.element(element)) {
+
+      // if interaction element is the current inertia target element
+      if (element === interaction.element) {
+        // stop inertia
+        raf.cancel(status.i);
+        status.active = false;
+        interaction.simulation = null;
+
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer, event, eventTarget, true);
+        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
+
+        // fire appropriate signals
+        var signalArg = {
+          interaction: interaction,
+          iEvent: resumeEvent
+        };
+
+        scope.Interaction.signals.fire('action-resume', signalArg);
+
+        // fire a reume event
+        var resumeEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
+
+        interaction.target.fire(resumeEvent);
+        interaction.prevEvent = resumeEvent;
+        modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
+
+        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+        break;
+      }
+
+      element = utils.dom.parentNode(element);
+    }
+  }
+}
+
+function release(_ref2, scope) {
+  var interaction = _ref2.interaction,
+      event = _ref2.event;
+
+  var status = interaction.simulations.inertia;
+
+  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
+    return;
+  }
+
+  var options = getOptions(interaction);
+
+  var now = new Date().getTime();
+  var pointerSpeed = interaction.pointerDelta.client.speed;
+
+  var smoothEnd = false;
+  var modifierResult = void 0;
+
+  // check if inertia should be started
+  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
+
+  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
+
+  var modifierArg = {
+    interaction: interaction,
+    pageCoords: utils.extend({}, interaction.curCoords.page),
+    statuses: {},
+    preEnd: true,
+    requireEndOnly: true
+  };
+
+  // smoothEnd
+  if (inertiaPossible && !inertia) {
+    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+
+    if (modifierResult.shouldMove && modifierResult.locked) {
+      smoothEnd = true;
+    }
+  }
+
+  if (!(inertia || smoothEnd)) {
+    return;
+  }
+
+  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
+
+  interaction.pointers[0] = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+
+  status.t0 = now;
+
+  status.active = true;
+  status.allowResume = options.allowResume;
+  interaction.simulation = status;
+
+  interaction.target.fire(status.startEvent);
+
+  if (inertia) {
+    status.vx0 = interaction.pointerDelta.client.vx;
+    status.vy0 = interaction.pointerDelta.client.vy;
+    status.v0 = pointerSpeed;
+
+    calcInertia(interaction, status);
+
+    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
+
+    modifierArg.pageCoords.x += status.xe;
+    modifierArg.pageCoords.y += status.ye;
+
+    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+
+    status.modifiedXe += modifierResult.dx;
+    status.modifiedYe += modifierResult.dy;
+
+    status.i = raf.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.smoothEnd = true;
+    status.xe = modifierResult.dx;
+    status.ye = modifierResult.dy;
+
+    status.sx = status.sy = 0;
+
+    status.i = raf.request(function () {
+      return smothEndTick(interaction);
+    });
+  }
+}
+
+function stop(_ref3) {
+  var interaction = _ref3.interaction;
+
+  var status = interaction.simulations.inertia;
+
+  if (status.active) {
+    raf.cancel(status.i);
+    status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function calcInertia(interaction, status) {
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
+
+  status.x0 = interaction.prevEvent.pageX;
+  status.y0 = interaction.prevEvent.pageY;
+  status.t0 = status.startEvent.timeStamp / 1000;
+  status.sx = status.sy = 0;
+
+  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+  status.te = inertiaDur;
+
+  status.lambda_v0 = lambda / status.v0;
+  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
+}
+
+function inertiaTick(interaction) {
+  updateInertiaCoords(interaction);
+  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
+
+  var status = interaction.simulations.inertia;
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var t = new Date().getTime() / 1000 - status.t0;
+
+  if (t < status.te) {
+
+    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+
+    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
+      status.sx = status.xe * progress;
+      status.sy = status.ye * progress;
+    } else {
+      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
+
+      status.sx = quadPoint.x;
+      status.sy = quadPoint.y;
+    }
+
+    interaction.doMove();
+
+    status.i = raf.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.sx = status.modifiedXe;
+    status.sy = status.modifiedYe;
+
+    interaction.doMove();
+    interaction.end(status.startEvent);
+    status.active = false;
+    interaction.simulation = null;
+  }
+
+  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+}
+
+function smothEndTick(interaction) {
+  updateInertiaCoords(interaction);
+
+  var status = interaction.simulations.inertia;
+  var t = new Date().getTime() - status.t0;
+
+  var _getOptions = getOptions(interaction),
+      duration = _getOptions.smoothEndDuration;
+
+  if (t < duration) {
+    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
+    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
+
+    interaction.doMove();
+
+    status.i = raf.request(function () {
+      return smothEndTick(interaction);
+    });
+  } else {
+    status.sx = status.xe;
+    status.sy = status.ye;
+
+    interaction.doMove();
+    interaction.end(status.startEvent);
+
+    status.smoothEnd = status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function updateInertiaCoords(interaction) {
+  var status = interaction.simulations.inertia;
+
+  // return if inertia isn't running
+  if (!status.active) {
+    return;
+  }
+
+  var pageUp = status.upCoords.page;
+  var clientUp = status.upCoords.client;
+
+  utils.pointer.setCoords(interaction.curCoords, [{
+    pageX: pageUp.x + status.sx,
+    pageY: pageUp.y + status.sy,
+    clientX: clientUp.x + status.sx,
+    clientY: clientUp.y + status.sy
+  }]);
+}
+
+function getOptions(_ref4) {
+  var target = _ref4.target,
+      prepared = _ref4.prepared;
+
+  return target && target.options && prepared.name && target.options[prepared.name].inertia;
+}
+
+module.exports = {
+  init: init,
+  calcInertia: calcInertia,
+  inertiaTick: inertiaTick,
+  smothEndTick: smothEndTick,
+  updateInertiaCoords: updateInertiaCoords
+};
+
+},{"../modifiers/base":20,"../utils":43,"../utils/raf":49}],33:[function(_dereq_,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5793,7 +5961,7 @@ var Signals = function () {
       var listener = _ref;
 
       if (listener(arg, name) === false) {
-        return;
+        return false;
       }
     }
   };
@@ -5807,7 +5975,7 @@ Signals.new = function () {
 
 module.exports = Signals;
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(_dereq_,module,exports){
 "use strict";
 
 function contains(array, target) {
@@ -5827,19 +5995,24 @@ function merge(target, source) {
   return target;
 }
 
+function from(source) {
+  return module.exports.merge([], source);
+}
+
 module.exports = {
   contains: contains,
-  merge: merge
+  merge: merge,
+  from: from
 };
 
-},{}],36:[function(require,module,exports){
+},{}],35:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = require('./window'),
+var _require = _dereq_('./window'),
     window = _require.window;
 
-var is = require('./is');
-var domObjects = require('./domObjects');
+var is = _dereq_('./is');
+var domObjects = _dereq_('./domObjects');
 
 var Element = domObjects.Element;
 var navigator = window.navigator;
@@ -5850,6 +6023,8 @@ var browser = {
 
   // Does the browser support PointerEvents
   supportsPointerEvent: !!domObjects.PointerEvent,
+
+  isIOS: /iP(hone|od|ad)/.test(navigator.platform),
 
   // scrolling doesn't change the result of getClientRects on iOS 7
   isIOS7: /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion),
@@ -5885,11 +6060,28 @@ browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch &
 
 module.exports = browser;
 
-},{"./domObjects":37,"./is":45,"./window":51}],37:[function(require,module,exports){
+},{"./domObjects":37,"./is":45,"./window":53}],36:[function(_dereq_,module,exports){
+'use strict';
+
+var is = _dereq_('./is');
+
+module.exports = function clone(source) {
+  var dest = {};
+  for (var prop in source) {
+    if (is.plainObject(source[prop])) {
+      dest[prop] = clone(source[prop]);
+    } else {
+      dest[prop] = source[prop];
+    }
+  }
+  return dest;
+};
+
+},{"./is":45}],37:[function(_dereq_,module,exports){
 'use strict';
 
 var domObjects = {};
-var win = require('./window').window;
+var win = _dereq_('./window').window;
 
 function blank() {}
 
@@ -5907,13 +6099,13 @@ domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
 module.exports = domObjects;
 
-},{"./window":51}],38:[function(require,module,exports){
+},{"./window":53}],38:[function(_dereq_,module,exports){
 'use strict';
 
-var win = require('./window');
-var browser = require('./browser');
-var is = require('./is');
-var domObjects = require('./domObjects');
+var win = _dereq_('./window');
+var browser = _dereq_('./browser');
+var is = _dereq_('./is');
+var domObjects = _dereq_('./domObjects');
 
 var domUtils = {
   nodeContains: function nodeContains(parent, child) {
@@ -6139,18 +6331,18 @@ var domUtils = {
 
 module.exports = domUtils;
 
-},{"./browser":36,"./domObjects":37,"./is":45,"./window":51}],39:[function(require,module,exports){
+},{"./browser":35,"./domObjects":37,"./is":45,"./window":53}],39:[function(_dereq_,module,exports){
 'use strict';
 
-var is = require('./is');
-var domUtils = require('./domUtils');
-var pointerUtils = require('./pointerUtils');
-var pExtend = require('./pointerExtend');
+var is = _dereq_('./is');
+var domUtils = _dereq_('./domUtils');
+var pointerUtils = _dereq_('./pointerUtils');
+var pExtend = _dereq_('./pointerExtend');
 
-var _require = require('./window'),
+var _require = _dereq_('./window'),
     window = _require.window;
 
-var _require2 = require('./arr'),
+var _require2 = _dereq_('./arr'),
     contains = _require2.contains;
 
 var elements = [];
@@ -6233,7 +6425,7 @@ function remove(element, type, listener, optionalArg) {
     } else {
       for (var _i = 0; _i < len; _i++) {
         if (target.events[type][_i] === listener) {
-          element.removeEventListener('on' + type, listener, supportsOptions ? options : !!options.capture);
+          element.removeEventListener(type, listener, supportsOptions ? options : !!options.capture);
           target.events[type].splice(_i, 1);
 
           break;
@@ -6429,7 +6621,7 @@ module.exports = {
   _targets: targets
 };
 
-},{"./arr":35,"./domUtils":38,"./is":45,"./pointerExtend":47,"./pointerUtils":48,"./window":51}],40:[function(require,module,exports){
+},{"./arr":34,"./domUtils":38,"./is":45,"./pointerExtend":47,"./pointerUtils":48,"./window":53}],40:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function extend(dest, source) {
@@ -6439,10 +6631,10 @@ module.exports = function extend(dest, source) {
   return dest;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = require('./rect'),
+var _require = _dereq_('./rect'),
     resolveRectLike = _require.resolveRectLike,
     rectToXY = _require.rectToXY;
 
@@ -6456,18 +6648,17 @@ module.exports = function (target, element, action) {
   return rectToXY(originRect) || { x: 0, y: 0 };
 };
 
-},{"./rect":50}],42:[function(require,module,exports){
+},{"./rect":50}],42:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],43:[function(require,module,exports){
+},{}],43:[function(_dereq_,module,exports){
 'use strict';
 
-var extend = require('./extend');
-var win = require('./window');
+var win = _dereq_('./window');
 
 var utils = {
   warnOnce: function warnOnce(method, message) {
@@ -6510,33 +6701,28 @@ var utils = {
     return dest;
   },
 
-  is: require('./is'),
-  extend: extend,
-  hypot: require('./hypot'),
-  getOriginXY: require('./getOriginXY')
+  Signals: _dereq_('./Signals'),
+  arr: _dereq_('./arr'),
+  dom: _dereq_('./domUtils'),
+  extend: _dereq_('./extend'),
+  getOriginXY: _dereq_('./getOriginXY'),
+  hypot: _dereq_('./hypot'),
+  is: _dereq_('./is'),
+  pointer: _dereq_('./pointerUtils'),
+  rect: _dereq_('./rect')
 };
-
-extend(utils, require('./arr'));
-extend(utils, require('./domUtils'));
-extend(utils, require('./pointerUtils'));
-extend(utils, require('./rect'));
 
 module.exports = utils;
 
-},{"./arr":35,"./domUtils":38,"./extend":40,"./getOriginXY":41,"./hypot":42,"./is":45,"./pointerUtils":48,"./rect":50,"./window":51}],44:[function(require,module,exports){
+},{"./Signals":33,"./arr":34,"./domUtils":38,"./extend":40,"./getOriginXY":41,"./hypot":42,"./is":45,"./pointerUtils":48,"./rect":50,"./window":53}],44:[function(_dereq_,module,exports){
 'use strict';
 
-var scope = require('../scope');
-var utils = require('./index');
+var utils = _dereq_('./index');
 
 var finder = {
   methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
 
-  search: function search(pointer, eventType, eventTarget) {
-    var pointerType = utils.getPointerType(pointer);
-    var pointerId = utils.getPointerId(pointer);
-    var details = { pointer: pointer, pointerId: pointerId, pointerType: pointerType, eventType: eventType, eventTarget: eventTarget };
-
+  search: function search(details) {
     for (var _i = 0; _i < finder.methodOrder.length; _i++) {
       var _ref;
 
@@ -6555,7 +6741,8 @@ var finder = {
   simulationResume: function simulationResume(_ref2) {
     var pointerType = _ref2.pointerType,
         eventType = _ref2.eventType,
-        eventTarget = _ref2.eventTarget;
+        eventTarget = _ref2.eventTarget,
+        scope = _ref2.scope;
 
     if (!/down|start/i.test(eventType)) {
       return null;
@@ -6575,7 +6762,7 @@ var finder = {
           if (element === interaction.element) {
             return interaction;
           }
-          element = utils.parentNode(element);
+          element = utils.dom.parentNode(element);
         }
       }
     }
@@ -6587,7 +6774,8 @@ var finder = {
   mouseOrPen: function mouseOrPen(_ref4) {
     var pointerId = _ref4.pointerId,
         pointerType = _ref4.pointerType,
-        eventType = _ref4.eventType;
+        eventType = _ref4.eventType,
+        scope = _ref4.scope;
 
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null;
@@ -6603,7 +6791,7 @@ var finder = {
 
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !utils.contains(interaction.pointerIds, pointerId)) {
+        if (interaction.simulation && !utils.arr.contains(interaction.pointerIds, pointerId)) {
           continue;
         }
 
@@ -6643,7 +6831,8 @@ var finder = {
 
   // get interaction that has this pointer
   hasPointer: function hasPointer(_ref7) {
-    var pointerId = _ref7.pointerId;
+    var pointerId = _ref7.pointerId,
+        scope = _ref7.scope;
 
     for (var _i5 = 0; _i5 < scope.interactions.length; _i5++) {
       var _ref8;
@@ -6651,7 +6840,7 @@ var finder = {
       _ref8 = scope.interactions[_i5];
       var interaction = _ref8;
 
-      if (utils.contains(interaction.pointerIds, pointerId)) {
+      if (utils.arr.contains(interaction.pointerIds, pointerId)) {
         return interaction;
       }
     }
@@ -6659,7 +6848,8 @@ var finder = {
 
   // get first idle interaction with a matching pointerType
   idle: function idle(_ref9) {
-    var pointerType = _ref9.pointerType;
+    var pointerType = _ref9.pointerType,
+        scope = _ref9.scope;
 
     for (var _i6 = 0; _i6 < scope.interactions.length; _i6++) {
       var _ref10;
@@ -6692,13 +6882,13 @@ var finder = {
 
 module.exports = finder;
 
-},{"../scope":33,"./index":43}],45:[function(require,module,exports){
+},{"./index":43}],45:[function(_dereq_,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var win = require('./window');
-var isWindow = require('./isWindow');
+var win = _dereq_('./window');
+var isWindow = _dereq_('./isWindow');
 
 var is = {
   array: function array() {},
@@ -6741,6 +6931,10 @@ var is = {
     return (/object|function/.test(_typeof(_window.Element)) ? thing instanceof _window.Element //DOM2
       : thing.nodeType === 1 && typeof thing.nodeName === 'string'
     );
+  },
+
+  plainObject: function plainObject(thing) {
+    return is.object(thing) && thing.constructor.name === 'Object';
   }
 };
 
@@ -6750,14 +6944,14 @@ is.array = function (thing) {
 
 module.exports = is;
 
-},{"./isWindow":46,"./window":51}],46:[function(require,module,exports){
+},{"./isWindow":46,"./window":53}],46:[function(_dereq_,module,exports){
 "use strict";
 
 module.exports = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],47:[function(require,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 'use strict';
 
 function pointerExtend(dest, source) {
@@ -6786,16 +6980,16 @@ pointerExtend.prefixedPropREs = {
 
 module.exports = pointerExtend;
 
-},{}],48:[function(require,module,exports){
+},{}],48:[function(_dereq_,module,exports){
 'use strict';
 
-var hypot = require('./hypot');
-var browser = require('./browser');
-var dom = require('./domObjects');
-var domUtils = require('./domUtils');
-var domObjects = require('./domObjects');
-var is = require('./is');
-var pointerExtend = require('./pointerExtend');
+var hypot = _dereq_('./hypot');
+var browser = _dereq_('./browser');
+var dom = _dereq_('./domObjects');
+var domUtils = _dereq_('./domUtils');
+var domObjects = _dereq_('./domObjects');
+var is = _dereq_('./is');
+var pointerExtend = _dereq_('./pointerExtend');
 
 var pointerUtils = {
   copyCoords: function copyCoords(dest, src) {
@@ -7009,53 +7203,59 @@ var pointerUtils = {
 
 module.exports = pointerUtils;
 
-},{"./browser":36,"./domObjects":37,"./domUtils":38,"./hypot":42,"./is":45,"./pointerExtend":47}],49:[function(require,module,exports){
+},{"./browser":35,"./domObjects":37,"./domUtils":38,"./hypot":42,"./is":45,"./pointerExtend":47}],49:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = require('./window'),
+var _require = _dereq_('./window'),
     window = _require.window;
 
-var vendors = ['ms', 'moz', 'webkit', 'o'];
 var lastTime = 0;
-var request = void 0;
-var cancel = void 0;
+var _request = window.requestAnimationFrame;
+var _cancel = window.cancelAnimationFrame;
 
-for (var x = 0; x < vendors.length && !window.requestAnimationFrame; x++) {
-  request = window[vendors[x] + 'RequestAnimationFrame'];
-  cancel = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+if (!_request) {
+  var vendors = ['ms', 'moz', 'webkit', 'o'];
+
+  for (var _i = 0; _i < vendors.length; _i++) {
+    var vendor = vendors[_i];
+    _request = window[vendor + 'RequestAnimationFrame'];
+    _cancel = window[vendor + 'CancelAnimationFrame'] || window[vendor + 'CancelRequestAnimationFrame'];
+  }
 }
 
-if (!request) {
-  request = function request(callback) {
+if (!_request) {
+  _request = function request(callback) {
     var currTime = new Date().getTime();
     var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var id = setTimeout(function () {
+    var token = setTimeout(function () {
       callback(currTime + timeToCall);
     }, timeToCall);
 
     lastTime = currTime + timeToCall;
-    return id;
+    return token;
   };
-}
 
-if (!cancel) {
-  cancel = function cancel(id) {
-    clearTimeout(id);
+  _cancel = function cancel(token) {
+    return clearTimeout(token);
   };
 }
 
 module.exports = {
-  request: request,
-  cancel: cancel
+  request: function request(callback) {
+    return _request(callback);
+  },
+  cancel: function cancel(token) {
+    return _cancel(token);
+  }
 };
 
-},{"./window":51}],50:[function(require,module,exports){
+},{"./window":53}],50:[function(_dereq_,module,exports){
 'use strict';
 
-var extend = require('./extend');
-var is = require('./is');
+var extend = _dereq_('./extend');
+var is = _dereq_('./is');
 
-var _require = require('./domUtils'),
+var _require = _dereq_('./domUtils'),
     closest = _require.closest,
     parentNode = _require.parentNode,
     getElementRect = _require.getElementRect;
@@ -7127,11 +7327,60 @@ var rectUtils = {
 
 module.exports = rectUtils;
 
-},{"./domUtils":38,"./extend":40,"./is":45}],51:[function(require,module,exports){
+},{"./domUtils":38,"./extend":40,"./is":45}],51:[function(_dereq_,module,exports){
+'use strict';
+
+var is = _dereq_('../is');
+
+module.exports = function (grid) {
+  return function (x, y) {
+    var gridX = grid.x,
+        gridY = grid.y,
+        range = grid.range,
+        offset = grid.offset,
+        _grid$limits = grid.limits,
+        limits = _grid$limits === undefined ? {
+      left: -Infinity,
+      right: Infinity,
+      top: -Infinity,
+      bottom: Infinity
+    } : _grid$limits;
+
+
+    var offsetX = 0;
+    var offsetY = 0;
+
+    if (is.object(offset)) {
+      offsetX = offset.x;
+      offsetY = offset.y;
+    }
+
+    var gridx = Math.round((x - offsetX) / gridX);
+    var gridy = Math.round((y - offsetY) / gridY);
+
+    var newX = Math.max(limits.left, Math.min(limits.right, gridx * gridX + offsetX));
+    var newY = Math.max(limits.top, Math.min(limits.bottom, gridy * gridY + offsetY));
+
+    return {
+      x: newX,
+      y: newY,
+      range: range
+    };
+  };
+};
+
+},{"../is":45}],52:[function(_dereq_,module,exports){
+'use strict';
+
+module.exports = {
+  grid: _dereq_('./grid')
+};
+
+},{"./grid":51}],53:[function(_dereq_,module,exports){
 'use strict';
 
 var win = module.exports;
-var isWindow = require('./isWindow');
+var isWindow = _dereq_('./isWindow');
 
 function init(window) {
   // get wrapped window if using Shadow DOM polyfill
@@ -7164,7 +7413,7 @@ win.getWindow = function getWindow(node) {
 
   var rootNode = node.ownerDocument || node;
 
-  return rootNode.defaultView || rootNode.parentWindow || win.window;
+  return rootNode.defaultView || win.window;
 };
 
 win.init = init;

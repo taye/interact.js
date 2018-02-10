@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.4.0-alpha",
+  "version": "1.4.0-alpha.0+sha.33d59dd",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
