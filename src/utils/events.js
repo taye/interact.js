@@ -85,7 +85,7 @@ function remove (element, type, listener, optionalArg) {
     else {
       for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element.removeEventListener(`on${type}`, listener, supportsOptions? options : !!options.capture);
+          element.removeEventListener(type, listener, supportsOptions? options : !!options.capture);
           target.events[type].splice(i, 1);
 
           break;

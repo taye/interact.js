@@ -20,6 +20,7 @@ require('./pointerEvents/holdRepeat');
 //require('./modifiers/snap');
 //require('./modifiers/restrict');
 require('./modifiers/restrictSize');
+require('./modifiers/restrictEdges');
 
 // autoStart hold
 require('./autoStart/hold');

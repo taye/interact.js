@@ -155,12 +155,12 @@ function newInteraction (options, scope) {
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { delegatedEvents, eventMap } = scope.Interaction;
+  const { eventMap } = scope.Interaction;
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
 
   // delegate event listener
-  for (const eventType in delegatedEvents) {
+  for (const eventType in events.delegatedEvents) {
     eventMethod(doc, eventType, events.delegateListener);
     eventMethod(doc, eventType, events.delegateUseCapture, true);
   }
