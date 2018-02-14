@@ -85,7 +85,7 @@ push_and_publish() {
   # push branch and tags to git origin
   git push --no-verify && git push --no-verify origin $NEW_TAG &&
 
-  if [[ $NEW_VERSION == "prerelease" ]]; then
+  if [[ $RELEASE_BRANCH == "unstable" ]]; then
     # publish to npm with "next" tag
     git tag --force next &&
       git push --no-verify -f origin next &&
