@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.0+sha.33d59dd
+ * interact.js v1.4.0-alpha.1+sha.63c5cd1
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5662,8 +5662,7 @@ function resume(_ref, scope) {
 
         // fire appropriate signals
         var signalArg = {
-          interaction: interaction,
-          iEvent: resumeEvent
+          interaction: interaction
         };
 
         scope.Interaction.signals.fire('action-resume', signalArg);
