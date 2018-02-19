@@ -68,7 +68,6 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
         // fire appropriate signals
         const signalArg = {
           interaction,
-          iEvent: resumeEvent,
         };
 
         scope.Interaction.signals.fire('action-resume', signalArg);
