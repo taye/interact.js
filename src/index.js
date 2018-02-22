@@ -19,8 +19,7 @@ interact.snappers = require('./utils/snappers');
 interact.createSnapGrid = interact.snappers.grid;
 
 // inertia
-interact.use(require('./simulations/base'));
-interact.use(require('./simulations/inertia'));
+interact.use(require('./inertia'));
 
 // pointerEvents
 interact.use(require('./pointerEvents/base'));
