@@ -143,10 +143,14 @@ class InteractEvent {
   }
 }
 
-signals.on('set-delta', function ({ iEvent, interaction, starting, deltaSource }) {
+signals.on('set-delta', function ({ iEvent, interaction, starting, ending, deltaSource }) {
   const prevEvent = starting? iEvent : interaction.prevEvent;
 
-  if (deltaSource === 'client') {
+  if (starting || ending) {
+    iEvent.dx = 0;
+    iEvent.dy = 0;
+  }
+  else if (deltaSource === 'client') {
     iEvent.dx = iEvent.clientX - prevEvent.clientX;
     iEvent.dy = iEvent.clientY - prevEvent.clientY;
   }
