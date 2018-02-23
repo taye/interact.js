@@ -17,7 +17,7 @@ require('./pointerEvents/holdRepeat');
 //require('./inertia');
 
 // modifiers
-//require('./modifiers/snap');
+require('./modifiers/snap');
 //require('./modifiers/restrict');
 require('./modifiers/restrictSize');
 require('./modifiers/restrictEdges');
