@@ -383,7 +383,7 @@ function init (scope) {
     interaction.resizeAxes = 'xy';
   });
 
-  InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action }) {
+  InteractEvent.signals.on('new', function ({ interaction, iEvent, action }) {
     if (action !== 'resize' || !interaction.resizeAxes) { return; }
 
     const options = interaction.target.options;

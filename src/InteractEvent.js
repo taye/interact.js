@@ -12,7 +12,7 @@ class InteractEvent {
     const starting    = phase === 'start';
     const ending      = phase === 'end';
     const coords      = starting? interaction.startCoords : interaction.curCoords;
-    const prevEvent   = interaction.prevEvent;
+    const prevEvent   = starting? this : interaction.prevEvent;
 
     element = element || interaction.element;
 
@@ -79,7 +79,18 @@ class InteractEvent {
     this.clientX0  = interaction.startCoords.client.x - origin.x;
     this.clientY0  = interaction.startCoords.client.y - origin.y;
 
-    signals.fire('set-delta', signalArg);
+    if (starting || ending) {
+      this.dx = 0;
+      this.dy = 0;
+    }
+    else if (deltaSource === 'client') {
+      this.dx = this.clientX - prevEvent.clientX;
+      this.dy = this.clientY - prevEvent.clientY;
+    }
+    else {
+      this.dx = this.pageX - prevEvent.pageX;
+      this.dy = this.pageY - prevEvent.pageY;
+    }
 
     this.timeStamp = coords.timeStamp;
     this.dt        = interaction.pointerDelta.timeStamp;
@@ -142,23 +153,6 @@ class InteractEvent {
     this.propagationStopped = true;
   }
 }
-
-signals.on('set-delta', function ({ iEvent, interaction, starting, ending, deltaSource }) {
-  const prevEvent = starting? iEvent : interaction.prevEvent;
-
-  if (starting || ending) {
-    iEvent.dx = 0;
-    iEvent.dy = 0;
-  }
-  else if (deltaSource === 'client') {
-    iEvent.dx = iEvent.clientX - prevEvent.clientX;
-    iEvent.dy = iEvent.clientY - prevEvent.clientY;
-  }
-  else {
-    iEvent.dx = iEvent.pageX - prevEvent.pageX;
-    iEvent.dy = iEvent.pageY - prevEvent.pageY;
-  }
-});
 
 InteractEvent.signals = signals;
 

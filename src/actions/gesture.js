@@ -99,7 +99,7 @@ function init (scope) {
     return this.options.gesture;
   };
 
-  InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action, event, starting, ending, deltaSource }) {
+  InteractEvent.signals.on('new', function ({ interaction, iEvent, action, event, starting, ending, deltaSource }) {
     if (action !== 'gesture') { return; }
 
     const pointers = interaction.pointers;
