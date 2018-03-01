@@ -2,7 +2,6 @@ const extend = require('../utils/extend');
 
 function init (scope) {
   const {
-    InteractEvent,
     Interaction,
   } = scope;
 
@@ -15,7 +14,7 @@ function init (scope) {
     interaction.modifierResult   = null;
   });
 
-  Interaction.signals.on('action-start' , arg =>
+  Interaction.signals.on('before-action-start' , arg =>
     start(arg, scope.modifiers, arg.interaction.startCoords.page));
 
   Interaction.signals.on('action-resume', arg => {
@@ -26,7 +25,8 @@ function init (scope) {
   Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
   Interaction.signals.on('before-action-end', arg => beforeEnd(arg, scope.modifiers));
 
-  InteractEvent.signals.on('set-xy', arg => setXY(arg, scope.modifiers));
+  Interaction.signals.on('before-action-start', arg => setCurCoords(arg, scope.modifiers));
+  Interaction.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
 }
 
 function setOffsets (arg, modifiers) {
@@ -113,6 +113,7 @@ function resetStatuses (statuses, modifiers) {
 
     status.dx = status.dy = 0;
     status.modifiedX = status.modifiedY = NaN;
+    status.realX = status.realY = NaN;
     status.locked = false;
     status.changed = true;
 
@@ -175,9 +176,12 @@ function beforeEnd ({ interaction, event, iEvent: endEvent }, modifiers) {
   }
 }
 
-function setXY (arg, modifiers) {
-  const { iEvent, interaction } = arg;
-  const modifierArg = extend({}, arg);
+function setCurCoords (arg, modifiers) {
+  const { interaction } = arg;
+  const modifierArg = extend({
+    page: interaction.curCoords.page,
+    client: interaction.curCoords.client,
+  }, arg);
 
   for (let i = 0; i < modifiers.names.length; i++) {
     const modifierName = modifiers.names[i];
@@ -191,7 +195,7 @@ function setXY (arg, modifiers) {
 
     modifierArg.status = interaction.modifierStatuses[modifierName];
 
-    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+    modifier.modifyCoords(modifierArg);
   }
 }
 

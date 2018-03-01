@@ -58,8 +58,6 @@ class InteractEvent {
       iEvent: this,
     };
 
-    signals.fire('set-xy', signalArg);
-
     if (ending) {
       // use previous coords when ending
       this.pageX = prevEvent.pageX;

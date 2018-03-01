@@ -120,12 +120,21 @@ class Interaction {
     this.element        = element;
 
     this._interacting = true;
-    const startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
     const signalArg = {
       interaction: this,
       event: this.downEvent,
-      iEvent: startEvent,
+      phase: 'start',
+      iEvent: null,
     };
+
+    const beforeStartResult = this._signals.fire('before-action-start', signalArg);
+
+    if (beforeStartResult === false) {
+      return;
+    }
+
+    const startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
+    signalArg.iEvent = startEvent;
 
     this._signals.fire('action-start', signalArg);
 
@@ -211,20 +220,23 @@ class Interaction {
       event: this.prevEvent,
       eventTarget: this._eventTarget,
       interaction: this,
+      phase: 'move',
     }, signalArg || {});
 
     const beforeMoveResult = this._signals.fire('before-action-move', signalArg);
 
-    if (beforeMoveResult !== false) {
-      const moveEvent = signalArg.iEvent =
-        this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
-
-      this._signals.fire('action-move', signalArg);
-
-      this._fireEvent(moveEvent);
-
-      this._signals.fire('after-action-move', signalArg);
+    if (beforeMoveResult === false) {
+      return;
     }
+
+    const moveEvent = signalArg.iEvent =
+      this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
+
+    this._signals.fire('action-move', signalArg);
+
+    this._fireEvent(moveEvent);
+
+    this._signals.fire('after-action-move', signalArg);
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
