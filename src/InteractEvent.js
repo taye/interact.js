@@ -6,24 +6,31 @@ const signals     = require('./utils/Signals').new();
 class InteractEvent {
   /** */
   constructor (interaction, event, action, phase, element, related, preEnd = false) {
+    element = element || interaction.element;
+
     const target      = interaction.target;
     const deltaSource = (target && target.options || defaults).deltaSource;
     const origin      = getOriginXY(target, element, action);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
-    const coords      = starting? interaction.startCoords : interaction.curCoords;
     const prevEvent   = starting? this : interaction.prevEvent;
+    const coords      = starting
+      ? interaction.startCoords
+      : ending
+        ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.curCoords.timeStamp }
+        : interaction.curCoords;
 
-    element = element || interaction.element;
+    this.page      = extend({}, coords.page);
+    this.client    = extend({}, coords.client);
+    this.timeStamp = coords.timeStamp;
 
-    const page   = extend({}, coords.page);
-    const client = extend({}, coords.client);
+    if (!ending) {
+      this.page.x -= origin.x;
+      this.page.y -= origin.y;
 
-    page.x -= origin.x;
-    page.y -= origin.y;
-
-    client.x -= origin.x;
-    client.y -= origin.y;
+      this.client.x -= origin.x;
+      this.client.y -= origin.y;
+    }
 
     this.ctrlKey       = event.ctrlKey;
     this.altKey        = event.altKey;
@@ -42,67 +49,64 @@ class InteractEvent {
     this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1]
                        : prevEvent.t0;
 
-    const signalArg = {
-      interaction,
-      event,
-      action,
-      phase,
-      element,
-      related,
-      page,
-      client,
-      coords,
-      starting,
-      ending,
-      deltaSource,
-      iEvent: this,
-    };
-
-    if (ending) {
-      // use previous coords when ending
-      this.pageX = prevEvent.pageX;
-      this.pageY = prevEvent.pageY;
-      this.clientX = prevEvent.clientX;
-      this.clientY = prevEvent.clientY;
-    }
-    else {
-      this.pageX     = page.x;
-      this.pageY     = page.y;
-      this.clientX   = client.x;
-      this.clientY   = client.y;
-    }
-
-    this.x0        = interaction.startCoords.page.x - origin.x;
-    this.y0        = interaction.startCoords.page.y - origin.y;
-    this.clientX0  = interaction.startCoords.client.x - origin.x;
-    this.clientY0  = interaction.startCoords.client.y - origin.y;
+    this.x0       = interaction.startCoords.page.x - origin.x;
+    this.y0       = interaction.startCoords.page.y - origin.y;
+    this.clientX0 = interaction.startCoords.client.x - origin.x;
+    this.clientY0 = interaction.startCoords.client.y - origin.y;
 
     if (starting || ending) {
       this.dx = 0;
       this.dy = 0;
     }
     else if (deltaSource === 'client') {
-      this.dx = this.clientX - prevEvent.clientX;
-      this.dy = this.clientY - prevEvent.clientY;
+      this.dx = this.client.x - prevEvent.client.x;
+      this.dy = this.client.y - prevEvent.client.y;
     }
     else {
-      this.dx = this.pageX - prevEvent.pageX;
-      this.dy = this.pageY - prevEvent.pageY;
+      this.dx = this.page.x - prevEvent.page.x;
+      this.dy = this.page.y - prevEvent.page.y;
     }
 
-    this.timeStamp = coords.timeStamp;
     this.dt        = interaction.pointerDelta.timeStamp;
     this.duration  = this.timeStamp - this.t0;
 
     // speed and velocity in pixels per second
     this.speed = interaction.pointerDelta[deltaSource].speed;
-    this.velocityX = interaction.pointerDelta[deltaSource].vx;
-    this.velocityY = interaction.pointerDelta[deltaSource].vy;
+    this.velocity = {
+      x: interaction.pointerDelta[deltaSource].vx,
+      y: interaction.pointerDelta[deltaSource].vy,
+    };
 
     this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
 
-    signals.fire('new', signalArg);
+    signals.fire('new', {
+      interaction,
+      event,
+      action,
+      phase,
+      element,
+      related,
+      starting,
+      ending,
+      deltaSource,
+      iEvent: this,
+    });
   }
+
+  get pageX () { return this.page.x; }
+  get pageY () { return this.page.y; }
+  set pageX (value) { this.page.x = value; }
+  set pageY (value) { this.page.y = value; }
+
+  get clientX () { return this.client.x; }
+  get clientY () { return this.client.y; }
+  set clientX (value) { this.client.x = value; }
+  set clientY (value) { this.client.y = value; }
+
+  get velocityX () { return this.velocity.x; }
+  get velocityY () { return this.velocity.y; }
+  set velocityX (value) { this.velocity.x = value; }
+  set velocityY (value) { this.velocity.y = value; }
 
   getSwipe () {
     const interaction = this.interaction;

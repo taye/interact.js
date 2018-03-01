@@ -168,9 +168,8 @@ function beforeEnd ({ interaction, event, iEvent: endEvent }, modifiers) {
       // fire a move event at the modified coordinates
       interaction.doMove({ event, preEnd: true });
       // update the end event's coords to match the latest move event
-      for (const coord of ['pageX', 'pageY', 'clientX', 'clientY']) {
-        endEvent[coord] = interaction.prevEvent[coord];
-      }
+      extend(endEvent.page, interaction.prevCoords.page);
+      extend(endEvent.client, interaction.prevCoords.client);
       break;
     }
   }

@@ -63,13 +63,13 @@ function newInteractEvent ({ iEvent, interaction }) {
   const axis = interaction.prepared.axis;
 
   if (axis === 'x') {
-    iEvent.pageY   = interaction.startCoords.page.y;
-    iEvent.clientY = interaction.startCoords.client.y;
+    iEvent.page.y   = interaction.startCoords.page.y;
+    iEvent.client.y = interaction.startCoords.client.y;
     iEvent.dy = 0;
   }
   else if (axis === 'y') {
-    iEvent.pageX   = interaction.startCoords.page.x;
-    iEvent.clientX = interaction.startCoords.client.x;
+    iEvent.page.x   = interaction.startCoords.page.x;
+    iEvent.client.x = interaction.startCoords.client.x;
     iEvent.dx = 0;
   }
 }

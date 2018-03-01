@@ -332,7 +332,7 @@ test('Interaction createPreparedEvent', t => {
   interaction.prepared = action;
   interaction.target = interactable;
   interaction.element = interactable.element;
-  interaction.prevEvent = {};
+  interaction.prevEvent = { page: {}, client: {}, velocity: {} };
 
   const iEvent = interaction._createPreparedEvent({}, phase);
 

@@ -195,8 +195,8 @@ function calcInertia (interaction, status) {
   const lambda = options.resistance;
   const inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
 
-  status.x0 = interaction.prevEvent.pageX;
-  status.y0 = interaction.prevEvent.pageY;
+  status.x0 = interaction.prevEvent.page.x;
+  status.y0 = interaction.prevEvent.page.y;
   status.t0 = status.startEvent.timeStamp / 1000;
   status.sx = status.sy = 0;
 
