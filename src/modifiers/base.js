@@ -159,7 +159,7 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
   }
 }
 
-function beforeEnd ({ interaction, event, iEvent: endEvent }, modifiers) {
+function beforeEnd ({ interaction, event }, modifiers) {
   for (const modifierName of modifiers.names) {
     const options = interaction.target.options[interaction.prepared.name][modifierName];
 
@@ -167,9 +167,6 @@ function beforeEnd ({ interaction, event, iEvent: endEvent }, modifiers) {
     if (shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
       interaction.doMove({ event, preEnd: true });
-      // update the end event's coords to match the latest move event
-      extend(endEvent.page, interaction.prevCoords.page);
-      extend(endEvent.client, interaction.prevCoords.client);
       break;
     }
   }

@@ -221,12 +221,15 @@ class Interaction {
       eventTarget: this._eventTarget,
       interaction: this,
       phase: 'move',
+      noBeforeMove: false,
     }, signalArg || {});
 
-    const beforeMoveResult = this._signals.fire('before-action-move', signalArg);
+    if (!signalArg.noBeforeMove) {
+      const beforeMoveResult = this._signals.fire('before-action-move', signalArg);
 
-    if (beforeMoveResult === false) {
-      return;
+      if (beforeMoveResult === false) {
+        return;
+      }
     }
 
     const moveEvent = signalArg.iEvent =
@@ -286,11 +289,10 @@ class Interaction {
     event = event || this.prevEvent;
 
     if (this.interacting()) {
-      const endEvent = this._createPreparedEvent(event, 'end', false);
       const signalArg = {
         event,
-        iEvent: endEvent,
         interaction: this,
+        iEvent: null,
       };
 
       const beforeEndResult = this._signals.fire('before-action-end', signalArg);
@@ -300,6 +302,7 @@ class Interaction {
         return;
       }
 
+      const endEvent = signalArg.iEvent = this._createPreparedEvent(event, 'end', false);
       this._signals.fire('action-end', signalArg);
 
       this._fireEvent(endEvent);
