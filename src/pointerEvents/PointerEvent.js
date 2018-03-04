@@ -1,6 +1,6 @@
-const pointerUtils = require('../utils/pointerUtils');
+import pointerUtils from '../utils/pointerUtils';
 
-module.exports = class PointerEvent {
+export default class PointerEvent {
   /** */
   constructor (type, pointer, event, eventTarget, interaction) {
     pointerUtils.pointerExtend(this, event);
@@ -67,4 +67,4 @@ module.exports = class PointerEvent {
   stopImmediatePropagation () {
     this.immediatePropagationStopped = this.propagationStopped = true;
   }
-};
+}

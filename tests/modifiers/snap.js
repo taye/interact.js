@@ -1,9 +1,10 @@
-const test = require('../test');
-const { mockSignals, mockInteractable } = require('../helpers');
+import test from '../test';
+import { mockSignals, mockInteractable } from '../helpers';
+
+import snap from '../../src/modifiers/snap';
+import Interaction from '../../src/Interaction';
 
 test('modifiers/snap', t => {
-  const snap = require('../../src/modifiers/snap');
-  const Interaction = require('../../src/Interaction');
 
   const interaction = new Interaction({ signals: mockSignals() });
   interaction.target = mockInteractable();

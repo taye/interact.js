@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import * as utils from '../utils';
 
 function init (scope) {
   const {
@@ -109,12 +109,12 @@ function init (scope) {
     if (utils.is.object(options)) {
       this.options.drop.enabled = options.enabled === false? false: true;
 
-      if (utils.is.function(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
-      if (utils.is.function(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
-      if (utils.is.function(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
-      if (utils.is.function(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
-      if (utils.is.function(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
-      if (utils.is.function(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
+      if (utils.is.func(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
+      if (utils.is.func(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
+      if (utils.is.func(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
+      if (utils.is.func(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
+      if (utils.is.func(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
+      if (utils.is.func(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
 
       if (/^(pointer|center)$/.test(options.overlap)) {
         this.options.drop.overlap = options.overlap;
@@ -245,7 +245,7 @@ function init (scope) {
   ]);
   actions.methodDict.drop = 'dropzone';
 
-  defaults.drop = module.exports.defaults;
+  defaults.drop = drop.defaults;
 }
 
 function collectDrops ({ interactables }, draggableElement) {
@@ -444,7 +444,7 @@ function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
   interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
 }
 
-module.exports = {
+const drop = {
   init,
   getActiveDrops,
   getDrop,
@@ -456,3 +456,5 @@ module.exports = {
     overlap: 'pointer',
   },
 };
+
+export default drop;

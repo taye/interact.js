@@ -1,6 +1,6 @@
-const is            = require('../utils/is');
-const extend        = require('../utils/extend');
-const { merge }     = require('../utils/arr');
+import * as is       from '../utils/is';
+import extend        from '../utils/extend';
+import { merge }     from '../utils/arr';
 
 function init (scope) {
   const {
@@ -60,6 +60,6 @@ function init (scope) {
   Interactable.settingsMethods.push('pointerEvents');
 }
 
-module.exports = {
+export default {
   init,
 };

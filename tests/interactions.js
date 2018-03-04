@@ -1,12 +1,12 @@
-const test = require('./test');
-const helpers = require('./helpers');
+import test from './test';
+import helpers from './helpers';
 
-const Interaction = require('../src/Interaction');
-const Signals = require('../src/utils/Signals');
+import Interaction from '../src/Interaction';
+import Signals from '../src/utils/Signals';
+import interactions from '../src/interactions';
 
 test('interactions', t => {
   let scope = helpers.mockScope();
-  const interactions = require('../src/interactions');
   const interaction = interactions.newInteraction(
     { pointerType: 'TEST' },
     scope
@@ -26,7 +26,7 @@ test('interactions', t => {
 
   scope = helpers.mockScope();
 
-  require('../src/interactions').init(scope);
+  interactions.init(scope);
   const newInteraction = scope.Interaction.new({});
 
   t.assert(typeof scope.Interaction === 'object');

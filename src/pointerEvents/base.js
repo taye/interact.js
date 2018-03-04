@@ -1,11 +1,11 @@
-const utils        = require('../utils');
-const PointerEvent = require('./PointerEvent');
+import * as utils   from '../utils';
+import PointerEvent from './PointerEvent';
 
-const signals       = utils.Signals.new();
+const signals       = new utils.Signals();
 const simpleSignals = [ 'down', 'up', 'cancel' ];
 const simpleEvents  = [ 'down', 'up', 'cancel' ];
 
-const pointerEvents = module.exports = {
+const pointerEvents = {
   init,
   signals,
   PointerEvent,
@@ -231,3 +231,5 @@ function createSignalListener (type) {
     fire({ interaction, eventTarget, pointer, event, type });
   };
 }
+
+export default pointerEvents;

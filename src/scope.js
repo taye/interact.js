@@ -1,11 +1,12 @@
-const Eventable = require('./Eventable');
-const defaults  = require('./defaultOptions');
-const utils     = require('./utils');
-const browser   = require('./utils/browser');
-const events    = require('./utils/events');
-const Signals   = require('./utils/Signals');
+import Eventable  from './Eventable';
+import defaults   from './defaultOptions';
+import * as utils from './utils';
+import browser    from './utils/browser';
+import events     from './utils/events';
+import Signals    from './utils/Signals';
 
-const { getWindow } = require('./utils/window');
+import { getWindow } from './utils/window';
+import { document } from './utils/domObjects';
 
 const scope = {
   Signals,
@@ -17,7 +18,7 @@ const scope = {
   Eventable,
 
   // main document
-  document: require('./utils/domObjects').document,
+  document,
   // all documents being listened to
   documents: [/* { doc, options } */],
 
@@ -68,4 +69,4 @@ const scope = {
   },
 };
 
-module.exports = scope;
+export default scope;

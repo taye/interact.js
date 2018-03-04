@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   base: {
     preventDefault: 'auto',
     deltaSource   : 'page',

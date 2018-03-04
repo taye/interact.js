@@ -1,7 +1,7 @@
-const is       = require('../utils/is');
-const domUtils = require('../utils/domUtils');
+import * as is       from '../utils/is';
+import * as domUtils from '../utils/domUtils';
 
-const { warnOnce } = require('../utils');
+import { warnOnce } from '../utils';
 
 function init (scope) {
   const {
@@ -145,7 +145,7 @@ function init (scope) {
    * @return {Function | Interactable} The checker function or this Interactable
    */
   Interactable.prototype.actionChecker = function (checker) {
-    if (is.function(checker)) {
+    if (is.func(checker)) {
       this.options.actionChecker = checker;
 
       return this;
@@ -210,4 +210,4 @@ function init (scope) {
   };
 }
 
-module.exports = { init };
+export default { init };

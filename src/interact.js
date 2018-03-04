@@ -1,10 +1,10 @@
 /** @module interact */
 
-const browser      = require('./utils/browser');
-const events       = require('./utils/events');
-const utils        = require('./utils');
-const scope        = require('./scope');
-const Interactable = require('./Interactable');
+import browser      from './utils/browser';
+import events       from './utils/events';
+import * as utils   from './utils';
+import scope        from './scope';
+import Interactable from './Interactable';
 
 const globalEvents = {};
 
@@ -307,4 +307,4 @@ scope.interactables.forEachMatch = function (element, callback) {
 
 scope.interact = interact;
 
-module.exports = interact;
+export default interact;

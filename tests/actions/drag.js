@@ -1,9 +1,11 @@
-const test = require('../test');
-const helpers = require('../helpers');
-const Signals = require('../../src/utils/Signals');
-const interactions = require('../../src/interactions');
-const drag = require('../../src/actions/drag');
-const pointerUtils = require('../../src/utils/pointerUtils');
+import test from '../test';
+import helpers from '../helpers';
+import Signals from '../../src/utils/Signals';
+import interactions from '../../src/interactions';
+import drag from '../../src/actions/drag';
+import pointerUtils from '../../src/utils/pointerUtils';
+import { extend } from '../../src/utils';
+
 
 function mockScope () {
   return helpers.mockScope({
@@ -11,10 +13,10 @@ function mockScope () {
       names: [],
       methodDict: {},
     },
-    InteractEvent: { signals: Signals.new() },
+    InteractEvent: { signals: new Signals() },
     Interactable: {
       prototype: {},
-      signals: Signals.new(),
+      signals: new Signals(),
       eventTypes: [],
     },
   });
@@ -194,8 +196,6 @@ test('drag axis', t => {
   t.end();
 
   function resetCoords () {
-    const { extend } = require('../../src/utils');
-
     pointerUtils.copyCoords(iEvent, eventCoords);
     iEvent.dx = eventCoords.dx;
     iEvent.dy = eventCoords.dy;

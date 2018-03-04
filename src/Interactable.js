@@ -1,20 +1,22 @@
-const clone     = require('./utils/clone');
-const is        = require('./utils/is');
-const events    = require('./utils/events');
-const extend    = require('./utils/extend');
-const arr       = require('./utils/arr');
-const scope     = require('./scope');
-const Eventable = require('./Eventable');
-const defaults  = require('./defaultOptions');
-const signals   = require('./utils/Signals').new();
+import clone     from './utils/clone';
+import * as is   from './utils/is';
+import events    from './utils/events';
+import extend    from './utils/extend';
+import * as arr  from './utils/arr';
+import scope     from './scope';
+import Eventable from './Eventable';
+import defaults  from './defaultOptions';
+import Signals   from './utils/Signals';
 
-const {
+const signals = new Signals();
+
+import {
   getElementRect,
   nodeContains,
   trySelector,
-}                    = require('./utils/domUtils');
-const { getWindow }  = require('./utils/window');
-const { wheelEvent } = require('./utils/browser');
+}                     from './utils/domUtils';
+import { getWindow }  from './utils/window';
+import { wheelEvent } from './utils/browser';
 
 class Interactable {
   /** */
@@ -39,10 +41,10 @@ class Interactable {
   setOnEvents (action, phases) {
     const onAction = 'on' + action;
 
-    if (is.function(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
-    if (is.function(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
-    if (is.function(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
-    if (is.function(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+    if (is.func(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
+    if (is.func(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
+    if (is.func(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
+    if (is.func(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
 
     return this;
   }
@@ -107,7 +109,7 @@ class Interactable {
    * @return {function | object} The checker function or this Interactable
    */
   rectChecker (checker) {
-    if (is.function(checker)) {
+    if (is.func(checker)) {
       this.getRect = checker;
 
       return this;
@@ -369,4 +371,4 @@ Interactable.signals = signals;
 
 Interactable.settingsMethods = [ 'deltaSource', 'origin', 'preventDefault', 'rectChecker' ];
 
-module.exports = Interactable;
+export default Interactable;

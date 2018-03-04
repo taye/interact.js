@@ -1,4 +1,4 @@
-const extend = require('../utils/extend');
+import extend from '../utils/extend';
 
 function init (scope) {
   const {
@@ -203,7 +203,7 @@ function shouldDo (options, preEnd, requireEndOnly) {
     && (!requireEndOnly || options.endOnly));
 }
 
-module.exports = {
+export default {
   init,
   setOffsets,
   setAll,

@@ -1,7 +1,11 @@
-const win = module.exports;
-const isWindow = require('./isWindow');
+import isWindow from './isWindow';
 
-function init (window) {
+const win = {
+  getWindow,
+  init,
+};
+
+export function init (window) {
   // get wrapped window if using Shadow DOM polyfill
 
   win.realWindow = window;
@@ -28,7 +32,7 @@ else {
   init(window);
 }
 
-win.getWindow = function getWindow (node) {
+export function getWindow (node) {
   if (isWindow(node)) {
     return node;
   }
@@ -36,6 +40,8 @@ win.getWindow = function getWindow (node) {
   const rootNode = (node.ownerDocument || node);
 
   return rootNode.defaultView || win.window;
-};
+}
 
 win.init = init;
+
+export default win;

@@ -1,8 +1,9 @@
-const test = require('./test');
-const d = require('./domator');
+import test from './test';
+import d from './domator';
 
-const Interactable = require('../src/Interactable');
-const scope = require('../src/scope');
+import Interactable from '../src/Interactable';
+import scope from '../src/scope';
+import defaults from '../src/defaultOptions';
 
 
 test('Interactable copies and extends defaults', t => {
@@ -14,7 +15,6 @@ test('Interactable copies and extends defaults', t => {
     this.setPerAction('test', options);
   };
 
-  const defaults = require('../src/defaultOptions');
   defaults.test = {
     fromDefault: { a: 1, b: 2 },
     specified: { c: 1, d: 2 },
@@ -53,7 +53,6 @@ test('Interactable copies and extends per action defaults', t => {
     this.setPerAction('test', options);
   };
 
-  const defaults = require('../src/defaultOptions');
   defaults.perAction.testModifier = {
     fromDefault: { a: 1, b: 2 },
     specified: null,

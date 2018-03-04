@@ -1,7 +1,7 @@
-const is = require('../utils/is');
-const { validateAction } = require('./base');
+import * as is from '../utils/is';
+import { validateAction } from './base';
 
-const { parentNode } = require('../utils/domUtils');
+import { parentNode } from '../utils/domUtils';
 
 function init (scope) {
   scope.autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {
@@ -72,4 +72,4 @@ function init (scope) {
   }
 }
 
-module.exports = { init };
+export default { init };

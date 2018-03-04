@@ -1,10 +1,10 @@
-const test = require('../test');
-const { mockSignals } = require('../helpers');
+import test from '../test';
+import { mockSignals } from '../helpers';
+
+import RestrictSize from '../../src/modifiers/restrictSize';
+import Interaction from '../../src/Interaction';
 
 test('restrictSize', t => {
-  const RestrictSize = require('../../src/modifiers/restrictSize');
-  const Interaction = require('../../src/Interaction');
-
   const interaction = new Interaction({ signals: mockSignals() });
   interaction.prepared = {};
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true };

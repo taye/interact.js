@@ -1,7 +1,3 @@
-const holdRepeat = {
-  init,
-};
-
 function init (scope) {
   const {
     pointerEvents,
@@ -18,8 +14,6 @@ function init (scope) {
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0;
   pointerEvents.types.push('holdrepeat');
-
-  pointerEvents.holdRepeat = holdRepeat;
 }
 
 function onNew ({ pointerEvent }) {
@@ -58,4 +52,6 @@ function endHoldRepeat ({ interaction }) {
   }
 }
 
-module.exports = holdRepeat;
+export default {
+  init,
+};

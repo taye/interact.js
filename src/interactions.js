@@ -1,10 +1,10 @@
-const Interaction  = require('./Interaction');
-const events       = require('./utils/events');
-const finder       = require('./utils/interactionFinder');
-const browser      = require('./utils/browser');
-const domObjects   = require('./utils/domObjects');
-const pointerUtils = require('./utils/pointerUtils');
-const Signals      = require('./utils/Signals');
+import Interaction  from './Interaction';
+import events       from './utils/events';
+import finder       from './utils/interactionFinder';
+import browser      from './utils/browser';
+import domObjects   from './utils/domObjects';
+import pointerUtils from './utils/pointerUtils';
+import Signals      from './utils/Signals';
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -12,7 +12,7 @@ const methodNames = [
 ];
 
 function init (scope) {
-  const signals = Signals.new();
+  const signals = new Signals();
 
   const listeners = {};
 
@@ -172,7 +172,7 @@ function onDocSignal ({ doc, scope, options }, signalName) {
   }
 }
 
-module.exports = {
+export default {
   init,
   onDocSignal,
   doOnInteractions,

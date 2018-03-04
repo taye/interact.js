@@ -1,5 +1,6 @@
 {
   "plugins": [
+    "transform-es2015-modules-commonjs",
     ["check-es2015-constants",                  { "loose": true }],
     ["transform-es2015-arrow-functions",        { "loose": true }],
     ["transform-es2015-block-scoped-functions", { "loose": true }],
@@ -19,6 +20,7 @@
     ["transform-es2015-sticky-regex",           { "loose": true }],
     ["transform-es2015-template-literals",      { "loose": true }],
     ["transform-es2015-typeof-symbol",          { "loose": true }],
-    ["transform-es2015-unicode-regex",          { "loose": true }]
+    ["transform-es2015-unicode-regex",          { "loose": true }],
+    ["transform-object-rest-spread"]
   ]
 }

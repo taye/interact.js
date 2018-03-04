@@ -9,9 +9,9 @@
 //   },
 // });
 
-const extend = require('../utils/extend');
-const rectUtils = require('../utils/rect');
-const restrictEdges = require('./restrictEdges');
+import extend from '../utils/extend';
+import rectUtils from '../utils/rect';
+import restrictEdges from './restrictEdges';
 
 const noMin = { width: -Infinity, height: -Infinity };
 const noMax = { width: +Infinity, height: +Infinity };
@@ -25,11 +25,11 @@ function init (scope) {
 
   const { resize } = actions;
 
-  modifiers.restrictSize = module.exports;
+  modifiers.restrictSize = restrictSize;
   modifiers.names.push('restrictSize');
 
-  defaults.perAction.restrictSize = module.exports.defaults;
-  resize.defaults.restrictSize = module.exports.defaults;
+  defaults.perAction.restrictSize = restrictSize.defaults;
+  resize.defaults.restrictSize = restrictSize.defaults;
 }
 
 function setOffset ({ interaction }) {
@@ -76,7 +76,7 @@ function set (arg) {
   restrictEdges.set(arg);
 }
 
-module.exports = {
+const restrictSize = {
   init,
   setOffset,
   set,
@@ -88,3 +88,5 @@ module.exports = {
     max: null,
   },
 };
+
+export default restrictSize;

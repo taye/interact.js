@@ -1,5 +1,5 @@
-const InteractEvent = require('./InteractEvent');
-const utils         = require('./utils');
+import InteractEvent from './InteractEvent';
+import * as utils    from './utils';
 
 class Interaction {
   /** */
@@ -413,4 +413,4 @@ Interaction.prototype.doMove = utils.warnOnce(
   },
   'The interaction.doMove() method has been renamed to interaction.move()');
 
-module.exports = Interaction;
+export default Interaction;

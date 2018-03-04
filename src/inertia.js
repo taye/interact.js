@@ -1,6 +1,6 @@
-const modifiers = require('./modifiers/base');
-const utils     = require('./utils');
-const raf       = require('./utils/raf');
+import modifiers  from './modifiers/base';
+import * as utils from './utils';
+import raf        from './utils/raf';
 
 function init (scope) {
   const {
@@ -301,7 +301,7 @@ function getOptions ({ target, prepared }) {
   return target && target.options && prepared.name && target.options[prepared.name].inertia;
 }
 
-module.exports = {
+export default {
   init,
   calcInertia,
   inertiaTick,

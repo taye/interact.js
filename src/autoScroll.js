@@ -1,7 +1,7 @@
-const raf            = require('./utils/raf');
-const getWindow      = require('./utils/window').getWindow;
-const is             = require('./utils/is');
-const domUtils       = require('./utils/domUtils');
+import raf            from './utils/raf';
+import { getWindow }  from './utils/window';
+import * as is        from './utils/is';
+import * as domUtils  from './utils/domUtils';
 
 function init (scope) {
   const {
@@ -124,4 +124,4 @@ function init (scope) {
   defaults.perAction.autoScroll = autoScroll.defaults;
 }
 
-module.exports = { init };
+export default { init };

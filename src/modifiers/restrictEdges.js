@@ -9,9 +9,9 @@
 //   },
 // });
 
-const extend = require('../utils/extend');
-const rectUtils = require('../utils/rect');
-const restrict = require('./restrict');
+import extend from '../utils/extend';
+import rectUtils from '../utils/rect';
+import restrict from './restrict';
 
 const { getRestrictionRect } = restrict;
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
@@ -26,7 +26,7 @@ function init (scope) {
 
   const { resize } = actions;
 
-  modifiers.restrictEdges = module.exports;
+  modifiers.restrictEdges = restrictEdges;
   modifiers.names.push('restrictEdges');
 
   defaults.perAction.restrictEdges = module.exports.defaults;
@@ -124,7 +124,7 @@ function fixRect (rect, defaults) {
   return rect;
 }
 
-module.exports = {
+const restrictEdges = {
   init,
   noInner,
   noOuter,
@@ -140,3 +140,5 @@ module.exports = {
     offset: null,
   },
 };
+
+export default restrictEdges;

@@ -1,7 +1,9 @@
-const extend      = require('./utils/extend');
-const getOriginXY = require('./utils/getOriginXY');
-const defaults    = require('./defaultOptions');
-const signals     = require('./utils/Signals').new();
+import extend      from './utils/extend';
+import getOriginXY from './utils/getOriginXY';
+import defaults    from './defaultOptions';
+import Signals     from './utils/Signals';
+
+const signals = new Signals();
 
 class InteractEvent {
   /** */
@@ -158,4 +160,4 @@ class InteractEvent {
 
 InteractEvent.signals = signals;
 
-module.exports = InteractEvent;
+export default InteractEvent;

@@ -1,10 +1,10 @@
-const hypot         = require('./hypot');
-const browser       = require('./browser');
-const dom           = require('./domObjects');
-const domUtils      = require('./domUtils');
-const domObjects    = require('./domObjects');
-const is            = require('./is');
-const pointerExtend = require('./pointerExtend');
+import hypot         from './hypot';
+import browser       from './browser';
+import dom           from './domObjects';
+import * as domUtils from './domUtils';
+import domObjects    from './domObjects';
+import * as is       from './is';
+import pointerExtend from './pointerExtend';
 
 const pointerUtils = {
   copyCoords: function (dest, src) {
@@ -217,7 +217,7 @@ const pointerUtils = {
 
   // [ event.target, event.currentTarget ]
   getEventTargets: function (event) {
-    const path = is.function(event.composedPath) ? event.composedPath() : event.path;
+    const path = is.func(event.composedPath) ? event.composedPath() : event.path;
 
     return [
       domUtils.getActualElement(path ? path[0] : event.target),
@@ -226,4 +226,4 @@ const pointerUtils = {
   },
 };
 
-module.exports = pointerUtils;
+export default pointerUtils;

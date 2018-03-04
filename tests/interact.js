@@ -1,11 +1,12 @@
-const test = require('./test');
-const interact = require('../src/interact');
-const scope = require('../src/scope');
-const interactions = require('../src/interactions');
-const { jsdom } = require('jsdom');
+import { jsdom } from 'jsdom';
+
+import test from './test';
+import interact from '../src/interact';
+import scope from '../src/scope';
+import interactions from '../src/interactions';
+import Interactable from '../src/Interactable';
 
 test('interact export', t => {
-  const Interactable = require('../src/Interactable');
   interactions.init(scope);
 
   const interactable1 = interact('selector');

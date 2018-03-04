@@ -1,4 +1,4 @@
-const utils = require('./index');
+import * as utils from './index';
 
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
@@ -114,4 +114,4 @@ const finder = {
   },
 };
 
-module.exports = finder;
+export default finder;

@@ -1,6 +1,12 @@
-const _ = require('lodash');
-const { window: { document } } = require('../src/utils/window');
-const utils = require('../src/utils');
+import _ from 'lodash';
+import win from '../src/utils/window';
+import * as utils from '../src/utils';
+import defaults  from '../src/defaultOptions';
+import Signals from '../src/utils/Signals';
+import Eventable from '../src/Eventable';
+
+
+const document = win.window.document;
 
 let counter = 0;
 
@@ -69,20 +75,20 @@ const helpers = {
   mockScope (options) {
     return Object.assign({
       documents: [],
-      defaults: require('../src/defaultOptions'),
+      defaults,
       interactions: [],
-      signals: require('../src/utils/Signals').new(),
+      signals: new Signals(),
       Interaction: {
-        signals: require('../src/utils/Signals').new(),
+        signals: new Signals(),
         new () {
           return {};
         },
       },
       InteractEvent: {
-        signals: require('../src/utils/Signals').new(),
+        signals: new Signals(),
       },
       Interactable: {
-        signals: require('../src/utils/Signals').new(),
+        signals: new Signals(),
       },
     }, options);
   },
@@ -96,8 +102,6 @@ const helpers = {
   },
 
   mockInteractable (props) {
-    const Eventable = require('../src/Eventable');
-
     return Object.assign(
       {
         options: {

@@ -1,6 +1,6 @@
-const is        = require('../utils/is');
-const extend    = require('../utils/extend');
-const rectUtils = require('../utils/rect');
+import * as is   from '../utils/is';
+import extend    from '../utils/extend';
+import rectUtils from '../utils/rect';
 
 function init (scope) {
   const {
@@ -8,10 +8,10 @@ function init (scope) {
     defaults,
   } = scope;
 
-  modifiers.restrict = module.exports;
+  modifiers.restrict = restrict;
   modifiers.names.push('restrict');
 
-  defaults.perAction.restrict = module.exports.defaults;
+  defaults.perAction.restrict = restrict.defaults;
 }
 
 function setOffset ({ rect, startOffset, options }) {
@@ -92,14 +92,14 @@ function modifyCoords ({ page, client, status, phase, options }) {
 }
 
 function getRestrictionRect (value, interaction, page) {
-  if (is.function(value)) {
+  if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
   } else {
     return rectUtils.resolveRectLike(value, interaction.target, interaction.element);
   }
 }
 
-module.exports = {
+const restrict = {
   init,
   setOffset,
   set,
@@ -112,3 +112,5 @@ module.exports = {
     elementRect: null,
   },
 };
+
+export default restrict;

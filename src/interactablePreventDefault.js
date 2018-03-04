@@ -1,11 +1,11 @@
-const Interactable = require('./Interactable');
-const scope        = require('./scope');
-const is           = require('./utils/is');
-const events       = require('./utils/events');
-const browser      = require('./utils/browser');
+import Interactable from './Interactable';
+import scope        from './scope';
+import * as is      from './utils/is';
+import events       from './utils/events';
+import browser      from './utils/browser';
 
-const { nodeContains, matchesSelector } = require('./utils/domUtils');
-const { getWindow } = require('./utils/window');
+import { nodeContains, matchesSelector } from './utils/domUtils';
+import { getWindow } from './utils/window';
 
 /**
  * Returns or sets whether to prevent the browser's default behaviour in
@@ -75,20 +75,22 @@ function onInteractionEvent ({ interaction, event }) {
   }
 }
 
-for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
-  scope.Interaction.signals.on(eventSignal, onInteractionEvent);
-}
-
-// prevent native HTML5 drag on interact.js target elements
-scope.Interaction.eventMap.dragstart = function preventNativeDrag (event) {
-  for (const interaction of scope.interactions) {
-
-    if (interaction.element
-        && (interaction.element === event.target
-            || nodeContains(interaction.element, event.target))) {
-
-      interaction.target.checkAndPreventDefault(event);
-      return;
-    }
+export default function init () {
+  for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
+    scope.Interaction.signals.on(eventSignal, onInteractionEvent);
   }
-};
+
+  // prevent native HTML5 drag on interact.js target elements
+  scope.Interaction.eventMap.dragstart = function preventNativeDrag (event) {
+    for (const interaction of scope.interactions) {
+
+      if (interaction.element
+        && (interaction.element === event.target
+          || nodeContains(interaction.element, event.target))) {
+
+        interaction.target.checkAndPreventDefault(event);
+        return;
+      }
+    }
+  };
+}

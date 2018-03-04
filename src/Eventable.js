@@ -1,4 +1,4 @@
-const extend = require('./utils/extend.js');
+import extend from './utils/extend.js';
 
 function fireUntilImmediateStopped (event, listeners) {
   for (const listener of listeners) {
@@ -60,4 +60,4 @@ class Eventable {
   }
 }
 
-module.exports = Eventable;
+export default Eventable;

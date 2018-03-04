@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import * as utils from '../utils';
 
 function init (scope) {
   const {
@@ -7,10 +7,10 @@ function init (scope) {
   } = scope;
 
 
-  modifiers.snap = module.exports;
+  modifiers.snap = snap;
   modifiers.names.push('snap');
 
-  defaults.perAction.snap = module.exports.defaults;
+  defaults.perAction.snap = snap.defaults;
 }
 
 function setOffset ({ interaction, interactable, element, rect, startOffset, options }) {
@@ -68,7 +68,7 @@ function set ({ interaction, modifiedCoords, status, options, offset: offsets })
     const relativeY = page.y - offsetY;
 
     for (const snapTarget of options.targets) {
-      if (utils.is.function(snapTarget)) {
+      if (utils.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction);
       }
       else {
@@ -181,7 +181,7 @@ function modifyCoords ({ page, client, status, phase, options }) {
   }
 }
 
-module.exports = {
+const snap = {
   init,
   setOffset,
   set,
@@ -196,3 +196,5 @@ module.exports = {
     relativePoints: null,
   },
 };
+
+export default snap;

@@ -1,15 +1,17 @@
-const test = require('./test');
-const pointerUtils = require('../src/utils/pointerUtils');
-const helpers = require('./helpers');
+import test from './test';
+import pointerUtils from '../src/utils/pointerUtils';
+import helpers from './helpers';
 
-const Interaction = require('../src/Interaction');
-const Signals = require('../src/utils/Signals');
+import Interaction from '../src/Interaction';
+import InteractEvent from '../src/InteractEvent';
+import Signals from '../src/utils/Signals';
+import interactions from '../src/interactions';
 
-const makeInteractionAndSignals = () => new Interaction({ signals: Signals.new() });
+const makeInteractionAndSignals = () => new Interaction({ signals: new Signals });
 
 test('Interaction constructor', t => {
   const testType = 'test';
-  const signals = Signals.new();
+  const signals = new Signals();
   const interaction = new Interaction({
     pointerType: testType,
     signals,
@@ -300,7 +302,7 @@ test('Interaction.start', t => {
 test('stop interaction from start event', t => {
   const scope = helpers.mockScope();
 
-  require('../src/interactions').init(scope);
+  interactions.init(scope);
   const interaction = scope.Interaction.new({});
   const interactable = helpers.mockInteractable();
 
@@ -320,10 +322,9 @@ test('stop interaction from start event', t => {
 });
 
 test('Interaction createPreparedEvent', t => {
-  const InteractEvent = require('../src/InteractEvent');
   const scope = helpers.mockScope();
 
-  require('../src/interactions').init(scope);
+  interactions.init(scope);
 
   const interaction = scope.Interaction.new({});
   const interactable = helpers.mockInteractable();

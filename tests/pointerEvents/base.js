@@ -1,11 +1,13 @@
-const test = require('../test');
-const helpers = require('../helpers');
-const interactions = require('../../src/interactions');
+import test from '../test';
+import helpers from '../helpers';
+import interactions from '../../src/interactions';
 
-const Interaction = require('../../src/Interaction');
+import Interaction from '../../src/Interaction';
+import pointerEvents from '../../src/pointerEvents/base';
+import Eventable     from '../../src/Eventable';
+import Signals from '../../src/utils/Signals';
 
 test('pointerEvents.types', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
 
   t.deepEqual(pointerEvents.types,
     [
@@ -23,9 +25,6 @@ test('pointerEvents.types', t => {
 });
 
 test('pointerEvents.fire', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
-  const Eventable     = require('../../src/Eventable');
-
   const eventable = new Eventable(pointerEvents.defaults);
   const type = 'TEST';
   const element = {};
@@ -62,7 +61,7 @@ test('pointerEvents.fire', t => {
 
   const tapTime = 500;
   const interaction = Object.assign(
-    new Interaction({ signals: require('../../src/utils/Signals').new() }),
+    new Interaction({ signals: new Signals() }),
     { tapTime: -1, prevTap: null });
   const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
     timeStamp: tapTime,
@@ -85,8 +84,6 @@ test('pointerEvents.fire', t => {
 });
 
 test('pointerEvents.collectEventTargets', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
-  const Eventable = require('../../src/Eventable');
   const type = 'TEST';
   const TEST_PROP = ['TEST_PROP'];
   const target = {
@@ -119,7 +116,6 @@ test('pointerEvents.collectEventTargets', t => {
 
 test('pointerEvents Interaction update-pointer-down signal', t => {
   const scope = helpers.mockScope();
-  const pointerEvents = require('../../src/pointerEvents/base');
 
   interactions.init(scope);
   pointerEvents.init(scope);
@@ -138,7 +134,6 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
 });
 
 test('pointerEvents Interaction remove-pointer signal', t => {
-  const pointerEvents = require('../../src/pointerEvents/base');
   const scope = helpers.mockScope();
 
   interactions.init(scope);

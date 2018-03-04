@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import * as utils from '../utils';
 
 function init (scope) {
   const {
@@ -423,4 +423,4 @@ function init (scope) {
   defaults.resize = resize.defaults;
 }
 
-module.exports = { init };
+export default { init };

@@ -1,7 +1,7 @@
-const test = require('../test');
-const { mockSignals } = require('../helpers');
-const restrictEdges = require('../../src/modifiers/restrictEdges');
-const Interaction = require('../../src/Interaction');
+import test from '../test';
+import { mockSignals } from '../helpers';
+import restrictEdges from '../../src/modifiers/restrictEdges';
+import Interaction from '../../src/Interaction';
 
 test('restrictEdges', t => {
 

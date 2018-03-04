@@ -1,49 +1,96 @@
 /* browser entry point */
 
-const scope = require('./scope');
+import {
+  win,
+  browser,
+  raf,
+} from './utils';
+import domObjects from './utils/domObjects';
 
-require('./interactions').init(scope);
+import scope from './scope';
 
-scope.Interactable = require('./Interactable');
-scope.InteractEvent = require('./InteractEvent');
-require('./interactablePreventDefault.js');
+import interactions from './interactions';
 
-const interact = require('./interact');
+import Interactable from './Interactable';
+import InteractEvent from './InteractEvent';
 
-// modifiers
-interact.use(require('./modifiers/base'));
-interact.use(require('./modifiers/snap'));
-interact.use(require('./modifiers/restrict'));
+import interactablePreventDefault from './interactablePreventDefault';
 
-interact.snappers = require('./utils/snappers');
-interact.createSnapGrid = interact.snappers.grid;
+import interact from './interact';
 
-// inertia
-interact.use(require('./inertia'));
+import modifiersBase from './modifiers/base';
+import snap from './modifiers/snap';
+import restrict from './modifiers/restrict';
+import snappers from './utils/snappers';
+import inertia from './inertia';
 
-// pointerEvents
-interact.use(require('./pointerEvents/base'));
-interact.use(require('./pointerEvents/holdRepeat'));
-interact.use(require('./pointerEvents/interactableTargets'));
+import pointerEventsBase from './pointerEvents/base';
+import holdRepeat from './pointerEvents/holdRepeat';
+import interactableTargets from './pointerEvents/interactableTargets';
 
-// autoStart hold
-interact.use(require('./autoStart/base'));
-interact.use(require('./autoStart/hold'));
-interact.use(require('./autoStart/dragAxis'));
+import base from './autoStart/base';
+import hold from './autoStart/hold';
+import dragAxis from './autoStart/dragAxis';
 
-// actions
-interact.use(require('./actions/gesture'));
-interact.use(require('./actions/resize'));
-interact.use(require('./actions/drag'));
-interact.use(require('./actions/drop'));
+import gesture from './actions/gesture';
+import resize from './actions/resize';
+import drag from './actions/drag';
+import drop from './actions/drop';
 
-// load these modifiers after resize is loaded
-interact.use(require('./modifiers/snapSize'));
-interact.use(require('./modifiers/restrictEdges'));
-interact.use(require('./modifiers/restrictSize'));
+import snapSize from './modifiers/snapSize';
+import restrictEdges from './modifiers/restrictEdges';
+import restrictSize from './modifiers/restrictSize';
 
-// autoScroll
-interact.use(require('./autoScroll'));
+import autoScroll from './autoScroll';
 
-// export interact
-module.exports = interact;
+export function init (window) {
+  win.init(window);
+  domObjects.init(window);
+  browser.init(window);
+  raf.init(window);
+
+  scope.document = window.document;
+
+  interactions.init(scope);
+  interactablePreventDefault(scope);
+
+  scope.Interactable  = Interactable;
+  scope.InteractEvent = InteractEvent;
+
+  // modifiers
+  interact.use(modifiersBase);
+  interact.use(snap);
+  interact.use(restrict);
+
+  interact.snappers = snappers;
+  interact.createSnapGrid = interact.snappers.grid;
+
+  // inertia
+  interact.use(inertia);
+
+  // pointerEvents
+  interact.use(pointerEventsBase);
+  interact.use(holdRepeat);
+  interact.use(interactableTargets);
+
+  // autoStart hold
+  interact.use(base);
+  interact.use(hold);
+  interact.use(dragAxis);
+
+  // actions
+  interact.use(gesture);
+  interact.use(resize);
+  interact.use(drag);
+  interact.use(drop);
+
+  // load these modifiers after resize is loaded
+  interact.use(snapSize);
+  interact.use(restrictEdges);
+  interact.use(restrictSize);
+
+  // autoScroll
+  interact.use(autoScroll);
+
+  return interact;
+}

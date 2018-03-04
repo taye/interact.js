@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import * as utils from '../utils';
 
 function init (scope) {
   const {
@@ -160,4 +160,4 @@ function init (scope) {
   defaults.gesture = gesture.defaults;
 }
 
-module.exports = { init };
+export default { init };

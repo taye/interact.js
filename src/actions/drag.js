@@ -1,5 +1,5 @@
-const is  = require('../utils/is');
-const arr = require('../utils/arr');
+import * as is from '../utils/is';
+import * as arr from '../utils/arr';
 
 function init (scope) {
   const {
@@ -16,9 +16,9 @@ function init (scope) {
   // dragmove
   InteractEvent.signals.on('new', newInteractEvent);
 
-  Interactable.prototype.draggable = module.exports.draggable;
+  Interactable.prototype.draggable = drag.draggable;
 
-  actions.drag = module.exports;
+  actions.drag = drag;
   actions.names.push('drag');
   arr.merge(Interactable.eventTypes, [
     'dragstart',
@@ -29,7 +29,7 @@ function init (scope) {
   ]);
   actions.methodDict.drag = 'draggable';
 
-  defaults.drag = module.exports.defaults;
+  defaults.drag = drag.defaults;
 }
 
 function beforeMove ({ interaction }) {
@@ -142,7 +142,7 @@ function draggable (options) {
   return this.options.drag;
 }
 
-module.exports = {
+const drag = {
   init,
   draggable,
   beforeMove,
@@ -169,3 +169,5 @@ module.exports = {
     return 'move';
   },
 };
+
+export default drag;

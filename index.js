@@ -6,13 +6,14 @@
  *
  * See https://github.com/taye/interact.js/issues/187
  */
-if (typeof window === 'undefined') {
-  module.exports = function (window) {
-    require('./src/utils/window').init(window);
 
-    return require('./src/index');
-  };
-}
-else {
-  module.exports = require('./src/index');
-}
+import { init } from './src/index';
+
+const exported = typeof window === 'undefined'
+  ? window => {
+    return init(window);
+  }
+  : init(window);
+
+// export default exported;
+module.exports = exported;

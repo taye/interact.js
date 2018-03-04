@@ -1,4 +1,5 @@
-const utils = require('../utils');
+import * as utils from '../utils';
+import InteractableMethods from './InteractableMethods';
 
 function init (scope) {
   const {
@@ -9,7 +10,7 @@ function init (scope) {
     Signals,
   } = scope;
 
-  interact.use(require('./InteractableMethods'));
+  interact.use(InteractableMethods);
 
   // set cursor style on mousedown
   Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
@@ -101,7 +102,7 @@ function init (scope) {
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
-    signals: Signals.new(),
+    signals: new Signals(),
   };
 }
 
@@ -243,7 +244,7 @@ function maxInteractions (newValue, scope) {
   return scope.autoStart.maxInteractions;
 }
 
-module.exports = {
+export default {
   init,
   maxInteractions,
   withinInteractionLimit,
