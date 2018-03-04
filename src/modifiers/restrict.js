@@ -32,7 +32,7 @@ function setOffset ({ rect, startOffset, options }) {
   return offset;
 }
 
-function set ({ modifiedCoords, interaction, status, options }) {
+function set ({ modifiedCoords, interaction, status, offset, options }) {
   if (!options) { return status; }
 
   const page = extend({}, modifiedCoords);
@@ -48,8 +48,6 @@ function set ({ modifiedCoords, interaction, status, options }) {
   const rect = restriction;
   let modifiedX = page.x;
   let modifiedY = page.y;
-
-  const offset = interaction.modifierOffsets.restrict;
 
   // object is assumed to have
   // x, y, width, height or

@@ -8,10 +8,12 @@ function init (scope) {
   scope.modifiers = { names: [] };
 
   Interaction.signals.on('new', function (interaction) {
-    interaction.startOffset      = { left: 0, right: 0, top: 0, bottom: 0 };
-    interaction.modifierOffsets  = {};
-    interaction.modifierStatuses = resetStatuses({}, scope.modifiers);
-    interaction.modifierResult   = null;
+    interaction.modifiers = {
+      startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      offsets    : {},
+      statuses   : resetStatuses({}, scope.modifiers),
+      result     : null,
+    };
   });
 
   Interaction.signals.on('before-action-start' , arg =>
@@ -31,7 +33,7 @@ function init (scope) {
 
 function setOffsets (arg, modifiers) {
   const { interaction, pageCoords: page } = arg;
-  const { target, element, startOffset } = interaction;
+  const { target, element, modifiers: { startOffset } } = interaction;
   const rect = target.getRect(element);
 
   if (rect) {
@@ -59,7 +61,7 @@ function setOffsets (arg, modifiers) {
       continue;
     }
 
-    interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
+    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].setOffset(arg);
   }
 }
 
@@ -83,7 +85,7 @@ function setAll (arg, modifiers) {
 
     arg.status = arg.status = statuses[modifierName];
     arg.options = options;
-    arg.offset = arg.interaction.modifierOffsets[modifierName];
+    arg.offset = arg.interaction.modifiers.offsets[modifierName];
 
     modifier.set(arg);
 
@@ -127,8 +129,8 @@ function start ({ interaction }, modifiers, pageCoords) {
   const arg = {
     interaction,
     pageCoords,
-    startOffset: interaction.startOffset,
-    statuses: interaction.modifierStatuses,
+    startOffset: interaction.modifiers.startOffset,
+    statuses: interaction.modifiers.statuses,
     preEnd: false,
     requireEndOnly: false,
   };
@@ -137,7 +139,7 @@ function start ({ interaction }, modifiers, pageCoords) {
   resetStatuses(arg.statuses, modifiers);
 
   arg.pageCoords = extend({}, interaction.startCoords.page);
-  interaction.modifierResult = setAll(arg, modifiers);
+  interaction.modifiers.result = setAll(arg, modifiers);
 }
 
 function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) {
@@ -146,11 +148,11 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
       interaction,
       preEnd,
       pageCoords: interaction.curCoords.page,
-      statuses: interaction.modifierStatuses,
+      statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
     }, modifiers);
 
-  interaction.modifierResult = modifierResult;
+  interaction.modifiers.result = modifierResult;
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
@@ -189,7 +191,7 @@ function setCurCoords (arg, modifiers) {
 
     const modifier = modifiers[modifierName];
 
-    modifierArg.status = interaction.modifierStatuses[modifierName];
+    modifierArg.status = interaction.modifiers.statuses[modifierName];
 
     modifier.modifyCoords(modifierArg);
   }

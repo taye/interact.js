@@ -77,7 +77,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           interaction, event, interaction.prepared.name, 'resume', interaction.element);
 
         interaction._fireEvent(resumeEvent);
-        modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
+        modifiers.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
 
         utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
         break;

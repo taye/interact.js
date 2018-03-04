@@ -34,7 +34,7 @@ function init (scope) {
 }
 
 function setOffset ({ interaction, options }) {
-  const startOffset = interaction.startOffset;
+  const startOffset = interaction.modifiers.startOffset;
   let offset;
 
   if (options) {

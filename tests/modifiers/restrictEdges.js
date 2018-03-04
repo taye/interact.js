@@ -79,7 +79,8 @@ test('restrictEdges', t => {
   );
 
   // setOffset
-  interaction.startOffset = { top: 5, left: 10, bottom: -8, right: -16 };
+  interaction.modifiers = {};
+  interaction.modifiers.startOffset = { top: 5, left: 10, bottom: -8, right: -16 };
   interaction.target = {
     getRect () {
       return { top: 500, left: 900 };
