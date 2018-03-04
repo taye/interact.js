@@ -24,7 +24,7 @@ function init (scope) {
     'dragstart',
     'dragmove',
     'draginertiastart',
-    'draginertiaresume',
+    'dragresume',
     'dragend',
   ]);
   actions.methodDict.drag = 'draggable';

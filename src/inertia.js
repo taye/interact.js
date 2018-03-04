@@ -74,10 +74,9 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
+          interaction, event, interaction.prepared.name, 'resume', interaction.element);
 
-        interaction.target.fire(resumeEvent);
-        interaction.prevEvent = resumeEvent;
+        interaction._fireEvent(resumeEvent);
         modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
 
         utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);

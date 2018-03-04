@@ -415,7 +415,7 @@ function init (scope) {
     'resizestart',
     'resizemove',
     'resizeinertiastart',
-    'resizeinertiaresume',
+    'resizeresume',
     'resizeend',
   ]);
   actions.methodDict.resize = 'resizable';
