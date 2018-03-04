@@ -271,10 +271,10 @@ test('Interaction.start', t => {
   interaction._interacting = false;
 
   let signalArg;
-  let interactingInStartListener;
+  // let interactingInStartListener;
   const signalListener = arg => {
     signalArg = arg;
-    interactingInStartListener = arg.interaction.interacting();
+    // interactingInStartListener = arg.interaction.interacting();
   };
 
   interaction._signals.on('action-start', signalListener);
@@ -284,7 +284,8 @@ test('Interaction.start', t => {
   t.equal(interaction.target, target, 'interaction.target is updated');
   t.equal(interaction.element, element, 'interaction.element is updated');
 
-  t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
+  // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
+  t.assert(interaction.interacting(), 'interaction is interacting after start method');
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg');
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg');
 

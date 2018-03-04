@@ -116,31 +116,14 @@ class Interaction {
     }
 
     utils.copyAction(this.prepared, action);
-    this.target         = target;
-    this.element        = element;
 
-    this._interacting = true;
-    const signalArg = {
+    this.target       = target;
+    this.element      = element;
+    this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
       phase: 'start',
-      iEvent: null,
-    };
-
-    const beforeStartResult = this._signals.fire('before-action-start', signalArg);
-
-    if (beforeStartResult === false) {
-      return;
-    }
-
-    const startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
-    signalArg.iEvent = startEvent;
-
-    this._signals.fire('action-start', signalArg);
-
-    this._fireEvent(startEvent);
-
-    this._signals.fire('after-action-start', signalArg);
+    });
   }
 
   pointerMove (pointer, event, eventTarget) {
@@ -221,23 +204,10 @@ class Interaction {
       eventTarget: this._eventTarget,
       interaction: this,
       phase: 'move',
-      noBeforeMove: false,
+      noBefore: false,
     }, signalArg || {});
 
-    if (!signalArg.noBeforeMove) {
-      const beforeMoveResult = this._signals.fire('before-action-move', signalArg);
-
-      if (beforeMoveResult === false) {
-        return;
-      }
-    }
-
-    const moveEvent = signalArg.iEvent =
-      this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
-
-    this._signals.fire('action-move', signalArg);
-
-    this._fireEvent(moveEvent);
+    this._doPhase(signalArg);
 
     this._signals.fire('after-action-move', signalArg);
   }
@@ -287,31 +257,21 @@ class Interaction {
   end (event) {
     this._ending = true;
     event = event || this.prevEvent;
+    let endPhaseResult;
 
     if (this.interacting()) {
-      const signalArg = {
+      endPhaseResult = this._doPhase({
         event,
         interaction: this,
-        iEvent: null,
-      };
-
-      const beforeEndResult = this._signals.fire('before-action-end', signalArg);
-
-      if (beforeEndResult === false) {
-        this._ending = false;
-        return;
-      }
-
-      const endEvent = signalArg.iEvent = this._createPreparedEvent(event, 'end', false);
-      this._signals.fire('action-end', signalArg);
-
-      this._fireEvent(endEvent);
-
-      this._signals.fire('after-action-end', signalArg);
+        phase: 'end',
+      });
     }
 
     this._ending = false;
-    this.stop();
+
+    if (endPhaseResult === true) {
+      this.stop();
+    }
   }
 
   currentAction () {
@@ -417,6 +377,28 @@ class Interaction {
   _fireEvent (iEvent) {
     this.target.fire(iEvent);
     this.prevEvent = iEvent;
+  }
+
+  _doPhase (signalArg) {
+    const { event, phase, preEnd } = signalArg;
+
+    if (!signalArg.noBefore) {
+      const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg);
+
+      if (beforeResult === false) {
+        return false;
+      }
+    }
+
+    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd);
+
+    this._signals.fire(`action-${phase}`, signalArg);
+
+    this._fireEvent(iEvent);
+
+    this._signals.fire(`after-action-${phase}`, signalArg);
+
+    return true;
   }
 }
 
