@@ -235,7 +235,7 @@ function inertiaTick (interaction) {
       status.sy = quadPoint.y;
     }
 
-    interaction.doMove();
+    interaction.move();
 
     status.i = raf.request(() => inertiaTick(interaction));
   }
@@ -243,7 +243,7 @@ function inertiaTick (interaction) {
     status.sx = status.modifiedXe;
     status.sy = status.modifiedYe;
 
-    interaction.doMove();
+    interaction.move();
     interaction.end(status.startEvent);
     status.active = false;
     interaction.simulation = null;
@@ -263,7 +263,7 @@ function smothEndTick (interaction) {
     status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
     status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
 
-    interaction.doMove();
+    interaction.move();
 
     status.i = raf.request(() => smothEndTick(interaction));
   }
@@ -271,7 +271,7 @@ function smothEndTick (interaction) {
     status.sx = status.xe;
     status.sy = status.ye;
 
-    interaction.doMove();
+    interaction.move();
     interaction.end(status.startEvent);
 
     status.smoothEnd =

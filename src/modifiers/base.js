@@ -166,7 +166,7 @@ function beforeEnd ({ interaction, event }, modifiers) {
     // if the endOnly option is true for any modifier
     if (shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
-      interaction.doMove({ event, preEnd: true });
+      interaction.move({ event, preEnd: true });
       break;
     }
   }

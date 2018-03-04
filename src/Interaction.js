@@ -187,7 +187,7 @@ class Interaction {
     if (!duplicateMove) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
-        this.doMove(signalArg);
+        this.move(signalArg);
       }
 
       if (this.pointerWasMoved) {
@@ -205,7 +205,7 @@ class Interaction {
    *       // change the snap settings
    *       event.interactable.draggable({ snap: { targets: [] }});
    *       // fire another move event with re-calculated snap
-   *       event.interaction.doMove();
+   *       event.interaction.move();
    *     }
    *   });
    * ```
@@ -214,7 +214,7 @@ class Interaction {
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    */
-  doMove (signalArg) {
+  move (signalArg) {
     signalArg = utils.extend({
       pointer: this.pointers[0],
       event: this.prevEvent,
@@ -421,5 +421,14 @@ class Interaction {
 }
 
 Interaction.pointerMoveTolerance = 1;
+
+/**
+ * @alias Interaction.prototype.move
+ */
+Interaction.prototype.doMove = utils.warnOnce(
+  function (signalArg) {
+    this.move(signalArg);
+  },
+  'The interaction.doMove() method has been renamed to interaction.move()');
 
 module.exports = Interaction;
