@@ -98,6 +98,7 @@ declare namespace interact {
   }
 
   interface ResizableOptions {
+    enabled?: boolean
     max?: number
     maxPerElement?: number
     manualStart?: boolean
@@ -120,6 +121,7 @@ declare namespace interact {
   }
 
   interface GesturableOptions {
+    enabled?: boolean,
     max?: Number,
     maxPerElement?: Number,
     manualStart?: Boolean,
@@ -273,7 +275,6 @@ declare namespace interact {
     on ( opt: OnEvent, listener?: Listener ) : Interactable
     on ( opt: OnEventFunctions ) : Interactable
     styleCursor ( yesno: boolean ) : Interactable
-    createSnapGrid ( opt: { x: number, y: number, range: number, offset: Position } ) : SnapFunction
     test ( x : SnapFunction )
   }
 
