@@ -48,7 +48,7 @@ function getHoldDuration (interaction) {
   return options[actionName].hold || options[actionName].delay;
 }
 
-module.exports = {
+export default {
   init,
   getHoldDuration,
 };

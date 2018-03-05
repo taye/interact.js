@@ -1,5 +1,5 @@
 import test from '../test';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 import Signals from '../../src/utils/Signals';
 import interactions from '../../src/interactions';
 import drag from '../../src/actions/drag';

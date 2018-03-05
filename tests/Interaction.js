@@ -1,6 +1,6 @@
 import test from './test';
 import pointerUtils from '../src/utils/pointerUtils';
-import helpers from './helpers';
+import * as helpers from './helpers';
 
 import Interaction from '../src/Interaction';
 import InteractEvent from '../src/InteractEvent';

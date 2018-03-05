@@ -21,7 +21,7 @@ import interact from './interact';
 import modifiersBase from './modifiers/base';
 import snap from './modifiers/snap';
 import restrict from './modifiers/restrict';
-import snappers from './utils/snappers';
+import * as snappers from './utils/snappers';
 import inertia from './inertia';
 
 import pointerEventsBase from './pointerEvents/base';

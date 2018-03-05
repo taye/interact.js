@@ -1,5 +1,5 @@
 import test from '../test';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 
 import PointerEvent from '../../src/pointerEvents/PointerEvent';
 import pointerUtils from '../../src/utils/pointerUtils';

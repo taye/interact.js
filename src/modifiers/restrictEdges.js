@@ -29,8 +29,8 @@ function init (scope) {
   modifiers.restrictEdges = restrictEdges;
   modifiers.names.push('restrictEdges');
 
-  defaults.perAction.restrictEdges = module.exports.defaults;
-  resize.defaults.restrictEdges = module.exports.defaults;
+  defaults.perAction.restrictEdges = restrictEdges.defaults;
+  resize.defaults.restrictEdges = restrictEdges.defaults;
 }
 
 function setOffset ({ interaction, options }) {

@@ -10,116 +10,112 @@ const document = win.window.document;
 
 let counter = 0;
 
-const helpers = {
-  unique () {
-    return (counter++);
-  },
+export function unique () {
+  return (counter++);
+}
 
-  uniqueProps (obj) {
-    for (const prop in obj) {
-      if (!obj.hasOwnProperty(prop)) { continue; }
+export function uniqueProps (obj) {
+  for (const prop in obj) {
+    if (!obj.hasOwnProperty(prop)) { continue; }
 
-      if (_.isObject(obj)) {
-        helpers.uniqueProps(obj[obj]);
-      }
-      else {
-        obj[prop] = (counter++);
-      }
+    if (_.isObject(obj)) {
+      uniqueProps(obj[obj]);
     }
-  },
+    else {
+      obj[prop] = (counter++);
+    }
+  }
+}
 
-  newCoordsSet (n = 0) {
-    return {
-      start: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
-      },
-      cur: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
-      },
-      prev: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
-      },
-    };
-  },
+export function newCoordsSet (n = 0) {
+  return {
+    start: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+    cur: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+    prev: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+  };
+}
 
-  newPointer (n = 50) {
-    return {
-      pointerId: n++,
-      pageX: n++,
-      pageY: n++,
-      clientX: n++,
-      clientY: n++,
-    };
-  },
+export function newPointer (n = 50) {
+  return {
+    pointerId: n++,
+    pageX: n++,
+    pageY: n++,
+    clientX: n++,
+    clientY: n++,
+  };
+}
 
-  _,
+export function $ (selector, context) {
+  return (context || document).querySelector(selector);
+}
 
-  $ (selector, context) {
-    return (context || document).querySelector(selector);
-  },
+export function $$ (selector, context) {
+  return Array.from((context || document).querySelectorAll(selector));
+}
 
-  $$ (selector, context) {
-    return Array.from((context || document).querySelectorAll(selector));
-  },
+export function createEl (name) {
+  return document.createElement(name);
+}
 
-  createEl (name) {
-    return document.createElement(name);
-  },
-
-  mockScope (options) {
-    return Object.assign({
-      documents: [],
-      defaults,
-      interactions: [],
+export function mockScope (options) {
+  return Object.assign({
+    documents: [],
+    defaults,
+    interactions: [],
+    signals: new Signals(),
+    Interaction: {
       signals: new Signals(),
-      Interaction: {
-        signals: new Signals(),
-        new () {
-          return {};
-        },
+      new () {
+        return {};
       },
-      InteractEvent: {
-        signals: new Signals(),
-      },
-      Interactable: {
-        signals: new Signals(),
-      },
-    }, options);
-  },
+    },
+    InteractEvent: {
+      signals: new Signals(),
+    },
+    Interactable: {
+      signals: new Signals(),
+    },
+  }, options);
+}
 
-  mockSignals () {
-    return {
-      on () {},
-      off () {},
-      fire () {},
-    };
-  },
+export function mockSignals () {
+  return {
+    on () {},
+    off () {},
+    fire () {},
+  };
+}
 
-  mockInteractable (props) {
-    return Object.assign(
-      {
-        options: {
-          deltaSource: 'page',
-        },
-        target: {},
-        events: new Eventable(),
-        getRect () {
-          return this.element
-            ? utils.dom.getClientRect(this.element)
-            : { left: 0, top: 0, right: 0, bottom: 0 };
-        },
-        fire (event) {
-          this.events.fire(event);
-        },
+export function mockInteractable (props) {
+  return Object.assign(
+    {
+      options: {
+        deltaSource: 'page',
       },
-      props);
-  },
-};
+      target: {},
+      events: new Eventable(),
+      getRect () {
+        return this.element
+          ? utils.dom.getClientRect(this.element)
+          : { left: 0, top: 0, right: 0, bottom: 0 };
+      },
+      fire (event) {
+        this.events.fire(event);
+      },
+    },
+    props);
+}
 
-module.exports = helpers;
+export { _ };

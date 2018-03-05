@@ -1,5 +1,5 @@
 import test from '../test';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 import interactions from '../../src/interactions';
 
 import Interaction from '../../src/Interaction';

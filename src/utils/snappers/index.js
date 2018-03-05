@@ -1,5 +1,5 @@
 import grid from './grid';
 
-module.exports = {
+export {
   grid,
 };

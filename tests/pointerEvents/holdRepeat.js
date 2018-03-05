@@ -1,5 +1,5 @@
 import test from '../test';
-import helpers from '../helpers';
+import * as helpers from '../helpers';
 import Signals from '../../src/utils/Signals';
 import Eventable from '../../src/Eventable';
 import holdRepeat from '../../src/pointerEvents/holdRepeat';
