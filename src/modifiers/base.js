@@ -24,7 +24,7 @@ function init (scope) {
   });
 
   Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
-  Interaction.signals.on('action-end', arg => beforeEnd(arg, scope.modifiers));
+  Interaction.signals.on('before-action-end', arg => beforeEnd(arg, scope.modifiers));
 
   InteractEvent.signals.on('set-xy', arg => setXY(arg, scope.modifiers));
 }
@@ -158,7 +158,7 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
   }
 }
 
-function beforeEnd ({ interaction, event }, modifiers) {
+function beforeEnd ({ interaction, event, iEvent: endEvent }, modifiers) {
   for (const modifierName of modifiers.names) {
     const options = interaction.target.options[interaction.prepared.name][modifierName];
 
@@ -166,6 +166,10 @@ function beforeEnd ({ interaction, event }, modifiers) {
     if (shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
       interaction.doMove({ event, preEnd: true });
+      // update the end event's coords to match the latest move event
+      for (const coord of ['pageX', 'pageY', 'clientX', 'clientY']) {
+        endEvent[coord] = interaction.prevEvent[coord];
+      }
       break;
     }
   }

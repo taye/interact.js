@@ -1,6 +1,6 @@
-const modifiers = require('../modifiers/base');
-const utils     = require('../utils');
-const raf       = require('../utils/raf');
+const modifiers = require('./modifiers/base');
+const utils     = require('./utils');
+const raf       = require('./utils/raf');
 
 function init (scope) {
   const {
@@ -9,7 +9,7 @@ function init (scope) {
   } = scope;
 
   Interaction.signals.on('new', function (interaction) {
-    interaction.simulations.inertia = {
+    interaction.inertia = {
       active     : false,
       smoothEnd  : false,
       allowResume: false,
@@ -45,7 +45,7 @@ function init (scope) {
 }
 
 function resume ({ interaction, event, pointer, eventTarget }, scope) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   // Check if the down event hits the current inertia target
   if (status.active) {
@@ -68,7 +68,6 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
         // fire appropriate signals
         const signalArg = {
           interaction,
-          iEvent: resumeEvent,
         };
 
         scope.Interaction.signals.fire('action-resume', signalArg);
@@ -91,7 +90,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 }
 
 function release ({ interaction, event }, scope) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   if (!interaction.interacting() || (interaction.simulation && interaction.simulation.active)) {
     return;
@@ -182,7 +181,7 @@ function release ({ interaction, event }, scope) {
 }
 
 function stop ({ interaction }) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   if (status.active) {
     raf.cancel(status.i);
@@ -213,7 +212,7 @@ function inertiaTick (interaction) {
   updateInertiaCoords(interaction);
   utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
   const options = getOptions(interaction);
   const lambda = options.resistance;
   const t = new Date().getTime() / 1000 - status.t0;
@@ -257,7 +256,7 @@ function inertiaTick (interaction) {
 function smothEndTick (interaction) {
   updateInertiaCoords(interaction);
 
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
   const t = new Date().getTime() - status.t0;
   const { smoothEndDuration: duration } = getOptions(interaction);
 
@@ -283,7 +282,7 @@ function smothEndTick (interaction) {
 }
 
 function updateInertiaCoords (interaction) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   // return if inertia isn't running
   if (!status.active) { return; }
