@@ -23,11 +23,11 @@
     "start": "node build --watch",
     "build": "node build --docs",
     "lint": "node build/lint",
-    "test": "npm run lint -- --fail-on-error && istanbul cover --print none tests/index.js | tap-spec && istanbul report text-summary",
+    "test": "npm run lint -- --fail-on-error && NODE_ENV=test nyc --silent node tests/index.js | tap-spec && nyc report",
     "docs": "node build/docs -- --go",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
-    "preversion": "npm test && istanbul check-coverage",
+    "preversion": "npm test && nyc check-coverage",
     "postversion": "",
     "release": "sh build/release.sh",
     "pre-release": "sh build/release.sh prerelease",
@@ -62,9 +62,11 @@
   "license": "MIT",
   "devDependencies": {
     "babel-eslint": "^7.1.1",
+    "babel-plugin-istanbul": "^4.1.5",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-es2015": "^6.22.0",
+    "babel-register": "^6.26.0",
     "babelify": "^7.3.0",
     "browserify": "^16.0.0",
     "combine-source-map": "^0.7.1",
@@ -75,17 +77,28 @@
     "eslint-plugin-require-path-exists": "^1.1.5",
     "fs-extra": "^4.0.2",
     "husky": "^0.13.1",
-    "istanbul": "^0.4.5",
     "jsdoc": "github:taye/jsdoc#master",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "^9.11.0",
     "lodash": "^3.10.1",
     "mkdirp": "^0.5.1",
+    "nyc": "^11.4.1",
     "semver": "^5.3.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
     "through2": "^2.0.0",
     "uglify-js": "^2.7.5",
     "watchify": "^3.9.0"
+  },
+  "nyc": {
+    "require": [
+      "babel-register"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ],
+    "sourceMap": false,
+    "instrument": false
   }
 }

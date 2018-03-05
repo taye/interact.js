@@ -22,5 +22,11 @@
     ["transform-es2015-typeof-symbol",          { "loose": true }],
     ["transform-es2015-unicode-regex",          { "loose": true }],
     ["transform-object-rest-spread"]
-  ]
+  ],
+
+  "env": {
+    "test": {
+      "plugins": ["istanbul"],
+    },
+  }
 }
