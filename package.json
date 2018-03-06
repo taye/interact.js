@@ -27,7 +27,7 @@
     "docs": "node build/docs -- --go",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
-    "preversion": "npm test && nyc check-coverage",
+    "preversion": "npm test",
     "postversion": "",
     "release": "sh build/release.sh",
     "pre-release": "sh build/release.sh prerelease",
