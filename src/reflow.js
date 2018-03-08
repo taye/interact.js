@@ -1,3 +1,4 @@
+/** @lends Interactable */
 import Interactable from './Interactable';
 import interactions from './interactions';
 import autoStart from './autoStart/base';
@@ -24,6 +25,21 @@ export function init (scope) {
     }
   });
 
+  /**
+   * ```js
+   * const interactable = interact(target);
+   * const drag = { name: drag, axis: 'x' };
+   * const resize = { name: resize, edges: { left: true, bottom: true };
+   *
+   * interactable.reflow(drag);
+   * interactable.reflow(resize);
+   * ```
+   *
+   * Start an action sequence to re-apply modifiers, check drops, etc.
+   *
+   * @param { Object } action The action to begin
+   * @param { string } action.name The name of the action
+   */
   Interactable.prototype.reflow = function (action) {
     return reflow(this, action, scope);
   };
