@@ -63,7 +63,7 @@ export function tlbrToXywh (rect) {
     rect = extend({}, rect);
 
     rect.x      = rect.left || 0;
-    rect.top    = rect.top  || 0;
+    rect.y      = rect.top  || 0;
     rect.width  = rect.width  || (rect.right  - rect.x);
     rect.height = rect.height || (rect.bottom - rect.y);
   }
