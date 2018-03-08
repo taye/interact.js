@@ -209,8 +209,6 @@ class Interaction {
     signalArg.phase = 'move';
 
     this._doPhase(signalArg);
-
-    this._signals.fire('after-action-move', signalArg);
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
