@@ -32,6 +32,7 @@ import restrictEdges from './modifiers/restrictEdges';
 import restrictSize from './modifiers/restrictSize';
 
 import autoScroll from './autoScroll';
+import reflow from './reflow';
 
 export function init (window) {
   scopeInit(window);
@@ -73,6 +74,9 @@ export function init (window) {
 
   // autoScroll
   interact.use(autoScroll);
+
+  // reflow
+  interact.use(reflow);
 
   return interact;
 }
