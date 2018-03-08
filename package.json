@@ -94,6 +94,9 @@
     "require": [
       "babel-register"
     ],
+    "include": [
+      "src"
+    ],
     "reporter": [
       "text",
       "lcov"
