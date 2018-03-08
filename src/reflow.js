@@ -1,5 +1,3 @@
-/** @lends Interactable */
-import Interactable from './Interactable';
 import interactions from './interactions';
 import autoStart from './autoStart/base';
 import {
@@ -11,7 +9,12 @@ import {
 } from './utils';
 
 export function init (scope) {
-  const { actions, Interaction } = scope;
+  const {
+    actions,
+    Interaction,
+    /** @lends Interactable */
+    Interactable,
+  } = scope;
 
   // add action reflow event types
   for (const actionName of actions.names) {
