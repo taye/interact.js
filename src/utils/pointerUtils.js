@@ -224,6 +224,15 @@ const pointerUtils = {
       domUtils.getActualElement(event.currentTarget),
     ];
   },
+
+  coordsToEvent: function ({ page, client }) {
+    return {
+      pageX: page.x,
+      pageY: page.y,
+      clientX: client.x,
+      clientY: client.y,
+    };
+  },
 };
 
 export default pointerUtils;
