@@ -203,9 +203,10 @@ class Interaction {
       event: this.prevEvent,
       eventTarget: this._eventTarget,
       interaction: this,
-      phase: 'move',
       noBefore: false,
     }, signalArg || {});
+
+    signalArg.phase = 'move';
 
     this._doPhase(signalArg);
 
@@ -368,10 +369,10 @@ class Interaction {
     this._curEventTarget = currentTarget;
   }
 
-  _createPreparedEvent (event, phase, preEnd) {
+  _createPreparedEvent (event, phase, preEnd, type) {
     const actionName = this.prepared.name;
 
-    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd);
+    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type);
   }
 
   _fireEvent (iEvent) {
@@ -380,7 +381,7 @@ class Interaction {
   }
 
   _doPhase (signalArg) {
-    const { event, phase, preEnd } = signalArg;
+    const { event, phase, preEnd, type } = signalArg;
 
     if (!signalArg.noBefore) {
       const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg);
@@ -390,7 +391,7 @@ class Interaction {
       }
     }
 
-    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd);
+    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
 
     this._signals.fire(`action-${phase}`, signalArg);
 

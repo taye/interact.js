@@ -81,9 +81,6 @@ export function mockScope (options) {
         return {};
       },
     },
-    InteractEvent: {
-      signals: new Signals(),
-    },
     Interactable: {
       signals: new Signals(),
     },

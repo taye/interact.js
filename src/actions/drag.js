@@ -4,7 +4,6 @@ import * as arr from '../utils/arr';
 function init (scope) {
   const {
     actions,
-    InteractEvent,
     Interactable,
     Interaction,
     defaults,
@@ -14,7 +13,7 @@ function init (scope) {
   Interaction.signals.on('action-resume', beforeMove);
 
   // dragmove
-  InteractEvent.signals.on('new', newInteractEvent);
+  Interaction.signals.on('action-move', move);
 
   Interactable.prototype.draggable = drag.draggable;
 
@@ -57,8 +56,8 @@ function beforeMove ({ interaction }) {
   }
 }
 
-function newInteractEvent ({ iEvent, interaction }) {
-  if (iEvent.type !== 'dragmove') { return; }
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
 
   const axis = interaction.prepared.axis;
 
@@ -146,7 +145,7 @@ const drag = {
   init,
   draggable,
   beforeMove,
-  newInteractEvent,
+  move,
   defaults: {
     startAxis : 'xy',
     lockAxis  : 'xy',

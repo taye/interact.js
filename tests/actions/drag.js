@@ -13,7 +13,6 @@ function mockScope () {
       names: [],
       methodDict: {},
     },
-    InteractEvent: { signals: new Signals() },
     Interactable: {
       prototype: {},
       signals: new Signals(),
@@ -142,7 +141,7 @@ test('drag axis', t => {
     tt.deepEqual(interaction.pointerDelta.client, deltaClient,
       'pointerDelta.client is not modified');
 
-    scope.InteractEvent.signals.fire('new', { iEvent, interaction });
+    scope.Interaction.signals.fire('action-move', { iEvent, interaction });
 
     tt.deepEqual(iEvent.page, eventCoords.page, 'page coords are not modified');
     tt.deepEqual(iEvent.dx, eventCoords.dx, 'dx is not modified');
@@ -159,7 +158,7 @@ test('drag axis', t => {
       resetCoords();
       interaction.prepared.axis = axis;
 
-      scope.InteractEvent.signals.fire('new', { iEvent, interaction });
+      scope.Interaction.signals.fire('action-move', { iEvent, interaction });
 
       tt.equal(iEvent['d' + opposite], 0,
         'd' + opposite + ' is zero');

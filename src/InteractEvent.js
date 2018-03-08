@@ -1,18 +1,15 @@
 import extend      from './utils/extend';
 import getOriginXY from './utils/getOriginXY';
 import defaults    from './defaultOptions';
-import Signals     from './utils/Signals';
-
-const signals = new Signals();
 
 class InteractEvent {
   /** */
-  constructor (interaction, event, action, phase, element, related, preEnd = false) {
+  constructor (interaction, event, actionName, phase, element, related, preEnd, type) {
     element = element || interaction.element;
 
     const target      = interaction.target;
     const deltaSource = (target && target.options || defaults).deltaSource;
-    const origin      = getOriginXY(target, element, action);
+    const origin      = getOriginXY(target, element, actionName);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
     const prevEvent   = starting? this : interaction.prevEvent;
@@ -44,7 +41,7 @@ class InteractEvent {
     this.currentTarget = element;
     this.relatedTarget = related || null;
     this.preEnd        = preEnd;
-    this.type          = action + (phase || '');
+    this.type          = type || (actionName + (phase || ''));
     this.interaction   = interaction;
     this.interactable  = target;
 
@@ -80,19 +77,6 @@ class InteractEvent {
     };
 
     this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
-
-    signals.fire('new', {
-      interaction,
-      event,
-      action,
-      phase,
-      element,
-      related,
-      starting,
-      ending,
-      deltaSource,
-      iEvent: this,
-    });
   }
 
   get pageX () { return this.page.x; }
@@ -157,7 +141,5 @@ class InteractEvent {
     this.propagationStopped = true;
   }
 }
-
-InteractEvent.signals = signals;
 
 export default InteractEvent;
