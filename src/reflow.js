@@ -1,4 +1,6 @@
 import Interactable from './Interactable';
+import interactions from './interactions';
+import autoStart from './autoStart/base';
 import {
   arr,
   is,
@@ -34,12 +36,10 @@ function reflow (interactable, action, scope) {
 
   // ignore elements that are currently being interacted with
   elements = elements.filter(
-    element => !arr.find(
-      scope.interactions,
-      i => i.target === interactable && i.element === element && i.interacting()));
+    element => autoStart.withinInteractionLimit(interactable, element, action, scope));
 
   for (const element of elements) {
-    const interaction = scope.Interaction.new({ pointerType: 'reflow' });
+    const interaction = interactions.newInteraction({ pointerType: 'reflow' }, scope);
 
     const rect = interactable.getRect(element);
 
