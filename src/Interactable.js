@@ -3,12 +3,9 @@ import * as is   from './utils/is';
 import events    from './utils/events';
 import extend    from './utils/extend';
 import * as arr  from './utils/arr';
-import scope     from './scope';
 import Eventable from './Eventable';
 import defaults  from './defaultOptions';
-import Signals   from './utils/Signals';
-
-const signals = new Signals();
+import { scope } from './scope';
 
 import {
   getElementRect,
@@ -21,7 +18,8 @@ import { wheelEvent } from './utils/browser';
 class Interactable {
   /** */
   constructor (target, options, defaultContext) {
-    this._signals = options.signals || Interactable.signals;
+    this._signals = options.signals;
+    this._actions = options.actions;
     this.target   = target;
     this.events   = new Eventable();
     this._context = options.context || defaultContext;
@@ -128,7 +126,7 @@ class Interactable {
     if (trySelector(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (const action of scope.actions.names) {
+      for (const action of this._actions.names) {
         this.options[action][optionName] = newValue;
       }
 
@@ -238,7 +236,7 @@ class Interactable {
 
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
-    if (arr.contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(this._actions.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
@@ -270,7 +268,7 @@ class Interactable {
     if (eventType === 'wheel') { eventType = wheelEvent; }
 
     // if it is an action event type
-    if (arr.contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(this._actions.eventTypes, eventType)) {
       this.events.off(eventType, listener);
     }
     // delegated event
@@ -298,8 +296,8 @@ class Interactable {
 
     this.options = extend({}, defaults.base);
 
-    for (const actionName in scope.actions.methodDict) {
-      const methodName = scope.actions.methodDict[actionName];
+    for (const actionName in this._actions.methodDict) {
+      const methodName = this._actions.methodDict[actionName];
 
       this.options[actionName] = {};
       this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
@@ -307,10 +305,8 @@ class Interactable {
       this[methodName](options[actionName]);
     }
 
-    for (const setting of Interactable.settingsMethods) {
-      this.options[setting] = defaults.base[setting];
-
-      if (setting in options) {
+    for (const setting in options) {
+      if (is.func(this[setting])) {
         this[setting](options[setting]);
       }
     }
@@ -363,12 +359,5 @@ class Interactable {
     return scope.interact;
   }
 }
-
-// all interact.js eventTypes
-Interactable.eventTypes = [];
-
-Interactable.signals = signals;
-
-Interactable.settingsMethods = [ 'deltaSource', 'origin', 'preventDefault', 'rectChecker' ];
 
 export default Interactable;

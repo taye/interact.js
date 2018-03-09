@@ -1,18 +1,8 @@
 /* browser entry point */
 
-import {
-  win,
-  browser,
-  raf,
-} from './utils';
-import domObjects from './utils/domObjects';
-
-import scope from './scope';
+import { init as scopeInit } from './scope';
 
 import interactions from './interactions';
-
-import Interactable from './Interactable';
-import InteractEvent from './InteractEvent';
 
 import interactablePreventDefault from './interactablePreventDefault';
 
@@ -44,18 +34,10 @@ import restrictSize from './modifiers/restrictSize';
 import autoScroll from './autoScroll';
 
 export function init (window) {
-  win.init(window);
-  domObjects.init(window);
-  browser.init(window);
-  raf.init(window);
+  scopeInit(window);
 
-  scope.document = window.document;
-
-  interactions.init(scope);
-  interactablePreventDefault(scope);
-
-  scope.Interactable  = Interactable;
-  scope.InteractEvent = InteractEvent;
+  interact.use(interactions);
+  interact.use(interactablePreventDefault);
 
   // modifiers
   interact.use(modifiersBase);

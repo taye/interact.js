@@ -1,5 +1,3 @@
-import Interactable from './Interactable';
-import scope        from './scope';
 import * as is      from './utils/is';
 import events       from './utils/events';
 import browser      from './utils/browser';
@@ -7,32 +5,22 @@ import browser      from './utils/browser';
 import { nodeContains, matchesSelector } from './utils/domUtils';
 import { getWindow } from './utils/window';
 
-/**
- * Returns or sets whether to prevent the browser's default behaviour in
- * response to pointer events. Can be set to:
- *  - `'always'` to always prevent
- *  - `'never'` to never prevent
- *  - `'auto'` to let interact.js try to determine what would be best
- *
- * @param {string} [newValue] `true`, `false` or `'auto'`
- * @return {string | Interactable} The current setting or this Interactable
- */
-Interactable.prototype.preventDefault = function (newValue) {
+function preventDefault (interactable, newValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
-    this.options.preventDefault = newValue;
-    return this;
+    interactable.options.preventDefault = newValue;
+    return interactable;
   }
 
   if (is.bool(newValue)) {
-    this.options.preventDefault = newValue? 'always' : 'never';
-    return this;
+    interactable.options.preventDefault = newValue? 'always' : 'never';
+    return interactable;
   }
 
-  return this.options.preventDefault;
-};
+  return interactable.options.preventDefault;
+}
 
-Interactable.prototype.checkAndPreventDefault = function (event) {
-  const setting = this.options.preventDefault;
+function checkAndPreventDefault (interactable, scope, event) {
+  const setting = interactable.options.preventDefault;
 
   if (setting === 'never') { return; }
 
@@ -67,7 +55,7 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   }
 
   event.preventDefault();
-};
+}
 
 function onInteractionEvent ({ interaction, event }) {
   if (interaction.target) {
@@ -75,7 +63,27 @@ function onInteractionEvent ({ interaction, event }) {
   }
 }
 
-export default function init () {
+export function init (scope) {
+  /** @lends Interactable */
+  const Interactable = scope.Interactable;
+  /**
+   * Returns or sets whether to prevent the browser's default behaviour in
+   * response to pointer events. Can be set to:
+   *  - `'always'` to always prevent
+   *  - `'never'` to never prevent
+   *  - `'auto'` to let interact.js try to determine what would be best
+   *
+   * @param {string} [newValue] `true`, `false` or `'auto'`
+   * @return {string | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.preventDefault = function (newValue) {
+    return preventDefault(this, newValue);
+  };
+
+  Interactable.prototype.checkAndPreventDefault = function (event) {
+    return checkAndPreventDefault(this, scope, event);
+  };
+
   for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
     scope.Interaction.signals.on(eventSignal, onInteractionEvent);
   }
@@ -94,3 +102,5 @@ export default function init () {
     }
   };
 }
+
+export default { init };

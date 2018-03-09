@@ -10,6 +10,7 @@ import hypot       from './hypot';
 import * as is     from './is';
 import pointer     from './pointerUtils';
 import rect        from './rect';
+import events      from './events';
 
 export function warnOnce (method, message) {
   let warned = false;
@@ -64,4 +65,5 @@ export {
   raf,
   win,
   browser,
+  events,
 };

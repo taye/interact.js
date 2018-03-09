@@ -5,7 +5,9 @@ import { merge }     from '../utils/arr';
 function init (scope) {
   const {
     pointerEvents,
+    actions,
     Interactable,
+    interactables,
   } = scope;
 
   pointerEvents.signals.on('collect-targets', function ({ targets, element, type, eventTarget }) {
@@ -26,18 +28,18 @@ function init (scope) {
     });
   });
 
-  Interactable.signals.on('new', function ({ interactable }) {
+  interactables.signals.on('new', function ({ interactable }) {
     interactable.events.getRect = function (element) {
       return interactable.getRect(element);
     };
   });
 
-  Interactable.signals.on('set', function ({ interactable, options }) {
+  interactables.signals.on('set', function ({ interactable, options }) {
     extend(interactable.events.options, pointerEvents.defaults);
     extend(interactable.events.options, options);
   });
 
-  merge(Interactable.eventTypes, pointerEvents.types);
+  merge(actions.eventTypes, pointerEvents.types);
 
   Interactable.prototype.pointerEvents = function (options) {
     extend(this.events.options, options);
@@ -56,8 +58,6 @@ function init (scope) {
 
     return ret;
   };
-
-  Interactable.settingsMethods.push('pointerEvents');
 }
 
 export default {

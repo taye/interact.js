@@ -221,7 +221,7 @@ function init (scope) {
 
   actions.resize = resize;
   actions.names.push('resize');
-  utils.arr.merge(Interactable.eventTypes, [
+  utils.arr.merge(actions.eventTypes, [
     'resizestart',
     'resizemove',
     'resizeinertiastart',

@@ -19,7 +19,7 @@ function init (scope) {
 
   actions.drag = drag;
   actions.names.push('drag');
-  arr.merge(Interactable.eventTypes, [
+  arr.merge(actions.eventTypes, [
     'dragstart',
     'dragmove',
     'draginertiastart',

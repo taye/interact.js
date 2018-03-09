@@ -69,6 +69,7 @@ function init (scope) {
   scope.actions = {
     names: [],
     methodDict: {},
+    eventTypes: [],
   };
 }
 

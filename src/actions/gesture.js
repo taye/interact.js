@@ -95,7 +95,7 @@ function init (scope) {
 
   actions.gesture = gesture;
   actions.names.push('gesture');
-  utils.arr.merge(Interactable.eventTypes, [
+  utils.arr.merge(actions.eventTypes, [
     'gesturestart',
     'gesturemove',
     'gestureend',

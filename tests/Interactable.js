@@ -1,15 +1,15 @@
 import test from './test';
 import d from './domator';
+import * as helpers from './helpers';
 
 import Interactable from '../src/Interactable';
-import scope from '../src/scope';
 import defaults from '../src/defaultOptions';
 
 
 test('Interactable copies and extends defaults', t => {
-  scope.actions = {
-    methodDict: { test: 'testize' },
-  };
+  const scope = helpers.mockScope();
+
+  scope.actions.methodDict = { test: 'testize' };
 
   Interactable.prototype.testize = function (options) {
     this.setPerAction('test', options);
@@ -23,7 +23,7 @@ test('Interactable copies and extends defaults', t => {
   const specified = { specified: 'parent' };
 
   const div = d('div');
-  const interactable = new Interactable(div, { test: specified });
+  const interactable = helpers.newInteractable(scope, div, { test: specified });
 
   t.deepEqual(interactable.options.test.specified, specified.specified,
     'specified options are properly set');
@@ -36,18 +36,13 @@ test('Interactable copies and extends defaults', t => {
   t.notOk('c' in interactable.options.test.fromDefault,
     'modifying defaults does not affect constructed interactables');
 
-  // Undo global changes
-  delete scope.actions;
-  delete Interactable.prototype.testize;
-  delete defaults.test;
-
   t.end();
 });
 
 test('Interactable copies and extends per action defaults', t => {
-  scope.actions = {
-    methodDict: { test: 'testize' },
-  };
+  const scope = helpers.mockScope();
+
+  scope.actions.methodDict = { test: 'testize' };
 
   Interactable.prototype.testize = function (options) {
     this.setPerAction('test', options);
@@ -60,7 +55,7 @@ test('Interactable copies and extends per action defaults', t => {
   defaults.test = { testModifier: defaults.perAction.testModifier };
 
   const div = d('div');
-  const interactable = new Interactable(div, {});
+  const interactable = helpers.newInteractable(scope, div, {});
   interactable.testize({ testModifier: { specified: 'parent' } });
 
   t.deepEqual(interactable.options.test, {

@@ -4,7 +4,6 @@ import InteractableMethods from './InteractableMethods';
 function init (scope) {
   const {
     interact,
-    Interactable,
     Interaction,
     defaults,
     Signals,
@@ -65,11 +64,6 @@ function init (scope) {
   });
 
   interact.maxInteractions = maxInteractions;
-
-  Interactable.settingsMethods.push('styleCursor');
-  Interactable.settingsMethods.push('actionChecker');
-  Interactable.settingsMethods.push('ignoreFrom');
-  Interactable.settingsMethods.push('allowFrom');
 
   defaults.base.actionChecker = null;
   defaults.base.styleCursor = true;

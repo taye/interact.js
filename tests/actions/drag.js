@@ -1,28 +1,13 @@
 import test from '../test';
 import * as helpers from '../helpers';
-import Signals from '../../src/utils/Signals';
 import interactions from '../../src/interactions';
 import drag from '../../src/actions/drag';
 import pointerUtils from '../../src/utils/pointerUtils';
 import { extend } from '../../src/utils';
 
 
-function mockScope () {
-  return helpers.mockScope({
-    actions: {
-      names: [],
-      methodDict: {},
-    },
-    Interactable: {
-      prototype: {},
-      signals: new Signals(),
-      eventTypes: [],
-    },
-  });
-}
-
 test('drag action init', t => {
-  const scope = mockScope();
+  const scope = helpers.mockScope();
 
   drag.init(scope);
 
@@ -93,7 +78,7 @@ test('Interactable.draggable method', t => {
 });
 
 test('drag axis', t => {
-  const scope = mockScope();
+  const scope = helpers.mockScope();
 
   interactions.init(scope);
   drag.init(scope);

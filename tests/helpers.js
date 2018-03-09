@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import win from '../src/utils/window';
 import * as utils from '../src/utils';
+import clone from '../src/utils/clone';
 import defaults  from '../src/defaultOptions';
 import Signals from '../src/utils/Signals';
 import Eventable from '../src/Eventable';
-
+import Interactable from '../src/Interactable';
+import Interaction from '../src/Interaction';
 
 const document = win.window.document;
 
@@ -72,18 +74,24 @@ export function createEl (name) {
 export function mockScope (options) {
   return Object.assign({
     documents: [],
-    defaults,
+    defaults: clone(defaults),
+    actions: {
+      names: [],
+      methodDict: {},
+      eventTypes: [],
+    },
     interactions: [],
+    interactables: {
+      signals: new Signals(),
+    },
     signals: new Signals(),
     Interaction: {
       signals: new Signals(),
-      new () {
-        return {};
+      new (props) {
+        return new Interaction({ signals: this.signals, ...props });
       },
     },
-    Interactable: {
-      signals: new Signals(),
-    },
+    Interactable: class extends Interactable {},
   }, options);
 }
 
@@ -95,9 +103,21 @@ export function mockSignals () {
   };
 }
 
+export function newInteractable (scope, target, options = {}, defaultContext) {
+  options.signals = scope.interactables.signals;
+  options.actions = scope.actions;
+
+  return new scope.Interactable(target, options, defaultContext);
+}
+
 export function mockInteractable (props) {
   return Object.assign(
     {
+      _signals: new Signals(),
+      _actions: {
+        names: [],
+        methodDict: {},
+      },
       options: {
         deltaSource: 'page',
       },

@@ -198,8 +198,6 @@ function init (scope) {
     return dropped;
   };
 
-  Interactable.settingsMethods.push('dropChecker');
-
   Interaction.signals.on('new', function (interaction) {
     interaction.dropTarget      = null; // the dropzone a drag target might be dropped into
     interaction.dropElement     = null; // the element at the time of checking
@@ -235,7 +233,7 @@ function init (scope) {
     return dynamicDrop;
   };
 
-  utils.arr.merge(Interactable.eventTypes, [
+  utils.arr.merge(actions.eventTypes, [
     'dragenter',
     'dragleave',
     'dropactivate',
