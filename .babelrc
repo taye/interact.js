@@ -1,5 +1,10 @@
 {
   "plugins": [
+    ["transform-runtime", {
+      helpers: true,
+      polyfill: false,
+      regenerator: false
+    }],
     "transform-es2015-modules-commonjs",
     ["check-es2015-constants",                  { "loose": true }],
     ["transform-es2015-arrow-functions",        { "loose": true }],
