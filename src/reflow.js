@@ -1,5 +1,4 @@
 import interactions from './interactions';
-import autoStart from './autoStart/base';
 import {
   arr,
   is,
@@ -18,7 +17,7 @@ export function init (scope) {
 
   // add action reflow event types
   for (const actionName of actions.names) {
-    Interactable.eventTypes.push(`${actionName}reflow`);
+    actions.eventTypes.push(`${actionName}reflow`);
   }
 
   // remove completed reflow interactions
@@ -53,9 +52,11 @@ function reflow (interactable, action, scope) {
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target];
 
-  // ignore elements that are currently being interacted with
-  elements = elements.filter(
-    element => autoStart.withinInteractionLimit(interactable, element, action, scope));
+  // follow autoStart max interaction settings
+  if (scope.autoStart) {
+    elements = elements.filter(
+      element => scope.autoStart.withinInteractionLimit(interactable, element, action, scope));
+  }
 
   for (const element of elements) {
     const interaction = interactions.newInteraction({ pointerType: 'reflow' }, scope);
