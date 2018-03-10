@@ -5,7 +5,6 @@ import extend    from './utils/extend';
 import * as arr  from './utils/arr';
 import Eventable from './Eventable';
 import defaults  from './defaultOptions';
-import { scope } from './scope';
 
 import {
   getElementRect,
@@ -355,8 +354,6 @@ class Interactable {
     }
 
     this._signals.fire('unset', { interactable: this });
-
-    return scope.interact;
   }
 }
 
