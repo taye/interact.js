@@ -103,6 +103,7 @@ declare namespace interact {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
+    snapSize?: SnapOptions
     restrict?: RestrictOption;
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
