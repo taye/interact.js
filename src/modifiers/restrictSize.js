@@ -18,18 +18,14 @@ const noMax = { width: +Infinity, height: +Infinity };
 
 function init (scope) {
   const {
-    actions,
     modifiers,
     defaults,
   } = scope;
-
-  const { resize } = actions;
 
   modifiers.restrictSize = restrictSize;
   modifiers.names.push('restrictSize');
 
   defaults.perAction.restrictSize = restrictSize.defaults;
-  resize.defaults.restrictSize = restrictSize.defaults;
 }
 
 function setOffset ({ interaction }) {

@@ -9,14 +9,12 @@ function init (scope) {
   const {
     modifiers,
     defaults,
-    actions,
   } = scope;
 
   modifiers.snapSize = snapSize;
   modifiers.names.push('snapSize');
 
   defaults.perAction.snapSize = snapSize.defaults;
-  actions.resize.defaults.snapSize  = snapSize.defaults;
 }
 
 function setOffset (arg) {

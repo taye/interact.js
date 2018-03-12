@@ -21,16 +21,12 @@ function init (scope) {
   const {
     modifiers,
     defaults,
-    actions,
   } = scope;
-
-  const { resize } = actions;
 
   modifiers.restrictEdges = restrictEdges;
   modifiers.names.push('restrictEdges');
 
   defaults.perAction.restrictEdges = restrictEdges.defaults;
-  resize.defaults.restrictEdges = restrictEdges.defaults;
 }
 
 function setOffset ({ interaction, options }) {
