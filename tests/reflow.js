@@ -26,7 +26,16 @@ test('reflow', t => {
   interactable.rectChecker(() => rect);
 
   scope.autoStart.withinInteractionLimit = () => false;
+  interactable.reflow({ name: 'test' });
   t.equal(fired.length, 0, 'follows scope.autoStart.withinInteractionLimit');
+
+  // modify move coords
+  scope.Interaction.signals.on('before-action-move', ({ interaction }) => {
+    interaction.curCoords.page = {
+      x: rect.left + 100,
+      y: rect.top - 50,
+    };
+  });
 
   scope.autoStart.withinInteractionLimit = () => true;
   interactable.reflow({ name: 'test' });
@@ -46,6 +55,36 @@ test('reflow', t => {
       y: rect.top,
     },
     'uses element top left for event coords'
+  );
+
+  const reflowMove = fired[2];
+
+  t.equal(
+    reflowMove.dx,
+    100,
+    'move dx is correct with modified interaction coords'
+  );
+
+  t.equal(
+    reflowMove.dy,
+    -50,
+    'move dy is correct with modified interaction coords'
+  );
+
+  t.notOk(
+    interaction.pointerIsDown,
+    'reflow pointer was lifted'
+  );
+
+  t.equal(
+    interaction.pointers.length,
+    0,
+    'reflow pointer was removed from interaction'
+  );
+
+  t.notOk(
+    scope.interactions.includes(interaction),
+    'interaction is removed from list'
   );
 
   t.end();

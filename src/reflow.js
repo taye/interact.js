@@ -97,6 +97,9 @@ function reflow (interactable, action, scope) {
     else {
       interaction.stop();
     }
+
+    interaction.removePointer(event, event);
+    interaction.pointerIsDown = false;
   }
 }
 
