@@ -11,6 +11,7 @@ import * as actions from './actions';
 import * as modifiers from './modifiers';
 import * as snappers from './utils/snappers';
 import autoScroll from './autoScroll';
+import reflow from './reflow';
 
 export function init (window) {
   scopeInit(window);
@@ -38,6 +39,9 @@ export function init (window) {
 
   // autoScroll
   interact.use(autoScroll);
+
+  // reflow
+  interact.use(reflow);
 
   return interact;
 }

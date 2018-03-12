@@ -43,6 +43,8 @@ import './actions/drag';
 // autoScroll
 //import './autoScroll';
 
+import './reflow';
+
 import './interact';
 
 //const index = import '../src/index';

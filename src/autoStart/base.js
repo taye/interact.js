@@ -96,6 +96,7 @@ function init (scope) {
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
+    withinInteractionLimit,
     signals: new Signals(),
   };
 }
