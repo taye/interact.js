@@ -29,6 +29,11 @@ declare namespace interact {
     height: number
   }
 
+  interface Rect3 {
+    width: number
+    height: number
+  }
+
   interface SnapFunction {
     ( x: number, y: number ) : SnapPosition
   }
@@ -74,6 +79,11 @@ declare namespace interact {
     endOnly?: boolean
   }
 
+  interface RestrictSizeOption {
+    min?: Rect3
+    max?: Rect3
+  }
+
   interface EdgeOptions {
     top?: boolean | CSSSelector | DOMElement
     left?: boolean | CSSSelector | DOMElement
@@ -87,7 +97,7 @@ declare namespace interact {
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
-    restrict?: RestrictOption;
+    restrict?: RestrictOption
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
     axis?: 'x' | 'y'
@@ -98,17 +108,17 @@ declare namespace interact {
   }
 
   interface ResizableOptions {
-    enabled?: boolean
     max?: number
     maxPerElement?: number
     manualStart?: boolean
     snap?: SnapOptions
     snapSize?: SnapOptions
-    restrict?: RestrictOption;
+    restrict?: RestrictOption
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
+    restrictSize?: RestrictSizeOption
 
-    square?: boolean,
+    square?: boolean
     edges?: EdgeOptions
     // deprecated
     axis?: 'x' | 'y'
@@ -290,7 +300,7 @@ declare namespace interact {
     supportsPointerEvent () : boolean
     stop ( event: any ) : InteractStatic
     pointerMoveTolerance ( tol?: number ) : number | InteractStatic
-    createSnapGrid ( opt: { x: number, y: number } ) : SnapFunction
+    createSnapGrid ( grid: { x: number, y: number, range: number, offset?: Position, limits?: Rect } ) : SnapFunction
     // TODO
     isSet ( any ) : any
     off ( any ) : any
