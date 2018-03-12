@@ -293,7 +293,7 @@ class Interactable {
       options = {};
     }
 
-    this.options = extend({}, defaults.base);
+    this.options = clone(defaults.base);
 
     for (const actionName in this._actions.methodDict) {
       const methodName = this._actions.methodDict[actionName];
