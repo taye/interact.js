@@ -10,11 +10,11 @@ snapping for modern browsers (and also IE9+).
 Features include:
 
  - **inertia** and **snapping**
- - **multiple interactions**
+ - **multi-touch**, simultaneous interactions
  - cross browser and device, supporting the **desktop and mobile** versions of
    Chrome, Firefox and Opera as well as **Internet Explorer 9+**
  - interaction with [**SVG**](http://interactjs.io/images/star.svg) elements
- - being **lightweight and standalone** (not _yet another_ jQuery plugin)
+ - being **standalone and customizable**
  - **not modifying the DOM** except to change the cursor (but you can disable
    that)
 
@@ -23,14 +23,14 @@ Installation
 
 * [Bower](http://bower.io/): `bower install interactjs`
 * [npm](https://www.npmjs.org/): `npm install interactjs`
-* [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.bower" % "interact.js" % "1.2.8")`
+* [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.bower" % "interactjs" % version)`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
     * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
     * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
     * Restart the Rails server
-* [jsDelivr CDN](http://www.jsdelivr.com/#!interact.js): `<script src="//cdn.jsdelivr.net/npm/interactjs@1.2.9/dist/interact.min.js"></script>`
-* [cdnjs CDN](https://cdnjs.com/libraries/interact.js): `<script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>`
+* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@1.3/dist/interact.min.js"></script>`
+* [unpkG CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@1.3/dist/interact.min.js"></script>`
 
 Documentation
 -------------
