@@ -390,7 +390,10 @@ class Interaction {
 
   _fireEvent (iEvent) {
     this.target.fire(iEvent);
-    this.prevEvent = iEvent;
+
+    if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
+      this.prevEvent = iEvent;
+    }
   }
 
   _doPhase (signalArg) {
