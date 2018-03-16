@@ -1,9 +1,5 @@
 extends: '../.eslintrc'
 
-parserOptions:
-  ecmaFeatures:
-    experimentalObjectRestSpread: true
-
 rules:
   no-console: 2
   strict: [2, never]

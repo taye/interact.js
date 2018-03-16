@@ -7,7 +7,11 @@ const config = {
   entries: 'index.js',
   standalone: 'interact',
 
-  transform: [[ 'babelify', { compact: false } ]],
+  transform: [[ 'babelify', {
+    babelrc: false,
+    sourceType: 'module',
+    ...require('../.babelrc'),
+  } ]],
 
   cache: {},
   packageCache: {},

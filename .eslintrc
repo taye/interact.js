@@ -6,7 +6,11 @@ env:
   node: true
 
 parserOptions:
+  parser: babel-eslint
   sourceType: module
+  ecmaVersion: 6
+  ecmaFeatures:
+    experimentalObjectRestSpread: true
 
 plugins:
   - require-path-exists
@@ -41,14 +45,9 @@ rules:
   semi: [2, always]
   space-before-function-paren: [2, always]
 
-ecma-features:
-  arrow-functions: true
-  block-bindings: true
-  classes: true
-  for-of: true
-  destructuring: true
-  object-literal-computed-properties: true
-  object-literal-shorthand-methods: true
-  oobject-literal-shorthand-properties: true
-  super-in-functions: true
-  template-strings: true
+  no-restricted-syntax:
+    - error
+    - default-params
+    - generators
+    - rest-params
+    - spread

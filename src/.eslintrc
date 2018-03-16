@@ -4,6 +4,10 @@ env:
   browser: true
   node: false
 
+parserOptions:
+  ecmaFeatures:
+    experimentalObjectRestSpread: false
+
 rules:
   no-console: 2
   strict: [2, never]

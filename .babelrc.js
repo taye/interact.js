@@ -1,4 +1,6 @@
-{
+const cwd = process.cwd();
+
+module.exports = {
   "plugins": [
     ["transform-runtime", {
       helpers: true,
@@ -14,7 +16,7 @@
     ["transform-es2015-computed-properties",    { "loose": true }],
     ["transform-es2015-destructuring",          { "loose": true }],
     ["transform-es2015-duplicate-keys",         { "loose": true }],
-    ["./build/babel-transform-for-of-array",    { "loose": true }],
+    [`${cwd}/build/babel-transform-for-of-array`,{ "loose": true }],
     ["transform-es2015-function-name",          { "loose": true }],
     ["transform-es2015-literals",               { "loose": true }],
     ["transform-es2015-modules-commonjs",       { "loose": true }],
@@ -31,7 +33,7 @@
 
   "env": {
     "test": {
-      "plugins": ["istanbul"],
-    },
+      "plugins": ["istanbul"]
+    }
   }
 }
