@@ -39,6 +39,7 @@ function init (scope) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     fireDropEvents(interaction, interaction.dropEvents);
+    interaction.dropEvents = {};
   });
 
   Interaction.signals.on('after-action-end', function ({ interaction }) {
@@ -250,7 +251,7 @@ function collectDrops ({ interactables }, draggableElement) {
   const drops = [];
 
   // collect all dropzones and their elements which qualify for a drop
-  for (const dropzone of interactables) {
+  for (const dropzone of interactables.list) {
     if (!dropzone.options.drop.enabled) { continue; }
 
     const accept = dropzone.options.drop.accept;
