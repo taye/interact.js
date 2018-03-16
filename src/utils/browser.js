@@ -29,10 +29,14 @@ function init (window) {
 
   // prefix matchesSelector
   browser.prefixedMatchesSelector = 'matches' in Element.prototype
-    ? 'matches': 'webkitMatchesSelector' in Element.prototype
-    ? 'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype
-    ? 'mozMatchesSelector': 'oMatchesSelector' in Element.prototype
-    ? 'oMatchesSelector': 'msMatchesSelector';
+    ? 'matches'
+    : 'webkitMatchesSelector' in Element.prototype
+      ? 'webkitMatchesSelector'
+      : 'mozMatchesSelector' in Element.prototype
+        ? 'mozMatchesSelector'
+        : 'oMatchesSelector' in Element.prototype
+          ? 'oMatchesSelector'
+          : 'msMatchesSelector';
 
   browser.pEventTypes = (domObjects.PointerEvent
     ? (domObjects.PointerEvent === window.MSPointerEvent

@@ -90,8 +90,8 @@ const pointerUtils = {
 
   setCoords: function (targetObj, pointers, timeStamp) {
     const pointer = (pointers.length > 1
-                     ? pointerUtils.pointerAverage(pointers)
-                     : pointers[0]);
+      ? pointerUtils.pointerAverage(pointers)
+      : pointers[0]);
 
     const tmpXY = {};
 
@@ -208,11 +208,11 @@ const pointerUtils = {
       ? pointer.pointerType
       : is.number(pointer.pointerType)
         ? [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType]
-          // if the PointerEvent API isn't available, then the "pointer" must
-          // be either a MouseEvent, TouchEvent, or Touch object
-          : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch
-            ? 'touch'
-            : 'mouse';
+        // if the PointerEvent API isn't available, then the "pointer" must
+        // be either a MouseEvent, TouchEvent, or Touch object
+        : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch
+          ? 'touch'
+          : 'mouse';
   },
 
   // [ event.target, event.currentTarget ]

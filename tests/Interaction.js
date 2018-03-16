@@ -81,13 +81,15 @@ test('Interaction.updatePointer', t => {
 
     const ret = interaction.updatePointer(pointer, event);
 
-    st.deepEqual(interaction.pointers, [{
-      id: pointer.pointerId,
-      pointer,
-      event,
-      downTime: null,
-      downTarget: null,
-    }],
+    st.deepEqual(
+      interaction.pointers,
+      [{
+        id: pointer.pointerId,
+        pointer,
+        event,
+        downTime: null,
+        downTarget: null,
+      }],
       'interaction.pointers == [{ pointer, ... }]');
     st.equal(ret, 0, 'new pointer index is returned');
 
@@ -249,7 +251,7 @@ test('Interaction.pointerDown', t => {
   t.equal(interaction.downEvent, event, 'downEvent is updated');
 
   t.deepEqual(
-  interaction.pointers,
+    interaction.pointers,
     [{
       id: pointer.pointerId,
       pointer,

@@ -51,5 +51,5 @@ import './interact';
 //const test = import 'tape';
 
 //test('module export', function (t) {
-  //t.equal(index, import '../src/interact');
+//t.equal(index, import '../src/interact');
 //});

@@ -10,7 +10,7 @@ function init (scope) {
     defaults,
   } = scope;
 
-// Less Precision with touch input
+  // Less Precision with touch input
   const defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
 
   const resize = {
@@ -49,12 +49,12 @@ function init (scope) {
         if (utils.is.object(resizeOptions.edges)) {
           for (const edge in resizeEdges) {
             resizeEdges[edge] = checkResizeEdge(edge,
-                                                resizeOptions.edges[edge],
-                                                page,
-                                                interaction._eventTarget,
-                                                element,
-                                                rect,
-                                                resizeOptions.margin || defaultMargin);
+              resizeOptions.edges[edge],
+              page,
+              interaction._eventTarget,
+              element,
+              rect,
+              resizeOptions.margin || defaultMargin);
           }
 
           resizeEdges.left = resizeEdges.left && !resizeEdges.right;

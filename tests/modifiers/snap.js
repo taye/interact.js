@@ -34,7 +34,7 @@ test('modifiers/snap', t => {
   snap.set(arg);
 
   t.deepEqual(
-  status,
+    status,
     {
       locked: true,
       range: Infinity,

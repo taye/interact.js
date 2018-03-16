@@ -224,7 +224,7 @@ function init (scope) {
   interact.dynamicDrop = function (newValue) {
     if (utils.is.bool(newValue)) {
       //if (dragging && dynamicDrop !== newValue && !newValue) {
-        //calcRects(dropzones);
+      //  calcRects(dropzones);
       //}
 
       dynamicDrop = newValue;
