@@ -18,7 +18,9 @@ test('modifiers/snap', t => {
     ],
     range: Infinity,
   };
-  const status = {};
+  const status = {
+    delta: { x: 0, y: 0 },
+  };
   const pageCoords = Object.freeze({ x: 10, y: 20 });
   const arg = {
     interaction,
@@ -34,13 +36,14 @@ test('modifiers/snap', t => {
   t.deepEqual(
   status,
     {
-      changed: true,
       locked: true,
       range: Infinity,
       realX: pageCoords.x,
       realY: pageCoords.y,
-      dx: target0.x - pageCoords.x,
-      dy: target0.y - pageCoords.y,
+      delta: {
+        x: target0.x - pageCoords.x,
+        y: target0.y - pageCoords.y,
+      },
       modifiedX: target0.x,
       modifiedY: target0.y,
     },

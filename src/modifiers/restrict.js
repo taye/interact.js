@@ -41,8 +41,8 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
 
   if (!restriction) { return status; }
 
-  status.dx = 0;
-  status.dy = 0;
+  status.delta.x = 0;
+  status.delta.y = 0;
   status.locked = false;
 
   const rect = restriction;
@@ -61,11 +61,10 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
     modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
   }
 
-  status.dx = modifiedX - page.x;
-  status.dy = modifiedY - page.y;
+  status.delta.x = modifiedX - page.x;
+  status.delta.y = modifiedY - page.y;
 
-  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-  status.locked = !!(status.dx || status.dy);
+  status.locked = !!(status.delta.x || status.delta.y);
 
   status.modifiedX = modifiedX;
   status.modifiedY = modifiedY;
@@ -78,15 +77,10 @@ function modifyCoords ({ page, client, status, phase, options }) {
       && !(phase === 'start' && elementRect && status.locked)) {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
-
-      return {
-        dx: status.dx,
-        dy: status.dy,
-      };
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
   }
 }

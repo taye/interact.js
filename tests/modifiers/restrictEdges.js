@@ -13,7 +13,9 @@ test('restrictEdges', t => {
   interaction._interacting = true;
 
   const options = { enabled: true };
-  const status = {};
+  const status = {
+    delta: { x: 0, y: 0 },
+  };
   const coords = { x: 40, y: 40 };
   const offset = { top: 0, left: 0, bottom: 0, right: 0 };
   const arg = { interaction, options, status, modifiedCoords: coords, offset };
@@ -25,11 +27,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     status,
     {
-      dx: 60,
-      dy: 60,
-      modifiedX: 100,
-      modifiedY: 100,
-      changed: true,
+      delta: { x: 60, y: 60 },
       locked: true,
     },
     'outer restriction is applied correctly'
@@ -43,11 +41,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     status,
     {
-      dx: -40,
-      dy: -40,
-      modifiedX: 0,
-      modifiedY: 0,
-      changed: true,
+      delta: { x: -40, y: -40 },
       locked: true,
     },
     'inner restriction is applied correctly'
@@ -68,11 +62,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     status,
     {
-      dx: 160,
-      dy: 160,
-      modifiedX: 200,
-      modifiedY: 200,
-      changed: true,
+      delta: { x: 160, y: 160 },
       locked: true,
     },
     'outer restriction is applied correctly with offset'
@@ -98,11 +88,7 @@ test('restrictEdges', t => {
   // modifyCoords
   arg.page = { x: 50, y: 100 };
   arg.status = {
-    dx: 150,
-    dy: 100,
-    modifiedX: 200,
-    modifiedY: 200,
-    changed: true,
+    delta: { x: 150, y: 100 },
     locked: true,
   };
   arg.phase = 'start';

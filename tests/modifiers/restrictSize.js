@@ -17,7 +17,9 @@ test('restrictSize', t => {
       min: { width:  60, height:  50 },
       max: { width: 600, height: 500 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };
@@ -32,7 +34,9 @@ test('restrictSize', t => {
     const options = {
       min: { width: 60, height: 50 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };
@@ -47,7 +51,9 @@ test('restrictSize', t => {
     const options = {
       max: { width: 600, height: 500 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };

@@ -67,15 +67,16 @@ function setOffsets (arg, modifiers) {
 
 function setAll (arg, modifiers) {
   const { interaction, statuses, preEnd, requireEndOnly } = arg;
+
+  arg.modifiedCoords = extend({}, arg.pageCoords);
+
   const result = {
-    dx: 0,
-    dy: 0,
+    delta: { x: 0, y: 0 },
+    coords: arg.modifiedCoords,
     changed: false,
     locked: false,
     shouldMove: true,
   };
-
-  arg.modifiedCoords = extend({}, arg.pageCoords);
 
   for (const modifierName of modifiers.names) {
     const modifier = modifiers[modifierName];
@@ -90,21 +91,25 @@ function setAll (arg, modifiers) {
     modifier.set(arg);
 
     if (arg.status.locked) {
-      arg.modifiedCoords.x += arg.status.dx;
-      arg.modifiedCoords.y += arg.status.dy;
+      arg.modifiedCoords.x += arg.status.delta.x;
+      arg.modifiedCoords.y += arg.status.delta.y;
 
-      result.dx += arg.status.dx;
-      result.dy += arg.status.dy;
+      result.delta.x += arg.status.delta.x;
+      result.delta.y += arg.status.delta.y;
 
       result.locked = true;
     }
   }
 
+  const changed =
+    interaction.curCoords.page.x !== arg.modifiedCoords.x ||
+    interaction.curCoords.page.y !== arg.modifiedCoords.y;
+
   // a move should be fired if:
   //  - there are no modifiers enabled,
   //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
   //  - the locked coords have changed since the last pointer move
-  result.shouldMove = !arg.status || !result.locked || arg.status.changed;
+  result.shouldMove = !arg.status || !result.locked || changed;
 
   return result;
 }
@@ -113,11 +118,8 @@ function resetStatuses (statuses, modifiers) {
   for (const modifierName of modifiers.names) {
     const status = statuses[modifierName] || {};
 
-    status.dx = status.dy = 0;
-    status.modifiedX = status.modifiedY = NaN;
-    status.realX = status.realY = NaN;
+    status.delta = { x: 0, y: 0 };
     status.locked = false;
-    status.changed = true;
 
     statuses[modifierName] = status;
   }
