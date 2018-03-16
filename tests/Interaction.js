@@ -47,13 +47,11 @@ test('Interaction constructor', t => {
   t.equal(interaction.pointerType, testType,
     'interaction.pointerType is set');
 
-  // array properties
-  for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
-    t.ok(interaction[prop],
-      `interaction.${prop} is an array`);
-    t.equal(interaction[prop].length, 0,
-      `interaction.${prop} is empty`);
-  }
+  // pointerInfo properties
+  t.deepEqual(
+    interaction.pointers,
+    [],
+    'interaction.pointers is initially an empty array');
 
   // false properties
   for (const prop of 'pointerIsDown pointerWasMoved _interacting mouse'.split(' ')) {
@@ -66,10 +64,10 @@ test('Interaction constructor', t => {
 test('Interaction.getPointerIndex', t => {
   const interaction = makeInteractionAndSignals();
 
-  interaction.pointerIds = [2, 4, 5, 0, -1];
+  interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id }));
 
-  interaction.pointerIds.forEach((pointerId, index) => {
-    t.equal(interaction.getPointerIndex({ pointerId: pointerId }), index);
+  interaction.pointers.forEach(({ id }, index) => {
+    t.equal(interaction.getPointerIndex({ pointerId: id }), index);
   });
 
   t.end();
@@ -79,15 +77,19 @@ test('Interaction.updatePointer', t => {
   t.test('no existing pointers', st => {
     const interaction = makeInteractionAndSignals();
     const pointer = { pointerId: 10 };
+    const event = {};
 
-    const ret = interaction.updatePointer(pointer);
+    const ret = interaction.updatePointer(pointer, event);
 
-    st.deepEqual(interaction.pointers, [pointer],
-      'interaction.pointers == [pointer]');
-    st.deepEqual(interaction.pointerIds, [pointer.pointerId],
-      'interaction.pointerIds == [pointer.pointerId]');
-    st.equal(ret, 0,
-      'new pointer is at index 0');
+    st.deepEqual(interaction.pointers, [{
+      id: pointer.pointerId,
+      pointer,
+      event,
+      downTime: null,
+      downTarget: null,
+    }],
+      'interaction.pointers == [{ pointer, ... }]');
+    st.equal(ret, 0, 'new pointer index is returned');
 
     st.end();
   });
@@ -95,17 +97,33 @@ test('Interaction.updatePointer', t => {
   t.test('new pointer with exisiting pointer', st => {
     const interaction = makeInteractionAndSignals();
     const existing = { pointerId: 0 };
+    const event = {};
 
-    interaction.updatePointer(existing);
+    interaction.updatePointer(existing, event);
 
     const newPointer = { pointerId: 10 };
-    const ret = interaction.updatePointer(newPointer);
+    const ret = interaction.updatePointer(newPointer, event);
 
-    st.deepEqual(interaction.pointers, [existing, newPointer],
-      'interaction.pointers == [pointer]');
-    st.deepEqual(interaction.pointerIds, [existing.pointerId, newPointer.pointerId],
-      'interaction.pointerIds == [pointer.pointerId]');
-    st.equal(ret, interaction.pointers.length - 1, 'new pointer index is n - 1');
+    st.deepEqual(
+      interaction.pointers, [
+        {
+          id: existing.pointerId,
+          pointer: existing,
+          event,
+          downTime: null,
+          downTarget: null,
+        },
+        {
+          id: newPointer.pointerId,
+          pointer: newPointer,
+          event,
+          downTime: null,
+          downTarget: null,
+        },
+      ],
+      'interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]');
+
+    st.equal(ret, 1, 'second pointer index is 1');
 
     st.end();
   });
@@ -114,21 +132,19 @@ test('Interaction.updatePointer', t => {
     const interaction = makeInteractionAndSignals();
 
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }));
-    const newPointers = oldPointers.map(({ pointerId }) => ({ pointerId }));
+    const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }));
 
     oldPointers.forEach(pointer => interaction.updatePointer(pointer));
-
-    // these "new" pointers are different objects with the same pointerIds
     newPointers.forEach(pointer => interaction.updatePointer(pointer));
 
     st.equal(interaction.pointers.length, oldPointers.length,
       'number of pointers is unchanged');
 
-    interaction.pointers.forEach((pointer, i) => {
-      st.notEqual(pointer, oldPointers[i],
-        'new pointer object !== old pointer object');
-      st.equal(pointer.pointerId, oldPointers[i].pointerId,
-        'pointerIds are identical');
+    interaction.pointers.forEach((pointerInfo, i) => {
+      st.equal(pointerInfo.id, oldPointers[i].pointerId,
+        `pointer[${i}].id is the same`);
+      st.notEqual(pointerInfo.pointer, oldPointers[i],
+        `new pointer ${i} !== old pointer object`);
     });
 
     st.end();
@@ -137,8 +153,7 @@ test('Interaction.updatePointer', t => {
 
 test('Interaction.removePointer', t => {
   const interaction = makeInteractionAndSignals();
-  const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
-  const pointerIds = [0, 1, 2, 3];
+  const ids = [0, 1, 2, 3];
   const removals = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4' },
     { id: 2, remain: [1,    3], message: 'middle of 3' },
@@ -146,24 +161,15 @@ test('Interaction.removePointer', t => {
     { id: 1, remain: [       ], message: 'final' },
   ];
 
-  pointerIds.forEach((id, index) => {
-    interaction.updatePointer({ pointerId: id });
-
-    // use the ids in these arrays for this test
-    interaction.downTimes  [index] = id;
-    interaction.downTargets[index] = id;
-  });
+  ids.forEach((pointerId) => interaction.updatePointer({ pointerId }));
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id });
 
-    t.deepEqual(interaction.pointers.map(p => p.pointerId), removal.remain,
+    t.deepEqual(
+      interaction.pointers.map(p => p.id),
+      removal.remain,
       `${removal.message} - remaining interaction.pointers is correct`);
-
-    for (const prop of pointerIdArrays) {
-      t.deepEqual(interaction[prop], removal.remain,
-        `${removal.message} - remaining interaction.${prop} is correct`);
-    }
   }
 
   t.end();
@@ -198,10 +204,18 @@ test('Interaction.pointerDown', t => {
   interaction.pointerDown(pointer, event, eventTarget);
 
   t.equal(interaction.downEvent, null, 'downEvent is not updated');
-  t.deepEqual(interaction.pointers, [pointer], 'pointer is added');
+  t.deepEqual(
+    interaction.pointers,
+    [{
+      id: pointer.pointerId,
+      pointer,
+      event,
+      downTime: null,
+      downTarget: null,
+    }],
+    'pointer is added'
+  );
 
-  t.deepEqual(interaction.downTargets, [], 'downTargets is not updated');
-  t.deepEqual(interaction.downTimes,   [], 'downTimes   is not updated');
   t.deepEqual(interaction.downPointer, {}, 'downPointer is not updated');
 
   t.deepEqual(interaction.startCoords, coords.start, 'startCoords are not modified');
@@ -234,8 +248,16 @@ test('Interaction.pointerDown', t => {
 
   t.equal(interaction.downEvent, event, 'downEvent is updated');
 
-  t.deepEqual(interaction.downTargets, [eventTarget],       'downTargets is updated');
-  t.deepEqual(interaction.downTimes,   [pointerCoords.timeStamp], 'downTimes   is updated');
+  t.deepEqual(
+  interaction.pointers,
+    [{
+      id: pointer.pointerId,
+      pointer,
+      event,
+      downTime: pointerCoords.timeStamp,
+      downTarget: eventTarget,
+    }],
+    'interaction.pointers is updated');
 
   t.deepEqual(interaction.startCoords, pointerCoords, 'startCoords are set to pointer');
   t.deepEqual(interaction.curCoords,   pointerCoords, 'curCoords   are set to pointer');
@@ -259,7 +281,7 @@ test('Interaction.start', t => {
   interaction.start(action, target, element);
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown');
 
-  // pointerIds is still empty
+  // pointers is still empty
   interaction.pointerIsDown = true;
   interaction.start(action, target, element);
   t.equal(interaction.prepared.name, null, 'do nothing if too few pointers are down');

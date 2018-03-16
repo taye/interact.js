@@ -136,7 +136,7 @@ function release ({ interaction, event }, scope) {
 
   utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
 
-  interaction.pointers[0] = status.startEvent = new scope.InteractEvent(
+  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(
     interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
 
   status.t0 = now;

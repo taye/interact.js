@@ -31,3 +31,7 @@ export function findIndex (array, func) {
 export function find (array, func) {
   return array[findIndex(array, func)];
 }
+
+export function some (array, func) {
+  return findIndex(array, func) !== -1;
+}

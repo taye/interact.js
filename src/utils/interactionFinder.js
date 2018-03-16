@@ -48,7 +48,7 @@ const finder = {
     for (const interaction of scope.interactions) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !utils.arr.contains(interaction.pointerIds, pointerId)) { continue; }
+        if (interaction.simulation && !hasPointerId(interaction, pointerId)) { continue; }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {
@@ -82,7 +82,7 @@ const finder = {
   // get interaction that has this pointer
   hasPointer: function ({ pointerId, scope }) {
     for (const interaction of scope.interactions) {
-      if (utils.arr.contains(interaction.pointerIds, pointerId)) {
+      if (hasPointerId(interaction, pointerId)) {
         return interaction;
       }
     }
@@ -92,7 +92,7 @@ const finder = {
   idle: function ({ pointerType, scope }) {
     for (const interaction of scope.interactions) {
       // if there's already a pointer held down
-      if (interaction.pointerIds.length === 1) {
+      if (interaction.pointers.length === 1) {
         const target = interaction.target;
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
@@ -101,7 +101,7 @@ const finder = {
         }
       }
       // maximum of 2 pointers per interaction
-      else if (interaction.pointerIds.length >= 2) {
+      else if (interaction.pointers.length >= 2) {
         continue;
       }
 
@@ -113,5 +113,9 @@ const finder = {
     return null;
   },
 };
+
+function hasPointerId (interaction, pointerId) {
+  return utils.arr.some(interaction.pointers, ({ id }) => id === pointerId);
+}
 
 export default finder;

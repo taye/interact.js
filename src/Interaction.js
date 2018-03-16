@@ -15,10 +15,7 @@ class Interaction {
     };
 
     // keep track of added pointers
-    this.pointers    = [];
-    this.pointerIds  = [];
-    this.downTargets = [];
-    this.downTimes   = [];
+    this.pointers = [/* { id, pointer, event, target, downTime }*/];
 
     // Previous native pointer move event coordinates
     this.prevCoords = {
@@ -50,8 +47,11 @@ class Interaction {
     this.downEvent   = null;    // pointerdown/mousedown/touchstart event
     this.downPointer = {};
 
-    this._eventTarget    = null;
-    this._curEventTarget = null;
+    this._latestPointer = {
+      pointer: null,
+      event: null,
+      eventTarget   : null,
+    };
 
     this.prevEvent = null;      // previous action event
 
@@ -111,7 +111,7 @@ class Interaction {
   start (action, target, element) {
     if (this.interacting()
         || !this.pointerIsDown
-        || this.pointerIds.length < (action.name === 'gesture'? 2 : 1)) {
+        || this.pointers.length < (action.name === 'gesture'? 2 : 1)) {
       return;
     }
 
@@ -129,7 +129,7 @@ class Interaction {
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false);
-      utils.pointer.setCoords(this.curCoords, this.pointers);
+      utils.pointer.setCoords(this.curCoords, this.pointers.map(p => p.pointer));
     }
 
     const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
@@ -199,9 +199,9 @@ class Interaction {
    */
   move (signalArg) {
     signalArg = utils.extend({
-      pointer: this.pointers[0],
-      event: this.prevEvent,
-      eventTarget: this._eventTarget,
+      pointer: this._latestPointer.pointer,
+      event: this._latestPointer.event,
+      eventTarget: this._latestPointer.eventTarget,
       interaction: this,
       noBefore: false,
     }, signalArg || {});
@@ -255,7 +255,7 @@ class Interaction {
    */
   end (event) {
     this._ending = true;
-    event = event || this.prevEvent;
+    event = event || this._latestPointer.event;
     let endPhaseResult;
 
     if (this.interacting()) {
@@ -292,40 +292,54 @@ class Interaction {
   }
 
   getPointerIndex (pointer) {
-    // mouse and pen interactions may have only one pointer
-    if (this.pointerType === 'mouse' || this.pointerType === 'pen') {
-      return 0;
-    }
+    const pointerId = utils.pointer.getPointerId(pointer);
 
-    return this.pointerIds.indexOf(utils.pointer.getPointerId(pointer));
+    // mouse and pen interactions may have only one pointer
+    return (this.pointerType === 'mouse' || this.pointerType === 'pen')
+      ? 0
+      : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId);
+  }
+
+  getPointerInfo (pointer) {
+    return this.pointers[this.getPointerIndex(pointer)];
   }
 
   updatePointer (pointer, event, eventTarget, down = event && /(down|start)$/i.test(event.type)) {
     const id = utils.pointer.getPointerId(pointer);
-    let index = this.getPointerIndex(pointer);
+    let pointerIndex = this.getPointerIndex(pointer);
+    let pointerInfo = this.pointers[pointerIndex];
 
-    if (index === -1) {
-      index = this.pointerIds.length;
-      this.pointerIds[index] = id;
+    if (!pointerInfo) {
+      pointerInfo = {
+        id,
+        pointer,
+        event,
+        downTime: null,
+        downTarget: null,
+      };
+
+      pointerIndex = this.pointers.length;
+      this.pointers.push(pointerInfo);
+    }
+    else {
+      pointerInfo.pointer = pointer;
     }
 
     if (down) {
-      this.pointerIds[index] = id;
-      this.pointers[index]   = pointer;
-      this.pointerIsDown     = true;
+      this.pointerIsDown = true;
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.startCoords, this.pointers);
+        utils.pointer.setCoords(this.startCoords, this.pointers.map(p => p.pointer));
 
         utils.pointer.copyCoords(this.curCoords , this.startCoords);
         utils.pointer.copyCoords(this.prevCoords, this.startCoords);
-
-        this.downEvent          = event;
-        this.downTimes[index]   = this.curCoords.timeStamp;
-        this.downTargets[index] = eventTarget;
-        this.pointerWasMoved    = false;
-
         utils.pointer.pointerExtend(this.downPointer, pointer);
+
+        this.downEvent = event;
+        pointerInfo.downTime = this.curCoords.timeStamp;
+        pointerInfo.downTarget = eventTarget;
+
+        this.pointerWasMoved = false;
       }
 
       this._signals.fire('update-pointer-down', {
@@ -333,38 +347,39 @@ class Interaction {
         event,
         eventTarget,
         down,
-        pointerId: id,
-        pointerIndex: index,
+        pointerInfo,
+        pointerIndex,
         interaction: this,
       });
     }
 
-    this.pointers[index] = pointer;
+    this._updateLatestPointer(pointer, event, eventTarget);
 
-    return index;
+    return pointerIndex;
   }
 
   removePointer (pointer, event) {
-    const index = this.getPointerIndex(pointer);
+    const pointerIndex = this.getPointerIndex(pointer);
 
-    if (index === -1) { return; }
+    if (pointerIndex === -1) { return; }
+
+    const pointerInfo = this.pointers[pointerIndex];
 
     this._signals.fire('remove-pointer', {
       pointer,
       event,
-      pointerIndex: index,
+      pointerIndex,
+      pointerInfo,
       interaction: this,
     });
 
-    this.pointers   .splice(index, 1);
-    this.pointerIds .splice(index, 1);
-    this.downTargets.splice(index, 1);
-    this.downTimes  .splice(index, 1);
+    this.pointers.splice(pointerIndex, 1);
   }
 
-  _updateEventTargets (target, currentTarget) {
-    this._eventTarget    = target;
-    this._curEventTarget = currentTarget;
+  _updateLatestPointer (pointer, event, eventTarget) {
+    this._latestPointer.pointer = pointer;
+    this._latestPointer.event = event;
+    this._latestPointer.eventTarget = eventTarget;
   }
 
   _createPreparedEvent (event, phase, preEnd, type) {

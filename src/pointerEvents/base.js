@@ -92,11 +92,12 @@ function fire (arg) {
 
 function collectEventTargets ({ interaction, pointer, event, eventTarget, type }) {
   const pointerIndex = interaction.getPointerIndex(pointer);
+  const pointerInfo = interaction.pointers[pointerIndex];
 
   // do not fire a tap event if the pointer was moved before being lifted
   if (type === 'tap' && (interaction.pointerWasMoved
       // or if the pointerup target is different to the pointerdown target
-      || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
+      || !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
     return [];
   }
 

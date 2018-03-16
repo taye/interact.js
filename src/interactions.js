@@ -131,7 +131,6 @@ function doOnInteractions (method, scope) {
     }
 
     for (const [pointer, interaction] of matches) {
-      interaction._updateEventTargets(eventTarget, curEventTarget);
       interaction[method](pointer, event, eventTarget, curEventTarget);
     }
   });

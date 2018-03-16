@@ -45,8 +45,9 @@ class InteractEvent {
     this.interaction   = interaction;
     this.interactable  = target;
 
-    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1]
-                       : prevEvent.t0;
+    this.t0 = starting
+      ? interaction.pointers[interaction.pointers.length - 1].downTime
+      : prevEvent.t0;
 
     this.x0       = interaction.startCoords.page.x - origin.x;
     this.y0       = interaction.startCoords.page.y - origin.y;

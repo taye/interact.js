@@ -21,7 +21,7 @@ export default class PointerEvent {
 
     if (type === 'tap') {
       const pointerIndex = interaction.getPointerIndex(pointer);
-      this.dt = this.timeStamp - interaction.downTimes[pointerIndex];
+      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
 
       const interval = this.timeStamp - interaction.tapTime;
 

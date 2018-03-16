@@ -63,6 +63,9 @@ test('pointerEvents.fire', t => {
   const interaction = Object.assign(
     new Interaction({ signals: new Signals() }),
     { tapTime: -1, prevTap: null });
+
+  interaction.updatePointer({});
+
   const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
     timeStamp: tapTime,
   });
@@ -141,15 +144,15 @@ test('pointerEvents Interaction remove-pointer signal', t => {
 
   const interaction = scope.Interaction.new({});
 
-  const pointerIds  = [0, 1, 2, 3];
-  const removals    = [
+  const ids = [0, 1, 2, 3];
+  const removals = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4'  },
     { id: 2, remain: [1,    3], message: 'middle of 3' },
     { id: 3, remain: [1      ], message: 'last of 2'   },
     { id: 1, remain: [       ], message: 'final'       },
   ];
 
-  for (const id of pointerIds) {
+  for (const id of ids) {
     const index = interaction.updatePointer({ pointerId: id }, null, true);
     // use the ids in the holdTimers array for this test
     interaction.holdTimers[index] = id;
@@ -157,9 +160,6 @@ test('pointerEvents Interaction remove-pointer signal', t => {
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id });
-
-    t.deepEqual(interaction.pointers.map(p => p.pointerId), removal.remain,
-      `${removal.message} - remaining interaction.pointers is correct`);
 
     t.deepEqual(interaction.holdTimers, removal.remain,
       `${removal.message} - remaining interaction.holdTimers is correct`);

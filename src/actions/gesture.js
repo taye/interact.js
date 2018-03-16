@@ -14,7 +14,7 @@ function init (scope) {
     },
 
     checker: function (pointer, event, interactable, element, interaction) {
-      if (interaction.pointerIds.length >= 2) {
+      if (interaction.pointers.length >= 2) {
         return { name: 'gesture' };
       }
 
@@ -141,7 +141,7 @@ function updateGestureProps ({ interaction, iEvent, event, phase, deltaSource })
   const starting = phase === 'start';
   const ending = phase === 'end';
 
-  iEvent.touches = [pointers[0], pointers[1]];
+  iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
 
   if (starting) {
     iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
