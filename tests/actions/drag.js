@@ -91,14 +91,13 @@ test('drag axis', t => {
     },
     target: element,
   };
-  const iEvent = { page: {}, client: {}, type: 'dragmove' };
+  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' };
 
   const opposites = { x: 'y', y: 'x' };
   const eventCoords = {
     page: { x: -1, y: -2 },
     client: { x: -3, y: -4 },
-    dx: -5,
-    dy: -6,
+    delta: { x: -5, y: -6 },
   };
   const startPage   = { x: 0, y: 1 };
   const startClient = { x: 2, y: 3 };
@@ -129,8 +128,7 @@ test('drag axis', t => {
     scope.Interaction.signals.fire('action-move', { iEvent, interaction });
 
     tt.deepEqual(iEvent.page, eventCoords.page, 'page coords are not modified');
-    tt.deepEqual(iEvent.dx, eventCoords.dx, 'dx is not modified');
-    tt.deepEqual(iEvent.dy, eventCoords.dy, 'dy is not modified');
+    tt.deepEqual(iEvent.delta, eventCoords.delta, 'delta is not modified');
 
     tt.end();
   });
@@ -145,14 +143,20 @@ test('drag axis', t => {
 
       scope.Interaction.signals.fire('action-move', { iEvent, interaction });
 
-      tt.equal(iEvent['d' + opposite], 0,
-        'd' + opposite + ' is zero');
-      tt.equal(iEvent['d' + axis], eventCoords['d' + axis],
-        'd' + axis + ' is not modified');
+      tt.deepEqual(
+        iEvent.delta,
+        {
+          [opposite]: 0,
+          [axis]: eventCoords.delta[axis],
+        },
+        `opposite axis (${opposite}) delta is 0; target axis (${axis}) delta is not modified`);
 
-      tt.equal(
-        iEvent.page[opposite],
-        startPage[opposite],
+      tt.deepEqual(
+        iEvent.page,
+        {
+          [opposite]: startPage[opposite],
+          [axis]: eventCoords.page[axis],
+        },
         `page.${opposite} is startCoords value`
       );
 
@@ -181,8 +185,8 @@ test('drag axis', t => {
 
   function resetCoords () {
     pointerUtils.copyCoords(iEvent, eventCoords);
-    iEvent.dx = eventCoords.dx;
-    iEvent.dy = eventCoords.dy;
+    extend(iEvent.delta, eventCoords.delta);
+
     extend(interaction.startCoords.page  , startPage);
     extend(interaction.startCoords.client, startClient);
 

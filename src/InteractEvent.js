@@ -54,16 +54,13 @@ class InteractEvent {
     this.clientY0 = interaction.startCoords.client.y - origin.y;
 
     if (starting || ending) {
-      this.dx = 0;
-      this.dy = 0;
-    }
-    else if (deltaSource === 'client') {
-      this.dx = this.client.x - prevEvent.client.x;
-      this.dy = this.client.y - prevEvent.client.y;
+      this.delta = { x: 0, y: 0 };
     }
     else {
-      this.dx = this.page.x - prevEvent.page.x;
-      this.dy = this.page.y - prevEvent.page.y;
+      this.delta = {
+        x: this[deltaSource].x - prevEvent[deltaSource].x,
+        y: this[deltaSource].y - prevEvent[deltaSource].y,
+      };
     }
 
     this.dt        = interaction.pointerDelta.timeStamp;
@@ -88,6 +85,11 @@ class InteractEvent {
   get clientY () { return this.client.y; }
   set clientX (value) { this.client.x = value; }
   set clientY (value) { this.client.y = value; }
+
+  get dx () { return this.delta.x; }
+  get dy () { return this.delta.y; }
+  set dx (value) { this.delta.x = value; }
+  set dy (value) { this.delta.y = value; }
 
   get velocityX () { return this.velocity.x; }
   get velocityY () { return this.velocity.y; }

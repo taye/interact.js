@@ -330,12 +330,11 @@ function move ({ iEvent, interaction }) {
   const start      = interaction.resizeRects.start;
   const current    = interaction.resizeRects.current;
   const inverted   = interaction.resizeRects.inverted;
-  const delta      = interaction.resizeRects.delta;
+  const deltaRect  = interaction.resizeRects.delta;
   const previous   = utils.extend(interaction.resizeRects.previous, inverted);
   const originalEdges = edges;
 
-  let dx = iEvent.dx;
-  let dy = iEvent.dy;
+  const eventDelta = utils.extend({}, iEvent.delta);
 
   if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
     // `resize.preserveAspectRatio` takes precedence over `resize.square`
@@ -347,17 +346,17 @@ function move ({ iEvent, interaction }) {
 
     if ((originalEdges.left && originalEdges.bottom)
         || (originalEdges.right && originalEdges.top)) {
-      dy = -dx / startAspectRatio;
+      eventDelta.y = -eventDelta.x / startAspectRatio;
     }
-    else if (originalEdges.left || originalEdges.right ) { dy = dx / startAspectRatio; }
-    else if (originalEdges.top  || originalEdges.bottom) { dx = dy * startAspectRatio; }
+    else if (originalEdges.left || originalEdges.right ) { eventDelta.y = eventDelta.x / startAspectRatio; }
+    else if (originalEdges.top  || originalEdges.bottom) { eventDelta.x = eventDelta.y * startAspectRatio; }
   }
 
   // update the 'current' rect without modifications
-  if (edges.top   ) { current.top    += dy; }
-  if (edges.bottom) { current.bottom += dy; }
-  if (edges.left  ) { current.left   += dx; }
-  if (edges.right ) { current.right  += dx; }
+  if (edges.top   ) { current.top    += eventDelta.y; }
+  if (edges.bottom) { current.bottom += eventDelta.y; }
+  if (edges.left  ) { current.left   += eventDelta.x; }
+  if (edges.right ) { current.right  += eventDelta.x; }
 
   if (invertible) {
     // if invertible, copy the current rect
@@ -393,12 +392,12 @@ function move ({ iEvent, interaction }) {
   inverted.height = inverted.bottom - inverted.top ;
 
   for (const edge in inverted) {
-    delta[edge] = inverted[edge] - previous[edge];
+    deltaRect[edge] = inverted[edge] - previous[edge];
   }
 
   iEvent.edges = interaction.prepared.edges;
   iEvent.rect = inverted;
-  iEvent.deltaRect = delta;
+  iEvent.deltaRect = deltaRect;
 }
 
 function updateEventAxes ({ interaction, iEvent, action }) {
@@ -408,10 +407,10 @@ function updateEventAxes ({ interaction, iEvent, action }) {
 
   if (options.resize.square) {
     if (interaction.resizeAxes === 'y') {
-      iEvent.dx = iEvent.dy;
+      iEvent.delta.x = iEvent.delta.y;
     }
     else {
-      iEvent.dy = iEvent.dx;
+      iEvent.delta.y = iEvent.delta.x;
     }
     iEvent.axes = 'xy';
   }
@@ -419,10 +418,10 @@ function updateEventAxes ({ interaction, iEvent, action }) {
     iEvent.axes = interaction.resizeAxes;
 
     if (interaction.resizeAxes === 'x') {
-      iEvent.dy = 0;
+      iEvent.delta.y = 0;
     }
     else if (interaction.resizeAxes === 'y') {
-      iEvent.dx = 0;
+      iEvent.delta.x = 0;
     }
   }
 }

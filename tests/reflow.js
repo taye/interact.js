@@ -59,16 +59,10 @@ test('reflow', t => {
 
   const reflowMove = fired[2];
 
-  t.equal(
-    reflowMove.dx,
-    100,
-    'move dx is correct with modified interaction coords'
-  );
-
-  t.equal(
-    reflowMove.dy,
-    -50,
-    'move dy is correct with modified interaction coords'
+  t.deepEqual(
+    reflowMove.delta,
+    { x: 100, y: -50 },
+    'move delta is correct with modified interaction coords'
   );
 
   t.notOk(

@@ -163,15 +163,15 @@ function release ({ interaction, event }, scope) {
 
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
-    status.modifiedXe += modifierResult.dx;
-    status.modifiedYe += modifierResult.dy;
+    status.modifiedXe += modifierResult.delta.x;
+    status.modifiedYe += modifierResult.delta.y;
 
     status.i = raf.request(() => inertiaTick(interaction));
   }
   else {
     status.smoothEnd = true;
-    status.xe = modifierResult.dx;
-    status.ye = modifierResult.dy;
+    status.xe = modifierResult.delta.x;
+    status.ye = modifierResult.delta.y;
 
     status.sx = status.sy = 0;
 

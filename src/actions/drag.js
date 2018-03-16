@@ -61,15 +61,12 @@ function move ({ iEvent, interaction }) {
 
   const axis = interaction.prepared.axis;
 
-  if (axis === 'x') {
-    iEvent.page.y   = interaction.startCoords.page.y;
-    iEvent.client.y = interaction.startCoords.client.y;
-    iEvent.dy = 0;
-  }
-  else if (axis === 'y') {
-    iEvent.page.x   = interaction.startCoords.page.x;
-    iEvent.client.x = interaction.startCoords.client.x;
-    iEvent.dx = 0;
+  if (axis === 'x' || axis === 'y') {
+    const opposite = axis === 'x' ? 'y' : 'x';
+
+    iEvent.page[opposite]   = interaction.startCoords.page[opposite];
+    iEvent.client[opposite] = interaction.startCoords.client[opposite];
+    iEvent.delta[opposite] = 0;
   }
 }
 
