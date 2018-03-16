@@ -220,7 +220,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
     if (interaction.element === element) {
       targetElementCount++;
 
-      if (otherAction !== action.name || targetElementCount >= maxPerElement) {
+      if (otherAction === action.name && targetElementCount >= maxPerElement) {
         return false;
       }
     }
