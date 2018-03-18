@@ -19,7 +19,7 @@ const finder = {
       return null;
     }
 
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       let element = eventTarget;
 
       if (interaction.simulation && interaction.simulation.allowResume
@@ -45,7 +45,7 @@ const finder = {
 
     let firstNonActive;
 
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
         if (interaction.simulation && !hasPointerId(interaction, pointerId)) { continue; }
@@ -70,7 +70,7 @@ const finder = {
     // find any mouse or pen interaction.
     // ignore the interaction if the eventType is a *down, and a simulation
     // is active
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       if (interaction.pointerType === pointerType && !(/down/i.test(eventType) && interaction.simulation)) {
         return interaction;
       }
@@ -81,7 +81,7 @@ const finder = {
 
   // get interaction that has this pointer
   hasPointer: function ({ pointerId, scope }) {
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       if (hasPointerId(interaction, pointerId)) {
         return interaction;
       }
@@ -90,7 +90,7 @@ const finder = {
 
   // get first idle interaction with a matching pointerType
   idle: function ({ pointerType, scope }) {
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       // if there's already a pointer held down
       if (interaction.pointers.length === 1) {
         const target = interaction.target;

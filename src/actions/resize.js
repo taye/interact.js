@@ -6,7 +6,7 @@ function init (scope) {
     browser,
     /** @lends Interactable */
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
@@ -209,15 +209,15 @@ function init (scope) {
     return this.options.resize;
   };
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.resizeAxes = 'xy';
   });
 
-  Interaction.signals.on('action-start', start);
-  Interaction.signals.on('action-move', move);
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
-  Interaction.signals.on('action-start', updateEventAxes);
-  Interaction.signals.on('action-move', updateEventAxes);
+  interactions.signals.on('action-start', updateEventAxes);
+  interactions.signals.on('action-move', updateEventAxes);
 
   actions.resize = resize;
   actions.names.push('resize');

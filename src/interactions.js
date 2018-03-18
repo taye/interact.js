@@ -41,7 +41,7 @@ function init (scope) {
   }
 
   eventMap.blur = event => {
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       interaction.documentBlur(event);
     }
   };
@@ -52,15 +52,16 @@ function init (scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // all active and idle interactions
-  scope.interactions = [];
-  scope.Interaction = {
+  // eslint-disable-next-line no-shadow
+  scope.Interaction = class Interaction extends Interaction {};
+  scope.interactions = {
     signals,
-    Interaction,
+    // all active and idle interactions
+    list: [],
     new (options) {
       options.signals = signals;
 
-      return new Interaction(options);
+      return new scope.Interaction(options);
     },
     listeners,
     eventMap,
@@ -75,7 +76,7 @@ function init (scope) {
 
 function doOnInteractions (method, scope) {
   return (function (event) {
-    const { interactions } = scope;
+    const interactions = scope.interactions.list;
 
     const pointerType = pointerUtils.getPointerType(event);
     const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event);
@@ -142,20 +143,20 @@ function getInteraction (searchDetails) {
   const foundInteraction = finder.search(searchDetails);
   const signalArg = { interaction: foundInteraction, searchDetails };
 
-  scope.Interaction.signals.fire('find', signalArg);
+  scope.interactions.signals.fire('find', signalArg);
 
   return signalArg.interaction || newInteraction({ pointerType }, scope);
 }
 
-function newInteraction (options, scope) {
-  const interaction = scope.Interaction.new(options);
+export function newInteraction (options, scope) {
+  const interaction = scope.interactions.new(options);
 
-  scope.interactions.push(interaction);
+  scope.interactions.list.push(interaction);
   return interaction;
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { eventMap } = scope.Interaction;
+  const { eventMap } = scope.interactions;
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
 

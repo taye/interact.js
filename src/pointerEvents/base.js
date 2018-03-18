@@ -129,27 +129,27 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
 
 function init (scope) {
   const {
-    Interaction,
+    interactions,
   } = scope;
 
   scope.pointerEvents = pointerEvents;
   scope.defaults.pointerEvents = pointerEvents.defaults;
 
-  Interaction.signals.on('new', interaction => {
+  interactions.signals.on('new', interaction => {
     interaction.prevTap    = null;  // the most recent tap event on this interaction
     interaction.tapTime    = 0;     // time of the most recent tap event
     interaction.holdTimers = [];    // [{ duration, timeout }]
   });
 
-  Interaction.signals.on('update-pointer-down', function ({ interaction, pointerIndex }) {
+  interactions.signals.on('update-pointer-down', function ({ interaction, pointerIndex }) {
     interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
   });
 
-  Interaction.signals.on('remove-pointer', function ({ interaction, pointerIndex }) {
+  interactions.signals.on('remove-pointer', function ({ interaction, pointerIndex }) {
     interaction.holdTimers.splice(pointerIndex, 1);
   });
 
-  Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
+  interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
     const pointerIndex = interaction.getPointerIndex(pointer);
 
     if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
@@ -164,7 +164,7 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
+  interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
     const timer = interaction.holdTimers[pointerIndex];
     const path = utils.dom.getPath(eventTarget);
     const signalArg = {
@@ -208,14 +208,14 @@ function init (scope) {
     }, minDuration);
   });
 
-  Interaction.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
+  interactions.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
     if (!interaction.pointerWasMoved) {
       fire({ interaction, eventTarget, pointer, event, type: 'tap' });
     }
   });
 
   for (const signalName of ['up', 'cancel']) {
-    Interaction.signals.on(signalName, function ({ interaction, pointerIndex }) {
+    interactions.signals.on(signalName, function ({ interaction, pointerIndex }) {
       if (interaction.holdTimers[pointerIndex]) {
         clearTimeout(interaction.holdTimers[pointerIndex].timeout);
       }
@@ -223,7 +223,7 @@ function init (scope) {
   }
 
   for (let i = 0; i < simpleSignals.length; i++) {
-    Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
+    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
   }
 }
 

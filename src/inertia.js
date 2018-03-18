@@ -4,11 +4,11 @@ import raf        from './utils/raf';
 
 function init (scope) {
   const {
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.inertia = {
       active     : false,
       smoothEnd  : false,
@@ -30,9 +30,9 @@ function init (scope) {
     };
   });
 
-  Interaction.signals.on('up'  , arg => release(arg, scope));
-  Interaction.signals.on('down', arg => resume (arg, scope));
-  Interaction.signals.on('stop', arg => stop   (arg, scope));
+  interactions.signals.on('up'  , arg => release(arg, scope));
+  interactions.signals.on('down', arg => resume (arg, scope));
+  interactions.signals.on('stop', arg => stop   (arg, scope));
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -70,7 +70,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           interaction,
         };
 
-        scope.Interaction.signals.fire('action-resume', signalArg);
+        scope.interactions.signals.fire('action-resume', signalArg);
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(

@@ -8,13 +8,13 @@ function init (scope) {
     interact,
     /** @lends Interactable */
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
   let dynamicDrop = false;
 
-  Interaction.signals.on('after-action-start', function ({ interaction, event }) {
+  interactions.signals.on('after-action-start', function ({ interaction, event }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     // reset active dropzones
@@ -33,23 +33,23 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('action-move', arg => onEventCreated(arg, scope, dynamicDrop));
-  Interaction.signals.on('action-end' , arg => onEventCreated(arg, scope, dynamicDrop));
+  interactions.signals.on('action-move', arg => onEventCreated(arg, scope, dynamicDrop));
+  interactions.signals.on('action-end' , arg => onEventCreated(arg, scope, dynamicDrop));
 
-  Interaction.signals.on('after-action-move', function ({ interaction }) {
+  interactions.signals.on('after-action-move', function ({ interaction }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     fireDropEvents(interaction, interaction.dropEvents);
     interaction.dropEvents = {};
   });
 
-  Interaction.signals.on('after-action-end', function ({ interaction }) {
+  interactions.signals.on('after-action-end', function ({ interaction }) {
     if (interaction.prepared.name === 'drag') {
       fireDropEvents(interaction, interaction.dropEvents);
     }
   });
 
-  Interaction.signals.on('stop', function ({ interaction }) {
+  interactions.signals.on('stop', function ({ interaction }) {
     interaction.activeDrops = null;
     interaction.dropEvents = null;
   });
@@ -200,7 +200,7 @@ function init (scope) {
     return dropped;
   };
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.dropTarget      = null; // the dropzone a drag target might be dropped into
     interaction.dropElement     = null; // the element at the time of checking
     interaction.prevDropTarget  = null; // the dropzone that was recently dragged away from
@@ -209,7 +209,7 @@ function init (scope) {
     interaction.activeDrops     = null; // an array of { dropzone, element, rect }
   });
 
-  Interaction.signals.on('stop', function ({ interaction }) {
+  interactions.signals.on('stop', function ({ interaction }) {
     interaction.dropTarget = interaction.dropElement =
       interaction.prevDropTarget = interaction.prevDropElement = null;
   });

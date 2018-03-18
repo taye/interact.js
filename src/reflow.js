@@ -1,4 +1,4 @@
-import interactions from './interactions';
+import { newInteraction } from './interactions';
 import {
   arr,
   is,
@@ -10,7 +10,7 @@ import {
 export function init (scope) {
   const {
     actions,
-    Interaction,
+    interactions,
     /** @lends Interactable */
     Interactable,
   } = scope;
@@ -21,9 +21,9 @@ export function init (scope) {
   }
 
   // remove completed reflow interactions
-  Interaction.signals.on('stop', ({ interaction }) => {
+  interactions.signals.on('stop', ({ interaction }) => {
     if (interaction.pointerType === 'reflow') {
-      arr.remove(scope.interactions, interaction);
+      arr.remove(scope.interactions.list, interaction);
     }
   });
 
@@ -59,7 +59,7 @@ function reflow (interactable, action, scope) {
   }
 
   for (const element of elements) {
-    const interaction = interactions.newInteraction({ pointerType: 'reflow' }, scope);
+    const interaction = newInteraction({ pointerType: 'reflow' }, scope);
 
     const rect = interactable.getRect(element);
 

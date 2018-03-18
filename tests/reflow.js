@@ -30,7 +30,7 @@ test('reflow', t => {
   t.equal(fired.length, 0, 'follows scope.autoStart.withinInteractionLimit');
 
   // modify move coords
-  scope.Interaction.signals.on('before-action-move', ({ interaction }) => {
+  scope.interactions.signals.on('before-action-move', ({ interaction }) => {
     interaction.curCoords.page = {
       x: rect.left + 100,
       y: rect.top - 50,

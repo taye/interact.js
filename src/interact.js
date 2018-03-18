@@ -228,8 +228,8 @@ interact.supportsPointerEvent = function () {
  * @return {object} interact
  */
 interact.stop = function (event) {
-  for (let i = scope.interactions.length - 1; i >= 0; i--) {
-    scope.interactions[i].stop(event);
+  for (const interaction of scope.interactions.list) {
+    interaction.stop(event);
   }
 
   return interact;
@@ -258,7 +258,7 @@ signals.on('unset', ({ interactable }) => {
   scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
 
   // Stop related interactions when an Interactable is unset
-  for (const interaction of scope.interactions) {
+  for (const interaction of scope.interactions.list) {
     if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
       interaction.stop();
     }

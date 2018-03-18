@@ -2,12 +2,12 @@ import extend from '../utils/extend';
 
 function init (scope) {
   const {
-    Interaction,
+    interactions,
   } = scope;
 
   scope.modifiers = { names: [] };
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.modifiers = {
       startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       offsets    : {},
@@ -16,19 +16,19 @@ function init (scope) {
     };
   });
 
-  Interaction.signals.on('before-action-start' , arg =>
+  interactions.signals.on('before-action-start' , arg =>
     start(arg, scope.modifiers, arg.interaction.startCoords.page));
 
-  Interaction.signals.on('action-resume', arg => {
+  interactions.signals.on('action-resume', arg => {
     beforeMove(arg, scope.modifiers);
     start(arg, scope.modifiers, arg.interaction.curCoords.page);
   });
 
-  Interaction.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
-  Interaction.signals.on('before-action-end', arg => beforeEnd(arg, scope.modifiers));
+  interactions.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
+  interactions.signals.on('before-action-end', arg => beforeEnd(arg, scope.modifiers));
 
-  Interaction.signals.on('before-action-start', arg => setCurCoords(arg, scope.modifiers));
-  Interaction.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
+  interactions.signals.on('before-action-start', arg => setCurCoords(arg, scope.modifiers));
+  interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
 }
 
 function setOffsets (arg, modifiers) {

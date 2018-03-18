@@ -5,7 +5,7 @@ function init (scope) {
   const {
     actions,
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
@@ -71,14 +71,14 @@ function init (scope) {
     return this.options.gesture;
   };
 
-  Interaction.signals.on('action-start', start);
-  Interaction.signals.on('action-move', move);
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
-  Interaction.signals.on('action-start', updateGestureProps);
-  Interaction.signals.on('action-move', updateGestureProps);
-  Interaction.signals.on('action-end', updateGestureProps);
+  interactions.signals.on('action-start', updateGestureProps);
+  interactions.signals.on('action-move', updateGestureProps);
+  interactions.signals.on('action-end', updateGestureProps);
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.gesture = {
       start: { x: 0, y: 0 },
 

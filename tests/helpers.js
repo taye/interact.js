@@ -80,7 +80,9 @@ export function mockScope (options) {
       methodDict: {},
       eventTypes: [],
     },
-    interactions: [],
+    interactions: {
+      list: {},
+    },
     interactables: {
       signals: new Signals(),
     },

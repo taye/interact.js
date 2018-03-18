@@ -83,7 +83,7 @@ test('drag axis', t => {
   interactions.init(scope);
   drag.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const element = {};
   const interactable = {
     options: {
@@ -114,7 +114,7 @@ test('drag axis', t => {
   }
 
   t.test('xy (any direction)', tt => {
-    scope.Interaction.signals.fire('before-action-move', { interaction });
+    scope.interactions.signals.fire('before-action-move', { interaction });
 
     tt.deepEqual(interaction.startCoords.page, startPage,
       'startCoords.page is not modified');
@@ -125,7 +125,7 @@ test('drag axis', t => {
     tt.deepEqual(interaction.pointerDelta.client, deltaClient,
       'pointerDelta.client is not modified');
 
-    scope.Interaction.signals.fire('action-move', { iEvent, interaction });
+    scope.interactions.signals.fire('action-move', { iEvent, interaction });
 
     tt.deepEqual(iEvent.page, eventCoords.page, 'page coords are not modified');
     tt.deepEqual(iEvent.delta, eventCoords.delta, 'delta is not modified');
@@ -141,7 +141,7 @@ test('drag axis', t => {
       resetCoords();
       interaction.prepared.axis = axis;
 
-      scope.Interaction.signals.fire('action-move', { iEvent, interaction });
+      scope.interactions.signals.fire('action-move', { iEvent, interaction });
 
       tt.deepEqual(
         iEvent.delta,

@@ -40,7 +40,7 @@ test('holdRepeat onFired', t => {
   interactions.init(scope);
   holdRepeat.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const pointerEvent = {
     type: 'hold',
   };

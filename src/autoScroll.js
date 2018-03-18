@@ -5,7 +5,7 @@ import * as domUtils  from './utils/domUtils';
 
 function init (scope) {
   const {
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
@@ -117,9 +117,9 @@ function init (scope) {
     },
   };
 
-  Interaction.signals.on('stop', autoScroll.stop);
+  interactions.signals.on('stop', autoScroll.stop);
 
-  Interaction.signals.on('action-move', autoScroll.onInteractionMove);
+  interactions.signals.on('action-move', autoScroll.onInteractionMove);
 
   defaults.perAction.autoScroll = autoScroll.defaults;
 }

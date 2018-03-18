@@ -1,14 +1,14 @@
 function init (scope) {
   const {
     pointerEvents,
-    Interaction,
+    interactions,
   } = scope;
 
   pointerEvents.signals.on('new', onNew);
   pointerEvents.signals.on('fired', arg => onFired(arg, pointerEvents));
 
   for (const signal of ['move', 'up', 'cancel', 'endall']) {
-    Interaction.signals.on(signal, endHoldRepeat);
+    interactions.signals.on(signal, endHoldRepeat);
   }
 
   // don't repeat by default

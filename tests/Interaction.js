@@ -318,7 +318,7 @@ test('Interaction.start', t => {
   interaction._interacting = false;
 
   // interaction.start(action, target, element);
-  // t.deepEqual(scope.interactions, [interaction], 'interaction is added back to scope');
+  // t.deepEqual(scope.interactions.list, [interaction], 'interaction is added back to scope');
 
   t.end();
 });
@@ -327,7 +327,7 @@ test('stop interaction from start event', t => {
   const scope = helpers.mockScope();
 
   interactions.init(scope);
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();
 
   interaction.target = interactable;
@@ -350,7 +350,7 @@ test('Interaction createPreparedEvent', t => {
 
   interactions.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();
   const action = { name: 'resize' };
   const phase = 'TEST_PHASE';

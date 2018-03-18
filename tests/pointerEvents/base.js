@@ -123,7 +123,7 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
   interactions.init(scope);
   pointerEvents.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const initialTimer = { duration: Infinity, timeout: null };
   const event = { type: 'down' };
 
@@ -142,7 +142,7 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   interactions.init(scope);
   pointerEvents.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
 
   const ids = [0, 1, 2, 3];
   const removals = [

@@ -4,7 +4,7 @@ import InteractableMethods from './InteractableMethods';
 function init (scope) {
   const {
     interact,
-    Interaction,
+    interactions,
     defaults,
     Signals,
   } = scope;
@@ -12,7 +12,7 @@ function init (scope) {
   interact.use(InteractableMethods);
 
   // set cursor style on mousedown
-  Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
+  interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
     if (interaction.interacting()) { return; }
 
     const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
@@ -20,7 +20,7 @@ function init (scope) {
   });
 
   // set cursor style on mousemove
-  Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
+  interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
     if (interaction.pointerType !== 'mouse'
         || interaction.pointerIsDown
         || interaction.interacting()) { return; }
@@ -29,7 +29,7 @@ function init (scope) {
     prepare(interaction, actionInfo, scope);
   });
 
-  Interaction.signals.on('move', function (arg) {
+  interactions.signals.on('move', function (arg) {
     const { interaction, event } = arg;
 
     if (!interaction.pointerIsDown
@@ -55,7 +55,7 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('stop', function ({ interaction }) {
+  interactions.signals.on('stop', function ({ interaction }) {
     const target = interaction.target;
 
     if (target && target.options.styleCursor) {
@@ -198,7 +198,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
   // no actions if any of these values == 0
   if (!(maxActions && maxPerElement && autoStartMax)) { return; }
 
-  for (const interaction of scope.interactions) {
+  for (const interaction of scope.interactions.list) {
     const otherAction = interaction.prepared.name;
 
     if (!interaction.interacting()) { continue; }

@@ -5,15 +5,15 @@ function init (scope) {
   const {
     actions,
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
-  Interaction.signals.on('before-action-move', beforeMove);
-  Interaction.signals.on('action-resume', beforeMove);
+  interactions.signals.on('before-action-move', beforeMove);
+  interactions.signals.on('action-resume', beforeMove);
 
   // dragmove
-  Interaction.signals.on('action-move', move);
+  interactions.signals.on('action-move', move);
 
   Interactable.prototype.draggable = drag.draggable;
 

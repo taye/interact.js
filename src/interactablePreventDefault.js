@@ -85,12 +85,12 @@ export function init (scope) {
   };
 
   for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
-    scope.Interaction.signals.on(eventSignal, onInteractionEvent);
+    scope.interactions.signals.on(eventSignal, onInteractionEvent);
   }
 
   // prevent native HTML5 drag on interact.js target elements
-  scope.Interaction.eventMap.dragstart = function preventNativeDrag (event) {
-    for (const interaction of scope.interactions) {
+  scope.interactions.eventMap.dragstart = function preventNativeDrag (event) {
+    for (const interaction of scope.interactions.list) {
 
       if (interaction.element
         && (interaction.element === event.target
