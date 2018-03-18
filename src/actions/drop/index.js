@@ -18,7 +18,7 @@ function init (scope) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     // reset active dropzones
-    interaction.activeDrops = [];
+    interaction.activeDrops = null;
     interaction.dropEvents = null;
 
     if (!interaction.dynamicDrop) {
@@ -50,7 +50,7 @@ function init (scope) {
   });
 
   Interaction.signals.on('stop', function ({ interaction }) {
-    interaction.activeDrops = [];
+    interaction.activeDrops = null;
     interaction.dropEvents = null;
   });
 
@@ -206,7 +206,7 @@ function init (scope) {
     interaction.prevDropTarget  = null; // the dropzone that was recently dragged away from
     interaction.prevDropElement = null; // the element at the time of checking
     interaction.dropEvents      = null; // the dropEvents related to the current drag event
-    interaction.activeDrops     = [];   // an array of { dropzone, element, rect }
+    interaction.activeDrops     = null; // an array of { dropzone, element, rect }
   });
 
   Interaction.signals.on('stop', function ({ interaction }) {
