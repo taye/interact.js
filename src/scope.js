@@ -84,5 +84,6 @@ export function init (window) {
   scope.document = window.document;
 
   scope.InteractEvent = InteractEvent;
-  scope.Interactable = class extends Interactable {};
+  // eslint-disable-next-line no-shadow
+  scope.Interactable = class Interactable extends Interactable {};
 }
