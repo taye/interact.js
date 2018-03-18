@@ -72,7 +72,7 @@ export function createEl (name) {
 }
 
 export function mockScope (options) {
-  return Object.assign({
+  const scope = Object.assign({
     documents: [],
     defaults: clone(defaults),
     actions: {
@@ -80,21 +80,22 @@ export function mockScope (options) {
       methodDict: {},
       eventTypes: [],
     },
+    Interaction: class extends Interaction {},
     interactions: {
-      list: {},
+      signals: new Signals(),
+      list: [],
+      new (props) {
+        return new scope.Interaction({ signals: this.signals, ...props });
+      },
     },
     interactables: {
       signals: new Signals(),
     },
     signals: new Signals(),
-    Interaction: {
-      signals: new Signals(),
-      new (props) {
-        return new Interaction({ signals: this.signals, ...props });
-      },
-    },
     Interactable: class extends Interactable {},
   }, options);
+
+  return scope;
 }
 
 export function mockSignals () {

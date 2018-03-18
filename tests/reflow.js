@@ -77,7 +77,7 @@ test('reflow', t => {
   );
 
   t.notOk(
-    scope.interactions.includes(interaction),
+    scope.interactions.list.includes(interaction),
     'interaction is removed from list'
   );
 
