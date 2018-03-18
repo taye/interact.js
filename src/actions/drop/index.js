@@ -1,4 +1,5 @@
 import * as utils from '../../utils';
+import DropEvent from './DropEvent';
 
 function init (scope) {
   const {
@@ -340,36 +341,17 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
     drop      : null,
   };
 
-  const tmpl = {
-    dragEvent,
-    interaction,
-    target       : interaction.dropElement,
-    dropzone     : interaction.dropTarget,
-    relatedTarget: dragEvent.target,
-    draggable    : dragEvent.interactable,
-    timeStamp    : dragEvent.timeStamp,
-  };
-
   if (interaction.dropElement !== interaction.prevDropElement) {
     // if there was a prevDropTarget, create a dragleave event
     if (interaction.prevDropTarget) {
-      dropEvents.leave = utils.extend({ type: 'dragleave' }, tmpl);
+      dropEvents.leave = new DropEvent(interaction, dragEvent, 'dragleave');
 
       dragEvent.dragLeave    = dropEvents.leave.target   = interaction.prevDropElement;
       dragEvent.prevDropzone = dropEvents.leave.dropzone = interaction.prevDropTarget;
     }
     // if the dropTarget is not null, create a dragenter event
     if (interaction.dropTarget) {
-      dropEvents.enter = {
-        dragEvent,
-        interaction,
-        target       : interaction.dropElement,
-        dropzone     : interaction.dropTarget,
-        relatedTarget: dragEvent.target,
-        draggable    : dragEvent.interactable,
-        timeStamp    : dragEvent.timeStamp,
-        type         : 'dragenter',
-      };
+      dropEvents.enter = new DropEvent(interaction, dragEvent, 'dragenter');
 
       dragEvent.dragEnter = interaction.dropElement;
       dragEvent.dropzone = interaction.dropTarget;
@@ -377,29 +359,27 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
   }
 
   if (dragEvent.type === 'dragend' && interaction.dropTarget) {
-    dropEvents.drop = utils.extend({ type: 'drop' }, tmpl);
+    dropEvents.drop = new DropEvent(interaction, dragEvent, 'drop');
 
     dragEvent.dropzone = interaction.dropTarget;
     dragEvent.relatedTarget = interaction.dropElement;
   }
   if (dragEvent.type === 'dragstart') {
-    dropEvents.activate = utils.extend({ type: 'dropactivate' }, tmpl);
+    dropEvents.activate = new DropEvent(interaction, dragEvent, 'dropactivate');
 
     dropEvents.activate.target   = null;
     dropEvents.activate.dropzone = null;
   }
   if (dragEvent.type === 'dragend') {
-    dropEvents.deactivate = utils.extend({ type: 'dropdeactivate' }, tmpl);
+    dropEvents.deactivate = new DropEvent(interaction, dragEvent, 'dropdeactivate');
 
     dropEvents.deactivate.target   = null;
     dropEvents.deactivate.dropzone = null;
   }
   if (dragEvent.type === 'dragmove' && interaction.dropTarget) {
-    dropEvents.move = utils.extend({
-      dragmove     : dragEvent,
-      type         : 'dropmove',
-    }, tmpl);
+    dropEvents.move = new DropEvent(interaction, dragEvent, 'dropmove');
 
+    dropEvents.move.dragmove = dragEvent;
     dragEvent.dropzone = interaction.dropTarget;
   }
 
@@ -431,7 +411,7 @@ function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
 
   if (dynamicDrop) {
-    interaction.activeDrops = getActiveDrops(scope, interaction.element);
+    interaction.activeDrops = getActiveDrops(scope, interaction.target, interaction.element);
   }
 
   const dragEvent = iEvent;
