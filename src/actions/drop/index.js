@@ -211,6 +211,7 @@ function init (scope) {
         dropzone : null,  // the dropzone that was recently dragged away from
         element  : null,  // the element at the time of checking
       },
+      rejected   : false, // wheather the potential drop was rejected from a listener
       events     : null,  // the drop events related to the current drag event
       activeDrops: null,  // an array of { dropzone, element, rect }
     };
@@ -219,6 +220,7 @@ function init (scope) {
   interactions.signals.on('stop', function ({ interaction: { dropStatus } }) {
     dropStatus.cur.dropzone = dropStatus.cur.element =
       dropStatus.prev.dropzone = dropStatus.prev.element = null;
+    dropStatus.rejected = false;
   });
 
   /**
@@ -347,6 +349,23 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
     drop      : null,
   };
 
+  if (dragEvent.type === 'dragstart') {
+    dropEvents.activate = new DropEvent(dropStatus, dragEvent, 'dropactivate');
+
+    dropEvents.activate.target   = null;
+    dropEvents.activate.dropzone = null;
+  }
+  if (dragEvent.type === 'dragend') {
+    dropEvents.deactivate = new DropEvent(dropStatus, dragEvent, 'dropdeactivate');
+
+    dropEvents.deactivate.target   = null;
+    dropEvents.deactivate.dropzone = null;
+  }
+
+  if (dropStatus.rejected) {
+    return dropEvents;
+  }
+
   if (dropStatus.cur.element !== dropStatus.prev.element) {
     // if there was a previous dropzone, create a dragleave event
     if (dropStatus.prev.dropzone) {
@@ -369,18 +388,6 @@ function getDropEvents (interaction, pointerEvent, dragEvent) {
 
     dragEvent.dropzone = dropStatus.cur.dropzone;
     dragEvent.relatedTarget = dropStatus.cur.element;
-  }
-  if (dragEvent.type === 'dragstart') {
-    dropEvents.activate = new DropEvent(dropStatus, dragEvent, 'dropactivate');
-
-    dropEvents.activate.target   = null;
-    dropEvents.activate.dropzone = null;
-  }
-  if (dragEvent.type === 'dragend') {
-    dropEvents.deactivate = new DropEvent(dropStatus, dragEvent, 'dropdeactivate');
-
-    dropEvents.deactivate.target   = null;
-    dropEvents.deactivate.dropzone = null;
   }
   if (dragEvent.type === 'dragmove' && dropStatus.cur.dropzone) {
     dropEvents.move = new DropEvent(dropStatus, dragEvent, 'dropmove');
@@ -424,6 +431,12 @@ function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
 
   const dragEvent = iEvent;
   const dropResult = getDrop(interaction, dragEvent, event);
+
+  // update rejected status
+  dropStatus.rejected = dropStatus.rejected &&
+    !!dropResult &&
+    dropResult.dropzone === dropStatus.cur.dropzone &&
+    dropResult.element === dropStatus.cur.element;
 
   dropStatus.cur.dropzone  = dropResult && dropResult.dropzone;
   dropStatus.cur.element = dropResult && dropResult.element;
