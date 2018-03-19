@@ -14,7 +14,7 @@ function init (scope) {
 
   let dynamicDrop = false;
 
-  interactions.signals.on('after-action-start', function ({ interaction, event }) {
+  interactions.signals.on('after-action-start', function ({ interaction, event, iEvent: dragEvent }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
     const { dropStatus } = interaction;
@@ -27,7 +27,6 @@ function init (scope) {
       dropStatus.activeDrops = getActiveDrops(scope, interaction.element);
     }
 
-    const dragEvent = interaction.prevEvent;
     const dropEvents = getDropEvents(interaction, event, dragEvent);
 
     if (dropEvents.activate) {
