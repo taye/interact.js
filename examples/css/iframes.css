@@ -13,6 +13,7 @@ body {
     border: solid 0.4em #666;
     border-radius: 0.75em;
     padding: 3%;
+    touch-action: none;
 
     position: absolute;
 
