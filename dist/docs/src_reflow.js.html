@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>src/autoStart/InteractableMethods.js - Documentation</title>
+    <title>src/reflow.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">src/autoStart/InteractableMethods.js</h1>
+    <h1 class="page-title">src/reflow.js</h1>
     
 
     
@@ -41,216 +41,109 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import * as is       from '../utils/is';
-import * as domUtils from '../utils/domUtils';
+            <pre class="prettyprint source linenums"><code>import { newInteraction } from './interactions';
+import {
+  arr,
+  is,
+  extend,
+  rect as rectUtils,
+  pointer as pointerUtils,
+} from './utils';
 
-import { warnOnce } from '../utils';
-
-function init (scope) {
+export function init (scope) {
   const {
+    actions,
+    interactions,
     /** @lends Interactable */
     Interactable,
-    actions,
   } = scope;
 
-  Interactable.prototype.getAction = function (pointer, event, interaction, element) {
-    const action = this.defaultActionChecker(pointer, event, interaction, element);
+  // add action reflow event types
+  for (const actionName of actions.names) {
+    actions.eventTypes.push(`${actionName}reflow`);
+  }
 
-    if (this.options.actionChecker) {
-      return this.options.actionChecker(pointer, event, action, this, element, interaction);
+  // remove completed reflow interactions
+  interactions.signals.on('stop', ({ interaction }) => {
+    if (interaction.pointerType === 'reflow') {
+      arr.remove(scope.interactions.list, interaction);
     }
-
-    return action;
-  };
+  });
 
   /**
    * ```js
-   * interact(element, { ignoreFrom: document.getElementById('no-action') });
-   * // or
-   * interact(element).ignoreFrom('input, textarea, a');
-   * ```
-   * @deprecated
-   * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
-   * of it's parents match the given CSS selector or Element, no
-   * drag/resize/gesture is started.
+   * const interactable = interact(target);
+   * const drag = { name: drag, axis: 'x' };
+   * const resize = { name: resize, edges: { left: true, bottom: true };
    *
-   * Don't use this method. Instead set the `ignoreFrom` option for each action
-   * or for `pointerEvents`
-   *
-   * @example
-   * interact(targett)
-   *   .draggable({
-   *     ignoreFrom: 'input, textarea, a[href]'',
-   *   })
-   *   .pointerEvents({
-   *     ignoreFrom: '[no-pointer]',
-   *   });
-   *
-   * @param {string | Element | null} [newValue] a CSS selector string, an
-   * Element or `null` to not ignore any elements
-   * @return {string | Element | object} The current ignoreFrom value or this
-   * Interactable
-   */
-  Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
-    return this._backCompatOption('ignoreFrom', newValue);
-  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
-
-  /**
-   * ```js
-   *
-   * @deprecated
-   * A drag/resize/gesture is started only If the target of the `mousedown`,
-   * `pointerdown` or `touchstart` event or any of it's parents match the given
-   * CSS selector or Element.
-   *
-   * Don't use this method. Instead set the `allowFrom` option for each action
-   * or for `pointerEvents`
-   *
-   * @example
-   * interact(targett)
-   *   .resizable({
-   *     allowFrom: '.resize-handle',
-   *   .pointerEvents({
-   *     allowFrom: '.handle',,
-   *   });
-   *
-   * @param {string | Element | null} [newValue] a CSS selector string, an
-   * Element or `null` to allow from any element
-   * @return {string | Element | object} The current allowFrom value or this
-   * Interactable
-   */
-  Interactable.prototype.allowFrom = warnOnce(function (newValue) {
-    return this._backCompatOption('allowFrom', newValue);
-  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
-
-  Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
-    if (!ignoreFrom || !is.element(element)) { return false; }
-
-    if (is.string(ignoreFrom)) {
-      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
-    }
-    else if (is.element(ignoreFrom)) {
-      return domUtils.nodeContains(ignoreFrom, element);
-    }
-
-    return false;
-  };
-
-  Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
-    if (!allowFrom) { return true; }
-
-    if (!is.element(element)) { return false; }
-
-    if (is.string(allowFrom)) {
-      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
-    }
-    else if (is.element(allowFrom)) {
-      return domUtils.nodeContains(allowFrom, element);
-    }
-
-    return false;
-  };
-
-  Interactable.prototype.testIgnoreAllow = function (options, interactableElement, eventTarget) {
-    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget)
-      &amp;&amp; this.testAllow(options.allowFrom, interactableElement, eventTarget));
-  };
-
-  /**
-   * ```js
-   * interact('.resize-drag')
-   *   .resizable(true)
-   *   .draggable(true)
-   *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
-   *
-   *   if (interact.matchesSelector(event.target, '.drag-handle') {
-   *     // force drag with handle target
-   *     action.name = drag;
-   *   }
-   *   else {
-   *     // resize from the top and right edges
-   *     action.name  = 'resize';
-   *     action.edges = { top: true, right: true };
-   *   }
-   *
-   *   return action;
-   * });
+   * interactable.reflow(drag);
+   * interactable.reflow(resize);
    * ```
    *
-   * Gets or sets the function used to check action to be performed on
-   * pointerDown
+   * Start an action sequence to re-apply modifiers, check drops, etc.
    *
-   * @param {function | null} [checker] A function which takes a pointer event,
-   * defaultAction string, interactable, element and interaction as parameters
-   * and returns an object with name property 'drag' 'resize' or 'gesture' and
-   * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
-   * props.
-   * @return {Function | Interactable} The checker function or this Interactable
+   * @param { Object } action The action to begin
+   * @param { string } action.name The name of the action
    */
-  Interactable.prototype.actionChecker = function (checker) {
-    if (is.func(checker)) {
-      this.options.actionChecker = checker;
-
-      return this;
-    }
-
-    if (checker === null) {
-      delete this.options.actionChecker;
-
-      return this;
-    }
-
-    return this.options.actionChecker;
+  Interactable.prototype.reflow = function (action) {
+    return reflow(this, action, scope);
   };
+}
 
-  /**
-   * Returns or sets whether the the cursor should be changed depending on the
-   * action that would be performed if the mouse were pressed and dragged.
-   *
-   * @param {boolean} [newValue]
-   * @return {boolean | Interactable} The current setting or this Interactable
-   */
-  Interactable.prototype.styleCursor = function (newValue) {
-    if (is.bool(newValue)) {
-      this.options.styleCursor = newValue;
+function reflow (interactable, action, scope) {
+  let elements = is.string(interactable.target)
+    ? arr.from(interactable._context.querySelectorAll(interactable.target))
+    : [interactable.target];
 
-      return this;
+  // follow autoStart max interaction settings
+  if (scope.autoStart) {
+    elements = elements.filter(
+      element => scope.autoStart.withinInteractionLimit(interactable, element, action, scope));
+  }
+
+  for (const element of elements) {
+    const interaction = newInteraction({ pointerType: 'reflow' }, scope);
+
+    const rect = interactable.getRect(element);
+
+    if (!rect) { break; }
+
+    const xywh = rectUtils.tlbrToXywh(rect);
+    const coords = {
+      page: xywh,
+      client: xywh,
+    };
+    const event = extend(pointerUtils.coordsToEvent(coords), coords);
+    const signalArg = {
+      interaction,
+      event,
+      pointer: event,
+      eventTarget: element,
+      phase: 'reflow',
+    };
+
+    interaction.target = interactable;
+    interaction.element = element;
+    interaction.prepared = extend({}, action);
+    interaction.prevEvent = event;
+    interaction.updatePointer(event, event, element, true);
+
+    interaction._doPhase(signalArg);
+
+    signalArg.phase = 'start';
+    interaction._interacting = interaction._doPhase(signalArg);
+
+    if (interaction._interacting) {
+      interaction.move(signalArg);
+      interaction.end(event);
+    }
+    else {
+      interaction.stop();
     }
 
-    if (newValue === null) {
-      delete this.options.styleCursor;
-
-      return this;
-    }
-
-    return this.options.styleCursor;
-  };
-
-  Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
-    const rect = this.getRect(element);
-    const buttons = event.buttons || ({
-      0: 1,
-      1: 4,
-      3: 8,
-      4: 16,
-    })[event.button];
-    let action = null;
-
-    for (const actionName of actions.names) {
-      // check mouseButton setting if the pointer is down
-      if (interaction.pointerIsDown
-          &amp;&amp; /mouse|pointer/.test(interaction.pointerType)
-          &amp;&amp; (buttons &amp; this.options[actionName].mouseButtons) === 0) {
-        continue;
-      }
-
-      action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
-
-      if (action) {
-        return action;
-      }
-    }
-  };
+    interaction.removePointer(event, event);
+    interaction.pointerIsDown = false;
+  }
 }
 
 export default { init };

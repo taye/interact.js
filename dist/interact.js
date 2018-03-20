@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.1+sha.63c5cd1
+ * interact.js v1.4.0-alpha.2+sha.f1199bc
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8,6 +8,13 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 'use strict';
 
+var _index = _dereq_('./src/index');
+
+var exported = typeof window === 'undefined' ? function (window) {
+  return (0, _index.init)(window);
+} : (0, _index.init)(window);
+
+// export default exported;
 /*
  * In a (windowless) server environment this file exports a factory function
  * that takes the window to use.
@@ -16,22 +23,1253 @@
  *
  * See https://github.com/taye/interact.js/issues/187
  */
-if (typeof window === 'undefined') {
-  module.exports = function (window) {
-    _dereq_('./src/utils/window').init(window);
 
-    return _dereq_('./src/index');
+module.exports = exported;
+
+},{"./src/index":100}],2:[function(_dereq_,module,exports){
+module.exports = { "default": _dereq_("core-js/library/fn/object/create"), __esModule: true };
+},{"core-js/library/fn/object/create":12}],3:[function(_dereq_,module,exports){
+module.exports = { "default": _dereq_("core-js/library/fn/object/define-property"), __esModule: true };
+},{"core-js/library/fn/object/define-property":13}],4:[function(_dereq_,module,exports){
+module.exports = { "default": _dereq_("core-js/library/fn/object/set-prototype-of"), __esModule: true };
+},{"core-js/library/fn/object/set-prototype-of":14}],5:[function(_dereq_,module,exports){
+module.exports = { "default": _dereq_("core-js/library/fn/symbol"), __esModule: true };
+},{"core-js/library/fn/symbol":15}],6:[function(_dereq_,module,exports){
+module.exports = { "default": _dereq_("core-js/library/fn/symbol/iterator"), __esModule: true };
+},{"core-js/library/fn/symbol/iterator":16}],7:[function(_dereq_,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+exports.default = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+},{}],8:[function(_dereq_,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+var _defineProperty = _dereq_("../core-js/object/define-property");
+
+var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
   };
-} else {
-  module.exports = _dereq_('./src/index');
+}();
+},{"../core-js/object/define-property":3}],9:[function(_dereq_,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+var _setPrototypeOf = _dereq_("../core-js/object/set-prototype-of");
+
+var _setPrototypeOf2 = _interopRequireDefault(_setPrototypeOf);
+
+var _create = _dereq_("../core-js/object/create");
+
+var _create2 = _interopRequireDefault(_create);
+
+var _typeof2 = _dereq_("../helpers/typeof");
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function (subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : (0, _typeof3.default)(superClass)));
+  }
+
+  subClass.prototype = (0, _create2.default)(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) _setPrototypeOf2.default ? (0, _setPrototypeOf2.default)(subClass, superClass) : subClass.__proto__ = superClass;
+};
+},{"../core-js/object/create":2,"../core-js/object/set-prototype-of":4,"../helpers/typeof":11}],10:[function(_dereq_,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+var _typeof2 = _dereq_("../helpers/typeof");
+
+var _typeof3 = _interopRequireDefault(_typeof2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = function (self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
+};
+},{"../helpers/typeof":11}],11:[function(_dereq_,module,exports){
+"use strict";
+
+exports.__esModule = true;
+
+var _iterator = _dereq_("../core-js/symbol/iterator");
+
+var _iterator2 = _interopRequireDefault(_iterator);
+
+var _symbol = _dereq_("../core-js/symbol");
+
+var _symbol2 = _interopRequireDefault(_symbol);
+
+var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
+  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
+} : function (obj) {
+  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+};
+},{"../core-js/symbol":5,"../core-js/symbol/iterator":6}],12:[function(_dereq_,module,exports){
+_dereq_('../../modules/es6.object.create');
+var $Object = _dereq_('../../modules/_core').Object;
+module.exports = function create(P, D) {
+  return $Object.create(P, D);
+};
+
+},{"../../modules/_core":22,"../../modules/es6.object.create":74}],13:[function(_dereq_,module,exports){
+_dereq_('../../modules/es6.object.define-property');
+var $Object = _dereq_('../../modules/_core').Object;
+module.exports = function defineProperty(it, key, desc) {
+  return $Object.defineProperty(it, key, desc);
+};
+
+},{"../../modules/_core":22,"../../modules/es6.object.define-property":75}],14:[function(_dereq_,module,exports){
+_dereq_('../../modules/es6.object.set-prototype-of');
+module.exports = _dereq_('../../modules/_core').Object.setPrototypeOf;
+
+},{"../../modules/_core":22,"../../modules/es6.object.set-prototype-of":76}],15:[function(_dereq_,module,exports){
+_dereq_('../../modules/es6.symbol');
+_dereq_('../../modules/es6.object.to-string');
+_dereq_('../../modules/es7.symbol.async-iterator');
+_dereq_('../../modules/es7.symbol.observable');
+module.exports = _dereq_('../../modules/_core').Symbol;
+
+},{"../../modules/_core":22,"../../modules/es6.object.to-string":77,"../../modules/es6.symbol":79,"../../modules/es7.symbol.async-iterator":80,"../../modules/es7.symbol.observable":81}],16:[function(_dereq_,module,exports){
+_dereq_('../../modules/es6.string.iterator');
+_dereq_('../../modules/web.dom.iterable');
+module.exports = _dereq_('../../modules/_wks-ext').f('iterator');
+
+},{"../../modules/_wks-ext":71,"../../modules/es6.string.iterator":78,"../../modules/web.dom.iterable":82}],17:[function(_dereq_,module,exports){
+module.exports = function (it) {
+  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+  return it;
+};
+
+},{}],18:[function(_dereq_,module,exports){
+module.exports = function () { /* empty */ };
+
+},{}],19:[function(_dereq_,module,exports){
+var isObject = _dereq_('./_is-object');
+module.exports = function (it) {
+  if (!isObject(it)) throw TypeError(it + ' is not an object!');
+  return it;
+};
+
+},{"./_is-object":38}],20:[function(_dereq_,module,exports){
+// false -> Array#indexOf
+// true  -> Array#includes
+var toIObject = _dereq_('./_to-iobject');
+var toLength = _dereq_('./_to-length');
+var toAbsoluteIndex = _dereq_('./_to-absolute-index');
+module.exports = function (IS_INCLUDES) {
+  return function ($this, el, fromIndex) {
+    var O = toIObject($this);
+    var length = toLength(O.length);
+    var index = toAbsoluteIndex(fromIndex, length);
+    var value;
+    // Array#includes uses SameValueZero equality algorithm
+    // eslint-disable-next-line no-self-compare
+    if (IS_INCLUDES && el != el) while (length > index) {
+      value = O[index++];
+      // eslint-disable-next-line no-self-compare
+      if (value != value) return true;
+    // Array#indexOf ignores holes, Array#includes - not
+    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
+      if (O[index] === el) return IS_INCLUDES || index || 0;
+    } return !IS_INCLUDES && -1;
+  };
+};
+
+},{"./_to-absolute-index":63,"./_to-iobject":65,"./_to-length":66}],21:[function(_dereq_,module,exports){
+var toString = {}.toString;
+
+module.exports = function (it) {
+  return toString.call(it).slice(8, -1);
+};
+
+},{}],22:[function(_dereq_,module,exports){
+var core = module.exports = { version: '2.5.1' };
+if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+
+},{}],23:[function(_dereq_,module,exports){
+// optional / simple context binding
+var aFunction = _dereq_('./_a-function');
+module.exports = function (fn, that, length) {
+  aFunction(fn);
+  if (that === undefined) return fn;
+  switch (length) {
+    case 1: return function (a) {
+      return fn.call(that, a);
+    };
+    case 2: return function (a, b) {
+      return fn.call(that, a, b);
+    };
+    case 3: return function (a, b, c) {
+      return fn.call(that, a, b, c);
+    };
+  }
+  return function (/* ...args */) {
+    return fn.apply(that, arguments);
+  };
+};
+
+},{"./_a-function":17}],24:[function(_dereq_,module,exports){
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function (it) {
+  if (it == undefined) throw TypeError("Can't call method on  " + it);
+  return it;
+};
+
+},{}],25:[function(_dereq_,module,exports){
+// Thank's IE8 for his funny defineProperty
+module.exports = !_dereq_('./_fails')(function () {
+  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+});
+
+},{"./_fails":30}],26:[function(_dereq_,module,exports){
+var isObject = _dereq_('./_is-object');
+var document = _dereq_('./_global').document;
+// typeof document.createElement is 'object' in old IE
+var is = isObject(document) && isObject(document.createElement);
+module.exports = function (it) {
+  return is ? document.createElement(it) : {};
+};
+
+},{"./_global":31,"./_is-object":38}],27:[function(_dereq_,module,exports){
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+
+},{}],28:[function(_dereq_,module,exports){
+// all enumerable object keys, includes symbols
+var getKeys = _dereq_('./_object-keys');
+var gOPS = _dereq_('./_object-gops');
+var pIE = _dereq_('./_object-pie');
+module.exports = function (it) {
+  var result = getKeys(it);
+  var getSymbols = gOPS.f;
+  if (getSymbols) {
+    var symbols = getSymbols(it);
+    var isEnum = pIE.f;
+    var i = 0;
+    var key;
+    while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
+  } return result;
+};
+
+},{"./_object-gops":51,"./_object-keys":54,"./_object-pie":55}],29:[function(_dereq_,module,exports){
+var global = _dereq_('./_global');
+var core = _dereq_('./_core');
+var ctx = _dereq_('./_ctx');
+var hide = _dereq_('./_hide');
+var PROTOTYPE = 'prototype';
+
+var $export = function (type, name, source) {
+  var IS_FORCED = type & $export.F;
+  var IS_GLOBAL = type & $export.G;
+  var IS_STATIC = type & $export.S;
+  var IS_PROTO = type & $export.P;
+  var IS_BIND = type & $export.B;
+  var IS_WRAP = type & $export.W;
+  var exports = IS_GLOBAL ? core : core[name] || (core[name] = {});
+  var expProto = exports[PROTOTYPE];
+  var target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE];
+  var key, own, out;
+  if (IS_GLOBAL) source = name;
+  for (key in source) {
+    // contains in native
+    own = !IS_FORCED && target && target[key] !== undefined;
+    if (own && key in exports) continue;
+    // export native or passed
+    out = own ? target[key] : source[key];
+    // prevent global pollution for namespaces
+    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
+    // bind timers to global for call from export context
+    : IS_BIND && own ? ctx(out, global)
+    // wrap global constructors for prevent change them in library
+    : IS_WRAP && target[key] == out ? (function (C) {
+      var F = function (a, b, c) {
+        if (this instanceof C) {
+          switch (arguments.length) {
+            case 0: return new C();
+            case 1: return new C(a);
+            case 2: return new C(a, b);
+          } return new C(a, b, c);
+        } return C.apply(this, arguments);
+      };
+      F[PROTOTYPE] = C[PROTOTYPE];
+      return F;
+    // make static versions for prototype methods
+    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
+    if (IS_PROTO) {
+      (exports.virtual || (exports.virtual = {}))[key] = out;
+      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
+      if (type & $export.R && expProto && !expProto[key]) hide(expProto, key, out);
+    }
+  }
+};
+// type bitmap
+$export.F = 1;   // forced
+$export.G = 2;   // global
+$export.S = 4;   // static
+$export.P = 8;   // proto
+$export.B = 16;  // bind
+$export.W = 32;  // wrap
+$export.U = 64;  // safe
+$export.R = 128; // real proto method for `library`
+module.exports = $export;
+
+},{"./_core":22,"./_ctx":23,"./_global":31,"./_hide":33}],30:[function(_dereq_,module,exports){
+module.exports = function (exec) {
+  try {
+    return !!exec();
+  } catch (e) {
+    return true;
+  }
+};
+
+},{}],31:[function(_dereq_,module,exports){
+// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
+var global = module.exports = typeof window != 'undefined' && window.Math == Math
+  ? window : typeof self != 'undefined' && self.Math == Math ? self
+  // eslint-disable-next-line no-new-func
+  : Function('return this')();
+if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
+
+},{}],32:[function(_dereq_,module,exports){
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function (it, key) {
+  return hasOwnProperty.call(it, key);
+};
+
+},{}],33:[function(_dereq_,module,exports){
+var dP = _dereq_('./_object-dp');
+var createDesc = _dereq_('./_property-desc');
+module.exports = _dereq_('./_descriptors') ? function (object, key, value) {
+  return dP.f(object, key, createDesc(1, value));
+} : function (object, key, value) {
+  object[key] = value;
+  return object;
+};
+
+},{"./_descriptors":25,"./_object-dp":46,"./_property-desc":56}],34:[function(_dereq_,module,exports){
+var document = _dereq_('./_global').document;
+module.exports = document && document.documentElement;
+
+},{"./_global":31}],35:[function(_dereq_,module,exports){
+module.exports = !_dereq_('./_descriptors') && !_dereq_('./_fails')(function () {
+  return Object.defineProperty(_dereq_('./_dom-create')('div'), 'a', { get: function () { return 7; } }).a != 7;
+});
+
+},{"./_descriptors":25,"./_dom-create":26,"./_fails":30}],36:[function(_dereq_,module,exports){
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = _dereq_('./_cof');
+// eslint-disable-next-line no-prototype-builtins
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
+  return cof(it) == 'String' ? it.split('') : Object(it);
+};
+
+},{"./_cof":21}],37:[function(_dereq_,module,exports){
+// 7.2.2 IsArray(argument)
+var cof = _dereq_('./_cof');
+module.exports = Array.isArray || function isArray(arg) {
+  return cof(arg) == 'Array';
+};
+
+},{"./_cof":21}],38:[function(_dereq_,module,exports){
+module.exports = function (it) {
+  return typeof it === 'object' ? it !== null : typeof it === 'function';
+};
+
+},{}],39:[function(_dereq_,module,exports){
+'use strict';
+var create = _dereq_('./_object-create');
+var descriptor = _dereq_('./_property-desc');
+var setToStringTag = _dereq_('./_set-to-string-tag');
+var IteratorPrototype = {};
+
+// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
+_dereq_('./_hide')(IteratorPrototype, _dereq_('./_wks')('iterator'), function () { return this; });
+
+module.exports = function (Constructor, NAME, next) {
+  Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
+  setToStringTag(Constructor, NAME + ' Iterator');
+};
+
+},{"./_hide":33,"./_object-create":45,"./_property-desc":56,"./_set-to-string-tag":59,"./_wks":72}],40:[function(_dereq_,module,exports){
+'use strict';
+var LIBRARY = _dereq_('./_library');
+var $export = _dereq_('./_export');
+var redefine = _dereq_('./_redefine');
+var hide = _dereq_('./_hide');
+var has = _dereq_('./_has');
+var Iterators = _dereq_('./_iterators');
+var $iterCreate = _dereq_('./_iter-create');
+var setToStringTag = _dereq_('./_set-to-string-tag');
+var getPrototypeOf = _dereq_('./_object-gpo');
+var ITERATOR = _dereq_('./_wks')('iterator');
+var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
+var FF_ITERATOR = '@@iterator';
+var KEYS = 'keys';
+var VALUES = 'values';
+
+var returnThis = function () { return this; };
+
+module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
+  $iterCreate(Constructor, NAME, next);
+  var getMethod = function (kind) {
+    if (!BUGGY && kind in proto) return proto[kind];
+    switch (kind) {
+      case KEYS: return function keys() { return new Constructor(this, kind); };
+      case VALUES: return function values() { return new Constructor(this, kind); };
+    } return function entries() { return new Constructor(this, kind); };
+  };
+  var TAG = NAME + ' Iterator';
+  var DEF_VALUES = DEFAULT == VALUES;
+  var VALUES_BUG = false;
+  var proto = Base.prototype;
+  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
+  var $default = $native || getMethod(DEFAULT);
+  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
+  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
+  var methods, key, IteratorPrototype;
+  // Fix native
+  if ($anyNative) {
+    IteratorPrototype = getPrototypeOf($anyNative.call(new Base()));
+    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
+      // Set @@toStringTag to native iterators
+      setToStringTag(IteratorPrototype, TAG, true);
+      // fix for some old engines
+      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
+    }
+  }
+  // fix Array#{values, @@iterator}.name in V8 / FF
+  if (DEF_VALUES && $native && $native.name !== VALUES) {
+    VALUES_BUG = true;
+    $default = function values() { return $native.call(this); };
+  }
+  // Define iterator
+  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+    hide(proto, ITERATOR, $default);
+  }
+  // Plug for library
+  Iterators[NAME] = $default;
+  Iterators[TAG] = returnThis;
+  if (DEFAULT) {
+    methods = {
+      values: DEF_VALUES ? $default : getMethod(VALUES),
+      keys: IS_SET ? $default : getMethod(KEYS),
+      entries: $entries
+    };
+    if (FORCED) for (key in methods) {
+      if (!(key in proto)) redefine(proto, key, methods[key]);
+    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
+  }
+  return methods;
+};
+
+},{"./_export":29,"./_has":32,"./_hide":33,"./_iter-create":39,"./_iterators":42,"./_library":43,"./_object-gpo":52,"./_redefine":57,"./_set-to-string-tag":59,"./_wks":72}],41:[function(_dereq_,module,exports){
+module.exports = function (done, value) {
+  return { value: value, done: !!done };
+};
+
+},{}],42:[function(_dereq_,module,exports){
+module.exports = {};
+
+},{}],43:[function(_dereq_,module,exports){
+module.exports = true;
+
+},{}],44:[function(_dereq_,module,exports){
+var META = _dereq_('./_uid')('meta');
+var isObject = _dereq_('./_is-object');
+var has = _dereq_('./_has');
+var setDesc = _dereq_('./_object-dp').f;
+var id = 0;
+var isExtensible = Object.isExtensible || function () {
+  return true;
+};
+var FREEZE = !_dereq_('./_fails')(function () {
+  return isExtensible(Object.preventExtensions({}));
+});
+var setMeta = function (it) {
+  setDesc(it, META, { value: {
+    i: 'O' + ++id, // object ID
+    w: {}          // weak collections IDs
+  } });
+};
+var fastKey = function (it, create) {
+  // return primitive with prefix
+  if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+  if (!has(it, META)) {
+    // can't set metadata to uncaught frozen object
+    if (!isExtensible(it)) return 'F';
+    // not necessary to add metadata
+    if (!create) return 'E';
+    // add missing metadata
+    setMeta(it);
+  // return object ID
+  } return it[META].i;
+};
+var getWeak = function (it, create) {
+  if (!has(it, META)) {
+    // can't set metadata to uncaught frozen object
+    if (!isExtensible(it)) return true;
+    // not necessary to add metadata
+    if (!create) return false;
+    // add missing metadata
+    setMeta(it);
+  // return hash weak collections IDs
+  } return it[META].w;
+};
+// add metadata on freeze-family methods calling
+var onFreeze = function (it) {
+  if (FREEZE && meta.NEED && isExtensible(it) && !has(it, META)) setMeta(it);
+  return it;
+};
+var meta = module.exports = {
+  KEY: META,
+  NEED: false,
+  fastKey: fastKey,
+  getWeak: getWeak,
+  onFreeze: onFreeze
+};
+
+},{"./_fails":30,"./_has":32,"./_is-object":38,"./_object-dp":46,"./_uid":69}],45:[function(_dereq_,module,exports){
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+var anObject = _dereq_('./_an-object');
+var dPs = _dereq_('./_object-dps');
+var enumBugKeys = _dereq_('./_enum-bug-keys');
+var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
+var Empty = function () { /* empty */ };
+var PROTOTYPE = 'prototype';
+
+// Create object with fake `null` prototype: use iframe Object with cleared prototype
+var createDict = function () {
+  // Thrash, waste and sodomy: IE GC bug
+  var iframe = _dereq_('./_dom-create')('iframe');
+  var i = enumBugKeys.length;
+  var lt = '<';
+  var gt = '>';
+  var iframeDocument;
+  iframe.style.display = 'none';
+  _dereq_('./_html').appendChild(iframe);
+  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
+  // createDict = iframe.contentWindow.Object;
+  // html.removeChild(iframe);
+  iframeDocument = iframe.contentWindow.document;
+  iframeDocument.open();
+  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
+  iframeDocument.close();
+  createDict = iframeDocument.F;
+  while (i--) delete createDict[PROTOTYPE][enumBugKeys[i]];
+  return createDict();
+};
+
+module.exports = Object.create || function create(O, Properties) {
+  var result;
+  if (O !== null) {
+    Empty[PROTOTYPE] = anObject(O);
+    result = new Empty();
+    Empty[PROTOTYPE] = null;
+    // add "__proto__" for Object.getPrototypeOf polyfill
+    result[IE_PROTO] = O;
+  } else result = createDict();
+  return Properties === undefined ? result : dPs(result, Properties);
+};
+
+},{"./_an-object":19,"./_dom-create":26,"./_enum-bug-keys":27,"./_html":34,"./_object-dps":47,"./_shared-key":60}],46:[function(_dereq_,module,exports){
+var anObject = _dereq_('./_an-object');
+var IE8_DOM_DEFINE = _dereq_('./_ie8-dom-define');
+var toPrimitive = _dereq_('./_to-primitive');
+var dP = Object.defineProperty;
+
+exports.f = _dereq_('./_descriptors') ? Object.defineProperty : function defineProperty(O, P, Attributes) {
+  anObject(O);
+  P = toPrimitive(P, true);
+  anObject(Attributes);
+  if (IE8_DOM_DEFINE) try {
+    return dP(O, P, Attributes);
+  } catch (e) { /* empty */ }
+  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
+  if ('value' in Attributes) O[P] = Attributes.value;
+  return O;
+};
+
+},{"./_an-object":19,"./_descriptors":25,"./_ie8-dom-define":35,"./_to-primitive":68}],47:[function(_dereq_,module,exports){
+var dP = _dereq_('./_object-dp');
+var anObject = _dereq_('./_an-object');
+var getKeys = _dereq_('./_object-keys');
+
+module.exports = _dereq_('./_descriptors') ? Object.defineProperties : function defineProperties(O, Properties) {
+  anObject(O);
+  var keys = getKeys(Properties);
+  var length = keys.length;
+  var i = 0;
+  var P;
+  while (length > i) dP.f(O, P = keys[i++], Properties[P]);
+  return O;
+};
+
+},{"./_an-object":19,"./_descriptors":25,"./_object-dp":46,"./_object-keys":54}],48:[function(_dereq_,module,exports){
+var pIE = _dereq_('./_object-pie');
+var createDesc = _dereq_('./_property-desc');
+var toIObject = _dereq_('./_to-iobject');
+var toPrimitive = _dereq_('./_to-primitive');
+var has = _dereq_('./_has');
+var IE8_DOM_DEFINE = _dereq_('./_ie8-dom-define');
+var gOPD = Object.getOwnPropertyDescriptor;
+
+exports.f = _dereq_('./_descriptors') ? gOPD : function getOwnPropertyDescriptor(O, P) {
+  O = toIObject(O);
+  P = toPrimitive(P, true);
+  if (IE8_DOM_DEFINE) try {
+    return gOPD(O, P);
+  } catch (e) { /* empty */ }
+  if (has(O, P)) return createDesc(!pIE.f.call(O, P), O[P]);
+};
+
+},{"./_descriptors":25,"./_has":32,"./_ie8-dom-define":35,"./_object-pie":55,"./_property-desc":56,"./_to-iobject":65,"./_to-primitive":68}],49:[function(_dereq_,module,exports){
+// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+var toIObject = _dereq_('./_to-iobject');
+var gOPN = _dereq_('./_object-gopn').f;
+var toString = {}.toString;
+
+var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+  ? Object.getOwnPropertyNames(window) : [];
+
+var getWindowNames = function (it) {
+  try {
+    return gOPN(it);
+  } catch (e) {
+    return windowNames.slice();
+  }
+};
+
+module.exports.f = function getOwnPropertyNames(it) {
+  return windowNames && toString.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
+};
+
+},{"./_object-gopn":50,"./_to-iobject":65}],50:[function(_dereq_,module,exports){
+// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+var $keys = _dereq_('./_object-keys-internal');
+var hiddenKeys = _dereq_('./_enum-bug-keys').concat('length', 'prototype');
+
+exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+  return $keys(O, hiddenKeys);
+};
+
+},{"./_enum-bug-keys":27,"./_object-keys-internal":53}],51:[function(_dereq_,module,exports){
+exports.f = Object.getOwnPropertySymbols;
+
+},{}],52:[function(_dereq_,module,exports){
+// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
+var has = _dereq_('./_has');
+var toObject = _dereq_('./_to-object');
+var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
+var ObjectProto = Object.prototype;
+
+module.exports = Object.getPrototypeOf || function (O) {
+  O = toObject(O);
+  if (has(O, IE_PROTO)) return O[IE_PROTO];
+  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
+    return O.constructor.prototype;
+  } return O instanceof Object ? ObjectProto : null;
+};
+
+},{"./_has":32,"./_shared-key":60,"./_to-object":67}],53:[function(_dereq_,module,exports){
+var has = _dereq_('./_has');
+var toIObject = _dereq_('./_to-iobject');
+var arrayIndexOf = _dereq_('./_array-includes')(false);
+var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
+
+module.exports = function (object, names) {
+  var O = toIObject(object);
+  var i = 0;
+  var result = [];
+  var key;
+  for (key in O) if (key != IE_PROTO) has(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while (names.length > i) if (has(O, key = names[i++])) {
+    ~arrayIndexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+
+},{"./_array-includes":20,"./_has":32,"./_shared-key":60,"./_to-iobject":65}],54:[function(_dereq_,module,exports){
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys = _dereq_('./_object-keys-internal');
+var enumBugKeys = _dereq_('./_enum-bug-keys');
+
+module.exports = Object.keys || function keys(O) {
+  return $keys(O, enumBugKeys);
+};
+
+},{"./_enum-bug-keys":27,"./_object-keys-internal":53}],55:[function(_dereq_,module,exports){
+exports.f = {}.propertyIsEnumerable;
+
+},{}],56:[function(_dereq_,module,exports){
+module.exports = function (bitmap, value) {
+  return {
+    enumerable: !(bitmap & 1),
+    configurable: !(bitmap & 2),
+    writable: !(bitmap & 4),
+    value: value
+  };
+};
+
+},{}],57:[function(_dereq_,module,exports){
+module.exports = _dereq_('./_hide');
+
+},{"./_hide":33}],58:[function(_dereq_,module,exports){
+// Works with __proto__ only. Old v8 can't work with null proto objects.
+/* eslint-disable no-proto */
+var isObject = _dereq_('./_is-object');
+var anObject = _dereq_('./_an-object');
+var check = function (O, proto) {
+  anObject(O);
+  if (!isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+};
+module.exports = {
+  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
+    function (test, buggy, set) {
+      try {
+        set = _dereq_('./_ctx')(Function.call, _dereq_('./_object-gopd').f(Object.prototype, '__proto__').set, 2);
+        set(test, []);
+        buggy = !(test instanceof Array);
+      } catch (e) { buggy = true; }
+      return function setPrototypeOf(O, proto) {
+        check(O, proto);
+        if (buggy) O.__proto__ = proto;
+        else set(O, proto);
+        return O;
+      };
+    }({}, false) : undefined),
+  check: check
+};
+
+},{"./_an-object":19,"./_ctx":23,"./_is-object":38,"./_object-gopd":48}],59:[function(_dereq_,module,exports){
+var def = _dereq_('./_object-dp').f;
+var has = _dereq_('./_has');
+var TAG = _dereq_('./_wks')('toStringTag');
+
+module.exports = function (it, tag, stat) {
+  if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
+};
+
+},{"./_has":32,"./_object-dp":46,"./_wks":72}],60:[function(_dereq_,module,exports){
+var shared = _dereq_('./_shared')('keys');
+var uid = _dereq_('./_uid');
+module.exports = function (key) {
+  return shared[key] || (shared[key] = uid(key));
+};
+
+},{"./_shared":61,"./_uid":69}],61:[function(_dereq_,module,exports){
+var global = _dereq_('./_global');
+var SHARED = '__core-js_shared__';
+var store = global[SHARED] || (global[SHARED] = {});
+module.exports = function (key) {
+  return store[key] || (store[key] = {});
+};
+
+},{"./_global":31}],62:[function(_dereq_,module,exports){
+var toInteger = _dereq_('./_to-integer');
+var defined = _dereq_('./_defined');
+// true  -> String#at
+// false -> String#codePointAt
+module.exports = function (TO_STRING) {
+  return function (that, pos) {
+    var s = String(defined(that));
+    var i = toInteger(pos);
+    var l = s.length;
+    var a, b;
+    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+    a = s.charCodeAt(i);
+    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+      ? TO_STRING ? s.charAt(i) : a
+      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+  };
+};
+
+},{"./_defined":24,"./_to-integer":64}],63:[function(_dereq_,module,exports){
+var toInteger = _dereq_('./_to-integer');
+var max = Math.max;
+var min = Math.min;
+module.exports = function (index, length) {
+  index = toInteger(index);
+  return index < 0 ? max(index + length, 0) : min(index, length);
+};
+
+},{"./_to-integer":64}],64:[function(_dereq_,module,exports){
+// 7.1.4 ToInteger
+var ceil = Math.ceil;
+var floor = Math.floor;
+module.exports = function (it) {
+  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+};
+
+},{}],65:[function(_dereq_,module,exports){
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = _dereq_('./_iobject');
+var defined = _dereq_('./_defined');
+module.exports = function (it) {
+  return IObject(defined(it));
+};
+
+},{"./_defined":24,"./_iobject":36}],66:[function(_dereq_,module,exports){
+// 7.1.15 ToLength
+var toInteger = _dereq_('./_to-integer');
+var min = Math.min;
+module.exports = function (it) {
+  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+};
+
+},{"./_to-integer":64}],67:[function(_dereq_,module,exports){
+// 7.1.13 ToObject(argument)
+var defined = _dereq_('./_defined');
+module.exports = function (it) {
+  return Object(defined(it));
+};
+
+},{"./_defined":24}],68:[function(_dereq_,module,exports){
+// 7.1.1 ToPrimitive(input [, PreferredType])
+var isObject = _dereq_('./_is-object');
+// instead of the ES6 spec version, we didn't implement @@toPrimitive case
+// and the second argument - flag - preferred type is a string
+module.exports = function (it, S) {
+  if (!isObject(it)) return it;
+  var fn, val;
+  if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;
+  if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
+  throw TypeError("Can't convert object to primitive value");
+};
+
+},{"./_is-object":38}],69:[function(_dereq_,module,exports){
+var id = 0;
+var px = Math.random();
+module.exports = function (key) {
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+
+},{}],70:[function(_dereq_,module,exports){
+var global = _dereq_('./_global');
+var core = _dereq_('./_core');
+var LIBRARY = _dereq_('./_library');
+var wksExt = _dereq_('./_wks-ext');
+var defineProperty = _dereq_('./_object-dp').f;
+module.exports = function (name) {
+  var $Symbol = core.Symbol || (core.Symbol = LIBRARY ? {} : global.Symbol || {});
+  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: wksExt.f(name) });
+};
+
+},{"./_core":22,"./_global":31,"./_library":43,"./_object-dp":46,"./_wks-ext":71}],71:[function(_dereq_,module,exports){
+exports.f = _dereq_('./_wks');
+
+},{"./_wks":72}],72:[function(_dereq_,module,exports){
+var store = _dereq_('./_shared')('wks');
+var uid = _dereq_('./_uid');
+var Symbol = _dereq_('./_global').Symbol;
+var USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function (name) {
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+
+},{"./_global":31,"./_shared":61,"./_uid":69}],73:[function(_dereq_,module,exports){
+'use strict';
+var addToUnscopables = _dereq_('./_add-to-unscopables');
+var step = _dereq_('./_iter-step');
+var Iterators = _dereq_('./_iterators');
+var toIObject = _dereq_('./_to-iobject');
+
+// 22.1.3.4 Array.prototype.entries()
+// 22.1.3.13 Array.prototype.keys()
+// 22.1.3.29 Array.prototype.values()
+// 22.1.3.30 Array.prototype[@@iterator]()
+module.exports = _dereq_('./_iter-define')(Array, 'Array', function (iterated, kind) {
+  this._t = toIObject(iterated); // target
+  this._i = 0;                   // next index
+  this._k = kind;                // kind
+// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
+}, function () {
+  var O = this._t;
+  var kind = this._k;
+  var index = this._i++;
+  if (!O || index >= O.length) {
+    this._t = undefined;
+    return step(1);
+  }
+  if (kind == 'keys') return step(0, index);
+  if (kind == 'values') return step(0, O[index]);
+  return step(0, [index, O[index]]);
+}, 'values');
+
+// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
+Iterators.Arguments = Iterators.Array;
+
+addToUnscopables('keys');
+addToUnscopables('values');
+addToUnscopables('entries');
+
+},{"./_add-to-unscopables":18,"./_iter-define":40,"./_iter-step":41,"./_iterators":42,"./_to-iobject":65}],74:[function(_dereq_,module,exports){
+var $export = _dereq_('./_export');
+// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
+$export($export.S, 'Object', { create: _dereq_('./_object-create') });
+
+},{"./_export":29,"./_object-create":45}],75:[function(_dereq_,module,exports){
+var $export = _dereq_('./_export');
+// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
+$export($export.S + $export.F * !_dereq_('./_descriptors'), 'Object', { defineProperty: _dereq_('./_object-dp').f });
+
+},{"./_descriptors":25,"./_export":29,"./_object-dp":46}],76:[function(_dereq_,module,exports){
+// 19.1.3.19 Object.setPrototypeOf(O, proto)
+var $export = _dereq_('./_export');
+$export($export.S, 'Object', { setPrototypeOf: _dereq_('./_set-proto').set });
+
+},{"./_export":29,"./_set-proto":58}],77:[function(_dereq_,module,exports){
+
+},{}],78:[function(_dereq_,module,exports){
+'use strict';
+var $at = _dereq_('./_string-at')(true);
+
+// 21.1.3.27 String.prototype[@@iterator]()
+_dereq_('./_iter-define')(String, 'String', function (iterated) {
+  this._t = String(iterated); // target
+  this._i = 0;                // next index
+// 21.1.5.2.1 %StringIteratorPrototype%.next()
+}, function () {
+  var O = this._t;
+  var index = this._i;
+  var point;
+  if (index >= O.length) return { value: undefined, done: true };
+  point = $at(O, index);
+  this._i += point.length;
+  return { value: point, done: false };
+});
+
+},{"./_iter-define":40,"./_string-at":62}],79:[function(_dereq_,module,exports){
+'use strict';
+// ECMAScript 6 symbols shim
+var global = _dereq_('./_global');
+var has = _dereq_('./_has');
+var DESCRIPTORS = _dereq_('./_descriptors');
+var $export = _dereq_('./_export');
+var redefine = _dereq_('./_redefine');
+var META = _dereq_('./_meta').KEY;
+var $fails = _dereq_('./_fails');
+var shared = _dereq_('./_shared');
+var setToStringTag = _dereq_('./_set-to-string-tag');
+var uid = _dereq_('./_uid');
+var wks = _dereq_('./_wks');
+var wksExt = _dereq_('./_wks-ext');
+var wksDefine = _dereq_('./_wks-define');
+var enumKeys = _dereq_('./_enum-keys');
+var isArray = _dereq_('./_is-array');
+var anObject = _dereq_('./_an-object');
+var toIObject = _dereq_('./_to-iobject');
+var toPrimitive = _dereq_('./_to-primitive');
+var createDesc = _dereq_('./_property-desc');
+var _create = _dereq_('./_object-create');
+var gOPNExt = _dereq_('./_object-gopn-ext');
+var $GOPD = _dereq_('./_object-gopd');
+var $DP = _dereq_('./_object-dp');
+var $keys = _dereq_('./_object-keys');
+var gOPD = $GOPD.f;
+var dP = $DP.f;
+var gOPN = gOPNExt.f;
+var $Symbol = global.Symbol;
+var $JSON = global.JSON;
+var _stringify = $JSON && $JSON.stringify;
+var PROTOTYPE = 'prototype';
+var HIDDEN = wks('_hidden');
+var TO_PRIMITIVE = wks('toPrimitive');
+var isEnum = {}.propertyIsEnumerable;
+var SymbolRegistry = shared('symbol-registry');
+var AllSymbols = shared('symbols');
+var OPSymbols = shared('op-symbols');
+var ObjectProto = Object[PROTOTYPE];
+var USE_NATIVE = typeof $Symbol == 'function';
+var QObject = global.QObject;
+// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+var setter = !QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild;
+
+// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+var setSymbolDesc = DESCRIPTORS && $fails(function () {
+  return _create(dP({}, 'a', {
+    get: function () { return dP(this, 'a', { value: 7 }).a; }
+  })).a != 7;
+}) ? function (it, key, D) {
+  var protoDesc = gOPD(ObjectProto, key);
+  if (protoDesc) delete ObjectProto[key];
+  dP(it, key, D);
+  if (protoDesc && it !== ObjectProto) dP(ObjectProto, key, protoDesc);
+} : dP;
+
+var wrap = function (tag) {
+  var sym = AllSymbols[tag] = _create($Symbol[PROTOTYPE]);
+  sym._k = tag;
+  return sym;
+};
+
+var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function (it) {
+  return typeof it == 'symbol';
+} : function (it) {
+  return it instanceof $Symbol;
+};
+
+var $defineProperty = function defineProperty(it, key, D) {
+  if (it === ObjectProto) $defineProperty(OPSymbols, key, D);
+  anObject(it);
+  key = toPrimitive(key, true);
+  anObject(D);
+  if (has(AllSymbols, key)) {
+    if (!D.enumerable) {
+      if (!has(it, HIDDEN)) dP(it, HIDDEN, createDesc(1, {}));
+      it[HIDDEN][key] = true;
+    } else {
+      if (has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
+      D = _create(D, { enumerable: createDesc(0, false) });
+    } return setSymbolDesc(it, key, D);
+  } return dP(it, key, D);
+};
+var $defineProperties = function defineProperties(it, P) {
+  anObject(it);
+  var keys = enumKeys(P = toIObject(P));
+  var i = 0;
+  var l = keys.length;
+  var key;
+  while (l > i) $defineProperty(it, key = keys[i++], P[key]);
+  return it;
+};
+var $create = function create(it, P) {
+  return P === undefined ? _create(it) : $defineProperties(_create(it), P);
+};
+var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+  var E = isEnum.call(this, key = toPrimitive(key, true));
+  if (this === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return false;
+  return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
+};
+var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+  it = toIObject(it);
+  key = toPrimitive(key, true);
+  if (it === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return;
+  var D = gOPD(it, key);
+  if (D && has(AllSymbols, key) && !(has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
+  return D;
+};
+var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+  var names = gOPN(toIObject(it));
+  var result = [];
+  var i = 0;
+  var key;
+  while (names.length > i) {
+    if (!has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
+  } return result;
+};
+var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+  var IS_OP = it === ObjectProto;
+  var names = gOPN(IS_OP ? OPSymbols : toIObject(it));
+  var result = [];
+  var i = 0;
+  var key;
+  while (names.length > i) {
+    if (has(AllSymbols, key = names[i++]) && (IS_OP ? has(ObjectProto, key) : true)) result.push(AllSymbols[key]);
+  } return result;
+};
+
+// 19.4.1.1 Symbol([description])
+if (!USE_NATIVE) {
+  $Symbol = function Symbol() {
+    if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
+    var tag = uid(arguments.length > 0 ? arguments[0] : undefined);
+    var $set = function (value) {
+      if (this === ObjectProto) $set.call(OPSymbols, value);
+      if (has(this, HIDDEN) && has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+      setSymbolDesc(this, tag, createDesc(1, value));
+    };
+    if (DESCRIPTORS && setter) setSymbolDesc(ObjectProto, tag, { configurable: true, set: $set });
+    return wrap(tag);
+  };
+  redefine($Symbol[PROTOTYPE], 'toString', function toString() {
+    return this._k;
+  });
+
+  $GOPD.f = $getOwnPropertyDescriptor;
+  $DP.f = $defineProperty;
+  _dereq_('./_object-gopn').f = gOPNExt.f = $getOwnPropertyNames;
+  _dereq_('./_object-pie').f = $propertyIsEnumerable;
+  _dereq_('./_object-gops').f = $getOwnPropertySymbols;
+
+  if (DESCRIPTORS && !_dereq_('./_library')) {
+    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+  }
+
+  wksExt.f = function (name) {
+    return wrap(wks(name));
+  };
 }
 
-},{"./src/index":16,"./src/utils/window":53}],2:[function(_dereq_,module,exports){
+$export($export.G + $export.W + $export.F * !USE_NATIVE, { Symbol: $Symbol });
+
+for (var es6Symbols = (
+  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+).split(','), j = 0; es6Symbols.length > j;)wks(es6Symbols[j++]);
+
+for (var wellKnownSymbols = $keys(wks.store), k = 0; wellKnownSymbols.length > k;) wksDefine(wellKnownSymbols[k++]);
+
+$export($export.S + $export.F * !USE_NATIVE, 'Symbol', {
+  // 19.4.2.1 Symbol.for(key)
+  'for': function (key) {
+    return has(SymbolRegistry, key += '')
+      ? SymbolRegistry[key]
+      : SymbolRegistry[key] = $Symbol(key);
+  },
+  // 19.4.2.5 Symbol.keyFor(sym)
+  keyFor: function keyFor(sym) {
+    if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+    for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
+  },
+  useSetter: function () { setter = true; },
+  useSimple: function () { setter = false; }
+});
+
+$export($export.S + $export.F * !USE_NATIVE, 'Object', {
+  // 19.1.2.2 Object.create(O [, Properties])
+  create: $create,
+  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+  defineProperty: $defineProperty,
+  // 19.1.2.3 Object.defineProperties(O, Properties)
+  defineProperties: $defineProperties,
+  // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+  // 19.1.2.7 Object.getOwnPropertyNames(O)
+  getOwnPropertyNames: $getOwnPropertyNames,
+  // 19.1.2.8 Object.getOwnPropertySymbols(O)
+  getOwnPropertySymbols: $getOwnPropertySymbols
+});
+
+// 24.3.2 JSON.stringify(value [, replacer [, space]])
+$JSON && $export($export.S + $export.F * (!USE_NATIVE || $fails(function () {
+  var S = $Symbol();
+  // MS Edge converts symbol values to JSON as {}
+  // WebKit converts symbol values to JSON as null
+  // V8 throws on boxed symbols
+  return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+})), 'JSON', {
+  stringify: function stringify(it) {
+    if (it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+    var args = [it];
+    var i = 1;
+    var replacer, $replacer;
+    while (arguments.length > i) args.push(arguments[i++]);
+    replacer = args[1];
+    if (typeof replacer == 'function') $replacer = replacer;
+    if ($replacer || !isArray(replacer)) replacer = function (key, value) {
+      if ($replacer) value = $replacer.call(this, key, value);
+      if (!isSymbol(value)) return value;
+    };
+    args[1] = replacer;
+    return _stringify.apply($JSON, args);
+  }
+});
+
+// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+$Symbol[PROTOTYPE][TO_PRIMITIVE] || _dereq_('./_hide')($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
+// 19.4.3.5 Symbol.prototype[@@toStringTag]
+setToStringTag($Symbol, 'Symbol');
+// 20.2.1.9 Math[@@toStringTag]
+setToStringTag(Math, 'Math', true);
+// 24.3.3 JSON[@@toStringTag]
+setToStringTag(global.JSON, 'JSON', true);
+
+},{"./_an-object":19,"./_descriptors":25,"./_enum-keys":28,"./_export":29,"./_fails":30,"./_global":31,"./_has":32,"./_hide":33,"./_is-array":37,"./_library":43,"./_meta":44,"./_object-create":45,"./_object-dp":46,"./_object-gopd":48,"./_object-gopn":50,"./_object-gopn-ext":49,"./_object-gops":51,"./_object-keys":54,"./_object-pie":55,"./_property-desc":56,"./_redefine":57,"./_set-to-string-tag":59,"./_shared":61,"./_to-iobject":65,"./_to-primitive":68,"./_uid":69,"./_wks":72,"./_wks-define":70,"./_wks-ext":71}],80:[function(_dereq_,module,exports){
+_dereq_('./_wks-define')('asyncIterator');
+
+},{"./_wks-define":70}],81:[function(_dereq_,module,exports){
+_dereq_('./_wks-define')('observable');
+
+},{"./_wks-define":70}],82:[function(_dereq_,module,exports){
+_dereq_('./es6.array.iterator');
+var global = _dereq_('./_global');
+var hide = _dereq_('./_hide');
+var Iterators = _dereq_('./_iterators');
+var TO_STRING_TAG = _dereq_('./_wks')('toStringTag');
+
+var DOMIterables = ('CSSRuleList,CSSStyleDeclaration,CSSValueList,ClientRectList,DOMRectList,DOMStringList,' +
+  'DOMTokenList,DataTransferItemList,FileList,HTMLAllCollection,HTMLCollection,HTMLFormElement,HTMLSelectElement,' +
+  'MediaList,MimeTypeArray,NamedNodeMap,NodeList,PaintRequestList,Plugin,PluginArray,SVGLengthList,SVGNumberList,' +
+  'SVGPathSegList,SVGPointList,SVGStringList,SVGTransformList,SourceBufferList,StyleSheetList,TextTrackCueList,' +
+  'TextTrackList,TouchList').split(',');
+
+for (var i = 0; i < DOMIterables.length; i++) {
+  var NAME = DOMIterables[i];
+  var Collection = global[NAME];
+  var proto = Collection && Collection.prototype;
+  if (proto && !proto[TO_STRING_TAG]) hide(proto, TO_STRING_TAG, NAME);
+  Iterators[NAME] = Iterators.Array;
+}
+
+},{"./_global":31,"./_hide":33,"./_iterators":42,"./_wks":72,"./es6.array.iterator":73}],83:[function(_dereq_,module,exports){
 'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var extend = _dereq_('./utils/extend.js');
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _extend = _dereq_('./utils/extend.js');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function fireUntilImmediateStopped(event, listeners) {
   for (var _i = 0; _i < listeners.length; _i++) {
@@ -50,9 +1288,9 @@ function fireUntilImmediateStopped(event, listeners) {
 
 var Eventable = function () {
   function Eventable(options) {
-    _classCallCheck(this, Eventable);
+    (0, _classCallCheck3.default)(this, Eventable);
 
-    this.options = extend({}, options || {});
+    this.options = (0, _extend2.default)({}, options || {});
   }
 
   Eventable.prototype.fire = function fire(event) {
@@ -102,43 +1340,63 @@ var Eventable = function () {
   return Eventable;
 }();
 
-module.exports = Eventable;
+exports.default = Eventable;
 
-},{"./utils/extend.js":40}],3:[function(_dereq_,module,exports){
+},{"./utils/extend.js":126,"babel-runtime/helpers/classCallCheck":7}],84:[function(_dereq_,module,exports){
 'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var extend = _dereq_('./utils/extend');
-var getOriginXY = _dereq_('./utils/getOriginXY');
-var defaults = _dereq_('./defaultOptions');
-var signals = _dereq_('./utils/Signals').new();
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = _dereq_('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _extend = _dereq_('./utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _getOriginXY = _dereq_('./utils/getOriginXY');
+
+var _getOriginXY2 = _interopRequireDefault(_getOriginXY);
+
+var _defaultOptions = _dereq_('./defaultOptions');
+
+var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var InteractEvent = function () {
   /** */
-  function InteractEvent(interaction, event, action, phase, element, related) {
-    var preEnd = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
-
-    _classCallCheck(this, InteractEvent);
-
-    var target = interaction.target;
-    var deltaSource = (target && target.options || defaults).deltaSource;
-    var origin = getOriginXY(target, element, action);
-    var starting = phase === 'start';
-    var ending = phase === 'end';
-    var coords = starting ? interaction.startCoords : interaction.curCoords;
-    var prevEvent = interaction.prevEvent;
+  function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
+    (0, _classCallCheck3.default)(this, InteractEvent);
 
     element = element || interaction.element;
 
-    var page = extend({}, coords.page);
-    var client = extend({}, coords.client);
+    var target = interaction.target;
+    var deltaSource = (target && target.options || _defaultOptions2.default).deltaSource;
+    var origin = (0, _getOriginXY2.default)(target, element, actionName);
+    var starting = phase === 'start';
+    var ending = phase === 'end';
+    var prevEvent = starting ? this : interaction.prevEvent;
+    var coords = starting ? interaction.startCoords : ending ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.curCoords.timeStamp } : interaction.curCoords;
 
-    page.x -= origin.x;
-    page.y -= origin.y;
+    this.page = (0, _extend2.default)({}, coords.page);
+    this.client = (0, _extend2.default)({}, coords.client);
+    this.timeStamp = coords.timeStamp;
 
-    client.x -= origin.x;
-    client.y -= origin.y;
+    if (!ending) {
+      this.page.x -= origin.x;
+      this.page.y -= origin.y;
+
+      this.client.x -= origin.x;
+      this.client.y -= origin.y;
+    }
 
     this.ctrlKey = event.ctrlKey;
     this.altKey = event.altKey;
@@ -150,62 +1408,37 @@ var InteractEvent = function () {
     this.currentTarget = element;
     this.relatedTarget = related || null;
     this.preEnd = preEnd;
-    this.type = action + (phase || '');
+    this.type = type || actionName + (phase || '');
     this.interaction = interaction;
     this.interactable = target;
 
-    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1] : prevEvent.t0;
-
-    var signalArg = {
-      interaction: interaction,
-      event: event,
-      action: action,
-      phase: phase,
-      element: element,
-      related: related,
-      page: page,
-      client: client,
-      coords: coords,
-      starting: starting,
-      ending: ending,
-      deltaSource: deltaSource,
-      iEvent: this
-    };
-
-    signals.fire('set-xy', signalArg);
-
-    if (ending) {
-      // use previous coords when ending
-      this.pageX = prevEvent.pageX;
-      this.pageY = prevEvent.pageY;
-      this.clientX = prevEvent.clientX;
-      this.clientY = prevEvent.clientY;
-    } else {
-      this.pageX = page.x;
-      this.pageY = page.y;
-      this.clientX = client.x;
-      this.clientY = client.y;
-    }
+    this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
 
     this.x0 = interaction.startCoords.page.x - origin.x;
     this.y0 = interaction.startCoords.page.y - origin.y;
     this.clientX0 = interaction.startCoords.client.x - origin.x;
     this.clientY0 = interaction.startCoords.client.y - origin.y;
 
-    signals.fire('set-delta', signalArg);
+    if (starting || ending) {
+      this.delta = { x: 0, y: 0 };
+    } else {
+      this.delta = {
+        x: this[deltaSource].x - prevEvent[deltaSource].x,
+        y: this[deltaSource].y - prevEvent[deltaSource].y
+      };
+    }
 
-    this.timeStamp = coords.timeStamp;
     this.dt = interaction.pointerDelta.timeStamp;
     this.duration = this.timeStamp - this.t0;
 
     // speed and velocity in pixels per second
     this.speed = interaction.pointerDelta[deltaSource].speed;
-    this.velocityX = interaction.pointerDelta[deltaSource].vx;
-    this.velocityY = interaction.pointerDelta[deltaSource].vy;
+    this.velocity = {
+      x: interaction.pointerDelta[deltaSource].vx,
+      y: interaction.pointerDelta[deltaSource].vy
+    };
 
     this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null;
-
-    signals.fire('new', signalArg);
   }
 
   InteractEvent.prototype.getSwipe = function getSwipe() {
@@ -258,66 +1491,136 @@ var InteractEvent = function () {
     this.propagationStopped = true;
   };
 
+  (0, _createClass3.default)(InteractEvent, [{
+    key: 'pageX',
+    get: function get() {
+      return this.page.x;
+    },
+    set: function set(value) {
+      this.page.x = value;
+    }
+  }, {
+    key: 'pageY',
+    get: function get() {
+      return this.page.y;
+    },
+    set: function set(value) {
+      this.page.y = value;
+    }
+  }, {
+    key: 'clientX',
+    get: function get() {
+      return this.client.x;
+    },
+    set: function set(value) {
+      this.client.x = value;
+    }
+  }, {
+    key: 'clientY',
+    get: function get() {
+      return this.client.y;
+    },
+    set: function set(value) {
+      this.client.y = value;
+    }
+  }, {
+    key: 'dx',
+    get: function get() {
+      return this.delta.x;
+    },
+    set: function set(value) {
+      this.delta.x = value;
+    }
+  }, {
+    key: 'dy',
+    get: function get() {
+      return this.delta.y;
+    },
+    set: function set(value) {
+      this.delta.y = value;
+    }
+  }, {
+    key: 'velocityX',
+    get: function get() {
+      return this.velocity.x;
+    },
+    set: function set(value) {
+      this.velocity.x = value;
+    }
+  }, {
+    key: 'velocityY',
+    get: function get() {
+      return this.velocity.y;
+    },
+    set: function set(value) {
+      this.velocity.y = value;
+    }
+  }]);
   return InteractEvent;
 }();
 
-signals.on('set-delta', function (_ref) {
-  var iEvent = _ref.iEvent,
-      interaction = _ref.interaction,
-      starting = _ref.starting,
-      deltaSource = _ref.deltaSource;
+exports.default = InteractEvent;
 
-  var prevEvent = starting ? iEvent : interaction.prevEvent;
-
-  if (deltaSource === 'client') {
-    iEvent.dx = iEvent.clientX - prevEvent.clientX;
-    iEvent.dy = iEvent.clientY - prevEvent.clientY;
-  } else {
-    iEvent.dx = iEvent.pageX - prevEvent.pageX;
-    iEvent.dy = iEvent.pageY - prevEvent.pageY;
-  }
-});
-
-InteractEvent.signals = signals;
-
-module.exports = InteractEvent;
-
-},{"./defaultOptions":15,"./utils/Signals":33,"./utils/extend":40,"./utils/getOriginXY":41}],4:[function(_dereq_,module,exports){
+},{"./defaultOptions":99,"./utils/extend":126,"./utils/getOriginXY":127,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/createClass":8}],85:[function(_dereq_,module,exports){
 'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var clone = _dereq_('./utils/clone');
-var is = _dereq_('./utils/is');
-var events = _dereq_('./utils/events');
-var extend = _dereq_('./utils/extend');
-var arr = _dereq_('./utils/arr');
-var scope = _dereq_('./scope');
-var Eventable = _dereq_('./Eventable');
-var defaults = _dereq_('./defaultOptions');
-var signals = _dereq_('./utils/Signals').new();
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
 
-var _require = _dereq_('./utils/domUtils'),
-    getElementRect = _require.getElementRect,
-    nodeContains = _require.nodeContains,
-    trySelector = _require.trySelector;
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _require2 = _dereq_('./utils/window'),
-    getWindow = _require2.getWindow;
+var _clone = _dereq_('./utils/clone');
 
-var _require3 = _dereq_('./utils/browser'),
-    wheelEvent = _require3.wheelEvent;
+var _clone2 = _interopRequireDefault(_clone);
+
+var _is = _dereq_('./utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _events = _dereq_('./utils/events');
+
+var _events2 = _interopRequireDefault(_events);
+
+var _extend = _dereq_('./utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _arr = _dereq_('./utils/arr');
+
+var arr = _interopRequireWildcard(_arr);
+
+var _Eventable = _dereq_('./Eventable');
+
+var _Eventable2 = _interopRequireDefault(_Eventable);
+
+var _defaultOptions = _dereq_('./defaultOptions');
+
+var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
+
+var _domUtils = _dereq_('./utils/domUtils');
+
+var _window = _dereq_('./utils/window');
+
+var _browser = _dereq_('./utils/browser');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Interactable = function () {
   /** */
   function Interactable(target, options, defaultContext) {
-    _classCallCheck(this, Interactable);
+    (0, _classCallCheck3.default)(this, Interactable);
 
-    this._signals = options.signals || Interactable.signals;
+    this._signals = options.signals;
+    this._actions = options.actions;
     this.target = target;
-    this.events = new Eventable();
+    this.events = new _Eventable2.default();
     this._context = options.context || defaultContext;
-    this._win = getWindow(trySelector(target) ? this._context : target);
+    this._win = (0, _window.getWindow)((0, _domUtils.trySelector)(target) ? this._context : target);
     this._doc = this._win.document;
 
     this._signals.fire('new', {
@@ -333,16 +1636,16 @@ var Interactable = function () {
   Interactable.prototype.setOnEvents = function setOnEvents(action, phases) {
     var onAction = 'on' + action;
 
-    if (is.function(phases.onstart)) {
+    if (is.func(phases.onstart)) {
       this.events[onAction + 'start'] = phases.onstart;
     }
-    if (is.function(phases.onmove)) {
+    if (is.func(phases.onmove)) {
       this.events[onAction + 'move'] = phases.onmove;
     }
-    if (is.function(phases.onend)) {
+    if (is.func(phases.onend)) {
       this.events[onAction + 'end'] = phases.onend;
     }
-    if (is.function(phases.oninertiastart)) {
+    if (is.func(phases.oninertiastart)) {
       this.events[onAction + 'inertiastart'] = phases.oninertiastart;
     }
 
@@ -363,15 +1666,15 @@ var Interactable = function () {
       // if the option value is an object
       else if (!isArray && is.plainObject(optionValue)) {
           // copy the object
-          actionOptions[optionName] = extend(actionOptions[optionName] || {}, clone(optionValue));
+          actionOptions[optionName] = (0, _extend2.default)(actionOptions[optionName] || {}, (0, _clone2.default)(optionValue));
 
           // set anabled field to true if it exists in the defaults
-          if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
+          if (is.object(_defaultOptions2.default.perAction[optionName]) && 'enabled' in _defaultOptions2.default.perAction[optionName]) {
             actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
           }
         }
         // if the option value is a boolean and the default is an object
-        else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
+        else if (is.bool(optionValue) && is.object(_defaultOptions2.default.perAction[optionName])) {
             actionOptions[optionName].enabled = optionValue;
           }
           // if it's anything else, do a plain assignment
@@ -397,7 +1700,7 @@ var Interactable = function () {
       element = this._context.querySelector(this.target);
     }
 
-    return getElementRect(element);
+    return (0, _domUtils.getElementRect)(element);
   };
 
   /**
@@ -411,7 +1714,7 @@ var Interactable = function () {
 
 
   Interactable.prototype.rectChecker = function rectChecker(checker) {
-    if (is.function(checker)) {
+    if (is.func(checker)) {
       this.getRect = checker;
 
       return this;
@@ -427,13 +1730,13 @@ var Interactable = function () {
   };
 
   Interactable.prototype._backCompatOption = function _backCompatOption(optionName, newValue) {
-    if (trySelector(newValue) || is.object(newValue)) {
+    if ((0, _domUtils.trySelector)(newValue) || is.object(newValue)) {
       this.options[optionName] = newValue;
 
-      for (var _i = 0; _i < scope.actions.names.length; _i++) {
+      for (var _i = 0; _i < this._actions.names.length; _i++) {
         var _ref;
 
-        _ref = scope.actions.names[_i];
+        _ref = this._actions.names[_i];
         var action = _ref;
 
         this.options[action][optionName] = newValue;
@@ -494,7 +1797,7 @@ var Interactable = function () {
   };
 
   Interactable.prototype.inContext = function inContext(element) {
-    return this._context === element.ownerDocument || nodeContains(this._context, element);
+    return this._context === element.ownerDocument || (0, _domUtils.nodeContains)(this._context, element);
   };
 
   /**
@@ -558,17 +1861,17 @@ var Interactable = function () {
     }
 
     if (eventType === 'wheel') {
-      eventType = wheelEvent;
+      eventType = _browser.wheelEvent;
     }
 
-    if (arr.contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(this._actions.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
     // delegated event for selector
     else if (is.string(this.target)) {
-        events.addDelegate(this.target, this._context, eventType, listener, options);
+        _events2.default.addDelegate(this.target, this._context, eventType, listener, options);
       } else {
-        events.add(this.target, eventType, listener, options);
+        _events2.default.add(this.target, eventType, listener, options);
       }
 
     return this;
@@ -592,20 +1895,20 @@ var Interactable = function () {
     }
 
     if (eventType === 'wheel') {
-      eventType = wheelEvent;
+      eventType = _browser.wheelEvent;
     }
 
     // if it is an action event type
-    if (arr.contains(Interactable.eventTypes, eventType)) {
+    if (arr.contains(this._actions.eventTypes, eventType)) {
       this.events.off(eventType, listener);
     }
     // delegated event
     else if (is.string(this.target)) {
-        events.removeDelegate(this.target, this._context, eventType, listener, options);
+        _events2.default.removeDelegate(this.target, this._context, eventType, listener, options);
       }
       // remove listener from this Interatable's element
       else {
-          events.remove(this.target, eventType, listener, options);
+          _events2.default.remove(this.target, eventType, listener, options);
         }
 
     return this;
@@ -624,26 +1927,19 @@ var Interactable = function () {
       options = {};
     }
 
-    this.options = extend({}, defaults.base);
+    this.options = (0, _clone2.default)(_defaultOptions2.default.base);
 
-    for (var actionName in scope.actions.methodDict) {
-      var methodName = scope.actions.methodDict[actionName];
+    for (var actionName in this._actions.methodDict) {
+      var methodName = this._actions.methodDict[actionName];
 
       this.options[actionName] = {};
-      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
+      this.setPerAction(actionName, (0, _extend2.default)((0, _extend2.default)({}, _defaultOptions2.default.perAction), _defaultOptions2.default[actionName]));
 
       this[methodName](options[actionName]);
     }
 
-    for (var _i3 = 0; _i3 < Interactable.settingsMethods.length; _i3++) {
-      var _ref3;
-
-      _ref3 = Interactable.settingsMethods[_i3];
-      var setting = _ref3;
-
-      this.options[setting] = defaults.base[setting];
-
-      if (setting in options) {
+    for (var setting in options) {
+      if (is.func(this[setting])) {
         this[setting](options[setting]);
       }
     }
@@ -665,12 +1961,12 @@ var Interactable = function () {
 
 
   Interactable.prototype.unset = function unset() {
-    events.remove(this.target, 'all');
+    _events2.default.remove(this.target, 'all');
 
     if (is.string(this.target)) {
       // remove delegated events
-      for (var type in events.delegatedEvents) {
-        var delegated = events.delegatedEvents[type];
+      for (var type in _events2.default.delegatedEvents) {
+        var delegated = _events2.default.delegatedEvents[type];
 
         if (delegated.selectors[0] === this.target && delegated.contexts[0] === this._context) {
 
@@ -684,47 +1980,50 @@ var Interactable = function () {
           }
         }
 
-        events.remove(this._context, type, events.delegateListener);
-        events.remove(this._context, type, events.delegateUseCapture, true);
+        _events2.default.remove(this._context, type, _events2.default.delegateListener);
+        _events2.default.remove(this._context, type, _events2.default.delegateUseCapture, true);
       }
     } else {
-      events.remove(this, 'all');
+      _events2.default.remove(this, 'all');
     }
 
     this._signals.fire('unset', { interactable: this });
-
-    return scope.interact;
   };
 
   return Interactable;
 }();
 
-// all interact.js eventTypes
+exports.default = Interactable;
 
-
-Interactable.eventTypes = [];
-
-Interactable.signals = signals;
-
-Interactable.settingsMethods = ['deltaSource', 'origin', 'preventDefault', 'rectChecker'];
-
-module.exports = Interactable;
-
-},{"./Eventable":2,"./defaultOptions":15,"./scope":30,"./utils/Signals":33,"./utils/arr":34,"./utils/browser":35,"./utils/clone":36,"./utils/domUtils":38,"./utils/events":39,"./utils/extend":40,"./utils/is":45,"./utils/window":53}],5:[function(_dereq_,module,exports){
+},{"./Eventable":83,"./defaultOptions":99,"./utils/arr":120,"./utils/browser":121,"./utils/clone":122,"./utils/domUtils":124,"./utils/events":125,"./utils/extend":126,"./utils/is":131,"./utils/window":139,"babel-runtime/helpers/classCallCheck":7}],86:[function(_dereq_,module,exports){
 'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var InteractEvent = _dereq_('./InteractEvent');
-var utils = _dereq_('./utils');
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _InteractEvent = _dereq_('./InteractEvent');
+
+var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
+
+var _utils = _dereq_('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Interaction = function () {
   /** */
   function Interaction(_ref) {
     var pointerType = _ref.pointerType,
         signals = _ref.signals;
-
-    _classCallCheck(this, Interaction);
+    (0, _classCallCheck3.default)(this, Interaction);
 
     this._signals = signals;
 
@@ -737,10 +2036,7 @@ var Interaction = function () {
     };
 
     // keep track of added pointers
-    this.pointers = [];
-    this.pointerIds = [];
-    this.downTargets = [];
-    this.downTimes = [];
+    this.pointers = [/* { id, pointer, event, target, downTime }*/];
 
     // Previous native pointer move event coordinates
     this.prevCoords = {
@@ -772,8 +2068,11 @@ var Interaction = function () {
     this.downEvent = null; // pointerdown/mousedown/touchstart event
     this.downPointer = {};
 
-    this._eventTarget = null;
-    this._curEventTarget = null;
+    this._latestPointer = {
+      pointer: null,
+      event: null,
+      eventTarget: null
+    };
 
     this.prevEvent = null; // previous action event
 
@@ -833,33 +2132,27 @@ var Interaction = function () {
 
 
   Interaction.prototype.start = function start(action, target, element) {
-    if (this.interacting() || !this.pointerIsDown || this.pointerIds.length < (action.name === 'gesture' ? 2 : 1)) {
+    if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
       return;
     }
 
     utils.copyAction(this.prepared, action);
+
     this.target = target;
     this.element = element;
-
-    this._interacting = true;
-    var startEvent = this._createPreparedEvent(this.downEvent, 'start', false);
-    var signalArg = {
+    this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
-      iEvent: startEvent
-    };
-
-    this._signals.fire('action-start', signalArg);
-
-    this._fireEvent(startEvent);
-
-    this._signals.fire('after-action-start', signalArg);
+      phase: 'start'
+    });
   };
 
   Interaction.prototype.pointerMove = function pointerMove(pointer, event, eventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false);
-      utils.pointer.setCoords(this.curCoords, this.pointers);
+      utils.pointer.setCoords(this.curCoords, this.pointers.map(function (p) {
+        return p.pointer;
+      }));
     }
 
     var duplicateMove = this.curCoords.page.x === this.prevCoords.page.x && this.curCoords.page.y === this.prevCoords.page.y && this.curCoords.client.x === this.prevCoords.client.x && this.curCoords.client.y === this.prevCoords.client.y;
@@ -897,7 +2190,7 @@ var Interaction = function () {
     if (!duplicateMove) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
-        this.doMove(signalArg);
+        this.move(signalArg);
       }
 
       if (this.pointerWasMoved) {
@@ -915,7 +2208,7 @@ var Interaction = function () {
    *       // change the snap settings
    *       event.interactable.draggable({ snap: { targets: [] }});
    *       // fire another move event with re-calculated snap
-   *       event.interaction.doMove();
+   *       event.interaction.move();
    *     }
    *   });
    * ```
@@ -926,25 +2219,18 @@ var Interaction = function () {
    */
 
 
-  Interaction.prototype.doMove = function doMove(signalArg) {
+  Interaction.prototype.move = function move(signalArg) {
     signalArg = utils.extend({
-      pointer: this.pointers[0],
-      event: this.prevEvent,
-      eventTarget: this._eventTarget,
-      interaction: this
+      pointer: this._latestPointer.pointer,
+      event: this._latestPointer.event,
+      eventTarget: this._latestPointer.eventTarget,
+      interaction: this,
+      noBefore: false
     }, signalArg || {});
 
-    var beforeMoveResult = this._signals.fire('before-action-move', signalArg);
+    signalArg.phase = 'move';
 
-    if (beforeMoveResult !== false) {
-      var moveEvent = signalArg.iEvent = this._createPreparedEvent(signalArg.event, 'move', signalArg.preEnd);
-
-      this._signals.fire('action-move', signalArg);
-
-      this._fireEvent(moveEvent);
-
-      this._signals.fire('after-action-move', signalArg);
-    }
+    this._doPhase(signalArg);
   };
 
   // End interact move events and stop auto-scroll unless simulation is running
@@ -995,32 +2281,22 @@ var Interaction = function () {
 
   Interaction.prototype.end = function end(event) {
     this._ending = true;
-    event = event || this.prevEvent;
+    event = event || this._latestPointer.event;
+    var endPhaseResult = void 0;
 
     if (this.interacting()) {
-      var endEvent = this._createPreparedEvent(event, 'end', false);
-      var signalArg = {
+      endPhaseResult = this._doPhase({
         event: event,
-        iEvent: endEvent,
-        interaction: this
-      };
-
-      var beforeEndResult = this._signals.fire('before-action-end', signalArg);
-
-      if (beforeEndResult === false) {
-        this._ending = false;
-        return;
-      }
-
-      this._signals.fire('action-end', signalArg);
-
-      this._fireEvent(endEvent);
-
-      this._signals.fire('after-action-end', signalArg);
+        interaction: this,
+        phase: 'end'
+      });
     }
 
     this._ending = false;
-    this.stop();
+
+    if (endPhaseResult === true) {
+      this.stop();
+    }
   };
 
   Interaction.prototype.currentAction = function currentAction() {
@@ -1044,42 +2320,57 @@ var Interaction = function () {
   };
 
   Interaction.prototype.getPointerIndex = function getPointerIndex(pointer) {
-    // mouse and pen interactions may have only one pointer
-    if (this.pointerType === 'mouse' || this.pointerType === 'pen') {
-      return 0;
-    }
+    var pointerId = utils.pointer.getPointerId(pointer);
 
-    return this.pointerIds.indexOf(utils.pointer.getPointerId(pointer));
+    // mouse and pen interactions may have only one pointer
+    return this.pointerType === 'mouse' || this.pointerType === 'pen' ? 0 : utils.arr.findIndex(this.pointers, function (curPointer) {
+      return curPointer.id === pointerId;
+    });
+  };
+
+  Interaction.prototype.getPointerInfo = function getPointerInfo(pointer) {
+    return this.pointers[this.getPointerIndex(pointer)];
   };
 
   Interaction.prototype.updatePointer = function updatePointer(pointer, event, eventTarget) {
     var down = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : event && /(down|start)$/i.test(event.type);
 
     var id = utils.pointer.getPointerId(pointer);
-    var index = this.getPointerIndex(pointer);
+    var pointerIndex = this.getPointerIndex(pointer);
+    var pointerInfo = this.pointers[pointerIndex];
 
-    if (index === -1) {
-      index = this.pointerIds.length;
-      this.pointerIds[index] = id;
+    if (!pointerInfo) {
+      pointerInfo = {
+        id: id,
+        pointer: pointer,
+        event: event,
+        downTime: null,
+        downTarget: null
+      };
+
+      pointerIndex = this.pointers.length;
+      this.pointers.push(pointerInfo);
+    } else {
+      pointerInfo.pointer = pointer;
     }
 
     if (down) {
-      this.pointerIds[index] = id;
-      this.pointers[index] = pointer;
       this.pointerIsDown = true;
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.startCoords, this.pointers);
+        utils.pointer.setCoords(this.startCoords, this.pointers.map(function (p) {
+          return p.pointer;
+        }));
 
         utils.pointer.copyCoords(this.curCoords, this.startCoords);
         utils.pointer.copyCoords(this.prevCoords, this.startCoords);
+        utils.pointer.pointerExtend(this.downPointer, pointer);
 
         this.downEvent = event;
-        this.downTimes[index] = this.curCoords.timeStamp;
-        this.downTargets[index] = eventTarget;
-        this.pointerWasMoved = false;
+        pointerInfo.downTime = this.curCoords.timeStamp;
+        pointerInfo.downTarget = eventTarget;
 
-        utils.pointer.pointerExtend(this.downPointer, pointer);
+        this.pointerWasMoved = false;
       }
 
       this._signals.fire('update-pointer-down', {
@@ -1087,51 +2378,81 @@ var Interaction = function () {
         event: event,
         eventTarget: eventTarget,
         down: down,
-        pointerId: id,
-        pointerIndex: index,
+        pointerInfo: pointerInfo,
+        pointerIndex: pointerIndex,
         interaction: this
       });
     }
 
-    this.pointers[index] = pointer;
+    this._updateLatestPointer(pointer, event, eventTarget);
 
-    return index;
+    return pointerIndex;
   };
 
   Interaction.prototype.removePointer = function removePointer(pointer, event) {
-    var index = this.getPointerIndex(pointer);
+    var pointerIndex = this.getPointerIndex(pointer);
 
-    if (index === -1) {
+    if (pointerIndex === -1) {
       return;
     }
+
+    var pointerInfo = this.pointers[pointerIndex];
 
     this._signals.fire('remove-pointer', {
       pointer: pointer,
       event: event,
-      pointerIndex: index,
+      pointerIndex: pointerIndex,
+      pointerInfo: pointerInfo,
       interaction: this
     });
 
-    this.pointers.splice(index, 1);
-    this.pointerIds.splice(index, 1);
-    this.downTargets.splice(index, 1);
-    this.downTimes.splice(index, 1);
+    this.pointers.splice(pointerIndex, 1);
   };
 
-  Interaction.prototype._updateEventTargets = function _updateEventTargets(target, currentTarget) {
-    this._eventTarget = target;
-    this._curEventTarget = currentTarget;
+  Interaction.prototype._updateLatestPointer = function _updateLatestPointer(pointer, event, eventTarget) {
+    this._latestPointer.pointer = pointer;
+    this._latestPointer.event = event;
+    this._latestPointer.eventTarget = eventTarget;
   };
 
-  Interaction.prototype._createPreparedEvent = function _createPreparedEvent(event, phase, preEnd) {
+  Interaction.prototype._createPreparedEvent = function _createPreparedEvent(event, phase, preEnd, type) {
     var actionName = this.prepared.name;
 
-    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd);
+    return new _InteractEvent2.default(this, event, actionName, phase, this.element, null, preEnd, type);
   };
 
   Interaction.prototype._fireEvent = function _fireEvent(iEvent) {
     this.target.fire(iEvent);
-    this.prevEvent = iEvent;
+
+    if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
+      this.prevEvent = iEvent;
+    }
+  };
+
+  Interaction.prototype._doPhase = function _doPhase(signalArg) {
+    var event = signalArg.event,
+        phase = signalArg.phase,
+        preEnd = signalArg.preEnd,
+        type = signalArg.type;
+
+
+    if (!signalArg.noBefore) {
+      var beforeResult = this._signals.fire('before-action-' + phase, signalArg);
+
+      if (beforeResult === false) {
+        return false;
+      }
+    }
+
+    var iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
+
+    this._signals.fire('action-' + phase, signalArg);
+
+    this._fireEvent(iEvent);
+
+    this._signals.fire('after-action-' + phase, signalArg);
+
+    return true;
   };
 
   return Interaction;
@@ -1139,36 +2460,53 @@ var Interaction = function () {
 
 Interaction.pointerMoveTolerance = 1;
 
-module.exports = Interaction;
+/**
+ * @alias Interaction.prototype.move
+ */
+Interaction.prototype.doMove = utils.warnOnce(function (signalArg) {
+  this.move(signalArg);
+}, 'The interaction.doMove() method has been renamed to interaction.move()');
 
-},{"./InteractEvent":3,"./utils":43}],6:[function(_dereq_,module,exports){
+exports.default = Interaction;
+
+},{"./InteractEvent":84,"./utils":129,"babel-runtime/helpers/classCallCheck":7}],87:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../utils/is');
-var arr = _dereq_('../utils/arr');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _is = _dereq_('../utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _arr = _dereq_('../utils/arr');
+
+var arr = _interopRequireWildcard(_arr);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var actions = scope.actions,
-      InteractEvent = scope.InteractEvent,
       Interactable = scope.Interactable,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults;
 
 
-  Interaction.signals.on('before-action-move', beforeMove);
-  Interaction.signals.on('action-resume', beforeMove);
+  interactions.signals.on('before-action-move', beforeMove);
+  interactions.signals.on('action-resume', beforeMove);
 
   // dragmove
-  InteractEvent.signals.on('new', newInteractEvent);
+  interactions.signals.on('action-move', move);
 
-  Interactable.prototype.draggable = module.exports.draggable;
+  Interactable.prototype.draggable = drag.draggable;
 
-  actions.drag = module.exports;
+  actions.drag = drag;
   actions.names.push('drag');
-  arr.merge(Interactable.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'draginertiaresume', 'dragend']);
+  arr.merge(actions.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'dragresume', 'dragend']);
   actions.methodDict.drag = 'draggable';
 
-  defaults.drag = module.exports.defaults;
+  defaults.drag = drag.defaults;
 }
 
 function beforeMove(_ref) {
@@ -1199,24 +2537,22 @@ function beforeMove(_ref) {
   }
 }
 
-function newInteractEvent(_ref2) {
+function move(_ref2) {
   var iEvent = _ref2.iEvent,
       interaction = _ref2.interaction;
 
-  if (iEvent.type !== 'dragmove') {
+  if (interaction.prepared.name !== 'drag') {
     return;
   }
 
   var axis = interaction.prepared.axis;
 
-  if (axis === 'x') {
-    iEvent.pageY = interaction.startCoords.page.y;
-    iEvent.clientY = interaction.startCoords.client.y;
-    iEvent.dy = 0;
-  } else if (axis === 'y') {
-    iEvent.pageX = interaction.startCoords.page.x;
-    iEvent.clientX = interaction.startCoords.client.x;
-    iEvent.dx = 0;
+  if (axis === 'x' || axis === 'y') {
+    var opposite = axis === 'x' ? 'y' : 'x';
+
+    iEvent.page[opposite] = interaction.startCoords.page[opposite];
+    iEvent.client[opposite] = interaction.startCoords.client[opposite];
+    iEvent.delta[opposite] = 0;
   }
 }
 
@@ -1288,11 +2624,11 @@ function draggable(options) {
   return this.options.drag;
 }
 
-module.exports = {
+var drag = {
   init: init,
   draggable: draggable,
   beforeMove: beforeMove,
-  newInteractEvent: newInteractEvent,
+  move: move,
   defaults: {
     startAxis: 'xy',
     lockAxis: 'xy'
@@ -1311,75 +2647,128 @@ module.exports = {
   }
 };
 
-},{"../utils/arr":34,"../utils/is":45}],7:[function(_dereq_,module,exports){
+exports.default = drag;
+
+},{"../utils/arr":120,"../utils/is":131}],88:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var DropEvent = function DropEvent(dropStatus, dragEvent, type) {
+  (0, _classCallCheck3.default)(this, DropEvent);
+
+  var _ref = type === 'deactivate' ? { element: null, dropzone: null } : type === 'dragleave' ? dropStatus.prev : dropStatus.cur,
+      element = _ref.element,
+      dropzone = _ref.dropzone;
+
+  this.type = type;
+  this.target = element;
+  this.currentTarget = element;
+  this.dropzone = dropzone;
+  this.dragEvent = dragEvent;
+  this.relatedTarget = dragEvent.target;
+  this.interaction = dragEvent.interaction;
+  this.draggable = dragEvent.interactable;
+  this.timeStamp = dragEvent.timeStamp;
+};
+
+exports.default = DropEvent;
+
+},{"babel-runtime/helpers/classCallCheck":7}],89:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _utils = _dereq_('../../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _DropEvent = _dereq_('./DropEvent');
+
+var _DropEvent2 = _interopRequireDefault(_DropEvent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var actions = scope.actions,
       interact = scope.interact,
       Interactable = scope.Interactable,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults;
 
 
   var dynamicDrop = false;
 
-  Interaction.signals.on('after-action-start', function (_ref) {
+  interactions.signals.on('after-action-start', function (_ref) {
     var interaction = _ref.interaction,
-        event = _ref.event;
+        event = _ref.event,
+        dragEvent = _ref.iEvent;
 
     if (interaction.prepared.name !== 'drag') {
       return;
     }
 
+    var dropStatus = interaction.dropStatus;
+
     // reset active dropzones
-    interaction.activeDrops = null;
-    interaction.dropEvents = null;
+
+    dropStatus.activeDrops = null;
+    dropStatus.events = null;
 
     if (!interaction.dynamicDrop) {
-      interaction.activeDrops = getActiveDrops(scope, interaction.element);
+      dropStatus.activeDrops = getActiveDrops(scope, interaction.element);
     }
 
-    var dragEvent = interaction.prevEvent;
     var dropEvents = getDropEvents(interaction, event, dragEvent);
 
     if (dropEvents.activate) {
-      fireActivationEvents(interaction.activeDrops, dropEvents.activate);
+      fireActivationEvents(dropStatus.activeDrops, dropEvents.activate);
     }
   });
 
-  Interaction.signals.on('action-move', function (arg) {
+  interactions.signals.on('action-move', function (arg) {
     return onEventCreated(arg, scope, dynamicDrop);
   });
-  Interaction.signals.on('action-end', function (arg) {
+  interactions.signals.on('action-end', function (arg) {
     return onEventCreated(arg, scope, dynamicDrop);
   });
 
-  Interaction.signals.on('after-action-move', function (_ref2) {
+  interactions.signals.on('after-action-move', function (_ref2) {
     var interaction = _ref2.interaction;
 
     if (interaction.prepared.name !== 'drag') {
       return;
     }
 
-    fireDropEvents(interaction, interaction.dropEvents);
+    fireDropEvents(interaction, interaction.dropStatus.events);
+    interaction.dropStatus.events = {};
   });
 
-  Interaction.signals.on('after-action-end', function (_ref3) {
+  interactions.signals.on('after-action-end', function (_ref3) {
     var interaction = _ref3.interaction;
 
     if (interaction.prepared.name === 'drag') {
-      fireDropEvents(interaction, interaction.dropEvents);
+      fireDropEvents(interaction, interaction.dropStatus.events);
     }
   });
 
-  Interaction.signals.on('stop', function (_ref4) {
+  interactions.signals.on('stop', function (_ref4) {
     var interaction = _ref4.interaction;
 
-    interaction.activeDrops = null;
-    interaction.dropEvents = null;
+    interaction.dropStatus.activeDrops = null;
+    interaction.dropStatus.events = null;
   });
 
   /**
@@ -1439,22 +2828,22 @@ function init(scope) {
     if (utils.is.object(options)) {
       this.options.drop.enabled = options.enabled === false ? false : true;
 
-      if (utils.is.function(options.ondrop)) {
+      if (utils.is.func(options.ondrop)) {
         this.events.ondrop = options.ondrop;
       }
-      if (utils.is.function(options.ondropactivate)) {
+      if (utils.is.func(options.ondropactivate)) {
         this.events.ondropactivate = options.ondropactivate;
       }
-      if (utils.is.function(options.ondropdeactivate)) {
+      if (utils.is.func(options.ondropdeactivate)) {
         this.events.ondropdeactivate = options.ondropdeactivate;
       }
-      if (utils.is.function(options.ondragenter)) {
+      if (utils.is.func(options.ondragenter)) {
         this.events.ondragenter = options.ondragenter;
       }
-      if (utils.is.function(options.ondragleave)) {
+      if (utils.is.func(options.ondragleave)) {
         this.events.ondragleave = options.ondragleave;
       }
-      if (utils.is.function(options.ondropmove)) {
+      if (utils.is.func(options.ondropmove)) {
         this.events.ondropmove = options.ondropmove;
       }
 
@@ -1534,21 +2923,25 @@ function init(scope) {
     return dropped;
   };
 
-  Interactable.settingsMethods.push('dropChecker');
-
-  Interaction.signals.on('new', function (interaction) {
-    interaction.dropTarget = null; // the dropzone a drag target might be dropped into
-    interaction.dropElement = null; // the element at the time of checking
-    interaction.prevDropTarget = null; // the dropzone that was recently dragged away from
-    interaction.prevDropElement = null; // the element at the time of checking
-    interaction.dropEvents = null; // the dropEvents related to the current drag event
-    interaction.activeDrops = null; // an array of { dropzone, element, rect }
+  interactions.signals.on('new', function (interaction) {
+    interaction.dropStatus = {
+      cur: {
+        dropzone: null, // the dropzone a drag target might be dropped into
+        element: null // the element at the time of checking
+      },
+      prev: {
+        dropzone: null, // the dropzone that was recently dragged away from
+        element: null // the element at the time of checking
+      },
+      events: null, // the drop events related to the current drag event
+      activeDrops: null // an array of { dropzone, element, rect }
+    };
   });
 
-  Interaction.signals.on('stop', function (_ref5) {
-    var interaction = _ref5.interaction;
+  interactions.signals.on('stop', function (_ref5) {
+    var dropStatus = _ref5.interaction.dropStatus;
 
-    interaction.dropTarget = interaction.dropElement = interaction.prevDropTarget = interaction.prevDropElement = null;
+    dropStatus.cur.dropzone = dropStatus.cur.element = dropStatus.prev.dropzone = dropStatus.prev.element = null;
   });
 
   /**
@@ -1562,7 +2955,7 @@ function init(scope) {
   interact.dynamicDrop = function (newValue) {
     if (utils.is.bool(newValue)) {
       //if (dragging && dynamicDrop !== newValue && !newValue) {
-      //calcRects(dropzones);
+      //  calcRects(dropzones);
       //}
 
       dynamicDrop = newValue;
@@ -1572,10 +2965,10 @@ function init(scope) {
     return dynamicDrop;
   };
 
-  utils.arr.merge(Interactable.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
+  utils.arr.merge(actions.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
   actions.methodDict.drop = 'dropzone';
 
-  defaults.drop = module.exports.defaults;
+  defaults.drop = drop.defaults;
 }
 
 function collectDrops(_ref6, draggableElement) {
@@ -1584,10 +2977,10 @@ function collectDrops(_ref6, draggableElement) {
   var drops = [];
 
   // collect all dropzones and their elements which qualify for a drop
-  for (var _i = 0; _i < interactables.length; _i++) {
+  for (var _i = 0; _i < interactables.list.length; _i++) {
     var _ref7;
 
-    _ref7 = interactables[_i];
+    _ref7 = interactables.list[_i];
     var dropzone = _ref7;
 
     if (!dropzone.options.drop.enabled) {
@@ -1666,19 +3059,17 @@ function getActiveDrops(scope, dragElement) {
 }
 
 function getDrop(_ref12, dragEvent, pointerEvent) {
-  var activeDrops = _ref12.activeDrops,
+  var dropStatus = _ref12.dropStatus,
       draggable = _ref12.target,
       dragElement = _ref12.element;
-  var interaction = dragEvent.interaction;
-
 
   var validDrops = [];
 
   // collect all dropzones and their elements which qualify for a drop
-  for (var _i5 = 0; _i5 < activeDrops.length; _i5++) {
+  for (var _i5 = 0; _i5 < dropStatus.activeDrops.length; _i5++) {
     var _ref14;
 
-    _ref14 = activeDrops[_i5];
+    _ref14 = dropStatus.activeDrops[_i5];
     var _ref13 = _ref14;
     var dropzone = _ref13.dropzone;
     var dropzoneElement = _ref13.element;
@@ -1690,10 +3081,12 @@ function getDrop(_ref12, dragEvent, pointerEvent) {
   // get the most appropriate dropzone based on DOM depth and order
   var dropIndex = utils.dom.indexOfDeepestElement(validDrops);
 
-  return interaction.activeDrops[dropIndex] || null;
+  return dropStatus.activeDrops[dropIndex] || null;
 }
 
 function getDropEvents(interaction, pointerEvent, dragEvent) {
+  var dropStatus = interaction.dropStatus;
+
   var dropEvents = {
     enter: null,
     leave: null,
@@ -1703,98 +3096,77 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
     drop: null
   };
 
-  var tmpl = {
-    dragEvent: dragEvent,
-    interaction: interaction,
-    target: interaction.dropElement,
-    dropzone: interaction.dropTarget,
-    relatedTarget: dragEvent.target,
-    draggable: dragEvent.interactable,
-    timeStamp: dragEvent.timeStamp
-  };
+  if (dropStatus.cur.element !== dropStatus.prev.element) {
+    // if there was a previous dropzone, create a dragleave event
+    if (dropStatus.prev.dropzone) {
+      dropEvents.leave = new _DropEvent2.default(dropStatus, dragEvent, 'dragleave');
 
-  if (interaction.dropElement !== interaction.prevDropElement) {
-    // if there was a prevDropTarget, create a dragleave event
-    if (interaction.prevDropTarget) {
-      dropEvents.leave = utils.extend({ type: 'dragleave' }, tmpl);
-
-      dragEvent.dragLeave = dropEvents.leave.target = interaction.prevDropElement;
-      dragEvent.prevDropzone = dropEvents.leave.dropzone = interaction.prevDropTarget;
+      dragEvent.dragLeave = dropEvents.leave.target = dropStatus.prev.element;
+      dragEvent.prevDropzone = dropEvents.leave.dropzone = dropStatus.prev.dropzone;
     }
-    // if the dropTarget is not null, create a dragenter event
-    if (interaction.dropTarget) {
-      dropEvents.enter = {
-        dragEvent: dragEvent,
-        interaction: interaction,
-        target: interaction.dropElement,
-        dropzone: interaction.dropTarget,
-        relatedTarget: dragEvent.target,
-        draggable: dragEvent.interactable,
-        timeStamp: dragEvent.timeStamp,
-        type: 'dragenter'
-      };
+    // if dropzone is not null, create a dragenter event
+    if (dropStatus.cur.dropzone) {
+      dropEvents.enter = new _DropEvent2.default(dropStatus, dragEvent, 'dragenter');
 
-      dragEvent.dragEnter = interaction.dropElement;
-      dragEvent.dropzone = interaction.dropTarget;
+      dragEvent.dragEnter = dropStatus.cur.element;
+      dragEvent.dropzone = dropStatus.cur.dropzone;
     }
   }
 
-  if (dragEvent.type === 'dragend' && interaction.dropTarget) {
-    dropEvents.drop = utils.extend({ type: 'drop' }, tmpl);
+  if (dragEvent.type === 'dragend' && dropStatus.cur.dropzone) {
+    dropEvents.drop = new _DropEvent2.default(dropStatus, dragEvent, 'drop');
 
-    dragEvent.dropzone = interaction.dropTarget;
-    dragEvent.relatedTarget = interaction.dropElement;
+    dragEvent.dropzone = dropStatus.cur.dropzone;
+    dragEvent.relatedTarget = dropStatus.cur.element;
   }
   if (dragEvent.type === 'dragstart') {
-    dropEvents.activate = utils.extend({ type: 'dropactivate' }, tmpl);
+    dropEvents.activate = new _DropEvent2.default(dropStatus, dragEvent, 'dropactivate');
 
     dropEvents.activate.target = null;
     dropEvents.activate.dropzone = null;
   }
   if (dragEvent.type === 'dragend') {
-    dropEvents.deactivate = utils.extend({ type: 'dropdeactivate' }, tmpl);
+    dropEvents.deactivate = new _DropEvent2.default(dropStatus, dragEvent, 'dropdeactivate');
 
     dropEvents.deactivate.target = null;
     dropEvents.deactivate.dropzone = null;
   }
-  if (dragEvent.type === 'dragmove' && interaction.dropTarget) {
-    dropEvents.move = utils.extend({
-      dragmove: dragEvent,
-      type: 'dropmove'
-    }, tmpl);
+  if (dragEvent.type === 'dragmove' && dropStatus.cur.dropzone) {
+    dropEvents.move = new _DropEvent2.default(dropStatus, dragEvent, 'dropmove');
 
-    dragEvent.dropzone = interaction.dropTarget;
+    dropEvents.move.dragmove = dragEvent;
+    dragEvent.dropzone = dropStatus.cur.dropzone;
   }
 
   return dropEvents;
 }
 
-function fireDropEvents(interaction, dropEvents) {
-  var activeDrops = interaction.activeDrops,
-      prevDropTarget = interaction.prevDropTarget,
-      dropTarget = interaction.dropTarget,
-      dropElement = interaction.dropElement;
+function fireDropEvents(interaction, events) {
+  var dropStatus = interaction.dropStatus;
+  var activeDrops = dropStatus.activeDrops,
+      cur = dropStatus.cur,
+      prev = dropStatus.prev;
 
 
-  if (dropEvents.leave) {
-    prevDropTarget.fire(dropEvents.leave);
+  if (events.leave) {
+    prev.dropzone.fire(events.leave);
   }
-  if (dropEvents.move) {
-    dropTarget.fire(dropEvents.move);
+  if (events.move) {
+    cur.dropzone.fire(events.move);
   }
-  if (dropEvents.enter) {
-    dropTarget.fire(dropEvents.enter);
+  if (events.enter) {
+    cur.dropzone.fire(events.enter);
   }
-  if (dropEvents.drop) {
-    dropTarget.fire(dropEvents.drop);
-  }
-
-  if (dropEvents.deactivate) {
-    fireActivationEvents(activeDrops, dropEvents.deactivate);
+  if (events.drop) {
+    cur.dropzone.fire(events.drop);
   }
 
-  interaction.prevDropTarget = dropTarget;
-  interaction.prevDropElement = dropElement;
+  if (events.deactivate) {
+    fireActivationEvents(activeDrops, events.deactivate);
+  }
+
+  dropStatus.prev.dropzone = cur.dropzone;
+  dropStatus.prev.element = cur.element;
 }
 
 function onEventCreated(_ref15, scope, dynamicDrop) {
@@ -1806,20 +3178,23 @@ function onEventCreated(_ref15, scope, dynamicDrop) {
     return;
   }
 
+  var dropStatus = interaction.dropStatus;
+
+
   if (dynamicDrop) {
-    interaction.activeDrops = getActiveDrops(scope, interaction.element);
+    dropStatus.activeDrops = getActiveDrops(scope, interaction.target, interaction.element);
   }
 
   var dragEvent = iEvent;
   var dropResult = getDrop(interaction, dragEvent, event);
 
-  interaction.dropTarget = dropResult && dropResult.dropzone;
-  interaction.dropElement = dropResult && dropResult.element;
+  dropStatus.cur.dropzone = dropResult && dropResult.dropzone;
+  dropStatus.cur.element = dropResult && dropResult.element;
 
-  interaction.dropEvents = getDropEvents(interaction, event, dragEvent);
+  dropStatus.events = getDropEvents(interaction, event, dragEvent);
 }
 
-module.exports = {
+var drop = {
   init: init,
   getActiveDrops: getActiveDrops,
   getDrop: getDrop,
@@ -1832,16 +3207,31 @@ module.exports = {
   }
 };
 
-},{"../utils":43}],8:[function(_dereq_,module,exports){
+exports.default = drop;
+
+},{"../../utils":129,"./DropEvent":88}],90:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _utils = _dereq_('../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _InteractEvent = _dereq_('../InteractEvent');
+
+var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var actions = scope.actions,
-      InteractEvent = scope.InteractEvent,
       Interactable = scope.Interactable,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults;
 
 
@@ -1849,7 +3239,7 @@ function init(scope) {
     defaults: {},
 
     checker: function checker(pointer, event, interactable, element, interaction) {
-      if (interaction.pointerIds.length >= 2) {
+      if (interaction.pointers.length >= 2) {
         return { name: 'gesture' };
       }
 
@@ -1860,41 +3250,6 @@ function init(scope) {
       return '';
     }
   };
-
-  InteractEvent.signals.on('new', function (_ref) {
-    var iEvent = _ref.iEvent,
-        interaction = _ref.interaction;
-
-    if (iEvent.type !== 'gesturestart') {
-      return;
-    }
-    iEvent.ds = 0;
-
-    interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
-    interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
-    interaction.gesture.scale = 1;
-  });
-
-  InteractEvent.signals.on('new', function (_ref2) {
-    var iEvent = _ref2.iEvent,
-        interaction = _ref2.interaction;
-
-    if (iEvent.type !== 'gesturemove') {
-      return;
-    }
-
-    iEvent.ds = iEvent.scale - interaction.gesture.scale;
-
-    interaction.target.fire(iEvent);
-
-    interaction.gesture.prevAngle = iEvent.angle;
-    interaction.gesture.prevDistance = iEvent.distance;
-
-    if (iEvent.scale !== Infinity && iEvent.scale !== null && iEvent.scale !== undefined && !isNaN(iEvent.scale)) {
-
-      interaction.gesture.scale = iEvent.scale;
-    }
-  });
 
   /**
    * ```js
@@ -1941,49 +3296,14 @@ function init(scope) {
     return this.options.gesture;
   };
 
-  InteractEvent.signals.on('set-delta', function (_ref3) {
-    var interaction = _ref3.interaction,
-        iEvent = _ref3.iEvent,
-        action = _ref3.action,
-        event = _ref3.event,
-        starting = _ref3.starting,
-        ending = _ref3.ending,
-        deltaSource = _ref3.deltaSource;
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
-    if (action !== 'gesture') {
-      return;
-    }
+  interactions.signals.on('action-start', updateGestureProps);
+  interactions.signals.on('action-move', updateGestureProps);
+  interactions.signals.on('action-end', updateGestureProps);
 
-    var pointers = interaction.pointers;
-
-    iEvent.touches = [pointers[0], pointers[1]];
-
-    if (starting) {
-      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-      iEvent.box = utils.pointer.touchBBox(pointers);
-      iEvent.scale = 1;
-      iEvent.ds = 0;
-      iEvent.angle = utils.pointer.touchAngle(pointers, undefined, deltaSource);
-      iEvent.da = 0;
-    } else if (ending || event instanceof InteractEvent) {
-      iEvent.distance = interaction.prevEvent.distance;
-      iEvent.box = interaction.prevEvent.box;
-      iEvent.scale = interaction.prevEvent.scale;
-      iEvent.ds = iEvent.scale - 1;
-      iEvent.angle = interaction.prevEvent.angle;
-      iEvent.da = iEvent.angle - interaction.gesture.startAngle;
-    } else {
-      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-      iEvent.box = utils.pointer.touchBBox(pointers);
-      iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
-      iEvent.angle = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
-
-      iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
-      iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
-    }
-  });
-
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.gesture = {
       start: { x: 0, y: 0 },
 
@@ -2000,25 +3320,149 @@ function init(scope) {
 
   actions.gesture = gesture;
   actions.names.push('gesture');
-  utils.arr.merge(Interactable.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
+  utils.arr.merge(actions.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
   actions.methodDict.gesture = 'gesturable';
 
   defaults.gesture = gesture.defaults;
 }
 
-module.exports = { init: init };
+function start(_ref) {
+  var iEvent = _ref.iEvent,
+      interaction = _ref.interaction;
 
-},{"../utils":43}],9:[function(_dereq_,module,exports){
+  if (interaction.prepared.name !== 'gesture') {
+    return;
+  }
+
+  iEvent.ds = 0;
+
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.scale = 1;
+}
+
+function move(_ref2) {
+  var iEvent = _ref2.iEvent,
+      interaction = _ref2.interaction;
+
+  if (interaction.prepared.name !== 'gesture') {
+    return;
+  }
+
+  iEvent.ds = iEvent.scale - interaction.gesture.scale;
+
+  interaction.target.fire(iEvent);
+
+  interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.prevDistance = iEvent.distance;
+
+  if (iEvent.scale !== Infinity && iEvent.scale !== null && iEvent.scale !== undefined && !isNaN(iEvent.scale)) {
+
+    interaction.gesture.scale = iEvent.scale;
+  }
+}
+
+function updateGestureProps(_ref3) {
+  var interaction = _ref3.interaction,
+      iEvent = _ref3.iEvent,
+      event = _ref3.event,
+      phase = _ref3.phase,
+      deltaSource = _ref3.deltaSource;
+
+  if (interaction.prepared.name !== 'gesture') {
+    return;
+  }
+
+  var pointers = interaction.pointers;
+  var starting = phase === 'start';
+  var ending = phase === 'end';
+
+  iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
+
+  if (starting) {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box = utils.pointer.touchBBox(pointers);
+    iEvent.scale = 1;
+    iEvent.ds = 0;
+    iEvent.angle = utils.pointer.touchAngle(pointers, undefined, deltaSource);
+    iEvent.da = 0;
+  } else if (ending || event instanceof _InteractEvent2.default) {
+    iEvent.distance = interaction.prevEvent.distance;
+    iEvent.box = interaction.prevEvent.box;
+    iEvent.scale = interaction.prevEvent.scale;
+    iEvent.ds = iEvent.scale - 1;
+    iEvent.angle = interaction.prevEvent.angle;
+    iEvent.da = iEvent.angle - interaction.gesture.startAngle;
+  } else {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box = utils.pointer.touchBBox(pointers);
+    iEvent.scale = iEvent.distance / interaction.gesture.startDistance;
+    iEvent.angle = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+
+    iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+    iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
+  }
+}
+
+exports.default = { init: init };
+
+},{"../InteractEvent":84,"../utils":129}],91:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = exports.drop = exports.drag = exports.resize = exports.gesture = undefined;
+
+var _gesture = _dereq_('./gesture');
+
+var _gesture2 = _interopRequireDefault(_gesture);
+
+var _resize = _dereq_('./resize');
+
+var _resize2 = _interopRequireDefault(_resize);
+
+var _drag = _dereq_('./drag');
+
+var _drag2 = _interopRequireDefault(_drag);
+
+var _drop = _dereq_('./drop');
+
+var _drop2 = _interopRequireDefault(_drop);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  _gesture2.default.init(scope);
+  _resize2.default.init(scope);
+  _drag2.default.init(scope);
+  _drop2.default.init(scope);
+}
+
+exports.gesture = _gesture2.default;
+exports.resize = _resize2.default;
+exports.drag = _drag2.default;
+exports.drop = _drop2.default;
+exports.init = init;
+
+},{"./drag":87,"./drop":89,"./gesture":90,"./resize":92}],92:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _utils = _dereq_('../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var actions = scope.actions,
       browser = scope.browser,
-      InteractEvent = scope.InteractEvent,
       Interactable = scope.Interactable,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults;
 
   // Less Precision with touch input
@@ -2136,153 +3580,6 @@ function init(scope) {
     }
   };
 
-  // resizestart
-  InteractEvent.signals.on('new', function (_ref) {
-    var iEvent = _ref.iEvent,
-        interaction = _ref.interaction;
-
-    if (iEvent.type !== 'resizestart' || !interaction.prepared.edges) {
-      return;
-    }
-
-    var startRect = interaction.target.getRect(interaction.element);
-    var resizeOptions = interaction.target.options.resize;
-
-    /*
-     * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
-     * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
-     * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
-     * on the active edges and the edge being interacted with.
-     */
-    if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-      var linkedEdges = utils.extend({}, interaction.prepared.edges);
-
-      linkedEdges.top = linkedEdges.top || linkedEdges.left && !linkedEdges.bottom;
-      linkedEdges.left = linkedEdges.left || linkedEdges.top && !linkedEdges.right;
-      linkedEdges.bottom = linkedEdges.bottom || linkedEdges.right && !linkedEdges.top;
-      linkedEdges.right = linkedEdges.right || linkedEdges.bottom && !linkedEdges.left;
-
-      interaction.prepared._linkedEdges = linkedEdges;
-    } else {
-      interaction.prepared._linkedEdges = null;
-    }
-
-    // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
-    if (resizeOptions.preserveAspectRatio) {
-      interaction.resizeStartAspectRatio = startRect.width / startRect.height;
-    }
-
-    interaction.resizeRects = {
-      start: startRect,
-      current: utils.extend({}, startRect),
-      inverted: utils.extend({}, startRect),
-      previous: utils.extend({}, startRect),
-      delta: {
-        left: 0, right: 0, width: 0,
-        top: 0, bottom: 0, height: 0
-      }
-    };
-
-    iEvent.rect = interaction.resizeRects.inverted;
-    iEvent.deltaRect = interaction.resizeRects.delta;
-  });
-
-  // resizemove
-  InteractEvent.signals.on('new', function (_ref2) {
-    var iEvent = _ref2.iEvent,
-        phase = _ref2.phase,
-        interaction = _ref2.interaction;
-
-    if (phase !== 'move' || !interaction.prepared.edges) {
-      return;
-    }
-
-    var resizeOptions = interaction.target.options.resize;
-    var invert = resizeOptions.invert;
-    var invertible = invert === 'reposition' || invert === 'negate';
-
-    var edges = interaction.prepared.edges;
-
-    var start = interaction.resizeRects.start;
-    var current = interaction.resizeRects.current;
-    var inverted = interaction.resizeRects.inverted;
-    var delta = interaction.resizeRects.delta;
-    var previous = utils.extend(interaction.resizeRects.previous, inverted);
-    var originalEdges = edges;
-
-    var dx = iEvent.dx;
-    var dy = iEvent.dy;
-
-    if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
-      // `resize.preserveAspectRatio` takes precedence over `resize.square`
-      var startAspectRatio = resizeOptions.preserveAspectRatio ? interaction.resizeStartAspectRatio : 1;
-
-      edges = interaction.prepared._linkedEdges;
-
-      if (originalEdges.left && originalEdges.bottom || originalEdges.right && originalEdges.top) {
-        dy = -dx / startAspectRatio;
-      } else if (originalEdges.left || originalEdges.right) {
-        dy = dx / startAspectRatio;
-      } else if (originalEdges.top || originalEdges.bottom) {
-        dx = dy * startAspectRatio;
-      }
-    }
-
-    // update the 'current' rect without modifications
-    if (edges.top) {
-      current.top += dy;
-    }
-    if (edges.bottom) {
-      current.bottom += dy;
-    }
-    if (edges.left) {
-      current.left += dx;
-    }
-    if (edges.right) {
-      current.right += dx;
-    }
-
-    if (invertible) {
-      // if invertible, copy the current rect
-      utils.extend(inverted, current);
-
-      if (invert === 'reposition') {
-        // swap edge values if necessary to keep width/height positive
-        var swap = void 0;
-
-        if (inverted.top > inverted.bottom) {
-          swap = inverted.top;
-
-          inverted.top = inverted.bottom;
-          inverted.bottom = swap;
-        }
-        if (inverted.left > inverted.right) {
-          swap = inverted.left;
-
-          inverted.left = inverted.right;
-          inverted.right = swap;
-        }
-      }
-    } else {
-      // if not invertible, restrict to minimum of 0x0 rect
-      inverted.top = Math.min(current.top, start.bottom);
-      inverted.bottom = Math.max(current.bottom, start.top);
-      inverted.left = Math.min(current.left, start.right);
-      inverted.right = Math.max(current.right, start.left);
-    }
-
-    inverted.width = inverted.right - inverted.left;
-    inverted.height = inverted.bottom - inverted.top;
-
-    for (var edge in inverted) {
-      delta[edge] = inverted[edge] - previous[edge];
-    }
-
-    iEvent.edges = interaction.prepared.edges;
-    iEvent.rect = inverted;
-    iEvent.deltaRect = delta;
-  });
-
   /**
    * ```js
    * interact(element).resizable({
@@ -2360,113 +3657,280 @@ function init(scope) {
     return this.options.resize;
   };
 
-  function checkResizeEdge(name, value, page, element, interactableElement, rect, margin) {
-    // false, '', undefined, null
-    if (!value) {
-      return false;
-    }
-
-    // true value, use pointer coords and element rect
-    if (value === true) {
-      // if dimensions are negative, "switch" edges
-      var width = utils.is.number(rect.width) ? rect.width : rect.right - rect.left;
-      var height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
-
-      if (width < 0) {
-        if (name === 'left') {
-          name = 'right';
-        } else if (name === 'right') {
-          name = 'left';
-        }
-      }
-      if (height < 0) {
-        if (name === 'top') {
-          name = 'bottom';
-        } else if (name === 'bottom') {
-          name = 'top';
-        }
-      }
-
-      if (name === 'left') {
-        return page.x < (width >= 0 ? rect.left : rect.right) + margin;
-      }
-      if (name === 'top') {
-        return page.y < (height >= 0 ? rect.top : rect.bottom) + margin;
-      }
-
-      if (name === 'right') {
-        return page.x > (width >= 0 ? rect.right : rect.left) - margin;
-      }
-      if (name === 'bottom') {
-        return page.y > (height >= 0 ? rect.bottom : rect.top) - margin;
-      }
-    }
-
-    // the remaining checks require an element
-    if (!utils.is.element(element)) {
-      return false;
-    }
-
-    return utils.is.element(value)
-    // the value is an element to use as a resize handle
-    ? value === element
-    // otherwise check if element matches value as selector
-    : utils.dom.matchesUpTo(element, value, interactableElement);
-  }
-
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.resizeAxes = 'xy';
   });
 
-  InteractEvent.signals.on('set-delta', function (_ref3) {
-    var interaction = _ref3.interaction,
-        iEvent = _ref3.iEvent,
-        action = _ref3.action;
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
-    if (action !== 'resize' || !interaction.resizeAxes) {
-      return;
-    }
-
-    var options = interaction.target.options;
-
-    if (options.resize.square) {
-      if (interaction.resizeAxes === 'y') {
-        iEvent.dx = iEvent.dy;
-      } else {
-        iEvent.dy = iEvent.dx;
-      }
-      iEvent.axes = 'xy';
-    } else {
-      iEvent.axes = interaction.resizeAxes;
-
-      if (interaction.resizeAxes === 'x') {
-        iEvent.dy = 0;
-      } else if (interaction.resizeAxes === 'y') {
-        iEvent.dx = 0;
-      }
-    }
-  });
+  interactions.signals.on('action-start', updateEventAxes);
+  interactions.signals.on('action-move', updateEventAxes);
 
   actions.resize = resize;
   actions.names.push('resize');
-  utils.arr.merge(Interactable.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeinertiaresume', 'resizeend']);
+  utils.arr.merge(actions.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeresume', 'resizeend']);
   actions.methodDict.resize = 'resizable';
 
   defaults.resize = resize.defaults;
 }
 
-module.exports = { init: init };
+function checkResizeEdge(name, value, page, element, interactableElement, rect, margin) {
+  // false, '', undefined, null
+  if (!value) {
+    return false;
+  }
 
-},{"../utils":43}],10:[function(_dereq_,module,exports){
+  // true value, use pointer coords and element rect
+  if (value === true) {
+    // if dimensions are negative, "switch" edges
+    var width = utils.is.number(rect.width) ? rect.width : rect.right - rect.left;
+    var height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
+
+    if (width < 0) {
+      if (name === 'left') {
+        name = 'right';
+      } else if (name === 'right') {
+        name = 'left';
+      }
+    }
+    if (height < 0) {
+      if (name === 'top') {
+        name = 'bottom';
+      } else if (name === 'bottom') {
+        name = 'top';
+      }
+    }
+
+    if (name === 'left') {
+      return page.x < (width >= 0 ? rect.left : rect.right) + margin;
+    }
+    if (name === 'top') {
+      return page.y < (height >= 0 ? rect.top : rect.bottom) + margin;
+    }
+
+    if (name === 'right') {
+      return page.x > (width >= 0 ? rect.right : rect.left) - margin;
+    }
+    if (name === 'bottom') {
+      return page.y > (height >= 0 ? rect.bottom : rect.top) - margin;
+    }
+  }
+
+  // the remaining checks require an element
+  if (!utils.is.element(element)) {
+    return false;
+  }
+
+  return utils.is.element(value)
+  // the value is an element to use as a resize handle
+  ? value === element
+  // otherwise check if element matches value as selector
+  : utils.dom.matchesUpTo(element, value, interactableElement);
+}
+
+function start(_ref) {
+  var iEvent = _ref.iEvent,
+      interaction = _ref.interaction;
+
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
+    return;
+  }
+
+  var startRect = interaction.target.getRect(interaction.element);
+  var resizeOptions = interaction.target.options.resize;
+
+  /*
+   * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
+   * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
+   * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
+   * on the active edges and the edge being interacted with.
+   */
+  if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
+    var linkedEdges = utils.extend({}, interaction.prepared.edges);
+
+    linkedEdges.top = linkedEdges.top || linkedEdges.left && !linkedEdges.bottom;
+    linkedEdges.left = linkedEdges.left || linkedEdges.top && !linkedEdges.right;
+    linkedEdges.bottom = linkedEdges.bottom || linkedEdges.right && !linkedEdges.top;
+    linkedEdges.right = linkedEdges.right || linkedEdges.bottom && !linkedEdges.left;
+
+    interaction.prepared._linkedEdges = linkedEdges;
+  } else {
+    interaction.prepared._linkedEdges = null;
+  }
+
+  // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
+  if (resizeOptions.preserveAspectRatio) {
+    interaction.resizeStartAspectRatio = startRect.width / startRect.height;
+  }
+
+  interaction.resizeRects = {
+    start: startRect,
+    current: utils.extend({}, startRect),
+    inverted: utils.extend({}, startRect),
+    previous: utils.extend({}, startRect),
+    delta: {
+      left: 0, right: 0, width: 0,
+      top: 0, bottom: 0, height: 0
+    }
+  };
+
+  iEvent.rect = interaction.resizeRects.inverted;
+  iEvent.deltaRect = interaction.resizeRects.delta;
+}
+
+function move(_ref2) {
+  var iEvent = _ref2.iEvent,
+      interaction = _ref2.interaction;
+
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
+    return;
+  }
+
+  var resizeOptions = interaction.target.options.resize;
+  var invert = resizeOptions.invert;
+  var invertible = invert === 'reposition' || invert === 'negate';
+
+  var edges = interaction.prepared.edges;
+
+  // eslint-disable-next-line no-shadow
+  var start = interaction.resizeRects.start;
+  var current = interaction.resizeRects.current;
+  var inverted = interaction.resizeRects.inverted;
+  var deltaRect = interaction.resizeRects.delta;
+  var previous = utils.extend(interaction.resizeRects.previous, inverted);
+  var originalEdges = edges;
+
+  var eventDelta = utils.extend({}, iEvent.delta);
+
+  if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
+    // `resize.preserveAspectRatio` takes precedence over `resize.square`
+    var startAspectRatio = resizeOptions.preserveAspectRatio ? interaction.resizeStartAspectRatio : 1;
+
+    edges = interaction.prepared._linkedEdges;
+
+    if (originalEdges.left && originalEdges.bottom || originalEdges.right && originalEdges.top) {
+      eventDelta.y = -eventDelta.x / startAspectRatio;
+    } else if (originalEdges.left || originalEdges.right) {
+      eventDelta.y = eventDelta.x / startAspectRatio;
+    } else if (originalEdges.top || originalEdges.bottom) {
+      eventDelta.x = eventDelta.y * startAspectRatio;
+    }
+  }
+
+  // update the 'current' rect without modifications
+  if (edges.top) {
+    current.top += eventDelta.y;
+  }
+  if (edges.bottom) {
+    current.bottom += eventDelta.y;
+  }
+  if (edges.left) {
+    current.left += eventDelta.x;
+  }
+  if (edges.right) {
+    current.right += eventDelta.x;
+  }
+
+  if (invertible) {
+    // if invertible, copy the current rect
+    utils.extend(inverted, current);
+
+    if (invert === 'reposition') {
+      // swap edge values if necessary to keep width/height positive
+      var swap = void 0;
+
+      if (inverted.top > inverted.bottom) {
+        swap = inverted.top;
+
+        inverted.top = inverted.bottom;
+        inverted.bottom = swap;
+      }
+      if (inverted.left > inverted.right) {
+        swap = inverted.left;
+
+        inverted.left = inverted.right;
+        inverted.right = swap;
+      }
+    }
+  } else {
+    // if not invertible, restrict to minimum of 0x0 rect
+    inverted.top = Math.min(current.top, start.bottom);
+    inverted.bottom = Math.max(current.bottom, start.top);
+    inverted.left = Math.min(current.left, start.right);
+    inverted.right = Math.max(current.right, start.left);
+  }
+
+  inverted.width = inverted.right - inverted.left;
+  inverted.height = inverted.bottom - inverted.top;
+
+  for (var edge in inverted) {
+    deltaRect[edge] = inverted[edge] - previous[edge];
+  }
+
+  iEvent.edges = interaction.prepared.edges;
+  iEvent.rect = inverted;
+  iEvent.deltaRect = deltaRect;
+}
+
+function updateEventAxes(_ref3) {
+  var interaction = _ref3.interaction,
+      iEvent = _ref3.iEvent,
+      action = _ref3.action;
+
+  if (action !== 'resize' || !interaction.resizeAxes) {
+    return;
+  }
+
+  var options = interaction.target.options;
+
+  if (options.resize.square) {
+    if (interaction.resizeAxes === 'y') {
+      iEvent.delta.x = iEvent.delta.y;
+    } else {
+      iEvent.delta.y = iEvent.delta.x;
+    }
+    iEvent.axes = 'xy';
+  } else {
+    iEvent.axes = interaction.resizeAxes;
+
+    if (interaction.resizeAxes === 'x') {
+      iEvent.delta.y = 0;
+    } else if (interaction.resizeAxes === 'y') {
+      iEvent.delta.x = 0;
+    }
+  }
+}
+
+exports.default = { init: init };
+
+},{"../utils":129}],93:[function(_dereq_,module,exports){
 'use strict';
 
-var raf = _dereq_('./utils/raf');
-var getWindow = _dereq_('./utils/window').getWindow;
-var is = _dereq_('./utils/is');
-var domUtils = _dereq_('./utils/domUtils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _raf = _dereq_('./utils/raf');
+
+var _raf2 = _interopRequireDefault(_raf);
+
+var _window = _dereq_('./utils/window');
+
+var _is = _dereq_('./utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _domUtils = _dereq_('./utils/domUtils');
+
+var domUtils = _interopRequireWildcard(_domUtils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function init(scope) {
-  var Interaction = scope.Interaction,
+  var interactions = scope.interactions,
       defaults = scope.defaults;
 
 
@@ -2487,22 +3951,22 @@ function init(scope) {
 
     start: function start(interaction) {
       autoScroll.isScrolling = true;
-      raf.cancel(autoScroll.i);
+      _raf2.default.cancel(autoScroll.i);
 
       autoScroll.interaction = interaction;
       autoScroll.prevTime = new Date().getTime();
-      autoScroll.i = raf.request(autoScroll.scroll);
+      autoScroll.i = _raf2.default.request(autoScroll.scroll);
     },
 
     stop: function stop() {
       autoScroll.isScrolling = false;
-      raf.cancel(autoScroll.i);
+      _raf2.default.cancel(autoScroll.i);
     },
 
     // scroll the window by the values in scroll.x/y
     scroll: function scroll() {
       var options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll;
-      var container = options.container || getWindow(autoScroll.interaction.element);
+      var container = options.container || (0, _window.getWindow)(autoScroll.interaction.element);
       var now = new Date().getTime();
       // change in time in seconds
       var dt = (now - autoScroll.prevTime) / 1000;
@@ -2521,8 +3985,8 @@ function init(scope) {
       }
 
       if (autoScroll.isScrolling) {
-        raf.cancel(autoScroll.i);
-        autoScroll.i = raf.request(autoScroll.scroll);
+        _raf2.default.cancel(autoScroll.i);
+        autoScroll.i = _raf2.default.request(autoScroll.scroll);
       }
     },
     check: function check(interactable, actionName) {
@@ -2549,7 +4013,7 @@ function init(scope) {
       var left = void 0;
 
       var options = interaction.target.options[interaction.prepared.name].autoScroll;
-      var container = options.container || getWindow(interaction.element);
+      var container = options.container || (0, _window.getWindow)(interaction.element);
 
       if (is.window(container)) {
         left = pointer.clientX < autoScroll.margin;
@@ -2578,23 +4042,33 @@ function init(scope) {
     }
   };
 
-  Interaction.signals.on('stop', autoScroll.stop);
+  interactions.signals.on('stop', autoScroll.stop);
 
-  Interaction.signals.on('action-move', autoScroll.onInteractionMove);
+  interactions.signals.on('action-move', autoScroll.onInteractionMove);
 
   defaults.perAction.autoScroll = autoScroll.defaults;
 }
 
-module.exports = { init: init };
+exports.default = { init: init };
 
-},{"./utils/domUtils":38,"./utils/is":45,"./utils/raf":49,"./utils/window":53}],11:[function(_dereq_,module,exports){
+},{"./utils/domUtils":124,"./utils/is":131,"./utils/raf":135,"./utils/window":139}],94:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../utils/is');
-var domUtils = _dereq_('../utils/domUtils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _require = _dereq_('../utils'),
-    warnOnce = _require.warnOnce;
+var _is = _dereq_('../utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _domUtils = _dereq_('../utils/domUtils');
+
+var domUtils = _interopRequireWildcard(_domUtils);
+
+var _utils = _dereq_('../utils');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var Interactable = scope.Interactable,
@@ -2639,7 +4113,7 @@ function init(scope) {
    * @return {string | Element | object} The current ignoreFrom value or this
    * Interactable
    */
-  Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
+  Interactable.prototype.ignoreFrom = (0, _utils.warnOnce)(function (newValue) {
     return this._backCompatOption('ignoreFrom', newValue);
   }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
 
@@ -2667,7 +4141,7 @@ function init(scope) {
    * @return {string | Element | object} The current allowFrom value or this
    * Interactable
    */
-  Interactable.prototype.allowFrom = warnOnce(function (newValue) {
+  Interactable.prototype.allowFrom = (0, _utils.warnOnce)(function (newValue) {
     return this._backCompatOption('allowFrom', newValue);
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
 
@@ -2739,7 +4213,7 @@ function init(scope) {
    * @return {Function | Interactable} The checker function or this Interactable
    */
   Interactable.prototype.actionChecker = function (checker) {
-    if (is.function(checker)) {
+    if (is.func(checker)) {
       this.options.actionChecker = checker;
 
       return this;
@@ -2807,25 +4281,38 @@ function init(scope) {
   };
 }
 
-module.exports = { init: init };
+exports.default = { init: init };
 
-},{"../utils":43,"../utils/domUtils":38,"../utils/is":45}],12:[function(_dereq_,module,exports){
+},{"../utils":129,"../utils/domUtils":124,"../utils/is":131}],95:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _utils = _dereq_('../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _InteractableMethods = _dereq_('./InteractableMethods');
+
+var _InteractableMethods2 = _interopRequireDefault(_InteractableMethods);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var interact = scope.interact,
-      Interactable = scope.Interactable,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults,
       Signals = scope.Signals;
 
 
-  interact.use(_dereq_('./InteractableMethods'));
+  interact.use(_InteractableMethods2.default);
 
   // set cursor style on mousedown
-  Interaction.signals.on('down', function (_ref) {
+  interactions.signals.on('down', function (_ref) {
     var interaction = _ref.interaction,
         pointer = _ref.pointer,
         event = _ref.event,
@@ -2840,7 +4327,7 @@ function init(scope) {
   });
 
   // set cursor style on mousemove
-  Interaction.signals.on('move', function (_ref2) {
+  interactions.signals.on('move', function (_ref2) {
     var interaction = _ref2.interaction,
         pointer = _ref2.pointer,
         event = _ref2.event,
@@ -2854,7 +4341,7 @@ function init(scope) {
     prepare(interaction, actionInfo, scope);
   });
 
-  Interaction.signals.on('move', function (arg) {
+  interactions.signals.on('move', function (arg) {
     var interaction = arg.interaction,
         event = arg.event;
 
@@ -2877,7 +4364,7 @@ function init(scope) {
     }
   });
 
-  Interaction.signals.on('stop', function (_ref3) {
+  interactions.signals.on('stop', function (_ref3) {
     var interaction = _ref3.interaction;
 
     var target = interaction.target;
@@ -2888,11 +4375,6 @@ function init(scope) {
   });
 
   interact.maxInteractions = maxInteractions;
-
-  Interactable.settingsMethods.push('styleCursor');
-  Interactable.settingsMethods.push('actionChecker');
-  Interactable.settingsMethods.push('ignoreFrom');
-  Interactable.settingsMethods.push('allowFrom');
 
   defaults.base.actionChecker = null;
   defaults.base.styleCursor = true;
@@ -2927,7 +4409,8 @@ function init(scope) {
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
-    signals: Signals.new()
+    withinInteractionLimit: withinInteractionLimit,
+    signals: new Signals()
   };
 }
 
@@ -3025,10 +4508,10 @@ function withinInteractionLimit(interactable, element, action, scope) {
     return;
   }
 
-  for (var _i = 0; _i < scope.interactions.length; _i++) {
+  for (var _i = 0; _i < scope.interactions.list.length; _i++) {
     var _ref5;
 
-    _ref5 = scope.interactions[_i];
+    _ref5 = scope.interactions.list[_i];
     var interaction = _ref5;
 
     var otherAction = interaction.prepared.name;
@@ -3056,7 +4539,7 @@ function withinInteractionLimit(interactable, element, action, scope) {
     if (interaction.element === element) {
       targetElementCount++;
 
-      if (otherAction !== action.name || targetElementCount >= maxPerElement) {
+      if (otherAction === action.name && targetElementCount >= maxPerElement) {
         return false;
       }
     }
@@ -3075,23 +4558,29 @@ function maxInteractions(newValue, scope) {
   return scope.autoStart.maxInteractions;
 }
 
-module.exports = {
+exports.default = {
   init: init,
   maxInteractions: maxInteractions,
   withinInteractionLimit: withinInteractionLimit,
   validateAction: validateAction
 };
 
-},{"../utils":43,"./InteractableMethods":11}],13:[function(_dereq_,module,exports){
+},{"../utils":129,"./InteractableMethods":94}],96:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../utils/is');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _require = _dereq_('./base'),
-    validateAction = _require.validateAction;
+var _is = _dereq_('../utils/is');
 
-var _require2 = _dereq_('../utils/domUtils'),
-    parentNode = _require2.parentNode;
+var is = _interopRequireWildcard(_is);
+
+var _base = _dereq_('./base');
+
+var _domUtils = _dereq_('../utils/domUtils');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   scope.autoStart.signals.on('before-start', function (_ref) {
@@ -3133,7 +4622,7 @@ function init(scope) {
 
           var action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
 
-          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && validateAction(action, interactable, element, eventTarget, scope)) {
+          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && (0, _base.validateAction)(action, interactable, element, eventTarget, scope)) {
 
             return interactable;
           }
@@ -3151,7 +4640,7 @@ function init(scope) {
           break;
         }
 
-        element = parentNode(element);
+        element = (0, _domUtils.parentNode)(element);
       }
     }
   });
@@ -3167,21 +4656,24 @@ function init(scope) {
   }
 }
 
-module.exports = { init: init };
+exports.default = { init: init };
 
-},{"../utils/domUtils":38,"../utils/is":45,"./base":12}],14:[function(_dereq_,module,exports){
+},{"../utils/domUtils":124,"../utils/is":131,"./base":95}],97:[function(_dereq_,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function init(scope) {
   var autoStart = scope.autoStart,
-      Interaction = scope.Interaction,
+      interactions = scope.interactions,
       defaults = scope.defaults;
 
 
   defaults.perAction.hold = 0;
   defaults.perAction.delay = 0;
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.autoStartHoldTimer = null;
   });
 
@@ -3197,7 +4689,7 @@ function init(scope) {
     }
   });
 
-  Interaction.signals.on('move', function (_ref2) {
+  interactions.signals.on('move', function (_ref2) {
     var interaction = _ref2.interaction,
         duplicate = _ref2.duplicate;
 
@@ -3230,15 +4722,51 @@ function getHoldDuration(interaction) {
   return options[actionName].hold || options[actionName].delay;
 }
 
-module.exports = {
+exports.default = {
   init: init,
   getHoldDuration: getHoldDuration
 };
 
-},{}],15:[function(_dereq_,module,exports){
+},{}],98:[function(_dereq_,module,exports){
 'use strict';
 
-module.exports = {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = exports.dragAxis = exports.hold = exports.autoStart = undefined;
+
+var _base = _dereq_('./base');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _hold = _dereq_('./hold');
+
+var _hold2 = _interopRequireDefault(_hold);
+
+var _dragAxis = _dereq_('./dragAxis');
+
+var _dragAxis2 = _interopRequireDefault(_dragAxis);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  _base2.default.init(scope);
+  _hold2.default.init(scope);
+  _dragAxis2.default.init(scope);
+}
+
+exports.autoStart = _base2.default;
+exports.hold = _hold2.default;
+exports.dragAxis = _dragAxis2.default;
+exports.init = init;
+
+},{"./base":95,"./dragAxis":96,"./hold":97}],99:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
   base: {
     preventDefault: 'auto',
     deltaSource: 'page'
@@ -3250,72 +4778,474 @@ module.exports = {
   }
 };
 
-},{}],16:[function(_dereq_,module,exports){
+},{}],100:[function(_dereq_,module,exports){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = init;
+
+var _scope = _dereq_('./scope');
+
+var _interact = _dereq_('./interact');
+
+var _interact2 = _interopRequireDefault(_interact);
+
+var _interactions = _dereq_('./interactions');
+
+var _interactions2 = _interopRequireDefault(_interactions);
+
+var _interactablePreventDefault = _dereq_('./interactablePreventDefault');
+
+var _interactablePreventDefault2 = _interopRequireDefault(_interactablePreventDefault);
+
+var _inertia = _dereq_('./inertia');
+
+var _inertia2 = _interopRequireDefault(_inertia);
+
+var _pointerEvents = _dereq_('./pointerEvents');
+
+var pointerEvents = _interopRequireWildcard(_pointerEvents);
+
+var _autoStart = _dereq_('./autoStart');
+
+var autoStart = _interopRequireWildcard(_autoStart);
+
+var _actions = _dereq_('./actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+var _modifiers = _dereq_('./modifiers');
+
+var modifiers = _interopRequireWildcard(_modifiers);
+
+var _snappers = _dereq_('./utils/snappers');
+
+var snappers = _interopRequireWildcard(_snappers);
+
+var _autoScroll = _dereq_('./autoScroll');
+
+var _autoScroll2 = _interopRequireDefault(_autoScroll);
+
+var _reflow = _dereq_('./reflow');
+
+var _reflow2 = _interopRequireDefault(_reflow);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* browser entry point */
 
-var scope = _dereq_('./scope');
+function init(window) {
+  (0, _scope.init)(window);
 
-_dereq_('./interactions').init(scope);
+  _interact2.default.use(_interactions2.default);
+  _interact2.default.use(_interactablePreventDefault2.default);
 
-scope.Interactable = _dereq_('./Interactable');
-scope.InteractEvent = _dereq_('./InteractEvent');
-_dereq_('./interactablePreventDefault.js');
+  // inertia
+  _interact2.default.use(_inertia2.default);
 
-var interact = _dereq_('./interact');
+  // pointerEvents
+  _interact2.default.use(pointerEvents);
 
-// modifiers
-interact.use(_dereq_('./modifiers/base'));
-interact.use(_dereq_('./modifiers/snap'));
-interact.use(_dereq_('./modifiers/restrict'));
+  // autoStart, hold
+  _interact2.default.use(autoStart);
 
-interact.snappers = _dereq_('./utils/snappers');
-interact.createSnapGrid = interact.snappers.grid;
+  // drag and drop, resize, gesture
+  _interact2.default.use(actions);
 
-// inertia
-interact.use(_dereq_('./simulations/base'));
-interact.use(_dereq_('./simulations/inertia'));
+  // snap, resize, etc.
+  _interact2.default.use(modifiers);
 
-// pointerEvents
-interact.use(_dereq_('./pointerEvents/base'));
-interact.use(_dereq_('./pointerEvents/holdRepeat'));
-interact.use(_dereq_('./pointerEvents/interactableTargets'));
+  _interact2.default.snappers = snappers;
+  _interact2.default.createSnapGrid = _interact2.default.snappers.grid;
 
-// autoStart hold
-interact.use(_dereq_('./autoStart/base'));
-interact.use(_dereq_('./autoStart/hold'));
-interact.use(_dereq_('./autoStart/dragAxis'));
+  // autoScroll
+  _interact2.default.use(_autoScroll2.default);
 
-// actions
-interact.use(_dereq_('./actions/gesture'));
-interact.use(_dereq_('./actions/resize'));
-interact.use(_dereq_('./actions/drag'));
-interact.use(_dereq_('./actions/drop'));
+  // reflow
+  _interact2.default.use(_reflow2.default);
 
-// load these modifiers after resize is loaded
-interact.use(_dereq_('./modifiers/snapSize'));
-interact.use(_dereq_('./modifiers/restrictEdges'));
-interact.use(_dereq_('./modifiers/restrictSize'));
+  return _interact2.default;
+}
 
-// autoScroll
-interact.use(_dereq_('./autoScroll'));
-
-// export interact
-module.exports = interact;
-
-},{"./InteractEvent":3,"./Interactable":4,"./actions/drag":6,"./actions/drop":7,"./actions/gesture":8,"./actions/resize":9,"./autoScroll":10,"./autoStart/base":12,"./autoStart/dragAxis":13,"./autoStart/hold":14,"./interact":17,"./interactablePreventDefault.js":18,"./interactions":19,"./modifiers/base":20,"./modifiers/restrict":21,"./modifiers/restrictEdges":22,"./modifiers/restrictSize":23,"./modifiers/snap":24,"./modifiers/snapSize":25,"./pointerEvents/base":27,"./pointerEvents/holdRepeat":28,"./pointerEvents/interactableTargets":29,"./scope":30,"./simulations/base":31,"./simulations/inertia":32,"./utils/snappers":52}],17:[function(_dereq_,module,exports){
+},{"./actions":91,"./autoScroll":93,"./autoStart":98,"./inertia":101,"./interact":102,"./interactablePreventDefault":103,"./interactions":104,"./modifiers":106,"./pointerEvents":115,"./reflow":117,"./scope":118,"./utils/snappers":138}],101:[function(_dereq_,module,exports){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _base = _dereq_('./modifiers/base');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _utils = _dereq_('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _raf = _dereq_('./utils/raf');
+
+var _raf2 = _interopRequireDefault(_raf);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  var interactions = scope.interactions,
+      defaults = scope.defaults;
+
+
+  interactions.signals.on('new', function (interaction) {
+    interaction.inertia = {
+      active: false,
+      smoothEnd: false,
+      allowResume: false,
+
+      startEvent: null,
+      upCoords: {},
+
+      xe: 0, ye: 0,
+      sx: 0, sy: 0,
+
+      t0: 0,
+      vx0: 0, vys: 0,
+      duration: 0,
+
+      lambda_v0: 0,
+      one_ve_v0: 0,
+      i: null
+    };
+  });
+
+  interactions.signals.on('up', function (arg) {
+    return release(arg, scope);
+  });
+  interactions.signals.on('down', function (arg) {
+    return resume(arg, scope);
+  });
+  interactions.signals.on('stop', function (arg) {
+    return stop(arg, scope);
+  });
+
+  defaults.perAction.inertia = {
+    enabled: false,
+    resistance: 10, // the lambda in exponential decay
+    minSpeed: 100, // target speed must be above this for inertia to start
+    endSpeed: 10, // the speed at which inertia is slow enough to stop
+    allowResume: true, // allow resuming an action in inertia phase
+    smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
+  };
+}
+
+function resume(_ref, scope) {
+  var interaction = _ref.interaction,
+      event = _ref.event,
+      pointer = _ref.pointer,
+      eventTarget = _ref.eventTarget;
+
+  var status = interaction.inertia;
+
+  // Check if the down event hits the current inertia target
+  if (status.active) {
+    var element = eventTarget;
+
+    // climb up the DOM tree from the event target
+    while (utils.is.element(element)) {
+
+      // if interaction element is the current inertia target element
+      if (element === interaction.element) {
+        // stop inertia
+        _raf2.default.cancel(status.i);
+        status.active = false;
+        interaction.simulation = null;
+
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer, event, eventTarget, true);
+        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
+
+        // fire appropriate signals
+        var signalArg = {
+          interaction: interaction
+        };
+
+        scope.interactions.signals.fire('action-resume', signalArg);
+
+        // fire a reume event
+        var resumeEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'resume', interaction.element);
+
+        interaction._fireEvent(resumeEvent);
+        _base2.default.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
+
+        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+        break;
+      }
+
+      element = utils.dom.parentNode(element);
+    }
+  }
+}
+
+function release(_ref2, scope) {
+  var interaction = _ref2.interaction,
+      event = _ref2.event;
+
+  var status = interaction.inertia;
+
+  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
+    return;
+  }
+
+  var options = getOptions(interaction);
+
+  var now = new Date().getTime();
+  var pointerSpeed = interaction.pointerDelta.client.speed;
+
+  var smoothEnd = false;
+  var modifierResult = void 0;
+
+  // check if inertia should be started
+  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
+
+  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
+
+  var modifierArg = {
+    interaction: interaction,
+    pageCoords: utils.extend({}, interaction.curCoords.page),
+    statuses: {},
+    preEnd: true,
+    requireEndOnly: true
+  };
+
+  // smoothEnd
+  if (inertiaPossible && !inertia) {
+    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
+
+    if (modifierResult.shouldMove && modifierResult.locked) {
+      smoothEnd = true;
+    }
+  }
+
+  if (!(inertia || smoothEnd)) {
+    return;
+  }
+
+  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
+
+  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+
+  status.t0 = now;
+
+  status.active = true;
+  status.allowResume = options.allowResume;
+  interaction.simulation = status;
+
+  interaction.target.fire(status.startEvent);
+
+  if (inertia) {
+    status.vx0 = interaction.pointerDelta.client.vx;
+    status.vy0 = interaction.pointerDelta.client.vy;
+    status.v0 = pointerSpeed;
+
+    calcInertia(interaction, status);
+
+    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
+
+    modifierArg.pageCoords.x += status.xe;
+    modifierArg.pageCoords.y += status.ye;
+
+    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
+
+    status.modifiedXe += modifierResult.delta.x;
+    status.modifiedYe += modifierResult.delta.y;
+
+    status.i = _raf2.default.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.smoothEnd = true;
+    status.xe = modifierResult.delta.x;
+    status.ye = modifierResult.delta.y;
+
+    status.sx = status.sy = 0;
+
+    status.i = _raf2.default.request(function () {
+      return smothEndTick(interaction);
+    });
+  }
+}
+
+function stop(_ref3) {
+  var interaction = _ref3.interaction;
+
+  var status = interaction.inertia;
+
+  if (status.active) {
+    _raf2.default.cancel(status.i);
+    status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function calcInertia(interaction, status) {
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
+
+  status.x0 = interaction.prevEvent.page.x;
+  status.y0 = interaction.prevEvent.page.y;
+  status.t0 = status.startEvent.timeStamp / 1000;
+  status.sx = status.sy = 0;
+
+  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+  status.te = inertiaDur;
+
+  status.lambda_v0 = lambda / status.v0;
+  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
+}
+
+function inertiaTick(interaction) {
+  updateInertiaCoords(interaction);
+  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
+
+  var status = interaction.inertia;
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var t = new Date().getTime() / 1000 - status.t0;
+
+  if (t < status.te) {
+
+    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+
+    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
+      status.sx = status.xe * progress;
+      status.sy = status.ye * progress;
+    } else {
+      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
+
+      status.sx = quadPoint.x;
+      status.sy = quadPoint.y;
+    }
+
+    interaction.move();
+
+    status.i = _raf2.default.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.sx = status.modifiedXe;
+    status.sy = status.modifiedYe;
+
+    interaction.move();
+    interaction.end(status.startEvent);
+    status.active = false;
+    interaction.simulation = null;
+  }
+
+  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+}
+
+function smothEndTick(interaction) {
+  updateInertiaCoords(interaction);
+
+  var status = interaction.inertia;
+  var t = new Date().getTime() - status.t0;
+
+  var _getOptions = getOptions(interaction),
+      duration = _getOptions.smoothEndDuration;
+
+  if (t < duration) {
+    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
+    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
+
+    interaction.move();
+
+    status.i = _raf2.default.request(function () {
+      return smothEndTick(interaction);
+    });
+  } else {
+    status.sx = status.xe;
+    status.sy = status.ye;
+
+    interaction.move();
+    interaction.end(status.startEvent);
+
+    status.smoothEnd = status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function updateInertiaCoords(interaction) {
+  var status = interaction.inertia;
+
+  // return if inertia isn't running
+  if (!status.active) {
+    return;
+  }
+
+  var pageUp = status.upCoords.page;
+  var clientUp = status.upCoords.client;
+
+  utils.pointer.setCoords(interaction.curCoords, [{
+    pageX: pageUp.x + status.sx,
+    pageY: pageUp.y + status.sy,
+    clientX: clientUp.x + status.sx,
+    clientY: clientUp.y + status.sy
+  }]);
+}
+
+function getOptions(_ref4) {
+  var target = _ref4.target,
+      prepared = _ref4.prepared;
+
+  return target && target.options && prepared.name && target.options[prepared.name].inertia;
+}
+
+exports.default = {
+  init: init,
+  calcInertia: calcInertia,
+  inertiaTick: inertiaTick,
+  smothEndTick: smothEndTick,
+  updateInertiaCoords: updateInertiaCoords
+};
+
+},{"./modifiers/base":105,"./utils":129,"./utils/raf":135}],102:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _browser = _dereq_('./utils/browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _events = _dereq_('./utils/events');
+
+var _events2 = _interopRequireDefault(_events);
+
+var _utils = _dereq_('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _scope = _dereq_('./scope');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /** @module interact */
 
-var browser = _dereq_('./utils/browser');
-var events = _dereq_('./utils/events');
-var utils = _dereq_('./utils');
-var scope = _dereq_('./scope');
-var Interactable = _dereq_('./Interactable');
-
 var globalEvents = {};
+var signals = new utils.Signals();
 
 /**
  * ```js
@@ -3343,15 +5273,19 @@ var globalEvents = {};
  * @return {Interactable}
  */
 function interact(element, options) {
-  var interactable = scope.interactables.get(element, options);
+  var interactable = _scope.scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options || {}, scope.document);
+    options = utils.extend(options || {}, {
+      signals: signals,
+      actions: _scope.scope.actions
+    });
+    interactable = new _scope.scope.Interactable(element, options, _scope.scope.document);
     interactable.events.global = globalEvents;
 
-    scope.addDocument(interactable._doc);
+    _scope.scope.addDocument(interactable._doc);
 
-    scope.interactables.push(interactable);
+    _scope.scope.interactables.list.push(interactable);
   }
 
   return interactable;
@@ -3367,7 +5301,7 @@ function interact(element, options) {
  * @return {interact}
 */
 interact.use = function (plugin) {
-  plugin.init(scope);
+  plugin.init(_scope.scope);
   return interact;
 };
 
@@ -3382,7 +5316,7 @@ interact.use = function (plugin) {
  * passed to interact
 */
 interact.isSet = function (element, options) {
-  return scope.interactables.indexOfElement(element, options && options.context) !== -1;
+  return _scope.scope.interactables.indexOfElement(element, options && options.context) !== -1;
 };
 
 /**
@@ -3423,7 +5357,7 @@ interact.on = function (type, listener, options) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.arr.contains(Interactable.eventTypes, type)) {
+  if (utils.arr.contains(_scope.scope.actions.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -3433,7 +5367,7 @@ interact.on = function (type, listener, options) {
   }
   // If non InteractEvent type, addEventListener to document
   else {
-      events.add(scope.document, type, listener, { options: options });
+      _events2.default.add(_scope.scope.document, type, listener, { options: options });
     }
 
   return interact;
@@ -3477,8 +5411,8 @@ interact.off = function (type, listener, options) {
     return interact;
   }
 
-  if (!utils.arr.contains(Interactable.eventTypes, type)) {
-    events.remove(scope.document, type, listener, options);
+  if (!utils.arr.contains(_scope.scope.actions.eventTypes, type)) {
+    _events2.default.remove(_scope.scope.document, type, listener, options);
   } else {
     var index = void 0;
 
@@ -3499,7 +5433,7 @@ interact.off = function (type, listener, options) {
  * and expose internal functions and variables
  */
 interact.debug = function () {
-  return scope;
+  return _scope.scope;
 };
 
 // expose the functions used to calculate multi-touch properties
@@ -3519,7 +5453,7 @@ interact.closest = utils.dom.closest;
  * @return {boolean} Whether or not the browser supports touch input
  */
 interact.supportsTouch = function () {
-  return browser.supportsTouch;
+  return _browser2.default.supportsTouch;
 };
 
 /**
@@ -3528,7 +5462,7 @@ interact.supportsTouch = function () {
  * @return {boolean} Whether or not the browser supports PointerEvents
  */
 interact.supportsPointerEvent = function () {
-  return browser.supportsPointerEvent;
+  return _browser2.default.supportsPointerEvent;
 };
 
 /**
@@ -3540,8 +5474,13 @@ interact.supportsPointerEvent = function () {
  * @return {object} interact
  */
 interact.stop = function (event) {
-  for (var i = scope.interactions.length - 1; i >= 0; i--) {
-    scope.interactions[i].stop(event);
+  for (var _i3 = 0; _i3 < _scope.scope.interactions.list.length; _i3++) {
+    var _ref3;
+
+    _ref3 = _scope.scope.interactions.list[_i3];
+    var interaction = _ref3;
+
+    interaction.stop(event);
   }
 
   return interact;
@@ -3558,129 +5497,135 @@ interact.stop = function (event) {
  */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
-    scope.Interaction.pointerMoveTolerance = newValue;
+    _scope.scope.Interaction.pointerMoveTolerance = newValue;
 
     return interact;
   }
 
-  return scope.Interaction.pointerMoveTolerance;
+  return _scope.scope.Interaction.pointerMoveTolerance;
 };
 
-Interactable.signals.on('unset', function (_ref3) {
-  var interactable = _ref3.interactable;
+signals.on('unset', function (_ref4) {
+  var interactable = _ref4.interactable;
 
-  scope.interactables.splice(scope.interactables.indexOf(interactable), 1);
+  _scope.scope.interactables.list.splice(_scope.scope.interactables.list.indexOf(interactable), 1);
 
   // Stop related interactions when an Interactable is unset
-  for (var _i3 = 0; _i3 < scope.interactions.length; _i3++) {
-    var _ref4;
+  for (var _i4 = 0; _i4 < _scope.scope.interactions.list.length; _i4++) {
+    var _ref5;
 
-    _ref4 = scope.interactions[_i3];
-    var interaction = _ref4;
+    _ref5 = _scope.scope.interactions.list[_i4];
+    var interaction = _ref5;
 
     if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
       interaction.stop();
     }
   }
 });
-interact.addDocument = scope.addDocument;
-interact.removeDocument = scope.removeDocument;
+interact.addDocument = _scope.scope.addDocument;
+interact.removeDocument = _scope.scope.removeDocument;
 
-// all set interactables
-scope.interactables = [];
+_scope.scope.interactables = {
+  // all set interactables
+  list: [],
 
-scope.interactables.indexOfElement = function indexOfElement(target, context) {
-  context = context || scope.document;
+  indexOfElement: function indexOfElement(target, context) {
+    context = context || _scope.scope.document;
 
-  for (var i = 0; i < this.length; i++) {
-    var interactable = this[i];
+    var list = this.list;
 
-    if (interactable.target === target && interactable._context === context) {
-      return i;
-    }
-  }
-  return -1;
-};
+    for (var i = 0; i < list.length; i++) {
+      var interactable = list[i];
 
-scope.interactables.get = function interactableGet(element, options, dontCheckInContext) {
-  var ret = this[this.indexOfElement(element, options && options.context)];
-
-  return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
-};
-
-scope.interactables.forEachMatch = function (element, callback) {
-  for (var _i4 = 0; _i4 < this.length; _i4++) {
-    var _ref5;
-
-    _ref5 = this[_i4];
-    var interactable = _ref5;
-
-    var ret = void 0;
-
-    if ((utils.is.string(interactable.target)
-    // target is a selector and the element matches
-    ? utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target) :
-    // target is the element
-    element === interactable.target) &&
-    // the element is in context
-    interactable.inContext(element)) {
-      ret = callback(interactable);
+      if (interactable.target === target && interactable._context === context) {
+        return i;
+      }
     }
 
-    if (ret !== undefined) {
-      return ret;
+    return -1;
+  },
+  get: function get(element, options, dontCheckInContext) {
+    var ret = this.list[this.indexOfElement(element, options && options.context)];
+
+    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
+  },
+  forEachMatch: function forEachMatch(element, callback) {
+    for (var _i5 = 0; _i5 < this.list.length; _i5++) {
+      var _ref6;
+
+      _ref6 = this.list[_i5];
+      var interactable = _ref6;
+
+      var ret = void 0;
+
+      if ((utils.is.string(interactable.target)
+      // target is a selector and the element matches
+      ? utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target) :
+      // target is the element
+      element === interactable.target) &&
+      // the element is in context
+      interactable.inContext(element)) {
+        ret = callback(interactable);
+      }
+
+      if (ret !== undefined) {
+        return ret;
+      }
     }
-  }
+  },
+
+
+  signals: signals
 };
 
-scope.interact = interact;
+_scope.scope.interact = interact;
 
-module.exports = interact;
+exports.default = interact;
 
-},{"./Interactable":4,"./scope":30,"./utils":43,"./utils/browser":35,"./utils/events":39}],18:[function(_dereq_,module,exports){
+},{"./scope":118,"./utils":129,"./utils/browser":121,"./utils/events":125}],103:[function(_dereq_,module,exports){
 'use strict';
 
-var Interactable = _dereq_('./Interactable');
-var scope = _dereq_('./scope');
-var is = _dereq_('./utils/is');
-var events = _dereq_('./utils/events');
-var browser = _dereq_('./utils/browser');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = init;
 
-var _require = _dereq_('./utils/domUtils'),
-    nodeContains = _require.nodeContains,
-    matchesSelector = _require.matchesSelector;
+var _is = _dereq_('./utils/is');
 
-var _require2 = _dereq_('./utils/window'),
-    getWindow = _require2.getWindow;
+var is = _interopRequireWildcard(_is);
 
-/**
- * Returns or sets whether to prevent the browser's default behaviour in
- * response to pointer events. Can be set to:
- *  - `'always'` to always prevent
- *  - `'never'` to never prevent
- *  - `'auto'` to let interact.js try to determine what would be best
- *
- * @param {string} [newValue] `true`, `false` or `'auto'`
- * @return {string | Interactable} The current setting or this Interactable
- */
+var _events = _dereq_('./utils/events');
 
+var _events2 = _interopRequireDefault(_events);
 
-Interactable.prototype.preventDefault = function (newValue) {
+var _browser = _dereq_('./utils/browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _domUtils = _dereq_('./utils/domUtils');
+
+var _window = _dereq_('./utils/window');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function preventDefault(interactable, newValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
-    this.options.preventDefault = newValue;
-    return this;
+    interactable.options.preventDefault = newValue;
+    return interactable;
   }
 
   if (is.bool(newValue)) {
-    this.options.preventDefault = newValue ? 'always' : 'never';
-    return this;
+    interactable.options.preventDefault = newValue ? 'always' : 'never';
+    return interactable;
   }
 
-  return this.options.preventDefault;
-};
+  return interactable.options.preventDefault;
+}
 
-Interactable.prototype.checkAndPreventDefault = function (event) {
-  var setting = this.options.preventDefault;
+function checkAndPreventDefault(interactable, scope, event) {
+  var setting = interactable.options.preventDefault;
 
   if (setting === 'never') {
     return;
@@ -3695,8 +5640,8 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
 
   // don't preventDefault of touch{start,move} events if the browser supports passive
   // events listeners. CSS touch-action and user-selecct should be used instead
-  if (events.supportsPassive && /^touch(start|move)$/.test(event.type) && !browser.isIOS) {
-    var docOptions = scope.getDocIndex(getWindow(event.target).document);
+  if (_events2.default.supportsPassive && /^touch(start|move)$/.test(event.type) && !_browser2.default.isIOS) {
+    var docOptions = scope.getDocIndex((0, _window.getWindow)(event.target).document);
 
     if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
       return;
@@ -3709,12 +5654,12 @@ Interactable.prototype.checkAndPreventDefault = function (event) {
   }
 
   // don't preventDefault on editable elements
-  if (is.element(event.target) && matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (is.element(event.target) && (0, _domUtils.matchesSelector)(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 
   event.preventDefault();
-};
+}
 
 function onInteractionEvent(_ref) {
   var interaction = _ref.interaction,
@@ -3725,44 +5670,108 @@ function onInteractionEvent(_ref) {
   }
 }
 
-var _arr = ['down', 'move', 'up', 'cancel'];
-for (var _i = 0; _i < _arr.length; _i++) {
-  var eventSignal = _arr[_i];
-  scope.Interaction.signals.on(eventSignal, onInteractionEvent);
+function init(scope) {
+  /** @lends Interactable */
+  var Interactable = scope.Interactable;
+  /**
+   * Returns or sets whether to prevent the browser's default behaviour in
+   * response to pointer events. Can be set to:
+   *  - `'always'` to always prevent
+   *  - `'never'` to never prevent
+   *  - `'auto'` to let interact.js try to determine what would be best
+   *
+   * @param {string} [newValue] `true`, `false` or `'auto'`
+   * @return {string | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.preventDefault = function (newValue) {
+    return preventDefault(this, newValue);
+  };
+
+  Interactable.prototype.checkAndPreventDefault = function (event) {
+    return checkAndPreventDefault(this, scope, event);
+  };
+
+  var _arr = ['down', 'move', 'up', 'cancel'];
+  for (var _i = 0; _i < _arr.length; _i++) {
+    var eventSignal = _arr[_i];
+    scope.interactions.signals.on(eventSignal, onInteractionEvent);
+  }
+
+  // prevent native HTML5 drag on interact.js target elements
+  scope.interactions.eventMap.dragstart = function preventNativeDrag(event) {
+    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
+      var _ref2;
+
+      _ref2 = scope.interactions.list[_i2];
+      var interaction = _ref2;
+
+
+      if (interaction.element && (interaction.element === event.target || (0, _domUtils.nodeContains)(interaction.element, event.target))) {
+
+        interaction.target.checkAndPreventDefault(event);
+        return;
+      }
+    }
+  };
 }
 
-// prevent native HTML5 drag on interact.js target elements
-scope.Interaction.eventMap.dragstart = function preventNativeDrag(event) {
-  for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
-    var _ref2;
+exports.default = { init: init };
 
-    _ref2 = scope.interactions[_i2];
-    var interaction = _ref2;
-
-
-    if (interaction.element && (interaction.element === event.target || nodeContains(interaction.element, event.target))) {
-
-      interaction.target.checkAndPreventDefault(event);
-      return;
-    }
-  }
-};
-
-},{"./Interactable":4,"./scope":30,"./utils/browser":35,"./utils/domUtils":38,"./utils/events":39,"./utils/is":45,"./utils/window":53}],19:[function(_dereq_,module,exports){
+},{"./utils/browser":121,"./utils/domUtils":124,"./utils/events":125,"./utils/is":131,"./utils/window":139}],104:[function(_dereq_,module,exports){
 'use strict';
 
-var Interaction = _dereq_('./Interaction');
-var events = _dereq_('./utils/events');
-var finder = _dereq_('./utils/interactionFinder');
-var browser = _dereq_('./utils/browser');
-var domObjects = _dereq_('./utils/domObjects');
-var pointerUtils = _dereq_('./utils/pointerUtils');
-var Signals = _dereq_('./utils/Signals');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _possibleConstructorReturn2 = _dereq_('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = _dereq_('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+exports.newInteraction = newInteraction;
+
+var _Interaction2 = _dereq_('./Interaction');
+
+var _Interaction3 = _interopRequireDefault(_Interaction2);
+
+var _events = _dereq_('./utils/events');
+
+var _events2 = _interopRequireDefault(_events);
+
+var _interactionFinder = _dereq_('./utils/interactionFinder');
+
+var _interactionFinder2 = _interopRequireDefault(_interactionFinder);
+
+var _browser = _dereq_('./utils/browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _domObjects = _dereq_('./utils/domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+var _pointerUtils = _dereq_('./utils/pointerUtils');
+
+var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
+
+var _Signals = _dereq_('./utils/Signals');
+
+var _Signals2 = _interopRequireDefault(_Signals);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer', 'windowBlur'];
 
 function init(scope) {
-  var signals = Signals.new();
+  var signals = new _Signals2.default();
 
   var listeners = {};
 
@@ -3772,9 +5781,9 @@ function init(scope) {
   }
 
   var eventMap = {/* 'eventType': listenerFunc */};
-  var pEventTypes = browser.pEventTypes;
+  var pEventTypes = _browser2.default.pEventTypes;
 
-  if (domObjects.PointerEvent) {
+  if (_domObjects2.default.PointerEvent) {
     eventMap[pEventTypes.down] = listeners.pointerDown;
     eventMap[pEventTypes.move] = listeners.pointerMove;
     eventMap[pEventTypes.up] = listeners.pointerUp;
@@ -3791,10 +5800,10 @@ function init(scope) {
   }
 
   eventMap.blur = function (event) {
-    for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
+    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
       var _ref;
 
-      _ref = scope.interactions[_i2];
+      _ref = scope.interactions.list[_i2];
       var interaction = _ref;
 
       interaction.documentBlur(event);
@@ -3807,15 +5816,25 @@ function init(scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // all active and idle interactions
-  scope.interactions = [];
-  scope.Interaction = {
+  // eslint-disable-next-line no-shadow
+  scope.Interaction = function (_Interaction) {
+    (0, _inherits3.default)(Interaction, _Interaction);
+
+    function Interaction() {
+      (0, _classCallCheck3.default)(this, Interaction);
+      return (0, _possibleConstructorReturn3.default)(this, _Interaction.apply(this, arguments));
+    }
+
+    return Interaction;
+  }(_Interaction3.default);
+  scope.interactions = {
     signals: signals,
-    Interaction: Interaction,
+    // all active and idle interactions
+    list: [],
     new: function _new(options) {
       options.signals = signals;
 
-      return new Interaction(options);
+      return new scope.Interaction(options);
     },
 
     listeners: listeners,
@@ -3824,24 +5843,24 @@ function init(scope) {
 
   scope.actions = {
     names: [],
-    methodDict: {}
+    methodDict: {},
+    eventTypes: []
   };
 }
 
 function doOnInteractions(method, scope) {
   return function (event) {
-    var interactions = scope.interactions;
+    var interactions = scope.interactions.list;
 
+    var pointerType = _pointerUtils2.default.getPointerType(event);
 
-    var pointerType = pointerUtils.getPointerType(event);
-
-    var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
+    var _pointerUtils$getEven = _pointerUtils2.default.getEventTargets(event),
         eventTarget = _pointerUtils$getEven[0],
         curEventTarget = _pointerUtils$getEven[1];
 
     var matches = []; // [ [pointer, interaction], ...]
 
-    if (browser.supportsTouch && /touch/.test(event.type)) {
+    if (_browser2.default.supportsTouch && /touch/.test(event.type)) {
       scope.prevTouchTime = new Date().getTime();
 
       for (var _i3 = 0; _i3 < event.changedTouches.length; _i3++) {
@@ -3851,7 +5870,7 @@ function doOnInteractions(method, scope) {
         var changedTouch = _ref2;
 
         var pointer = changedTouch;
-        var pointerId = pointerUtils.getPointerId(pointer);
+        var pointerId = _pointerUtils2.default.getPointerId(pointer);
         var interaction = getInteraction({
           pointer: pointer,
           pointerId: pointerId,
@@ -3866,7 +5885,7 @@ function doOnInteractions(method, scope) {
     } else {
       var invalidPointer = false;
 
-      if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
+      if (!_browser2.default.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
         for (var i = 0; i < interactions.length && !invalidPointer; i++) {
           invalidPointer = interactions[i].pointerType !== 'mouse' && interactions[i].pointerIsDown;
@@ -3882,7 +5901,7 @@ function doOnInteractions(method, scope) {
       if (!invalidPointer) {
         var _interaction = getInteraction({
           pointer: event,
-          pointerId: pointerUtils.getPointerId(event),
+          pointerId: _pointerUtils2.default.getPointerId(event),
           pointerType: pointerType,
           eventType: event.type,
           eventTarget: eventTarget,
@@ -3898,7 +5917,6 @@ function doOnInteractions(method, scope) {
       var _pointer = _ref3[0];
       var _interaction2 = _ref3[1];
 
-      _interaction2._updateEventTargets(eventTarget, curEventTarget);
       _interaction2[method](_pointer, event, eventTarget, curEventTarget);
     }
   };
@@ -3909,18 +5927,18 @@ function getInteraction(searchDetails) {
       scope = searchDetails.scope;
 
 
-  var foundInteraction = finder.search(searchDetails);
+  var foundInteraction = _interactionFinder2.default.search(searchDetails);
   var signalArg = { interaction: foundInteraction, searchDetails: searchDetails };
 
-  scope.Interaction.signals.fire('find', signalArg);
+  scope.interactions.signals.fire('find', signalArg);
 
   return signalArg.interaction || newInteraction({ pointerType: pointerType }, scope);
 }
 
 function newInteraction(options, scope) {
-  var interaction = scope.Interaction.new(options);
+  var interaction = scope.interactions.new(options);
 
-  scope.interactions.push(interaction);
+  scope.interactions.list.push(interaction);
   return interaction;
 }
 
@@ -3928,14 +5946,14 @@ function onDocSignal(_ref4, signalName) {
   var doc = _ref4.doc,
       scope = _ref4.scope,
       options = _ref4.options;
-  var eventMap = scope.Interaction.eventMap;
+  var eventMap = scope.interactions.eventMap;
 
-  var eventMethod = signalName.indexOf('add') === 0 ? events.add : events.remove;
+  var eventMethod = signalName.indexOf('add') === 0 ? _events2.default.add : _events2.default.remove;
 
   // delegate event listener
-  for (var eventType in events.delegatedEvents) {
-    eventMethod(doc, eventType, events.delegateListener);
-    eventMethod(doc, eventType, events.delegateUseCapture, true);
+  for (var eventType in _events2.default.delegatedEvents) {
+    eventMethod(doc, eventType, _events2.default.delegateListener);
+    eventMethod(doc, eventType, _events2.default.delegateUseCapture, true);
   }
 
   var eventOptions = options && options.events;
@@ -3945,7 +5963,7 @@ function onDocSignal(_ref4, signalName) {
   }
 }
 
-module.exports = {
+exports.default = {
   init: init,
   onDocSignal: onDocSignal,
   doOnInteractions: doOnInteractions,
@@ -3953,43 +5971,55 @@ module.exports = {
   methodNames: methodNames
 };
 
-},{"./Interaction":5,"./utils/Signals":33,"./utils/browser":35,"./utils/domObjects":37,"./utils/events":39,"./utils/interactionFinder":44,"./utils/pointerUtils":48}],20:[function(_dereq_,module,exports){
+},{"./Interaction":86,"./utils/Signals":119,"./utils/browser":121,"./utils/domObjects":123,"./utils/events":125,"./utils/interactionFinder":130,"./utils/pointerUtils":134,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/inherits":9,"babel-runtime/helpers/possibleConstructorReturn":10}],105:[function(_dereq_,module,exports){
 'use strict';
 
-var extend = _dereq_('../utils/extend');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function init(scope) {
-  var InteractEvent = scope.InteractEvent,
-      Interaction = scope.Interaction;
+  var interactions = scope.interactions;
 
 
   scope.modifiers = { names: [] };
 
-  Interaction.signals.on('new', function (interaction) {
-    interaction.startOffset = { left: 0, right: 0, top: 0, bottom: 0 };
-    interaction.modifierOffsets = {};
-    interaction.modifierStatuses = resetStatuses({}, scope.modifiers);
-    interaction.modifierResult = null;
+  interactions.signals.on('new', function (interaction) {
+    interaction.modifiers = {
+      startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      offsets: {},
+      statuses: resetStatuses({}, scope.modifiers),
+      result: null
+    };
   });
 
-  Interaction.signals.on('action-start', function (arg) {
+  interactions.signals.on('before-action-start', function (arg) {
     return start(arg, scope.modifiers, arg.interaction.startCoords.page);
   });
 
-  Interaction.signals.on('action-resume', function (arg) {
+  interactions.signals.on('action-resume', function (arg) {
     beforeMove(arg, scope.modifiers);
     start(arg, scope.modifiers, arg.interaction.curCoords.page);
   });
 
-  Interaction.signals.on('before-action-move', function (arg) {
+  interactions.signals.on('before-action-move', function (arg) {
     return beforeMove(arg, scope.modifiers);
   });
-  Interaction.signals.on('action-end', function (arg) {
+  interactions.signals.on('before-action-end', function (arg) {
     return beforeEnd(arg, scope.modifiers);
   });
 
-  InteractEvent.signals.on('set-xy', function (arg) {
-    return setXY(arg, scope.modifiers);
+  interactions.signals.on('before-action-start', function (arg) {
+    return setCurCoords(arg, scope.modifiers);
+  });
+  interactions.signals.on('before-action-move', function (arg) {
+    return setCurCoords(arg, scope.modifiers);
   });
 }
 
@@ -3998,7 +6028,7 @@ function setOffsets(arg, modifiers) {
       page = arg.pageCoords;
   var target = interaction.target,
       element = interaction.element,
-      startOffset = interaction.startOffset;
+      startOffset = interaction.modifiers.startOffset;
 
   var rect = target.getRect(element);
 
@@ -4035,7 +6065,7 @@ function setOffsets(arg, modifiers) {
       continue;
     }
 
-    interaction.modifierOffsets[modifierName] = modifiers[modifierName].setOffset(arg);
+    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].setOffset(arg);
   }
 }
 
@@ -4045,15 +6075,16 @@ function setAll(arg, modifiers) {
       preEnd = arg.preEnd,
       requireEndOnly = arg.requireEndOnly;
 
+
+  arg.modifiedCoords = (0, _extend2.default)({}, arg.pageCoords);
+
   var result = {
-    dx: 0,
-    dy: 0,
+    delta: { x: 0, y: 0 },
+    coords: arg.modifiedCoords,
     changed: false,
     locked: false,
     shouldMove: true
   };
-
-  arg.modifiedCoords = extend({}, arg.pageCoords);
 
   for (var _i2 = 0; _i2 < modifiers.names.length; _i2++) {
     var _ref2;
@@ -4070,26 +6101,28 @@ function setAll(arg, modifiers) {
 
     arg.status = arg.status = statuses[modifierName];
     arg.options = options;
-    arg.offset = arg.interaction.modifierOffsets[modifierName];
+    arg.offset = arg.interaction.modifiers.offsets[modifierName];
 
     modifier.set(arg);
 
     if (arg.status.locked) {
-      arg.modifiedCoords.x += arg.status.dx;
-      arg.modifiedCoords.y += arg.status.dy;
+      arg.modifiedCoords.x += arg.status.delta.x;
+      arg.modifiedCoords.y += arg.status.delta.y;
 
-      result.dx += arg.status.dx;
-      result.dy += arg.status.dy;
+      result.delta.x += arg.status.delta.x;
+      result.delta.y += arg.status.delta.y;
 
       result.locked = true;
     }
   }
 
+  var changed = interaction.curCoords.page.x !== arg.modifiedCoords.x || interaction.curCoords.page.y !== arg.modifiedCoords.y;
+
   // a move should be fired if:
   //  - there are no modifiers enabled,
   //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
   //  - the locked coords have changed since the last pointer move
-  result.shouldMove = !arg.status || !result.locked || arg.status.changed;
+  result.shouldMove = !arg.status || !result.locked || changed;
 
   return result;
 }
@@ -4103,10 +6136,8 @@ function resetStatuses(statuses, modifiers) {
 
     var status = statuses[modifierName] || {};
 
-    status.dx = status.dy = 0;
-    status.modifiedX = status.modifiedY = NaN;
+    status.delta = { x: 0, y: 0 };
     status.locked = false;
-    status.changed = true;
 
     statuses[modifierName] = status;
   }
@@ -4120,8 +6151,8 @@ function start(_ref4, modifiers, pageCoords) {
   var arg = {
     interaction: interaction,
     pageCoords: pageCoords,
-    startOffset: interaction.startOffset,
-    statuses: interaction.modifierStatuses,
+    startOffset: interaction.modifiers.startOffset,
+    statuses: interaction.modifiers.statuses,
     preEnd: false,
     requireEndOnly: false
   };
@@ -4129,8 +6160,8 @@ function start(_ref4, modifiers, pageCoords) {
   setOffsets(arg, modifiers);
   resetStatuses(arg.statuses, modifiers);
 
-  arg.pageCoords = extend({}, interaction.startCoords.page);
-  interaction.modifierResult = setAll(arg, modifiers);
+  arg.pageCoords = (0, _extend2.default)({}, interaction.startCoords.page);
+  interaction.modifiers.result = setAll(arg, modifiers);
 }
 
 function beforeMove(_ref5, modifiers) {
@@ -4142,11 +6173,11 @@ function beforeMove(_ref5, modifiers) {
     interaction: interaction,
     preEnd: preEnd,
     pageCoords: interaction.curCoords.page,
-    statuses: interaction.modifierStatuses,
+    statuses: interaction.modifiers.statuses,
     requireEndOnly: false
   }, modifiers);
 
-  interaction.modifierResult = modifierResult;
+  interaction.modifiers.result = modifierResult;
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
@@ -4170,17 +6201,19 @@ function beforeEnd(_ref6, modifiers) {
     // if the endOnly option is true for any modifier
     if (shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
-      interaction.doMove({ event: event, preEnd: true });
+      interaction.move({ event: event, preEnd: true });
       break;
     }
   }
 }
 
-function setXY(arg, modifiers) {
-  var iEvent = arg.iEvent,
-      interaction = arg.interaction;
+function setCurCoords(arg, modifiers) {
+  var interaction = arg.interaction;
 
-  var modifierArg = extend({}, arg);
+  var modifierArg = (0, _extend2.default)({
+    page: interaction.curCoords.page,
+    client: interaction.curCoords.client
+  }, arg);
 
   for (var i = 0; i < modifiers.names.length; i++) {
     var modifierName = modifiers.names[i];
@@ -4192,9 +6225,9 @@ function setXY(arg, modifiers) {
 
     var modifier = modifiers[modifierName];
 
-    modifierArg.status = interaction.modifierStatuses[modifierName];
+    modifierArg.status = interaction.modifiers.statuses[modifierName];
 
-    iEvent[modifierName] = modifier.modifyCoords(modifierArg);
+    modifier.modifyCoords(modifierArg);
   }
 }
 
@@ -4202,7 +6235,7 @@ function shouldDo(options, preEnd, requireEndOnly) {
   return options && options.enabled && (preEnd || !options.endOnly) && (!requireEndOnly || options.endOnly);
 }
 
-module.exports = {
+exports.default = {
   init: init,
   setOffsets: setOffsets,
   setAll: setAll,
@@ -4213,22 +6246,89 @@ module.exports = {
   shouldDo: shouldDo
 };
 
-},{"../utils/extend":40}],21:[function(_dereq_,module,exports){
+},{"../utils/extend":126}],106:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../utils/is');
-var extend = _dereq_('../utils/extend');
-var rectUtils = _dereq_('../utils/rect');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = exports.restrictSize = exports.restrictEdges = exports.restrict = exports.snapSize = exports.snap = exports.modifiers = undefined;
+
+var _base = _dereq_('./base');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _snap = _dereq_('./snap');
+
+var _snap2 = _interopRequireDefault(_snap);
+
+var _snapSize = _dereq_('./snapSize');
+
+var _snapSize2 = _interopRequireDefault(_snapSize);
+
+var _restrict = _dereq_('./restrict');
+
+var _restrict2 = _interopRequireDefault(_restrict);
+
+var _restrictEdges = _dereq_('./restrictEdges');
+
+var _restrictEdges2 = _interopRequireDefault(_restrictEdges);
+
+var _restrictSize = _dereq_('./restrictSize');
+
+var _restrictSize2 = _interopRequireDefault(_restrictSize);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  _base2.default.init(scope);
+  _snap2.default.init(scope);
+  _snapSize2.default.init(scope);
+  _restrict2.default.init(scope);
+  _restrictEdges2.default.init(scope);
+  _restrictSize2.default.init(scope);
+}
+
+exports.modifiers = _base2.default;
+exports.snap = _snap2.default;
+exports.snapSize = _snapSize2.default;
+exports.restrict = _restrict2.default;
+exports.restrictEdges = _restrictEdges2.default;
+exports.restrictSize = _restrictSize2.default;
+exports.init = init;
+
+},{"./base":105,"./restrict":107,"./restrictEdges":108,"./restrictSize":109,"./snap":110,"./snapSize":111}],107:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _is = _dereq_('../utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _rect = _dereq_('../utils/rect');
+
+var _rect2 = _interopRequireDefault(_rect);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var modifiers = scope.modifiers,
       defaults = scope.defaults;
 
 
-  modifiers.restrict = module.exports;
+  modifiers.restrict = restrict;
   modifiers.names.push('restrict');
 
-  defaults.perAction.restrict = module.exports.defaults;
+  defaults.perAction.restrict = restrict.defaults;
 }
 
 function setOffset(_ref) {
@@ -4256,13 +6356,14 @@ function set(_ref2) {
   var modifiedCoords = _ref2.modifiedCoords,
       interaction = _ref2.interaction,
       status = _ref2.status,
+      offset = _ref2.offset,
       options = _ref2.options;
 
   if (!options) {
     return status;
   }
 
-  var page = extend({}, modifiedCoords);
+  var page = (0, _extend2.default)({}, modifiedCoords);
 
   var restriction = getRestrictionRect(options.restriction, interaction, page);
 
@@ -4270,15 +6371,13 @@ function set(_ref2) {
     return status;
   }
 
-  status.dx = 0;
-  status.dy = 0;
+  status.delta.x = 0;
+  status.delta.y = 0;
   status.locked = false;
 
   var rect = restriction;
   var modifiedX = page.x;
   var modifiedY = page.y;
-
-  var offset = interaction.modifierOffsets.restrict;
 
   // object is assumed to have
   // x, y, width, height or
@@ -4291,11 +6390,10 @@ function set(_ref2) {
     modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top + offset.top);
   }
 
-  status.dx = modifiedX - page.x;
-  status.dy = modifiedY - page.y;
+  status.delta.x = modifiedX - page.x;
+  status.delta.y = modifiedY - page.y;
 
-  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-  status.locked = !!(status.dx || status.dy);
+  status.locked = !!(status.delta.x || status.delta.y);
 
   status.modifiedX = modifiedX;
   status.modifiedY = modifiedY;
@@ -4313,28 +6411,23 @@ function modifyCoords(_ref3) {
   if (options && options.enabled && !(phase === 'start' && elementRect && status.locked)) {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
-
-      return {
-        dx: status.dx,
-        dy: status.dy
-      };
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
   }
 }
 
 function getRestrictionRect(value, interaction, page) {
-  if (is.function(value)) {
-    return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
+  if (is.func(value)) {
+    return _rect2.default.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
   } else {
-    return rectUtils.resolveRectLike(value, interaction.target, interaction.element);
+    return _rect2.default.resolveRectLike(value, interaction.target, interaction.element);
   }
 }
 
-module.exports = {
+var restrict = {
   init: init,
   setOffset: setOffset,
   set: set,
@@ -4348,10 +6441,30 @@ module.exports = {
   }
 };
 
-},{"../utils/extend":40,"../utils/is":45,"../utils/rect":50}],22:[function(_dereq_,module,exports){
+exports.default = restrict;
+
+},{"../utils/extend":126,"../utils/is":131,"../utils/rect":136}],108:[function(_dereq_,module,exports){
 'use strict';
 
-// This module adds the options.resize.restrictEdges setting which sets min and
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _rect = _dereq_('../utils/rect');
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _restrict = _dereq_('./restrict');
+
+var _restrict2 = _interopRequireDefault(_restrict);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var getRestrictionRect = _restrict2.default.getRestrictionRect; // This module adds the options.resize.restrictEdges setting which sets min and
 // max for the top, left, bottom and right edges of the target being resized.
 //
 // interact(target).resize({
@@ -4362,40 +6475,31 @@ module.exports = {
 //   },
 // });
 
-var extend = _dereq_('../utils/extend');
-var rectUtils = _dereq_('../utils/rect');
-var restrict = _dereq_('./restrict');
-
-var getRestrictionRect = restrict.getRestrictionRect;
-
 var noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
 var noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
 
 function init(scope) {
   var modifiers = scope.modifiers,
-      defaults = scope.defaults,
-      actions = scope.actions;
-  var resize = actions.resize;
+      defaults = scope.defaults;
 
 
-  modifiers.restrictEdges = module.exports;
+  modifiers.restrictEdges = restrictEdges;
   modifiers.names.push('restrictEdges');
 
-  defaults.perAction.restrictEdges = module.exports.defaults;
-  resize.defaults.restrictEdges = module.exports.defaults;
+  defaults.perAction.restrictEdges = restrictEdges.defaults;
 }
 
 function setOffset(_ref) {
   var interaction = _ref.interaction,
       options = _ref.options;
 
-  var startOffset = interaction.startOffset;
+  var startOffset = interaction.modifiers.startOffset;
   var offset = void 0;
 
   if (options) {
     var offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
 
-    offset = rectUtils.rectToXY(offsetRect);
+    offset = _rect2.default.rectToXY(offsetRect);
   }
 
   offset = offset || { x: 0, y: 0 };
@@ -4421,7 +6525,7 @@ function set(_ref2) {
     return;
   }
 
-  var page = extend({}, modifiedCoords);
+  var page = (0, _extend2.default)({}, modifiedCoords);
   var inner = getRestrictionRect(options.inner, interaction, page) || {};
   var outer = getRestrictionRect(options.outer, interaction, page) || {};
 
@@ -4431,8 +6535,8 @@ function set(_ref2) {
   var modifiedX = page.x;
   var modifiedY = page.y;
 
-  status.dx = 0;
-  status.dy = 0;
+  status.delta.x = 0;
+  status.delta.y = 0;
   status.locked = false;
 
   if (edges.top) {
@@ -4446,14 +6550,10 @@ function set(_ref2) {
     modifiedX = Math.max(Math.min(outer.right + offset.right, page.x), inner.right + offset.right);
   }
 
-  status.dx = modifiedX - page.x;
-  status.dy = modifiedY - page.y;
+  status.delta.x = modifiedX - page.x;
+  status.delta.y = modifiedY - page.y;
 
-  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-  status.locked = !!(status.dx || status.dy);
-
-  status.modifiedX = modifiedX;
-  status.modifiedY = modifiedY;
+  status.locked = !!(status.delta.x || status.delta.y);
 }
 
 function modifyCoords(_ref3) {
@@ -4466,15 +6566,10 @@ function modifyCoords(_ref3) {
   if (options && options.enabled && phase !== 'start') {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
-
-      return {
-        dx: status.dx,
-        dy: status.dy
-      };
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
   }
 }
@@ -4492,7 +6587,7 @@ function fixRect(rect, defaults) {
   return rect;
 }
 
-module.exports = {
+var restrictEdges = {
   init: init,
   noInner: noInner,
   noOuter: noOuter,
@@ -4509,10 +6604,30 @@ module.exports = {
   }
 };
 
-},{"../utils/extend":40,"../utils/rect":50,"./restrict":21}],23:[function(_dereq_,module,exports){
+exports.default = restrictEdges;
+
+},{"../utils/extend":126,"../utils/rect":136,"./restrict":107}],109:[function(_dereq_,module,exports){
 'use strict';
 
-// This module adds the options.resize.restrictSize setting which sets min and
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _rect = _dereq_('../utils/rect');
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _restrictEdges = _dereq_('./restrictEdges');
+
+var _restrictEdges2 = _interopRequireDefault(_restrictEdges);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var noMin = { width: -Infinity, height: -Infinity }; // This module adds the options.resize.restrictSize setting which sets min and
 // max width and height for the target being resized.
 //
 // interact(target).resize({
@@ -4523,31 +6638,23 @@ module.exports = {
 //   },
 // });
 
-var extend = _dereq_('../utils/extend');
-var rectUtils = _dereq_('../utils/rect');
-var restrictEdges = _dereq_('./restrictEdges');
-
-var noMin = { width: -Infinity, height: -Infinity };
 var noMax = { width: +Infinity, height: +Infinity };
 
 function init(scope) {
-  var actions = scope.actions,
-      modifiers = scope.modifiers,
+  var modifiers = scope.modifiers,
       defaults = scope.defaults;
-  var resize = actions.resize;
 
 
-  modifiers.restrictSize = module.exports;
+  modifiers.restrictSize = restrictSize;
   modifiers.names.push('restrictSize');
 
-  defaults.perAction.restrictSize = module.exports.defaults;
-  resize.defaults.restrictSize = module.exports.defaults;
+  defaults.perAction.restrictSize = restrictSize.defaults;
 }
 
 function setOffset(_ref) {
   var interaction = _ref.interaction;
 
-  return restrictEdges.setOffset({ interaction: interaction });
+  return _restrictEdges2.default.setOffset({ interaction: interaction });
 }
 
 function set(arg) {
@@ -4560,16 +6667,16 @@ function set(arg) {
     return;
   }
 
-  var rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted);
+  var rect = _rect2.default.xywhToTlbr(interaction.resizeRects.inverted);
 
-  var minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin;
-  var maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax;
+  var minSize = _rect2.default.tlbrToXywh(_restrictEdges2.default.getRestrictionRect(options.min, interaction)) || noMin;
+  var maxSize = _rect2.default.tlbrToXywh(_restrictEdges2.default.getRestrictionRect(options.max, interaction)) || noMax;
 
   arg.options = {
     enabled: options.enabled,
     endOnly: options.endOnly,
-    inner: extend({}, restrictEdges.noInner),
-    outer: extend({}, restrictEdges.noOuter)
+    inner: (0, _extend2.default)({}, _restrictEdges2.default.noInner),
+    outer: (0, _extend2.default)({}, _restrictEdges2.default.noOuter)
   };
 
   if (edges.top) {
@@ -4587,14 +6694,14 @@ function set(arg) {
     arg.options.outer.right = rect.left + maxSize.width;
   }
 
-  restrictEdges.set(arg);
+  _restrictEdges2.default.set(arg);
 }
 
-module.exports = {
+var restrictSize = {
   init: init,
   setOffset: setOffset,
   set: set,
-  modifyCoords: restrictEdges.modifyCoords,
+  modifyCoords: _restrictEdges2.default.modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
@@ -4603,20 +6710,30 @@ module.exports = {
   }
 };
 
-},{"../utils/extend":40,"../utils/rect":50,"./restrictEdges":22}],24:[function(_dereq_,module,exports){
+exports.default = restrictSize;
+
+},{"../utils/extend":126,"../utils/rect":136,"./restrictEdges":108}],110:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _utils = _dereq_('../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var modifiers = scope.modifiers,
       defaults = scope.defaults;
 
 
-  modifiers.snap = module.exports;
+  modifiers.snap = snap;
   modifiers.names.push('snap');
 
-  defaults.perAction.snap = module.exports.defaults;
+  defaults.perAction.snap = snap.defaults;
 }
 
 function setOffset(_ref) {
@@ -4704,7 +6821,7 @@ function set(_ref4) {
       _ref7 = options.targets[_i3];
       var snapTarget = _ref7;
 
-      if (utils.is.function(snapTarget)) {
+      if (utils.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction);
       } else {
         target = snapTarget;
@@ -4770,24 +6887,12 @@ function set(_ref4) {
     }
   }
 
-  var snapChanged = void 0;
+  status.modifiedX = closest.target.x;
+  status.modifiedY = closest.target.y;
 
-  if (closest.target) {
-    snapChanged = status.modifiedX !== closest.target.x || status.modifiedY !== closest.target.y;
+  status.delta.x = closest.dx;
+  status.delta.y = closest.dy;
 
-    status.modifiedX = closest.target.x;
-    status.modifiedY = closest.target.y;
-  } else {
-    snapChanged = true;
-
-    status.modifiedX = NaN;
-    status.modifiedY = NaN;
-  }
-
-  status.dx = closest.dx;
-  status.dy = closest.dy;
-
-  status.changed = snapChanged || closest.inRange && !status.locked;
   status.locked = closest.inRange;
 }
 
@@ -4803,10 +6908,10 @@ function modifyCoords(_ref8) {
   if (options && options.enabled && !(phase === 'start' && relativePoints && relativePoints.length)) {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
 
     return {
@@ -4816,13 +6921,13 @@ function modifyCoords(_ref8) {
       y: status.modifiedY,
       realX: status.realX,
       realY: status.realY,
-      dx: status.dx,
-      dy: status.dy
+      dx: status.delta.x,
+      dy: status.delta.y
     };
   }
 }
 
-module.exports = {
+var snap = {
   init: init,
   setOffset: setOffset,
   set: set,
@@ -4838,28 +6943,42 @@ module.exports = {
   }
 };
 
-},{"../utils":43}],25:[function(_dereq_,module,exports){
+exports.default = snap;
+
+},{"../utils":129}],111:[function(_dereq_,module,exports){
 'use strict';
 
-// This module allows snapping of the size of targets during resize
-// interactions.
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var extend = _dereq_('../utils/extend');
-var is = _dereq_('../utils/is');
-var snap = _dereq_('./snap');
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _is = _dereq_('../utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _snap = _dereq_('./snap');
+
+var _snap2 = _interopRequireDefault(_snap);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function init(scope) {
   var modifiers = scope.modifiers,
-      defaults = scope.defaults,
-      actions = scope.actions;
+      defaults = scope.defaults;
 
 
-  modifiers.snapSize = module.exports;
+  modifiers.snapSize = snapSize;
   modifiers.names.push('snapSize');
 
-  defaults.perAction.snapSize = module.exports.defaults;
-  actions.resize.defaults.snapSize = module.exports.defaults;
-}
+  defaults.perAction.snapSize = snapSize.defaults;
+} // This module allows snapping of the size of targets during resize
+// interactions.
 
 function setOffset(arg) {
   var interaction = arg.interaction,
@@ -4881,7 +7000,7 @@ function setOffset(arg) {
     range: options.range
   };
 
-  var offsets = snap.setOffset(arg);
+  var offsets = _snap2.default.setOffset(arg);
   arg.options = options;
 
   return offsets;
@@ -4893,11 +7012,11 @@ function set(arg) {
       offset = arg.offset,
       modifiedCoords = arg.modifiedCoords;
 
-  var page = extend({}, modifiedCoords);
+  var page = (0, _extend2.default)({}, modifiedCoords);
   var relativeX = page.x - offset[0].x;
   var relativeY = page.y - offset[0].y;
 
-  arg.options = extend({}, options);
+  arg.options = (0, _extend2.default)({}, options);
   arg.options.targets = [];
 
   for (var _i = 0; _i < (options.targets || []).length; _i++) {
@@ -4908,7 +7027,7 @@ function set(arg) {
 
     var target = void 0;
 
-    if (is.function(snapTarget)) {
+    if (is.func(snapTarget)) {
       target = snapTarget(relativeX, relativeY, interaction);
     } else {
       target = snapTarget;
@@ -4926,21 +7045,21 @@ function set(arg) {
     arg.options.targets.push(target);
   }
 
-  snap.set(arg);
+  _snap2.default.set(arg);
 }
 
 function modifyCoords(arg) {
   var options = arg.options;
 
 
-  arg.options = extend({}, options);
+  arg.options = (0, _extend2.default)({}, options);
   arg.options.enabled = options.enabled;
   arg.options.relativePoints = [null];
 
-  snap.modifyCoords(arg);
+  _snap2.default.modifyCoords(arg);
 }
 
-module.exports = {
+var snapSize = {
   init: init,
   setOffset: setOffset,
   set: set,
@@ -4954,22 +7073,34 @@ module.exports = {
   }
 };
 
-},{"../utils/extend":40,"../utils/is":45,"./snap":24}],26:[function(_dereq_,module,exports){
+exports.default = snapSize;
+
+},{"../utils/extend":126,"../utils/is":131,"./snap":110}],112:[function(_dereq_,module,exports){
 'use strict';
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var pointerUtils = _dereq_('../utils/pointerUtils');
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
 
-module.exports = function () {
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _pointerUtils = _dereq_('../utils/pointerUtils');
+
+var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var PointerEvent = function () {
   /** */
   function PointerEvent(type, pointer, event, eventTarget, interaction) {
-    _classCallCheck(this, PointerEvent);
+    (0, _classCallCheck3.default)(this, PointerEvent);
 
-    pointerUtils.pointerExtend(this, event);
+    _pointerUtils2.default.pointerExtend(this, event);
 
     if (event !== pointer) {
-      pointerUtils.pointerExtend(this, pointer);
+      _pointerUtils2.default.pointerExtend(this, pointer);
     }
 
     this.interaction = interaction;
@@ -4977,14 +7108,14 @@ module.exports = function () {
     this.timeStamp = new Date().getTime();
     this.originalEvent = event;
     this.type = type;
-    this.pointerId = pointerUtils.getPointerId(pointer);
-    this.pointerType = pointerUtils.getPointerType(pointer);
+    this.pointerId = _pointerUtils2.default.getPointerId(pointer);
+    this.pointerType = _pointerUtils2.default.getPointerType(pointer);
     this.target = eventTarget;
     this.currentTarget = null;
 
     if (type === 'tap') {
       var pointerIndex = interaction.getPointerIndex(pointer);
-      this.dt = this.timeStamp - interaction.downTimes[pointerIndex];
+      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
 
       var interval = this.timeStamp - interaction.tapTime;
 
@@ -5042,20 +7173,35 @@ module.exports = function () {
   return PointerEvent;
 }();
 
-},{"../utils/pointerUtils":48}],27:[function(_dereq_,module,exports){
+exports.default = PointerEvent;
+
+},{"../utils/pointerUtils":134,"babel-runtime/helpers/classCallCheck":7}],113:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('../utils');
-var PointerEvent = _dereq_('./PointerEvent');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var signals = utils.Signals.new();
+var _utils = _dereq_('../utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _PointerEvent = _dereq_('./PointerEvent');
+
+var _PointerEvent2 = _interopRequireDefault(_PointerEvent);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var signals = new utils.Signals();
 var simpleSignals = ['down', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'cancel'];
 
-var pointerEvents = module.exports = {
+var pointerEvents = {
   init: init,
   signals: signals,
-  PointerEvent: PointerEvent,
+  PointerEvent: _PointerEvent2.default,
   fire: fire,
   collectEventTargets: collectEventTargets,
   createSignalListener: createSignalListener,
@@ -5078,7 +7224,7 @@ function fire(arg) {
       _arg$targets = arg.targets,
       targets = _arg$targets === undefined ? collectEventTargets(arg) : _arg$targets,
       _arg$pointerEvent = arg.pointerEvent,
-      pointerEvent = _arg$pointerEvent === undefined ? new PointerEvent(type, pointer, event, eventTarget, interaction) : _arg$pointerEvent;
+      pointerEvent = _arg$pointerEvent === undefined ? new _PointerEvent2.default(type, pointer, event, eventTarget, interaction) : _arg$pointerEvent;
 
 
   var signalArg = {
@@ -5138,11 +7284,12 @@ function collectEventTargets(_ref) {
       type = _ref.type;
 
   var pointerIndex = interaction.getPointerIndex(pointer);
+  var pointerInfo = interaction.pointers[pointerIndex];
 
   // do not fire a tap event if the pointer was moved before being lifted
   if (type === 'tap' && (interaction.pointerWasMoved
   // or if the pointerup target is different to the pointerdown target
-  || !(interaction.downTargets[pointerIndex] && interaction.downTargets[pointerIndex] === eventTarget))) {
+  || !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
     return [];
   }
 
@@ -5179,33 +7326,33 @@ function collectEventTargets(_ref) {
 }
 
 function init(scope) {
-  var Interaction = scope.Interaction;
+  var interactions = scope.interactions;
 
 
   scope.pointerEvents = pointerEvents;
   scope.defaults.pointerEvents = pointerEvents.defaults;
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.prevTap = null; // the most recent tap event on this interaction
     interaction.tapTime = 0; // time of the most recent tap event
     interaction.holdTimers = []; // [{ duration, timeout }]
   });
 
-  Interaction.signals.on('update-pointer-down', function (_ref3) {
+  interactions.signals.on('update-pointer-down', function (_ref3) {
     var interaction = _ref3.interaction,
         pointerIndex = _ref3.pointerIndex;
 
     interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
   });
 
-  Interaction.signals.on('remove-pointer', function (_ref4) {
+  interactions.signals.on('remove-pointer', function (_ref4) {
     var interaction = _ref4.interaction,
         pointerIndex = _ref4.pointerIndex;
 
     interaction.holdTimers.splice(pointerIndex, 1);
   });
 
-  Interaction.signals.on('move', function (_ref5) {
+  interactions.signals.on('move', function (_ref5) {
     var interaction = _ref5.interaction,
         pointer = _ref5.pointer,
         event = _ref5.event,
@@ -5226,7 +7373,7 @@ function init(scope) {
     }
   });
 
-  Interaction.signals.on('down', function (_ref6) {
+  interactions.signals.on('down', function (_ref6) {
     var interaction = _ref6.interaction,
         pointer = _ref6.pointer,
         event = _ref6.event,
@@ -5288,7 +7435,7 @@ function init(scope) {
     }, minDuration);
   });
 
-  Interaction.signals.on('up', function (_ref9) {
+  interactions.signals.on('up', function (_ref9) {
     var interaction = _ref9.interaction,
         pointer = _ref9.pointer,
         event = _ref9.event,
@@ -5302,7 +7449,7 @@ function init(scope) {
   var _arr = ['up', 'cancel'];
   for (var _i4 = 0; _i4 < _arr.length; _i4++) {
     var signalName = _arr[_i4];
-    Interaction.signals.on(signalName, function (_ref10) {
+    interactions.signals.on(signalName, function (_ref10) {
       var interaction = _ref10.interaction,
           pointerIndex = _ref10.pointerIndex;
 
@@ -5313,7 +7460,7 @@ function init(scope) {
   }
 
   for (var i = 0; i < simpleSignals.length; i++) {
-    Interaction.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
+    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
   }
 }
 
@@ -5328,16 +7475,17 @@ function createSignalListener(type) {
   };
 }
 
-},{"../utils":43,"./PointerEvent":26}],28:[function(_dereq_,module,exports){
+exports.default = pointerEvents;
+
+},{"../utils":129,"./PointerEvent":112}],114:[function(_dereq_,module,exports){
 'use strict';
 
-var holdRepeat = {
-  init: init
-};
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 function init(scope) {
   var pointerEvents = scope.pointerEvents,
-      Interaction = scope.Interaction;
+      interactions = scope.interactions;
 
 
   pointerEvents.signals.on('new', onNew);
@@ -5348,14 +7496,12 @@ function init(scope) {
   var _arr = ['move', 'up', 'cancel', 'endall'];
   for (var _i = 0; _i < _arr.length; _i++) {
     var signal = _arr[_i];
-    Interaction.signals.on(signal, endHoldRepeat);
+    interactions.signals.on(signal, endHoldRepeat);
   }
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0;
   pointerEvents.types.push('holdrepeat');
-
-  pointerEvents.holdRepeat = holdRepeat;
 }
 
 function onNew(_ref) {
@@ -5409,20 +7555,69 @@ function endHoldRepeat(_ref3) {
   }
 }
 
-module.exports = holdRepeat;
+exports.default = {
+  init: init
+};
 
-},{}],29:[function(_dereq_,module,exports){
+},{}],115:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../utils/is');
-var extend = _dereq_('../utils/extend');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = exports.interactableTargets = exports.holdRepeat = exports.pointerEvents = undefined;
 
-var _require = _dereq_('../utils/arr'),
-    merge = _require.merge;
+var _base = _dereq_('./base');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _holdRepeat = _dereq_('./holdRepeat');
+
+var _holdRepeat2 = _interopRequireDefault(_holdRepeat);
+
+var _interactableTargets = _dereq_('./interactableTargets');
+
+var _interactableTargets2 = _interopRequireDefault(_interactableTargets);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  _base2.default.init(scope);
+  _holdRepeat2.default.init(scope);
+  _interactableTargets2.default.init(scope);
+}
+
+exports.pointerEvents = _base2.default;
+exports.holdRepeat = _holdRepeat2.default;
+exports.interactableTargets = _interactableTargets2.default;
+exports.init = init;
+
+},{"./base":113,"./holdRepeat":114,"./interactableTargets":116}],116:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _is = _dereq_('../utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _extend = _dereq_('../utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _arr = _dereq_('../utils/arr');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function init(scope) {
   var pointerEvents = scope.pointerEvents,
-      Interactable = scope.Interactable;
+      actions = scope.actions,
+      Interactable = scope.Interactable,
+      interactables = scope.interactables;
 
 
   pointerEvents.signals.on('collect-targets', function (_ref) {
@@ -5446,7 +7641,7 @@ function init(scope) {
     });
   });
 
-  Interactable.signals.on('new', function (_ref2) {
+  interactables.signals.on('new', function (_ref2) {
     var interactable = _ref2.interactable;
 
     interactable.events.getRect = function (element) {
@@ -5454,18 +7649,18 @@ function init(scope) {
     };
   });
 
-  Interactable.signals.on('set', function (_ref3) {
+  interactables.signals.on('set', function (_ref3) {
     var interactable = _ref3.interactable,
         options = _ref3.options;
 
-    extend(interactable.events.options, pointerEvents.defaults);
-    extend(interactable.events.options, options);
+    (0, _extend2.default)(interactable.events.options, pointerEvents.defaults);
+    (0, _extend2.default)(interactable.events.options, options);
   });
 
-  merge(Interactable.eventTypes, pointerEvents.types);
+  (0, _arr.merge)(actions.eventTypes, pointerEvents.types);
 
   Interactable.prototype.pointerEvents = function (options) {
-    extend(this.events.options, options);
+    (0, _extend2.default)(this.events.options, options);
 
     return this;
   };
@@ -5481,38 +7676,198 @@ function init(scope) {
 
     return ret;
   };
-
-  Interactable.settingsMethods.push('pointerEvents');
 }
 
-module.exports = {
+exports.default = {
   init: init
 };
 
-},{"../utils/arr":34,"../utils/extend":40,"../utils/is":45}],30:[function(_dereq_,module,exports){
+},{"../utils/arr":120,"../utils/extend":126,"../utils/is":131}],117:[function(_dereq_,module,exports){
 'use strict';
 
-var Eventable = _dereq_('./Eventable');
-var defaults = _dereq_('./defaultOptions');
-var utils = _dereq_('./utils');
-var browser = _dereq_('./utils/browser');
-var events = _dereq_('./utils/events');
-var Signals = _dereq_('./utils/Signals');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = init;
 
-var _require = _dereq_('./utils/window'),
-    getWindow = _require.getWindow;
+var _interactions = _dereq_('./interactions');
 
-var scope = {
+var _utils = _dereq_('./utils');
+
+function init(scope) {
+  var actions = scope.actions,
+      interactions = scope.interactions,
+      Interactable = scope.Interactable;
+
+  // add action reflow event types
+
+  for (var _i = 0; _i < actions.names.length; _i++) {
+    var _ref;
+
+    _ref = actions.names[_i];
+    var actionName = _ref;
+
+    actions.eventTypes.push(actionName + 'reflow');
+  }
+
+  // remove completed reflow interactions
+  interactions.signals.on('stop', function (_ref2) {
+    var interaction = _ref2.interaction;
+
+    if (interaction.pointerType === 'reflow') {
+      _utils.arr.remove(scope.interactions.list, interaction);
+    }
+  });
+
+  /**
+   * ```js
+   * const interactable = interact(target);
+   * const drag = { name: drag, axis: 'x' };
+   * const resize = { name: resize, edges: { left: true, bottom: true };
+   *
+   * interactable.reflow(drag);
+   * interactable.reflow(resize);
+   * ```
+   *
+   * Start an action sequence to re-apply modifiers, check drops, etc.
+   *
+   * @param { Object } action The action to begin
+   * @param { string } action.name The name of the action
+   */
+  Interactable.prototype.reflow = function (action) {
+    return reflow(this, action, scope);
+  };
+}
+
+function reflow(interactable, action, scope) {
+  var elements = _utils.is.string(interactable.target) ? _utils.arr.from(interactable._context.querySelectorAll(interactable.target)) : [interactable.target];
+
+  // follow autoStart max interaction settings
+  if (scope.autoStart) {
+    elements = elements.filter(function (element) {
+      return scope.autoStart.withinInteractionLimit(interactable, element, action, scope);
+    });
+  }
+
+  for (var _i2 = 0; _i2 < elements.length; _i2++) {
+    var _ref3;
+
+    _ref3 = elements[_i2];
+    var element = _ref3;
+
+    var interaction = (0, _interactions.newInteraction)({ pointerType: 'reflow' }, scope);
+
+    var rect = interactable.getRect(element);
+
+    if (!rect) {
+      break;
+    }
+
+    var xywh = _utils.rect.tlbrToXywh(rect);
+    var coords = {
+      page: xywh,
+      client: xywh
+    };
+    var event = (0, _utils.extend)(_utils.pointer.coordsToEvent(coords), coords);
+    var signalArg = {
+      interaction: interaction,
+      event: event,
+      pointer: event,
+      eventTarget: element,
+      phase: 'reflow'
+    };
+
+    interaction.target = interactable;
+    interaction.element = element;
+    interaction.prepared = (0, _utils.extend)({}, action);
+    interaction.prevEvent = event;
+    interaction.updatePointer(event, event, element, true);
+
+    interaction._doPhase(signalArg);
+
+    signalArg.phase = 'start';
+    interaction._interacting = interaction._doPhase(signalArg);
+
+    if (interaction._interacting) {
+      interaction.move(signalArg);
+      interaction.end(event);
+    } else {
+      interaction.stop();
+    }
+
+    interaction.removePointer(event, event);
+    interaction.pointerIsDown = false;
+  }
+}
+
+exports.default = { init: init };
+
+},{"./interactions":104,"./utils":129}],118:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.scope = undefined;
+
+var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _possibleConstructorReturn2 = _dereq_('babel-runtime/helpers/possibleConstructorReturn');
+
+var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+var _inherits2 = _dereq_('babel-runtime/helpers/inherits');
+
+var _inherits3 = _interopRequireDefault(_inherits2);
+
+exports.init = init;
+
+var _Eventable = _dereq_('./Eventable');
+
+var _Eventable2 = _interopRequireDefault(_Eventable);
+
+var _defaultOptions = _dereq_('./defaultOptions');
+
+var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
+
+var _utils = _dereq_('./utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _domObjects = _dereq_('./utils/domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+var _InteractEvent = _dereq_('./InteractEvent');
+
+var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
+
+var _Interactable2 = _dereq_('./Interactable');
+
+var _Interactable3 = _interopRequireDefault(_Interactable2);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var win = utils.win,
+    browser = utils.browser,
+    raf = utils.raf,
+    Signals = utils.Signals,
+    events = utils.events;
+var scope = exports.scope = {
   Signals: Signals,
   signals: new Signals(),
   browser: browser,
   events: events,
   utils: utils,
-  defaults: defaults,
-  Eventable: Eventable,
+  defaults: _defaultOptions2.default,
+  Eventable: _Eventable2.default,
 
   // main document
-  document: _dereq_('./utils/domObjects').document,
+  document: null,
   // all documents being listened to
   documents: [/* { doc, options } */],
 
@@ -5522,7 +7877,7 @@ var scope = {
       return false;
     }
 
-    var win = getWindow(doc);
+    var window = win.getWindow(doc);
 
     scope.documents.push({ doc: doc, options: options });
     events.documents.push(doc);
@@ -5530,23 +7885,23 @@ var scope = {
     // don't add an unload event for the main document
     // so that the page may be cached in browser history
     if (doc !== scope.document) {
-      events.add(win, 'unload', scope.onWindowUnload);
+      events.add(window, 'unload', scope.onWindowUnload);
     }
 
-    scope.signals.fire('add-document', { doc: doc, win: win, scope: scope, options: options });
+    scope.signals.fire('add-document', { doc: doc, window: window, scope: scope, options: options });
   },
   removeDocument: function removeDocument(doc) {
     var index = scope.getDocIndex(doc);
 
-    var win = getWindow(doc);
+    var window = win.getWindow(doc);
     var options = scope.documents[index].options;
 
-    events.remove(win, 'unload', scope.onWindowUnload);
+    events.remove(window, 'unload', scope.onWindowUnload);
 
     scope.documents.splice(index, 1);
     events.documents.splice(index, 1);
 
-    scope.signals.fire('remove-document', { doc: doc, win: win, scope: scope, options: options });
+    scope.signals.fire('remove-document', { doc: doc, window: window, scope: scope, options: options });
   },
   onWindowUnload: function onWindowUnload(event) {
     scope.removeDocument(event.target.document);
@@ -5562,363 +7917,44 @@ var scope = {
   }
 };
 
-module.exports = scope;
-
-},{"./Eventable":2,"./defaultOptions":15,"./utils":43,"./utils/Signals":33,"./utils/browser":35,"./utils/domObjects":37,"./utils/events":39,"./utils/window":53}],31:[function(_dereq_,module,exports){
-'use strict';
-
-function init(scope) {
-  var Interaction = scope.Interaction;
-
-
-  Interaction.signals.on('new', function (interaction) {
-    interaction.simulations = {};
-  });
-}
-
-module.exports = {
-  init: init
-};
-
-},{}],32:[function(_dereq_,module,exports){
-'use strict';
-
-var modifiers = _dereq_('../modifiers/base');
-var utils = _dereq_('../utils');
-var raf = _dereq_('../utils/raf');
-
-function init(scope) {
-  var Interaction = scope.Interaction,
-      defaults = scope.defaults;
-
-
-  Interaction.signals.on('new', function (interaction) {
-    interaction.simulations.inertia = {
-      active: false,
-      smoothEnd: false,
-      allowResume: false,
-
-      startEvent: null,
-      upCoords: {},
-
-      xe: 0, ye: 0,
-      sx: 0, sy: 0,
-
-      t0: 0,
-      vx0: 0, vys: 0,
-      duration: 0,
-
-      lambda_v0: 0,
-      one_ve_v0: 0,
-      i: null
-    };
-  });
-
-  Interaction.signals.on('up', function (arg) {
-    return release(arg, scope);
-  });
-  Interaction.signals.on('down', function (arg) {
-    return resume(arg, scope);
-  });
-  Interaction.signals.on('stop', function (arg) {
-    return stop(arg, scope);
-  });
-
-  defaults.perAction.inertia = {
-    enabled: false,
-    resistance: 10, // the lambda in exponential decay
-    minSpeed: 100, // target speed must be above this for inertia to start
-    endSpeed: 10, // the speed at which inertia is slow enough to stop
-    allowResume: true, // allow resuming an action in inertia phase
-    smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
-  };
-}
-
-function resume(_ref, scope) {
-  var interaction = _ref.interaction,
-      event = _ref.event,
-      pointer = _ref.pointer,
-      eventTarget = _ref.eventTarget;
-
-  var status = interaction.simulations.inertia;
-
-  // Check if the down event hits the current inertia target
-  if (status.active) {
-    var element = eventTarget;
-
-    // climb up the DOM tree from the event target
-    while (utils.is.element(element)) {
-
-      // if interaction element is the current inertia target element
-      if (element === interaction.element) {
-        // stop inertia
-        raf.cancel(status.i);
-        status.active = false;
-        interaction.simulation = null;
-
-        // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer, event, eventTarget, true);
-        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
-
-        // fire appropriate signals
-        var signalArg = {
-          interaction: interaction
-        };
-
-        scope.Interaction.signals.fire('action-resume', signalArg);
-
-        // fire a reume event
-        var resumeEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
-
-        interaction.target.fire(resumeEvent);
-        interaction.prevEvent = resumeEvent;
-        modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
-
-        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
-        break;
-      }
-
-      element = utils.dom.parentNode(element);
-    }
-  }
-}
-
-function release(_ref2, scope) {
-  var interaction = _ref2.interaction,
-      event = _ref2.event;
-
-  var status = interaction.simulations.inertia;
-
-  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
-    return;
-  }
-
-  var options = getOptions(interaction);
-
-  var now = new Date().getTime();
-  var pointerSpeed = interaction.pointerDelta.client.speed;
-
-  var smoothEnd = false;
-  var modifierResult = void 0;
-
-  // check if inertia should be started
-  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
-
-  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
-
-  var modifierArg = {
-    interaction: interaction,
-    pageCoords: utils.extend({}, interaction.curCoords.page),
-    statuses: {},
-    preEnd: true,
-    requireEndOnly: true
-  };
-
-  // smoothEnd
-  if (inertiaPossible && !inertia) {
-    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
-
-    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
-
-    if (modifierResult.shouldMove && modifierResult.locked) {
-      smoothEnd = true;
-    }
-  }
-
-  if (!(inertia || smoothEnd)) {
-    return;
-  }
-
-  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
-
-  interaction.pointers[0] = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
-
-  status.t0 = now;
-
-  status.active = true;
-  status.allowResume = options.allowResume;
-  interaction.simulation = status;
-
-  interaction.target.fire(status.startEvent);
-
-  if (inertia) {
-    status.vx0 = interaction.pointerDelta.client.vx;
-    status.vy0 = interaction.pointerDelta.client.vy;
-    status.v0 = pointerSpeed;
-
-    calcInertia(interaction, status);
-
-    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
-
-    modifierArg.pageCoords.x += status.xe;
-    modifierArg.pageCoords.y += status.ye;
-
-    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
-
-    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
-
-    status.modifiedXe += modifierResult.dx;
-    status.modifiedYe += modifierResult.dy;
-
-    status.i = raf.request(function () {
-      return inertiaTick(interaction);
-    });
-  } else {
-    status.smoothEnd = true;
-    status.xe = modifierResult.dx;
-    status.ye = modifierResult.dy;
-
-    status.sx = status.sy = 0;
-
-    status.i = raf.request(function () {
-      return smothEndTick(interaction);
-    });
-  }
-}
-
-function stop(_ref3) {
-  var interaction = _ref3.interaction;
-
-  var status = interaction.simulations.inertia;
-
-  if (status.active) {
-    raf.cancel(status.i);
-    status.active = false;
-    interaction.simulation = null;
-  }
-}
-
-function calcInertia(interaction, status) {
-  var options = getOptions(interaction);
-  var lambda = options.resistance;
-  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
-
-  status.x0 = interaction.prevEvent.pageX;
-  status.y0 = interaction.prevEvent.pageY;
-  status.t0 = status.startEvent.timeStamp / 1000;
-  status.sx = status.sy = 0;
-
-  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-  status.te = inertiaDur;
-
-  status.lambda_v0 = lambda / status.v0;
-  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
-}
-
-function inertiaTick(interaction) {
-  updateInertiaCoords(interaction);
-  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
-
-  var status = interaction.simulations.inertia;
-  var options = getOptions(interaction);
-  var lambda = options.resistance;
-  var t = new Date().getTime() / 1000 - status.t0;
-
-  if (t < status.te) {
-
-    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
-
-    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
-      status.sx = status.xe * progress;
-      status.sy = status.ye * progress;
-    } else {
-      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
-
-      status.sx = quadPoint.x;
-      status.sy = quadPoint.y;
+function init(window) {
+  win.init(window);
+  _domObjects2.default.init(window);
+  browser.init(window);
+  raf.init(window);
+
+  scope.document = window.document;
+
+  scope.InteractEvent = _InteractEvent2.default;
+  // eslint-disable-next-line no-shadow
+  scope.Interactable = function (_Interactable) {
+    (0, _inherits3.default)(Interactable, _Interactable);
+
+    function Interactable() {
+      (0, _classCallCheck3.default)(this, Interactable);
+      return (0, _possibleConstructorReturn3.default)(this, _Interactable.apply(this, arguments));
     }
 
-    interaction.doMove();
-
-    status.i = raf.request(function () {
-      return inertiaTick(interaction);
-    });
-  } else {
-    status.sx = status.modifiedXe;
-    status.sy = status.modifiedYe;
-
-    interaction.doMove();
-    interaction.end(status.startEvent);
-    status.active = false;
-    interaction.simulation = null;
-  }
-
-  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+    return Interactable;
+  }(_Interactable3.default);
 }
 
-function smothEndTick(interaction) {
-  updateInertiaCoords(interaction);
-
-  var status = interaction.simulations.inertia;
-  var t = new Date().getTime() - status.t0;
-
-  var _getOptions = getOptions(interaction),
-      duration = _getOptions.smoothEndDuration;
-
-  if (t < duration) {
-    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
-    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
-
-    interaction.doMove();
-
-    status.i = raf.request(function () {
-      return smothEndTick(interaction);
-    });
-  } else {
-    status.sx = status.xe;
-    status.sy = status.ye;
-
-    interaction.doMove();
-    interaction.end(status.startEvent);
-
-    status.smoothEnd = status.active = false;
-    interaction.simulation = null;
-  }
-}
-
-function updateInertiaCoords(interaction) {
-  var status = interaction.simulations.inertia;
-
-  // return if inertia isn't running
-  if (!status.active) {
-    return;
-  }
-
-  var pageUp = status.upCoords.page;
-  var clientUp = status.upCoords.client;
-
-  utils.pointer.setCoords(interaction.curCoords, [{
-    pageX: pageUp.x + status.sx,
-    pageY: pageUp.y + status.sy,
-    clientX: clientUp.x + status.sx,
-    clientY: clientUp.y + status.sy
-  }]);
-}
-
-function getOptions(_ref4) {
-  var target = _ref4.target,
-      prepared = _ref4.prepared;
-
-  return target && target.options && prepared.name && target.options[prepared.name].inertia;
-}
-
-module.exports = {
-  init: init,
-  calcInertia: calcInertia,
-  inertiaTick: inertiaTick,
-  smothEndTick: smothEndTick,
-  updateInertiaCoords: updateInertiaCoords
-};
-
-},{"../modifiers/base":20,"../utils":43,"../utils/raf":49}],33:[function(_dereq_,module,exports){
+},{"./Eventable":83,"./InteractEvent":84,"./Interactable":85,"./defaultOptions":99,"./utils":129,"./utils/domObjects":123,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/inherits":9,"babel-runtime/helpers/possibleConstructorReturn":10}],119:[function(_dereq_,module,exports){
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _classCallCheck2 = _dereq_("babel-runtime/helpers/classCallCheck");
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Signals = function () {
   function Signals() {
-    _classCallCheck(this, Signals);
+    (0, _classCallCheck3.default)(this, Signals);
 
     this.listeners = {
       // signalName: [listeners],
@@ -5968,17 +8004,27 @@ var Signals = function () {
   return Signals;
 }();
 
-Signals.new = function () {
-  return new Signals();
-};
+exports.default = Signals;
 
-module.exports = Signals;
-
-},{}],34:[function(_dereq_,module,exports){
+},{"babel-runtime/helpers/classCallCheck":7}],120:[function(_dereq_,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.contains = contains;
+exports.remove = remove;
+exports.merge = merge;
+exports.from = from;
+exports.findIndex = findIndex;
+exports.find = find;
+exports.some = some;
 function contains(array, target) {
   return array.indexOf(target) !== -1;
+}
+
+function remove(array, target) {
+  return array.splice(array.indexOf(target), 1);
 }
 
 function merge(target, source) {
@@ -5995,45 +8041,78 @@ function merge(target, source) {
 }
 
 function from(source) {
-  return module.exports.merge([], source);
+  return merge([], source);
 }
 
-module.exports = {
-  contains: contains,
-  merge: merge,
-  from: from
-};
+function findIndex(array, func) {
+  for (var i = 0; i < array.length; i++) {
+    if (func(array[i], i, array)) {
+      return i;
+    }
+  }
 
-},{}],35:[function(_dereq_,module,exports){
+  return -1;
+}
+
+function find(array, func) {
+  return array[findIndex(array, func)];
+}
+
+function some(array, func) {
+  return findIndex(array, func) !== -1;
+}
+
+},{}],121:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = _dereq_('./window'),
-    window = _require.window;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var is = _dereq_('./is');
-var domObjects = _dereq_('./domObjects');
+var _window = _dereq_('./window');
 
-var Element = domObjects.Element;
-var navigator = window.navigator;
+var _window2 = _interopRequireDefault(_window);
+
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _domObjects = _dereq_('./domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var browser = {
+  init: init
+};
+
+exports.default = browser;
+
+
+function init(window) {
+  var Element = _domObjects2.default.Element;
+  var navigator = _window2.default.window.navigator;
+
   // Does the browser support touch input?
-  supportsTouch: !!('ontouchstart' in window || is.function(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch),
+  browser.supportsTouch = !!('ontouchstart' in window || is.func(window.DocumentTouch) && _domObjects2.default.document instanceof window.DocumentTouch);
 
   // Does the browser support PointerEvents
-  supportsPointerEvent: !!domObjects.PointerEvent,
+  browser.supportsPointerEvent = !!_domObjects2.default.PointerEvent;
 
-  isIOS: /iP(hone|od|ad)/.test(navigator.platform),
+  browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform);
 
   // scrolling doesn't change the result of getClientRects on iOS 7
-  isIOS7: /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion),
+  browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion);
 
-  isIe9: /MSIE 9/.test(navigator.userAgent),
+  browser.isIe9 = /MSIE 9/.test(navigator.userAgent);
 
   // prefix matchesSelector
-  prefixedMatchesSelector: 'matches' in Element.prototype ? 'matches' : 'webkitMatchesSelector' in Element.prototype ? 'webkitMatchesSelector' : 'mozMatchesSelector' in Element.prototype ? 'mozMatchesSelector' : 'oMatchesSelector' in Element.prototype ? 'oMatchesSelector' : 'msMatchesSelector',
+  browser.prefixedMatchesSelector = 'matches' in Element.prototype ? 'matches' : 'webkitMatchesSelector' in Element.prototype ? 'webkitMatchesSelector' : 'mozMatchesSelector' in Element.prototype ? 'mozMatchesSelector' : 'oMatchesSelector' in Element.prototype ? 'oMatchesSelector' : 'msMatchesSelector';
 
-  pEventTypes: domObjects.PointerEvent ? domObjects.PointerEvent === window.MSPointerEvent ? {
+  browser.pEventTypes = _domObjects2.default.PointerEvent ? _domObjects2.default.PointerEvent === window.MSPointerEvent ? {
     up: 'MSPointerUp',
     down: 'MSPointerDown',
     over: 'mouseover',
@@ -6047,302 +8126,367 @@ var browser = {
     out: 'pointerout',
     move: 'pointermove',
     cancel: 'pointercancel'
-  } : null,
+  } : null;
 
   // because Webkit and Opera still use 'mousewheel' event type
-  wheelEvent: 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel'
+  browser.wheelEvent = 'onmousewheel' in _domObjects2.default.document ? 'mousewheel' : 'wheel';
 
-};
+  // Opera Mobile must be handled differently
+  browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto');
+}
 
-// Opera Mobile must be handled differently
-browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto');
-
-module.exports = browser;
-
-},{"./domObjects":37,"./is":45,"./window":53}],36:[function(_dereq_,module,exports){
+},{"./domObjects":123,"./is":131,"./window":139}],122:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('./is');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = clone;
 
-module.exports = function clone(source) {
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _arr = _dereq_('./arr');
+
+var arr = _interopRequireWildcard(_arr);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function clone(source) {
   var dest = {};
+
   for (var prop in source) {
-    if (is.plainObject(source[prop])) {
-      dest[prop] = clone(source[prop]);
+    var value = source[prop];
+
+    if (is.plainObject(value)) {
+      dest[prop] = clone(value);
+    } else if (is.array(value)) {
+      dest[prop] = arr.from(value);
     } else {
-      dest[prop] = source[prop];
+      dest[prop] = value;
     }
   }
+
   return dest;
+}
+
+},{"./arr":120,"./is":131}],123:[function(_dereq_,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var domObjects = {
+  init: init
 };
-
-},{"./is":45}],37:[function(_dereq_,module,exports){
-'use strict';
-
-var domObjects = {};
-var win = _dereq_('./window').window;
 
 function blank() {}
 
-domObjects.document = win.document;
-domObjects.DocumentFragment = win.DocumentFragment || blank;
-domObjects.SVGElement = win.SVGElement || blank;
-domObjects.SVGSVGElement = win.SVGSVGElement || blank;
-domObjects.SVGElementInstance = win.SVGElementInstance || blank;
-domObjects.Element = win.Element || blank;
-domObjects.HTMLElement = win.HTMLElement || domObjects.Element;
+exports.default = domObjects;
 
-domObjects.Event = win.Event;
-domObjects.Touch = win.Touch || blank;
-domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 
-module.exports = domObjects;
+function init(window) {
+  domObjects.document = window.document;
+  domObjects.DocumentFragment = window.DocumentFragment || blank;
+  domObjects.SVGElement = window.SVGElement || blank;
+  domObjects.SVGSVGElement = window.SVGSVGElement || blank;
+  domObjects.SVGElementInstance = window.SVGElementInstance || blank;
+  domObjects.Element = window.Element || blank;
+  domObjects.HTMLElement = window.HTMLElement || domObjects.Element;
 
-},{"./window":53}],38:[function(_dereq_,module,exports){
+  domObjects.Event = window.Event;
+  domObjects.Touch = window.Touch || blank;
+  domObjects.PointerEvent = window.PointerEvent || window.MSPointerEvent;
+}
+
+},{}],124:[function(_dereq_,module,exports){
 'use strict';
 
-var win = _dereq_('./window');
-var browser = _dereq_('./browser');
-var is = _dereq_('./is');
-var domObjects = _dereq_('./domObjects');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.nodeContains = nodeContains;
+exports.closest = closest;
+exports.parentNode = parentNode;
+exports.matchesSelector = matchesSelector;
+exports.indexOfDeepestElement = indexOfDeepestElement;
+exports.matchesUpTo = matchesUpTo;
+exports.getActualElement = getActualElement;
+exports.getScrollXY = getScrollXY;
+exports.getElementClientRect = getElementClientRect;
+exports.getElementRect = getElementRect;
+exports.getPath = getPath;
+exports.trySelector = trySelector;
 
-var domUtils = {
-  nodeContains: function nodeContains(parent, child) {
-    while (child) {
-      if (child === parent) {
-        return true;
-      }
+var _window = _dereq_('./window');
 
-      child = child.parentNode;
+var _window2 = _interopRequireDefault(_window);
+
+var _browser = _dereq_('./browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _domObjects = _dereq_('./domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function nodeContains(parent, child) {
+  while (child) {
+    if (child === parent) {
+      return true;
     }
 
-    return false;
-  },
+    child = child.parentNode;
+  }
 
-  closest: function closest(element, selector) {
-    while (is.element(element)) {
-      if (domUtils.matchesSelector(element, selector)) {
-        return element;
-      }
+  return false;
+}
 
-      element = domUtils.parentNode(element);
+function closest(element, selector) {
+  while (is.element(element)) {
+    if (matchesSelector(element, selector)) {
+      return element;
     }
 
-    return null;
-  },
+    element = parentNode(element);
+  }
 
-  parentNode: function parentNode(node) {
-    var parent = node.parentNode;
+  return null;
+}
 
-    if (is.docFrag(parent)) {
-      // skip past #shado-root fragments
-      while ((parent = parent.host) && is.docFrag(parent)) {
-        continue;
-      }
+function parentNode(node) {
+  var parent = node.parentNode;
 
-      return parent;
+  if (is.docFrag(parent)) {
+    // skip past #shado-root fragments
+    while ((parent = parent.host) && is.docFrag(parent)) {
+      continue;
     }
 
     return parent;
-  },
+  }
 
-  matchesSelector: function matchesSelector(element, selector) {
-    // remove /deep/ from selectors if shadowDOM polyfill is used
-    if (win.window !== win.realWindow) {
-      selector = selector.replace(/\/deep\//g, ' ');
+  return parent;
+}
+
+function matchesSelector(element, selector) {
+  // remove /deep/ from selectors if shadowDOM polyfill is used
+  if (_window2.default.window !== _window2.default.realWindow) {
+    selector = selector.replace(/\/deep\//g, ' ');
+  }
+
+  return element[_browser2.default.prefixedMatchesSelector](selector);
+}
+
+// Test for the element that's "above" all other qualifiers
+function indexOfDeepestElement(elements) {
+  var deepestZoneParents = [];
+  var dropzoneParents = [];
+  var dropzone = void 0;
+  var deepestZone = elements[0];
+  var index = deepestZone ? 0 : -1;
+  var parent = void 0;
+  var child = void 0;
+  var i = void 0;
+  var n = void 0;
+
+  for (i = 1; i < elements.length; i++) {
+    dropzone = elements[i];
+
+    // an element might belong to multiple selector dropzones
+    if (!dropzone || dropzone === deepestZone) {
+      continue;
     }
 
-    return element[browser.prefixedMatchesSelector](selector);
-  },
+    if (!deepestZone) {
+      deepestZone = dropzone;
+      index = i;
+      continue;
+    }
 
-  // Test for the element that's "above" all other qualifiers
-  indexOfDeepestElement: function indexOfDeepestElement(elements) {
-    var deepestZoneParents = [];
-    var dropzoneParents = [];
-    var dropzone = void 0;
-    var deepestZone = elements[0];
-    var index = deepestZone ? 0 : -1;
-    var parent = void 0;
-    var child = void 0;
-    var i = void 0;
-    var n = void 0;
-
-    for (i = 1; i < elements.length; i++) {
-      dropzone = elements[i];
-
-      // an element might belong to multiple selector dropzones
-      if (!dropzone || dropzone === deepestZone) {
-        continue;
-      }
-
-      if (!deepestZone) {
+    // check if the deepest or current are document.documentElement or document.rootElement
+    // - if the current dropzone is, do nothing and continue
+    if (dropzone.parentNode === dropzone.ownerDocument) {
+      continue;
+    }
+    // - if deepest is, update with the current dropzone and continue to next
+    else if (deepestZone.parentNode === dropzone.ownerDocument) {
         deepestZone = dropzone;
         index = i;
         continue;
       }
 
-      // check if the deepest or current are document.documentElement or document.rootElement
-      // - if the current dropzone is, do nothing and continue
-      if (dropzone.parentNode === dropzone.ownerDocument) {
-        continue;
-      }
-      // - if deepest is, update with the current dropzone and continue to next
-      else if (deepestZone.parentNode === dropzone.ownerDocument) {
-          deepestZone = dropzone;
-          index = i;
-          continue;
-        }
-
-      if (!deepestZoneParents.length) {
-        parent = deepestZone;
-        while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
-          deepestZoneParents.unshift(parent);
-          parent = parent.parentNode;
-        }
-      }
-
-      // if this element is an svg element and the current deepest is
-      // an HTMLElement
-      if (deepestZone instanceof domObjects.HTMLElement && dropzone instanceof domObjects.SVGElement && !(dropzone instanceof domObjects.SVGSVGElement)) {
-
-        if (dropzone === deepestZone.parentNode) {
-          continue;
-        }
-
-        parent = dropzone.ownerSVGElement;
-      } else {
-        parent = dropzone;
-      }
-
-      dropzoneParents = [];
-
-      while (parent.parentNode !== parent.ownerDocument) {
-        dropzoneParents.unshift(parent);
+    if (!deepestZoneParents.length) {
+      parent = deepestZone;
+      while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
+        deepestZoneParents.unshift(parent);
         parent = parent.parentNode;
       }
+    }
 
-      n = 0;
+    // if this element is an svg element and the current deepest is
+    // an HTMLElement
+    if (deepestZone instanceof _domObjects2.default.HTMLElement && dropzone instanceof _domObjects2.default.SVGElement && !(dropzone instanceof _domObjects2.default.SVGSVGElement)) {
 
-      // get (position of last common ancestor) + 1
-      while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
-        n++;
+      if (dropzone === deepestZone.parentNode) {
+        continue;
       }
 
-      var parents = [dropzoneParents[n - 1], dropzoneParents[n], deepestZoneParents[n]];
+      parent = dropzone.ownerSVGElement;
+    } else {
+      parent = dropzone;
+    }
 
-      child = parents[0].lastChild;
+    dropzoneParents = [];
 
-      while (child) {
-        if (child === parents[1]) {
-          deepestZone = dropzone;
-          index = i;
-          deepestZoneParents = [];
+    while (parent.parentNode !== parent.ownerDocument) {
+      dropzoneParents.unshift(parent);
+      parent = parent.parentNode;
+    }
 
-          break;
-        } else if (child === parents[2]) {
-          break;
-        }
+    n = 0;
 
-        child = child.previousSibling;
+    // get (position of last common ancestor) + 1
+    while (dropzoneParents[n] && dropzoneParents[n] === deepestZoneParents[n]) {
+      n++;
+    }
+
+    var parents = [dropzoneParents[n - 1], dropzoneParents[n], deepestZoneParents[n]];
+
+    child = parents[0].lastChild;
+
+    while (child) {
+      if (child === parents[1]) {
+        deepestZone = dropzone;
+        index = i;
+        deepestZoneParents = [];
+
+        break;
+      } else if (child === parents[2]) {
+        break;
       }
+
+      child = child.previousSibling;
     }
-
-    return index;
-  },
-
-  matchesUpTo: function matchesUpTo(element, selector, limit) {
-    while (is.element(element)) {
-      if (domUtils.matchesSelector(element, selector)) {
-        return true;
-      }
-
-      element = domUtils.parentNode(element);
-
-      if (element === limit) {
-        return domUtils.matchesSelector(element, selector);
-      }
-    }
-
-    return false;
-  },
-
-  getActualElement: function getActualElement(element) {
-    return element instanceof domObjects.SVGElementInstance ? element.correspondingUseElement : element;
-  },
-
-  getScrollXY: function getScrollXY(relevantWindow) {
-    relevantWindow = relevantWindow || win.window;
-    return {
-      x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
-      y: relevantWindow.scrollY || relevantWindow.document.documentElement.scrollTop
-    };
-  },
-
-  getElementClientRect: function getElementClientRect(element) {
-    var clientRect = element instanceof domObjects.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
-
-    return clientRect && {
-      left: clientRect.left,
-      right: clientRect.right,
-      top: clientRect.top,
-      bottom: clientRect.bottom,
-      width: clientRect.width || clientRect.right - clientRect.left,
-      height: clientRect.height || clientRect.bottom - clientRect.top
-    };
-  },
-
-  getElementRect: function getElementRect(element) {
-    var clientRect = domUtils.getElementClientRect(element);
-
-    if (!browser.isIOS7 && clientRect) {
-      var scroll = domUtils.getScrollXY(win.getWindow(element));
-
-      clientRect.left += scroll.x;
-      clientRect.right += scroll.x;
-      clientRect.top += scroll.y;
-      clientRect.bottom += scroll.y;
-    }
-
-    return clientRect;
-  },
-
-  getPath: function getPath(element) {
-    var path = [];
-
-    while (element) {
-      path.push(element);
-      element = domUtils.parentNode(element);
-    }
-
-    return path;
-  },
-
-  trySelector: function trySelector(value) {
-    if (!is.string(value)) {
-      return false;
-    }
-
-    // an exception will be raised if it is invalid
-    domObjects.document.querySelector(value);
-    return true;
   }
-};
 
-module.exports = domUtils;
+  return index;
+}
 
-},{"./browser":35,"./domObjects":37,"./is":45,"./window":53}],39:[function(_dereq_,module,exports){
+function matchesUpTo(element, selector, limit) {
+  while (is.element(element)) {
+    if (matchesSelector(element, selector)) {
+      return true;
+    }
+
+    element = parentNode(element);
+
+    if (element === limit) {
+      return matchesSelector(element, selector);
+    }
+  }
+
+  return false;
+}
+
+function getActualElement(element) {
+  return element instanceof _domObjects2.default.SVGElementInstance ? element.correspondingUseElement : element;
+}
+
+function getScrollXY(relevantWindow) {
+  relevantWindow = relevantWindow || _window2.default.window;
+  return {
+    x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
+    y: relevantWindow.scrollY || relevantWindow.document.documentElement.scrollTop
+  };
+}
+
+function getElementClientRect(element) {
+  var clientRect = element instanceof _domObjects2.default.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
+
+  return clientRect && {
+    left: clientRect.left,
+    right: clientRect.right,
+    top: clientRect.top,
+    bottom: clientRect.bottom,
+    width: clientRect.width || clientRect.right - clientRect.left,
+    height: clientRect.height || clientRect.bottom - clientRect.top
+  };
+}
+
+function getElementRect(element) {
+  var clientRect = getElementClientRect(element);
+
+  if (!_browser2.default.isIOS7 && clientRect) {
+    var scroll = getScrollXY(_window2.default.getWindow(element));
+
+    clientRect.left += scroll.x;
+    clientRect.right += scroll.x;
+    clientRect.top += scroll.y;
+    clientRect.bottom += scroll.y;
+  }
+
+  return clientRect;
+}
+
+function getPath(element) {
+  var path = [];
+
+  while (element) {
+    path.push(element);
+    element = parentNode(element);
+  }
+
+  return path;
+}
+
+function trySelector(value) {
+  if (!is.string(value)) {
+    return false;
+  }
+
+  // an exception will be raised if it is invalid
+  _domObjects2.default.document.querySelector(value);
+  return true;
+}
+
+},{"./browser":121,"./domObjects":123,"./is":131,"./window":139}],125:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('./is');
-var domUtils = _dereq_('./domUtils');
-var pointerUtils = _dereq_('./pointerUtils');
-var pExtend = _dereq_('./pointerExtend');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _require = _dereq_('./window'),
-    window = _require.window;
+var _is = _dereq_('./is');
 
-var _require2 = _dereq_('./arr'),
-    contains = _require2.contains;
+var is = _interopRequireWildcard(_is);
+
+var _domUtils = _dereq_('./domUtils');
+
+var domUtils = _interopRequireWildcard(_domUtils);
+
+var _pointerUtils = _dereq_('./pointerUtils');
+
+var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
+
+var _pointerExtend = _dereq_('./pointerExtend');
+
+var _pointerExtend2 = _interopRequireDefault(_pointerExtend);
+
+var _arr = _dereq_('./arr');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var elements = [];
 var targets = [];
@@ -6357,17 +8501,7 @@ var targets = [];
 var delegatedEvents = {};
 var documents = [];
 
-var supportsOptions = function () {
-  var supported = false;
-
-  window.document.createElement('div').addEventListener('test', null, {
-    get capture() {
-      supported = true;
-    }
-  });
-
-  return supported;
-}();
+var supportsOptions = void 0;
 
 function add(element, type, listener, optionalArg) {
   var options = getOptions(optionalArg);
@@ -6389,7 +8523,7 @@ function add(element, type, listener, optionalArg) {
     target.typeCount++;
   }
 
-  if (!contains(target.events[type], listener)) {
+  if (!(0, _arr.contains)(target.events[type], listener)) {
     element.addEventListener(type, listener, supportsOptions ? options : !!options.capture);
     target.events[type].push(listener);
   }
@@ -6549,13 +8683,13 @@ function delegateListener(event, optionalArg) {
   var fakeEvent = {};
   var delegated = delegatedEvents[event.type];
 
-  var _pointerUtils$getEven = pointerUtils.getEventTargets(event),
+  var _pointerUtils$getEven = _pointerUtils2.default.getEventTargets(event),
       eventTarget = _pointerUtils$getEven[0];
 
   var element = eventTarget;
 
   // duplicate the event so that currentTarget can be changed
-  pExtend(fakeEvent, event);
+  (0, _pointerExtend2.default)(fakeEvent, event);
 
   fakeEvent.originalEvent = event;
   fakeEvent.preventDefault = preventOriginalDefault;
@@ -6602,7 +8736,7 @@ function getOptions(param) {
   return is.object(param) ? param : { capture: param };
 }
 
-module.exports = {
+exports.default = {
   add: add,
   remove: remove,
 
@@ -6617,106 +8751,198 @@ module.exports = {
   supportsOptions: supportsOptions,
 
   _elements: elements,
-  _targets: targets
+  _targets: targets,
+
+  init: function init(window) {
+    supportsOptions = false;
+
+    window.document.createElement('div').addEventListener('test', null, {
+      get capture() {
+        supportsOptions = true;
+      }
+    });
+  }
 };
 
-},{"./arr":34,"./domUtils":38,"./is":45,"./pointerExtend":47,"./pointerUtils":48,"./window":53}],40:[function(_dereq_,module,exports){
+},{"./arr":120,"./domUtils":124,"./is":131,"./pointerExtend":133,"./pointerUtils":134}],126:[function(_dereq_,module,exports){
 "use strict";
 
-module.exports = function extend(dest, source) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = extend;
+function extend(dest, source) {
   for (var prop in source) {
     dest[prop] = source[prop];
   }
   return dest;
-};
+}
 
-},{}],41:[function(_dereq_,module,exports){
+},{}],127:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = _dereq_('./rect'),
-    resolveRectLike = _require.resolveRectLike,
-    rectToXY = _require.rectToXY;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-module.exports = function (target, element, action) {
+exports.default = function (target, element, action) {
   var actionOptions = target.options[action];
   var actionOrigin = actionOptions && actionOptions.origin;
   var origin = actionOrigin || target.options.origin;
 
-  var originRect = resolveRectLike(origin, target, element, [target && element]);
+  var originRect = (0, _rect.resolveRectLike)(origin, target, element, [target && element]);
 
-  return rectToXY(originRect) || { x: 0, y: 0 };
+  return (0, _rect.rectToXY)(originRect) || { x: 0, y: 0 };
 };
 
-},{"./rect":50}],42:[function(_dereq_,module,exports){
+var _rect = _dereq_('./rect');
+
+},{"./rect":136}],128:[function(_dereq_,module,exports){
 "use strict";
 
-module.exports = function (x, y) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],43:[function(_dereq_,module,exports){
+},{}],129:[function(_dereq_,module,exports){
 'use strict';
 
-var win = _dereq_('./window');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.events = exports.browser = exports.win = exports.raf = exports.rect = exports.pointer = exports.is = exports.hypot = exports.getOriginXY = exports.extend = exports.dom = exports.arr = exports.Signals = undefined;
+exports.warnOnce = warnOnce;
+exports._getQBezierValue = _getQBezierValue;
+exports.getQuadraticCurvePoint = getQuadraticCurvePoint;
+exports.easeOutQuad = easeOutQuad;
+exports.copyAction = copyAction;
 
-var utils = {
-  warnOnce: function warnOnce(method, message) {
-    var warned = false;
+var _window = _dereq_('./window');
 
-    return function () {
-      if (!warned) {
-        win.window.console.warn(message);
-        warned = true;
-      }
+var _window2 = _interopRequireDefault(_window);
 
-      return method.apply(this, arguments);
-    };
-  },
+var _browser = _dereq_('./browser');
 
-  // http://stackoverflow.com/a/5634528/2280888
-  _getQBezierValue: function _getQBezierValue(t, p1, p2, p3) {
-    var iT = 1 - t;
-    return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
-  },
+var _browser2 = _interopRequireDefault(_browser);
 
-  getQuadraticCurvePoint: function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
-    return {
-      x: utils._getQBezierValue(position, startX, cpX, endX),
-      y: utils._getQBezierValue(position, startY, cpY, endY)
-    };
-  },
+var _Signals = _dereq_('./Signals');
 
-  // http://gizma.com/easing/
-  easeOutQuad: function easeOutQuad(t, b, c, d) {
-    t /= d;
-    return -c * t * (t - 2) + b;
-  },
+var _Signals2 = _interopRequireDefault(_Signals);
 
-  copyAction: function copyAction(dest, src) {
-    dest.name = src.name;
-    dest.axis = src.axis;
-    dest.edges = src.edges;
+var _arr = _dereq_('./arr');
 
-    return dest;
-  },
+var arr = _interopRequireWildcard(_arr);
 
-  Signals: _dereq_('./Signals'),
-  arr: _dereq_('./arr'),
-  dom: _dereq_('./domUtils'),
-  extend: _dereq_('./extend'),
-  getOriginXY: _dereq_('./getOriginXY'),
-  hypot: _dereq_('./hypot'),
-  is: _dereq_('./is'),
-  pointer: _dereq_('./pointerUtils'),
-  rect: _dereq_('./rect')
-};
+var _domUtils = _dereq_('./domUtils');
 
-module.exports = utils;
+var dom = _interopRequireWildcard(_domUtils);
 
-},{"./Signals":33,"./arr":34,"./domUtils":38,"./extend":40,"./getOriginXY":41,"./hypot":42,"./is":45,"./pointerUtils":48,"./rect":50,"./window":53}],44:[function(_dereq_,module,exports){
+var _raf = _dereq_('./raf');
+
+var _raf2 = _interopRequireDefault(_raf);
+
+var _extend = _dereq_('./extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _getOriginXY = _dereq_('./getOriginXY');
+
+var _getOriginXY2 = _interopRequireDefault(_getOriginXY);
+
+var _hypot = _dereq_('./hypot');
+
+var _hypot2 = _interopRequireDefault(_hypot);
+
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _pointerUtils = _dereq_('./pointerUtils');
+
+var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
+
+var _rect = _dereq_('./rect');
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _events = _dereq_('./events');
+
+var _events2 = _interopRequireDefault(_events);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function warnOnce(method, message) {
+  var warned = false;
+
+  return function () {
+    if (!warned) {
+      _window2.default.window.console.warn(message);
+      warned = true;
+    }
+
+    return method.apply(this, arguments);
+  };
+}
+
+// http://stackoverflow.com/a/5634528/2280888
+function _getQBezierValue(t, p1, p2, p3) {
+  var iT = 1 - t;
+  return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
+}
+
+function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
+  return {
+    x: _getQBezierValue(position, startX, cpX, endX),
+    y: _getQBezierValue(position, startY, cpY, endY)
+  };
+}
+
+// http://gizma.com/easing/
+function easeOutQuad(t, b, c, d) {
+  t /= d;
+  return -c * t * (t - 2) + b;
+}
+
+function copyAction(dest, src) {
+  dest.name = src.name;
+  dest.axis = src.axis;
+  dest.edges = src.edges;
+
+  return dest;
+}
+
+exports.Signals = _Signals2.default;
+exports.arr = arr;
+exports.dom = dom;
+exports.extend = _extend2.default;
+exports.getOriginXY = _getOriginXY2.default;
+exports.hypot = _hypot2.default;
+exports.is = is;
+exports.pointer = _pointerUtils2.default;
+exports.rect = _rect2.default;
+exports.raf = _raf2.default;
+exports.win = _window2.default;
+exports.browser = _browser2.default;
+exports.events = _events2.default;
+
+},{"./Signals":119,"./arr":120,"./browser":121,"./domUtils":124,"./events":125,"./extend":126,"./getOriginXY":127,"./hypot":128,"./is":131,"./pointerUtils":134,"./raf":135,"./rect":136,"./window":139}],130:[function(_dereq_,module,exports){
 'use strict';
 
-var utils = _dereq_('./index');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _index = _dereq_('./index');
+
+var utils = _interopRequireWildcard(_index);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var finder = {
   methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
@@ -6747,10 +8973,10 @@ var finder = {
       return null;
     }
 
-    for (var _i2 = 0; _i2 < scope.interactions.length; _i2++) {
+    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
       var _ref3;
 
-      _ref3 = scope.interactions[_i2];
+      _ref3 = scope.interactions.list[_i2];
       var interaction = _ref3;
 
       var element = eventTarget;
@@ -6782,15 +9008,15 @@ var finder = {
 
     var firstNonActive = void 0;
 
-    for (var _i3 = 0; _i3 < scope.interactions.length; _i3++) {
+    for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
       var _ref5;
 
-      _ref5 = scope.interactions[_i3];
+      _ref5 = scope.interactions.list[_i3];
       var interaction = _ref5;
 
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !utils.arr.contains(interaction.pointerIds, pointerId)) {
+        if (interaction.simulation && !hasPointerId(interaction, pointerId)) {
           continue;
         }
 
@@ -6814,10 +9040,10 @@ var finder = {
     // find any mouse or pen interaction.
     // ignore the interaction if the eventType is a *down, and a simulation
     // is active
-    for (var _i4 = 0; _i4 < scope.interactions.length; _i4++) {
+    for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
       var _ref6;
 
-      _ref6 = scope.interactions[_i4];
+      _ref6 = scope.interactions.list[_i4];
       var _interaction = _ref6;
 
       if (_interaction.pointerType === pointerType && !(/down/i.test(eventType) && _interaction.simulation)) {
@@ -6833,13 +9059,13 @@ var finder = {
     var pointerId = _ref7.pointerId,
         scope = _ref7.scope;
 
-    for (var _i5 = 0; _i5 < scope.interactions.length; _i5++) {
+    for (var _i5 = 0; _i5 < scope.interactions.list.length; _i5++) {
       var _ref8;
 
-      _ref8 = scope.interactions[_i5];
+      _ref8 = scope.interactions.list[_i5];
       var interaction = _ref8;
 
-      if (utils.arr.contains(interaction.pointerIds, pointerId)) {
+      if (hasPointerId(interaction, pointerId)) {
         return interaction;
       }
     }
@@ -6850,14 +9076,14 @@ var finder = {
     var pointerType = _ref9.pointerType,
         scope = _ref9.scope;
 
-    for (var _i6 = 0; _i6 < scope.interactions.length; _i6++) {
+    for (var _i6 = 0; _i6 < scope.interactions.list.length; _i6++) {
       var _ref10;
 
-      _ref10 = scope.interactions[_i6];
+      _ref10 = scope.interactions.list[_i6];
       var interaction = _ref10;
 
       // if there's already a pointer held down
-      if (interaction.pointerIds.length === 1) {
+      if (interaction.pointers.length === 1) {
         var target = interaction.target;
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
@@ -6866,7 +9092,7 @@ var finder = {
         }
       }
       // maximum of 2 pointers per interaction
-      else if (interaction.pointerIds.length >= 2) {
+      else if (interaction.pointers.length >= 2) {
           continue;
         }
 
@@ -6879,83 +9105,106 @@ var finder = {
   }
 };
 
-module.exports = finder;
+function hasPointerId(interaction, pointerId) {
+  return utils.arr.some(interaction.pointers, function (_ref11) {
+    var id = _ref11.id;
+    return id === pointerId;
+  });
+}
 
-},{"./index":43}],45:[function(_dereq_,module,exports){
+exports.default = finder;
+
+},{"./index":129}],131:[function(_dereq_,module,exports){
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.array = exports.plainObject = exports.element = exports.string = exports.bool = exports.number = exports.func = exports.object = exports.docFrag = exports.window = undefined;
 
-var win = _dereq_('./window');
-var isWindow = _dereq_('./isWindow');
+var _typeof2 = _dereq_('babel-runtime/helpers/typeof');
 
-var is = {
-  array: function array() {},
+var _typeof3 = _interopRequireDefault(_typeof2);
 
-  window: function window(thing) {
-    return thing === win.window || isWindow(thing);
-  },
+var _window2 = _dereq_('./window');
 
-  docFrag: function docFrag(thing) {
-    return is.object(thing) && thing.nodeType === 11;
-  },
+var _window3 = _interopRequireDefault(_window2);
 
-  object: function object(thing) {
-    return !!thing && (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) === 'object';
-  },
+var _isWindow = _dereq_('./isWindow');
 
-  function: function _function(thing) {
-    return typeof thing === 'function';
-  },
+var _isWindow2 = _interopRequireDefault(_isWindow);
 
-  number: function number(thing) {
-    return typeof thing === 'number';
-  },
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-  bool: function bool(thing) {
-    return typeof thing === 'boolean';
-  },
+var window = exports.window = function window(thing) {
+  return thing === _window3.default.window || (0, _isWindow2.default)(thing);
+};
 
-  string: function string(thing) {
-    return typeof thing === 'string';
-  },
+var docFrag = exports.docFrag = function docFrag(thing) {
+  return object(thing) && thing.nodeType === 11;
+};
 
-  element: function element(thing) {
-    if (!thing || (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) !== 'object') {
-      return false;
-    }
+var object = exports.object = function object(thing) {
+  return !!thing && (typeof thing === 'undefined' ? 'undefined' : (0, _typeof3.default)(thing)) === 'object';
+};
 
-    var _window = win.getWindow(thing) || win.window;
+var func = exports.func = function func(thing) {
+  return typeof thing === 'function';
+};
 
-    return (/object|function/.test(_typeof(_window.Element)) ? thing instanceof _window.Element //DOM2
-      : thing.nodeType === 1 && typeof thing.nodeName === 'string'
-    );
-  },
+var number = exports.number = function number(thing) {
+  return typeof thing === 'number';
+};
 
-  plainObject: function plainObject(thing) {
-    return is.object(thing) && thing.constructor.name === 'Object';
+var bool = exports.bool = function bool(thing) {
+  return typeof thing === 'boolean';
+};
+
+var string = exports.string = function string(thing) {
+  return typeof thing === 'string';
+};
+
+var element = exports.element = function element(thing) {
+  if (!thing || (typeof thing === 'undefined' ? 'undefined' : (0, _typeof3.default)(thing)) !== 'object') {
+    return false;
   }
+
+  var _window = _window3.default.getWindow(thing) || _window3.default.window;
+
+  return (/object|function/.test((0, _typeof3.default)(_window.Element)) ? thing instanceof _window.Element //DOM2
+    : thing.nodeType === 1 && typeof thing.nodeName === 'string'
+  );
 };
 
-is.array = function (thing) {
-  return is.object(thing) && typeof thing.length !== 'undefined' && is.function(thing.splice);
+var plainObject = exports.plainObject = function plainObject(thing) {
+  return object(thing) && thing.constructor.name === 'Object';
 };
 
-module.exports = is;
+var array = exports.array = function array(thing) {
+  return object(thing) && typeof thing.length !== 'undefined' && func(thing.splice);
+};
 
-},{"./isWindow":46,"./window":53}],46:[function(_dereq_,module,exports){
+},{"./isWindow":132,"./window":139,"babel-runtime/helpers/typeof":11}],132:[function(_dereq_,module,exports){
 "use strict";
 
-module.exports = function (thing) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+exports.default = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],47:[function(_dereq_,module,exports){
+},{}],133:[function(_dereq_,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = pointerExtend;
 function pointerExtend(dest, source) {
   for (var prop in source) {
-    var prefixedPropREs = module.exports.prefixedPropREs;
+    var prefixedPropREs = pointerExtend.prefixedPropREs;
     var deprecated = false;
 
     // skip deprecated prefixed properties
@@ -6977,18 +9226,40 @@ pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
 };
 
-module.exports = pointerExtend;
-
-},{}],48:[function(_dereq_,module,exports){
+},{}],134:[function(_dereq_,module,exports){
 'use strict';
 
-var hypot = _dereq_('./hypot');
-var browser = _dereq_('./browser');
-var dom = _dereq_('./domObjects');
-var domUtils = _dereq_('./domUtils');
-var domObjects = _dereq_('./domObjects');
-var is = _dereq_('./is');
-var pointerExtend = _dereq_('./pointerExtend');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _hypot = _dereq_('./hypot');
+
+var _hypot2 = _interopRequireDefault(_hypot);
+
+var _browser = _dereq_('./browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _domObjects = _dereq_('./domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+var _domUtils = _dereq_('./domUtils');
+
+var domUtils = _interopRequireWildcard(_domUtils);
+
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _pointerExtend = _dereq_('./pointerExtend');
+
+var _pointerExtend2 = _interopRequireDefault(_pointerExtend);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var pointerUtils = {
   copyCoords: function copyCoords(dest, src) {
@@ -7013,17 +9284,17 @@ var pointerUtils = {
     // set pointer velocity
     var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
 
-    targetObj.page.speed = hypot(targetObj.page.x, targetObj.page.y) / dt;
+    targetObj.page.speed = (0, _hypot2.default)(targetObj.page.x, targetObj.page.y) / dt;
     targetObj.page.vx = targetObj.page.x / dt;
     targetObj.page.vy = targetObj.page.y / dt;
 
-    targetObj.client.speed = hypot(targetObj.client.x, targetObj.page.y) / dt;
+    targetObj.client.speed = (0, _hypot2.default)(targetObj.client.x, targetObj.page.y) / dt;
     targetObj.client.vx = targetObj.client.x / dt;
     targetObj.client.vy = targetObj.client.y / dt;
   },
 
   isNativePointer: function isNativePointer(pointer) {
-    return pointer instanceof dom.Event || pointer instanceof dom.Touch;
+    return pointer instanceof _domObjects2.default.Event || pointer instanceof _domObjects2.default.Touch;
   },
 
   // Get specified X/Y coords for mouse or event.touches[0]
@@ -7041,7 +9312,7 @@ var pointerUtils = {
     page = page || {};
 
     // Opera Mobile handles the viewport and scrolling oddly
-    if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+    if (_browser2.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
       pointerUtils.getXY('screen', pointer, page);
 
       page.x += window.scrollX;
@@ -7056,7 +9327,7 @@ var pointerUtils = {
   getClientXY: function getClientXY(pointer, client) {
     client = client || {};
 
-    if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+    if (_browser2.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
       // Opera Mobile handles the viewport and scrolling oddly
       pointerUtils.getXY('screen', pointer, client);
     } else {
@@ -7086,7 +9357,7 @@ var pointerUtils = {
     targetObj.timeStamp = is.number(timeStamp) ? timeStamp : new Date().getTime();
   },
 
-  pointerExtend: pointerExtend,
+  pointerExtend: _pointerExtend2.default,
 
   getTouchPair: function getTouchPair(event) {
     var touches = [];
@@ -7171,7 +9442,7 @@ var pointerUtils = {
     var dx = touches[0][sourceX] - touches[1][sourceX];
     var dy = touches[0][sourceY] - touches[1][sourceY];
 
-    return hypot(dx, dy);
+    return (0, _hypot2.default)(dx, dy);
   },
 
   touchAngle: function touchAngle(event, prevAngle, deltaSource) {
@@ -7189,149 +9460,194 @@ var pointerUtils = {
     return is.string(pointer.pointerType) ? pointer.pointerType : is.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]
     // if the PointerEvent API isn't available, then the "pointer" must
     // be either a MouseEvent, TouchEvent, or Touch object
-    : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch ? 'touch' : 'mouse';
+    : /touch/.test(pointer.type) || pointer instanceof _domObjects2.default.Touch ? 'touch' : 'mouse';
   },
 
   // [ event.target, event.currentTarget ]
   getEventTargets: function getEventTargets(event) {
-    var path = is.function(event.composedPath) ? event.composedPath() : event.path;
+    var path = is.func(event.composedPath) ? event.composedPath() : event.path;
 
     return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
+  },
+
+  coordsToEvent: function coordsToEvent(_ref2) {
+    var page = _ref2.page,
+        client = _ref2.client;
+
+    return {
+      pageX: page.x,
+      pageY: page.y,
+      clientX: client.x,
+      clientY: client.y
+    };
   }
 };
 
-module.exports = pointerUtils;
+exports.default = pointerUtils;
 
-},{"./browser":35,"./domObjects":37,"./domUtils":38,"./hypot":42,"./is":45,"./pointerExtend":47}],49:[function(_dereq_,module,exports){
+},{"./browser":121,"./domObjects":123,"./domUtils":124,"./hypot":128,"./is":131,"./pointerExtend":133}],135:[function(_dereq_,module,exports){
 'use strict';
 
-var _require = _dereq_('./window'),
-    window = _require.window;
-
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var lastTime = 0;
-var _request = window.requestAnimationFrame;
-var _cancel = window.cancelAnimationFrame;
+var _request = void 0;
+var _cancel = void 0;
 
-if (!_request) {
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
+function init(window) {
+  _request = window.requestAnimationFrame;
+  _cancel = window.cancelAnimationFrame;
 
-  for (var _i = 0; _i < vendors.length; _i++) {
-    var vendor = vendors[_i];
-    _request = window[vendor + 'RequestAnimationFrame'];
-    _cancel = window[vendor + 'CancelAnimationFrame'] || window[vendor + 'CancelRequestAnimationFrame'];
+  if (!_request) {
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+
+    for (var _i = 0; _i < vendors.length; _i++) {
+      var vendor = vendors[_i];
+      _request = window[vendor + 'RequestAnimationFrame'];
+      _cancel = window[vendor + 'CancelAnimationFrame'] || window[vendor + 'CancelRequestAnimationFrame'];
+    }
+  }
+
+  if (!_request) {
+    _request = function request(callback) {
+      var currTime = new Date().getTime();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      var token = setTimeout(function () {
+        callback(currTime + timeToCall);
+      }, timeToCall);
+
+      lastTime = currTime + timeToCall;
+      return token;
+    };
+
+    _cancel = function cancel(token) {
+      return clearTimeout(token);
+    };
   }
 }
 
-if (!_request) {
-  _request = function request(callback) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var token = setTimeout(function () {
-      callback(currTime + timeToCall);
-    }, timeToCall);
-
-    lastTime = currTime + timeToCall;
-    return token;
-  };
-
-  _cancel = function cancel(token) {
-    return clearTimeout(token);
-  };
-}
-
-module.exports = {
+exports.default = {
   request: function request(callback) {
     return _request(callback);
   },
   cancel: function cancel(token) {
     return _cancel(token);
-  }
+  },
+  init: init
 };
 
-},{"./window":53}],50:[function(_dereq_,module,exports){
+},{}],136:[function(_dereq_,module,exports){
 'use strict';
 
-var extend = _dereq_('./extend');
-var is = _dereq_('./is');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getStringOptionResult = getStringOptionResult;
+exports.resolveRectLike = resolveRectLike;
+exports.rectToXY = rectToXY;
+exports.xywhToTlbr = xywhToTlbr;
+exports.tlbrToXywh = tlbrToXywh;
 
-var _require = _dereq_('./domUtils'),
-    closest = _require.closest,
-    parentNode = _require.parentNode,
-    getElementRect = _require.getElementRect;
+var _extend = _dereq_('./extend');
 
-var rectUtils = {
-  getStringOptionResult: function getStringOptionResult(value, interactable, element) {
-    if (!is.string(value)) {
-      return null;
-    }
+var _extend2 = _interopRequireDefault(_extend);
 
-    if (value === 'parent') {
-      value = parentNode(element);
-    } else if (value === 'self') {
-      value = interactable.getRect(element);
-    } else {
-      value = closest(element, value);
-    }
+var _is = _dereq_('./is');
 
-    return value;
-  },
+var is = _interopRequireWildcard(_is);
 
-  resolveRectLike: function resolveRectLike(value, interactable, element, functionArgs) {
-    value = rectUtils.getStringOptionResult(value, interactable, element) || value;
+var _domUtils = _dereq_('./domUtils');
 
-    if (is.function(value)) {
-      value = value.apply(null, functionArgs);
-    }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-    if (is.element(value)) {
-      value = getElementRect(value);
-    }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-    return value;
-  },
-
-  rectToXY: function rectToXY(rect) {
-    return rect && {
-      x: 'x' in rect ? rect.x : rect.left,
-      y: 'y' in rect ? rect.y : rect.top
-    };
-  },
-
-  xywhToTlbr: function xywhToTlbr(rect) {
-    if (rect && !('left' in rect && 'top' in rect)) {
-      rect = extend({}, rect);
-
-      rect.left = rect.x || 0;
-      rect.top = rect.y || 0;
-      rect.right = rect.right || rect.left + rect.width;
-      rect.bottom = rect.bottom || rect.top + rect.height;
-    }
-
-    return rect;
-  },
-
-  tlbrToXywh: function tlbrToXywh(rect) {
-    if (rect && !('x' in rect && 'y' in rect)) {
-      rect = extend({}, rect);
-
-      rect.x = rect.left || 0;
-      rect.top = rect.top || 0;
-      rect.width = rect.width || rect.right - rect.x;
-      rect.height = rect.height || rect.bottom - rect.y;
-    }
-
-    return rect;
+function getStringOptionResult(value, interactable, element) {
+  if (!is.string(value)) {
+    return null;
   }
+
+  if (value === 'parent') {
+    value = (0, _domUtils.parentNode)(element);
+  } else if (value === 'self') {
+    value = interactable.getRect(element);
+  } else {
+    value = (0, _domUtils.closest)(element, value);
+  }
+
+  return value;
+}
+
+function resolveRectLike(value, interactable, element, functionArgs) {
+  value = getStringOptionResult(value, interactable, element) || value;
+
+  if (is.func(value)) {
+    value = value.apply(null, functionArgs);
+  }
+
+  if (is.element(value)) {
+    value = (0, _domUtils.getElementRect)(value);
+  }
+
+  return value;
+}
+
+function rectToXY(rect) {
+  return rect && {
+    x: 'x' in rect ? rect.x : rect.left,
+    y: 'y' in rect ? rect.y : rect.top
+  };
+}
+
+function xywhToTlbr(rect) {
+  if (rect && !('left' in rect && 'top' in rect)) {
+    rect = (0, _extend2.default)({}, rect);
+
+    rect.left = rect.x || 0;
+    rect.top = rect.y || 0;
+    rect.right = rect.right || rect.left + rect.width;
+    rect.bottom = rect.bottom || rect.top + rect.height;
+  }
+
+  return rect;
+}
+
+function tlbrToXywh(rect) {
+  if (rect && !('x' in rect && 'y' in rect)) {
+    rect = (0, _extend2.default)({}, rect);
+
+    rect.x = rect.left || 0;
+    rect.y = rect.top || 0;
+    rect.width = rect.width || rect.right - rect.x;
+    rect.height = rect.height || rect.bottom - rect.y;
+  }
+
+  return rect;
+}
+
+exports.default = {
+  getStringOptionResult: getStringOptionResult,
+  resolveRectLike: resolveRectLike,
+  rectToXY: rectToXY,
+  xywhToTlbr: xywhToTlbr,
+  tlbrToXywh: tlbrToXywh
 };
 
-module.exports = rectUtils;
-
-},{"./domUtils":38,"./extend":40,"./is":45}],51:[function(_dereq_,module,exports){
+},{"./domUtils":124,"./extend":126,"./is":131}],137:[function(_dereq_,module,exports){
 'use strict';
 
-var is = _dereq_('../is');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-module.exports = function (grid) {
+var _is = _dereq_('../is');
+
+var is = _interopRequireWildcard(_is);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+exports.default = function (grid) {
   return function (x, y) {
     var gridX = grid.x,
         gridY = grid.y,
@@ -7368,18 +9684,41 @@ module.exports = function (grid) {
   };
 };
 
-},{"../is":45}],52:[function(_dereq_,module,exports){
+},{"../is":131}],138:[function(_dereq_,module,exports){
 'use strict';
 
-module.exports = {
-  grid: _dereq_('./grid')
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.grid = undefined;
+
+var _grid = _dereq_('./grid');
+
+var _grid2 = _interopRequireDefault(_grid);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.grid = _grid2.default;
+
+},{"./grid":137}],139:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.init = init;
+exports.getWindow = getWindow;
+
+var _isWindow = _dereq_('./isWindow');
+
+var _isWindow2 = _interopRequireDefault(_isWindow);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var win = {
+  getWindow: getWindow,
+  init: init
 };
-
-},{"./grid":51}],53:[function(_dereq_,module,exports){
-'use strict';
-
-var win = module.exports;
-var isWindow = _dereq_('./isWindow');
 
 function init(window) {
   // get wrapped window if using Shadow DOM polyfill
@@ -7405,19 +9744,21 @@ if (typeof window === 'undefined') {
   init(window);
 }
 
-win.getWindow = function getWindow(node) {
-  if (isWindow(node)) {
+function getWindow(node) {
+  if ((0, _isWindow2.default)(node)) {
     return node;
   }
 
   var rootNode = node.ownerDocument || node;
 
   return rootNode.defaultView || win.window;
-};
+}
 
 win.init = init;
 
-},{"./isWindow":46}]},{},[1])(1)
+exports.default = win;
+
+},{"./isWindow":132}]},{},[1])(1)
 });
 
 
