@@ -1,6 +1,6 @@
-const is = require('../is');
+import * as is from '../is';
 
-module.exports = (grid) => {
+export default (grid) => {
   return function (x, y) {
     const {
       x: gridX,

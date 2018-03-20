@@ -1,3 +1,5 @@
-module.exports = {
-  grid: require('./grid'),
+import grid from './grid';
+
+export {
+  grid,
 };

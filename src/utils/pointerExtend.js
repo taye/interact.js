@@ -1,6 +1,6 @@
-function pointerExtend (dest, source) {
+export default function pointerExtend (dest, source) {
   for (const prop in source) {
-    const prefixedPropREs = module.exports.prefixedPropREs;
+    const prefixedPropREs = pointerExtend.prefixedPropREs;
     let deprecated = false;
 
     // skip deprecated prefixed properties
@@ -21,5 +21,3 @@ function pointerExtend (dest, source) {
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
 };
-
-module.exports = pointerExtend;

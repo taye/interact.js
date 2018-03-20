@@ -1,6 +1,6 @@
-const pointerUtils = require('../utils/pointerUtils');
+import pointerUtils from '../utils/pointerUtils';
 
-module.exports = class PointerEvent {
+export default class PointerEvent {
   /** */
   constructor (type, pointer, event, eventTarget, interaction) {
     pointerUtils.pointerExtend(this, event);
@@ -21,7 +21,7 @@ module.exports = class PointerEvent {
 
     if (type === 'tap') {
       const pointerIndex = interaction.getPointerIndex(pointer);
-      this.dt = this.timeStamp - interaction.downTimes[pointerIndex];
+      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
 
       const interval = this.timeStamp - interaction.tapTime;
 
@@ -67,4 +67,4 @@ module.exports = class PointerEvent {
   stopImmediatePropagation () {
     this.immediatePropagationStopped = this.propagationStopped = true;
   }
-};
+}

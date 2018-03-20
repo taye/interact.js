@@ -1,10 +1,10 @@
-const test = require('../test');
-const { mockSignals } = require('../helpers');
+import test from '../test';
+import { mockSignals } from '../helpers';
+
+import RestrictSize from '../../src/modifiers/restrictSize';
+import Interaction from '../../src/Interaction';
 
 test('restrictSize', t => {
-  const RestrictSize = require('../../src/modifiers/restrictSize');
-  const Interaction = require('../../src/Interaction');
-
   const interaction = new Interaction({ signals: mockSignals() });
   interaction.prepared = {};
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true };
@@ -17,7 +17,9 @@ test('restrictSize', t => {
       min: { width:  60, height:  50 },
       max: { width: 600, height: 500 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };
@@ -32,7 +34,9 @@ test('restrictSize', t => {
     const options = {
       min: { width: 60, height: 50 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };
@@ -47,7 +51,9 @@ test('restrictSize', t => {
     const options = {
       max: { width: 600, height: 500 },
     };
-    const status = {};
+    const status = {
+      delta: { x: 0, y: 0 },
+    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const arg = { interaction, options, status, pageCoords, offset };

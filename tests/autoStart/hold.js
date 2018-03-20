@@ -1,5 +1,7 @@
-const test = require('../test');
-const helpers = require('../helpers');
+import test from '../test';
+import * as helpers from '../helpers';
+import Signals from '../../src/utils/Signals';
+import hold from '../../src/autoStart/hold';
 
 test('autoStart/hold', t => {
   const scope = helpers.mockScope({
@@ -7,10 +9,10 @@ test('autoStart/hold', t => {
       defaults: {
         perAction: {},
       },
-      signals: require('../../src/utils/Signals').new(),
+      signals: new Signals(),
     },
   });
-  const autoStartHold = require('../../src/autoStart/hold');
+  const autoStartHold = hold;
   autoStartHold.init(scope);
 
   t.equal(scope.defaults.perAction.hold, 0, 'sets scope.defaults.perAction.hold');

@@ -1,26 +1,13 @@
-const test = require('../test');
-const helpers = require('../helpers');
-const Signals = require('../../src/utils/Signals');
-const interactions = require('../../src/interactions');
-const drag = require('../../src/actions/drag');
+import test from '../test';
+import * as helpers from '../helpers';
+import interactions from '../../src/interactions';
+import drag from '../../src/actions/drag';
+import pointerUtils from '../../src/utils/pointerUtils';
+import { extend } from '../../src/utils';
 
-function mockScope () {
-  return helpers.mockScope({
-    actions: {
-      names: [],
-      methodDict: {},
-    },
-    InteractEvent: { signals: Signals.new() },
-    Interactable: {
-      prototype: {},
-      signals: Signals.new(),
-      eventTypes: [],
-    },
-  });
-}
 
 test('drag action init', t => {
-  const scope = mockScope();
+  const scope = helpers.mockScope();
 
   drag.init(scope);
 
@@ -91,12 +78,12 @@ test('Interactable.draggable method', t => {
 });
 
 test('drag axis', t => {
-  const scope = mockScope();
+  const scope = helpers.mockScope();
 
   interactions.init(scope);
   drag.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const element = {};
   const interactable = {
     options: {
@@ -104,13 +91,13 @@ test('drag axis', t => {
     },
     target: element,
   };
-  const iEvent = { type: 'dragmove' };
+  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' };
 
   const opposites = { x: 'y', y: 'x' };
   const eventCoords = {
-    pageX:   -1, pageY:   -2,
-    clientX: -3, clientY: -4,
-    dx:      -5, dy:      -6,
+    page: { x: -1, y: -2 },
+    client: { x: -3, y: -4 },
+    delta: { x: -5, y: -6 },
   };
   const startPage   = { x: 0, y: 1 };
   const startClient = { x: 2, y: 3 };
@@ -121,8 +108,13 @@ test('drag axis', t => {
   interaction.prepared = { name: 'drag', axis: 'xy' };
   interaction.target = interactable;
 
+  const coords = helpers.newCoordsSet();
+  for (const prop in coords) {
+    interaction[prop + 'Coords'] = coords[prop];
+  }
+
   t.test('xy (any direction)', tt => {
-    scope.Interaction.signals.fire('before-action-move', { interaction });
+    scope.interactions.signals.fire('before-action-move', { interaction });
 
     tt.deepEqual(interaction.startCoords.page, startPage,
       'startCoords.page is not modified');
@@ -133,42 +125,57 @@ test('drag axis', t => {
     tt.deepEqual(interaction.pointerDelta.client, deltaClient,
       'pointerDelta.client is not modified');
 
-    scope.InteractEvent.signals.fire('new', { iEvent, interaction });
+    scope.interactions.signals.fire('action-move', { iEvent, interaction });
 
-    tt.equal(iEvent.pageX, eventCoords.pageX, 'pageX is not modified');
-    tt.equal(iEvent.pageY, eventCoords.pageY, 'pageY is not modified');
-    tt.equal(iEvent.dx, eventCoords.dx, 'dx is not modified');
-    tt.equal(iEvent.dy, eventCoords.dy, 'dy is not modified');
+    tt.deepEqual(iEvent.page, eventCoords.page, 'page coords are not modified');
+    tt.deepEqual(iEvent.delta, eventCoords.delta, 'delta is not modified');
 
     tt.end();
   });
 
   for (const axis in opposites) {
     const opposite = opposites[axis];
-    const Opposite = opposite.toUpperCase();
-    const Axis = axis.toUpperCase();
 
     t.test(axis + '-axis', tt => {
 
       resetCoords();
       interaction.prepared.axis = axis;
 
-      scope.InteractEvent.signals.fire('new', { iEvent, interaction });
+      scope.interactions.signals.fire('action-move', { iEvent, interaction });
 
-      tt.equal(iEvent['d' + opposite], 0,
-        'd' + opposite + ' is zero');
-      tt.equal(iEvent['d' + axis], eventCoords['d' + axis],
-        'd' + axis + ' is not modified');
+      tt.deepEqual(
+        iEvent.delta,
+        {
+          [opposite]: 0,
+          [axis]: eventCoords.delta[axis],
+        },
+        `opposite axis (${opposite}) delta is 0; target axis (${axis}) delta is not modified`);
 
-      tt.equal(iEvent['page' + Opposite], startPage[opposite],
-        'page' + Opposite + ' is startCoords value');
-      tt.equal(iEvent['page' + Axis], eventCoords['page' + Axis],
-        'page' + Axis + ' is not modified');
+      tt.deepEqual(
+        iEvent.page,
+        {
+          [opposite]: startPage[opposite],
+          [axis]: eventCoords.page[axis],
+        },
+        `page.${opposite} is startCoords value`
+      );
 
-      tt.equal(iEvent['client' + Opposite], startClient[opposite],
-        'client' + Opposite + ' is startCoords value');
-      tt.equal(iEvent['client' + Axis], eventCoords['client' + Axis],
-        'client' + Axis + ' is not modified');
+      tt.equal(
+        iEvent.page[axis],
+        eventCoords.page[axis],
+        `page.${axis} is not modified`
+      );
+
+      tt.equal(
+        iEvent.client[opposite],
+        startClient[opposite],
+        `client.${opposite} is startCoords value`
+      );
+      tt.equal(
+        iEvent.client[axis],
+        eventCoords.client[axis],
+        `client.${axis} is not modified`
+      );
 
       tt.end();
     });
@@ -177,9 +184,9 @@ test('drag axis', t => {
   t.end();
 
   function resetCoords () {
-    const { extend } = require('../../src/utils');
+    pointerUtils.copyCoords(iEvent, eventCoords);
+    extend(iEvent.delta, eventCoords.delta);
 
-    extend(iEvent, eventCoords);
     extend(interaction.startCoords.page  , startPage);
     extend(interaction.startCoords.client, startClient);
 

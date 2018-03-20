@@ -1,22 +1,20 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-const extend = require('../utils/extend');
-const is = require('../utils/is');
-const snap = require('./snap');
+import extend from '../utils/extend';
+import * as is from '../utils/is';
+import snap from './snap';
 
 function init (scope) {
   const {
     modifiers,
     defaults,
-    actions,
   } = scope;
 
-  modifiers.snapSize = module.exports;
+  modifiers.snapSize = snapSize;
   modifiers.names.push('snapSize');
 
-  defaults.perAction.snapSize = module.exports.defaults;
-  actions.resize.defaults.snapSize  = module.exports.defaults;
+  defaults.perAction.snapSize = snapSize.defaults;
 }
 
 function setOffset (arg) {
@@ -53,7 +51,7 @@ function set (arg) {
   for (const snapTarget of (options.targets || [])) {
     let target;
 
-    if (is.function(snapTarget)) {
+    if (is.func(snapTarget)) {
       target = snapTarget(relativeX, relativeY, interaction);
     }
     else {
@@ -83,7 +81,7 @@ function modifyCoords (arg) {
   snap.modifyCoords(arg);
 }
 
-module.exports = {
+const snapSize = {
   init,
   setOffset,
   set,
@@ -96,3 +94,5 @@ module.exports = {
     offsets: null,
   },
 };
+
+export default snapSize;

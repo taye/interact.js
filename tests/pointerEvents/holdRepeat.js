@@ -1,11 +1,15 @@
-const test = require('../test');
-const helpers = require('../helpers');
+import test from '../test';
+import * as helpers from '../helpers';
+import Signals from '../../src/utils/Signals';
+import Eventable from '../../src/Eventable';
+import holdRepeat from '../../src/pointerEvents/holdRepeat';
+import interactions from '../../src/interactions';
 
 function mockScope () {
   return helpers.mockScope({
     pointerEvents: {
       defaults: {},
-      signals: require('../../src/utils/Signals').new(),
+      signals: new Signals(),
       types: [],
       fire: () => {},
     },
@@ -18,7 +22,7 @@ test('holdRepeat count', t => {
     type: 'hold',
   };
 
-  require('../../src/pointerEvents/holdRepeat').init(scope);
+  holdRepeat.init(scope);
 
   scope.pointerEvents.signals.fire('new', { pointerEvent });
   t.equal(pointerEvent.count, 1, 'first hold count is 1 with count previously undefined');
@@ -33,11 +37,10 @@ test('holdRepeat count', t => {
 
 test('holdRepeat onFired', t => {
   const scope = mockScope();
-  const Eventable = require('../../src/Eventable');
-  require('../../src/interactions').init(scope);
-  require('../../src/pointerEvents/holdRepeat').init(scope);
+  interactions.init(scope);
+  holdRepeat.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const pointerEvent = {
     type: 'hold',
   };

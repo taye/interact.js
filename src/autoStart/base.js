@@ -1,18 +1,18 @@
-const utils = require('../utils');
+import * as utils from '../utils';
+import InteractableMethods from './InteractableMethods';
 
 function init (scope) {
   const {
     interact,
-    Interactable,
-    Interaction,
+    interactions,
     defaults,
     Signals,
   } = scope;
 
-  interact.use(require('./InteractableMethods'));
+  interact.use(InteractableMethods);
 
   // set cursor style on mousedown
-  Interaction.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
+  interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
     if (interaction.interacting()) { return; }
 
     const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
@@ -20,7 +20,7 @@ function init (scope) {
   });
 
   // set cursor style on mousemove
-  Interaction.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
+  interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
     if (interaction.pointerType !== 'mouse'
         || interaction.pointerIsDown
         || interaction.interacting()) { return; }
@@ -29,7 +29,7 @@ function init (scope) {
     prepare(interaction, actionInfo, scope);
   });
 
-  Interaction.signals.on('move', function (arg) {
+  interactions.signals.on('move', function (arg) {
     const { interaction, event } = arg;
 
     if (!interaction.pointerIsDown
@@ -55,7 +55,7 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('stop', function ({ interaction }) {
+  interactions.signals.on('stop', function ({ interaction }) {
     const target = interaction.target;
 
     if (target && target.options.styleCursor) {
@@ -64,11 +64,6 @@ function init (scope) {
   });
 
   interact.maxInteractions = maxInteractions;
-
-  Interactable.settingsMethods.push('styleCursor');
-  Interactable.settingsMethods.push('actionChecker');
-  Interactable.settingsMethods.push('ignoreFrom');
-  Interactable.settingsMethods.push('allowFrom');
 
   defaults.base.actionChecker = null;
   defaults.base.styleCursor = true;
@@ -101,7 +96,8 @@ function init (scope) {
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
-    signals: Signals.new(),
+    withinInteractionLimit,
+    signals: new Signals(),
   };
 }
 
@@ -202,7 +198,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
   // no actions if any of these values == 0
   if (!(maxActions && maxPerElement && autoStartMax)) { return; }
 
-  for (const interaction of scope.interactions) {
+  for (const interaction of scope.interactions.list) {
     const otherAction = interaction.prepared.name;
 
     if (!interaction.interacting()) { continue; }
@@ -224,7 +220,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
     if (interaction.element === element) {
       targetElementCount++;
 
-      if (otherAction !== action.name || targetElementCount >= maxPerElement) {
+      if (otherAction === action.name && targetElementCount >= maxPerElement) {
         return false;
       }
     }
@@ -243,7 +239,7 @@ function maxInteractions (newValue, scope) {
   return scope.autoStart.maxInteractions;
 }
 
-module.exports = {
+export default {
   init,
   maxInteractions,
   withinInteractionLimit,

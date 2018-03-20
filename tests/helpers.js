@@ -1,121 +1,141 @@
-const _ = require('lodash');
-const { window: { document } } = require('../src/utils/window');
-const utils = require('../src/utils');
+import _ from 'lodash';
+import win from '../src/utils/window';
+import * as utils from '../src/utils';
+import clone from '../src/utils/clone';
+import defaults  from '../src/defaultOptions';
+import Signals from '../src/utils/Signals';
+import Eventable from '../src/Eventable';
+import Interactable from '../src/Interactable';
+import Interaction from '../src/Interaction';
+
+const document = win.window.document;
 
 let counter = 0;
 
-const helpers = {
-  unique () {
-    return (counter++);
-  },
+export function unique () {
+  return (counter++);
+}
 
-  uniqueProps (obj) {
-    for (const prop in obj) {
-      if (!obj.hasOwnProperty(prop)) { continue; }
+export function uniqueProps (obj) {
+  for (const prop in obj) {
+    if (!obj.hasOwnProperty(prop)) { continue; }
 
-      if (_.isObject(obj)) {
-        helpers.uniqueProps(obj[obj]);
-      }
-      else {
-        obj[prop] = (counter++);
-      }
+    if (_.isObject(obj)) {
+      uniqueProps(obj[obj]);
     }
-  },
+    else {
+      obj[prop] = (counter++);
+    }
+  }
+}
 
-  newCoordsSet (n = 0) {
-    return {
-      start: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
+export function newCoordsSet (n = 0) {
+  return {
+    start: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+    cur: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+    prev: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+  };
+}
+
+export function newPointer (n = 50) {
+  return {
+    pointerId: n++,
+    pageX: n++,
+    pageY: n++,
+    clientX: n++,
+    clientY: n++,
+  };
+}
+
+export function $ (selector, context) {
+  return (context || document).querySelector(selector);
+}
+
+export function $$ (selector, context) {
+  return Array.from((context || document).querySelectorAll(selector));
+}
+
+export function createEl (name) {
+  return document.createElement(name);
+}
+
+export function mockScope (options) {
+  const scope = Object.assign({
+    documents: [],
+    defaults: clone(defaults),
+    actions: {
+      names: [],
+      methodDict: {},
+      eventTypes: [],
+    },
+    Interaction: class extends Interaction {},
+    interactions: {
+      signals: new Signals(),
+      list: [],
+      new (props) {
+        return new scope.Interaction({ signals: this.signals, ...props });
       },
-      cur: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
+    },
+    interactables: {
+      signals: new Signals(),
+    },
+    signals: new Signals(),
+    Interactable: class extends Interactable {},
+  }, options);
+
+  return scope;
+}
+
+export function mockSignals () {
+  return {
+    on () {},
+    off () {},
+    fire () {},
+  };
+}
+
+export function newInteractable (scope, target, options = {}, defaultContext) {
+  options.signals = scope.interactables.signals;
+  options.actions = scope.actions;
+
+  return new scope.Interactable(target, options, defaultContext);
+}
+
+export function mockInteractable (props) {
+  return Object.assign(
+    {
+      _signals: new Signals(),
+      _actions: {
+        names: [],
+        methodDict: {},
       },
-      prev: {
-        page     : { x: n++, y: n++ },
-        client   : { x: n++, y: n++ },
-        timeStamp: n++,
+      options: {
+        deltaSource: 'page',
       },
-    };
-  },
-
-  newPointer (n = 50) {
-    return {
-      pointerId: n++,
-      pageX: n++,
-      pageY: n++,
-      clientX: n++,
-      clientY: n++,
-    };
-  },
-
-  _,
-
-  $ (selector, context) {
-    return (context || document).querySelector(selector);
-  },
-
-  $$ (selector, context) {
-    return Array.from((context || document).querySelectorAll(selector));
-  },
-
-  createEl (name) {
-    return document.createElement(name);
-  },
-
-  mockScope (options) {
-    return Object.assign({
-      documents: [],
-      defaults: require('../src/defaultOptions'),
-      interactions: [],
-      signals: require('../src/utils/Signals').new(),
-      Interaction: {
-        signals: require('../src/utils/Signals').new(),
-        new () {
-          return {};
-        },
+      target: {},
+      events: new Eventable(),
+      getRect () {
+        return this.element
+          ? utils.dom.getClientRect(this.element)
+          : { left: 0, top: 0, right: 0, bottom: 0 };
       },
-      InteractEvent: {
-        signals: require('../src/utils/Signals').new(),
+      fire (event) {
+        this.events.fire(event);
       },
-      Interactable: {
-        signals: require('../src/utils/Signals').new(),
-      },
-    }, options);
-  },
+    },
+    props);
+}
 
-  mockSignals () {
-    return {
-      on () {},
-      off () {},
-      fire () {},
-    };
-  },
-
-  mockInteractable (props) {
-    const Eventable = require('../src/Eventable');
-
-    return Object.assign(
-      {
-        options: {
-          deltaSource: 'page',
-        },
-        target: {},
-        events: new Eventable(),
-        getRect () {
-          return this.element
-            ? utils.dom.getClientRect(this.element)
-            : { left: 0, top: 0, right: 0, bottom: 0 };
-        },
-        fire (event) {
-          this.events.fire(event);
-        },
-      },
-      props);
-  },
-};
-
-module.exports = helpers;
+export { _ };

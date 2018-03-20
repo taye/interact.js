@@ -1,6 +1,13 @@
-const { jsdom } = require('jsdom');
+import { jsdom } from 'jsdom';
+import tape from 'tape';
+
+import { scope, init as scopeInit } from '../src/scope';
+
 const doc = jsdom('<!DOCTYPE html><html><body></body></html>');
+const window = doc.defaultView;
 
-require('../src/utils/window').init(doc.defaultView);
+scope.document = doc;
 
-module.exports = require('tape');
+scopeInit(window);
+
+export default tape;

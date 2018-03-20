@@ -37,8 +37,4 @@ class Signals {
   }
 }
 
-Signals.new = function () {
-  return new Signals();
-};
-
-module.exports = Signals;
+export default Signals;

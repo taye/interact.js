@@ -1,5 +1,5 @@
-const test = require('./test');
-const Eventable = require('../src/Eventable');
+import test from './test';
+import Eventable from '../src/Eventable';
 
 test('Eventable', t => {
   const eventable = new Eventable();

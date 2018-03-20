@@ -1,12 +1,12 @@
 /** @module interact */
 
-const browser      = require('./utils/browser');
-const events       = require('./utils/events');
-const utils        = require('./utils');
-const scope        = require('./scope');
-const Interactable = require('./Interactable');
+import browser      from './utils/browser';
+import events       from './utils/events';
+import * as utils   from './utils';
+import { scope }    from './scope';
 
 const globalEvents = {};
+const signals = new utils.Signals();
 
 /**
  * ```js
@@ -37,12 +37,16 @@ function interact (element, options) {
   let interactable = scope.interactables.get(element, options);
 
   if (!interactable) {
-    interactable = new Interactable(element, options || {}, scope.document);
+    options = utils.extend(options || {}, {
+      signals: signals,
+      actions: scope.actions,
+    });
+    interactable = new scope.Interactable(element, options, scope.document);
     interactable.events.global = globalEvents;
 
     scope.addDocument(interactable._doc);
 
-    scope.interactables.push(interactable);
+    scope.interactables.list.push(interactable);
   }
 
   return interactable;
@@ -109,7 +113,7 @@ interact.on = function (type, listener, options) {
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.arr.contains(Interactable.eventTypes, type)) {
+  if (utils.arr.contains(scope.actions.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -159,7 +163,7 @@ interact.off = function (type, listener, options) {
     return interact;
   }
 
-  if (!utils.arr.contains(Interactable.eventTypes, type)) {
+  if (!utils.arr.contains(scope.actions.eventTypes, type)) {
     events.remove(scope.document, type, listener, options);
   }
   else {
@@ -224,8 +228,8 @@ interact.supportsPointerEvent = function () {
  * @return {object} interact
  */
 interact.stop = function (event) {
-  for (let i = scope.interactions.length - 1; i >= 0; i--) {
-    scope.interactions[i].stop(event);
+  for (const interaction of scope.interactions.list) {
+    interaction.stop(event);
   }
 
   return interact;
@@ -250,11 +254,11 @@ interact.pointerMoveTolerance = function (newValue) {
   return scope.Interaction.pointerMoveTolerance;
 };
 
-Interactable.signals.on('unset', ({ interactable }) => {
-  scope.interactables.splice(scope.interactables.indexOf(interactable), 1);
+signals.on('unset', ({ interactable }) => {
+  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
 
   // Stop related interactions when an Interactable is unset
-  for (const interaction of scope.interactions) {
+  for (const interaction of scope.interactions.list) {
     if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
       interaction.stop();
     }
@@ -263,48 +267,55 @@ Interactable.signals.on('unset', ({ interactable }) => {
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
 
-// all set interactables
-scope.interactables = [];
+scope.interactables = {
+  // all set interactables
+  list: [],
 
-scope.interactables.indexOfElement = function indexOfElement (target, context) {
-  context = context || scope.document;
+  indexOfElement (target, context) {
+    context = context || scope.document;
 
-  for (let i = 0; i < this.length; i++) {
-    const interactable = this[i];
+    const list = this.list;
 
-    if (interactable.target === target && interactable._context === context) {
-      return i;
+    for (let i = 0; i < list.length; i++) {
+      const interactable = list[i];
+
+      if (interactable.target === target && interactable._context === context) {
+        return i;
+      }
     }
-  }
-  return -1;
-};
 
-scope.interactables.get = function interactableGet (element, options, dontCheckInContext) {
-  const ret = this[this.indexOfElement(element, options && options.context)];
+    return -1;
+  },
 
-  return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
-};
+  get (element, options, dontCheckInContext) {
+    const ret = this.list[this.indexOfElement(element, options && options.context)];
 
-scope.interactables.forEachMatch = function (element, callback) {
-  for (const interactable of this) {
-    let ret;
+    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
+  },
 
-    if ((utils.is.string(interactable.target)
+  forEachMatch (element, callback) {
+    for (const interactable of this.list) {
+      let ret;
+
+      if ((utils.is.string(interactable.target)
         // target is a selector and the element matches
         ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
         // target is the element
         : element === interactable.target)
         // the element is in context
-      && (interactable.inContext(element))) {
-      ret = callback(interactable);
-    }
+        && (interactable.inContext(element))) {
+        ret = callback(interactable);
+      }
 
-    if (ret !== undefined) {
-      return ret;
+      if (ret !== undefined) {
+        return ret;
+      }
     }
-  }
+  },
+
+  signals: signals,
 };
 
 scope.interact = interact;
 
-module.exports = interact;
+export default interact;

@@ -1,21 +1,23 @@
-const test = require('./test');
-const interact = require('../src/interact');
-const scope = require('../src/scope');
-const interactions = require('../src/interactions');
-const { jsdom } = require('jsdom');
+import { jsdom } from 'jsdom';
+
+import test from './test';
+import interact from '../src/interact';
+import { scope } from '../src/scope';
+import interactions from '../src/interactions';
 
 test('interact export', t => {
-  const Interactable = require('../src/Interactable');
   interactions.init(scope);
 
   const interactable1 = interact('selector');
-  t.assert(interactable1 instanceof Interactable,
+  t.assert(interactable1 instanceof scope.Interactable,
     'interact function returns Interactable instance');
   t.equal(interact('selector'), interactable1,
     'same interactable is returned with same target and context');
+  t.equal(scope.interactables.list.length, 1,
+    'new interactables are added to list');
 
   interactable1.unset();
-  t.equal(scope.interactables.length, 0,
+  t.equal(scope.interactables.list.length, 0,
     'unset interactables are removed');
 
   const constructsUniqueMessage =
@@ -52,7 +54,9 @@ test('interact export', t => {
 
   t.pass(getsUniqueMessage);
 
-  scope.interactables.forEach(i => i.unset());
+  scope.interactables.list.forEach(i => i.unset());
+
+  delete scope.Interactable;
 
   t.end();
 });

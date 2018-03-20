@@ -1,13 +1,20 @@
-const Eventable = require('./Eventable');
-const defaults  = require('./defaultOptions');
-const utils     = require('./utils');
-const browser   = require('./utils/browser');
-const events    = require('./utils/events');
-const Signals   = require('./utils/Signals');
+import Eventable  from './Eventable';
+import defaults   from './defaultOptions';
+import * as utils from './utils';
+import domObjects from './utils/domObjects';
 
-const { getWindow } = require('./utils/window');
+import InteractEvent from './InteractEvent';
+import Interactable from './Interactable';
 
-const scope = {
+const {
+  win,
+  browser,
+  raf,
+  Signals,
+  events,
+} = utils;
+
+export const scope = {
   Signals,
   signals: new Signals(),
   browser,
@@ -17,7 +24,7 @@ const scope = {
   Eventable,
 
   // main document
-  document: require('./utils/domObjects').document,
+  document: null,
   // all documents being listened to
   documents: [/* { doc, options } */],
 
@@ -25,7 +32,7 @@ const scope = {
     // do nothing if document is already known
     if (scope.getDocIndex(doc) !== -1) { return false; }
 
-    const win = getWindow(doc);
+    const window = win.getWindow(doc);
 
     scope.documents.push({ doc, options });
     events.documents.push(doc);
@@ -33,24 +40,24 @@ const scope = {
     // don't add an unload event for the main document
     // so that the page may be cached in browser history
     if (doc !== scope.document) {
-      events.add(win, 'unload', scope.onWindowUnload);
+      events.add(window, 'unload', scope.onWindowUnload);
     }
 
-    scope.signals.fire('add-document', { doc, win, scope, options });
+    scope.signals.fire('add-document', { doc, window, scope, options });
   },
 
   removeDocument (doc) {
     const index = scope.getDocIndex(doc);
 
-    const win = getWindow(doc);
+    const window = win.getWindow(doc);
     const options = scope.documents[index].options;
 
-    events.remove(win, 'unload', scope.onWindowUnload);
+    events.remove(window, 'unload', scope.onWindowUnload);
 
     scope.documents.splice(index, 1);
     events.documents.splice(index, 1);
 
-    scope.signals.fire('remove-document', { doc, win, scope, options });
+    scope.signals.fire('remove-document', { doc, window, scope, options });
   },
 
   onWindowUnload (event) {
@@ -68,4 +75,15 @@ const scope = {
   },
 };
 
-module.exports = scope;
+export function init (window) {
+  win.init(window);
+  domObjects.init(window);
+  browser.init(window);
+  raf.init(window);
+
+  scope.document = window.document;
+
+  scope.InteractEvent = InteractEvent;
+  // eslint-disable-next-line no-shadow
+  scope.Interactable = class Interactable extends Interactable {};
+}

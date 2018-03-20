@@ -1,25 +1,19 @@
-const holdRepeat = {
-  init,
-};
-
 function init (scope) {
   const {
     pointerEvents,
-    Interaction,
+    interactions,
   } = scope;
 
   pointerEvents.signals.on('new', onNew);
   pointerEvents.signals.on('fired', arg => onFired(arg, pointerEvents));
 
   for (const signal of ['move', 'up', 'cancel', 'endall']) {
-    Interaction.signals.on(signal, endHoldRepeat);
+    interactions.signals.on(signal, endHoldRepeat);
   }
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0;
   pointerEvents.types.push('holdrepeat');
-
-  pointerEvents.holdRepeat = holdRepeat;
 }
 
 function onNew ({ pointerEvent }) {
@@ -58,4 +52,6 @@ function endHoldRepeat ({ interaction }) {
   }
 }
 
-module.exports = holdRepeat;
+export default {
+  init,
+};

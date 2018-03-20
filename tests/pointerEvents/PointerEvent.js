@@ -1,12 +1,13 @@
-const test = require('../test');
-const helpers = require('../helpers');
+import test from '../test';
+import * as helpers from '../helpers';
+
+import PointerEvent from '../../src/pointerEvents/PointerEvent';
+import pointerUtils from '../../src/utils/pointerUtils';
+import Interaction from '../../src/Interaction';
+import Signals from '../../src/utils/Signals';
+
 
 test('PointerEvent constructor', t => {
-  const PointerEvent = require('../../src/pointerEvents/PointerEvent');
-  const pointerUtils = require('../../src/utils/pointerUtils');
-  const Interaction = require('../../src/Interaction');
-  const Signals = require('../../src/utils/Signals');
-
   const type = 'TEST_EVENT';
   const pointerId = -100;
   const testPointerProp = ['TEST_POINTER_PROP'];
@@ -19,7 +20,7 @@ test('PointerEvent constructor', t => {
   const event = {
     testEventProp,
   };
-  const interaction = new Interaction({ signals: Signals.new() });
+  const interaction = new Interaction({ signals: new Signals() });
   const eventTarget = {};
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction);
 
@@ -47,8 +48,6 @@ test('PointerEvent constructor', t => {
 });
 
 test('PointerEvent methods', t => {
-  const PointerEvent = require('../../src/pointerEvents/PointerEvent');
-
   const methodContexts = {};
   const event = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
     .reduce((acc, methodName) => {

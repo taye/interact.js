@@ -1,15 +1,15 @@
-const modifiers = require('../modifiers/base');
-const utils     = require('../utils');
-const raf       = require('../utils/raf');
+import modifiers  from './modifiers/base';
+import * as utils from './utils';
+import raf        from './utils/raf';
 
 function init (scope) {
   const {
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
-  Interaction.signals.on('new', function (interaction) {
-    interaction.simulations.inertia = {
+  interactions.signals.on('new', function (interaction) {
+    interaction.inertia = {
       active     : false,
       smoothEnd  : false,
       allowResume: false,
@@ -30,9 +30,9 @@ function init (scope) {
     };
   });
 
-  Interaction.signals.on('up'  , arg => release(arg, scope));
-  Interaction.signals.on('down', arg => resume (arg, scope));
-  Interaction.signals.on('stop', arg => stop   (arg, scope));
+  interactions.signals.on('up'  , arg => release(arg, scope));
+  interactions.signals.on('down', arg => resume (arg, scope));
+  interactions.signals.on('stop', arg => stop   (arg, scope));
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -45,7 +45,7 @@ function init (scope) {
 }
 
 function resume ({ interaction, event, pointer, eventTarget }, scope) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   // Check if the down event hits the current inertia target
   if (status.active) {
@@ -70,15 +70,14 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           interaction,
         };
 
-        scope.Interaction.signals.fire('action-resume', signalArg);
+        scope.interactions.signals.fire('action-resume', signalArg);
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, 'inertiaresume', interaction.element);
+          interaction, event, interaction.prepared.name, 'resume', interaction.element);
 
-        interaction.target.fire(resumeEvent);
-        interaction.prevEvent = resumeEvent;
-        modifiers.resetStatuses(interaction.modifierStatuses, scope.modifiers);
+        interaction._fireEvent(resumeEvent);
+        modifiers.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
 
         utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
         break;
@@ -90,7 +89,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 }
 
 function release ({ interaction, event }, scope) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   if (!interaction.interacting() || (interaction.simulation && interaction.simulation.active)) {
     return;
@@ -137,7 +136,7 @@ function release ({ interaction, event }, scope) {
 
   utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
 
-  interaction.pointers[0] = status.startEvent = new scope.InteractEvent(
+  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(
     interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
 
   status.t0 = now;
@@ -164,15 +163,15 @@ function release ({ interaction, event }, scope) {
 
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
-    status.modifiedXe += modifierResult.dx;
-    status.modifiedYe += modifierResult.dy;
+    status.modifiedXe += modifierResult.delta.x;
+    status.modifiedYe += modifierResult.delta.y;
 
     status.i = raf.request(() => inertiaTick(interaction));
   }
   else {
     status.smoothEnd = true;
-    status.xe = modifierResult.dx;
-    status.ye = modifierResult.dy;
+    status.xe = modifierResult.delta.x;
+    status.ye = modifierResult.delta.y;
 
     status.sx = status.sy = 0;
 
@@ -181,7 +180,7 @@ function release ({ interaction, event }, scope) {
 }
 
 function stop ({ interaction }) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   if (status.active) {
     raf.cancel(status.i);
@@ -195,8 +194,8 @@ function calcInertia (interaction, status) {
   const lambda = options.resistance;
   const inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
 
-  status.x0 = interaction.prevEvent.pageX;
-  status.y0 = interaction.prevEvent.pageY;
+  status.x0 = interaction.prevEvent.page.x;
+  status.y0 = interaction.prevEvent.page.y;
   status.t0 = status.startEvent.timeStamp / 1000;
   status.sx = status.sy = 0;
 
@@ -212,7 +211,7 @@ function inertiaTick (interaction) {
   updateInertiaCoords(interaction);
   utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
 
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
   const options = getOptions(interaction);
   const lambda = options.resistance;
   const t = new Date().getTime() / 1000 - status.t0;
@@ -236,7 +235,7 @@ function inertiaTick (interaction) {
       status.sy = quadPoint.y;
     }
 
-    interaction.doMove();
+    interaction.move();
 
     status.i = raf.request(() => inertiaTick(interaction));
   }
@@ -244,7 +243,7 @@ function inertiaTick (interaction) {
     status.sx = status.modifiedXe;
     status.sy = status.modifiedYe;
 
-    interaction.doMove();
+    interaction.move();
     interaction.end(status.startEvent);
     status.active = false;
     interaction.simulation = null;
@@ -256,7 +255,7 @@ function inertiaTick (interaction) {
 function smothEndTick (interaction) {
   updateInertiaCoords(interaction);
 
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
   const t = new Date().getTime() - status.t0;
   const { smoothEndDuration: duration } = getOptions(interaction);
 
@@ -264,7 +263,7 @@ function smothEndTick (interaction) {
     status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
     status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
 
-    interaction.doMove();
+    interaction.move();
 
     status.i = raf.request(() => smothEndTick(interaction));
   }
@@ -272,7 +271,7 @@ function smothEndTick (interaction) {
     status.sx = status.xe;
     status.sy = status.ye;
 
-    interaction.doMove();
+    interaction.move();
     interaction.end(status.startEvent);
 
     status.smoothEnd =
@@ -282,7 +281,7 @@ function smothEndTick (interaction) {
 }
 
 function updateInertiaCoords (interaction) {
-  const status = interaction.simulations.inertia;
+  const status = interaction.inertia;
 
   // return if inertia isn't running
   if (!status.active) { return; }
@@ -302,7 +301,7 @@ function getOptions ({ target, prepared }) {
   return target && target.options && prepared.name && target.options[prepared.name].inertia;
 }
 
-module.exports = {
+export default {
   init,
   calcInertia,
   inertiaTick,

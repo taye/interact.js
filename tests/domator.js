@@ -1,4 +1,6 @@
-const domator = require('domator');
-domator.setDocument(require('../src/utils/window').window.document);
+import domator from 'domator';
+import win from '../src/utils/window';
 
-module.exports = domator;
+domator.setDocument(win.window.document);
+
+export default domator;

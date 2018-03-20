@@ -1,10 +1,10 @@
-const Interaction  = require('./Interaction');
-const events       = require('./utils/events');
-const finder       = require('./utils/interactionFinder');
-const browser      = require('./utils/browser');
-const domObjects   = require('./utils/domObjects');
-const pointerUtils = require('./utils/pointerUtils');
-const Signals      = require('./utils/Signals');
+import Interaction  from './Interaction';
+import events       from './utils/events';
+import finder       from './utils/interactionFinder';
+import browser      from './utils/browser';
+import domObjects   from './utils/domObjects';
+import pointerUtils from './utils/pointerUtils';
+import Signals      from './utils/Signals';
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -12,7 +12,7 @@ const methodNames = [
 ];
 
 function init (scope) {
-  const signals = Signals.new();
+  const signals = new Signals();
 
   const listeners = {};
 
@@ -41,7 +41,7 @@ function init (scope) {
   }
 
   eventMap.blur = event => {
-    for (const interaction of scope.interactions) {
+    for (const interaction of scope.interactions.list) {
       interaction.documentBlur(event);
     }
   };
@@ -52,15 +52,16 @@ function init (scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // all active and idle interactions
-  scope.interactions = [];
-  scope.Interaction = {
+  // eslint-disable-next-line no-shadow
+  scope.Interaction = class Interaction extends Interaction {};
+  scope.interactions = {
     signals,
-    Interaction,
+    // all active and idle interactions
+    list: [],
     new (options) {
       options.signals = signals;
 
-      return new Interaction(options);
+      return new scope.Interaction(options);
     },
     listeners,
     eventMap,
@@ -69,12 +70,13 @@ function init (scope) {
   scope.actions = {
     names: [],
     methodDict: {},
+    eventTypes: [],
   };
 }
 
 function doOnInteractions (method, scope) {
   return (function (event) {
-    const { interactions } = scope;
+    const interactions = scope.interactions.list;
 
     const pointerType = pointerUtils.getPointerType(event);
     const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event);
@@ -130,7 +132,6 @@ function doOnInteractions (method, scope) {
     }
 
     for (const [pointer, interaction] of matches) {
-      interaction._updateEventTargets(eventTarget, curEventTarget);
       interaction[method](pointer, event, eventTarget, curEventTarget);
     }
   });
@@ -142,20 +143,20 @@ function getInteraction (searchDetails) {
   const foundInteraction = finder.search(searchDetails);
   const signalArg = { interaction: foundInteraction, searchDetails };
 
-  scope.Interaction.signals.fire('find', signalArg);
+  scope.interactions.signals.fire('find', signalArg);
 
   return signalArg.interaction || newInteraction({ pointerType }, scope);
 }
 
-function newInteraction (options, scope) {
-  const interaction = scope.Interaction.new(options);
+export function newInteraction (options, scope) {
+  const interaction = scope.interactions.new(options);
 
-  scope.interactions.push(interaction);
+  scope.interactions.list.push(interaction);
   return interaction;
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { eventMap } = scope.Interaction;
+  const { eventMap } = scope.interactions;
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
 
@@ -172,7 +173,7 @@ function onDocSignal ({ doc, scope, options }, signalName) {
   }
 }
 
-module.exports = {
+export default {
   init,
   onDocSignal,
   doOnInteractions,

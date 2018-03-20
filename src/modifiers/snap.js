@@ -1,4 +1,4 @@
-const utils = require('../utils');
+import * as utils from '../utils';
 
 function init (scope) {
   const {
@@ -7,10 +7,10 @@ function init (scope) {
   } = scope;
 
 
-  modifiers.snap = module.exports;
+  modifiers.snap = snap;
   modifiers.names.push('snap');
 
-  defaults.perAction.snap = module.exports.defaults;
+  defaults.perAction.snap = snap.defaults;
 }
 
 function setOffset ({ interaction, interactable, element, rect, startOffset, options }) {
@@ -68,7 +68,7 @@ function set ({ interaction, modifiedCoords, status, options, offset: offsets })
     const relativeY = page.y - offsetY;
 
     for (const snapTarget of options.targets) {
-      if (utils.is.function(snapTarget)) {
+      if (utils.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction);
       }
       else {
@@ -111,16 +111,16 @@ function set ({ interaction, modifiedCoords, status, options, offset: offsets })
     }
 
     if (!closest.target || (inRange
-        // is the closest target in range?
-        ? (closest.inRange && range !== Infinity
+      // is the closest target in range?
+      ? (closest.inRange && range !== Infinity
         // the pointer is relatively deeper in this target
         ? distance / range < closest.distance / closest.range
         // this target has Infinite range and the closest doesn't
-        : (range === Infinity && closest.range !== Infinity)
-        // OR this target is closer that the previous closest
-      || distance < closest.distance)
-        // The other is not in range and the pointer is closer to this target
-        : (!closest.inRange && distance < closest.distance))) {
+        : (range === Infinity && closest.range !== Infinity) ||
+          // OR this target is closer that the previous closest
+          distance < closest.distance)
+      // The other is not in range and the pointer is closer to this target
+      : (!closest.inRange && distance < closest.distance))) {
 
       closest.target = target;
       closest.distance = distance;
@@ -133,25 +133,12 @@ function set ({ interaction, modifiedCoords, status, options, offset: offsets })
     }
   }
 
-  let snapChanged;
+  status.modifiedX = closest.target.x;
+  status.modifiedY = closest.target.y;
 
-  if (closest.target) {
-    snapChanged = (status.modifiedX !== closest.target.x || status.modifiedY !== closest.target.y);
+  status.delta.x = closest.dx;
+  status.delta.y = closest.dy;
 
-    status.modifiedX = closest.target.x;
-    status.modifiedY = closest.target.y;
-  }
-  else {
-    snapChanged = true;
-
-    status.modifiedX = NaN;
-    status.modifiedY = NaN;
-  }
-
-  status.dx = closest.dx;
-  status.dy = closest.dy;
-
-  status.changed = (snapChanged || (closest.inRange && !status.locked));
   status.locked = closest.inRange;
 }
 
@@ -162,10 +149,10 @@ function modifyCoords ({ page, client, status, phase, options }) {
       && !(phase === 'start' && relativePoints && relativePoints.length)) {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
 
     return {
@@ -175,13 +162,13 @@ function modifyCoords ({ page, client, status, phase, options }) {
       y      : status.modifiedY,
       realX  : status.realX,
       realY  : status.realY,
-      dx     : status.dx,
-      dy     : status.dy,
+      dx     : status.delta.x,
+      dy     : status.delta.y,
     };
   }
 }
 
-module.exports = {
+const snap = {
   init,
   setOffset,
   set,
@@ -196,3 +183,5 @@ module.exports = {
     relativePoints: null,
   },
 };
+
+export default snap;

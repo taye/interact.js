@@ -1,33 +1,37 @@
-const { window } = require('./window');
-
 let lastTime = 0;
-let request = window.requestAnimationFrame;
-let cancel = window.cancelAnimationFrame;
+let request;
+let cancel;
 
-if (!request) {
-  const vendors = ['ms', 'moz', 'webkit', 'o'];
+function init (window) {
+  request = window.requestAnimationFrame;
+  cancel = window.cancelAnimationFrame;
 
-  for (const vendor of vendors) {
-    request = window[`${vendor}RequestAnimationFrame`];
-    cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`];
+  if (!request) {
+    const vendors = ['ms', 'moz', 'webkit', 'o'];
+
+    for (const vendor of vendors) {
+      request = window[`${vendor}RequestAnimationFrame`];
+      cancel = window[`${vendor}CancelAnimationFrame`] || window[`${vendor}CancelRequestAnimationFrame`];
+    }
+  }
+
+  if (!request) {
+    request = callback => {
+      const currTime = new Date().getTime();
+      const timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      const token = setTimeout(function () { callback(currTime + timeToCall); },
+        timeToCall);
+
+      lastTime = currTime + timeToCall;
+      return token;
+    };
+
+    cancel = token => clearTimeout(token);
   }
 }
 
-if (!request) {
-  request = callback => {
-    const currTime = new Date().getTime();
-    const timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    const token = setTimeout(function () { callback(currTime + timeToCall); },
-                          timeToCall);
-
-    lastTime = currTime + timeToCall;
-    return token;
-  };
-
-  cancel = token => clearTimeout(token);
-}
-
-module.exports = {
+export default {
   request: callback => request(callback),
   cancel: token => cancel(token),
+  init,
 };

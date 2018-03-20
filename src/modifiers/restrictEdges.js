@@ -9,9 +9,9 @@
 //   },
 // });
 
-const extend = require('../utils/extend');
-const rectUtils = require('../utils/rect');
-const restrict = require('./restrict');
+import extend from '../utils/extend';
+import rectUtils from '../utils/rect';
+import restrict from './restrict';
 
 const { getRestrictionRect } = restrict;
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
@@ -21,20 +21,16 @@ function init (scope) {
   const {
     modifiers,
     defaults,
-    actions,
   } = scope;
 
-  const { resize } = actions;
-
-  modifiers.restrictEdges = module.exports;
+  modifiers.restrictEdges = restrictEdges;
   modifiers.names.push('restrictEdges');
 
-  defaults.perAction.restrictEdges = module.exports.defaults;
-  resize.defaults.restrictEdges = module.exports.defaults;
+  defaults.perAction.restrictEdges = restrictEdges.defaults;
 }
 
 function setOffset ({ interaction, options }) {
-  const startOffset = interaction.startOffset;
+  const startOffset = interaction.modifiers.startOffset;
   let offset;
 
   if (options) {
@@ -70,8 +66,8 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
   let modifiedX = page.x;
   let modifiedY = page.y;
 
-  status.dx = 0;
-  status.dy = 0;
+  status.delta.x = 0;
+  status.delta.y = 0;
   status.locked = false;
 
   if (edges.top) {
@@ -87,29 +83,20 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
     modifiedX = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right);
   }
 
-  status.dx = modifiedX - page.x;
-  status.dy = modifiedY - page.y;
+  status.delta.x = modifiedX - page.x;
+  status.delta.y = modifiedY - page.y;
 
-  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-  status.locked = !!(status.dx || status.dy);
-
-  status.modifiedX = modifiedX;
-  status.modifiedY = modifiedY;
+  status.locked = !!(status.delta.x || status.delta.y);
 }
 
 function modifyCoords ({ page, client, status, phase, options }) {
   if (options && options.enabled && phase !== 'start') {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
-
-      return {
-        dx: status.dx,
-        dy: status.dy,
-      };
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
   }
 }
@@ -124,7 +111,7 @@ function fixRect (rect, defaults) {
   return rect;
 }
 
-module.exports = {
+const restrictEdges = {
   init,
   noInner,
   noOuter,
@@ -140,3 +127,5 @@ module.exports = {
     offset: null,
   },
 };
+
+export default restrictEdges;

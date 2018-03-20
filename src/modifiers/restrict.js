@@ -1,6 +1,6 @@
-const is        = require('../utils/is');
-const extend    = require('../utils/extend');
-const rectUtils = require('../utils/rect');
+import * as is   from '../utils/is';
+import extend    from '../utils/extend';
+import rectUtils from '../utils/rect';
 
 function init (scope) {
   const {
@@ -8,10 +8,10 @@ function init (scope) {
     defaults,
   } = scope;
 
-  modifiers.restrict = module.exports;
+  modifiers.restrict = restrict;
   modifiers.names.push('restrict');
 
-  defaults.perAction.restrict = module.exports.defaults;
+  defaults.perAction.restrict = restrict.defaults;
 }
 
 function setOffset ({ rect, startOffset, options }) {
@@ -32,7 +32,7 @@ function setOffset ({ rect, startOffset, options }) {
   return offset;
 }
 
-function set ({ modifiedCoords, interaction, status, options }) {
+function set ({ modifiedCoords, interaction, status, offset, options }) {
   if (!options) { return status; }
 
   const page = extend({}, modifiedCoords);
@@ -41,15 +41,13 @@ function set ({ modifiedCoords, interaction, status, options }) {
 
   if (!restriction) { return status; }
 
-  status.dx = 0;
-  status.dy = 0;
+  status.delta.x = 0;
+  status.delta.y = 0;
   status.locked = false;
 
   const rect = restriction;
   let modifiedX = page.x;
   let modifiedY = page.y;
-
-  const offset = interaction.modifierOffsets.restrict;
 
   // object is assumed to have
   // x, y, width, height or
@@ -63,11 +61,10 @@ function set ({ modifiedCoords, interaction, status, options }) {
     modifiedY = Math.max(Math.min(rect.bottom - offset.bottom, page.y), rect.top  + offset.top );
   }
 
-  status.dx = modifiedX - page.x;
-  status.dy = modifiedY - page.y;
+  status.delta.x = modifiedX - page.x;
+  status.delta.y = modifiedY - page.y;
 
-  status.changed = status.modifiedX !== modifiedX || status.modifiedY !== modifiedY;
-  status.locked = !!(status.dx || status.dy);
+  status.locked = !!(status.delta.x || status.delta.y);
 
   status.modifiedX = modifiedX;
   status.modifiedY = modifiedY;
@@ -80,28 +77,23 @@ function modifyCoords ({ page, client, status, phase, options }) {
       && !(phase === 'start' && elementRect && status.locked)) {
 
     if (status.locked) {
-      page.x += status.dx;
-      page.y += status.dy;
-      client.x += status.dx;
-      client.y += status.dy;
-
-      return {
-        dx: status.dx,
-        dy: status.dy,
-      };
+      page.x += status.delta.x;
+      page.y += status.delta.y;
+      client.x += status.delta.x;
+      client.y += status.delta.y;
     }
   }
 }
 
 function getRestrictionRect (value, interaction, page) {
-  if (is.function(value)) {
+  if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
   } else {
     return rectUtils.resolveRectLike(value, interaction.target, interaction.element);
   }
 }
 
-module.exports = {
+const restrict = {
   init,
   setOffset,
   set,
@@ -114,3 +106,5 @@ module.exports = {
     elementRect: null,
   },
 };
+
+export default restrict;

@@ -1,14 +1,14 @@
 function init (scope) {
   const {
     autoStart,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
   defaults.perAction.hold = 0;
   defaults.perAction.delay = 0;
 
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.autoStartHoldTimer = null;
   });
 
@@ -22,7 +22,7 @@ function init (scope) {
     }
   });
 
-  Interaction.signals.on('move', function ({ interaction, duplicate }) {
+  interactions.signals.on('move', function ({ interaction, duplicate }) {
     if (interaction.pointerWasMoved && !duplicate) {
       clearTimeout(interaction.autoStartHoldTimer);
     }
@@ -48,7 +48,7 @@ function getHoldDuration (interaction) {
   return options[actionName].hold || options[actionName].delay;
 }
 
-module.exports = {
+export default {
   init,
   getHoldDuration,
 };

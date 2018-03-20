@@ -1,11 +1,11 @@
-const utils = require('../utils');
+import * as utils from '../utils';
+import InteractEvent from '../InteractEvent';
 
 function init (scope) {
   const {
     actions,
-    InteractEvent,
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
@@ -14,7 +14,7 @@ function init (scope) {
     },
 
     checker: function (pointer, event, interactable, element, interaction) {
-      if (interaction.pointerIds.length >= 2) {
+      if (interaction.pointers.length >= 2) {
         return { name: 'gesture' };
       }
 
@@ -25,34 +25,6 @@ function init (scope) {
       return '';
     },
   };
-
-  InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
-    if (iEvent.type !== 'gesturestart') { return; }
-    iEvent.ds = 0;
-
-    interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
-    interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
-    interaction.gesture.scale = 1;
-  });
-
-  InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
-    if (iEvent.type !== 'gesturemove') { return; }
-
-    iEvent.ds = iEvent.scale - interaction.gesture.scale;
-
-    interaction.target.fire(iEvent);
-
-    interaction.gesture.prevAngle = iEvent.angle;
-    interaction.gesture.prevDistance = iEvent.distance;
-
-    if (iEvent.scale !== Infinity
-        && iEvent.scale !== null
-        && iEvent.scale !== undefined
-        && !isNaN(iEvent.scale)) {
-
-      interaction.gesture.scale = iEvent.scale;
-    }
-  });
 
   /**
    * ```js
@@ -99,41 +71,14 @@ function init (scope) {
     return this.options.gesture;
   };
 
-  InteractEvent.signals.on('set-delta', function ({ interaction, iEvent, action, event, starting, ending, deltaSource }) {
-    if (action !== 'gesture') { return; }
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
-    const pointers = interaction.pointers;
+  interactions.signals.on('action-start', updateGestureProps);
+  interactions.signals.on('action-move', updateGestureProps);
+  interactions.signals.on('action-end', updateGestureProps);
 
-    iEvent.touches = [pointers[0], pointers[1]];
-
-    if (starting) {
-      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-      iEvent.box      = utils.pointer.touchBBox(pointers);
-      iEvent.scale    = 1;
-      iEvent.ds       = 0;
-      iEvent.angle    = utils.pointer.touchAngle(pointers, undefined, deltaSource);
-      iEvent.da       = 0;
-    }
-    else if (ending || event instanceof InteractEvent) {
-      iEvent.distance = interaction.prevEvent.distance;
-      iEvent.box      = interaction.prevEvent.box;
-      iEvent.scale    = interaction.prevEvent.scale;
-      iEvent.ds       = iEvent.scale - 1;
-      iEvent.angle    = interaction.prevEvent.angle;
-      iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
-    }
-    else {
-      iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
-      iEvent.box      = utils.pointer.touchBBox(pointers);
-      iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
-      iEvent.angle    = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
-
-      iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
-      iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
-    }
-  });
-
-  Interaction.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction) {
     interaction.gesture = {
       start: { x: 0, y: 0 },
 
@@ -150,7 +95,7 @@ function init (scope) {
 
   actions.gesture = gesture;
   actions.names.push('gesture');
-  utils.arr.merge(Interactable.eventTypes, [
+  utils.arr.merge(actions.eventTypes, [
     'gesturestart',
     'gesturemove',
     'gestureend',
@@ -160,4 +105,69 @@ function init (scope) {
   defaults.gesture = gesture.defaults;
 }
 
-module.exports = { init };
+function start ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  iEvent.ds = 0;
+
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.scale = 1;
+}
+
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  iEvent.ds = iEvent.scale - interaction.gesture.scale;
+
+  interaction.target.fire(iEvent);
+
+  interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.prevDistance = iEvent.distance;
+
+  if (iEvent.scale !== Infinity
+      && iEvent.scale !== null
+      && iEvent.scale !== undefined
+      && !isNaN(iEvent.scale)) {
+
+    interaction.gesture.scale = iEvent.scale;
+  }
+}
+
+function updateGestureProps ({ interaction, iEvent, event, phase, deltaSource }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  const pointers = interaction.pointers;
+  const starting = phase === 'start';
+  const ending = phase === 'end';
+
+  iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
+
+  if (starting) {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box      = utils.pointer.touchBBox(pointers);
+    iEvent.scale    = 1;
+    iEvent.ds       = 0;
+    iEvent.angle    = utils.pointer.touchAngle(pointers, undefined, deltaSource);
+    iEvent.da       = 0;
+  }
+  else if (ending || event instanceof InteractEvent) {
+    iEvent.distance = interaction.prevEvent.distance;
+    iEvent.box      = interaction.prevEvent.box;
+    iEvent.scale    = interaction.prevEvent.scale;
+    iEvent.ds       = iEvent.scale - 1;
+    iEvent.angle    = interaction.prevEvent.angle;
+    iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
+  }
+  else {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box      = utils.pointer.touchBBox(pointers);
+    iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
+    iEvent.angle    = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+
+    iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+    iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
+  }
+}
+
+export default { init };

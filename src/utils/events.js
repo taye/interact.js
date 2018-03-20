@@ -1,10 +1,9 @@
-const is           = require('./is');
-const domUtils     = require('./domUtils');
-const pointerUtils = require('./pointerUtils');
-const pExtend      = require('./pointerExtend');
+import * as is       from './is';
+import * as domUtils from './domUtils';
+import pointerUtils  from './pointerUtils';
+import pExtend       from './pointerExtend';
 
-const { window }   = require('./window');
-const { contains } = require('./arr');
+import { contains } from './arr';
 
 const elements = [];
 const targets  = [];
@@ -19,15 +18,7 @@ const targets  = [];
 const delegatedEvents = {};
 const documents       = [];
 
-const supportsOptions = (() => {
-  let supported = false;
-
-  window.document.createElement('div').addEventListener('test', null, {
-    get capture () { supported = true; },
-  });
-
-  return supported;
-})();
+let supportsOptions;
 
 function add (element, type, listener, optionalArg) {
   const options = getOptions(optionalArg);
@@ -251,7 +242,7 @@ function getOptions (param) {
   return is.object(param)? param : { capture: param };
 }
 
-module.exports = {
+export default {
   add,
   remove,
 
@@ -267,4 +258,12 @@ module.exports = {
 
   _elements: elements,
   _targets: targets,
+
+  init (window) {
+    supportsOptions = false;
+
+    window.document.createElement('div').addEventListener('test', null, {
+      get capture () { supportsOptions = true; },
+    });
+  },
 };

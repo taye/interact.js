@@ -1,18 +1,21 @@
-const domObjects = {};
-const win = require('./window').window;
+const domObjects = {
+  init,
+};
 
 function blank () {}
 
-domObjects.document           = win.document;
-domObjects.DocumentFragment   = win.DocumentFragment   || blank;
-domObjects.SVGElement         = win.SVGElement         || blank;
-domObjects.SVGSVGElement      = win.SVGSVGElement      || blank;
-domObjects.SVGElementInstance = win.SVGElementInstance || blank;
-domObjects.Element            = win.Element            || blank;
-domObjects.HTMLElement        = win.HTMLElement        || domObjects.Element;
+export default domObjects;
 
-domObjects.Event        = win.Event;
-domObjects.Touch        = win.Touch || blank;
-domObjects.PointerEvent = (win.PointerEvent || win.MSPointerEvent);
+function init (window) {
+  domObjects.document           = window.document;
+  domObjects.DocumentFragment   = window.DocumentFragment   || blank;
+  domObjects.SVGElement         = window.SVGElement         || blank;
+  domObjects.SVGSVGElement      = window.SVGSVGElement      || blank;
+  domObjects.SVGElementInstance = window.SVGElementInstance || blank;
+  domObjects.Element            = window.Element            || blank;
+  domObjects.HTMLElement        = window.HTMLElement        || domObjects.Element;
 
-module.exports = domObjects;
+  domObjects.Event        = window.Event;
+  domObjects.Touch        = window.Touch || blank;
+  domObjects.PointerEvent = (window.PointerEvent || window.MSPointerEvent);
+}

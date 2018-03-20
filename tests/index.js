@@ -1,52 +1,55 @@
-require('./Interactable');
-require('./Interaction');
-require('./interactions');
+import './Interactable';
+import './Interaction';
+import './interactions';
 
 // Legacy browser support
-//require('./legacyBrowsers');
+//import './legacyBrowsers';
 
-require('./Eventable');
+import './Eventable';
 
 // pointerEvents
-require('./pointerEvents/base');
-require('./pointerEvents/PointerEvent');
-require('./pointerEvents/holdRepeat');
-//require('./pointerEvents/interactableTargets');
+import './pointerEvents/base';
+import './pointerEvents/PointerEvent';
+import './pointerEvents/holdRepeat';
+//import './pointerEvents/interactableTargets';
 
 // inertia
-//require('./inertia');
+//import './inertia';
 
 // modifiers
-//require('./modifiers/snap');
-//require('./modifiers/restrict');
-require('./modifiers/restrictSize');
-require('./modifiers/restrictEdges');
+import './modifiers/snap';
+import './modifiers/snapSize';
+//import './modifiers/restrict';
+import './modifiers/restrictSize';
+import './modifiers/restrictEdges';
 
 // autoStart hold
-require('./autoStart/hold');
+import './autoStart/hold';
 
 // actions
-//require('./actions/gesture');
-//require('./actions/resize');
-require('./actions/drag');
-//require('./actions/drop');
+//import './actions/gesture';
+//import './actions/resize';
+import './actions/drag';
+//import './actions/drop';
 
 // autoStart actions
-//require('./autoStart/gesture');
-//require('./autoStart/resize');
-//require('./autoStart/drag');
+//import './autoStart/gesture';
+//import './autoStart/resize';
+//import './autoStart/drag';
 
 // Interactable preventDefault setting
-//require('./interactablePreventDefault.js');
+//import './interactablePreventDefault.js';
 
 // autoScroll
-//require('./autoScroll');
+//import './autoScroll';
 
-require('./interact');
+import './reflow';
 
-//const index = require('../src/index');
-//const test = require('tape');
+import './interact';
+
+//const index = import '../src/index';
+//const test = import 'tape';
 
 //test('module export', function (t) {
-  //t.equal(index, require('../src/interact'));
+//t.equal(index, import '../src/interact');
 //});

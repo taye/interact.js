@@ -1,55 +1,69 @@
-const win    = require('./window');
+import win         from './window';
+import browser     from './browser';
+import Signals     from './Signals';
+import * as arr    from './arr';
+import * as dom    from './domUtils';
+import raf         from './raf';
+import extend      from './extend';
+import getOriginXY from './getOriginXY';
+import hypot       from './hypot';
+import * as is     from './is';
+import pointer     from './pointerUtils';
+import rect        from './rect';
+import events      from './events';
 
-const utils = {
-  warnOnce: function (method, message) {
-    let warned = false;
+export function warnOnce (method, message) {
+  let warned = false;
 
-    return function () {
-      if (!warned) {
-        win.window.console.warn(message);
-        warned = true;
-      }
+  return function () {
+    if (!warned) {
+      win.window.console.warn(message);
+      warned = true;
+    }
 
-      return method.apply(this, arguments);
-    };
-  },
+    return method.apply(this, arguments);
+  };
+}
 
-  // http://stackoverflow.com/a/5634528/2280888
-  _getQBezierValue: function (t, p1, p2, p3) {
-    const iT = 1 - t;
-    return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
-  },
+// http://stackoverflow.com/a/5634528/2280888
+export function _getQBezierValue (t, p1, p2, p3) {
+  const iT = 1 - t;
+  return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
+}
 
-  getQuadraticCurvePoint: function (startX, startY, cpX, cpY, endX, endY, position) {
-    return {
-      x:  utils._getQBezierValue(position, startX, cpX, endX),
-      y:  utils._getQBezierValue(position, startY, cpY, endY),
-    };
-  },
+export function getQuadraticCurvePoint (startX, startY, cpX, cpY, endX, endY, position) {
+  return {
+    x:  _getQBezierValue(position, startX, cpX, endX),
+    y:  _getQBezierValue(position, startY, cpY, endY),
+  };
+}
 
-  // http://gizma.com/easing/
-  easeOutQuad: function (t, b, c, d) {
-    t /= d;
-    return -c * t*(t-2) + b;
-  },
+// http://gizma.com/easing/
+export function easeOutQuad (t, b, c, d) {
+  t /= d;
+  return -c * t*(t-2) + b;
+}
 
-  copyAction: function (dest, src) {
-    dest.name  = src.name;
-    dest.axis  = src.axis;
-    dest.edges = src.edges;
+export function copyAction (dest, src) {
+  dest.name  = src.name;
+  dest.axis  = src.axis;
+  dest.edges = src.edges;
 
-    return dest;
-  },
+  return dest;
+}
 
-  Signals    : require('./Signals'),
-  arr        : require('./arr'),
-  dom        : require('./domUtils'),
-  extend     : require('./extend'),
-  getOriginXY: require('./getOriginXY'),
-  hypot      : require('./hypot'),
-  is         : require('./is'),
-  pointer    : require('./pointerUtils'),
-  rect       : require('./rect'),
+export {
+  Signals,
+  arr,
+  dom,
+  extend,
+  getOriginXY,
+  hypot,
+  is,
+  pointer,
+  rect,
+  raf,
+  win,
+  browser,
+  events,
 };
-
-module.exports = utils;

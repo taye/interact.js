@@ -1,29 +1,35 @@
-const extend      = require('./utils/extend');
-const getOriginXY = require('./utils/getOriginXY');
-const defaults    = require('./defaultOptions');
-const signals     = require('./utils/Signals').new();
+import extend      from './utils/extend';
+import getOriginXY from './utils/getOriginXY';
+import defaults    from './defaultOptions';
 
 class InteractEvent {
   /** */
-  constructor (interaction, event, action, phase, element, related, preEnd = false) {
-    const target      = interaction.target;
-    const deltaSource = (target && target.options || defaults).deltaSource;
-    const origin      = getOriginXY(target, element, action);
-    const starting    = phase === 'start';
-    const ending      = phase === 'end';
-    const coords      = starting? interaction.startCoords : interaction.curCoords;
-    const prevEvent   = interaction.prevEvent;
-
+  constructor (interaction, event, actionName, phase, element, related, preEnd, type) {
     element = element || interaction.element;
 
-    const page   = extend({}, coords.page);
-    const client = extend({}, coords.client);
+    const target      = interaction.target;
+    const deltaSource = (target && target.options || defaults).deltaSource;
+    const origin      = getOriginXY(target, element, actionName);
+    const starting    = phase === 'start';
+    const ending      = phase === 'end';
+    const prevEvent   = starting? this : interaction.prevEvent;
+    const coords      = starting
+      ? interaction.startCoords
+      : ending
+        ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.curCoords.timeStamp }
+        : interaction.curCoords;
 
-    page.x -= origin.x;
-    page.y -= origin.y;
+    this.page      = extend({}, coords.page);
+    this.client    = extend({}, coords.client);
+    this.timeStamp = coords.timeStamp;
 
-    client.x -= origin.x;
-    client.y -= origin.y;
+    if (!ending) {
+      this.page.x -= origin.x;
+      this.page.y -= origin.y;
+
+      this.client.x -= origin.x;
+      this.client.y -= origin.y;
+    }
 
     this.ctrlKey       = event.ctrlKey;
     this.altKey        = event.altKey;
@@ -35,65 +41,61 @@ class InteractEvent {
     this.currentTarget = element;
     this.relatedTarget = related || null;
     this.preEnd        = preEnd;
-    this.type          = action + (phase || '');
+    this.type          = type || (actionName + (phase || ''));
     this.interaction   = interaction;
     this.interactable  = target;
 
-    this.t0 = starting ? interaction.downTimes[interaction.downTimes.length - 1]
-                       : prevEvent.t0;
+    this.t0 = starting
+      ? interaction.pointers[interaction.pointers.length - 1].downTime
+      : prevEvent.t0;
 
-    const signalArg = {
-      interaction,
-      event,
-      action,
-      phase,
-      element,
-      related,
-      page,
-      client,
-      coords,
-      starting,
-      ending,
-      deltaSource,
-      iEvent: this,
-    };
+    this.x0       = interaction.startCoords.page.x - origin.x;
+    this.y0       = interaction.startCoords.page.y - origin.y;
+    this.clientX0 = interaction.startCoords.client.x - origin.x;
+    this.clientY0 = interaction.startCoords.client.y - origin.y;
 
-    signals.fire('set-xy', signalArg);
-
-    if (ending) {
-      // use previous coords when ending
-      this.pageX = prevEvent.pageX;
-      this.pageY = prevEvent.pageY;
-      this.clientX = prevEvent.clientX;
-      this.clientY = prevEvent.clientY;
+    if (starting || ending) {
+      this.delta = { x: 0, y: 0 };
     }
     else {
-      this.pageX     = page.x;
-      this.pageY     = page.y;
-      this.clientX   = client.x;
-      this.clientY   = client.y;
+      this.delta = {
+        x: this[deltaSource].x - prevEvent[deltaSource].x,
+        y: this[deltaSource].y - prevEvent[deltaSource].y,
+      };
     }
 
-    this.x0        = interaction.startCoords.page.x - origin.x;
-    this.y0        = interaction.startCoords.page.y - origin.y;
-    this.clientX0  = interaction.startCoords.client.x - origin.x;
-    this.clientY0  = interaction.startCoords.client.y - origin.y;
-
-    signals.fire('set-delta', signalArg);
-
-    this.timeStamp = coords.timeStamp;
     this.dt        = interaction.pointerDelta.timeStamp;
     this.duration  = this.timeStamp - this.t0;
 
     // speed and velocity in pixels per second
     this.speed = interaction.pointerDelta[deltaSource].speed;
-    this.velocityX = interaction.pointerDelta[deltaSource].vx;
-    this.velocityY = interaction.pointerDelta[deltaSource].vy;
+    this.velocity = {
+      x: interaction.pointerDelta[deltaSource].vx,
+      y: interaction.pointerDelta[deltaSource].vy,
+    };
 
     this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
-
-    signals.fire('new', signalArg);
   }
+
+  get pageX () { return this.page.x; }
+  get pageY () { return this.page.y; }
+  set pageX (value) { this.page.x = value; }
+  set pageY (value) { this.page.y = value; }
+
+  get clientX () { return this.client.x; }
+  get clientY () { return this.client.y; }
+  set clientX (value) { this.client.x = value; }
+  set clientY (value) { this.client.y = value; }
+
+  get dx () { return this.delta.x; }
+  get dy () { return this.delta.y; }
+  set dx (value) { this.delta.x = value; }
+  set dy (value) { this.delta.y = value; }
+
+  get velocityX () { return this.velocity.x; }
+  get velocityY () { return this.velocity.y; }
+  set velocityX (value) { this.velocity.x = value; }
+  set velocityY (value) { this.velocity.y = value; }
 
   getSwipe () {
     const interaction = this.interaction;
@@ -143,19 +145,4 @@ class InteractEvent {
   }
 }
 
-signals.on('set-delta', function ({ iEvent, interaction, starting, deltaSource }) {
-  const prevEvent = starting? iEvent : interaction.prevEvent;
-
-  if (deltaSource === 'client') {
-    iEvent.dx = iEvent.clientX - prevEvent.clientX;
-    iEvent.dy = iEvent.clientY - prevEvent.clientY;
-  }
-  else {
-    iEvent.dx = iEvent.pageX - prevEvent.pageX;
-    iEvent.dy = iEvent.pageY - prevEvent.pageY;
-  }
-});
-
-InteractEvent.signals = signals;
-
-module.exports = InteractEvent;
+export default InteractEvent;

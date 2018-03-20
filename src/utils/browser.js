@@ -1,34 +1,44 @@
-const { window } = require('./window');
-const is     = require('./is');
-const domObjects = require('./domObjects');
-
-const Element = domObjects.Element;
-const navigator  = window.navigator;
+import win from './window';
+import * as is from './is';
+import domObjects from './domObjects';
 
 const browser = {
+  init,
+};
+
+export default browser;
+
+function init (window) {
+  const Element = domObjects.Element;
+  const navigator  = win.window.navigator;
+
   // Does the browser support touch input?
-  supportsTouch: !!(('ontouchstart' in window) || is.function(window.DocumentTouch)
-                     && domObjects.document instanceof window.DocumentTouch),
+  browser.supportsTouch = !!(('ontouchstart' in window) || is.func(window.DocumentTouch)
+                     && domObjects.document instanceof window.DocumentTouch);
 
   // Does the browser support PointerEvents
-  supportsPointerEvent: !!domObjects.PointerEvent,
+  browser.supportsPointerEvent = !!domObjects.PointerEvent;
 
-  isIOS: (/iP(hone|od|ad)/.test(navigator.platform)),
+  browser.isIOS = (/iP(hone|od|ad)/.test(navigator.platform));
 
   // scrolling doesn't change the result of getClientRects on iOS 7
-  isIOS7: (/iP(hone|od|ad)/.test(navigator.platform)
-           && /OS 7[^\d]/.test(navigator.appVersion)),
+  browser.isIOS7 = (/iP(hone|od|ad)/.test(navigator.platform)
+           && /OS 7[^\d]/.test(navigator.appVersion));
 
-  isIe9: /MSIE 9/.test(navigator.userAgent),
+  browser.isIe9 = /MSIE 9/.test(navigator.userAgent);
 
   // prefix matchesSelector
-  prefixedMatchesSelector: 'matches' in Element.prototype
-    ? 'matches': 'webkitMatchesSelector' in Element.prototype
-    ? 'webkitMatchesSelector': 'mozMatchesSelector' in Element.prototype
-    ? 'mozMatchesSelector': 'oMatchesSelector' in Element.prototype
-    ? 'oMatchesSelector': 'msMatchesSelector',
+  browser.prefixedMatchesSelector = 'matches' in Element.prototype
+    ? 'matches'
+    : 'webkitMatchesSelector' in Element.prototype
+      ? 'webkitMatchesSelector'
+      : 'mozMatchesSelector' in Element.prototype
+        ? 'mozMatchesSelector'
+        : 'oMatchesSelector' in Element.prototype
+          ? 'oMatchesSelector'
+          : 'msMatchesSelector';
 
-  pEventTypes: (domObjects.PointerEvent
+  browser.pEventTypes = (domObjects.PointerEvent
     ? (domObjects.PointerEvent === window.MSPointerEvent
       ? {
         up:     'MSPointerUp',
@@ -46,16 +56,13 @@ const browser = {
         move:   'pointermove',
         cancel: 'pointercancel',
       })
-    : null),
+    : null);
 
   // because Webkit and Opera still use 'mousewheel' event type
-  wheelEvent: 'onmousewheel' in domObjects.document? 'mousewheel': 'wheel',
+  browser.wheelEvent = 'onmousewheel' in domObjects.document? 'mousewheel': 'wheel';
 
-};
-
-// Opera Mobile must be handled differently
-browser.isOperaMobile = (navigator.appName === 'Opera'
-  && browser.supportsTouch
-  && navigator.userAgent.match('Presto'));
-
-module.exports = browser;
+  // Opera Mobile must be handled differently
+  browser.isOperaMobile = (navigator.appName === 'Opera'
+    && browser.supportsTouch
+    && navigator.userAgent.match('Presto'));
+}

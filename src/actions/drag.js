@@ -1,35 +1,34 @@
-const is  = require('../utils/is');
-const arr = require('../utils/arr');
+import * as is from '../utils/is';
+import * as arr from '../utils/arr';
 
 function init (scope) {
   const {
     actions,
-    InteractEvent,
     Interactable,
-    Interaction,
+    interactions,
     defaults,
   } = scope;
 
-  Interaction.signals.on('before-action-move', beforeMove);
-  Interaction.signals.on('action-resume', beforeMove);
+  interactions.signals.on('before-action-move', beforeMove);
+  interactions.signals.on('action-resume', beforeMove);
 
   // dragmove
-  InteractEvent.signals.on('new', newInteractEvent);
+  interactions.signals.on('action-move', move);
 
-  Interactable.prototype.draggable = module.exports.draggable;
+  Interactable.prototype.draggable = drag.draggable;
 
-  actions.drag = module.exports;
+  actions.drag = drag;
   actions.names.push('drag');
-  arr.merge(Interactable.eventTypes, [
+  arr.merge(actions.eventTypes, [
     'dragstart',
     'dragmove',
     'draginertiastart',
-    'draginertiaresume',
+    'dragresume',
     'dragend',
   ]);
   actions.methodDict.drag = 'draggable';
 
-  defaults.drag = module.exports.defaults;
+  defaults.drag = drag.defaults;
 }
 
 function beforeMove ({ interaction }) {
@@ -57,20 +56,17 @@ function beforeMove ({ interaction }) {
   }
 }
 
-function newInteractEvent ({ iEvent, interaction }) {
-  if (iEvent.type !== 'dragmove') { return; }
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'drag') { return; }
 
   const axis = interaction.prepared.axis;
 
-  if (axis === 'x') {
-    iEvent.pageY   = interaction.startCoords.page.y;
-    iEvent.clientY = interaction.startCoords.client.y;
-    iEvent.dy = 0;
-  }
-  else if (axis === 'y') {
-    iEvent.pageX   = interaction.startCoords.page.x;
-    iEvent.clientX = interaction.startCoords.client.x;
-    iEvent.dx = 0;
+  if (axis === 'x' || axis === 'y') {
+    const opposite = axis === 'x' ? 'y' : 'x';
+
+    iEvent.page[opposite]   = interaction.startCoords.page[opposite];
+    iEvent.client[opposite] = interaction.startCoords.client[opposite];
+    iEvent.delta[opposite] = 0;
   }
 }
 
@@ -142,11 +138,11 @@ function draggable (options) {
   return this.options.drag;
 }
 
-module.exports = {
+const drag = {
   init,
   draggable,
   beforeMove,
-  newInteractEvent,
+  move,
   defaults: {
     startAxis : 'xy',
     lockAxis  : 'xy',
@@ -169,3 +165,5 @@ module.exports = {
     return 'move';
   },
 };
+
+export default drag;

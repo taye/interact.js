@@ -1,15 +1,17 @@
-const test = require('./test');
-const pointerUtils = require('../src/utils/pointerUtils');
-const helpers = require('./helpers');
+import test from './test';
+import pointerUtils from '../src/utils/pointerUtils';
+import * as helpers from './helpers';
 
-const Interaction = require('../src/Interaction');
-const Signals = require('../src/utils/Signals');
+import Interaction from '../src/Interaction';
+import InteractEvent from '../src/InteractEvent';
+import Signals from '../src/utils/Signals';
+import interactions from '../src/interactions';
 
-const makeInteractionAndSignals = () => new Interaction({ signals: Signals.new() });
+const makeInteractionAndSignals = () => new Interaction({ signals: new Signals });
 
 test('Interaction constructor', t => {
   const testType = 'test';
-  const signals = Signals.new();
+  const signals = new Signals();
   const interaction = new Interaction({
     pointerType: testType,
     signals,
@@ -45,13 +47,11 @@ test('Interaction constructor', t => {
   t.equal(interaction.pointerType, testType,
     'interaction.pointerType is set');
 
-  // array properties
-  for (const prop of 'pointers pointerIds downTargets downTimes'.split(' ')) {
-    t.ok(interaction[prop],
-      `interaction.${prop} is an array`);
-    t.equal(interaction[prop].length, 0,
-      `interaction.${prop} is empty`);
-  }
+  // pointerInfo properties
+  t.deepEqual(
+    interaction.pointers,
+    [],
+    'interaction.pointers is initially an empty array');
 
   // false properties
   for (const prop of 'pointerIsDown pointerWasMoved _interacting mouse'.split(' ')) {
@@ -64,10 +64,10 @@ test('Interaction constructor', t => {
 test('Interaction.getPointerIndex', t => {
   const interaction = makeInteractionAndSignals();
 
-  interaction.pointerIds = [2, 4, 5, 0, -1];
+  interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id }));
 
-  interaction.pointerIds.forEach((pointerId, index) => {
-    t.equal(interaction.getPointerIndex({ pointerId: pointerId }), index);
+  interaction.pointers.forEach(({ id }, index) => {
+    t.equal(interaction.getPointerIndex({ pointerId: id }), index);
   });
 
   t.end();
@@ -77,15 +77,21 @@ test('Interaction.updatePointer', t => {
   t.test('no existing pointers', st => {
     const interaction = makeInteractionAndSignals();
     const pointer = { pointerId: 10 };
+    const event = {};
 
-    const ret = interaction.updatePointer(pointer);
+    const ret = interaction.updatePointer(pointer, event);
 
-    st.deepEqual(interaction.pointers, [pointer],
-      'interaction.pointers == [pointer]');
-    st.deepEqual(interaction.pointerIds, [pointer.pointerId],
-      'interaction.pointerIds == [pointer.pointerId]');
-    st.equal(ret, 0,
-      'new pointer is at index 0');
+    st.deepEqual(
+      interaction.pointers,
+      [{
+        id: pointer.pointerId,
+        pointer,
+        event,
+        downTime: null,
+        downTarget: null,
+      }],
+      'interaction.pointers == [{ pointer, ... }]');
+    st.equal(ret, 0, 'new pointer index is returned');
 
     st.end();
   });
@@ -93,17 +99,33 @@ test('Interaction.updatePointer', t => {
   t.test('new pointer with exisiting pointer', st => {
     const interaction = makeInteractionAndSignals();
     const existing = { pointerId: 0 };
+    const event = {};
 
-    interaction.updatePointer(existing);
+    interaction.updatePointer(existing, event);
 
     const newPointer = { pointerId: 10 };
-    const ret = interaction.updatePointer(newPointer);
+    const ret = interaction.updatePointer(newPointer, event);
 
-    st.deepEqual(interaction.pointers, [existing, newPointer],
-      'interaction.pointers == [pointer]');
-    st.deepEqual(interaction.pointerIds, [existing.pointerId, newPointer.pointerId],
-      'interaction.pointerIds == [pointer.pointerId]');
-    st.equal(ret, interaction.pointers.length - 1, 'new pointer index is n - 1');
+    st.deepEqual(
+      interaction.pointers, [
+        {
+          id: existing.pointerId,
+          pointer: existing,
+          event,
+          downTime: null,
+          downTarget: null,
+        },
+        {
+          id: newPointer.pointerId,
+          pointer: newPointer,
+          event,
+          downTime: null,
+          downTarget: null,
+        },
+      ],
+      'interaction.pointers == [{ pointer: existing, ... }, { pointer: newPointer, ... }]');
+
+    st.equal(ret, 1, 'second pointer index is 1');
 
     st.end();
   });
@@ -112,21 +134,19 @@ test('Interaction.updatePointer', t => {
     const interaction = makeInteractionAndSignals();
 
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }));
-    const newPointers = oldPointers.map(({ pointerId }) => ({ pointerId }));
+    const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }));
 
     oldPointers.forEach(pointer => interaction.updatePointer(pointer));
-
-    // these "new" pointers are different objects with the same pointerIds
     newPointers.forEach(pointer => interaction.updatePointer(pointer));
 
     st.equal(interaction.pointers.length, oldPointers.length,
       'number of pointers is unchanged');
 
-    interaction.pointers.forEach((pointer, i) => {
-      st.notEqual(pointer, oldPointers[i],
-        'new pointer object !== old pointer object');
-      st.equal(pointer.pointerId, oldPointers[i].pointerId,
-        'pointerIds are identical');
+    interaction.pointers.forEach((pointerInfo, i) => {
+      st.equal(pointerInfo.id, oldPointers[i].pointerId,
+        `pointer[${i}].id is the same`);
+      st.notEqual(pointerInfo.pointer, oldPointers[i],
+        `new pointer ${i} !== old pointer object`);
     });
 
     st.end();
@@ -135,8 +155,7 @@ test('Interaction.updatePointer', t => {
 
 test('Interaction.removePointer', t => {
   const interaction = makeInteractionAndSignals();
-  const pointerIdArrays = 'pointerIds downTargets downTimes'.split(' ');
-  const pointerIds = [0, 1, 2, 3];
+  const ids = [0, 1, 2, 3];
   const removals = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4' },
     { id: 2, remain: [1,    3], message: 'middle of 3' },
@@ -144,24 +163,15 @@ test('Interaction.removePointer', t => {
     { id: 1, remain: [       ], message: 'final' },
   ];
 
-  pointerIds.forEach((id, index) => {
-    interaction.updatePointer({ pointerId: id });
-
-    // use the ids in these arrays for this test
-    interaction.downTimes  [index] = id;
-    interaction.downTargets[index] = id;
-  });
+  ids.forEach((pointerId) => interaction.updatePointer({ pointerId }));
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id });
 
-    t.deepEqual(interaction.pointers.map(p => p.pointerId), removal.remain,
+    t.deepEqual(
+      interaction.pointers.map(p => p.id),
+      removal.remain,
       `${removal.message} - remaining interaction.pointers is correct`);
-
-    for (const prop of pointerIdArrays) {
-      t.deepEqual(interaction[prop], removal.remain,
-        `${removal.message} - remaining interaction.${prop} is correct`);
-    }
   }
 
   t.end();
@@ -196,10 +206,18 @@ test('Interaction.pointerDown', t => {
   interaction.pointerDown(pointer, event, eventTarget);
 
   t.equal(interaction.downEvent, null, 'downEvent is not updated');
-  t.deepEqual(interaction.pointers, [pointer], 'pointer is added');
+  t.deepEqual(
+    interaction.pointers,
+    [{
+      id: pointer.pointerId,
+      pointer,
+      event,
+      downTime: null,
+      downTarget: null,
+    }],
+    'pointer is added'
+  );
 
-  t.deepEqual(interaction.downTargets, [], 'downTargets is not updated');
-  t.deepEqual(interaction.downTimes,   [], 'downTimes   is not updated');
   t.deepEqual(interaction.downPointer, {}, 'downPointer is not updated');
 
   t.deepEqual(interaction.startCoords, coords.start, 'startCoords are not modified');
@@ -232,8 +250,16 @@ test('Interaction.pointerDown', t => {
 
   t.equal(interaction.downEvent, event, 'downEvent is updated');
 
-  t.deepEqual(interaction.downTargets, [eventTarget],       'downTargets is updated');
-  t.deepEqual(interaction.downTimes,   [pointerCoords.timeStamp], 'downTimes   is updated');
+  t.deepEqual(
+    interaction.pointers,
+    [{
+      id: pointer.pointerId,
+      pointer,
+      event,
+      downTime: pointerCoords.timeStamp,
+      downTarget: eventTarget,
+    }],
+    'interaction.pointers is updated');
 
   t.deepEqual(interaction.startCoords, pointerCoords, 'startCoords are set to pointer');
   t.deepEqual(interaction.curCoords,   pointerCoords, 'curCoords   are set to pointer');
@@ -257,7 +283,7 @@ test('Interaction.start', t => {
   interaction.start(action, target, element);
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown');
 
-  // pointerIds is still empty
+  // pointers is still empty
   interaction.pointerIsDown = true;
   interaction.start(action, target, element);
   t.equal(interaction.prepared.name, null, 'do nothing if too few pointers are down');
@@ -271,10 +297,10 @@ test('Interaction.start', t => {
   interaction._interacting = false;
 
   let signalArg;
-  let interactingInStartListener;
+  // let interactingInStartListener;
   const signalListener = arg => {
     signalArg = arg;
-    interactingInStartListener = arg.interaction.interacting();
+    // interactingInStartListener = arg.interaction.interacting();
   };
 
   interaction._signals.on('action-start', signalListener);
@@ -284,14 +310,15 @@ test('Interaction.start', t => {
   t.equal(interaction.target, target, 'interaction.target is updated');
   t.equal(interaction.element, element, 'interaction.element is updated');
 
-  t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
+  // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
+  t.assert(interaction.interacting(), 'interaction is interacting after start method');
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg');
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg');
 
   interaction._interacting = false;
 
   // interaction.start(action, target, element);
-  // t.deepEqual(scope.interactions, [interaction], 'interaction is added back to scope');
+  // t.deepEqual(scope.interactions.list, [interaction], 'interaction is added back to scope');
 
   t.end();
 });
@@ -299,8 +326,8 @@ test('Interaction.start', t => {
 test('stop interaction from start event', t => {
   const scope = helpers.mockScope();
 
-  require('../src/interactions').init(scope);
-  const interaction = scope.Interaction.new({});
+  interactions.init(scope);
+  const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();
 
   interaction.target = interactable;
@@ -319,12 +346,11 @@ test('stop interaction from start event', t => {
 });
 
 test('Interaction createPreparedEvent', t => {
-  const InteractEvent = require('../src/InteractEvent');
   const scope = helpers.mockScope();
 
-  require('../src/interactions').init(scope);
+  interactions.init(scope);
 
-  const interaction = scope.Interaction.new({});
+  const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();
   const action = { name: 'resize' };
   const phase = 'TEST_PHASE';
@@ -332,7 +358,7 @@ test('Interaction createPreparedEvent', t => {
   interaction.prepared = action;
   interaction.target = interactable;
   interaction.element = interactable.element;
-  interaction.prevEvent = {};
+  interaction.prevEvent = { page: {}, client: {}, velocity: {} };
 
   const iEvent = interaction._createPreparedEvent({}, phase);
 

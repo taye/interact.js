@@ -1,50 +1,47 @@
 /* browser entry point */
 
-const scope = require('./scope');
+import { init as scopeInit } from './scope';
+import interact from './interact';
+import interactions from './interactions';
+import interactablePreventDefault from './interactablePreventDefault';
+import inertia from './inertia';
+import * as pointerEvents from './pointerEvents';
+import * as autoStart from './autoStart';
+import * as actions from './actions';
+import * as modifiers from './modifiers';
+import * as snappers from './utils/snappers';
+import autoScroll from './autoScroll';
+import reflow from './reflow';
 
-require('./interactions').init(scope);
+export function init (window) {
+  scopeInit(window);
 
-scope.Interactable = require('./Interactable');
-scope.InteractEvent = require('./InteractEvent');
-require('./interactablePreventDefault.js');
+  interact.use(interactions);
+  interact.use(interactablePreventDefault);
 
-const interact = require('./interact');
+  // inertia
+  interact.use(inertia);
 
-// modifiers
-interact.use(require('./modifiers/base'));
-interact.use(require('./modifiers/snap'));
-interact.use(require('./modifiers/restrict'));
+  // pointerEvents
+  interact.use(pointerEvents);
 
-interact.snappers = require('./utils/snappers');
-interact.createSnapGrid = interact.snappers.grid;
+  // autoStart, hold
+  interact.use(autoStart);
 
-// inertia
-interact.use(require('./simulations/base'));
-interact.use(require('./simulations/inertia'));
+  // drag and drop, resize, gesture
+  interact.use(actions);
 
-// pointerEvents
-interact.use(require('./pointerEvents/base'));
-interact.use(require('./pointerEvents/holdRepeat'));
-interact.use(require('./pointerEvents/interactableTargets'));
+  // snap, resize, etc.
+  interact.use(modifiers);
 
-// autoStart hold
-interact.use(require('./autoStart/base'));
-interact.use(require('./autoStart/hold'));
-interact.use(require('./autoStart/dragAxis'));
+  interact.snappers = snappers;
+  interact.createSnapGrid = interact.snappers.grid;
 
-// actions
-interact.use(require('./actions/gesture'));
-interact.use(require('./actions/resize'));
-interact.use(require('./actions/drag'));
-interact.use(require('./actions/drop'));
+  // autoScroll
+  interact.use(autoScroll);
 
-// load these modifiers after resize is loaded
-interact.use(require('./modifiers/snapSize'));
-interact.use(require('./modifiers/restrictEdges'));
-interact.use(require('./modifiers/restrictSize'));
+  // reflow
+  interact.use(reflow);
 
-// autoScroll
-interact.use(require('./autoScroll'));
-
-// export interact
-module.exports = interact;
+  return interact;
+}
