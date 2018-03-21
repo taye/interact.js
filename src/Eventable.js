@@ -25,7 +25,7 @@ class Eventable {
     }
 
     // interactable.onevent listener
-    if (this[onEvent]) {
+    if (!event.propagationStopped && this[onEvent]) {
       this[onEvent](event);
     }
 
