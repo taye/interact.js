@@ -27,10 +27,10 @@ function init (scope) {
       dropStatus.activeDrops = getActiveDrops(scope, interaction.element);
     }
 
-    const dropEvents = getDropEvents(interaction, event, dragEvent);
+    dropStatus.events = getDropEvents(interaction, event, dragEvent);
 
-    if (dropEvents.activate) {
-      fireActivationEvents(dropStatus.activeDrops, dropEvents.activate);
+    if (dropStatus.events.activate) {
+      fireActivationEvents(dropStatus.activeDrops, dropStatus.events.activate);
     }
   });
 

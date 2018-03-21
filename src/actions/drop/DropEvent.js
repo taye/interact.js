@@ -1,3 +1,5 @@
+import * as arr from '../../utils/arr';
+
 export default class DropEvent {
   constructor (dropStatus, dragEvent, type) {
     const { element, dropzone } = type === 'deactivate'
@@ -23,9 +25,10 @@ export default class DropEvent {
     const { dropStatus } = this.interaction;
 
     if (
-      !this.dropzone ||
-      dropStatus.cur.dropzone !== this.dropzone ||
-      dropStatus.cur.element !== this.target) {
+      (this.type !== 'dropactivate') && (
+        !this.dropzone ||
+        dropStatus.cur.dropzone !== this.dropzone ||
+        dropStatus.cur.element !== this.target)) {
       return;
     }
 
@@ -35,10 +38,29 @@ export default class DropEvent {
     dropStatus.rejected = true;
     dropStatus.events.enter = null;
 
-    // TODO: reject dropactivate
-
     this.stopImmediatePropagation();
-    this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'));
+
+    if (this.type === 'dragenter') {
+      this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'));
+    }
+
+    if (this.type === 'dropactivate') {
+      const activeDrops = dropStatus.activeDrops;
+      const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
+        dropzone === this.dropzone && element === this.target);
+
+      dropStatus.activeDrops = [
+        ...activeDrops.slice(0, index),
+        ...activeDrops.slice(index + 1),
+      ];
+
+      const deactivateEvent = new DropEvent(dropStatus, this.dragEvent, 'dropdeactivate');
+
+      deactivateEvent.dropzone = this.dropzone;
+      deactivateEvent.target = this.target;
+
+      this.dropzone.fire(deactivateEvent);
+    }
   }
 
   preventDefault () {}
