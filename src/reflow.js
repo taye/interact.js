@@ -24,6 +24,7 @@ export function init (scope) {
   // remove completed reflow interactions
   interactions.signals.on('stop', ({ interaction }) => {
     if (interaction.pointerType === 'reflow') {
+      interaction._reflowResolve();
       arr.remove(scope.interactions.list, interaction);
     }
   });
@@ -42,6 +43,7 @@ export function init (scope) {
    *
    * @param { Object } action The action to begin
    * @param { string } action.name The name of the action
+   * @returns { Promise<Interactable> }
    */
   Interactable.prototype.reflow = function (action) {
     return reflow(this, action, scope);
@@ -59,9 +61,9 @@ function reflow (interactable, action, scope) {
       element => scope.autoStart.withinInteractionLimit(interactable, element, action, scope));
   }
 
-  for (const element of elements) {
-    const interaction = newInteraction({ pointerType: 'reflow' }, scope);
+  const promises = win.window.Promise ? [] : null;
 
+  for (const element of elements) {
     const rect = interactable.getRect(element);
 
     if (!rect) { break; }
@@ -71,37 +73,58 @@ function reflow (interactable, action, scope) {
       page: xywh,
       client: xywh,
     };
+
     const event = extend(pointerUtils.coordsToEvent(coords), coords);
-    const signalArg = {
-      interaction,
-      event,
-      pointer: event,
-      eventTarget: element,
-      phase: 'reflow',
-    };
 
-    interaction.target = interactable;
-    interaction.element = element;
-    interaction.prepared = extend({}, action);
-    interaction.prevEvent = event;
-    interaction.updatePointer(event, event, element, true);
+    const reflowPromise = startReflow(scope, interactable, element, action, event);
 
-    interaction._doPhase(signalArg);
-
-    signalArg.phase = 'start';
-    interaction._interacting = interaction._doPhase(signalArg);
-
-    if (interaction._interacting) {
-      interaction.move(signalArg);
-      interaction.end(event);
+    if (promises) {
+      promises.push(reflowPromise);
     }
-    else {
-      interaction.stop();
-    }
-
-    interaction.removePointer(event, event);
-    interaction.pointerIsDown = false;
   }
+
+  return promises && win.window.Promise.all(promises).then(() => interactable);
+}
+
+function startReflow (scope, interactable, element, action, event) {
+  const interaction = newInteraction({ pointerType: 'reflow' }, scope);
+  const signalArg = {
+    interaction,
+    event,
+    pointer: event,
+    eventTarget: element,
+    phase: 'reflow',
+  };
+
+  interaction.target = interactable;
+  interaction.element = element;
+  interaction.prepared = extend({}, action);
+  interaction.prevEvent = event;
+  interaction.updatePointer(event, event, element, true);
+
+  interaction._doPhase(signalArg);
+
+  const reflowPromise = win.window.Promise
+    ? new win.window.Promise((resolve) => {
+      interaction._reflowResolve = resolve;
+    })
+    : null;
+
+  signalArg.phase = 'start';
+  interaction._interacting = interaction._doPhase(signalArg);
+
+  if (interaction._interacting) {
+    interaction.move(signalArg);
+    interaction.end(event);
+  }
+  else {
+    interaction.stop();
+  }
+
+  interaction.removePointer(event, event);
+  interaction.pointerIsDown = false;
+
+  return reflowPromise;
 }
 
 export default { init };
