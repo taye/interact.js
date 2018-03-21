@@ -2,11 +2,14 @@ import test from './test';
 import * as helpers from './helpers';
 import reflow from '../src/reflow';
 import win from '../src/utils/window';
+import interactions from '../src/interactions';
 
 test('reflow', t => {
   const scope = helpers.mockScope({
     autoStart: {},
   });
+
+  interactions.init(scope);
 
   Object.assign(scope.actions, { test: {}, names: ['test'] });
 

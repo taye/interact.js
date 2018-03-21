@@ -14,68 +14,82 @@ const {
   events,
 } = utils;
 
-export const scope = {
-  Signals,
-  signals: new Signals(),
-  browser,
-  events,
-  utils,
-  defaults,
-  Eventable,
+export function createScope () {
+  const scope = {
+    Signals,
+    signals: new Signals(),
+    browser,
+    events,
+    utils,
+    defaults: utils.clone(defaults),
+    Eventable,
 
-  // main document
-  document: null,
-  // all documents being listened to
-  documents: [/* { doc, options } */],
+    InteractEvent: InteractEvent,
+    // eslint-disable-next-line no-shadow
+    Interactable: class Interactable extends Interactable {
+      get _defaults () { return scope.defaults; }
+    },
 
-  addDocument (doc, options) {
-    // do nothing if document is already known
-    if (scope.getDocIndex(doc) !== -1) { return false; }
+    // main document
+    document: null,
+    // all documents being listened to
+    documents: [/* { doc, options } */],
 
-    const window = win.getWindow(doc);
+    init (window) {
+      return initScope(scope, window);
+    },
 
-    scope.documents.push({ doc, options });
-    events.documents.push(doc);
+    addDocument (doc, options) {
+      // do nothing if document is already known
+      if (scope.getDocIndex(doc) !== -1) { return false; }
 
-    // don't add an unload event for the main document
-    // so that the page may be cached in browser history
-    if (doc !== scope.document) {
-      events.add(window, 'unload', scope.onWindowUnload);
-    }
+      const window = win.getWindow(doc);
 
-    scope.signals.fire('add-document', { doc, window, scope, options });
-  },
+      scope.documents.push({ doc, options });
+      events.documents.push(doc);
 
-  removeDocument (doc) {
-    const index = scope.getDocIndex(doc);
-
-    const window = win.getWindow(doc);
-    const options = scope.documents[index].options;
-
-    events.remove(window, 'unload', scope.onWindowUnload);
-
-    scope.documents.splice(index, 1);
-    events.documents.splice(index, 1);
-
-    scope.signals.fire('remove-document', { doc, window, scope, options });
-  },
-
-  onWindowUnload (event) {
-    scope.removeDocument(event.target.document);
-  },
-
-  getDocIndex (doc) {
-    for (let i = 0; i < scope.documents.length; i++) {
-      if (scope.documents[i].doc === doc) {
-        return i;
+      // don't add an unload event for the main document
+      // so that the page may be cached in browser history
+      if (doc !== scope.document) {
+        events.add(window, 'unload', scope.onWindowUnload);
       }
-    }
 
-    return -1;
-  },
-};
+      scope.signals.fire('add-document', { doc, window, scope, options });
+    },
 
-export function init (window) {
+    removeDocument (doc) {
+      const index = scope.getDocIndex(doc);
+
+      const window = win.getWindow(doc);
+      const options = scope.documents[index].options;
+
+      events.remove(window, 'unload', scope.onWindowUnload);
+
+      scope.documents.splice(index, 1);
+      events.documents.splice(index, 1);
+
+      scope.signals.fire('remove-document', { doc, window, scope, options });
+    },
+
+    onWindowUnload (event) {
+      scope.removeDocument(event.target.document);
+    },
+
+    getDocIndex (doc) {
+      for (let i = 0; i < scope.documents.length; i++) {
+        if (scope.documents[i].doc === doc) {
+          return i;
+        }
+      }
+
+      return -1;
+    },
+  };
+
+  return scope;
+}
+
+export function initScope (scope, window) {
   win.init(window);
   domObjects.init(window);
   browser.init(window);
@@ -83,7 +97,5 @@ export function init (window) {
 
   scope.document = window.document;
 
-  scope.InteractEvent = InteractEvent;
-  // eslint-disable-next-line no-shadow
-  scope.Interactable = class Interactable extends Interactable {};
+  return scope;
 }

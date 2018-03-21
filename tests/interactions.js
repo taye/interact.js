@@ -7,6 +7,9 @@ import interactions from '../src/interactions';
 
 test('interactions', t => {
   let scope = helpers.mockScope();
+
+  interactions.init(scope);
+
   const interaction = interactions.newInteraction(
     { pointerType: 'TEST' },
     scope

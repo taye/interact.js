@@ -5,6 +5,7 @@ import {
   extend,
   rect as rectUtils,
   pointer as pointerUtils,
+  win,
 } from './utils';
 
 export function init (scope) {

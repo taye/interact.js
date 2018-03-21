@@ -5,6 +5,7 @@ import * as arr    from './arr';
 import * as dom    from './domUtils';
 import raf         from './raf';
 import extend      from './extend';
+import clone       from './clone';
 import getOriginXY from './getOriginXY';
 import hypot       from './hypot';
 import * as is     from './is';
@@ -57,6 +58,7 @@ export {
   arr,
   dom,
   extend,
+  clone,
   getOriginXY,
   hypot,
   is,

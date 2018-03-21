@@ -1,12 +1,13 @@
 /** @module interact */
 
-import browser      from './utils/browser';
-import events       from './utils/events';
-import * as utils   from './utils';
-import { scope }    from './scope';
+import browser         from './utils/browser';
+import events          from './utils/events';
+import * as utils      from './utils';
+import { createScope } from './scope';
 
 const globalEvents = {};
 const signals = new utils.Signals();
+const scope = createScope();
 
 /**
  * ```js
@@ -318,4 +319,5 @@ scope.interactables = {
 
 scope.interact = interact;
 
+export { scope };
 export default interact;

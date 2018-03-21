@@ -1,7 +1,6 @@
 /* browser entry point */
 
-import { init as scopeInit } from './scope';
-import interact from './interact';
+import { default as interact, scope } from './interact';
 import interactions from './interactions';
 import interactablePreventDefault from './interactablePreventDefault';
 import inertia from './inertia';
@@ -14,7 +13,7 @@ import autoScroll from './autoScroll';
 import reflow from './reflow';
 
 export function init (window) {
-  scopeInit(window);
+  scope.init(window);
 
   interact.use(interactions);
   interact.use(interactablePreventDefault);

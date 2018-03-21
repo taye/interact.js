@@ -1,11 +1,11 @@
 import { jsdom } from 'jsdom';
 
 import test from './test';
-import interact from '../src/interact';
-import { scope } from '../src/scope';
+import { default as interact, scope } from '../src/interact';
 import interactions from '../src/interactions';
 
 test('interact export', t => {
+  scope.init(jsdom('').defaultView);
   interactions.init(scope);
 
   const interactable1 = interact('selector');

@@ -3,15 +3,14 @@ import d from './domator';
 import * as helpers from './helpers';
 
 import Interactable from '../src/Interactable';
-import defaults from '../src/defaultOptions';
-
 
 test('Interactable copies and extends defaults', t => {
   const scope = helpers.mockScope();
+  const { defaults } = scope;
 
   scope.actions.methodDict = { test: 'testize' };
 
-  Interactable.prototype.testize = function (options) {
+  scope.Interactable.prototype.testize = function (options) {
     this.setPerAction('test', options);
   };
 
@@ -41,10 +40,11 @@ test('Interactable copies and extends defaults', t => {
 
 test('Interactable copies and extends per action defaults', t => {
   const scope = helpers.mockScope();
+  const { defaults } = scope;
 
   scope.actions.methodDict = { test: 'testize' };
 
-  Interactable.prototype.testize = function (options) {
+  scope.Interactable.prototype.testize = function (options) {
     this.setPerAction('test', options);
   };
 

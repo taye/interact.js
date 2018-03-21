@@ -4,7 +4,6 @@ import events    from './utils/events';
 import extend    from './utils/extend';
 import * as arr  from './utils/arr';
 import Eventable from './Eventable';
-import defaults  from './defaultOptions';
 
 import {
   getElementRect,
@@ -15,6 +14,13 @@ import { getWindow }  from './utils/window';
 import { wheelEvent } from './utils/browser';
 
 class Interactable {
+  get _defaults () {
+    return {
+      base: {},
+      perAction: {},
+    };
+  }
+
   /** */
   constructor (target, options, defaultContext) {
     this._signals = options.signals;
@@ -47,6 +53,8 @@ class Interactable {
   }
 
   setPerAction (actionName, options) {
+    const defaults = this._defaults;
+
     // for all the default per-action options
     for (const optionName in options) {
       const actionOptions = this.options[actionName];
@@ -233,8 +241,6 @@ class Interactable {
       return this;
     }
 
-    if (eventType === 'wheel') { eventType = wheelEvent; }
-
     if (arr.contains(this._actions.eventTypes, eventType)) {
       this.events.on(eventType, listener);
     }
@@ -289,6 +295,8 @@ class Interactable {
    * @return {object} This Interactable
    */
   set (options) {
+    const defaults = this._defaults;
+
     if (!is.object(options)) {
       options = {};
     }

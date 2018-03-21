@@ -1,14 +1,10 @@
 import _ from 'lodash';
-import win from '../src/utils/window';
+
+import { createScope } from '../src/scope';
 import * as utils from '../src/utils';
-import clone from '../src/utils/clone';
-import defaults  from '../src/defaultOptions';
 import Signals from '../src/utils/Signals';
 import Eventable from '../src/Eventable';
-import Interactable from '../src/Interactable';
-import Interaction from '../src/Interaction';
-
-const document = win.window.document;
+import { doc } from './domator';
 
 let counter = 0;
 
@@ -59,40 +55,26 @@ export function newPointer (n = 50) {
   };
 }
 
-export function $ (selector, context) {
-  return (context || document).querySelector(selector);
-}
+export function mockScope (options = {}) {
+  const document = options.document || doc;
+  const window = document.defaultView;
 
-export function $$ (selector, context) {
-  return Array.from((context || document).querySelectorAll(selector));
-}
+  const scope = createScope().init(window);
 
-export function createEl (name) {
-  return document.createElement(name);
-}
-
-export function mockScope (options) {
-  const scope = Object.assign({
-    documents: [],
-    defaults: clone(defaults),
+  Object.assign(scope, {
     actions: {
       names: [],
       methodDict: {},
       eventTypes: [],
     },
-    Interaction: class extends Interaction {},
+    interactables: {
+      signals: new Signals(),
+      list: [],
+    },
     interactions: {
       signals: new Signals(),
       list: [],
-      new (props) {
-        return new scope.Interaction({ signals: this.signals, ...props });
-      },
     },
-    interactables: {
-      signals: new Signals(),
-    },
-    signals: new Signals(),
-    Interactable: class extends Interactable {},
   }, options);
 
   return scope;
@@ -110,7 +92,10 @@ export function newInteractable (scope, target, options = {}, defaultContext) {
   options.signals = scope.interactables.signals;
   options.actions = scope.actions;
 
-  return new scope.Interactable(target, options, defaultContext);
+  const interactable = new scope.Interactable(target, options, defaultContext);
+  scope.interactables.list.push(interactable);
+
+  return interactable;
 }
 
 export function mockInteractable (props) {

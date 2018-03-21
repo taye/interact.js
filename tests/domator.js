@@ -1,6 +1,15 @@
 import domator from 'domator';
-import win from '../src/utils/window';
+import { jsdom } from 'jsdom';
 
-domator.setDocument(win.window.document);
+const doc = typeof window === 'undefined'
+  ? jsdom('<!DOCTYPE html><html><body></body></html>')
+  : window.document;
+
+domator.setDocument(doc);
+
+export {
+  domator,
+  doc,
+};
 
 export default domator;
