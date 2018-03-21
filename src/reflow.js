@@ -70,12 +70,12 @@ function reflow (interactable, action, scope) {
 
     const xywh = rectUtils.tlbrToXywh(rect);
     const coords = {
-      page: xywh,
-      client: xywh,
+      page     : { x: xywh.x, y: xywh.y },
+      client   : { x: xywh.x, y: xywh.y },
+      timeStamp: Date.now(),
     };
 
-    const event = extend(pointerUtils.coordsToEvent(coords), coords);
-
+    const event = pointerUtils.coordsToEvent(coords);
     const reflowPromise = startReflow(scope, interactable, element, action, event);
 
     if (promises) {

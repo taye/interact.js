@@ -225,8 +225,11 @@ const pointerUtils = {
     ];
   },
 
-  coordsToEvent: function ({ page, client }) {
+  coordsToEvent: function ({ page, client, timeStamp }) {
     return {
+      page,
+      client,
+      timeStamp,
       pageX: page.x,
       pageY: page.y,
       clientX: client.x,
