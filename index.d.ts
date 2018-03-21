@@ -178,7 +178,7 @@ declare namespace interact {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-
+    origin?: 'self' | any // TODO: What are the options here, beyond 'self'?
   }
 
   interface RectChecker {
@@ -314,7 +314,8 @@ declare namespace interact {
     gesturable ( opt: boolean | GesturableOptions ) : Interactable
     dropzone () : DropZoneOptions
     dropzone ( opt: boolean | DropZoneOptions | null ) : Interactable
-    pointerEvents () : PointerEventsOptions
+    pointerEvents () : PointerEventsOptions // TODO: This might actually be wrong. Is there a getter for pointerEvents?
+    pointerEvents ( opt: PointerEventsOptions) : Interactable
     on ( opt: OnEvent, listener?: Listener ) : Interactable
     on ( opt: OnEventFunctions ) : Interactable
     off ( opt: OnEvent, listener?: Listener ) : Interactable
