@@ -51,39 +51,53 @@ export function init (scope) {
 }
 
 function reflow (interactable, action, scope) {
-  let elements = is.string(interactable.target)
+  const elements = is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target];
 
-  // follow autoStart max interaction settings
-  if (scope.autoStart) {
-    elements = elements.filter(
-      element => scope.autoStart.withinInteractionLimit(interactable, element, action, scope));
-  }
-
-  const promises = win.window.Promise ? [] : null;
+  const Promise = win.window.Promise;
+  const promises = Promise ? [] : null;
 
   for (const element of elements) {
     const rect = interactable.getRect(element);
 
     if (!rect) { break; }
 
-    const xywh = rectUtils.tlbrToXywh(rect);
-    const coords = {
-      page     : { x: xywh.x, y: xywh.y },
-      client   : { x: xywh.x, y: xywh.y },
-      timeStamp: Date.now(),
-    };
+    const runningInteraction = arr.find(
+      scope.interactions.list,
+      interaction => {
+        return interaction.interacting() &&
+          interaction.target === interactable &&
+          interaction.element === element &&
+          interaction.prepared.name === action.name;
+      });
+    let reflowPromise;
 
-    const event = pointerUtils.coordsToEvent(coords);
-    const reflowPromise = startReflow(scope, interactable, element, action, event);
+    if (runningInteraction) {
+      runningInteraction.move();
+
+      reflowPromise = runningInteraction._reflowPromise || new Promise(resolve => {
+        runningInteraction._reflowResolve = resolve;
+      });
+    }
+    else {
+      const xywh = rectUtils.tlbrToXywh(rect);
+      const coords = {
+        page     : { x: xywh.x, y: xywh.y },
+        client   : { x: xywh.x, y: xywh.y },
+        timeStamp: Date.now(),
+      };
+
+      const event = pointerUtils.coordsToEvent(coords);
+      reflowPromise = startReflow(scope, interactable, element, action, event);
+    }
 
     if (promises) {
       promises.push(reflowPromise);
     }
   }
 
-  return promises && win.window.Promise.all(promises).then(() => interactable);
+  return promises && Promise.all(promises).then(() => interactable);
 }
 
 function startReflow (scope, interactable, element, action, event) {
@@ -111,6 +125,7 @@ function startReflow (scope, interactable, element, action, event) {
     : null;
 
   signalArg.phase = 'start';
+  interaction._reflowPromise = reflowPromise;
   interaction._interacting = interaction._doPhase(signalArg);
 
   if (interaction._interacting) {

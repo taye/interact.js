@@ -5,9 +5,7 @@ import win from '../src/utils/window';
 import interactions from '../src/interactions';
 
 test('reflow', t => {
-  const scope = helpers.mockScope({
-    autoStart: {},
-  });
+  const scope = helpers.mockScope();
 
   interactions.init(scope);
 
@@ -23,14 +21,11 @@ test('reflow', t => {
   const fired = [];
   const interactable = helpers.newInteractable(scope, win.window);
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 });
+
   interactable.fire = iEvent => fired.push(iEvent);
   interactable.target = {};
   interactable.options.test = {};
   interactable.rectChecker(() => rect);
-
-  scope.autoStart.withinInteractionLimit = () => false;
-  interactable.reflow({ name: 'test' });
-  t.equal(fired.length, 0, 'follows scope.autoStart.withinInteractionLimit');
 
   // modify move coords
   scope.interactions.signals.on('before-action-move', ({ interaction }) => {
@@ -40,7 +35,6 @@ test('reflow', t => {
     };
   });
 
-  scope.autoStart.withinInteractionLimit = () => true;
   interactable.reflow({ name: 'test' });
 
   const phases = ['reflow', 'start', 'move', 'end'];
