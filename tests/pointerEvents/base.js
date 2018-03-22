@@ -125,12 +125,12 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
 
   const interaction = scope.interactions.new({});
   const initialTimer = { duration: Infinity, timeout: null };
-  const event = { type: 'down' };
+  const event = {};
 
-  interaction.updatePointer(helpers.newPointer(0), event);
+  interaction.updatePointer(helpers.newPointer(0), event, null, true);
   t.deepEqual(interaction.holdTimers, [initialTimer]);
 
-  interaction.updatePointer(helpers.newPointer(5), event);
+  interaction.updatePointer(helpers.newPointer(5), event, null, true);
   t.deepEqual(interaction.holdTimers, [initialTimer, initialTimer]);
 
   t.end();

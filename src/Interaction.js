@@ -304,7 +304,7 @@ class Interaction {
     return this.pointers[this.getPointerIndex(pointer)];
   }
 
-  updatePointer (pointer, event, eventTarget, down = event && /(down|start)$/i.test(event.type)) {
+  updatePointer (pointer, event, eventTarget, down) {
     const id = utils.pointer.getPointerId(pointer);
     let pointerIndex = this.getPointerIndex(pointer);
     let pointerInfo = this.pointers[pointerIndex];

@@ -8,7 +8,7 @@ env:
 parserOptions:
   parser: babel-eslint
   sourceType: module
-  ecmaVersion: 6
+  ecmaVersion: 2017
   ecmaFeatures:
     experimentalObjectRestSpread: true
 
@@ -44,10 +44,3 @@ rules:
   require-path-exists/notEmpty: 2
   semi: [2, always]
   space-before-function-paren: [2, always]
-
-  no-restricted-syntax:
-    - error
-    - default-params
-    - generators
-    - rest-params
-    - spread
