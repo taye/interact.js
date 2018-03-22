@@ -2,11 +2,9 @@ import * as arr from '../../utils/arr';
 
 export default class DropEvent {
   constructor (dropStatus, dragEvent, type) {
-    const { element, dropzone } = type === 'deactivate'
-      ? { element: null, dropzone: null }
-      : type === 'dragleave'
-        ? dropStatus.prev
-        : dropStatus.cur;
+    const { element, dropzone } = type === 'dragleave'
+      ? dropStatus.prev
+      : dropStatus.cur;
 
     this.type          = type;
     this.target        = element;
@@ -40,10 +38,6 @@ export default class DropEvent {
 
     this.stopImmediatePropagation();
 
-    if (this.type === 'dragenter') {
-      this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'));
-    }
-
     if (this.type === 'dropactivate') {
       const activeDrops = dropStatus.activeDrops;
       const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
@@ -60,6 +54,9 @@ export default class DropEvent {
       deactivateEvent.target = this.target;
 
       this.dropzone.fire(deactivateEvent);
+    }
+    else {
+      this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'));
     }
   }
 
