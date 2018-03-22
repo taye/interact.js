@@ -1,6 +1,9 @@
 import * as arr from '../../utils/arr';
 
-export default class DropEvent {
+class DropEvent {
+  /**
+   * Class of events fired on dropzones during drags with acceptable targets.
+   */
   constructor (dropStatus, dragEvent, type) {
     const { element, dropzone } = type === 'dragleave'
       ? dropStatus.prev
@@ -19,6 +22,13 @@ export default class DropEvent {
     this.propagationStopped = this.immediatePropagationStopped = false;
   }
 
+  /**
+   * If this is a `dropactivate` event, the dropzone element will be
+   * deactivated.
+   *
+   * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the
+   * dropzone element and more.
+   */
   reject () {
     const { dropStatus } = this.interaction;
 
@@ -70,3 +80,5 @@ export default class DropEvent {
     this.immediatePropagationStopped = this.propagationStopped = true;
   }
 }
+
+export default DropEvent;
