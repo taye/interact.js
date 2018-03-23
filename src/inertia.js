@@ -30,9 +30,9 @@ function init (scope) {
     };
   });
 
-  interactions.signals.on('up'  , arg => release(arg, scope));
-  interactions.signals.on('down', arg => resume (arg, scope));
-  interactions.signals.on('stop', arg => stop   (arg, scope));
+  interactions.signals.on('before-action-end', arg => release(arg, scope));
+  interactions.signals.on('down'             , arg => resume (arg, scope));
+  interactions.signals.on('stop'             , arg => stop   (arg, scope));
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -177,6 +177,8 @@ function release ({ interaction, event }, scope) {
 
     status.i = raf.request(() => smothEndTick(interaction));
   }
+
+  return false;
 }
 
 function stop ({ interaction }) {
