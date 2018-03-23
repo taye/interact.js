@@ -12,9 +12,8 @@ ratings:
     - "src/**"
 
 exclude_paths:
- - "examples/*"
- - "docs/*"
- - "gulp/*"
- - "test/*"
- - "gulpfile.js"
- - "karma.conf.js"
+  - "**/examples/"
+  - "**/build/"
+  - "**/docs/"
+  - "**/tests/"
+  - "**/*.d.ts"
