@@ -1,8 +1,8 @@
 import test from '../test';
 import { mockSignals } from '../helpers';
 
-import RestrictSize from '../../src/modifiers/restrictSize';
-import Interaction from '../../src/Interaction';
+import RestrictSize from '@interactjs/modifiers/restrictSize';
+import Interaction from '@interactjs/core/Interaction';
 
 test('restrictSize', t => {
   const interaction = new Interaction({ signals: mockSignals() });

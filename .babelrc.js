@@ -3,7 +3,7 @@ const buildDir = `${__dirname}/build`;
 module.exports = {
   "plugins": [
     ["transform-runtime", {
-      helpers: true,
+      helpers: false,
       polyfill: false,
       regenerator: false
     }],

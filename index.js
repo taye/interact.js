@@ -7,7 +7,7 @@
  * See https://github.com/taye/interact.js/issues/187
  */
 
-import { init } from './src/index';
+import { init } from '@interactjs/interact';
 
 const exported = typeof window === 'undefined'
   ? window => {

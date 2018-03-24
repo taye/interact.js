@@ -5,9 +5,9 @@ const gitRev        = require('./gitRev');
 
 const version = {
   get ({ updateMetadata = true } = {}) {
-    const package = JSON.parse(fs.readFileSync('package.json').toString());
+    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
 
-    const parsed = semver.parse(package.version);
+    const parsed = semver.parse(pkg.version);
     const dirty = child_process.execSync(`
       git diff-index --quiet HEAD -- . ':!dist' ':!package.json' &&
       git diff --quiet -- . ':!dist' ||
@@ -41,10 +41,10 @@ const version = {
   },
 
   write (newVersion) {
-    const package = JSON.parse(fs.readFileSync('package.json').toString());
-    package.version = newVersion;
+    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
+    pkg.version = newVersion;
 
-    fs.writeFileSync('package.json', `${JSON.stringify(package, null, 2)}\n`);
+    fs.writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
   },
 };
 

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import { createScope } from '../src/scope';
-import * as utils from '../src/utils';
-import Signals from '../src/utils/Signals';
-import Eventable from '../src/Eventable';
+import { createScope } from '@interactjs/core/scope';
+import * as utils from '@interactjs/utils';
+import Signals from '@interactjs/utils/Signals';
+import Eventable from '@interactjs/core/Eventable';
 import { doc } from './domator';
 
 let counter = 0;

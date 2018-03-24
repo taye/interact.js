@@ -1,9 +1,9 @@
 import test from './test';
 import * as helpers from './helpers';
 
-import Interaction from '../src/Interaction';
-import Signals from '../src/utils/Signals';
-import interactions from '../src/interactions';
+import Interaction from '@interactjs/core/Interaction';
+import Signals from '@interactjs/utils/Signals';
+import interactions from '@interactjs/core/interactions';
 
 test('interactions', t => {
   let scope = helpers.mockScope();

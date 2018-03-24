@@ -1,10 +1,10 @@
 import test from '../test';
 import * as helpers from '../helpers';
 
-import PointerEvent from '../../src/pointerEvents/PointerEvent';
-import pointerUtils from '../../src/utils/pointerUtils';
-import Interaction from '../../src/Interaction';
-import Signals from '../../src/utils/Signals';
+import PointerEvent from '@interactjs/pointerEvents/PointerEvent';
+import pointerUtils from '@interactjs/utils/pointerUtils';
+import Interaction from '@interactjs/core/Interaction';
+import Signals from '@interactjs/utils/Signals';
 
 
 test('PointerEvent constructor', t => {

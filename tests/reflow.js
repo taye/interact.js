@@ -1,8 +1,8 @@
 import test from './test';
 import * as helpers from './helpers';
-import reflow from '../src/reflow';
-import win from '../src/utils/window';
-import interactions from '../src/interactions';
+import reflow from '@interactjs/reflow';
+import win from '@interactjs/utils/window';
+import interactions from '@interactjs/core/interactions';
 
 test('reflow', t => {
   const scope = helpers.mockScope();

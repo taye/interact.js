@@ -1,8 +1,8 @@
 import { jsdom } from 'jsdom';
 
 import test from './test';
-import { default as interact, scope } from '../src/interact';
-import interactions from '../src/interactions';
+import { default as interact, scope } from '@interactjs/interact/interact';
+import interactions from '@interactjs/core/interactions';
 
 test('interact export', t => {
   scope.init(jsdom('').defaultView);

@@ -10,6 +10,7 @@ const config = {
   transform: [[ 'babelify', {
     babelrc: false,
     sourceType: 'module',
+    global: true,
     ...require('../.babelrc'),
   } ]],
 

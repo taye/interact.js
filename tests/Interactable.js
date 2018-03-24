@@ -2,7 +2,7 @@ import test from './test';
 import d from './domator';
 import * as helpers from './helpers';
 
-import Interactable from '../src/Interactable';
+import Interactable from '@interactjs/core/Interactable';
 
 test('Interactable copies and extends defaults', t => {
   const scope = helpers.mockScope();

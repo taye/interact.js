@@ -97,7 +97,7 @@
       "./build/babel-register"
     ],
     "include": [
-      "src"
+      "packages"
     ],
     "reporter": [
       "text",

@@ -1,8 +1,8 @@
 import test from '../test';
 import { mockSignals, mockInteractable } from '../helpers';
 
-import snap from '../../src/modifiers/snap';
-import Interaction from '../../src/Interaction';
+import snap from '@interactjs/modifiers/snap';
+import Interaction from '@interactjs/core/Interaction';
 
 test('modifiers/snap', t => {
 

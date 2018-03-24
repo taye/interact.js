@@ -8,23 +8,23 @@ import './interactions';
 import './Eventable';
 
 // pointerEvents
-import './pointerEvents/base';
-import './pointerEvents/PointerEvent';
-import './pointerEvents/holdRepeat';
-//import './pointerEvents/interactableTargets';
+import '@interactjs/pointerEvents/base';
+import '@interactjs/pointerEvents/PointerEvent';
+import '@interactjs/pointerEvents/holdRepeat';
+//import '@interactjs/pointerEvents/interactableTargets';
 
 // inertia
 //import './inertia';
 
 // modifiers
-import './modifiers/snap';
-import './modifiers/snapSize';
-//import './modifiers/restrict';
-import './modifiers/restrictSize';
-import './modifiers/restrictEdges';
+import '@interactjs/modifiers/snap';
+import '@interactjs/modifiers/snapSize';
+//import '@interactjs/modifiers/restrict';
+import '@interactjs/modifiers/restrictSize';
+import '@interactjs/modifiers/restrictEdges';
 
 // autoStart hold
-import './autoStart/hold';
+import '@interactjs/autoStart/hold';
 
 // actions
 //import './actions/gesture';
@@ -33,23 +33,23 @@ import './actions/drag';
 //import './actions/drop';
 
 // autoStart actions
-//import './autoStart/gesture';
-//import './autoStart/resize';
-//import './autoStart/drag';
+//import '@interactjs/autoStart/gesture';
+//import '@interactjs/autoStart/resize';
+//import '@interactjs/autoStart/drag';
 
 // Interactable preventDefault setting
 //import './interactablePreventDefault.js';
 
 // autoScroll
-//import './autoScroll';
+//import '@interactjs/autoScroll';
 
-import './reflow';
+import '@interactjs/reflow';
 
 import './interact';
 
-//const index = import '../src/index';
+//const index = import '@interactjs/core/index';
 //const test = import 'tape';
 
 //test('module export', function (t) {
-//t.equal(index, import '../src/interact');
+//t.equal(index, import '@interactjs/interact');
 //});

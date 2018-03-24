@@ -1,7 +1,7 @@
 import test from '../test';
 import { mockSignals, mockInteractable } from '../helpers';
-import snapSize from '../../src/modifiers/snapSize';
-import Interaction from '../../src/Interaction';
+import snapSize from '@interactjs/modifiers/snapSize';
+import Interaction from '@interactjs/core/Interaction';
 
 test('modifiers/snapSize', t => {
 

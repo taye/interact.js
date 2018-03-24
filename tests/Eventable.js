@@ -1,5 +1,5 @@
 import test from './test';
-import Eventable from '../src/Eventable';
+import Eventable from '@interactjs/core/Eventable';
 
 test('Eventable', t => {
   const eventable = new Eventable();
