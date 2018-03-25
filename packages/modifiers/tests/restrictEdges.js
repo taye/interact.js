@@ -68,7 +68,7 @@ test('restrictEdges', t => {
     'outer restriction is applied correctly with offset'
   );
 
-  // setOffset
+  // start
   interaction.modifiers = {};
   interaction.modifiers.startOffset = { top: 5, left: 10, bottom: -8, right: -16 };
   interaction.target = {
@@ -80,9 +80,9 @@ test('restrictEdges', t => {
   options.offset = 'self';
 
   t.deepEqual(
-    restrictEdges.setOffset(arg),
+    restrictEdges.start(arg),
     { top: 505, left: 910, bottom: 508, right: 916 },
-    'setOffset gets x/y from selector string'
+    'start gets x/y from selector string'
   );
 
   t.end();

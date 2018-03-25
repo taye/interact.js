@@ -17,7 +17,7 @@ function init (scope) {
   defaults.perAction.snapSize = snapSize.defaults;
 }
 
-function setOffset (arg) {
+function start (arg) {
   const { interaction, options } = arg;
   const edges = interaction.prepared.edges;
 
@@ -33,7 +33,7 @@ function setOffset (arg) {
     range: options.range,
   };
 
-  const offsets = snap.setOffset(arg);
+  const offsets = snap.start(arg);
   arg.options = options;
 
   return offsets;
@@ -73,7 +73,7 @@ function set (arg) {
 
 const snapSize = {
   init,
-  setOffset,
+  start,
   set,
   defaults: {
     enabled: false,

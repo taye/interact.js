@@ -14,7 +14,7 @@ function init (scope) {
   defaults.perAction.restrict = restrict.defaults;
 }
 
-function setOffset ({ rect, startOffset, options }) {
+function start ({ rect, startOffset, options }) {
   const elementRect = options && options.elementRect;
   const offset = {};
 
@@ -80,7 +80,7 @@ function getRestrictionRect (value, interaction, page) {
 
 const restrict = {
   init,
-  setOffset,
+  start,
   set,
   getRestrictionRect,
   defaults: {

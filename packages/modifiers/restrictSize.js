@@ -28,8 +28,8 @@ function init (scope) {
   defaults.perAction.restrictSize = restrictSize.defaults;
 }
 
-function setOffset ({ interaction }) {
-  return restrictEdges.setOffset({ interaction });
+function start ({ interaction }) {
+  return restrictEdges.start({ interaction });
 }
 
 function set (arg) {
@@ -74,7 +74,7 @@ function set (arg) {
 
 const restrictSize = {
   init,
-  setOffset,
+  start,
   set,
   defaults: {
     enabled: false,
