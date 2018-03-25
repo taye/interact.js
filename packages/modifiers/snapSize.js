@@ -18,10 +18,10 @@ function init (scope) {
 }
 
 function start (arg) {
-  const { interaction, options } = arg;
+  const { interaction, status, options } = arg;
   const edges = interaction.prepared.edges;
 
-  if (!edges) { return; }
+  if (!edges) { return null; }
 
   arg.options = {
     relativePoints: [{
@@ -29,9 +29,14 @@ function start (arg) {
       y: edges.top ? 0 : 1,
     }],
     origin: { x: 0, y: 0 },
-    offset: 'self',
+    offset: options.offset || 'self',
     range: options.range,
   };
+
+  status.targetFields = status.targetFields || [
+    ['width', 'height'],
+    ['x', 'y'],
+  ];
 
   const offsets = snap.start(arg);
   arg.options = options;
@@ -40,10 +45,11 @@ function start (arg) {
 }
 
 function set (arg) {
-  const { interaction, options, offset, modifiedCoords } = arg;
-  const page = extend({}, modifiedCoords);
-  const relativeX = page.x - offset[0].x;
-  const relativeY = page.y - offset[0].y;
+  const { interaction, status, options, offset, modifiedCoords } = arg;
+  const relative = {
+    x: modifiedCoords.x - offset[0].x,
+    y: modifiedCoords.y - offset[0].y,
+  };
 
   arg.options = extend({}, options);
   arg.options.targets = [];
@@ -52,7 +58,7 @@ function set (arg) {
     let target;
 
     if (is.func(snapTarget)) {
-      target = snapTarget(relativeX, relativeY, interaction);
+      target = snapTarget(relative.x, relative.y, interaction);
     }
     else {
       target = snapTarget;
@@ -60,9 +66,13 @@ function set (arg) {
 
     if (!target) { continue; }
 
-    if ('width' in target && 'height' in target) {
-      target.x = target.width;
-      target.y = target.height;
+    for (const [xField, yField] of status.targetFields) {
+      if (xField in target || yField in target) {
+        target.x = target[xField];
+        target.y = target[yField];
+
+        break;
+      }
     }
 
     arg.options.targets.push(target);
@@ -80,6 +90,7 @@ const snapSize = {
     endOnly: false,
     range  : Infinity,
     targets: null,
+    offset: null,
     offsets: null,
   },
 };
