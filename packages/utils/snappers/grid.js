@@ -1,12 +1,14 @@
-import * as is from '../is';
-
 export default (grid) => {
+  const coordFields = [
+    ['x', 'y'],
+    ['left', 'top'],
+    ['right', 'bottom'],
+    ['width', 'height'],
+  ].filter(([xField, yField]) => xField in grid || yField in grid);
+
   return function (x, y) {
     const {
-      x: gridX,
-      y: gridY,
       range,
-      offset,
       limits = {
         left  : -Infinity,
         right :  Infinity,
@@ -15,24 +17,17 @@ export default (grid) => {
       },
     } = grid;
 
-    let offsetX = 0;
-    let offsetY = 0;
+    const offset = offset || { x: 0, y: 0 };
+    const result = { range };
 
-    if (is.object(offset)) {
-      offsetX = offset.x;
-      offsetY = offset.y;
+    for (const [xField, yField] of coordFields) {
+      const gridx = Math.round((x - offset.x) / grid[xField]);
+      const gridy = Math.round((y - offset.y) / grid[yField]);
+
+      result[xField] = Math.max(limits.left, Math.min(limits.right , gridx * grid[xField] + offset.x));
+      result[yField] = Math.max(limits.top, Math.min(limits.bottom , gridy * grid[yField] + offset.y));
     }
 
-    const gridx = Math.round((x - offsetX) / gridX);
-    const gridy = Math.round((y - offsetY) / gridY);
-
-    const newX = Math.max(limits.left, Math.min(limits.right , gridx * gridX + offsetX));
-    const newY = Math.max(limits.top , Math.min(limits.bottom, gridy * gridY + offsetY));
-
-    return {
-      x: newX,
-      y: newY,
-      range: range,
-    };
+    return result;
   };
 };
