@@ -1,6 +1,6 @@
 import { jsdom } from 'jsdom';
 
-import test from './test';
+import test from '@interactjs/_dev/test/test';
 import { default as interact, scope } from '@interactjs/interact/interact';
 import interactions from '@interactjs/core/interactions';
 

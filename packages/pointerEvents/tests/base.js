@@ -1,5 +1,5 @@
-import test from '../test';
-import * as helpers from '../helpers';
+import test from '@interactjs/_dev/test/test';
+import * as helpers from '@interactjs/_dev/test/helpers';
 import interactions from '@interactjs/core/interactions';
 
 import Interaction from '@interactjs/core/Interaction';

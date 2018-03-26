@@ -1,6 +1,6 @@
-import test from './test';
+import test from '@interactjs/_dev/test/test';
 import pointerUtils from '@interactjs/utils/pointerUtils';
-import * as helpers from './helpers';
+import * as helpers from '@interactjs/_dev/test/helpers';
 
 import Interaction from '@interactjs/core/Interaction';
 import InteractEvent from '@interactjs/core/InteractEvent';

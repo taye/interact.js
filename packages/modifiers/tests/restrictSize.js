@@ -1,5 +1,5 @@
-import test from '../test';
-import { mockSignals } from '../helpers';
+import test from '@interactjs/_dev/test/test';
+import { mockSignals } from '@interactjs/_dev/test/helpers';
 
 import RestrictSize from '@interactjs/modifiers/restrictSize';
 import Interaction from '@interactjs/core/Interaction';

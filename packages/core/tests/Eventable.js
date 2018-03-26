@@ -1,4 +1,4 @@
-import test from './test';
+import test from '@interactjs/_dev/test/test';
 import Eventable from '@interactjs/core/Eventable';
 
 test('Eventable', t => {

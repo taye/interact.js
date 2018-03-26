@@ -1,6 +1,6 @@
-import test from './test';
-import d from './domator';
-import * as helpers from './helpers';
+import test from '@interactjs/_dev/test/test';
+import d from '@interactjs/_dev/test/domator';
+import * as helpers from '@interactjs/_dev/test/helpers';
 
 import Interactable from '@interactjs/core/Interactable';
 

@@ -1,4 +1,4 @@
-import test from '../../test';
+import test from '@interactjs/_dev/test/test';
 import * as utils from '@interactjs/utils';
 import DropEvent from '@interactjs/actions/drop/DropEvent';
 
