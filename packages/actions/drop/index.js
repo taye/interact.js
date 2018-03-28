@@ -12,8 +12,6 @@ function init (scope) {
     defaults,
   } = scope;
 
-  let dynamicDrop = false;
-
   interactions.signals.on('after-action-start', function ({ interaction, event, iEvent: dragEvent }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
@@ -23,7 +21,7 @@ function init (scope) {
     dropStatus.activeDrops = null;
     dropStatus.events = null;
 
-    if (!interaction.dynamicDrop) {
+    if (!scope.dynamicDrop) {
       dropStatus.activeDrops = getActiveDrops(scope, interaction.element);
     }
 
@@ -34,8 +32,8 @@ function init (scope) {
     }
   });
 
-  interactions.signals.on('action-move', arg => onEventCreated(arg, scope, dynamicDrop));
-  interactions.signals.on('action-end' , arg => onEventCreated(arg, scope, dynamicDrop));
+  interactions.signals.on('action-move', arg => onEventCreated(arg, scope));
+  interactions.signals.on('action-end' , arg => onEventCreated(arg, scope));
 
   interactions.signals.on('after-action-move', function ({ interaction }) {
     if (interaction.prepared.name !== 'drag') { return; }
@@ -54,152 +52,6 @@ function init (scope) {
     interaction.dropStatus.activeDrops = null;
     interaction.dropStatus.events = null;
   });
-
-  /**
-   * ```js
-   * interact(target)
-   * .dropChecker(function(dragEvent,         // related dragmove or dragend event
-   *                       event,             // TouchEvent/PointerEvent/MouseEvent
-   *                       dropped,           // bool result of the default checker
-   *                       dropzone,          // dropzone Interactable
-   *                       dropElement,       // dropzone elemnt
-   *                       draggable,         // draggable Interactable
-   *                       draggableElement) {// draggable element
-   *
-   *   return dropped && event.target.hasAttribute('allow-drop');
-   * }
-   * ```
-   *
-   * ```js
-   * interact('.drop').dropzone({
-   *   accept: '.can-drop' || document.getElementById('single-drop'),
-   *   overlap: 'pointer' || 'center' || zeroToOne
-   * }
-   * ```
-   *
-   * Returns or sets whether draggables can be dropped onto this target to
-   * trigger drop events
-   *
-   * Dropzones can receive the following events:
-   *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
-   *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
-   *  - `dragmove` when a draggable that has entered the dropzone is moved
-   *  - `drop` when a draggable is dropped into this dropzone
-   *
-   * Use the `accept` option to allow only elements that match the given CSS
-   * selector or element. The value can be:
-   *
-   *  - **an Element** - only that element can be dropped into this dropzone.
-   *  - **a string**, - the element being dragged must match it as a CSS selector.
-   *  - **`null`** - accept options is cleared - it accepts any element.
-   *
-   * Use the `overlap` option to set how drops are checked for. The allowed
-   * values are:
-   *
-   *   - `'pointer'`, the pointer must be over the dropzone (default)
-   *   - `'center'`, the draggable element's center must be over the dropzone
-   *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
-   *   e.g. `0.5` for drop to happen when half of the area of the draggable is
-   *   over the dropzone
-   *
-   * Use the `checker` option to specify a function to check if a dragged element
-   * is over this Interactable.
-   *
-   * @param {boolean | object | null} [options] The new options to be set.
-   * @return {boolean | Interactable} The current setting or this Interactable
-   */
-  Interactable.prototype.dropzone = function (options) {
-    if (utils.is.object(options)) {
-      this.options.drop.enabled = options.enabled === false? false: true;
-
-      if (utils.is.func(options.ondrop)          ) { this.on('drop'          , options.ondrop          ); }
-      if (utils.is.func(options.ondropactivate)  ) { this.on('dropactivate'  , options.ondropactivate  ); }
-      if (utils.is.func(options.ondropdeactivate)) { this.on('dropdeactivate', options.ondropdeactivate); }
-      if (utils.is.func(options.ondragenter)     ) { this.on('dragenter'     , options.ondragenter     ); }
-      if (utils.is.func(options.ondragleave)     ) { this.on('dragleave'     , options.ondragleave     ); }
-      if (utils.is.func(options.ondropmove)      ) { this.on('dropmove'      , options.ondropmove      ); }
-
-      if (/^(pointer|center)$/.test(options.overlap)) {
-        this.options.drop.overlap = options.overlap;
-      }
-      else if (utils.is.number(options.overlap)) {
-        this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
-      }
-      if ('accept' in options) {
-        this.options.drop.accept = options.accept;
-      }
-      if ('checker' in options) {
-        this.options.drop.checker = options.checker;
-      }
-
-
-      return this;
-    }
-
-    if (utils.is.bool(options)) {
-      this.options.drop.enabled = options;
-
-      if (!options) {
-        this.ondragenter = this.ondragleave = this.ondrop
-          = this.ondropactivate = this.ondropdeactivate = null;
-      }
-
-      return this;
-    }
-
-    return this.options.drop;
-  };
-
-  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
-    let dropped = false;
-
-    // if the dropzone has no rect (eg. display: none)
-    // call the custom dropChecker or just return false
-    if (!(rect = rect || this.getRect(dropElement))) {
-      return (this.options.drop.checker
-        ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement)
-        : false);
-    }
-
-    const dropOverlap = this.options.drop.overlap;
-
-    if (dropOverlap === 'pointer') {
-      const origin = utils.getOriginXY(draggable, draggableElement, 'drag');
-      const page = utils.pointer.getPageXY(dragEvent);
-
-      page.x += origin.x;
-      page.y += origin.y;
-
-      const horizontal = (page.x > rect.left) && (page.x < rect.right);
-      const vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
-
-      dropped = horizontal && vertical;
-    }
-
-    const dragRect = draggable.getRect(draggableElement);
-
-    if (dragRect && dropOverlap === 'center') {
-      const cx = dragRect.left + dragRect.width  / 2;
-      const cy = dragRect.top  + dragRect.height / 2;
-
-      dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
-    }
-
-    if (dragRect && utils.is.number(dropOverlap)) {
-      const overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
-                            * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top )));
-
-      const overlapRatio = overlapArea / (dragRect.width * dragRect.height);
-
-      dropped = overlapRatio >= dropOverlap;
-    }
-
-    if (this.options.drop.checker) {
-      dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
-    }
-
-    return dropped;
-  };
 
   interactions.signals.on('new', function (interaction) {
     interaction.dropStatus = {
@@ -223,6 +75,14 @@ function init (scope) {
     dropStatus.rejected = false;
   });
 
+  Interactable.prototype.dropzone = function (options) {
+    return dropzoneMethod(this, options);
+  };
+
+  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
+    return dropCheckMethod(this, dragEvent, event, draggable, draggableElement, dropElement, rect);
+  };
+
   /**
    * Returns or sets whether the dimensions of dropzone elements are calculated
    * on every dragmove or only on dragstart for the default dropChecker
@@ -233,15 +93,15 @@ function init (scope) {
    */
   interact.dynamicDrop = function (newValue) {
     if (utils.is.bool(newValue)) {
-      //if (dragging && dynamicDrop !== newValue && !newValue) {
+      //if (dragging && scope.dynamicDrop !== newValue && !newValue) {
       //  calcRects(dropzones);
       //}
 
-      dynamicDrop = newValue;
+      scope.dynamicDrop = newValue;
 
       return interact;
     }
-    return dynamicDrop;
+    return scope.dynamicDrop;
   };
 
   utils.arr.merge(actions.eventTypes, [
@@ -253,6 +113,8 @@ function init (scope) {
     'drop',
   ]);
   actions.methodDict.drop = 'dropzone';
+
+  scope.dynamicDrop = false;
 
   defaults.drop = drop.defaults;
 }
@@ -420,12 +282,12 @@ function fireDropEvents (interaction, events) {
   dropStatus.prev.element = cur.element;
 }
 
-function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
+function onEventCreated ({ interaction, iEvent, event }, scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return; }
 
   const { dropStatus } = interaction;
 
-  if (dynamicDrop) {
+  if (scope.dynamicDrop) {
     dropStatus.activeDrops = getActiveDrops(scope, interaction.target, interaction.element);
   }
 
@@ -443,6 +305,153 @@ function onEventCreated ({ interaction, iEvent, event }, scope, dynamicDrop) {
 
   dropStatus.events = getDropEvents(interaction, event, dragEvent);
 }
+
+/**
+ * ```js
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
+ *
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ * ```
+ *
+ * ```js
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ * ```
+ *
+ * Returns or sets whether draggables can be dropped onto this target to
+ * trigger drop events
+ *
+ * Dropzones can receive the following events:
+ *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
+ *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+ *  - `dragmove` when a draggable that has entered the dropzone is moved
+ *  - `drop` when a draggable is dropped into this dropzone
+ *
+ * Use the `accept` option to allow only elements that match the given CSS
+ * selector or element. The value can be:
+ *
+ *  - **an Element** - only that element can be dropped into this dropzone.
+ *  - **a string**, - the element being dragged must match it as a CSS selector.
+ *  - **`null`** - accept options is cleared - it accepts any element.
+ *
+ * Use the `overlap` option to set how drops are checked for. The allowed
+ * values are:
+ *
+ *   - `'pointer'`, the pointer must be over the dropzone (default)
+ *   - `'center'`, the draggable element's center must be over the dropzone
+ *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
+ *   e.g. `0.5` for drop to happen when half of the area of the draggable is
+ *   over the dropzone
+ *
+ * Use the `checker` option to specify a function to check if a dragged element
+ * is over this Interactable.
+ *
+ * @param {boolean | object | null} [options] The new options to be set.
+ * @return {boolean | Interactable} The current setting or this Interactable
+ */
+function dropzoneMethod (interactable, options) {
+  if (utils.is.object(options)) {
+    interactable.options.drop.enabled = options.enabled === false? false: true;
+
+    if (utils.is.func(options.ondrop)          ) { interactable.on('drop'          , options.ondrop          ); }
+    if (utils.is.func(options.ondropactivate)  ) { interactable.on('dropactivate'  , options.ondropactivate  ); }
+    if (utils.is.func(options.ondropdeactivate)) { interactable.on('dropdeactivate', options.ondropdeactivate); }
+    if (utils.is.func(options.ondragenter)     ) { interactable.on('dragenter'     , options.ondragenter     ); }
+    if (utils.is.func(options.ondragleave)     ) { interactable.on('dragleave'     , options.ondragleave     ); }
+    if (utils.is.func(options.ondropmove)      ) { interactable.on('dropmove'      , options.ondropmove      ); }
+
+    if (/^(pointer|center)$/.test(options.overlap)) {
+      interactable.options.drop.overlap = options.overlap;
+    }
+    else if (utils.is.number(options.overlap)) {
+      interactable.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
+    }
+    if ('accept' in options) {
+      interactable.options.drop.accept = options.accept;
+    }
+    if ('checker' in options) {
+      interactable.options.drop.checker = options.checker;
+    }
+
+
+    return interactable;
+  }
+
+  if (utils.is.bool(options)) {
+    interactable.options.drop.enabled = options;
+
+    if (!options) {
+      interactable.ondragenter = interactable.ondragleave = interactable.ondrop
+        = interactable.ondropactivate = interactable.ondropdeactivate = null;
+    }
+
+    return interactable;
+  }
+
+  return interactable.options.drop;
+}
+
+function dropCheckMethod (interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
+  let dropped = false;
+
+  // if the dropzone has no rect (eg. display: none)
+  // call the custom dropChecker or just return false
+  if (!(rect = rect || interactable.getRect(dropElement))) {
+    return (interactable.options.drop.checker
+      ? interactable.options.drop.checker(dragEvent, event, dropped, interactable, dropElement, draggable, draggableElement)
+      : false);
+  }
+
+  const dropOverlap = interactable.options.drop.overlap;
+
+  if (dropOverlap === 'pointer') {
+    const origin = utils.getOriginXY(draggable, draggableElement, 'drag');
+    const page = utils.pointer.getPageXY(dragEvent);
+
+    page.x += origin.x;
+    page.y += origin.y;
+
+    const horizontal = (page.x > rect.left) && (page.x < rect.right);
+    const vertical   = (page.y > rect.top ) && (page.y < rect.bottom);
+
+    dropped = horizontal && vertical;
+  }
+
+  const dragRect = draggable.getRect(draggableElement);
+
+  if (dragRect && dropOverlap === 'center') {
+    const cx = dragRect.left + dragRect.width  / 2;
+    const cy = dragRect.top  + dragRect.height / 2;
+
+    dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
+  }
+
+  if (dragRect && utils.is.number(dropOverlap)) {
+    const overlapArea  = (Math.max(0, Math.min(rect.right , dragRect.right ) - Math.max(rect.left, dragRect.left))
+                          * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top , dragRect.top )));
+
+    const overlapRatio = overlapArea / (dragRect.width * dragRect.height);
+
+    dropped = overlapRatio >= dropOverlap;
+  }
+
+  if (interactable.options.drop.checker) {
+    dropped = interactable.options.drop.checker(dragEvent, event, dropped, interactable, dropElement, draggable, draggableElement);
+  }
+
+  return dropped;
+}
+
 
 const drop = {
   init,
