@@ -43,6 +43,16 @@ class Interactable {
     return this;
   }
 
+  updatePerActionListeners (actionName, prev, cur) {
+    if (is.array(prev)) {
+      this.off(actionName, prev);
+    }
+
+    if (is.array(cur)) {
+      this.on(actionName, cur);
+    }
+  }
+
   setPerAction (actionName, options) {
     const defaults = this._defaults;
 
@@ -51,6 +61,11 @@ class Interactable {
       const actionOptions = this.options[actionName];
       const optionValue = options[optionName];
       const isArray = is.array(optionValue);
+
+      // remove old event listeners and add new ones
+      if (optionName === 'listeners') {
+        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue);
+      }
 
       // if the option value is an array
       if (isArray) {
