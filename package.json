@@ -101,7 +101,8 @@
       "packages"
     ],
     "exclude": [
-      "**/_*"
+      "**/_*",
+      "**/tests"
     ],
     "reporter": [
       "text",
