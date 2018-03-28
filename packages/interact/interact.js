@@ -247,12 +247,12 @@ interact.stop = function (event) {
  */
 interact.pointerMoveTolerance = function (newValue) {
   if (utils.is.number(newValue)) {
-    scope.Interaction.pointerMoveTolerance = newValue;
+    scope.interactions.pointerMoveTolerance = newValue;
 
     return interact;
   }
 
-  return scope.Interaction.pointerMoveTolerance;
+  return scope.interactions.pointerMoveTolerance;
 };
 
 signals.on('unset', ({ interactable }) => {

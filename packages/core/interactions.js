@@ -53,7 +53,15 @@ function init (scope) {
   scope.prevTouchTime = 0;
 
   // eslint-disable-next-line no-shadow
-  scope.Interaction = class Interaction extends Interaction {};
+  scope.Interaction = class Interaction extends Interaction {
+    get pointerMoveTolerance () {
+      return scope.interactions.pointerMoveTolerance;
+    }
+
+    set pointerMoveTolerance (value) {
+      scope.interactions.pointerMoveTolerance = value;
+    }
+  };
   scope.interactions = {
     signals,
     // all active and idle interactions
@@ -65,6 +73,7 @@ function init (scope) {
     },
     listeners,
     eventMap,
+    pointerMoveTolerance: 1,
   };
 
   scope.actions = {

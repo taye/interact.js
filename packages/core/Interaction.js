@@ -2,6 +2,10 @@ import InteractEvent from './InteractEvent';
 import * as utils    from '@interactjs/utils';
 
 class Interaction {
+  get pointerMoveTolerance () {
+    return 1;
+  }
+
   /** */
   constructor ({ pointerType, signals }) {
     this._signals = signals;
@@ -145,7 +149,7 @@ class Interaction {
       dx = this.curCoords.client.x - this.startCoords.client.x;
       dy = this.curCoords.client.y - this.startCoords.client.y;
 
-      this.pointerWasMoved = utils.hypot(dx, dy) > Interaction.pointerMoveTolerance;
+      this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance;
     }
 
     const signalArg = {
@@ -418,8 +422,6 @@ class Interaction {
     return true;
   }
 }
-
-Interaction.pointerMoveTolerance = 1;
 
 /**
  * @alias Interaction.prototype.move
