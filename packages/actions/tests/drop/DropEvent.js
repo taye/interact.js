@@ -94,3 +94,20 @@ test('DropEvent.reject()', t => {
 
   t.end();
 });
+
+test('DropEvent.stop[Immediate]Propagation()', t => {
+  const dropEvent = new DropEvent({ cur: {} }, {}, 'dragmove');
+
+  t.notOk(dropEvent.propagationStopped || dropEvent.immediatePropagationStopped);
+
+  dropEvent.stopPropagation();
+  t.ok(dropEvent.propagationStopped);
+  t.notOk(dropEvent.immediatePropagationStopped);
+
+  dropEvent.propagationStopped = false;
+
+  dropEvent.stopImmediatePropagation();
+  t.ok(dropEvent.propagationStopped && dropEvent.immediatePropagationStopped);
+
+  t.end();
+});

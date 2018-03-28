@@ -155,18 +155,14 @@ function collectDrops ({ interactables }, draggableElement) {
 }
 
 function fireActivationEvents (activeDrops, event) {
-  let prevElement;
-
   // loop through all active dropzones and trigger event
   for (const { dropzone, element } of activeDrops) {
+    event.dropzone = dropzone;
 
-    // prevent trigger of duplicate events on same element
-    if (element !== prevElement) {
-      // set current element as event target
-      event.target = element;
-      dropzone.fire(event);
-    }
-    prevElement = element;
+    // set current element as event target
+    event.target = element;
+    dropzone.fire(event);
+    event.propagationStopped = event.immediatePropagationStopped = false;
   }
 }
 
