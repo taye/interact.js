@@ -23,7 +23,7 @@
     "start": "node packages/_dev/build --watch",
     "build": "node packages/_dev/build --docs",
     "lint": "node packages/_dev/build/lint",
-    "test": "npm run lint -- --fail-on-error && NODE_ENV=test nyc --silent node packages/_dev/test/index.js | tap-spec && nyc report",
+    "test": "npm run lint -- --fail-on-error && NODE_ENV=test nyc --silent node packages/_dev/test/index.js | tap-spec && nyc report && nyc check-coverage",
     "docs": "node packages/_dev/build/docs -- --go",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
@@ -92,23 +92,5 @@
     "through2": "^2.0.0",
     "uglify-js": "^2.7.5",
     "watchify": "^3.9.0"
-  },
-  "nyc": {
-    "require": [
-      "@interactjs/_dev/babel-register"
-    ],
-    "include": [
-      "packages"
-    ],
-    "exclude": [
-      "**/_*",
-      "**/tests"
-    ],
-    "reporter": [
-      "text",
-      "lcov"
-    ],
-    "sourceMap": false,
-    "instrument": false
   }
 }
