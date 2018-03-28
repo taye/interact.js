@@ -48,7 +48,13 @@ function setOffset ({ interaction, interactable, element, rect, startOffset, opt
   return offsets;
 }
 
-function set ({ interaction, modifiedCoords, status, options, offset: offsets }) {
+function set ({ interaction, modifiedCoords, status, phase, options, offset: offsets }) {
+  const relativePoints = options && options.relativePoints;
+
+  if (phase === 'start' && relativePoints && relativePoints.length) {
+    return;
+  }
+
   const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
   const page = utils.extend({}, modifiedCoords);
   const targets = [];
@@ -142,37 +148,10 @@ function set ({ interaction, modifiedCoords, status, options, offset: offsets })
   status.locked = closest.inRange;
 }
 
-function modifyCoords ({ page, client, status, phase, options }) {
-  const relativePoints = options && options.relativePoints;
-
-  if (options && options.enabled
-      && !(phase === 'start' && relativePoints && relativePoints.length)) {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-
-    return {
-      range  : status.range,
-      locked : status.locked,
-      x      : status.modifiedX,
-      y      : status.modifiedY,
-      realX  : status.realX,
-      realY  : status.realY,
-      dx     : status.delta.x,
-      dy     : status.delta.y,
-    };
-  }
-}
-
 const snap = {
   init,
   setOffset,
   set,
-  modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,

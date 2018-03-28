@@ -33,10 +33,10 @@ function setOffset ({ interaction }) {
 }
 
 function set (arg) {
-  const { interaction, options } = arg;
+  const { interaction, options, phase } = arg;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges) {
+  if (!interaction.interacting() || !edges || phase === 'start') {
     return;
   }
 
@@ -76,7 +76,6 @@ const restrictSize = {
   init,
   setOffset,
   set,
-  modifyCoords: restrictEdges.modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,

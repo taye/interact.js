@@ -32,8 +32,8 @@ function setOffset ({ rect, startOffset, options }) {
   return offset;
 }
 
-function set ({ modifiedCoords, interaction, status, offset, options }) {
-  if (!options) { return status; }
+function set ({ modifiedCoords, interaction, status, phase, offset, options }) {
+  if (phase === 'start' && options.elementRect) { return; }
 
   const page = extend({}, modifiedCoords);
 
@@ -70,21 +70,6 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
   status.modifiedY = modifiedY;
 }
 
-function modifyCoords ({ page, client, status, phase, options }) {
-  const elementRect = options && options.elementRect;
-
-  if (options && options.enabled
-      && !(phase === 'start' && elementRect && status.locked)) {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-  }
-}
-
 function getRestrictionRect (value, interaction, page) {
   if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
@@ -97,7 +82,6 @@ const restrict = {
   init,
   setOffset,
   set,
-  modifyCoords,
   getRestrictionRect,
   defaults: {
     enabled    : false,

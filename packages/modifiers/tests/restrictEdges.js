@@ -85,16 +85,5 @@ test('restrictEdges', t => {
     'setOffset gets x/y from selector string'
   );
 
-  // modifyCoords
-  arg.page = { x: 50, y: 100 };
-  arg.status = {
-    delta: { x: 150, y: 100 },
-    locked: true,
-  };
-  arg.phase = 'start';
-  restrictEdges.modifyCoords(arg);
-
-  t.ok(arg.page, { x: 200, y: 200 });
-
   t.end();
 });

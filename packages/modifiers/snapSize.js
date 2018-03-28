@@ -71,21 +71,10 @@ function set (arg) {
   snap.set(arg);
 }
 
-function modifyCoords (arg) {
-  const { options } = arg;
-
-  arg.options = extend({}, options);
-  arg.options.enabled = options.enabled;
-  arg.options.relativePoints = [null];
-
-  snap.modifyCoords(arg);
-}
-
 const snapSize = {
   init,
   setOffset,
   set,
-  modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,

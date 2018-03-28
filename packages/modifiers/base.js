@@ -127,10 +127,11 @@ function resetStatuses (statuses, modifiers) {
   return statuses;
 }
 
-function start ({ interaction }, modifiers, pageCoords) {
+function start ({ interaction, phase }, modifiers, pageCoords) {
   const arg = {
     interaction,
     pageCoords,
+    phase,
     startOffset: interaction.modifiers.startOffset,
     statuses: interaction.modifiers.statuses,
     preEnd: false,
@@ -187,15 +188,18 @@ function setCurCoords (arg, modifiers) {
     const modifierName = modifiers.names[i];
     modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
 
-    if (!modifierArg.options) {
+    if (!modifierArg.options || !modifierArg.options.enabled) {
       continue;
     }
 
-    const modifier = modifiers[modifierName];
+    const status = interaction.modifiers.statuses[modifierName];
 
-    modifierArg.status = interaction.modifiers.statuses[modifierName];
-
-    modifier.modifyCoords(modifierArg);
+    if (status.locked) {
+      modifierArg.page.x += status.delta.x;
+      modifierArg.page.y += status.delta.y;
+      modifierArg.client.x += status.delta.x;
+      modifierArg.client.y += status.delta.y;
+    }
   }
 }
 
