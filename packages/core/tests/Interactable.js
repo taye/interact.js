@@ -22,7 +22,7 @@ test('Interactable copies and extends defaults', t => {
   const specified = { specified: 'parent' };
 
   const div = d('div');
-  const interactable = helpers.newInteractable(scope, div, { test: specified });
+  const interactable = scope.interactables.new(div, { test: specified });
 
   t.deepEqual(interactable.options.test.specified, specified.specified,
     'specified options are properly set');
@@ -55,7 +55,7 @@ test('Interactable copies and extends per action defaults', t => {
   defaults.test = { testModifier: defaults.perAction.testModifier };
 
   const div = d('div');
-  const interactable = helpers.newInteractable(scope, div, {});
+  const interactable = scope.interactables.new(div, {});
   interactable.testize({ testModifier: { specified: 'parent' } });
 
   t.deepEqual(interactable.options.test, {

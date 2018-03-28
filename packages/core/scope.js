@@ -28,6 +28,92 @@ export function createScope () {
     // eslint-disable-next-line no-shadow
     Interactable: class Interactable extends Interactable {
       get _defaults () { return scope.defaults; }
+
+      set (options) {
+        super.set(options);
+
+        scope.signals.fire('set', {
+          options,
+          interactable: this,
+        });
+
+        return this;
+      }
+
+      unset () {
+        super.unset();
+        scope.interactables.signals.fire('unset', { interactable: this });
+      }
+    },
+
+    interactables: {
+      // all set interactables
+      list: [],
+
+      new (target, options) {
+        options = utils.extend(options || {}, {
+          actions: scope.actions,
+        });
+
+        const interactable = new scope.Interactable(target, options, scope.document);
+
+        scope.addDocument(interactable._doc);
+
+        scope.interactables.list.push(interactable);
+
+        scope.interactables.signals.fire('new', {
+          target,
+          options,
+          interactable: interactable,
+          win: this._win,
+        });
+
+        return interactable;
+      },
+
+      indexOfElement (target, context) {
+        context = context || scope.document;
+
+        const list = this.list;
+
+        for (let i = 0; i < list.length; i++) {
+          const interactable = list[i];
+
+          if (interactable.target === target && interactable._context === context) {
+            return i;
+          }
+        }
+
+        return -1;
+      },
+
+      get (element, options, dontCheckInContext) {
+        const ret = this.list[this.indexOfElement(element, options && options.context)];
+
+        return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
+      },
+
+      forEachMatch (element, callback) {
+        for (const interactable of this.list) {
+          let ret;
+
+          if ((utils.is.string(interactable.target)
+            // target is a selector and the element matches
+            ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
+            // target is the element
+            : element === interactable.target)
+            // the element is in context
+            && (interactable.inContext(element))) {
+            ret = callback(interactable);
+          }
+
+          if (ret !== undefined) {
+            return ret;
+          }
+        }
+      },
+
+      signals: new utils.Signals(),
     },
 
     // main document

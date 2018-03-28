@@ -67,10 +67,6 @@ export function mockScope (options = {}) {
       methodDict: {},
       eventTypes: [],
     },
-    interactables: {
-      signals: new Signals(),
-      list: [],
-    },
     interactions: {
       signals: new Signals(),
       list: [],
@@ -86,16 +82,6 @@ export function mockSignals () {
     off () {},
     fire () {},
   };
-}
-
-export function newInteractable (scope, target, options = {}, defaultContext) {
-  options.signals = scope.interactables.signals;
-  options.actions = scope.actions;
-
-  const interactable = new scope.Interactable(target, options, defaultContext);
-  scope.interactables.list.push(interactable);
-
-  return interactable;
 }
 
 export function mockInteractable (props) {

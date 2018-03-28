@@ -19,7 +19,7 @@ test('reflow', t => {
   );
 
   const fired = [];
-  const interactable = helpers.newInteractable(scope, win.window);
+  const interactable = scope.interactables.new(win.window);
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 });
 
   interactable.fire = iEvent => fired.push(iEvent);
@@ -91,7 +91,7 @@ test('async reflow', async t => {
   let reflowEvent;
   let promise;
 
-  const interactable = helpers.newInteractable(scope, win.window);
+  const interactable = scope.interactables.new(win.window);
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 });
   interactable.rectChecker(() => rect);
   interactable.fire = iEvent => { reflowEvent = iEvent; };

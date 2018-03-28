@@ -24,20 +24,12 @@ class Interactable {
 
   /** */
   constructor (target, options, defaultContext) {
-    this._signals = options.signals;
     this._actions = options.actions;
     this.target   = target;
     this.events   = new Eventable();
     this._context = options.context || defaultContext;
     this._win     = getWindow(trySelector(target)? this._context : target);
     this._doc     = this._win.document;
-
-    this._signals.fire('new', {
-      target,
-      options,
-      interactable: this,
-      win: this._win,
-    });
 
     this.set(options);
   }
@@ -292,11 +284,6 @@ class Interactable {
       }
     }
 
-    this._signals.fire('set', {
-      options,
-      interactable: this,
-    });
-
     return this;
   }
 
@@ -334,8 +321,6 @@ class Interactable {
     else {
       events.remove(this, 'all');
     }
-
-    this._signals.fire('unset', { interactable: this });
   }
 }
 

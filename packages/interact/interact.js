@@ -6,7 +6,6 @@ import * as utils      from '@interactjs/utils';
 import { createScope } from '@interactjs/core/scope';
 
 const globalEvents = {};
-const signals = new utils.Signals();
 const scope = createScope();
 
 /**
@@ -30,24 +29,17 @@ const scope = createScope();
  *
  * @global
  *
- * @param {Element | string} element The HTML or SVG Element to interact with
+ * @param {Element | string} target The HTML or SVG Element to interact with
  * or CSS selector
  * @return {Interactable}
  */
-function interact (element, options) {
-  let interactable = scope.interactables.get(element, options);
+function interact (target, options) {
+  let interactable = scope.interactables.get(target, options);
+
 
   if (!interactable) {
-    options = utils.extend(options || {}, {
-      signals: signals,
-      actions: scope.actions,
-    });
-    interactable = new scope.Interactable(element, options, scope.document);
+    interactable = scope.interactables.new(target, options);
     interactable.events.global = globalEvents;
-
-    scope.addDocument(interactable._doc);
-
-    scope.interactables.list.push(interactable);
   }
 
   return interactable;
@@ -255,7 +247,7 @@ interact.pointerMoveTolerance = function (newValue) {
   return scope.interactions.pointerMoveTolerance;
 };
 
-signals.on('unset', ({ interactable }) => {
+scope.interactables.signals.on('unset', ({ interactable }) => {
   scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
 
   // Stop related interactions when an Interactable is unset
@@ -267,55 +259,6 @@ signals.on('unset', ({ interactable }) => {
 });
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
-
-scope.interactables = {
-  // all set interactables
-  list: [],
-
-  indexOfElement (target, context) {
-    context = context || scope.document;
-
-    const list = this.list;
-
-    for (let i = 0; i < list.length; i++) {
-      const interactable = list[i];
-
-      if (interactable.target === target && interactable._context === context) {
-        return i;
-      }
-    }
-
-    return -1;
-  },
-
-  get (element, options, dontCheckInContext) {
-    const ret = this.list[this.indexOfElement(element, options && options.context)];
-
-    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
-  },
-
-  forEachMatch (element, callback) {
-    for (const interactable of this.list) {
-      let ret;
-
-      if ((utils.is.string(interactable.target)
-        // target is a selector and the element matches
-        ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
-        // target is the element
-        : element === interactable.target)
-        // the element is in context
-        && (interactable.inContext(element))) {
-        ret = callback(interactable);
-      }
-
-      if (ret !== undefined) {
-        return ret;
-      }
-    }
-  },
-
-  signals: signals,
-};
 
 scope.interact = interact;
 
