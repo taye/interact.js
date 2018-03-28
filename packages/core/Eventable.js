@@ -1,4 +1,6 @@
-import extend from '@interactjs/utils/extend.js';
+import * as arr  from '@interactjs/utils/arr';
+import extend    from '@interactjs/utils/extend';
+import normalize from '@interactjs/utils/normalizeListeners';
 
 function fireUntilImmediateStopped (event, listeners) {
   for (const listener of listeners) {
@@ -12,6 +14,8 @@ class Eventable {
 
   constructor (options) {
     this.options = extend({}, options || {});
+    this.types = {};
+    this.propagationStopped = this.immediatePropagationStopped = false;
   }
 
   fire (event) {
@@ -20,7 +24,7 @@ class Eventable {
     const global = this.global;
 
     // Interactable#on() listeners
-    if ((listeners = this[event.type])) {
+    if ((listeners = this.types[event.type])) {
       fireUntilImmediateStopped(event, listeners);
     }
 
@@ -35,27 +39,29 @@ class Eventable {
     }
   }
 
-  on (eventType, listener) {
-    // if this type of event was never bound
-    if (this[eventType]) {
-      this[eventType].push(listener);
-    }
-    else {
-      this[eventType] = [listener];
+  on (type, listener) {
+    const listeners = normalize(type, listener);
+
+    for (type in listeners) {
+      this.types[type] = arr.merge(this.types[type] || [], listeners[type]);
     }
   }
 
-  off (eventType, listener) {
-    // if it is an action event type
-    const eventList = this[eventType];
-    const index     = eventList? eventList.indexOf(listener) : -1;
+  off (type, listener) {
+    const listeners = normalize(type, listener);
 
-    if (index !== -1) {
-      eventList.splice(index, 1);
-    }
+    for (type in listeners) {
+      const eventList = this.types[type];
 
-    if (eventList && eventList.length === 0 || !listener) {
-      this[eventType] = undefined;
+      if (!eventList || !eventList.length) { continue; }
+
+      for (listener of listeners[type]) {
+        const index = eventList.indexOf(listener);
+
+        if (index !== -1) {
+          eventList.splice(index, 1);
+        }
+      }
     }
   }
 }

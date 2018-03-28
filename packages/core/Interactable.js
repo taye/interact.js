@@ -3,6 +3,7 @@ import * as is   from '@interactjs/utils/is';
 import events    from '@interactjs/utils/events';
 import extend    from '@interactjs/utils/extend';
 import * as arr  from '@interactjs/utils/arr';
+import normalizeListeners from '@interactjs/utils/normalizeListeners';
 import Eventable from './Eventable';
 
 import {
@@ -204,88 +205,63 @@ class Interactable {
     return this;
   }
 
-  _onOffMultiple (method, eventType, listener, options) {
-    if (is.string(eventType) && eventType.search(' ') !== -1) {
-      eventType = eventType.trim().split(/ +/);
+  _onOffMultiple (method, typeArg, listenerArg, options) {
+    if (is.object(typeArg) && !is.array(typeArg)) {
+      options = listenerArg;
+      listenerArg = null;
     }
 
-    if (is.array(eventType)) {
-      for (const type of eventType) {
-        this[method](type, listener, options);
+    const addRemove = method === 'on' ? 'add' : 'remove';
+    const listeners = normalizeListeners(typeArg, listenerArg);
+
+    for (let type in listeners) {
+      if (type === 'wheel') { type = wheelEvent; }
+
+      for (const listener of listeners[type]) {
+        // if it is an action event type
+        if (arr.contains(this._actions.eventTypes, type)) {
+          this.events[method](type, listener);
+        }
+        // delegated event
+        else if (is.string(this.target)) {
+          events[`${addRemove}Delegate`](this.target, this._context, type, listener, options);
+        }
+        // remove listener from this Interatable's element
+        else {
+          events[addRemove](this.target, type, listener, options);
+        }
       }
-
-      return true;
     }
 
-    if (is.object(eventType)) {
-      for (const prop in eventType) {
-        this[method](prop, eventType[prop], listener);
-      }
-
-      return true;
-    }
+    return this;
   }
 
   /**
    * Binds a listener for an InteractEvent, pointerEvent or DOM event.
    *
-   * @param {string | array | object} eventType  The types of events to listen
+   * @param {string | array | object} types The types of events to listen
    * for
-   * @param {function} listener   The function event (s)
-   * @param {object | boolean} [options]    options object or useCapture flag
-   * for addEventListener
-   * @return {object} This Interactable
+   * @param {function | array | object} [listener] The event listener function(s)
+   * @param {object | boolean} [options] options object or useCapture flag for
+   * addEventListener
+   * @return {Interactable} This Interactable
    */
-  on (eventType, listener, options) {
-    if (this._onOffMultiple('on', eventType, listener, options)) {
-      return this;
-    }
-
-    if (arr.contains(this._actions.eventTypes, eventType)) {
-      this.events.on(eventType, listener);
-    }
-    // delegated event for selector
-    else if (is.string(this.target)) {
-      events.addDelegate(this.target, this._context, eventType, listener, options);
-    }
-    else {
-      events.add(this.target, eventType, listener, options);
-    }
-
-    return this;
+  on (types, listener, options) {
+    return this._onOffMultiple('on', types, listener, options);
   }
 
   /**
-   * Removes an InteractEvent, pointerEvent or DOM event listener
+   * Removes an InteractEvent, pointerEvent or DOM event listener.
    *
-   * @param {string | array | object} eventType The types of events that were
+   * @param {string | array | object} types The types of events that were
    * listened for
-   * @param {function} listener The listener function to be removed
+   * @param {function | array | object} [listener] The event listener function(s)
    * @param {object | boolean} [options] options object or useCapture flag for
    * removeEventListener
-   * @return {object} This Interactable
+   * @return {Interactable} This Interactable
    */
-  off (eventType, listener, options) {
-    if (this._onOffMultiple('off', eventType, listener, options)) {
-      return this;
-    }
-
-    if (eventType === 'wheel') { eventType = wheelEvent; }
-
-    // if it is an action event type
-    if (arr.contains(this._actions.eventTypes, eventType)) {
-      this.events.off(eventType, listener);
-    }
-    // delegated event
-    else if (is.string(this.target)) {
-      events.removeDelegate(this.target, this._context, eventType, listener, options);
-    }
-    // remove listener from this Interatable's element
-    else {
-      events.remove(this.target, eventType, listener, options);
-    }
-
-    return this;
+  off (types, listener, options) {
+    return this._onOffMultiple('off', types, listener, options);
   }
 
   /**

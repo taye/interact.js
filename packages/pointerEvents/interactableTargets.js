@@ -15,9 +15,11 @@ function init (scope) {
       const eventable = interactable.events;
       const options = eventable.options;
 
-      if (eventable[type]
-        && is.element(element)
-        && interactable.testIgnoreAllow(options, element, eventTarget)) {
+      if (
+        eventable.types[type] &&
+        eventable.types[type].length &&
+        is.element(element) &&
+        interactable.testIgnoreAllow(options, element, eventTarget)) {
 
         targets.push({
           element,
