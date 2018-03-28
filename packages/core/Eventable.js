@@ -20,17 +20,11 @@ class Eventable {
 
   fire (event) {
     let listeners;
-    const onEvent = 'on' + event.type;
     const global = this.global;
 
     // Interactable#on() listeners
     if ((listeners = this.types[event.type])) {
       fireUntilImmediateStopped(event, listeners);
-    }
-
-    // interactable.onevent listener
-    if (!event.propagationStopped && this[onEvent]) {
-      this[onEvent](event);
     }
 
     // interact.on() listeners

@@ -112,12 +112,12 @@ function init (scope) {
     if (utils.is.object(options)) {
       this.options.drop.enabled = options.enabled === false? false: true;
 
-      if (utils.is.func(options.ondrop)          ) { this.events.ondrop           = options.ondrop          ; }
-      if (utils.is.func(options.ondropactivate)  ) { this.events.ondropactivate   = options.ondropactivate  ; }
-      if (utils.is.func(options.ondropdeactivate)) { this.events.ondropdeactivate = options.ondropdeactivate; }
-      if (utils.is.func(options.ondragenter)     ) { this.events.ondragenter      = options.ondragenter     ; }
-      if (utils.is.func(options.ondragleave)     ) { this.events.ondragleave      = options.ondragleave     ; }
-      if (utils.is.func(options.ondropmove)      ) { this.events.ondropmove       = options.ondropmove      ; }
+      if (utils.is.func(options.ondrop)          ) { this.on('drop'          , options.ondrop          ); }
+      if (utils.is.func(options.ondropactivate)  ) { this.on('dropactivate'  , options.ondropactivate  ); }
+      if (utils.is.func(options.ondropdeactivate)) { this.on('dropdeactivate', options.ondropdeactivate); }
+      if (utils.is.func(options.ondragenter)     ) { this.on('dragenter'     , options.ondragenter     ); }
+      if (utils.is.func(options.ondragleave)     ) { this.on('dragleave'     , options.ondragleave     ); }
+      if (utils.is.func(options.ondropmove)      ) { this.on('dropmove'      , options.ondropmove      ); }
 
       if (/^(pointer|center)$/.test(options.overlap)) {
         this.options.drop.overlap = options.overlap;

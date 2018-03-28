@@ -42,13 +42,11 @@ class Interactable {
     this.set(options);
   }
 
-  setOnEvents (action, phases) {
-    const onAction = 'on' + action;
-
-    if (is.func(phases.onstart)       ) { this.events[onAction + 'start'        ] = phases.onstart         ; }
-    if (is.func(phases.onmove)        ) { this.events[onAction + 'move'         ] = phases.onmove          ; }
-    if (is.func(phases.onend)         ) { this.events[onAction + 'end'          ] = phases.onend           ; }
-    if (is.func(phases.oninertiastart)) { this.events[onAction + 'inertiastart' ] = phases.oninertiastart  ; }
+  setOnEvents (actionName, phases) {
+    if (is.func(phases.onstart)       ) { this.on(`${actionName}start`       , phases.onstart       ); }
+    if (is.func(phases.onmove)        ) { this.on(`${actionName}move`        , phases.onmove        ); }
+    if (is.func(phases.onend)         ) { this.on(`${actionName}end`         , phases.onend         ); }
+    if (is.func(phases.oninertiastart)) { this.on(`${actionName}inertiastart`, phases.oninertiastart); }
 
     return this;
   }
