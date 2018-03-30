@@ -1,4 +1,4 @@
-extends: '../.eslintrc'
+extends: '../.eslintrc.yml'
 
 env:
   browser: true

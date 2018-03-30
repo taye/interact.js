@@ -1,4 +1,4 @@
-extends: '../.eslintrc'
+extends: '../.eslintrc.yml'
 
 parserOptions:
   sourceType: commonjs
