@@ -117,7 +117,10 @@ declare namespace interact {
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
     restrictSize?: RestrictSizeOption
-
+    preserveAspectRatio?: any;
+    restrictEdges?: any;
+    restrictSize?: any;
+    
     square?: boolean
     edges?: EdgeOptions
     // deprecated
