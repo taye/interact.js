@@ -3,8 +3,8 @@ import defaults   from './defaultOptions';
 import * as utils from '@interactjs/utils';
 import domObjects from '@interactjs/utils/domObjects';
 
-import InteractEvent from './InteractEvent';
-import Interactable from './Interactable';
+import InteractEvent    from './InteractEvent';
+import InteractableBase from './Interactable';
 
 const {
   win,
@@ -25,8 +25,7 @@ export function createScope () {
     Eventable,
 
     InteractEvent: InteractEvent,
-    // eslint-disable-next-line no-shadow
-    Interactable: class Interactable extends Interactable {
+    Interactable: class Interactable extends InteractableBase {
       get _defaults () { return scope.defaults; }
 
       set (options) {

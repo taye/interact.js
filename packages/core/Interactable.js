@@ -12,7 +12,7 @@ import {
   trySelector,
 }                     from '@interactjs/utils/domUtils';
 import { getWindow }  from '@interactjs/utils/window';
-import { wheelEvent } from '@interactjs/utils/browser';
+import browser from '@interactjs/utils/browser';
 
 class Interactable {
   get _defaults () {
@@ -220,7 +220,7 @@ class Interactable {
     const listeners = normalizeListeners(typeArg, listenerArg);
 
     for (let type in listeners) {
-      if (type === 'wheel') { type = wheelEvent; }
+      if (type === 'wheel') { type = browser.wheelEvent; }
 
       for (const listener of listeners[type]) {
         // if it is an action event type

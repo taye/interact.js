@@ -1,10 +1,10 @@
-import Interaction  from './Interaction';
-import events       from '@interactjs/utils/events';
-import finder       from '@interactjs/utils/interactionFinder';
-import browser      from '@interactjs/utils/browser';
-import domObjects   from '@interactjs/utils/domObjects';
-import pointerUtils from '@interactjs/utils/pointerUtils';
-import Signals      from '@interactjs/utils/Signals';
+import InteractionBase from './Interaction';
+import events          from '@interactjs/utils/events';
+import finder          from '@interactjs/utils/interactionFinder';
+import browser         from '@interactjs/utils/browser';
+import domObjects      from '@interactjs/utils/domObjects';
+import pointerUtils    from '@interactjs/utils/pointerUtils';
+import Signals         from '@interactjs/utils/Signals';
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -52,8 +52,7 @@ function init (scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // eslint-disable-next-line no-shadow
-  scope.Interaction = class Interaction extends Interaction {
+  scope.Interaction = class Interaction extends InteractionBase {
     get pointerMoveTolerance () {
       return scope.interactions.pointerMoveTolerance;
     }

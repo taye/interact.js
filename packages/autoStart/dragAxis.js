@@ -1,5 +1,5 @@
 import * as is from '@interactjs/utils/is';
-import { validateAction } from './base';
+import autoStart from './base';
 
 import { parentNode } from '@interactjs/utils/domUtils';
 
@@ -40,7 +40,7 @@ function init (scope) {
           if (action
               && action.name === 'drag'
               && checkStartAxis(currentAxis, interactable)
-              && validateAction(action, interactable, element, eventTarget, scope)) {
+              && autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
 
             return interactable;
           }

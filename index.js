@@ -15,5 +15,8 @@ const exported = typeof window === 'undefined'
   }
   : init(window);
 
-// export default exported;
-module.exports = exported;
+export default exported;
+
+if (typeof module === 'object' && !!module) {
+  module.exports = exported;
+}
