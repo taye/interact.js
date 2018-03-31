@@ -157,7 +157,7 @@ export function createScope () {
     },
 
     onWindowUnload (event) {
-      scope.removeDocument(event.target.document);
+      scope.removeDocument(event.currentTarget.document);
     },
 
     getDocIndex (doc) {
