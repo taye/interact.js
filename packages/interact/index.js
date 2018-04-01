@@ -1,7 +1,6 @@
 /* browser entry point */
 
 import { default as interact, scope } from './interact';
-import interactions from '@interactjs/core/interactions';
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault';
 import inertia from '@interactjs/inertia';
 import * as pointerEvents from '@interactjs/pointerEvents';
@@ -15,7 +14,6 @@ import reflow from '@interactjs/reflow';
 export function init (window) {
   scope.init(window);
 
-  interact.use(interactions);
   interact.use(interactablePreventDefault);
 
   // inertia
