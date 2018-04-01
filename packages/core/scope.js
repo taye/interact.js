@@ -180,6 +180,7 @@ export function initScope (scope, window) {
   browser.init(window);
   raf.init(window);
 
+  interactions.init(scope);
   scope.document = window.document;
 
   return scope;
