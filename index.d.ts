@@ -300,7 +300,7 @@ declare namespace interact {
     supportsPointerEvent () : boolean
     stop ( event: any ) : InteractStatic
     pointerMoveTolerance ( tol?: number ) : number | InteractStatic
-    createSnapGrid ( grid: { x: number, y: number, range: number, offset?: Position, limits?: Rect } ) : SnapFunction
+    createSnapGrid ( grid: { x: number, y: number, range?: number, offset?: Position, limits?: Rect } ) : SnapFunction
     // TODO
     isSet ( any ) : any
     off ( any ) : any
