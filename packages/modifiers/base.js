@@ -145,7 +145,7 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
   interaction.modifiers.result = setAll(arg, modifiers);
 }
 
-function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) {
+function beforeMove ({ interaction, preEnd }, modifiers) {
   const modifierResult = setAll(
     {
       interaction,
@@ -159,7 +159,7 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
-  if (!modifierResult.shouldMove && interactingBeforeMove) {
+  if (!modifierResult.shouldMove && interaction.interacting()) {
     return false;
   }
 }

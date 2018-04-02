@@ -161,7 +161,6 @@ class Interaction {
       dy,
       duplicate: duplicateMove,
       interaction: this,
-      interactingBeforeMove: this.interacting(),
     };
 
     if (!duplicateMove) {
