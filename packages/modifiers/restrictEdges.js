@@ -34,7 +34,7 @@ function setOffset ({ interaction, options }) {
   let offset;
 
   if (options) {
-    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page);
 
     offset = rectUtils.rectToXY(offsetRect);
   }

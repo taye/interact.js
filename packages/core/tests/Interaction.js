@@ -21,11 +21,6 @@ test('Interaction constructor', t => {
     client   : { x: 0, y: 0 },
     timeStamp: 0,
   };
-  const zeroDelta = {
-    page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-    client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-    timeStamp: 0,
-  };
 
   t.equal(interaction._signals, signals,
     'signals option is set assigned to interaction._signals');
@@ -35,14 +30,10 @@ test('Interaction constructor', t => {
   t.ok(interaction.downPointer instanceof Object,
     'interaction.downPointer is an object');
 
-  t.deepEqual(interaction.prevCoords, zeroCoords,
-    'interaction.prevCoords set to zero');
-  t.deepEqual(interaction.curCoords, zeroCoords,
-    'interaction.curCoords set to zero');
-  t.deepEqual(interaction.startCoords, zeroCoords,
-    'interaction.startCoords set to zero');
-  t.deepEqual(interaction.pointerDelta, zeroDelta,
-    'interaction.pointerDelta set to zero');
+  for (const coordField in interaction.coords) {
+    t.deepEqual(interaction.coords[coordField], zeroCoords,
+      `nteraction.coords.${coordField} set to zero`);
+  }
 
   t.equal(interaction.pointerType, testType,
     'interaction.pointerType is set');
@@ -198,7 +189,7 @@ test('Interaction.pointerDown', t => {
   pointerUtils.setCoords(pointerCoords, [pointer]);
 
   for (const prop in coords) {
-    pointerUtils.copyCoords(interaction[prop + 'Coords'], coords[prop]);
+    pointerUtils.copyCoords(interaction.coords[prop], coords[prop]);
   }
 
   // test while interacting
@@ -220,9 +211,9 @@ test('Interaction.pointerDown', t => {
 
   t.deepEqual(interaction.downPointer, {}, 'downPointer is not updated');
 
-  t.deepEqual(interaction.startCoords, coords.start, 'startCoords are not modified');
-  t.deepEqual(interaction.curCoords,   coords.cur,   'curCoords   are not modified');
-  t.deepEqual(interaction.prevCoords,  coords.prev,  'prevCoords  are not modified');
+  t.deepEqual(interaction.coords.start, coords.start, 'coords.start are not modified');
+  t.deepEqual(interaction.coords.cur,   coords.cur,   'coords.cur   are not modified');
+  t.deepEqual(interaction.coords.prev,  coords.prev,  'coords.prev  are not modified');
 
   t.ok(interaction.pointerIsDown, 'pointerIsDown');
   t.notOk(interaction.pointerWasMoved, '!pointerWasMoved');
@@ -246,7 +237,7 @@ test('Interaction.pointerDown', t => {
 
   // timeStamp is assigned with new Date.getTime()
   // don't let it cause deepEaual to fail
-  pointerCoords.timeStamp = interaction.startCoords.timeStamp;
+  pointerCoords.timeStamp = interaction.coords.start.timeStamp;
 
   t.equal(interaction.downEvent, event, 'downEvent is updated');
 
@@ -261,9 +252,9 @@ test('Interaction.pointerDown', t => {
     }],
     'interaction.pointers is updated');
 
-  t.deepEqual(interaction.startCoords, pointerCoords, 'startCoords are set to pointer');
-  t.deepEqual(interaction.curCoords,   pointerCoords, 'curCoords   are set to pointer');
-  t.deepEqual(interaction.prevCoords,  pointerCoords, 'prevCoords  are set to pointer');
+  t.deepEqual(interaction.coords.start, pointerCoords, 'coords.start are set to pointer');
+  t.deepEqual(interaction.coords.cur,   pointerCoords, 'coords.cur   are set to pointer');
+  t.deepEqual(interaction.coords.prev,  pointerCoords, 'coords.prev  are set to pointer');
 
   t.equal(typeof signalArg, 'object', 'down signal was fired again');
   t.ok(interaction.pointerIsDown, 'pointerIsDown');

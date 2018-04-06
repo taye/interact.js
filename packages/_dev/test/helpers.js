@@ -42,6 +42,16 @@ export function newCoordsSet (n = 0) {
       client   : { x: n++, y: n++ },
       timeStamp: n++,
     },
+    delta: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
+    velocity: {
+      page     : { x: n++, y: n++ },
+      client   : { x: n++, y: n++ },
+      timeStamp: n++,
+    },
   };
 }
 

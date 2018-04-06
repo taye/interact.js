@@ -29,7 +29,7 @@ test('reflow', t => {
 
   // modify move coords
   scope.interactions.signals.on('before-action-move', ({ interaction }) => {
-    interaction.curCoords.page = {
+    interaction.coords.cur.page = {
       x: rect.left + 100,
       y: rect.top - 50,
     };
@@ -46,7 +46,7 @@ test('reflow', t => {
   const interaction = fired[0].interaction;
 
   t.deepEqual(
-    interaction.startCoords.page,
+    interaction.coords.start.page,
     {
       x: rect.left,
       y: rect.top,

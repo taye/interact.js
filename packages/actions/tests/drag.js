@@ -99,31 +99,19 @@ test('drag axis', t => {
     client: { x: -3, y: -4 },
     delta: { x: -5, y: -6 },
   };
-  const startPage   = { x: 0, y: 1 };
-  const startClient = { x: 2, y: 3 };
-  const deltaPage   = { x: 4, y: 5,  vx: 6,  vy: 7,  speed: 8  };
-  const deltaClient = { x: 9, y: 10, vx: 11, vy: 12, speed: 13 };
+  const coords = helpers.newCoordsSet();
 
   resetCoords();
   interaction.prepared = { name: 'drag', axis: 'xy' };
   interaction.target = interactable;
 
-  const coords = helpers.newCoordsSet();
-  for (const prop in coords) {
-    interaction[prop + 'Coords'] = coords[prop];
-  }
-
   t.test('xy (any direction)', tt => {
     scope.interactions.signals.fire('before-action-move', { interaction });
 
-    tt.deepEqual(interaction.startCoords.page, startPage,
-      'startCoords.page is not modified');
-    tt.deepEqual(interaction.startCoords.client, startClient,
-      'startCoords.client is not modified');
-    tt.deepEqual(interaction.pointerDelta.page, deltaPage,
-      'pointerDelta.page is not modified');
-    tt.deepEqual(interaction.pointerDelta.client, deltaClient,
-      'pointerDelta.client is not modified');
+    tt.deepEqual(interaction.coords.start, coords.start,
+      'coords.start is not modified');
+    tt.deepEqual(interaction.coords.delta, coords.delta,
+      'coords.delta is not modified');
 
     scope.interactions.signals.fire('action-move', { iEvent, interaction });
 
@@ -154,10 +142,10 @@ test('drag axis', t => {
       tt.deepEqual(
         iEvent.page,
         {
-          [opposite]: startPage[opposite],
+          [opposite]: coords.start.page[opposite],
           [axis]: eventCoords.page[axis],
         },
-        `page.${opposite} is startCoords value`
+        `page.${opposite} is coords.start value`
       );
 
       tt.equal(
@@ -168,8 +156,8 @@ test('drag axis', t => {
 
       tt.equal(
         iEvent.client[opposite],
-        startClient[opposite],
-        `client.${opposite} is startCoords value`
+        coords.start.client[opposite],
+        `client.${opposite} is coords.start value`
       );
       tt.equal(
         iEvent.client[axis],
@@ -187,11 +175,9 @@ test('drag axis', t => {
     pointerUtils.copyCoords(iEvent, eventCoords);
     extend(iEvent.delta, eventCoords.delta);
 
-    extend(interaction.startCoords.page  , startPage);
-    extend(interaction.startCoords.client, startClient);
-
-    extend(interaction.pointerDelta.page  , deltaPage);
-    extend(interaction.pointerDelta.client, deltaClient);
+    for (const prop in coords) {
+      pointerUtils.copyCoords(interaction.coords[prop], coords[prop]);
+    }
   }
 
 });

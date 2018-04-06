@@ -1,6 +1,7 @@
 import extend      from '@interactjs/utils/extend';
 import getOriginXY from '@interactjs/utils/getOriginXY';
 import defaults    from './defaultOptions';
+import hypot       from '@interactjs/utils/hypot';
 
 class InteractEvent {
   /** */
@@ -14,10 +15,10 @@ class InteractEvent {
     const ending      = phase === 'end';
     const prevEvent   = starting? this : interaction.prevEvent;
     const coords      = starting
-      ? interaction.startCoords
+      ? interaction.coords.start
       : ending
-        ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.curCoords.timeStamp }
-        : interaction.curCoords;
+        ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.coords.cur.timeStamp }
+        : interaction.coords.cur;
 
     this.page      = extend({}, coords.page);
     this.client    = extend({}, coords.client);
@@ -49,10 +50,10 @@ class InteractEvent {
       ? interaction.pointers[interaction.pointers.length - 1].downTime
       : prevEvent.t0;
 
-    this.x0       = interaction.startCoords.page.x - origin.x;
-    this.y0       = interaction.startCoords.page.y - origin.y;
-    this.clientX0 = interaction.startCoords.client.x - origin.x;
-    this.clientY0 = interaction.startCoords.client.y - origin.y;
+    this.x0       = interaction.coords.start.page.x - origin.x;
+    this.y0       = interaction.coords.start.page.y - origin.y;
+    this.clientX0 = interaction.coords.start.client.x - origin.x;
+    this.clientY0 = interaction.coords.start.client.y - origin.y;
 
     if (starting || ending) {
       this.delta = { x: 0, y: 0 };
@@ -64,15 +65,12 @@ class InteractEvent {
       };
     }
 
-    this.dt        = interaction.pointerDelta.timeStamp;
+    this.dt        = interaction.coords.delta.timeStamp;
     this.duration  = this.timeStamp - this.t0;
 
-    // speed and velocity in pixels per second
-    this.speed = interaction.pointerDelta[deltaSource].speed;
-    this.velocity = {
-      x: interaction.pointerDelta[deltaSource].vx,
-      y: interaction.pointerDelta[deltaSource].vy,
-    };
+    // velocity and speed in pixels per second
+    this.velocity = extend({}, interaction.coords.velocity[deltaSource]);
+    this.speed = hypot(this.velocity.x, this.velocity.y);
 
     this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
   }

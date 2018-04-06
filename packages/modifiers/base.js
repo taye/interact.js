@@ -17,11 +17,11 @@ function init (scope) {
   });
 
   interactions.signals.on('before-action-start' , arg =>
-    start(arg, scope.modifiers, arg.interaction.startCoords.page));
+    start(arg, scope.modifiers, arg.interaction.coords.start.page));
 
   interactions.signals.on('action-resume', arg => {
     beforeMove(arg, scope.modifiers);
-    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+    start(arg, scope.modifiers, arg.interaction.coords.cur.page);
   });
 
   interactions.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
@@ -102,8 +102,8 @@ function setAll (arg, modifiers) {
   }
 
   const changed =
-    interaction.curCoords.page.x !== arg.modifiedCoords.x ||
-    interaction.curCoords.page.y !== arg.modifiedCoords.y;
+    interaction.coords.cur.page.x !== arg.modifiedCoords.x ||
+    interaction.coords.cur.page.y !== arg.modifiedCoords.y;
 
   // a move should be fired if:
   //  - there are no modifiers enabled,
@@ -141,7 +141,7 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
   setOffsets(arg, modifiers);
   resetStatuses(arg.statuses, modifiers);
 
-  arg.pageCoords = extend({}, interaction.startCoords.page);
+  arg.pageCoords = extend({}, interaction.coords.start.page);
   interaction.modifiers.result = setAll(arg, modifiers);
 }
 
@@ -150,7 +150,7 @@ function beforeMove ({ interaction, preEnd }, modifiers) {
     {
       interaction,
       preEnd,
-      pageCoords: interaction.curCoords.page,
+      pageCoords: interaction.coords.cur.page,
       statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
     }, modifiers);
@@ -180,8 +180,8 @@ function beforeEnd ({ interaction, event }, modifiers) {
 function setCurCoords (arg, modifiers) {
   const { interaction } = arg;
   const modifierArg = extend({
-    page: interaction.curCoords.page,
-    client: interaction.curCoords.client,
+    page: interaction.coords.cur.page,
+    client: interaction.coords.cur.client,
   }, arg);
 
   for (let i = 0; i < modifiers.names.length; i++) {

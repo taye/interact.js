@@ -21,31 +21,17 @@ class Interaction {
     // keep track of added pointers
     this.pointers = [/* { id, pointer, event, target, downTime }*/];
 
-    // Previous native pointer move event coordinates
-    this.prevCoords = {
-      page     : { x: 0, y: 0 },
-      client   : { x: 0, y: 0 },
-      timeStamp: 0,
-    };
-    // current native pointer move event coordinates
-    this.curCoords = {
-      page     : { x: 0, y: 0 },
-      client   : { x: 0, y: 0 },
-      timeStamp: 0,
-    };
-
-    // Starting InteractEvent pointer coordinates
-    this.startCoords = {
-      page     : { x: 0, y: 0 },
-      client   : { x: 0, y: 0 },
-      timeStamp: 0,
-    };
-
-    // Change in coordinates and time of the pointer
-    this.pointerDelta = {
-      page     : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-      client   : { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-      timeStamp: 0,
+    this.coords = {
+      // Starting InteractEvent pointer coordinates
+      start: utils.pointer.newCoords(),
+      // Previous native pointer move event coordinates
+      prev: utils.pointer.newCoords(),
+      // current native pointer move event coordinates
+      cur: utils.pointer.newCoords(),
+      // Change in coordinates and time of the pointer
+      delta: utils.pointer.newCoords(),
+      // pointer velocity
+      velocity: utils.pointer.newCoords(),
     };
 
     this.downEvent   = null;    // pointerdown/mousedown/touchstart event
@@ -133,21 +119,21 @@ class Interaction {
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false);
-      utils.pointer.setCoords(this.curCoords, this.pointers.map(p => p.pointer));
+      utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer));
     }
 
-    const duplicateMove = (this.curCoords.page.x === this.prevCoords.page.x
-                           && this.curCoords.page.y === this.prevCoords.page.y
-                           && this.curCoords.client.x === this.prevCoords.client.x
-                           && this.curCoords.client.y === this.prevCoords.client.y);
+    const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x
+                           && this.coords.cur.page.y === this.coords.prev.page.y
+                           && this.coords.cur.client.x === this.coords.prev.client.x
+                           && this.coords.cur.client.y === this.coords.prev.client.y);
 
     let dx;
     let dy;
 
     // register movement greater than pointerMoveTolerance
     if (this.pointerIsDown && !this.pointerWasMoved) {
-      dx = this.curCoords.client.x - this.startCoords.client.x;
-      dy = this.curCoords.client.y - this.startCoords.client.y;
+      dx = this.coords.cur.client.x - this.coords.start.client.x;
+      dy = this.coords.cur.client.y - this.coords.start.client.y;
 
       this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance;
     }
@@ -164,8 +150,9 @@ class Interaction {
     };
 
     if (!duplicateMove) {
-      // set pointer coordinate, time changes and speeds
-      utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
+      // set pointer coordinate, time changes and velocity
+      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur);
+      utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta);
     }
 
     this._signals.fire('move', signalArg);
@@ -177,7 +164,7 @@ class Interaction {
       }
 
       if (this.pointerWasMoved) {
-        utils.pointer.copyCoords(this.prevCoords, this.curCoords);
+        utils.pointer.copyCoords(this.coords.prev, this.coords.cur);
       }
     }
   }
@@ -332,14 +319,14 @@ class Interaction {
       this.pointerIsDown = true;
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.startCoords, this.pointers.map(p => p.pointer));
+        utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer));
 
-        utils.pointer.copyCoords(this.curCoords , this.startCoords);
-        utils.pointer.copyCoords(this.prevCoords, this.startCoords);
+        utils.pointer.copyCoords(this.coords.cur , this.coords.start);
+        utils.pointer.copyCoords(this.coords.prev, this.coords.start);
         utils.pointer.pointerExtend(this.downPointer, pointer);
 
         this.downEvent = event;
-        pointerInfo.downTime = this.curCoords.timeStamp;
+        pointerInfo.downTime = this.coords.cur.timeStamp;
         pointerInfo.downTarget = eventTarget;
 
         this.pointerWasMoved = false;

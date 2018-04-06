@@ -23,8 +23,8 @@ function setOffset ({ interaction, interactable, element, rect, startOffset, opt
 
   if (options.offset === 'startCoords') {
     snapOffset = {
-      x: interaction.startCoords.page.x - origin.x,
-      y: interaction.startCoords.page.y - origin.y,
+      x: interaction.coords.start.page.x - origin.x,
+      y: interaction.coords.start.page.y - origin.y,
     };
   }
   else  {

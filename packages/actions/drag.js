@@ -37,22 +37,18 @@ function beforeMove ({ interaction }) {
   const axis = interaction.prepared.axis;
 
   if (axis === 'x') {
-    interaction.curCoords.page.y   = interaction.startCoords.page.y;
-    interaction.curCoords.client.y = interaction.startCoords.client.y;
+    interaction.coords.cur.page.y   = interaction.coords.start.page.y;
+    interaction.coords.cur.client.y = interaction.coords.start.client.y;
 
-    interaction.pointerDelta.page.speed   = Math.abs(interaction.pointerDelta.page.vx);
-    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vx);
-    interaction.pointerDelta.client.vy = 0;
-    interaction.pointerDelta.page.vy   = 0;
+    interaction.coords.velocity.client.y = 0;
+    interaction.coords.velocity.page.y   = 0;
   }
   else if (axis === 'y') {
-    interaction.curCoords.page.x   = interaction.startCoords.page.x;
-    interaction.curCoords.client.x = interaction.startCoords.client.x;
+    interaction.coords.cur.page.x   = interaction.coords.start.page.x;
+    interaction.coords.cur.client.x = interaction.coords.start.client.x;
 
-    interaction.pointerDelta.page.speed   = Math.abs(interaction.pointerDelta.page.vy);
-    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vy);
-    interaction.pointerDelta.client.vx = 0;
-    interaction.pointerDelta.page.vx   = 0;
+    interaction.coords.velocity.client.x = 0;
+    interaction.coords.velocity.page.x   = 0;
   }
 }
 
@@ -64,8 +60,8 @@ function move ({ iEvent, interaction }) {
   if (axis === 'x' || axis === 'y') {
     const opposite = axis === 'x' ? 'y' : 'x';
 
-    iEvent.page[opposite]   = interaction.startCoords.page[opposite];
-    iEvent.client[opposite] = interaction.startCoords.client[opposite];
+    iEvent.page[opposite]   = interaction.coords.start.page[opposite];
+    iEvent.client[opposite] = interaction.coords.start.client[opposite];
     iEvent.delta[opposite] = 0;
   }
 }
