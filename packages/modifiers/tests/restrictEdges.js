@@ -13,19 +13,24 @@ test('restrictEdges', t => {
   interaction._interacting = true;
 
   const options = { enabled: true };
-  const status = {
-    delta: { x: 0, y: 0 },
-  };
   const coords = { x: 40, y: 40 };
   const offset = { top: 0, left: 0, bottom: 0, right: 0 };
-  const arg = { interaction, options, status, modifiedCoords: coords, offset };
+  const status = {
+    delta: { x: 0, y: 0 },
+    options,
+    offset,
+  };
+  const arg = { interaction, status, modifiedCoords: coords };
 
   // outer restriction
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 };
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status,
+    {
+      delta: status.delta,
+      locked: status.locked,
+    },
     {
       delta: { x: 60, y: 60 },
       locked: true,
@@ -39,7 +44,10 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status,
+    {
+      delta: status.delta,
+      locked: status.locked,
+    },
     {
       delta: { x: -40, y: -40 },
       locked: true,
@@ -60,7 +68,10 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status,
+    {
+      delta: status.delta,
+      locked: status.locked,
+    },
     {
       delta: { x: 160, y: 160 },
       locked: true,
@@ -78,9 +89,10 @@ test('restrictEdges', t => {
   };
 
   options.offset = 'self';
+  restrictEdges.start(arg);
 
   t.deepEqual(
-    restrictEdges.start(arg),
+    arg.status.offset,
     { top: 505, left: 910, bottom: 508, right: 916 },
     'start gets x/y from selector string'
   );

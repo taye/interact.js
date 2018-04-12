@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals, mockInteractable } from '@interactjs/_dev/test/helpers';
+import { mockSignals, mockInteractable, getProps } from '@interactjs/_dev/test/helpers';
 
 import snap from '@interactjs/modifiers/snap';
 import Interaction from '@interactjs/core/Interaction';
@@ -19,22 +19,22 @@ test('modifiers/snap', t => {
     range: Infinity,
   };
   const status = {
+    options,
     delta: { x: 0, y: 0 },
+    offset: [{ x: 0, y: 0 }],
   };
   const pageCoords = Object.freeze({ x: 10, y: 20 });
   const arg = {
     interaction,
-    options,
     status,
     pageCoords,
     modifiedCoords: { ...pageCoords },
-    offset: [{ x: 0, y: 0 }],
   };
 
   snap.set(arg);
 
   t.deepEqual(
-    status,
+    getProps(status, 'locked range realX realY delta modifiedX modifiedY'.split(' ')),
     {
       locked: true,
       range: Infinity,

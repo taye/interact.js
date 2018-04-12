@@ -7,11 +7,13 @@ function init (scope) {
 
   scope.modifiers = { names: [] };
 
+  scope.defaults.perAction.modifiers = [];
+
   interactions.signals.on('new', function (interaction) {
     interaction.modifiers = {
       startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       offsets    : {},
-      statuses   : resetStatuses({}, scope.modifiers),
+      statuses   : null,
       result     : null,
     };
   });
@@ -31,10 +33,9 @@ function init (scope) {
   interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
 }
 
-function startAll (arg, modifiers) {
-  const { interaction, pageCoords: page } = arg;
-  const { target, element, modifiers: { startOffset } } = interaction;
-  const rect = target.getRect(element);
+function startAll (arg) {
+  const { interaction, statuses, rect, pageCoords: page } = arg;
+  const { modifiers: { startOffset } } = interaction;
 
   if (rect) {
     startOffset.left = page.x - rect.left;
@@ -50,23 +51,13 @@ function startAll (arg, modifiers) {
     startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
   }
 
-  arg.rect = rect;
-  arg.interactable = target;
-  arg.element = element;
-
-  for (const modifierName of modifiers.names) {
-    arg.options = target.options[interaction.prepared.name][modifierName];
-    arg.status = arg.statuses[modifierName];
-
-    if (!arg.options) {
-      continue;
-    }
-
-    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].start(arg);
+  for (const status of statuses) {
+    arg.status = status;
+    status.methods.start(arg);
   }
 }
 
-function setAll (arg, modifiers) {
+function setAll (arg) {
   const { interaction, statuses, preEnd, requireEndOnly } = arg;
 
   arg.modifiedCoords = extend({}, arg.pageCoords);
@@ -79,24 +70,20 @@ function setAll (arg, modifiers) {
     shouldMove: true,
   };
 
-  for (const modifierName of modifiers.names) {
-    const modifier = modifiers[modifierName];
-    const options = interaction.target.options[interaction.prepared.name][modifierName];
+  for (const status of statuses) {
+    const { options } = status;
 
     if (!shouldDo(options, preEnd, requireEndOnly)) { continue; }
 
-    arg.status = arg.status = statuses[modifierName];
-    arg.options = options;
-    arg.offset = arg.interaction.modifiers.offsets[modifierName];
+    arg.status = status;
+    status.methods.set(arg);
 
-    modifier.set(arg);
+    if (status.locked) {
+      arg.modifiedCoords.x += status.delta.x;
+      arg.modifiedCoords.y += status.delta.y;
 
-    if (arg.status.locked) {
-      arg.modifiedCoords.x += arg.status.delta.x;
-      arg.modifiedCoords.y += arg.status.delta.y;
-
-      result.delta.x += arg.status.delta.x;
-      result.delta.y += arg.status.delta.y;
+      result.delta.x += status.delta.x;
+      result.delta.y += status.delta.y;
 
       result.locked = true;
     }
@@ -107,40 +94,56 @@ function setAll (arg, modifiers) {
     interaction.coords.cur.page.y !== arg.modifiedCoords.y;
 
   // a move should be fired if:
-  //  - there are no modifiers enabled,
   //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
   //  - the locked coords have changed since the last pointer move
-  result.shouldMove = !arg.status || !result.locked || changed;
+  result.shouldMove = !result.locked || changed;
 
   return result;
 }
 
-function resetStatuses (statuses, modifiers) {
-  for (const modifierName of modifiers.names) {
-    const status = statuses[modifierName] || {};
+function prepareStatuses (modifierList) {
+  const statuses = [];
 
-    status.delta = { x: 0, y: 0 };
-    status.locked = false;
+  for (const { options, methods } of modifierList) {
+    if (!options || options.enabled === false) { continue; }
 
-    statuses[modifierName] = status;
+    statuses.push({
+      options,
+      offset: null,
+      delta: { x: 0, y: 0 },
+      locked: false,
+      methods,
+    });
   }
 
   return statuses;
 }
 
+function resetStatus (status) {
+  status.delta = { x: 0, y: 0 };
+  status.locked = false;
+}
+
 function start ({ interaction, phase }, modifiers, pageCoords) {
+  const { target: interactable, element } = interaction;
+  const rect = interactable.getRect(element);
+  const modifierList = getModifierList(interaction);
+  const statuses = prepareStatuses(modifierList, modifiers);
+
   const arg = {
     interaction,
+    interactable,
     pageCoords,
     phase,
+    rect,
     startOffset: interaction.modifiers.startOffset,
-    statuses: interaction.modifiers.statuses,
+    statuses,
     preEnd: false,
     requireEndOnly: false,
   };
 
+  interaction.modifiers.statuses = statuses;
   startAll(arg, modifiers);
-  resetStatuses(arg.statuses, modifiers);
 
   arg.pageCoords = extend({}, interaction.coords.start.page);
   interaction.modifiers.result = setAll(arg, modifiers);
@@ -165,10 +168,10 @@ function beforeMove ({ interaction, preEnd }, modifiers) {
   }
 }
 
-function beforeEnd ({ interaction, event }, modifiers) {
-  for (const modifierName of modifiers.names) {
-    const options = interaction.target.options[interaction.prepared.name][modifierName];
+function beforeEnd ({ interaction, event }) {
+  const modifierList = getModifierList(interaction);
 
+  for (const { options } of modifierList) {
     // if the endOnly option is true for any modifier
     if (shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
@@ -178,45 +181,63 @@ function beforeEnd ({ interaction, event }, modifiers) {
   }
 }
 
-function setCurCoords (arg, modifiers) {
+function setCurCoords (arg) {
   const { interaction } = arg;
   const modifierArg = extend({
     page: interaction.coords.cur.page,
     client: interaction.coords.cur.client,
   }, arg);
 
-  for (let i = 0; i < modifiers.names.length; i++) {
-    const modifierName = modifiers.names[i];
-    modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
+  const { statuses } = interaction.modifiers;
 
-    if (!modifierArg.options || !modifierArg.options.enabled) {
-      continue;
-    }
-
-    const status = interaction.modifiers.statuses[modifierName];
-
-    if (status.locked) {
-      modifierArg.page.x += status.delta.x;
-      modifierArg.page.y += status.delta.y;
-      modifierArg.client.x += status.delta.x;
-      modifierArg.client.y += status.delta.y;
+  for (const { locked, delta } of statuses) {
+    if (locked) {
+      modifierArg.page.x += delta.x;
+      modifierArg.page.y += delta.y;
+      modifierArg.client.x += delta.x;
+      modifierArg.client.y += delta.y;
     }
   }
 }
 
+function getModifierList (interaction) {
+  const actionOptions = interaction.target.options[interaction.prepared.name];
+  const actionModifiers = actionOptions.modifiers;
+
+  if (actionModifiers && actionModifiers.length) {
+    return actionModifiers;
+  }
+
+  return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
+    .map(type => {
+      const options = actionOptions[type] || null;
+
+      return options && {
+        options,
+        methods: options._methods,
+      };
+    })
+    .filter(m => !!m);
+}
+
 function shouldDo (options, preEnd, requireEndOnly) {
-  return (options && options.enabled
-    && (preEnd || !options.endOnly)
-    && (!requireEndOnly || options.endOnly));
+  return (
+    options &&
+    options.enabled !== false &&
+    (preEnd || !options.endOnly) &&
+    (!requireEndOnly || options.endOnly)
+  );
 }
 
 export default {
   init,
   startAll,
   setAll,
-  resetStatuses,
+  prepareStatuses,
+  resetStatus,
   start,
   beforeMove,
   beforeEnd,
   shouldDo,
+  getModifierList,
 };

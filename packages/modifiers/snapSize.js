@@ -5,32 +5,23 @@ import extend from '@interactjs/utils/extend';
 import * as is from '@interactjs/utils/is';
 import snap from './snap';
 
-function init (scope) {
-  const {
-    modifiers,
-    defaults,
-  } = scope;
-
-  modifiers.snapSize = snapSize;
-  modifiers.names.push('snapSize');
-
-  defaults.perAction.snapSize = snapSize.defaults;
-}
-
 function start (arg) {
-  const { interaction, status, options } = arg;
+  const { interaction, status } = arg;
+  const { options } = status;
   const edges = interaction.prepared.edges;
 
   if (!edges) { return null; }
 
-  arg.options = {
-    relativePoints: [{
-      x: edges.left? 0 : 1,
-      y: edges.top ? 0 : 1,
-    }],
-    origin: { x: 0, y: 0 },
-    offset: options.offset || 'self',
-    range: options.range,
+  arg.status = {
+    options: {
+      relativePoints: [{
+        x: edges.left? 0 : 1,
+        y: edges.top ? 0 : 1,
+      }],
+      origin: { x: 0, y: 0 },
+      offset: options.offset || 'self',
+      range: options.range,
+    },
   };
 
   status.targetFields = status.targetFields || [
@@ -38,21 +29,22 @@ function start (arg) {
     ['x', 'y'],
   ];
 
-  const offsets = snap.start(arg);
-  arg.options = options;
+  snap.start(arg);
+  status.offset = arg.status.offset;
 
-  return offsets;
+  arg.status = status;
 }
 
 function set (arg) {
-  const { interaction, status, options, offset, modifiedCoords } = arg;
+  const { interaction, status, modifiedCoords } = arg;
+  const { options, offset } = status;
   const relative = {
     x: modifiedCoords.x - offset[0].x,
     y: modifiedCoords.y - offset[0].y,
   };
 
-  arg.options = extend({}, options);
-  arg.options.targets = [];
+  status.options = extend({}, options);
+  status.options.targets = [];
 
   for (const snapTarget of (options.targets || [])) {
     let target;
@@ -75,14 +67,15 @@ function set (arg) {
       }
     }
 
-    arg.options.targets.push(target);
+    status.options.targets.push(target);
   }
 
   snap.set(arg);
+
+  status.options = options;
 }
 
 const snapSize = {
-  init,
   start,
   set,
   defaults: {

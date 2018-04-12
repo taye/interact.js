@@ -1,23 +1,10 @@
 import * as utils from '@interactjs/utils';
 
-function init (scope) {
-  const {
-    modifiers,
-    defaults,
-  } = scope;
-
-
-  modifiers.snap = snap;
-  modifiers.names.push('snap');
-
-  defaults.perAction.snap = snap.defaults;
-}
-
-function start ({ interaction, interactable, element, rect, startOffset, options }) {
+function start ({ interaction, interactable, element, rect, status, startOffset }) {
+  const { options } = status;
   const offsets = [];
   const optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin));
   const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
-  options = options || interactable.options[interaction.prepared.name].snap || {};
 
   let snapOffset;
 
@@ -45,10 +32,11 @@ function start ({ interaction, interactable, element, rect, startOffset, options
     offsets.push(snapOffset);
   }
 
-  return offsets;
+  status.offset = offsets;
 }
 
-function set ({ interaction, modifiedCoords, status, phase, options, offset: offsets }) {
+function set ({ interaction, modifiedCoords, status, phase }) {
+  const { options, offset: offsets } = status;
   const relativePoints = options && options.relativePoints;
 
   if (phase === 'start' && relativePoints && relativePoints.length) {
@@ -149,7 +137,6 @@ function set ({ interaction, modifiedCoords, status, phase, options, offset: off
 }
 
 const snap = {
-  init,
   start,
   set,
   defaults: {

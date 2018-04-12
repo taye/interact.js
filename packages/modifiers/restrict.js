@@ -2,20 +2,9 @@ import * as is   from '@interactjs/utils/is';
 import extend    from '@interactjs/utils/extend';
 import rectUtils from '@interactjs/utils/rect';
 
-function init (scope) {
-  const {
-    modifiers,
-    defaults,
-  } = scope;
-
-  modifiers.restrict = restrict;
-  modifiers.names.push('restrict');
-
-  defaults.perAction.restrict = restrict.defaults;
-}
-
-function start ({ rect, startOffset, options }) {
-  const elementRect = options && options.elementRect;
+function start ({ rect, startOffset, status }) {
+  const { options } = status;
+  const { elementRect } = options;
   const offset = {};
 
   if (rect && elementRect) {
@@ -29,14 +18,15 @@ function start ({ rect, startOffset, options }) {
     offset.left = offset.top = offset.right = offset.bottom = 0;
   }
 
-  return offset;
+  status.offset = offset;
 }
 
-function set ({ modifiedCoords, interaction, status, phase, offset, options }) {
+function set ({ modifiedCoords, interaction, status, phase }) {
+  const { options, offset } = status;
+
   if (phase === 'start' && options.elementRect) { return; }
 
   const page = extend({}, modifiedCoords);
-
   const restriction = getRestrictionRect(options.restriction, interaction, page);
 
   if (!restriction) { return status; }
@@ -79,7 +69,6 @@ function getRestrictionRect (value, interaction, page) {
 }
 
 const restrict = {
-  init,
   start,
   set,
   getRestrictionRect,

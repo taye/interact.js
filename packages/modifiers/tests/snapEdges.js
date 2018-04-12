@@ -26,7 +26,6 @@ test('modifiers/snapEdges', t => {
   const arg = {
     interaction,
     interactable: interaction.target,
-    options,
     status: null,
     pageCoords,
     modifiedCoords: { ...pageCoords },
@@ -36,7 +35,7 @@ test('modifiers/snapEdges', t => {
   // resize from top left
   interaction.prepared.edges = { top: true, left: true };
 
-  arg.status = { delta: { x: 0, y: 0 } };
+  arg.status = { options, delta: { x: 0, y: 0 } };
   snapEdges.start(arg);
   snapEdges.set(arg);
 
@@ -48,7 +47,7 @@ test('modifiers/snapEdges', t => {
   // resize from bottom right
   interaction.prepared.edges = { bottom: true, right: true };
 
-  arg.status = { delta: { x: 0, y: 0 } };
+  arg.status = { options, delta: { x: 0, y: 0 } };
   snapEdges.start(arg);
   snapEdges.set(arg);
 

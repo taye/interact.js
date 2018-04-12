@@ -17,19 +17,8 @@ const { getRestrictionRect } = restrict;
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
 
-function init (scope) {
-  const {
-    modifiers,
-    defaults,
-  } = scope;
-
-  modifiers.restrictEdges = restrictEdges;
-  modifiers.names.push('restrictEdges');
-
-  defaults.perAction.restrictEdges = restrictEdges.defaults;
-}
-
-function start ({ interaction, options }) {
+function start ({ interaction, status }) {
+  const { options } = status;
   const startOffset = interaction.modifiers.startOffset;
   let offset;
 
@@ -41,7 +30,7 @@ function start ({ interaction, options }) {
 
   offset = offset || { x: 0, y: 0 };
 
-  return {
+  status.offset = {
     top:    offset.y + startOffset.top,
     left:   offset.x + startOffset.left,
     bottom: offset.y - startOffset.bottom,
@@ -49,7 +38,8 @@ function start ({ interaction, options }) {
   };
 }
 
-function set ({ modifiedCoords, interaction, status, phase, offset, options }) {
+function set ({ modifiedCoords, interaction, status, phase }) {
+  const { offset, options } = status;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
   if (!interaction.interacting() || !edges || phase === 'start') {
@@ -100,7 +90,6 @@ function fixRect (rect, defaults) {
 }
 
 const restrictEdges = {
-  init,
   noInner,
   noOuter,
   getRestrictionRect,

@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals, mockInteractable } from '@interactjs/_dev/test/helpers';
+import { mockSignals, mockInteractable, getProps } from '@interactjs/_dev/test/helpers';
 import snapSize from '@interactjs/modifiers/snapSize';
 import Interaction from '@interactjs/core/Interaction';
 
@@ -21,24 +21,24 @@ test('modifiers/snapSize', t => {
     range: Infinity,
   };
   const status = {
+    options,
     delta: { x: 0, y: 0 },
+    offset: [{ x: 0, y: 0 }],
   };
   const pageCoords = Object.freeze({ x: 10, y: 20 });
   const arg = {
     interaction,
     interactable: interaction.target,
-    options,
     status,
     pageCoords,
     modifiedCoords: { ...pageCoords },
-    offset: [{ x: 0, y: 0 }],
   };
 
   snapSize.start(arg);
   snapSize.set(arg);
 
   t.deepEqual(
-    status,
+    getProps(status, 'locked range realX realY delta modifiedX modifiedY'.split(' ')),
     {
       locked: true,
       range: Infinity,
@@ -50,7 +50,6 @@ test('modifiers/snapSize', t => {
       },
       modifiedX: target0.x,
       modifiedY: target0.y,
-      targetFields: [ [ 'width', 'height' ], [ 'x', 'y' ] ],
     },
     'snapSize.set single target, zereo offset'
   );

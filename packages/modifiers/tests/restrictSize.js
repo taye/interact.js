@@ -17,12 +17,14 @@ test('restrictSize', t => {
       min: { width:  60, height:  50 },
       max: { width: 600, height: 500 },
     };
-    const status = {
-      delta: { x: 0, y: 0 },
-    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-    const arg = { interaction, options, status, pageCoords, offset };
+    const status = {
+      delta: { x: 0, y: 0 },
+      options,
+      offset,
+    };
+    const arg = { interaction, status, pageCoords };
 
     RestrictSize.set(arg);
     tt.deepEqual(arg.options.inner, { top: 170, left: 250, bottom: -Infinity, right: -Infinity });
@@ -34,12 +36,14 @@ test('restrictSize', t => {
     const options = {
       min: { width: 60, height: 50 },
     };
-    const status = {
-      delta: { x: 0, y: 0 },
-    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-    const arg = { interaction, options, status, pageCoords, offset };
+    const status = {
+      delta: { x: 0, y: 0 },
+      options,
+      offset,
+    };
+    const arg = { interaction, status, pageCoords };
 
     RestrictSize.set(arg);
     tt.deepEqual(arg.options.inner, { top:       170, left:       250, bottom: -Infinity, right: -Infinity });
@@ -51,11 +55,13 @@ test('restrictSize', t => {
     const options = {
       max: { width: 600, height: 500 },
     };
-    const status = {
-      delta: { x: 0, y: 0 },
-    };
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
+    const status = {
+      delta: { x: 0, y: 0 },
+      options,
+      offset,
+    };
     const arg = { interaction, options, status, pageCoords, offset };
 
     RestrictSize.set(arg);
