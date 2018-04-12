@@ -117,7 +117,7 @@ test('pointerEvents.collectEventTargets', t => {
   t.end();
 });
 
-test('pointerEvents Interaction update-pointer-down signal', t => {
+test('pointerEvents Interaction update-pointer signal', t => {
   const scope = helpers.mockScope();
 
   interactions.init(scope);
@@ -126,6 +126,9 @@ test('pointerEvents Interaction update-pointer-down signal', t => {
   const interaction = scope.interactions.new({});
   const initialTimer = { duration: Infinity, timeout: null };
   const event = {};
+
+  interaction.updatePointer(helpers.newPointer(0), event, null, false);
+  t.deepEqual(interaction.holdTimers, []);
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true);
   t.deepEqual(interaction.holdTimers, [initialTimer]);

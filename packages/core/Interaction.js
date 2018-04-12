@@ -331,19 +331,19 @@ class Interaction {
 
         this.pointerWasMoved = false;
       }
-
-      this._signals.fire('update-pointer-down', {
-        pointer,
-        event,
-        eventTarget,
-        down,
-        pointerInfo,
-        pointerIndex,
-        interaction: this,
-      });
     }
 
     this._updateLatestPointer(pointer, event, eventTarget);
+
+    this._signals.fire('update-pointer', {
+      pointer,
+      event,
+      eventTarget,
+      down,
+      pointerInfo,
+      pointerIndex,
+      interaction: this,
+    });
 
     return pointerIndex;
   }
