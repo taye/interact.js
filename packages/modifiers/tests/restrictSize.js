@@ -71,4 +71,4 @@ test('restrictSize', t => {
   });
 
   t.end();
-});
+}, { skip: true });
