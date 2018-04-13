@@ -31,7 +31,7 @@ function init (scope) {
   interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
 }
 
-function setOffsets (arg, modifiers) {
+function startAll (arg, modifiers) {
   const { interaction, pageCoords: page } = arg;
   const { target, element, modifiers: { startOffset } } = interaction;
   const rect = target.getRect(element);
@@ -56,12 +56,13 @@ function setOffsets (arg, modifiers) {
 
   for (const modifierName of modifiers.names) {
     arg.options = target.options[interaction.prepared.name][modifierName];
+    arg.status = arg.statuses[modifierName];
 
     if (!arg.options) {
       continue;
     }
 
-    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].setOffset(arg);
+    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].start(arg);
   }
 }
 
@@ -138,7 +139,7 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
     requireEndOnly: false,
   };
 
-  setOffsets(arg, modifiers);
+  startAll(arg, modifiers);
   resetStatuses(arg.statuses, modifiers);
 
   arg.pageCoords = extend({}, interaction.coords.start.page);
@@ -211,7 +212,7 @@ function shouldDo (options, preEnd, requireEndOnly) {
 
 export default {
   init,
-  setOffsets,
+  startAll,
   setAll,
   resetStatuses,
   start,

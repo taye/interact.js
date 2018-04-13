@@ -210,7 +210,7 @@ class Interactable {
     return this;
   }
 
-  _onOffMultiple (method, typeArg, listenerArg, options) {
+  _onOff (method, typeArg, listenerArg, options) {
     if (is.object(typeArg) && !is.array(typeArg)) {
       options = listenerArg;
       listenerArg = null;
@@ -252,7 +252,7 @@ class Interactable {
    * @return {Interactable} This Interactable
    */
   on (types, listener, options) {
-    return this._onOffMultiple('on', types, listener, options);
+    return this._onOff('on', types, listener, options);
   }
 
   /**
@@ -266,7 +266,7 @@ class Interactable {
    * @return {Interactable} This Interactable
    */
   off (types, listener, options) {
-    return this._onOffMultiple('off', types, listener, options);
+    return this._onOff('off', types, listener, options);
   }
 
   /**
