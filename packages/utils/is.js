@@ -25,7 +25,9 @@ export const element  = thing => {
     : thing.nodeType === 1 && typeof thing.nodeName === 'string');
 };
 
-export const plainObject = thing => object(thing) && thing.constructor.name === 'Object';
+export const plainObject = thing => object(thing) &&
+  !!thing.constructor &&
+  thing.constructor.name === 'Object';
 
 export const array = thing => (object(thing)
   && (typeof thing.length !== 'undefined')
