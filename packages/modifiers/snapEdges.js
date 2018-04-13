@@ -1,5 +1,30 @@
-// This module allows snapping of the edges of targets during resize
-// interactions.
+/**
+ * @module modifiers/snapEdges
+ *
+ * @description
+ * This module allows snapping of the edges of targets during resize
+ * interactions.
+ *
+ * @example
+ * interact(target).resizable({
+ *   snapEdges: {
+ *     targets: [interact.snappers.grid({ x: 100, y: 50 })],
+ *   },
+ * });
+ *
+ * interact(target).resizable({
+ *   snapEdges: {
+ *     targets: [
+ *       interact.snappers.grid({
+ *        top: 50,
+ *        left: 50,
+ *        bottom: 100,
+ *        right: 100,
+ *       }),
+ *     ],
+ *   },
+ * });
+ */
 
 import clone from '@interactjs/utils/clone';
 import extend from '@interactjs/utils/extend';
