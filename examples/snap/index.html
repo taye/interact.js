@@ -5,9 +5,9 @@
 <title>interact.js drag snapping</title>
 <meta name="description" content="A demonstration of interact.js drag snapping" />
 <meta name="author" content="Taye Adeyemi" />
-<script type="text/javascript" src="../dist/interact.js"></script>
-<script type="text/javascript" src="js/snap.js"></script>
-<link rel="stylesheet" href="css/snap.css" type="text/css"/>
+<script type="text/javascript" src="../../dist/interact.js"></script>
+<script type="text/javascript" src="index.js"></script>
+<link rel="stylesheet" href="index.css" type="text/css"/>
 </head>
 <body>
 <canvas id="grid"> Your browser does not support the HTML5 canvas</canvas>
@@ -17,15 +17,15 @@
     <div id="controls">
     <section id="sliders">
         <h3> grid spacing </h3>
-        <input id="grid-x" type="range" value="300" min="20" max="500" title="x-axis">
-        <input id="grid-y" type="range" value="300" min="20" max="500" title="x-axis">
+        <input id="grid-x" type="range" value="500" min="20" max="500" title="x-axis">
+        <input id="grid-y" type="range" value="500" min="20" max="500" title="x-axis">
         <br>
         <h3> grid offset </h3>
-        <input id="offset-x" type="range" value="50" min="0" max="500" title="x-axis">
-        <input id="offset-y" type="range" value="50" min="0" max="500" title="x-axis">
+        <input id="offset-x" type="range" value="240" min="0" max="500" title="x-axis">
+        <input id="offset-y" type="range" value="240" min="0" max="500" title="x-axis">
         <br>
         <h3> snap range </h3>
-        <input id="snap-range" type="range" min="-1" value="120" min="10" max="150" title="snap range">
+        <input id="snap-range" type="range" min="-1" value="-1" min="10" max="150" title="snap range">
     </section>
         <br>
         <section id="modes">
@@ -52,7 +52,7 @@
 
             <label for="inertia">
                 Inertia
-                <input id="inertia" type="checkbox" checked>
+                <input id="inertia" type="checkbox">
             </label>
 
             <label for="relative">

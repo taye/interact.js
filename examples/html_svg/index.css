@@ -8,12 +8,13 @@ div.demo-node {
 	border-radius   : 10px;
 	border          : 5px solid #333333;
 	border          : 5px solid #333333;
-	width           : 200px;
+	width           : 230px;
 	height          : 200px;
 	padding         : 15px;
 	margin          : 15px;
 	overflow        : auto;
 	background-color: #2288FF;
+  box-sizing: border-box;
 
     touch-action: none;
 }

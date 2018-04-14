@@ -10,7 +10,7 @@ canvas {
     top: 0;
     left: 0;
 
-    margin: 20px;
+    _margin: 20px;
     padding: 0;
 
     touch-action: none;
