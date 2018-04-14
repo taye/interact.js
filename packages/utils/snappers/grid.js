@@ -15,9 +15,9 @@ export default (grid) => {
         top   : -Infinity,
         bottom:  Infinity,
       },
+      offset = { x: 0, y: 0 },
     } = grid;
 
-    const offset = offset || { x: 0, y: 0 };
     const result = { range };
 
     for (const [xField, yField] of coordFields) {
