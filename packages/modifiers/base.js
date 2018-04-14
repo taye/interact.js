@@ -141,11 +141,12 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
   interaction.modifiers.result = setAll(arg, modifiers);
 }
 
-function beforeMove ({ interaction, preEnd }, modifiers) {
+function beforeMove ({ interaction, phase, preEnd }, modifiers) {
   const modifierResult = setAll(
     {
       interaction,
       preEnd,
+      phase,
       pageCoords: interaction.coords.cur.page,
       statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
