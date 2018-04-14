@@ -58,7 +58,6 @@ function set ({ modifiedCoords, interaction, status, phase }) {
 
   status.delta.x = 0;
   status.delta.y = 0;
-  status.locked = false;
 
   if (edges.top) {
     modifiedY = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
@@ -75,8 +74,6 @@ function set ({ modifiedCoords, interaction, status, phase }) {
 
   status.delta.x = modifiedX - page.x;
   status.delta.y = modifiedY - page.y;
-
-  status.locked = !!(status.delta.x || status.delta.y);
 }
 
 function fixRect (rect, defaults) {

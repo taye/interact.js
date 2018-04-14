@@ -127,13 +127,14 @@ function set ({ interaction, modifiedCoords, status, phase }) {
     }
   }
 
-  status.modifiedX = closest.target.x;
-  status.modifiedY = closest.target.y;
-
-  status.delta.x = closest.dx;
-  status.delta.y = closest.dy;
-
-  status.locked = closest.inRange;
+  if (closest.inRange) {
+    status.delta.x = closest.dx;
+    status.delta.y = closest.dy;
+  }
+  else {
+    status.delta.x = 0;
+    status.delta.y = 0;
+  }
 }
 
 const snap = {

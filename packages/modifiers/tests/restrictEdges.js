@@ -27,14 +27,8 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    {
-      delta: status.delta,
-      locked: status.locked,
-    },
-    {
-      delta: { x: 60, y: 60 },
-      locked: true,
-    },
+    status.delta,
+    { x: 60, y: 60 },
     'outer restriction is applied correctly'
   );
 
@@ -44,14 +38,8 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    {
-      delta: status.delta,
-      locked: status.locked,
-    },
-    {
-      delta: { x: -40, y: -40 },
-      locked: true,
-    },
+    status.delta,
+    { x: -40, y: -40 },
     'inner restriction is applied correctly'
   );
 
@@ -68,14 +56,8 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    {
-      delta: status.delta,
-      locked: status.locked,
-    },
-    {
-      delta: { x: 160, y: 160 },
-      locked: true,
-    },
+    status.delta,
+    { x: 160, y: 160 },
     'outer restriction is applied correctly with offset'
   );
 

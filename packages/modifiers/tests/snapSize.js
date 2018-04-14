@@ -38,9 +38,8 @@ test('modifiers/snapSize', t => {
   snapSize.set(arg);
 
   t.deepEqual(
-    getProps(status, 'locked range realX realY delta modifiedX modifiedY'.split(' ')),
+    getProps(status, 'range realX realY delta'.split(' ')),
     {
-      locked: true,
       range: Infinity,
       realX: pageCoords.x,
       realY: pageCoords.y,
@@ -48,8 +47,6 @@ test('modifiers/snapSize', t => {
         x: target0.x - pageCoords.x,
         y: target0.y - pageCoords.y,
       },
-      modifiedX: target0.x,
-      modifiedY: target0.y,
     },
     'snapSize.set single target, zereo offset'
   );

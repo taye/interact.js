@@ -33,7 +33,6 @@ function set ({ modifiedCoords, interaction, status, phase }) {
 
   status.delta.x = 0;
   status.delta.y = 0;
-  status.locked = false;
 
   const rect = restriction;
   let modifiedX = page.x;
@@ -53,8 +52,6 @@ function set ({ modifiedCoords, interaction, status, phase }) {
 
   status.delta.x = modifiedX - page.x;
   status.delta.y = modifiedY - page.y;
-
-  status.locked = !!(status.delta.x || status.delta.y);
 
   status.modifiedX = modifiedX;
   status.modifiedY = modifiedY;

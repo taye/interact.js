@@ -65,8 +65,6 @@ function setAll (arg) {
   const result = {
     delta: { x: 0, y: 0 },
     coords: arg.modifiedCoords,
-    changed: false,
-    locked: false,
     shouldMove: true,
   };
 
@@ -78,25 +76,22 @@ function setAll (arg) {
     arg.status = status;
     status.methods.set(arg);
 
-    if (status.locked) {
-      arg.modifiedCoords.x += status.delta.x;
-      arg.modifiedCoords.y += status.delta.y;
+    arg.modifiedCoords.x += status.delta.x;
+    arg.modifiedCoords.y += status.delta.y;
 
-      result.delta.x += status.delta.x;
-      result.delta.y += status.delta.y;
-
-      result.locked = true;
-    }
+    result.delta.x += status.delta.x;
+    result.delta.y += status.delta.y;
   }
 
-  const changed =
-    interaction.coords.cur.page.x !== arg.modifiedCoords.x ||
-    interaction.coords.cur.page.y !== arg.modifiedCoords.y;
+  const differsFromPrevCoords =
+    interaction.coords.prev.page.x !== result.coords.x ||
+    interaction.coords.prev.page.y !== result.coords.y;
 
   // a move should be fired if:
-  //  - no modifiers are "locked" i.e. have changed the pointer's coordinates, or
-  //  - the locked coords have changed since the last pointer move
-  result.shouldMove = !result.locked || changed;
+  //  - the modified coords are different to the prev interaction coords
+  //  - there's a non zero result.delta
+  result.shouldMove = differsFromPrevCoords ||
+    result.delta.x !== 0 || result.delta.y !== 0;
 
   return result;
 }
@@ -109,10 +104,8 @@ function prepareStatuses (modifierList) {
 
     statuses.push({
       options,
-      offset: null,
-      delta: { x: 0, y: 0 },
-      locked: false,
       methods,
+      delta: { x: 0, y: 0 },
     });
   }
 
@@ -121,7 +114,6 @@ function prepareStatuses (modifierList) {
 
 function resetStatus (status) {
   status.delta = { x: 0, y: 0 };
-  status.locked = false;
 }
 
 function start ({ interaction, phase }, modifiers, pageCoords) {
@@ -190,13 +182,11 @@ function setCurCoords (arg) {
 
   const { statuses } = interaction.modifiers;
 
-  for (const { locked, delta } of statuses) {
-    if (locked) {
-      modifierArg.page.x += delta.x;
-      modifierArg.page.y += delta.y;
-      modifierArg.client.x += delta.x;
-      modifierArg.client.y += delta.y;
-    }
+  for (const { delta } of statuses) {
+    modifierArg.page.x += delta.x;
+    modifierArg.page.y += delta.y;
+    modifierArg.client.x += delta.x;
+    modifierArg.client.y += delta.y;
   }
 }
 
