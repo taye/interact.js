@@ -31,6 +31,9 @@ function init (scope) {
 
   interactions.signals.on('before-action-start', arg => setCurCoords(arg, scope.modifiers));
   interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
+
+  interactions.signals.on('after-action-start', arg => restoreCurCoords(arg, scope.modifiers));
+  interactions.signals.on('after-action-move', arg => restoreCurCoords(arg, scope.modifiers));
 }
 
 function startAll (arg) {
@@ -181,14 +184,21 @@ function setCurCoords (arg) {
     client: interaction.coords.cur.client,
   }, arg);
 
-  const { statuses } = interaction.modifiers;
+  const { delta } = interaction.modifiers.result;
 
-  for (const { delta } of statuses) {
-    modifierArg.page.x += delta.x;
-    modifierArg.page.y += delta.y;
-    modifierArg.client.x += delta.x;
-    modifierArg.client.y += delta.y;
-  }
+  modifierArg.page.x += delta.x;
+  modifierArg.page.y += delta.y;
+  modifierArg.client.x += delta.x;
+  modifierArg.client.y += delta.y;
+}
+
+function restoreCurCoords ({ interaction: { coords, modifiers } }) {
+  const { delta } = modifiers.result;
+
+  coords.cur.page.x -= delta.x;
+  coords.cur.page.y -= delta.y;
+  coords.cur.client.x -= delta.x;
+  coords.cur.client.y -= delta.y;
 }
 
 function getModifierList (interaction) {
