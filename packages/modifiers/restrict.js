@@ -70,8 +70,6 @@ const restrict = {
   set,
   getRestrictionRect,
   defaults: {
-    enabled    : false,
-    endOnly    : false,
     restriction: null,
     elementRect: null,
   },

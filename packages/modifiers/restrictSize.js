@@ -67,8 +67,6 @@ const restrictSize = {
   start,
   set,
   defaults: {
-    enabled: false,
-    endOnly: false,
     min: null,
     max: null,
   },
