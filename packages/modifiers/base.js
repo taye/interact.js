@@ -37,8 +37,7 @@ function init (scope) {
 }
 
 function startAll (arg) {
-  const { interaction, statuses, rect, pageCoords: page } = arg;
-  const { modifiers: { startOffset } } = interaction;
+  const { statuses, startOffset, rect, pageCoords: page } = arg;
 
   if (rect) {
     startOffset.left = page.x - rect.left;
@@ -66,10 +65,11 @@ function setAll (arg) {
   arg.modifiedCoords = extend({}, arg.pageCoords);
 
   const result = {
-    delta: { x: 0, y: 0 },
     coords: arg.modifiedCoords,
     shouldMove: true,
   };
+
+  resetStatus(result);
 
   for (const status of statuses) {
     const { options } = status;
@@ -103,13 +103,15 @@ function prepareStatuses (modifierList) {
   const statuses = [];
 
   for (const { options, methods } of modifierList) {
-    if (!options || options.enabled === false) { continue; }
+    if (options && options.enabled === false) { continue; }
 
-    statuses.push({
+    const status = {
       options,
       methods,
-      delta: { x: 0, y: 0 },
-    });
+    };
+
+    resetStatus(status);
+    statuses.push(status);
   }
 
   return statuses;
@@ -128,6 +130,7 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
   const arg = {
     interaction,
     interactable,
+    element,
     pageCoords,
     phase,
     rect,
@@ -148,6 +151,8 @@ function beforeMove ({ interaction, phase, preEnd }, modifiers) {
   const modifierResult = setAll(
     {
       interaction,
+      interactable: interaction.target,
+      element: interaction.elemnet,
       preEnd,
       phase,
       pageCoords: interaction.coords.cur.page,
@@ -211,9 +216,9 @@ function getModifierList (interaction) {
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
     .map(type => {
-      const options = actionOptions[type] || null;
+      const options = actionOptions[type];
 
-      return options && {
+      return options && options.enabled && {
         options,
         methods: options._methods,
       };
@@ -222,12 +227,11 @@ function getModifierList (interaction) {
 }
 
 function shouldDo (options, preEnd, requireEndOnly) {
-  return (
-    options &&
-    options.enabled !== false &&
-    (preEnd || !options.endOnly) &&
-    (!requireEndOnly || options.endOnly)
-  );
+  return options
+    ? options.enabled !== false &&
+      (preEnd || !options.endOnly) &&
+      (!requireEndOnly || options.endOnly)
+    : !requireEndOnly;
 }
 
 export default {

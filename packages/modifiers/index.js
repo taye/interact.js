@@ -17,6 +17,8 @@ function makeModifier (name, module) {
   const { defaults } = module;
 
   const modifier = options => {
+    options = options || {};
+
     // add missing defaults to options
     options.enabled = options.enabled !== false;
 
