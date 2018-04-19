@@ -19,21 +19,22 @@ function init (scope) {
   });
 
   interactions.signals.on('before-action-start' , arg =>
-    start(arg, scope.modifiers, arg.interaction.coords.start.page));
+    start(arg, arg.interaction.coords.start.page));
 
   interactions.signals.on('action-resume', arg => {
-    beforeMove(arg, scope.modifiers);
-    start(arg, scope.modifiers, arg.interaction.coords.cur.page);
+    beforeMove(arg);
+    start(arg, arg.interaction.coords.cur.page);
   });
 
-  interactions.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
-  interactions.signals.on('before-action-end', arg => beforeEnd(arg, scope.modifiers));
+  interactions.signals.on('before-action-move', beforeMove);
+  interactions.signals.on('before-action-end', beforeEnd);
 
-  interactions.signals.on('before-action-start', arg => setCurCoords(arg, scope.modifiers));
-  interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
+  interactions.signals.on('before-action-start', setCurCoords);
+  interactions.signals.on('before-action-move', setCurCoords);
 
-  interactions.signals.on('after-action-start', arg => restoreCurCoords(arg, scope.modifiers));
-  interactions.signals.on('after-action-move', arg => restoreCurCoords(arg, scope.modifiers));
+  interactions.signals.on('after-action-start', restoreCurCoords);
+  interactions.signals.on('after-action-move', restoreCurCoords);
+  interactions.signals.on('action-stop', restoreCurCoords);
 }
 
 function startAll (arg) {
@@ -121,11 +122,11 @@ function resetStatus (status) {
   status.delta = { x: 0, y: 0 };
 }
 
-function start ({ interaction, phase }, modifiers, pageCoords) {
+function start ({ interaction, phase }, pageCoords) {
   const { target: interactable, element } = interaction;
   const rect = interactable.getRect(element);
   const modifierList = getModifierList(interaction);
-  const statuses = prepareStatuses(modifierList, modifiers);
+  const statuses = prepareStatuses(modifierList);
 
   const arg = {
     interaction,
@@ -141,13 +142,13 @@ function start ({ interaction, phase }, modifiers, pageCoords) {
   };
 
   interaction.modifiers.statuses = statuses;
-  startAll(arg, modifiers);
+  startAll(arg);
 
   arg.pageCoords = extend({}, interaction.coords.start.page);
-  interaction.modifiers.result = setAll(arg, modifiers);
+  interaction.modifiers.result = setAll(arg);
 }
 
-function beforeMove ({ interaction, phase, preEnd }, modifiers) {
+function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
   const modifierResult = setAll(
     {
       interaction,
@@ -158,7 +159,8 @@ function beforeMove ({ interaction, phase, preEnd }, modifiers) {
       pageCoords: interaction.coords.cur.page,
       statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
-    }, modifiers);
+      skipModifiers,
+    });
 
   interaction.modifiers.result = modifierResult;
 
