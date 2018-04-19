@@ -36,11 +36,11 @@ function start (arg) {
 }
 
 function set (arg) {
-  const { interaction, status, modifiedCoords } = arg;
+  const { interaction, status, coords } = arg;
   const { options, offset } = status;
   const relative = {
-    x: modifiedCoords.x - offset[0].x,
-    y: modifiedCoords.y - offset[0].y,
+    x: coords.x - offset[0].x,
+    y: coords.y - offset[0].y,
   };
 
   status.options = extend({}, options);

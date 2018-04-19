@@ -31,7 +31,7 @@ test('modifiers/snapSize', t => {
     interactable: interaction.target,
     status,
     pageCoords,
-    modifiedCoords: { ...pageCoords },
+    coords: { ...pageCoords },
   };
 
   snapSize.start(arg);

@@ -28,7 +28,7 @@ test('modifiers/snap', t => {
     interaction,
     status,
     pageCoords,
-    modifiedCoords: { ...pageCoords },
+    coords: { ...pageCoords },
   };
 
   snap.set(arg);

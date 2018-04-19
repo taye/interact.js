@@ -62,10 +62,10 @@ function startAll (arg) {
 function setAll (arg) {
   const { interaction, statuses, preEnd, requireEndOnly } = arg;
 
-  arg.modifiedCoords = extend({}, arg.pageCoords);
+  arg.coords = extend({}, arg.pageCoords);
 
   const result = {
-    coords: arg.modifiedCoords,
+    coords: arg.coords,
     shouldMove: true,
   };
 
@@ -79,8 +79,8 @@ function setAll (arg) {
     arg.status = status;
     status.methods.set(arg);
 
-    arg.modifiedCoords.x += status.delta.x;
-    arg.modifiedCoords.y += status.delta.y;
+    arg.coords.x += status.delta.x;
+    arg.coords.y += status.delta.y;
 
     result.delta.x += status.delta.x;
     result.delta.y += status.delta.y;

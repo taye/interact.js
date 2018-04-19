@@ -21,12 +21,12 @@ function start ({ rect, startOffset, status }) {
   status.offset = offset;
 }
 
-function set ({ modifiedCoords, interaction, status, phase }) {
+function set ({ coords, interaction, status, phase }) {
   const { options, offset } = status;
 
   if (phase === 'start' && options.elementRect) { return; }
 
-  const page = extend({}, modifiedCoords);
+  const page = extend({}, coords);
   const restriction = getRestrictionRect(options.restriction, interaction, page);
 
   if (!restriction) { return status; }

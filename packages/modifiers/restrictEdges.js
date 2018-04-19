@@ -38,7 +38,7 @@ function start ({ interaction, status }) {
   };
 }
 
-function set ({ modifiedCoords, interaction, status, phase }) {
+function set ({ coords, interaction, status, phase }) {
   const { offset, options } = status;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
@@ -46,7 +46,7 @@ function set ({ modifiedCoords, interaction, status, phase }) {
     return;
   }
 
-  const page = extend({}, modifiedCoords);
+  const page = extend({}, coords);
   const inner = getRestrictionRect(options.inner, interaction, page) || {};
   const outer = getRestrictionRect(options.outer, interaction, page) || {};
 

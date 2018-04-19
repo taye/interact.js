@@ -20,7 +20,7 @@ test('restrictEdges', t => {
     options,
     offset,
   };
-  const arg = { interaction, status, modifiedCoords: coords };
+  const arg = { interaction, status, coords };
 
   // outer restriction
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 };

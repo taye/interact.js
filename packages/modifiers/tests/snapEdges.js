@@ -28,7 +28,7 @@ test('modifiers/snapEdges', t => {
     interactable: interaction.target,
     status: null,
     pageCoords,
-    modifiedCoords: { ...pageCoords },
+    coords: { ...pageCoords },
     offset: [{ x: 0, y: 0 }],
   };
 

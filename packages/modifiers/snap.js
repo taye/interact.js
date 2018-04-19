@@ -35,7 +35,7 @@ function start ({ interaction, interactable, element, rect, status, startOffset 
   status.offset = offsets;
 }
 
-function set ({ interaction, modifiedCoords, status, phase }) {
+function set ({ interaction, coords, status, phase }) {
   const { options, offset: offsets } = status;
   const relativePoints = options && options.relativePoints;
 
@@ -44,7 +44,7 @@ function set ({ interaction, modifiedCoords, status, phase }) {
   }
 
   const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
-  const page = utils.extend({}, modifiedCoords);
+  const page = utils.extend({}, coords);
   const targets = [];
   let target;
   let i;
