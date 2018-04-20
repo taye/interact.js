@@ -52,7 +52,12 @@ bump_version() {
   echo_funcname
 
   # bump the version in package.json
-  NEW_VERSION=$(node build/bump $NEW_VERSION)
+  NEW_VERSION=$(node packages/_dev/build/bump $NEW_VERSION)
+
+  if [[ -z $NEW_VERSION ]]; then
+    quit "failed to bump version" 1
+  fi
+
   NEW_TAG="v$(semver clean $NEW_VERSION)"
 
   # if the version tag already exists
