@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>InteractEvent - Documentation</title>
+    <title>pointerEvents/PointerEvent.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,294 +31,89 @@
 
 <div id="main">
     
-    <h1 class="page-title">InteractEvent</h1>
+    <h1 class="page-title">pointerEvents/PointerEvent.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
-    
-        <h2>
-        InteractEvent
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="InteractEvent"><span class="type-signature"></span>new InteractEvent<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_InteractEvent.js.html">core/InteractEvent.js</a>, <a href="core_InteractEvent.js.html#line8">line 8</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="stopImmediatePropagation"><span class="type-signature"></span>stopImmediatePropagation<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import pointerUtils from '@interactjs/utils/pointerUtils';
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_InteractEvent.js.html">core/InteractEvent.js</a>, <a href="core_InteractEvent.js.html#line136">line 136</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="stopPropagation"><span class="type-signature"></span>stopPropagation<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
+export default class PointerEvent {
+  /** */
+  constructor (type, pointer, event, eventTarget, interaction) {
+    pointerUtils.pointerExtend(this, event);
 
+    if (event !== pointer) {
+      pointerUtils.pointerExtend(this, pointer);
+    }
 
+    this.interaction = interaction;
 
+    this.timeStamp     = new Date().getTime();
+    this.originalEvent = event;
+    this.type          = type;
+    this.pointerId     = pointerUtils.getPointerId(pointer);
+    this.pointerType   = pointerUtils.getPointerType(pointer);
+    this.target        = eventTarget;
+    this.currentTarget = null;
 
+    if (type === 'tap') {
+      const pointerIndex = interaction.getPointerIndex(pointer);
+      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
 
-<dl class="details">
+      const interval = this.timeStamp - interaction.tapTime;
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_InteractEvent.js.html">core/InteractEvent.js</a>, <a href="core_InteractEvent.js.html#line141">line 141</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
+      this.double = !!(interaction.prevTap
+        &amp;&amp; interaction.prevTap.type !== 'doubletap'
+        &amp;&amp; interaction.prevTap.target === this.target
+        &amp;&amp; interval &lt; 500);
+    }
+    else if (type === 'doubletap') {
+      this.dt = pointer.timeStamp - interaction.tapTime;
+    }
+  }
 
+  subtractOrigin ({ x: originX, y: originY }) {
+    this.pageX   -= originX;
+    this.pageY   -= originY;
+    this.clientX -= originX;
+    this.clientY -= originY;
 
+    return this;
+  }
 
+  addOrigin ({ x: originX, y: originY }) {
+    this.pageX   += originX;
+    this.pageY   += originY;
+    this.clientX += originX;
+    this.clientY += originY;
 
+    return this;
+  }
 
+  /** */
+  preventDefault () {
+    this.originalEvent.preventDefault();
+  }
 
-
-
-
-
-
-
-
-
-</div>
-
-        
-    
-
-    
-
-    
-</article>
+  /** */
+  stopPropagation () {
+    this.propagationStopped = true;
+  }
 
-</section>
+  /** */
+  stopImmediatePropagation () {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  }
+}
+</code></pre>
+        </article>
+    </section>
 
 
 

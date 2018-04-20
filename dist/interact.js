@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.2+sha.f1199bc
+ * interact.js v1.4.0-alpha.3+sha.e190fe4
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8,2479 +8,42 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.interact = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 'use strict';
 
-var _index = _dereq_('./src/index');
-
-var exported = typeof window === 'undefined' ? function (window) {
-  return (0, _index.init)(window);
-} : (0, _index.init)(window);
-
-// export default exported;
-/*
- * In a (windowless) server environment this file exports a factory function
- * that takes the window to use.
- *
- *     var interact = require('interact.js')(windowObject);
- *
- * See https://github.com/taye/interact.js/issues/187
- */
-
-module.exports = exported;
-
-},{"./src/index":100}],2:[function(_dereq_,module,exports){
-module.exports = { "default": _dereq_("core-js/library/fn/object/create"), __esModule: true };
-},{"core-js/library/fn/object/create":12}],3:[function(_dereq_,module,exports){
-module.exports = { "default": _dereq_("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":13}],4:[function(_dereq_,module,exports){
-module.exports = { "default": _dereq_("core-js/library/fn/object/set-prototype-of"), __esModule: true };
-},{"core-js/library/fn/object/set-prototype-of":14}],5:[function(_dereq_,module,exports){
-module.exports = { "default": _dereq_("core-js/library/fn/symbol"), __esModule: true };
-},{"core-js/library/fn/symbol":15}],6:[function(_dereq_,module,exports){
-module.exports = { "default": _dereq_("core-js/library/fn/symbol/iterator"), __esModule: true };
-},{"core-js/library/fn/symbol/iterator":16}],7:[function(_dereq_,module,exports){
-"use strict";
-
-exports.__esModule = true;
-
-exports.default = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-},{}],8:[function(_dereq_,module,exports){
-"use strict";
-
-exports.__esModule = true;
-
-var _defineProperty = _dereq_("../core-js/object/define-property");
-
-var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      (0, _defineProperty2.default)(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-},{"../core-js/object/define-property":3}],9:[function(_dereq_,module,exports){
-"use strict";
-
-exports.__esModule = true;
-
-var _setPrototypeOf = _dereq_("../core-js/object/set-prototype-of");
-
-var _setPrototypeOf2 = _interopRequireDefault(_setPrototypeOf);
-
-var _create = _dereq_("../core-js/object/create");
-
-var _create2 = _interopRequireDefault(_create);
-
-var _typeof2 = _dereq_("../helpers/typeof");
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : (0, _typeof3.default)(superClass)));
-  }
-
-  subClass.prototype = (0, _create2.default)(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) _setPrototypeOf2.default ? (0, _setPrototypeOf2.default)(subClass, superClass) : subClass.__proto__ = superClass;
-};
-},{"../core-js/object/create":2,"../core-js/object/set-prototype-of":4,"../helpers/typeof":11}],10:[function(_dereq_,module,exports){
-"use strict";
-
-exports.__esModule = true;
-
-var _typeof2 = _dereq_("../helpers/typeof");
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return call && ((typeof call === "undefined" ? "undefined" : (0, _typeof3.default)(call)) === "object" || typeof call === "function") ? call : self;
-};
-},{"../helpers/typeof":11}],11:[function(_dereq_,module,exports){
-"use strict";
-
-exports.__esModule = true;
-
-var _iterator = _dereq_("../core-js/symbol/iterator");
-
-var _iterator2 = _interopRequireDefault(_iterator);
-
-var _symbol = _dereq_("../core-js/symbol");
-
-var _symbol2 = _interopRequireDefault(_symbol);
-
-var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
-  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
-} : function (obj) {
-  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
-};
-},{"../core-js/symbol":5,"../core-js/symbol/iterator":6}],12:[function(_dereq_,module,exports){
-_dereq_('../../modules/es6.object.create');
-var $Object = _dereq_('../../modules/_core').Object;
-module.exports = function create(P, D) {
-  return $Object.create(P, D);
-};
-
-},{"../../modules/_core":22,"../../modules/es6.object.create":74}],13:[function(_dereq_,module,exports){
-_dereq_('../../modules/es6.object.define-property');
-var $Object = _dereq_('../../modules/_core').Object;
-module.exports = function defineProperty(it, key, desc) {
-  return $Object.defineProperty(it, key, desc);
-};
-
-},{"../../modules/_core":22,"../../modules/es6.object.define-property":75}],14:[function(_dereq_,module,exports){
-_dereq_('../../modules/es6.object.set-prototype-of');
-module.exports = _dereq_('../../modules/_core').Object.setPrototypeOf;
-
-},{"../../modules/_core":22,"../../modules/es6.object.set-prototype-of":76}],15:[function(_dereq_,module,exports){
-_dereq_('../../modules/es6.symbol');
-_dereq_('../../modules/es6.object.to-string');
-_dereq_('../../modules/es7.symbol.async-iterator');
-_dereq_('../../modules/es7.symbol.observable');
-module.exports = _dereq_('../../modules/_core').Symbol;
-
-},{"../../modules/_core":22,"../../modules/es6.object.to-string":77,"../../modules/es6.symbol":79,"../../modules/es7.symbol.async-iterator":80,"../../modules/es7.symbol.observable":81}],16:[function(_dereq_,module,exports){
-_dereq_('../../modules/es6.string.iterator');
-_dereq_('../../modules/web.dom.iterable');
-module.exports = _dereq_('../../modules/_wks-ext').f('iterator');
-
-},{"../../modules/_wks-ext":71,"../../modules/es6.string.iterator":78,"../../modules/web.dom.iterable":82}],17:[function(_dereq_,module,exports){
-module.exports = function (it) {
-  if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-  return it;
-};
-
-},{}],18:[function(_dereq_,module,exports){
-module.exports = function () { /* empty */ };
-
-},{}],19:[function(_dereq_,module,exports){
-var isObject = _dereq_('./_is-object');
-module.exports = function (it) {
-  if (!isObject(it)) throw TypeError(it + ' is not an object!');
-  return it;
-};
-
-},{"./_is-object":38}],20:[function(_dereq_,module,exports){
-// false -> Array#indexOf
-// true  -> Array#includes
-var toIObject = _dereq_('./_to-iobject');
-var toLength = _dereq_('./_to-length');
-var toAbsoluteIndex = _dereq_('./_to-absolute-index');
-module.exports = function (IS_INCLUDES) {
-  return function ($this, el, fromIndex) {
-    var O = toIObject($this);
-    var length = toLength(O.length);
-    var index = toAbsoluteIndex(fromIndex, length);
-    var value;
-    // Array#includes uses SameValueZero equality algorithm
-    // eslint-disable-next-line no-self-compare
-    if (IS_INCLUDES && el != el) while (length > index) {
-      value = O[index++];
-      // eslint-disable-next-line no-self-compare
-      if (value != value) return true;
-    // Array#indexOf ignores holes, Array#includes - not
-    } else for (;length > index; index++) if (IS_INCLUDES || index in O) {
-      if (O[index] === el) return IS_INCLUDES || index || 0;
-    } return !IS_INCLUDES && -1;
-  };
-};
-
-},{"./_to-absolute-index":63,"./_to-iobject":65,"./_to-length":66}],21:[function(_dereq_,module,exports){
-var toString = {}.toString;
-
-module.exports = function (it) {
-  return toString.call(it).slice(8, -1);
-};
-
-},{}],22:[function(_dereq_,module,exports){
-var core = module.exports = { version: '2.5.1' };
-if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
-
-},{}],23:[function(_dereq_,module,exports){
-// optional / simple context binding
-var aFunction = _dereq_('./_a-function');
-module.exports = function (fn, that, length) {
-  aFunction(fn);
-  if (that === undefined) return fn;
-  switch (length) {
-    case 1: return function (a) {
-      return fn.call(that, a);
-    };
-    case 2: return function (a, b) {
-      return fn.call(that, a, b);
-    };
-    case 3: return function (a, b, c) {
-      return fn.call(that, a, b, c);
-    };
-  }
-  return function (/* ...args */) {
-    return fn.apply(that, arguments);
-  };
-};
-
-},{"./_a-function":17}],24:[function(_dereq_,module,exports){
-// 7.2.1 RequireObjectCoercible(argument)
-module.exports = function (it) {
-  if (it == undefined) throw TypeError("Can't call method on  " + it);
-  return it;
-};
-
-},{}],25:[function(_dereq_,module,exports){
-// Thank's IE8 for his funny defineProperty
-module.exports = !_dereq_('./_fails')(function () {
-  return Object.defineProperty({}, 'a', { get: function () { return 7; } }).a != 7;
+Object.defineProperty(exports, "__esModule", {
+  value: true
 });
 
-},{"./_fails":30}],26:[function(_dereq_,module,exports){
-var isObject = _dereq_('./_is-object');
-var document = _dereq_('./_global').document;
-// typeof document.createElement is 'object' in old IE
-var is = isObject(document) && isObject(document.createElement);
-module.exports = function (it) {
-  return is ? document.createElement(it) : {};
-};
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /*
+                                                                                                                                                                                                                                                                               * In a (windowless) server environment this file exports a factory function
+                                                                                                                                                                                                                                                                               * that takes the window to use.
+                                                                                                                                                                                                                                                                               *
+                                                                                                                                                                                                                                                                               *     var interact = require('interact.js')(windowObject);
+                                                                                                                                                                                                                                                                               *
+                                                                                                                                                                                                                                                                               * See https://github.com/taye/interact.js/issues/187
+                                                                                                                                                                                                                                                                               */
 
-},{"./_global":31,"./_is-object":38}],27:[function(_dereq_,module,exports){
-// IE 8- don't enum bug keys
-module.exports = (
-  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
-).split(',');
+var _interact = _dereq_('@interactjs/interact');
 
-},{}],28:[function(_dereq_,module,exports){
-// all enumerable object keys, includes symbols
-var getKeys = _dereq_('./_object-keys');
-var gOPS = _dereq_('./_object-gops');
-var pIE = _dereq_('./_object-pie');
-module.exports = function (it) {
-  var result = getKeys(it);
-  var getSymbols = gOPS.f;
-  if (getSymbols) {
-    var symbols = getSymbols(it);
-    var isEnum = pIE.f;
-    var i = 0;
-    var key;
-    while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
-  } return result;
-};
+var exported = (typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object' ? _interact.interact : _interact.init;
 
-},{"./_object-gops":51,"./_object-keys":54,"./_object-pie":55}],29:[function(_dereq_,module,exports){
-var global = _dereq_('./_global');
-var core = _dereq_('./_core');
-var ctx = _dereq_('./_ctx');
-var hide = _dereq_('./_hide');
-var PROTOTYPE = 'prototype';
+exports.default = exported;
 
-var $export = function (type, name, source) {
-  var IS_FORCED = type & $export.F;
-  var IS_GLOBAL = type & $export.G;
-  var IS_STATIC = type & $export.S;
-  var IS_PROTO = type & $export.P;
-  var IS_BIND = type & $export.B;
-  var IS_WRAP = type & $export.W;
-  var exports = IS_GLOBAL ? core : core[name] || (core[name] = {});
-  var expProto = exports[PROTOTYPE];
-  var target = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE];
-  var key, own, out;
-  if (IS_GLOBAL) source = name;
-  for (key in source) {
-    // contains in native
-    own = !IS_FORCED && target && target[key] !== undefined;
-    if (own && key in exports) continue;
-    // export native or passed
-    out = own ? target[key] : source[key];
-    // prevent global pollution for namespaces
-    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
-    // bind timers to global for call from export context
-    : IS_BIND && own ? ctx(out, global)
-    // wrap global constructors for prevent change them in library
-    : IS_WRAP && target[key] == out ? (function (C) {
-      var F = function (a, b, c) {
-        if (this instanceof C) {
-          switch (arguments.length) {
-            case 0: return new C();
-            case 1: return new C(a);
-            case 2: return new C(a, b);
-          } return new C(a, b, c);
-        } return C.apply(this, arguments);
-      };
-      F[PROTOTYPE] = C[PROTOTYPE];
-      return F;
-    // make static versions for prototype methods
-    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
-    // export proto methods to core.%CONSTRUCTOR%.methods.%NAME%
-    if (IS_PROTO) {
-      (exports.virtual || (exports.virtual = {}))[key] = out;
-      // export proto methods to core.%CONSTRUCTOR%.prototype.%NAME%
-      if (type & $export.R && expProto && !expProto[key]) hide(expProto, key, out);
-    }
-  }
-};
-// type bitmap
-$export.F = 1;   // forced
-$export.G = 2;   // global
-$export.S = 4;   // static
-$export.P = 8;   // proto
-$export.B = 16;  // bind
-$export.W = 32;  // wrap
-$export.U = 64;  // safe
-$export.R = 128; // real proto method for `library`
-module.exports = $export;
 
-},{"./_core":22,"./_ctx":23,"./_global":31,"./_hide":33}],30:[function(_dereq_,module,exports){
-module.exports = function (exec) {
-  try {
-    return !!exec();
-  } catch (e) {
-    return true;
-  }
-};
-
-},{}],31:[function(_dereq_,module,exports){
-// https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
-var global = module.exports = typeof window != 'undefined' && window.Math == Math
-  ? window : typeof self != 'undefined' && self.Math == Math ? self
-  // eslint-disable-next-line no-new-func
-  : Function('return this')();
-if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
-
-},{}],32:[function(_dereq_,module,exports){
-var hasOwnProperty = {}.hasOwnProperty;
-module.exports = function (it, key) {
-  return hasOwnProperty.call(it, key);
-};
-
-},{}],33:[function(_dereq_,module,exports){
-var dP = _dereq_('./_object-dp');
-var createDesc = _dereq_('./_property-desc');
-module.exports = _dereq_('./_descriptors') ? function (object, key, value) {
-  return dP.f(object, key, createDesc(1, value));
-} : function (object, key, value) {
-  object[key] = value;
-  return object;
-};
-
-},{"./_descriptors":25,"./_object-dp":46,"./_property-desc":56}],34:[function(_dereq_,module,exports){
-var document = _dereq_('./_global').document;
-module.exports = document && document.documentElement;
-
-},{"./_global":31}],35:[function(_dereq_,module,exports){
-module.exports = !_dereq_('./_descriptors') && !_dereq_('./_fails')(function () {
-  return Object.defineProperty(_dereq_('./_dom-create')('div'), 'a', { get: function () { return 7; } }).a != 7;
-});
-
-},{"./_descriptors":25,"./_dom-create":26,"./_fails":30}],36:[function(_dereq_,module,exports){
-// fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = _dereq_('./_cof');
-// eslint-disable-next-line no-prototype-builtins
-module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
-  return cof(it) == 'String' ? it.split('') : Object(it);
-};
-
-},{"./_cof":21}],37:[function(_dereq_,module,exports){
-// 7.2.2 IsArray(argument)
-var cof = _dereq_('./_cof');
-module.exports = Array.isArray || function isArray(arg) {
-  return cof(arg) == 'Array';
-};
-
-},{"./_cof":21}],38:[function(_dereq_,module,exports){
-module.exports = function (it) {
-  return typeof it === 'object' ? it !== null : typeof it === 'function';
-};
-
-},{}],39:[function(_dereq_,module,exports){
-'use strict';
-var create = _dereq_('./_object-create');
-var descriptor = _dereq_('./_property-desc');
-var setToStringTag = _dereq_('./_set-to-string-tag');
-var IteratorPrototype = {};
-
-// 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-_dereq_('./_hide')(IteratorPrototype, _dereq_('./_wks')('iterator'), function () { return this; });
-
-module.exports = function (Constructor, NAME, next) {
-  Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
-  setToStringTag(Constructor, NAME + ' Iterator');
-};
-
-},{"./_hide":33,"./_object-create":45,"./_property-desc":56,"./_set-to-string-tag":59,"./_wks":72}],40:[function(_dereq_,module,exports){
-'use strict';
-var LIBRARY = _dereq_('./_library');
-var $export = _dereq_('./_export');
-var redefine = _dereq_('./_redefine');
-var hide = _dereq_('./_hide');
-var has = _dereq_('./_has');
-var Iterators = _dereq_('./_iterators');
-var $iterCreate = _dereq_('./_iter-create');
-var setToStringTag = _dereq_('./_set-to-string-tag');
-var getPrototypeOf = _dereq_('./_object-gpo');
-var ITERATOR = _dereq_('./_wks')('iterator');
-var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
-var FF_ITERATOR = '@@iterator';
-var KEYS = 'keys';
-var VALUES = 'values';
-
-var returnThis = function () { return this; };
-
-module.exports = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCED) {
-  $iterCreate(Constructor, NAME, next);
-  var getMethod = function (kind) {
-    if (!BUGGY && kind in proto) return proto[kind];
-    switch (kind) {
-      case KEYS: return function keys() { return new Constructor(this, kind); };
-      case VALUES: return function values() { return new Constructor(this, kind); };
-    } return function entries() { return new Constructor(this, kind); };
-  };
-  var TAG = NAME + ' Iterator';
-  var DEF_VALUES = DEFAULT == VALUES;
-  var VALUES_BUG = false;
-  var proto = Base.prototype;
-  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-  var $default = $native || getMethod(DEFAULT);
-  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
-  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
-  var methods, key, IteratorPrototype;
-  // Fix native
-  if ($anyNative) {
-    IteratorPrototype = getPrototypeOf($anyNative.call(new Base()));
-    if (IteratorPrototype !== Object.prototype && IteratorPrototype.next) {
-      // Set @@toStringTag to native iterators
-      setToStringTag(IteratorPrototype, TAG, true);
-      // fix for some old engines
-      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
-    }
-  }
-  // fix Array#{values, @@iterator}.name in V8 / FF
-  if (DEF_VALUES && $native && $native.name !== VALUES) {
-    VALUES_BUG = true;
-    $default = function values() { return $native.call(this); };
-  }
-  // Define iterator
-  if ((!LIBRARY || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
-    hide(proto, ITERATOR, $default);
-  }
-  // Plug for library
-  Iterators[NAME] = $default;
-  Iterators[TAG] = returnThis;
-  if (DEFAULT) {
-    methods = {
-      values: DEF_VALUES ? $default : getMethod(VALUES),
-      keys: IS_SET ? $default : getMethod(KEYS),
-      entries: $entries
-    };
-    if (FORCED) for (key in methods) {
-      if (!(key in proto)) redefine(proto, key, methods[key]);
-    } else $export($export.P + $export.F * (BUGGY || VALUES_BUG), NAME, methods);
-  }
-  return methods;
-};
-
-},{"./_export":29,"./_has":32,"./_hide":33,"./_iter-create":39,"./_iterators":42,"./_library":43,"./_object-gpo":52,"./_redefine":57,"./_set-to-string-tag":59,"./_wks":72}],41:[function(_dereq_,module,exports){
-module.exports = function (done, value) {
-  return { value: value, done: !!done };
-};
-
-},{}],42:[function(_dereq_,module,exports){
-module.exports = {};
-
-},{}],43:[function(_dereq_,module,exports){
-module.exports = true;
-
-},{}],44:[function(_dereq_,module,exports){
-var META = _dereq_('./_uid')('meta');
-var isObject = _dereq_('./_is-object');
-var has = _dereq_('./_has');
-var setDesc = _dereq_('./_object-dp').f;
-var id = 0;
-var isExtensible = Object.isExtensible || function () {
-  return true;
-};
-var FREEZE = !_dereq_('./_fails')(function () {
-  return isExtensible(Object.preventExtensions({}));
-});
-var setMeta = function (it) {
-  setDesc(it, META, { value: {
-    i: 'O' + ++id, // object ID
-    w: {}          // weak collections IDs
-  } });
-};
-var fastKey = function (it, create) {
-  // return primitive with prefix
-  if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return 'F';
-    // not necessary to add metadata
-    if (!create) return 'E';
-    // add missing metadata
-    setMeta(it);
-  // return object ID
-  } return it[META].i;
-};
-var getWeak = function (it, create) {
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return true;
-    // not necessary to add metadata
-    if (!create) return false;
-    // add missing metadata
-    setMeta(it);
-  // return hash weak collections IDs
-  } return it[META].w;
-};
-// add metadata on freeze-family methods calling
-var onFreeze = function (it) {
-  if (FREEZE && meta.NEED && isExtensible(it) && !has(it, META)) setMeta(it);
-  return it;
-};
-var meta = module.exports = {
-  KEY: META,
-  NEED: false,
-  fastKey: fastKey,
-  getWeak: getWeak,
-  onFreeze: onFreeze
-};
-
-},{"./_fails":30,"./_has":32,"./_is-object":38,"./_object-dp":46,"./_uid":69}],45:[function(_dereq_,module,exports){
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-var anObject = _dereq_('./_an-object');
-var dPs = _dereq_('./_object-dps');
-var enumBugKeys = _dereq_('./_enum-bug-keys');
-var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
-var Empty = function () { /* empty */ };
-var PROTOTYPE = 'prototype';
-
-// Create object with fake `null` prototype: use iframe Object with cleared prototype
-var createDict = function () {
-  // Thrash, waste and sodomy: IE GC bug
-  var iframe = _dereq_('./_dom-create')('iframe');
-  var i = enumBugKeys.length;
-  var lt = '<';
-  var gt = '>';
-  var iframeDocument;
-  iframe.style.display = 'none';
-  _dereq_('./_html').appendChild(iframe);
-  iframe.src = 'javascript:'; // eslint-disable-line no-script-url
-  // createDict = iframe.contentWindow.Object;
-  // html.removeChild(iframe);
-  iframeDocument = iframe.contentWindow.document;
-  iframeDocument.open();
-  iframeDocument.write(lt + 'script' + gt + 'document.F=Object' + lt + '/script' + gt);
-  iframeDocument.close();
-  createDict = iframeDocument.F;
-  while (i--) delete createDict[PROTOTYPE][enumBugKeys[i]];
-  return createDict();
-};
-
-module.exports = Object.create || function create(O, Properties) {
-  var result;
-  if (O !== null) {
-    Empty[PROTOTYPE] = anObject(O);
-    result = new Empty();
-    Empty[PROTOTYPE] = null;
-    // add "__proto__" for Object.getPrototypeOf polyfill
-    result[IE_PROTO] = O;
-  } else result = createDict();
-  return Properties === undefined ? result : dPs(result, Properties);
-};
-
-},{"./_an-object":19,"./_dom-create":26,"./_enum-bug-keys":27,"./_html":34,"./_object-dps":47,"./_shared-key":60}],46:[function(_dereq_,module,exports){
-var anObject = _dereq_('./_an-object');
-var IE8_DOM_DEFINE = _dereq_('./_ie8-dom-define');
-var toPrimitive = _dereq_('./_to-primitive');
-var dP = Object.defineProperty;
-
-exports.f = _dereq_('./_descriptors') ? Object.defineProperty : function defineProperty(O, P, Attributes) {
-  anObject(O);
-  P = toPrimitive(P, true);
-  anObject(Attributes);
-  if (IE8_DOM_DEFINE) try {
-    return dP(O, P, Attributes);
-  } catch (e) { /* empty */ }
-  if ('get' in Attributes || 'set' in Attributes) throw TypeError('Accessors not supported!');
-  if ('value' in Attributes) O[P] = Attributes.value;
-  return O;
-};
-
-},{"./_an-object":19,"./_descriptors":25,"./_ie8-dom-define":35,"./_to-primitive":68}],47:[function(_dereq_,module,exports){
-var dP = _dereq_('./_object-dp');
-var anObject = _dereq_('./_an-object');
-var getKeys = _dereq_('./_object-keys');
-
-module.exports = _dereq_('./_descriptors') ? Object.defineProperties : function defineProperties(O, Properties) {
-  anObject(O);
-  var keys = getKeys(Properties);
-  var length = keys.length;
-  var i = 0;
-  var P;
-  while (length > i) dP.f(O, P = keys[i++], Properties[P]);
-  return O;
-};
-
-},{"./_an-object":19,"./_descriptors":25,"./_object-dp":46,"./_object-keys":54}],48:[function(_dereq_,module,exports){
-var pIE = _dereq_('./_object-pie');
-var createDesc = _dereq_('./_property-desc');
-var toIObject = _dereq_('./_to-iobject');
-var toPrimitive = _dereq_('./_to-primitive');
-var has = _dereq_('./_has');
-var IE8_DOM_DEFINE = _dereq_('./_ie8-dom-define');
-var gOPD = Object.getOwnPropertyDescriptor;
-
-exports.f = _dereq_('./_descriptors') ? gOPD : function getOwnPropertyDescriptor(O, P) {
-  O = toIObject(O);
-  P = toPrimitive(P, true);
-  if (IE8_DOM_DEFINE) try {
-    return gOPD(O, P);
-  } catch (e) { /* empty */ }
-  if (has(O, P)) return createDesc(!pIE.f.call(O, P), O[P]);
-};
-
-},{"./_descriptors":25,"./_has":32,"./_ie8-dom-define":35,"./_object-pie":55,"./_property-desc":56,"./_to-iobject":65,"./_to-primitive":68}],49:[function(_dereq_,module,exports){
-// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = _dereq_('./_to-iobject');
-var gOPN = _dereq_('./_object-gopn').f;
-var toString = {}.toString;
-
-var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
-  ? Object.getOwnPropertyNames(window) : [];
-
-var getWindowNames = function (it) {
-  try {
-    return gOPN(it);
-  } catch (e) {
-    return windowNames.slice();
-  }
-};
-
-module.exports.f = function getOwnPropertyNames(it) {
-  return windowNames && toString.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(toIObject(it));
-};
-
-},{"./_object-gopn":50,"./_to-iobject":65}],50:[function(_dereq_,module,exports){
-// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-var $keys = _dereq_('./_object-keys-internal');
-var hiddenKeys = _dereq_('./_enum-bug-keys').concat('length', 'prototype');
-
-exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
-  return $keys(O, hiddenKeys);
-};
-
-},{"./_enum-bug-keys":27,"./_object-keys-internal":53}],51:[function(_dereq_,module,exports){
-exports.f = Object.getOwnPropertySymbols;
-
-},{}],52:[function(_dereq_,module,exports){
-// 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-var has = _dereq_('./_has');
-var toObject = _dereq_('./_to-object');
-var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
-var ObjectProto = Object.prototype;
-
-module.exports = Object.getPrototypeOf || function (O) {
-  O = toObject(O);
-  if (has(O, IE_PROTO)) return O[IE_PROTO];
-  if (typeof O.constructor == 'function' && O instanceof O.constructor) {
-    return O.constructor.prototype;
-  } return O instanceof Object ? ObjectProto : null;
-};
-
-},{"./_has":32,"./_shared-key":60,"./_to-object":67}],53:[function(_dereq_,module,exports){
-var has = _dereq_('./_has');
-var toIObject = _dereq_('./_to-iobject');
-var arrayIndexOf = _dereq_('./_array-includes')(false);
-var IE_PROTO = _dereq_('./_shared-key')('IE_PROTO');
-
-module.exports = function (object, names) {
-  var O = toIObject(object);
-  var i = 0;
-  var result = [];
-  var key;
-  for (key in O) if (key != IE_PROTO) has(O, key) && result.push(key);
-  // Don't enum bug & hidden keys
-  while (names.length > i) if (has(O, key = names[i++])) {
-    ~arrayIndexOf(result, key) || result.push(key);
-  }
-  return result;
-};
-
-},{"./_array-includes":20,"./_has":32,"./_shared-key":60,"./_to-iobject":65}],54:[function(_dereq_,module,exports){
-// 19.1.2.14 / 15.2.3.14 Object.keys(O)
-var $keys = _dereq_('./_object-keys-internal');
-var enumBugKeys = _dereq_('./_enum-bug-keys');
-
-module.exports = Object.keys || function keys(O) {
-  return $keys(O, enumBugKeys);
-};
-
-},{"./_enum-bug-keys":27,"./_object-keys-internal":53}],55:[function(_dereq_,module,exports){
-exports.f = {}.propertyIsEnumerable;
-
-},{}],56:[function(_dereq_,module,exports){
-module.exports = function (bitmap, value) {
-  return {
-    enumerable: !(bitmap & 1),
-    configurable: !(bitmap & 2),
-    writable: !(bitmap & 4),
-    value: value
-  };
-};
-
-},{}],57:[function(_dereq_,module,exports){
-module.exports = _dereq_('./_hide');
-
-},{"./_hide":33}],58:[function(_dereq_,module,exports){
-// Works with __proto__ only. Old v8 can't work with null proto objects.
-/* eslint-disable no-proto */
-var isObject = _dereq_('./_is-object');
-var anObject = _dereq_('./_an-object');
-var check = function (O, proto) {
-  anObject(O);
-  if (!isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
-};
-module.exports = {
-  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
-    function (test, buggy, set) {
-      try {
-        set = _dereq_('./_ctx')(Function.call, _dereq_('./_object-gopd').f(Object.prototype, '__proto__').set, 2);
-        set(test, []);
-        buggy = !(test instanceof Array);
-      } catch (e) { buggy = true; }
-      return function setPrototypeOf(O, proto) {
-        check(O, proto);
-        if (buggy) O.__proto__ = proto;
-        else set(O, proto);
-        return O;
-      };
-    }({}, false) : undefined),
-  check: check
-};
-
-},{"./_an-object":19,"./_ctx":23,"./_is-object":38,"./_object-gopd":48}],59:[function(_dereq_,module,exports){
-var def = _dereq_('./_object-dp').f;
-var has = _dereq_('./_has');
-var TAG = _dereq_('./_wks')('toStringTag');
-
-module.exports = function (it, tag, stat) {
-  if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
-};
-
-},{"./_has":32,"./_object-dp":46,"./_wks":72}],60:[function(_dereq_,module,exports){
-var shared = _dereq_('./_shared')('keys');
-var uid = _dereq_('./_uid');
-module.exports = function (key) {
-  return shared[key] || (shared[key] = uid(key));
-};
-
-},{"./_shared":61,"./_uid":69}],61:[function(_dereq_,module,exports){
-var global = _dereq_('./_global');
-var SHARED = '__core-js_shared__';
-var store = global[SHARED] || (global[SHARED] = {});
-module.exports = function (key) {
-  return store[key] || (store[key] = {});
-};
-
-},{"./_global":31}],62:[function(_dereq_,module,exports){
-var toInteger = _dereq_('./_to-integer');
-var defined = _dereq_('./_defined');
-// true  -> String#at
-// false -> String#codePointAt
-module.exports = function (TO_STRING) {
-  return function (that, pos) {
-    var s = String(defined(that));
-    var i = toInteger(pos);
-    var l = s.length;
-    var a, b;
-    if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-    a = s.charCodeAt(i);
-    return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-      ? TO_STRING ? s.charAt(i) : a
-      : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-  };
-};
-
-},{"./_defined":24,"./_to-integer":64}],63:[function(_dereq_,module,exports){
-var toInteger = _dereq_('./_to-integer');
-var max = Math.max;
-var min = Math.min;
-module.exports = function (index, length) {
-  index = toInteger(index);
-  return index < 0 ? max(index + length, 0) : min(index, length);
-};
-
-},{"./_to-integer":64}],64:[function(_dereq_,module,exports){
-// 7.1.4 ToInteger
-var ceil = Math.ceil;
-var floor = Math.floor;
-module.exports = function (it) {
-  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
-};
-
-},{}],65:[function(_dereq_,module,exports){
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = _dereq_('./_iobject');
-var defined = _dereq_('./_defined');
-module.exports = function (it) {
-  return IObject(defined(it));
-};
-
-},{"./_defined":24,"./_iobject":36}],66:[function(_dereq_,module,exports){
-// 7.1.15 ToLength
-var toInteger = _dereq_('./_to-integer');
-var min = Math.min;
-module.exports = function (it) {
-  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
-};
-
-},{"./_to-integer":64}],67:[function(_dereq_,module,exports){
-// 7.1.13 ToObject(argument)
-var defined = _dereq_('./_defined');
-module.exports = function (it) {
-  return Object(defined(it));
-};
-
-},{"./_defined":24}],68:[function(_dereq_,module,exports){
-// 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = _dereq_('./_is-object');
-// instead of the ES6 spec version, we didn't implement @@toPrimitive case
-// and the second argument - flag - preferred type is a string
-module.exports = function (it, S) {
-  if (!isObject(it)) return it;
-  var fn, val;
-  if (S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
-  if (typeof (fn = it.valueOf) == 'function' && !isObject(val = fn.call(it))) return val;
-  if (!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it))) return val;
-  throw TypeError("Can't convert object to primitive value");
-};
-
-},{"./_is-object":38}],69:[function(_dereq_,module,exports){
-var id = 0;
-var px = Math.random();
-module.exports = function (key) {
-  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-};
-
-},{}],70:[function(_dereq_,module,exports){
-var global = _dereq_('./_global');
-var core = _dereq_('./_core');
-var LIBRARY = _dereq_('./_library');
-var wksExt = _dereq_('./_wks-ext');
-var defineProperty = _dereq_('./_object-dp').f;
-module.exports = function (name) {
-  var $Symbol = core.Symbol || (core.Symbol = LIBRARY ? {} : global.Symbol || {});
-  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: wksExt.f(name) });
-};
-
-},{"./_core":22,"./_global":31,"./_library":43,"./_object-dp":46,"./_wks-ext":71}],71:[function(_dereq_,module,exports){
-exports.f = _dereq_('./_wks');
-
-},{"./_wks":72}],72:[function(_dereq_,module,exports){
-var store = _dereq_('./_shared')('wks');
-var uid = _dereq_('./_uid');
-var Symbol = _dereq_('./_global').Symbol;
-var USE_SYMBOL = typeof Symbol == 'function';
-
-var $exports = module.exports = function (name) {
-  return store[name] || (store[name] =
-    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
-};
-
-$exports.store = store;
-
-},{"./_global":31,"./_shared":61,"./_uid":69}],73:[function(_dereq_,module,exports){
-'use strict';
-var addToUnscopables = _dereq_('./_add-to-unscopables');
-var step = _dereq_('./_iter-step');
-var Iterators = _dereq_('./_iterators');
-var toIObject = _dereq_('./_to-iobject');
-
-// 22.1.3.4 Array.prototype.entries()
-// 22.1.3.13 Array.prototype.keys()
-// 22.1.3.29 Array.prototype.values()
-// 22.1.3.30 Array.prototype[@@iterator]()
-module.exports = _dereq_('./_iter-define')(Array, 'Array', function (iterated, kind) {
-  this._t = toIObject(iterated); // target
-  this._i = 0;                   // next index
-  this._k = kind;                // kind
-// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
-}, function () {
-  var O = this._t;
-  var kind = this._k;
-  var index = this._i++;
-  if (!O || index >= O.length) {
-    this._t = undefined;
-    return step(1);
-  }
-  if (kind == 'keys') return step(0, index);
-  if (kind == 'values') return step(0, O[index]);
-  return step(0, [index, O[index]]);
-}, 'values');
-
-// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
-Iterators.Arguments = Iterators.Array;
-
-addToUnscopables('keys');
-addToUnscopables('values');
-addToUnscopables('entries');
-
-},{"./_add-to-unscopables":18,"./_iter-define":40,"./_iter-step":41,"./_iterators":42,"./_to-iobject":65}],74:[function(_dereq_,module,exports){
-var $export = _dereq_('./_export');
-// 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
-$export($export.S, 'Object', { create: _dereq_('./_object-create') });
-
-},{"./_export":29,"./_object-create":45}],75:[function(_dereq_,module,exports){
-var $export = _dereq_('./_export');
-// 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
-$export($export.S + $export.F * !_dereq_('./_descriptors'), 'Object', { defineProperty: _dereq_('./_object-dp').f });
-
-},{"./_descriptors":25,"./_export":29,"./_object-dp":46}],76:[function(_dereq_,module,exports){
-// 19.1.3.19 Object.setPrototypeOf(O, proto)
-var $export = _dereq_('./_export');
-$export($export.S, 'Object', { setPrototypeOf: _dereq_('./_set-proto').set });
-
-},{"./_export":29,"./_set-proto":58}],77:[function(_dereq_,module,exports){
-
-},{}],78:[function(_dereq_,module,exports){
-'use strict';
-var $at = _dereq_('./_string-at')(true);
-
-// 21.1.3.27 String.prototype[@@iterator]()
-_dereq_('./_iter-define')(String, 'String', function (iterated) {
-  this._t = String(iterated); // target
-  this._i = 0;                // next index
-// 21.1.5.2.1 %StringIteratorPrototype%.next()
-}, function () {
-  var O = this._t;
-  var index = this._i;
-  var point;
-  if (index >= O.length) return { value: undefined, done: true };
-  point = $at(O, index);
-  this._i += point.length;
-  return { value: point, done: false };
-});
-
-},{"./_iter-define":40,"./_string-at":62}],79:[function(_dereq_,module,exports){
-'use strict';
-// ECMAScript 6 symbols shim
-var global = _dereq_('./_global');
-var has = _dereq_('./_has');
-var DESCRIPTORS = _dereq_('./_descriptors');
-var $export = _dereq_('./_export');
-var redefine = _dereq_('./_redefine');
-var META = _dereq_('./_meta').KEY;
-var $fails = _dereq_('./_fails');
-var shared = _dereq_('./_shared');
-var setToStringTag = _dereq_('./_set-to-string-tag');
-var uid = _dereq_('./_uid');
-var wks = _dereq_('./_wks');
-var wksExt = _dereq_('./_wks-ext');
-var wksDefine = _dereq_('./_wks-define');
-var enumKeys = _dereq_('./_enum-keys');
-var isArray = _dereq_('./_is-array');
-var anObject = _dereq_('./_an-object');
-var toIObject = _dereq_('./_to-iobject');
-var toPrimitive = _dereq_('./_to-primitive');
-var createDesc = _dereq_('./_property-desc');
-var _create = _dereq_('./_object-create');
-var gOPNExt = _dereq_('./_object-gopn-ext');
-var $GOPD = _dereq_('./_object-gopd');
-var $DP = _dereq_('./_object-dp');
-var $keys = _dereq_('./_object-keys');
-var gOPD = $GOPD.f;
-var dP = $DP.f;
-var gOPN = gOPNExt.f;
-var $Symbol = global.Symbol;
-var $JSON = global.JSON;
-var _stringify = $JSON && $JSON.stringify;
-var PROTOTYPE = 'prototype';
-var HIDDEN = wks('_hidden');
-var TO_PRIMITIVE = wks('toPrimitive');
-var isEnum = {}.propertyIsEnumerable;
-var SymbolRegistry = shared('symbol-registry');
-var AllSymbols = shared('symbols');
-var OPSymbols = shared('op-symbols');
-var ObjectProto = Object[PROTOTYPE];
-var USE_NATIVE = typeof $Symbol == 'function';
-var QObject = global.QObject;
-// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
-var setter = !QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild;
-
-// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
-var setSymbolDesc = DESCRIPTORS && $fails(function () {
-  return _create(dP({}, 'a', {
-    get: function () { return dP(this, 'a', { value: 7 }).a; }
-  })).a != 7;
-}) ? function (it, key, D) {
-  var protoDesc = gOPD(ObjectProto, key);
-  if (protoDesc) delete ObjectProto[key];
-  dP(it, key, D);
-  if (protoDesc && it !== ObjectProto) dP(ObjectProto, key, protoDesc);
-} : dP;
-
-var wrap = function (tag) {
-  var sym = AllSymbols[tag] = _create($Symbol[PROTOTYPE]);
-  sym._k = tag;
-  return sym;
-};
-
-var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function (it) {
-  return typeof it == 'symbol';
-} : function (it) {
-  return it instanceof $Symbol;
-};
-
-var $defineProperty = function defineProperty(it, key, D) {
-  if (it === ObjectProto) $defineProperty(OPSymbols, key, D);
-  anObject(it);
-  key = toPrimitive(key, true);
-  anObject(D);
-  if (has(AllSymbols, key)) {
-    if (!D.enumerable) {
-      if (!has(it, HIDDEN)) dP(it, HIDDEN, createDesc(1, {}));
-      it[HIDDEN][key] = true;
-    } else {
-      if (has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
-      D = _create(D, { enumerable: createDesc(0, false) });
-    } return setSymbolDesc(it, key, D);
-  } return dP(it, key, D);
-};
-var $defineProperties = function defineProperties(it, P) {
-  anObject(it);
-  var keys = enumKeys(P = toIObject(P));
-  var i = 0;
-  var l = keys.length;
-  var key;
-  while (l > i) $defineProperty(it, key = keys[i++], P[key]);
-  return it;
-};
-var $create = function create(it, P) {
-  return P === undefined ? _create(it) : $defineProperties(_create(it), P);
-};
-var $propertyIsEnumerable = function propertyIsEnumerable(key) {
-  var E = isEnum.call(this, key = toPrimitive(key, true));
-  if (this === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return false;
-  return E || !has(this, key) || !has(AllSymbols, key) || has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
-};
-var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
-  it = toIObject(it);
-  key = toPrimitive(key, true);
-  if (it === ObjectProto && has(AllSymbols, key) && !has(OPSymbols, key)) return;
-  var D = gOPD(it, key);
-  if (D && has(AllSymbols, key) && !(has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
-  return D;
-};
-var $getOwnPropertyNames = function getOwnPropertyNames(it) {
-  var names = gOPN(toIObject(it));
-  var result = [];
-  var i = 0;
-  var key;
-  while (names.length > i) {
-    if (!has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
-  } return result;
-};
-var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
-  var IS_OP = it === ObjectProto;
-  var names = gOPN(IS_OP ? OPSymbols : toIObject(it));
-  var result = [];
-  var i = 0;
-  var key;
-  while (names.length > i) {
-    if (has(AllSymbols, key = names[i++]) && (IS_OP ? has(ObjectProto, key) : true)) result.push(AllSymbols[key]);
-  } return result;
-};
-
-// 19.4.1.1 Symbol([description])
-if (!USE_NATIVE) {
-  $Symbol = function Symbol() {
-    if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
-    var tag = uid(arguments.length > 0 ? arguments[0] : undefined);
-    var $set = function (value) {
-      if (this === ObjectProto) $set.call(OPSymbols, value);
-      if (has(this, HIDDEN) && has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
-      setSymbolDesc(this, tag, createDesc(1, value));
-    };
-    if (DESCRIPTORS && setter) setSymbolDesc(ObjectProto, tag, { configurable: true, set: $set });
-    return wrap(tag);
-  };
-  redefine($Symbol[PROTOTYPE], 'toString', function toString() {
-    return this._k;
-  });
-
-  $GOPD.f = $getOwnPropertyDescriptor;
-  $DP.f = $defineProperty;
-  _dereq_('./_object-gopn').f = gOPNExt.f = $getOwnPropertyNames;
-  _dereq_('./_object-pie').f = $propertyIsEnumerable;
-  _dereq_('./_object-gops').f = $getOwnPropertySymbols;
-
-  if (DESCRIPTORS && !_dereq_('./_library')) {
-    redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
-  }
-
-  wksExt.f = function (name) {
-    return wrap(wks(name));
-  };
+if ((typeof module === 'undefined' ? 'undefined' : _typeof(module)) === 'object' && !!module) {
+  module.exports = exported;
 }
 
-$export($export.G + $export.W + $export.F * !USE_NATIVE, { Symbol: $Symbol });
-
-for (var es6Symbols = (
-  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
-  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
-).split(','), j = 0; es6Symbols.length > j;)wks(es6Symbols[j++]);
-
-for (var wellKnownSymbols = $keys(wks.store), k = 0; wellKnownSymbols.length > k;) wksDefine(wellKnownSymbols[k++]);
-
-$export($export.S + $export.F * !USE_NATIVE, 'Symbol', {
-  // 19.4.2.1 Symbol.for(key)
-  'for': function (key) {
-    return has(SymbolRegistry, key += '')
-      ? SymbolRegistry[key]
-      : SymbolRegistry[key] = $Symbol(key);
-  },
-  // 19.4.2.5 Symbol.keyFor(sym)
-  keyFor: function keyFor(sym) {
-    if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
-    for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
-  },
-  useSetter: function () { setter = true; },
-  useSimple: function () { setter = false; }
-});
-
-$export($export.S + $export.F * !USE_NATIVE, 'Object', {
-  // 19.1.2.2 Object.create(O [, Properties])
-  create: $create,
-  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
-  defineProperty: $defineProperty,
-  // 19.1.2.3 Object.defineProperties(O, Properties)
-  defineProperties: $defineProperties,
-  // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
-  // 19.1.2.7 Object.getOwnPropertyNames(O)
-  getOwnPropertyNames: $getOwnPropertyNames,
-  // 19.1.2.8 Object.getOwnPropertySymbols(O)
-  getOwnPropertySymbols: $getOwnPropertySymbols
-});
-
-// 24.3.2 JSON.stringify(value [, replacer [, space]])
-$JSON && $export($export.S + $export.F * (!USE_NATIVE || $fails(function () {
-  var S = $Symbol();
-  // MS Edge converts symbol values to JSON as {}
-  // WebKit converts symbol values to JSON as null
-  // V8 throws on boxed symbols
-  return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
-})), 'JSON', {
-  stringify: function stringify(it) {
-    if (it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
-    var args = [it];
-    var i = 1;
-    var replacer, $replacer;
-    while (arguments.length > i) args.push(arguments[i++]);
-    replacer = args[1];
-    if (typeof replacer == 'function') $replacer = replacer;
-    if ($replacer || !isArray(replacer)) replacer = function (key, value) {
-      if ($replacer) value = $replacer.call(this, key, value);
-      if (!isSymbol(value)) return value;
-    };
-    args[1] = replacer;
-    return _stringify.apply($JSON, args);
-  }
-});
-
-// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
-$Symbol[PROTOTYPE][TO_PRIMITIVE] || _dereq_('./_hide')($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
-// 19.4.3.5 Symbol.prototype[@@toStringTag]
-setToStringTag($Symbol, 'Symbol');
-// 20.2.1.9 Math[@@toStringTag]
-setToStringTag(Math, 'Math', true);
-// 24.3.3 JSON[@@toStringTag]
-setToStringTag(global.JSON, 'JSON', true);
-
-},{"./_an-object":19,"./_descriptors":25,"./_enum-keys":28,"./_export":29,"./_fails":30,"./_global":31,"./_has":32,"./_hide":33,"./_is-array":37,"./_library":43,"./_meta":44,"./_object-create":45,"./_object-dp":46,"./_object-gopd":48,"./_object-gopn":50,"./_object-gopn-ext":49,"./_object-gops":51,"./_object-keys":54,"./_object-pie":55,"./_property-desc":56,"./_redefine":57,"./_set-to-string-tag":59,"./_shared":61,"./_to-iobject":65,"./_to-primitive":68,"./_uid":69,"./_wks":72,"./_wks-define":70,"./_wks-ext":71}],80:[function(_dereq_,module,exports){
-_dereq_('./_wks-define')('asyncIterator');
-
-},{"./_wks-define":70}],81:[function(_dereq_,module,exports){
-_dereq_('./_wks-define')('observable');
-
-},{"./_wks-define":70}],82:[function(_dereq_,module,exports){
-_dereq_('./es6.array.iterator');
-var global = _dereq_('./_global');
-var hide = _dereq_('./_hide');
-var Iterators = _dereq_('./_iterators');
-var TO_STRING_TAG = _dereq_('./_wks')('toStringTag');
-
-var DOMIterables = ('CSSRuleList,CSSStyleDeclaration,CSSValueList,ClientRectList,DOMRectList,DOMStringList,' +
-  'DOMTokenList,DataTransferItemList,FileList,HTMLAllCollection,HTMLCollection,HTMLFormElement,HTMLSelectElement,' +
-  'MediaList,MimeTypeArray,NamedNodeMap,NodeList,PaintRequestList,Plugin,PluginArray,SVGLengthList,SVGNumberList,' +
-  'SVGPathSegList,SVGPointList,SVGStringList,SVGTransformList,SourceBufferList,StyleSheetList,TextTrackCueList,' +
-  'TextTrackList,TouchList').split(',');
-
-for (var i = 0; i < DOMIterables.length; i++) {
-  var NAME = DOMIterables[i];
-  var Collection = global[NAME];
-  var proto = Collection && Collection.prototype;
-  if (proto && !proto[TO_STRING_TAG]) hide(proto, TO_STRING_TAG, NAME);
-  Iterators[NAME] = Iterators.Array;
-}
-
-},{"./_global":31,"./_hide":33,"./_iterators":42,"./_wks":72,"./es6.array.iterator":73}],83:[function(_dereq_,module,exports){
+},{"@interactjs/interact":23}],2:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _extend = _dereq_('./utils/extend.js');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function fireUntilImmediateStopped(event, listeners) {
-  for (var _i = 0; _i < listeners.length; _i++) {
-    var _ref;
-
-    _ref = listeners[_i];
-    var listener = _ref;
-
-    if (event.immediatePropagationStopped) {
-      break;
-    }
-
-    listener(event);
-  }
-}
-
-var Eventable = function () {
-  function Eventable(options) {
-    (0, _classCallCheck3.default)(this, Eventable);
-
-    this.options = (0, _extend2.default)({}, options || {});
-  }
-
-  Eventable.prototype.fire = function fire(event) {
-    var listeners = void 0;
-    var onEvent = 'on' + event.type;
-    var global = this.global;
-
-    // Interactable#on() listeners
-    if (listeners = this[event.type]) {
-      fireUntilImmediateStopped(event, listeners);
-    }
-
-    // interactable.onevent listener
-    if (this[onEvent]) {
-      this[onEvent](event);
-    }
-
-    // interact.on() listeners
-    if (!event.propagationStopped && global && (listeners = global[event.type])) {
-      fireUntilImmediateStopped(event, listeners);
-    }
-  };
-
-  Eventable.prototype.on = function on(eventType, listener) {
-    // if this type of event was never bound
-    if (this[eventType]) {
-      this[eventType].push(listener);
-    } else {
-      this[eventType] = [listener];
-    }
-  };
-
-  Eventable.prototype.off = function off(eventType, listener) {
-    // if it is an action event type
-    var eventList = this[eventType];
-    var index = eventList ? eventList.indexOf(listener) : -1;
-
-    if (index !== -1) {
-      eventList.splice(index, 1);
-    }
-
-    if (eventList && eventList.length === 0 || !listener) {
-      this[eventType] = undefined;
-    }
-  };
-
-  return Eventable;
-}();
-
-exports.default = Eventable;
-
-},{"./utils/extend.js":126,"babel-runtime/helpers/classCallCheck":7}],84:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = _dereq_('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-var _extend = _dereq_('./utils/extend');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _getOriginXY = _dereq_('./utils/getOriginXY');
-
-var _getOriginXY2 = _interopRequireDefault(_getOriginXY);
-
-var _defaultOptions = _dereq_('./defaultOptions');
-
-var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var InteractEvent = function () {
-  /** */
-  function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
-    (0, _classCallCheck3.default)(this, InteractEvent);
-
-    element = element || interaction.element;
-
-    var target = interaction.target;
-    var deltaSource = (target && target.options || _defaultOptions2.default).deltaSource;
-    var origin = (0, _getOriginXY2.default)(target, element, actionName);
-    var starting = phase === 'start';
-    var ending = phase === 'end';
-    var prevEvent = starting ? this : interaction.prevEvent;
-    var coords = starting ? interaction.startCoords : ending ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.curCoords.timeStamp } : interaction.curCoords;
-
-    this.page = (0, _extend2.default)({}, coords.page);
-    this.client = (0, _extend2.default)({}, coords.client);
-    this.timeStamp = coords.timeStamp;
-
-    if (!ending) {
-      this.page.x -= origin.x;
-      this.page.y -= origin.y;
-
-      this.client.x -= origin.x;
-      this.client.y -= origin.y;
-    }
-
-    this.ctrlKey = event.ctrlKey;
-    this.altKey = event.altKey;
-    this.shiftKey = event.shiftKey;
-    this.metaKey = event.metaKey;
-    this.button = event.button;
-    this.buttons = event.buttons;
-    this.target = element;
-    this.currentTarget = element;
-    this.relatedTarget = related || null;
-    this.preEnd = preEnd;
-    this.type = type || actionName + (phase || '');
-    this.interaction = interaction;
-    this.interactable = target;
-
-    this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
-
-    this.x0 = interaction.startCoords.page.x - origin.x;
-    this.y0 = interaction.startCoords.page.y - origin.y;
-    this.clientX0 = interaction.startCoords.client.x - origin.x;
-    this.clientY0 = interaction.startCoords.client.y - origin.y;
-
-    if (starting || ending) {
-      this.delta = { x: 0, y: 0 };
-    } else {
-      this.delta = {
-        x: this[deltaSource].x - prevEvent[deltaSource].x,
-        y: this[deltaSource].y - prevEvent[deltaSource].y
-      };
-    }
-
-    this.dt = interaction.pointerDelta.timeStamp;
-    this.duration = this.timeStamp - this.t0;
-
-    // speed and velocity in pixels per second
-    this.speed = interaction.pointerDelta[deltaSource].speed;
-    this.velocity = {
-      x: interaction.pointerDelta[deltaSource].vx,
-      y: interaction.pointerDelta[deltaSource].vy
-    };
-
-    this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null;
-  }
-
-  InteractEvent.prototype.getSwipe = function getSwipe() {
-    var interaction = this.interaction;
-
-    if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
-      return null;
-    }
-
-    var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
-    var overlap = 22.5;
-
-    if (angle < 0) {
-      angle += 360;
-    }
-
-    var left = 135 - overlap <= angle && angle < 225 + overlap;
-    var up = 225 - overlap <= angle && angle < 315 + overlap;
-
-    var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
-    var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
-
-    return {
-      up: up,
-      down: down,
-      left: left,
-      right: right,
-      angle: angle,
-      speed: interaction.prevEvent.speed,
-      velocity: {
-        x: interaction.prevEvent.velocityX,
-        y: interaction.prevEvent.velocityY
-      }
-    };
-  };
-
-  InteractEvent.prototype.preventDefault = function preventDefault() {};
-
-  /** */
-
-
-  InteractEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
-    this.immediatePropagationStopped = this.propagationStopped = true;
-  };
-
-  /** */
-
-
-  InteractEvent.prototype.stopPropagation = function stopPropagation() {
-    this.propagationStopped = true;
-  };
-
-  (0, _createClass3.default)(InteractEvent, [{
-    key: 'pageX',
-    get: function get() {
-      return this.page.x;
-    },
-    set: function set(value) {
-      this.page.x = value;
-    }
-  }, {
-    key: 'pageY',
-    get: function get() {
-      return this.page.y;
-    },
-    set: function set(value) {
-      this.page.y = value;
-    }
-  }, {
-    key: 'clientX',
-    get: function get() {
-      return this.client.x;
-    },
-    set: function set(value) {
-      this.client.x = value;
-    }
-  }, {
-    key: 'clientY',
-    get: function get() {
-      return this.client.y;
-    },
-    set: function set(value) {
-      this.client.y = value;
-    }
-  }, {
-    key: 'dx',
-    get: function get() {
-      return this.delta.x;
-    },
-    set: function set(value) {
-      this.delta.x = value;
-    }
-  }, {
-    key: 'dy',
-    get: function get() {
-      return this.delta.y;
-    },
-    set: function set(value) {
-      this.delta.y = value;
-    }
-  }, {
-    key: 'velocityX',
-    get: function get() {
-      return this.velocity.x;
-    },
-    set: function set(value) {
-      this.velocity.x = value;
-    }
-  }, {
-    key: 'velocityY',
-    get: function get() {
-      return this.velocity.y;
-    },
-    set: function set(value) {
-      this.velocity.y = value;
-    }
-  }]);
-  return InteractEvent;
-}();
-
-exports.default = InteractEvent;
-
-},{"./defaultOptions":99,"./utils/extend":126,"./utils/getOriginXY":127,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/createClass":8}],85:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _clone = _dereq_('./utils/clone');
-
-var _clone2 = _interopRequireDefault(_clone);
-
-var _is = _dereq_('./utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _events = _dereq_('./utils/events');
-
-var _events2 = _interopRequireDefault(_events);
-
-var _extend = _dereq_('./utils/extend');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _arr = _dereq_('./utils/arr');
-
-var arr = _interopRequireWildcard(_arr);
-
-var _Eventable = _dereq_('./Eventable');
-
-var _Eventable2 = _interopRequireDefault(_Eventable);
-
-var _defaultOptions = _dereq_('./defaultOptions');
-
-var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
-
-var _domUtils = _dereq_('./utils/domUtils');
-
-var _window = _dereq_('./utils/window');
-
-var _browser = _dereq_('./utils/browser');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Interactable = function () {
-  /** */
-  function Interactable(target, options, defaultContext) {
-    (0, _classCallCheck3.default)(this, Interactable);
-
-    this._signals = options.signals;
-    this._actions = options.actions;
-    this.target = target;
-    this.events = new _Eventable2.default();
-    this._context = options.context || defaultContext;
-    this._win = (0, _window.getWindow)((0, _domUtils.trySelector)(target) ? this._context : target);
-    this._doc = this._win.document;
-
-    this._signals.fire('new', {
-      target: target,
-      options: options,
-      interactable: this,
-      win: this._win
-    });
-
-    this.set(options);
-  }
-
-  Interactable.prototype.setOnEvents = function setOnEvents(action, phases) {
-    var onAction = 'on' + action;
-
-    if (is.func(phases.onstart)) {
-      this.events[onAction + 'start'] = phases.onstart;
-    }
-    if (is.func(phases.onmove)) {
-      this.events[onAction + 'move'] = phases.onmove;
-    }
-    if (is.func(phases.onend)) {
-      this.events[onAction + 'end'] = phases.onend;
-    }
-    if (is.func(phases.oninertiastart)) {
-      this.events[onAction + 'inertiastart'] = phases.oninertiastart;
-    }
-
-    return this;
-  };
-
-  Interactable.prototype.setPerAction = function setPerAction(actionName, options) {
-    // for all the default per-action options
-    for (var optionName in options) {
-      var actionOptions = this.options[actionName];
-      var optionValue = options[optionName];
-      var isArray = is.array(optionValue);
-
-      // if the option value is an array
-      if (isArray) {
-        actionOptions[optionName] = arr.from(optionValue);
-      }
-      // if the option value is an object
-      else if (!isArray && is.plainObject(optionValue)) {
-          // copy the object
-          actionOptions[optionName] = (0, _extend2.default)(actionOptions[optionName] || {}, (0, _clone2.default)(optionValue));
-
-          // set anabled field to true if it exists in the defaults
-          if (is.object(_defaultOptions2.default.perAction[optionName]) && 'enabled' in _defaultOptions2.default.perAction[optionName]) {
-            actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
-          }
-        }
-        // if the option value is a boolean and the default is an object
-        else if (is.bool(optionValue) && is.object(_defaultOptions2.default.perAction[optionName])) {
-            actionOptions[optionName].enabled = optionValue;
-          }
-          // if it's anything else, do a plain assignment
-          else {
-              actionOptions[optionName] = optionValue;
-            }
-    }
-  };
-
-  /**
-   * The default function to get an Interactables bounding rect. Can be
-   * overridden using {@link Interactable.rectChecker}.
-   *
-   * @param {Element} [element] The element to measure.
-   * @return {object} The object's bounding rectangle.
-   */
-
-
-  Interactable.prototype.getRect = function getRect(element) {
-    element = element || this.target;
-
-    if (is.string(this.target) && !is.element(element)) {
-      element = this._context.querySelector(this.target);
-    }
-
-    return (0, _domUtils.getElementRect)(element);
-  };
-
-  /**
-   * Returns or sets the function used to calculate the interactable's
-   * element's rectangle
-   *
-   * @param {function} [checker] A function which returns this Interactable's
-   * bounding rectangle. See {@link Interactable.getRect}
-   * @return {function | object} The checker function or this Interactable
-   */
-
-
-  Interactable.prototype.rectChecker = function rectChecker(checker) {
-    if (is.func(checker)) {
-      this.getRect = checker;
-
-      return this;
-    }
-
-    if (checker === null) {
-      delete this.options.getRect;
-
-      return this;
-    }
-
-    return this.getRect;
-  };
-
-  Interactable.prototype._backCompatOption = function _backCompatOption(optionName, newValue) {
-    if ((0, _domUtils.trySelector)(newValue) || is.object(newValue)) {
-      this.options[optionName] = newValue;
-
-      for (var _i = 0; _i < this._actions.names.length; _i++) {
-        var _ref;
-
-        _ref = this._actions.names[_i];
-        var action = _ref;
-
-        this.options[action][optionName] = newValue;
-      }
-
-      return this;
-    }
-
-    return this.options[optionName];
-  };
-
-  /**
-   * Gets or sets the origin of the Interactable's element.  The x and y
-   * of the origin will be subtracted from action event coordinates.
-   *
-   * @param {Element | object | string} [origin] An HTML or SVG Element whose
-   * rect will be used, an object eg. { x: 0, y: 0 } or string 'parent', 'self'
-   * or any CSS selector
-   *
-   * @return {object} The current origin or this Interactable
-   */
-
-
-  Interactable.prototype.origin = function origin(newValue) {
-    return this._backCompatOption('origin', newValue);
-  };
-
-  /**
-   * Returns or sets the mouse coordinate types used to calculate the
-   * movement of the pointer.
-   *
-   * @param {string} [newValue] Use 'client' if you will be scrolling while
-   * interacting; Use 'page' if you want autoScroll to work
-   * @return {string | object} The current deltaSource or this Interactable
-   */
-
-
-  Interactable.prototype.deltaSource = function deltaSource(newValue) {
-    if (newValue === 'page' || newValue === 'client') {
-      this.options.deltaSource = newValue;
-
-      return this;
-    }
-
-    return this.options.deltaSource;
-  };
-
-  /**
-   * Gets the selector context Node of the Interactable. The default is
-   * `window.document`.
-   *
-   * @return {Node} The context Node of this Interactable
-   */
-
-
-  Interactable.prototype.context = function context() {
-    return this._context;
-  };
-
-  Interactable.prototype.inContext = function inContext(element) {
-    return this._context === element.ownerDocument || (0, _domUtils.nodeContains)(this._context, element);
-  };
-
-  /**
-   * Calls listeners for the given InteractEvent type bound globally
-   * and directly to this Interactable
-   *
-   * @param {InteractEvent} iEvent The InteractEvent object to be fired on this
-   * Interactable
-   * @return {Interactable} this Interactable
-   */
-
-
-  Interactable.prototype.fire = function fire(iEvent) {
-    this.events.fire(iEvent);
-
-    return this;
-  };
-
-  Interactable.prototype._onOffMultiple = function _onOffMultiple(method, eventType, listener, options) {
-    if (is.string(eventType) && eventType.search(' ') !== -1) {
-      eventType = eventType.trim().split(/ +/);
-    }
-
-    if (is.array(eventType)) {
-      for (var _i2 = 0; _i2 < eventType.length; _i2++) {
-        var _ref2;
-
-        _ref2 = eventType[_i2];
-        var type = _ref2;
-
-        this[method](type, listener, options);
-      }
-
-      return true;
-    }
-
-    if (is.object(eventType)) {
-      for (var prop in eventType) {
-        this[method](prop, eventType[prop], listener);
-      }
-
-      return true;
-    }
-  };
-
-  /**
-   * Binds a listener for an InteractEvent, pointerEvent or DOM event.
-   *
-   * @param {string | array | object} eventType  The types of events to listen
-   * for
-   * @param {function} listener   The function event (s)
-   * @param {object | boolean} [options]    options object or useCapture flag
-   * for addEventListener
-   * @return {object} This Interactable
-   */
-
-
-  Interactable.prototype.on = function on(eventType, listener, options) {
-    if (this._onOffMultiple('on', eventType, listener, options)) {
-      return this;
-    }
-
-    if (eventType === 'wheel') {
-      eventType = _browser.wheelEvent;
-    }
-
-    if (arr.contains(this._actions.eventTypes, eventType)) {
-      this.events.on(eventType, listener);
-    }
-    // delegated event for selector
-    else if (is.string(this.target)) {
-        _events2.default.addDelegate(this.target, this._context, eventType, listener, options);
-      } else {
-        _events2.default.add(this.target, eventType, listener, options);
-      }
-
-    return this;
-  };
-
-  /**
-   * Removes an InteractEvent, pointerEvent or DOM event listener
-   *
-   * @param {string | array | object} eventType The types of events that were
-   * listened for
-   * @param {function} listener The listener function to be removed
-   * @param {object | boolean} [options] options object or useCapture flag for
-   * removeEventListener
-   * @return {object} This Interactable
-   */
-
-
-  Interactable.prototype.off = function off(eventType, listener, options) {
-    if (this._onOffMultiple('off', eventType, listener, options)) {
-      return this;
-    }
-
-    if (eventType === 'wheel') {
-      eventType = _browser.wheelEvent;
-    }
-
-    // if it is an action event type
-    if (arr.contains(this._actions.eventTypes, eventType)) {
-      this.events.off(eventType, listener);
-    }
-    // delegated event
-    else if (is.string(this.target)) {
-        _events2.default.removeDelegate(this.target, this._context, eventType, listener, options);
-      }
-      // remove listener from this Interatable's element
-      else {
-          _events2.default.remove(this.target, eventType, listener, options);
-        }
-
-    return this;
-  };
-
-  /**
-   * Reset the options of this Interactable
-   *
-   * @param {object} options The new settings to apply
-   * @return {object} This Interactable
-   */
-
-
-  Interactable.prototype.set = function set(options) {
-    if (!is.object(options)) {
-      options = {};
-    }
-
-    this.options = (0, _clone2.default)(_defaultOptions2.default.base);
-
-    for (var actionName in this._actions.methodDict) {
-      var methodName = this._actions.methodDict[actionName];
-
-      this.options[actionName] = {};
-      this.setPerAction(actionName, (0, _extend2.default)((0, _extend2.default)({}, _defaultOptions2.default.perAction), _defaultOptions2.default[actionName]));
-
-      this[methodName](options[actionName]);
-    }
-
-    for (var setting in options) {
-      if (is.func(this[setting])) {
-        this[setting](options[setting]);
-      }
-    }
-
-    this._signals.fire('set', {
-      options: options,
-      interactable: this
-    });
-
-    return this;
-  };
-
-  /**
-   * Remove this interactable from the list of interactables and remove it's
-   * action capabilities and event listeners
-   *
-   * @return {interact}
-   */
-
-
-  Interactable.prototype.unset = function unset() {
-    _events2.default.remove(this.target, 'all');
-
-    if (is.string(this.target)) {
-      // remove delegated events
-      for (var type in _events2.default.delegatedEvents) {
-        var delegated = _events2.default.delegatedEvents[type];
-
-        if (delegated.selectors[0] === this.target && delegated.contexts[0] === this._context) {
-
-          delegated.selectors.splice(0, 1);
-          delegated.contexts.splice(0, 1);
-          delegated.listeners.splice(0, 1);
-
-          // remove the arrays if they are empty
-          if (!delegated.selectors.length) {
-            delegated[type] = null;
-          }
-        }
-
-        _events2.default.remove(this._context, type, _events2.default.delegateListener);
-        _events2.default.remove(this._context, type, _events2.default.delegateUseCapture, true);
-      }
-    } else {
-      _events2.default.remove(this, 'all');
-    }
-
-    this._signals.fire('unset', { interactable: this });
-  };
-
-  return Interactable;
-}();
-
-exports.default = Interactable;
-
-},{"./Eventable":83,"./defaultOptions":99,"./utils/arr":120,"./utils/browser":121,"./utils/clone":122,"./utils/domUtils":124,"./utils/events":125,"./utils/extend":126,"./utils/is":131,"./utils/window":139,"babel-runtime/helpers/classCallCheck":7}],86:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _InteractEvent = _dereq_('./InteractEvent');
-
-var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
-
-var _utils = _dereq_('./utils');
-
-var utils = _interopRequireWildcard(_utils);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var Interaction = function () {
-  /** */
-  function Interaction(_ref) {
-    var pointerType = _ref.pointerType,
-        signals = _ref.signals;
-    (0, _classCallCheck3.default)(this, Interaction);
-
-    this._signals = signals;
-
-    this.target = null; // current interactable being interacted with
-    this.element = null; // the target element of the interactable
-    this.prepared = { // action that's ready to be fired on next move event
-      name: null,
-      axis: null,
-      edges: null
-    };
-
-    // keep track of added pointers
-    this.pointers = [/* { id, pointer, event, target, downTime }*/];
-
-    // Previous native pointer move event coordinates
-    this.prevCoords = {
-      page: { x: 0, y: 0 },
-      client: { x: 0, y: 0 },
-      timeStamp: 0
-    };
-    // current native pointer move event coordinates
-    this.curCoords = {
-      page: { x: 0, y: 0 },
-      client: { x: 0, y: 0 },
-      timeStamp: 0
-    };
-
-    // Starting InteractEvent pointer coordinates
-    this.startCoords = {
-      page: { x: 0, y: 0 },
-      client: { x: 0, y: 0 },
-      timeStamp: 0
-    };
-
-    // Change in coordinates and time of the pointer
-    this.pointerDelta = {
-      page: { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-      client: { x: 0, y: 0, vx: 0, vy: 0, speed: 0 },
-      timeStamp: 0
-    };
-
-    this.downEvent = null; // pointerdown/mousedown/touchstart event
-    this.downPointer = {};
-
-    this._latestPointer = {
-      pointer: null,
-      event: null,
-      eventTarget: null
-    };
-
-    this.prevEvent = null; // previous action event
-
-    this.pointerIsDown = false;
-    this.pointerWasMoved = false;
-    this._interacting = false;
-    this._ending = false;
-
-    this.pointerType = pointerType;
-
-    this._signals.fire('new', this);
-  }
-
-  Interaction.prototype.pointerDown = function pointerDown(pointer, event, eventTarget) {
-    var pointerIndex = this.updatePointer(pointer, event, eventTarget, true);
-
-    this._signals.fire('down', {
-      pointer: pointer,
-      event: event,
-      eventTarget: eventTarget,
-      pointerIndex: pointerIndex,
-      interaction: this
-    });
-  };
-
-  /**
-   * ```js
-   * interact(target)
-   *   .draggable({
-   *     // disable the default drag start by down->move
-   *     manualStart: true
-   *   })
-   *   // start dragging after the user holds the pointer down
-   *   .on('hold', function (event) {
-   *     var interaction = event.interaction;
-   *
-   *     if (!interaction.interacting()) {
-   *       interaction.start({ name: 'drag' },
-   *                         event.interactable,
-   *                         event.currentTarget);
-   *     }
-   * });
-   * ```
-   *
-   * Start an action with the given Interactable and Element as tartgets. The
-   * action must be enabled for the target Interactable and an appropriate
-   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
-   *
-   * Use it with `interactable.<action>able({ manualStart: false })` to always
-   * [start actions manually](https://github.com/taye/interact.js/issues/114)
-   *
-   * @param {object} action   The action to be performed - drag, resize, etc.
-   * @param {Interactable} target  The Interactable to target
-   * @param {Element} element The DOM Element to target
-   * @return {object} interact
-   */
-
-
-  Interaction.prototype.start = function start(action, target, element) {
-    if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
-      return;
-    }
-
-    utils.copyAction(this.prepared, action);
-
-    this.target = target;
-    this.element = element;
-    this._interacting = this._doPhase({
-      interaction: this,
-      event: this.downEvent,
-      phase: 'start'
-    });
-  };
-
-  Interaction.prototype.pointerMove = function pointerMove(pointer, event, eventTarget) {
-    if (!this.simulation) {
-      this.updatePointer(pointer, event, eventTarget, false);
-      utils.pointer.setCoords(this.curCoords, this.pointers.map(function (p) {
-        return p.pointer;
-      }));
-    }
-
-    var duplicateMove = this.curCoords.page.x === this.prevCoords.page.x && this.curCoords.page.y === this.prevCoords.page.y && this.curCoords.client.x === this.prevCoords.client.x && this.curCoords.client.y === this.prevCoords.client.y;
-
-    var dx = void 0;
-    var dy = void 0;
-
-    // register movement greater than pointerMoveTolerance
-    if (this.pointerIsDown && !this.pointerWasMoved) {
-      dx = this.curCoords.client.x - this.startCoords.client.x;
-      dy = this.curCoords.client.y - this.startCoords.client.y;
-
-      this.pointerWasMoved = utils.hypot(dx, dy) > Interaction.pointerMoveTolerance;
-    }
-
-    var signalArg = {
-      pointer: pointer,
-      pointerIndex: this.getPointerIndex(pointer),
-      event: event,
-      eventTarget: eventTarget,
-      dx: dx,
-      dy: dy,
-      duplicate: duplicateMove,
-      interaction: this,
-      interactingBeforeMove: this.interacting()
-    };
-
-    if (!duplicateMove) {
-      // set pointer coordinate, time changes and speeds
-      utils.pointer.setCoordDeltas(this.pointerDelta, this.prevCoords, this.curCoords);
-    }
-
-    this._signals.fire('move', signalArg);
-
-    if (!duplicateMove) {
-      // if interacting, fire an 'action-move' signal etc
-      if (this.interacting()) {
-        this.move(signalArg);
-      }
-
-      if (this.pointerWasMoved) {
-        utils.pointer.copyCoords(this.prevCoords, this.curCoords);
-      }
-    }
-  };
-
-  /**
-   * ```js
-   * interact(target)
-   *   .draggable(true)
-   *   .on('dragmove', function (event) {
-   *     if (someCondition) {
-   *       // change the snap settings
-   *       event.interactable.draggable({ snap: { targets: [] }});
-   *       // fire another move event with re-calculated snap
-   *       event.interaction.move();
-   *     }
-   *   });
-   * ```
-   *
-   * Force a move of the current action at the same coordinates. Useful if
-   * snap/restrict has been changed and you want a movement with the new
-   * settings.
-   */
-
-
-  Interaction.prototype.move = function move(signalArg) {
-    signalArg = utils.extend({
-      pointer: this._latestPointer.pointer,
-      event: this._latestPointer.event,
-      eventTarget: this._latestPointer.eventTarget,
-      interaction: this,
-      noBefore: false
-    }, signalArg || {});
-
-    signalArg.phase = 'move';
-
-    this._doPhase(signalArg);
-  };
-
-  // End interact move events and stop auto-scroll unless simulation is running
-
-
-  Interaction.prototype.pointerUp = function pointerUp(pointer, event, eventTarget, curEventTarget) {
-    var pointerIndex = this.getPointerIndex(pointer);
-
-    this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
-      pointer: pointer,
-      pointerIndex: pointerIndex,
-      event: event,
-      eventTarget: eventTarget,
-      curEventTarget: curEventTarget,
-      interaction: this
-    });
-
-    if (!this.simulation) {
-      this.end(event);
-    }
-
-    this.pointerIsDown = false;
-    this.removePointer(pointer, event);
-  };
-
-  Interaction.prototype.documentBlur = function documentBlur(event) {
-    this.end(event);
-    this._signals.fire('blur', { event: event, interaction: this });
-  };
-
-  /**
-   * ```js
-   * interact(target)
-   *   .draggable(true)
-   *   .on('move', function (event) {
-   *     if (event.pageX > 1000) {
-   *       // end the current action
-   *       event.interaction.end();
-   *       // stop all further listeners from being called
-   *       event.stopImmediatePropagation();
-   *     }
-   *   });
-   * ```
-   *
-   * @param {PointerEvent} [event]
-   */
-
-
-  Interaction.prototype.end = function end(event) {
-    this._ending = true;
-    event = event || this._latestPointer.event;
-    var endPhaseResult = void 0;
-
-    if (this.interacting()) {
-      endPhaseResult = this._doPhase({
-        event: event,
-        interaction: this,
-        phase: 'end'
-      });
-    }
-
-    this._ending = false;
-
-    if (endPhaseResult === true) {
-      this.stop();
-    }
-  };
-
-  Interaction.prototype.currentAction = function currentAction() {
-    return this._interacting ? this.prepared.name : null;
-  };
-
-  Interaction.prototype.interacting = function interacting() {
-    return this._interacting;
-  };
-
-  /** */
-
-
-  Interaction.prototype.stop = function stop() {
-    this._signals.fire('stop', { interaction: this });
-
-    this.target = this.element = null;
-
-    this._interacting = false;
-    this.prepared.name = this.prevEvent = null;
-  };
-
-  Interaction.prototype.getPointerIndex = function getPointerIndex(pointer) {
-    var pointerId = utils.pointer.getPointerId(pointer);
-
-    // mouse and pen interactions may have only one pointer
-    return this.pointerType === 'mouse' || this.pointerType === 'pen' ? 0 : utils.arr.findIndex(this.pointers, function (curPointer) {
-      return curPointer.id === pointerId;
-    });
-  };
-
-  Interaction.prototype.getPointerInfo = function getPointerInfo(pointer) {
-    return this.pointers[this.getPointerIndex(pointer)];
-  };
-
-  Interaction.prototype.updatePointer = function updatePointer(pointer, event, eventTarget) {
-    var down = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : event && /(down|start)$/i.test(event.type);
-
-    var id = utils.pointer.getPointerId(pointer);
-    var pointerIndex = this.getPointerIndex(pointer);
-    var pointerInfo = this.pointers[pointerIndex];
-
-    if (!pointerInfo) {
-      pointerInfo = {
-        id: id,
-        pointer: pointer,
-        event: event,
-        downTime: null,
-        downTarget: null
-      };
-
-      pointerIndex = this.pointers.length;
-      this.pointers.push(pointerInfo);
-    } else {
-      pointerInfo.pointer = pointer;
-    }
-
-    if (down) {
-      this.pointerIsDown = true;
-
-      if (!this.interacting()) {
-        utils.pointer.setCoords(this.startCoords, this.pointers.map(function (p) {
-          return p.pointer;
-        }));
-
-        utils.pointer.copyCoords(this.curCoords, this.startCoords);
-        utils.pointer.copyCoords(this.prevCoords, this.startCoords);
-        utils.pointer.pointerExtend(this.downPointer, pointer);
-
-        this.downEvent = event;
-        pointerInfo.downTime = this.curCoords.timeStamp;
-        pointerInfo.downTarget = eventTarget;
-
-        this.pointerWasMoved = false;
-      }
-
-      this._signals.fire('update-pointer-down', {
-        pointer: pointer,
-        event: event,
-        eventTarget: eventTarget,
-        down: down,
-        pointerInfo: pointerInfo,
-        pointerIndex: pointerIndex,
-        interaction: this
-      });
-    }
-
-    this._updateLatestPointer(pointer, event, eventTarget);
-
-    return pointerIndex;
-  };
-
-  Interaction.prototype.removePointer = function removePointer(pointer, event) {
-    var pointerIndex = this.getPointerIndex(pointer);
-
-    if (pointerIndex === -1) {
-      return;
-    }
-
-    var pointerInfo = this.pointers[pointerIndex];
-
-    this._signals.fire('remove-pointer', {
-      pointer: pointer,
-      event: event,
-      pointerIndex: pointerIndex,
-      pointerInfo: pointerInfo,
-      interaction: this
-    });
-
-    this.pointers.splice(pointerIndex, 1);
-  };
-
-  Interaction.prototype._updateLatestPointer = function _updateLatestPointer(pointer, event, eventTarget) {
-    this._latestPointer.pointer = pointer;
-    this._latestPointer.event = event;
-    this._latestPointer.eventTarget = eventTarget;
-  };
-
-  Interaction.prototype._createPreparedEvent = function _createPreparedEvent(event, phase, preEnd, type) {
-    var actionName = this.prepared.name;
-
-    return new _InteractEvent2.default(this, event, actionName, phase, this.element, null, preEnd, type);
-  };
-
-  Interaction.prototype._fireEvent = function _fireEvent(iEvent) {
-    this.target.fire(iEvent);
-
-    if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
-      this.prevEvent = iEvent;
-    }
-  };
-
-  Interaction.prototype._doPhase = function _doPhase(signalArg) {
-    var event = signalArg.event,
-        phase = signalArg.phase,
-        preEnd = signalArg.preEnd,
-        type = signalArg.type;
-
-
-    if (!signalArg.noBefore) {
-      var beforeResult = this._signals.fire('before-action-' + phase, signalArg);
-
-      if (beforeResult === false) {
-        return false;
-      }
-    }
-
-    var iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
-
-    this._signals.fire('action-' + phase, signalArg);
-
-    this._fireEvent(iEvent);
-
-    this._signals.fire('after-action-' + phase, signalArg);
-
-    return true;
-  };
-
-  return Interaction;
-}();
-
-Interaction.pointerMoveTolerance = 1;
-
-/**
- * @alias Interaction.prototype.move
- */
-Interaction.prototype.doMove = utils.warnOnce(function (signalArg) {
-  this.move(signalArg);
-}, 'The interaction.doMove() method has been renamed to interaction.move()');
-
-exports.default = Interaction;
-
-},{"./InteractEvent":84,"./utils":129,"babel-runtime/helpers/classCallCheck":7}],87:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _is = _dereq_('../utils/is');
-
-var is = _interopRequireWildcard(_is);
-
-var _arr = _dereq_('../utils/arr');
+var _arr = _dereq_('@interactjs/utils/arr');
 
 var arr = _interopRequireWildcard(_arr);
 
@@ -2519,21 +82,17 @@ function beforeMove(_ref) {
   var axis = interaction.prepared.axis;
 
   if (axis === 'x') {
-    interaction.curCoords.page.y = interaction.startCoords.page.y;
-    interaction.curCoords.client.y = interaction.startCoords.client.y;
+    interaction.coords.cur.page.y = interaction.coords.start.page.y;
+    interaction.coords.cur.client.y = interaction.coords.start.client.y;
 
-    interaction.pointerDelta.page.speed = Math.abs(interaction.pointerDelta.page.vx);
-    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vx);
-    interaction.pointerDelta.client.vy = 0;
-    interaction.pointerDelta.page.vy = 0;
+    interaction.coords.velocity.client.y = 0;
+    interaction.coords.velocity.page.y = 0;
   } else if (axis === 'y') {
-    interaction.curCoords.page.x = interaction.startCoords.page.x;
-    interaction.curCoords.client.x = interaction.startCoords.client.x;
+    interaction.coords.cur.page.x = interaction.coords.start.page.x;
+    interaction.coords.cur.client.x = interaction.coords.start.client.x;
 
-    interaction.pointerDelta.page.speed = Math.abs(interaction.pointerDelta.page.vy);
-    interaction.pointerDelta.client.speed = Math.abs(interaction.pointerDelta.client.vy);
-    interaction.pointerDelta.client.vx = 0;
-    interaction.pointerDelta.page.vx = 0;
+    interaction.coords.velocity.client.x = 0;
+    interaction.coords.velocity.page.x = 0;
   }
 }
 
@@ -2550,8 +109,8 @@ function move(_ref2) {
   if (axis === 'x' || axis === 'y') {
     var opposite = axis === 'x' ? 'y' : 'x';
 
-    iEvent.page[opposite] = interaction.startCoords.page[opposite];
-    iEvent.client[opposite] = interaction.startCoords.client[opposite];
+    iEvent.page[opposite] = interaction.coords.start.page[opposite];
+    iEvent.client[opposite] = interaction.coords.start.client[opposite];
     iEvent.delta[opposite] = 0;
   }
 }
@@ -2649,47 +208,116 @@ var drag = {
 
 exports.default = drag;
 
-},{"../utils/arr":120,"../utils/is":131}],88:[function(_dereq_,module,exports){
+},{"@interactjs/utils/arr":40,"@interactjs/utils/is":51}],3:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
+var _arr = _dereq_('@interactjs/utils/arr');
 
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+var arr = _interopRequireWildcard(_arr);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-var DropEvent = function DropEvent(dropStatus, dragEvent, type) {
-  (0, _classCallCheck3.default)(this, DropEvent);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  var _ref = type === 'deactivate' ? { element: null, dropzone: null } : type === 'dragleave' ? dropStatus.prev : dropStatus.cur,
-      element = _ref.element,
-      dropzone = _ref.dropzone;
+var DropEvent = function () {
+  /**
+   * Class of events fired on dropzones during drags with acceptable targets.
+   */
+  function DropEvent(dropStatus, dragEvent, type) {
+    _classCallCheck(this, DropEvent);
 
-  this.type = type;
-  this.target = element;
-  this.currentTarget = element;
-  this.dropzone = dropzone;
-  this.dragEvent = dragEvent;
-  this.relatedTarget = dragEvent.target;
-  this.interaction = dragEvent.interaction;
-  this.draggable = dragEvent.interactable;
-  this.timeStamp = dragEvent.timeStamp;
-};
+    var _ref = type === 'dragleave' ? dropStatus.prev : dropStatus.cur,
+        element = _ref.element,
+        dropzone = _ref.dropzone;
+
+    this.type = type;
+    this.target = element;
+    this.currentTarget = element;
+    this.dropzone = dropzone;
+    this.dragEvent = dragEvent;
+    this.relatedTarget = dragEvent.target;
+    this.interaction = dragEvent.interaction;
+    this.draggable = dragEvent.interactable;
+    this.timeStamp = dragEvent.timeStamp;
+
+    this.propagationStopped = this.immediatePropagationStopped = false;
+  }
+
+  /**
+   * If this is a `dropactivate` event, the dropzone element will be
+   * deactivated.
+   *
+   * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the
+   * dropzone element and more.
+   */
+
+
+  DropEvent.prototype.reject = function reject() {
+    var _this = this;
+
+    var dropStatus = this.interaction.dropStatus;
+
+
+    if (this.type !== 'dropactivate' && (!this.dropzone || dropStatus.cur.dropzone !== this.dropzone || dropStatus.cur.element !== this.target)) {
+      return;
+    }
+
+    dropStatus.prev.dropzone = this.dropzone;
+    dropStatus.prev.element = this.target;
+
+    dropStatus.rejected = true;
+    dropStatus.events.enter = null;
+
+    this.stopImmediatePropagation();
+
+    if (this.type === 'dropactivate') {
+      var activeDrops = dropStatus.activeDrops;
+      var index = arr.findIndex(activeDrops, function (_ref2) {
+        var dropzone = _ref2.dropzone,
+            element = _ref2.element;
+        return dropzone === _this.dropzone && element === _this.target;
+      });
+
+      dropStatus.activeDrops = [].concat(activeDrops.slice(0, index), activeDrops.slice(index + 1));
+
+      var deactivateEvent = new DropEvent(dropStatus, this.dragEvent, 'dropdeactivate');
+
+      deactivateEvent.dropzone = this.dropzone;
+      deactivateEvent.target = this.target;
+
+      this.dropzone.fire(deactivateEvent);
+    } else {
+      this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'));
+    }
+  };
+
+  DropEvent.prototype.preventDefault = function preventDefault() {};
+
+  DropEvent.prototype.stopPropagation = function stopPropagation() {
+    this.propagationStopped = true;
+  };
+
+  DropEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  };
+
+  return DropEvent;
+}();
 
 exports.default = DropEvent;
 
-},{"babel-runtime/helpers/classCallCheck":7}],89:[function(_dereq_,module,exports){
+},{"@interactjs/utils/arr":40}],4:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -2709,8 +337,6 @@ function init(scope) {
       defaults = scope.defaults;
 
 
-  var dynamicDrop = false;
-
   interactions.signals.on('after-action-start', function (_ref) {
     var interaction = _ref.interaction,
         event = _ref.event,
@@ -2727,22 +353,22 @@ function init(scope) {
     dropStatus.activeDrops = null;
     dropStatus.events = null;
 
-    if (!interaction.dynamicDrop) {
+    if (!scope.dynamicDrop) {
       dropStatus.activeDrops = getActiveDrops(scope, interaction.element);
     }
 
-    var dropEvents = getDropEvents(interaction, event, dragEvent);
+    dropStatus.events = getDropEvents(interaction, event, dragEvent);
 
-    if (dropEvents.activate) {
-      fireActivationEvents(dropStatus.activeDrops, dropEvents.activate);
+    if (dropStatus.events.activate) {
+      fireActivationEvents(dropStatus.activeDrops, dropStatus.events.activate);
     }
   });
 
   interactions.signals.on('action-move', function (arg) {
-    return onEventCreated(arg, scope, dynamicDrop);
+    return onEventCreated(arg, scope);
   });
   interactions.signals.on('action-end', function (arg) {
-    return onEventCreated(arg, scope, dynamicDrop);
+    return onEventCreated(arg, scope);
   });
 
   interactions.signals.on('after-action-move', function (_ref2) {
@@ -2771,158 +397,6 @@ function init(scope) {
     interaction.dropStatus.events = null;
   });
 
-  /**
-   * ```js
-   * interact(target)
-   * .dropChecker(function(dragEvent,         // related dragmove or dragend event
-   *                       event,             // TouchEvent/PointerEvent/MouseEvent
-   *                       dropped,           // bool result of the default checker
-   *                       dropzone,          // dropzone Interactable
-   *                       dropElement,       // dropzone elemnt
-   *                       draggable,         // draggable Interactable
-   *                       draggableElement) {// draggable element
-   *
-   *   return dropped && event.target.hasAttribute('allow-drop');
-   * }
-   * ```
-   *
-   * ```js
-   * interact('.drop').dropzone({
-   *   accept: '.can-drop' || document.getElementById('single-drop'),
-   *   overlap: 'pointer' || 'center' || zeroToOne
-   * }
-   * ```
-   *
-   * Returns or sets whether draggables can be dropped onto this target to
-   * trigger drop events
-   *
-   * Dropzones can receive the following events:
-   *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
-   *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
-   *  - `dragmove` when a draggable that has entered the dropzone is moved
-   *  - `drop` when a draggable is dropped into this dropzone
-   *
-   * Use the `accept` option to allow only elements that match the given CSS
-   * selector or element. The value can be:
-   *
-   *  - **an Element** - only that element can be dropped into this dropzone.
-   *  - **a string**, - the element being dragged must match it as a CSS selector.
-   *  - **`null`** - accept options is cleared - it accepts any element.
-   *
-   * Use the `overlap` option to set how drops are checked for. The allowed
-   * values are:
-   *
-   *   - `'pointer'`, the pointer must be over the dropzone (default)
-   *   - `'center'`, the draggable element's center must be over the dropzone
-   *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
-   *   e.g. `0.5` for drop to happen when half of the area of the draggable is
-   *   over the dropzone
-   *
-   * Use the `checker` option to specify a function to check if a dragged element
-   * is over this Interactable.
-   *
-   * @param {boolean | object | null} [options] The new options to be set.
-   * @return {boolean | Interactable} The current setting or this Interactable
-   */
-  Interactable.prototype.dropzone = function (options) {
-    if (utils.is.object(options)) {
-      this.options.drop.enabled = options.enabled === false ? false : true;
-
-      if (utils.is.func(options.ondrop)) {
-        this.events.ondrop = options.ondrop;
-      }
-      if (utils.is.func(options.ondropactivate)) {
-        this.events.ondropactivate = options.ondropactivate;
-      }
-      if (utils.is.func(options.ondropdeactivate)) {
-        this.events.ondropdeactivate = options.ondropdeactivate;
-      }
-      if (utils.is.func(options.ondragenter)) {
-        this.events.ondragenter = options.ondragenter;
-      }
-      if (utils.is.func(options.ondragleave)) {
-        this.events.ondragleave = options.ondragleave;
-      }
-      if (utils.is.func(options.ondropmove)) {
-        this.events.ondropmove = options.ondropmove;
-      }
-
-      if (/^(pointer|center)$/.test(options.overlap)) {
-        this.options.drop.overlap = options.overlap;
-      } else if (utils.is.number(options.overlap)) {
-        this.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
-      }
-      if ('accept' in options) {
-        this.options.drop.accept = options.accept;
-      }
-      if ('checker' in options) {
-        this.options.drop.checker = options.checker;
-      }
-
-      return this;
-    }
-
-    if (utils.is.bool(options)) {
-      this.options.drop.enabled = options;
-
-      if (!options) {
-        this.ondragenter = this.ondragleave = this.ondrop = this.ondropactivate = this.ondropdeactivate = null;
-      }
-
-      return this;
-    }
-
-    return this.options.drop;
-  };
-
-  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
-    var dropped = false;
-
-    // if the dropzone has no rect (eg. display: none)
-    // call the custom dropChecker or just return false
-    if (!(rect = rect || this.getRect(dropElement))) {
-      return this.options.drop.checker ? this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement) : false;
-    }
-
-    var dropOverlap = this.options.drop.overlap;
-
-    if (dropOverlap === 'pointer') {
-      var origin = utils.getOriginXY(draggable, draggableElement, 'drag');
-      var page = utils.pointer.getPageXY(dragEvent);
-
-      page.x += origin.x;
-      page.y += origin.y;
-
-      var horizontal = page.x > rect.left && page.x < rect.right;
-      var vertical = page.y > rect.top && page.y < rect.bottom;
-
-      dropped = horizontal && vertical;
-    }
-
-    var dragRect = draggable.getRect(draggableElement);
-
-    if (dragRect && dropOverlap === 'center') {
-      var cx = dragRect.left + dragRect.width / 2;
-      var cy = dragRect.top + dragRect.height / 2;
-
-      dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
-    }
-
-    if (dragRect && utils.is.number(dropOverlap)) {
-      var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
-
-      var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
-
-      dropped = overlapRatio >= dropOverlap;
-    }
-
-    if (this.options.drop.checker) {
-      dropped = this.options.drop.checker(dragEvent, event, dropped, this, dropElement, draggable, draggableElement);
-    }
-
-    return dropped;
-  };
-
   interactions.signals.on('new', function (interaction) {
     interaction.dropStatus = {
       cur: {
@@ -2933,6 +407,7 @@ function init(scope) {
         dropzone: null, // the dropzone that was recently dragged away from
         element: null // the element at the time of checking
       },
+      rejected: false, // wheather the potential drop was rejected from a listener
       events: null, // the drop events related to the current drag event
       activeDrops: null // an array of { dropzone, element, rect }
     };
@@ -2942,7 +417,16 @@ function init(scope) {
     var dropStatus = _ref5.interaction.dropStatus;
 
     dropStatus.cur.dropzone = dropStatus.cur.element = dropStatus.prev.dropzone = dropStatus.prev.element = null;
+    dropStatus.rejected = false;
   });
+
+  Interactable.prototype.dropzone = function (options) {
+    return dropzoneMethod(this, options);
+  };
+
+  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
+    return dropCheckMethod(this, dragEvent, event, draggable, draggableElement, dropElement, rect);
+  };
 
   /**
    * Returns or sets whether the dimensions of dropzone elements are calculated
@@ -2954,19 +438,21 @@ function init(scope) {
    */
   interact.dynamicDrop = function (newValue) {
     if (utils.is.bool(newValue)) {
-      //if (dragging && dynamicDrop !== newValue && !newValue) {
+      //if (dragging && scope.dynamicDrop !== newValue && !newValue) {
       //  calcRects(dropzones);
       //}
 
-      dynamicDrop = newValue;
+      scope.dynamicDrop = newValue;
 
       return interact;
     }
-    return dynamicDrop;
+    return scope.dynamicDrop;
   };
 
   utils.arr.merge(actions.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
   actions.methodDict.drop = 'dropzone';
+
+  scope.dynamicDrop = false;
 
   defaults.drop = drop.defaults;
 }
@@ -3017,8 +503,6 @@ function collectDrops(_ref6, draggableElement) {
 }
 
 function fireActivationEvents(activeDrops, event) {
-  var prevElement = void 0;
-
   // loop through all active dropzones and trigger event
   for (var _i3 = 0; _i3 < activeDrops.length; _i3++) {
     var _ref10;
@@ -3028,14 +512,12 @@ function fireActivationEvents(activeDrops, event) {
     var dropzone = _ref9.dropzone;
     var element = _ref9.element;
 
+    event.dropzone = dropzone;
 
-    // prevent trigger of duplicate events on same element
-    if (element !== prevElement) {
-      // set current element as event target
-      event.target = element;
-      dropzone.fire(event);
-    }
-    prevElement = element;
+    // set current element as event target
+    event.target = element;
+    dropzone.fire(event);
+    event.propagationStopped = event.immediatePropagationStopped = false;
   }
 }
 
@@ -3096,6 +578,23 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
     drop: null
   };
 
+  if (dragEvent.type === 'dragstart') {
+    dropEvents.activate = new _DropEvent2.default(dropStatus, dragEvent, 'dropactivate');
+
+    dropEvents.activate.target = null;
+    dropEvents.activate.dropzone = null;
+  }
+  if (dragEvent.type === 'dragend') {
+    dropEvents.deactivate = new _DropEvent2.default(dropStatus, dragEvent, 'dropdeactivate');
+
+    dropEvents.deactivate.target = null;
+    dropEvents.deactivate.dropzone = null;
+  }
+
+  if (dropStatus.rejected) {
+    return dropEvents;
+  }
+
   if (dropStatus.cur.element !== dropStatus.prev.element) {
     // if there was a previous dropzone, create a dragleave event
     if (dropStatus.prev.dropzone) {
@@ -3118,18 +617,6 @@ function getDropEvents(interaction, pointerEvent, dragEvent) {
 
     dragEvent.dropzone = dropStatus.cur.dropzone;
     dragEvent.relatedTarget = dropStatus.cur.element;
-  }
-  if (dragEvent.type === 'dragstart') {
-    dropEvents.activate = new _DropEvent2.default(dropStatus, dragEvent, 'dropactivate');
-
-    dropEvents.activate.target = null;
-    dropEvents.activate.dropzone = null;
-  }
-  if (dragEvent.type === 'dragend') {
-    dropEvents.deactivate = new _DropEvent2.default(dropStatus, dragEvent, 'dropdeactivate');
-
-    dropEvents.deactivate.target = null;
-    dropEvents.deactivate.dropzone = null;
   }
   if (dragEvent.type === 'dragmove' && dropStatus.cur.dropzone) {
     dropEvents.move = new _DropEvent2.default(dropStatus, dragEvent, 'dropmove');
@@ -3169,7 +656,7 @@ function fireDropEvents(interaction, events) {
   dropStatus.prev.element = cur.element;
 }
 
-function onEventCreated(_ref15, scope, dynamicDrop) {
+function onEventCreated(_ref15, scope) {
   var interaction = _ref15.interaction,
       iEvent = _ref15.iEvent,
       event = _ref15.event;
@@ -3181,17 +668,172 @@ function onEventCreated(_ref15, scope, dynamicDrop) {
   var dropStatus = interaction.dropStatus;
 
 
-  if (dynamicDrop) {
+  if (scope.dynamicDrop) {
     dropStatus.activeDrops = getActiveDrops(scope, interaction.target, interaction.element);
   }
 
   var dragEvent = iEvent;
   var dropResult = getDrop(interaction, dragEvent, event);
 
+  // update rejected status
+  dropStatus.rejected = dropStatus.rejected && !!dropResult && dropResult.dropzone === dropStatus.cur.dropzone && dropResult.element === dropStatus.cur.element;
+
   dropStatus.cur.dropzone = dropResult && dropResult.dropzone;
   dropStatus.cur.element = dropResult && dropResult.element;
 
   dropStatus.events = getDropEvents(interaction, event, dragEvent);
+}
+
+/**
+ * ```js
+ * interact(target)
+ * .dropChecker(function(dragEvent,         // related dragmove or dragend event
+ *                       event,             // TouchEvent/PointerEvent/MouseEvent
+ *                       dropped,           // bool result of the default checker
+ *                       dropzone,          // dropzone Interactable
+ *                       dropElement,       // dropzone elemnt
+ *                       draggable,         // draggable Interactable
+ *                       draggableElement) {// draggable element
+ *
+ *   return dropped && event.target.hasAttribute('allow-drop');
+ * }
+ * ```
+ *
+ * ```js
+ * interact('.drop').dropzone({
+ *   accept: '.can-drop' || document.getElementById('single-drop'),
+ *   overlap: 'pointer' || 'center' || zeroToOne
+ * }
+ * ```
+ *
+ * Returns or sets whether draggables can be dropped onto this target to
+ * trigger drop events
+ *
+ * Dropzones can receive the following events:
+ *  - `dropactivate` and `dropdeactivate` when an acceptable drag starts and ends
+ *  - `dragenter` and `dragleave` when a draggable enters and leaves the dropzone
+ *  - `dragmove` when a draggable that has entered the dropzone is moved
+ *  - `drop` when a draggable is dropped into this dropzone
+ *
+ * Use the `accept` option to allow only elements that match the given CSS
+ * selector or element. The value can be:
+ *
+ *  - **an Element** - only that element can be dropped into this dropzone.
+ *  - **a string**, - the element being dragged must match it as a CSS selector.
+ *  - **`null`** - accept options is cleared - it accepts any element.
+ *
+ * Use the `overlap` option to set how drops are checked for. The allowed
+ * values are:
+ *
+ *   - `'pointer'`, the pointer must be over the dropzone (default)
+ *   - `'center'`, the draggable element's center must be over the dropzone
+ *   - a number from 0-1 which is the `(intersection area) / (draggable area)`.
+ *   e.g. `0.5` for drop to happen when half of the area of the draggable is
+ *   over the dropzone
+ *
+ * Use the `checker` option to specify a function to check if a dragged element
+ * is over this Interactable.
+ *
+ * @param {boolean | object | null} [options] The new options to be set.
+ * @return {boolean | Interactable} The current setting or this Interactable
+ */
+function dropzoneMethod(interactable, options) {
+  if (utils.is.object(options)) {
+    interactable.options.drop.enabled = options.enabled === false ? false : true;
+
+    if (utils.is.func(options.ondrop)) {
+      interactable.on('drop', options.ondrop);
+    }
+    if (utils.is.func(options.ondropactivate)) {
+      interactable.on('dropactivate', options.ondropactivate);
+    }
+    if (utils.is.func(options.ondropdeactivate)) {
+      interactable.on('dropdeactivate', options.ondropdeactivate);
+    }
+    if (utils.is.func(options.ondragenter)) {
+      interactable.on('dragenter', options.ondragenter);
+    }
+    if (utils.is.func(options.ondragleave)) {
+      interactable.on('dragleave', options.ondragleave);
+    }
+    if (utils.is.func(options.ondropmove)) {
+      interactable.on('dropmove', options.ondropmove);
+    }
+
+    if (/^(pointer|center)$/.test(options.overlap)) {
+      interactable.options.drop.overlap = options.overlap;
+    } else if (utils.is.number(options.overlap)) {
+      interactable.options.drop.overlap = Math.max(Math.min(1, options.overlap), 0);
+    }
+    if ('accept' in options) {
+      interactable.options.drop.accept = options.accept;
+    }
+    if ('checker' in options) {
+      interactable.options.drop.checker = options.checker;
+    }
+
+    return interactable;
+  }
+
+  if (utils.is.bool(options)) {
+    interactable.options.drop.enabled = options;
+
+    if (!options) {
+      interactable.ondragenter = interactable.ondragleave = interactable.ondrop = interactable.ondropactivate = interactable.ondropdeactivate = null;
+    }
+
+    return interactable;
+  }
+
+  return interactable.options.drop;
+}
+
+function dropCheckMethod(interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
+  var dropped = false;
+
+  // if the dropzone has no rect (eg. display: none)
+  // call the custom dropChecker or just return false
+  if (!(rect = rect || interactable.getRect(dropElement))) {
+    return interactable.options.drop.checker ? interactable.options.drop.checker(dragEvent, event, dropped, interactable, dropElement, draggable, draggableElement) : false;
+  }
+
+  var dropOverlap = interactable.options.drop.overlap;
+
+  if (dropOverlap === 'pointer') {
+    var origin = utils.getOriginXY(draggable, draggableElement, 'drag');
+    var page = utils.pointer.getPageXY(dragEvent);
+
+    page.x += origin.x;
+    page.y += origin.y;
+
+    var horizontal = page.x > rect.left && page.x < rect.right;
+    var vertical = page.y > rect.top && page.y < rect.bottom;
+
+    dropped = horizontal && vertical;
+  }
+
+  var dragRect = draggable.getRect(draggableElement);
+
+  if (dragRect && dropOverlap === 'center') {
+    var cx = dragRect.left + dragRect.width / 2;
+    var cy = dragRect.top + dragRect.height / 2;
+
+    dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
+  }
+
+  if (dragRect && utils.is.number(dropOverlap)) {
+    var overlapArea = Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top));
+
+    var overlapRatio = overlapArea / (dragRect.width * dragRect.height);
+
+    dropped = overlapRatio >= dropOverlap;
+  }
+
+  if (interactable.options.drop.checker) {
+    dropped = interactable.options.drop.checker(dragEvent, event, dropped, interactable, dropElement, draggable, draggableElement);
+  }
+
+  return dropped;
 }
 
 var drop = {
@@ -3209,18 +851,18 @@ var drop = {
 
 exports.default = drop;
 
-},{"../../utils":129,"./DropEvent":88}],90:[function(_dereq_,module,exports){
+},{"./DropEvent":3,"@interactjs/utils":49}],5:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
-var _InteractEvent = _dereq_('../InteractEvent');
+var _InteractEvent = _dereq_('@interactjs/core/InteractEvent');
 
 var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
 
@@ -3406,7 +1048,7 @@ function updateGestureProps(_ref3) {
 
 exports.default = { init: init };
 
-},{"../InteractEvent":84,"../utils":129}],91:[function(_dereq_,module,exports){
+},{"@interactjs/core/InteractEvent":15,"@interactjs/utils":49}],6:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3445,14 +1087,14 @@ exports.drag = _drag2.default;
 exports.drop = _drop2.default;
 exports.init = init;
 
-},{"./drag":87,"./drop":89,"./gesture":90,"./resize":92}],92:[function(_dereq_,module,exports){
+},{"./drag":2,"./drop":4,"./gesture":5,"./resize":7}],7:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -3496,7 +1138,7 @@ function init(scope) {
         return null;
       }
 
-      var page = utils.extend({}, interaction.curCoords.page);
+      var page = utils.extend({}, interaction.coords.cur.page);
       var options = interactable.options;
 
       if (options.resize.enabled) {
@@ -3904,24 +1546,24 @@ function updateEventAxes(_ref3) {
 
 exports.default = { init: init };
 
-},{"../utils":129}],93:[function(_dereq_,module,exports){
+},{"@interactjs/utils":49}],8:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _raf = _dereq_('./utils/raf');
+var _raf = _dereq_('@interactjs/utils/raf');
 
 var _raf2 = _interopRequireDefault(_raf);
 
-var _window = _dereq_('./utils/window');
+var _window = _dereq_('@interactjs/utils/window');
 
-var _is = _dereq_('./utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _domUtils = _dereq_('./utils/domUtils');
+var _domUtils = _dereq_('@interactjs/utils/domUtils');
 
 var domUtils = _interopRequireWildcard(_domUtils);
 
@@ -4051,22 +1693,22 @@ function init(scope) {
 
 exports.default = { init: init };
 
-},{"./utils/domUtils":124,"./utils/is":131,"./utils/raf":135,"./utils/window":139}],94:[function(_dereq_,module,exports){
+},{"@interactjs/utils/domUtils":44,"@interactjs/utils/is":51,"@interactjs/utils/raf":56,"@interactjs/utils/window":60}],9:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _is = _dereq_('../utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _domUtils = _dereq_('../utils/domUtils');
+var _domUtils = _dereq_('@interactjs/utils/domUtils');
 
 var domUtils = _interopRequireWildcard(_domUtils);
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4283,14 +1925,14 @@ function init(scope) {
 
 exports.default = { init: init };
 
-},{"../utils":129,"../utils/domUtils":124,"../utils/is":131}],95:[function(_dereq_,module,exports){
+},{"@interactjs/utils":49,"@interactjs/utils/domUtils":44,"@interactjs/utils/is":51}],10:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -4565,20 +2207,24 @@ exports.default = {
   validateAction: validateAction
 };
 
-},{"../utils":129,"./InteractableMethods":94}],96:[function(_dereq_,module,exports){
+},{"./InteractableMethods":9,"@interactjs/utils":49}],11:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _is = _dereq_('../utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
 var _base = _dereq_('./base');
 
-var _domUtils = _dereq_('../utils/domUtils');
+var _base2 = _interopRequireDefault(_base);
+
+var _domUtils = _dereq_('@interactjs/utils/domUtils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -4622,7 +2268,7 @@ function init(scope) {
 
           var action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
 
-          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && (0, _base.validateAction)(action, interactable, element, eventTarget, scope)) {
+          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && _base2.default.validateAction(action, interactable, element, eventTarget, scope)) {
 
             return interactable;
           }
@@ -4658,7 +2304,7 @@ function init(scope) {
 
 exports.default = { init: init };
 
-},{"../utils/domUtils":124,"../utils/is":131,"./base":95}],97:[function(_dereq_,module,exports){
+},{"./base":10,"@interactjs/utils/domUtils":44,"@interactjs/utils/is":51}],12:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4727,7 +2373,7 @@ exports.default = {
   getHoldDuration: getHoldDuration
 };
 
-},{}],98:[function(_dereq_,module,exports){
+},{}],13:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4760,7 +2406,1213 @@ exports.hold = _hold2.default;
 exports.dragAxis = _dragAxis2.default;
 exports.init = init;
 
-},{"./base":95,"./dragAxis":96,"./hold":97}],99:[function(_dereq_,module,exports){
+},{"./base":10,"./dragAxis":11,"./hold":12}],14:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _arr = _dereq_('@interactjs/utils/arr');
+
+var arr = _interopRequireWildcard(_arr);
+
+var _extend = _dereq_('@interactjs/utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _normalizeListeners = _dereq_('@interactjs/utils/normalizeListeners');
+
+var _normalizeListeners2 = _interopRequireDefault(_normalizeListeners);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function fireUntilImmediateStopped(event, listeners) {
+  for (var _i = 0; _i < listeners.length; _i++) {
+    var _ref;
+
+    _ref = listeners[_i];
+    var listener = _ref;
+
+    if (event.immediatePropagationStopped) {
+      break;
+    }
+
+    listener(event);
+  }
+}
+
+var Eventable = function () {
+  function Eventable(options) {
+    _classCallCheck(this, Eventable);
+
+    this.options = (0, _extend2.default)({}, options || {});
+    this.types = {};
+    this.propagationStopped = this.immediatePropagationStopped = false;
+  }
+
+  Eventable.prototype.fire = function fire(event) {
+    var listeners = void 0;
+    var global = this.global;
+
+    // Interactable#on() listeners
+    if (listeners = this.types[event.type]) {
+      fireUntilImmediateStopped(event, listeners);
+    }
+
+    // interact.on() listeners
+    if (!event.propagationStopped && global && (listeners = global[event.type])) {
+      fireUntilImmediateStopped(event, listeners);
+    }
+  };
+
+  Eventable.prototype.on = function on(type, listener) {
+    var listeners = (0, _normalizeListeners2.default)(type, listener);
+
+    for (type in listeners) {
+      this.types[type] = arr.merge(this.types[type] || [], listeners[type]);
+    }
+  };
+
+  Eventable.prototype.off = function off(type, listener) {
+    var listeners = (0, _normalizeListeners2.default)(type, listener);
+
+    for (type in listeners) {
+      var eventList = this.types[type];
+
+      if (!eventList || !eventList.length) {
+        continue;
+      }
+
+      for (var _i2 = 0; _i2 < listeners[type].length; _i2++) {
+        listener = listeners[type][_i2];
+
+        var index = eventList.indexOf(listener);
+
+        if (index !== -1) {
+          eventList.splice(index, 1);
+        }
+      }
+    }
+  };
+
+  return Eventable;
+}();
+
+exports.default = Eventable;
+
+},{"@interactjs/utils/arr":40,"@interactjs/utils/extend":46,"@interactjs/utils/normalizeListeners":53}],15:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extend = _dereq_('@interactjs/utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _getOriginXY = _dereq_('@interactjs/utils/getOriginXY');
+
+var _getOriginXY2 = _interopRequireDefault(_getOriginXY);
+
+var _defaultOptions = _dereq_('./defaultOptions');
+
+var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
+
+var _hypot = _dereq_('@interactjs/utils/hypot');
+
+var _hypot2 = _interopRequireDefault(_hypot);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var InteractEvent = function () {
+  /** */
+  function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
+    _classCallCheck(this, InteractEvent);
+
+    element = element || interaction.element;
+
+    var target = interaction.target;
+    var deltaSource = (target && target.options || _defaultOptions2.default).deltaSource;
+    var origin = (0, _getOriginXY2.default)(target, element, actionName);
+    var starting = phase === 'start';
+    var ending = phase === 'end';
+    var prevEvent = starting ? this : interaction.prevEvent;
+    var coords = starting ? interaction.coords.start : ending ? { page: prevEvent.page, client: prevEvent.client, timeStamp: interaction.coords.cur.timeStamp } : interaction.coords.cur;
+
+    this.page = (0, _extend2.default)({}, coords.page);
+    this.client = (0, _extend2.default)({}, coords.client);
+    this.timeStamp = coords.timeStamp;
+
+    if (!ending) {
+      this.page.x -= origin.x;
+      this.page.y -= origin.y;
+
+      this.client.x -= origin.x;
+      this.client.y -= origin.y;
+    }
+
+    this.ctrlKey = event.ctrlKey;
+    this.altKey = event.altKey;
+    this.shiftKey = event.shiftKey;
+    this.metaKey = event.metaKey;
+    this.button = event.button;
+    this.buttons = event.buttons;
+    this.target = element;
+    this.currentTarget = element;
+    this.relatedTarget = related || null;
+    this.preEnd = preEnd;
+    this.type = type || actionName + (phase || '');
+    this.interaction = interaction;
+    this.interactable = target;
+
+    this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
+
+    this.x0 = interaction.coords.start.page.x - origin.x;
+    this.y0 = interaction.coords.start.page.y - origin.y;
+    this.clientX0 = interaction.coords.start.client.x - origin.x;
+    this.clientY0 = interaction.coords.start.client.y - origin.y;
+
+    if (starting || ending) {
+      this.delta = { x: 0, y: 0 };
+    } else {
+      this.delta = {
+        x: this[deltaSource].x - prevEvent[deltaSource].x,
+        y: this[deltaSource].y - prevEvent[deltaSource].y
+      };
+    }
+
+    this.dt = interaction.coords.delta.timeStamp;
+    this.duration = this.timeStamp - this.t0;
+
+    // velocity and speed in pixels per second
+    this.velocity = (0, _extend2.default)({}, interaction.coords.velocity[deltaSource]);
+    this.speed = (0, _hypot2.default)(this.velocity.x, this.velocity.y);
+
+    this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null;
+  }
+
+  InteractEvent.prototype.getSwipe = function getSwipe() {
+    var interaction = this.interaction;
+
+    if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
+      return null;
+    }
+
+    var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
+    var overlap = 22.5;
+
+    if (angle < 0) {
+      angle += 360;
+    }
+
+    var left = 135 - overlap <= angle && angle < 225 + overlap;
+    var up = 225 - overlap <= angle && angle < 315 + overlap;
+
+    var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
+    var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
+
+    return {
+      up: up,
+      down: down,
+      left: left,
+      right: right,
+      angle: angle,
+      speed: interaction.prevEvent.speed,
+      velocity: {
+        x: interaction.prevEvent.velocityX,
+        y: interaction.prevEvent.velocityY
+      }
+    };
+  };
+
+  InteractEvent.prototype.preventDefault = function preventDefault() {};
+
+  /** */
+
+
+  InteractEvent.prototype.stopImmediatePropagation = function stopImmediatePropagation() {
+    this.immediatePropagationStopped = this.propagationStopped = true;
+  };
+
+  /** */
+
+
+  InteractEvent.prototype.stopPropagation = function stopPropagation() {
+    this.propagationStopped = true;
+  };
+
+  _createClass(InteractEvent, [{
+    key: 'pageX',
+    get: function get() {
+      return this.page.x;
+    },
+    set: function set(value) {
+      this.page.x = value;
+    }
+  }, {
+    key: 'pageY',
+    get: function get() {
+      return this.page.y;
+    },
+    set: function set(value) {
+      this.page.y = value;
+    }
+  }, {
+    key: 'clientX',
+    get: function get() {
+      return this.client.x;
+    },
+    set: function set(value) {
+      this.client.x = value;
+    }
+  }, {
+    key: 'clientY',
+    get: function get() {
+      return this.client.y;
+    },
+    set: function set(value) {
+      this.client.y = value;
+    }
+  }, {
+    key: 'dx',
+    get: function get() {
+      return this.delta.x;
+    },
+    set: function set(value) {
+      this.delta.x = value;
+    }
+  }, {
+    key: 'dy',
+    get: function get() {
+      return this.delta.y;
+    },
+    set: function set(value) {
+      this.delta.y = value;
+    }
+  }, {
+    key: 'velocityX',
+    get: function get() {
+      return this.velocity.x;
+    },
+    set: function set(value) {
+      this.velocity.x = value;
+    }
+  }, {
+    key: 'velocityY',
+    get: function get() {
+      return this.velocity.y;
+    },
+    set: function set(value) {
+      this.velocity.y = value;
+    }
+  }]);
+
+  return InteractEvent;
+}();
+
+exports.default = InteractEvent;
+
+},{"./defaultOptions":18,"@interactjs/utils/extend":46,"@interactjs/utils/getOriginXY":47,"@interactjs/utils/hypot":48}],16:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _clone = _dereq_('@interactjs/utils/clone');
+
+var _clone2 = _interopRequireDefault(_clone);
+
+var _is = _dereq_('@interactjs/utils/is');
+
+var is = _interopRequireWildcard(_is);
+
+var _events = _dereq_('@interactjs/utils/events');
+
+var _events2 = _interopRequireDefault(_events);
+
+var _extend = _dereq_('@interactjs/utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _arr = _dereq_('@interactjs/utils/arr');
+
+var arr = _interopRequireWildcard(_arr);
+
+var _normalizeListeners = _dereq_('@interactjs/utils/normalizeListeners');
+
+var _normalizeListeners2 = _interopRequireDefault(_normalizeListeners);
+
+var _Eventable = _dereq_('./Eventable');
+
+var _Eventable2 = _interopRequireDefault(_Eventable);
+
+var _domUtils = _dereq_('@interactjs/utils/domUtils');
+
+var _window = _dereq_('@interactjs/utils/window');
+
+var _browser = _dereq_('@interactjs/utils/browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Interactable = function () {
+  _createClass(Interactable, [{
+    key: '_defaults',
+    get: function get() {
+      return {
+        base: {},
+        perAction: {}
+      };
+    }
+
+    /** */
+
+  }]);
+
+  function Interactable(target, options, defaultContext) {
+    _classCallCheck(this, Interactable);
+
+    this._actions = options.actions;
+    this.target = target;
+    this.events = new _Eventable2.default();
+    this._context = options.context || defaultContext;
+    this._win = (0, _window.getWindow)((0, _domUtils.trySelector)(target) ? this._context : target);
+    this._doc = this._win.document;
+
+    this.set(options);
+  }
+
+  Interactable.prototype.setOnEvents = function setOnEvents(actionName, phases) {
+    if (is.func(phases.onstart)) {
+      this.on(actionName + 'start', phases.onstart);
+    }
+    if (is.func(phases.onmove)) {
+      this.on(actionName + 'move', phases.onmove);
+    }
+    if (is.func(phases.onend)) {
+      this.on(actionName + 'end', phases.onend);
+    }
+    if (is.func(phases.oninertiastart)) {
+      this.on(actionName + 'inertiastart', phases.oninertiastart);
+    }
+
+    return this;
+  };
+
+  Interactable.prototype.updatePerActionListeners = function updatePerActionListeners(actionName, prev, cur) {
+    if (is.array(prev)) {
+      this.off(actionName, prev);
+    }
+
+    if (is.array(cur)) {
+      this.on(actionName, cur);
+    }
+  };
+
+  Interactable.prototype.setPerAction = function setPerAction(actionName, options) {
+    var defaults = this._defaults;
+
+    // for all the default per-action options
+    for (var optionName in options) {
+      var actionOptions = this.options[actionName];
+      var optionValue = options[optionName];
+      var isArray = is.array(optionValue);
+
+      // remove old event listeners and add new ones
+      if (optionName === 'listeners') {
+        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue);
+      }
+
+      // if the option value is an array
+      if (isArray) {
+        actionOptions[optionName] = arr.from(optionValue);
+      }
+      // if the option value is an object
+      else if (!isArray && is.plainObject(optionValue)) {
+          // copy the object
+          actionOptions[optionName] = (0, _extend2.default)(actionOptions[optionName] || {}, (0, _clone2.default)(optionValue));
+
+          // set anabled field to true if it exists in the defaults
+          if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
+            actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
+          }
+        }
+        // if the option value is a boolean and the default is an object
+        else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
+            actionOptions[optionName].enabled = optionValue;
+          }
+          // if it's anything else, do a plain assignment
+          else {
+              actionOptions[optionName] = optionValue;
+            }
+    }
+  };
+
+  /**
+   * The default function to get an Interactables bounding rect. Can be
+   * overridden using {@link Interactable.rectChecker}.
+   *
+   * @param {Element} [element] The element to measure.
+   * @return {object} The object's bounding rectangle.
+   */
+
+
+  Interactable.prototype.getRect = function getRect(element) {
+    element = element || this.target;
+
+    if (is.string(this.target) && !is.element(element)) {
+      element = this._context.querySelector(this.target);
+    }
+
+    return (0, _domUtils.getElementRect)(element);
+  };
+
+  /**
+   * Returns or sets the function used to calculate the interactable's
+   * element's rectangle
+   *
+   * @param {function} [checker] A function which returns this Interactable's
+   * bounding rectangle. See {@link Interactable.getRect}
+   * @return {function | object} The checker function or this Interactable
+   */
+
+
+  Interactable.prototype.rectChecker = function rectChecker(checker) {
+    if (is.func(checker)) {
+      this.getRect = checker;
+
+      return this;
+    }
+
+    if (checker === null) {
+      delete this.options.getRect;
+
+      return this;
+    }
+
+    return this.getRect;
+  };
+
+  Interactable.prototype._backCompatOption = function _backCompatOption(optionName, newValue) {
+    if ((0, _domUtils.trySelector)(newValue) || is.object(newValue)) {
+      this.options[optionName] = newValue;
+
+      for (var _i = 0; _i < this._actions.names.length; _i++) {
+        var _ref;
+
+        _ref = this._actions.names[_i];
+        var action = _ref;
+
+        this.options[action][optionName] = newValue;
+      }
+
+      return this;
+    }
+
+    return this.options[optionName];
+  };
+
+  /**
+   * Gets or sets the origin of the Interactable's element.  The x and y
+   * of the origin will be subtracted from action event coordinates.
+   *
+   * @param {Element | object | string} [origin] An HTML or SVG Element whose
+   * rect will be used, an object eg. { x: 0, y: 0 } or string 'parent', 'self'
+   * or any CSS selector
+   *
+   * @return {object} The current origin or this Interactable
+   */
+
+
+  Interactable.prototype.origin = function origin(newValue) {
+    return this._backCompatOption('origin', newValue);
+  };
+
+  /**
+   * Returns or sets the mouse coordinate types used to calculate the
+   * movement of the pointer.
+   *
+   * @param {string} [newValue] Use 'client' if you will be scrolling while
+   * interacting; Use 'page' if you want autoScroll to work
+   * @return {string | object} The current deltaSource or this Interactable
+   */
+
+
+  Interactable.prototype.deltaSource = function deltaSource(newValue) {
+    if (newValue === 'page' || newValue === 'client') {
+      this.options.deltaSource = newValue;
+
+      return this;
+    }
+
+    return this.options.deltaSource;
+  };
+
+  /**
+   * Gets the selector context Node of the Interactable. The default is
+   * `window.document`.
+   *
+   * @return {Node} The context Node of this Interactable
+   */
+
+
+  Interactable.prototype.context = function context() {
+    return this._context;
+  };
+
+  Interactable.prototype.inContext = function inContext(element) {
+    return this._context === element.ownerDocument || (0, _domUtils.nodeContains)(this._context, element);
+  };
+
+  /**
+   * Calls listeners for the given InteractEvent type bound globally
+   * and directly to this Interactable
+   *
+   * @param {InteractEvent} iEvent The InteractEvent object to be fired on this
+   * Interactable
+   * @return {Interactable} this Interactable
+   */
+
+
+  Interactable.prototype.fire = function fire(iEvent) {
+    this.events.fire(iEvent);
+
+    return this;
+  };
+
+  Interactable.prototype._onOff = function _onOff(method, typeArg, listenerArg, options) {
+    if (is.object(typeArg) && !is.array(typeArg)) {
+      options = listenerArg;
+      listenerArg = null;
+    }
+
+    var addRemove = method === 'on' ? 'add' : 'remove';
+    var listeners = (0, _normalizeListeners2.default)(typeArg, listenerArg);
+
+    for (var type in listeners) {
+      if (type === 'wheel') {
+        type = _browser2.default.wheelEvent;
+      }
+
+      for (var _i2 = 0; _i2 < listeners[type].length; _i2++) {
+        var _ref2;
+
+        _ref2 = listeners[type][_i2];
+        var listener = _ref2;
+
+        // if it is an action event type
+        if (arr.contains(this._actions.eventTypes, type)) {
+          this.events[method](type, listener);
+        }
+        // delegated event
+        else if (is.string(this.target)) {
+            _events2.default[addRemove + 'Delegate'](this.target, this._context, type, listener, options);
+          }
+          // remove listener from this Interatable's element
+          else {
+              _events2.default[addRemove](this.target, type, listener, options);
+            }
+      }
+    }
+
+    return this;
+  };
+
+  /**
+   * Binds a listener for an InteractEvent, pointerEvent or DOM event.
+   *
+   * @param {string | array | object} types The types of events to listen
+   * for
+   * @param {function | array | object} [listener] The event listener function(s)
+   * @param {object | boolean} [options] options object or useCapture flag for
+   * addEventListener
+   * @return {Interactable} This Interactable
+   */
+
+
+  Interactable.prototype.on = function on(types, listener, options) {
+    return this._onOff('on', types, listener, options);
+  };
+
+  /**
+   * Removes an InteractEvent, pointerEvent or DOM event listener.
+   *
+   * @param {string | array | object} types The types of events that were
+   * listened for
+   * @param {function | array | object} [listener] The event listener function(s)
+   * @param {object | boolean} [options] options object or useCapture flag for
+   * removeEventListener
+   * @return {Interactable} This Interactable
+   */
+
+
+  Interactable.prototype.off = function off(types, listener, options) {
+    return this._onOff('off', types, listener, options);
+  };
+
+  /**
+   * Reset the options of this Interactable
+   *
+   * @param {object} options The new settings to apply
+   * @return {object} This Interactable
+   */
+
+
+  Interactable.prototype.set = function set(options) {
+    var defaults = this._defaults;
+
+    if (!is.object(options)) {
+      options = {};
+    }
+
+    this.options = (0, _clone2.default)(defaults.base);
+
+    for (var actionName in this._actions.methodDict) {
+      var methodName = this._actions.methodDict[actionName];
+
+      this.options[actionName] = {};
+      this.setPerAction(actionName, (0, _extend2.default)((0, _extend2.default)({}, defaults.perAction), defaults[actionName]));
+
+      this[methodName](options[actionName]);
+    }
+
+    for (var setting in options) {
+      if (is.func(this[setting])) {
+        this[setting](options[setting]);
+      }
+    }
+
+    return this;
+  };
+
+  /**
+   * Remove this interactable from the list of interactables and remove it's
+   * action capabilities and event listeners
+   *
+   * @return {interact}
+   */
+
+
+  Interactable.prototype.unset = function unset() {
+    _events2.default.remove(this.target, 'all');
+
+    if (is.string(this.target)) {
+      // remove delegated events
+      for (var type in _events2.default.delegatedEvents) {
+        var delegated = _events2.default.delegatedEvents[type];
+
+        if (delegated.selectors[0] === this.target && delegated.contexts[0] === this._context) {
+
+          delegated.selectors.splice(0, 1);
+          delegated.contexts.splice(0, 1);
+          delegated.listeners.splice(0, 1);
+
+          // remove the arrays if they are empty
+          if (!delegated.selectors.length) {
+            delegated[type] = null;
+          }
+        }
+
+        _events2.default.remove(this._context, type, _events2.default.delegateListener);
+        _events2.default.remove(this._context, type, _events2.default.delegateUseCapture, true);
+      }
+    } else {
+      _events2.default.remove(this, 'all');
+    }
+  };
+
+  return Interactable;
+}();
+
+exports.default = Interactable;
+
+},{"./Eventable":14,"@interactjs/utils/arr":40,"@interactjs/utils/browser":41,"@interactjs/utils/clone":42,"@interactjs/utils/domUtils":44,"@interactjs/utils/events":45,"@interactjs/utils/extend":46,"@interactjs/utils/is":51,"@interactjs/utils/normalizeListeners":53,"@interactjs/utils/window":60}],17:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _InteractEvent = _dereq_('./InteractEvent');
+
+var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
+
+var _utils = _dereq_('@interactjs/utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Interaction = function () {
+  _createClass(Interaction, [{
+    key: 'pointerMoveTolerance',
+    get: function get() {
+      return 1;
+    }
+
+    /** */
+
+  }]);
+
+  function Interaction(_ref) {
+    var pointerType = _ref.pointerType,
+        signals = _ref.signals;
+
+    _classCallCheck(this, Interaction);
+
+    this._signals = signals;
+
+    this.target = null; // current interactable being interacted with
+    this.element = null; // the target element of the interactable
+    this.prepared = { // action that's ready to be fired on next move event
+      name: null,
+      axis: null,
+      edges: null
+    };
+
+    // keep track of added pointers
+    this.pointers = [/* { id, pointer, event, target, downTime }*/];
+
+    this.coords = {
+      // Starting InteractEvent pointer coordinates
+      start: utils.pointer.newCoords(),
+      // Previous native pointer move event coordinates
+      prev: utils.pointer.newCoords(),
+      // current native pointer move event coordinates
+      cur: utils.pointer.newCoords(),
+      // Change in coordinates and time of the pointer
+      delta: utils.pointer.newCoords(),
+      // pointer velocity
+      velocity: utils.pointer.newCoords()
+    };
+
+    this.downEvent = null; // pointerdown/mousedown/touchstart event
+    this.downPointer = {};
+
+    this._latestPointer = {
+      pointer: null,
+      event: null,
+      eventTarget: null
+    };
+
+    this.prevEvent = null; // previous action event
+
+    this.pointerIsDown = false;
+    this.pointerWasMoved = false;
+    this._interacting = false;
+    this._ending = false;
+
+    this.pointerType = pointerType;
+
+    this._signals.fire('new', this);
+  }
+
+  Interaction.prototype.pointerDown = function pointerDown(pointer, event, eventTarget) {
+    var pointerIndex = this.updatePointer(pointer, event, eventTarget, true);
+
+    this._signals.fire('down', {
+      pointer: pointer,
+      event: event,
+      eventTarget: eventTarget,
+      pointerIndex: pointerIndex,
+      interaction: this
+    });
+  };
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable({
+   *     // disable the default drag start by down->move
+   *     manualStart: true
+   *   })
+   *   // start dragging after the user holds the pointer down
+   *   .on('hold', function (event) {
+   *     var interaction = event.interaction;
+   *
+   *     if (!interaction.interacting()) {
+   *       interaction.start({ name: 'drag' },
+   *                         event.interactable,
+   *                         event.currentTarget);
+   *     }
+   * });
+   * ```
+   *
+   * Start an action with the given Interactable and Element as tartgets. The
+   * action must be enabled for the target Interactable and an appropriate
+   * number of pointers must be held down - 1 for drag/resize, 2 for gesture.
+   *
+   * Use it with `interactable.<action>able({ manualStart: false })` to always
+   * [start actions manually](https://github.com/taye/interact.js/issues/114)
+   *
+   * @param {object} action   The action to be performed - drag, resize, etc.
+   * @param {Interactable} target  The Interactable to target
+   * @param {Element} element The DOM Element to target
+   * @return {object} interact
+   */
+
+
+  Interaction.prototype.start = function start(action, target, element) {
+    if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
+      return;
+    }
+
+    utils.copyAction(this.prepared, action);
+
+    this.target = target;
+    this.element = element;
+    this._interacting = this._doPhase({
+      interaction: this,
+      event: this.downEvent,
+      phase: 'start'
+    });
+  };
+
+  Interaction.prototype.pointerMove = function pointerMove(pointer, event, eventTarget) {
+    if (!this.simulation) {
+      this.updatePointer(pointer, event, eventTarget, false);
+      utils.pointer.setCoords(this.coords.cur, this.pointers.map(function (p) {
+        return p.pointer;
+      }));
+    }
+
+    var duplicateMove = this.coords.cur.page.x === this.coords.prev.page.x && this.coords.cur.page.y === this.coords.prev.page.y && this.coords.cur.client.x === this.coords.prev.client.x && this.coords.cur.client.y === this.coords.prev.client.y;
+
+    var dx = void 0;
+    var dy = void 0;
+
+    // register movement greater than pointerMoveTolerance
+    if (this.pointerIsDown && !this.pointerWasMoved) {
+      dx = this.coords.cur.client.x - this.coords.start.client.x;
+      dy = this.coords.cur.client.y - this.coords.start.client.y;
+
+      this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance;
+    }
+
+    var signalArg = {
+      pointer: pointer,
+      pointerIndex: this.getPointerIndex(pointer),
+      event: event,
+      eventTarget: eventTarget,
+      dx: dx,
+      dy: dy,
+      duplicate: duplicateMove,
+      interaction: this
+    };
+
+    if (!duplicateMove) {
+      // set pointer coordinate, time changes and velocity
+      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur);
+      utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta);
+    }
+
+    this._signals.fire('move', signalArg);
+
+    if (!duplicateMove) {
+      // if interacting, fire an 'action-move' signal etc
+      if (this.interacting()) {
+        this.move(signalArg);
+      }
+
+      if (this.pointerWasMoved) {
+        utils.pointer.copyCoords(this.coords.prev, this.coords.cur);
+      }
+    }
+  };
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable(true)
+   *   .on('dragmove', function (event) {
+   *     if (someCondition) {
+   *       // change the snap settings
+   *       event.interactable.draggable({ snap: { targets: [] }});
+   *       // fire another move event with re-calculated snap
+   *       event.interaction.move();
+   *     }
+   *   });
+   * ```
+   *
+   * Force a move of the current action at the same coordinates. Useful if
+   * snap/restrict has been changed and you want a movement with the new
+   * settings.
+   */
+
+
+  Interaction.prototype.move = function move(signalArg) {
+    signalArg = utils.extend({
+      pointer: this._latestPointer.pointer,
+      event: this._latestPointer.event,
+      eventTarget: this._latestPointer.eventTarget,
+      interaction: this,
+      noBefore: false
+    }, signalArg || {});
+
+    signalArg.phase = 'move';
+
+    this._doPhase(signalArg);
+  };
+
+  // End interact move events and stop auto-scroll unless simulation is running
+
+
+  Interaction.prototype.pointerUp = function pointerUp(pointer, event, eventTarget, curEventTarget) {
+    var pointerIndex = this.getPointerIndex(pointer);
+
+    this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
+      pointer: pointer,
+      pointerIndex: pointerIndex,
+      event: event,
+      eventTarget: eventTarget,
+      curEventTarget: curEventTarget,
+      interaction: this
+    });
+
+    if (!this.simulation) {
+      this.end(event);
+    }
+
+    this.pointerIsDown = false;
+    this.removePointer(pointer, event);
+  };
+
+  Interaction.prototype.documentBlur = function documentBlur(event) {
+    this.end(event);
+    this._signals.fire('blur', { event: event, interaction: this });
+  };
+
+  /**
+   * ```js
+   * interact(target)
+   *   .draggable(true)
+   *   .on('move', function (event) {
+   *     if (event.pageX > 1000) {
+   *       // end the current action
+   *       event.interaction.end();
+   *       // stop all further listeners from being called
+   *       event.stopImmediatePropagation();
+   *     }
+   *   });
+   * ```
+   *
+   * @param {PointerEvent} [event]
+   */
+
+
+  Interaction.prototype.end = function end(event) {
+    this._ending = true;
+    event = event || this._latestPointer.event;
+    var endPhaseResult = void 0;
+
+    if (this.interacting()) {
+      endPhaseResult = this._doPhase({
+        event: event,
+        interaction: this,
+        phase: 'end'
+      });
+    }
+
+    this._ending = false;
+
+    if (endPhaseResult === true) {
+      this.stop();
+    }
+  };
+
+  Interaction.prototype.currentAction = function currentAction() {
+    return this._interacting ? this.prepared.name : null;
+  };
+
+  Interaction.prototype.interacting = function interacting() {
+    return this._interacting;
+  };
+
+  /** */
+
+
+  Interaction.prototype.stop = function stop() {
+    this._signals.fire('stop', { interaction: this });
+
+    this.target = this.element = null;
+
+    this._interacting = false;
+    this.prepared.name = this.prevEvent = null;
+  };
+
+  Interaction.prototype.getPointerIndex = function getPointerIndex(pointer) {
+    var pointerId = utils.pointer.getPointerId(pointer);
+
+    // mouse and pen interactions may have only one pointer
+    return this.pointerType === 'mouse' || this.pointerType === 'pen' ? 0 : utils.arr.findIndex(this.pointers, function (curPointer) {
+      return curPointer.id === pointerId;
+    });
+  };
+
+  Interaction.prototype.getPointerInfo = function getPointerInfo(pointer) {
+    return this.pointers[this.getPointerIndex(pointer)];
+  };
+
+  Interaction.prototype.updatePointer = function updatePointer(pointer, event, eventTarget, down) {
+    var id = utils.pointer.getPointerId(pointer);
+    var pointerIndex = this.getPointerIndex(pointer);
+    var pointerInfo = this.pointers[pointerIndex];
+
+    if (!pointerInfo) {
+      pointerInfo = {
+        id: id,
+        pointer: pointer,
+        event: event,
+        downTime: null,
+        downTarget: null
+      };
+
+      pointerIndex = this.pointers.length;
+      this.pointers.push(pointerInfo);
+    } else {
+      pointerInfo.pointer = pointer;
+    }
+
+    if (down) {
+      this.pointerIsDown = true;
+
+      if (!this.interacting()) {
+        utils.pointer.setCoords(this.coords.start, this.pointers.map(function (p) {
+          return p.pointer;
+        }));
+
+        utils.pointer.copyCoords(this.coords.cur, this.coords.start);
+        utils.pointer.copyCoords(this.coords.prev, this.coords.start);
+        utils.pointer.pointerExtend(this.downPointer, pointer);
+
+        this.downEvent = event;
+        pointerInfo.downTime = this.coords.cur.timeStamp;
+        pointerInfo.downTarget = eventTarget;
+
+        this.pointerWasMoved = false;
+      }
+    }
+
+    this._updateLatestPointer(pointer, event, eventTarget);
+
+    this._signals.fire('update-pointer', {
+      pointer: pointer,
+      event: event,
+      eventTarget: eventTarget,
+      down: down,
+      pointerInfo: pointerInfo,
+      pointerIndex: pointerIndex,
+      interaction: this
+    });
+
+    return pointerIndex;
+  };
+
+  Interaction.prototype.removePointer = function removePointer(pointer, event) {
+    var pointerIndex = this.getPointerIndex(pointer);
+
+    if (pointerIndex === -1) {
+      return;
+    }
+
+    var pointerInfo = this.pointers[pointerIndex];
+
+    this._signals.fire('remove-pointer', {
+      pointer: pointer,
+      event: event,
+      pointerIndex: pointerIndex,
+      pointerInfo: pointerInfo,
+      interaction: this
+    });
+
+    this.pointers.splice(pointerIndex, 1);
+  };
+
+  Interaction.prototype._updateLatestPointer = function _updateLatestPointer(pointer, event, eventTarget) {
+    this._latestPointer.pointer = pointer;
+    this._latestPointer.event = event;
+    this._latestPointer.eventTarget = eventTarget;
+  };
+
+  Interaction.prototype._createPreparedEvent = function _createPreparedEvent(event, phase, preEnd, type) {
+    var actionName = this.prepared.name;
+
+    return new _InteractEvent2.default(this, event, actionName, phase, this.element, null, preEnd, type);
+  };
+
+  Interaction.prototype._fireEvent = function _fireEvent(iEvent) {
+    this.target.fire(iEvent);
+
+    if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
+      this.prevEvent = iEvent;
+    }
+  };
+
+  Interaction.prototype._doPhase = function _doPhase(signalArg) {
+    var event = signalArg.event,
+        phase = signalArg.phase,
+        preEnd = signalArg.preEnd,
+        type = signalArg.type;
+
+
+    if (!signalArg.noBefore) {
+      var beforeResult = this._signals.fire('before-action-' + phase, signalArg);
+
+      if (beforeResult === false) {
+        return false;
+      }
+    }
+
+    var iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
+
+    this._signals.fire('action-' + phase, signalArg);
+
+    this._fireEvent(iEvent);
+
+    this._signals.fire('after-action-' + phase, signalArg);
+
+    return true;
+  };
+
+  return Interaction;
+}();
+
+/**
+ * @alias Interaction.prototype.move
+ */
+
+
+Interaction.prototype.doMove = utils.warnOnce(function (signalArg) {
+  this.move(signalArg);
+}, 'The interaction.doMove() method has been renamed to interaction.move()');
+
+exports.default = Interaction;
+
+},{"./InteractEvent":15,"@interactjs/utils":49}],18:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4778,7 +3630,7 @@ exports.default = {
   }
 };
 
-},{}],100:[function(_dereq_,module,exports){
+},{}],19:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4786,825 +3638,21 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.init = init;
 
-var _scope = _dereq_('./scope');
-
-var _interact = _dereq_('./interact');
-
-var _interact2 = _interopRequireDefault(_interact);
-
-var _interactions = _dereq_('./interactions');
-
-var _interactions2 = _interopRequireDefault(_interactions);
-
-var _interactablePreventDefault = _dereq_('./interactablePreventDefault');
-
-var _interactablePreventDefault2 = _interopRequireDefault(_interactablePreventDefault);
-
-var _inertia = _dereq_('./inertia');
-
-var _inertia2 = _interopRequireDefault(_inertia);
-
-var _pointerEvents = _dereq_('./pointerEvents');
-
-var pointerEvents = _interopRequireWildcard(_pointerEvents);
-
-var _autoStart = _dereq_('./autoStart');
-
-var autoStart = _interopRequireWildcard(_autoStart);
-
-var _actions = _dereq_('./actions');
-
-var actions = _interopRequireWildcard(_actions);
-
-var _modifiers = _dereq_('./modifiers');
-
-var modifiers = _interopRequireWildcard(_modifiers);
-
-var _snappers = _dereq_('./utils/snappers');
-
-var snappers = _interopRequireWildcard(_snappers);
-
-var _autoScroll = _dereq_('./autoScroll');
-
-var _autoScroll2 = _interopRequireDefault(_autoScroll);
-
-var _reflow = _dereq_('./reflow');
-
-var _reflow2 = _interopRequireDefault(_reflow);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/* browser entry point */
-
-function init(window) {
-  (0, _scope.init)(window);
-
-  _interact2.default.use(_interactions2.default);
-  _interact2.default.use(_interactablePreventDefault2.default);
-
-  // inertia
-  _interact2.default.use(_inertia2.default);
-
-  // pointerEvents
-  _interact2.default.use(pointerEvents);
-
-  // autoStart, hold
-  _interact2.default.use(autoStart);
-
-  // drag and drop, resize, gesture
-  _interact2.default.use(actions);
-
-  // snap, resize, etc.
-  _interact2.default.use(modifiers);
-
-  _interact2.default.snappers = snappers;
-  _interact2.default.createSnapGrid = _interact2.default.snappers.grid;
-
-  // autoScroll
-  _interact2.default.use(_autoScroll2.default);
-
-  // reflow
-  _interact2.default.use(_reflow2.default);
-
-  return _interact2.default;
-}
-
-},{"./actions":91,"./autoScroll":93,"./autoStart":98,"./inertia":101,"./interact":102,"./interactablePreventDefault":103,"./interactions":104,"./modifiers":106,"./pointerEvents":115,"./reflow":117,"./scope":118,"./utils/snappers":138}],101:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _base = _dereq_('./modifiers/base');
-
-var _base2 = _interopRequireDefault(_base);
-
-var _utils = _dereq_('./utils');
-
-var utils = _interopRequireWildcard(_utils);
-
-var _raf = _dereq_('./utils/raf');
-
-var _raf2 = _interopRequireDefault(_raf);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function init(scope) {
-  var interactions = scope.interactions,
-      defaults = scope.defaults;
-
-
-  interactions.signals.on('new', function (interaction) {
-    interaction.inertia = {
-      active: false,
-      smoothEnd: false,
-      allowResume: false,
-
-      startEvent: null,
-      upCoords: {},
-
-      xe: 0, ye: 0,
-      sx: 0, sy: 0,
-
-      t0: 0,
-      vx0: 0, vys: 0,
-      duration: 0,
-
-      lambda_v0: 0,
-      one_ve_v0: 0,
-      i: null
-    };
-  });
-
-  interactions.signals.on('up', function (arg) {
-    return release(arg, scope);
-  });
-  interactions.signals.on('down', function (arg) {
-    return resume(arg, scope);
-  });
-  interactions.signals.on('stop', function (arg) {
-    return stop(arg, scope);
-  });
-
-  defaults.perAction.inertia = {
-    enabled: false,
-    resistance: 10, // the lambda in exponential decay
-    minSpeed: 100, // target speed must be above this for inertia to start
-    endSpeed: 10, // the speed at which inertia is slow enough to stop
-    allowResume: true, // allow resuming an action in inertia phase
-    smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
-  };
-}
-
-function resume(_ref, scope) {
-  var interaction = _ref.interaction,
-      event = _ref.event,
-      pointer = _ref.pointer,
-      eventTarget = _ref.eventTarget;
-
-  var status = interaction.inertia;
-
-  // Check if the down event hits the current inertia target
-  if (status.active) {
-    var element = eventTarget;
-
-    // climb up the DOM tree from the event target
-    while (utils.is.element(element)) {
-
-      // if interaction element is the current inertia target element
-      if (element === interaction.element) {
-        // stop inertia
-        _raf2.default.cancel(status.i);
-        status.active = false;
-        interaction.simulation = null;
-
-        // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer, event, eventTarget, true);
-        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
-
-        // fire appropriate signals
-        var signalArg = {
-          interaction: interaction
-        };
-
-        scope.interactions.signals.fire('action-resume', signalArg);
-
-        // fire a reume event
-        var resumeEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'resume', interaction.element);
-
-        interaction._fireEvent(resumeEvent);
-        _base2.default.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
-
-        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
-        break;
-      }
-
-      element = utils.dom.parentNode(element);
-    }
-  }
-}
-
-function release(_ref2, scope) {
-  var interaction = _ref2.interaction,
-      event = _ref2.event;
-
-  var status = interaction.inertia;
-
-  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
-    return;
-  }
-
-  var options = getOptions(interaction);
-
-  var now = new Date().getTime();
-  var pointerSpeed = interaction.pointerDelta.client.speed;
-
-  var smoothEnd = false;
-  var modifierResult = void 0;
-
-  // check if inertia should be started
-  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
-
-  var inertia = inertiaPossible && now - interaction.curCoords.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
-
-  var modifierArg = {
-    interaction: interaction,
-    pageCoords: utils.extend({}, interaction.curCoords.page),
-    statuses: {},
-    preEnd: true,
-    requireEndOnly: true
-  };
-
-  // smoothEnd
-  if (inertiaPossible && !inertia) {
-    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
-
-    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
-
-    if (modifierResult.shouldMove && modifierResult.locked) {
-      smoothEnd = true;
-    }
-  }
-
-  if (!(inertia || smoothEnd)) {
-    return;
-  }
-
-  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
-
-  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
-
-  status.t0 = now;
-
-  status.active = true;
-  status.allowResume = options.allowResume;
-  interaction.simulation = status;
-
-  interaction.target.fire(status.startEvent);
-
-  if (inertia) {
-    status.vx0 = interaction.pointerDelta.client.vx;
-    status.vy0 = interaction.pointerDelta.client.vy;
-    status.v0 = pointerSpeed;
-
-    calcInertia(interaction, status);
-
-    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
-
-    modifierArg.pageCoords.x += status.xe;
-    modifierArg.pageCoords.y += status.ye;
-
-    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
-
-    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
-
-    status.modifiedXe += modifierResult.delta.x;
-    status.modifiedYe += modifierResult.delta.y;
-
-    status.i = _raf2.default.request(function () {
-      return inertiaTick(interaction);
-    });
-  } else {
-    status.smoothEnd = true;
-    status.xe = modifierResult.delta.x;
-    status.ye = modifierResult.delta.y;
-
-    status.sx = status.sy = 0;
-
-    status.i = _raf2.default.request(function () {
-      return smothEndTick(interaction);
-    });
-  }
-}
-
-function stop(_ref3) {
-  var interaction = _ref3.interaction;
-
-  var status = interaction.inertia;
-
-  if (status.active) {
-    _raf2.default.cancel(status.i);
-    status.active = false;
-    interaction.simulation = null;
-  }
-}
-
-function calcInertia(interaction, status) {
-  var options = getOptions(interaction);
-  var lambda = options.resistance;
-  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
-
-  status.x0 = interaction.prevEvent.page.x;
-  status.y0 = interaction.prevEvent.page.y;
-  status.t0 = status.startEvent.timeStamp / 1000;
-  status.sx = status.sy = 0;
-
-  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-  status.te = inertiaDur;
-
-  status.lambda_v0 = lambda / status.v0;
-  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
-}
-
-function inertiaTick(interaction) {
-  updateInertiaCoords(interaction);
-  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
-
-  var status = interaction.inertia;
-  var options = getOptions(interaction);
-  var lambda = options.resistance;
-  var t = new Date().getTime() / 1000 - status.t0;
-
-  if (t < status.te) {
-
-    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
-
-    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
-      status.sx = status.xe * progress;
-      status.sy = status.ye * progress;
-    } else {
-      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
-
-      status.sx = quadPoint.x;
-      status.sy = quadPoint.y;
-    }
-
-    interaction.move();
-
-    status.i = _raf2.default.request(function () {
-      return inertiaTick(interaction);
-    });
-  } else {
-    status.sx = status.modifiedXe;
-    status.sy = status.modifiedYe;
-
-    interaction.move();
-    interaction.end(status.startEvent);
-    status.active = false;
-    interaction.simulation = null;
-  }
-
-  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
-}
-
-function smothEndTick(interaction) {
-  updateInertiaCoords(interaction);
-
-  var status = interaction.inertia;
-  var t = new Date().getTime() - status.t0;
-
-  var _getOptions = getOptions(interaction),
-      duration = _getOptions.smoothEndDuration;
-
-  if (t < duration) {
-    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
-    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
-
-    interaction.move();
-
-    status.i = _raf2.default.request(function () {
-      return smothEndTick(interaction);
-    });
-  } else {
-    status.sx = status.xe;
-    status.sy = status.ye;
-
-    interaction.move();
-    interaction.end(status.startEvent);
-
-    status.smoothEnd = status.active = false;
-    interaction.simulation = null;
-  }
-}
-
-function updateInertiaCoords(interaction) {
-  var status = interaction.inertia;
-
-  // return if inertia isn't running
-  if (!status.active) {
-    return;
-  }
-
-  var pageUp = status.upCoords.page;
-  var clientUp = status.upCoords.client;
-
-  utils.pointer.setCoords(interaction.curCoords, [{
-    pageX: pageUp.x + status.sx,
-    pageY: pageUp.y + status.sy,
-    clientX: clientUp.x + status.sx,
-    clientY: clientUp.y + status.sy
-  }]);
-}
-
-function getOptions(_ref4) {
-  var target = _ref4.target,
-      prepared = _ref4.prepared;
-
-  return target && target.options && prepared.name && target.options[prepared.name].inertia;
-}
-
-exports.default = {
-  init: init,
-  calcInertia: calcInertia,
-  inertiaTick: inertiaTick,
-  smothEndTick: smothEndTick,
-  updateInertiaCoords: updateInertiaCoords
-};
-
-},{"./modifiers/base":105,"./utils":129,"./utils/raf":135}],102:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _browser = _dereq_('./utils/browser');
-
-var _browser2 = _interopRequireDefault(_browser);
-
-var _events = _dereq_('./utils/events');
-
-var _events2 = _interopRequireDefault(_events);
-
-var _utils = _dereq_('./utils');
-
-var utils = _interopRequireWildcard(_utils);
-
-var _scope = _dereq_('./scope');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/** @module interact */
-
-var globalEvents = {};
-var signals = new utils.Signals();
-
-/**
- * ```js
- * interact('#draggable').draggable(true);
- *
- * var rectables = interact('rect');
- * rectables
- *   .gesturable(true)
- *   .on('gesturemove', function (event) {
- *       // ...
- *   });
- * ```
- *
- * The methods of this variable can be used to set elements as interactables
- * and also to change various default settings.
- *
- * Calling it as a function and passing an element or a valid CSS selector
- * string returns an Interactable object which has various methods to configure
- * it.
- *
- * @global
- *
- * @param {Element | string} element The HTML or SVG Element to interact with
- * or CSS selector
- * @return {Interactable}
- */
-function interact(element, options) {
-  var interactable = _scope.scope.interactables.get(element, options);
-
-  if (!interactable) {
-    options = utils.extend(options || {}, {
-      signals: signals,
-      actions: _scope.scope.actions
-    });
-    interactable = new _scope.scope.Interactable(element, options, _scope.scope.document);
-    interactable.events.global = globalEvents;
-
-    _scope.scope.addDocument(interactable._doc);
-
-    _scope.scope.interactables.list.push(interactable);
-  }
-
-  return interactable;
-}
-
-/**
- * Use a plugin
- *
- * @alias module:interact.use
- *
- * @param {Object} plugin
- * @param {function} plugin.init
- * @return {interact}
-*/
-interact.use = function (plugin) {
-  plugin.init(_scope.scope);
-  return interact;
-};
-
-/**
- * Check if an element or selector has been set with the {@link interact}
- * function
- *
- * @alias module:interact.isSet
- *
- * @param {Element} element The Element being searched for
- * @return {boolean} Indicates if the element or CSS selector was previously
- * passed to interact
-*/
-interact.isSet = function (element, options) {
-  return _scope.scope.interactables.indexOfElement(element, options && options.context) !== -1;
-};
-
-/**
- * Add a global listener for an InteractEvent or adds a DOM event to `document`
- *
- * @alias module:interact.on
- *
- * @param {string | array | object} type The types of events to listen for
- * @param {function} listener The function event (s)
- * @param {object | boolean} [options] object or useCapture flag for
- * addEventListener
- * @return {object} interact
- */
-interact.on = function (type, listener, options) {
-  if (utils.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
-  }
-
-  if (utils.is.array(type)) {
-    for (var _i = 0; _i < type.length; _i++) {
-      var _ref;
-
-      _ref = type[_i];
-      var eventType = _ref;
-
-      interact.on(eventType, listener, options);
-    }
-
-    return interact;
-  }
-
-  if (utils.is.object(type)) {
-    for (var prop in type) {
-      interact.on(prop, type[prop], listener);
-    }
-
-    return interact;
-  }
-
-  // if it is an InteractEvent type, add listener to globalEvents
-  if (utils.arr.contains(_scope.scope.actions.eventTypes, type)) {
-    // if this type of event was never bound
-    if (!globalEvents[type]) {
-      globalEvents[type] = [listener];
-    } else {
-      globalEvents[type].push(listener);
-    }
-  }
-  // If non InteractEvent type, addEventListener to document
-  else {
-      _events2.default.add(_scope.scope.document, type, listener, { options: options });
-    }
-
-  return interact;
-};
-
-/**
- * Removes a global InteractEvent listener or DOM event from `document`
- *
- * @alias module:interact.off
- *
- * @param {string | array | object} type The types of events that were listened
- * for
- * @param {function} listener The listener function to be removed
- * @param {object | boolean} options [options] object or useCapture flag for
- * removeEventListener
- * @return {object} interact
- */
-interact.off = function (type, listener, options) {
-  if (utils.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
-  }
-
-  if (utils.is.array(type)) {
-    for (var _i2 = 0; _i2 < type.length; _i2++) {
-      var _ref2;
-
-      _ref2 = type[_i2];
-      var eventType = _ref2;
-
-      interact.off(eventType, listener, options);
-    }
-
-    return interact;
-  }
-
-  if (utils.is.object(type)) {
-    for (var prop in type) {
-      interact.off(prop, type[prop], listener);
-    }
-
-    return interact;
-  }
-
-  if (!utils.arr.contains(_scope.scope.actions.eventTypes, type)) {
-    _events2.default.remove(_scope.scope.document, type, listener, options);
-  } else {
-    var index = void 0;
-
-    if (type in globalEvents && (index = globalEvents[type].indexOf(listener)) !== -1) {
-      globalEvents[type].splice(index, 1);
-    }
-  }
-
-  return interact;
-};
-
-/**
- * Returns an object which exposes internal data
-
- * @alias module:interact.debug
- *
- * @return {object} An object with properties that outline the current state
- * and expose internal functions and variables
- */
-interact.debug = function () {
-  return _scope.scope;
-};
-
-// expose the functions used to calculate multi-touch properties
-interact.getPointerAverage = utils.pointer.pointerAverage;
-interact.getTouchBBox = utils.pointer.touchBBox;
-interact.getTouchDistance = utils.pointer.touchDistance;
-interact.getTouchAngle = utils.pointer.touchAngle;
-
-interact.getElementRect = utils.dom.getElementRect;
-interact.getElementClientRect = utils.dom.getElementClientRect;
-interact.matchesSelector = utils.dom.matchesSelector;
-interact.closest = utils.dom.closest;
-
-/**
- * @alias module:interact.supportsTouch
- *
- * @return {boolean} Whether or not the browser supports touch input
- */
-interact.supportsTouch = function () {
-  return _browser2.default.supportsTouch;
-};
-
-/**
- * @alias module:interact.supportsPointerEvent
- *
- * @return {boolean} Whether or not the browser supports PointerEvents
- */
-interact.supportsPointerEvent = function () {
-  return _browser2.default.supportsPointerEvent;
-};
-
-/**
- * Cancels all interactions (end events are not fired)
- *
- * @alias module:interact.stop
- *
- * @param {Event} event An event on which to call preventDefault()
- * @return {object} interact
- */
-interact.stop = function (event) {
-  for (var _i3 = 0; _i3 < _scope.scope.interactions.list.length; _i3++) {
-    var _ref3;
-
-    _ref3 = _scope.scope.interactions.list[_i3];
-    var interaction = _ref3;
-
-    interaction.stop(event);
-  }
-
-  return interact;
-};
-
-/**
- * Returns or sets the distance the pointer must be moved before an action
- * sequence occurs. This also affects tolerance for tap events.
- *
- * @alias module:interact.pointerMoveTolerance
- *
- * @param {number} [newValue] The movement from the start position must be greater than this value
- * @return {interact | number}
- */
-interact.pointerMoveTolerance = function (newValue) {
-  if (utils.is.number(newValue)) {
-    _scope.scope.Interaction.pointerMoveTolerance = newValue;
-
-    return interact;
-  }
-
-  return _scope.scope.Interaction.pointerMoveTolerance;
-};
-
-signals.on('unset', function (_ref4) {
-  var interactable = _ref4.interactable;
-
-  _scope.scope.interactables.list.splice(_scope.scope.interactables.list.indexOf(interactable), 1);
-
-  // Stop related interactions when an Interactable is unset
-  for (var _i4 = 0; _i4 < _scope.scope.interactions.list.length; _i4++) {
-    var _ref5;
-
-    _ref5 = _scope.scope.interactions.list[_i4];
-    var interaction = _ref5;
-
-    if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
-      interaction.stop();
-    }
-  }
-});
-interact.addDocument = _scope.scope.addDocument;
-interact.removeDocument = _scope.scope.removeDocument;
-
-_scope.scope.interactables = {
-  // all set interactables
-  list: [],
-
-  indexOfElement: function indexOfElement(target, context) {
-    context = context || _scope.scope.document;
-
-    var list = this.list;
-
-    for (var i = 0; i < list.length; i++) {
-      var interactable = list[i];
-
-      if (interactable.target === target && interactable._context === context) {
-        return i;
-      }
-    }
-
-    return -1;
-  },
-  get: function get(element, options, dontCheckInContext) {
-    var ret = this.list[this.indexOfElement(element, options && options.context)];
-
-    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
-  },
-  forEachMatch: function forEachMatch(element, callback) {
-    for (var _i5 = 0; _i5 < this.list.length; _i5++) {
-      var _ref6;
-
-      _ref6 = this.list[_i5];
-      var interactable = _ref6;
-
-      var ret = void 0;
-
-      if ((utils.is.string(interactable.target)
-      // target is a selector and the element matches
-      ? utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target) :
-      // target is the element
-      element === interactable.target) &&
-      // the element is in context
-      interactable.inContext(element)) {
-        ret = callback(interactable);
-      }
-
-      if (ret !== undefined) {
-        return ret;
-      }
-    }
-  },
-
-
-  signals: signals
-};
-
-_scope.scope.interact = interact;
-
-exports.default = interact;
-
-},{"./scope":118,"./utils":129,"./utils/browser":121,"./utils/events":125}],103:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.init = init;
-
-var _is = _dereq_('./utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _events = _dereq_('./utils/events');
+var _events = _dereq_('@interactjs/utils/events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _browser = _dereq_('./utils/browser');
+var _browser = _dereq_('@interactjs/utils/browser');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _domUtils = _dereq_('./utils/domUtils');
+var _domUtils = _dereq_('@interactjs/utils/domUtils');
 
-var _window = _dereq_('./utils/window');
+var _window = _dereq_('@interactjs/utils/window');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5717,56 +3765,52 @@ function init(scope) {
 
 exports.default = { init: init };
 
-},{"./utils/browser":121,"./utils/domUtils":124,"./utils/events":125,"./utils/is":131,"./utils/window":139}],104:[function(_dereq_,module,exports){
+},{"@interactjs/utils/browser":41,"@interactjs/utils/domUtils":44,"@interactjs/utils/events":45,"@interactjs/utils/is":51,"@interactjs/utils/window":60}],20:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _possibleConstructorReturn2 = _dereq_('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = _dereq_('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 exports.newInteraction = newInteraction;
 
-var _Interaction2 = _dereq_('./Interaction');
+var _Interaction = _dereq_('./Interaction');
 
-var _Interaction3 = _interopRequireDefault(_Interaction2);
+var _Interaction2 = _interopRequireDefault(_Interaction);
 
-var _events = _dereq_('./utils/events');
+var _events = _dereq_('@interactjs/utils/events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _interactionFinder = _dereq_('./utils/interactionFinder');
+var _interactionFinder = _dereq_('@interactjs/utils/interactionFinder');
 
 var _interactionFinder2 = _interopRequireDefault(_interactionFinder);
 
-var _browser = _dereq_('./utils/browser');
+var _browser = _dereq_('@interactjs/utils/browser');
 
 var _browser2 = _interopRequireDefault(_browser);
 
-var _domObjects = _dereq_('./utils/domObjects');
+var _domObjects = _dereq_('@interactjs/utils/domObjects');
 
 var _domObjects2 = _interopRequireDefault(_domObjects);
 
-var _pointerUtils = _dereq_('./utils/pointerUtils');
+var _pointerUtils = _dereq_('@interactjs/utils/pointerUtils');
 
 var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
 
-var _Signals = _dereq_('./utils/Signals');
+var _Signals = _dereq_('@interactjs/utils/Signals');
 
 var _Signals2 = _interopRequireDefault(_Signals);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var methodNames = ['pointerDown', 'pointerMove', 'pointerUp', 'updatePointer', 'removePointer', 'windowBlur'];
 
@@ -5816,17 +3860,27 @@ function init(scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // eslint-disable-next-line no-shadow
-  scope.Interaction = function (_Interaction) {
-    (0, _inherits3.default)(Interaction, _Interaction);
+  scope.Interaction = function (_InteractionBase) {
+    _inherits(Interaction, _InteractionBase);
 
     function Interaction() {
-      (0, _classCallCheck3.default)(this, Interaction);
-      return (0, _possibleConstructorReturn3.default)(this, _Interaction.apply(this, arguments));
+      _classCallCheck(this, Interaction);
+
+      return _possibleConstructorReturn(this, _InteractionBase.apply(this, arguments));
     }
 
+    _createClass(Interaction, [{
+      key: 'pointerMoveTolerance',
+      get: function get() {
+        return scope.interactions.pointerMoveTolerance;
+      },
+      set: function set(value) {
+        scope.interactions.pointerMoveTolerance = value;
+      }
+    }]);
+
     return Interaction;
-  }(_Interaction3.default);
+  }(_Interaction2.default);
   scope.interactions = {
     signals: signals,
     // all active and idle interactions
@@ -5838,7 +3892,8 @@ function init(scope) {
     },
 
     listeners: listeners,
-    eventMap: eventMap
+    eventMap: eventMap,
+    pointerMoveTolerance: 1
   };
 
   scope.actions = {
@@ -5871,16 +3926,18 @@ function doOnInteractions(method, scope) {
 
         var pointer = changedTouch;
         var pointerId = _pointerUtils2.default.getPointerId(pointer);
-        var interaction = getInteraction({
+        var searchDetails = {
           pointer: pointer,
           pointerId: pointerId,
           pointerType: pointerType,
           eventType: event.type,
           eventTarget: eventTarget,
+          curEventTarget: curEventTarget,
           scope: scope
-        });
+        };
+        var interaction = getInteraction(searchDetails);
 
-        matches.push([pointer, interaction]);
+        matches.push([searchDetails.pointer, searchDetails.eventTarget, searchDetails.curEventTarget, interaction]);
       }
     } else {
       var invalidPointer = false;
@@ -5899,25 +3956,31 @@ function doOnInteractions(method, scope) {
       }
 
       if (!invalidPointer) {
-        var _interaction = getInteraction({
+        var _searchDetails = {
           pointer: event,
           pointerId: _pointerUtils2.default.getPointerId(event),
           pointerType: pointerType,
           eventType: event.type,
+          curEventTarget: curEventTarget,
           eventTarget: eventTarget,
           scope: scope
-        });
+        };
 
-        matches.push([event, _interaction]);
+        var _interaction = getInteraction(_searchDetails);
+
+        matches.push([_searchDetails.pointer, _searchDetails.eventTarget, _searchDetails.curEventTarget, _interaction]);
       }
     }
 
+    // eslint-disable-next-line no-shadow
     for (var _i4 = 0; _i4 < matches.length; _i4++) {
       var _ref3 = matches[_i4];
       var _pointer = _ref3[0];
-      var _interaction2 = _ref3[1];
+      var _eventTarget = _ref3[1];
+      var _curEventTarget = _ref3[2];
+      var _interaction2 = _ref3[3];
 
-      _interaction2[method](_pointer, event, eventTarget, curEventTarget);
+      _interaction2[method](_pointer, event, _eventTarget, _curEventTarget);
     }
   };
 }
@@ -5971,14 +4034,1011 @@ exports.default = {
   methodNames: methodNames
 };
 
-},{"./Interaction":86,"./utils/Signals":119,"./utils/browser":121,"./utils/domObjects":123,"./utils/events":125,"./utils/interactionFinder":130,"./utils/pointerUtils":134,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/inherits":9,"babel-runtime/helpers/possibleConstructorReturn":10}],105:[function(_dereq_,module,exports){
+},{"./Interaction":17,"@interactjs/utils/Signals":39,"@interactjs/utils/browser":41,"@interactjs/utils/domObjects":43,"@interactjs/utils/events":45,"@interactjs/utils/interactionFinder":50,"@interactjs/utils/pointerUtils":55}],21:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extend = _dereq_('../utils/extend');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.createScope = createScope;
+exports.initScope = initScope;
+
+var _Eventable = _dereq_('./Eventable');
+
+var _Eventable2 = _interopRequireDefault(_Eventable);
+
+var _defaultOptions = _dereq_('./defaultOptions');
+
+var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
+
+var _utils = _dereq_('@interactjs/utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _domObjects = _dereq_('@interactjs/utils/domObjects');
+
+var _domObjects2 = _interopRequireDefault(_domObjects);
+
+var _interactions = _dereq_('@interactjs/core/interactions');
+
+var _interactions2 = _interopRequireDefault(_interactions);
+
+var _InteractEvent = _dereq_('./InteractEvent');
+
+var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
+
+var _Interactable = _dereq_('./Interactable');
+
+var _Interactable2 = _interopRequireDefault(_Interactable);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var win = utils.win,
+    browser = utils.browser,
+    raf = utils.raf,
+    Signals = utils.Signals,
+    events = utils.events;
+function createScope() {
+  var scope = {
+    Signals: Signals,
+    signals: new Signals(),
+    browser: browser,
+    events: events,
+    utils: utils,
+    defaults: utils.clone(_defaultOptions2.default),
+    Eventable: _Eventable2.default,
+
+    InteractEvent: _InteractEvent2.default,
+    Interactable: function (_InteractableBase) {
+      _inherits(Interactable, _InteractableBase);
+
+      function Interactable() {
+        _classCallCheck(this, Interactable);
+
+        return _possibleConstructorReturn(this, _InteractableBase.apply(this, arguments));
+      }
+
+      Interactable.prototype.set = function set(options) {
+        _InteractableBase.prototype.set.call(this, options);
+
+        scope.signals.fire('set', {
+          options: options,
+          interactable: this
+        });
+
+        return this;
+      };
+
+      Interactable.prototype.unset = function unset() {
+        _InteractableBase.prototype.unset.call(this);
+        scope.interactables.signals.fire('unset', { interactable: this });
+      };
+
+      _createClass(Interactable, [{
+        key: '_defaults',
+        get: function get() {
+          return scope.defaults;
+        }
+      }]);
+
+      return Interactable;
+    }(_Interactable2.default),
+
+    interactables: {
+      // all set interactables
+      list: [],
+
+      new: function _new(target, options) {
+        options = utils.extend(options || {}, {
+          actions: scope.actions
+        });
+
+        var interactable = new scope.Interactable(target, options, scope.document);
+
+        scope.addDocument(interactable._doc);
+
+        scope.interactables.list.push(interactable);
+
+        scope.interactables.signals.fire('new', {
+          target: target,
+          options: options,
+          interactable: interactable,
+          win: this._win
+        });
+
+        return interactable;
+      },
+      indexOfElement: function indexOfElement(target, context) {
+        context = context || scope.document;
+
+        var list = this.list;
+
+        for (var i = 0; i < list.length; i++) {
+          var interactable = list[i];
+
+          if (interactable.target === target && interactable._context === context) {
+            return i;
+          }
+        }
+
+        return -1;
+      },
+      get: function get(element, options, dontCheckInContext) {
+        var ret = this.list[this.indexOfElement(element, options && options.context)];
+
+        return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
+      },
+      forEachMatch: function forEachMatch(element, callback) {
+        for (var _i = 0; _i < this.list.length; _i++) {
+          var _ref;
+
+          _ref = this.list[_i];
+          var interactable = _ref;
+
+          var ret = void 0;
+
+          if ((utils.is.string(interactable.target)
+          // target is a selector and the element matches
+          ? utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target) :
+          // target is the element
+          element === interactable.target) &&
+          // the element is in context
+          interactable.inContext(element)) {
+            ret = callback(interactable);
+          }
+
+          if (ret !== undefined) {
+            return ret;
+          }
+        }
+      },
+
+
+      signals: new utils.Signals()
+    },
+
+    // main document
+    document: null,
+    // all documents being listened to
+    documents: [/* { doc, options } */],
+
+    init: function init(window) {
+      return initScope(scope, window);
+    },
+    addDocument: function addDocument(doc, options) {
+      // do nothing if document is already known
+      if (scope.getDocIndex(doc) !== -1) {
+        return false;
+      }
+
+      var window = win.getWindow(doc);
+
+      scope.documents.push({ doc: doc, options: options });
+      events.documents.push(doc);
+
+      // don't add an unload event for the main document
+      // so that the page may be cached in browser history
+      if (doc !== scope.document) {
+        events.add(window, 'unload', scope.onWindowUnload);
+      }
+
+      scope.signals.fire('add-document', { doc: doc, window: window, scope: scope, options: options });
+    },
+    removeDocument: function removeDocument(doc) {
+      var index = scope.getDocIndex(doc);
+
+      var window = win.getWindow(doc);
+      var options = scope.documents[index].options;
+
+      events.remove(window, 'unload', scope.onWindowUnload);
+
+      scope.documents.splice(index, 1);
+      events.documents.splice(index, 1);
+
+      scope.signals.fire('remove-document', { doc: doc, window: window, scope: scope, options: options });
+    },
+    onWindowUnload: function onWindowUnload(event) {
+      scope.removeDocument(event.currentTarget.document);
+    },
+    getDocIndex: function getDocIndex(doc) {
+      for (var i = 0; i < scope.documents.length; i++) {
+        if (scope.documents[i].doc === doc) {
+          return i;
+        }
+      }
+
+      return -1;
+    }
+  };
+
+  _interactions2.default.init(scope);
+
+  return scope;
+}
+
+function initScope(scope, window) {
+  win.init(window);
+  _domObjects2.default.init(window);
+  browser.init(window);
+  raf.init(window);
+
+  _interactions2.default.init(scope);
+  scope.document = window.document;
+
+  return scope;
+}
+
+},{"./Eventable":14,"./InteractEvent":15,"./Interactable":16,"./defaultOptions":18,"@interactjs/core/interactions":20,"@interactjs/utils":49,"@interactjs/utils/domObjects":43}],22:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _base = _dereq_('@interactjs/modifiers/base');
+
+var _base2 = _interopRequireDefault(_base);
+
+var _utils = _dereq_('@interactjs/utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _raf = _dereq_('@interactjs/utils/raf');
+
+var _raf2 = _interopRequireDefault(_raf);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  var interactions = scope.interactions,
+      defaults = scope.defaults;
+
+
+  interactions.signals.on('new', function (interaction) {
+    interaction.inertia = {
+      active: false,
+      smoothEnd: false,
+      allowResume: false,
+
+      startEvent: null,
+      upCoords: {},
+
+      xe: 0, ye: 0,
+      sx: 0, sy: 0,
+
+      t0: 0,
+      vx0: 0, vys: 0,
+      duration: 0,
+
+      lambda_v0: 0,
+      one_ve_v0: 0,
+      i: null
+    };
+  });
+
+  interactions.signals.on('before-action-end', function (arg) {
+    return release(arg, scope);
+  });
+  interactions.signals.on('down', function (arg) {
+    return resume(arg, scope);
+  });
+  interactions.signals.on('stop', function (arg) {
+    return stop(arg, scope);
+  });
+
+  defaults.perAction.inertia = {
+    enabled: false,
+    resistance: 10, // the lambda in exponential decay
+    minSpeed: 100, // target speed must be above this for inertia to start
+    endSpeed: 10, // the speed at which inertia is slow enough to stop
+    allowResume: true, // allow resuming an action in inertia phase
+    smoothEndDuration: 300 // animate to snap/restrict endOnly if there's no inertia
+  };
+}
+
+function resume(_ref, scope) {
+  var interaction = _ref.interaction,
+      event = _ref.event,
+      pointer = _ref.pointer,
+      eventTarget = _ref.eventTarget;
+
+  var status = interaction.inertia;
+
+  // Check if the down event hits the current inertia target
+  if (status.active) {
+    var element = eventTarget;
+
+    // climb up the DOM tree from the event target
+    while (utils.is.element(element)) {
+
+      // if interaction element is the current inertia target element
+      if (element === interaction.element) {
+        // stop inertia
+        _raf2.default.cancel(status.i);
+        status.active = false;
+        interaction.simulation = null;
+
+        // update pointers to the down event's coordinates
+        interaction.updatePointer(pointer, event, eventTarget, true);
+        utils.pointer.setCoords(interaction.coords.cur, interaction.pointers);
+
+        // fire appropriate signals
+        var signalArg = {
+          interaction: interaction
+        };
+
+        scope.interactions.signals.fire('action-resume', signalArg);
+
+        // fire a reume event
+        var resumeEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'resume', interaction.element);
+
+        interaction._fireEvent(resumeEvent);
+        _base2.default.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
+
+        utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
+        break;
+      }
+
+      element = utils.dom.parentNode(element);
+    }
+  }
+}
+
+function release(_ref2, scope) {
+  var interaction = _ref2.interaction,
+      event = _ref2.event;
+
+  var status = interaction.inertia;
+
+  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
+    return;
+  }
+
+  var options = getOptions(interaction);
+
+  var now = new Date().getTime();
+  var velocityClient = interaction.coords.velocity.client;
+
+  var pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y);
+
+  var smoothEnd = false;
+  var modifierResult = void 0;
+
+  // check if inertia should be started
+  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
+
+  var inertia = inertiaPossible && now - interaction.coords.cur.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
+
+  var modifierArg = {
+    interaction: interaction,
+    pageCoords: utils.extend({}, interaction.coords.cur.page),
+    statuses: {},
+    preEnd: true,
+    requireEndOnly: true
+  };
+
+  // smoothEnd
+  if (inertiaPossible && !inertia) {
+    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
+
+    if (modifierResult.shouldMove && modifierResult.locked) {
+      smoothEnd = true;
+    }
+  }
+
+  if (!(inertia || smoothEnd)) {
+    return;
+  }
+
+  utils.pointer.copyCoords(status.upCoords, interaction.coords.cur);
+
+  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+
+  status.t0 = now;
+
+  status.active = true;
+  status.allowResume = options.allowResume;
+  interaction.simulation = status;
+
+  interaction.target.fire(status.startEvent);
+
+  if (inertia) {
+    status.vx0 = interaction.coords.velocity.client.x;
+    status.vy0 = interaction.coords.velocity.client.y;
+    status.v0 = pointerSpeed;
+
+    calcInertia(interaction, status);
+
+    utils.extend(modifierArg.pageCoords, interaction.coords.cur.page);
+
+    modifierArg.pageCoords.x += status.xe;
+    modifierArg.pageCoords.y += status.ye;
+
+    _base2.default.resetStatuses(modifierArg.statuses, scope.modifiers);
+
+    modifierResult = _base2.default.setAll(modifierArg, scope.modifiers);
+
+    status.modifiedXe += modifierResult.delta.x;
+    status.modifiedYe += modifierResult.delta.y;
+
+    status.i = _raf2.default.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.smoothEnd = true;
+    status.xe = modifierResult.delta.x;
+    status.ye = modifierResult.delta.y;
+
+    status.sx = status.sy = 0;
+
+    status.i = _raf2.default.request(function () {
+      return smothEndTick(interaction);
+    });
+  }
+
+  return false;
+}
+
+function stop(_ref3) {
+  var interaction = _ref3.interaction;
+
+  var status = interaction.inertia;
+
+  if (status.active) {
+    _raf2.default.cancel(status.i);
+    status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function calcInertia(interaction, status) {
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
+
+  status.x0 = interaction.prevEvent.page.x;
+  status.y0 = interaction.prevEvent.page.y;
+  status.t0 = status.startEvent.timeStamp / 1000;
+  status.sx = status.sy = 0;
+
+  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
+  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
+  status.te = inertiaDur;
+
+  status.lambda_v0 = lambda / status.v0;
+  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
+}
+
+function inertiaTick(interaction) {
+  updateInertiaCoords(interaction);
+  utils.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
+  utils.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
+
+  var status = interaction.inertia;
+  var options = getOptions(interaction);
+  var lambda = options.resistance;
+  var t = new Date().getTime() / 1000 - status.t0;
+
+  if (t < status.te) {
+
+    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+
+    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
+      status.sx = status.xe * progress;
+      status.sy = status.ye * progress;
+    } else {
+      var quadPoint = utils.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
+
+      status.sx = quadPoint.x;
+      status.sy = quadPoint.y;
+    }
+
+    interaction.move();
+
+    status.i = _raf2.default.request(function () {
+      return inertiaTick(interaction);
+    });
+  } else {
+    status.sx = status.modifiedXe;
+    status.sy = status.modifiedYe;
+
+    interaction.move();
+    interaction.end(status.startEvent);
+    status.active = false;
+    interaction.simulation = null;
+  }
+
+  utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
+}
+
+function smothEndTick(interaction) {
+  updateInertiaCoords(interaction);
+
+  var status = interaction.inertia;
+  var t = new Date().getTime() - status.t0;
+
+  var _getOptions = getOptions(interaction),
+      duration = _getOptions.smoothEndDuration;
+
+  if (t < duration) {
+    status.sx = utils.easeOutQuad(t, 0, status.xe, duration);
+    status.sy = utils.easeOutQuad(t, 0, status.ye, duration);
+
+    interaction.move();
+
+    status.i = _raf2.default.request(function () {
+      return smothEndTick(interaction);
+    });
+  } else {
+    status.sx = status.xe;
+    status.sy = status.ye;
+
+    interaction.move();
+    interaction.end(status.startEvent);
+
+    status.smoothEnd = status.active = false;
+    interaction.simulation = null;
+  }
+}
+
+function updateInertiaCoords(interaction) {
+  var status = interaction.inertia;
+
+  // return if inertia isn't running
+  if (!status.active) {
+    return;
+  }
+
+  var pageUp = status.upCoords.page;
+  var clientUp = status.upCoords.client;
+
+  utils.pointer.setCoords(interaction.coords.cur, [{
+    pageX: pageUp.x + status.sx,
+    pageY: pageUp.y + status.sy,
+    clientX: clientUp.x + status.sx,
+    clientY: clientUp.y + status.sy
+  }]);
+}
+
+function getOptions(_ref4) {
+  var target = _ref4.target,
+      prepared = _ref4.prepared;
+
+  return target && target.options && prepared.name && target.options[prepared.name].inertia;
+}
+
+exports.default = {
+  init: init,
+  calcInertia: calcInertia,
+  inertiaTick: inertiaTick,
+  smothEndTick: smothEndTick,
+  updateInertiaCoords: updateInertiaCoords
+};
+
+},{"@interactjs/modifiers/base":25,"@interactjs/utils":49,"@interactjs/utils/raf":56}],23:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.interact = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /* browser entry point */
+
+exports.init = init;
+
+var _interact = _dereq_('./interact');
+
+var _interact2 = _interopRequireDefault(_interact);
+
+var _interactablePreventDefault = _dereq_('@interactjs/core/interactablePreventDefault');
+
+var _interactablePreventDefault2 = _interopRequireDefault(_interactablePreventDefault);
+
+var _inertia = _dereq_('@interactjs/inertia');
+
+var _inertia2 = _interopRequireDefault(_inertia);
+
+var _pointerEvents = _dereq_('@interactjs/pointerEvents');
+
+var pointerEvents = _interopRequireWildcard(_pointerEvents);
+
+var _autoStart = _dereq_('@interactjs/autoStart');
+
+var autoStart = _interopRequireWildcard(_autoStart);
+
+var _actions = _dereq_('@interactjs/actions');
+
+var actions = _interopRequireWildcard(_actions);
+
+var _modifiers = _dereq_('@interactjs/modifiers');
+
+var modifiers = _interopRequireWildcard(_modifiers);
+
+var _snappers = _dereq_('@interactjs/utils/snappers');
+
+var snappers = _interopRequireWildcard(_snappers);
+
+var _autoScroll = _dereq_('@interactjs/autoScroll');
+
+var _autoScroll2 = _interopRequireDefault(_autoScroll);
+
+var _reflow = _dereq_('@interactjs/reflow');
+
+var _reflow2 = _interopRequireDefault(_reflow);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(window) {
+  _interact.scope.init(window);
+
+  _interact2.default.use(_interactablePreventDefault2.default);
+
+  // inertia
+  _interact2.default.use(_inertia2.default);
+
+  // pointerEvents
+  _interact2.default.use(pointerEvents);
+
+  // autoStart, hold
+  _interact2.default.use(autoStart);
+
+  // drag and drop, resize, gesture
+  _interact2.default.use(actions);
+
+  // snap, resize, etc.
+  _interact2.default.use(modifiers);
+
+  _interact2.default.snappers = snappers;
+  _interact2.default.createSnapGrid = _interact2.default.snappers.grid;
+
+  // autoScroll
+  _interact2.default.use(_autoScroll2.default);
+
+  // reflow
+  _interact2.default.use(_reflow2.default);
+
+  return _interact2.default;
+}
+
+if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === 'object') {
+  init(window);
+}
+
+exports.default = _interact2.default;
+exports.interact = _interact2.default;
+
+},{"./interact":24,"@interactjs/actions":6,"@interactjs/autoScroll":8,"@interactjs/autoStart":13,"@interactjs/core/interactablePreventDefault":19,"@interactjs/inertia":22,"@interactjs/modifiers":26,"@interactjs/pointerEvents":36,"@interactjs/reflow":38,"@interactjs/utils/snappers":59}],24:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.scope = undefined;
+
+var _browser = _dereq_('@interactjs/utils/browser');
+
+var _browser2 = _interopRequireDefault(_browser);
+
+var _events = _dereq_('@interactjs/utils/events');
+
+var _events2 = _interopRequireDefault(_events);
+
+var _utils = _dereq_('@interactjs/utils');
+
+var utils = _interopRequireWildcard(_utils);
+
+var _scope = _dereq_('@interactjs/core/scope');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/** @module interact */
+
+var globalEvents = {};
+var scope = (0, _scope.createScope)();
+
+/**
+ * ```js
+ * interact('#draggable').draggable(true);
+ *
+ * var rectables = interact('rect');
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   });
+ * ```
+ *
+ * The methods of this variable can be used to set elements as interactables
+ * and also to change various default settings.
+ *
+ * Calling it as a function and passing an element or a valid CSS selector
+ * string returns an Interactable object which has various methods to configure
+ * it.
+ *
+ * @global
+ *
+ * @param {Element | string} target The HTML or SVG Element to interact with
+ * or CSS selector
+ * @return {Interactable}
+ */
+function interact(target, options) {
+  var interactable = scope.interactables.get(target, options);
+
+  if (!interactable) {
+    interactable = scope.interactables.new(target, options);
+    interactable.events.global = globalEvents;
+  }
+
+  return interactable;
+}
+
+/**
+ * Use a plugin
+ *
+ * @alias module:interact.use
+ *
+ * @param {Object} plugin
+ * @param {function} plugin.init
+ * @return {interact}
+*/
+interact.use = function (plugin) {
+  plugin.init(scope);
+  return interact;
+};
+
+/**
+ * Check if an element or selector has been set with the {@link interact}
+ * function
+ *
+ * @alias module:interact.isSet
+ *
+ * @param {Element} element The Element being searched for
+ * @return {boolean} Indicates if the element or CSS selector was previously
+ * passed to interact
+*/
+interact.isSet = function (element, options) {
+  return scope.interactables.indexOfElement(element, options && options.context) !== -1;
+};
+
+/**
+ * Add a global listener for an InteractEvent or adds a DOM event to `document`
+ *
+ * @alias module:interact.on
+ *
+ * @param {string | array | object} type The types of events to listen for
+ * @param {function} listener The function event (s)
+ * @param {object | boolean} [options] object or useCapture flag for
+ * addEventListener
+ * @return {object} interact
+ */
+interact.on = function (type, listener, options) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
+    type = type.trim().split(/ +/);
+  }
+
+  if (utils.is.array(type)) {
+    for (var _i = 0; _i < type.length; _i++) {
+      var _ref;
+
+      _ref = type[_i];
+      var eventType = _ref;
+
+      interact.on(eventType, listener, options);
+    }
+
+    return interact;
+  }
+
+  if (utils.is.object(type)) {
+    for (var prop in type) {
+      interact.on(prop, type[prop], listener);
+    }
+
+    return interact;
+  }
+
+  // if it is an InteractEvent type, add listener to globalEvents
+  if (utils.arr.contains(scope.actions.eventTypes, type)) {
+    // if this type of event was never bound
+    if (!globalEvents[type]) {
+      globalEvents[type] = [listener];
+    } else {
+      globalEvents[type].push(listener);
+    }
+  }
+  // If non InteractEvent type, addEventListener to document
+  else {
+      _events2.default.add(scope.document, type, listener, { options: options });
+    }
+
+  return interact;
+};
+
+/**
+ * Removes a global InteractEvent listener or DOM event from `document`
+ *
+ * @alias module:interact.off
+ *
+ * @param {string | array | object} type The types of events that were listened
+ * for
+ * @param {function} listener The listener function to be removed
+ * @param {object | boolean} options [options] object or useCapture flag for
+ * removeEventListener
+ * @return {object} interact
+ */
+interact.off = function (type, listener, options) {
+  if (utils.is.string(type) && type.search(' ') !== -1) {
+    type = type.trim().split(/ +/);
+  }
+
+  if (utils.is.array(type)) {
+    for (var _i2 = 0; _i2 < type.length; _i2++) {
+      var _ref2;
+
+      _ref2 = type[_i2];
+      var eventType = _ref2;
+
+      interact.off(eventType, listener, options);
+    }
+
+    return interact;
+  }
+
+  if (utils.is.object(type)) {
+    for (var prop in type) {
+      interact.off(prop, type[prop], listener);
+    }
+
+    return interact;
+  }
+
+  if (!utils.arr.contains(scope.actions.eventTypes, type)) {
+    _events2.default.remove(scope.document, type, listener, options);
+  } else {
+    var index = void 0;
+
+    if (type in globalEvents && (index = globalEvents[type].indexOf(listener)) !== -1) {
+      globalEvents[type].splice(index, 1);
+    }
+  }
+
+  return interact;
+};
+
+/**
+ * Returns an object which exposes internal data
+
+ * @alias module:interact.debug
+ *
+ * @return {object} An object with properties that outline the current state
+ * and expose internal functions and variables
+ */
+interact.debug = function () {
+  return scope;
+};
+
+// expose the functions used to calculate multi-touch properties
+interact.getPointerAverage = utils.pointer.pointerAverage;
+interact.getTouchBBox = utils.pointer.touchBBox;
+interact.getTouchDistance = utils.pointer.touchDistance;
+interact.getTouchAngle = utils.pointer.touchAngle;
+
+interact.getElementRect = utils.dom.getElementRect;
+interact.getElementClientRect = utils.dom.getElementClientRect;
+interact.matchesSelector = utils.dom.matchesSelector;
+interact.closest = utils.dom.closest;
+
+/**
+ * @alias module:interact.supportsTouch
+ *
+ * @return {boolean} Whether or not the browser supports touch input
+ */
+interact.supportsTouch = function () {
+  return _browser2.default.supportsTouch;
+};
+
+/**
+ * @alias module:interact.supportsPointerEvent
+ *
+ * @return {boolean} Whether or not the browser supports PointerEvents
+ */
+interact.supportsPointerEvent = function () {
+  return _browser2.default.supportsPointerEvent;
+};
+
+/**
+ * Cancels all interactions (end events are not fired)
+ *
+ * @alias module:interact.stop
+ *
+ * @param {Event} event An event on which to call preventDefault()
+ * @return {object} interact
+ */
+interact.stop = function (event) {
+  for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
+    var _ref3;
+
+    _ref3 = scope.interactions.list[_i3];
+    var interaction = _ref3;
+
+    interaction.stop(event);
+  }
+
+  return interact;
+};
+
+/**
+ * Returns or sets the distance the pointer must be moved before an action
+ * sequence occurs. This also affects tolerance for tap events.
+ *
+ * @alias module:interact.pointerMoveTolerance
+ *
+ * @param {number} [newValue] The movement from the start position must be greater than this value
+ * @return {interact | number}
+ */
+interact.pointerMoveTolerance = function (newValue) {
+  if (utils.is.number(newValue)) {
+    scope.interactions.pointerMoveTolerance = newValue;
+
+    return interact;
+  }
+
+  return scope.interactions.pointerMoveTolerance;
+};
+
+scope.interactables.signals.on('unset', function (_ref4) {
+  var interactable = _ref4.interactable;
+
+  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
+
+  // Stop related interactions when an Interactable is unset
+  for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
+    var _ref5;
+
+    _ref5 = scope.interactions.list[_i4];
+    var interaction = _ref5;
+
+    if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
+      interaction.stop();
+    }
+  }
+});
+interact.addDocument = scope.addDocument;
+interact.removeDocument = scope.removeDocument;
+
+scope.interact = interact;
+
+exports.scope = scope;
+exports.default = interact;
+
+},{"@interactjs/core/scope":21,"@interactjs/utils":49,"@interactjs/utils/browser":41,"@interactjs/utils/events":45}],25:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
@@ -6000,12 +5060,12 @@ function init(scope) {
   });
 
   interactions.signals.on('before-action-start', function (arg) {
-    return start(arg, scope.modifiers, arg.interaction.startCoords.page);
+    return start(arg, scope.modifiers, arg.interaction.coords.start.page);
   });
 
   interactions.signals.on('action-resume', function (arg) {
     beforeMove(arg, scope.modifiers);
-    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+    start(arg, scope.modifiers, arg.interaction.coords.cur.page);
   });
 
   interactions.signals.on('before-action-move', function (arg) {
@@ -6023,7 +5083,7 @@ function init(scope) {
   });
 }
 
-function setOffsets(arg, modifiers) {
+function startAll(arg, modifiers) {
   var interaction = arg.interaction,
       page = arg.pageCoords;
   var target = interaction.target,
@@ -6060,12 +5120,13 @@ function setOffsets(arg, modifiers) {
     var modifierName = _ref;
 
     arg.options = target.options[interaction.prepared.name][modifierName];
+    arg.status = arg.statuses[modifierName];
 
     if (!arg.options) {
       continue;
     }
 
-    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].setOffset(arg);
+    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].start(arg);
   }
 }
 
@@ -6116,7 +5177,7 @@ function setAll(arg, modifiers) {
     }
   }
 
-  var changed = interaction.curCoords.page.x !== arg.modifiedCoords.x || interaction.curCoords.page.y !== arg.modifiedCoords.y;
+  var changed = interaction.coords.cur.page.x !== arg.modifiedCoords.x || interaction.coords.cur.page.y !== arg.modifiedCoords.y;
 
   // a move should be fired if:
   //  - there are no modifiers enabled,
@@ -6146,33 +5207,34 @@ function resetStatuses(statuses, modifiers) {
 }
 
 function start(_ref4, modifiers, pageCoords) {
-  var interaction = _ref4.interaction;
+  var interaction = _ref4.interaction,
+      phase = _ref4.phase;
 
   var arg = {
     interaction: interaction,
     pageCoords: pageCoords,
+    phase: phase,
     startOffset: interaction.modifiers.startOffset,
     statuses: interaction.modifiers.statuses,
     preEnd: false,
     requireEndOnly: false
   };
 
-  setOffsets(arg, modifiers);
+  startAll(arg, modifiers);
   resetStatuses(arg.statuses, modifiers);
 
-  arg.pageCoords = (0, _extend2.default)({}, interaction.startCoords.page);
+  arg.pageCoords = (0, _extend2.default)({}, interaction.coords.start.page);
   interaction.modifiers.result = setAll(arg, modifiers);
 }
 
 function beforeMove(_ref5, modifiers) {
   var interaction = _ref5.interaction,
-      preEnd = _ref5.preEnd,
-      interactingBeforeMove = _ref5.interactingBeforeMove;
+      preEnd = _ref5.preEnd;
 
   var modifierResult = setAll({
     interaction: interaction,
     preEnd: preEnd,
-    pageCoords: interaction.curCoords.page,
+    pageCoords: interaction.coords.cur.page,
     statuses: interaction.modifiers.statuses,
     requireEndOnly: false
   }, modifiers);
@@ -6181,7 +5243,7 @@ function beforeMove(_ref5, modifiers) {
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
-  if (!modifierResult.shouldMove && interactingBeforeMove) {
+  if (!modifierResult.shouldMove && interaction.interacting()) {
     return false;
   }
 }
@@ -6211,23 +5273,26 @@ function setCurCoords(arg, modifiers) {
   var interaction = arg.interaction;
 
   var modifierArg = (0, _extend2.default)({
-    page: interaction.curCoords.page,
-    client: interaction.curCoords.client
+    page: interaction.coords.cur.page,
+    client: interaction.coords.cur.client
   }, arg);
 
   for (var i = 0; i < modifiers.names.length; i++) {
     var modifierName = modifiers.names[i];
     modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
 
-    if (!modifierArg.options) {
+    if (!modifierArg.options || !modifierArg.options.enabled) {
       continue;
     }
 
-    var modifier = modifiers[modifierName];
+    var status = interaction.modifiers.statuses[modifierName];
 
-    modifierArg.status = interaction.modifiers.statuses[modifierName];
-
-    modifier.modifyCoords(modifierArg);
+    if (status.locked) {
+      modifierArg.page.x += status.delta.x;
+      modifierArg.page.y += status.delta.y;
+      modifierArg.client.x += status.delta.x;
+      modifierArg.client.y += status.delta.y;
+    }
   }
 }
 
@@ -6237,7 +5302,7 @@ function shouldDo(options, preEnd, requireEndOnly) {
 
 exports.default = {
   init: init,
-  setOffsets: setOffsets,
+  startAll: startAll,
   setAll: setAll,
   resetStatuses: resetStatuses,
   start: start,
@@ -6246,13 +5311,13 @@ exports.default = {
   shouldDo: shouldDo
 };
 
-},{"../utils/extend":126}],106:[function(_dereq_,module,exports){
+},{"@interactjs/utils/extend":46}],26:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.init = exports.restrictSize = exports.restrictEdges = exports.restrict = exports.snapSize = exports.snap = exports.modifiers = undefined;
+exports.init = exports.restrictSize = exports.restrictEdges = exports.restrict = exports.snapEdges = exports.snapSize = exports.snap = exports.modifiers = undefined;
 
 var _base = _dereq_('./base');
 
@@ -6265,6 +5330,10 @@ var _snap2 = _interopRequireDefault(_snap);
 var _snapSize = _dereq_('./snapSize');
 
 var _snapSize2 = _interopRequireDefault(_snapSize);
+
+var _snapEdges = _dereq_('./snapEdges');
+
+var _snapEdges2 = _interopRequireDefault(_snapEdges);
 
 var _restrict = _dereq_('./restrict');
 
@@ -6284,6 +5353,7 @@ function init(scope) {
   _base2.default.init(scope);
   _snap2.default.init(scope);
   _snapSize2.default.init(scope);
+  _snapEdges2.default.init(scope);
   _restrict2.default.init(scope);
   _restrictEdges2.default.init(scope);
   _restrictSize2.default.init(scope);
@@ -6292,27 +5362,28 @@ function init(scope) {
 exports.modifiers = _base2.default;
 exports.snap = _snap2.default;
 exports.snapSize = _snapSize2.default;
+exports.snapEdges = _snapEdges2.default;
 exports.restrict = _restrict2.default;
 exports.restrictEdges = _restrictEdges2.default;
 exports.restrictSize = _restrictSize2.default;
 exports.init = init;
 
-},{"./base":105,"./restrict":107,"./restrictEdges":108,"./restrictSize":109,"./snap":110,"./snapSize":111}],107:[function(_dereq_,module,exports){
+},{"./base":25,"./restrict":27,"./restrictEdges":28,"./restrictSize":29,"./snap":30,"./snapEdges":31,"./snapSize":32}],27:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _is = _dereq_('../utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _extend = _dereq_('../utils/extend');
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _rect = _dereq_('../utils/rect');
+var _rect = _dereq_('@interactjs/utils/rect');
 
 var _rect2 = _interopRequireDefault(_rect);
 
@@ -6331,7 +5402,7 @@ function init(scope) {
   defaults.perAction.restrict = restrict.defaults;
 }
 
-function setOffset(_ref) {
+function start(_ref) {
   var rect = _ref.rect,
       startOffset = _ref.startOffset,
       options = _ref.options;
@@ -6356,11 +5427,12 @@ function set(_ref2) {
   var modifiedCoords = _ref2.modifiedCoords,
       interaction = _ref2.interaction,
       status = _ref2.status,
+      phase = _ref2.phase,
       offset = _ref2.offset,
       options = _ref2.options;
 
-  if (!options) {
-    return status;
+  if (phase === 'start' && options.elementRect) {
+    return;
   }
 
   var page = (0, _extend2.default)({}, modifiedCoords);
@@ -6399,26 +5471,6 @@ function set(_ref2) {
   status.modifiedY = modifiedY;
 }
 
-function modifyCoords(_ref3) {
-  var page = _ref3.page,
-      client = _ref3.client,
-      status = _ref3.status,
-      phase = _ref3.phase,
-      options = _ref3.options;
-
-  var elementRect = options && options.elementRect;
-
-  if (options && options.enabled && !(phase === 'start' && elementRect && status.locked)) {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-  }
-}
-
 function getRestrictionRect(value, interaction, page) {
   if (is.func(value)) {
     return _rect2.default.resolveRectLike(value, interaction.target, interaction.element, [page.x, page.y, interaction]);
@@ -6429,9 +5481,8 @@ function getRestrictionRect(value, interaction, page) {
 
 var restrict = {
   init: init,
-  setOffset: setOffset,
+  start: start,
   set: set,
-  modifyCoords: modifyCoords,
   getRestrictionRect: getRestrictionRect,
   defaults: {
     enabled: false,
@@ -6443,18 +5494,18 @@ var restrict = {
 
 exports.default = restrict;
 
-},{"../utils/extend":126,"../utils/is":131,"../utils/rect":136}],108:[function(_dereq_,module,exports){
+},{"@interactjs/utils/extend":46,"@interactjs/utils/is":51,"@interactjs/utils/rect":57}],28:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extend = _dereq_('../utils/extend');
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _rect = _dereq_('../utils/rect');
+var _rect = _dereq_('@interactjs/utils/rect');
 
 var _rect2 = _interopRequireDefault(_rect);
 
@@ -6489,7 +5540,7 @@ function init(scope) {
   defaults.perAction.restrictEdges = restrictEdges.defaults;
 }
 
-function setOffset(_ref) {
+function start(_ref) {
   var interaction = _ref.interaction,
       options = _ref.options;
 
@@ -6497,7 +5548,7 @@ function setOffset(_ref) {
   var offset = void 0;
 
   if (options) {
-    var offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+    var offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page);
 
     offset = _rect2.default.rectToXY(offsetRect);
   }
@@ -6516,12 +5567,13 @@ function set(_ref2) {
   var modifiedCoords = _ref2.modifiedCoords,
       interaction = _ref2.interaction,
       status = _ref2.status,
+      phase = _ref2.phase,
       offset = _ref2.offset,
       options = _ref2.options;
 
   var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges) {
+  if (!interaction.interacting() || !edges || phase === 'start') {
     return;
   }
 
@@ -6556,24 +5608,6 @@ function set(_ref2) {
   status.locked = !!(status.delta.x || status.delta.y);
 }
 
-function modifyCoords(_ref3) {
-  var page = _ref3.page,
-      client = _ref3.client,
-      status = _ref3.status,
-      phase = _ref3.phase,
-      options = _ref3.options;
-
-  if (options && options.enabled && phase !== 'start') {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-  }
-}
-
 function fixRect(rect, defaults) {
   var _arr = ['top', 'left', 'bottom', 'right'];
 
@@ -6592,9 +5626,8 @@ var restrictEdges = {
   noInner: noInner,
   noOuter: noOuter,
   getRestrictionRect: getRestrictionRect,
-  setOffset: setOffset,
+  start: start,
   set: set,
-  modifyCoords: modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
@@ -6606,18 +5639,18 @@ var restrictEdges = {
 
 exports.default = restrictEdges;
 
-},{"../utils/extend":126,"../utils/rect":136,"./restrict":107}],109:[function(_dereq_,module,exports){
+},{"./restrict":27,"@interactjs/utils/extend":46,"@interactjs/utils/rect":57}],29:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extend = _dereq_('../utils/extend');
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _rect = _dereq_('../utils/rect');
+var _rect = _dereq_('@interactjs/utils/rect');
 
 var _rect2 = _interopRequireDefault(_rect);
 
@@ -6651,19 +5684,20 @@ function init(scope) {
   defaults.perAction.restrictSize = restrictSize.defaults;
 }
 
-function setOffset(_ref) {
+function start(_ref) {
   var interaction = _ref.interaction;
 
-  return _restrictEdges2.default.setOffset({ interaction: interaction });
+  return _restrictEdges2.default.start({ interaction: interaction });
 }
 
 function set(arg) {
   var interaction = arg.interaction,
-      options = arg.options;
+      options = arg.options,
+      phase = arg.phase;
 
   var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges) {
+  if (!interaction.interacting() || !edges || phase === 'start') {
     return;
   }
 
@@ -6699,9 +5733,8 @@ function set(arg) {
 
 var restrictSize = {
   init: init,
-  setOffset: setOffset,
+  start: start,
   set: set,
-  modifyCoords: _restrictEdges2.default.modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
@@ -6712,14 +5745,14 @@ var restrictSize = {
 
 exports.default = restrictSize;
 
-},{"../utils/extend":126,"../utils/rect":136,"./restrictEdges":108}],110:[function(_dereq_,module,exports){
+},{"./restrictEdges":28,"@interactjs/utils/extend":46,"@interactjs/utils/rect":57}],30:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -6736,7 +5769,7 @@ function init(scope) {
   defaults.perAction.snap = snap.defaults;
 }
 
-function setOffset(_ref) {
+function start(_ref) {
   var interaction = _ref.interaction,
       interactable = _ref.interactable,
       element = _ref.element,
@@ -6753,8 +5786,8 @@ function setOffset(_ref) {
 
   if (options.offset === 'startCoords') {
     snapOffset = {
-      x: interaction.startCoords.page.x - origin.x,
-      y: interaction.startCoords.page.y - origin.y
+      x: interaction.coords.start.page.x - origin.x,
+      y: interaction.coords.start.page.y - origin.y
     };
   } else {
     var offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
@@ -6787,8 +5820,15 @@ function set(_ref4) {
   var interaction = _ref4.interaction,
       modifiedCoords = _ref4.modifiedCoords,
       status = _ref4.status,
+      phase = _ref4.phase,
       options = _ref4.options,
       offsets = _ref4.offset;
+
+  var relativePoints = options && options.relativePoints;
+
+  if (phase === 'start' && relativePoints && relativePoints.length) {
+    return;
+  }
 
   var origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
   var page = utils.extend({}, modifiedCoords);
@@ -6896,42 +5936,10 @@ function set(_ref4) {
   status.locked = closest.inRange;
 }
 
-function modifyCoords(_ref8) {
-  var page = _ref8.page,
-      client = _ref8.client,
-      status = _ref8.status,
-      phase = _ref8.phase,
-      options = _ref8.options;
-
-  var relativePoints = options && options.relativePoints;
-
-  if (options && options.enabled && !(phase === 'start' && relativePoints && relativePoints.length)) {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-
-    return {
-      range: status.range,
-      locked: status.locked,
-      x: status.modifiedX,
-      y: status.modifiedY,
-      realX: status.realX,
-      realY: status.realY,
-      dx: status.delta.x,
-      dy: status.delta.y
-    };
-  }
-}
-
 var snap = {
   init: init,
-  setOffset: setOffset,
+  start: start,
   set: set,
-  modifyCoords: modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
@@ -6945,18 +5953,108 @@ var snap = {
 
 exports.default = snap;
 
-},{"../utils":129}],111:[function(_dereq_,module,exports){
+},{"@interactjs/utils":49}],31:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _extend = _dereq_('../utils/extend');
+var _clone = _dereq_('@interactjs/utils/clone');
+
+var _clone2 = _interopRequireDefault(_clone);
+
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _is = _dereq_('../utils/is');
+var _snapSize = _dereq_('./snapSize');
+
+var _snapSize2 = _interopRequireDefault(_snapSize);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function init(scope) {
+  var modifiers = scope.modifiers,
+      defaults = scope.defaults;
+
+
+  modifiers.snapEdges = snapEdges;
+  modifiers.names.push('snapEdges');
+
+  defaults.perAction.snapEdges = snapEdges.defaults;
+} /**
+   * @module modifiers/snapEdges
+   *
+   * @description
+   * This module allows snapping of the edges of targets during resize
+   * interactions.
+   *
+   * @example
+   * interact(target).resizable({
+   *   snapEdges: {
+   *     targets: [interact.snappers.grid({ x: 100, y: 50 })],
+   *   },
+   * });
+   *
+   * interact(target).resizable({
+   *   snapEdges: {
+   *     targets: [
+   *       interact.snappers.grid({
+   *        top: 50,
+   *        left: 50,
+   *        bottom: 100,
+   *        right: 100,
+   *       }),
+   *     ],
+   *   },
+   * });
+   */
+
+function start(arg) {
+  var edges = arg.interaction.prepared.edges;
+
+  if (!edges) {
+    return null;
+  }
+
+  arg.status.targetFields = arg.status.targetFields || [[edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom']];
+
+  return _snapSize2.default.start(arg);
+}
+
+function set(arg) {
+  return _snapSize2.default.set(arg);
+}
+
+function modifyCoords(arg) {
+  _snapSize2.default.modifyCoords(arg);
+}
+
+var snapEdges = {
+  init: init,
+  start: start,
+  set: set,
+  modifyCoords: modifyCoords,
+  defaults: (0, _extend2.default)((0, _clone2.default)(_snapSize2.default.defaults), {
+    offset: { x: 0, y: 0 }
+  })
+};
+
+exports.default = snapEdges;
+
+},{"./snapSize":32,"@interactjs/utils/clone":42,"@interactjs/utils/extend":46}],32:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extend = _dereq_('@interactjs/utils/extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
@@ -6980,14 +6078,15 @@ function init(scope) {
 } // This module allows snapping of the size of targets during resize
 // interactions.
 
-function setOffset(arg) {
+function start(arg) {
   var interaction = arg.interaction,
+      status = arg.status,
       options = arg.options;
 
   var edges = interaction.prepared.edges;
 
   if (!edges) {
-    return;
+    return null;
   }
 
   arg.options = {
@@ -6996,11 +6095,13 @@ function setOffset(arg) {
       y: edges.top ? 0 : 1
     }],
     origin: { x: 0, y: 0 },
-    offset: 'self',
+    offset: options.offset || 'self',
     range: options.range
   };
 
-  var offsets = _snap2.default.setOffset(arg);
+  status.targetFields = status.targetFields || [['width', 'height'], ['x', 'y']];
+
+  var offsets = _snap2.default.start(arg);
   arg.options = options;
 
   return offsets;
@@ -7008,13 +6109,15 @@ function setOffset(arg) {
 
 function set(arg) {
   var interaction = arg.interaction,
+      status = arg.status,
       options = arg.options,
       offset = arg.offset,
       modifiedCoords = arg.modifiedCoords;
 
-  var page = (0, _extend2.default)({}, modifiedCoords);
-  var relativeX = page.x - offset[0].x;
-  var relativeY = page.y - offset[0].y;
+  var relative = {
+    x: modifiedCoords.x - offset[0].x,
+    y: modifiedCoords.y - offset[0].y
+  };
 
   arg.options = (0, _extend2.default)({}, options);
   arg.options.targets = [];
@@ -7028,7 +6131,7 @@ function set(arg) {
     var target = void 0;
 
     if (is.func(snapTarget)) {
-      target = snapTarget(relativeX, relativeY, interaction);
+      target = snapTarget(relative.x, relative.y, interaction);
     } else {
       target = snapTarget;
     }
@@ -7037,9 +6140,20 @@ function set(arg) {
       continue;
     }
 
-    if ('width' in target && 'height' in target) {
-      target.x = target.width;
-      target.y = target.height;
+    for (var _i2 = 0; _i2 < status.targetFields.length; _i2++) {
+      var _ref3;
+
+      _ref3 = status.targetFields[_i2];
+      var _ref2 = _ref3;
+      var xField = _ref2[0];
+      var yField = _ref2[1];
+
+      if (xField in target || yField in target) {
+        target.x = target[xField];
+        target.y = target[yField];
+
+        break;
+      }
     }
 
     arg.options.targets.push(target);
@@ -7048,54 +6162,41 @@ function set(arg) {
   _snap2.default.set(arg);
 }
 
-function modifyCoords(arg) {
-  var options = arg.options;
-
-
-  arg.options = (0, _extend2.default)({}, options);
-  arg.options.enabled = options.enabled;
-  arg.options.relativePoints = [null];
-
-  _snap2.default.modifyCoords(arg);
-}
-
 var snapSize = {
   init: init,
-  setOffset: setOffset,
+  start: start,
   set: set,
-  modifyCoords: modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,
     range: Infinity,
     targets: null,
+    offset: null,
     offsets: null
   }
 };
 
 exports.default = snapSize;
 
-},{"../utils/extend":126,"../utils/is":131,"./snap":110}],112:[function(_dereq_,module,exports){
+},{"./snap":30,"@interactjs/utils/extend":46,"@interactjs/utils/is":51}],33:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _pointerUtils = _dereq_('../utils/pointerUtils');
+var _pointerUtils = _dereq_('@interactjs/utils/pointerUtils');
 
 var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var PointerEvent = function () {
   /** */
   function PointerEvent(type, pointer, event, eventTarget, interaction) {
-    (0, _classCallCheck3.default)(this, PointerEvent);
+    _classCallCheck(this, PointerEvent);
 
     _pointerUtils2.default.pointerExtend(this, event);
 
@@ -7175,14 +6276,14 @@ var PointerEvent = function () {
 
 exports.default = PointerEvent;
 
-},{"../utils/pointerUtils":134,"babel-runtime/helpers/classCallCheck":7}],113:[function(_dereq_,module,exports){
+},{"@interactjs/utils/pointerUtils":55}],34:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _utils = _dereq_('../utils');
+var _utils = _dereq_('@interactjs/utils');
 
 var utils = _interopRequireWildcard(_utils);
 
@@ -7338,9 +6439,14 @@ function init(scope) {
     interaction.holdTimers = []; // [{ duration, timeout }]
   });
 
-  interactions.signals.on('update-pointer-down', function (_ref3) {
+  interactions.signals.on('update-pointer', function (_ref3) {
     var interaction = _ref3.interaction,
+        down = _ref3.down,
         pointerIndex = _ref3.pointerIndex;
+
+    if (!down) {
+      return;
+    }
 
     interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
   });
@@ -7477,7 +6583,7 @@ function createSignalListener(type) {
 
 exports.default = pointerEvents;
 
-},{"../utils":129,"./PointerEvent":112}],114:[function(_dereq_,module,exports){
+},{"./PointerEvent":33,"@interactjs/utils":49}],35:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7559,7 +6665,7 @@ exports.default = {
   init: init
 };
 
-},{}],115:[function(_dereq_,module,exports){
+},{}],36:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7592,22 +6698,22 @@ exports.holdRepeat = _holdRepeat2.default;
 exports.interactableTargets = _interactableTargets2.default;
 exports.init = init;
 
-},{"./base":113,"./holdRepeat":114,"./interactableTargets":116}],116:[function(_dereq_,module,exports){
+},{"./base":34,"./holdRepeat":35,"./interactableTargets":37}],37:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _is = _dereq_('../utils/is');
+var _is = _dereq_('@interactjs/utils/is');
 
 var is = _interopRequireWildcard(_is);
 
-var _extend = _dereq_('../utils/extend');
+var _extend = _dereq_('@interactjs/utils/extend');
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _arr = _dereq_('../utils/arr');
+var _arr = _dereq_('@interactjs/utils/arr');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7630,7 +6736,7 @@ function init(scope) {
       var eventable = interactable.events;
       var options = eventable.options;
 
-      if (eventable[type] && is.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+      if (eventable.types[type] && eventable.types[type].length && is.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
 
         targets.push({
           element: element,
@@ -7682,7 +6788,7 @@ exports.default = {
   init: init
 };
 
-},{"../utils/arr":120,"../utils/extend":126,"../utils/is":131}],117:[function(_dereq_,module,exports){
+},{"@interactjs/utils/arr":40,"@interactjs/utils/extend":46,"@interactjs/utils/is":51}],38:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -7690,9 +6796,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.init = init;
 
-var _interactions = _dereq_('./interactions');
+var _interactions = _dereq_('@interactjs/core/interactions');
 
-var _utils = _dereq_('./utils');
+var _utils = _dereq_('@interactjs/utils');
 
 function init(scope) {
   var actions = scope.actions,
@@ -7715,6 +6821,7 @@ function init(scope) {
     var interaction = _ref2.interaction;
 
     if (interaction.pointerType === 'reflow') {
+      interaction._reflowResolve();
       _utils.arr.remove(scope.interactions.list, interaction);
     }
   });
@@ -7733,6 +6840,7 @@ function init(scope) {
    *
    * @param { Object } action The action to begin
    * @param { string } action.name The name of the action
+   * @returns { Promise<Interactable> }
    */
   Interactable.prototype.reflow = function (action) {
     return reflow(this, action, scope);
@@ -7742,12 +6850,43 @@ function init(scope) {
 function reflow(interactable, action, scope) {
   var elements = _utils.is.string(interactable.target) ? _utils.arr.from(interactable._context.querySelectorAll(interactable.target)) : [interactable.target];
 
-  // follow autoStart max interaction settings
-  if (scope.autoStart) {
-    elements = elements.filter(function (element) {
-      return scope.autoStart.withinInteractionLimit(interactable, element, action, scope);
+  var Promise = _utils.win.window.Promise;
+  var promises = Promise ? [] : null;
+
+  var _loop = function _loop(element) {
+    var rect = interactable.getRect(element);
+
+    if (!rect) {
+      return 'break';
+    }
+
+    var runningInteraction = _utils.arr.find(scope.interactions.list, function (interaction) {
+      return interaction.interacting() && interaction.target === interactable && interaction.element === element && interaction.prepared.name === action.name;
     });
-  }
+    var reflowPromise = void 0;
+
+    if (runningInteraction) {
+      runningInteraction.move();
+
+      reflowPromise = runningInteraction._reflowPromise || new Promise(function (resolve) {
+        runningInteraction._reflowResolve = resolve;
+      });
+    } else {
+      var xywh = _utils.rect.tlbrToXywh(rect);
+      var coords = {
+        page: { x: xywh.x, y: xywh.y },
+        client: { x: xywh.x, y: xywh.y },
+        timeStamp: Date.now()
+      };
+
+      var event = _utils.pointer.coordsToEvent(coords);
+      reflowPromise = startReflow(scope, interactable, element, action, event);
+    }
+
+    if (promises) {
+      promises.push(reflowPromise);
+    }
+  };
 
   for (var _i2 = 0; _i2 < elements.length; _i2++) {
     var _ref3;
@@ -7755,206 +6894,69 @@ function reflow(interactable, action, scope) {
     _ref3 = elements[_i2];
     var element = _ref3;
 
-    var interaction = (0, _interactions.newInteraction)({ pointerType: 'reflow' }, scope);
+    var _ret = _loop(element);
 
-    var rect = interactable.getRect(element);
-
-    if (!rect) {
-      break;
-    }
-
-    var xywh = _utils.rect.tlbrToXywh(rect);
-    var coords = {
-      page: xywh,
-      client: xywh
-    };
-    var event = (0, _utils.extend)(_utils.pointer.coordsToEvent(coords), coords);
-    var signalArg = {
-      interaction: interaction,
-      event: event,
-      pointer: event,
-      eventTarget: element,
-      phase: 'reflow'
-    };
-
-    interaction.target = interactable;
-    interaction.element = element;
-    interaction.prepared = (0, _utils.extend)({}, action);
-    interaction.prevEvent = event;
-    interaction.updatePointer(event, event, element, true);
-
-    interaction._doPhase(signalArg);
-
-    signalArg.phase = 'start';
-    interaction._interacting = interaction._doPhase(signalArg);
-
-    if (interaction._interacting) {
-      interaction.move(signalArg);
-      interaction.end(event);
-    } else {
-      interaction.stop();
-    }
-
-    interaction.removePointer(event, event);
-    interaction.pointerIsDown = false;
+    if (_ret === 'break') break;
   }
+
+  return promises && Promise.all(promises).then(function () {
+    return interactable;
+  });
+}
+
+function startReflow(scope, interactable, element, action, event) {
+  var interaction = (0, _interactions.newInteraction)({ pointerType: 'reflow' }, scope);
+  var signalArg = {
+    interaction: interaction,
+    event: event,
+    pointer: event,
+    eventTarget: element,
+    phase: 'reflow'
+  };
+
+  interaction.target = interactable;
+  interaction.element = element;
+  interaction.prepared = (0, _utils.extend)({}, action);
+  interaction.prevEvent = event;
+  interaction.updatePointer(event, event, element, true);
+
+  interaction._doPhase(signalArg);
+
+  var reflowPromise = _utils.win.window.Promise ? new _utils.win.window.Promise(function (resolve) {
+    interaction._reflowResolve = resolve;
+  }) : null;
+
+  signalArg.phase = 'start';
+  interaction._reflowPromise = reflowPromise;
+  interaction._interacting = interaction._doPhase(signalArg);
+
+  if (interaction._interacting) {
+    interaction.move(signalArg);
+    interaction.end(event);
+  } else {
+    interaction.stop();
+  }
+
+  interaction.removePointer(event, event);
+  interaction.pointerIsDown = false;
+
+  return reflowPromise;
 }
 
 exports.default = { init: init };
 
-},{"./interactions":104,"./utils":129}],118:[function(_dereq_,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.scope = undefined;
-
-var _classCallCheck2 = _dereq_('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _possibleConstructorReturn2 = _dereq_('babel-runtime/helpers/possibleConstructorReturn');
-
-var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-var _inherits2 = _dereq_('babel-runtime/helpers/inherits');
-
-var _inherits3 = _interopRequireDefault(_inherits2);
-
-exports.init = init;
-
-var _Eventable = _dereq_('./Eventable');
-
-var _Eventable2 = _interopRequireDefault(_Eventable);
-
-var _defaultOptions = _dereq_('./defaultOptions');
-
-var _defaultOptions2 = _interopRequireDefault(_defaultOptions);
-
-var _utils = _dereq_('./utils');
-
-var utils = _interopRequireWildcard(_utils);
-
-var _domObjects = _dereq_('./utils/domObjects');
-
-var _domObjects2 = _interopRequireDefault(_domObjects);
-
-var _InteractEvent = _dereq_('./InteractEvent');
-
-var _InteractEvent2 = _interopRequireDefault(_InteractEvent);
-
-var _Interactable2 = _dereq_('./Interactable');
-
-var _Interactable3 = _interopRequireDefault(_Interactable2);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var win = utils.win,
-    browser = utils.browser,
-    raf = utils.raf,
-    Signals = utils.Signals,
-    events = utils.events;
-var scope = exports.scope = {
-  Signals: Signals,
-  signals: new Signals(),
-  browser: browser,
-  events: events,
-  utils: utils,
-  defaults: _defaultOptions2.default,
-  Eventable: _Eventable2.default,
-
-  // main document
-  document: null,
-  // all documents being listened to
-  documents: [/* { doc, options } */],
-
-  addDocument: function addDocument(doc, options) {
-    // do nothing if document is already known
-    if (scope.getDocIndex(doc) !== -1) {
-      return false;
-    }
-
-    var window = win.getWindow(doc);
-
-    scope.documents.push({ doc: doc, options: options });
-    events.documents.push(doc);
-
-    // don't add an unload event for the main document
-    // so that the page may be cached in browser history
-    if (doc !== scope.document) {
-      events.add(window, 'unload', scope.onWindowUnload);
-    }
-
-    scope.signals.fire('add-document', { doc: doc, window: window, scope: scope, options: options });
-  },
-  removeDocument: function removeDocument(doc) {
-    var index = scope.getDocIndex(doc);
-
-    var window = win.getWindow(doc);
-    var options = scope.documents[index].options;
-
-    events.remove(window, 'unload', scope.onWindowUnload);
-
-    scope.documents.splice(index, 1);
-    events.documents.splice(index, 1);
-
-    scope.signals.fire('remove-document', { doc: doc, window: window, scope: scope, options: options });
-  },
-  onWindowUnload: function onWindowUnload(event) {
-    scope.removeDocument(event.target.document);
-  },
-  getDocIndex: function getDocIndex(doc) {
-    for (var i = 0; i < scope.documents.length; i++) {
-      if (scope.documents[i].doc === doc) {
-        return i;
-      }
-    }
-
-    return -1;
-  }
-};
-
-function init(window) {
-  win.init(window);
-  _domObjects2.default.init(window);
-  browser.init(window);
-  raf.init(window);
-
-  scope.document = window.document;
-
-  scope.InteractEvent = _InteractEvent2.default;
-  // eslint-disable-next-line no-shadow
-  scope.Interactable = function (_Interactable) {
-    (0, _inherits3.default)(Interactable, _Interactable);
-
-    function Interactable() {
-      (0, _classCallCheck3.default)(this, Interactable);
-      return (0, _possibleConstructorReturn3.default)(this, _Interactable.apply(this, arguments));
-    }
-
-    return Interactable;
-  }(_Interactable3.default);
-}
-
-},{"./Eventable":83,"./InteractEvent":84,"./Interactable":85,"./defaultOptions":99,"./utils":129,"./utils/domObjects":123,"babel-runtime/helpers/classCallCheck":7,"babel-runtime/helpers/inherits":9,"babel-runtime/helpers/possibleConstructorReturn":10}],119:[function(_dereq_,module,exports){
+},{"@interactjs/core/interactions":20,"@interactjs/utils":49}],39:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _classCallCheck2 = _dereq_("babel-runtime/helpers/classCallCheck");
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Signals = function () {
   function Signals() {
-    (0, _classCallCheck3.default)(this, Signals);
+    _classCallCheck(this, Signals);
 
     this.listeners = {
       // signalName: [listeners],
@@ -8006,7 +7008,7 @@ var Signals = function () {
 
 exports.default = Signals;
 
-},{"babel-runtime/helpers/classCallCheck":7}],120:[function(_dereq_,module,exports){
+},{}],40:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8062,7 +7064,7 @@ function some(array, func) {
   return findIndex(array, func) !== -1;
 }
 
-},{}],121:[function(_dereq_,module,exports){
+},{}],41:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8135,7 +7137,7 @@ function init(window) {
   browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto');
 }
 
-},{"./domObjects":123,"./is":131,"./window":139}],122:[function(_dereq_,module,exports){
+},{"./domObjects":43,"./is":51,"./window":60}],42:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8171,7 +7173,7 @@ function clone(source) {
   return dest;
 }
 
-},{"./arr":120,"./is":131}],123:[function(_dereq_,module,exports){
+},{"./arr":40,"./is":51}],43:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8200,7 +7202,7 @@ function init(window) {
   domObjects.PointerEvent = window.PointerEvent || window.MSPointerEvent;
 }
 
-},{}],124:[function(_dereq_,module,exports){
+},{}],44:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8459,7 +7461,7 @@ function trySelector(value) {
   return true;
 }
 
-},{"./browser":121,"./domObjects":123,"./is":131,"./window":139}],125:[function(_dereq_,module,exports){
+},{"./browser":41,"./domObjects":43,"./is":51,"./window":60}],45:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8764,7 +7766,7 @@ exports.default = {
   }
 };
 
-},{"./arr":120,"./domUtils":124,"./is":131,"./pointerExtend":133,"./pointerUtils":134}],126:[function(_dereq_,module,exports){
+},{"./arr":40,"./domUtils":44,"./is":51,"./pointerExtend":54,"./pointerUtils":55}],46:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8778,7 +7780,7 @@ function extend(dest, source) {
   return dest;
 }
 
-},{}],127:[function(_dereq_,module,exports){
+},{}],47:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -8797,7 +7799,7 @@ exports.default = function (target, element, action) {
 
 var _rect = _dereq_('./rect');
 
-},{"./rect":136}],128:[function(_dereq_,module,exports){
+},{"./rect":57}],48:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8808,30 +7810,121 @@ exports.default = function (x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-},{}],129:[function(_dereq_,module,exports){
+},{}],49:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.events = exports.browser = exports.win = exports.raf = exports.rect = exports.pointer = exports.is = exports.hypot = exports.getOriginXY = exports.extend = exports.dom = exports.arr = exports.Signals = undefined;
+exports.normaizeListeners = exports.hypot = exports.events = exports.rect = exports.pointer = exports.getOriginXY = exports.clone = exports.extend = exports.raf = exports.Signals = exports.browser = exports.is = exports.dom = exports.arr = exports.win = undefined;
 exports.warnOnce = warnOnce;
 exports._getQBezierValue = _getQBezierValue;
 exports.getQuadraticCurvePoint = getQuadraticCurvePoint;
 exports.easeOutQuad = easeOutQuad;
 exports.copyAction = copyAction;
 
-var _window = _dereq_('./window');
-
-var _window2 = _interopRequireDefault(_window);
-
 var _browser = _dereq_('./browser');
 
-var _browser2 = _interopRequireDefault(_browser);
+Object.defineProperty(exports, 'browser', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_browser).default;
+  }
+});
 
 var _Signals = _dereq_('./Signals');
 
-var _Signals2 = _interopRequireDefault(_Signals);
+Object.defineProperty(exports, 'Signals', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_Signals).default;
+  }
+});
+
+var _raf = _dereq_('./raf');
+
+Object.defineProperty(exports, 'raf', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_raf).default;
+  }
+});
+
+var _extend = _dereq_('./extend');
+
+Object.defineProperty(exports, 'extend', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_extend).default;
+  }
+});
+
+var _clone = _dereq_('./clone');
+
+Object.defineProperty(exports, 'clone', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_clone).default;
+  }
+});
+
+var _getOriginXY = _dereq_('./getOriginXY');
+
+Object.defineProperty(exports, 'getOriginXY', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_getOriginXY).default;
+  }
+});
+
+var _pointerUtils = _dereq_('./pointerUtils');
+
+Object.defineProperty(exports, 'pointer', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_pointerUtils).default;
+  }
+});
+
+var _rect = _dereq_('./rect');
+
+Object.defineProperty(exports, 'rect', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_rect).default;
+  }
+});
+
+var _events = _dereq_('./events');
+
+Object.defineProperty(exports, 'events', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_events).default;
+  }
+});
+
+var _hypot = _dereq_('./hypot');
+
+Object.defineProperty(exports, 'hypot', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_hypot).default;
+  }
+});
+
+var _normalizeListeners = _dereq_('./normalizeListeners');
+
+Object.defineProperty(exports, 'normaizeListeners', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_normalizeListeners).default;
+  }
+});
+
+var _window = _dereq_('./window');
+
+var _window2 = _interopRequireDefault(_window);
 
 var _arr = _dereq_('./arr');
 
@@ -8841,37 +7934,9 @@ var _domUtils = _dereq_('./domUtils');
 
 var dom = _interopRequireWildcard(_domUtils);
 
-var _raf = _dereq_('./raf');
-
-var _raf2 = _interopRequireDefault(_raf);
-
-var _extend = _dereq_('./extend');
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _getOriginXY = _dereq_('./getOriginXY');
-
-var _getOriginXY2 = _interopRequireDefault(_getOriginXY);
-
-var _hypot = _dereq_('./hypot');
-
-var _hypot2 = _interopRequireDefault(_hypot);
-
 var _is = _dereq_('./is');
 
 var is = _interopRequireWildcard(_is);
-
-var _pointerUtils = _dereq_('./pointerUtils');
-
-var _pointerUtils2 = _interopRequireDefault(_pointerUtils);
-
-var _rect = _dereq_('./rect');
-
-var _rect2 = _interopRequireDefault(_rect);
-
-var _events = _dereq_('./events');
-
-var _events2 = _interopRequireDefault(_events);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -8917,21 +7982,12 @@ function copyAction(dest, src) {
   return dest;
 }
 
-exports.Signals = _Signals2.default;
+exports.win = _window2.default;
 exports.arr = arr;
 exports.dom = dom;
-exports.extend = _extend2.default;
-exports.getOriginXY = _getOriginXY2.default;
-exports.hypot = _hypot2.default;
 exports.is = is;
-exports.pointer = _pointerUtils2.default;
-exports.rect = _rect2.default;
-exports.raf = _raf2.default;
-exports.win = _window2.default;
-exports.browser = _browser2.default;
-exports.events = _events2.default;
 
-},{"./Signals":119,"./arr":120,"./browser":121,"./domUtils":124,"./events":125,"./extend":126,"./getOriginXY":127,"./hypot":128,"./is":131,"./pointerUtils":134,"./raf":135,"./rect":136,"./window":139}],130:[function(_dereq_,module,exports){
+},{"./Signals":39,"./arr":40,"./browser":41,"./clone":42,"./domUtils":44,"./events":45,"./extend":46,"./getOriginXY":47,"./hypot":48,"./is":51,"./normalizeListeners":53,"./pointerUtils":55,"./raf":56,"./rect":57,"./window":60}],50:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9114,7 +8170,7 @@ function hasPointerId(interaction, pointerId) {
 
 exports.default = finder;
 
-},{"./index":129}],131:[function(_dereq_,module,exports){
+},{"./index":49}],51:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9122,9 +8178,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.array = exports.plainObject = exports.element = exports.string = exports.bool = exports.number = exports.func = exports.object = exports.docFrag = exports.window = undefined;
 
-var _typeof2 = _dereq_('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _window2 = _dereq_('./window');
 
@@ -9145,7 +8199,7 @@ var docFrag = exports.docFrag = function docFrag(thing) {
 };
 
 var object = exports.object = function object(thing) {
-  return !!thing && (typeof thing === 'undefined' ? 'undefined' : (0, _typeof3.default)(thing)) === 'object';
+  return !!thing && (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) === 'object';
 };
 
 var func = exports.func = function func(thing) {
@@ -9165,26 +8219,26 @@ var string = exports.string = function string(thing) {
 };
 
 var element = exports.element = function element(thing) {
-  if (!thing || (typeof thing === 'undefined' ? 'undefined' : (0, _typeof3.default)(thing)) !== 'object') {
+  if (!thing || (typeof thing === 'undefined' ? 'undefined' : _typeof(thing)) !== 'object') {
     return false;
   }
 
   var _window = _window3.default.getWindow(thing) || _window3.default.window;
 
-  return (/object|function/.test((0, _typeof3.default)(_window.Element)) ? thing instanceof _window.Element //DOM2
+  return (/object|function/.test(_typeof(_window.Element)) ? thing instanceof _window.Element //DOM2
     : thing.nodeType === 1 && typeof thing.nodeName === 'string'
   );
 };
 
 var plainObject = exports.plainObject = function plainObject(thing) {
-  return object(thing) && thing.constructor.name === 'Object';
+  return object(thing) && !!thing.constructor && thing.constructor.name === 'Object';
 };
 
 var array = exports.array = function array(thing) {
   return object(thing) && typeof thing.length !== 'undefined' && func(thing.splice);
 };
 
-},{"./isWindow":132,"./window":139,"babel-runtime/helpers/typeof":11}],132:[function(_dereq_,module,exports){
+},{"./isWindow":52,"./window":60}],52:[function(_dereq_,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9195,7 +8249,67 @@ exports.default = function (thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-},{}],133:[function(_dereq_,module,exports){
+},{}],53:[function(_dereq_,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = normalize;
+
+var _is = _dereq_('./is');
+
+var is = _interopRequireWildcard(_is);
+
+var _extend = _dereq_('./extend');
+
+var _extend2 = _interopRequireDefault(_extend);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function normalize(type, listener, result) {
+  result = result || {};
+
+  if (is.string(type) && type.search(' ') !== -1) {
+    type = type.trim().split(/ +/);
+  }
+
+  if (is.array(type)) {
+    return type.reduce(function (acc, t) {
+      return (0, _extend2.default)(acc, normalize(t, listener, result));
+    }, {});
+  }
+
+  // ({ type: fn }) -> ('', { type: fn })
+  if (is.object(type)) {
+    listener = type;
+    type = '';
+  }
+
+  if (is.func(listener)) {
+    result[type] = result[type] || [];
+    result[type].push(listener);
+  } else if (is.array(listener)) {
+    for (var _i = 0; _i < listener.length; _i++) {
+      var _ref;
+
+      _ref = listener[_i];
+      var l = _ref;
+
+      normalize(type, l, result);
+    }
+  } else if (is.object(listener)) {
+    for (var prefix in listener) {
+      normalize('' + type + prefix, listener[prefix], result);
+    }
+  }
+
+  return result;
+}
+
+},{"./extend":46,"./is":51}],54:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9226,7 +8340,7 @@ pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
 };
 
-},{}],134:[function(_dereq_,module,exports){
+},{}],55:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9280,18 +8394,18 @@ var pointerUtils = {
     targetObj.client.x = cur.client.x - prev.client.x;
     targetObj.client.y = cur.client.y - prev.client.y;
     targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
-
-    // set pointer velocity
-    var dt = Math.max(targetObj.timeStamp / 1000, 0.001);
-
-    targetObj.page.speed = (0, _hypot2.default)(targetObj.page.x, targetObj.page.y) / dt;
-    targetObj.page.vx = targetObj.page.x / dt;
-    targetObj.page.vy = targetObj.page.y / dt;
-
-    targetObj.client.speed = (0, _hypot2.default)(targetObj.client.x, targetObj.page.y) / dt;
-    targetObj.client.vx = targetObj.client.x / dt;
-    targetObj.client.vy = targetObj.client.y / dt;
   },
+
+  setCoordVelocity: function setCoordVelocity(targetObj, delta) {
+    var dt = Math.max(delta.timeStamp / 1000, 0.001);
+
+    targetObj.page.x = delta.page.x / dt;
+    targetObj.page.y = delta.page.y / dt;
+    targetObj.client.x = delta.client.x / dt;
+    targetObj.client.y = delta.client.y / dt;
+    targetObj.timeStamp = dt;
+  },
+
 
   isNativePointer: function isNativePointer(pointer) {
     return pointer instanceof _domObjects2.default.Event || pointer instanceof _domObjects2.default.Touch;
@@ -9470,11 +8584,24 @@ var pointerUtils = {
     return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
   },
 
+  newCoords: function newCoords() {
+    return {
+      page: { x: 0, y: 0 },
+      client: { x: 0, y: 0 },
+      timeStamp: 0
+    };
+  },
+
+
   coordsToEvent: function coordsToEvent(_ref2) {
     var page = _ref2.page,
-        client = _ref2.client;
+        client = _ref2.client,
+        timeStamp = _ref2.timeStamp;
 
     return {
+      page: page,
+      client: client,
+      timeStamp: timeStamp,
       pageX: page.x,
       pageY: page.y,
       clientX: client.x,
@@ -9485,7 +8612,7 @@ var pointerUtils = {
 
 exports.default = pointerUtils;
 
-},{"./browser":121,"./domObjects":123,"./domUtils":124,"./hypot":128,"./is":131,"./pointerExtend":133}],135:[function(_dereq_,module,exports){
+},{"./browser":41,"./domObjects":43,"./domUtils":44,"./hypot":48,"./is":51,"./pointerExtend":54}],56:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9537,7 +8664,7 @@ exports.default = {
   init: init
 };
 
-},{}],136:[function(_dereq_,module,exports){
+},{}],57:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9634,57 +8761,55 @@ exports.default = {
   tlbrToXywh: tlbrToXywh
 };
 
-},{"./domUtils":124,"./extend":126,"./is":131}],137:[function(_dereq_,module,exports){
+},{"./domUtils":44,"./extend":46,"./is":51}],58:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _is = _dereq_('../is');
-
-var is = _interopRequireWildcard(_is);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
 exports.default = function (grid) {
+  var coordFields = [['x', 'y'], ['left', 'top'], ['right', 'bottom'], ['width', 'height']].filter(function (_ref) {
+    var xField = _ref[0],
+        yField = _ref[1];
+    return xField in grid || yField in grid;
+  });
+
   return function (x, y) {
-    var gridX = grid.x,
-        gridY = grid.y,
-        range = grid.range,
-        offset = grid.offset,
+    var range = grid.range,
         _grid$limits = grid.limits,
         limits = _grid$limits === undefined ? {
       left: -Infinity,
       right: Infinity,
       top: -Infinity,
       bottom: Infinity
-    } : _grid$limits;
+    } : _grid$limits,
+        _grid$offset = grid.offset,
+        offset = _grid$offset === undefined ? { x: 0, y: 0 } : _grid$offset;
 
 
-    var offsetX = 0;
-    var offsetY = 0;
+    var result = { range: range };
 
-    if (is.object(offset)) {
-      offsetX = offset.x;
-      offsetY = offset.y;
+    for (var _i = 0; _i < coordFields.length; _i++) {
+      var _ref3;
+
+      _ref3 = coordFields[_i];
+      var _ref2 = _ref3;
+      var xField = _ref2[0];
+      var yField = _ref2[1];
+
+      var gridx = Math.round((x - offset.x) / grid[xField]);
+      var gridy = Math.round((y - offset.y) / grid[yField]);
+
+      result[xField] = Math.max(limits.left, Math.min(limits.right, gridx * grid[xField] + offset.x));
+      result[yField] = Math.max(limits.top, Math.min(limits.bottom, gridy * grid[yField] + offset.y));
     }
 
-    var gridx = Math.round((x - offsetX) / gridX);
-    var gridy = Math.round((y - offsetY) / gridY);
-
-    var newX = Math.max(limits.left, Math.min(limits.right, gridx * gridX + offsetX));
-    var newY = Math.max(limits.top, Math.min(limits.bottom, gridy * gridY + offsetY));
-
-    return {
-      x: newX,
-      y: newY,
-      range: range
-    };
+    return result;
   };
 };
 
-},{"../is":131}],138:[function(_dereq_,module,exports){
+},{}],59:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9700,7 +8825,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 exports.grid = _grid2.default;
 
-},{"./grid":137}],139:[function(_dereq_,module,exports){
+},{"./grid":58}],60:[function(_dereq_,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9758,7 +8883,7 @@ win.init = init;
 
 exports.default = win;
 
-},{"./isWindow":132}]},{},[1])(1)
+},{"./isWindow":52}]},{},[1])(1)
 });
 
 

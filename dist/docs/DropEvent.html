@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Interaction - Documentation</title>
+    <title>DropEvent - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Interaction</h1>
+    <h1 class="page-title">DropEvent</h1>
     
 
     
@@ -44,7 +44,7 @@
 <header>
     
         <h2>
-        Interaction
+        DropEvent
         </h2>
         
     
@@ -58,11 +58,15 @@
 
     
 
-    <h4 class="name" id="Interaction"><span class="type-signature"></span>new Interaction<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="DropEvent"><span class="type-signature"></span>new DropEvent<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
+
+<div class="description">
+    <p>Class of events fired on dropzones during drags with acceptable targets.</p>
+</div>
 
 
 
@@ -97,7 +101,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line10">line 10</a>
+        <a href="actions_drop_DropEvent.js.html">actions/drop/DropEvent.js</a>, <a href="actions_drop_DropEvent.js.html#line7">line 7</a>
     </li></ul></dd>
     
 
@@ -146,70 +150,6 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<div class="section-members">
-<h4 class="name" id="move"><span class="type-signature"></span>move<span class="type-signature"></span></h4>
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line415">line 415</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-</div>
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -220,24 +160,17 @@
 
     
 
-    <h4 class="name" id="end"><span class="type-signature"></span>end<span class="signature">(event<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="reject"><span class="type-signature"></span>reject<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    <pre class="prettyprint source lang-js"><code>interact(target)
-  .draggable(true)
-  .on('move', function (event) {
-    if (event.pageX > 1000) {
-      // end the current action
-      event.interaction.end();
-      // stop all further listeners from being called
-      event.stopImmediatePropagation();
-    }
-  });
-</code></pre>
+    <p>If this is a <code>dropactivate</code> event, the dropzone element will be
+deactivated.</p>
+<p>If this is a <code>dragmove</code> or <code>dragenter</code>, a <code>dragleave</code> will be fired on the
+dropzone element and more.</p>
 </div>
 
 
@@ -273,481 +206,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line246">line 246</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>event</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>PointerEvent</code></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="param-description last">
-                
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="move"><span class="type-signature"></span>move<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <pre class="prettyprint source lang-js"><code>interact(target)
-  .draggable(true)
-  .on('dragmove', function (event) {
-    if (someCondition) {
-      // change the snap settings
-      event.interactable.draggable({ snap: { targets: [] }});
-      // fire another move event with re-calculated snap
-      event.interaction.move();
-    }
-  });
-</code></pre>
-<p>Force a move of the current action at the same coordinates. Useful if
-snap/restrict has been changed and you want a movement with the new
-settings.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line190">line 190</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="start"><span class="type-signature"></span>start<span class="signature">(action, target, element)</span><span class="type-signature"> &rarr; {object}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <pre class="prettyprint source lang-js"><code>interact(target)
-  .draggable({
-    // disable the default drag start by down->move
-    manualStart: true
-  })
-  // start dragging after the user holds the pointer down
-  .on('hold', function (event) {
-    var interaction = event.interaction;
-
-    if (!interaction.interacting()) {
-      interaction.start({ name: 'drag' },
-                        event.interactable,
-                        event.currentTarget);
-    }
-});
-</code></pre>
-<p>Start an action with the given Interactable and Element as tartgets. The
-action must be enabled for the target Interactable and an appropriate
-number of pointers must be held down - 1 for drag/resize, 2 for gesture.</p>
-<p>Use it with <code>interactable.&lt;action&gt;able({ manualStart: false })</code> to always
-<a href="https://github.com/taye/interact.js/issues/114">start actions manually</a></p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line101">line 101</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>action</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>object</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="param-description last">
-                <p>The action to be performed - drag, resize, etc.</p>
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>target</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code><a href="Interactable.html">Interactable</a></code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="param-description last">
-                <p>The Interactable to target</p>
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>element</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>Element</code></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="param-description last">
-                <p>The DOM Element to target</p>
-                
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="section-returns">
-<h5>Returns:</h5>
-
-        
-
-<dl class="param-type">
-    <dt>
-        Type:
-    </dt>
-    <dd>
-        
-<span class="param-type"><code>object</code></span>
-
-
-    </dd>
-</dl>
-
-
-<div class="param-desc">
-    <p>interact</p>
-</div>
-
-    
-</div>
-
-
-
-</div>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="stop"><span class="type-signature"></span>stop<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="core_Interaction.js.html">core/Interaction.js</a>, <a href="core_Interaction.js.html#line275">line 275</a>
+        <a href="actions_drop_DropEvent.js.html">actions/drop/DropEvent.js</a>, <a href="actions_drop_DropEvent.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
