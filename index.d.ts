@@ -330,7 +330,7 @@ declare namespace interact {
     set ( options: any ) : Interactable
     styleCursor ( yesno: boolean ) : Interactable
     test ( x : SnapFunction ) : any
-    unset(): void
+    unset(): Interactable
   }
 
   interface InteractOptions {
