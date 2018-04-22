@@ -101,7 +101,7 @@ declare namespace interact {
     hold?: number
     snap?: SnapOptions
     restrict?: RestrictOption
-    inertia?: InertiaOption
+    inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
     onstart?: Listener
     onmove?: Listener
@@ -174,11 +174,15 @@ declare namespace interact {
     ondrop?: Listener
   }
 
+  interface OriginFunction {
+    ( target: DOMElement ) : 'self' | 'parent' | Rect | Position | CSSSelector | DOMElement;
+  }
+
   interface PointerEventsOptions {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-    origin?: 'self' | any // TODO: What are the options here, beyond 'self'?
+    origin?: 'self' | 'parent' | Rect | Position | CSSSelector | DOMElement | OriginFunction;
   }
 
   interface RectChecker {
@@ -299,7 +303,7 @@ declare namespace interact {
 
   interface Interactable {
     actionChecker ( checker: ActionChecker) : Interactable
-    context () : Node // TODO: Correct or should it be DOMElement (any)?
+    context () : Node;
     deltaSource () : string | object
     deltaSource ( newValue : string | object): Interactable
     fire ( iEvent : InteractEvent) : Interactable
@@ -326,7 +330,7 @@ declare namespace interact {
     set ( options: any ) : Interactable
     styleCursor ( yesno: boolean ) : Interactable
     test ( x : SnapFunction ) : any
-    unset(): void // TODO: JSDoc and code doesn't seem to agree here?
+    unset(): void
   }
 
   interface InteractOptions {
@@ -339,7 +343,6 @@ declare namespace interact {
 
   interface InteractStatic {
     ( el: DOMElement | CSSSelector, opts?: InteractOptions | any): Interactable
-    debug (): any
     maxInteractions () : number
     maxInteractions ( newValue: number) : InteractStatic
     off ( opt: OnEvent | OnEventFunctions, listener?: Listener ) : InteractStatic
@@ -351,9 +354,8 @@ declare namespace interact {
     pointerMoveTolerance ( tol: number ) : InteractStatic
     createSnapGrid ( grid: { x: number, y: number, range: number, offset?: Position, limits?: Rect } ) : SnapFunction
     isSet ( element: DOMElement | CSSSelector ) : boolean
-    debug () : any // TODO: Add typings for scope. But should this really be part of the public API?
-    addDocument ( document: any, options: any ) : void // TODO: Not sure about types. Is Document a DOM Document?
-    removeDocument ( document: any, options: any ) : void // TODO: Not sure about types. Is Document a DOM Document?
+    addDocument ( document: Document, options: any ) : void
+    removeDocument ( document: Document, options: any ) : void
     use ( plugin: Plugin) : InteractStatic;
   }
 }
