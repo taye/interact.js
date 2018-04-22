@@ -20,18 +20,18 @@
     "main": "index"
   },
   "scripts": {
-    "start": "node build --watch",
-    "build": "node build --docs",
-    "lint": "node build/lint",
-    "test": "npm run lint -- --fail-on-error && NODE_ENV=test nyc --silent node tests/index.js | tap-spec && nyc report",
-    "docs": "node build/docs -- --go",
+    "start": "node packages/_dev/build --watch",
+    "build": "node packages/_dev/build --docs",
+    "lint": "node packages/_dev/build/lint",
+    "test": "npm run lint -- --fail-on-error && NODE_ENV=test nyc --silent node packages/_dev/test/index.js | tap-spec && nyc report && nyc check-coverage",
+    "docs": "node packages/_dev/build/docs -- --go",
     "precommit": "npm run lint -- --fail-on-error",
     "prepush": "npm run preversion",
     "preversion": "npm test",
     "postversion": "",
-    "release": "sh build/release.sh",
-    "pre-release": "sh build/release.sh prerelease",
-    "bump": "node build/bump $@"
+    "release": "sh packages/_dev/build/release.sh",
+    "pre-release": "sh packages/_dev/build/release.sh prerelease",
+    "bump": "node packages/_dev/build/bump $@"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
   "homepage": "http://interactjs.io",
@@ -78,6 +78,7 @@
     "eslint": "^4.18.2",
     "eslint-plugin-require-path-exists": "^1.1.5",
     "fs-extra": "^4.0.2",
+    "glob": "^7.1.2",
     "husky": "^0.13.1",
     "jsdoc": "github:taye/jsdoc#master",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
@@ -91,19 +92,5 @@
     "through2": "^2.0.0",
     "uglify-js": "^2.7.5",
     "watchify": "^3.9.0"
-  },
-  "nyc": {
-    "require": [
-      "./build/babel-register"
-    ],
-    "include": [
-      "src"
-    ],
-    "reporter": [
-      "text",
-      "lcov"
-    ],
-    "sourceMap": false,
-    "instrument": false
   }
 }

@@ -1,0 +1,23 @@
+{
+  "per-file": false,
+  "statements": 53,
+  "lines": 53,
+  "branches": 33,
+  "functions": 50,
+  "include": [
+    "packages"
+  ],
+  "exclude": [
+    "**/_*",
+    "**/tests"
+  ],
+  "reporter": [
+    "text",
+    "lcov"
+  ],
+  "require": [
+    "@interactjs/_dev/babel-register"
+  ],
+  "sourceMap": false,
+  "instrument": false
+}
