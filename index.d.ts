@@ -362,4 +362,4 @@ declare namespace interact {
 
 declare var interact:interact.InteractStatic;
 export as namespace interact;
-  export = interact;
+export = interact;
