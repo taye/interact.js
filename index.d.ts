@@ -352,7 +352,7 @@ declare namespace interact {
     stop ( event: any ) : InteractStatic
     pointerMoveTolerance () : number
     pointerMoveTolerance ( tol: number ) : InteractStatic
-    createSnapGrid ( grid: { x: number, y: number, range: number, offset?: Position, limits?: Rect } ) : SnapFunction
+    createSnapGrid ( grid: { x: number, y: number, range?: number, offset?: Position, limits?: Rect } ) : SnapFunction
     isSet ( element: DOMElement | CSSSelector ) : boolean
     addDocument ( document: Document, options: any ) : void
     removeDocument ( document: Document, options: any ) : void
@@ -362,4 +362,4 @@ declare namespace interact {
 
 declare var interact:interact.InteractStatic;
 export as namespace interact;
-export = interact;
+  export = interact;
