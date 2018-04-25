@@ -2,6 +2,7 @@ import * as is       from './is';
 import * as domUtils from './domUtils';
 import pointerUtils  from './pointerUtils';
 import pExtend       from './pointerExtend';
+import browser       from './browser';
 
 import { contains } from './arr';
 
@@ -41,6 +42,12 @@ function add (element, type, listener, optionalArg) {
   }
 
   if (!contains(target.events[type], listener)) {
+    // fix for #561: prevent container scrolling on iOS by setting
+    // passive = false
+    if (browser.isIOS) {
+      supportsOptions = true;
+      options.passive = false;
+    }
     element.addEventListener(type, listener, supportsOptions? options : !!options.capture);
     target.events[type].push(listener);
   }
