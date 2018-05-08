@@ -182,6 +182,7 @@ export function initScope (scope, window) {
   domObjects.init(window);
   browser.init(window);
   raf.init(window);
+  events.init(window);
 
   interactions.init(scope);
   scope.document = window.document;
