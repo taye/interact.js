@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.3+sha.e190fe4
+ * interact.js v1.4.0-alpha.4+sha.e13a63d
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
