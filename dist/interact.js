@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.4+sha.e13a63d
+ * interact.js v1.4.0-alpha.5+sha.4cd8a45
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -4272,6 +4272,7 @@ function initScope(scope, window) {
   _domObjects2.default.init(window);
   browser.init(window);
   raf.init(window);
+  events.init(window);
 
   _interactions2.default.init(scope);
   scope.document = window.document;
