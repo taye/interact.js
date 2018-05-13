@@ -1,10 +1,10 @@
-import Interaction  from './Interaction';
-import events       from '@interactjs/utils/events';
-import finder       from '@interactjs/utils/interactionFinder';
-import browser      from '@interactjs/utils/browser';
-import domObjects   from '@interactjs/utils/domObjects';
-import pointerUtils from '@interactjs/utils/pointerUtils';
-import Signals      from '@interactjs/utils/Signals';
+import InteractionBase from './Interaction';
+import events          from '@interactjs/utils/events';
+import finder          from '@interactjs/utils/interactionFinder';
+import browser         from '@interactjs/utils/browser';
+import domObjects      from '@interactjs/utils/domObjects';
+import pointerUtils    from '@interactjs/utils/pointerUtils';
+import Signals         from '@interactjs/utils/Signals';
 
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
@@ -52,8 +52,15 @@ function init (scope) {
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0;
 
-  // eslint-disable-next-line no-shadow
-  scope.Interaction = class Interaction extends Interaction {};
+  scope.Interaction = class Interaction extends InteractionBase {
+    get pointerMoveTolerance () {
+      return scope.interactions.pointerMoveTolerance;
+    }
+
+    set pointerMoveTolerance (value) {
+      scope.interactions.pointerMoveTolerance = value;
+    }
+  };
   scope.interactions = {
     signals,
     // all active and idle interactions
@@ -65,6 +72,7 @@ function init (scope) {
     },
     listeners,
     eventMap,
+    pointerMoveTolerance: 1,
   };
 
   scope.actions = {
@@ -88,16 +96,23 @@ function doOnInteractions (method, scope) {
       for (const changedTouch of event.changedTouches) {
         const pointer = changedTouch;
         const pointerId = pointerUtils.getPointerId(pointer);
-        const interaction = getInteraction({
+        const searchDetails = {
           pointer,
           pointerId,
           pointerType,
           eventType: event.type,
           eventTarget,
+          curEventTarget,
           scope,
-        });
+        };
+        const interaction = getInteraction(searchDetails);
 
-        matches.push([pointer, interaction]);
+        matches.push([
+          searchDetails.pointer,
+          searchDetails.eventTarget,
+          searchDetails.curEventTarget,
+          interaction,
+        ]);
       }
     }
     else {
@@ -118,20 +133,29 @@ function doOnInteractions (method, scope) {
       }
 
       if (!invalidPointer) {
-        const interaction = getInteraction({
+        const searchDetails = {
           pointer: event,
           pointerId: pointerUtils.getPointerId(event),
           pointerType,
           eventType: event.type,
+          curEventTarget,
           eventTarget,
           scope,
-        });
+        };
 
-        matches.push([event, interaction]);
+        const interaction = getInteraction(searchDetails);
+
+        matches.push([
+          searchDetails.pointer,
+          searchDetails.eventTarget,
+          searchDetails.curEventTarget,
+          interaction,
+        ]);
       }
     }
 
-    for (const [pointer, interaction] of matches) {
+    // eslint-disable-next-line no-shadow
+    for (const [pointer, eventTarget, curEventTarget, interaction] of matches) {
       interaction[method](pointer, event, eventTarget, curEventTarget);
     }
   });

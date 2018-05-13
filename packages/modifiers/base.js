@@ -17,11 +17,11 @@ function init (scope) {
   });
 
   interactions.signals.on('before-action-start' , arg =>
-    start(arg, scope.modifiers, arg.interaction.startCoords.page));
+    start(arg, scope.modifiers, arg.interaction.coords.start.page));
 
   interactions.signals.on('action-resume', arg => {
     beforeMove(arg, scope.modifiers);
-    start(arg, scope.modifiers, arg.interaction.curCoords.page);
+    start(arg, scope.modifiers, arg.interaction.coords.cur.page);
   });
 
   interactions.signals.on('before-action-move', arg => beforeMove(arg, scope.modifiers));
@@ -31,7 +31,7 @@ function init (scope) {
   interactions.signals.on('before-action-move', arg => setCurCoords(arg, scope.modifiers));
 }
 
-function setOffsets (arg, modifiers) {
+function startAll (arg, modifiers) {
   const { interaction, pageCoords: page } = arg;
   const { target, element, modifiers: { startOffset } } = interaction;
   const rect = target.getRect(element);
@@ -56,12 +56,13 @@ function setOffsets (arg, modifiers) {
 
   for (const modifierName of modifiers.names) {
     arg.options = target.options[interaction.prepared.name][modifierName];
+    arg.status = arg.statuses[modifierName];
 
     if (!arg.options) {
       continue;
     }
 
-    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].setOffset(arg);
+    interaction.modifiers.offsets[modifierName] = modifiers[modifierName].start(arg);
   }
 }
 
@@ -102,8 +103,8 @@ function setAll (arg, modifiers) {
   }
 
   const changed =
-    interaction.curCoords.page.x !== arg.modifiedCoords.x ||
-    interaction.curCoords.page.y !== arg.modifiedCoords.y;
+    interaction.coords.cur.page.x !== arg.modifiedCoords.x ||
+    interaction.coords.cur.page.y !== arg.modifiedCoords.y;
 
   // a move should be fired if:
   //  - there are no modifiers enabled,
@@ -127,29 +128,30 @@ function resetStatuses (statuses, modifiers) {
   return statuses;
 }
 
-function start ({ interaction }, modifiers, pageCoords) {
+function start ({ interaction, phase }, modifiers, pageCoords) {
   const arg = {
     interaction,
     pageCoords,
+    phase,
     startOffset: interaction.modifiers.startOffset,
     statuses: interaction.modifiers.statuses,
     preEnd: false,
     requireEndOnly: false,
   };
 
-  setOffsets(arg, modifiers);
+  startAll(arg, modifiers);
   resetStatuses(arg.statuses, modifiers);
 
-  arg.pageCoords = extend({}, interaction.startCoords.page);
+  arg.pageCoords = extend({}, interaction.coords.start.page);
   interaction.modifiers.result = setAll(arg, modifiers);
 }
 
-function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) {
+function beforeMove ({ interaction, preEnd }, modifiers) {
   const modifierResult = setAll(
     {
       interaction,
       preEnd,
-      pageCoords: interaction.curCoords.page,
+      pageCoords: interaction.coords.cur.page,
       statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
     }, modifiers);
@@ -158,7 +160,7 @@ function beforeMove ({ interaction, preEnd, interactingBeforeMove }, modifiers) 
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
-  if (!modifierResult.shouldMove && interactingBeforeMove) {
+  if (!modifierResult.shouldMove && interaction.interacting()) {
     return false;
   }
 }
@@ -179,23 +181,26 @@ function beforeEnd ({ interaction, event }, modifiers) {
 function setCurCoords (arg, modifiers) {
   const { interaction } = arg;
   const modifierArg = extend({
-    page: interaction.curCoords.page,
-    client: interaction.curCoords.client,
+    page: interaction.coords.cur.page,
+    client: interaction.coords.cur.client,
   }, arg);
 
   for (let i = 0; i < modifiers.names.length; i++) {
     const modifierName = modifiers.names[i];
     modifierArg.options = interaction.target.options[interaction.prepared.name][modifierName];
 
-    if (!modifierArg.options) {
+    if (!modifierArg.options || !modifierArg.options.enabled) {
       continue;
     }
 
-    const modifier = modifiers[modifierName];
+    const status = interaction.modifiers.statuses[modifierName];
 
-    modifierArg.status = interaction.modifiers.statuses[modifierName];
-
-    modifier.modifyCoords(modifierArg);
+    if (status.locked) {
+      modifierArg.page.x += status.delta.x;
+      modifierArg.page.y += status.delta.y;
+      modifierArg.client.x += status.delta.x;
+      modifierArg.client.y += status.delta.y;
+    }
   }
 }
 
@@ -207,7 +212,7 @@ function shouldDo (options, preEnd, requireEndOnly) {
 
 export default {
   init,
-  setOffsets,
+  startAll,
   setAll,
   resetStatuses,
   start,

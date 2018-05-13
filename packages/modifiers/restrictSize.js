@@ -28,15 +28,15 @@ function init (scope) {
   defaults.perAction.restrictSize = restrictSize.defaults;
 }
 
-function setOffset ({ interaction }) {
-  return restrictEdges.setOffset({ interaction });
+function start ({ interaction }) {
+  return restrictEdges.start({ interaction });
 }
 
 function set (arg) {
-  const { interaction, options } = arg;
+  const { interaction, options, phase } = arg;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges) {
+  if (!interaction.interacting() || !edges || phase === 'start') {
     return;
   }
 
@@ -74,9 +74,8 @@ function set (arg) {
 
 const restrictSize = {
   init,
-  setOffset,
+  start,
   set,
-  modifyCoords: restrictEdges.modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,

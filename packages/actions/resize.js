@@ -38,7 +38,7 @@ function init (scope) {
     checker: function (pointer, event, interactable, element, interaction, rect) {
       if (!rect) { return null; }
 
-      const page = utils.extend({}, interaction.curCoords.page);
+      const page = utils.extend({}, interaction.coords.cur.page);
       const options = interactable.options;
 
       if (options.resize.enabled) {

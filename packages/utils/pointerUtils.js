@@ -25,17 +25,16 @@ const pointerUtils = {
     targetObj.client.x  = cur.client.x  - prev.client.x;
     targetObj.client.y  = cur.client.y  - prev.client.y;
     targetObj.timeStamp = cur.timeStamp - prev.timeStamp;
+  },
 
-    // set pointer velocity
-    const dt = Math.max(targetObj.timeStamp / 1000, 0.001);
+  setCoordVelocity (targetObj, delta) {
+    const dt = Math.max(delta.timeStamp / 1000, 0.001);
 
-    targetObj.page.speed   = hypot(targetObj.page.x, targetObj.page.y) / dt;
-    targetObj.page.vx      = targetObj.page.x / dt;
-    targetObj.page.vy      = targetObj.page.y / dt;
-
-    targetObj.client.speed = hypot(targetObj.client.x, targetObj.page.y) / dt;
-    targetObj.client.vx    = targetObj.client.x / dt;
-    targetObj.client.vy    = targetObj.client.y / dt;
+    targetObj.page.x   = delta.page.x / dt;
+    targetObj.page.y   = delta.page.y / dt;
+    targetObj.client.x = delta.client.x / dt;
+    targetObj.client.y = delta.client.y / dt;
+    targetObj.timeStamp = dt;
   },
 
   isNativePointer: function  (pointer) {
@@ -223,6 +222,14 @@ const pointerUtils = {
       domUtils.getActualElement(path ? path[0] : event.target),
       domUtils.getActualElement(event.currentTarget),
     ];
+  },
+
+  newCoords () {
+    return {
+      page     : { x: 0, y: 0 },
+      client   : { x: 0, y: 0 },
+      timeStamp: 0,
+    };
   },
 
   coordsToEvent: function ({ page, client, timeStamp }) {

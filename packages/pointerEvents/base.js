@@ -141,7 +141,11 @@ function init (scope) {
     interaction.holdTimers = [];    // [{ duration, timeout }]
   });
 
-  interactions.signals.on('update-pointer-down', function ({ interaction, pointerIndex }) {
+  interactions.signals.on('update-pointer', function ({ interaction, down, pointerIndex }) {
+    if (!down) {
+      return;
+    }
+
     interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
   });
 

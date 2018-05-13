@@ -1,17 +1,4 @@
-import win         from './window';
-import browser     from './browser';
-import Signals     from './Signals';
-import * as arr    from './arr';
-import * as dom    from './domUtils';
-import raf         from './raf';
-import extend      from './extend';
-import clone       from './clone';
-import getOriginXY from './getOriginXY';
-import hypot       from './hypot';
-import * as is     from './is';
-import pointer     from './pointerUtils';
-import rect        from './rect';
-import events      from './events';
+import win from './window';
 
 export function warnOnce (method, message) {
   let warned = false;
@@ -53,19 +40,25 @@ export function copyAction (dest, src) {
   return dest;
 }
 
+import * as arr    from './arr';
+import * as dom    from './domUtils';
+import * as is     from './is';
+
 export {
-  Signals,
+  win,
   arr,
   dom,
-  extend,
-  clone,
-  getOriginXY,
-  hypot,
   is,
-  pointer,
-  rect,
-  raf,
-  win,
-  browser,
-  events,
 };
+
+export { default as browser }           from './browser';
+export { default as Signals }           from './Signals';
+export { default as raf }               from './raf';
+export { default as extend }            from './extend';
+export { default as clone }             from './clone';
+export { default as getOriginXY }       from './getOriginXY';
+export { default as pointer }           from './pointerUtils';
+export { default as rect }              from './rect';
+export { default as events }            from './events';
+export { default as hypot }             from './hypot';
+export { default as normaizeListeners } from './normalizeListeners';

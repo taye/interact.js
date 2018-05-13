@@ -29,12 +29,12 @@ function init (scope) {
   defaults.perAction.restrictEdges = restrictEdges.defaults;
 }
 
-function setOffset ({ interaction, options }) {
+function start ({ interaction, options }) {
   const startOffset = interaction.modifiers.startOffset;
   let offset;
 
   if (options) {
-    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.startCoords.page);
+    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page);
 
     offset = rectUtils.rectToXY(offsetRect);
   }
@@ -49,10 +49,10 @@ function setOffset ({ interaction, options }) {
   };
 }
 
-function set ({ modifiedCoords, interaction, status, offset, options }) {
+function set ({ modifiedCoords, interaction, status, phase, offset, options }) {
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges) {
+  if (!interaction.interacting() || !edges || phase === 'start') {
     return;
   }
 
@@ -89,18 +89,6 @@ function set ({ modifiedCoords, interaction, status, offset, options }) {
   status.locked = !!(status.delta.x || status.delta.y);
 }
 
-function modifyCoords ({ page, client, status, phase, options }) {
-  if (options && options.enabled && phase !== 'start') {
-
-    if (status.locked) {
-      page.x += status.delta.x;
-      page.y += status.delta.y;
-      client.x += status.delta.x;
-      client.y += status.delta.y;
-    }
-  }
-}
-
 function fixRect (rect, defaults) {
   for (const edge of ['top', 'left', 'bottom', 'right']) {
     if (!(edge in rect)) {
@@ -116,9 +104,8 @@ const restrictEdges = {
   noInner,
   noOuter,
   getRestrictionRect,
-  setOffset,
+  start,
   set,
-  modifyCoords,
   defaults: {
     enabled: false,
     endOnly: false,

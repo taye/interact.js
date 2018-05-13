@@ -63,7 +63,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 
         // update pointers to the down event's coordinates
         interaction.updatePointer(pointer, event, eventTarget, true);
-        utils.pointer.setCoords(interaction.curCoords, interaction.pointers);
+        utils.pointer.setCoords(interaction.coords.cur, interaction.pointers);
 
         // fire appropriate signals
         const signalArg = {
@@ -79,7 +79,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
         interaction._fireEvent(resumeEvent);
         modifiers.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
 
-        utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+        utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
         break;
       }
 
@@ -98,7 +98,8 @@ function release ({ interaction, event }, scope) {
   const options = getOptions(interaction);
 
   const now = new Date().getTime();
-  const pointerSpeed = interaction.pointerDelta.client.speed;
+  const { client: velocityClient } = interaction.coords.velocity;
+  const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y);
 
   let smoothEnd = false;
   let modifierResult;
@@ -109,13 +110,13 @@ function release ({ interaction, event }, scope) {
                      && event !== status.startEvent);
 
   const inertia = (inertiaPossible
-    && (now - interaction.curCoords.timeStamp) < 50
+    && (now - interaction.coords.cur.timeStamp) < 50
     && pointerSpeed > options.minSpeed
     && pointerSpeed > options.endSpeed);
 
   const modifierArg = {
     interaction,
-    pageCoords: utils.extend({}, interaction.curCoords.page),
+    pageCoords: utils.extend({}, interaction.coords.cur.page),
     statuses: {},
     preEnd: true,
     requireEndOnly: true,
@@ -134,7 +135,7 @@ function release ({ interaction, event }, scope) {
 
   if (!(inertia || smoothEnd)) { return; }
 
-  utils.pointer.copyCoords(status.upCoords, interaction.curCoords);
+  utils.pointer.copyCoords(status.upCoords, interaction.coords.cur);
 
   interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(
     interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
@@ -148,13 +149,13 @@ function release ({ interaction, event }, scope) {
   interaction.target.fire(status.startEvent);
 
   if (inertia) {
-    status.vx0 = interaction.pointerDelta.client.vx;
-    status.vy0 = interaction.pointerDelta.client.vy;
+    status.vx0 = interaction.coords.velocity.client.x;
+    status.vy0 = interaction.coords.velocity.client.y;
     status.v0 = pointerSpeed;
 
     calcInertia(interaction, status);
 
-    utils.extend(modifierArg.pageCoords, interaction.curCoords.page);
+    utils.extend(modifierArg.pageCoords, interaction.coords.cur.page);
 
     modifierArg.pageCoords.x += status.xe;
     modifierArg.pageCoords.y += status.ye;
@@ -211,7 +212,8 @@ function calcInertia (interaction, status) {
 
 function inertiaTick (interaction) {
   updateInertiaCoords(interaction);
-  utils.pointer.setCoordDeltas(interaction.pointerDelta, interaction.prevCoords, interaction.curCoords);
+  utils.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
+  utils.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
 
   const status = interaction.inertia;
   const options = getOptions(interaction);
@@ -251,7 +253,7 @@ function inertiaTick (interaction) {
     interaction.simulation = null;
   }
 
-  utils.pointer.copyCoords(interaction.prevCoords, interaction.curCoords);
+  utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
 }
 
 function smothEndTick (interaction) {
@@ -291,7 +293,7 @@ function updateInertiaCoords (interaction) {
   const pageUp   = status.upCoords.page;
   const clientUp = status.upCoords.client;
 
-  utils.pointer.setCoords(interaction.curCoords, [ {
+  utils.pointer.setCoords(interaction.coords.cur, [ {
     pageX  : pageUp.x   + status.sx,
     pageY  : pageUp.y   + status.sy,
     clientX: clientUp.x + status.sx,

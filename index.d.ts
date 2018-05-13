@@ -91,33 +91,31 @@ declare namespace interact {
     right?: boolean | CSSSelector | DOMElement
   }
 
-  interface DraggableOptions {
+  interface CommonOptions {
     enabled?: boolean
+    allowFrom?: string
+    ignoreFrom?: string
     max?: number
     maxPerElement?: number
     manualStart?: boolean
+    hold?: number
     snap?: SnapOptions
     restrict?: RestrictOption
     inertia?: InertiaOptions
     autoScroll?: AutoScrollOptions
-    axis?: 'x' | 'y'
     onstart?: Listener
     onmove?: Listener
-    oninertiastart?: Listener
     onend?: Listener
   }
 
-  interface ResizableOptions {
-    max?: number
-    maxPerElement?: number
-    manualStart?: boolean
-    snap?: SnapOptions
-    snapSize?: SnapOptions
-    restrict?: RestrictOption
-    inertia?: InertiaOptions
-    autoScroll?: AutoScrollOptions
-    restrictSize?: RestrictSizeOption
+  interface DraggableOptions extends CommonOptions{
+    axis?: 'x' | 'y'
+    oninertiastart?: Listener
+  }
 
+  interface ResizableOptions extends CommonOptions {
+    snapSize?: SnapOptions
+    restrictSize?: RestrictSizeOption
     square?: boolean
     edges?: EdgeOptions
     // deprecated
@@ -125,22 +123,31 @@ declare namespace interact {
     //
     invert?: 'none' | 'negate' | 'reposition'
     squareResize?: boolean
-    onstart?: Listener
-    onmove?: Listener
     oninertiastart?: Listener
-    onend?: Listener
   }
 
-  interface GesturableOptions {
-    enabled?: boolean,
-    max?: Number,
-    maxPerElement?: Number,
-    manualStart?: Boolean,
-    restrict?: RestrictOption
-    onstart?: Listener
-    onmove?: Listener
-    onend?: Listener
+  interface GesturableOptions extends CommonOptions {
   }
+
+  interface Interaction {
+    doMove () : void
+    end ( event: PointerEvent ): void
+    start ( action: Action ): any
+    stop () : void
+  }
+
+  interface Action {
+    name: 'drag' | 'resize' | 'gesture'
+    edges?: Partial<Rect>;
+  }
+
+  interface ActionChecker {
+    ( pointerEvent: any
+    , defaultAction: string
+    , interactable: Interactable
+    , element: DOMElement
+    , interaction: Interaction
+    ): Action }
 
   interface DropFunctionChecker {
     ( dragEvent: any // related drag operation
@@ -167,6 +174,22 @@ declare namespace interact {
     ondrop?: Listener
   }
 
+  interface OriginFunction {
+    ( target: DOMElement ) : 'self' | 'parent' | Rect | Position | CSSSelector | DOMElement;
+  }
+
+  interface PointerEventsOptions {
+    holdDuration?: number
+    allowFrom?: string
+    ignoreFrom?: string
+    origin?: 'self' | 'parent' | Rect | Position | CSSSelector | DOMElement | OriginFunction;
+  }
+
+  interface RectChecker {
+    ( element: Element ) : Partial<Rect & Rect3>
+  }
+
+  /* TODO: Might be a good idea to split into event types, if possible */
   interface InteractEvent {
     // For other things specific to each event (See W3C), use
     // event [ 'bubbles' ] instead of event.bubbles
@@ -175,7 +198,7 @@ declare namespace interact {
     target: DOMElement
     relatedTarget: DOMElement
     currentTarget: DOMElement
-    preventDefault ()
+    preventDefault (): void
     pageX: number
     pageY: number
     clientX: number
@@ -279,34 +302,61 @@ declare namespace interact {
   type OnEvent = OnEventName | OnEventName[]
 
   interface Interactable {
-    draggable ( opt: DraggableOptions ) : Interactable
-    resizable ( opt: ResizableOptions ) : Interactable
-    gesturable ( opt: GesturableOptions ) : Interactable
-    dropzone ( opt: DropZoneOptions ) : Interactable
+    actionChecker ( checker: ActionChecker) : Interactable
+    context () : Node;
+    deltaSource () : string | object
+    deltaSource ( newValue : string | object): Interactable
+    fire ( iEvent : InteractEvent) : Interactable
+    getRect ( element?: DOMElement ) : Partial<Rect & Rect3>
+    origin () : Element | Position | string;
+    origin ( origin: Element | Position | string ) : Interactable
+    draggable ()  : DraggableOptions
+    draggable ( opt: boolean | DraggableOptions ) : Interactable
+    resizable () : ResizableOptions
+    resizable ( opt: boolean | ResizableOptions ) : Interactable
+    gesturable () : GesturableOptions
+    gesturable ( opt: boolean | GesturableOptions ) : Interactable
+    dropzone () : DropZoneOptions
+    dropzone ( opt: boolean | DropZoneOptions | null ) : Interactable
+    pointerEvents () : PointerEventsOptions // TODO: This might actually be wrong. Is there a getter for pointerEvents?
+    pointerEvents ( opt: PointerEventsOptions) : Interactable
     on ( opt: OnEvent, listener?: Listener ) : Interactable
     on ( opt: OnEventFunctions ) : Interactable
+    off ( opt: OnEvent, listener?: Listener ) : Interactable
+    preventDefault ( ): 'always' | 'never' | 'auto';
+    preventDefault ( newValue : 'always' | 'never' | 'auto' ) : Interactable
+    rectChecker( ) : RectChecker
+    rectChecker( checker: RectChecker) : Interactable
+    set ( options: any ) : Interactable
     styleCursor ( yesno: boolean ) : Interactable
-    test ( x : SnapFunction )
+    test ( x : SnapFunction ) : any
+    unset(): Interactable
   }
 
   interface InteractOptions {
     context: DOMElement
   }
 
+  interface Plugin {
+    init ( scope: any ) : void // TODO: Add typings for scope
+  }
+
   interface InteractStatic {
-    ( el: DOMElement | CSSSelector, opts?: InteractOptions ): Interactable
-    on ( opt: OnEvent | OnEventFunctions, listener?: Listener ) : Interactable
+    ( el: DOMElement | CSSSelector, opts?: InteractOptions | any): Interactable
+    maxInteractions () : number
+    maxInteractions ( newValue: number) : InteractStatic
+    off ( opt: OnEvent | OnEventFunctions, listener?: Listener ) : InteractStatic
+    on ( opt: OnEvent | OnEventFunctions, listener?: Listener ) : InteractStatic
     supportsTouch () : boolean
     supportsPointerEvent () : boolean
     stop ( event: any ) : InteractStatic
-    pointerMoveTolerance ( tol?: number ) : number | InteractStatic
+    pointerMoveTolerance () : number
+    pointerMoveTolerance ( tol: number ) : InteractStatic
     createSnapGrid ( grid: { x: number, y: number, range?: number, offset?: Position, limits?: Rect } ) : SnapFunction
-    // TODO
-    isSet ( any ) : any
-    off ( any ) : any
-    debug ( any ) : any
-    addDocument ( any ) : any
-    removeDocument ( any ) : any
+    isSet ( element: DOMElement | CSSSelector ) : boolean
+    addDocument ( document: Document, options: any ) : void
+    removeDocument ( document: Document, options: any ) : void
+    use ( plugin: Plugin) : InteractStatic;
   }
 }
 

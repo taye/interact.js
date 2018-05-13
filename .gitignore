@@ -1,5 +1,5 @@
+dist
 coverage
 .nyc_output
-dist
 node_modules/*
 !node_modules/@interactjs
