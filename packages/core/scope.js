@@ -172,6 +172,12 @@ export function createScope () {
 
       return -1;
     },
+
+    getDocOptions (doc) {
+      const docIndex = scope.getDocIndex(doc);
+
+      return docIndex === -1 ? null : scope.documents[docIndex].options;
+    },
   };
 
   interactions.init(scope);
