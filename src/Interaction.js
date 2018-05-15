@@ -469,7 +469,7 @@ function onDocSignal ({ doc }, signalName) {
   }
 
   for (const eventType in docEvents) {
-    eventMethod(doc, eventType, docEvents[eventType]);
+    eventMethod(doc, eventType, docEvents[eventType], browser.isIOS ? { passive: false } : undefined);
   }
 }
 
