@@ -1,5 +1,5 @@
 /**
- * interact.js v1.3.3
+ * interact.js v1.3.4
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1280,7 +1280,7 @@ function onDocSignal(_ref5, signalName) {
   }
 
   for (var _eventType in docEvents) {
-    eventMethod(doc, _eventType, docEvents[_eventType]);
+    eventMethod(doc, _eventType, docEvents[_eventType], browser.isIOS ? { passive: false } : undefined);
   }
 }
 
