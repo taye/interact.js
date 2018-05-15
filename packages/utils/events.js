@@ -18,8 +18,6 @@ const targets  = [];
 const delegatedEvents = {};
 const documents       = [];
 
-let supportsOptions;
-
 function add (element, type, listener, optionalArg) {
   const options = getOptions(optionalArg);
   let elementIndex = elements.indexOf(element);
@@ -41,7 +39,7 @@ function add (element, type, listener, optionalArg) {
   }
 
   if (!contains(target.events[type], listener)) {
-    element.addEventListener(type, listener, supportsOptions? options : !!options.capture);
+    element.addEventListener(type, listener, events.supportsOptions? options : !!options.capture);
     target.events[type].push(listener);
   }
 }
@@ -76,7 +74,7 @@ function remove (element, type, listener, optionalArg) {
     else {
       for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element.removeEventListener(type, listener, supportsOptions? options : !!options.capture);
+          element.removeEventListener(type, listener, events.supportsOptions? options : !!options.capture);
           target.events[type].splice(i, 1);
 
           break;
@@ -242,7 +240,7 @@ function getOptions (param) {
   return is.object(param)? param : { capture: param };
 }
 
-export default {
+const events = {
   add,
   remove,
 
@@ -254,16 +252,18 @@ export default {
   delegatedEvents,
   documents,
 
-  supportsOptions,
+  supportsOptions: false,
+  supportsPassive: false,
 
   _elements: elements,
   _targets: targets,
 
   init (window) {
-    supportsOptions = false;
-
     window.document.createElement('div').addEventListener('test', null, {
-      get capture () { supportsOptions = true; },
+      get capture () { events.supportsOptions = true; },
+      get passive () { events.supportsPassive = true; },
     });
   },
 };
+
+export default events;

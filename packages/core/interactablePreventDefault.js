@@ -1,6 +1,5 @@
-import * as is      from '@interactjs/utils/is';
-import events       from '@interactjs/utils/events';
-import browser      from '@interactjs/utils/browser';
+import * as is from '@interactjs/utils/is';
+import events from '@interactjs/utils/events';
 
 import { nodeContains, matchesSelector } from '@interactjs/utils/domUtils';
 import { getWindow } from '@interactjs/utils/window';
@@ -31,12 +30,12 @@ function checkAndPreventDefault (interactable, scope, event) {
 
   // setting === 'auto'
 
-  // don't preventDefault of touch{start,move} events if the browser supports passive
-  // events listeners. CSS touch-action and user-selecct should be used instead
-  if (events.supportsPassive
-    && /^touch(start|move)$/.test(event.type)
-    && !browser.isIOS) {
-    const docOptions = scope.getDocIndex(getWindow(event.target).document);
+  // if the browser supports passive event listeners and isn't running on iOS,
+  // don't preventDefault of touch{start,move} events. CSS touch-action and
+  // user-select should be used instead of calling event.preventDefault().
+  if (events.supportsPassive && /^touch(start|move)$/.test(event.type)) {
+    const doc = getWindow(event.target).document;
+    const docOptions = scope.getDocOptions(doc);
 
     if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
       return;
@@ -73,7 +72,7 @@ export function init (scope) {
    *  - `'never'` to never prevent
    *  - `'auto'` to let interact.js try to determine what would be best
    *
-   * @param {string} [newValue] `true`, `false` or `'auto'`
+   * @param {string} [newValue] `'always'`, `'never'` or `'auto'`
    * @return {string | Interactable} The current setting or this Interactable
    */
   Interactable.prototype.preventDefault = function (newValue) {

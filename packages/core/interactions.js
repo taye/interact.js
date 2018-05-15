@@ -184,6 +184,10 @@ function onDocSignal ({ doc, scope, options }, signalName) {
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove;
 
+  if (scope.browser.isIOS && !options.events) {
+    options.events = { passive: false };
+  }
+
   // delegate event listener
   for (const eventType in events.delegatedEvents) {
     eventMethod(doc, eventType, events.delegateListener);

@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/_dev/test/helpers';
+import { jsdom } from 'jsdom';
 
 import Interaction from '@interactjs/core/Interaction';
 import Signals from '@interactjs/utils/Signals';
@@ -45,3 +46,28 @@ test('interactions', t => {
   t.end();
 });
 
+test('interactions document event options', t => {
+  const scope = helpers.mockScope();
+  const doc = scope.document;
+
+  let options = {};
+  scope.browser = { isIOS: false };
+  scope.signals.fire('add-document', { doc, scope, options });
+
+  t.deepEqual(
+    options,
+    {},
+    'no doc options.event.passive is added when not iOS');
+
+  options = {};
+
+  scope.browser.isIOS = true;
+  scope.signals.fire('add-document', { doc, scope, options });
+
+  t.deepEqual(
+    options,
+    { events: { passive: false } },
+    'doc options.event.passive is set to false for iOS');
+
+  t.end();
+});
