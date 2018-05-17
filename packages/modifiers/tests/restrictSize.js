@@ -20,7 +20,6 @@ test('restrictSize', t => {
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const status = {
-      delta: { x: 0, y: 0 },
       options,
       offset,
     };
@@ -39,7 +38,6 @@ test('restrictSize', t => {
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const status = {
-      delta: { x: 0, y: 0 },
       options,
       offset,
     };
@@ -58,7 +56,6 @@ test('restrictSize', t => {
     const pageCoords = { x: 5, y: 15 };
     const offset = { top: 0, bottom: 0, left: 0, right: 0 };
     const status = {
-      delta: { x: 0, y: 0 },
       options,
       offset,
     };

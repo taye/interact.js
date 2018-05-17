@@ -80,7 +80,6 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           interaction, event, interaction.prepared.name, 'resume', interaction.element);
 
         interaction._fireEvent(resumeEvent);
-        interaction.modifiers.statuses.forEach(modifiers.resetStatus);
 
         utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
         break;
@@ -120,13 +119,9 @@ function release ({ interaction, event }, scope) {
   const modifierArg = {
     interaction,
     pageCoords: utils.extend({}, interaction.coords.cur.page),
-    statuses: inertiaPossible && interaction.modifiers.statuses.map(modifierStatus => {
-      const newStatus = utils.extend({}, modifierStatus);
-
-      modifiers.resetStatus(newStatus);
-
-      return newStatus;
-    }),
+    statuses: inertiaPossible && interaction.modifiers.statuses.map(
+      modifierStatus => utils.extend({}, modifierStatus)
+    ),
     preEnd: true,
     requireEndOnly: true,
   };

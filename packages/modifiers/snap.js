@@ -128,12 +128,8 @@ function set ({ interaction, coords, status, phase }) {
   }
 
   if (closest.inRange) {
-    status.delta.x = closest.dx;
-    status.delta.y = closest.dy;
-  }
-  else {
-    status.delta.x = 0;
-    status.delta.y = 0;
+    coords.x = closest.target.x;
+    coords.y = closest.target.y;
   }
 }
 

@@ -35,26 +35,26 @@ test('modifiers/snapEdges', t => {
   // resize from top left
   interaction.prepared.edges = { top: true, left: true };
 
-  arg.status = { options, delta: { x: 0, y: 0 } };
+  arg.status = { options };
   snapEdges.start(arg);
   snapEdges.set(arg);
 
   t.deepEqual(
-    arg.status.delta,
-    { x: target0.left - pageCoords.x, y: target0.top - pageCoords.y },
-    'modified delta is correct');
+    arg.coords,
+    { x: target0.left, y: target0.top },
+    'modified coords are correct');
 
   // resize from bottom right
   interaction.prepared.edges = { bottom: true, right: true };
 
-  arg.status = { options, delta: { x: 0, y: 0 } };
+  arg.status = { options };
   snapEdges.start(arg);
   snapEdges.set(arg);
 
   t.deepEqual(
-    arg.status.delta,
-    { x: target0.right - pageCoords.x, y: target0.bottom - pageCoords.y },
-    'modified coord is correct');
+    arg.coords,
+    { x: target0.right, y: target0.bottom },
+    'modified coord are correct');
 
   t.end();
 });

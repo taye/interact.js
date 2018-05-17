@@ -53,27 +53,18 @@ function set ({ coords, interaction, status, phase }) {
   fixRect(inner, noInner);
   fixRect(outer, noOuter);
 
-  let modifiedX = page.x;
-  let modifiedY = page.y;
-
-  status.delta.x = 0;
-  status.delta.y = 0;
-
   if (edges.top) {
-    modifiedY = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
+    coords.y = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
   }
   else if (edges.bottom) {
-    modifiedY = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom);
+    coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom);
   }
   if (edges.left) {
-    modifiedX = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left);
+    coords.x = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left);
   }
   else if (edges.right) {
-    modifiedX = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right);
+    coords.x = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right);
   }
-
-  status.delta.x = modifiedX - page.x;
-  status.delta.y = modifiedY - page.y;
 }
 
 function fixRect (rect, defaults) {

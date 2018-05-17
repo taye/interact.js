@@ -15,22 +15,22 @@ test('restrictEdges', t => {
   const options = { enabled: true };
   const coords = { x: 40, y: 40 };
   const offset = { top: 0, left: 0, bottom: 0, right: 0 };
-  const status = {
-    delta: { x: 0, y: 0 },
-    options,
-    offset,
-  };
-  const arg = { interaction, status, coords };
+  const status = { options, offset };
+  const arg = { interaction, status };
+
+  arg.coords = { ...coords };
 
   // outer restriction
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 };
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status.delta,
-    { x: 60, y: 60 },
+    arg.coords,
+    { x: coords.y + 60, y: coords.y + 60 },
     'outer restriction is applied correctly'
   );
+
+  arg.coords = { ...coords };
 
   // inner restriction
   options.outer = null;
@@ -38,8 +38,8 @@ test('restrictEdges', t => {
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status.delta,
-    { x: -40, y: -40 },
+    arg.coords,
+    { x: coords.x - 40, y: coords.y - 40 },
     'inner restriction is applied correctly'
   );
 
@@ -50,14 +50,15 @@ test('restrictEdges', t => {
     bottom: 200,
     right: 200,
   });
+  arg.coords = { ...coords };
 
   options.outer = { top: 100, left: 100, bottom: 200, right: 200 };
   options.inner = null;
   restrictEdges.set(arg);
 
   t.deepEqual(
-    status.delta,
-    { x: 160, y: 160 },
+    arg.coords,
+    { x: coords.x + 160, y: coords.x + 160 },
     'outer restriction is applied correctly with offset'
   );
 

@@ -34,58 +34,99 @@ function init (scope) {
 
   interactions.signals.on('after-action-start', restoreCurCoords);
   interactions.signals.on('after-action-move', restoreCurCoords);
-  interactions.signals.on('action-stop', restoreCurCoords);
+  interactions.signals.on('stop', stop);
 }
 
 function startAll (arg) {
-  const { statuses, startOffset, rect, pageCoords: page } = arg;
-
-  if (rect) {
-    startOffset.left = page.x - rect.left;
-    startOffset.top  = page.y - rect.top;
-
-    startOffset.right  = rect.right  - page.x;
-    startOffset.bottom = rect.bottom - page.y;
-
-    if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
-    if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
-  }
-  else {
-    startOffset.left = startOffset.top = startOffset.right = startOffset.bottom = 0;
-  }
-
-  for (const status of statuses) {
-    arg.status = status;
-    status.methods.start(arg);
+  for (const status of arg.statuses) {
+    if (status.methods.start) {
+      arg.status = status;
+      status.methods.start(arg);
+    }
   }
 }
 
+function getRectOffset (rect, coords) {
+  return rect
+    ? {
+      left  : coords.x - rect.left,
+      top   : coords.y - rect.top,
+      right : rect.right  - coords.x,
+      bottom: rect.bottom - coords.y,
+    }
+    : {
+      left  : 0,
+      top   : 0,
+      right : 0,
+      bottom: 0,
+    };
+}
+
+function start ({ interaction, phase }, pageCoords) {
+  const { target: interactable, element } = interaction;
+  const modifierList = getModifierList(interaction);
+  const statuses = prepareStatuses(modifierList);
+
+  const rect = extend({}, interactable.getRect(element));
+
+  if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
+  if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
+
+  const startOffset = getRectOffset(rect, pageCoords);
+  interaction.modifiers.startOffset = startOffset;
+
+  const arg = {
+    interaction,
+    interactable,
+    element,
+    pageCoords,
+    phase,
+    rect,
+    startOffset,
+    statuses,
+    preEnd: false,
+    requireEndOnly: false,
+  };
+
+  interaction.modifiers.statuses = statuses;
+  startAll(arg);
+
+  arg.pageCoords = extend({}, interaction.coords.start.page);
+
+  const result = interaction.modifiers.result = setAll(arg);
+
+  return result;
+}
+
 function setAll (arg) {
-  const { interaction, statuses, preEnd, requireEndOnly } = arg;
+  const { interaction, preEnd, requireEndOnly, rect, skipModifiers } = arg;
+
+  const statuses = skipModifiers
+    ? arg.statuses.slice(interaction.modifiers.skil)
+    : arg.statuses;
 
   arg.coords = extend({}, arg.pageCoords);
+  arg.rect = extend({}, rect);
 
   const result = {
+    delta: { x: 0, y: 0 },
     coords: arg.coords,
     shouldMove: true,
   };
 
-  resetStatus(result);
-
   for (const status of statuses) {
     const { options } = status;
 
-    if (!shouldDo(options, preEnd, requireEndOnly)) { continue; }
+    if (!status.methods.set ||
+      !shouldDo(options, preEnd, requireEndOnly)) { continue; }
 
     arg.status = status;
     status.methods.set(arg);
-
-    arg.coords.x += status.delta.x;
-    arg.coords.y += status.delta.y;
-
-    result.delta.x += status.delta.x;
-    result.delta.y += status.delta.y;
   }
+
+  result.delta.x = arg.coords.x - arg.pageCoords.x;
+  result.delta.y = arg.coords.y - arg.pageCoords.y;
+
 
   const differsFromPrevCoords =
     interaction.coords.prev.page.x !== result.coords.x ||
@@ -103,60 +144,34 @@ function setAll (arg) {
 function prepareStatuses (modifierList) {
   const statuses = [];
 
-  for (const { options, methods } of modifierList) {
+  for (let index = 0; index < modifierList.length; index++) {
+    const { options, methods } = modifierList[index];
+
     if (options && options.enabled === false) { continue; }
 
     const status = {
       options,
       methods,
+      index,
     };
 
-    resetStatus(status);
     statuses.push(status);
   }
 
   return statuses;
 }
 
-function resetStatus (status) {
-  status.delta = { x: 0, y: 0 };
-}
-
-function start ({ interaction, phase }, pageCoords) {
-  const { target: interactable, element } = interaction;
-  const rect = interactable.getRect(element);
-  const modifierList = getModifierList(interaction);
-  const statuses = prepareStatuses(modifierList);
-
-  const arg = {
-    interaction,
-    interactable,
-    element,
-    pageCoords,
-    phase,
-    rect,
-    startOffset: interaction.modifiers.startOffset,
-    statuses,
-    preEnd: false,
-    requireEndOnly: false,
-  };
-
-  interaction.modifiers.statuses = statuses;
-  startAll(arg);
-
-  arg.pageCoords = extend({}, interaction.coords.start.page);
-  interaction.modifiers.result = setAll(arg);
-}
-
 function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
+  const { target: interactable, element } = interaction;
   const modifierResult = setAll(
     {
       interaction,
-      interactable: interaction.target,
-      element: interaction.elemnet,
+      interactable,
+      element,
       preEnd,
       phase,
       pageCoords: interaction.coords.cur.page,
+      rect: interactable.getRect(element),
       statuses: interaction.modifiers.statuses,
       requireEndOnly: false,
       skipModifiers,
@@ -171,17 +186,59 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
   }
 }
 
-function beforeEnd ({ interaction, event }) {
-  const modifierList = getModifierList(interaction);
+function beforeEnd (arg) {
+  const { interaction, event } = arg;
+  const statuses = interaction.modifiers.statuses;
 
-  for (const { options } of modifierList) {
+  if (!statuses || !statuses.length) {
+    return;
+  }
+
+  let didPreEnd = false;
+
+  for (const status of statuses) {
+    arg.status = status;
+    const { options, methods } = status;
+
+    const endResult = methods.beforeEnd && methods.beforeEnd(arg);
+
+    if (endResult === false) {
+      return false;
+    }
+
     // if the endOnly option is true for any modifier
-    if (shouldDo(options, true, true)) {
+    if (!didPreEnd && shouldDo(options, true, true)) {
       // fire a move event at the modified coordinates
       interaction.move({ event, preEnd: true });
-      break;
+      didPreEnd = true;
     }
   }
+}
+
+function stop (arg) {
+  const { interaction } = arg;
+  const statuses = interaction.modifiers.statuses;
+
+  if (!statuses || !statuses.length) {
+    return;
+  }
+
+  const modifierArg = extend({
+    statuses,
+    interactable: interaction.target,
+    element: interaction.element,
+  }, arg);
+
+
+  restoreCurCoords(arg);
+
+  for (const status of statuses) {
+    modifierArg.status = status;
+
+    if (status.methods.stop) { status.methods.stop(modifierArg); }
+  }
+
+  arg.interaction.modifiers.statuses = null;
 }
 
 function setCurCoords (arg) {
@@ -193,8 +250,8 @@ function setCurCoords (arg) {
 
   const { delta } = interaction.modifiers.result;
 
-  modifierArg.page.x += delta.x;
-  modifierArg.page.y += delta.y;
+  modifierArg.page.x   += delta.x;
+  modifierArg.page.y   += delta.y;
   modifierArg.client.x += delta.x;
   modifierArg.client.y += delta.y;
 }
@@ -241,10 +298,10 @@ export default {
   startAll,
   setAll,
   prepareStatuses,
-  resetStatus,
   start,
   beforeMove,
   beforeEnd,
+  stop,
   shouldDo,
   getModifierList,
 };

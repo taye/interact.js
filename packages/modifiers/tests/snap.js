@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals, mockInteractable, getProps } from '@interactjs/_dev/test/helpers';
+import { mockSignals, mockInteractable } from '@interactjs/_dev/test/helpers';
 
 import snap from '@interactjs/modifiers/snap';
 import Interaction from '@interactjs/core/Interaction';
@@ -34,16 +34,8 @@ test('modifiers/snap', t => {
   snap.set(arg);
 
   t.deepEqual(
-    getProps(status, 'range realX realY delta'.split(' ')),
-    {
-      range: Infinity,
-      realX: pageCoords.x,
-      realY: pageCoords.y,
-      delta: {
-        x: target0.x - pageCoords.x,
-        y: target0.y - pageCoords.y,
-      },
-    },
+    arg.coords,
+    target0,
     'snap.set single target, zereo offset'
   );
 
