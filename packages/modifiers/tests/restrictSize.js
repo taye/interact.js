@@ -1,71 +1,63 @@
 import test from '@interactjs/_dev/test/test';
 import { mockSignals } from '@interactjs/_dev/test/helpers';
 
-import RestrictSize from '@interactjs/modifiers/restrictSize';
+import rectUtils from '@interactjs/utils/rect';
+import base from '@interactjs/modifiers/base';
+import restrictSize from '@interactjs/modifiers/restrictSize';
 import Interaction from '@interactjs/core/Interaction';
 
 test('restrictSize', t => {
+  const edges = { left: true, top: true };
+  const rect = { left: 0, top: 0, right: 200, bottom: 300 };
   const interaction = new Interaction({ signals: mockSignals() });
+
   interaction.prepared = {};
-  interaction.prepared.edges = { top: true, bottom: true, left: true, right: true };
+  interaction.prepared.edges = edges;
   interaction.resizeRects = {};
-  interaction.resizeRects.inverted = { x: 10, y: 20, width: 300, height: 200 };
+  interaction.resizeRects.inverted = rectUtils.xywhToTlbr(rect);
+  interaction.modifiers = {};
   interaction._interacting = true;
 
-  t.test('works with min and max options', tt => {
-    const options = {
-      min: { width:  60, height:  50 },
-      max: { width: 600, height: 500 },
-    };
-    const pageCoords = { x: 5, y: 15 };
-    const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-    const status = {
-      options,
-      offset,
-    };
-    const arg = { interaction, status, pageCoords };
+  const options = {
+    min: { width:  60, height:  50 },
+    max: { width: 300, height: 350 },
+  };
+  const startCoords = Object.freeze({ x: 0, y: 0 });
+  const offset = { top: 0, bottom: 0, left: 0, right: 0 };
+  const status = {
+    options,
+    offset,
+    methods: restrictSize,
+  };
+  const arg = {
+    interaction,
+    statuses: [status],
+    coords: startCoords,
+    pageCoords: startCoords,
+    options,
+  };
 
-    RestrictSize.set(arg);
-    tt.deepEqual(arg.options.inner, { top: 170, left: 250, bottom: -Infinity, right: -Infinity });
-    tt.deepEqual(arg.options.outer, { top: -280, left: -290, bottom: Infinity, right: Infinity });
-    tt.end();
-  });
+  interaction.modifiers.startOffset = base.getRectOffset(rect, startCoords);
+  base.startAll(arg);
+  arg.status = status;
 
-  t.test('works with min option only', tt => {
-    const options = {
-      min: { width: 60, height: 50 },
-    };
-    const pageCoords = { x: 5, y: 15 };
-    const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-    const status = {
-      options,
-      offset,
-    };
-    const arg = { interaction, status, pageCoords };
+  const move1 = Object.freeze({ x: -50, y: -40 });
+  arg.coords = { ...move1 };
+  restrictSize.set(arg);
 
-    RestrictSize.set(arg);
-    tt.deepEqual(arg.options.inner, { top:       170, left:       250, bottom: -Infinity, right: -Infinity });
-    tt.deepEqual(arg.options.outer, { top: -Infinity, left: -Infinity, bottom:  Infinity, right:  Infinity });
-    tt.end();
-  });
+  t.deepEqual(arg.coords, move1, 'within both min and max');
 
-  t.test('works with max option only', tt => {
-    const options = {
-      max: { width: 600, height: 500 },
-    };
-    const pageCoords = { x: 5, y: 15 };
-    const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-    const status = {
-      options,
-      offset,
-    };
-    const arg = { interaction, options, status, pageCoords, offset };
+  const move2 = Object.freeze({ x: -200, y: -300 });
+  arg.coords = { ...move2 };
+  restrictSize.set(arg);
 
-    RestrictSize.set(arg);
-    tt.deepEqual(arg.options.inner, { top: Infinity, left: Infinity, bottom: -Infinity, right: -Infinity });
-    tt.deepEqual(arg.options.outer, { top: -280, left: -290, bottom: Infinity, right: Infinity });
-    tt.end();
-  });
+  t.deepEqual(arg.coords, { x: -100, y: -50 }, 'outside max');
+
+  const move3 = Object.freeze({ x: 250, y: 320 });
+  arg.coords = { ...move3 };
+  restrictSize.set(arg);
+
+  t.deepEqual(arg.coords, { x: 140, y: 250 }, 'outside min');
 
   t.end();
-}, { skip: true });
+});

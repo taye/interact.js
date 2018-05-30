@@ -304,4 +304,5 @@ export default {
   stop,
   shouldDo,
   getModifierList,
+  getRectOffset,
 };
