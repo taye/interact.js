@@ -32,7 +32,7 @@ export function createScope () {
       set (options) {
         super.set(options);
 
-        scope.signals.fire('set', {
+        scope.interactables.signals.fire('set', {
           options,
           interactable: this,
         });
