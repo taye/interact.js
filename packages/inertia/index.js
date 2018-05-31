@@ -63,7 +63,10 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
 
         // update pointers to the down event's coordinates
         interaction.updatePointer(pointer, event, eventTarget, true);
-        utils.pointer.setCoords(interaction.coords.cur, interaction.pointers);
+        utils.pointer.setCoords(
+          interaction.coords.cur,
+          interaction.pointers.map(p => p.pointer)
+        );
 
         // fire appropriate signals
         const signalArg = {
