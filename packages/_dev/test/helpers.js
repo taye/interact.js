@@ -77,10 +77,6 @@ export function mockScope (options = {}) {
       methodDict: {},
       eventTypes: [],
     },
-    interactions: {
-      signals: new Signals(),
-      list: [],
-    },
   }, options);
 
   return scope;
