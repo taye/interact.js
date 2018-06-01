@@ -38,11 +38,11 @@ function start ({ interaction, status }) {
   };
 }
 
-function set ({ coords, interaction, status, phase }) {
+function set ({ coords, interaction, status }) {
   const { offset, options } = status;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges || phase === 'start') {
+  if (!edges) {
     return;
   }
 

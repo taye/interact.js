@@ -35,13 +35,8 @@ function start ({ interaction, interactable, element, rect, status, startOffset 
   status.offset = offsets;
 }
 
-function set ({ interaction, coords, status, phase }) {
+function set ({ interaction, coords, status }) {
   const { options, offset: offsets } = status;
-  const relativePoints = options && options.relativePoints;
-
-  if (phase === 'start' && relativePoints && relativePoints.length) {
-    return;
-  }
 
   const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
   const page = utils.extend({}, coords);

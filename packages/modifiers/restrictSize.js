@@ -21,11 +21,11 @@ function start (arg) {
 }
 
 function set (arg) {
-  const { interaction, phase, status } = arg;
+  const { interaction, status } = arg;
   const { options } = status;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
-  if (!interaction.interacting() || !edges || phase === 'start') {
+  if (!edges) {
     return;
   }
 

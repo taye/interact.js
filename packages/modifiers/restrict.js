@@ -20,10 +20,8 @@ function start ({ rect, startOffset, status }) {
   status.offset = offset;
 }
 
-function set ({ coords, interaction, status, phase }) {
+function set ({ coords, interaction, status }) {
   const { options, offset } = status;
-
-  if (phase === 'start' && options.elementRect) { return; }
 
   const restriction = getRestrictionRect(options.restriction, interaction, coords);
 

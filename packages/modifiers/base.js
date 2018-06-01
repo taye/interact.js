@@ -29,11 +29,11 @@ function init (scope) {
   interactions.signals.on('before-action-move', beforeMove);
   interactions.signals.on('before-action-end', beforeEnd);
 
-  interactions.signals.on('before-action-start', setCurCoords);
-  interactions.signals.on('before-action-move', setCurCoords);
+  interactions.signals.on('before-action-start', setCoords);
+  interactions.signals.on('before-action-move', setCoords);
 
-  interactions.signals.on('after-action-start', restoreCurCoords);
-  interactions.signals.on('after-action-move', restoreCurCoords);
+  interactions.signals.on('after-action-start', restoreCoords);
+  interactions.signals.on('after-action-move', restoreCoords);
   interactions.signals.on('stop', stop);
 }
 
@@ -99,7 +99,7 @@ function start ({ interaction, phase }, pageCoords) {
 }
 
 function setAll (arg) {
-  const { interaction, preEnd, requireEndOnly, rect, skipModifiers } = arg;
+  const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg;
 
   const statuses = skipModifiers
     ? arg.statuses.slice(interaction.modifiers.skil)
@@ -118,7 +118,7 @@ function setAll (arg) {
     const { options } = status;
 
     if (!status.methods.set ||
-      !shouldDo(options, preEnd, requireEndOnly)) { continue; }
+      !shouldDo(options, preEnd, requireEndOnly, phase)) { continue; }
 
     arg.status = status;
     status.methods.set(arg);
@@ -230,7 +230,7 @@ function stop (arg) {
   }, arg);
 
 
-  restoreCurCoords(arg);
+  restoreCoords(arg);
 
   for (const status of statuses) {
     modifierArg.status = status;
@@ -241,23 +241,34 @@ function stop (arg) {
   arg.interaction.modifiers.statuses = null;
 }
 
-function setCurCoords (arg) {
-  const { interaction } = arg;
-  const modifierArg = extend({
-    page: interaction.coords.cur.page,
-    client: interaction.coords.cur.client,
-  }, arg);
+function setCoords (arg) {
+  const { interaction, phase } = arg;
+  const coordsSets = [arg.curCoords || interaction.coords.cur];
 
   const { delta } = interaction.modifiers.result;
 
-  modifierArg.page.x   += delta.x;
-  modifierArg.page.y   += delta.y;
-  modifierArg.client.x += delta.x;
-  modifierArg.client.y += delta.y;
+  if (phase === 'start') {
+    coordsSets.unshift(arg.startCoords || interaction.coords.start);
+    interaction.modifiers.startDelta = extend({}, delta);
+  }
+
+  for (const coordsSet of coordsSets) {
+    coordsSet.page.x   += delta.x;
+    coordsSet.page.y   += delta.y;
+    coordsSet.client.x += delta.x;
+    coordsSet.client.y += delta.y;
+  }
 }
 
-function restoreCurCoords ({ interaction: { coords, modifiers } }) {
-  const { delta } = modifiers.result;
+function restoreCoords ({ interaction: { coords, modifiers }, phase }) {
+  const { startDelta, result: { delta } } = modifiers;
+
+  if (phase === 'start') {
+    coords.start.page.x -= startDelta.x;
+    coords.start.page.y -= startDelta.y;
+    coords.start.client.x -= startDelta.x;
+    coords.start.client.y -= startDelta.y;
+  }
 
   coords.cur.page.x -= delta.x;
   coords.cur.page.y -= delta.y;
@@ -285,11 +296,12 @@ function getModifierList (interaction) {
     .filter(m => !!m);
 }
 
-function shouldDo (options, preEnd, requireEndOnly) {
+function shouldDo (options, preEnd, requireEndOnly, phase) {
   return options
     ? options.enabled !== false &&
       (preEnd || !options.endOnly) &&
-      (!requireEndOnly || options.endOnly)
+      (!requireEndOnly || options.endOnly) &&
+      (options.setStart || phase !== 'start')
     : !requireEndOnly;
 }
 
