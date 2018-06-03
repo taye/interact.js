@@ -15,17 +15,24 @@ test('modifiers/base', t => {
 
   const element = utils.win.window.document.documentElement;
   const interactable = scope.interactables.new(element);
-  const event = {
+  const startEvent = {
     pageX: 100,
     pageY: 200,
     clientX: 100,
     clientY: 200,
     target: element,
   };
+  const moveEvent = {
+    pageX: 400,
+    pageY: 500,
+    clientX: 400,
+    clientY: 500,
+    target: element,
+  };
   const options = { target: { x: 100, y: 100 }, setStart: true };
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }));
-  interaction.pointerDown(event, event, event.target);
+  interaction.pointerDown(startEvent, startEvent, element);
 
   interactable.options.test = {
     modifiers: [
@@ -50,19 +57,35 @@ test('modifiers/base', t => {
 
   t.deepEqual(
     interaction.prevEvent.page,
-    { x: 100, y: 100},
+    options.target,
     'start event coords are modified');
 
   t.deepEqual(
     interaction.coords.start.page,
     { x: 100, y: 200},
-    'interaction.coords.start are restored after action phase');
+    'interaction.coords.start are restored after action start phase');
 
   t.deepEqual(
     interaction.coords.cur.page,
     { x: 100, y: 200},
-    'interaction.coords.cur are restored after action phase');
+    'interaction.coords.cur are restored after action start phase');
 
+  interaction.pointerMove(moveEvent, moveEvent, element);
+
+  t.deepEqual(
+    interaction.coords.cur.page,
+    { x: moveEvent.pageX, y: moveEvent.pageY },
+    'interaction.coords.cur are restored after action move phase');
+
+  t.deepEqual(
+    interaction.coords.start.page,
+    { x: startEvent.pageX, y: startEvent.pageY },
+    'interaction.coords.start are restored after action move phase');
+
+  t.deepEqual(
+    { x: interaction.prevEvent.x0, y: interaction.prevEvent.y0 },
+    { x: 100, y: 100},
+    'move event start coords are modified');
 
   interaction.stop();
 
@@ -79,6 +102,7 @@ test('modifiers/base', t => {
     methods: doubleModifier,
   });
 
+  interaction.pointerDown(startEvent, startEvent, element);
   interaction.start({ name: 'test' }, interactable, element);
 
   t.notOk(
@@ -95,14 +119,6 @@ test('modifiers/base', t => {
     interaction.coords.start.page,
     { x: 100, y: 200},
     'interaction.coords.start are not modified without options.setStart');
-
-  const moveEvent = {
-    pageX: 400,
-    pageY: 500,
-    clientX: 400,
-    clientY: 500,
-    target: element,
-  };
 
   interaction.pointerMove(moveEvent, moveEvent, element);
 

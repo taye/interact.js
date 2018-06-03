@@ -73,7 +73,9 @@ function start ({ interaction, phase }, pageCoords) {
   if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
 
   const startOffset = getRectOffset(rect, pageCoords);
+
   interaction.modifiers.startOffset = startOffset;
+  interaction.modifiers.startDelta = { x: 0, y: 0 };
 
   const arg = {
     interaction,
@@ -243,16 +245,16 @@ function stop (arg) {
 
 function setCoords (arg) {
   const { interaction, phase } = arg;
-  const coordsSets = [arg.curCoords || interaction.coords.cur];
-
-  const { delta } = interaction.modifiers.result;
+  const curCoords = arg.curCoords || interaction.coords.cur;
+  const startCoords = arg.startCoords || interaction.coords.start;
+  const { result, startDelta } = interaction.modifiers;
+  const curDelta = result.delta;
 
   if (phase === 'start') {
-    coordsSets.unshift(arg.startCoords || interaction.coords.start);
-    interaction.modifiers.startDelta = extend({}, delta);
+    extend(interaction.modifiers.startDelta, result.delta);
   }
 
-  for (const coordsSet of coordsSets) {
+  for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]]) {
     coordsSet.page.x   += delta.x;
     coordsSet.page.y   += delta.y;
     coordsSet.client.x += delta.x;
@@ -260,20 +262,16 @@ function setCoords (arg) {
   }
 }
 
-function restoreCoords ({ interaction: { coords, modifiers }, phase }) {
-  const { startDelta, result: { delta } } = modifiers;
+function restoreCoords ({ interaction: { coords, modifiers } }) {
+  const { startDelta, result: { delta: curDelta } } = modifiers;
 
-  if (phase === 'start') {
-    coords.start.page.x -= startDelta.x;
-    coords.start.page.y -= startDelta.y;
-    coords.start.client.x -= startDelta.x;
-    coords.start.client.y -= startDelta.y;
+  for (const [coordsSet, delta] of [[coords.start, startDelta], [coords.cur, curDelta]]) {
+    coordsSet.page.x -= delta.x;
+    coordsSet.page.y -= delta.y;
+    coordsSet.client.x -= delta.x;
+    coordsSet.client.y -= delta.y;
   }
 
-  coords.cur.page.x -= delta.x;
-  coords.cur.page.y -= delta.y;
-  coords.cur.client.x -= delta.x;
-  coords.cur.client.y -= delta.y;
 }
 
 function getModifierList (interaction) {
