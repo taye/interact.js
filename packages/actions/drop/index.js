@@ -386,11 +386,6 @@ function dropzoneMethod (interactable, options) {
   if (utils.is.bool(options)) {
     interactable.options.drop.enabled = options;
 
-    if (!options) {
-      interactable.ondragenter = interactable.ondragleave = interactable.ondrop
-        = interactable.ondropactivate = interactable.ondropdeactivate = null;
-    }
-
     return interactable;
   }
 

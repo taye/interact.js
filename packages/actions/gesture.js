@@ -61,10 +61,6 @@ function init (scope) {
     if (utils.is.bool(options)) {
       this.options.gesture.enabled = options;
 
-      if (!options) {
-        this.ongesturestart = this.ongesturestart = this.ongestureend = null;
-      }
-
       return this;
     }
 
