@@ -46,11 +46,13 @@ var pixelSize = 16;
 interact('.rainbow-pixel-canvas')
   .origin('self')
   .draggable({
-    snap: {
-        targets: [ interact.createSnapGrid({
+    modifiers: [
+      interact.modifiers.snap({
+        targets: [ interact.snappers.grid({
           x: pixelSize, y: pixelSize
-        }) ]
-    },
+        }) ],
+      }),
+    ],
     // allow multiple drags on the same element
     maxPerElement: Infinity
   })

@@ -80,7 +80,6 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
           interaction, event, interaction.prepared.name, 'resume', interaction.element);
 
         interaction._fireEvent(resumeEvent);
-        modifiers.resetStatuses(interaction.modifiers.statuses, scope.modifiers);
 
         utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
         break;
@@ -120,15 +119,15 @@ function release ({ interaction, event }, scope) {
   const modifierArg = {
     interaction,
     pageCoords: utils.extend({}, interaction.coords.cur.page),
-    statuses: {},
+    statuses: inertiaPossible && interaction.modifiers.statuses.map(
+      modifierStatus => utils.extend({}, modifierStatus)
+    ),
     preEnd: true,
     requireEndOnly: true,
   };
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
-
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
     if (modifierResult.shouldMove && modifierResult.locked) {
@@ -162,8 +161,6 @@ function release ({ interaction, event }, scope) {
 
     modifierArg.pageCoords.x += status.xe;
     modifierArg.pageCoords.y += status.ye;
-
-    modifiers.resetStatuses(modifierArg.statuses, scope.modifiers);
 
     modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
 
