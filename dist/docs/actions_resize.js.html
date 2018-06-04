@@ -243,10 +243,6 @@ function init (scope) {
     if (utils.is.bool(options)) {
       this.options.resize.enabled = options;
 
-      if (!options) {
-        this.onresizestart = this.onresizestart = this.onresizeend = null;
-      }
-
       return this;
     }
     return this.options.resize;

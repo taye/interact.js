@@ -294,7 +294,7 @@ blockquote {
   width: calc(100% - 240px);
   padding: 0;
   min-width: initial; }
-  #main > *:not(section):not(ol):not(ul), #main .article > *:not(section):not(ol):not(ul) {
+  #main > * , #main .article > * {
     padding-left: 10px;
     padding-right: 10px; }
 
