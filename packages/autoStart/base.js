@@ -59,7 +59,7 @@ function init (scope) {
     const target = interaction.target;
 
     if (target && target.options.styleCursor) {
-      target._doc.documentElement.style.cursor = '';
+      setCursor(interaction.element, '', scope);
     }
   });
 
@@ -97,6 +97,7 @@ function init (scope) {
     // Allow this many interactions to happen simultaneously
     maxInteractions: Infinity,
     withinInteractionLimit,
+    cursorElement: null,
     signals: new Signals(),
   };
 }
@@ -171,7 +172,7 @@ function prepare (interaction, { action, target, element }, scope) {
   action = action || {};
 
   if (interaction.target && interaction.target.options.styleCursor) {
-    interaction.target._doc.documentElement.style.cursor = '';
+    setCursor(interaction.element, '', scope);
   }
 
   interaction.target = target;
@@ -180,7 +181,7 @@ function prepare (interaction, { action, target, element }, scope) {
 
   if (target && target.options.styleCursor) {
     const cursor = action? scope.actions[action.name].getCursor(action) : '';
-    interaction.target._doc.documentElement.style.cursor = cursor;
+    setCursor(interaction.element, cursor, scope);
   }
 
   scope.autoStart.signals.fire('prepared', { interaction: interaction });
@@ -237,6 +238,16 @@ function maxInteractions (newValue, scope) {
   }
 
   return scope.autoStart.maxInteractions;
+}
+
+function setCursor (element, cursor, scope) {
+  if (scope.autoStart.cursorElement) {
+    scope.autoStart.cursorElement.style.cursor = '';
+  }
+
+  element.ownerDocument.documentElement.style.cursor = cursor;
+  element.style.cursor = cursor;
+  scope.autoStart.cursorElement = cursor ? element : null;
 }
 
 export default {

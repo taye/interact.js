@@ -5,7 +5,7 @@ export default function normalize (type, listener, result) {
   result = result || {};
 
   if (is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
+    type = split(type);
   }
 
   if (is.array(type)) {
@@ -29,9 +29,15 @@ export default function normalize (type, listener, result) {
   }
   else if (is.object(listener)) {
     for (const prefix in listener) {
-      normalize(`${type}${prefix}`, listener[prefix], result);
+      const combinedTypes = split(prefix).map(p => `${type}${p}`);
+
+      normalize(combinedTypes, listener[prefix], result);
     }
   }
 
   return result;
+}
+
+function split (type) {
+  return type.trim().split(/ +/);
 }

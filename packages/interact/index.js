@@ -6,6 +6,7 @@ import inertia from '@interactjs/inertia';
 import * as pointerEvents from '@interactjs/pointerEvents';
 import * as autoStart from '@interactjs/autoStart';
 import * as actions from '@interactjs/actions';
+import modifiersBase from '@interactjs/modifiers/base';
 import * as modifiers from '@interactjs/modifiers';
 import * as snappers from '@interactjs/utils/snappers';
 import autoScroll from '@interactjs/autoScroll';
@@ -29,10 +30,18 @@ export function init (window) {
   interact.use(actions);
 
   // snap, resize, etc.
-  interact.use(modifiers);
-
+  interact.use(modifiersBase);
+  interact.modifiers = modifiers;
   interact.snappers = snappers;
   interact.createSnapGrid = interact.snappers.grid;
+
+  // for backwrads compatibility
+  for (const type in modifiers) {
+    const { _defaults, _methods } = modifiers[type];
+
+    _defaults._methods = _methods;
+    scope.defaults.perAction[type] = _defaults;
+  }
 
   // autoScroll
   interact.use(autoScroll);

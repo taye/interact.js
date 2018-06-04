@@ -38,7 +38,7 @@ function init (scope) {
 
   interactables.signals.on('set', function ({ interactable, options }) {
     extend(interactable.events.options, pointerEvents.defaults);
-    extend(interactable.events.options, options);
+    extend(interactable.events.options, options.pointerEvents || {});
   });
 
   merge(actions.eventTypes, pointerEvents.types);

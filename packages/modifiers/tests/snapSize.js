@@ -21,37 +21,25 @@ test('modifiers/snapSize', t => {
     range: Infinity,
   };
   const status = {
+    options,
     delta: { x: 0, y: 0 },
+    offset: [{ x: 0, y: 0 }],
   };
   const pageCoords = Object.freeze({ x: 10, y: 20 });
   const arg = {
     interaction,
     interactable: interaction.target,
-    options,
     status,
     pageCoords,
-    modifiedCoords: { ...pageCoords },
-    offset: [{ x: 0, y: 0 }],
+    coords: { ...pageCoords },
   };
 
   snapSize.start(arg);
   snapSize.set(arg);
 
   t.deepEqual(
-    status,
-    {
-      locked: true,
-      range: Infinity,
-      realX: pageCoords.x,
-      realY: pageCoords.y,
-      delta: {
-        x: target0.x - pageCoords.x,
-        y: target0.y - pageCoords.y,
-      },
-      modifiedX: target0.x,
-      modifiedY: target0.y,
-      targetFields: [ [ 'width', 'height' ], [ 'x', 'y' ] ],
-    },
+    arg.coords,
+    target0,
     'snapSize.set single target, zereo offset'
   );
 

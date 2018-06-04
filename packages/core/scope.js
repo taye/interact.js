@@ -32,7 +32,7 @@ export function createScope () {
       set (options) {
         super.set(options);
 
-        scope.signals.fire('set', {
+        scope.interactables.signals.fire('set', {
           options,
           interactable: this,
         });
@@ -131,6 +131,8 @@ export function createScope () {
 
       const window = win.getWindow(doc);
 
+      options = options ? utils.extend({}, options) : {};
+
       scope.documents.push({ doc, options });
       events.documents.push(doc);
 
@@ -169,6 +171,12 @@ export function createScope () {
       }
 
       return -1;
+    },
+
+    getDocOptions (doc) {
+      const docIndex = scope.getDocIndex(doc);
+
+      return docIndex === -1 ? null : scope.documents[docIndex].options;
     },
   };
 

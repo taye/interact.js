@@ -124,10 +124,6 @@ function draggable (options) {
   if (is.bool(options)) {
     this.options.drag.enabled = options;
 
-    if (!options) {
-      this.ondragstart = this.ondragstart = this.ondragend = null;
-    }
-
     return this;
   }
 
