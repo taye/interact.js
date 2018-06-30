@@ -128,7 +128,7 @@ function release ({ interaction, event }, scope) {
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+    modifierResult = modifiers.setAll(modifierArg);
 
     if (modifierResult.shouldMove && modifierResult.locked) {
       smoothEnd = true;
@@ -162,7 +162,7 @@ function release ({ interaction, event }, scope) {
     modifierArg.pageCoords.x += status.xe;
     modifierArg.pageCoords.y += status.ye;
 
-    modifierResult = modifiers.setAll(modifierArg, scope.modifiers);
+    modifierResult = modifiers.setAll(modifierArg);
 
     status.modifiedXe += modifierResult.delta.x;
     status.modifiedYe += modifierResult.delta.y;

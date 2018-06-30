@@ -23,3 +23,6 @@ interact(target).draggable({
   modifiers: [restrictToParent, snap100x100],
 })
 ```
+
+Modifers in the array are applied sequentially and the order may affect the
+result.
