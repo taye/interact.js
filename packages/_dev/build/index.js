@@ -67,8 +67,8 @@ function update (ids) {
   bundleProcessor({
     noMetadata,
     bundleStream: b.bundle(),
-    headerFile: require.resolve('@interactjs/core/header.js'),
-    minHeaderFile: require.resolve('@interactjs/core/minHeader.js'),
+    headerFile: require.resolve('./header.js'),
+    minHeaderFile: require.resolve('./minHeader.js'),
   });
 }
 

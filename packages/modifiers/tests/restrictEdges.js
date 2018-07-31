@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals } from '@interactjs/_dev/test/helpers';
+import { mockSignals } from '@interactjs/core/tests/helpers';
 import Interaction from '@interactjs/core/Interaction';
 import restrictEdges from '../restrictEdges';
 

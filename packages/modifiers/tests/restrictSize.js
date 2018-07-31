@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals } from '@interactjs/_dev/test/helpers';
+import { mockSignals } from '@interactjs/core/tests/helpers';
 
 import rectUtils from '@interactjs/utils/rect';
 import Interaction from '@interactjs/core/Interaction';

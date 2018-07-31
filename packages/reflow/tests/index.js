@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import * as helpers from '@interactjs/_dev/test/helpers';
+import * as helpers from '@interactjs/core/tests/helpers';
 import win from '@interactjs/utils/window';
 import interactions from '@interactjs/core/interactions';
 import reflow from '../';

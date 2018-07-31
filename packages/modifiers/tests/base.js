@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import * as helpers from '@interactjs/_dev/test/helpers';
+import * as helpers from '@interactjs/core/tests/helpers';
 import * as utils from '@interactjs/utils';
 import modifiersBase from '../base';
 

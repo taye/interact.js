@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import d from '@interactjs/_dev/test/domator';
-import * as helpers from '@interactjs/_dev/test/helpers';
 
+import * as helpers from './helpers';
 import Interactable from '../Interactable';
 
 test('Interactable copies and extends defaults', t => {

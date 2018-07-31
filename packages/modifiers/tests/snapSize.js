@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import { mockSignals, mockInteractable } from '@interactjs/_dev/test/helpers';
+import { mockSignals, mockInteractable } from '@interactjs/core/tests/helpers';
 import Interaction from '@interactjs/core/Interaction';
 import snapSize from '../snapSize';
 
