@@ -2,10 +2,10 @@ import test from '@interactjs/_dev/test/test';
 import pointerUtils from '@interactjs/utils/pointerUtils';
 import * as helpers from '@interactjs/_dev/test/helpers';
 
-import Interaction from '@interactjs/core/Interaction';
-import InteractEvent from '@interactjs/core/InteractEvent';
 import Signals from '@interactjs/utils/Signals';
-import interactions from '@interactjs/core/interactions';
+import Interaction from '../Interaction';
+import InteractEvent from '../InteractEvent';
+import interactions from '../interactions';
 
 const makeInteractionAndSignals = () => new Interaction({ signals: new Signals });
 

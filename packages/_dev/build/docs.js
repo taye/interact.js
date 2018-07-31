@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const fs = require('fs-extra');
 const path = require('path');
 
@@ -14,7 +15,7 @@ module.exports = ({ stdio = 'inherit' } = {}) => {
     cwd: path.join(__dirname, '..', 'docs'),
   });
 
-  fs.copySync('img', `${destination}/img`);
+  fs.copySync(path.join(confPath, '../../../../img'), `${destination}/img`);
 
   console.log(' done.');
 };

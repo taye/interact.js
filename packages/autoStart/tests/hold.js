@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/_dev/test/helpers';
 import Signals from '@interactjs/utils/Signals';
-import hold from '@interactjs/autoStart/hold';
+import hold from '../hold';
 
 test('autoStart/hold', t => {
   const scope = helpers.mockScope({

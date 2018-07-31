@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test';
-import normalizeListeners from '@interactjs/utils/normalizeListeners';
+import normalizeListeners from '../normalizeListeners';
 
 test('utils/normalizeListeners', t => {
   const a = () => {};

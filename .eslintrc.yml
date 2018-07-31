@@ -1,4 +1,6 @@
-extends: 'eslint:recommended'
+extends:
+  - 'eslint:recommended'
+  - 'plugin:node/recommended'
 
 env:
   commonjs: true
@@ -37,6 +39,8 @@ rules:
   no-trailing-spaces: 2
   no-unused-expressions: 2
   no-var: 2
+  node/no-extraneous-import: [2, { allowModules: ['@interactjs/_dev'] }]
+  node/no-unsupported-features/es-syntax: 0
   one-var: [2, never]
   prefer-const: 2
   quotes: [2, single, avoid-escape]

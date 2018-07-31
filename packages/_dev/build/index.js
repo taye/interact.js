@@ -1,10 +1,17 @@
+#!/usr/bin/env node
+const path = require('path');
+
+const dir = path.join(__dirname, '..');
+process.chdir(dir);
+process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`;
+require('module')._initPaths();
+
 const browserify      = require('browserify');
 const bundleProcessor = require('./bundleProcessor');
-const path = require('path');
 
 const config = {
   debug: true,
-  entries: 'index.js',
+  entries: '../../index.js',
   standalone: 'interact',
 
   transform: [[ 'babelify', {

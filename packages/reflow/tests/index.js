@@ -1,8 +1,8 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/_dev/test/helpers';
-import reflow from '@interactjs/reflow';
 import win from '@interactjs/utils/window';
 import interactions from '@interactjs/core/interactions';
+import reflow from '../';
 
 test('reflow', t => {
   const scope = helpers.mockScope();
@@ -39,7 +39,8 @@ test('reflow', t => {
 
   const phases = ['reflow', 'start', 'move', 'end'];
 
-  for (const [index, phase] of Object.entries(phases)) {
+  for (const index in phases) {
+    const phase = phases[index];
     t.equal(fired[index].type, `test${phase}`, `event #${index} is ${phase}`);
   }
 

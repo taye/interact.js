@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const version = require('./version');
 
 const [,, release, prereleaseId] = process.argv;

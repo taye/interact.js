@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test';
 import * as utils from '@interactjs/utils';
-import DropEvent from '@interactjs/actions/drop/DropEvent';
+import DropEvent from '../../drop/DropEvent';
 
 const dz1 = { target: 'dz1', fire (event) { this.fired = event; } };
 const dz2 = { target: 'dz2', fire (event) { this.fired = event; } };

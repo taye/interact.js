@@ -8,7 +8,7 @@ const replacer     = require('./replacer');
 
 const pwd = process.env.PWD;
 
-const destDir = 'dist';
+const destDir = '../../dist';
 const filenames = {
   raw:   'interact.js',
   rawMap: 'interact.js.map',

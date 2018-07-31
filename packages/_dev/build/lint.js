@@ -1,10 +1,11 @@
+#!/usr/bin/env node
 const fix = process.argv.includes('--fix');
 const failOnError = process.argv.includes('--fail-on-error');
 
 const sources = (function () {
   try {
     return require('child_process')
-      .execSync('git ls-files "build/**.js" "src/**.js" "tests/**.js"')
+      .execSync('git ls-files "packages/**.js"')
       .toString().trim().split('\n');
   }
   catch (e) {
@@ -27,7 +28,7 @@ const errors = CLIEngine.getErrorResults(report.results);
 console.log(cli.getFormatter('table')(errors));
 
 if (failOnError && errors.length) {
-  process.exit(1);
+  throw 'Test failed';
 }
 
 if (fix) {

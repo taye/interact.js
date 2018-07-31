@@ -1,5 +1,5 @@
 dist
 coverage
 .nyc_output
-node_modules/*
-!node_modules/@interactjs
+**/node_modules
+**/lerna-debug.log
