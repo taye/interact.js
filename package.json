@@ -67,5 +67,11 @@
     "lerna": "^3.0.0-rc.0",
     "nyc": "^11.4.1",
     "tap-spec": "^4.1.1"
+  },
+  "_dev": {
+    "entries": "./index.js",
+    "standalone": "interact",
+    "destDir": "./dist",
+    "name": "interact"
   }
 }

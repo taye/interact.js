@@ -1,8 +1,32 @@
 #!/usr/bin/env node
 const path = require('path');
+const argv = require('yargs')
+  .config()
+  .pkgConf('_dev')
+  .default({
+    watch: false,
+    docs: false,
+    metadata: true,
+    debug: true,
+    headerFile: require.resolve('./header.js'),
+    minHeaderFile: require.resolve('./minHeader.js'),
+    name: 'index',
+  })
+  .option('entries', {
+    required: true,
+    array: 'true',
+    coerce: entries => {
+      return entries.map(entry => path.resolve(entry));
+    },
+  })
+  .option('destDir', {
+    required: true,
+    coerce: path.resolve,
+  })
+  .argv;
 
 const dir = path.join(__dirname, '..');
-process.chdir(dir);
+
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`;
 require('module')._initPaths();
 
@@ -10,9 +34,10 @@ const browserify      = require('browserify');
 const bundleProcessor = require('./bundleProcessor');
 
 const config = {
-  debug: true,
-  entries: '../../index.js',
-  standalone: 'interact',
+  debug: argv.debug,
+
+  entries: argv.entries,
+  standalone: argv.standalone,
 
   transform: [[ 'babelify', {
     babelrc: false,
@@ -27,11 +52,7 @@ const config = {
 
 const b = browserify(config);
 
-const noMetadata = process.argv.includes('--no-metadata');
-const watch      = process.argv.includes('--watch');
-const docs       = process.argv.includes('--docs')? require('./docs') : null;
-
-if (watch) {
+if (argv.watch) {
   b.plugin(require('watchify'));
   b.plugin(require('errorify'));
 
@@ -45,13 +66,13 @@ else {
 }
 
 function update (ids) {
-  if (docs) {
-    docs({
+  if (argv.docs) {
+    require('./docs')({
       stdio: ['ignore', 'ignore', 'inherit'],
     });
   }
 
-  if (watch) {
+  if (argv.watch) {
     console.log('Bundling...');
   }
   else {
@@ -65,10 +86,8 @@ function update (ids) {
   }
 
   bundleProcessor({
-    noMetadata,
+    ...argv,
     bundleStream: b.bundle(),
-    headerFile: require.resolve('./header.js'),
-    minHeaderFile: require.resolve('./minHeader.js'),
   });
 }
 

@@ -8,18 +8,24 @@ const replacer     = require('./replacer');
 
 const pwd = process.env.PWD;
 
-const destDir = '../../dist';
-const filenames = {
-  raw:   'interact.js',
-  rawMap: 'interact.js.map',
-  min: 'interact.min.js',
-  minMap: 'interact.min.js.map',
-};
-
-module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeaderFile, noMetadata }) {
+module.exports = function bundleProcessor ({
+  bundleStream,
+  headerFile,
+  minHeaderFile,
+  destDir,
+  name,
+  metadata,
+}) {
   mkdirp(destDir);
 
   let streamCode = '';
+
+  const filenames = {
+    raw   : `${name}.js`,
+    rawMap: `${name}.js.map`,
+    min   : `${name}.min.js`,
+    minMap: `${name}.min.js.map`,
+  };
 
   bundleStream.on('data', chunk => streamCode += chunk);
   bundleStream.on('end', function () {
@@ -29,9 +35,10 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
       raw = bundleHeader(getHeaderOpts(headerFile, filenames.raw, streamCode));
     }
     catch (e) {
-      for (const name in filenames) {
+      for (const filename in filenames) {
         write({
-          filename: filenames[name],
+          destDir,
+          filename: filenames[filename],
           code: streamCode,
           map: { sources: [] },
         });
@@ -57,16 +64,17 @@ module.exports = function bundleProcessor ({ bundleStream, headerFile, minHeader
 
   function getHeaderOpts (headerFilename, filename, code, map) {
     return {
+      destDir,
       filename,
       code,
       map,
       headerFilename,
-      replacer: input => replacer(input, { updateMetadata: !noMetadata }),
+      replacer: input => replacer(input, { updateMetadata: metadata }),
     };
   }
 };
 
-function write ({ filename, code, map }) {
+function write ({ destDir, filename, code, map }) {
   map.sources = map.sources.map(source => path.relative(pwd, source));
   map.file = filename;
 
