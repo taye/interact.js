@@ -5,7 +5,8 @@
     "@build": "./build/index.js",
     "@bump": "./build/bump.js",
     "@docs": "./build/docs.js",
-    "@lint": "./build/lint.js"
+    "@lint": "./build/lint.js",
+    "@test": "./test/test.sh"
   },
   "dependencies": {
     "@interactjs/core": "../core",
