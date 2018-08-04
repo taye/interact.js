@@ -39,12 +39,28 @@ const config = {
   entries: argv.entries,
   standalone: argv.standalone,
 
-  transform: [[ 'babelify', {
-    babelrc: false,
-    sourceType: 'module',
-    global: true,
-    ...require('../.babelrc'),
-  } ]],
+  transform: [
+    [ require('babelify'), {
+      babelrc: false,
+      sourceType: 'module',
+      global: true,
+      ...require('../.babelrc'),
+    } ],
+    [ require('envify'), {
+      global: true,
+      _: 'purge',
+    } ],
+  ],
+
+  plugin: argv.watch
+    ? [
+      require('watchify'),
+      require('errorify'),
+    ]
+    : [
+      require('browser-pack-flat/plugin'),
+      require('common-shakeify'),
+    ],
 
   cache: {},
   packageCache: {},
@@ -53,9 +69,6 @@ const config = {
 const b = browserify(config);
 
 if (argv.watch) {
-  b.plugin(require('watchify'));
-  b.plugin(require('errorify'));
-
   b.on('update', update);
   b.on('log', msg => console.log(msg));
 }
