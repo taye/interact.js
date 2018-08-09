@@ -89,7 +89,7 @@ export function indexOfDeepestElement (elements) {
 
     if (!deepestZoneParents.length) {
       parent = deepestZone;
-      while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
+      while (parent.parentNode && parent.parentNode !== parent.ownerDocument && !is.docFrag(parent.parentNode)) {
         deepestZoneParents.unshift(parent);
         parent = parent.parentNode;
       }
