@@ -7,5 +7,4 @@ addons:
 before_install:
   - npx lerna bootstrap
 after_success:
-  - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < ./coverage/lcov.info
+  - npx codeclimate-test-reporter < ./coverage/lcov.info
