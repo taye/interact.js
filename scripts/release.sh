@@ -1,3 +1,5 @@
+PATH=$PATH:$PWD/node_modules/.bin
+
 NEW_VERSION=$1
 RELEASE_BRANCH="stable"
 BUILD_ARG="--no-metadata"
@@ -45,15 +47,19 @@ merge_to_release() {
 run_preversion_tests() {
   echo_funcname
 
+  pushd $(dirname $(readlink -f $0))/..
+
   # preversion tests must pass
   npm run preversion || quit "tests have failed" $?
+
+  popd
 }
 
 bump_version() {
   echo_funcname
 
   # bump the version in package.json
-  NEW_VERSION=$(node packages/_dev/build/bump $NEW_VERSION)
+  NEW_VERSION=$(@bump $NEW_VERSION)
 
   if [[ -z $NEW_VERSION ]]; then
     quit "failed to bump version" 1
@@ -73,7 +79,7 @@ bump_version() {
 run_build() {
   echo_funcname
 
-  npm run build -- $BUILD_ARG || exit $?
+  @build --docs $BUILD_ARG || exit $?
 }
 
 commit_and_tag() {

@@ -13,5 +13,6 @@
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
+    "@interactjs/_dev": "0.0.0"
   }
 }

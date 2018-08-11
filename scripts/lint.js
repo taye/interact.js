@@ -3,9 +3,24 @@ const argv = require('yargs')
   .defaults({
     fix: false,
     failOnError: false,
-    sources: ['+(packages|src|examples|test)/**/*.js', './*.js'],
+  })
+  .option('sources', {
+    array: true,
+    default: getSources,
   })
   .argv;
+
+function getSources () {
+  const glob = require('glob');
+
+  return [
+    '+(packages|src|examples|test)/**/*.js',
+    './*.js',
+  ].reduce((acc, pattern) => [
+    ...acc,
+    ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
+  ], []);
+}
 
 const CLIEngine = require('eslint').CLIEngine;
 

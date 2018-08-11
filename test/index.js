@@ -1,3 +1,5 @@
+require('../babel-register');
+
 const glob = require('glob');
 const path = require('path');
 
@@ -17,9 +19,13 @@ function getMatches (pattern) {
 }
 
 
-Promise.all([
-  getMatches('**/tests/**/*.js'),
-  getMatches('**/*.spec.js'),
-]).then(([tests, specs]) => {
-  new Set([...tests, ...specs]).forEach(f => require(path.resolve(f)));
+Promise.all(
+  [
+    '**/tests/**/*.js',
+    '**/*.spec.js',
+  ].map(getMatches)
+).then(([tests, specs]) => {
+  for (const file of new Set([...tests, ...specs])) {
+    require(path.resolve(file));
+  }
 });

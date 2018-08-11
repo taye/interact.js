@@ -83,7 +83,7 @@ else {
 
 function update (ids) {
   if (argv.docs) {
-    require('./docs')({
+    require('../docs')({
       stdio: ['ignore', 'ignore', 'inherit'],
     });
   }
