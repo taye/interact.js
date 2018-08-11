@@ -32,12 +32,8 @@ import snapSize from './snapSize';
 
 function init (scope) {
   const {
-    modifiers,
     defaults,
   } = scope;
-
-  modifiers.snapEdges = snapEdges;
-  modifiers.names.push('snapEdges');
 
   defaults.perAction.snapEdges = snapEdges.defaults;
 }

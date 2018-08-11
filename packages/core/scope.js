@@ -2,8 +2,8 @@ import Eventable  from './Eventable';
 import defaults   from './defaultOptions';
 import * as utils from '@interactjs/utils';
 import domObjects from '@interactjs/utils/domObjects';
-import interactions from '@interactjs/core/interactions';
 
+import interactions from './interactions';
 import InteractEvent    from './InteractEvent';
 import InteractableBase from './Interactable';
 

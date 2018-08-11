@@ -1,0 +1,9 @@
+{
+  "name": "@interactjs/autoScroll",
+  "version": "0.0.0",
+  "dependencies": {
+    "@interactjs/utils": "0.0.0"
+  },
+  "devDependencies": {
+  }
+}

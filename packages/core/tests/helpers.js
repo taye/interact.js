@@ -1,10 +1,10 @@
 import _ from 'lodash';
 
-import { createScope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import Signals from '@interactjs/utils/Signals';
-import Eventable from '@interactjs/core/Eventable';
-import { doc } from './domator';
+import { createScope } from '../scope';
+import Eventable from '../Eventable';
+import { doc } from '@interactjs/_dev/test/domator';
 
 let counter = 0;
 
@@ -25,7 +25,9 @@ export function uniqueProps (obj) {
   }
 }
 
-export function newCoordsSet (n = 0) {
+export function newCoordsSet (n) {
+  n = n || 0;
+
   return {
     start: {
       page     : { x: n++, y: n++ },
@@ -55,7 +57,9 @@ export function newCoordsSet (n = 0) {
   };
 }
 
-export function newPointer (n = 50) {
+export function newPointer (n) {
+  n = n || 50;
+
   return {
     pointerId: n++,
     pageX: n++,
@@ -65,7 +69,9 @@ export function newPointer (n = 50) {
   };
 }
 
-export function mockScope (options = {}) {
+export function mockScope (options) {
+  options = options || {};
+
   const document = options.document || doc;
   const window = document.defaultView;
 

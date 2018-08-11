@@ -10,6 +10,7 @@ domator.setDocument(doc);
 export {
   domator,
   doc,
+  jsdom,
 };
 
 export default domator;

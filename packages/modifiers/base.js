@@ -5,8 +5,6 @@ function init (scope) {
     interactions,
   } = scope;
 
-  scope.modifiers = { names: [] };
-
   scope.defaults.perAction.modifiers = [];
 
   interactions.signals.on('new', function (interaction) {

@@ -5,7 +5,7 @@ module.exports = function combine (options) {
   const headerContent = (options.replacer || (s => s))(options.headerContent
     || fs.readFileSync(options.headerFilename).toString());
 
-  const filename = options.filename;
+  const { destDir, filename } = options;
   const combiner = combineSourceMap.create();
   const combinedCode = headerContent + options.code;
   const offset = { line: newlinesIn(headerContent) };
@@ -29,6 +29,7 @@ module.exports = function combine (options) {
   newMap.file = filename;
 
   return {
+    destDir,
     filename,
     code: `${combineSourceMap.removeComments(combinedCode)}\n//# sourceMappingURL=${filename}.map\n`,
     map: newMap,

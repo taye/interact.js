@@ -260,8 +260,8 @@ const events = {
 
   init (window) {
     window.document.createElement('div').addEventListener('test', null, {
-      get capture () { events.supportsOptions = true; },
-      get passive () { events.supportsPassive = true; },
+      get capture () { return (events.supportsOptions = true); },
+      get passive () { return (events.supportsPassive = true); },
     });
   },
 };

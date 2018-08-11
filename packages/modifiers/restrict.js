@@ -55,6 +55,7 @@ const restrict = {
   set,
   getRestrictionRect,
   defaults: {
+    enabled: false,
     restriction: null,
     elementRect: null,
   },

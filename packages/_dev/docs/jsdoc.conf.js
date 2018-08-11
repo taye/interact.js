@@ -8,6 +8,7 @@ module.exports = {
       .readdirSync(packagesDir)
       .filter(name => !/^[_.]/.test(name))
       .map(name => path.join(packagesDir, name)),
+    excludePattern: '[\\/]node_modules[\\/]',
   },
 
   opts: {

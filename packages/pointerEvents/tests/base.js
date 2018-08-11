@@ -1,11 +1,11 @@
 import test from '@interactjs/_dev/test/test';
-import * as helpers from '@interactjs/_dev/test/helpers';
+import * as helpers from '@interactjs/core/tests/helpers';
 import interactions from '@interactjs/core/interactions';
 
 import Interaction from '@interactjs/core/Interaction';
-import pointerEvents from '@interactjs/pointerEvents/base';
 import Eventable     from '@interactjs/core/Eventable';
 import Signals from '@interactjs/utils/Signals';
+import pointerEvents from '../base';
 
 test('pointerEvents.types', t => {
 

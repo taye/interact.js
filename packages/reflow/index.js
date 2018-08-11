@@ -124,9 +124,8 @@ function startReflow (scope, interactable, element, action, event) {
     })
     : null;
 
-  signalArg.phase = 'start';
   interaction._reflowPromise = reflowPromise;
-  interaction._interacting = interaction._doPhase(signalArg);
+  interaction.start(action, interactable, element);
 
   if (interaction._interacting) {
     interaction.move(signalArg);

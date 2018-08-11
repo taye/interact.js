@@ -4,7 +4,7 @@ BUILD_ARG="--no-metadata"
 
 if [[ $NEW_VERSION == "prerelease" ]]; then
   RELEASE_BRANCH="unstable"
-  BUILD_ARG=""
+  BUILD_ARG="--metadata"
 fi
 
 main() {
