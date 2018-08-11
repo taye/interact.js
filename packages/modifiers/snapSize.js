@@ -79,6 +79,7 @@ const snapSize = {
   start,
   set,
   defaults: {
+    enabled: false,
     range  : Infinity,
     targets: null,
     offset: null,

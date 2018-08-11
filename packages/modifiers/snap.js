@@ -132,6 +132,7 @@ const snap = {
   start,
   set,
   defaults: {
+    enabled: false,
     range  : Infinity,
     targets: null,
     offsets: null,

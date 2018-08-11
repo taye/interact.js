@@ -84,6 +84,7 @@ const restrictEdges = {
   start,
   set,
   defaults: {
+    enabled: false,
     inner: null,
     outer: null,
     offset: null,
