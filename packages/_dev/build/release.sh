@@ -8,13 +8,13 @@ if [[ $NEW_VERSION == "prerelease" ]]; then
 fi
 
 main() {
-  ensure_clean_index
-  merge_to_release
-  run_preversion_tests
-  bump_version
-  run_build
-  commit_and_tag
-  push_and_publish
+  ensure_clean_index &&
+    merge_to_release &&
+    run_preversion_tests &&
+    bump_version &&
+    run_build &&
+    commit_and_tag &&
+    push_and_publish &&
 
   # leave the "unstable" branch
   quit
@@ -26,6 +26,7 @@ ensure_clean_index() {
   # make sure the repo is clean
   git clean -fx dist/*
   if ! git diff-index HEAD --stat --exit-code; then
+    echo
     quit "working directory must be clean" $?
   fi
 }
@@ -66,7 +67,7 @@ bump_version() {
   fi
 
   # add package version change
-  git add package.json package-lock.json
+  git add package.json
 }
 
 run_build() {
@@ -79,9 +80,9 @@ commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- package.json package-lock.json dist
-  git commit -m "v$NEW_VERSION"
-  git tag $NEW_TAG
+  git add -- package.json dist &&
+    git commit -m "v$NEW_VERSION" &&
+    git tag $NEW_TAG
 }
 
 push_and_publish() {

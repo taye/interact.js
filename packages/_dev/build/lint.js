@@ -3,20 +3,9 @@ const argv = require('yargs')
   .defaults({
     fix: false,
     failOnError: false,
-    sources: repoJsFiles,
+    sources: ['+(packages|src|examples|test)/**/*.js', './*.js'],
   })
   .argv;
-
-function repoJsFiles () {
-  try {
-    return require('child_process')
-      .execSync('git ls-files "**/*.js"')
-      .toString().trim().split('\n');
-  }
-  catch (e) {
-    return ['**/*.js'];
-  }
-}
 
 const CLIEngine = require('eslint').CLIEngine;
 

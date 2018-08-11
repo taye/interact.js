@@ -25,7 +25,7 @@
     "lint": "@lint",
     "test": "@lint --fail-on-error && @test | tap-spec && nyc report && nyc check-coverage",
     "docs": "@docs --go",
-    "precommit": "@lint -- --fail-on-error",
+    "precommit": "@lint --fail-on-error",
     "prepush": "npm run preversion",
     "preversion": "npm test",
     "postversion": "",
