@@ -102,7 +102,7 @@ function setAll (arg) {
   const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg;
 
   const statuses = skipModifiers
-    ? arg.statuses.slice(interaction.modifiers.skil)
+    ? arg.statuses.slice(interaction.modifiers.skip)
     : arg.statuses;
 
   arg.coords = extend({}, arg.pageCoords);
@@ -301,6 +301,44 @@ function shouldDo (options, preEnd, requireEndOnly, phase) {
     : !requireEndOnly;
 }
 
+function makeModifier (module, name) {
+  const { defaults } = module;
+  const methods = {
+    start: module.start,
+    set: module.set,
+    beforeEnd: module.beforeEnd,
+    stop: module.stop,
+  };
+
+  const modifier = options => {
+    options = options || {};
+
+    // add missing defaults to options
+    options.enabled = options.enabled !== false;
+
+    for (const prop in defaults) {
+      if (!(prop in options)) {
+        options[prop] = defaults[prop];
+      }
+    }
+
+    return { options, methods };
+  };
+
+  if (typeof name === 'string') {
+    Object.defineProperty(
+      modifier,
+      'name',
+      { value: name });
+
+    // for backwrads compatibility
+    modifier._defaults = defaults;
+    modifier._methods = methods;
+  }
+
+  return modifier;
+}
+
 export default {
   init,
   startAll,
@@ -313,4 +351,5 @@ export default {
   shouldDo,
   getModifierList,
   getRectOffset,
+  makeModifier,
 };
