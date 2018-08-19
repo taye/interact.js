@@ -359,6 +359,26 @@ function dropzoneMethod (interactable, options) {
   if (utils.is.object(options)) {
     interactable.options.drop.enabled = options.enabled === false? false: true;
 
+    if (options.listeners) {
+      const normalized = utils.normalizeListeners(options.listeners);
+      // rename 'drop' to '' as it will be prefixed with 'drop'
+      const corrected = Object.keys(normalized).reduce((acc, type) => {
+        const correctedType = /^(enter|leave)/.test(type)
+          ? `drag${type}`
+          : /^(activate|deactivate|move)/.test(type)
+            ? `drop${type}`
+            : type;
+
+        acc[correctedType] = normalized[type];
+
+        return acc;
+      }, {});
+
+      interactable.off(interactable.options.drop.listeners);
+      interactable.on(corrected);
+      interactable.options.drop.listeners = corrected;
+    }
+
     if (utils.is.func(options.ondrop)          ) { interactable.on('drop'          , options.ondrop          ); }
     if (utils.is.func(options.ondropactivate)  ) { interactable.on('dropactivate'  , options.ondropactivate  ); }
     if (utils.is.func(options.ondropdeactivate)) { interactable.on('dropdeactivate', options.ondropdeactivate); }
