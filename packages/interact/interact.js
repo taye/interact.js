@@ -45,6 +45,8 @@ function interact (target, options) {
   return interactable;
 }
 
+scope._plugins = [];
+
 /**
  * Use a plugin
  *
@@ -55,7 +57,12 @@ function interact (target, options) {
  * @return {interact}
 */
 interact.use = function (plugin) {
+  if (scope._plugins.indexOf(plugin) !== -1) {
+    return;
+  }
+
   plugin.init(scope);
+  scope._plugins.push(plugin);
   return interact;
 };
 
