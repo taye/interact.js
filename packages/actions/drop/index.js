@@ -131,7 +131,8 @@ function collectDrops ({ interactables }, draggableElement) {
     // test the draggable draggableElement against the dropzone's accept setting
     if ((utils.is.element(accept) && accept !== draggableElement)
         || (utils.is.string(accept)
-        && !utils.dom.matchesSelector(draggableElement, accept))) {
+        && !utils.dom.matchesSelector(draggableElement, accept))
+        || (utils.is.func(accept) && !accept({ dropzone, draggableElement }))) {
 
       continue;
     }
@@ -139,7 +140,7 @@ function collectDrops ({ interactables }, draggableElement) {
     // query for new elements if necessary
     const dropElements = utils.is.string(dropzone.target)
       ? dropzone._context.querySelectorAll(dropzone.target)
-      : [dropzone.target];
+      : utils.is.array(dropzone.target) ? dropzone.target : [dropzone.target];
 
     for (const dropzoneElement of dropElements) {
       if (dropzoneElement !== draggableElement) {
