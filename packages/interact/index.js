@@ -49,6 +49,9 @@ export function init (window) {
   // reflow
   interact.use(reflow);
 
+  // eslint-disable-next-line no-undef
+  interact.version = process.env.npm_package_version;
+
   return interact;
 }
 
