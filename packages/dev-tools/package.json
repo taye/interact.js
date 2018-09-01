@@ -1,0 +1,10 @@
+{
+  "name": "@interactjs/dev-tools",
+  "version": "0.0.0",
+  "dependencies": {
+    "@interactjs/utils": "0.0.0"
+  },
+  "devDependencies": {
+    "@interactjs/_dev": "0.0.0"
+  }
+}

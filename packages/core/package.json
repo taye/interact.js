@@ -2,10 +2,12 @@
   "name": "@interactjs/core",
   "version": "0.0.0",
   "peerDependencies": {
+    "@interactjs/dev-tools": "0.0.0",
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
+    "@interactjs/dev-tools": "0.0.0",
     "@interactjs/utils": "0.0.0"
   },
   "publishConfig": {
