@@ -2,7 +2,7 @@ import modifiers  from '@interactjs/modifiers/base';
 import * as utils from '@interactjs/utils';
 import raf        from '@interactjs/utils/raf';
 
-function init (scope) {
+function install (scope) {
   const {
     interactions,
     defaults,
@@ -306,7 +306,7 @@ function getOptions ({ target, prepared }) {
 }
 
 export default {
-  init,
+  install,
   calcInertia,
   inertiaTick,
   smothEndTick,

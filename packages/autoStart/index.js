@@ -2,15 +2,15 @@ import autoStart from './base';
 import hold from './hold';
 import dragAxis from './dragAxis';
 
-function init (scope) {
-  autoStart.init(scope);
-  hold.init(scope);
-  dragAxis.init(scope);
+function install (scope) {
+  autoStart.install(scope);
+  hold.install(scope);
+  dragAxis.install(scope);
 }
 
 export {
   autoStart,
   hold,
   dragAxis,
-  init,
+  install,
 };

@@ -6,7 +6,7 @@ import modifiersBase from '../base';
 test('modifiers/base', t => {
   const scope = helpers.mockScope();
 
-  modifiersBase.init(scope);
+  modifiersBase.install(scope);
 
   const interaction = new scope.interactions.new({});
 

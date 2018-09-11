@@ -22,7 +22,7 @@ test('holdRepeat count', t => {
     type: 'hold',
   };
 
-  holdRepeat.init(scope);
+  holdRepeat.install(scope);
 
   scope.pointerEvents.signals.fire('new', { pointerEvent });
   t.equal(pointerEvent.count, 1, 'first hold count is 1 with count previously undefined');
@@ -37,8 +37,8 @@ test('holdRepeat count', t => {
 
 test('holdRepeat onFired', t => {
   const scope = mockScope();
-  interactions.init(scope);
-  holdRepeat.init(scope);
+  interactions.install(scope);
+  holdRepeat.install(scope);
 
   const interaction = scope.interactions.new({});
   const pointerEvent = {

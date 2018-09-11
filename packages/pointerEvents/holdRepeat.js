@@ -1,4 +1,4 @@
-function init (scope) {
+function install (scope) {
   const {
     pointerEvents,
     interactions,
@@ -53,5 +53,5 @@ function endHoldRepeat ({ interaction }) {
 }
 
 export default {
-  init,
+  install,
 };

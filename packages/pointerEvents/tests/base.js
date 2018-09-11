@@ -120,8 +120,8 @@ test('pointerEvents.collectEventTargets', t => {
 test('pointerEvents Interaction update-pointer signal', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
-  pointerEvents.init(scope);
+  interactions.install(scope);
+  pointerEvents.install(scope);
 
   const interaction = scope.interactions.new({});
   const initialTimer = { duration: Infinity, timeout: null };
@@ -142,8 +142,8 @@ test('pointerEvents Interaction update-pointer signal', t => {
 test('pointerEvents Interaction remove-pointer signal', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
-  pointerEvents.init(scope);
+  interactions.install(scope);
+  pointerEvents.install(scope);
 
   const interaction = scope.interactions.new({});
 

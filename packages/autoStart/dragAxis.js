@@ -3,7 +3,7 @@ import autoStart from './base';
 
 import { parentNode } from '@interactjs/utils/domUtils';
 
-function init (scope) {
+function install (scope) {
   scope.autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {
     if (interaction.prepared.name !== 'drag') { return; }
 
@@ -72,4 +72,4 @@ function init (scope) {
   }
 }
 
-export default { init };
+export default { install };

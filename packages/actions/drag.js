@@ -1,7 +1,7 @@
 import * as is from '@interactjs/utils/is';
 import * as arr from '@interactjs/utils/arr';
 
-function init (scope) {
+function install (scope) {
   const {
     actions,
     Interactable,
@@ -131,7 +131,7 @@ function draggable (options) {
 }
 
 const drag = {
-  init,
+  install,
   draggable,
   beforeMove,
   move,

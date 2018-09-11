@@ -2,7 +2,7 @@ import * as is       from '@interactjs/utils/is';
 import extend        from '@interactjs/utils/extend';
 import { merge }     from '@interactjs/utils/arr';
 
-function init (scope) {
+function install (scope) {
   const {
     pointerEvents,
     actions,
@@ -63,5 +63,5 @@ function init (scope) {
 }
 
 export default {
-  init,
+  install,
 };

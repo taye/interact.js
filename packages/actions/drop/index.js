@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils';
 import DropEvent from './DropEvent';
 
-function init (scope) {
+function install (scope) {
   const {
     actions,
     /** @lends module:interact */
@@ -466,7 +466,7 @@ function dropCheckMethod (interactable, dragEvent, event, draggable, draggableEl
 
 
 const drop = {
-  init,
+  install,
   getActiveDrops,
   getDrop,
   getDropEvents,

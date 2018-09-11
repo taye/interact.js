@@ -55,9 +55,5 @@ export function init (window) {
   return interact;
 }
 
-if (typeof window === 'object') {
-  init(window);
-}
-
 export default interact;
 export { interact };

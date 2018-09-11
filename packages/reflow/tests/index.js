@@ -7,11 +7,11 @@ import reflow from '../';
 test('reflow', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
+  interactions.install(scope);
 
   Object.assign(scope.actions, { test: {}, names: ['test'] });
 
-  reflow.init(scope);
+  reflow.install(scope);
 
   t.ok(
     scope.Interactable.prototype.reflow instanceof Function,
@@ -85,7 +85,7 @@ test('reflow', t => {
 test('async reflow', async t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
+  interactions.install(scope);
 
   Object.assign(scope.actions, { test: {}, names: ['test'] });
 
@@ -97,7 +97,7 @@ test('async reflow', async t => {
   interactable.rectChecker(() => rect);
   interactable.fire = iEvent => { reflowEvent = iEvent; };
 
-  reflow.init(scope);
+  reflow.install(scope);
 
   promise = interactable.reflow({ name: 'test' });
   t.ok(promise instanceof win.window.Promise, 'method returns a Promise');

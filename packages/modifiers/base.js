@@ -1,6 +1,6 @@
 import extend from '@interactjs/utils/extend';
 
-function init (scope) {
+function install (scope) {
   const {
     interactions,
   } = scope;
@@ -340,7 +340,7 @@ function makeModifier (module, name) {
 }
 
 export default {
-  init,
+  install,
   startAll,
   setAll,
   prepareStatuses,

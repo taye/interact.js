@@ -180,8 +180,6 @@ export function createScope () {
     },
   };
 
-  interactions.init(scope);
-
   return scope;
 }
 
@@ -192,7 +190,7 @@ export function initScope (scope, window) {
   raf.init(window);
   events.init(window);
 
-  interactions.init(scope);
+  interactions.install(scope);
   scope.document = window.document;
 
   return scope;

@@ -9,7 +9,7 @@ import drag from '../drag';
 test('drag action init', t => {
   const scope = helpers.mockScope();
 
-  drag.init(scope);
+  drag.install(scope);
 
   t.ok(scope.actions.names.includes('drag'), '"drag" in actions.names');
   t.equal(scope.actions.methodDict.drag, 'draggable');
@@ -80,8 +80,8 @@ test('Interactable.draggable method', t => {
 test('drag axis', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
-  drag.init(scope);
+  interactions.install(scope);
+  drag.install(scope);
 
   const interaction = scope.interactions.new({});
   const element = {};

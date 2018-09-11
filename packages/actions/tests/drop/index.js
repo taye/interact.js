@@ -6,8 +6,8 @@ import drop from '../../drop';
 test('actions/drop options', t => {
   const scope = helpers.mockScope();
   scope.interact = {};
-  interactions.init(scope);
-  drop.init(scope);
+  interactions.install(scope);
+  drop.install(scope);
 
   const interactable = scope.interactables.new('test');
 

@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils';
 import InteractEvent from '@interactjs/core/InteractEvent';
 
-function init (scope) {
+function install (scope) {
   const {
     actions,
     Interactable,
@@ -166,4 +166,4 @@ function updateGestureProps ({ interaction, iEvent, event, phase, deltaSource })
   }
 }
 
-export default { init };
+export default { install };

@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils';
 import InteractableMethods from './InteractableMethods';
 
-function init (scope) {
+function install (scope) {
   const {
     interact,
     interactions,
@@ -251,7 +251,7 @@ function setCursor (element, cursor, scope) {
 }
 
 export default {
-  init,
+  install,
   maxInteractions,
   withinInteractionLimit,
   validateAction,

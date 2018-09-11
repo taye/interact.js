@@ -53,7 +53,7 @@ scope._plugins = [];
  * @alias module:interact.use
  *
  * @param {Object} plugin
- * @param {function} plugin.init
+ * @param {function} plugin.install
  * @return {interact}
 */
 interact.use = function (plugin) {
@@ -61,7 +61,7 @@ interact.use = function (plugin) {
     return;
   }
 
-  plugin.init(scope);
+  plugin.install(scope);
   scope._plugins.push(plugin);
   return interact;
 };

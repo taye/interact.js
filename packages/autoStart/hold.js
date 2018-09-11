@@ -1,4 +1,4 @@
-function init (scope) {
+function install (scope) {
   const {
     autoStart,
     interactions,
@@ -49,6 +49,6 @@ function getHoldDuration (interaction) {
 }
 
 export default {
-  init,
+  install,
   getHoldDuration,
 };

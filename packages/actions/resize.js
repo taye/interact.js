@@ -1,6 +1,6 @@
 import * as utils from '@interactjs/utils';
 
-function init (scope) {
+function install (scope) {
   const {
     actions,
     browser,
@@ -422,4 +422,4 @@ function updateEventAxes ({ interaction, iEvent, action }) {
   }
 }
 
-export default { init };
+export default { install };
