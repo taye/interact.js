@@ -6,6 +6,7 @@ function install (scope) {
   } = scope;
 
   scope.defaults.perAction.modifiers = [];
+  scope.modifiers = {};
 
   interactions.signals.on('new', function (interaction) {
     interaction.modifiers = {
@@ -17,11 +18,11 @@ function install (scope) {
   });
 
   interactions.signals.on('before-action-start' , arg =>
-    start(arg, arg.interaction.coords.start.page));
+    start(arg, arg.interaction.coords.start.page, scope.modifiers));
 
   interactions.signals.on('action-resume', arg => {
     beforeMove(arg);
-    start(arg, arg.interaction.coords.cur.page);
+    start(arg, arg.interaction.coords.cur.page, scope.modifiers);
   });
 
   interactions.signals.on('before-action-move', beforeMove);
@@ -60,9 +61,9 @@ function getRectOffset (rect, coords) {
     };
 }
 
-function start ({ interaction, phase }, pageCoords) {
+function start ({ interaction, phase }, pageCoords, registeredModifiers) {
   const { target: interactable, element } = interaction;
-  const modifierList = getModifierList(interaction);
+  const modifierList = getModifierList(interaction, registeredModifiers);
   const statuses = prepareStatuses(modifierList);
 
   const rect = extend({}, interactable.getRect(element));
@@ -272,12 +273,18 @@ function restoreCoords ({ interaction: { coords, modifiers } }) {
 
 }
 
-function getModifierList (interaction) {
+function getModifierList (interaction, registeredModifiers) {
   const actionOptions = interaction.target.options[interaction.prepared.name];
   const actionModifiers = actionOptions.modifiers;
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers;
+    return actionModifiers.map(modifier => {
+      if (!modifier.methods && modifier.type) {
+        return registeredModifiers[modifier.type](modifier);
+      }
+
+      return modifier;
+    });
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']

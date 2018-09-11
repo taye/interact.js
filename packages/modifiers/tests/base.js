@@ -126,6 +126,20 @@ test('modifiers/base', t => {
     { x: 200, y: 200},
     'move event coords are modified by all modifiers');
 
+  // modifier options.type
+  scope.modifiers.target = modifiersBase.makeModifier(targetModifier);
+  options.type = 'target';
+  options.started = false;
+  interactable.options.test = {
+    modifiers: [
+      options,
+    ],
+  };
+  interaction.stop();
+  interaction.start({ name: 'test' }, interactable, element);
+
+  t.ok(options.started, 'gets `scpe.modifiers[options.type]`');
+
   t.end();
 });
 
