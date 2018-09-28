@@ -90,10 +90,12 @@ function resume ({ interaction, event, pointer, eventTarget }, scope) {
   }
 }
 
-function release ({ interaction, event }, scope) {
+function release ({ interaction, event, noPreEnd }, scope) {
   const status = interaction.inertia;
 
-  if (!interaction.interacting() || (interaction.simulation && interaction.simulation.active)) {
+  if (!interaction.interacting() ||
+    (interaction.simulation && interaction.simulation.active) ||
+  noPreEnd) {
     return;
   }
 
@@ -130,7 +132,7 @@ function release ({ interaction, event }, scope) {
   if (inertiaPossible && !inertia) {
     modifierResult = modifiers.setAll(modifierArg);
 
-    if (modifierResult.shouldMove && modifierResult.locked) {
+    if (modifierResult.shouldMove) {
       smoothEnd = true;
     }
   }
