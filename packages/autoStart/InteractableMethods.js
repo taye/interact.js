@@ -3,7 +3,7 @@ import * as domUtils from '@interactjs/utils/domUtils';
 
 import { warnOnce } from '@interactjs/utils';
 
-function init (scope) {
+function install (scope) {
   const {
     /** @lends Interactable */
     Interactable,
@@ -210,4 +210,4 @@ function init (scope) {
   };
 }
 
-export default { init };
+export default { install };

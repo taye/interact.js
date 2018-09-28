@@ -8,7 +8,7 @@ import {
   win,
 } from '@interactjs/utils';
 
-export function init (scope) {
+export function install (scope) {
   const {
     actions,
     interactions,
@@ -141,4 +141,4 @@ function startReflow (scope, interactable, element, action, event) {
   return reflowPromise;
 }
 
-export default { init };
+export default { install };

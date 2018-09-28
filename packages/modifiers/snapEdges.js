@@ -30,7 +30,7 @@ import clone from '@interactjs/utils/clone';
 import extend from '@interactjs/utils/extend';
 import snapSize from './snapSize';
 
-function init (scope) {
+function install (scope) {
   const {
     defaults,
   } = scope;
@@ -59,7 +59,7 @@ function modifyCoords (arg) {
 }
 
 const snapEdges = {
-  init,
+  install,
   start,
   set,
   modifyCoords,

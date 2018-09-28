@@ -3,11 +3,11 @@ import resize from './resize';
 import drag from './drag';
 import drop from './drop';
 
-function init (scope) {
-  gesture.init(scope);
-  resize.init(scope);
-  drag.init(scope);
-  drop.init(scope);
+function install (scope) {
+  gesture.install(scope);
+  resize.install(scope);
+  drag.install(scope);
+  drop.install(scope);
 }
 
 export {
@@ -15,5 +15,5 @@ export {
   resize,
   drag,
   drop,
-  init,
+  install,
 };

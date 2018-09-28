@@ -3,7 +3,7 @@ import { getWindow }  from '@interactjs/utils/window';
 import * as is        from '@interactjs/utils/is';
 import * as domUtils  from '@interactjs/utils/domUtils';
 
-function init (scope) {
+function install (scope) {
   const {
     interactions,
     defaults,
@@ -124,4 +124,4 @@ function init (scope) {
   defaults.perAction.autoScroll = autoScroll.defaults;
 }
 
-export default { init };
+export default { install };

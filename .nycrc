@@ -16,7 +16,6 @@
     "lcov"
   ],
   "require": [
-    "@interactjs/_dev/babel-register"
   ],
   "sourceMap": false,
   "instrument": false

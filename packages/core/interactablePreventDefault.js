@@ -62,7 +62,7 @@ function onInteractionEvent ({ interaction, event }) {
   }
 }
 
-export function init (scope) {
+export function install (scope) {
   /** @lends Interactable */
   const Interactable = scope.Interactable;
   /**
@@ -102,4 +102,4 @@ export function init (scope) {
   };
 }
 
-export default { init };
+export default { install };

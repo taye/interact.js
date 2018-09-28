@@ -33,10 +33,23 @@ require('module')._initPaths();
 const browserify      = require('browserify');
 const bundleProcessor = require('./bundleProcessor');
 
-const config = {
+const plugins = (() => {
+  if (argv.watch) {
+    return [
+      require('watchify'),
+      require('errorify'),
+    ];
+  }
+  return [
+    require('browser-pack-flat/plugin'),
+    require('common-shakeify'),
+  ];
+})();
+
+
+const b = browserify(argv.entries, {
   debug: argv.debug,
 
-  entries: argv.entries,
   standalone: argv.standalone,
 
   transform: [
@@ -52,21 +65,11 @@ const config = {
     } ],
   ],
 
-  plugin: argv.watch
-    ? [
-      require('watchify'),
-      require('errorify'),
-    ]
-    : [
-      require('browser-pack-flat/plugin'),
-      require('common-shakeify'),
-    ],
+  plugin: plugins,
 
   cache: {},
   packageCache: {},
-};
-
-const b = browserify(config);
+});
 
 if (argv.watch) {
   b.on('update', update);
@@ -80,7 +83,7 @@ else {
 
 function update (ids) {
   if (argv.docs) {
-    require('./docs')({
+    require('../docs')({
       stdio: ['ignore', 'ignore', 'inherit'],
     });
   }

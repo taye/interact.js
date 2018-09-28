@@ -6,7 +6,7 @@ import modifiersBase from '../base';
 test('modifiers/base', t => {
   const scope = helpers.mockScope();
 
-  modifiersBase.init(scope);
+  modifiersBase.install(scope);
 
   const interaction = new scope.interactions.new({});
 
@@ -125,6 +125,20 @@ test('modifiers/base', t => {
     interaction.prevEvent.page,
     { x: 200, y: 200},
     'move event coords are modified by all modifiers');
+
+  // modifier options.type
+  scope.modifiers.target = modifiersBase.makeModifier(targetModifier);
+  options.type = 'target';
+  options.started = false;
+  interactable.options.test = {
+    modifiers: [
+      options,
+    ],
+  };
+  interaction.stop();
+  interaction.start({ name: 'test' }, interactable, element);
+
+  t.ok(options.started, 'gets `scpe.modifiers[options.type]`');
 
   t.end();
 });

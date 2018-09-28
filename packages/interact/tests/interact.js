@@ -5,7 +5,7 @@ import interactions from '@interactjs/core/interactions';
 
 test('interact export', t => {
   scope.init(jsdom('').defaultView);
-  interactions.init(scope);
+  interactions.install(scope);
 
   const interactable1 = interact('selector');
   t.assert(interactable1 instanceof scope.Interactable,

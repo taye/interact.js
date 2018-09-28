@@ -1,18 +1,18 @@
-const fs = require('fs');
-const path = require('path');
-const packagesDir = `${__dirname}/../../`;
+const packagesDir = `${__dirname}/../packages`;
+const glob = require('glob');
+
+const include = glob.sync(`${packagesDir}/**/*.js`, {
+  ignore: '**/node_modules/**',
+});
 
 module.exports = {
   source: {
-    include: fs
-      .readdirSync(packagesDir)
-      .filter(name => !/^[_.]/.test(name))
-      .map(name => path.join(packagesDir, name)),
+    include,
     excludePattern: '[\\/]node_modules[\\/]',
   },
 
   opts: {
-    destination: '../../../dist/docs/',
+    destination: `${process.cwd()}/dist/docs/`,
     recurse: true,
   },
 

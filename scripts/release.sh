@@ -1,3 +1,5 @@
+PATH=$PATH:$PWD/node_modules/.bin
+
 NEW_VERSION=$1
 RELEASE_BRANCH="stable"
 BUILD_ARG="--no-metadata"
@@ -8,13 +10,13 @@ if [[ $NEW_VERSION == "prerelease" ]]; then
 fi
 
 main() {
-  ensure_clean_index
-  merge_to_release
-  run_preversion_tests
-  bump_version
-  run_build
-  commit_and_tag
-  push_and_publish
+  ensure_clean_index &&
+    merge_to_release &&
+    run_preversion_tests &&
+    bump_version &&
+    run_build &&
+    commit_and_tag &&
+    push_and_publish &&
 
   # leave the "unstable" branch
   quit
@@ -26,6 +28,7 @@ ensure_clean_index() {
   # make sure the repo is clean
   git clean -fx dist/*
   if ! git diff-index HEAD --stat --exit-code; then
+    echo
     quit "working directory must be clean" $?
   fi
 }
@@ -44,15 +47,19 @@ merge_to_release() {
 run_preversion_tests() {
   echo_funcname
 
+  pushd $(dirname $(readlink -f $0))/..
+
   # preversion tests must pass
   npm run preversion || quit "tests have failed" $?
+
+  popd
 }
 
 bump_version() {
   echo_funcname
 
   # bump the version in package.json
-  NEW_VERSION=$(node packages/_dev/build/bump $NEW_VERSION)
+  NEW_VERSION=$(@bump $NEW_VERSION)
 
   if [[ -z $NEW_VERSION ]]; then
     quit "failed to bump version" 1
@@ -66,22 +73,22 @@ bump_version() {
   fi
 
   # add package version change
-  git add package.json package-lock.json
+  git add package.json
 }
 
 run_build() {
   echo_funcname
 
-  npm run build -- $BUILD_ARG || exit $?
+  @build --docs $BUILD_ARG || exit $?
 }
 
 commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- package.json package-lock.json dist
-  git commit -m "v$NEW_VERSION"
-  git tag $NEW_TAG
+  git add -- package.json dist &&
+    git commit -m "v$NEW_VERSION" &&
+    git tag $NEW_TAG
 }
 
 push_and_publish() {

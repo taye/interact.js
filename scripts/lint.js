@@ -3,19 +3,23 @@ const argv = require('yargs')
   .defaults({
     fix: false,
     failOnError: false,
-    sources: repoJsFiles,
+  })
+  .option('sources', {
+    array: true,
+    default: getSources,
   })
   .argv;
 
-function repoJsFiles () {
-  try {
-    return require('child_process')
-      .execSync('git ls-files "**/*.js"')
-      .toString().trim().split('\n');
-  }
-  catch (e) {
-    return ['**/*.js'];
-  }
+function getSources () {
+  const glob = require('glob');
+
+  return [
+    '+(packages|src|examples|test)/**/*.js',
+    './*.js',
+  ].reduce((acc, pattern) => [
+    ...acc,
+    ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
+  ], []);
 }
 
 const CLIEngine = require('eslint').CLIEngine;

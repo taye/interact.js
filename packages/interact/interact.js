@@ -45,17 +45,24 @@ function interact (target, options) {
   return interactable;
 }
 
+scope._plugins = [];
+
 /**
  * Use a plugin
  *
  * @alias module:interact.use
  *
  * @param {Object} plugin
- * @param {function} plugin.init
+ * @param {function} plugin.install
  * @return {interact}
 */
 interact.use = function (plugin) {
-  plugin.init(scope);
+  if (scope._plugins.indexOf(plugin) !== -1) {
+    return;
+  }
+
+  plugin.install(scope);
+  scope._plugins.push(plugin);
   return interact;
 };
 

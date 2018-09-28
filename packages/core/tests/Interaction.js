@@ -317,7 +317,7 @@ test('Interaction.start', t => {
 test('stop interaction from start event', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
+  interactions.install(scope);
   const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();
 
@@ -339,7 +339,7 @@ test('stop interaction from start event', t => {
 test('Interaction createPreparedEvent', t => {
   const scope = helpers.mockScope();
 
-  interactions.init(scope);
+  interactions.install(scope);
 
   const interaction = scope.interactions.new({});
   const interactable = helpers.mockInteractable();

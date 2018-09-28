@@ -6,7 +6,7 @@ const simpleSignals = [ 'down', 'up', 'cancel' ];
 const simpleEvents  = [ 'down', 'up', 'cancel' ];
 
 const pointerEvents = {
-  init,
+  install,
   signals,
   PointerEvent,
   fire,
@@ -127,7 +127,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
   return signalArg.targets;
 }
 
-function init (scope) {
+function install (scope) {
   const {
     interactions,
   } = scope;

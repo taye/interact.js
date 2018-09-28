@@ -11,7 +11,7 @@ const methodNames = [
   'updatePointer', 'removePointer', 'windowBlur',
 ];
 
-function init (scope) {
+function install (scope) {
   const signals = new Signals();
 
   const listeners = {};
@@ -202,7 +202,7 @@ function onDocSignal ({ doc, scope, options }, signalName) {
 }
 
 export default {
-  init,
+  install,
   onDocSignal,
   doOnInteractions,
   newInteraction,

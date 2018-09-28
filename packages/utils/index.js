@@ -61,4 +61,4 @@ export { default as pointer }           from './pointerUtils';
 export { default as rect }              from './rect';
 export { default as events }            from './events';
 export { default as hypot }             from './hypot';
-export { default as normaizeListeners } from './normalizeListeners';
+export { default as normalizeListeners } from './normalizeListeners';

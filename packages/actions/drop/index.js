@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils';
 import DropEvent from './DropEvent';
 
-function init (scope) {
+function install (scope) {
   const {
     actions,
     /** @lends module:interact */
@@ -131,7 +131,8 @@ function collectDrops ({ interactables }, draggableElement) {
     // test the draggable draggableElement against the dropzone's accept setting
     if ((utils.is.element(accept) && accept !== draggableElement)
         || (utils.is.string(accept)
-        && !utils.dom.matchesSelector(draggableElement, accept))) {
+        && !utils.dom.matchesSelector(draggableElement, accept))
+        || (utils.is.func(accept) && !accept({ dropzone, draggableElement }))) {
 
       continue;
     }
@@ -139,7 +140,7 @@ function collectDrops ({ interactables }, draggableElement) {
     // query for new elements if necessary
     const dropElements = utils.is.string(dropzone.target)
       ? dropzone._context.querySelectorAll(dropzone.target)
-      : [dropzone.target];
+      : utils.is.array(dropzone.target) ? dropzone.target : [dropzone.target];
 
     for (const dropzoneElement of dropElements) {
       if (dropzoneElement !== draggableElement) {
@@ -359,6 +360,26 @@ function dropzoneMethod (interactable, options) {
   if (utils.is.object(options)) {
     interactable.options.drop.enabled = options.enabled === false? false: true;
 
+    if (options.listeners) {
+      const normalized = utils.normalizeListeners(options.listeners);
+      // rename 'drop' to '' as it will be prefixed with 'drop'
+      const corrected = Object.keys(normalized).reduce((acc, type) => {
+        const correctedType = /^(enter|leave)/.test(type)
+          ? `drag${type}`
+          : /^(activate|deactivate|move)/.test(type)
+            ? `drop${type}`
+            : type;
+
+        acc[correctedType] = normalized[type];
+
+        return acc;
+      }, {});
+
+      interactable.off(interactable.options.drop.listeners);
+      interactable.on(corrected);
+      interactable.options.drop.listeners = corrected;
+    }
+
     if (utils.is.func(options.ondrop)          ) { interactable.on('drop'          , options.ondrop          ); }
     if (utils.is.func(options.ondropactivate)  ) { interactable.on('dropactivate'  , options.ondropactivate  ); }
     if (utils.is.func(options.ondropdeactivate)) { interactable.on('dropdeactivate', options.ondropdeactivate); }
@@ -445,7 +466,7 @@ function dropCheckMethod (interactable, dragEvent, event, draggable, draggableEl
 
 
 const drop = {
-  init,
+  install,
   getActiveDrops,
   getDrop,
   getDropEvents,
