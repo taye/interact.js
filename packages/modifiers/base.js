@@ -188,10 +188,10 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
 }
 
 function beforeEnd (arg) {
-  const { interaction, event } = arg;
+  const { interaction, event, noPreEnd } = arg;
   const statuses = interaction.modifiers.statuses;
 
-  if (!statuses || !statuses.length) {
+  if (noPreEnd || !statuses || !statuses.length) {
     return;
   }
 

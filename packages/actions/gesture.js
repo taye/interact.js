@@ -67,12 +67,12 @@ function install (scope) {
     return this.options.gesture;
   };
 
-  interactions.signals.on('action-start', start);
-  interactions.signals.on('action-move', move);
-
   interactions.signals.on('action-start', updateGestureProps);
   interactions.signals.on('action-move', updateGestureProps);
   interactions.signals.on('action-end', updateGestureProps);
+
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
 
   interactions.signals.on('new', function (interaction) {
     interaction.gesture = {
@@ -130,12 +130,13 @@ function move ({ iEvent, interaction }) {
   }
 }
 
-function updateGestureProps ({ interaction, iEvent, event, phase, deltaSource }) {
+function updateGestureProps ({ interaction, iEvent, event, phase }) {
   if (interaction.prepared.name !== 'gesture') { return; }
 
-  const pointers = interaction.pointers;
+  const pointers = interaction.pointers.map(p => p.pointer);
   const starting = phase === 'start';
   const ending = phase === 'end';
+  const deltaSource = interaction.target.options.deltaSource;
 
   iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
 
