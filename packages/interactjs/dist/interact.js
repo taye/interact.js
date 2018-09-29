@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.8+sha.0b5b856
+ * interact.js v1.4.0-alpha.9+sha.524db20
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -2852,12 +2852,12 @@ function __install_4(scope) {
     return this.options.gesture;
   };
 
-  interactions.signals.on('action-start', start);
-  interactions.signals.on('action-move', __move_4);
-
   interactions.signals.on('action-start', updateGestureProps);
   interactions.signals.on('action-move', updateGestureProps);
   interactions.signals.on('action-end', updateGestureProps);
+
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', __move_4);
 
   interactions.signals.on('new', function (interaction) {
     interaction.gesture = {
@@ -2922,16 +2922,18 @@ function updateGestureProps(_ref3) {
   var interaction = _ref3.interaction,
       iEvent = _ref3.iEvent,
       event = _ref3.event,
-      phase = _ref3.phase,
-      deltaSource = _ref3.deltaSource;
+      phase = _ref3.phase;
 
   if (interaction.prepared.name !== 'gesture') {
     return;
   }
 
-  var pointers = interaction.pointers;
+  var pointers = interaction.pointers.map(function (p) {
+    return p.pointer;
+  });
   var starting = phase === 'start';
   var ending = phase === 'end';
+  var deltaSource = interaction.target.options.deltaSource;
 
   iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
 
@@ -4689,11 +4691,12 @@ function __beforeMove_25(_ref4) {
 
 function beforeEnd(arg) {
   var interaction = arg.interaction,
-      event = arg.event;
+      event = arg.event,
+      noPreEnd = arg.noPreEnd;
 
   var statuses = interaction.modifiers.statuses;
 
-  if (!statuses || !statuses.length) {
+  if (noPreEnd || !statuses || !statuses.length) {
     return;
   }
 
@@ -5010,11 +5013,12 @@ function resume(_ref, scope) {
 
 function release(_ref2, scope) {
   var interaction = _ref2.interaction,
-      event = _ref2.event;
+      event = _ref2.event,
+      noPreEnd = _ref2.noPreEnd;
 
   var status = interaction.inertia;
 
-  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active) {
+  if (!interaction.interacting() || interaction.simulation && interaction.simulation.active || noPreEnd) {
     return;
   }
 
@@ -5047,7 +5051,7 @@ function release(_ref2, scope) {
   if (inertiaPossible && !inertia) {
     modifierResult = ___base2_21.default.setAll(modifierArg);
 
-    if (modifierResult.shouldMove && modifierResult.locked) {
+    if (modifierResult.shouldMove) {
       smoothEnd = true;
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.4.0-alpha.8+sha.0b5b856",
+  "version": "1.4.0-alpha.9+sha.524db20",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -44,8 +44,7 @@
     "SVG"
   ],
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@interactjs/interact": "0.0.0",
     "@interactjs/_dev": "0.0.0"
