@@ -2,11 +2,13 @@ import raf            from '@interactjs/utils/raf';
 import { getWindow }  from '@interactjs/utils/window';
 import * as is        from '@interactjs/utils/is';
 import * as domUtils  from '@interactjs/utils/domUtils';
+import { getStringOptionResult } from '@interactjs/utils/rect';
 
 function install (scope) {
   const {
     interactions,
     defaults,
+    actions,
   } = scope;
 
   const autoScroll = scope.autoScroll = {
@@ -28,6 +30,7 @@ function install (scope) {
       autoScroll.isScrolling = true;
       raf.cancel(autoScroll.i);
 
+      interaction.autoScroll = autoScroll;
       autoScroll.interaction = interaction;
       autoScroll.prevTime = new Date().getTime();
       autoScroll.i = raf.request(autoScroll.scroll);
@@ -35,13 +38,18 @@ function install (scope) {
 
     stop: function () {
       autoScroll.isScrolling = false;
+      if (autoScroll.interaction) {
+        autoScroll.interaction.autoScroll = null;
+      }
       raf.cancel(autoScroll.i);
     },
 
     // scroll the window by the values in scroll.x/y
     scroll: function () {
-      const options = autoScroll.interaction.target.options[autoScroll.interaction.prepared.name].autoScroll;
-      const container = options.container || getWindow(autoScroll.interaction.element);
+      const { interaction } = autoScroll;
+      const { target: interactable, element } = interaction;
+      const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll;
+      const container = getContainer(options.container, interactable, element);
       const now = new Date().getTime();
       // change in time in seconds
       const dt = (now - autoScroll.prevTime) / 1000;
@@ -49,12 +57,38 @@ function install (scope) {
       const s = options.speed * dt;
 
       if (s >= 1) {
-        if (is.window(container)) {
-          container.scrollBy(autoScroll.x * s, autoScroll.y * s);
-        }
-        else if (container) {
-          container.scrollLeft += autoScroll.x * s;
-          container.scrollTop  += autoScroll.y * s;
+        const scrollBy = {
+          x: autoScroll.x * s,
+          y: autoScroll.y * s,
+        };
+
+        if (scrollBy.x || scrollBy.y) {
+          const prevScroll = getScroll(container);
+
+          if (is.window(container)) {
+            container.scrollBy(scrollBy.x, scrollBy.y);
+          }
+          else if (container) {
+            container.scrollLeft += scrollBy.x;
+            container.scrollTop  += scrollBy.y;
+          }
+
+          const curScroll = getScroll(container);
+          const delta = {
+            x: curScroll.x - prevScroll.x,
+            y: curScroll.y - prevScroll.y,
+          };
+
+          if (delta.x || delta.y) {
+            interactable.fire({
+              type: 'autoscroll',
+              target: element,
+              interactable,
+              delta,
+              interaction,
+              container,
+            });
+          }
         }
 
         autoScroll.prevTime = now;
@@ -86,8 +120,9 @@ function install (scope) {
       let bottom;
       let left;
 
-      const options = interaction.target.options[interaction.prepared.name].autoScroll;
-      const container = options.container || getWindow(interaction.element);
+      const { target: interactable, element } = interaction;
+      const options = interactable.options[interaction.prepared.name].autoScroll;
+      const container = getContainer(options.container, interactable, element);
 
       if (is.window(container)) {
         left   = pointer.clientX < autoScroll.margin;
@@ -117,11 +152,56 @@ function install (scope) {
     },
   };
 
+  interactions.signals.on('new', function (interaction) {
+    interaction.autoScroll = null;
+  });
+
   interactions.signals.on('stop', autoScroll.stop);
 
   interactions.signals.on('action-move', autoScroll.onInteractionMove);
 
+  actions.eventTypes.push('autoscroll');
   defaults.perAction.autoScroll = autoScroll.defaults;
+}
+
+export function getContainer (value, interactable, element) {
+  return (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element);
+}
+
+export function getScroll (container) {
+  if (is.window(container)) { container = window.document.body; }
+
+  return { x: container.scrollLeft, y: container.scrollTop };
+}
+
+export function getScrollSize (container) {
+  if (is.window(container)) { container = window.document.body; }
+
+  return { x: container.scrollWidth, y: container.scrollHeight };
+}
+
+export function getScrollSizeDelta ({ interaction, element }, func) {
+  const scrollOptions = interaction && interaction.target.options[interaction.prepared.name].autoScroll;
+
+  if (!scrollOptions || !scrollOptions.enabled) {
+    func();
+    return { x: 0, y: 0 };
+  }
+
+  const scrollContainer = getContainer(
+    scrollOptions.container,
+    interaction.target,
+    element
+  );
+
+  const prevSize = getScroll(scrollContainer);
+  func();
+  const curSize = getScroll(scrollContainer);
+
+  return {
+    x: curSize.x - prevSize.x,
+    y: curSize.y - prevSize.y,
+  };
 }
 
 export default { install };
