@@ -26,15 +26,16 @@
     "bump": "scripts/bump.js $@"
   },
   "dependencies": {
-    "babel-eslint": "^7.1.1",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/register": "^7.0.0",
+    "@babel/runtime": "^7.1.2",
+    "babel-eslint": "^10.0.1",
     "babel-plugin-istanbul": "^4.1.5",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-es2015": "^6.22.0",
-    "babel-register": "^6.26.0",
-    "babel-runtime": "^6.26.0",
-    "babelify": "^8.0.0",
+    "babelify": "^10.0.0",
     "browser-pack-flat": "^3.1.0",
     "browserify": "^16.0.0",
     "combine-source-map": "^0.7.1",
@@ -48,21 +49,19 @@
     "eslint-plugin-require-path-exists": "^1.1.5",
     "fs-extra": "^4.0.2",
     "glob": "^7.1.2",
+    "husky": "^0.13.1",
     "jsdoc": "github:taye/jsdoc#master",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "^9.11.0",
+    "lerna": "^3.0.0-rc.0",
     "mkdirp": "^0.5.1",
     "nyc": "^11.4.1",
     "semver": "^5.3.0",
+    "tap-spec": "^4.1.1",
     "tape": "^4.6.3",
     "through2": "^2.0.0",
     "uglify-js": "^2.7.5",
     "watchify": "^3.9.0",
     "yargs": "^12.0.1"
-  },
-  "devDependencies": {
-    "husky": "^0.13.1",
-    "lerna": "^3.0.0-rc.0",
-    "tap-spec": "^4.1.1"
   }
 }
