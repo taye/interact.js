@@ -40,7 +40,6 @@
     "browserify": "^16.0.0",
     "combine-source-map": "^0.7.1",
     "common-shakeify": "^0.5.0",
-    "derequire": "^2.0.6",
     "domator": "^2.0.0",
     "envify": "^4.1.0",
     "errorify": "^0.3.1",
