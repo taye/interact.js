@@ -12,7 +12,7 @@
     "index.d.ts",
     "interact-test.ts"
   ],
-  "main": "index.js",
+  "main": "dist/interact.js",
   "jsdelivr": "dist/interact.min.js",
   "jspm": {
     "main": "index"
