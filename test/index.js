@@ -22,7 +22,9 @@ function getMatches (pattern) {
 Promise.all(
   [
     '**/tests/**/*.js',
+    '**/tests/**/*.ts',
     '**/*.spec.js',
+    '**/*.spec.ts',
   ].map(getMatches)
 ).then(([tests, specs]) => {
   for (const file of new Set([...tests, ...specs])) {

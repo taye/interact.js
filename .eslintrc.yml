@@ -7,6 +7,8 @@ env:
   es6: true
   node: true
 
+parser: typescript-eslint-parser
+
 parserOptions:
   parser: babel-eslint
   sourceType: module
@@ -46,3 +48,10 @@ rules:
   require-path-exists/notEmpty: 2
   semi: [2, always]
   space-before-function-paren: [2, always]
+
+overrides:
+  files: '*.ts'
+  rules:
+    no-undef: 0
+    require-path-exists/exists: 0
+    require-path-exists/notEmpty: 0
