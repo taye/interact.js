@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.4.0-alpha.10+sha.a52806a",
+  "version": "1.4.0-alpha.11+sha.fecbeb8",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -13,6 +13,9 @@
     "interact-test.ts"
   ],
   "main": "dist/interact.js",
+  "scripts": {
+    "build": "@build --docs"
+  },
   "jsdelivr": "dist/interact.min.js",
   "jspm": {
     "main": "index"

@@ -79,7 +79,7 @@ bump_version() {
 run_build() {
   echo_funcname
 
-  @build --docs $BUILD_ARG || exit $?
+  npm run build -- $BUILD_ARG || exit $?
 }
 
 commit_and_tag() {
