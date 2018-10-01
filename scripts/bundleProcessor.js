@@ -2,7 +2,6 @@ const uglify       = require('uglify-js');
 const mkdirp       = require('mkdirp');
 const path         = require('path');
 const fs           = require('fs');
-const derequire    = require('derequire');
 const bundleHeader = require('./bundle-header');
 const replacer     = require('./replacer');
 
@@ -81,6 +80,6 @@ function write ({ destDir, filename, code, map }) {
   const codeFilename = path.join(destDir, filename);
   const codeStream = fs.createWriteStream(codeFilename);
 
-  codeStream.end(derequire(code));
+  codeStream.end(code);
   fs.createWriteStream(`${codeFilename}.map`).end(JSON.stringify(map));
 }
