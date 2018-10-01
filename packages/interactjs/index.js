@@ -7,11 +7,10 @@
  * See https://github.com/taye/interact.js/issues/187
  */
 
-import { interact, init } from '@interactjs/interact';
+import { init } from '@interactjs/interact';
 
-const exported = typeof window === 'object'
-  ? interact
-  : init;
+const win = typeof window === 'object' && window;
+const exported = win ? init(win) : init;
 
 export default exported;
 
