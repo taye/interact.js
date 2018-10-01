@@ -13,6 +13,9 @@
     "interact-test.ts"
   ],
   "main": "index.js",
+  "scripts": {
+    "build": "@build --docs"
+  },
   "jsdelivr": "dist/interact.min.js",
   "jspm": {
     "main": "index"
