@@ -1,4 +1,4 @@
-<a href="http://interactjs.io"><img alt="interact.js" src="https://c4d6f7d727e094887e93-4ea74b676357550bd514a6a5b344c625.ssl.cf2.rackcdn.com/ijs-anim.svg" height="131px" width="100%"></a>
+<a href="http://interactjs.io"><img alt="interact.js" src="https://c4d6f7d727e094887e93-4ea74b676357550bd514a6a5b344c625.ssl.cf2.rackcdn.com/ijs-solid.svg" height="70px" width="100%"></a>
 
 JavaScript drag and drop, resizing and multi-touch gestures with inertia and
 snapping for modern browsers (and also IE9+).
