@@ -90,6 +90,7 @@ function start ({ interaction, phase }, pageCoords, registeredModifiers) {
   };
 
   interaction.modifiers.statuses = statuses;
+  interaction.modifiers.result = null;
   startAll(arg);
 
   arg.pageCoords = extend({}, interaction.coords.start.page);
@@ -112,7 +113,7 @@ function setAll (arg) {
   const result = {
     delta: { x: 0, y: 0 },
     coords: arg.coords,
-    shouldMove: true,
+    changed: true,
   };
 
   for (const status of statuses) {
@@ -128,16 +129,13 @@ function setAll (arg) {
   result.delta.x = arg.coords.x - arg.pageCoords.x;
   result.delta.y = arg.coords.y - arg.pageCoords.y;
 
+  const prevCoords = interaction.modifiers.result
+    ? interaction.modifiers.result.coords
+    : interaction.coords.prev.page;
 
-  const differsFromPrevCoords =
-    interaction.coords.prev.page.x !== result.coords.x ||
-    interaction.coords.prev.page.y !== result.coords.y;
-
-  // a move should be fired if:
-  //  - the modified coords are different to the prev interaction coords
-  //  - there's a non zero result.delta
-  result.shouldMove = differsFromPrevCoords ||
-    result.delta.x !== 0 || result.delta.y !== 0;
+  result.changed = (
+    prevCoords.x !== result.coords.x ||
+    prevCoords.y !== result.coords.y);
 
   return result;
 }
@@ -182,7 +180,7 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
 
   // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
-  if (!modifierResult.shouldMove && interaction.interacting()) {
+  if (!modifierResult.changed && interaction.interacting()) {
     return false;
   }
 }

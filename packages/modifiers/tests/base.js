@@ -7,6 +7,7 @@ test('modifiers/base', t => {
   const scope = helpers.mockScope();
 
   modifiersBase.install(scope);
+  scope.actions.eventTypes.push('teststart', 'testmove', 'testend');
 
   const interaction = new scope.interactions.new({});
 
@@ -29,8 +30,10 @@ test('modifiers/base', t => {
     target: element,
   };
   const options = { target: { x: 100, y: 100 }, setStart: true };
+  let firedEvents = [];
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }));
+  interactable.on('teststart testmove testend', event => firedEvents.push(event));
   interaction.pointerDown(startEvent, startEvent, element);
 
   interactable.options.test = {
@@ -85,6 +88,11 @@ test('modifiers/base', t => {
     { x: interaction.prevEvent.x0, y: interaction.prevEvent.y0 },
     { x: 100, y: 100},
     'move event start coords are modified');
+
+  firedEvents = [];
+  const similarMoveEvent = { ...moveEvent, pageX: moveEvent.pageX + 0.5 };
+  interaction.pointerMove(similarMoveEvent, similarMoveEvent, element);
+  t.equal(firedEvents.length, 0, 'duplicate result coords are ignored');
 
   interaction.stop();
 
