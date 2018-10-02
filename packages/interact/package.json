@@ -1,7 +1,7 @@
 {
   "name": "@interactjs/interact",
   "version": "0.0.0",
-  "dependencies": {
+  "peerDependencies": {
     "@interactjs/actions": "0.0.0",
     "@interactjs/autoScroll": "0.0.0",
     "@interactjs/autoStart": "0.0.0",
@@ -13,6 +13,15 @@
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
-    "@interactjs/_dev": "0.0.0"
+    "@interactjs/_dev": "0.0.0",
+    "@interactjs/actions": "0.0.0",
+    "@interactjs/autoScroll": "0.0.0",
+    "@interactjs/autoStart": "0.0.0",
+    "@interactjs/core": "0.0.0",
+    "@interactjs/inertia": "0.0.0",
+    "@interactjs/modifiers": "0.0.0",
+    "@interactjs/pointerEvents": "0.0.0",
+    "@interactjs/reflow": "0.0.0",
+    "@interactjs/utils": "0.0.0"
   }
 }

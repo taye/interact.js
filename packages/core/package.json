@@ -1,11 +1,11 @@
 {
   "name": "@interactjs/core",
   "version": "0.0.0",
-  "dependencies": {
+  "peerDependencies": {
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
-    "lodash": "^3.10.1"
+    "@interactjs/utils": "0.0.0"
   }
 }

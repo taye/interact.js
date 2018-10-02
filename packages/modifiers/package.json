@@ -1,11 +1,13 @@
 {
   "name": "@interactjs/modifiers",
   "version": "0.0.0",
-  "dependencies": {
+  "peerDependencies": {
     "@interactjs/core": "0.0.0",
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
-    "@interactjs/_dev": "0.0.0"
+    "@interactjs/_dev": "0.0.0",
+    "@interactjs/core": "0.0.0",
+    "@interactjs/utils": "0.0.0"
   }
 }
