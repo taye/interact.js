@@ -121,7 +121,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(target =>
-      target.eventable.options.holdDuration === interaction.holdTimers[pointerIndex].duration);
+      target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration);
   }
 
   return signalArg.targets;
@@ -138,19 +138,14 @@ function install (scope) {
   interactions.signals.on('new', interaction => {
     interaction.prevTap    = null;  // the most recent tap event on this interaction
     interaction.tapTime    = 0;     // time of the most recent tap event
-    interaction.holdTimers = [];    // [{ duration, timeout }]
   });
 
-  interactions.signals.on('update-pointer', function ({ interaction, down, pointerIndex }) {
+  interactions.signals.on('update-pointer', function ({ down, pointerInfo }) {
     if (!down) {
       return;
     }
 
-    interaction.holdTimers[pointerIndex] = { duration: Infinity, timeout: null };
-  });
-
-  interactions.signals.on('remove-pointer', function ({ interaction, pointerIndex }) {
-    interaction.holdTimers.splice(pointerIndex, 1);
+    pointerInfo.hold = { duration: Infinity, timeout: null };
   });
 
   interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
@@ -158,7 +153,7 @@ function install (scope) {
 
     if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
       if (interaction.pointerIsDown) {
-        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+        clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
       }
 
       fire({
@@ -169,7 +164,7 @@ function install (scope) {
   });
 
   interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
-    const timer = interaction.holdTimers[pointerIndex];
+    const timer = interaction.pointers[pointerIndex].hold;
     const path = utils.dom.getPath(eventTarget);
     const signalArg = {
       interaction,
@@ -220,8 +215,8 @@ function install (scope) {
 
   for (const signalName of ['up', 'cancel']) {
     interactions.signals.on(signalName, function ({ interaction, pointerIndex }) {
-      if (interaction.holdTimers[pointerIndex]) {
-        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+      if (interaction.pointers[pointerIndex].hold) {
+        clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
       }
     });
   }

@@ -128,13 +128,13 @@ test('pointerEvents Interaction update-pointer signal', t => {
   const event = {};
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false);
-  t.deepEqual(interaction.holdTimers, []);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [undefined]);
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true);
-  t.deepEqual(interaction.holdTimers, [initialTimer]);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialTimer]);
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true);
-  t.deepEqual(interaction.holdTimers, [initialTimer, initialTimer]);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialTimer, initialTimer]);
 
   t.end();
 });
@@ -157,14 +157,14 @@ test('pointerEvents Interaction remove-pointer signal', t => {
 
   for (const id of ids) {
     const index = interaction.updatePointer({ pointerId: id }, null, true);
-    // use the ids in the holdTimers array for this test
-    interaction.holdTimers[index] = id;
+    // use the ids as the pointerInfo.hold value for this test
+    interaction.pointers[index].hold = id;
   }
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id });
 
-    t.deepEqual(interaction.holdTimers, removal.remain,
+    t.deepEqual(interaction.pointers.map(p => p.hold), removal.remain,
       `${removal.message} - remaining interaction.holdTimers is correct`);
   }
 
