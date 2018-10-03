@@ -12,7 +12,7 @@ module.exports = {
   },
 
   opts: {
-    destination: `${process.cwd()}/dist/docs/`,
+    destination: `${packagesDir}/interactjs/dist/docs/`,
     recurse: true,
   },
 
