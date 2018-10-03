@@ -97,7 +97,7 @@ commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- **/LICENSE **/package*.json **/bower.json **/dist &&
+  git add -- package*.json **/LICENSE **/package*.json **/bower.json **/dist &&
     git commit -m "v$NEW_VERSION" &&
     git tag $NEW_TAG
 }

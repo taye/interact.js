@@ -15,7 +15,7 @@ module.exports = ({ stdio = 'inherit' } = {}) => {
 
   require('child_process').spawnSync('npx', ['jsdoc', '-c', 'jsdoc.conf.js'], {
     stdio,
-    cwd: path.join(__dirname, '..', 'docs'),
+    cwd: __dirname,
   });
 
   fs.copySync(path.join(confPath, '../../img'), `${destination}/img`);
