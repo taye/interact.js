@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.12+sha.5e01ace
+ * interact.js v1.4.0-alpha.13+sha.cf47517
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8778,7 +8778,7 @@ function __init_22(window) {
   _interact.default.use(_reflow.default); // eslint-disable-next-line no-undef
 
 
-  _interact.default.version = "1.4.0-alpha.12";
+  _interact.default.version = "1.4.0-alpha.13";
   return _interact.default;
 }
 
