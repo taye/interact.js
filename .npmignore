@@ -1,0 +1,13 @@
+coverage
+docs
+examples
+img
+packages
+test
+*.log
+ISSUE_TEMPLATE.md
+PULL_REQUEST_TEMPLATEA>md
+.travis.yml
+.nycrc
+.tern-project
+.codeclimate.yml
