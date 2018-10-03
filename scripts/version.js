@@ -41,10 +41,15 @@ const version = {
   },
 
   write (newVersion) {
-    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
-    pkg.version = newVersion;
+    for (const pkgFile of ['package.json', 'bower.json']) {
+      try { fs.statSync(pkgFile); }
+      catch (e) { continue; }
 
-    fs.writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
+      const pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
+      pkg.version = newVersion;
+
+      fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+    }
   },
 };
 
