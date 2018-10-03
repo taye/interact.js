@@ -7,5 +7,8 @@
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
     "@interactjs/utils": "0.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
