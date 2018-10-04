@@ -41,21 +41,18 @@ const version = {
   },
 
   write (newVersion) {
-    for (const pkgFile of ['package.json', 'bower.json']) {
-      try { fs.statSync(pkgFile); }
-      catch (e) { continue; }
+    const pkgFile = 'package.json';
 
-      const pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
-      pkg.version = newVersion;
+    const pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
+    pkg.version = newVersion;
 
-      for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f] || {})) {
-        for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
-          deps[name] = newVersion;
-        }
+    for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f] || {})) {
+      for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
+        deps[name] = newVersion;
       }
-
-      fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
     }
+
+    fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
   },
 };
 
