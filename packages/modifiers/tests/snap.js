@@ -18,7 +18,7 @@ test('modifiers/snap', t => {
     ],
     range: Infinity,
   };
-  const status = {
+  const state = {
     options,
     delta: { x: 0, y: 0 },
     offset: [{ x: 0, y: 0 }],
@@ -26,7 +26,7 @@ test('modifiers/snap', t => {
   const pageCoords = Object.freeze({ x: 10, y: 20 });
   const arg = {
     interaction,
-    status,
+    state,
     pageCoords,
     coords: { ...pageCoords },
   };

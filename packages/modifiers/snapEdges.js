@@ -43,7 +43,7 @@ function start (arg) {
 
   if (!edges) { return null; }
 
-  arg.status.targetFields = arg.status.targetFields || [
+  arg.state.targetFields = arg.state.targetFields || [
     [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],
   ];
 

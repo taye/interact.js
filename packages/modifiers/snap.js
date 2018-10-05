@@ -1,7 +1,7 @@
 import * as utils from '@interactjs/utils';
 
-function start ({ interaction, interactable, element, rect, status, startOffset }) {
-  const { options } = status;
+function start ({ interaction, interactable, element, rect, state, startOffset }) {
+  const { options } = state;
   const offsets = [];
   const optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin));
   const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
@@ -32,11 +32,11 @@ function start ({ interaction, interactable, element, rect, status, startOffset 
     offsets.push(snapOffset);
   }
 
-  status.offset = offsets;
+  state.offset = offsets;
 }
 
-function set ({ interaction, coords, status }) {
-  const { options, offset: offsets } = status;
+function set ({ interaction, coords, state }) {
+  const { options, offset: offsets } = state;
 
   const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
   const page = utils.extend({}, coords);
@@ -47,8 +47,8 @@ function set ({ interaction, coords, status }) {
   page.x -= origin.x;
   page.y -= origin.y;
 
-  status.realX = page.x;
-  status.realY = page.y;
+  state.realX = page.x;
+  state.realY = page.y;
 
   let len = options.targets? options.targets.length : 0;
 
@@ -118,7 +118,7 @@ function set ({ interaction, coords, status }) {
       closest.dx = dx;
       closest.dy = dy;
 
-      status.range = range;
+      state.range = range;
     }
   }
 

@@ -24,14 +24,14 @@ test('restrictSize', t => {
   };
   const startCoords = Object.freeze({ x: 0, y: 0 });
   const offset = { top: 0, bottom: 0, left: 0, right: 0 };
-  const status = {
+  const state = {
     options,
     offset,
     methods: restrictSize,
   };
   const arg = {
     interaction,
-    statuses: [status],
+    states: [state],
     coords: startCoords,
     pageCoords: startCoords,
     options,
@@ -39,7 +39,7 @@ test('restrictSize', t => {
 
   interaction.modifiers.startOffset = base.getRectOffset(rect, startCoords);
   base.startAll(arg);
-  arg.status = status;
+  arg.state = state;
 
   const move1 = Object.freeze({ x: -50, y: -40 });
   arg.coords = { ...move1 };

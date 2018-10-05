@@ -20,7 +20,7 @@ test('modifiers/snapSize', t => {
     ],
     range: Infinity,
   };
-  const status = {
+  const state = {
     options,
     delta: { x: 0, y: 0 },
     offset: [{ x: 0, y: 0 }],
@@ -29,7 +29,7 @@ test('modifiers/snapSize', t => {
   const arg = {
     interaction,
     interactable: interaction.target,
-    status,
+    state,
     pageCoords,
     coords: { ...pageCoords },
   };

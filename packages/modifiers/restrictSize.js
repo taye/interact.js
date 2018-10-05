@@ -21,8 +21,8 @@ function start (arg) {
 }
 
 function set (arg) {
-  const { interaction, status } = arg;
-  const { options } = status;
+  const { interaction, state } = arg;
+  const { options } = state;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
@@ -34,7 +34,7 @@ function set (arg) {
   const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin;
   const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax;
 
-  status.options = {
+  state.options = {
     enabled: options.enabled,
     endOnly: options.endOnly,
     inner: extend({}, restrictEdges.noInner),
@@ -42,25 +42,25 @@ function set (arg) {
   };
 
   if (edges.top) {
-    status.options.inner.top = rect.bottom - minSize.height;
-    status.options.outer.top = rect.bottom - maxSize.height;
+    state.options.inner.top = rect.bottom - minSize.height;
+    state.options.outer.top = rect.bottom - maxSize.height;
   }
   else if (edges.bottom) {
-    status.options.inner.bottom = rect.top + minSize.height;
-    status.options.outer.bottom = rect.top + maxSize.height;
+    state.options.inner.bottom = rect.top + minSize.height;
+    state.options.outer.bottom = rect.top + maxSize.height;
   }
   if (edges.left) {
-    status.options.inner.left = rect.right - minSize.width;
-    status.options.outer.left = rect.right - maxSize.width;
+    state.options.inner.left = rect.right - minSize.width;
+    state.options.outer.left = rect.right - maxSize.width;
   }
   else if (edges.right) {
-    status.options.inner.right = rect.left + minSize.width;
-    status.options.outer.right = rect.left + maxSize.width;
+    state.options.inner.right = rect.left + minSize.width;
+    state.options.outer.right = rect.left + maxSize.width;
   }
 
   restrictEdges.set(arg);
 
-  status.options = options;
+  state.options = options;
 }
 
 const restrictSize = {

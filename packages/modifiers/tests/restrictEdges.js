@@ -15,8 +15,8 @@ test('restrictEdges', t => {
   const options = { enabled: true };
   const coords = { x: 40, y: 40 };
   const offset = { top: 0, left: 0, bottom: 0, right: 0 };
-  const status = { options, offset };
-  const arg = { interaction, status };
+  const state = { options, offset };
+  const arg = { interaction, state };
 
   arg.coords = { ...coords };
 
@@ -75,7 +75,7 @@ test('restrictEdges', t => {
   restrictEdges.start(arg);
 
   t.deepEqual(
-    arg.status.offset,
+    arg.state.offset,
     { top: 505, left: 910, bottom: 508, right: 916 },
     'start gets x/y from selector string'
   );
