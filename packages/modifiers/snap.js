@@ -20,23 +20,32 @@ function start ({ interaction, interactable, element, rect, state, startOffset }
     snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 };
   }
 
+  const relativePoints = options.relativePoints || [];
+
   if (rect && options.relativePoints && options.relativePoints.length) {
-    for (const { x: relativeX, y: relativeY } of (options.relativePoints || [])) {
+    for (let index = 0; index < relativePoints.length; index++) {
+      const relativePoint = relativePoints[index];
+
       offsets.push({
-        x: startOffset.left - (rect.width  * relativeX) + snapOffset.x,
-        y: startOffset.top  - (rect.height * relativeY) + snapOffset.y,
+        index,
+        relativePoint,
+        x: startOffset.left - (rect.width  * relativePoint.x) + snapOffset.x,
+        y: startOffset.top  - (rect.height * relativePoint.y) + snapOffset.y,
       });
     }
   }
   else {
-    offsets.push(snapOffset);
+    offsets.push(utils.extend({
+      index: 0,
+      relativePoint: null,
+    }, snapOffset));
   }
 
-  state.offset = offsets;
+  state.offsets = offsets;
 }
 
 function set ({ interaction, coords, state }) {
-  const { options, offset: offsets } = state;
+  const { options, offsets } = state;
 
   const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
   const page = utils.extend({}, coords);
@@ -52,13 +61,15 @@ function set ({ interaction, coords, state }) {
 
   let len = options.targets? options.targets.length : 0;
 
-  for (const { x: offsetX, y: offsetY } of offsets) {
-    const relativeX = page.x - offsetX;
-    const relativeY = page.y - offsetY;
+  for (const offset of offsets) {
 
-    for (const snapTarget of options.targets) {
+    const relativeX = page.x - offset.x;
+    const relativeY = page.y - offset.y;
+
+    for (let index = 0; index < options.targets.length; index++) {
+      const snapTarget = options.targets[index];
       if (utils.is.func(snapTarget)) {
-        target = snapTarget(relativeX, relativeY, interaction);
+        target = snapTarget(relativeX, relativeY, interaction, offset, index);
       }
       else {
         target = snapTarget;
@@ -67,8 +78,8 @@ function set ({ interaction, coords, state }) {
       if (!target) { continue; }
 
       targets.push({
-        x: utils.is.number(target.x) ? (target.x + offsetX) : relativeX,
-        y: utils.is.number(target.y) ? (target.y + offsetY) : relativeY,
+        x: utils.is.number(target.x) ? (target.x + offset.x) : relativeX,
+        y: utils.is.number(target.y) ? (target.y + offset.y) : relativeY,
 
         range: utils.is.number(target.range)? target.range: options.range,
       });
@@ -135,7 +146,7 @@ const snap = {
     enabled: false,
     range  : Infinity,
     targets: null,
-    offsets: null,
+    offset: null,
 
     relativePoints: null,
   },

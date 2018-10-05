@@ -30,17 +30,17 @@ function start (arg) {
   ];
 
   snap.start(arg);
-  state.offset = arg.state.offset;
+  state.offsets = arg.state.offsets;
 
   arg.state = state;
 }
 
 function set (arg) {
   const { interaction, state, coords } = arg;
-  const { options, offset } = state;
+  const { options, offsets } = state;
   const relative = {
-    x: coords.x - offset[0].x,
-    y: coords.y - offset[0].y,
+    x: coords.x - offsets[0].x,
+    y: coords.y - offsets[0].y,
   };
 
   state.options = extend({}, options);
@@ -83,7 +83,6 @@ const snapSize = {
     range  : Infinity,
     targets: null,
     offset: null,
-    offsets: null,
   },
 };
 
