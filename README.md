@@ -46,15 +46,13 @@ var pixelSize = 16;
 interact('.rainbow-pixel-canvas')
   .origin('self')
   .draggable({
-    modifiers: [
-      interact.modifiers.snap({
-        targets: [ interact.snappers.grid({
-          x: pixelSize, y: pixelSize
-        }) ],
-      }),
-    ],
-    // allow multiple drags on the same element
-    maxPerElement: Infinity
+    modifiers: [{
+      // snap to the corners of a grid
+      type: 'snap',
+      targets: [
+        interact.snappers.grid({ x: pixelSize, y: pixelSize }),
+      ],
+    }],
   })
   // draw colored squares on move
   .on('dragmove', function (event) {
@@ -89,7 +87,7 @@ interact('.rainbow-pixel-canvas')
   interact(window).on('resize', resizeCanvases);
 ```
 
-See the above code in action at http://codepen.io/taye/pen/YPyLxE
+See the above code in action at https://codepen.io/taye/pen/tCKAm
 
 License
 -------
