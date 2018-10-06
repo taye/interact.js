@@ -137,6 +137,8 @@ function set ({ interaction, coords, state }) {
     coords.x = closest.target.x;
     coords.y = closest.target.y;
   }
+
+  state.closest = closest;
 }
 
 const snap = {
