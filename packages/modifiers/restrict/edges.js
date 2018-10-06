@@ -11,7 +11,7 @@
 
 import extend from '@interactjs/utils/extend';
 import rectUtils from '@interactjs/utils/rect';
-import restrict from './restrict';
+import restrict from './pointer';
 
 const { getRestrictionRect } = restrict;
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };

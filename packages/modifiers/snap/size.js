@@ -3,7 +3,7 @@
 
 import extend from '@interactjs/utils/extend';
 import * as is from '@interactjs/utils/is';
-import snap from './snap';
+import snap from './pointer';
 
 function start (arg) {
   const { interaction, state } = arg;

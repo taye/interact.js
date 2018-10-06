@@ -1,10 +1,10 @@
 import base from './base';
-import snapModule from './snap';
-import snapSizeModule from './snapSize';
-import snapEdgesModule from './snapEdges';
-import restrictModule from './restrict';
-import restrictEdgesModule from './restrictEdges';
-import restrictSizeModule from './restrictSize';
+import snapModule from './snap/pointer';
+import snapSizeModule from './snap/size';
+import snapEdgesModule from './snap/edges';
+import restrictModule from './restrict/pointer';
+import restrictEdgesModule from './restrict/edges';
+import restrictSizeModule from './restrict/size';
 
 const { makeModifier } = base;
 

@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import { mockSignals, mockInteractable, mockScope } from '@interactjs/core/tests/helpers';
 import Interaction from '@interactjs/core/Interaction';
-import snapEdges from '../snapEdges';
+import snapEdges from '../../snap/edges';
 
 test('modifiers/snapEdges', t => {
   mockScope();

@@ -11,7 +11,7 @@
 
 import extend from '@interactjs/utils/extend';
 import rectUtils from '@interactjs/utils/rect';
-import restrictEdges from './restrictEdges';
+import restrictEdges from './edges';
 
 const noMin = { width: -Infinity, height: -Infinity };
 const noMax = { width: +Infinity, height: +Infinity };

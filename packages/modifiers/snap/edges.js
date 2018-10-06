@@ -28,7 +28,7 @@
 
 import clone from '@interactjs/utils/clone';
 import extend from '@interactjs/utils/extend';
-import snapSize from './snapSize';
+import snapSize from './size';
 
 function install (scope) {
   const {
