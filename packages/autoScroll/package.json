@@ -1,5 +1,5 @@
 {
-  "name": "@interactjs/autoScroll",
+  "name": "@interactjs/auto-scroll",
   "version": "0.0.0",
   "peerDependencies": {
     "@interactjs/utils": "0.0.0"

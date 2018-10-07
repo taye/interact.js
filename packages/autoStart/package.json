@@ -1,5 +1,5 @@
 {
-  "name": "@interactjs/autoStart",
+  "name": "@interactjs/auto-start",
   "version": "0.0.0",
   "peerDependencies": {
     "@interactjs/core": "0.0.0",

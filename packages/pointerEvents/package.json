@@ -1,5 +1,5 @@
 {
-  "name": "@interactjs/pointerEvents",
+  "name": "@interactjs/pointer-events",
   "version": "0.0.0",
   "peerDependencies": {
     "@interactjs/core": "*",
