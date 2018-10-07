@@ -112,10 +112,10 @@ push_and_publish() {
     # publish to npm with "next" tag
     git tag --force next &&
       git push --no-verify -f origin next &&
-      npx lerna exec -- npm publish --tag next
+      npx lerna exec --no-private -- npm publish --tag next
   else
     # publish with default "latest" tag
-    npx lerna exec -- npm publish
+    npx lerna exec --no-private -- npm publish
   fi
 
   cd $ROOT
