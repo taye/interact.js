@@ -1,8 +1,8 @@
 import * as is   from '@interactjs/utils/is';
 import rectUtils from '@interactjs/utils/rect';
 
-function start ({ rect, startOffset, status }) {
-  const { options } = status;
+function start ({ rect, startOffset, state }) {
+  const { options } = state;
   const { elementRect } = options;
   const offset = {};
 
@@ -17,15 +17,15 @@ function start ({ rect, startOffset, status }) {
     offset.left = offset.top = offset.right = offset.bottom = 0;
   }
 
-  status.offset = offset;
+  state.offset = offset;
 }
 
-function set ({ coords, interaction, status }) {
-  const { options, offset } = status;
+function set ({ coords, interaction, state }) {
+  const { options, offset } = state;
 
   const restriction = getRestrictionRect(options.restriction, interaction, coords);
 
-  if (!restriction) { return status; }
+  if (!restriction) { return state; }
 
   const rect = restriction;
 

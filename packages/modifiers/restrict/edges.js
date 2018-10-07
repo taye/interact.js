@@ -11,14 +11,14 @@
 
 import extend from '@interactjs/utils/extend';
 import rectUtils from '@interactjs/utils/rect';
-import restrict from './restrict';
+import restrict from './pointer';
 
 const { getRestrictionRect } = restrict;
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
 
-function start ({ interaction, status }) {
-  const { options } = status;
+function start ({ interaction, state }) {
+  const { options } = state;
   const startOffset = interaction.modifiers.startOffset;
   let offset;
 
@@ -30,7 +30,7 @@ function start ({ interaction, status }) {
 
   offset = offset || { x: 0, y: 0 };
 
-  status.offset = {
+  state.offset = {
     top:    offset.y + startOffset.top,
     left:   offset.x + startOffset.left,
     bottom: offset.y - startOffset.bottom,
@@ -38,8 +38,8 @@ function start ({ interaction, status }) {
   };
 }
 
-function set ({ coords, interaction, status }) {
-  const { offset, options } = status;
+function set ({ coords, interaction, state }) {
+  const { offset, options } = state;
   const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
   if (!edges) {

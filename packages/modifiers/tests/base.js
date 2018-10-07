@@ -152,21 +152,21 @@ test('modifiers/base', t => {
 });
 
 const targetModifier = {
-  start ({ status }) {
-    status.options.started = true;
+  start ({ state }) {
+    state.options.started = true;
   },
-  set ({ status, coords }) {
-    const { target } = status.options;
+  set ({ state, coords }) {
+    const { target } = state.options;
 
     coords.x = target.x;
     coords.y = target.y;
 
-    status.options.setted = true;
+    state.options.setted = true;
   },
-  stop ({ status }) {
-    status.options.stopped = true;
-    delete status.options.started;
-    delete status.options.setted;
+  stop ({ state }) {
+    state.options.stopped = true;
+    delete state.options.started;
+    delete state.options.setted;
   },
 };
 

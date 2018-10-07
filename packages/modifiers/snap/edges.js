@@ -28,7 +28,7 @@
 
 import clone from '@interactjs/utils/clone';
 import extend from '@interactjs/utils/extend';
-import snapSize from './snapSize';
+import snapSize from './size';
 
 function install (scope) {
   const {
@@ -43,7 +43,7 @@ function start (arg) {
 
   if (!edges) { return null; }
 
-  arg.status.targetFields = arg.status.targetFields || [
+  arg.state.targetFields = arg.state.targetFields || [
     [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],
   ];
 

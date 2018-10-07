@@ -12,7 +12,7 @@ function install (scope) {
     interaction.modifiers = {
       startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       offsets    : {},
-      statuses   : null,
+      states   : null,
       result     : null,
     };
   });
@@ -37,10 +37,10 @@ function install (scope) {
 }
 
 function startAll (arg) {
-  for (const status of arg.statuses) {
-    if (status.methods.start) {
-      arg.status = status;
-      status.methods.start(arg);
+  for (const state of arg.states) {
+    if (state.methods.start) {
+      arg.state = state;
+      state.methods.start(arg);
     }
   }
 }
@@ -64,7 +64,7 @@ function getRectOffset (rect, coords) {
 function start ({ interaction, phase }, pageCoords, registeredModifiers) {
   const { target: interactable, element } = interaction;
   const modifierList = getModifierList(interaction, registeredModifiers);
-  const statuses = prepareStatuses(modifierList);
+  const states = prepareStates(modifierList);
 
   const rect = extend({}, interactable.getRect(element));
 
@@ -84,12 +84,12 @@ function start ({ interaction, phase }, pageCoords, registeredModifiers) {
     phase,
     rect,
     startOffset,
-    statuses,
+    states,
     preEnd: false,
     requireEndOnly: false,
   };
 
-  interaction.modifiers.statuses = statuses;
+  interaction.modifiers.states = states;
   interaction.modifiers.result = null;
   startAll(arg);
 
@@ -103,9 +103,9 @@ function start ({ interaction, phase }, pageCoords, registeredModifiers) {
 function setAll (arg) {
   const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg;
 
-  const statuses = skipModifiers
-    ? arg.statuses.slice(interaction.modifiers.skip)
-    : arg.statuses;
+  const states = skipModifiers
+    ? arg.states.slice(interaction.modifiers.skip)
+    : arg.states;
 
   arg.coords = extend({}, arg.pageCoords);
   arg.rect = extend({}, rect);
@@ -116,14 +116,14 @@ function setAll (arg) {
     changed: true,
   };
 
-  for (const status of statuses) {
-    const { options } = status;
+  for (const state of states) {
+    const { options } = state;
 
-    if (!status.methods.set ||
+    if (!state.methods.set ||
       !shouldDo(options, preEnd, requireEndOnly, phase)) { continue; }
 
-    arg.status = status;
-    status.methods.set(arg);
+    arg.state = state;
+    state.methods.set(arg);
   }
 
   result.delta.x = arg.coords.x - arg.pageCoords.x;
@@ -140,24 +140,24 @@ function setAll (arg) {
   return result;
 }
 
-function prepareStatuses (modifierList) {
-  const statuses = [];
+function prepareStates (modifierList) {
+  const states = [];
 
   for (let index = 0; index < modifierList.length; index++) {
     const { options, methods } = modifierList[index];
 
     if (options && options.enabled === false) { continue; }
 
-    const status = {
+    const state = {
       options,
       methods,
       index,
     };
 
-    statuses.push(status);
+    states.push(state);
   }
 
-  return statuses;
+  return states;
 }
 
 function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
@@ -171,7 +171,7 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
       phase,
       pageCoords: interaction.coords.cur.page,
       rect: interactable.getRect(element),
-      statuses: interaction.modifiers.statuses,
+      states: interaction.modifiers.states,
       requireEndOnly: false,
       skipModifiers,
     });
@@ -187,17 +187,17 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }) {
 
 function beforeEnd (arg) {
   const { interaction, event, noPreEnd } = arg;
-  const statuses = interaction.modifiers.statuses;
+  const states = interaction.modifiers.states;
 
-  if (noPreEnd || !statuses || !statuses.length) {
+  if (noPreEnd || !states || !states.length) {
     return;
   }
 
   let didPreEnd = false;
 
-  for (const status of statuses) {
-    arg.status = status;
-    const { options, methods } = status;
+  for (const state of states) {
+    arg.state = state;
+    const { options, methods } = state;
 
     const endResult = methods.beforeEnd && methods.beforeEnd(arg);
 
@@ -216,14 +216,14 @@ function beforeEnd (arg) {
 
 function stop (arg) {
   const { interaction } = arg;
-  const statuses = interaction.modifiers.statuses;
+  const states = interaction.modifiers.states;
 
-  if (!statuses || !statuses.length) {
+  if (!states || !states.length) {
     return;
   }
 
   const modifierArg = extend({
-    statuses,
+    states,
     interactable: interaction.target,
     element: interaction.element,
   }, arg);
@@ -231,13 +231,13 @@ function stop (arg) {
 
   restoreCoords(arg);
 
-  for (const status of statuses) {
-    modifierArg.status = status;
+  for (const state of states) {
+    modifierArg.state = state;
 
-    if (status.methods.stop) { status.methods.stop(modifierArg); }
+    if (state.methods.stop) { state.methods.stop(modifierArg); }
   }
 
-  arg.interaction.modifiers.statuses = null;
+  arg.interaction.modifiers.states = null;
 }
 
 function setCoords (arg) {
@@ -348,7 +348,7 @@ export default {
   install,
   startAll,
   setAll,
-  prepareStatuses,
+  prepareStates,
   start,
   beforeMove,
   beforeEnd,

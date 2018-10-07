@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import { mockSignals, mockInteractable, mockScope } from '@interactjs/core/tests/helpers';
 import Interaction from '@interactjs/core/Interaction';
-import snapEdges from '../snapEdges';
+import snapEdges from '../../snap/edges';
 
 test('modifiers/snapEdges', t => {
   mockScope();
@@ -26,7 +26,7 @@ test('modifiers/snapEdges', t => {
   const arg = {
     interaction,
     interactable: interaction.target,
-    status: null,
+    state: null,
     pageCoords,
     coords: { ...pageCoords },
     offset: [{ x: 0, y: 0 }],
@@ -35,7 +35,7 @@ test('modifiers/snapEdges', t => {
   // resize from top left
   interaction.prepared.edges = { top: true, left: true };
 
-  arg.status = { options };
+  arg.state = { options };
   snapEdges.start(arg);
   snapEdges.set(arg);
 
@@ -47,7 +47,7 @@ test('modifiers/snapEdges', t => {
   // resize from bottom right
   interaction.prepared.edges = { bottom: true, right: true };
 
-  arg.status = { options };
+  arg.state = { options };
   snapEdges.start(arg);
   snapEdges.set(arg);
 
