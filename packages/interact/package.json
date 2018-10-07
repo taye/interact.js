@@ -1,28 +1,28 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.4.0-alpha.14+sha.69d796b",
+  "version": "1.4.0-alpha.15+sha.8940ff6",
   "peerDependencies": {
-    "@interactjs/actions": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/auto-scroll": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/auto-start": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/core": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/inertia": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/modifiers": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/pointer-events": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/reflow": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/utils": "1.4.0-alpha.14+sha.69d796b"
+    "@interactjs/actions": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/auto-scroll": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/auto-start": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/core": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/inertia": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/modifiers": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/pointer-events": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/reflow": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/utils": "1.4.0-alpha.15+sha.8940ff6"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/actions": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/auto-scroll": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/auto-start": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/core": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/inertia": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/modifiers": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/pointer-events": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/reflow": "1.4.0-alpha.14+sha.69d796b",
-    "@interactjs/utils": "1.4.0-alpha.14+sha.69d796b"
+    "@interactjs/_dev": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/actions": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/auto-scroll": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/auto-start": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/core": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/inertia": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/modifiers": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/pointer-events": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/reflow": "1.4.0-alpha.15+sha.8940ff6",
+    "@interactjs/utils": "1.4.0-alpha.15+sha.8940ff6"
   },
   "publishConfig": {
     "access": "public"

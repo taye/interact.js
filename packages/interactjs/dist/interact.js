@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.14+sha.69d796b-dirty
+ * interact.js v1.4.0-alpha.15+sha.8940ff6-dirty
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8769,7 +8769,7 @@ function __init_22(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_22.version = "1.4.0-alpha.14";
+_interact.default.version = __init_22.version = "1.4.0-alpha.15";
 var ___default_22 = _interact.default;
 /* common-shake removed: exports.default = */ void ___default_22;
 
