@@ -3,14 +3,14 @@
 import { default as interact, scope } from './interact';
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault';
 import inertia from '@interactjs/inertia';
-import * as pointerEvents from '@interactjs/pointerEvents';
-import * as autoStart from '@interactjs/autoStart';
+import * as pointerEvents from '@interactjs/pointer-events';
+import * as autoStart from '@interactjs/auto-start';
 import * as actions from '@interactjs/actions';
 import modifiersBase from '@interactjs/modifiers/base';
 import * as modifiers from '@interactjs/modifiers';
 import * as snappers from '@interactjs/utils/snappers';
 import extend from '@interactjs/utils/extend';
-import autoScroll from '@interactjs/autoScroll';
+import autoScroll from '@interactjs/auto-scroll';
 import reflow from '@interactjs/reflow';
 
 export function init (window) {
