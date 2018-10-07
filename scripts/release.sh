@@ -45,6 +45,7 @@ merge_to_release() {
   git checkout $RELEASE_BRANCH || exit $?
 
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
+  npx lerna bootstrap || quit "bootstrapping failed" $?
 }
 
 run_tests() {
