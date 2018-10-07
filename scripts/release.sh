@@ -72,7 +72,7 @@ bump_version() {
   fi
 
   npx lerna version --no-git-tag-version $NEW_VERSION &&
-    npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION ||
+    npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION > /dev/null ||
     quit "failed to bump version" 1
 
   cd $ROOT
@@ -97,7 +97,7 @@ commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- package*.json **/LICENSE **/package*.json **/bower.json **/dist &&
+  git add --all &&
     git commit -m "v$NEW_VERSION" &&
     git tag $NEW_TAG
 }
