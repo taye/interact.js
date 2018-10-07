@@ -49,8 +49,8 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@interactjs/interact": "0.0.0",
-    "@interactjs/_dev": "0.0.0"
+    "@interactjs/_dev": "0.0.0",
+    "@interactjs/interact": "0.0.0"
   },
   "_dev": {
     "entries": "./index.js",

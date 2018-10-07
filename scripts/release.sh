@@ -4,6 +4,8 @@ NEW_VERSION=$1
 RELEASE_BRANCH="stable"
 BUILD_ARG="--no-metadata"
 
+ROOT=$(dirname $(readlink -f $0))/..
+
 if [[ $NEW_VERSION == "prerelease" ]]; then
   RELEASE_BRANCH="unstable"
   BUILD_ARG="--metadata"
@@ -12,9 +14,10 @@ fi
 main() {
   ensure_clean_index &&
     merge_to_release &&
-    run_preversion_tests &&
+    run_tests &&
     bump_version &&
     run_build &&
+    bootstrap &&
     commit_and_tag &&
     push_and_publish &&
 
@@ -44,22 +47,18 @@ merge_to_release() {
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
 }
 
-run_preversion_tests() {
+run_tests() {
   echo_funcname
 
-  pushd $(dirname $(readlink -f $0))/..
-
-  # preversion tests must pass
-  npm run preversion || quit "tests have failed" $?
-
-  popd
+  npx lerna run test || quit "tests have failed" $?
+  cd $ROOT
 }
 
 bump_version() {
   echo_funcname
 
   # bump the version in package.json
-  NEW_VERSION=$(@bump $NEW_VERSION)
+  NEW_VERSION=$($ROOT/scripts/bump.js $NEW_VERSION)
 
   if [[ -z $NEW_VERSION ]]; then
     quit "failed to bump version" 1
@@ -72,21 +71,33 @@ bump_version() {
     quit "$NEW_TAG tag already exists" 1
   fi
 
-  # add package version change
-  git add package.json
+  npx lerna version --no-git-tag-version $NEW_VERSION &&
+    npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION > /dev/null ||
+    quit "failed to bump version" 1
+
+  cd $ROOT
 }
 
 run_build() {
   echo_funcname
 
-  npm run build -- $BUILD_ARG || exit $?
+  # copy license file
+  npx lerna exec --no-private -- cp -v $ROOT/LICENSE .
+
+  npx lerna run --no-private build -- $BUILD_ARG || exit $?
+
+  cd $ROOT
+}
+
+bootstrap() {
+  npx lerna run bootstrap
 }
 
 commit_and_tag() {
   echo_funcname
 
   # commit and add new version tag
-  git add -- package.json dist &&
+  git add --all &&
     git commit -m "v$NEW_VERSION" &&
     git tag $NEW_TAG
 }
@@ -101,15 +112,18 @@ push_and_publish() {
     # publish to npm with "next" tag
     git tag --force next &&
       git push --no-verify -f origin next &&
-      npm publish --tag next
+      npx lerna exec -- npm publish --tag next
   else
     # publish with default "latest" tag
-    npm publish
+    npx lerna exec -- npm publish
   fi
+
+  cd $ROOT
 }
 
 echo_funcname() {
   echo -e "\n==== ${FUNCNAME[1]} ====\n"
+  pwd
 }
 
 quit() {

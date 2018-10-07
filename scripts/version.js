@@ -41,10 +41,18 @@ const version = {
   },
 
   write (newVersion) {
-    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
+    const pkgFile = 'package.json';
+
+    const pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
     pkg.version = newVersion;
 
-    fs.writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
+    for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f] || {})) {
+      for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
+        deps[name] = newVersion;
+      }
+    }
+
+    fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
   },
 };
 

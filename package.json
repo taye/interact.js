@@ -18,9 +18,7 @@
     "test": "scripts/lint.js --fail-on-error && scripts/test.sh",
     "docs": "node docs --go",
     "precommit": "npm run lint -- --fail-on-error",
-    "prepush": "npm run preversion",
-    "preversion": "npm test",
-    "postversion": "",
+    "prepush": "npm test",
     "release": "cd packages/interactjs; sh ../../scripts/release.sh",
     "pre-release": "npm run release -- prerelease",
     "bump": "scripts/bump.js $@"

@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import * as utils from '@interactjs/utils';
 import Signals from '@interactjs/utils/Signals';
 import { createScope } from '../scope';
@@ -16,7 +14,7 @@ export function uniqueProps (obj) {
   for (const prop in obj) {
     if (!obj.hasOwnProperty(prop)) { continue; }
 
-    if (_.isObject(obj)) {
+    if (utils.is.object(obj)) {
       uniqueProps(obj[obj]);
     }
     else {
@@ -127,4 +125,3 @@ export function getProps (src, props) {
     return acc;
   }, {});
 }
-export { _ };

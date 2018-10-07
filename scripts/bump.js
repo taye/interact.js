@@ -18,6 +18,12 @@ if (release) {
     if (newVersion === null) {
       throw `Invalid version "${release}"`;
     }
+
+    const metadata = release.replace(/^[^+]*[+]*/, '');
+
+    if (metadata) {
+      newVersion = `${newVersion}+${metadata}`;
+    }
   }
 }
 // if this was run with no arguments, get the current version with
