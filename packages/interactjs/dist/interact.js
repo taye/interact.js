@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.13+sha.cf47517
+ * interact.js v1.4.0-alpha.14+sha.69d796b-dirty
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -4449,7 +4449,7 @@ function __install_25(scope) {
         bottom: 0
       },
       offsets: {},
-      statuses: null,
+      states: null,
       result: null
     };
   });
@@ -4470,15 +4470,15 @@ function __install_25(scope) {
 }
 
 function startAll(arg) {
-  for (var _i = 0; _i < arg.statuses.length; _i++) {
+  for (var _i = 0; _i < arg.states.length; _i++) {
     var _ref;
 
-    _ref = arg.statuses[_i];
-    var status = _ref;
+    _ref = arg.states[_i];
+    var state = _ref;
 
-    if (status.methods.start) {
-      arg.status = status;
-      status.methods.start(arg);
+    if (state.methods.start) {
+      arg.state = state;
+      state.methods.start(arg);
     }
   }
 }
@@ -4503,7 +4503,7 @@ function __start_25(_ref2, pageCoords, registeredModifiers) {
   var interactable = interaction.target,
       element = interaction.element;
   var modifierList = getModifierList(interaction, registeredModifiers);
-  var statuses = prepareStatuses(modifierList);
+  var states = prepareStates(modifierList);
   var rect = (0, ___extend_25.default)({}, interactable.getRect(element));
 
   if (!('width' in rect)) {
@@ -4528,11 +4528,12 @@ function __start_25(_ref2, pageCoords, registeredModifiers) {
     phase: phase,
     rect: rect,
     startOffset: startOffset,
-    statuses: statuses,
+    states: states,
     preEnd: false,
     requireEndOnly: false
   };
-  interaction.modifiers.statuses = statuses;
+  interaction.modifiers.states = states;
+  interaction.modifiers.result = null;
   startAll(arg);
   arg.pageCoords = (0, ___extend_25.default)({}, interaction.coords.start.page);
   var result = interaction.modifiers.result = setAll(arg);
@@ -4546,7 +4547,7 @@ function setAll(arg) {
       requireEndOnly = arg.requireEndOnly,
       rect = arg.rect,
       skipModifiers = arg.skipModifiers;
-  var statuses = skipModifiers ? arg.statuses.slice(interaction.modifiers.skip) : arg.statuses;
+  var states = skipModifiers ? arg.states.slice(interaction.modifiers.skip) : arg.states;
   arg.coords = (0, ___extend_25.default)({}, arg.pageCoords);
   arg.rect = (0, ___extend_25.default)({}, rect);
   var result = {
@@ -4555,36 +4556,33 @@ function setAll(arg) {
       y: 0
     },
     coords: arg.coords,
-    shouldMove: true
+    changed: true
   };
 
-  for (var _i2 = 0; _i2 < statuses.length; _i2++) {
+  for (var _i2 = 0; _i2 < states.length; _i2++) {
     var _ref3;
 
-    _ref3 = statuses[_i2];
-    var status = _ref3;
-    var options = status.options;
+    _ref3 = states[_i2];
+    var state = _ref3;
+    var options = state.options;
 
-    if (!status.methods.set || !shouldDo(options, preEnd, requireEndOnly, phase)) {
+    if (!state.methods.set || !shouldDo(options, preEnd, requireEndOnly, phase)) {
       continue;
     }
 
-    arg.status = status;
-    status.methods.set(arg);
+    arg.state = state;
+    state.methods.set(arg);
   }
 
   result.delta.x = arg.coords.x - arg.pageCoords.x;
   result.delta.y = arg.coords.y - arg.pageCoords.y;
-  var differsFromPrevCoords = interaction.coords.prev.page.x !== result.coords.x || interaction.coords.prev.page.y !== result.coords.y; // a move should be fired if:
-  //  - the modified coords are different to the prev interaction coords
-  //  - there's a non zero result.delta
-
-  result.shouldMove = differsFromPrevCoords || result.delta.x !== 0 || result.delta.y !== 0;
+  var prevCoords = interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.coords.prev.page;
+  result.changed = prevCoords.x !== result.coords.x || prevCoords.y !== result.coords.y;
   return result;
 }
 
-function prepareStatuses(modifierList) {
-  var statuses = [];
+function prepareStates(modifierList) {
+  var states = [];
 
   for (var index = 0; index < modifierList.length; index++) {
     var _modifierList$index = modifierList[index],
@@ -4595,15 +4593,15 @@ function prepareStatuses(modifierList) {
       continue;
     }
 
-    var status = {
+    var state = {
       options: options,
       methods: methods,
       index: index
     };
-    statuses.push(status);
+    states.push(state);
   }
 
-  return statuses;
+  return states;
 }
 
 function __beforeMove_25(_ref4) {
@@ -4621,14 +4619,14 @@ function __beforeMove_25(_ref4) {
     phase: phase,
     pageCoords: interaction.coords.cur.page,
     rect: interactable.getRect(element),
-    statuses: interaction.modifiers.statuses,
+    states: interaction.modifiers.states,
     requireEndOnly: false,
     skipModifiers: skipModifiers
   });
   interaction.modifiers.result = modifierResult; // don't fire an action move if a modifier would keep the event in the same
   // cordinates as before
 
-  if (!modifierResult.shouldMove && interaction.interacting()) {
+  if (!modifierResult.changed && interaction.interacting()) {
     return false;
   }
 }
@@ -4637,22 +4635,22 @@ function beforeEnd(arg) {
   var interaction = arg.interaction,
       event = arg.event,
       noPreEnd = arg.noPreEnd;
-  var statuses = interaction.modifiers.statuses;
+  var states = interaction.modifiers.states;
 
-  if (noPreEnd || !statuses || !statuses.length) {
+  if (noPreEnd || !states || !states.length) {
     return;
   }
 
   var didPreEnd = false;
 
-  for (var _i3 = 0; _i3 < statuses.length; _i3++) {
+  for (var _i3 = 0; _i3 < states.length; _i3++) {
     var _ref5;
 
-    _ref5 = statuses[_i3];
-    var status = _ref5;
-    arg.status = status;
-    var options = status.options,
-        methods = status.methods;
+    _ref5 = states[_i3];
+    var state = _ref5;
+    arg.state = state;
+    var options = state.options,
+        methods = state.methods;
     var endResult = methods.beforeEnd && methods.beforeEnd(arg);
 
     if (endResult === false) {
@@ -4673,32 +4671,32 @@ function beforeEnd(arg) {
 
 function stop(arg) {
   var interaction = arg.interaction;
-  var statuses = interaction.modifiers.statuses;
+  var states = interaction.modifiers.states;
 
-  if (!statuses || !statuses.length) {
+  if (!states || !states.length) {
     return;
   }
 
   var modifierArg = (0, ___extend_25.default)({
-    statuses: statuses,
+    states: states,
     interactable: interaction.target,
     element: interaction.element
   }, arg);
   restoreCoords(arg);
 
-  for (var _i4 = 0; _i4 < statuses.length; _i4++) {
+  for (var _i4 = 0; _i4 < states.length; _i4++) {
     var _ref6;
 
-    _ref6 = statuses[_i4];
-    var status = _ref6;
-    modifierArg.status = status;
+    _ref6 = states[_i4];
+    var state = _ref6;
+    modifierArg.state = state;
 
-    if (status.methods.stop) {
-      status.methods.stop(modifierArg);
+    if (state.methods.stop) {
+      state.methods.stop(modifierArg);
     }
   }
 
-  arg.interaction.modifiers.statuses = null;
+  arg.interaction.modifiers.states = null;
 }
 
 function setCoords(arg) {
@@ -4820,7 +4818,7 @@ var ___default_25 = {
   install: __install_25,
   startAll: startAll,
   setAll: setAll,
-  prepareStatuses: prepareStatuses,
+  prepareStates: prepareStates,
   start: __start_25,
   beforeMove: __beforeMove_25,
   beforeEnd: beforeEnd,
@@ -4902,18 +4900,18 @@ function resume(_ref, scope) {
       event = _ref.event,
       pointer = _ref.pointer,
       eventTarget = _ref.eventTarget;
-  var status = interaction.inertia; // Check if the down event hits the current inertia target
+  var state = interaction.inertia; // Check if the down event hits the current inertia target
 
-  if (status.active) {
+  if (state.active) {
     var element = eventTarget; // climb up the DOM tree from the event target
 
     while (__utils_21.is.element(element)) {
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        ___raf_21.default.cancel(status.i);
+        ___raf_21.default.cancel(state.i);
 
-        status.active = false;
+        state.active = false;
         interaction.simulation = null; // update pointers to the down event's coordinates
 
         interaction.updatePointer(pointer, event, eventTarget, true);
@@ -4943,7 +4941,7 @@ function release(_ref2, scope) {
   var interaction = _ref2.interaction,
       event = _ref2.event,
       noPreEnd = _ref2.noPreEnd;
-  var status = interaction.inertia;
+  var state = interaction.inertia;
 
   if (!interaction.interacting() || interaction.simulation && interaction.simulation.active || noPreEnd) {
     return;
@@ -4956,12 +4954,12 @@ function release(_ref2, scope) {
   var smoothEnd = false;
   var modifierResult; // check if inertia should be started
 
-  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== status.startEvent;
+  var inertiaPossible = options && options.enabled && interaction.prepared.name !== 'gesture' && event !== state.startEvent;
   var inertia = inertiaPossible && now - interaction.coords.cur.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
   var modifierArg = {
     interaction: interaction,
     pageCoords: __utils_21.extend({}, interaction.coords.cur.page),
-    statuses: inertiaPossible && interaction.modifiers.statuses.map(function (modifierStatus) {
+    states: inertiaPossible && interaction.modifiers.states.map(function (modifierStatus) {
       return __utils_21.extend({}, modifierStatus);
     }),
     preEnd: true,
@@ -4980,34 +4978,34 @@ function release(_ref2, scope) {
     return;
   }
 
-  __utils_21.pointer.copyCoords(status.upCoords, interaction.coords.cur);
-  interaction.pointers[0].pointer = status.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
-  status.t0 = now;
-  status.active = true;
-  status.allowResume = options.allowResume;
-  interaction.simulation = status;
-  interaction.target.fire(status.startEvent);
+  __utils_21.pointer.copyCoords(state.upCoords, interaction.coords.cur);
+  interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+  state.t0 = now;
+  state.active = true;
+  state.allowResume = options.allowResume;
+  interaction.simulation = state;
+  interaction.target.fire(state.startEvent);
 
   if (inertia) {
-    status.vx0 = interaction.coords.velocity.client.x;
-    status.vy0 = interaction.coords.velocity.client.y;
-    status.v0 = pointerSpeed;
-    calcInertia(interaction, status);
+    state.vx0 = interaction.coords.velocity.client.x;
+    state.vy0 = interaction.coords.velocity.client.y;
+    state.v0 = pointerSpeed;
+    calcInertia(interaction, state);
     __utils_21.extend(modifierArg.pageCoords, interaction.coords.cur.page);
-    modifierArg.pageCoords.x += status.xe;
-    modifierArg.pageCoords.y += status.ye;
+    modifierArg.pageCoords.x += state.xe;
+    modifierArg.pageCoords.y += state.ye;
     modifierResult = ___base_21.default.setAll(modifierArg);
-    status.modifiedXe += modifierResult.delta.x;
-    status.modifiedYe += modifierResult.delta.y;
-    status.i = ___raf_21.default.request(function () {
+    state.modifiedXe += modifierResult.delta.x;
+    state.modifiedYe += modifierResult.delta.y;
+    state.i = ___raf_21.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
-    status.smoothEnd = true;
-    status.xe = modifierResult.delta.x;
-    status.ye = modifierResult.delta.y;
-    status.sx = status.sy = 0;
-    status.i = ___raf_21.default.request(function () {
+    state.smoothEnd = true;
+    state.xe = modifierResult.delta.x;
+    state.ye = modifierResult.delta.y;
+    state.sx = state.sy = 0;
+    state.i = ___raf_21.default.request(function () {
       return smothEndTick(interaction);
     });
   }
@@ -5017,62 +5015,62 @@ function release(_ref2, scope) {
 
 function __stop_21(_ref3) {
   var interaction = _ref3.interaction;
-  var status = interaction.inertia;
+  var state = interaction.inertia;
 
-  if (status.active) {
-    ___raf_21.default.cancel(status.i);
+  if (state.active) {
+    ___raf_21.default.cancel(state.i);
 
-    status.active = false;
+    state.active = false;
     interaction.simulation = null;
   }
 }
 
-function calcInertia(interaction, status) {
+function calcInertia(interaction, state) {
   var options = __getOptions_21(interaction);
   var lambda = options.resistance;
-  var inertiaDur = -Math.log(options.endSpeed / status.v0) / lambda;
-  status.x0 = interaction.prevEvent.page.x;
-  status.y0 = interaction.prevEvent.page.y;
-  status.t0 = status.startEvent.timeStamp / 1000;
-  status.sx = status.sy = 0;
-  status.modifiedXe = status.xe = (status.vx0 - inertiaDur) / lambda;
-  status.modifiedYe = status.ye = (status.vy0 - inertiaDur) / lambda;
-  status.te = inertiaDur;
-  status.lambda_v0 = lambda / status.v0;
-  status.one_ve_v0 = 1 - options.endSpeed / status.v0;
+  var inertiaDur = -Math.log(options.endSpeed / state.v0) / lambda;
+  state.x0 = interaction.prevEvent.page.x;
+  state.y0 = interaction.prevEvent.page.y;
+  state.t0 = state.startEvent.timeStamp / 1000;
+  state.sx = state.sy = 0;
+  state.modifiedXe = state.xe = (state.vx0 - inertiaDur) / lambda;
+  state.modifiedYe = state.ye = (state.vy0 - inertiaDur) / lambda;
+  state.te = inertiaDur;
+  state.lambda_v0 = lambda / state.v0;
+  state.one_ve_v0 = 1 - options.endSpeed / state.v0;
 }
 
 function inertiaTick(interaction) {
   updateInertiaCoords(interaction);
   __utils_21.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
   __utils_21.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
-  var status = interaction.inertia;
+  var state = interaction.inertia;
   var options = __getOptions_21(interaction);
   var lambda = options.resistance;
-  var t = new Date().getTime() / 1000 - status.t0;
+  var t = new Date().getTime() / 1000 - state.t0;
 
-  if (t < status.te) {
-    var progress = 1 - (Math.exp(-lambda * t) - status.lambda_v0) / status.one_ve_v0;
+  if (t < state.te) {
+    var progress = 1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0;
 
-    if (status.modifiedXe === status.xe && status.modifiedYe === status.ye) {
-      status.sx = status.xe * progress;
-      status.sy = status.ye * progress;
+    if (state.modifiedXe === state.xe && state.modifiedYe === state.ye) {
+      state.sx = state.xe * progress;
+      state.sy = state.ye * progress;
     } else {
-      var quadPoint = __utils_21.getQuadraticCurvePoint(0, 0, status.xe, status.ye, status.modifiedXe, status.modifiedYe, progress);
-      status.sx = quadPoint.x;
-      status.sy = quadPoint.y;
+      var quadPoint = __utils_21.getQuadraticCurvePoint(0, 0, state.xe, state.ye, state.modifiedXe, state.modifiedYe, progress);
+      state.sx = quadPoint.x;
+      state.sy = quadPoint.y;
     }
 
     interaction.move();
-    status.i = ___raf_21.default.request(function () {
+    state.i = ___raf_21.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
-    status.sx = status.modifiedXe;
-    status.sy = status.modifiedYe;
+    state.sx = state.modifiedXe;
+    state.sy = state.modifiedYe;
     interaction.move();
-    interaction.end(status.startEvent);
-    status.active = false;
+    interaction.end(state.startEvent);
+    state.active = false;
     interaction.simulation = null;
   }
 
@@ -5081,43 +5079,43 @@ function inertiaTick(interaction) {
 
 function smothEndTick(interaction) {
   updateInertiaCoords(interaction);
-  var status = interaction.inertia;
-  var t = new Date().getTime() - status.t0;
+  var state = interaction.inertia;
+  var t = new Date().getTime() - state.t0;
 
   var _getOptions = __getOptions_21(interaction),
       duration = _getOptions.smoothEndDuration;
 
   if (t < duration) {
-    status.sx = __utils_21.easeOutQuad(t, 0, status.xe, duration);
-    status.sy = __utils_21.easeOutQuad(t, 0, status.ye, duration);
+    state.sx = __utils_21.easeOutQuad(t, 0, state.xe, duration);
+    state.sy = __utils_21.easeOutQuad(t, 0, state.ye, duration);
     interaction.move();
-    status.i = ___raf_21.default.request(function () {
+    state.i = ___raf_21.default.request(function () {
       return smothEndTick(interaction);
     });
   } else {
-    status.sx = status.xe;
-    status.sy = status.ye;
+    state.sx = state.xe;
+    state.sy = state.ye;
     interaction.move();
-    interaction.end(status.startEvent);
-    status.smoothEnd = status.active = false;
+    interaction.end(state.startEvent);
+    state.smoothEnd = state.active = false;
     interaction.simulation = null;
   }
 }
 
 function updateInertiaCoords(interaction) {
-  var status = interaction.inertia; // return if inertia isn't running
+  var state = interaction.inertia; // return if inertia isn't running
 
-  if (!status.active) {
+  if (!state.active) {
     return;
   }
 
-  var pageUp = status.upCoords.page;
-  var clientUp = status.upCoords.client;
+  var pageUp = state.upCoords.page;
+  var clientUp = state.upCoords.client;
   __utils_21.pointer.setCoords(interaction.coords.cur, [{
-    pageX: pageUp.x + status.sx,
-    pageY: pageUp.y + status.sy,
-    clientX: clientUp.x + status.sx,
-    clientY: clientUp.y + status.sy
+    pageX: pageUp.x + state.sx,
+    pageY: pageUp.y + state.sy,
+    clientX: clientUp.x + state.sx,
+    clientY: clientUp.y + state.sy
   }]);
 }
 
@@ -7128,27 +7126,27 @@ scope.interact = interact;
 var ___default_23 = interact;
 _$interact_23.default = ___default_23;
 
-var _$restrict_27 = {};
+var _$pointer_28 = {};
 "use strict";
 
-Object.defineProperty(_$restrict_27, "__esModule", {
+Object.defineProperty(_$pointer_28, "__esModule", {
   value: true
 });
-_$restrict_27.default = void 0;
+_$pointer_28.default = void 0;
 
-var __is_27 = ___interopRequireWildcard_27(_$is_51);
+var __is_28 = ___interopRequireWildcard_28(_$is_51);
 
-var ___rect_27 = ___interopRequireDefault_27(_$rect_57);
+var ___rect_28 = ___interopRequireDefault_28(_$rect_57);
 
-function ___interopRequireDefault_27(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_27(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_28(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function __start_27(_ref) {
+function __start_28(_ref) {
   var rect = _ref.rect,
       startOffset = _ref.startOffset,
-      status = _ref.status;
-  var options = status.options;
+      state = _ref.state;
+  var options = state.options;
   var elementRect = options.elementRect;
   var offset = {};
 
@@ -7161,19 +7159,19 @@ function __start_27(_ref) {
     offset.left = offset.top = offset.right = offset.bottom = 0;
   }
 
-  status.offset = offset;
+  state.offset = offset;
 }
 
 function set(_ref2) {
   var coords = _ref2.coords,
       interaction = _ref2.interaction,
-      status = _ref2.status;
-  var options = status.options,
-      offset = status.offset;
+      state = _ref2.state;
+  var options = state.options,
+      offset = state.offset;
   var restriction = getRestrictionRect(options.restriction, interaction, coords);
 
   if (!restriction) {
-    return status;
+    return state;
   }
 
   var rect = restriction; // object is assumed to have
@@ -7190,15 +7188,15 @@ function set(_ref2) {
 }
 
 function getRestrictionRect(value, interaction, coords) {
-  if (__is_27.func(value)) {
-    return ___rect_27.default.resolveRectLike(value, interaction.target, interaction.element, [coords.x, coords.y, interaction]);
+  if (__is_28.func(value)) {
+    return ___rect_28.default.resolveRectLike(value, interaction.target, interaction.element, [coords.x, coords.y, interaction]);
   } else {
-    return ___rect_27.default.resolveRectLike(value, interaction.target, interaction.element);
+    return ___rect_28.default.resolveRectLike(value, interaction.target, interaction.element);
   }
 }
 
 var restrict = {
-  start: __start_27,
+  start: __start_28,
   set: set,
   getRestrictionRect: getRestrictionRect,
   defaults: {
@@ -7207,24 +7205,24 @@ var restrict = {
     elementRect: null
   }
 };
-var ___default_27 = restrict;
-_$restrict_27.default = ___default_27;
+var ___default_28 = restrict;
+_$pointer_28.default = ___default_28;
 
-var _$restrictEdges_28 = {};
+var _$edges_27 = {};
 "use strict";
 
-Object.defineProperty(_$restrictEdges_28, "__esModule", {
+Object.defineProperty(_$edges_27, "__esModule", {
   value: true
 });
-_$restrictEdges_28.default = void 0;
+_$edges_27.default = void 0;
 
-var ___extend_28 = ___interopRequireDefault_28(_$extend_46);
+var ___extend_27 = ___interopRequireDefault_27(_$extend_46);
 
-var ___rect_28 = ___interopRequireDefault_28(_$rect_57);
+var ___rect_27 = ___interopRequireDefault_27(_$rect_57);
 
-var _restrict = ___interopRequireDefault_28(_$restrict_27);
+var _pointer = ___interopRequireDefault_27(_$pointer_28);
 
-function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_27(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This module adds the options.resize.restrictEdges setting which sets min and
 // max for the top, left, bottom and right edges of the target being resized.
@@ -7236,7 +7234,7 @@ function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj :
 //     outer: { top:   0, left:   0, right: 600, bottom: 600 },
 //   },
 // });
-var __getRestrictionRect_28 = _restrict.default.getRestrictionRect;
+var __getRestrictionRect_27 = _pointer.default.getRestrictionRect;
 var noInner = {
   top: +Infinity,
   left: +Infinity,
@@ -7250,23 +7248,23 @@ var noOuter = {
   right: +Infinity
 };
 
-function __start_28(_ref) {
+function __start_27(_ref) {
   var interaction = _ref.interaction,
-      status = _ref.status;
-  var options = status.options;
+      state = _ref.state;
+  var options = state.options;
   var startOffset = interaction.modifiers.startOffset;
   var offset;
 
   if (options) {
-    var offsetRect = __getRestrictionRect_28(options.offset, interaction, interaction.coords.start.page);
-    offset = ___rect_28.default.rectToXY(offsetRect);
+    var offsetRect = __getRestrictionRect_27(options.offset, interaction, interaction.coords.start.page);
+    offset = ___rect_27.default.rectToXY(offsetRect);
   }
 
   offset = offset || {
     x: 0,
     y: 0
   };
-  status.offset = {
+  state.offset = {
     top: offset.y + startOffset.top,
     left: offset.x + startOffset.left,
     bottom: offset.y - startOffset.bottom,
@@ -7274,21 +7272,21 @@ function __start_28(_ref) {
   };
 }
 
-function __set_28(_ref2) {
+function __set_27(_ref2) {
   var coords = _ref2.coords,
       interaction = _ref2.interaction,
-      status = _ref2.status;
-  var offset = status.offset,
-      options = status.options;
+      state = _ref2.state;
+  var offset = state.offset,
+      options = state.options;
   var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
     return;
   }
 
-  var page = (0, ___extend_28.default)({}, coords);
-  var inner = __getRestrictionRect_28(options.inner, interaction, page) || {};
-  var outer = __getRestrictionRect_28(options.outer, interaction, page) || {};
+  var page = (0, ___extend_27.default)({}, coords);
+  var inner = __getRestrictionRect_27(options.inner, interaction, page) || {};
+  var outer = __getRestrictionRect_27(options.outer, interaction, page) || {};
   fixRect(inner, noInner);
   fixRect(outer, noOuter);
 
@@ -7322,9 +7320,9 @@ function fixRect(rect, defaults) {
 var restrictEdges = {
   noInner: noInner,
   noOuter: noOuter,
-  getRestrictionRect: __getRestrictionRect_28,
-  start: __start_28,
-  set: __set_28,
+  getRestrictionRect: __getRestrictionRect_27,
+  start: __start_27,
+  set: __set_27,
   defaults: {
     enabled: false,
     inner: null,
@@ -7332,22 +7330,22 @@ var restrictEdges = {
     offset: null
   }
 };
-var ___default_28 = restrictEdges;
-_$restrictEdges_28.default = ___default_28;
+var ___default_27 = restrictEdges;
+_$edges_27.default = ___default_27;
 
-var _$restrictSize_29 = {};
+var _$size_29 = {};
 "use strict";
 
-Object.defineProperty(_$restrictSize_29, "__esModule", {
+Object.defineProperty(_$size_29, "__esModule", {
   value: true
 });
-_$restrictSize_29.default = void 0;
+_$size_29.default = void 0;
 
 var ___extend_29 = ___interopRequireDefault_29(_$extend_46);
 
 var ___rect_29 = ___interopRequireDefault_29(_$rect_57);
 
-var _restrictEdges = ___interopRequireDefault_29(_$restrictEdges_28);
+var _edges = ___interopRequireDefault_29(_$edges_27);
 
 function ___interopRequireDefault_29(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -7371,13 +7369,13 @@ var noMax = {
 };
 
 function __start_29(arg) {
-  return _restrictEdges.default.start(arg);
+  return _edges.default.start(arg);
 }
 
 function __set_29(arg) {
   var interaction = arg.interaction,
-      status = arg.status;
-  var options = status.options;
+      state = arg.state;
+  var options = state.options;
   var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
@@ -7386,34 +7384,34 @@ function __set_29(arg) {
 
   var rect = ___rect_29.default.xywhToTlbr(interaction.resizeRects.inverted);
 
-  var minSize = ___rect_29.default.tlbrToXywh(_restrictEdges.default.getRestrictionRect(options.min, interaction)) || noMin;
-  var maxSize = ___rect_29.default.tlbrToXywh(_restrictEdges.default.getRestrictionRect(options.max, interaction)) || noMax;
-  status.options = {
+  var minSize = ___rect_29.default.tlbrToXywh(_edges.default.getRestrictionRect(options.min, interaction)) || noMin;
+  var maxSize = ___rect_29.default.tlbrToXywh(_edges.default.getRestrictionRect(options.max, interaction)) || noMax;
+  state.options = {
     enabled: options.enabled,
     endOnly: options.endOnly,
-    inner: (0, ___extend_29.default)({}, _restrictEdges.default.noInner),
-    outer: (0, ___extend_29.default)({}, _restrictEdges.default.noOuter)
+    inner: (0, ___extend_29.default)({}, _edges.default.noInner),
+    outer: (0, ___extend_29.default)({}, _edges.default.noOuter)
   };
 
   if (edges.top) {
-    status.options.inner.top = rect.bottom - minSize.height;
-    status.options.outer.top = rect.bottom - maxSize.height;
+    state.options.inner.top = rect.bottom - minSize.height;
+    state.options.outer.top = rect.bottom - maxSize.height;
   } else if (edges.bottom) {
-    status.options.inner.bottom = rect.top + minSize.height;
-    status.options.outer.bottom = rect.top + maxSize.height;
+    state.options.inner.bottom = rect.top + minSize.height;
+    state.options.outer.bottom = rect.top + maxSize.height;
   }
 
   if (edges.left) {
-    status.options.inner.left = rect.right - minSize.width;
-    status.options.outer.left = rect.right - maxSize.width;
+    state.options.inner.left = rect.right - minSize.width;
+    state.options.outer.left = rect.right - maxSize.width;
   } else if (edges.right) {
-    status.options.inner.right = rect.left + minSize.width;
-    status.options.outer.right = rect.left + maxSize.width;
+    state.options.inner.right = rect.left + minSize.width;
+    state.options.outer.right = rect.left + maxSize.width;
   }
 
-  _restrictEdges.default.set(arg);
+  _edges.default.set(arg);
 
-  status.options = options;
+  state.options = options;
 }
 
 var restrictSize = {
@@ -7426,31 +7424,31 @@ var restrictSize = {
   }
 };
 var ___default_29 = restrictSize;
-_$restrictSize_29.default = ___default_29;
+_$size_29.default = ___default_29;
 
-var _$snap_30 = {};
+var _$pointer_31 = {};
 "use strict";
 
-Object.defineProperty(_$snap_30, "__esModule", {
+Object.defineProperty(_$pointer_31, "__esModule", {
   value: true
 });
-_$snap_30.default = void 0;
+_$pointer_31.default = void 0;
 
-var __utils_30 = ___interopRequireWildcard_30(_$utils_49);
+var __utils_31 = ___interopRequireWildcard_31(_$utils_49);
 
-function ___interopRequireWildcard_30(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_31(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function __start_30(_ref) {
+function __start_31(_ref) {
   var interaction = _ref.interaction,
       interactable = _ref.interactable,
       element = _ref.element,
       rect = _ref.rect,
-      status = _ref.status,
+      state = _ref.state,
       startOffset = _ref.startOffset;
-  var options = status.options;
+  var options = state.options;
   var offsets = [];
-  var optionsOrigin = __utils_30.rect.rectToXY(__utils_30.rect.resolveRectLike(options.origin));
-  var origin = optionsOrigin || __utils_30.getOriginXY(interactable, element, interaction.prepared.name);
+  var optionsOrigin = __utils_31.rect.rectToXY(__utils_31.rect.resolveRectLike(options.origin));
+  var origin = optionsOrigin || __utils_31.getOriginXY(interactable, element, interaction.prepared.name);
   var snapOffset;
 
   if (options.offset === 'startCoords') {
@@ -7459,68 +7457,65 @@ function __start_30(_ref) {
       y: interaction.coords.start.page.y - origin.y
     };
   } else {
-    var offsetRect = __utils_30.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
-    snapOffset = __utils_30.rect.rectToXY(offsetRect) || {
+    var offsetRect = __utils_31.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
+    snapOffset = __utils_31.rect.rectToXY(offsetRect) || {
       x: 0,
       y: 0
     };
   }
 
-  if (rect && options.relativePoints && options.relativePoints.length) {
-    for (var _i = 0; _i < (options.relativePoints || []).length; _i++) {
-      var _ref2;
+  var relativePoints = options.relativePoints || [];
 
-      _ref2 = (options.relativePoints || [])[_i];
-      var _ref3 = _ref2,
-          relativeX = _ref3.x,
-          relativeY = _ref3.y;
+  if (rect && options.relativePoints && options.relativePoints.length) {
+    for (var index = 0; index < relativePoints.length; index++) {
+      var relativePoint = relativePoints[index];
       offsets.push({
-        x: startOffset.left - rect.width * relativeX + snapOffset.x,
-        y: startOffset.top - rect.height * relativeY + snapOffset.y
+        index: index,
+        relativePoint: relativePoint,
+        x: startOffset.left - rect.width * relativePoint.x + snapOffset.x,
+        y: startOffset.top - rect.height * relativePoint.y + snapOffset.y
       });
     }
   } else {
-    offsets.push(snapOffset);
+    offsets.push(__utils_31.extend({
+      index: 0,
+      relativePoint: null
+    }, snapOffset));
   }
 
-  status.offset = offsets;
+  state.offsets = offsets;
 }
 
-function __set_30(_ref4) {
-  var interaction = _ref4.interaction,
-      coords = _ref4.coords,
-      status = _ref4.status;
-  var options = status.options,
-      offsets = status.offset;
-  var origin = __utils_30.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
-  var page = __utils_30.extend({}, coords);
+function __set_31(_ref2) {
+  var interaction = _ref2.interaction,
+      coords = _ref2.coords,
+      state = _ref2.state;
+  var options = state.options,
+      offsets = state.offsets;
+  var origin = __utils_31.getOriginXY(interaction.target, interaction.element, interaction.prepared.name);
+  var page = __utils_31.extend({}, coords);
   var targets = [];
   var target;
   var i;
   page.x -= origin.x;
   page.y -= origin.y;
-  status.realX = page.x;
-  status.realY = page.y;
+  state.realX = page.x;
+  state.realY = page.y;
   var len = options.targets ? options.targets.length : 0;
 
-  for (var _i2 = 0; _i2 < offsets.length; _i2++) {
-    var _ref5;
+  for (var _i = 0; _i < offsets.length; _i++) {
+    var _ref3;
 
-    _ref5 = offsets[_i2];
-    var _ref6 = _ref5,
-        offsetX = _ref6.x,
-        offsetY = _ref6.y;
-    var relativeX = page.x - offsetX;
-    var relativeY = page.y - offsetY;
+    _ref3 = offsets[_i];
+    var offset = _ref3;
+    var relativeX = page.x - offset.x;
+    var relativeY = page.y - offset.y;
 
-    for (var _i3 = 0; _i3 < options.targets.length; _i3++) {
-      var _ref7;
+    for (var index = 0; index < options.targets.length; index++) {
+      var snapTarget = options.targets[index];
 
-      _ref7 = options.targets[_i3];
-      var snapTarget = _ref7;
-
-      if (__utils_30.is.func(snapTarget)) {
-        target = snapTarget(relativeX, relativeY, interaction);
+      if (__utils_31.is.func(snapTarget)) {
+        target = snapTarget(relativeX, relativeY, interaction, offset, index);
       } else {
         target = snapTarget;
       }
@@ -7530,9 +7525,9 @@ function __set_30(_ref4) {
       }
 
       targets.push({
-        x: __utils_30.is.number(target.x) ? target.x + offsetX : relativeX,
-        y: __utils_30.is.number(target.y) ? target.y + offsetY : relativeY,
-        range: __utils_30.is.number(target.range) ? target.range : options.range
+        x: __utils_31.is.number(target.x) ? target.x + offset.x : relativeX,
+        y: __utils_31.is.number(target.y) ? target.y + offset.y : relativeY,
+        range: __utils_31.is.number(target.range) ? target.range : options.range
       });
     }
   }
@@ -7551,7 +7546,7 @@ function __set_30(_ref4) {
     var range = target.range;
     var dx = target.x - page.x;
     var dy = target.y - page.y;
-    var distance = __utils_30.hypot(dx, dy);
+    var distance = __utils_31.hypot(dx, dy);
     var inRange = distance <= range; // Infinite targets count as being out of range
     // compared to non infinite ones that are in range
 
@@ -7571,7 +7566,7 @@ function __set_30(_ref4) {
       closest.inRange = inRange;
       closest.dx = dx;
       closest.dy = dy;
-      status.range = range;
+      state.range = range;
     }
   }
 
@@ -7579,35 +7574,37 @@ function __set_30(_ref4) {
     coords.x = closest.target.x;
     coords.y = closest.target.y;
   }
+
+  state.closest = closest;
 }
 
 var snap = {
-  start: __start_30,
-  set: __set_30,
+  start: __start_31,
+  set: __set_31,
   defaults: {
     enabled: false,
     range: Infinity,
     targets: null,
-    offsets: null,
+    offset: null,
     relativePoints: null
   }
 };
-var ___default_30 = snap;
-_$snap_30.default = ___default_30;
+var ___default_31 = snap;
+_$pointer_31.default = ___default_31;
 
-var _$snapSize_32 = {};
+var _$size_32 = {};
 "use strict";
 
-Object.defineProperty(_$snapSize_32, "__esModule", {
+Object.defineProperty(_$size_32, "__esModule", {
   value: true
 });
-_$snapSize_32.default = void 0;
+_$size_32.default = void 0;
 
 var ___extend_32 = ___interopRequireDefault_32(_$extend_46);
 
 var __is_32 = ___interopRequireWildcard_32(_$is_51);
 
-var _snap = ___interopRequireDefault_32(_$snap_30);
+var ___pointer_32 = ___interopRequireDefault_32(_$pointer_31);
 
 function ___interopRequireWildcard_32(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -7623,15 +7620,15 @@ function ___arrayWithHoles_32(arr) { if (Array.isArray(arr)) return arr; }
 
 function __start_32(arg) {
   var interaction = arg.interaction,
-      status = arg.status;
-  var options = status.options;
+      state = arg.state;
+  var options = state.options;
   var edges = interaction.prepared.edges;
 
   if (!edges) {
     return null;
   }
 
-  arg.status = {
+  arg.state = {
     options: {
       relativePoints: [{
         x: edges.left ? 0 : 1,
@@ -7645,26 +7642,26 @@ function __start_32(arg) {
       range: options.range
     }
   };
-  status.targetFields = status.targetFields || [['width', 'height'], ['x', 'y']];
+  state.targetFields = state.targetFields || [['width', 'height'], ['x', 'y']];
 
-  _snap.default.start(arg);
+  ___pointer_32.default.start(arg);
 
-  status.offset = arg.status.offset;
-  arg.status = status;
+  state.offsets = arg.state.offsets;
+  arg.state = state;
 }
 
 function __set_32(arg) {
   var interaction = arg.interaction,
-      status = arg.status,
+      state = arg.state,
       coords = arg.coords;
-  var options = status.options,
-      offset = status.offset;
+  var options = state.options,
+      offsets = state.offsets;
   var relative = {
-    x: coords.x - offset[0].x,
-    y: coords.y - offset[0].y
+    x: coords.x - offsets[0].x,
+    y: coords.y - offsets[0].y
   };
-  status.options = (0, ___extend_32.default)({}, options);
-  status.options.targets = [];
+  state.options = (0, ___extend_32.default)({}, options);
+  state.options.targets = [];
 
   for (var _i = 0; _i < (options.targets || []).length; _i++) {
     var _ref;
@@ -7683,10 +7680,10 @@ function __set_32(arg) {
       continue;
     }
 
-    for (var _i2 = 0; _i2 < status.targetFields.length; _i2++) {
+    for (var _i2 = 0; _i2 < state.targetFields.length; _i2++) {
       var _ref2;
 
-      _ref2 = status.targetFields[_i2];
+      _ref2 = state.targetFields[_i2];
 
       var _ref3 = _ref2,
           _ref4 = ___slicedToArray_32(_ref3, 2),
@@ -7700,12 +7697,12 @@ function __set_32(arg) {
       }
     }
 
-    status.options.targets.push(target);
+    state.options.targets.push(target);
   }
 
-  _snap.default.set(arg);
+  ___pointer_32.default.set(arg);
 
-  status.options = options;
+  state.options = options;
 }
 
 var snapSize = {
@@ -7715,28 +7712,27 @@ var snapSize = {
     enabled: false,
     range: Infinity,
     targets: null,
-    offset: null,
-    offsets: null
+    offset: null
   }
 };
 var ___default_32 = snapSize;
-_$snapSize_32.default = ___default_32;
+_$size_32.default = ___default_32;
 
-var _$snapEdges_31 = {};
+var _$edges_30 = {};
 "use strict";
 
-Object.defineProperty(_$snapEdges_31, "__esModule", {
+Object.defineProperty(_$edges_30, "__esModule", {
   value: true
 });
-_$snapEdges_31.default = void 0;
+_$edges_30.default = void 0;
 
-var ___clone_31 = ___interopRequireDefault_31(_$clone_42);
+var ___clone_30 = ___interopRequireDefault_30(_$clone_42);
 
-var ___extend_31 = ___interopRequireDefault_31(_$extend_46);
+var ___extend_30 = ___interopRequireDefault_30(_$extend_46);
 
-var _snapSize = ___interopRequireDefault_31(_$snapSize_32);
+var _size = ___interopRequireDefault_30(_$size_32);
 
-function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_30(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * @module modifiers/snapEdges
@@ -7765,44 +7761,44 @@ function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj :
  *   },
  * });
  */
-function __install_31(scope) {
+function __install_30(scope) {
   var defaults = scope.defaults;
   defaults.perAction.snapEdges = snapEdges.defaults;
 }
 
-function __start_31(arg) {
+function __start_30(arg) {
   var edges = arg.interaction.prepared.edges;
 
   if (!edges) {
     return null;
   }
 
-  arg.status.targetFields = arg.status.targetFields || [[edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom']];
-  return _snapSize.default.start(arg);
+  arg.state.targetFields = arg.state.targetFields || [[edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom']];
+  return _size.default.start(arg);
 }
 
-function __set_31(arg) {
-  return _snapSize.default.set(arg);
+function __set_30(arg) {
+  return _size.default.set(arg);
 }
 
 function modifyCoords(arg) {
-  _snapSize.default.modifyCoords(arg);
+  _size.default.modifyCoords(arg);
 }
 
 var snapEdges = {
-  install: __install_31,
-  start: __start_31,
-  set: __set_31,
+  install: __install_30,
+  start: __start_30,
+  set: __set_30,
   modifyCoords: modifyCoords,
-  defaults: (0, ___extend_31.default)((0, ___clone_31.default)(_snapSize.default.defaults), {
+  defaults: (0, ___extend_30.default)((0, ___clone_30.default)(_size.default.defaults), {
     offset: {
       x: 0,
       y: 0
     }
   })
 };
-var ___default_31 = snapEdges;
-_$snapEdges_31.default = ___default_31;
+var ___default_30 = snapEdges;
+_$edges_30.default = ___default_30;
 
 var _$modifiers_26 = {};
 "use strict";
@@ -7814,32 +7810,32 @@ _$modifiers_26.restrictSize = _$modifiers_26.restrictEdges = _$modifiers_26.rest
 
 var ___base_26 = ___interopRequireDefault_26(_$base_25);
 
-var ___snap_26 = ___interopRequireDefault_26(_$snap_30);
+var ___pointer_26 = ___interopRequireDefault_26(_$pointer_31);
 
-var ___snapSize_26 = ___interopRequireDefault_26(_$snapSize_32);
+var ___size_26 = ___interopRequireDefault_26(_$size_32);
 
-var _snapEdges = ___interopRequireDefault_26(_$snapEdges_31);
+var ___edges_26 = ___interopRequireDefault_26(_$edges_30);
 
-var ___restrict_26 = ___interopRequireDefault_26(_$restrict_27);
+var _pointer2 = ___interopRequireDefault_26(_$pointer_28);
 
-var ___restrictEdges_26 = ___interopRequireDefault_26(_$restrictEdges_28);
+var _edges2 = ___interopRequireDefault_26(_$edges_27);
 
-var _restrictSize = ___interopRequireDefault_26(_$restrictSize_29);
+var _size2 = ___interopRequireDefault_26(_$size_29);
 
 function ___interopRequireDefault_26(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var __makeModifier_26 = ___base_26.default.makeModifier;
-var __snap_26 = __makeModifier_26(___snap_26.default, 'snap');
+var __snap_26 = __makeModifier_26(___pointer_26.default, 'snap');
 _$modifiers_26.snap = __snap_26;
-var __snapSize_26 = __makeModifier_26(___snapSize_26.default, 'snapSize');
+var __snapSize_26 = __makeModifier_26(___size_26.default, 'snapSize');
 _$modifiers_26.snapSize = __snapSize_26;
-var __snapEdges_26 = __makeModifier_26(_snapEdges.default, 'snapEdges');
+var __snapEdges_26 = __makeModifier_26(___edges_26.default, 'snapEdges');
 _$modifiers_26.snapEdges = __snapEdges_26;
-var __restrict_26 = __makeModifier_26(___restrict_26.default, 'restrict');
+var __restrict_26 = __makeModifier_26(_pointer2.default, 'restrict');
 _$modifiers_26.restrict = __restrict_26;
-var __restrictEdges_26 = __makeModifier_26(___restrictEdges_26.default, 'restrictEdges');
+var __restrictEdges_26 = __makeModifier_26(_edges2.default, 'restrictEdges');
 _$modifiers_26.restrictEdges = __restrictEdges_26;
-var __restrictSize_26 = __makeModifier_26(_restrictSize.default, 'restrictSize');
+var __restrictSize_26 = __makeModifier_26(_size2.default, 'restrictSize');
 _$modifiers_26.restrictSize = __restrictSize_26;
 
 var _$PointerEvent_33 = {};
@@ -8076,7 +8072,7 @@ function collectEventTargets(_ref) {
 
   if (type === 'hold') {
     signalArg.targets = signalArg.targets.filter(function (target) {
-      return target.eventable.options.holdDuration === interaction.holdTimers[pointerIndex].duration;
+      return target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration;
     });
   }
 
@@ -8091,39 +8087,31 @@ function __install_34(scope) {
     interaction.prevTap = null; // the most recent tap event on this interaction
 
     interaction.tapTime = 0; // time of the most recent tap event
-
-    interaction.holdTimers = []; // [{ duration, timeout }]
   });
   interactions.signals.on('update-pointer', function (_ref3) {
-    var interaction = _ref3.interaction,
-        down = _ref3.down,
-        pointerIndex = _ref3.pointerIndex;
+    var down = _ref3.down,
+        pointerInfo = _ref3.pointerInfo;
 
     if (!down) {
       return;
     }
 
-    interaction.holdTimers[pointerIndex] = {
+    pointerInfo.hold = {
       duration: Infinity,
       timeout: null
     };
   });
-  interactions.signals.on('remove-pointer', function (_ref4) {
+  interactions.signals.on('move', function (_ref4) {
     var interaction = _ref4.interaction,
-        pointerIndex = _ref4.pointerIndex;
-    interaction.holdTimers.splice(pointerIndex, 1);
-  });
-  interactions.signals.on('move', function (_ref5) {
-    var interaction = _ref5.interaction,
-        pointer = _ref5.pointer,
-        event = _ref5.event,
-        eventTarget = _ref5.eventTarget,
-        duplicateMove = _ref5.duplicateMove;
+        pointer = _ref4.pointer,
+        event = _ref4.event,
+        eventTarget = _ref4.eventTarget,
+        duplicateMove = _ref4.duplicateMove;
     var pointerIndex = interaction.getPointerIndex(pointer);
 
     if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
       if (interaction.pointerIsDown) {
-        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+        clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
       }
 
       fire({
@@ -8135,13 +8123,13 @@ function __install_34(scope) {
       });
     }
   });
-  interactions.signals.on('down', function (_ref6) {
-    var interaction = _ref6.interaction,
-        pointer = _ref6.pointer,
-        event = _ref6.event,
-        eventTarget = _ref6.eventTarget,
-        pointerIndex = _ref6.pointerIndex;
-    var timer = interaction.holdTimers[pointerIndex];
+  interactions.signals.on('down', function (_ref5) {
+    var interaction = _ref5.interaction,
+        pointer = _ref5.pointer,
+        event = _ref5.event,
+        eventTarget = _ref5.eventTarget,
+        pointerIndex = _ref5.pointerIndex;
+    var timer = interaction.pointers[pointerIndex].hold;
     var path = __utils_34.dom.getPath(eventTarget);
     var signalArg = {
       interaction: interaction,
@@ -8155,10 +8143,10 @@ function __install_34(scope) {
     };
 
     for (var _i2 = 0; _i2 < path.length; _i2++) {
-      var _ref7;
+      var _ref6;
 
-      _ref7 = path[_i2];
-      var element = _ref7;
+      _ref6 = path[_i2];
+      var element = _ref6;
       signalArg.element = element;
       signals.fire('collect-targets', signalArg);
     }
@@ -8170,10 +8158,10 @@ function __install_34(scope) {
     var minDuration = Infinity;
 
     for (var _i3 = 0; _i3 < signalArg.targets.length; _i3++) {
-      var _ref8;
+      var _ref7;
 
-      _ref8 = signalArg.targets[_i3];
-      var target = _ref8;
+      _ref7 = signalArg.targets[_i3];
+      var target = _ref7;
       var holdDuration = target.eventable.options.holdDuration;
 
       if (holdDuration < minDuration) {
@@ -8192,11 +8180,11 @@ function __install_34(scope) {
       });
     }, minDuration);
   });
-  interactions.signals.on('up', function (_ref9) {
-    var interaction = _ref9.interaction,
-        pointer = _ref9.pointer,
-        event = _ref9.event,
-        eventTarget = _ref9.eventTarget;
+  interactions.signals.on('up', function (_ref8) {
+    var interaction = _ref8.interaction,
+        pointer = _ref8.pointer,
+        event = _ref8.event,
+        eventTarget = _ref8.eventTarget;
 
     if (!interaction.pointerWasMoved) {
       fire({
@@ -8212,12 +8200,12 @@ function __install_34(scope) {
 
   for (var _i4 = 0; _i4 < _arr.length; _i4++) {
     var signalName = _arr[_i4];
-    interactions.signals.on(signalName, function (_ref10) {
-      var interaction = _ref10.interaction,
-          pointerIndex = _ref10.pointerIndex;
+    interactions.signals.on(signalName, function (_ref9) {
+      var interaction = _ref9.interaction,
+          pointerIndex = _ref9.pointerIndex;
 
-      if (interaction.holdTimers[pointerIndex]) {
-        clearTimeout(interaction.holdTimers[pointerIndex].timeout);
+      if (interaction.pointers[pointerIndex].hold) {
+        clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
       }
     });
   }
@@ -8228,11 +8216,11 @@ function __install_34(scope) {
 }
 
 function createSignalListener(type) {
-  return function (_ref11) {
-    var interaction = _ref11.interaction,
-        pointer = _ref11.pointer,
-        event = _ref11.event,
-        eventTarget = _ref11.eventTarget;
+  return function (_ref10) {
+    var interaction = _ref10.interaction,
+        pointer = _ref10.pointer,
+        event = _ref10.event,
+        eventTarget = _ref10.eventTarget;
     fire({
       interaction: interaction,
       eventTarget: eventTarget,
@@ -8775,13 +8763,13 @@ function __init_22(window) {
   _interact.default.use(_autoScroll.default); // reflow
 
 
-  _interact.default.use(_reflow.default); // eslint-disable-next-line no-undef
+  _interact.default.use(_reflow.default);
 
-
-  _interact.default.version = "1.4.0-alpha.13";
   return _interact.default;
-}
+} // eslint-disable-next-line no-undef
 
+
+_interact.default.version = __init_22.version = "1.4.0-alpha.14";
 var ___default_22 = _interact.default;
 /* common-shake removed: exports.default = */ void ___default_22;
 

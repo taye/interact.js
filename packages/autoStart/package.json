@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/autoStart",
-  "version": "0.0.0",
+  "version": "1.4.0-alpha.14+sha.69d796b",
   "peerDependencies": {
-    "@interactjs/core": "0.0.0",
-    "@interactjs/utils": "0.0.0"
+    "@interactjs/core": "1.4.0-alpha.14+sha.69d796b",
+    "@interactjs/utils": "1.4.0-alpha.14+sha.69d796b"
   },
   "devDependencies": {
-    "@interactjs/_dev": "0.0.0",
-    "@interactjs/core": "0.0.0",
-    "@interactjs/utils": "0.0.0"
+    "@interactjs/_dev": "1.4.0-alpha.14+sha.69d796b",
+    "@interactjs/core": "1.4.0-alpha.14+sha.69d796b",
+    "@interactjs/utils": "1.4.0-alpha.14+sha.69d796b"
   },
   "publishConfig": {
     "access": "public"

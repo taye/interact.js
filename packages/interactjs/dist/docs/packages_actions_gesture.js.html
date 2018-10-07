@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/actions/gesture.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent.html">DropEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DropEvent.html#reject">reject</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#actionChecker">actionChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#styleCursor">styleCursor</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent.html">InteractEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopImmediatePropagation">stopImmediatePropagation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="InteractEvent.html#stopPropagation">stopPropagation</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interaction.html">Interaction</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#end">end</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#move">move</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#start">start</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interaction.html#stop">stop</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports_module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.isSet">isSet</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.pointerMoveTolerance">pointerMoveTolerance</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.stop">stop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsPointerEvent">supportsPointerEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.supportsTouch">supportsTouch</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.use">use</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#_$interact_23scope">_$interact_23scope</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#dropzoneMethod">dropzoneMethod</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#stopImmediatePropagation">stopImmediatePropagation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#stopPropagation">stopPropagation</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/actions/gesture.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import * as utils from '@interactjs/utils';
+import InteractEvent from '@interactjs/core/InteractEvent';
+
+function install (scope) {
+  const {
+    actions,
+    Interactable,
+    interactions,
+    defaults,
+  } = scope;
+
+  const gesture = {
+    defaults: {
+    },
+
+    checker: function (pointer, event, interactable, element, interaction) {
+      if (interaction.pointers.length >= 2) {
+        return { name: 'gesture' };
+      }
+
+      return null;
+    },
+
+    getCursor: function () {
+      return '';
+    },
+  };
+
+  /**
+   * ```js
+   * interact(element).gesturable({
+   *     onstart: function (event) {},
+   *     onmove : function (event) {},
+   *     onend  : function (event) {},
+   *
+   *     // limit multiple gestures.
+   *     // See the explanation in {@link Interactable.draggable} example
+   *     max: Infinity,
+   *     maxPerElement: 1,
+   * });
+   *
+   * var isGestureable = interact(element).gesturable();
+   * ```
+   *
+   * Gets or sets whether multitouch gestures can be performed on the target
+   *
+   * @param {boolean | object} [options] true/false or An object with event
+   * listeners to be fired on gesture events (makes the Interactable gesturable)
+   * @return {boolean | Interactable} A boolean indicating if this can be the
+   * target of gesture events, or this Interactable
+   */
+  Interactable.prototype.gesturable = function (options) {
+    if (utils.is.object(options)) {
+      this.options.gesture.enabled = options.enabled === false? false: true;
+      this.setPerAction('gesture', options);
+      this.setOnEvents('gesture', options);
+
+      return this;
+    }
+
+    if (utils.is.bool(options)) {
+      this.options.gesture.enabled = options;
+
+      return this;
+    }
+
+    return this.options.gesture;
+  };
+
+  interactions.signals.on('action-start', updateGestureProps);
+  interactions.signals.on('action-move', updateGestureProps);
+  interactions.signals.on('action-end', updateGestureProps);
+
+  interactions.signals.on('action-start', start);
+  interactions.signals.on('action-move', move);
+
+  interactions.signals.on('new', function (interaction) {
+    interaction.gesture = {
+      start: { x: 0, y: 0 },
+
+      startDistance: 0,   // distance between two touches of touchStart
+      prevDistance : 0,
+      distance     : 0,
+
+      scale: 1,           // gesture.distance / gesture.startDistance
+
+      startAngle: 0,      // angle of line joining two touches
+      prevAngle : 0,      // angle of the previous gesture event
+    };
+  });
+
+  actions.gesture = gesture;
+  actions.names.push('gesture');
+  utils.arr.merge(actions.eventTypes, [
+    'gesturestart',
+    'gesturemove',
+    'gestureend',
+  ]);
+  actions.methodDict.gesture = 'gesturable';
+
+  defaults.gesture = gesture.defaults;
+}
+
+function start ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  iEvent.ds = 0;
+
+  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance;
+  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.scale = 1;
+}
+
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  iEvent.ds = iEvent.scale - interaction.gesture.scale;
+
+  interaction.target.fire(iEvent);
+
+  interaction.gesture.prevAngle = iEvent.angle;
+  interaction.gesture.prevDistance = iEvent.distance;
+
+  if (iEvent.scale !== Infinity
+      &amp;&amp; iEvent.scale !== null
+      &amp;&amp; iEvent.scale !== undefined
+      &amp;&amp; !isNaN(iEvent.scale)) {
+
+    interaction.gesture.scale = iEvent.scale;
+  }
+}
+
+function updateGestureProps ({ interaction, iEvent, event, phase }) {
+  if (interaction.prepared.name !== 'gesture') { return; }
+
+  const pointers = interaction.pointers.map(p => p.pointer);
+  const starting = phase === 'start';
+  const ending = phase === 'end';
+  const deltaSource = interaction.target.options.deltaSource;
+
+  iEvent.touches = [pointers[0].pointer, pointers[1].pointer];
+
+  if (starting) {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box      = utils.pointer.touchBBox(pointers);
+    iEvent.scale    = 1;
+    iEvent.ds       = 0;
+    iEvent.angle    = utils.pointer.touchAngle(pointers, undefined, deltaSource);
+    iEvent.da       = 0;
+  }
+  else if (ending || event instanceof InteractEvent) {
+    iEvent.distance = interaction.prevEvent.distance;
+    iEvent.box      = interaction.prevEvent.box;
+    iEvent.scale    = interaction.prevEvent.scale;
+    iEvent.ds       = iEvent.scale - 1;
+    iEvent.angle    = interaction.prevEvent.angle;
+    iEvent.da       = iEvent.angle - interaction.gesture.startAngle;
+  }
+  else {
+    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource);
+    iEvent.box      = utils.pointer.touchBBox(pointers);
+    iEvent.scale    = iEvent.distance / interaction.gesture.startDistance;
+    iEvent.angle    = utils.pointer.touchAngle(pointers, interaction.gesture.prevAngle, deltaSource);
+
+    iEvent.ds = iEvent.scale - interaction.gesture.prevScale;
+    iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
+  }
+}
+
+export default { install };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
