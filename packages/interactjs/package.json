@@ -5,13 +5,6 @@
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
   },
-  "files": [
-    "dist/",
-    "index.js",
-    "LICENSE",
-    "index.d.ts",
-    "interact-test.ts"
-  ],
   "main": "dist/interact.js",
   "scripts": {
     "build": "@build --docs"

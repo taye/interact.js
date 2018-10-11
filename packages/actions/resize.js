@@ -239,6 +239,9 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     const width  = utils.is.number(rect.width )? rect.width  : rect.right  - rect.left;
     const height = utils.is.number(rect.height)? rect.height : rect.bottom - rect.top ;
 
+    // don't use margin greater than half the relevent dimension
+    margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2);
+
     if (width < 0) {
       if      (name === 'left' ) { name = 'right'; }
       else if (name === 'right') { name = 'left' ; }
