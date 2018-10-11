@@ -237,10 +237,10 @@ const pointerUtils = {
       page,
       client,
       timeStamp,
-      pageX: page.x,
-      pageY: page.y,
-      clientX: client.x,
-      clientY: client.y,
+      get pageX () { return page.x; },
+      get pageY () { return page.y; },
+      get clientX () { return client.x; },
+      get clientY () { return client.y; },
     };
   },
 };
