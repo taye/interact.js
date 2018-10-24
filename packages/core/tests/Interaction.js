@@ -127,8 +127,8 @@ test('Interaction.updatePointer', t => {
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }));
     const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }));
 
-    oldPointers.forEach(pointer => interaction.updatePointer(pointer));
-    newPointers.forEach(pointer => interaction.updatePointer(pointer));
+    oldPointers.forEach(pointer => interaction.updatePointer(pointer, pointer));
+    newPointers.forEach(pointer => interaction.updatePointer(pointer, pointer));
 
     st.equal(interaction.pointers.length, oldPointers.length,
       'number of pointers is unchanged');
@@ -154,7 +154,7 @@ test('Interaction.removePointer', t => {
     { id: 1, remain: [       ], message: 'final' },
   ];
 
-  ids.forEach((pointerId) => interaction.updatePointer({ pointerId }));
+  ids.forEach((pointerId) => interaction.updatePointer({ pointerId }, {}));
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id });
@@ -164,6 +164,67 @@ test('Interaction.removePointer', t => {
       removal.remain,
       `${removal.message} - remaining interaction.pointers is correct`);
   }
+
+  t.end();
+});
+
+test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
+  const signals = new Signals();
+  const interaction = new Interaction({ signals });
+  const eventTarget = {};
+  const pointer = {
+    target: eventTarget,
+    pointerId: 0,
+  };
+  let info = {};
+
+  signals.on('update-pointer', (arg) => info.updated = arg.pointerInfo);
+  signals.on('remove-pointer', (arg) => info.removed = arg.pointerInfo);
+
+  interaction.coords.cur.timeStamp = 0;
+  const commonPointerInfo = {
+    id: 0,
+    pointer,
+    event: pointer,
+    downTime: null,
+    downTarget: null,
+  };
+
+  interaction.pointerDown(pointer, pointer, eventTarget);
+  t.deepEqual(
+    info.updated,
+    {
+      ...commonPointerInfo,
+      downTime: interaction.coords.cur.timeStamp,
+      downTarget: eventTarget,
+    },
+    'interaction.pointerDown updates pointer'
+  );
+  t.equal(info.removed, undefined, 'interaction.pointerDown doesn\'t remove pointer');
+  interaction.removePointer(pointer);
+  info = {};
+
+  interaction.pointerMove(pointer, pointer, eventTarget);
+  t.deepEqual(
+    info.updated,
+    commonPointerInfo,
+    'interaction.pointerMove updates pointer'
+  );
+  t.equal(info.removed, undefined, 'interaction.pointerMove doesn\'t remove pointer');
+  info = {};
+
+  interaction.pointerUp(pointer, pointer, eventTarget);
+  t.equal(info.updated, undefined, 'interaction.pointerUp doesn\'t update existing pointer');
+  info = {};
+
+  interaction.pointerUp(pointer, pointer, eventTarget);
+  t.deepEqual(
+    info.updated,
+    commonPointerInfo,
+    'interaction.pointerUp updates non existing pointer'
+  );
+  t.deepEqual(info.removed, commonPointerInfo, 'interaction.pointerUp also removes pointer');
+  info = {};
 
   t.end();
 });

@@ -203,7 +203,11 @@ class Interaction {
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
-    const pointerIndex = this.getPointerIndex(pointer);
+    let pointerIndex = this.getPointerIndex(pointer);
+
+    if (pointerIndex === -1) {
+      pointerIndex = this.updatePointer(pointer, event, eventTarget, false);
+    }
 
     this._signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
       pointer,
@@ -286,7 +290,7 @@ class Interaction {
 
     // mouse and pen interactions may have only one pointer
     return (this.pointerType === 'mouse' || this.pointerType === 'pen')
-      ? 0
+      ? this.pointers.length - 1
       : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId);
   }
 
@@ -298,6 +302,10 @@ class Interaction {
     const id = utils.pointer.getPointerId(pointer);
     let pointerIndex = this.getPointerIndex(pointer);
     let pointerInfo = this.pointers[pointerIndex];
+
+    down = down === false
+      ? false
+      : down || /(down|start)$/i.test(event.type);
 
     if (!pointerInfo) {
       pointerInfo = {

@@ -141,7 +141,7 @@ function install (scope) {
   });
 
   interactions.signals.on('update-pointer', function ({ down, pointerInfo }) {
-    if (!down) {
+    if (!down && pointerInfo.hold) {
       return;
     }
 
