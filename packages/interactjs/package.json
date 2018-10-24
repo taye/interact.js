@@ -44,7 +44,9 @@
   },
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
-    "@interactjs/interact": "0.0.0"
+    "@interactjs/interact": "0.0.0",
+    "@interactjs/modifiers": "0.0.0",
+    "@interactjs/utils": "0.0.0"
   },
   "_dev": {
     "entries": "./index.js",
