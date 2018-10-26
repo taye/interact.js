@@ -49,6 +49,7 @@
     "glob": "^7.1.2",
     "husky": "^0.13.1",
     "jsdoc": "github:taye/jsdoc#master",
+    "jsdoc-babel": "^0.5.0",
     "jsdoc-stale": "github:taye/jsdoc-stale#master",
     "jsdom": "^9.11.0",
     "lerna": "^3.0.0-rc.0",

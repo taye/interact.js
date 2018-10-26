@@ -1,5 +1,5 @@
-/// <reference path="./interact.d.ts" />
-import { interact } from 'interact.js/interact'
+/// <reference path="./index.d.ts" />
+import * as interact from './index';
 
 // Interactables
 interact('.drag-and-resize')
