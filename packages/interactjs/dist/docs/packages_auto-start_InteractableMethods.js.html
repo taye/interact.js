@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>packages/pointerEvents/PointerEvent.js - Documentation</title>
+    <title>packages/auto-start/InteractableMethods.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">packages/pointerEvents/PointerEvent.js</h1>
+    <h1 class="page-title">packages/auto-start/InteractableMethods.js</h1>
     
 
     
@@ -41,76 +41,219 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import pointerUtils from '@interactjs/utils/pointerUtils';
+            <pre class="prettyprint source linenums"><code>import * as is       from '@interactjs/utils/is';
+import * as domUtils from '@interactjs/utils/domUtils';
 
-export default class PointerEvent {
-  /** */
-  constructor (type, pointer, event, eventTarget, interaction) {
-    pointerUtils.pointerExtend(this, event);
+import { warnOnce } from '@interactjs/utils';
 
-    if (event !== pointer) {
-      pointerUtils.pointerExtend(this, pointer);
+function install (scope) {
+  const {
+    /** @lends Interactable */
+    Interactable,
+    actions,
+  } = scope;
+
+  Interactable.prototype.getAction = function (pointer, event, interaction, element) {
+    const action = this.defaultActionChecker(pointer, event, interaction, element);
+
+    if (this.options.actionChecker) {
+      return this.options.actionChecker(pointer, event, action, this, element, interaction);
     }
 
-    this.interaction = interaction;
+    return action;
+  };
 
-    this.timeStamp     = new Date().getTime();
-    this.originalEvent = event;
-    this.type          = type;
-    this.pointerId     = pointerUtils.getPointerId(pointer);
-    this.pointerType   = pointerUtils.getPointerType(pointer);
-    this.target        = eventTarget;
-    this.currentTarget = null;
+  /**
+   * ```js
+   * interact(element, { ignoreFrom: document.getElementById('no-action') });
+   * // or
+   * interact(element).ignoreFrom('input, textarea, a');
+   * ```
+   * @deprecated
+   * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
+   * of it's parents match the given CSS selector or Element, no
+   * drag/resize/gesture is started.
+   *
+   * Don't use this method. Instead set the `ignoreFrom` option for each action
+   * or for `pointerEvents`
+   *
+   * @example
+   * interact(targett)
+   *   .draggable({
+   *     ignoreFrom: 'input, textarea, a[href]'',
+   *   })
+   *   .pointerEvents({
+   *     ignoreFrom: '[no-pointer]',
+   *   });
+   *
+   * @param {string | Element | null} [newValue] a CSS selector string, an
+   * Element or `null` to not ignore any elements
+   * @return {string | Element | object} The current ignoreFrom value or this
+   * Interactable
+   */
+  Interactable.prototype.ignoreFrom = warnOnce(function (newValue) {
+    return this._backCompatOption('ignoreFrom', newValue);
+  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
 
-    if (type === 'tap') {
-      const pointerIndex = interaction.getPointerIndex(pointer);
-      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
+  /**
+   * ```js
+   *
+   * @deprecated
+   * A drag/resize/gesture is started only If the target of the `mousedown`,
+   * `pointerdown` or `touchstart` event or any of it's parents match the given
+   * CSS selector or Element.
+   *
+   * Don't use this method. Instead set the `allowFrom` option for each action
+   * or for `pointerEvents`
+   *
+   * @example
+   * interact(targett)
+   *   .resizable({
+   *     allowFrom: '.resize-handle',
+   *   .pointerEvents({
+   *     allowFrom: '.handle',,
+   *   });
+   *
+   * @param {string | Element | null} [newValue] a CSS selector string, an
+   * Element or `null` to allow from any element
+   * @return {string | Element | object} The current allowFrom value or this
+   * Interactable
+   */
+  Interactable.prototype.allowFrom = warnOnce(function (newValue) {
+    return this._backCompatOption('allowFrom', newValue);
+  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
 
-      const interval = this.timeStamp - interaction.tapTime;
+  Interactable.prototype.testIgnore = function (ignoreFrom, interactableElement, element) {
+    if (!ignoreFrom || !is.element(element)) { return false; }
 
-      this.double = !!(interaction.prevTap
-        &amp;&amp; interaction.prevTap.type !== 'doubletap'
-        &amp;&amp; interaction.prevTap.target === this.target
-        &amp;&amp; interval &lt; 500);
+    if (is.string(ignoreFrom)) {
+      return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
     }
-    else if (type === 'doubletap') {
-      this.dt = pointer.timeStamp - interaction.tapTime;
+    else if (is.element(ignoreFrom)) {
+      return domUtils.nodeContains(ignoreFrom, element);
     }
-  }
 
-  subtractOrigin ({ x: originX, y: originY }) {
-    this.pageX   -= originX;
-    this.pageY   -= originY;
-    this.clientX -= originX;
-    this.clientY -= originY;
+    return false;
+  };
 
-    return this;
-  }
+  Interactable.prototype.testAllow = function (allowFrom, interactableElement, element) {
+    if (!allowFrom) { return true; }
 
-  addOrigin ({ x: originX, y: originY }) {
-    this.pageX   += originX;
-    this.pageY   += originY;
-    this.clientX += originX;
-    this.clientY += originY;
+    if (!is.element(element)) { return false; }
 
-    return this;
-  }
+    if (is.string(allowFrom)) {
+      return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+    }
+    else if (is.element(allowFrom)) {
+      return domUtils.nodeContains(allowFrom, element);
+    }
 
-  /** */
-  preventDefault () {
-    this.originalEvent.preventDefault();
-  }
+    return false;
+  };
 
-  /** */
-  stopPropagation () {
-    this.propagationStopped = true;
-  }
+  Interactable.prototype.testIgnoreAllow = function (options, interactableElement, eventTarget) {
+    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget)
+      &amp;&amp; this.testAllow(options.allowFrom, interactableElement, eventTarget));
+  };
 
-  /** */
-  stopImmediatePropagation () {
-    this.immediatePropagationStopped = this.propagationStopped = true;
-  }
+  /**
+   * ```js
+   * interact('.resize-drag')
+   *   .resizable(true)
+   *   .draggable(true)
+   *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
+   *
+   *   if (interact.matchesSelector(event.target, '.drag-handle') {
+   *     // force drag with handle target
+   *     action.name = drag;
+   *   }
+   *   else {
+   *     // resize from the top and right edges
+   *     action.name  = 'resize';
+   *     action.edges = { top: true, right: true };
+   *   }
+   *
+   *   return action;
+   * });
+   * ```
+   *
+   * Gets or sets the function used to check action to be performed on
+   * pointerDown
+   *
+   * @param {function | null} [checker] A function which takes a pointer event,
+   * defaultAction string, interactable, element and interaction as parameters
+   * and returns an object with name property 'drag' 'resize' or 'gesture' and
+   * optionally an `edges` object with boolean 'top', 'left', 'bottom' and right
+   * props.
+   * @return {Function | Interactable} The checker function or this Interactable
+   */
+  Interactable.prototype.actionChecker = function (checker) {
+    if (is.func(checker)) {
+      this.options.actionChecker = checker;
+
+      return this;
+    }
+
+    if (checker === null) {
+      delete this.options.actionChecker;
+
+      return this;
+    }
+
+    return this.options.actionChecker;
+  };
+
+  /**
+   * Returns or sets whether the the cursor should be changed depending on the
+   * action that would be performed if the mouse were pressed and dragged.
+   *
+   * @param {boolean} [newValue]
+   * @return {boolean | Interactable} The current setting or this Interactable
+   */
+  Interactable.prototype.styleCursor = function (newValue) {
+    if (is.bool(newValue)) {
+      this.options.styleCursor = newValue;
+
+      return this;
+    }
+
+    if (newValue === null) {
+      delete this.options.styleCursor;
+
+      return this;
+    }
+
+    return this.options.styleCursor;
+  };
+
+  Interactable.prototype.defaultActionChecker = function (pointer, event, interaction, element) {
+    const rect = this.getRect(element);
+    const buttons = event.buttons || ({
+      0: 1,
+      1: 4,
+      3: 8,
+      4: 16,
+    })[event.button];
+    let action = null;
+
+    for (const actionName of actions.names) {
+      // check mouseButton setting if the pointer is down
+      if (interaction.pointerIsDown
+          &amp;&amp; /mouse|pointer/.test(interaction.pointerType)
+          &amp;&amp; (buttons &amp; this.options[actionName].mouseButtons) === 0) {
+        continue;
+      }
+
+      action = actions[actionName].checker(pointer, event, this, element, interaction, rect);
+
+      if (action) {
+        return action;
+      }
+    }
+  };
 }
+
+export default { install };
 </code></pre>
         </article>
     </section>

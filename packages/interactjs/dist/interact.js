@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.16+sha.5b3c738-dirty
+ * interact.js v1.4.0-alpha.17+sha.793e5fa-dirty
  *
  * Copyright (c) 2012-2018 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5894,6 +5894,10 @@ function () {
     value: function pointerUp(pointer, event, eventTarget, curEventTarget) {
       var pointerIndex = this.getPointerIndex(pointer);
 
+      if (pointerIndex === -1) {
+        pointerIndex = this.updatePointer(pointer, event, eventTarget, false);
+      }
+
       this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
         pointer: pointer,
         pointerIndex: pointerIndex,
@@ -5986,7 +5990,7 @@ function () {
     value: function getPointerIndex(pointer) {
       var pointerId = __utils_16.pointer.getPointerId(pointer); // mouse and pen interactions may have only one pointer
 
-      return this.pointerType === 'mouse' || this.pointerType === 'pen' ? 0 : __utils_16.arr.findIndex(this.pointers, function (curPointer) {
+      return this.pointerType === 'mouse' || this.pointerType === 'pen' ? this.pointers.length - 1 : __utils_16.arr.findIndex(this.pointers, function (curPointer) {
         return curPointer.id === pointerId;
       });
     }
@@ -6001,6 +6005,7 @@ function () {
       var id = __utils_16.pointer.getPointerId(pointer);
       var pointerIndex = this.getPointerIndex(pointer);
       var pointerInfo = this.pointers[pointerIndex];
+      down = down === false ? false : down || /(down|start)$/i.test(event.type);
 
       if (!pointerInfo) {
         pointerInfo = {
@@ -8107,7 +8112,7 @@ function __install_34(scope) {
     var down = _ref3.down,
         pointerInfo = _ref3.pointerInfo;
 
-    if (!down) {
+    if (!down && pointerInfo.hold) {
       return;
     }
 
@@ -8617,6 +8622,89 @@ var ___default_38 = {
 };
 _$reflow_38.default = ___default_38;
 
+var _$interact_22 = {};
+"use strict";
+
+Object.defineProperty(_$interact_22, "__esModule", {
+  value: true
+});
+_$interact_22.init = __init_22;
+Object.defineProperty(_$interact_22, "interact", {
+  enumerable: true,
+  get: function get() {
+    return _interact.default;
+  }
+});
+/* common-shake removed: exports.default = */ void void 0;
+
+var _interact = ___interopRequireWildcard_22(_$interact_23);
+
+var _interactablePreventDefault = ___interopRequireDefault_22(_$interactablePreventDefault_18);
+
+var _inertia = ___interopRequireDefault_22(_$inertia_21);
+
+var __pointerEvents_22 = ___interopRequireWildcard_22(_$pointerEvents_36);
+
+var autoStart = ___interopRequireWildcard_22(_$autoStart_12);
+
+var actions = ___interopRequireWildcard_22(_$actions_5);
+
+var ___base_22 = ___interopRequireDefault_22(_$base_25);
+
+var modifiers = ___interopRequireWildcard_22(_$modifiers_26);
+
+var _autoScroll = ___interopRequireDefault_22(_$autoScroll_7);
+
+var _reflow = ___interopRequireDefault_22(_$reflow_38);
+
+function ___interopRequireDefault_22(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ___interopRequireWildcard_22(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+/* browser entry point */
+function __init_22(window) {
+  _interact.scope.init(window);
+
+  _interact.default.use(_interactablePreventDefault.default); // inertia
+
+
+  _interact.default.use(_inertia.default); // pointerEvents
+
+
+  _interact.default.use(__pointerEvents_22); // autoStart, hold
+
+
+  _interact.default.use(autoStart); // drag and drop, resize, gesture
+
+
+  _interact.default.use(actions); // snap, resize, etc.
+
+
+  _interact.default.use(___base_22.default); // for backwrads compatibility
+
+
+  for (var type in modifiers) {
+    var _modifiers$type = modifiers[type],
+        _defaults = _modifiers$type._defaults,
+        _methods = _modifiers$type._methods;
+    _defaults._methods = _methods;
+    _interact.scope.defaults.perAction[type] = _defaults;
+  } // autoScroll
+
+
+  _interact.default.use(_autoScroll.default); // reflow
+
+
+  _interact.default.use(_reflow.default);
+
+  return _interact.default;
+} // eslint-disable-next-line no-undef
+
+
+_interact.default.version = __init_22.version = "1.4.0-alpha.17";
+var ___default_22 = _interact.default;
+/* common-shake removed: exports.default = */ void ___default_22;
+
 var _$grid_58 = {};
 "use strict";
 
@@ -8698,96 +8786,6 @@ var _grid = ___interopRequireDefault_59(_$grid_58);
 
 function ___interopRequireDefault_59(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _$interact_22 = {};
-"use strict";
-
-Object.defineProperty(_$interact_22, "__esModule", {
-  value: true
-});
-_$interact_22.init = __init_22;
-Object.defineProperty(_$interact_22, "interact", {
-  enumerable: true,
-  get: function get() {
-    return _interact.default;
-  }
-});
-/* common-shake removed: exports.default = */ void void 0;
-
-var _interact = ___interopRequireWildcard_22(_$interact_23);
-
-var _interactablePreventDefault = ___interopRequireDefault_22(_$interactablePreventDefault_18);
-
-var _inertia = ___interopRequireDefault_22(_$inertia_21);
-
-var __pointerEvents_22 = ___interopRequireWildcard_22(_$pointerEvents_36);
-
-var autoStart = ___interopRequireWildcard_22(_$autoStart_12);
-
-var actions = ___interopRequireWildcard_22(_$actions_5);
-
-var ___base_22 = ___interopRequireDefault_22(_$base_25);
-
-var modifiers = ___interopRequireWildcard_22(_$modifiers_26);
-
-var snappers = ___interopRequireWildcard_22(_$snappers_59);
-
-var ___extend_22 = ___interopRequireDefault_22(_$extend_46);
-
-var _autoScroll = ___interopRequireDefault_22(_$autoScroll_7);
-
-var _reflow = ___interopRequireDefault_22(_$reflow_38);
-
-function ___interopRequireDefault_22(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ___interopRequireWildcard_22(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
-
-/* browser entry point */
-function __init_22(window) {
-  _interact.scope.init(window);
-
-  _interact.default.use(_interactablePreventDefault.default); // inertia
-
-
-  _interact.default.use(_inertia.default); // pointerEvents
-
-
-  _interact.default.use(__pointerEvents_22); // autoStart, hold
-
-
-  _interact.default.use(autoStart); // drag and drop, resize, gesture
-
-
-  _interact.default.use(actions); // snap, resize, etc.
-
-
-  _interact.default.use(___base_22.default);
-
-  _interact.default.modifiers = (0, ___extend_22.default)(_interact.scope.modifiers, modifiers);
-  _interact.default.snappers = snappers;
-  _interact.default.createSnapGrid = _interact.default.snappers.grid; // for backwrads compatibility
-
-  for (var type in modifiers) {
-    var _modifiers$type = modifiers[type],
-        _defaults = _modifiers$type._defaults,
-        _methods = _modifiers$type._methods;
-    _defaults._methods = _methods;
-    _interact.scope.defaults.perAction[type] = _defaults;
-  } // autoScroll
-
-
-  _interact.default.use(_autoScroll.default); // reflow
-
-
-  _interact.default.use(_reflow.default);
-
-  return _interact.default;
-} // eslint-disable-next-line no-undef
-
-
-_interact.default.version = __init_22.version = "1.4.0-alpha.16";
-var ___default_22 = _interact.default;
-/* common-shake removed: exports.default = */ void ___default_22;
-
 var _$interactjs_24 = { exports: {} };
 "use strict";
 
@@ -8798,10 +8796,29 @@ _$interactjs_24.exports.default = void 0;
 
 /* removed: var _$interact_22 = require("@interactjs/interact"); */;
 
+var snappers = ___interopRequireWildcard_24(_$snappers_59);
+
+var ___extend_24 = ___interopRequireDefault_24(_$extend_46);
+
+var __modifiers_24 = ___interopRequireWildcard_24(_$modifiers_26);
+
+function ___interopRequireDefault_24(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ___interopRequireWildcard_24(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
 function ___typeof_24(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_24 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_24 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_24(obj); }
 
 var __win_24 = (typeof window === "undefined" ? "undefined" : ___typeof_24(window)) === 'object' && window;
-var exported = __win_24 ? (0, _$interact_22.init)(__win_24) : _$interact_22.init;
+var exported = __win_24 ? function () {
+  var interact = (0, _$interact_22.init)(__win_24);
+  return interact.use({
+    install: function install(scope) {
+      interact.modifiers = (0, ___extend_24.default)(scope.modifiers, __modifiers_24);
+      interact.snappers = snappers;
+      interact.createSnapGrid = interact.snappers.grid;
+    }
+  });
+}() : _$interact_22.init;
 var ___default_24 = exported;
 _$interactjs_24.exports.default = ___default_24;
 

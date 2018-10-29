@@ -42,7 +42,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * interact.js v1.4.0-alpha.15+sha.8940ff6-dirty
+ * interact.js v1.4.0-alpha.16+sha.5b3c738-dirty
  *
  * Copyright (c) 2012-2018 Taye Adeyemi &lt;dev@taye.me>
  * Released under the MIT License.
@@ -1230,10 +1230,23 @@ var pointerUtils = {
       page: page,
       client: client,
       timeStamp: timeStamp,
-      pageX: page.x,
-      pageY: page.y,
-      clientX: client.x,
-      clientY: client.y
+
+      get pageX() {
+        return page.x;
+      },
+
+      get pageY() {
+        return page.y;
+      },
+
+      get clientX() {
+        return client.x;
+      },
+
+      get clientY() {
+        return client.y;
+      }
+
     };
   }
 };
@@ -3118,7 +3131,9 @@ function checkResizeEdge(name, value, page, element, interactableElement, rect, 
   if (value === true) {
     // if dimensions are negative, "switch" edges
     var width = __utils_6.is.number(rect.width) ? rect.width : rect.right - rect.left;
-    var height = __utils_6.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
+    var height = __utils_6.is.number(rect.height) ? rect.height : rect.bottom - rect.top; // don't use margin greater than half the relevent dimension
+
+    margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2);
 
     if (width &lt; 0) {
       if (name === 'left') {
@@ -8812,7 +8827,7 @@ function __init_22(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_22.version = "1.4.0-alpha.15";
+_interact.default.version = __init_22.version = "1.4.0-alpha.16";
 var ___default_22 = _interact.default;
 /* common-shake removed: exports.default = */ void ___default_22;
 
