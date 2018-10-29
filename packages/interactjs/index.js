@@ -8,9 +8,23 @@
  */
 
 import { init } from '@interactjs/interact';
+import * as snappers from '@interactjs/utils/snappers';
+import extend from '@interactjs/utils/extend';
+import * as modifiers from '@interactjs/modifiers';
 
 const win = typeof window === 'object' && window;
-const exported = win ? init(win) : init;
+const exported = win
+  ? (() => {
+    const interact = init(win);
+
+    return interact.use({
+      install (scope) {
+        interact.modifiers = extend(scope.modifiers, modifiers);
+        interact.snappers = snappers;
+        interact.createSnapGrid = interact.snappers.grid;
+      },
+    });
+  })(): init;
 
 export default exported;
 

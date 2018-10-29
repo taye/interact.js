@@ -64,7 +64,7 @@ test('pointerEvents.fire', t => {
     new Interaction({ signals: new Signals() }),
     { tapTime: -1, prevTap: null });
 
-  interaction.updatePointer({});
+  interaction.updatePointer({}, {});
 
   const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
     timeStamp: tapTime,
@@ -124,17 +124,19 @@ test('pointerEvents Interaction update-pointer signal', t => {
   pointerEvents.install(scope);
 
   const interaction = scope.interactions.new({});
-  const initialTimer = { duration: Infinity, timeout: null };
+  const initialHold = { duration: Infinity, timeout: null };
   const event = {};
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false);
-  t.deepEqual(interaction.pointers.map(p => p.hold), [undefined]);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer');
+
+  interaction.removePointer(helpers.newPointer(0), event);
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true);
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialTimer]);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold]);
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true);
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialTimer, initialTimer]);
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold, initialHold]);
 
   t.end();
 });
@@ -156,7 +158,7 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   ];
 
   for (const id of ids) {
-    const index = interaction.updatePointer({ pointerId: id }, null, true);
+    const index = interaction.updatePointer({ pointerId: id }, {}, true);
     // use the ids as the pointerInfo.hold value for this test
     interaction.pointers[index].hold = id;
   }

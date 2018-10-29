@@ -42,7 +42,9 @@
   "license": "MIT",
   "devDependencies": {
     "@interactjs/_dev": "1.4.0-alpha.16+sha.5b3c738",
-    "@interactjs/interact": "1.4.0-alpha.16+sha.5b3c738"
+    "@interactjs/interact": "1.4.0-alpha.16+sha.5b3c738",
+    "@interactjs/modifiers": "1.4.0-alpha.16+sha.5b3c738",
+    "@interactjs/utils": "1.4.0-alpha.16+sha.5b3c738"
   },
   "_dev": {
     "entries": "./index.js",

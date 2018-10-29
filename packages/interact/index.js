@@ -8,8 +8,6 @@ import * as autoStart from '@interactjs/auto-start';
 import * as actions from '@interactjs/actions';
 import modifiersBase from '@interactjs/modifiers/base';
 import * as modifiers from '@interactjs/modifiers';
-import * as snappers from '@interactjs/utils/snappers';
-import extend from '@interactjs/utils/extend';
 import autoScroll from '@interactjs/auto-scroll';
 import reflow from '@interactjs/reflow';
 
@@ -32,10 +30,6 @@ export function init (window) {
 
   // snap, resize, etc.
   interact.use(modifiersBase);
-  interact.modifiers = extend(scope.modifiers, modifiers);
-  interact.snappers = snappers;
-  interact.createSnapGrid = interact.snappers.grid;
-
 
   // for backwrads compatibility
   for (const type in modifiers) {
