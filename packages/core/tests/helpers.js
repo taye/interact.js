@@ -1,7 +1,7 @@
-import * as utils from '@interactjs/utils/index.ts';
-import Signals from '@interactjs/utils/Signals.ts';
-import { createScope } from '../scope.ts';
-import Eventable from '../Eventable.ts';
+import * as utils from '@interactjs/utils';
+import Signals from '@interactjs/utils/Signals';
+import { createScope } from '../scope';
+import Eventable from '../Eventable';
 import { doc } from '@interactjs/_dev/test/domator';
 
 let counter = 0;

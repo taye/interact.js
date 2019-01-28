@@ -1,11 +1,11 @@
 import test from '@interactjs/_dev/test/test';
-import pointerUtils from '@interactjs/utils/pointerUtils.ts';
+import pointerUtils from '@interactjs/utils/pointerUtils';
 import * as helpers from './helpers';
 
-import Signals from '@interactjs/utils/Signals.ts';
-import Interaction from '../Interaction.ts';
-import InteractEvent from '../InteractEvent.ts';
-import interactions from '../interactions.ts';
+import Signals from '@interactjs/utils/Signals';
+import Interaction from '../Interaction';
+import InteractEvent from '../InteractEvent';
+import interactions from '../interactions';
 
 const makeInteractionAndSignals = () => new Interaction({ signals: new Signals });
 

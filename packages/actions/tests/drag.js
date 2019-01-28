@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/core/tests/helpers';
-import interactions from '@interactjs/core/interactions.ts';
-import pointerUtils from '@interactjs/utils/pointerUtils.ts';
-import { extend } from '@interactjs/utils/index.ts';
-import drag from '../drag.ts';
+import interactions from '@interactjs/core/interactions';
+import pointerUtils from '@interactjs/utils/pointerUtils';
+import { extend } from '@interactjs/utils';
+import drag from '../drag';
 
 
 test('drag action init', t => {

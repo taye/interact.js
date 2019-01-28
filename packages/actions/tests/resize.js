@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/core/tests/helpers';
-import pointerUtils from '@interactjs/utils/pointerUtils.ts';
-import resize from '../resize.ts';
+import pointerUtils from '@interactjs/utils/pointerUtils';
+import resize from '../resize';
 
 
 test('resize', t => {
