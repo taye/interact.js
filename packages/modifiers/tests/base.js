@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/core/tests/helpers';
-import * as utils from '@interactjs/utils/index.ts';
-import modifiersBase from '../base.ts';
+import * as utils from '@interactjs/utils';
+import modifiersBase from '../base';
 
 test('modifiers/base', t => {
   const scope = helpers.mockScope();

@@ -40,11 +40,20 @@
     "SVG"
   ],
   "license": "MIT",
-  "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.18+sha.a8adfbf",
+  "dependencies": {
+    "@interactjs/actions": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/auto-scroll": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/auto-start": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/core": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/inertia": "1.4.0-alpha.18+sha.a8adfbf",
     "@interactjs/interact": "1.4.0-alpha.18+sha.a8adfbf",
     "@interactjs/modifiers": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/pointer-events": "1.4.0-alpha.18+sha.a8adfbf",
+    "@interactjs/reflow": "1.4.0-alpha.18+sha.a8adfbf",
     "@interactjs/utils": "1.4.0-alpha.18+sha.a8adfbf"
+  },
+  "devDependencies": {
+    "@interactjs/_dev": "1.4.0-alpha.18+sha.a8adfbf"
   },
   "_dev": {
     "entries": "./index.ts",
