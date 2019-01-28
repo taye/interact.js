@@ -109,7 +109,7 @@ export function mockInteractable (props) {
       events: new Eventable(),
       getRect () {
         return this.element
-          ? utils.dom.getClientRect(this.element)
+          ? utils.dom.getElementClientRect(this.element)
           : { left: 0, top: 0, right: 0, bottom: 0 }
       },
       fire (event) {
