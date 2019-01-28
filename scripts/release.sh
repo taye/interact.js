@@ -85,6 +85,10 @@ run_build() {
   # copy license file
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE .
 
+  # generate .js and .d.ts files
+  npx lerna exec --no-private -- 'tsc --emitDeclarationOnly false -p .'
+
+  # build packages
   npx lerna run --no-private build -- $BUILD_ARG || exit $?
 
   cd $ROOT
