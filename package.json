@@ -32,6 +32,7 @@
     "@babel/register": "^7.0.0",
     "@babel/runtime": "^7.3.1",
     "@types/node": "^10.12.18",
+    "@typescript-eslint/eslint-plugin": "^1.1.0",
     "@typescript-eslint/parser": "^1.1.0",
     "babel-eslint": "^10.0.1",
     "babel-plugin-istanbul": "^4.1.5",
