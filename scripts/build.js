@@ -26,6 +26,7 @@ const argv = require('yargs')
   .argv;
 
 const dir = path.join(__dirname, '..');
+const extensions = ['.ts', '.js'];
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`;
 require('module')._initPaths();
@@ -48,6 +49,8 @@ const plugins = (() => {
 
 
 const b = browserify(argv.entries, {
+  extensions,
+
   debug: argv.debug,
 
   standalone: argv.standalone,
@@ -57,6 +60,7 @@ const b = browserify(argv.entries, {
       babelrc: false,
       sourceType: 'module',
       global: true,
+      extensions,
       ...require('../.babelrc'),
     } ],
     [ require('envify'), {

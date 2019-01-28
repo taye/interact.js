@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test';
 import * as helpers from '@interactjs/core/tests/helpers';
-import Signals from '@interactjs/utils/Signals';
-import Eventable from '@interactjs/core/Eventable';
-import interactions from '@interactjs/core/interactions';
-import holdRepeat from '../holdRepeat';
+import Signals from '@interactjs/utils/Signals.ts';
+import Eventable from '@interactjs/core/Eventable.ts';
+import interactions from '@interactjs/core/interactions.ts';
+import holdRepeat from '../holdRepeat.ts';
 
 function mockScope () {
   return helpers.mockScope({

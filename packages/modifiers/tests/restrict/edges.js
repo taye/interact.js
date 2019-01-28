@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test';
 import { mockSignals } from '@interactjs/core/tests/helpers';
-import Interaction from '@interactjs/core/Interaction';
-import restrictEdges from '../../restrict/edges';
+import Interaction from '@interactjs/core/Interaction.ts';
+import restrictEdges from '../../restrict/edges.ts';
 
 test('restrictEdges', t => {
 

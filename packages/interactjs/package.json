@@ -47,7 +47,7 @@
     "@interactjs/utils": "1.4.0-alpha.17+sha.793e5fa"
   },
   "_dev": {
-    "entries": "./index.js",
+    "entries": "./index.ts",
     "standalone": "interact",
     "destDir": "./dist",
     "name": "interact"

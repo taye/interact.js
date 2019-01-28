@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+
+const { existsSync } = require('fs');
+
+const jsExt = /\.js$/;
+const dtsExt = /\.d\.ts$/;
+
+function isNotGenerated (source) {
+  return !dtsExt.test(source) && !(jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')));
+}
+
 const argv = require('yargs')
   .defaults({
     fix: false,
@@ -13,13 +23,16 @@ const argv = require('yargs')
 function getSources () {
   const glob = require('glob');
 
-  return [
+  const jsAndTs = [
     '+(packages|src|examples|test)/**/*.js',
+    '+(packages|src|examples|test)/**/*.ts',
     './*.js',
   ].reduce((acc, pattern) => [
     ...acc,
     ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
   ], []);
+
+  return jsAndTs.filter(source => isNotGenerated(source));
 }
 
 const CLIEngine = require('eslint').CLIEngine;
@@ -29,6 +42,9 @@ console.log('Linting...');
 const cli = new CLIEngine({
   fix: argv.fix,
   useEslintrc: true,
+  rules: {
+    'node/no-missing-import': 0,
+  },
 });
 
 const report = cli.executeOnFiles(argv.sources);

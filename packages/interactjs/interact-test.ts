@@ -1,5 +1,4 @@
-/// <reference path="./interact.d.ts" />
-import { interact } from 'interact.js/interact'
+import interact from './index';
 
 // Interactables
 interact('.drag-and-resize')
@@ -8,22 +7,22 @@ interact('.drag-and-resize')
       targets: [
         { x: 100, y: 200 },
         function (x, y) { return { x: x % 20, y: y }; }
-    ]}
+      ]}
   })
   .resizable({
     inertia: true
   });
 
 // Selector context
-var myList = document.querySelector('#my-list');
+const myList = document.querySelector('#my-list');
 
 interact('li', {
-    context: myList
-  })
+  context: myList
+})
   .draggable({ /* ... */ });
 
 // Action options
-var target = 'li'
+const target = 'li'
 interact(target)
   .draggable({
     max          : 1,
@@ -56,9 +55,9 @@ interact(target)
     restrict     : {/* ... */}
   });
 
-  // autoscroll
-  var element = 'li'
-  interact(element)
+// autoscroll
+const element = 'li'
+interact(element)
   .draggable({
     autoScroll: true,
   })
@@ -80,7 +79,7 @@ interact(target).resizable({
   axis: 'x'
 });
 
-var handleEl = 'li'
+const handleEl = 'li'
 interact(target).resizable({
   edges: {
     top   : true,       // Use pointer coords to check for resize.
@@ -113,23 +112,28 @@ interact(target).dropzone({
 
 // dropzone checker
 interact(target).dropzone({
-  checker: function (dragEvent,         // related dragmove or dragend
-                     event,             // Touch, Pointer or Mouse Event
-                     dropped,           // bool default checker result
-                     dropzone,          // dropzone Interactable
-                     dropElement,       // dropzone elemnt
-                     draggable,         // draggable Interactable
-                     draggableElement) {// draggable element
+  checker: function (
+    _dragEvent,           // related dragmove or dragend
+    _event,               // Touch, Pointer or Mouse Event
+    dropped,              // bool default checker result
+    _dropzone,            // dropzone Interactable
+    dropElement,          // dropzone elemnt
+    _draggable,           // draggable Interactable
+    _draggableElement) {  // draggable element
 
 
-// only allow drops into empty dropzone elements
+    // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes();
   }
 });
 
+interact.dynamicDrop()
+interact.dynamicDrop(false)
+
 // Events
 function listener (event) {
-  console.log(event.type, event.pageX, event.pageY);
+  const { type, pageX, pageY } = event;
+  alert({ type, pageX, pageY });
 }
 
 
@@ -151,11 +155,9 @@ interact(target).draggable({
   onend: listener
 });
 
-interact.on(['dragmove', 'resizestart'], function (event) {
-  console.log(event.type, event.pageX, event.pageY);
-});
+interact.on(['dragmove', 'resizestart'], listener);
 
-var dropTarget = 'div'
+const dropTarget = 'div'
 // Drop Events
 interact(dropTarget)
   .dropzone({
@@ -169,7 +171,7 @@ interact(dropTarget)
     event.target.classList.add('drop-activated');
   });
 
-interact(target).on('up', function (event) {});
+interact(target).on('up', function (_event) {});
 
 // fast click
 interact('a[href]').on('tap', function (event) {

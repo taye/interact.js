@@ -1,14 +1,16 @@
 const packagesDir = `${__dirname}/../packages`;
 const glob = require('glob');
-
-const include = glob.sync(`${packagesDir}/**/*.js`, {
-  ignore: '**/node_modules/**',
-});
+const ignore = ['**/node_modules/**', '**/tests/**', '**/*.d.ts', '**/dist/**'];
+const include = [...new Set([
+  ...glob.sync(`${packagesDir}/**/*.js`, { ignore }),
+  ...glob.sync(`${packagesDir}/**/*.ts`, { ignore }),
+])];
 
 module.exports = {
   source: {
     include,
     excludePattern: '[\\/]node_modules[\\/]',
+    includePattern: '.*',
   },
 
   opts: {
@@ -19,7 +21,14 @@ module.exports = {
   plugins: [
     'plugins/markdown',
     'jsdoc-stale',
+    'jsdoc-babel',
   ],
+
+  babel: {
+    extensions: ['js', 'ts'],
+    babelrc: false,
+    presets: ['@babel/preset-typescript'],
+  },
 
   markdown: {
     idInHeadings: true,
