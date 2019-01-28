@@ -23,7 +23,7 @@ declare module '@interactjs/interact/interact' {
 const win = typeof window === 'object' && window;
 const exported = (win
   ? (() => {
-    const interact = init(win);
+    init(win);
 
     return interact.use({
       install (scope) {

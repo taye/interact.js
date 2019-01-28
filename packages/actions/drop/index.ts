@@ -107,7 +107,7 @@ function install (scope: Scope) {
     dropStatus.rejected = false;
   });
 
-   /**
+  /**
    *
    * ```js
    * interact('.drop').dropzone({

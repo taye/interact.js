@@ -7,22 +7,22 @@ interact('.drag-and-resize')
       targets: [
         { x: 100, y: 200 },
         function (x, y) { return { x: x % 20, y: y }; }
-    ]}
+      ]}
   })
   .resizable({
     inertia: true
   });
 
 // Selector context
-var myList = document.querySelector('#my-list');
+const myList = document.querySelector('#my-list');
 
 interact('li', {
-    context: myList
-  })
+  context: myList
+})
   .draggable({ /* ... */ });
 
 // Action options
-var target = 'li'
+const target = 'li'
 interact(target)
   .draggable({
     max          : 1,
@@ -55,9 +55,9 @@ interact(target)
     restrict     : {/* ... */}
   });
 
-  // autoscroll
-  var element = 'li'
-  interact(element)
+// autoscroll
+const element = 'li'
+interact(element)
   .draggable({
     autoScroll: true,
   })
@@ -79,7 +79,7 @@ interact(target).resizable({
   axis: 'x'
 });
 
-var handleEl = 'li'
+const handleEl = 'li'
 interact(target).resizable({
   edges: {
     top   : true,       // Use pointer coords to check for resize.
@@ -122,7 +122,7 @@ interact(target).dropzone({
     _draggableElement) {  // draggable element
 
 
-// only allow drops into empty dropzone elements
+    // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes();
   }
 });
@@ -132,7 +132,8 @@ interact.dynamicDrop(false)
 
 // Events
 function listener (event) {
-  console.log(event.type, event.pageX, event.pageY);
+  const { type, pageX, pageY } = event;
+  alert({ type, pageX, pageY });
 }
 
 
@@ -154,11 +155,9 @@ interact(target).draggable({
   onend: listener
 });
 
-interact.on(['dragmove', 'resizestart'], function (event) {
-  console.log(event.type, event.pageX, event.pageY);
-});
+interact.on(['dragmove', 'resizestart'], listener);
 
-var dropTarget = 'div'
+const dropTarget = 'div'
 // Drop Events
 interact(dropTarget)
   .dropzone({

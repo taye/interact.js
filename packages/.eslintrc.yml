@@ -13,6 +13,6 @@ rules:
     - selector: :matches(ArrowFunctionExpression,FunctionExpression,FunctionDeclaration) > AssignmentPattern
       message: Using default parameters is not allowed.
     - Generator
-    - RestElement
+#   - RestElement
     - ExperimentalRestProperty
     - ExperimentalSpreadProperty

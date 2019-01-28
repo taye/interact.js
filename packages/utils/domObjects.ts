@@ -4,6 +4,7 @@ const domObjects = {
   DocumentFragment: null as typeof DocumentFragment,
   SVGElement: null as typeof SVGElement,
   SVGSVGElement: null as typeof SVGSVGElement,
+  // eslint-disable-next-line no-undef
   SVGElementInstance: null as typeof SVGElementInstance,
   Element: null as typeof Element,
   HTMLElement: null as typeof HTMLElement,

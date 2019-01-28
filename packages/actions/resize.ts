@@ -272,7 +272,7 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
 }
 
 function initCursors (browser) {
-return (browser.isIe9 ? {
+  return (browser.isIe9 ? {
     x : 'e-resize',
     y : 's-resize',
     xy: 'se-resize',

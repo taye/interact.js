@@ -17,7 +17,7 @@ plugins:
   - '@typescript-eslint'
 
 rules:
-  comma-dangle: [2, always-multiline]
+  comma-dangle: 0
   comma-style: [2, last]
   curly: 2
   dot-notation: 2
@@ -31,6 +31,7 @@ rules:
   no-console: 0
   no-empty: 0
   no-extra-bind: 2
+  no-extra-semi: 0
   no-self-compare: 2
   no-sequences: 2
   no-shadow-restricted-names: 2
@@ -44,5 +45,10 @@ rules:
   one-var: [2, never]
   prefer-const: 2
   quotes: [2, single, avoid-escape]
-  semi: [2, always]
+  semi: 0
   space-before-function-paren: [2, always]
+
+overrides:
+  files: '*.ts'
+  rules:
+    no-unused-vars: 0

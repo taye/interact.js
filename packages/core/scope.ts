@@ -101,29 +101,29 @@ export class Scope {
       return docIndex === -1 ? null : this.documents[docIndex].options;
     }
 
-  constructor() {
-    const scope = this;
+    constructor () {
+      const scope = this;
 
-    (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
-      get _defaults () { return scope.defaults; }
+      (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
+        get _defaults () { return scope.defaults; }
 
-      set (options) {
-        super.set(options);
+        set (options) {
+          super.set(options);
 
-        scope.interactables.signals.fire('set', {
-          options,
-          interactable: this,
-        });
+          scope.interactables.signals.fire('set', {
+            options,
+            interactable: this,
+          });
 
-        return this;
-      }
+          return this;
+        }
 
-      unset () {
-        super.unset();
-        scope.interactables.signals.fire('unset', { interactable: this });
+        unset () {
+          super.unset();
+          scope.interactables.signals.fire('unset', { interactable: this });
+        }
       }
     }
-  }
 }
 
 class InteractableSet {
@@ -181,18 +181,18 @@ class InteractableSet {
       let ret;
 
       if ((utils.is.string(interactable.target)
-           // target is a selector and the element matches
-             ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
-             // target is the element
-               : element === interactable.target)
-               // the element is in context
-               && (interactable.inContext(element))) {
-                 ret = callback(interactable);
-               }
+      // target is a selector and the element matches
+        ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
+        // target is the element
+        : element === interactable.target)
+        // the element is in context
+        && (interactable.inContext(element))) {
+        ret = callback(interactable);
+      }
 
-               if (ret !== undefined) {
-                 return ret;
-               }
+      if (ret !== undefined) {
+        return ret;
+      }
     }
   }
 

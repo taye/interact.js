@@ -48,6 +48,7 @@ export function init (window) {
   return interact;
 }
 
+// eslint-disable-next-line no-undef
 interact.version = init.version = process.env.npm_package_version;
 
 export default interact;

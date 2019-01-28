@@ -181,7 +181,7 @@ const autoScroll = {
 };
 
 export function getContainer (value, interactable, element) {
-return (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element);
+  return (is.string(value) ? getStringOptionResult(value, interactable, element) : value) || getWindow(element);
 }
 
 export function getScroll (container) {

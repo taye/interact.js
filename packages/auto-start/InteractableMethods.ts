@@ -175,31 +175,31 @@ function defaultActionChecker (interactable: Interactable, pointer: Interact.Poi
     if (interaction.pointerIsDown
         && /mouse|pointer/.test(interaction.pointerType)
       && (buttons & interactable.options[actionName].mouseButtons) === 0) {
-        continue;
-      }
+      continue;
+    }
 
-      action = actions[actionName].checker(pointer, event, interactable, element, interaction, rect);
+    action = actions[actionName].checker(pointer, event, interactable, element, interaction, rect);
 
-      if (action) {
-        return action;
-      }
+    if (action) {
+      return action;
+    }
   }
 }
 
 function styleCursor (newValue) {
-    if (is.bool(newValue)) {
-      this.options.styleCursor = newValue;
+  if (is.bool(newValue)) {
+    this.options.styleCursor = newValue;
 
-      return this;
-    }
+    return this;
+  }
 
-    if (newValue === null) {
-      delete this.options.styleCursor;
+  if (newValue === null) {
+    delete this.options.styleCursor;
 
-      return this;
-    }
+    return this;
+  }
 
-    return this.options.styleCursor;
+  return this.options.styleCursor;
 }
 
 function actionChecker (checker) {

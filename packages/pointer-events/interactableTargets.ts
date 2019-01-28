@@ -6,7 +6,7 @@ import * as is from '@interactjs/utils/is';
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     pointerEvents: typeof pointerEventsMethod
-    __backCompatOption: typeof __backCompatOption
+    __backCompatOption: (string, any) => any
   }
 }
 
@@ -55,23 +55,21 @@ function install (scope: Scope) {
 
   const __backCompatOption = Interactable.prototype._backCompatOption;
 
-  Interactable.prototype._backCompatOption = __backCompatOption;
+  Interactable.prototype._backCompatOption = function (optionName, newValue) {
+    const ret = __backCompatOption.call(this, optionName, newValue);
+
+    if (ret === this) {
+      this.events.options[optionName] = newValue;
+    }
+
+    return ret;
+  }
 }
 
 function pointerEventsMethod (options) {
   extend(this.events.options, options);
 
   return this;
-}
-
-function __backCompatOption (optionName, newValue) {
-  const ret = __backCompatOption.call(this, optionName, newValue);
-
-  if (ret === this) {
-    this.events.options[optionName] = newValue;
-  }
-
-  return ret;
 }
 
 export default {
