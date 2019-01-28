@@ -1,5 +1,6 @@
 dist
 coverage
 .nyc_output
+**.d.ts
 **/node_modules
 **/lerna-debug.log

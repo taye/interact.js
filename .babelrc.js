@@ -18,5 +18,9 @@ module.exports = {
     "test": {
       "plugins": ["istanbul"],
     }
-  }
+  },
+  "extensions": [
+    ".ts",
+    ".js",
+  ]
 }

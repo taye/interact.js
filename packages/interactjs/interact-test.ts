@@ -1,5 +1,4 @@
-/// <reference path="./index.d.ts" />
-import * as interact from './index';
+import interact from './index';
 
 // Interactables
 interact('.drag-and-resize')
@@ -113,19 +112,23 @@ interact(target).dropzone({
 
 // dropzone checker
 interact(target).dropzone({
-  checker: function (dragEvent,         // related dragmove or dragend
-                     event,             // Touch, Pointer or Mouse Event
-                     dropped,           // bool default checker result
-                     dropzone,          // dropzone Interactable
-                     dropElement,       // dropzone elemnt
-                     draggable,         // draggable Interactable
-                     draggableElement) {// draggable element
+  checker: function (
+    _dragEvent,           // related dragmove or dragend
+    _event,               // Touch, Pointer or Mouse Event
+    dropped,              // bool default checker result
+    _dropzone,            // dropzone Interactable
+    dropElement,          // dropzone elemnt
+    _draggable,           // draggable Interactable
+    _draggableElement) {  // draggable element
 
 
 // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes();
   }
 });
+
+interact.dynamicDrop()
+interact.dynamicDrop(false)
 
 // Events
 function listener (event) {
@@ -169,7 +172,7 @@ interact(dropTarget)
     event.target.classList.add('drop-activated');
   });
 
-interact(target).on('up', function (event) {});
+interact(target).on('up', function (_event) {});
 
 // fast click
 interact('a[href]').on('tap', function (event) {
