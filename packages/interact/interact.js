@@ -5,14 +5,6 @@ import browser from '@interactjs/utils/browser';
 import events from '@interactjs/utils/events';
 const globalEvents = {};
 const scope = new Scope();
-function interactStatic(target, options) {
-    let interactable = scope.interactables.get(target, options);
-    if (!interactable) {
-        interactable = scope.interactables.new(target, options);
-        interactable.events.global = globalEvents;
-    }
-    return interactable;
-}
 /**
  * ```js
  * interact('#draggable').draggable(true);
@@ -38,7 +30,14 @@ function interactStatic(target, options) {
  * or CSS selector
  * @return {Interactable}
  */
-export const interact = interactStatic;
+export function interact(target, options) {
+    let interactable = scope.interactables.get(target, options);
+    if (!interactable) {
+        interactable = scope.interactables.new(target, options);
+        interactable.events.global = globalEvents;
+    }
+    return interactable;
+}
 scope._plugins = [];
 /**
  * Use a plugin
@@ -247,7 +246,8 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 });
 interact.addDocument = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
-scope.interact = interact;
+export const interactExport = interact;
+scope.interact = interactExport;
 export { scope };
-export default interact;
+export default interactExport;
 //# sourceMappingURL=interact.js.map

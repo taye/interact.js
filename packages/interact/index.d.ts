@@ -1,5 +1,5 @@
 import { default as interact } from './interact';
-export declare function init(window: any): import("@interactjs/interact/interact").InteractStatic & ((target: import("../interactjs/types").Target, options?: any) => import("@interactjs/core/Interactable").Interactable);
+export declare function init(window: Window): typeof interact;
 export declare namespace init {
     var version: string;
 }

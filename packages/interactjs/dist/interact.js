@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.19+sha.19ac543-dirty
+ * interact.js v1.4.0-alpha.20+sha.ce0da21-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -955,7 +955,8 @@ var _$pointerExtend_54 = {};
 Object.defineProperty(_$pointerExtend_54, "__esModule", {
   value: true
 });
-_$pointerExtend_54.default = pointerExtend;
+_$pointerExtend_54.pointerExtend = pointerExtend;
+_$pointerExtend_54.default = void 0;
 
 function pointerExtend(dest, source) {
   for (var prop in source) {
@@ -980,6 +981,8 @@ function pointerExtend(dest, source) {
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
 };
+var ___default_54 = pointerExtend;
+_$pointerExtend_54.default = ___default_54;
 
 var _$hypot_48 = {};
 "use strict";
@@ -6950,7 +6953,8 @@ var _$interact_23 = {};
 Object.defineProperty(_$interact_23, "__esModule", {
   value: true
 });
-_$interact_23.default = _$interact_23.scope = _$interact_23.interact = void 0;
+_$interact_23.interact = interact;
+_$interact_23.default = _$interact_23.scope = _$interact_23.interactExport = void 0;
 
 /* removed: var _$scope_20 = require("@interactjs/core/scope"); */;
 
@@ -6967,18 +6971,6 @@ function ___interopRequireWildcard_23(obj) { if (obj && obj.__esModule) { return
 /** @module interact */
 var globalEvents = {};
 var scope = new _$scope_20.Scope();
-_$interact_23.scope = scope;
-
-function interactStatic(target, options) {
-  var interactable = scope.interactables.get(target, options);
-
-  if (!interactable) {
-    interactable = scope.interactables.new(target, options);
-    interactable.events.global = globalEvents;
-  }
-
-  return interactable;
-}
 /**
  * ```js
  * interact('#draggable').draggable(true);
@@ -7005,9 +6997,19 @@ function interactStatic(target, options) {
  * @return {Interactable}
  */
 
+_$interact_23.scope = scope;
 
-var interact = interactStatic;
-_$interact_23.interact = interact;
+function interact(target, options) {
+  var interactable = scope.interactables.get(target, options);
+
+  if (!interactable) {
+    interactable = scope.interactables.new(target, options);
+    interactable.events.global = globalEvents;
+  }
+
+  return interactable;
+}
+
 scope._plugins = [];
 /**
  * Use a plugin
@@ -7277,8 +7279,10 @@ scope.interactables.signals.on('unset', function (_ref4) {
 });
 interact.addDocument = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
-scope.interact = interact;
-var ___default_23 = interact;
+var interactExport = interact;
+_$interact_23.interactExport = interactExport;
+scope.interact = interactExport;
+var ___default_23 = interactExport;
 _$interact_23.default = ___default_23;
 
 var _$pointer_28 = {};
@@ -8841,7 +8845,7 @@ function __init_22(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_22.version = "1.4.0-alpha.19";
+_interact.default.version = __init_22.version = "1.4.0-alpha.20";
 var ___default_22 = _interact.default;
 _$interact_22.default = ___default_22;
 

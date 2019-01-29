@@ -1,4 +1,4 @@
-export default function pointerExtend(dest, source) {
+export function pointerExtend(dest, source) {
     for (const prop in source) {
         const prefixedPropREs = pointerExtend.prefixedPropREs;
         let deprecated = false;
@@ -18,4 +18,5 @@ export default function pointerExtend(dest, source) {
 pointerExtend.prefixedPropREs = {
     webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
 };
+export default pointerExtend;
 //# sourceMappingURL=pointerExtend.js.map
