@@ -11,7 +11,7 @@ import * as pointerEvents from '@interactjs/pointer-events';
 import reflow from '@interactjs/reflow';
 import { default as interact, scope } from './interact';
 
-export function init (window) {
+export function init (window: Window): typeof interact {
   scope.init(window);
 
   interact.use(interactablePreventDefault);

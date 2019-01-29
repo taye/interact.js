@@ -1,0 +1,20 @@
+{
+  "name": "@interactjs/types",
+  "version": "0.0.0",
+  "devDependencies": {
+    "@interactjs/actions": "0.0.0",
+    "@interactjs/auto-scroll": "0.0.0",
+    "@interactjs/auto-start": "0.0.0",
+    "@interactjs/core": "0.0.0",
+    "@interactjs/inertia": "0.0.0",
+    "@interactjs/interact": "0.0.0",
+    "@interactjs/modifiers": "0.0.0",
+    "@interactjs/pointer-events": "0.0.0",
+    "@interactjs/reflow": "0.0.0",
+    "@interactjs/utils": "0.0.0",
+    "interactjs": "0.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

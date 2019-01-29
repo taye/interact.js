@@ -86,7 +86,9 @@ run_build() {
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE .
 
   # generate .js and .d.ts files
-  npx lerna exec --no-private -- 'tsc --emitDeclarationOnly false -p .'
+  rm -r $ROOT/packages/types/@interactjs
+  npx tsc --emitDeclarationOnly false -p $ROOT
+  npx tsc -p $ROOT/packages/types
 
   # build packages
   npx lerna run --no-private build -- $BUILD_ARG || exit $?

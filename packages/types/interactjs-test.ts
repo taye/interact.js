@@ -1,4 +1,4 @@
-import interact from './index';
+import interact from 'interactjs';
 
 // Interactables
 interact('.drag-and-resize')

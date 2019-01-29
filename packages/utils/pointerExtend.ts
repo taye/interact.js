@@ -1,4 +1,9 @@
-export default function pointerExtend (dest, source) {
+export interface PointerExtend {
+  webkit: RegExp;
+  [prefix: string]: RegExp;
+}
+
+export function pointerExtend<PointerExtend> (dest, source) {
   for (const prop in source) {
     const prefixedPropREs = pointerExtend.prefixedPropREs;
     let deprecated = false;
@@ -21,3 +26,5 @@ export default function pointerExtend (dest, source) {
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
 };
+
+export default pointerExtend;

@@ -32,12 +32,16 @@ export class Interaction {
   // pointerdown/mousedown/touchstart event
   downEvent: Interact.PointerEventType = null;
 
-  downPointer = {} as Interact.PointerType;
+  downPointer: Interact.PointerType = {} as Interact.PointerType;
 
-  _latestPointer = {
-    pointer: null as Interact.PointerType,
-    event: null as Interact.PointerEventType,
-    eventTarget: null as EventTarget,
+  _latestPointer: {
+    pointer: EventTarget
+    event: Interact.PointerEventType
+    eventTarget: Node,
+  } = {
+    pointer: null,
+    event: null,
+    eventTarget: null,
   };
 
   // previous action event

@@ -11,7 +11,7 @@ export interface Plugin extends Partial<any>{
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    interact: typeof interact // FIXME
+    interact: typeof interactExport
     _plugins: Plugin[]
   }
 }
@@ -42,18 +42,6 @@ export interface InteractStatic {
 const globalEvents: any = {};
 const scope = new Scope();
 
-function interactStatic (target: Interact.Target, options?: any) {
-  let interactable = scope.interactables.get(target, options);
-
-
-  if (!interactable) {
-    interactable = scope.interactables.new(target, options);
-    interactable.events.global = globalEvents;
-  }
-
-  return interactable;
-}
-
 /**
  * ```js
  * interact('#draggable').draggable(true);
@@ -79,7 +67,17 @@ function interactStatic (target: Interact.Target, options?: any) {
  * or CSS selector
  * @return {Interactable}
  */
-export const interact = interactStatic as InteractStatic & typeof interactStatic
+export function interact<InteractStatic> (target: Interact.Target, options?: any) {
+  let interactable = scope.interactables.get(target, options);
+
+
+  if (!interactable) {
+    interactable = scope.interactables.new(target, options);
+    interactable.events.global = globalEvents;
+  }
+
+  return interactable;
+}
 
 scope._plugins = [];
 
@@ -312,7 +310,8 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
 
-scope.interact = interact;
+export const interactExport = interact as InteractStatic & typeof interact
+scope.interact = interactExport;
 
 export { scope };
-export default interact;
+export default interactExport;
