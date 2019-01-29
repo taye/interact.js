@@ -1,0 +1,20 @@
+{
+  "name": "@interactjs/types",
+  "version": "1.4.0-alpha.19+sha.19ac543",
+  "devDependencies": {
+    "@interactjs/actions": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/auto-scroll": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/auto-start": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/core": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/inertia": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/interact": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/modifiers": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/pointer-events": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/reflow": "1.4.0-alpha.19+sha.19ac543",
+    "@interactjs/utils": "1.4.0-alpha.19+sha.19ac543",
+    "interactjs": "1.4.0-alpha.19+sha.19ac543"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

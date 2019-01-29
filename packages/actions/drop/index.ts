@@ -29,7 +29,7 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
-    dynamicDrop?: (newValue?: boolean) => boolean | InteractStatic
+    dynamicDrop: (newValue?: boolean) => boolean | InteractStatic
   }
 }
 
