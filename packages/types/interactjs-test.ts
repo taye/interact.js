@@ -1,6 +1,10 @@
 import interact from 'interactjs';
 
 // Interactables
+interact(document.body);
+interact(document);
+interact(window);
+
 interact('.drag-and-resize')
   .draggable({
     snap: {

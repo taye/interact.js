@@ -7,7 +7,7 @@ import Interactable from '@interactjs/core/Interactable';
 import { Action } from '@interactjs/core/Interaction';
 
 declare namespace Interact {
-  type Target = Element | String
+  type Target = Window | Document | Element | String
 
   interface Point {
     x: number
@@ -261,26 +261,6 @@ declare namespace Interact {
   interface InteractOptions {
     context?: DOMElement
   }
-
-  /*
-  interface InteractStatic {
-    ( el: DOMElement | CSSSelector, opts?: InteractOptions | any): Interactable
-    maxInteractions () : number
-    maxInteractions ( newValue: number) : InteractStatic
-    off ( opt: OnEvent | OnEventFunctions, listener?: Listeners ) : InteractStatic
-    on ( opt: OnEvent | OnEventFunctions, listener?: Listeners ) : InteractStatic
-    supportsTouch () : boolean
-    supportsPointerEvent () : boolean
-    stop ( event: any ) : InteractStatic
-    pointerMoveTolerance () : number
-    pointerMoveTolerance ( tol: number ) : InteractStatic
-    createSnapGrid ( grid: { x: number, y: number, range?: number, offset?: Point, limits?: Rect } ) : SnapFunction
-    isSet ( element: DOMElement | CSSSelector ) : boolean
-    addDocument ( document: Document, options: any ) : void
-    removeDocument ( document: Document, options: any ) : void
-    use ( plugin: Plugin) : InteractStatic;
-  }
-  */
 }
 
 export as namespace Interact;

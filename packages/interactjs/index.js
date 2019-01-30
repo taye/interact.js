@@ -12,14 +12,6 @@ import * as modifiers from '@interactjs/modifiers';
 import extend from '@interactjs/utils/extend';
 import * as snappers from '@interactjs/utils/snappers';
 
-declare module '@interactjs/interact/interact' {
-  interface InteractStatic {
-    modifiers?: any
-    snappers?: typeof snappers
-    createSnapGrid?: typeof interact.snappers.grid
-  }
-}
-
 const win = typeof window === 'object' && window;
 const exported = (win
   ? (() => {
@@ -32,7 +24,7 @@ const exported = (win
         interact.createSnapGrid = interact.snappers.grid;
       },
     });
-  })(): init) as typeof interact;
+  })(): init);
 
 export default exported;
 

@@ -62,7 +62,4 @@
   "include": [
     "./packages/*/*.ts",
   ],
-  "exclude": [
-    "./packages/types/**",
-  ],
 }

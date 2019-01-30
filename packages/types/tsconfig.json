@@ -7,22 +7,12 @@
     "typeRoots": [
       "./"
     ],
-    "paths": {
-      "@interactjs/*": ["./@interactjs/*"],
-      "interactjs": ["./@interactjs/interactjs"]
-    },
-    "types": [],
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
     "sourceMap": false,
-    "outDir": "./@interactjs"
   },
   "include": [
-    "./interact-test.ts",
-    "../**/*.ts"
+    "**/*.ts"
   ],
-  "exclude": [
-    "./@interactjs/**"
-  ]
 }
