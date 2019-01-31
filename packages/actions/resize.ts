@@ -1,50 +1,34 @@
-import { Scope } from '@interactjs/core/scope';
-import * as utils from '@interactjs/utils';
+import { Action, Interaction } from '@interactjs/core/Interaction'
+import { Scope } from '@interactjs/core/scope'
+import * as utils from '@interactjs/utils'
+type Interactable = import ('@interactjs/core/Interactable').default
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
-
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    resizable?: (options: any) => Interactable | { [key: string]: any }
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    resize?: any
-  }
-}
-
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    resize?: typeof resize
-  }
-}
 
 function install (scope: Scope) {
   const {
     actions,
     browser,
     /** @lends Interactable */
-    Interactable,
+    Interactable, // tslint:disable-line no-shadowed-variable
     interactions,
     defaults,
-  } = scope;
+  } = scope
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', function (interaction) {
-    interaction.resizeAxes = 'xy';
-  });
+  interactions.signals.on('new', (interaction: Interaction) => {
+    interaction.resizeAxes = 'xy'
+  })
 
-  interactions.signals.on('action-start', start);
-  interactions.signals.on('action-move', move);
+  interactions.signals.on('action-start', start)
+  interactions.signals.on('action-move', move)
 
-  interactions.signals.on('action-start', updateEventAxes);
-  interactions.signals.on('action-move', updateEventAxes);
+  interactions.signals.on('action-start', updateEventAxes)
+  interactions.signals.on('action-move', updateEventAxes)
 
-  resize.cursors = initCursors(browser);
-  resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
+  resize.cursors = initCursors(browser)
+  resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10
 
   /**
    * ```js
@@ -95,21 +79,22 @@ function install (scope: Scope) {
     return resizable(this, options, scope)
   }
 
-  actions.resize = resize;
-  actions.names.push('resize');
+  actions.resize = resize
+  actions.names.push('resize')
   utils.arr.merge(actions.eventTypes, [
     'resizestart',
     'resizemove',
     'resizeinertiastart',
     'resizeresume',
     'resizeend',
-  ]);
-  actions.methodDict.resize = 'resizable';
+  ])
+  actions.methodDict.resize = 'resizable'
 
-  defaults.resize = resize.defaults;
+  defaults.resize = resize.defaults
 }
 
 const resize = {
+  install,
   defaults: {
     square: false,
     preserveAspectRatio: false,
@@ -129,17 +114,24 @@ const resize = {
     // 'reposition' will keep the width/height positive by swapping
     // the top and bottom edges and/or swapping the left and right edges
     invert: 'none',
-  },
+  } as Interact.ResizableOptions,
 
-  checker: function (_pointer, _event, interactable, element, interaction, rect) {
-    if (!rect) { return null; }
+  checker (
+    _pointer: Interact.PointerType,
+    _event: Interact.PointerEventType,
+    interactable: Interactable,
+    element: Element,
+    interaction: Interaction,
+    rect: Interact.Rect
+  ) {
+    if (!rect) { return null }
 
-    const page = utils.extend({}, interaction.coords.cur.page);
-    const options = interactable.options;
+    const page = utils.extend({}, interaction.coords.cur.page)
+    const options = interactable.options
 
     if (options.resize.enabled) {
-      const resizeOptions = options.resize;
-      const resizeEdges = { left: false, right: false, top: false, bottom: false };
+      const resizeOptions = options.resize
+      const resizeEdges: { [edge: string]: boolean } = { left: false, right: false, top: false, bottom: false }
 
       // if using resize.edges
       if (utils.is.object(resizeOptions.edges)) {
@@ -147,128 +139,131 @@ const resize = {
           resizeEdges[edge] = checkResizeEdge(edge,
             resizeOptions.edges[edge],
             page,
-            interaction._eventTarget,
+            interaction._latestPointer.eventTarget,
             element,
             rect,
-            resizeOptions.margin || this.defaultMargin);
+            resizeOptions.margin || this.defaultMargin)
         }
 
-        resizeEdges.left = resizeEdges.left && !resizeEdges.right;
-        resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom;
+        resizeEdges.left = resizeEdges.left && !resizeEdges.right
+        resizeEdges.top  = resizeEdges.top  && !resizeEdges.bottom
 
         if (resizeEdges.left || resizeEdges.right || resizeEdges.top || resizeEdges.bottom) {
           return {
             name: 'resize',
             edges: resizeEdges,
-          };
+          }
         }
       }
       else {
-        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - this.defaultMargin);
-        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - this.defaultMargin);
+        const right  = options.resize.axis !== 'y' && page.x > (rect.right  - this.defaultMargin)
+        const bottom = options.resize.axis !== 'x' && page.y > (rect.bottom - this.defaultMargin)
 
         if (right || bottom) {
           return {
             name: 'resize',
-            axes: (right? 'x' : '') + (bottom? 'y' : ''),
-          };
+            axes: (right ? 'x' : '') + (bottom ? 'y' : ''),
+          }
         }
       }
     }
 
-    return null;
+    return null
   },
 
-  cursors: null as ReturnType<typeof initCursors>,
+  cursors: null as unknown as ReturnType<typeof initCursors>,
 
-  getCursor: function (action) {
+  getCursor (action: Action) {
+    const cursors = resize.cursors as { [key: string]: string }
     if (action.axis) {
-      return resize.cursors[action.name + action.axis];
+      return cursors[action.name + action.axis]
     }
     else if (action.edges) {
-      let cursorKey = '';
-      const edgeNames = ['top', 'bottom', 'left', 'right'];
+      let cursorKey = ''
+      const edgeNames = ['top', 'bottom', 'left', 'right']
 
       for (let i = 0; i < 4; i++) {
         if (action.edges[edgeNames[i]]) {
-          cursorKey += edgeNames[i];
+          cursorKey += edgeNames[i]
         }
       }
 
-      return resize.cursors[cursorKey];
+      return cursors[cursorKey]
     }
+
+    return null
   },
 
   defaultMargin: null as number,
-};
+}
 
 function resizable (interactable, options, scope: Scope) {
   if (utils.is.object(options)) {
-    interactable.options.resize.enabled = options.enabled === false? false: true;
-    interactable.setPerAction('resize', options);
-    interactable.setOnEvents('resize', options);
+    interactable.options.resize.enabled = options.enabled !== false
+    interactable.setPerAction('resize', options)
+    interactable.setOnEvents('resize', options)
 
     if (/^x$|^y$|^xy$/.test(options.axis)) {
-      interactable.options.resize.axis = options.axis;
+      interactable.options.resize.axis = options.axis
     }
     else if (options.axis === null) {
-      interactable.options.resize.axis = scope.defaults.resize.axis;
+      interactable.options.resize.axis = scope.defaults.resize.axis
     }
 
     if (utils.is.bool(options.preserveAspectRatio)) {
-      interactable.options.resize.preserveAspectRatio = options.preserveAspectRatio;
+      interactable.options.resize.preserveAspectRatio = options.preserveAspectRatio
     }
     else if (utils.is.bool(options.square)) {
-      interactable.options.resize.square = options.square;
+      interactable.options.resize.square = options.square
     }
 
-    return interactable;
+    return interactable
   }
   if (utils.is.bool(options)) {
-    interactable.options.resize.enabled = options;
+    interactable.options.resize.enabled = options
 
-    return interactable;
+    return interactable
   }
-  return interactable.options.resize;
-};
+  return interactable.options.resize
+}
 
 function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
   // false, '', undefined, null
-  if (!value) { return false; }
+  if (!value) { return false }
 
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width  = utils.is.number(rect.width )? rect.width  : rect.right  - rect.left;
-    const height = utils.is.number(rect.height)? rect.height : rect.bottom - rect.top ;
+    const width  = utils.is.number(rect.width) ? rect.width  : rect.right  - rect.left
+    const height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top
 
     // don't use margin greater than half the relevent dimension
-    margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2);
+    margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2)
 
     if (width < 0) {
-      if      (name === 'left' ) { name = 'right'; }
-      else if (name === 'right') { name = 'left' ; }
+      if      (name === 'left') { name = 'right' }
+      else if (name === 'right') { name = 'left'  }
     }
     if (height < 0) {
-      if      (name === 'top'   ) { name = 'bottom'; }
-      else if (name === 'bottom') { name = 'top'   ; }
+      if      (name === 'top') { name = 'bottom' }
+      else if (name === 'bottom') { name = 'top'    }
     }
 
-    if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
-    if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
+    if (name === 'left') { return page.x < ((width  >= 0 ? rect.left : rect.right) + margin) }
+    if (name === 'top') { return page.y < ((height >= 0 ? rect.top : rect.bottom) + margin) }
 
-    if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
-    if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
+    if (name === 'right') { return page.x > ((width  >= 0 ? rect.right : rect.left) - margin) }
+    if (name === 'bottom') { return page.y > ((height >= 0 ? rect.bottom : rect.top) - margin) }
   }
 
   // the remaining checks require an element
-  if (!utils.is.element(element)) { return false; }
+  if (!utils.is.element(element)) { return false }
 
   return utils.is.element(value)
   // the value is an element to use as a resize handle
     ? value === element
     // otherwise check if element matches value as selector
-    : utils.dom.matchesUpTo(element, value, interactableElement);
+    : utils.dom.matchesUpTo(element, value, interactableElement)
 }
 
 function initCursors (browser) {
@@ -303,11 +298,11 @@ function initCursors (browser) {
 
 function start ({ iEvent, interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
-    return;
+    return
   }
 
-  const startRect = interaction.target.getRect(interaction.element);
-  const resizeOptions = interaction.target.options.resize;
+  const startRect = interaction.target.getRect(interaction.element)
+  const resizeOptions = interaction.target.options.resize
 
   /*
    * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
@@ -316,22 +311,22 @@ function start ({ iEvent, interaction }) {
    * on the active edges and the edge being interacted with.
    */
   if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-    const linkedEdges = utils.extend({}, interaction.prepared.edges);
+    const linkedEdges = utils.extend({}, interaction.prepared.edges)
 
-    linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom);
-    linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right );
-    linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top   );
-    linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left  );
+    linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom)
+    linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right)
+    linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top)
+    linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left)
 
-    interaction.prepared._linkedEdges = linkedEdges;
+    interaction.prepared._linkedEdges = linkedEdges
   }
   else {
-    interaction.prepared._linkedEdges = null;
+    interaction.prepared._linkedEdges = null
   }
 
   // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
   if (resizeOptions.preserveAspectRatio) {
-    interaction.resizeStartAspectRatio = startRect.width / startRect.height;
+    interaction.resizeStartAspectRatio = startRect.width / startRect.height
   }
 
   interaction.resizeRects = {
@@ -340,122 +335,126 @@ function start ({ iEvent, interaction }) {
     inverted  : utils.extend({}, startRect),
     previous  : utils.extend({}, startRect),
     delta     : {
-      left: 0, right : 0, width : 0,
-      top : 0, bottom: 0, height: 0,
+      left: 0,
+      right : 0,
+      width : 0,
+      top : 0,
+      bottom: 0,
+      height: 0,
     },
-  };
+  }
 
-  iEvent.rect = interaction.resizeRects.inverted;
-  iEvent.deltaRect = interaction.resizeRects.delta;
+  iEvent.rect = interaction.resizeRects.inverted
+  iEvent.deltaRect = interaction.resizeRects.delta
 }
 
 function move ({ iEvent, interaction }) {
-  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return; }
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
-  const resizeOptions = interaction.target.options.resize;
-  const invert = resizeOptions.invert;
-  const invertible = invert === 'reposition' || invert === 'negate';
+  const resizeOptions = interaction.target.options.resize
+  const invert = resizeOptions.invert
+  const invertible = invert === 'reposition' || invert === 'negate'
 
-  let edges = interaction.prepared.edges;
+  let edges = interaction.prepared.edges
 
   // eslint-disable-next-line no-shadow
-  const start      = interaction.resizeRects.start;
-  const current    = interaction.resizeRects.current;
-  const inverted   = interaction.resizeRects.inverted;
-  const deltaRect  = interaction.resizeRects.delta;
-  const previous   = utils.extend(interaction.resizeRects.previous, inverted);
-  const originalEdges = edges;
+  const start      = interaction.resizeRects.start
+  const current    = interaction.resizeRects.current
+  const inverted   = interaction.resizeRects.inverted
+  const deltaRect  = interaction.resizeRects.delta
+  const previous   = utils.extend(interaction.resizeRects.previous, inverted)
+  const originalEdges = edges
 
-  const eventDelta = utils.extend({}, iEvent.delta);
+  const eventDelta = utils.extend({}, iEvent.delta)
 
   if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
     // `resize.preserveAspectRatio` takes precedence over `resize.square`
     const startAspectRatio = resizeOptions.preserveAspectRatio
       ? interaction.resizeStartAspectRatio
-      : 1;
+      : 1
 
-    edges = interaction.prepared._linkedEdges;
+    edges = interaction.prepared._linkedEdges
 
-    if ((originalEdges.left && originalEdges.bottom)
-        || (originalEdges.right && originalEdges.top)) {
-      eventDelta.y = -eventDelta.x / startAspectRatio;
+    if ((originalEdges.left && originalEdges.bottom) ||
+        (originalEdges.right && originalEdges.top)) {
+      eventDelta.y = -eventDelta.x / startAspectRatio
     }
-    else if (originalEdges.left || originalEdges.right ) { eventDelta.y = eventDelta.x / startAspectRatio; }
-    else if (originalEdges.top  || originalEdges.bottom) { eventDelta.x = eventDelta.y * startAspectRatio; }
+    else if (originalEdges.left || originalEdges.right) { eventDelta.y = eventDelta.x / startAspectRatio }
+    else if (originalEdges.top  || originalEdges.bottom) { eventDelta.x = eventDelta.y * startAspectRatio }
   }
 
   // update the 'current' rect without modifications
-  if (edges.top   ) { current.top    += eventDelta.y; }
-  if (edges.bottom) { current.bottom += eventDelta.y; }
-  if (edges.left  ) { current.left   += eventDelta.x; }
-  if (edges.right ) { current.right  += eventDelta.x; }
+  if (edges.top) { current.top    += eventDelta.y }
+  if (edges.bottom) { current.bottom += eventDelta.y }
+  if (edges.left) { current.left   += eventDelta.x }
+  if (edges.right) { current.right  += eventDelta.x }
 
   if (invertible) {
     // if invertible, copy the current rect
-    utils.extend(inverted, current);
+    utils.extend(inverted, current)
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
-      let swap;
+      let swap
 
       if (inverted.top > inverted.bottom) {
-        swap = inverted.top;
+        swap = inverted.top
 
-        inverted.top = inverted.bottom;
-        inverted.bottom = swap;
+        inverted.top = inverted.bottom
+        inverted.bottom = swap
       }
       if (inverted.left > inverted.right) {
-        swap = inverted.left;
+        swap = inverted.left
 
-        inverted.left = inverted.right;
-        inverted.right = swap;
+        inverted.left = inverted.right
+        inverted.right = swap
       }
     }
   }
   else {
     // if not invertible, restrict to minimum of 0x0 rect
-    inverted.top    = Math.min(current.top, start.bottom);
-    inverted.bottom = Math.max(current.bottom, start.top);
-    inverted.left   = Math.min(current.left, start.right);
-    inverted.right  = Math.max(current.right, start.left);
+    inverted.top    = Math.min(current.top, start.bottom)
+    inverted.bottom = Math.max(current.bottom, start.top)
+    inverted.left   = Math.min(current.left, start.right)
+    inverted.right  = Math.max(current.right, start.left)
   }
 
-  inverted.width  = inverted.right  - inverted.left;
-  inverted.height = inverted.bottom - inverted.top ;
+  inverted.width  = inverted.right  - inverted.left
+  inverted.height = inverted.bottom - inverted.top
 
   for (const edge in inverted) {
-    deltaRect[edge] = inverted[edge] - previous[edge];
+    deltaRect[edge] = inverted[edge] - previous[edge]
   }
 
-  iEvent.edges = interaction.prepared.edges;
-  iEvent.rect = inverted;
-  iEvent.deltaRect = deltaRect;
+  iEvent.edges = interaction.prepared.edges
+  iEvent.rect = inverted
+  iEvent.deltaRect = deltaRect
 }
 
 function updateEventAxes ({ interaction, iEvent, action }) {
-  if (action !== 'resize' || !interaction.resizeAxes) { return; }
+  if (action !== 'resize' || !interaction.resizeAxes) { return }
 
-  const options = interaction.target.options;
+  const options = interaction.target.options
 
   if (options.resize.square) {
     if (interaction.resizeAxes === 'y') {
-      iEvent.delta.x = iEvent.delta.y;
+      iEvent.delta.x = iEvent.delta.y
     }
     else {
-      iEvent.delta.y = iEvent.delta.x;
+      iEvent.delta.y = iEvent.delta.x
     }
-    iEvent.axes = 'xy';
+    iEvent.axes = 'xy'
   }
   else {
-    iEvent.axes = interaction.resizeAxes;
+    iEvent.axes = interaction.resizeAxes
 
     if (interaction.resizeAxes === 'x') {
-      iEvent.delta.y = 0;
+      iEvent.delta.y = 0
     }
     else if (interaction.resizeAxes === 'y') {
-      iEvent.delta.x = 0;
+      iEvent.delta.x = 0
     }
   }
 }
 
-export default { install };
+export default resize

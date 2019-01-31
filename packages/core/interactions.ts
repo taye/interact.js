@@ -1,12 +1,11 @@
-import browser from '@interactjs/utils/browser';
-import domObjects from '@interactjs/utils/domObjects';
-import events from '@interactjs/utils/events';
-import finder from '@interactjs/utils/interactionFinder';
-import pointerUtils from '@interactjs/utils/pointerUtils';
-import Signals from '@interactjs/utils/Signals';
-import InteractionBase from './Interaction';
-import { Scope } from './scope';
-
+import browser from '@interactjs/utils/browser'
+import domObjects from '@interactjs/utils/domObjects'
+import events from '@interactjs/utils/events'
+import finder from '@interactjs/utils/interactionFinder'
+import pointerUtils from '@interactjs/utils/pointerUtils'
+import Signals from '@interactjs/utils/Signals'
+import InteractionBase from './Interaction'
+import { Scope } from './scope'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -15,7 +14,7 @@ declare module '@interactjs/core/scope' {
       signals: Signals
       new: (options: any) => InteractionBase
       list: InteractionBase[]
-      listeners: { [type: string]: Function }
+      listeners: { [type: string]: Interact.Listener }
       eventMap: any
       pointerMoveTolerance: number
     }
@@ -33,93 +32,93 @@ declare module '@interactjs/core/scope' {
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
   'updatePointer', 'removePointer', 'windowBlur',
-];
+]
 
 function install (scope: Scope) {
-  const signals = new Signals();
+  const signals = new Signals()
 
-  const listeners = {} as any;
+  const listeners = {} as any
 
   for (const method of methodNames) {
-    listeners[method] = doOnInteractions(method, scope);
+    listeners[method] = doOnInteractions(method, scope)
   }
 
-  const pEventTypes = browser.pEventTypes;
-  const eventMap = {} as { [key: string]: Function};
+  const pEventTypes = browser.pEventTypes
+  const eventMap = {} as { [key: string]: Interact.Listener }
 
   if (domObjects.PointerEvent) {
-    eventMap[pEventTypes.down  ] = listeners.pointerDown;
-    eventMap[pEventTypes.move  ] = listeners.pointerMove;
-    eventMap[pEventTypes.up    ] = listeners.pointerUp;
-    eventMap[pEventTypes.cancel] = listeners.pointerUp;
+    eventMap[pEventTypes.down  ] = listeners.pointerDown
+    eventMap[pEventTypes.move  ] = listeners.pointerMove
+    eventMap[pEventTypes.up    ] = listeners.pointerUp
+    eventMap[pEventTypes.cancel] = listeners.pointerUp
   }
   else {
-    eventMap.mousedown   = listeners.pointerDown;
-    eventMap.mousemove   = listeners.pointerMove;
-    eventMap.mouseup     = listeners.pointerUp;
+    eventMap.mousedown   = listeners.pointerDown
+    eventMap.mousemove   = listeners.pointerMove
+    eventMap.mouseup     = listeners.pointerUp
 
-    eventMap.touchstart  = listeners.pointerDown;
-    eventMap.touchmove   = listeners.pointerMove;
-    eventMap.touchend    = listeners.pointerUp;
-    eventMap.touchcancel = listeners.pointerUp;
+    eventMap.touchstart  = listeners.pointerDown
+    eventMap.touchmove   = listeners.pointerMove
+    eventMap.touchend    = listeners.pointerUp
+    eventMap.touchcancel = listeners.pointerUp
   }
 
-  eventMap.blur = event => {
+  eventMap.blur = (event) => {
     for (const interaction of scope.interactions.list) {
-      interaction.documentBlur(event);
+      interaction.documentBlur(event)
     }
-  };
+  }
 
-  scope.signals.on('add-document'   , onDocSignal);
-  scope.signals.on('remove-document', onDocSignal);
+  scope.signals.on('add-document', onDocSignal)
+  scope.signals.on('remove-document', onDocSignal)
 
   // for ignoring browser's simulated mouse events
-  scope.prevTouchTime = 0;
+  scope.prevTouchTime = 0
 
   scope.Interaction = class Interaction extends InteractionBase {
     get pointerMoveTolerance () {
-      return scope.interactions.pointerMoveTolerance;
+      return scope.interactions.pointerMoveTolerance
     }
 
     set pointerMoveTolerance (value) {
-      scope.interactions.pointerMoveTolerance = value;
+      scope.interactions.pointerMoveTolerance = value
     }
-  };
+  }
   scope.interactions = {
     signals,
     // all active and idle interactions
     list: [],
     new (options) {
-      options.signals = signals;
+      options.signals = signals
 
-      return new scope.Interaction(options);
+      return new scope.Interaction(options)
     },
     listeners,
     eventMap,
     pointerMoveTolerance: 1,
-  };
+  }
 
   scope.actions = {
     names: [],
     methodDict: {},
     eventTypes: [],
-  };
+  }
 }
 
 function doOnInteractions (method, scope) {
-  return (function (event) {
-    const interactions = scope.interactions.list;
+  return function (event) {
+    const interactions = scope.interactions.list
 
-    const pointerType = pointerUtils.getPointerType(event);
-    const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event);
-    const matches = []; // [ [pointer, interaction], ...]
+    const pointerType = pointerUtils.getPointerType(event)
+    const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event)
+    const matches = [] // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
-      scope.prevTouchTime = new Date().getTime();
+      scope.prevTouchTime = new Date().getTime()
 
       for (const changedTouch of event.changedTouches) {
-        const pointer = changedTouch;
-        const pointerId = pointerUtils.getPointerId(pointer);
+        const pointer = changedTouch
+        const pointerId = pointerUtils.getPointerId(pointer)
         const searchDetails = {
           pointer,
           pointerId,
@@ -128,32 +127,32 @@ function doOnInteractions (method, scope) {
           eventTarget,
           curEventTarget,
           scope,
-        };
-        const interaction = getInteraction(searchDetails);
+        }
+        const interaction = getInteraction(searchDetails)
 
         matches.push([
           searchDetails.pointer,
           searchDetails.eventTarget,
           searchDetails.curEventTarget,
           interaction,
-        ]);
+        ])
       }
     }
     else {
-      let invalidPointer = false;
+      let invalidPointer = false
 
       if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
         // ignore mouse events while touch interactions are active
         for (let i = 0; i < interactions.length && !invalidPointer; i++) {
-          invalidPointer = interactions[i].pointerType !== 'mouse' && interactions[i].pointerIsDown;
+          invalidPointer = interactions[i].pointerType !== 'mouse' && interactions[i].pointerIsDown
         }
 
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
-        invalidPointer = invalidPointer
-          || (new Date().getTime() - scope.prevTouchTime < 500)
+        invalidPointer = invalidPointer ||
+          (new Date().getTime() - scope.prevTouchTime < 500) ||
           // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
-          || event.timeStamp === 0;
+          event.timeStamp === 0
       }
 
       if (!invalidPointer) {
@@ -165,63 +164,63 @@ function doOnInteractions (method, scope) {
           curEventTarget,
           eventTarget,
           scope,
-        };
+        }
 
-        const interaction = getInteraction(searchDetails);
+        const interaction = getInteraction(searchDetails)
 
         matches.push([
           searchDetails.pointer,
           searchDetails.eventTarget,
           searchDetails.curEventTarget,
           interaction,
-        ]);
+        ])
       }
     }
 
     // eslint-disable-next-line no-shadow
     for (const [pointer, eventTarget, curEventTarget, interaction] of matches) {
-      interaction[method](pointer, event, eventTarget, curEventTarget);
+      interaction[method](pointer, event, eventTarget, curEventTarget)
     }
-  });
+  }
 }
 
 function getInteraction (searchDetails) {
-  const { pointerType, scope } = searchDetails;
+  const { pointerType, scope } = searchDetails
 
-  const foundInteraction = finder.search(searchDetails);
-  const signalArg = { interaction: foundInteraction, searchDetails };
+  const foundInteraction = finder.search(searchDetails)
+  const signalArg = { interaction: foundInteraction, searchDetails }
 
-  scope.interactions.signals.fire('find', signalArg);
+  scope.interactions.signals.fire('find', signalArg)
 
-  return signalArg.interaction || newInteraction({ pointerType }, scope);
+  return signalArg.interaction || newInteraction({ pointerType }, scope)
 }
 
 export function newInteraction (options, scope) {
-  const interaction = scope.interactions.new(options);
+  const interaction = scope.interactions.new(options)
 
-  scope.interactions.list.push(interaction);
-  return interaction;
+  scope.interactions.list.push(interaction)
+  return interaction
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { eventMap } = scope.interactions;
+  const { eventMap } = scope.interactions
   const eventMethod = signalName.indexOf('add') === 0
-    ? events.add : events.remove;
+    ? events.add : events.remove
 
   if (scope.browser.isIOS && !options.events) {
-    options.events = { passive: false };
+    options.events = { passive: false }
   }
 
   // delegate event listener
   for (const eventType in events.delegatedEvents) {
-    eventMethod(doc, eventType, events.delegateListener);
-    eventMethod(doc, eventType, events.delegateUseCapture, true);
+    eventMethod(doc, eventType, events.delegateListener)
+    eventMethod(doc, eventType, events.delegateUseCapture, true)
   }
 
-  const eventOptions = options && options.events;
+  const eventOptions = options && options.events
 
   for (const eventType in eventMap) {
-    eventMethod(doc, eventType, eventMap[eventType], eventOptions);
+    eventMethod(doc, eventType, eventMap[eventType], eventOptions)
   }
 }
 
@@ -231,4 +230,4 @@ export default {
   doOnInteractions,
   newInteraction,
   methodNames,
-};
+}

@@ -1,25 +1,29 @@
-import interact from 'interactjs';
+import interact from 'interactjs'
 
 // Interactables
+interact(document.body)
+interact(document)
+interact(window)
+
 interact('.drag-and-resize')
   .draggable({
     snap: {
       targets: [
         { x: 100, y: 200 },
-        function (x, y) { return { x: x % 20, y: y }; }
-      ]}
+        function (x: number, y: number) { return { x: x % 20, y } },
+      ] },
   })
   .resizable({
-    inertia: true
-  });
+    inertia: true,
+  })
 
 // Selector context
-const myList = document.querySelector('#my-list');
+const myList = document.querySelector('#my-list')
 
 interact('li', {
-  context: myList
+  context: myList,
 })
-  .draggable({ /* ... */ });
+  .draggable({ /* ... */ })
 
 // Action options
 const target = 'li'
@@ -33,7 +37,7 @@ interact(target)
     inertia      : {/* ... */},
     autoScroll   : {/* ... */},
 
-    axis         : 'x' || 'y'
+    axis         : 'x' || 'y',
 
   })
   .resizable({
@@ -46,14 +50,14 @@ interact(target)
     autoScroll   : {/* ... */},
 
     square       : true || false,
-    axis         : 'x' || 'y'
+    axis         : 'x' || 'y',
   })
   .gesturable({
     max          : 1,
     maxPerElement: 2,
     manualStart  : true,
-    restrict     : {/* ... */}
-  });
+    restrict     : {/* ... */},
+  })
 
 // autoscroll
 const element = 'li'
@@ -66,76 +70,73 @@ interact(element)
       container: document.body,
       margin: 50,
       distance: 5,
-      interval: 10
-    }
-  });
+      interval: 10,
+    },
+  })
 
 // axis
 interact(target).draggable({
-  axis: 'x'
-});
+  axis: 'x',
+})
 
 interact(target).resizable({
-  axis: 'x'
-});
+  axis: 'x',
+})
 
 const handleEl = 'li'
 interact(target).resizable({
   edges: {
     top   : true,       // Use pointer coords to check for resize.
     left  : false,      // Disable resizing from left edge.
-    bottom: '.resize-s',// Resize if pointer target matches selector
-    right : handleEl    // Resize if pointer target is the given Element
-  }
-});
+    bottom: '.resize-s', // Resize if pointer target matches selector
+    right : handleEl,    // Resize if pointer target is the given Element
+  },
+})
 
 // resize invert
 interact(target).resizable({
   edges: { bottom: true, right: true },
-  invert: 'reposition'
-});
+  invert: 'reposition',
+})
 
 // resize square
 interact(target).resizable({
-  squareResize: true
-});
+  squareResize: true,
+})
 
 // dropzone  accept
 interact(target).dropzone({
   accept: '.drag0, .drag1',
-});
+})
 
 // dropzone overlap
 interact(target).dropzone({
-  overlap: 0.25
-});
+  overlap: 0.25,
+})
 
 // dropzone checker
 interact(target).dropzone({
-  checker: function (
-    _dragEvent,           // related dragmove or dragend
-    _event,               // Touch, Pointer or Mouse Event
-    dropped,              // bool default checker result
-    _dropzone,            // dropzone Interactable
-    dropElement,          // dropzone elemnt
-    _draggable,           // draggable Interactable
-    _draggableElement) {  // draggable element
-
-
+  checker (
+    _dragEvent: Element,          // related dragmove or dragend
+    _event: Event,                // Touch, Pointer or Mouse Event
+    dropped: boolean,             // bool default checker result
+    _dropzone: Interact.Interactable,      // dropzone Interactable
+    dropElement: Element,         // dropzone elemnt
+    _draggable: Interact.Interactable,     // draggable Interactable
+    _draggableElement: Element) { // draggable element
     // only allow drops into empty dropzone elements
-    return dropped && !dropElement.hasChildNodes();
-  }
-});
+    return dropped && !dropElement.hasChildNodes()
+  },
+})
 
 interact.dynamicDrop()
 interact.dynamicDrop(false)
 
 // Events
 function listener (event) {
-  const { type, pageX, pageY } = event;
-  alert({ type, pageX, pageY });
+  const { type, pageX, pageY } = event
+  alert({ type, pageX, pageY })
 }
-
 
 interact(target)
   .on('dragstart', listener)
@@ -144,38 +145,36 @@ interact(target)
   .on(['resizemove', 'resizeend'], listener)
   .on({
     gesturestart: listener,
-    gestureend: listener
-  });
-
-
+    gestureend: listener,
+  })
 
 interact(target).draggable({
   onstart: listener,
   onmove: listener,
-  onend: listener
-});
+  onend: listener,
+})
 
-interact.on(['dragmove', 'resizestart'], listener);
+interact.on(['dragmove', 'resizestart'], listener)
 
 const dropTarget = 'div'
 // Drop Events
 interact(dropTarget)
   .dropzone({
-    ondrop: function (event) {
-      alert(event.relatedTarget.id
-            + ' was dropped into '
-            + event.target.id);
-    }
+    ondrop (event) {
+      alert(event.relatedTarget.id +
+            ' was dropped into ' +
+            event.target.id)
+    },
   })
-  .on('dropactivate', function (event) {
-    event.target.classList.add('drop-activated');
-  });
+  .on('dropactivate', (event) => {
+    event.target.classList.add('drop-activated')
+  })
 
-interact(target).on('up', function (_event) {});
+interact(target).on('up', (_event) => {})
 
 // fast click
-interact('a[href]').on('tap', function (event) {
-  window.location.href = event.currentTarget.href;
+interact('a[href]').on('tap', (event) => {
+  window.location.href = event.currentTarget.href
 
-  event.preventDefault();
-});
+  event.preventDefault()
+})

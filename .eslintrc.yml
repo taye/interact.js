@@ -1,6 +1,5 @@
 extends:
-  - 'eslint:recommended'
-  - 'plugin:node/recommended'
+  - 'standard'
 
 env:
   commonjs: true
@@ -17,38 +16,31 @@ plugins:
   - '@typescript-eslint'
 
 rules:
-  comma-dangle: 0
+  brace-style: 0
+  comma-dangle: [2, 'always-multiline']
   comma-style: [2, last]
-  curly: 2
-  dot-notation: 2
-  eol-last: 2
-  eqeqeq: 2
   guard-for-in: 0
-  indent: [2, 2]
-  keyword-spacing: [2, { before: true, after: true }]
+  key-spacing: 0
   linebreak-style: [2, unix]
   no-caller: 2
   no-console: 0
   no-empty: 0
-  no-extra-bind: 2
-  no-extra-semi: 0
-  no-self-compare: 2
-  no-sequences: 2
-  no-shadow-restricted-names: 2
+  no-multi-spaces: 0
   no-shadow: 2
-  no-trailing-spaces: 2
-  no-unused-expressions: 2
+  no-useless-constructor: 0
   no-var: 2
   node/no-extraneous-import: [2, { allowModules: ['@interactjs/_dev'] }]
   node/no-missing-import: 2
   node/no-unsupported-features/es-syntax: 0
-  one-var: [2, never]
+  prefer-arrow-callback: [2, { allowNamedFunctions: true }]
   prefer-const: 2
-  quotes: [2, single, avoid-escape]
-  semi: 0
-  space-before-function-paren: [2, always]
+  standard/array-bracket-even-spacing: 0
+  standard/computed-property-even-spacing: 0
+  standard/object-curly-even-spacing: 0
 
 overrides:
   files: '*.ts'
   rules:
     no-unused-vars: 0
+    no-use-before-define: 0
+    node/no-missing-import: 0

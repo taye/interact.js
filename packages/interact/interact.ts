@@ -1,22 +1,25 @@
 /** @module interact */
 
-import { Scope } from '@interactjs/core/scope';
-import * as utils from '@interactjs/utils';
-import browser from '@interactjs/utils/browser';
-import events from '@interactjs/utils/events';
+import { Options } from '@interactjs/core/defaultOptions'
+import Interactable from '@interactjs/core/Interactable'
+import { Scope } from '@interactjs/core/scope'
+import * as utils from '@interactjs/utils'
+import browser from '@interactjs/utils/browser'
+import events from '@interactjs/utils/events'
 
 export interface Plugin extends Partial<any>{
-  install ( scope: any ) : void // TODO: Add typings for scope
+  install (scope: any): void
 }
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    interact: typeof interactExport
+    interact: InteractStatic
     _plugins: Plugin[]
   }
 }
 
 export interface InteractStatic {
+  (target: Interact.Target, options?: Options): Interactable
   on: typeof on
   pointerMoveTolerance: typeof pointerMoveTolerance
   stop: typeof stop
@@ -39,19 +42,19 @@ export interface InteractStatic {
   version: string
 }
 
-const globalEvents: any = {};
-const scope = new Scope();
+const globalEvents: any = {}
+const scope = new Scope()
 
 /**
  * ```js
- * interact('#draggable').draggable(true);
+ * interact('#draggable').draggable(true)
  *
- * var rectables = interact('rect');
+ * var rectables = interact('rect')
  * rectables
  *   .gesturable(true)
  *   .on('gesturemove', function (event) {
  *       // ...
- *   });
+ *   })
  * ```
  *
  * The methods of this variable can be used to set elements as interactables
@@ -67,19 +70,18 @@ const scope = new Scope();
  * or CSS selector
  * @return {Interactable}
  */
-export function interact<InteractStatic> (target: Interact.Target, options?: any) {
-  let interactable = scope.interactables.get(target, options);
-
+export const interact: InteractStatic = function interact (target: Interact.Target, options?: any) {
+  let interactable = scope.interactables.get(target, options)
 
   if (!interactable) {
-    interactable = scope.interactables.new(target, options);
-    interactable.events.global = globalEvents;
+    interactable = scope.interactables.new(target, options)
+    interactable.events.global = globalEvents
   }
 
-  return interactable;
-}
+  return interactable
+} as InteractStatic
 
-scope._plugins = [];
+scope._plugins = []
 
 /**
  * Use a plugin
@@ -89,17 +91,17 @@ scope._plugins = [];
  * @param {Object} plugin
  * @param {function} plugin.install
  * @return {interact}
-*/
-interact.use = use;
+ */
+interact.use = use
 function use (plugin: Plugin) {
   if (scope._plugins.indexOf(plugin) !== -1) {
-    return interact;
+    return interact
   }
 
-  plugin.install(scope);
-  scope._plugins.push(plugin);
-  return interact;
-};
+  plugin.install(scope)
+  scope._plugins.push(plugin)
+  return interact
+}
 
 /**
  * Check if an element or selector has been set with the {@link interact}
@@ -110,11 +112,11 @@ function use (plugin: Plugin) {
  * @param {Element} element The Element being searched for
  * @return {boolean} Indicates if the element or CSS selector was previously
  * passed to interact
-*/
-interact.isSet = isSet;
+ */
+interact.isSet = isSet
 function isSet (element: Element, options?: any) {
-  return scope.interactables.indexOfElement(element, options && options.context) !== -1;
-};
+  return scope.interactables.indexOfElement(element, options && options.context) !== -1
+}
 
 /**
  * Add a global listener for an InteractEvent or adds a DOM event to `document`
@@ -127,45 +129,45 @@ function isSet (element: Element, options?: any) {
  * addEventListener
  * @return {object} interact
  */
-interact.on = on;
-function on (type: String | Interact.EventTypes, listener: Interact.Listeners, options?) {
+interact.on = on
+function on (type: string | Interact.EventTypes, listener: Interact.Listeners, options?) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
+    type = type.trim().split(/ +/)
   }
 
   if (utils.is.array(type)) {
     for (const eventType of (type as any[])) {
-      interact.on(eventType, listener, options);
+      interact.on(eventType, listener, options)
     }
 
-    return interact;
+    return interact
   }
 
   if (utils.is.object(type)) {
     for (const prop in type) {
-      interact.on(prop, type[prop], listener);
+      interact.on(prop, (type as Interact.EventTypes)[prop], listener)
     }
 
-    return interact;
+    return interact
   }
 
   // if it is an InteractEvent type, add listener to globalEvents
   if (utils.arr.contains(scope.actions.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
-      globalEvents[type] = [listener];
+      globalEvents[type] = [listener]
     }
     else {
-      globalEvents[type].push(listener);
+      globalEvents[type].push(listener)
     }
   }
   // If non InteractEvent type, addEventListener to document
   else {
-    events.add(scope.document, type, listener as Function, { options });
+    events.add(scope.document, type, listener as Interact.Listener, { options })
   }
 
-  return interact;
-};
+  return interact
+}
 
 /**
  * Removes a global InteractEvent listener or DOM event from `document`
@@ -179,86 +181,85 @@ function on (type: String | Interact.EventTypes, listener: Interact.Listeners, o
  * removeEventListener
  * @return {object} interact
  */
-interact.off = off;
+interact.off = off
 function off (type, listener, options) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
+    type = type.trim().split(/ +/)
   }
 
   if (utils.is.array(type)) {
     for (const eventType of type) {
-      interact.off(eventType, listener, options);
+      interact.off(eventType, listener, options)
     }
 
-    return interact;
+    return interact
   }
 
   if (utils.is.object(type)) {
     for (const prop in type) {
-      interact.off(prop, type[prop], listener);
+      interact.off(prop, type[prop], listener)
     }
 
-    return interact;
+    return interact
   }
 
   if (!utils.arr.contains(scope.actions.eventTypes, type)) {
-    events.remove(scope.document, type, listener, options);
+    events.remove(scope.document, type, listener, options)
   }
   else {
-    let index;
+    let index
 
-    if (type in globalEvents
-        && (index = globalEvents[type].indexOf(listener)) !== -1) {
-      globalEvents[type].splice(index, 1);
+    if (type in globalEvents &&
+        (index = globalEvents[type].indexOf(listener)) !== -1) {
+      globalEvents[type].splice(index, 1)
     }
   }
 
-  return interact;
-};
+  return interact
+}
 
 /**
  * Returns an object which exposes internal data
-
  * @alias module:interact.debug
  *
  * @return {object} An object with properties that outline the current state
  * and expose internal functions and variables
  */
-interact.debug = debug;
+interact.debug = debug
 function debug () {
-  return scope;
-};
+  return scope
+}
 
 // expose the functions used to calculate multi-touch properties
-interact.getPointerAverage  = utils.pointer.pointerAverage;
-interact.getTouchBBox       = utils.pointer.touchBBox;
-interact.getTouchDistance   = utils.pointer.touchDistance;
-interact.getTouchAngle      = utils.pointer.touchAngle;
+interact.getPointerAverage  = utils.pointer.pointerAverage
+interact.getTouchBBox       = utils.pointer.touchBBox
+interact.getTouchDistance   = utils.pointer.touchDistance
+interact.getTouchAngle      = utils.pointer.touchAngle
 
-interact.getElementRect       = utils.dom.getElementRect;
-interact.getElementClientRect = utils.dom.getElementClientRect;
-interact.matchesSelector      = utils.dom.matchesSelector;
-interact.closest              = utils.dom.closest;
+interact.getElementRect       = utils.dom.getElementRect
+interact.getElementClientRect = utils.dom.getElementClientRect
+interact.matchesSelector      = utils.dom.matchesSelector
+interact.closest              = utils.dom.closest
 
 /**
  * @alias module:interact.supportsTouch
  *
  * @return {boolean} Whether or not the browser supports touch input
  */
-interact.supportsTouch = supportsTouch;
+interact.supportsTouch = supportsTouch
 function supportsTouch () {
-  return browser.supportsTouch;
-};
+  return browser.supportsTouch
+}
 
 /**
  * @alias module:interact.supportsPointerEvent
  *
  * @return {boolean} Whether or not the browser supports PointerEvents
  */
-interact.supportsPointerEvent = supportsPointerEvent;
+interact.supportsPointerEvent = supportsPointerEvent
 function supportsPointerEvent () {
-  return browser.supportsPointerEvent;
-};
+  return browser.supportsPointerEvent
+}
 
 /**
  * Cancels all interactions (end events are not fired)
@@ -267,14 +268,14 @@ function supportsPointerEvent () {
  *
  * @return {object} interact
  */
-interact.stop = stop;
+interact.stop = stop
 function stop () {
   for (const interaction of scope.interactions.list) {
-    interaction.stop();
+    interaction.stop()
   }
 
-  return interact;
-};
+  return interact
+}
 
 /**
  * Returns or sets the distance the pointer must be moved before an action
@@ -285,33 +286,32 @@ function stop () {
  * @param {number} [newValue] The movement from the start position must be greater than this value
  * @return {interact | number}
  */
-interact.pointerMoveTolerance = pointerMoveTolerance;
+interact.pointerMoveTolerance = pointerMoveTolerance
 function pointerMoveTolerance (newValue) {
   if (utils.is.number(newValue)) {
-    scope.interactions.pointerMoveTolerance = newValue;
+    scope.interactions.pointerMoveTolerance = newValue
 
-    return interact;
+    return interact
   }
 
-  return scope.interactions.pointerMoveTolerance;
-};
+  return scope.interactions.pointerMoveTolerance
+}
 
 scope.interactables.signals.on('unset', ({ interactable }) => {
-  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
+  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1)
 
   // Stop related interactions when an Interactable is unset
   for (const interaction of scope.interactions.list) {
     if (interaction.target === interactable && interaction.interacting() && interaction._ending) {
-      interaction.stop();
+      interaction.stop()
     }
   }
-});
+})
 
-interact.addDocument    = scope.addDocument;
-interact.removeDocument = scope.removeDocument;
+interact.addDocument    = scope.addDocument
+interact.removeDocument = scope.removeDocument
 
-export const interactExport = interact as InteractStatic & typeof interact
-scope.interact = interactExport;
+scope.interact = interact
 
-export { scope };
-export default interactExport;
+export { scope }
+export default interact

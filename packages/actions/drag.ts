@@ -1,24 +1,8 @@
-import { Scope } from '@interactjs/core/scope';
-import * as arr from '@interactjs/utils/arr';
-import * as is from '@interactjs/utils/is';
+import { Scope } from '@interactjs/core/scope'
+import * as arr from '@interactjs/utils/arr'
+import * as is from '@interactjs/utils/is'
 
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    draggable?: (options: any) => Interactable | { [key: string]: any }
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    drag?: any
-  }
-}
-
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    drag?: typeof drag
-  }
-}
+export type DraggableMethod = (options: Interact.DraggableOptions) => Interact.Interactable | { [key: string]: any }
 
 function install (scope: Scope) {
   const {
@@ -26,62 +10,62 @@ function install (scope: Scope) {
     Interactable,
     interactions,
     defaults,
-  } = scope;
+  } = scope
 
-  interactions.signals.on('before-action-move', beforeMove);
-  interactions.signals.on('action-resume', beforeMove);
+  interactions.signals.on('before-action-move', beforeMove)
+  interactions.signals.on('action-resume', beforeMove)
 
   // dragmove
-  interactions.signals.on('action-move', move);
+  interactions.signals.on('action-move', move)
 
-  Interactable.prototype.draggable = drag.draggable;
+  Interactable.prototype.draggable = drag.draggable
 
-  actions.drag = drag;
-  actions.names.push('drag');
+  actions.drag = drag
+  actions.names.push('drag')
   arr.merge(actions.eventTypes, [
     'dragstart',
     'dragmove',
     'draginertiastart',
     'dragresume',
     'dragend',
-  ]);
-  actions.methodDict.drag = 'draggable';
+  ])
+  actions.methodDict.drag = 'draggable'
 
-  defaults.drag = drag.defaults;
+  defaults.drag = drag.defaults
 }
 
 function beforeMove ({ interaction }) {
-  if (interaction.prepared.name !== 'drag') { return; }
+  if (interaction.prepared.name !== 'drag') { return }
 
-  const axis = interaction.prepared.axis;
+  const axis = interaction.prepared.axis
 
   if (axis === 'x') {
-    interaction.coords.cur.page.y   = interaction.coords.start.page.y;
-    interaction.coords.cur.client.y = interaction.coords.start.client.y;
+    interaction.coords.cur.page.y   = interaction.coords.start.page.y
+    interaction.coords.cur.client.y = interaction.coords.start.client.y
 
-    interaction.coords.velocity.client.y = 0;
-    interaction.coords.velocity.page.y   = 0;
+    interaction.coords.velocity.client.y = 0
+    interaction.coords.velocity.page.y   = 0
   }
   else if (axis === 'y') {
-    interaction.coords.cur.page.x   = interaction.coords.start.page.x;
-    interaction.coords.cur.client.x = interaction.coords.start.client.x;
+    interaction.coords.cur.page.x   = interaction.coords.start.page.x
+    interaction.coords.cur.client.x = interaction.coords.start.client.x
 
-    interaction.coords.velocity.client.x = 0;
-    interaction.coords.velocity.page.x   = 0;
+    interaction.coords.velocity.client.x = 0
+    interaction.coords.velocity.page.x   = 0
   }
 }
 
 function move ({ iEvent, interaction }) {
-  if (interaction.prepared.name !== 'drag') { return; }
+  if (interaction.prepared.name !== 'drag') { return }
 
-  const axis = interaction.prepared.axis;
+  const axis = interaction.prepared.axis
 
   if (axis === 'x' || axis === 'y') {
-    const opposite = axis === 'x' ? 'y' : 'x';
+    const opposite = axis === 'x' ? 'y' : 'x'
 
-    iEvent.page[opposite]   = interaction.coords.start.page[opposite];
-    iEvent.client[opposite] = interaction.coords.start.client[opposite];
-    iEvent.delta[opposite] = 0;
+    iEvent.page[opposite]   = interaction.coords.start.page[opposite]
+    iEvent.client[opposite] = interaction.coords.start.client[opposite]
+    iEvent.delta[opposite] = 0
   }
 }
 
@@ -126,27 +110,27 @@ function move ({ iEvent, interaction }) {
  */
 function draggable (options) {
   if (is.object(options)) {
-    this.options.drag.enabled = options.enabled === false? false: true;
-    this.setPerAction('drag', options);
-    this.setOnEvents('drag', options);
+    this.options.drag.enabled = options.enabled !== false
+    this.setPerAction('drag', options)
+    this.setOnEvents('drag', options)
 
     if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
-      this.options.drag.lockAxis = options.lockAxis;
+      this.options.drag.lockAxis = options.lockAxis
     }
     if (/^(xy|x|y)$/.test(options.startAxis)) {
-      this.options.drag.startAxis = options.startAxis;
+      this.options.drag.startAxis = options.startAxis
     }
 
-    return this;
+    return this
   }
 
   if (is.bool(options)) {
-    this.options.drag.enabled = options;
+    this.options.drag.enabled = options
 
-    return this;
+    return this
   }
 
-  return this.options.drag;
+  return this.options.drag
 }
 
 const drag = {
@@ -157,10 +141,10 @@ const drag = {
   defaults: {
     startAxis : 'xy',
     lockAxis  : 'xy',
-  },
+  } as Interact.DropzoneOptions,
 
   checker (_pointer, _event, interactable) {
-    const dragOptions = interactable.options.drag;
+    const dragOptions = interactable.options.drag
 
     return dragOptions.enabled
       ? {
@@ -169,12 +153,12 @@ const drag = {
           ? dragOptions.startAxis
           : dragOptions.lockAxis),
       }
-      : null;
+      : null
   },
 
   getCursor () {
-    return 'move';
+    return 'move'
   },
-};
+}
 
-export default drag;
+export default drag

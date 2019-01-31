@@ -3,23 +3,31 @@ export interface Defaults {
   perAction: PerActionDefaults
 }
 
-export interface BaseDefaults extends SubDefaults {}
-export interface PerActionDefaults extends SubDefaults {}
+export interface BaseDefaults extends SubDefaults {
+  preventDefault?: 'auto' | 'never' | string
+  deltaSource?: 'page' | 'client'
+}
+export interface PerActionDefaults extends SubDefaults {
+  enabled?: boolean
+  origin?: Interact.Point | string | Element
+}
 
 export interface SubDefaults {
   [key: string]: any
 }
 
+export interface Options extends BaseDefaults, PerActionDefaults {}
+
 export const defaults: Defaults = {
   base: {
     preventDefault: 'auto',
-    deltaSource   : 'page',
-  } as BaseDefaults,
+    deltaSource: 'page',
+  },
 
   perAction: {
-    enabled     : false,
+    enabled: false,
     origin: { x: 0, y: 0 },
-  } as PerActionDefaults,
+  },
 }
 
 export default defaults

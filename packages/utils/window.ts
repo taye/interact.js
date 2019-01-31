@@ -1,49 +1,49 @@
-import isWindow from './isWindow';
+import isWindow from './isWindow'
 
 const win = {
   realWindow: undefined,
   window: undefined,
   getWindow,
   init,
-};
+}
 
 export function init (window) {
   // get wrapped window if using Shadow DOM polyfill
 
-  win.realWindow = window;
+  win.realWindow = window
 
   // create a TextNode
-  const el = window.document.createTextNode('');
+  const el = window.document.createTextNode('')
 
   // check if it's wrapped by a polyfill
-  if (el.ownerDocument !== window.document
-      && typeof window.wrap === 'function'
-    && window.wrap(el) === el) {
+  if (el.ownerDocument !== window.document &&
+      typeof window.wrap === 'function' &&
+    window.wrap(el) === el) {
     // use wrapped window
-    window = window.wrap(window);
+    window = window.wrap(window)
   }
 
-  win.window = window;
+  win.window = window
 }
 
 if (typeof window === 'undefined') {
-  win.window     = undefined;
-  win.realWindow = undefined;
+  win.window     = undefined
+  win.realWindow = undefined
 }
 else {
-  init(window);
+  init(window)
 }
 
 export function getWindow (node) {
   if (isWindow(node)) {
-    return node;
+    return node
   }
 
-  const rootNode = (node.ownerDocument || node);
+  const rootNode = (node.ownerDocument || node)
 
-  return rootNode.defaultView || win.window;
+  return rootNode.defaultView || win.window
 }
 
-win.init = init;
+win.init = init
 
-export default win;
+export default win

@@ -1,3 +1,3 @@
-import tape from 'tape';
+import tape from 'tape'
 
-export default tape;
+export default tape

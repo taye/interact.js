@@ -3,48 +3,54 @@
 // Definitions by: Gaspard Bucher <feature-space.com>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-import Interactable from '@interactjs/core/Interactable';
-import { Action } from '@interactjs/core/Interaction';
+import { Options as _Options } from '@interactjs/core/defaultOptions'
+import _Interactable from '@interactjs/core/Interactable'
+import _Interaction from '@interactjs/core/Interaction'
+import { Action } from '@interactjs/core/Interaction'
+import interact from '@interactjs/interact/interact'
 
 declare namespace Interact {
-  type Target = Element | String
+  export type Target = Window | Document | Element | string
+  export type interact = typeof interact
+  export type Interactable = _Interactable
+  export type Interaction = _Interaction
+  export type Options = _Options
 
-  interface Point {
+  export interface Point {
     x: number
     y: number
   }
 
-  interface SnapPosition {
+  export interface SnapPosition {
     x: number
     y: number
     range?: number
   }
 
-  interface Rect {
+  export interface Rect {
     top: number
     left: number
     bottom: number
     right: number
   }
 
-  interface Rect2 {
+  export interface Rect2 {
     x: number
     y: number
     width: number
     height: number
   }
 
-  interface Rect3 {
+  export interface Rect3 {
     width: number
     height: number
   }
 
-  interface SnapFunction {
-    ( x: number, y: number ) : SnapPosition
-  }
+  export type SnapFunction = ( x: number, y: number ) => SnapPosition
 
-  type SnapTarget = SnapPosition | SnapFunction
-  type SnapOptions = {
+
+  export type SnapTarget = SnapPosition | SnapFunction
+  export interface SnapOptions {
     targets?: SnapTarget[]
     // target range
     range?: number
@@ -54,7 +60,7 @@ declare namespace Interact {
     offset?: Point | 'startCoords'
   }
 
-  interface InertiaOption {
+  export interface InertiaOption {
     resistance?: number
     minSpeed?: number
     endSpeed?: number
@@ -62,20 +68,20 @@ declare namespace Interact {
     zeroResumeDelta?: boolean
     smoothEndDuration?: number
   }
-  type InertiaOptions = InertiaOption | boolean
+  export type InertiaOptions = InertiaOption | boolean
 
-  interface AutoScrollOption {
+  export interface AutoScrollOption {
     container?: DOMElement
     margin?: number
     distance?: number
     interval?: number
   }
-  type AutoScrollOptions = AutoScrollOption | boolean
+  export type AutoScrollOptions = AutoScrollOption | boolean
 
-  type CSSSelector = string
-  type DOMElement = any
+  export type CSSSelector = string
+  export type DOMElement = any
 
-  type RestrictOption = {
+  export interface RestrictOption {
     // where to drag over
     restriction?: Rect | Rect2 | CSSSelector | DOMElement | 'self' | 'parent'
     // what part of self is allowed to drag over
@@ -84,122 +90,95 @@ declare namespace Interact {
     endOnly?: boolean
   }
 
-  interface RestrictSizeOption {
+  export interface RestrictSizeOption {
     min?: Rect3
     max?: Rect3
   }
 
-  interface EdgeOptions {
+  export interface EdgeOptions {
     top?: boolean | CSSSelector | DOMElement
     left?: boolean | CSSSelector | DOMElement
     bottom?: boolean | CSSSelector | DOMElement
     right?: boolean | CSSSelector | DOMElement
   }
 
-  interface CommonOptions {
-    enabled?: boolean
-    allowFrom?: string
-    ignoreFrom?: string
-    max?: number
-    maxPerElement?: number
-    manualStart?: boolean
-    hold?: number
-    snap?: SnapOptions
-    restrict?: RestrictOption
-    inertia?: InertiaOptions
-    autoScroll?: AutoScrollOptions
-    onstart?: Listeners
-    onmove?: Listeners
-    onend?: Listeners
-  }
+  export type CommonOptions = Options
 
-  interface DraggableOptions extends CommonOptions{
+  export interface DraggableOptions extends Options {
     axis?: 'x' | 'y'
     oninertiastart?: Listeners
   }
 
-  interface ResizableOptions extends CommonOptions {
+  export interface DropzoneOptions extends Options {
+    accept?: string
+    // How the overlap is checked on the drop zone
+    overlap?: 'pointer' | 'center' | number
+    checker?: DropFunctionChecker
+
+    ondropactivate?: Interact.Listeners
+    ondropdeactivate?: Interact.Listeners
+    ondragenter?: Interact.Listeners
+    ondragleave?: Interact.Listeners
+    ondropmove?: Interact.Listeners
+    ondrop?: Interact.Listeners
+  }
+
+  export type DropFunctionChecker = (
+    dragEvent: any, // related drag operation
+    event: any, // touch or mouse EventEmitter
+    dropped: boolean, // default checker result
+    dropzone: Interact.Interactable, // dropzone interactable
+    dropElement: Element, // drop zone element
+    draggable: Interact.Interactable, // draggable's Interactable
+    draggableElement: Element, // dragged element
+  ) => boolean
+
+  export interface ResizableOptions extends Options {
     snapSize?: SnapOptions
     restrictSize?: RestrictSizeOption
     square?: boolean
     edges?: EdgeOptions
     // deprecated
-    axis?: 'x' | 'y'
+    axis?: 'x' | 'y' | 'xy'
     //
     invert?: 'none' | 'negate' | 'reposition'
     squareResize?: boolean
     oninertiastart?: Listeners
   }
 
-  interface GesturableOptions extends CommonOptions {
-  }
+  export type GesturableOptions = Options
 
-  interface Interaction {
-    doMove () : void
-    end ( event: PointerEvent ): void
-    start ( action: Action ): any
-    stop () : void
-  }
-
-  interface ActionChecker {
+  export type ActionChecker =
     ( pointerEvent: any
     , defaultAction: string
     , interactable: Interactable
     , element: DOMElement
     , interaction: Interaction
-    ): Action }
+    ) => Action
 
-  interface DropFunctionChecker {
-    ( dragEvent: any // related drag operation
-    , event: any // touch or mouse EventEmitter
-    , dropped: boolean // default checker result
-    , dropzone: Interactable // dropzone interactable
-    , dropElement: DOMElement // drop zone element
-    , draggable: Interactable // draggable's Interactable
-    , draggableElement: DOMElement // dragged element
-    ) : boolean
-  }
+  export type OriginFunction = ( target: DOMElement )  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
 
-  interface DropZoneOptions {
-    accept?: CSSSelector
-    // How the overlap is checked on the drop zone
-    overlap?: 'pointer' | 'center' | number
-    checker?: DropFunctionChecker
-
-    ondropactivate?: Listeners
-    ondropdeactivate?: Listeners
-    ondragenter?: Listeners
-    ondragleave?: Listeners
-    ondropmove?: Listeners
-    ondrop?: Listeners
-  }
-
-  interface OriginFunction {
-    ( target: DOMElement ) : 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement;
-  }
-
-  interface PointerEventsOptions {
+  export interface PointerEventsOptions {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction;
+    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction
   }
 
-  interface RectChecker {
-    ( element: Element ) : Partial<Rect & Rect3>
-  }
+  export type RectChecker = ( element: Element )  => Partial<Rect & Rect3>
 
-  type PointerEventType = MouseEvent | TouchEvent | PointerEvent;
-  type PointerType = MouseEvent | Touch | PointerEvent
+  export type PointerEventType = MouseEvent | TouchEvent | PointerEvent
+  export type PointerType = MouseEvent | Touch | PointerEvent
 
-  type EventTypes = String | String[] | {
+  export type EventTypes = string | string[] | {
     [index: string]: EventTypes | Listeners
   }
 
-  type Listeners = Function | Function[]
+  export type Listener = (...args: any) => any
+  export type Listeners = Listener | Listener[]
 
 
-  type OnEventName =
+  export type OnEventName =
     'dragstart'
     | 'dragmove'
     | 'draginertiastart'
@@ -227,7 +206,7 @@ declare namespace Interact {
     | 'doubletap'
     | 'hold'
 
-  interface OnEventFunctions {
+  export interface OnEventFunctions {
     dragstart?: Listeners
     dragmove?: Listeners
     draginertiastart?: Listeners
@@ -256,32 +235,12 @@ declare namespace Interact {
     hold?: Listeners
   }
 
-  type OnEvent = OnEventName | OnEventName[]
+  export type OnEvent = OnEventName | OnEventName[]
 
-  interface InteractOptions {
+  export interface InteractOptions {
     context?: DOMElement
   }
-
-  /*
-  interface InteractStatic {
-    ( el: DOMElement | CSSSelector, opts?: InteractOptions | any): Interactable
-    maxInteractions () : number
-    maxInteractions ( newValue: number) : InteractStatic
-    off ( opt: OnEvent | OnEventFunctions, listener?: Listeners ) : InteractStatic
-    on ( opt: OnEvent | OnEventFunctions, listener?: Listeners ) : InteractStatic
-    supportsTouch () : boolean
-    supportsPointerEvent () : boolean
-    stop ( event: any ) : InteractStatic
-    pointerMoveTolerance () : number
-    pointerMoveTolerance ( tol: number ) : InteractStatic
-    createSnapGrid ( grid: { x: number, y: number, range?: number, offset?: Point, limits?: Rect } ) : SnapFunction
-    isSet ( element: DOMElement | CSSSelector ) : boolean
-    addDocument ( document: Document, options: any ) : void
-    removeDocument ( document: Document, options: any ) : void
-    use ( plugin: Plugin) : InteractStatic;
-  }
-  */
 }
 
-export as namespace Interact;
-export = Interact;
+export as namespace Interact
+export = Interact

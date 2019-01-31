@@ -1,1 +1,1 @@
-export default (thing) => !!(thing && thing.Window) && (thing instanceof thing.Window);
+export default (thing) => !!(thing && thing.Window) && (thing instanceof thing.Window)

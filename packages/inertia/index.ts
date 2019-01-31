@@ -1,16 +1,16 @@
-import modifiers  from '@interactjs/modifiers/base';
-import * as utils from '@interactjs/utils';
-import raf        from '@interactjs/utils/raf';
+import modifiers from '@interactjs/modifiers/base'
+import * as utils from '@interactjs/utils'
+import raf from '@interactjs/utils/raf'
 
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope
 
 function install (scope: Scope) {
   const {
     interactions,
     defaults,
-  } = scope;
+  } = scope
 
-  interactions.signals.on('new', function (interaction) {
+  interactions.signals.on('new', (interaction) => {
     interaction.inertia = {
       active     : false,
       smoothEnd  : false,
@@ -19,22 +19,25 @@ function install (scope: Scope) {
       startEvent: null,
       upCoords  : {},
 
-      xe: 0, ye: 0,
-      sx: 0, sy: 0,
+      xe: 0,
+      ye: 0,
+      sx: 0,
+      sy: 0,
 
       t0: 0,
-      vx0: 0, vys: 0,
+      vx0: 0,
+      vys: 0,
       duration: 0,
 
       lambda_v0: 0,
       one_ve_v0: 0,
       i  : null,
-    };
-  });
+    }
+  })
 
-  interactions.signals.on('before-action-end', arg => release(arg, scope));
-  interactions.signals.on('down'             , arg => resume (arg, scope));
-  interactions.signals.on('stop'             , arg => stop   (arg));
+  interactions.signals.on('before-action-end', (arg) => release(arg, scope))
+  interactions.signals.on('down', (arg) => resume(arg, scope))
+  interactions.signals.on('stop', (arg) => stop(arg))
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -43,270 +46,268 @@ function install (scope: Scope) {
     endSpeed         : 10,    // the speed at which inertia is slow enough to stop
     allowResume      : true,  // allow resuming an action in inertia phase
     smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
-  };
+  }
 }
 
 function resume ({ interaction, event, pointer, eventTarget }, scope: Scope) {
-  const state = interaction.inertia;
+  const state = interaction.inertia
 
   // Check if the down event hits the current inertia target
   if (state.active) {
-    let element = eventTarget;
+    let element = eventTarget
 
     // climb up the DOM tree from the event target
     while (utils.is.element(element)) {
-
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        raf.cancel(state.i);
-        state.active = false;
-        interaction.simulation = null;
+        raf.cancel(state.i)
+        state.active = false
+        interaction.simulation = null
 
         // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer, event, eventTarget, true);
+        interaction.updatePointer(pointer, event, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
-          interaction.pointers.map(p => p.pointer)
-        );
+          interaction.pointers.map((p) => p.pointer)
+        )
 
         // fire appropriate signals
         const signalArg = {
           interaction,
-        };
+        }
 
-        scope.interactions.signals.fire('action-resume', signalArg);
+        scope.interactions.signals.fire('action-resume', signalArg)
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, 'resume', interaction.element);
+          interaction, event, interaction.prepared.name, 'resume', interaction.element)
 
-        interaction._fireEvent(resumeEvent);
+        interaction._fireEvent(resumeEvent)
 
-        utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
-        break;
+        utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur)
+        break
       }
 
-      element = utils.dom.parentNode(element);
+      element = utils.dom.parentNode(element)
     }
   }
 }
 
 function release ({ interaction, event, noPreEnd }, scope: Scope) {
-  const state = interaction.inertia;
+  const state = interaction.inertia
 
   if (!interaction.interacting() ||
     (interaction.simulation && interaction.simulation.active) ||
   noPreEnd) {
-    return null;
+    return null
   }
 
-  const options = getOptions(interaction);
+  const options = getOptions(interaction)
 
-  const now = new Date().getTime();
-  const { client: velocityClient } = interaction.coords.velocity;
-  const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y);
+  const now = new Date().getTime()
+  const { client: velocityClient } = interaction.coords.velocity
+  const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
-  let smoothEnd = false;
-  let modifierResult;
+  let smoothEnd = false
+  let modifierResult
 
   // check if inertia should be started
-  const inertiaPossible = (options && options.enabled
-                     && interaction.prepared.name !== 'gesture'
-                     && event !== state.startEvent);
+  const inertiaPossible = (options && options.enabled &&
+                     interaction.prepared.name !== 'gesture' &&
+                     event !== state.startEvent)
 
-  const inertia = (inertiaPossible
-    && (now - interaction.coords.cur.timeStamp) < 50
-    && pointerSpeed > options.minSpeed
-    && pointerSpeed > options.endSpeed);
+  const inertia = (inertiaPossible &&
+    (now - interaction.coords.cur.timeStamp) < 50 &&
+    pointerSpeed > options.minSpeed &&
+    pointerSpeed > options.endSpeed)
 
   const modifierArg = {
     interaction,
     pageCoords: utils.extend({}, interaction.coords.cur.page),
     states: inertiaPossible && interaction.modifiers.states.map(
-      modifierStatus => utils.extend({}, modifierStatus)
+      (modifierStatus) => utils.extend({}, modifierStatus)
     ),
     preEnd: true,
     requireEndOnly: true,
-  };
+  }
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifierResult = modifiers.setAll(modifierArg);
+    modifierResult = modifiers.setAll(modifierArg)
 
     if (modifierResult.shouldMove) {
-      smoothEnd = true;
+      smoothEnd = true
     }
   }
 
-  if (!(inertia || smoothEnd)) { return null; }
+  if (!(inertia || smoothEnd)) { return null }
 
-  utils.pointer.copyCoords(state.upCoords, interaction.coords.cur);
+  utils.pointer.copyCoords(state.upCoords, interaction.coords.cur)
 
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(
-    interaction, event, interaction.prepared.name, 'inertiastart', interaction.element);
+    interaction, event, interaction.prepared.name, 'inertiastart', interaction.element)
 
-  state.t0 = now;
+  state.t0 = now
 
-  state.active = true;
-  state.allowResume = options.allowResume;
-  interaction.simulation = state;
+  state.active = true
+  state.allowResume = options.allowResume
+  interaction.simulation = state
 
-  interaction.target.fire(state.startEvent);
+  interaction.target.fire(state.startEvent)
 
   if (inertia) {
-    state.vx0 = interaction.coords.velocity.client.x;
-    state.vy0 = interaction.coords.velocity.client.y;
-    state.v0 = pointerSpeed;
+    state.vx0 = interaction.coords.velocity.client.x
+    state.vy0 = interaction.coords.velocity.client.y
+    state.v0 = pointerSpeed
 
-    calcInertia(interaction, state);
+    calcInertia(interaction, state)
 
-    utils.extend(modifierArg.pageCoords, interaction.coords.cur.page);
+    utils.extend(modifierArg.pageCoords, interaction.coords.cur.page)
 
-    modifierArg.pageCoords.x += state.xe;
-    modifierArg.pageCoords.y += state.ye;
+    modifierArg.pageCoords.x += state.xe
+    modifierArg.pageCoords.y += state.ye
 
-    modifierResult = modifiers.setAll(modifierArg);
+    modifierResult = modifiers.setAll(modifierArg)
 
-    state.modifiedXe += modifierResult.delta.x;
-    state.modifiedYe += modifierResult.delta.y;
+    state.modifiedXe += modifierResult.delta.x
+    state.modifiedYe += modifierResult.delta.y
 
-    state.i = raf.request(() => inertiaTick(interaction));
+    state.i = raf.request(() => inertiaTick(interaction))
   }
   else {
-    state.smoothEnd = true;
-    state.xe = modifierResult.delta.x;
-    state.ye = modifierResult.delta.y;
+    state.smoothEnd = true
+    state.xe = modifierResult.delta.x
+    state.ye = modifierResult.delta.y
 
-    state.sx = state.sy = 0;
+    state.sx = state.sy = 0
 
-    state.i = raf.request(() => smothEndTick(interaction));
+    state.i = raf.request(() => smothEndTick(interaction))
   }
 
-  return false;
+  return false
 }
 
 function stop ({ interaction }) {
-  const state = interaction.inertia;
+  const state = interaction.inertia
 
   if (state.active) {
-    raf.cancel(state.i);
-    state.active = false;
-    interaction.simulation = null;
+    raf.cancel(state.i)
+    state.active = false
+    interaction.simulation = null
   }
 }
 
 function calcInertia (interaction, state) {
-  const options = getOptions(interaction);
-  const lambda = options.resistance;
-  const inertiaDur = -Math.log(options.endSpeed / state.v0) / lambda;
+  const options = getOptions(interaction)
+  const lambda = options.resistance
+  const inertiaDur = -Math.log(options.endSpeed / state.v0) / lambda
 
-  state.x0 = interaction.prevEvent.page.x;
-  state.y0 = interaction.prevEvent.page.y;
-  state.t0 = state.startEvent.timeStamp / 1000;
-  state.sx = state.sy = 0;
+  state.x0 = interaction.prevEvent.page.x
+  state.y0 = interaction.prevEvent.page.y
+  state.t0 = state.startEvent.timeStamp / 1000
+  state.sx = state.sy = 0
 
-  state.modifiedXe = state.xe = (state.vx0 - inertiaDur) / lambda;
-  state.modifiedYe = state.ye = (state.vy0 - inertiaDur) / lambda;
-  state.te = inertiaDur;
+  state.modifiedXe = state.xe = (state.vx0 - inertiaDur) / lambda
+  state.modifiedYe = state.ye = (state.vy0 - inertiaDur) / lambda
+  state.te = inertiaDur
 
-  state.lambda_v0 = lambda / state.v0;
-  state.one_ve_v0 = 1 - options.endSpeed / state.v0;
+  state.lambda_v0 = lambda / state.v0
+  state.one_ve_v0 = 1 - options.endSpeed / state.v0
 }
 
 function inertiaTick (interaction) {
-  updateInertiaCoords(interaction);
-  utils.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
-  utils.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
+  updateInertiaCoords(interaction)
+  utils.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur)
+  utils.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta)
 
-  const state = interaction.inertia;
-  const options = getOptions(interaction);
-  const lambda = options.resistance;
-  const t = new Date().getTime() / 1000 - state.t0;
+  const state = interaction.inertia
+  const options = getOptions(interaction)
+  const lambda = options.resistance
+  const t = new Date().getTime() / 1000 - state.t0
 
   if (t < state.te) {
-
-    const progress =  1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0;
+    const progress =  1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0
 
     if (state.modifiedXe === state.xe && state.modifiedYe === state.ye) {
-      state.sx = state.xe * progress;
-      state.sy = state.ye * progress;
+      state.sx = state.xe * progress
+      state.sy = state.ye * progress
     }
     else {
       const quadPoint = utils.getQuadraticCurvePoint(
         0, 0,
         state.xe, state.ye,
         state.modifiedXe, state.modifiedYe,
-        progress);
+        progress)
 
-      state.sx = quadPoint.x;
-      state.sy = quadPoint.y;
+      state.sx = quadPoint.x
+      state.sy = quadPoint.y
     }
 
-    interaction.move();
+    interaction.move()
 
-    state.i = raf.request(() => inertiaTick(interaction));
+    state.i = raf.request(() => inertiaTick(interaction))
   }
   else {
-    state.sx = state.modifiedXe;
-    state.sy = state.modifiedYe;
+    state.sx = state.modifiedXe
+    state.sy = state.modifiedYe
 
-    interaction.move();
-    interaction.end(state.startEvent);
-    state.active = false;
-    interaction.simulation = null;
+    interaction.move()
+    interaction.end(state.startEvent)
+    state.active = false
+    interaction.simulation = null
   }
 
-  utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
+  utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur)
 }
 
 function smothEndTick (interaction) {
-  updateInertiaCoords(interaction);
+  updateInertiaCoords(interaction)
 
-  const state = interaction.inertia;
-  const t = new Date().getTime() - state.t0;
-  const { smoothEndDuration: duration } = getOptions(interaction);
+  const state = interaction.inertia
+  const t = new Date().getTime() - state.t0
+  const { smoothEndDuration: duration } = getOptions(interaction)
 
   if (t < duration) {
-    state.sx = utils.easeOutQuad(t, 0, state.xe, duration);
-    state.sy = utils.easeOutQuad(t, 0, state.ye, duration);
+    state.sx = utils.easeOutQuad(t, 0, state.xe, duration)
+    state.sy = utils.easeOutQuad(t, 0, state.ye, duration)
 
-    interaction.move();
+    interaction.move()
 
-    state.i = raf.request(() => smothEndTick(interaction));
+    state.i = raf.request(() => smothEndTick(interaction))
   }
   else {
-    state.sx = state.xe;
-    state.sy = state.ye;
+    state.sx = state.xe
+    state.sy = state.ye
 
-    interaction.move();
-    interaction.end(state.startEvent);
+    interaction.move()
+    interaction.end(state.startEvent)
 
     state.smoothEnd =
-      state.active = false;
-    interaction.simulation = null;
+      state.active = false
+    interaction.simulation = null
   }
 }
 
 function updateInertiaCoords (interaction) {
-  const state = interaction.inertia;
+  const state = interaction.inertia
 
   // return if inertia isn't running
-  if (!state.active) { return; }
+  if (!state.active) { return }
 
-  const pageUp   = state.upCoords.page;
-  const clientUp = state.upCoords.client;
+  const pageUp   = state.upCoords.page
+  const clientUp = state.upCoords.client
 
   utils.pointer.setCoords(interaction.coords.cur, [ {
     pageX  : pageUp.x   + state.sx,
     pageY  : pageUp.y   + state.sy,
     clientX: clientUp.x + state.sx,
     clientY: clientUp.y + state.sy,
-  } ]);
+  } ])
 }
 
 function getOptions ({ target, prepared }) {
-  return target && target.options && prepared.name && target.options[prepared.name].inertia;
+  return target && target.options && prepared.name && target.options[prepared.name].inertia
 }
 
 export default {
@@ -315,4 +316,4 @@ export default {
   inertiaTick,
   smothEndTick,
   updateInertiaCoords,
-};
+}

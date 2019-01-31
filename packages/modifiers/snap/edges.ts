@@ -26,33 +26,33 @@
  * });
  */
 
-import { Scope } from '@interactjs/core/scope';
-import clone from '@interactjs/utils/clone';
-import extend from '@interactjs/utils/extend';
-import snapSize from './size';
+import { Scope } from '@interactjs/core/scope'
+import clone from '@interactjs/utils/clone'
+import extend from '@interactjs/utils/extend'
+import snapSize from './size'
 
 function install (scope: Scope) {
   const {
     defaults,
-  } = scope;
+  } = scope
 
-  defaults.perAction.snapEdges = snapEdges.defaults;
+  defaults.perAction.snapEdges = snapEdges.defaults
 }
 
 function start (arg) {
-  const edges = arg.interaction.prepared.edges;
+  const edges = arg.interaction.prepared.edges
 
-  if (!edges) { return null; }
+  if (!edges) { return null }
 
   arg.state.targetFields = arg.state.targetFields || [
     [edges.left ? 'left' : 'right', edges.top ? 'top' : 'bottom'],
-  ];
+  ]
 
-  return snapSize.start(arg);
+  return snapSize.start(arg)
 }
 
 function set (arg) {
-  return snapSize.set(arg);
+  return snapSize.set(arg)
 }
 
 const snapEdges = {
@@ -62,6 +62,6 @@ const snapEdges = {
   defaults: extend(clone(snapSize.defaults), {
     offset: { x: 0, y: 0 },
   }),
-};
+}
 
-export default snapEdges;
+export default snapEdges
