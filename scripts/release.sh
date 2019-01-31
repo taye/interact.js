@@ -85,6 +85,9 @@ run_build() {
   # copy license file
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE .
 
+  # copy README
+  cp $ROOT/README.md packages/interactjs/
+
   # generate .js and .d.ts files
   npx tsc --emitDeclarationOnly false -p $ROOT
 
