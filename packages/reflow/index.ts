@@ -1,12 +1,12 @@
-import { Action, Interaction } from '@interactjs/core/Interaction';
-import { newInteraction } from '@interactjs/core/interactions';
-import { Scope } from '@interactjs/core/scope';
-import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils';
-type Interactable = import ('@interactjs/core/Interactable').default;
+import { Action, Interaction } from '@interactjs/core/Interaction'
+import { newInteraction } from '@interactjs/core/interactions'
+import { Scope } from '@interactjs/core/scope'
+import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
+type Interactable = import ('@interactjs/core/Interactable').default
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow: (action: Action) => ReturnType<typeof reflow>;
+    reflow: (action: Action) => ReturnType<typeof reflow>
   }
 }
 
@@ -16,20 +16,20 @@ export function install (scope: Scope) {
     interactions,
     /** @lends Interactable */
     Interactable,
-  } = scope;
+  } = scope
 
   // add action reflow event types
   for (const actionName of actions.names) {
-    actions.eventTypes.push(`${actionName}reflow`);
+    actions.eventTypes.push(`${actionName}reflow`)
   }
 
   // remove completed reflow interactions
   interactions.signals.on('stop', ({ interaction }) => {
     if (interaction.pointerType === 'reflow') {
-      interaction._reflowResolve();
-      arr.remove(scope.interactions.list, interaction);
+      interaction._reflowResolve()
+      arr.remove(scope.interactions.list, interaction)
     }
-  });
+  })
 
   /**
    * ```js
@@ -48,23 +48,23 @@ export function install (scope: Scope) {
    * @returns { Promise<Interactable> }
    */
   Interactable.prototype.reflow = function (action) {
-    return reflow(this, action, scope);
-  };
+    return reflow(this, action, scope)
+  }
 }
 
 function reflow (interactable: Interactable, action: Action, scope: Scope) {
   const elements = is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
-    : [interactable.target];
+    : [interactable.target]
 
   // tslint:disable-next-line variable-name
-  const Promise = (win.window as any).Promise;
-  const promises: Array<Promise<null>> | null = Promise ? [] : null;
+  const Promise = (win.window as any).Promise
+  const promises: Array<Promise<null>> | null = Promise ? [] : null
 
   for (const element of elements) {
-    const rect = interactable.getRect(element);
+    const rect = interactable.getRect(element)
 
-    if (!rect) { break; }
+    if (!rect) { break }
 
     const runningInteraction = arr.find(
       scope.interactions.list,
@@ -72,76 +72,76 @@ function reflow (interactable: Interactable, action: Action, scope: Scope) {
         return interaction.interacting() &&
           interaction.target === interactable &&
           interaction.element === element &&
-          interaction.prepared.name === action.name;
-      });
-    let reflowPromise: Promise<null>;
+          interaction.prepared.name === action.name
+      })
+    let reflowPromise: Promise<null>
 
     if (runningInteraction) {
-      runningInteraction.move();
+      runningInteraction.move()
 
       reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
-        runningInteraction._reflowResolve = resolve;
-      });
+        runningInteraction._reflowResolve = resolve
+      })
     }
     else {
-      const xywh = rectUtils.tlbrToXywh(rect);
+      const xywh = rectUtils.tlbrToXywh(rect)
       const coords = {
         page     : { x: xywh.x, y: xywh.y },
         client   : { x: xywh.x, y: xywh.y },
         timeStamp: Date.now(),
-      };
+      }
 
-      const event = pointerUtils.coordsToEvent(coords);
-      reflowPromise = startReflow(scope, interactable, element, action, event);
+      const event = pointerUtils.coordsToEvent(coords)
+      reflowPromise = startReflow(scope, interactable, element, action, event)
     }
 
     if (promises) {
-      promises.push(reflowPromise);
+      promises.push(reflowPromise)
     }
   }
 
-  return promises && Promise.all(promises).then(() => interactable);
+  return promises && Promise.all(promises).then(() => interactable)
 }
 
 function startReflow (scope: Scope, interactable: Interactable, element: Element, action: Action, event: any) {
-  const interaction = newInteraction({ pointerType: 'reflow' }, scope);
+  const interaction = newInteraction({ pointerType: 'reflow' }, scope)
   const signalArg = {
     interaction,
     event,
     pointer: event,
     eventTarget: element,
     phase: 'reflow',
-  };
+  }
 
-  interaction.target = interactable;
-  interaction.element = element;
-  interaction.prepared = extend({}, action);
-  interaction.prevEvent = event;
-  interaction.updatePointer(event, event, element, true);
+  interaction.target = interactable
+  interaction.element = element
+  interaction.prepared = extend({}, action)
+  interaction.prevEvent = event
+  interaction.updatePointer(event, event, element, true)
 
-  interaction._doPhase(signalArg);
+  interaction._doPhase(signalArg)
 
   const reflowPromise = (win.window as unknown as any).Promise
     ? new (win.window as unknown as any).Promise((resolve: any) => {
-      interaction._reflowResolve = resolve;
+      interaction._reflowResolve = resolve
     })
-    : null;
+    : null
 
-  interaction._reflowPromise = reflowPromise;
-  interaction.start(action, interactable, element);
+  interaction._reflowPromise = reflowPromise
+  interaction.start(action, interactable, element)
 
   if (interaction._interacting) {
-    interaction.move(signalArg);
-    interaction.end(event);
+    interaction.move(signalArg)
+    interaction.end(event)
   }
   else {
-    interaction.stop();
+    interaction.stop()
   }
 
-  interaction.removePointer(event, event);
-  interaction.pointerIsDown = false;
+  interaction.removePointer(event, event)
+  interaction.pointerIsDown = false
 
-  return reflowPromise;
+  return reflowPromise
 }
 
-export default { install };
+export default { install }

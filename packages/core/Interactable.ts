@@ -1,15 +1,14 @@
-import * as arr from '@interactjs/utils/arr';
-import browser from '@interactjs/utils/browser';
-import clone from '@interactjs/utils/clone';
-import { getElementRect, nodeContains, trySelector } from '@interactjs/utils/domUtils';
-import events from '@interactjs/utils/events';
-import extend from '@interactjs/utils/extend';
-import * as is from '@interactjs/utils/is';
-import normalizeListeners from '@interactjs/utils/normalizeListeners';
-import { getWindow } from '@interactjs/utils/window';
-import { Defaults, Options } from './defaultOptions';
-import Eventable from './Eventable';
-
+import * as arr from '@interactjs/utils/arr'
+import browser from '@interactjs/utils/browser'
+import clone from '@interactjs/utils/clone'
+import { getElementRect, nodeContains, trySelector } from '@interactjs/utils/domUtils'
+import events from '@interactjs/utils/events'
+import extend from '@interactjs/utils/extend'
+import * as is from '@interactjs/utils/is'
+import normalizeListeners from '@interactjs/utils/normalizeListeners'
+import { getWindow } from '@interactjs/utils/window'
+import { Defaults, Options } from './defaultOptions'
+import Eventable from './Eventable'
 
 /** */
 export class Interactable implements Partial<Eventable> {
@@ -17,84 +16,84 @@ export class Interactable implements Partial<Eventable> {
     return {
       base: {},
       perAction: {},
-    };
+    }
   }
 
-  options!: Options;
-  _actions: any;
-  readonly target: Interact.Target;
-  events = new Eventable();
-  _context: Element;
-  _win: Window;
-  _doc: Document;
+  options!: Options
+  _actions: any
+  readonly target: Interact.Target
+  events = new Eventable()
+  _context: Element
+  _win: Window
+  _doc: Document
 
   /** */
   constructor (target: Interact.Target, options: any, defaultContext: Element | Node) {
-    this._actions = options.actions;
-    this.target   = target;
-    this._context = options.context || defaultContext;
-    this._win     = getWindow(trySelector(target) ? this._context : target);
-    this._doc     = this._win.document;
+    this._actions = options.actions
+    this.target   = target
+    this._context = options.context || defaultContext
+    this._win     = getWindow(trySelector(target) ? this._context : target)
+    this._doc     = this._win.document
 
-    this.set(options);
+    this.set(options)
   }
 
   setOnEvents (actionName: string, phases: { [phase: string]: Interact.Listeners }) {
-    if (is.func(phases.onstart)       ) { this.on(`${actionName}start`       , phases.onstart       ); }
-    if (is.func(phases.onmove)        ) { this.on(`${actionName}move`        , phases.onmove        ); }
-    if (is.func(phases.onend)         ) { this.on(`${actionName}end`         , phases.onend         ); }
-    if (is.func(phases.oninertiastart)) { this.on(`${actionName}inertiastart`, phases.oninertiastart); }
+    if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
+    if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
+    if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
+    if (is.func(phases.oninertiastart)) { this.on(`${actionName}inertiastart`, phases.oninertiastart) }
 
-    return this;
+    return this
   }
 
   updatePerActionListeners (actionName, prev, cur) {
     if (is.array(prev)) {
-      this.off(actionName, prev);
+      this.off(actionName, prev)
     }
 
     if (is.array(cur)) {
-      this.on(actionName, cur);
+      this.on(actionName, cur)
     }
   }
 
   setPerAction (actionName, options: Options) {
-    const defaults = this._defaults;
+    const defaults = this._defaults
 
     // for all the default per-action options
     for (const optionName in options) {
-      const actionOptions = this.options[actionName];
-      const optionValue = options[optionName];
-      const isArray = is.array(optionValue);
+      const actionOptions = this.options[actionName]
+      const optionValue = options[optionName]
+      const isArray = is.array(optionValue)
 
       // remove old event listeners and add new ones
       if (optionName === 'listeners') {
-        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue);
+        this.updatePerActionListeners(actionName, actionOptions.listeners, optionValue)
       }
 
       // if the option value is an array
       if (isArray) {
-        actionOptions[optionName] = arr.from(optionValue);
+        actionOptions[optionName] = arr.from(optionValue)
       }
       // if the option value is an object
       else if (!isArray && is.plainObject(optionValue)) {
         // copy the object
         actionOptions[optionName] = extend(
           actionOptions[optionName] || {},
-          clone(optionValue));
+          clone(optionValue))
 
         // set anabled field to true if it exists in the defaults
         if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
-          actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
+          actionOptions[optionName].enabled = optionValue.enabled !== false
         }
       }
       // if the option value is a boolean and the default is an object
       else if (is.bool(optionValue) && is.object(defaults.perAction[optionName])) {
-        actionOptions[optionName].enabled = optionValue;
+        actionOptions[optionName].enabled = optionValue
       }
       // if it's anything else, do a plain assignment
       else {
-        actionOptions[optionName] = optionValue;
+        actionOptions[optionName] = optionValue
       }
     }
   }
@@ -107,17 +106,15 @@ export class Interactable implements Partial<Eventable> {
    * @return {object} The object's bounding rectangle.
    */
   getRect (element: Element) {
-    element = element
-      ? element
-      : is.element(this.target)
-        ? this.target
-        : null;
+    element = element || (is.element(this.target)
+      ? this.target
+      : null)
 
     if (is.string(this.target)) {
-      element = element || this._context.querySelector(this.target);
+      element = element || this._context.querySelector(this.target)
     }
 
-    return getElementRect(element);
+    return getElementRect(element)
   }
 
   /**
@@ -130,32 +127,32 @@ export class Interactable implements Partial<Eventable> {
    */
   rectChecker (checker: (element: Element) => any) {
     if (is.func(checker)) {
-      this.getRect = checker;
+      this.getRect = checker
 
-      return this;
+      return this
     }
 
     if (checker === null) {
-      delete this.options.getRect;
+      delete this.options.getRect
 
-      return this;
+      return this
     }
 
-    return this.getRect;
+    return this.getRect
   }
 
   _backCompatOption (optionName, newValue) {
     if (trySelector(newValue) || is.object(newValue)) {
-      this.options[optionName] = newValue;
+      this.options[optionName] = newValue
 
       for (const action of this._actions.names) {
-        this.options[action][optionName] = newValue;
+        this.options[action][optionName] = newValue
       }
 
-      return this;
+      return this
     }
 
-    return this.options[optionName];
+    return this.options[optionName]
   }
 
   /**
@@ -169,7 +166,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {object} The current origin or this Interactable
    */
   origin (newValue) {
-    return this._backCompatOption('origin', newValue);
+    return this._backCompatOption('origin', newValue)
   }
 
   /**
@@ -182,12 +179,12 @@ export class Interactable implements Partial<Eventable> {
    */
   deltaSource (newValue) {
     if (newValue === 'page' || newValue === 'client') {
-      this.options.deltaSource = newValue;
+      this.options.deltaSource = newValue
 
-      return this;
+      return this
     }
 
-    return this.options.deltaSource;
+    return this.options.deltaSource
   }
 
   /**
@@ -197,12 +194,12 @@ export class Interactable implements Partial<Eventable> {
    * @return {Node} The context Node of this Interactable
    */
   context () {
-    return this._context;
+    return this._context
   }
 
   inContext (element) {
-    return (this._context === element.ownerDocument
-            || nodeContains(this._context, element));
+    return (this._context === element.ownerDocument ||
+            nodeContains(this._context, element))
   }
 
   /**
@@ -214,40 +211,40 @@ export class Interactable implements Partial<Eventable> {
    * @return {Interactable} this Interactable
    */
   fire (iEvent) {
-    this.events.fire(iEvent);
+    this.events.fire(iEvent)
 
-    return this;
+    return this
   }
 
   _onOff (method, typeArg, listenerArg, options) {
     if (is.object(typeArg) && !is.array(typeArg)) {
-      options = listenerArg;
-      listenerArg = null;
+      options = listenerArg
+      listenerArg = null
     }
 
-    const addRemove = method === 'on' ? 'add' : 'remove';
-    const listeners = normalizeListeners(typeArg, listenerArg);
+    const addRemove = method === 'on' ? 'add' : 'remove'
+    const listeners = normalizeListeners(typeArg, listenerArg)
 
     for (let type in listeners) {
-      if (type === 'wheel') { type = browser.wheelEvent; }
+      if (type === 'wheel') { type = browser.wheelEvent }
 
       for (const listener of listeners[type]) {
         // if it is an action event type
         if (arr.contains(this._actions.eventTypes, type)) {
-          this.events[method](type, listener);
+          this.events[method](type, listener)
         }
         // delegated event
         else if (is.string(this.target)) {
-          events[`${addRemove}Delegate`](this.target, this._context, type, listener, options);
+          events[`${addRemove}Delegate`](this.target, this._context, type, listener, options)
         }
         // remove listener from this Interatable's element
         else {
-          (events[addRemove] as typeof events.remove)(this.target as Element, type, listener, options);
+          (events[addRemove] as typeof events.remove)(this.target as Element, type, listener, options)
         }
       }
     }
 
-    return this;
+    return this
   }
 
   /**
@@ -261,7 +258,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {Interactable} This Interactable
    */
   on (types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any) {
-    return this._onOff('on', types, listener, options);
+    return this._onOff('on', types, listener, options)
   }
 
   /**
@@ -275,7 +272,7 @@ export class Interactable implements Partial<Eventable> {
    * @return {Interactable} This Interactable
    */
   off (types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any) {
-    return this._onOff('off', types, listener, options);
+    return this._onOff('off', types, listener, options)
   }
 
   /**
@@ -285,30 +282,30 @@ export class Interactable implements Partial<Eventable> {
    * @return {object} This Interactable
    */
   set (options) {
-    const defaults = this._defaults;
+    const defaults = this._defaults
 
     if (!is.object(options)) {
-      options = {};
+      options = {}
     }
 
-    this.options = clone(defaults.base);
+    this.options = clone(defaults.base)
 
     for (const actionName in this._actions.methodDict) {
-      const methodName = this._actions.methodDict[actionName];
+      const methodName = this._actions.methodDict[actionName]
 
-      this.options[actionName] = {};
-      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]));
+      this.options[actionName] = {}
+      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]))
 
-      this[methodName](options[actionName]);
+      this[methodName](options[actionName])
     }
 
     for (const setting in options) {
       if (is.func(this[setting])) {
-        this[setting](options[setting]);
+        this[setting](options[setting])
       }
     }
 
-    return this;
+    return this
   }
 
   /**
@@ -318,34 +315,33 @@ export class Interactable implements Partial<Eventable> {
    * @return {interact}
    */
   unset () {
-    events.remove(this.target as Node, 'all');
+    events.remove(this.target as Node, 'all')
 
     if (is.string(this.target)) {
       // remove delegated events
       for (const type in events.delegatedEvents) {
-        const delegated = events.delegatedEvents[type];
+        const delegated = events.delegatedEvents[type]
 
-        if (delegated.selectors[0] === this.target
-            && delegated.contexts[0] === this._context) {
-
-          delegated.selectors.splice(0, 1);
-          delegated.contexts .splice(0, 1);
-          delegated.listeners.splice(0, 1);
+        if (delegated.selectors[0] === this.target &&
+            delegated.contexts[0] === this._context) {
+          delegated.selectors.splice(0, 1)
+          delegated.contexts.splice(0, 1)
+          delegated.listeners.splice(0, 1)
 
           // remove the arrays if they are empty
           if (!delegated.selectors.length) {
-            delegated[type] = null;
+            delegated[type] = null
           }
         }
 
-        events.remove(this._context, type, events.delegateListener);
-        events.remove(this._context, type, events.delegateUseCapture, true);
+        events.remove(this._context, type, events.delegateListener)
+        events.remove(this._context, type, events.delegateUseCapture, true)
       }
     }
     else {
-      events.remove(this.target as Node, 'all');
+      events.remove(this.target as Node, 'all')
     }
   }
 }
 
-export default Interactable;
+export default Interactable

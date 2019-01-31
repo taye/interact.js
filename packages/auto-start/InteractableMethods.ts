@@ -1,33 +1,33 @@
-import { warnOnce } from '@interactjs/utils';
-import * as domUtils from '@interactjs/utils/domUtils';
-import * as is from '@interactjs/utils/is';
+import { warnOnce } from '@interactjs/utils'
+import * as domUtils from '@interactjs/utils/domUtils'
+import * as is from '@interactjs/utils/is'
 
 // TODO: there seems to be a @babel/preset-typescript bug causing regular import
 // syntax to remain in js output
-type Scope = import ('@interactjs/core/scope').Scope;
-type Actions = import ('@interactjs/core/scope').Actions;
-type Interaction = import ('@interactjs/core/Interaction').default;
-type Interactable = import ('@interactjs/core/Interactable').default;
+type Scope = import ('@interactjs/core/scope').Scope
+type Actions = import ('@interactjs/core/scope').Actions
+type Interaction = import ('@interactjs/core/Interaction').default
+type Interactable = import ('@interactjs/core/Interactable').default
 
-type IgnoreValue = string | Element | boolean;
+type IgnoreValue = string | Element | boolean
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    getAction: typeof getAction;
-    defaultActionChecker: (pointer: any, event: any, interaction: any, element: any) => any;
-    styleCursor: typeof styleCursor;
-    actionChecker: typeof actionChecker;
-    testIgnoreAllow: typeof testIgnoreAllow;
-    testAllow: typeof testAllow;
-    testIgnore: typeof testIgnore;
-    ignoreFrom: (...args: any) => boolean;
-    allowFrom: (...args: any) => boolean;
+    getAction: typeof getAction
+    defaultActionChecker: (pointer: any, event: any, interaction: any, element: any) => any
+    styleCursor: typeof styleCursor
+    actionChecker: typeof actionChecker
+    testIgnoreAllow: typeof testIgnoreAllow
+    testAllow: typeof testAllow
+    testIgnore: typeof testIgnore
+    ignoreFrom: (...args: any) => boolean
+    allowFrom: (...args: any) => boolean
   }
 }
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    pointerIsDown: boolean;
+    pointerIsDown: boolean
   }
 }
 
@@ -36,9 +36,9 @@ function install (scope: Scope) {
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
     actions,
-  } = scope;
+  } = scope
 
-  Interactable.prototype.getAction = getAction;
+  Interactable.prototype.getAction = getAction
 
   /**
    * ```js
@@ -69,8 +69,8 @@ function install (scope: Scope) {
    * Interactable
    */
   Interactable.prototype.ignoreFrom = warnOnce(function (this: Interactable, newValue) {
-    return this._backCompatOption('ignoreFrom', newValue);
-  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
+    return this._backCompatOption('ignoreFrom', newValue)
+  }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).')
 
   /**
    * @deprecated
@@ -96,14 +96,14 @@ function install (scope: Scope) {
    * Interactable
    */
   Interactable.prototype.allowFrom = warnOnce(function (this: Interactable, newValue) {
-    return this._backCompatOption('allowFrom', newValue);
-  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
+    return this._backCompatOption('allowFrom', newValue)
+  }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).')
 
-  Interactable.prototype.testIgnore = testIgnore;
+  Interactable.prototype.testIgnore = testIgnore
 
-  Interactable.prototype.testAllow = testAllow;
+  Interactable.prototype.testAllow = testAllow
 
-  Interactable.prototype.testIgnoreAllow = testIgnoreAllow;
+  Interactable.prototype.testIgnoreAllow = testIgnoreAllow
 
   /**
    * ```js
@@ -136,7 +136,7 @@ function install (scope: Scope) {
    * props.
    * @return {Function | Interactable} The checker function or this Interactable
    */
-  Interactable.prototype.actionChecker = actionChecker;
+  Interactable.prototype.actionChecker = actionChecker
 
   /**
    * Returns or sets whether the the cursor should be changed depending on the
@@ -145,112 +145,112 @@ function install (scope: Scope) {
    * @param {boolean} [newValue]
    * @return {boolean | Interactable} The current setting or this Interactable
    */
-  Interactable.prototype.styleCursor = styleCursor;
+  Interactable.prototype.styleCursor = styleCursor
 
   Interactable.prototype.defaultActionChecker = function (this: Interactable, pointer, event, interaction, element) {
-    return defaultActionChecker(this, pointer, event, interaction, element, actions);
-  };
+    return defaultActionChecker(this, pointer, event, interaction, element, actions)
+  }
 }
 
 function getAction (this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element) {
-  const action = this.defaultActionChecker(pointer, event, interaction, element);
+  const action = this.defaultActionChecker(pointer, event, interaction, element)
 
   if (this.options.actionChecker) {
-    return this.options.actionChecker(pointer, event, action, this, element, interaction);
+    return this.options.actionChecker(pointer, event, action, this, element, interaction)
   }
 
-  return action;
+  return action
 }
 
 function defaultActionChecker (interactable: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element, actions: Actions) {
-  const rect = interactable.getRect(element);
+  const rect = interactable.getRect(element)
   const buttons = (event as MouseEvent).buttons || ({
     0: 1,
     1: 4,
     3: 8,
     4: 16,
-  })[(event as MouseEvent).button as 0 | 1 | 3 | 4];
-  let action = null;
+  })[(event as MouseEvent).button as 0 | 1 | 3 | 4]
+  let action = null
 
   for (const actionName of actions.names) {
     // check mouseButton setting if the pointer is down
-    if (interaction.pointerIsDown
-        && /mouse|pointer/.test(interaction.pointerType)
-      && (buttons & interactable.options[actionName].mouseButtons) === 0) {
-      continue;
+    if (interaction.pointerIsDown &&
+        /mouse|pointer/.test(interaction.pointerType) &&
+      (buttons & interactable.options[actionName].mouseButtons) === 0) {
+      continue
     }
 
-    action = (actions[actionName as keyof Actions] as any).checker(pointer, event, interactable, element, interaction, rect);
+    action = (actions[actionName as keyof Actions] as any).checker(pointer, event, interactable, element, interaction, rect)
 
     if (action) {
-      return action;
+      return action
     }
   }
 }
 
 function styleCursor (this: Interactable, newValue?: boolean) {
   if (is.bool(newValue)) {
-    this.options.styleCursor = newValue;
+    this.options.styleCursor = newValue
 
-    return this;
+    return this
   }
 
   if (newValue === null) {
-    delete this.options.styleCursor;
+    delete this.options.styleCursor
 
-    return this;
+    return this
   }
 
-  return this.options.styleCursor;
+  return this.options.styleCursor
 }
 
 function actionChecker (this: Interactable, checker: any) {
   if (is.func(checker)) {
-    this.options.actionChecker = checker;
+    this.options.actionChecker = checker
 
-    return this;
+    return this
   }
 
   if (checker === null) {
-    delete this.options.actionChecker;
+    delete this.options.actionChecker
 
-    return this;
+    return this
   }
 
-  return this.options.actionChecker;
+  return this.options.actionChecker
 }
 
 function testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, interactableElement: Element, eventTarget: Element) {
-  return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget)
-          && this.testAllow(options.allowFrom, interactableElement, eventTarget));
+  return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) &&
+          this.testAllow(options.allowFrom, interactableElement, eventTarget))
 }
 
 function testAllow (this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element) {
-  if (!allowFrom) { return true; }
+  if (!allowFrom) { return true }
 
-  if (!is.element(element)) { return false; }
+  if (!is.element(element)) { return false }
 
   if (is.string(allowFrom)) {
-    return domUtils.matchesUpTo(element, allowFrom, interactableElement);
+    return domUtils.matchesUpTo(element, allowFrom, interactableElement)
   }
   else if (is.element(allowFrom)) {
-    return domUtils.nodeContains(allowFrom, element);
+    return domUtils.nodeContains(allowFrom, element)
   }
 
-  return false;
+  return false
 }
 
 function testIgnore (this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element) {
-  if (!ignoreFrom || !is.element(element)) { return false; }
+  if (!ignoreFrom || !is.element(element)) { return false }
 
   if (is.string(ignoreFrom)) {
-    return domUtils.matchesUpTo(element, ignoreFrom, interactableElement);
+    return domUtils.matchesUpTo(element, ignoreFrom, interactableElement)
   }
   else if (is.element(ignoreFrom)) {
-    return domUtils.nodeContains(ignoreFrom, element);
+    return domUtils.nodeContains(ignoreFrom, element)
   }
 
-  return false;
+  return false
 }
 
-export default { install };
+export default { install }

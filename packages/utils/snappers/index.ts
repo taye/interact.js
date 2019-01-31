@@ -1,4 +1,3 @@
-import grid from './grid';
+import grid from './grid'
 
-export { grid, };
-
+export { grid }

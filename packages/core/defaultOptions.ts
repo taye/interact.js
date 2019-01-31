@@ -1,19 +1,19 @@
 export interface Defaults {
-  base: BaseDefaults;
-  perAction: PerActionDefaults;
+  base: BaseDefaults
+  perAction: PerActionDefaults
 }
 
 export interface BaseDefaults extends SubDefaults {
-  preventDefault?: 'auto' | 'never' | string;
-  deltaSource?: 'page' | 'client';
+  preventDefault?: 'auto' | 'never' | string
+  deltaSource?: 'page' | 'client'
 }
 export interface PerActionDefaults extends SubDefaults {
-  enabled?: boolean;
-  origin?: Interact.Point | string | Element;
+  enabled?: boolean
+  origin?: Interact.Point | string | Element
 }
 
 export interface SubDefaults {
-  [key: string]: any;
+  [key: string]: any
 }
 
 export interface Options extends BaseDefaults, PerActionDefaults {}
@@ -28,6 +28,6 @@ export const defaults: Defaults = {
     enabled: false,
     origin: { x: 0, y: 0 },
   },
-};
+}
 
-export default defaults;
+export default defaults

@@ -1,30 +1,30 @@
-import * as utils from '@interactjs/utils';
-import Signals from '@interactjs/utils/Signals';
-import { createScope } from '../scope';
-import Eventable from '../Eventable';
-import { doc } from '@interactjs/_dev/test/domator';
+import * as utils from '@interactjs/utils'
+import Signals from '@interactjs/utils/Signals'
+import { createScope } from '../scope'
+import Eventable from '../Eventable'
+import { doc } from '@interactjs/_dev/test/domator'
 
-let counter = 0;
+let counter = 0
 
 export function unique () {
-  return (counter++);
+  return (counter++)
 }
 
 export function uniqueProps (obj) {
   for (const prop in obj) {
-    if (!obj.hasOwnProperty(prop)) { continue; }
+    if (!obj.hasOwnProperty(prop)) { continue }
 
     if (utils.is.object(obj)) {
-      uniqueProps(obj[obj]);
+      uniqueProps(obj[obj])
     }
     else {
-      obj[prop] = (counter++);
+      obj[prop] = (counter++)
     }
   }
 }
 
 export function newCoordsSet (n) {
-  n = n || 0;
+  n = n || 0
 
   return {
     start: {
@@ -52,11 +52,11 @@ export function newCoordsSet (n) {
       client   : { x: n++, y: n++ },
       timeStamp: n++,
     },
-  };
+  }
 }
 
 export function newPointer (n) {
-  n = n || 50;
+  n = n || 50
 
   return {
     pointerId: n++,
@@ -64,16 +64,16 @@ export function newPointer (n) {
     pageY: n++,
     clientX: n++,
     clientY: n++,
-  };
+  }
 }
 
 export function mockScope (options) {
-  options = options || {};
+  options = options || {}
 
-  const document = options.document || doc;
-  const window = document.defaultView;
+  const document = options.document || doc
+  const window = document.defaultView
 
-  const scope = createScope().init(window);
+  const scope = createScope().init(window)
 
   Object.assign(scope, {
     actions: {
@@ -81,9 +81,9 @@ export function mockScope (options) {
       methodDict: {},
       eventTypes: [],
     },
-  }, options);
+  }, options)
 
-  return scope;
+  return scope
 }
 
 export function mockSignals () {
@@ -91,7 +91,7 @@ export function mockSignals () {
     on () {},
     off () {},
     fire () {},
-  };
+  }
 }
 
 export function mockInteractable (props) {
@@ -110,18 +110,18 @@ export function mockInteractable (props) {
       getRect () {
         return this.element
           ? utils.dom.getClientRect(this.element)
-          : { left: 0, top: 0, right: 0, bottom: 0 };
+          : { left: 0, top: 0, right: 0, bottom: 0 }
       },
       fire (event) {
-        this.events.fire(event);
+        this.events.fire(event)
       },
     },
-    props);
+    props)
 }
 
 export function getProps (src, props) {
   return props.reduce((acc, prop) => {
-    acc[prop] = src[prop];
-    return acc;
-  }, {});
+    acc[prop] = src[prop]
+    return acc
+  }, {})
 }

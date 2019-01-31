@@ -1,9 +1,9 @@
-require('../babel-register');
+require('../babel-register')
 
-const glob = require('glob');
-const path = require('path');
+const glob = require('glob')
+const path = require('path')
 
-const globOptions = { ignore: '**/node_modules/**' };
+const globOptions = { ignore: '**/node_modules/**' }
 
 function getMatches (pattern) {
   return new Promise((resolve, reject) => {
@@ -11,13 +11,12 @@ function getMatches (pattern) {
       pattern,
       globOptions,
       (error, files) => {
-        if (error) { reject(error); }
-        else { resolve(files); }
+        if (error) { reject(error) }
+        else { resolve(files) }
       }
-    );
-  });
+    )
+  })
 }
-
 
 Promise.all(
   [
@@ -28,6 +27,6 @@ Promise.all(
   ].map(getMatches)
 ).then(([tests, specs]) => {
   for (const file of new Set([...tests, ...specs])) {
-    require(path.resolve(file));
+    require(path.resolve(file))
   }
-});
+})

@@ -9,41 +9,40 @@
 //   },
 // });
 
-import Interaction from '@interactjs/core/Interaction';
-import extend from '@interactjs/utils/extend';
-import rectUtils from '@interactjs/utils/rect';
-import restrict from './pointer';
-
+import Interaction from '@interactjs/core/Interaction'
+import extend from '@interactjs/utils/extend'
+import rectUtils from '@interactjs/utils/rect'
+import restrict from './pointer'
 
 declare module '@interactjs/core/Interaction' {
   interface Action {
-    linkedEdges?: { [key: string]: boolean };
+    linkedEdges?: { [key: string]: boolean }
   }
 }
 
-const { getRestrictionRect } = restrict;
-const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity };
-const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity };
+const { getRestrictionRect } = restrict
+const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
+const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
 
 function start ({ interaction, state }: { interaction: Interaction, state: any }) {
-  const { options } = state;
-  const startOffset = interaction.modifiers.startOffset;
-  let offset;
+  const { options } = state
+  const startOffset = interaction.modifiers.startOffset
+  let offset
 
   if (options) {
-    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page);
+    const offsetRect = getRestrictionRect(options.offset, interaction, interaction.coords.start.page)
 
-    offset = rectUtils.rectToXY(offsetRect);
+    offset = rectUtils.rectToXY(offsetRect)
   }
 
-  offset = offset || { x: 0, y: 0 };
+  offset = offset || { x: 0, y: 0 }
 
   state.offset = {
     top:    offset.y + startOffset.top,
     left:   offset.x + startOffset.left,
     bottom: offset.y - startOffset.bottom,
     right:  offset.x - startOffset.right,
-  };
+  }
 }
 
 function set ({ coords, interaction, state }: {
@@ -51,42 +50,42 @@ function set ({ coords, interaction, state }: {
   interaction: Interaction,
   state: any
 }) {
-  const { offset, options } = state;
-  const edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
+  const { offset, options } = state
+  const edges = interaction.prepared.linkedEdges || interaction.prepared.edges
 
   if (!edges) {
-    return;
+    return
   }
 
-  const page = extend({}, coords);
-  const inner = getRestrictionRect(options.inner, interaction, page) || {};
-  const outer = getRestrictionRect(options.outer, interaction, page) || {};
+  const page = extend({}, coords)
+  const inner = getRestrictionRect(options.inner, interaction, page) || {}
+  const outer = getRestrictionRect(options.outer, interaction, page) || {}
 
-  fixRect(inner, noInner);
-  fixRect(outer, noOuter);
+  fixRect(inner, noInner)
+  fixRect(outer, noOuter)
 
   if (edges.top) {
-    coords.y = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top);
+    coords.y = Math.min(Math.max(outer.top    + offset.top,    page.y), inner.top    + offset.top)
   }
   else if (edges.bottom) {
-    coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom);
+    coords.y = Math.max(Math.min(outer.bottom + offset.bottom, page.y), inner.bottom + offset.bottom)
   }
   if (edges.left) {
-    coords.x = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left);
+    coords.x = Math.min(Math.max(outer.left   + offset.left,   page.x), inner.left   + offset.left)
   }
   else if (edges.right) {
-    coords.x = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right);
+    coords.x = Math.max(Math.min(outer.right  + offset.right,  page.x), inner.right  + offset.right)
   }
 }
 
 function fixRect (rect, defaults) {
   for (const edge of ['top', 'left', 'bottom', 'right']) {
     if (!(edge in rect)) {
-      rect[edge] = defaults[edge];
+      rect[edge] = defaults[edge]
     }
   }
 
-  return rect;
+  return rect
 }
 
 const restrictEdges = {
@@ -101,6 +100,6 @@ const restrictEdges = {
     outer: null,
     offset: null,
   },
-};
+}
 
-export default restrictEdges;
+export default restrictEdges

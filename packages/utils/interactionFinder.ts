@@ -1,14 +1,14 @@
-import * as utils from './index';
+import * as utils from './index'
 
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
   search (details) {
     for (const method of finder.methodOrder) {
-      const interaction = finder[method](details);
+      const interaction = finder[method](details)
 
       if (interaction) {
-        return interaction;
+        return interaction
       }
     }
   },
@@ -16,47 +16,47 @@ const finder = {
   // try to resume simulation with a new pointer
   simulationResume ({ pointerType, eventType, eventTarget, scope }) {
     if (!/down|start/i.test(eventType)) {
-      return null;
+      return null
     }
 
     for (const interaction of scope.interactions.list) {
-      let element = eventTarget;
+      let element = eventTarget
 
-      if (interaction.simulation && interaction.simulation.allowResume
-          && (interaction.pointerType === pointerType)) {
+      if (interaction.simulation && interaction.simulation.allowResume &&
+          (interaction.pointerType === pointerType)) {
         while (element) {
           // if the element is the interaction element
           if (element === interaction.element) {
-            return interaction;
+            return interaction
           }
-          element = utils.dom.parentNode(element);
+          element = utils.dom.parentNode(element)
         }
       }
     }
 
-    return null;
+    return null
   },
 
   // if it's a mouse or pen interaction
   mouseOrPen ({ pointerId, pointerType, eventType, scope }) {
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
-      return null;
+      return null
     }
 
-    let firstNonActive;
+    let firstNonActive
 
     for (const interaction of scope.interactions.list) {
       if (interaction.pointerType === pointerType) {
         // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !hasPointerId(interaction, pointerId)) { continue; }
+        if (interaction.simulation && !hasPointerId(interaction, pointerId)) { continue }
 
         // if the interaction is active, return it immediately
         if (interaction.interacting()) {
-          return interaction;
+          return interaction
         }
         // otherwise save it and look for another active interaction
         else if (!firstNonActive) {
-          firstNonActive = interaction;
+          firstNonActive = interaction
         }
       }
     }
@@ -64,7 +64,7 @@ const finder = {
     // if no active mouse interaction was found use the first inactive mouse
     // interaction
     if (firstNonActive) {
-      return firstNonActive;
+      return firstNonActive
     }
 
     // find any mouse or pen interaction.
@@ -72,18 +72,18 @@ const finder = {
     // is active
     for (const interaction of scope.interactions.list) {
       if (interaction.pointerType === pointerType && !(/down/i.test(eventType) && interaction.simulation)) {
-        return interaction;
+        return interaction
       }
     }
 
-    return null;
+    return null
   },
 
   // get interaction that has this pointer
   hasPointer ({ pointerId, scope }) {
     for (const interaction of scope.interactions.list) {
       if (hasPointerId(interaction, pointerId)) {
-        return interaction;
+        return interaction
       }
     }
   },
@@ -93,29 +93,29 @@ const finder = {
     for (const interaction of scope.interactions.list) {
       // if there's already a pointer held down
       if (interaction.pointers.length === 1) {
-        const target = interaction.target;
+        const target = interaction.target
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
         if (target && !target.options.gesture.enabled) {
-          continue;
+          continue
         }
       }
       // maximum of 2 pointers per interaction
       else if (interaction.pointers.length >= 2) {
-        continue;
+        continue
       }
 
       if (!interaction.interacting() && (pointerType === interaction.pointerType)) {
-        return interaction;
+        return interaction
       }
     }
 
-    return null;
+    return null
   },
-};
-
-function hasPointerId (interaction, pointerId) {
-  return utils.arr.some(interaction.pointers, ({ id }) => id === pointerId);
 }
 
-export default finder;
+function hasPointerId (interaction, pointerId) {
+  return utils.arr.some(interaction.pointers, ({ id }) => id === pointerId)
+}
+
+export default finder

@@ -1,16 +1,16 @@
 // This module allows snapping of the size of targets during resize
 // interactions.
 
-import extend from '@interactjs/utils/extend';
-import * as is from '@interactjs/utils/is';
-import snap from './pointer';
+import extend from '@interactjs/utils/extend'
+import * as is from '@interactjs/utils/is'
+import snap from './pointer'
 
 function start (arg) {
-  const { interaction, state } = arg;
-  const { options } = state;
-  const edges = interaction.prepared.edges;
+  const { interaction, state } = arg
+  const { options } = state
+  const edges = interaction.prepared.edges
 
-  if (!edges) { return null; }
+  if (!edges) { return null }
 
   arg.state = {
     options: {
@@ -22,57 +22,57 @@ function start (arg) {
       offset: options.offset || 'self',
       range: options.range,
     },
-  };
+  }
 
   state.targetFields = state.targetFields || [
     ['width', 'height'],
     ['x', 'y'],
-  ];
+  ]
 
-  snap.start(arg);
-  state.offsets = arg.state.offsets;
+  snap.start(arg)
+  state.offsets = arg.state.offsets
 
-  arg.state = state;
+  arg.state = state
 }
 
 function set (arg) {
-  const { interaction, state, coords } = arg;
-  const { options, offsets } = state;
+  const { interaction, state, coords } = arg
+  const { options, offsets } = state
   const relative = {
     x: coords.x - offsets[0].x,
     y: coords.y - offsets[0].y,
-  };
+  }
 
-  state.options = extend({}, options);
-  state.options.targets = [];
+  state.options = extend({}, options)
+  state.options.targets = []
 
   for (const snapTarget of (options.targets || [])) {
-    let target;
+    let target
 
     if (is.func(snapTarget)) {
-      target = snapTarget(relative.x, relative.y, interaction);
+      target = snapTarget(relative.x, relative.y, interaction)
     }
     else {
-      target = snapTarget;
+      target = snapTarget
     }
 
-    if (!target) { continue; }
+    if (!target) { continue }
 
     for (const [xField, yField] of state.targetFields) {
       if (xField in target || yField in target) {
-        target.x = target[xField];
-        target.y = target[yField];
+        target.x = target[xField]
+        target.y = target[yField]
 
-        break;
+        break
       }
     }
 
-    state.options.targets.push(target);
+    state.options.targets.push(target)
   }
 
-  snap.set(arg);
+  snap.set(arg)
 
-  state.options = options;
+  state.options = options
 }
 
 const snapSize = {
@@ -84,6 +84,6 @@ const snapSize = {
     targets: null,
     offset: null,
   },
-};
+}
 
-export default snapSize;
+export default snapSize

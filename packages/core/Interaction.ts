@@ -1,39 +1,39 @@
-import * as utils from '@interactjs/utils';
-import Interactable from './Interactable';
-import InteractEvent from './InteractEvent';
-import PointerInfo from './PointerInfo';
+import * as utils from '@interactjs/utils'
+import Interactable from './Interactable'
+import InteractEvent from './InteractEvent'
+import PointerInfo from './PointerInfo'
 
 export interface Action {
-  name: 'drag' | 'resize' | 'gesture';
-  axis?: 'x' | 'y' | 'xy';
-  edges?: Partial<Interact.Rect>;
+  name: 'drag' | 'resize' | 'gesture'
+  axis?: 'x' | 'y' | 'xy'
+  edges?: Partial<Interact.Rect>
 }
 
 export class Interaction {
   // current interactable being interacted with
-  target: Interactable = null as any;
+  target: Interactable = null as any
 
   // the target element of the interactable
-  element: Node = null as any;
+  element: Node = null as any
 
-  _signals: utils.Signals;
+  _signals: utils.Signals
 
   // action that's ready to be fired on next move event
   prepared: Action = {
     name : null as any,
     axis : null as any,
     edges: null as any,
-  };
+  }
 
-  pointerType: string;
+  pointerType: string
 
   // keep track of added pointers
-  pointers: PointerInfo[] = [];
+  pointers: PointerInfo[] = []
 
   // pointerdown/mousedown/touchstart event
-  downEvent: Interact.PointerEventType = null as any;
+  downEvent: Interact.PointerEventType = null as any
 
-  downPointer: Interact.PointerType = {} as Interact.PointerType;
+  downPointer: Interact.PointerType = {} as Interact.PointerType
 
   _latestPointer: {
     pointer: EventTarget
@@ -43,20 +43,20 @@ export class Interaction {
     pointer: null as any,
     event: null as any,
     eventTarget: null as any,
-  };
+  }
 
   // previous action event
-  prevEvent: InteractEvent = null as any;
+  prevEvent: InteractEvent = null as any
 
-  pointerIsDown = false;
-  pointerWasMoved = false;
-  _interacting = false;
-  _ending = false;
+  pointerIsDown = false
+  pointerWasMoved = false
+  _interacting = false
+  _ending = false
 
-  simulation = null;
+  simulation = null
 
   get pointerMoveTolerance () {
-    return 1;
+    return 1
   }
 
   /**
@@ -64,9 +64,9 @@ export class Interaction {
    */
   doMove = utils.warnOnce(
     function (this: Interaction, signalArg: any) {
-      this.move(signalArg);
+      this.move(signalArg)
     },
-    'The interaction.doMove() method has been renamed to interaction.move()');
+    'The interaction.doMove() method has been renamed to interaction.move()')
 
   coords = {
     // Starting InteractEvent pointer coordinates
@@ -79,18 +79,18 @@ export class Interaction {
     delta: utils.pointer.newCoords(),
     // pointer velocity
     velocity: utils.pointer.newCoords(),
-  };
+  }
 
   /** */
   constructor ({ pointerType, signals }: { pointerType: string, signals: utils.Signals }) {
-    this._signals = signals;
-    this.pointerType = pointerType;
+    this._signals = signals
+    this.pointerType = pointerType
 
-    this._signals.fire('new', this);
+    this._signals.fire('new', this)
   }
 
   pointerDown (pointer, event, eventTarget) {
-    const pointerIndex = this.updatePointer(pointer, event, eventTarget, true);
+    const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
 
     this._signals.fire('down', {
       pointer,
@@ -98,7 +98,7 @@ export class Interaction {
       eventTarget,
       pointerIndex,
       interaction: this,
-    });
+    })
   }
 
   /**
@@ -133,43 +133,43 @@ export class Interaction {
    * @return {object} interact
    */
   start (action, target, element) {
-    if (this.interacting()
-        || !this.pointerIsDown
-        || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
-      return;
+    if (this.interacting() ||
+        !this.pointerIsDown ||
+        this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
+      return
     }
 
-    utils.copyAction(this.prepared, action);
+    utils.copyAction(this.prepared, action)
 
-    this.target       = target;
-    this.element      = element;
+    this.target       = target
+    this.element      = element
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
       phase: 'start',
-    });
+    })
   }
 
   pointerMove (pointer, event, eventTarget) {
     if (!this.simulation) {
-      this.updatePointer(pointer, event, eventTarget, false);
-      utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer));
+      this.updatePointer(pointer, event, eventTarget, false)
+      utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer))
     }
 
-    const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x
-                           && this.coords.cur.page.y === this.coords.prev.page.y
-                           && this.coords.cur.client.x === this.coords.prev.client.x
-                           && this.coords.cur.client.y === this.coords.prev.client.y);
+    const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
+                           this.coords.cur.page.y === this.coords.prev.page.y &&
+                           this.coords.cur.client.x === this.coords.prev.client.x &&
+                           this.coords.cur.client.y === this.coords.prev.client.y)
 
-    let dx;
-    let dy;
+    let dx
+    let dy
 
     // register movement greater than pointerMoveTolerance
     if (this.pointerIsDown && !this.pointerWasMoved) {
-      dx = this.coords.cur.client.x - this.coords.start.client.x;
-      dy = this.coords.cur.client.y - this.coords.start.client.y;
+      dx = this.coords.cur.client.x - this.coords.start.client.x
+      dy = this.coords.cur.client.y - this.coords.start.client.y
 
-      this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance;
+      this.pointerWasMoved = utils.hypot(dx, dy) > this.pointerMoveTolerance
     }
 
     const signalArg = {
@@ -181,24 +181,24 @@ export class Interaction {
       dy,
       duplicate: duplicateMove,
       interaction: this,
-    };
+    }
 
     if (!duplicateMove) {
       // set pointer coordinate, time changes and velocity
-      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur);
-      utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta);
+      utils.pointer.setCoordDeltas(this.coords.delta, this.coords.prev, this.coords.cur)
+      utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta)
     }
 
-    this._signals.fire('move', signalArg);
+    this._signals.fire('move', signalArg)
 
     if (!duplicateMove) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
-        this.move(signalArg);
+        this.move(signalArg)
       }
 
       if (this.pointerWasMoved) {
-        utils.pointer.copyCoords(this.coords.prev, this.coords.cur);
+        utils.pointer.copyCoords(this.coords.prev, this.coords.cur)
       }
     }
   }
@@ -228,19 +228,19 @@ export class Interaction {
       eventTarget: this._latestPointer.eventTarget,
       interaction: this,
       noBefore: false,
-    }, signalArg || {});
+    }, signalArg || {})
 
-    signalArg.phase = 'move';
+    signalArg.phase = 'move'
 
-    this._doPhase(signalArg);
+    this._doPhase(signalArg)
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
   pointerUp (pointer, event, eventTarget, curEventTarget) {
-    let pointerIndex = this.getPointerIndex(pointer);
+    let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
-      pointerIndex = this.updatePointer(pointer, event, eventTarget, false);
+      pointerIndex = this.updatePointer(pointer, event, eventTarget, false)
     }
 
     this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
@@ -250,19 +250,19 @@ export class Interaction {
       eventTarget,
       curEventTarget,
       interaction: this,
-    });
+    })
 
     if (!this.simulation) {
-      this.end(event);
+      this.end(event)
     }
 
-    this.pointerIsDown = false;
-    this.removePointer(pointer, event);
+    this.pointerIsDown = false
+    this.removePointer(pointer, event)
   }
 
   documentBlur (event) {
-    this.end(event);
-    this._signals.fire('blur', { event, interaction: this });
+    this.end(event)
+    this._signals.fire('blur', { event, interaction: this })
   }
 
   /**
@@ -282,64 +282,64 @@ export class Interaction {
    * @param {PointerEvent} [event]
    */
   end (event) {
-    this._ending = true;
-    event = event || this._latestPointer.event;
-    let endPhaseResult;
+    this._ending = true
+    event = event || this._latestPointer.event
+    let endPhaseResult
 
     if (this.interacting()) {
       endPhaseResult = this._doPhase({
         event,
         interaction: this,
         phase: 'end',
-      });
+      })
     }
 
-    this._ending = false;
+    this._ending = false
 
     if (endPhaseResult === true) {
-      this.stop();
+      this.stop()
     }
   }
 
   currentAction () {
-    return this._interacting ? this.prepared.name : null;
+    return this._interacting ? this.prepared.name : null
   }
 
   interacting () {
-    return this._interacting;
+    return this._interacting
   }
 
   /** */
   stop () {
-    this._signals.fire('stop', { interaction: this });
+    this._signals.fire('stop', { interaction: this })
 
-    this.target = this.element = null;
+    this.target = this.element = null
 
-    this._interacting = false;
-    this.prepared.name = this.prevEvent = null;
+    this._interacting = false
+    this.prepared.name = this.prevEvent = null
   }
 
   getPointerIndex (pointer) {
-    const pointerId = utils.pointer.getPointerId(pointer);
+    const pointerId = utils.pointer.getPointerId(pointer)
 
     // mouse and pen interactions may have only one pointer
     return (this.pointerType === 'mouse' || this.pointerType === 'pen')
       ? this.pointers.length - 1
-      : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId);
+      : utils.arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId)
   }
 
   getPointerInfo (pointer) {
-    return this.pointers[this.getPointerIndex(pointer)];
+    return this.pointers[this.getPointerIndex(pointer)]
   }
 
   updatePointer (pointer, event, eventTarget, down) {
-    const id = utils.pointer.getPointerId(pointer);
-    let pointerIndex = this.getPointerIndex(pointer);
-    let pointerInfo = this.pointers[pointerIndex];
+    const id = utils.pointer.getPointerId(pointer)
+    let pointerIndex = this.getPointerIndex(pointer)
+    let pointerInfo = this.pointers[pointerIndex]
 
     down = down === false
       ? false
-      : down || /(down|start)$/i.test(event.type);
+      : down || /(down|start)$/i.test(event.type)
 
     if (!pointerInfo) {
       pointerInfo = new PointerInfo(
@@ -348,34 +348,34 @@ export class Interaction {
         event,
         null,
         null,
-      );
+      )
 
-      pointerIndex = this.pointers.length;
-      this.pointers.push(pointerInfo);
+      pointerIndex = this.pointers.length
+      this.pointers.push(pointerInfo)
     }
     else {
-      pointerInfo.pointer = pointer;
+      pointerInfo.pointer = pointer
     }
 
     if (down) {
-      this.pointerIsDown = true;
+      this.pointerIsDown = true
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer));
+        utils.pointer.setCoords(this.coords.start, this.pointers.map((p) => p.pointer))
 
-        utils.pointer.copyCoords(this.coords.cur , this.coords.start);
-        utils.pointer.copyCoords(this.coords.prev, this.coords.start);
-        utils.pointer.pointerExtend(this.downPointer, pointer);
+        utils.pointer.copyCoords(this.coords.cur, this.coords.start)
+        utils.pointer.copyCoords(this.coords.prev, this.coords.start)
+        utils.pointer.pointerExtend(this.downPointer, pointer)
 
-        this.downEvent = event;
-        pointerInfo.downTime = this.coords.cur.timeStamp;
-        pointerInfo.downTarget = eventTarget;
+        this.downEvent = event
+        pointerInfo.downTime = this.coords.cur.timeStamp
+        pointerInfo.downTarget = eventTarget
 
-        this.pointerWasMoved = false;
+        this.pointerWasMoved = false
       }
     }
 
-    this._updateLatestPointer(pointer, event, eventTarget);
+    this._updateLatestPointer(pointer, event, eventTarget)
 
     this._signals.fire('update-pointer', {
       pointer,
@@ -385,17 +385,17 @@ export class Interaction {
       pointerInfo,
       pointerIndex,
       interaction: this,
-    });
+    })
 
-    return pointerIndex;
+    return pointerIndex
   }
 
   removePointer (pointer, event) {
-    const pointerIndex = this.getPointerIndex(pointer);
+    const pointerIndex = this.getPointerIndex(pointer)
 
-    if (pointerIndex === -1) { return; }
+    if (pointerIndex === -1) { return }
 
-    const pointerInfo = this.pointers[pointerIndex];
+    const pointerInfo = this.pointers[pointerIndex]
 
     this._signals.fire('remove-pointer', {
       pointer,
@@ -403,53 +403,53 @@ export class Interaction {
       pointerIndex,
       pointerInfo,
       interaction: this,
-    });
+    })
 
-    this.pointers.splice(pointerIndex, 1);
+    this.pointers.splice(pointerIndex, 1)
   }
 
   _updateLatestPointer (pointer, event, eventTarget) {
-    this._latestPointer.pointer = pointer;
-    this._latestPointer.event = event;
-    this._latestPointer.eventTarget = eventTarget;
+    this._latestPointer.pointer = pointer
+    this._latestPointer.event = event
+    this._latestPointer.eventTarget = eventTarget
   }
 
   _createPreparedEvent (event, phase, preEnd, type) {
-    const actionName = this.prepared.name;
+    const actionName = this.prepared.name
 
-    return new InteractEvent(this, event, actionName, phase, this.element as Element, null, preEnd, type);
+    return new InteractEvent(this, event, actionName, phase, this.element as Element, null, preEnd, type)
   }
 
   _fireEvent (iEvent) {
-    this.target.fire(iEvent);
+    this.target.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
-      this.prevEvent = iEvent;
+      this.prevEvent = iEvent
     }
   }
 
   _doPhase (signalArg) {
-    const { event, phase, preEnd, type } = signalArg;
+    const { event, phase, preEnd, type } = signalArg
 
     if (!signalArg.noBefore) {
-      const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg);
+      const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg)
 
       if (beforeResult === false) {
-        return false;
+        return false
       }
     }
 
-    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
+    const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)
 
-    this._signals.fire(`action-${phase}`, signalArg);
+    this._signals.fire(`action-${phase}`, signalArg)
 
-    this._fireEvent(iEvent);
+    this._fireEvent(iEvent)
 
-    this._signals.fire(`after-action-${phase}`, signalArg);
+    this._signals.fire(`after-action-${phase}`, signalArg)
 
-    return true;
+    return true
   }
 }
 
-export default Interaction;
-export { PointerInfo };
+export default Interaction
+export { PointerInfo }

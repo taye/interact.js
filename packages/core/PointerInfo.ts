@@ -8,4 +8,4 @@ export class PointerInfo {
   ) {}
 }
 
-export default PointerInfo;
+export default PointerInfo
