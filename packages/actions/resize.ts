@@ -147,7 +147,7 @@ const resize = {
           resizeEdges[edge] = checkResizeEdge(edge,
             resizeOptions.edges[edge],
             page,
-            interaction._eventTarget,
+            interaction._latestPointer.eventTarget,
             element,
             rect,
             resizeOptions.margin || this.defaultMargin);
