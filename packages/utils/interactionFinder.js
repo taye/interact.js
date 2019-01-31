@@ -1,7 +1,7 @@
 import * as utils from './index';
 const finder = {
     methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
-    search: function (details) {
+    search(details) {
         for (const method of finder.methodOrder) {
             const interaction = finder[method](details);
             if (interaction) {
@@ -10,14 +10,14 @@ const finder = {
         }
     },
     // try to resume simulation with a new pointer
-    simulationResume: function ({ pointerType, eventType, eventTarget, scope }) {
+    simulationResume({ pointerType, eventType, eventTarget, scope }) {
         if (!/down|start/i.test(eventType)) {
             return null;
         }
         for (const interaction of scope.interactions.list) {
             let element = eventTarget;
-            if (interaction.simulation && interaction.simulation.allowResume
-                && (interaction.pointerType === pointerType)) {
+            if (interaction.simulation && interaction.simulation.allowResume &&
+                (interaction.pointerType === pointerType)) {
                 while (element) {
                     // if the element is the interaction element
                     if (element === interaction.element) {
@@ -30,7 +30,7 @@ const finder = {
         return null;
     },
     // if it's a mouse or pen interaction
-    mouseOrPen: function ({ pointerId, pointerType, eventType, scope }) {
+    mouseOrPen({ pointerId, pointerType, eventType, scope }) {
         if (pointerType !== 'mouse' && pointerType !== 'pen') {
             return null;
         }
@@ -67,7 +67,7 @@ const finder = {
         return null;
     },
     // get interaction that has this pointer
-    hasPointer: function ({ pointerId, scope }) {
+    hasPointer({ pointerId, scope }) {
         for (const interaction of scope.interactions.list) {
             if (hasPointerId(interaction, pointerId)) {
                 return interaction;
@@ -75,7 +75,7 @@ const finder = {
         }
     },
     // get first idle interaction with a matching pointerType
-    idle: function ({ pointerType, scope }) {
+    idle({ pointerType, scope }) {
         for (const interaction of scope.interactions.list) {
             // if there's already a pointer held down
             if (interaction.pointers.length === 1) {

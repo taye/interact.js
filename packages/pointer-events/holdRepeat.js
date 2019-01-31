@@ -1,7 +1,7 @@
 function install(scope) {
     const { pointerEvents, interactions, } = scope;
     pointerEvents.signals.on('new', onNew);
-    pointerEvents.signals.on('fired', arg => onFired(arg, pointerEvents));
+    pointerEvents.signals.on('fired', (arg) => onFired(arg, pointerEvents));
     for (const signal of ['move', 'up', 'cancel', 'endall']) {
         interactions.signals.on(signal, endHoldRepeat);
     }
@@ -26,7 +26,7 @@ function onFired({ interaction, pointerEvent, eventTarget, targets }, pointerEve
         return;
     }
     // set a timeout to fire the holdrepeat event
-    interaction.holdIntervalHandle = setTimeout(function () {
+    interaction.holdIntervalHandle = setTimeout(() => {
         pointerEvents.fire({
             interaction,
             eventTarget,

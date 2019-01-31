@@ -27,7 +27,7 @@ function install(scope) {
      */
     Interactable.prototype.gesturable = function (options) {
         if (utils.is.object(options)) {
-            this.options.gesture.enabled = options.enabled === false ? false : true;
+            this.options.gesture.enabled = options.enabled !== false;
             this.setPerAction('gesture', options);
             this.setOnEvents('gesture', options);
             return this;
@@ -43,7 +43,7 @@ function install(scope) {
     interactions.signals.on('action-end', updateGestureProps);
     interactions.signals.on('action-start', start);
     interactions.signals.on('action-move', move);
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.gesture = {
             start: { x: 0, y: 0 },
             startDistance: 0,
@@ -65,14 +65,15 @@ function install(scope) {
     defaults.gesture = gesture.defaults;
 }
 const gesture = {
+    install,
     defaults: {},
-    checker: function (_pointer, _event, _interactable, _element, interaction) {
+    checker(_pointer, _event, _interactable, _element, interaction) {
         if (interaction.pointers.length >= 2) {
             return { name: 'gesture' };
         }
         return null;
     },
-    getCursor: function () {
+    getCursor() {
         return '';
     },
 };
@@ -93,10 +94,10 @@ function move({ iEvent, interaction }) {
     interaction.target.fire(iEvent);
     interaction.gesture.prevAngle = iEvent.angle;
     interaction.gesture.prevDistance = iEvent.distance;
-    if (iEvent.scale !== Infinity
-        && iEvent.scale !== null
-        && iEvent.scale !== undefined
-        && !isNaN(iEvent.scale)) {
+    if (iEvent.scale !== Infinity &&
+        iEvent.scale !== null &&
+        iEvent.scale !== undefined &&
+        !isNaN(iEvent.scale)) {
         interaction.gesture.scale = iEvent.scale;
     }
 }
@@ -104,7 +105,7 @@ function updateGestureProps({ interaction, iEvent, event, phase }) {
     if (interaction.prepared.name !== 'gesture') {
         return;
     }
-    const pointers = interaction.pointers.map(p => p.pointer);
+    const pointers = interaction.pointers.map((p) => p.pointer);
     const starting = phase === 'start';
     const ending = phase === 'end';
     const deltaSource = interaction.target.options.deltaSource;
@@ -134,5 +135,5 @@ function updateGestureProps({ interaction, iEvent, event, phase }) {
         iEvent.da = iEvent.angle - interaction.gesture.prevAngle;
     }
 }
-export default { install };
+export default gesture;
 //# sourceMappingURL=gesture.js.map

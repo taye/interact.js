@@ -13,7 +13,7 @@ declare module '@interactjs/core/scope' {
 }
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
-        manualStart?: false;
+        manualStart?: boolean;
         max?: number;
         maxPerElement?: number;
         allowFrom?: string | Element;

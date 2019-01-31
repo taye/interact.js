@@ -2,9 +2,10 @@ import * as utils from '@interactjs/utils';
 function install(scope) {
     const { actions, browser, 
     /** @lends Interactable */
-    Interactable, interactions, defaults, } = scope;
+    Interactable, // tslint:disable-line no-shadowed-variable
+    interactions, defaults, } = scope;
     // Less Precision with touch input
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.resizeAxes = 'xy';
     });
     interactions.signals.on('action-start', start);
@@ -74,6 +75,7 @@ function install(scope) {
     defaults.resize = resize.defaults;
 }
 const resize = {
+    install,
     defaults: {
         square: false,
         preserveAspectRatio: false,
@@ -91,7 +93,7 @@ const resize = {
         // the top and bottom edges and/or swapping the left and right edges
         invert: 'none',
     },
-    checker: function (_pointer, _event, interactable, element, interaction, rect) {
+    checker(_pointer, _event, interactable, element, interaction, rect) {
         if (!rect) {
             return null;
         }
@@ -103,7 +105,7 @@ const resize = {
             // if using resize.edges
             if (utils.is.object(resizeOptions.edges)) {
                 for (const edge in resizeEdges) {
-                    resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._eventTarget, element, rect, resizeOptions.margin || this.defaultMargin);
+                    resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._latestPointer.eventTarget, element, rect, resizeOptions.margin || this.defaultMargin);
                 }
                 resizeEdges.left = resizeEdges.left && !resizeEdges.right;
                 resizeEdges.top = resizeEdges.top && !resizeEdges.bottom;
@@ -128,9 +130,10 @@ const resize = {
         return null;
     },
     cursors: null,
-    getCursor: function (action) {
+    getCursor(action) {
+        const cursors = resize.cursors;
         if (action.axis) {
-            return resize.cursors[action.name + action.axis];
+            return cursors[action.name + action.axis];
         }
         else if (action.edges) {
             let cursorKey = '';
@@ -140,14 +143,15 @@ const resize = {
                     cursorKey += edgeNames[i];
                 }
             }
-            return resize.cursors[cursorKey];
+            return cursors[cursorKey];
         }
+        return null;
     },
     defaultMargin: null,
 };
 function resizable(interactable, options, scope) {
     if (utils.is.object(options)) {
-        interactable.options.resize.enabled = options.enabled === false ? false : true;
+        interactable.options.resize.enabled = options.enabled !== false;
         interactable.setPerAction('resize', options);
         interactable.setOnEvents('resize', options);
         if (/^x$|^y$|^xy$/.test(options.axis)) {
@@ -170,7 +174,6 @@ function resizable(interactable, options, scope) {
     }
     return interactable.options.resize;
 }
-;
 function checkResizeEdge(name, value, page, element, interactableElement, rect, margin) {
     // false, '', undefined, null
     if (!value) {
@@ -282,8 +285,12 @@ function start({ iEvent, interaction }) {
         inverted: utils.extend({}, startRect),
         previous: utils.extend({}, startRect),
         delta: {
-            left: 0, right: 0, width: 0,
-            top: 0, bottom: 0, height: 0,
+            left: 0,
+            right: 0,
+            width: 0,
+            top: 0,
+            bottom: 0,
+            height: 0,
         },
     };
     iEvent.rect = interaction.resizeRects.inverted;
@@ -311,8 +318,8 @@ function move({ iEvent, interaction }) {
             ? interaction.resizeStartAspectRatio
             : 1;
         edges = interaction.prepared._linkedEdges;
-        if ((originalEdges.left && originalEdges.bottom)
-            || (originalEdges.right && originalEdges.top)) {
+        if ((originalEdges.left && originalEdges.bottom) ||
+            (originalEdges.right && originalEdges.top)) {
             eventDelta.y = -eventDelta.x / startAspectRatio;
         }
         else if (originalEdges.left || originalEdges.right) {
@@ -393,5 +400,5 @@ function updateEventAxes({ interaction, iEvent, action }) {
         }
     }
 }
-export default { install };
+export default resize;
 //# sourceMappingURL=resize.js.map

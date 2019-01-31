@@ -9,7 +9,8 @@ class InteractEvent {
         this.propagationStopped = false;
         element = element || interaction.element;
         const target = interaction.target;
-        const deltaSource = (target && target.options || defaults).deltaSource;
+        // FIXME: add deltaSource to defaults
+        const deltaSource = ((target && target.options) || defaults).deltaSource;
         const origin = getOriginXY(target, element, actionName);
         const starting = phase === 'start';
         const ending = phase === 'end';
@@ -65,25 +66,25 @@ class InteractEvent {
         this.swipe = (ending || phase === 'inertiastart') ? this.getSwipe() : null;
     }
     get pageX() { return this.page.x; }
-    get pageY() { return this.page.y; }
     set pageX(value) { this.page.x = value; }
+    get pageY() { return this.page.y; }
     set pageY(value) { this.page.y = value; }
     get clientX() { return this.client.x; }
-    get clientY() { return this.client.y; }
     set clientX(value) { this.client.x = value; }
+    get clientY() { return this.client.y; }
     set clientY(value) { this.client.y = value; }
     get dx() { return this.delta.x; }
-    get dy() { return this.delta.y; }
     set dx(value) { this.delta.x = value; }
+    get dy() { return this.delta.y; }
     set dy(value) { this.delta.y = value; }
     get velocityX() { return this.velocity.x; }
-    get velocityY() { return this.velocity.y; }
     set velocityX(value) { this.velocity.x = value; }
+    get velocityY() { return this.velocity.y; }
     set velocityY(value) { this.velocity.y = value; }
     getSwipe() {
         const interaction = this.interaction;
-        if (interaction.prevEvent.speed < 600
-            || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
+        if (interaction.prevEvent.speed < 600 ||
+            this.timeStamp - interaction.prevEvent.timeStamp > 150) {
             return null;
         }
         let angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;

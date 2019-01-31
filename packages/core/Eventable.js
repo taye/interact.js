@@ -20,6 +20,7 @@ class Eventable {
         let listeners;
         const global = this.global;
         // Interactable#on() listeners
+        // tslint:disable no-conditional-assignment
         if ((listeners = this.types[event.type])) {
             fireUntilImmediateStopped(event, listeners);
         }

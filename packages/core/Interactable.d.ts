@@ -1,11 +1,9 @@
+import { Defaults, Options } from './defaultOptions';
 import Eventable from './Eventable';
 /** */
 export declare class Interactable implements Partial<Eventable> {
-    protected readonly _defaults: {
-        base: {};
-        perAction: {};
-    };
-    options: any;
+    protected readonly _defaults: Defaults;
+    options: Options;
     _actions: any;
     readonly target: Interact.Target;
     events: Eventable;
@@ -13,10 +11,12 @@ export declare class Interactable implements Partial<Eventable> {
     _win: Window;
     _doc: Document;
     /** */
-    constructor(target: Interact.Target, options: any, defaultContext: any);
-    setOnEvents(actionName: any, phases: any): this;
+    constructor(target: Interact.Target, options: any, defaultContext: Element | Node);
+    setOnEvents(actionName: string, phases: {
+        [phase: string]: Interact.Listeners;
+    }): this;
     updatePerActionListeners(actionName: any, prev: any, cur: any): void;
-    setPerAction(actionName: any, options: any): void;
+    setPerAction(actionName: any, options: Options): void;
     /**
      * The default function to get an Interactables bounding rect. Can be
      * overridden using {@link Interactable.rectChecker}.
@@ -68,7 +68,7 @@ export declare class Interactable implements Partial<Eventable> {
      * interacting; Use 'page' if you want autoScroll to work
      * @return {string | object} The current deltaSource or this Interactable
      */
-    deltaSource(newValue: any): any;
+    deltaSource(newValue: any): "client" | "page" | this;
     /**
      * Gets the selector context Node of the Interactable. The default is
      * `window.document`.

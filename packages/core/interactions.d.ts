@@ -9,7 +9,7 @@ declare module '@interactjs/core/scope' {
             new: (options: any) => InteractionBase;
             list: InteractionBase[];
             listeners: {
-                [type: string]: Function;
+                [type: string]: Interact.Listener;
             };
             eventMap: any;
             pointerMoveTolerance: number;

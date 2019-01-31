@@ -1,39 +1,14 @@
+import { Action, Interaction } from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 export declare type EdgeName = 'top' | 'left' | 'bottom' | 'right';
-declare module '@interactjs/core/Interactable' {
-    interface Interactable {
-        resizable?: (options: any) => Interactable | {
-            [key: string]: any;
-        };
-    }
-}
-declare module '@interactjs/core/defaultOptions' {
-    interface Defaults {
-        resize?: any;
-    }
-}
-declare module '@interactjs/core/scope' {
-    interface Actions {
-        resize?: typeof resize;
-    }
-}
 declare function install(scope: Scope): void;
 declare const resize: {
-    defaults: {
-        square: boolean;
-        preserveAspectRatio: boolean;
-        axis: string;
-        margin: number;
-        edges: any;
-        invert: string;
-    };
-    checker: (_pointer: any, _event: any, interactable: any, element: any, interaction: any, rect: any) => {
+    install: typeof install;
+    defaults: import("../interactjs/types").ResizableOptions;
+    checker(_pointer: import("../interactjs/types").PointerType, _event: import("../interactjs/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: Element, interaction: Interaction, rect: import("../interactjs/types").Rect): {
         name: string;
         edges: {
-            left: boolean;
-            right: boolean;
-            top: boolean;
-            bottom: boolean;
+            [edge: string]: boolean;
         };
         axes?: undefined;
     } | {
@@ -54,10 +29,7 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor: (action: any) => any;
+    getCursor(action: Action): string;
     defaultMargin: number;
 };
-declare const _default: {
-    install: typeof install;
-};
-export default _default;
+export default resize;

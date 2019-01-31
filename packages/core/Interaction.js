@@ -1,5 +1,6 @@
 import * as utils from '@interactjs/utils';
 import InteractEvent from './InteractEvent';
+import PointerInfo from './PointerInfo';
 export class Interaction {
     /** */
     constructor({ pointerType, signals }) {
@@ -97,9 +98,9 @@ export class Interaction {
      * @return {object} interact
      */
     start(action, target, element) {
-        if (this.interacting()
-            || !this.pointerIsDown
-            || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
+        if (this.interacting() ||
+            !this.pointerIsDown ||
+            this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
             return;
         }
         utils.copyAction(this.prepared, action);
@@ -114,12 +115,12 @@ export class Interaction {
     pointerMove(pointer, event, eventTarget) {
         if (!this.simulation) {
             this.updatePointer(pointer, event, eventTarget, false);
-            utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer));
+            utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer));
         }
-        const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x
-            && this.coords.cur.page.y === this.coords.prev.page.y
-            && this.coords.cur.client.x === this.coords.prev.client.x
-            && this.coords.cur.client.y === this.coords.prev.client.y);
+        const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
+            this.coords.cur.page.y === this.coords.prev.page.y &&
+            this.coords.cur.client.x === this.coords.prev.client.x &&
+            this.coords.cur.client.y === this.coords.prev.client.y);
         let dx;
         let dy;
         // register movement greater than pointerMoveTolerance
@@ -257,7 +258,7 @@ export class Interaction {
         // mouse and pen interactions may have only one pointer
         return (this.pointerType === 'mouse' || this.pointerType === 'pen')
             ? this.pointers.length - 1
-            : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId);
+            : utils.arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId);
     }
     getPointerInfo(pointer) {
         return this.pointers[this.getPointerIndex(pointer)];
@@ -280,7 +281,7 @@ export class Interaction {
         if (down) {
             this.pointerIsDown = true;
             if (!this.interacting()) {
-                utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer));
+                utils.pointer.setCoords(this.coords.start, this.pointers.map((p) => p.pointer));
                 utils.pointer.copyCoords(this.coords.cur, this.coords.start);
                 utils.pointer.copyCoords(this.coords.prev, this.coords.start);
                 utils.pointer.pointerExtend(this.downPointer, pointer);
@@ -347,14 +348,6 @@ export class Interaction {
         return true;
     }
 }
-export class PointerInfo {
-    constructor(id, pointer, event, downTime, downTarget) {
-        this.id = id;
-        this.pointer = pointer;
-        this.event = event;
-        this.downTime = downTime;
-        this.downTarget = downTarget;
-    }
-}
 export default Interaction;
+export { PointerInfo };
 //# sourceMappingURL=Interaction.js.map

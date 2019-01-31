@@ -70,7 +70,7 @@ export class Interactable {
                 actionOptions[optionName] = extend(actionOptions[optionName] || {}, clone(optionValue));
                 // set anabled field to true if it exists in the defaults
                 if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
-                    actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
+                    actionOptions[optionName].enabled = optionValue.enabled !== false;
                 }
             }
             // if the option value is a boolean and the default is an object
@@ -91,11 +91,9 @@ export class Interactable {
      * @return {object} The object's bounding rectangle.
      */
     getRect(element) {
-        element = element
-            ? element
-            : is.element(this.target)
-                ? this.target
-                : null;
+        element = element || (is.element(this.target)
+            ? this.target
+            : null);
         if (is.string(this.target)) {
             element = element || this._context.querySelector(this.target);
         }
@@ -168,8 +166,8 @@ export class Interactable {
         return this._context;
     }
     inContext(element) {
-        return (this._context === element.ownerDocument
-            || nodeContains(this._context, element));
+        return (this._context === element.ownerDocument ||
+            nodeContains(this._context, element));
     }
     /**
      * Calls listeners for the given InteractEvent type bound globally
@@ -274,8 +272,8 @@ export class Interactable {
             // remove delegated events
             for (const type in events.delegatedEvents) {
                 const delegated = events.delegatedEvents[type];
-                if (delegated.selectors[0] === this.target
-                    && delegated.contexts[0] === this._context) {
+                if (delegated.selectors[0] === this.target &&
+                    delegated.contexts[0] === this._context) {
                     delegated.selectors.splice(0, 1);
                     delegated.contexts.splice(0, 1);
                     delegated.listeners.splice(0, 1);

@@ -4,6 +4,7 @@ import * as is from './is';
 import win from './window';
 export function warnOnce(method, message) {
     let warned = false;
+    // eslint-disable-next-line no-shadow
     return function () {
         if (!warned) {
             win.window.console.warn(message);
@@ -45,5 +46,5 @@ export { default as pointer } from './pointerUtils';
 export { default as raf } from './raf';
 export { default as rect } from './rect';
 export { default as Signals } from './Signals';
-export { win, arr, dom, is, };
+export { win, arr, dom, is };
 //# sourceMappingURL=index.js.map

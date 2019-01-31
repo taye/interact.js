@@ -27,18 +27,29 @@ export declare class Scope {
         wheelEvent: string;
     };
     events: {
-        add: (element: EventTarget, type: string, listener: Function, optionalArg?: any) => void;
-        remove: (element: EventTarget, type: string, listener?: Function | "all", optionalArg?: any) => void;
-        addDelegate: (selector: string, context: EventTarget, type: string, listener: Function, optionalArg?: any) => void;
+        add: (element: EventTarget, type: string, listener: (event: Event) => any, optionalArg?: any) => void;
+        remove: (element: EventTarget, type: string, listener?: "all" | ((event: Event) => any), optionalArg?: any) => void;
+        addDelegate: (selector: string, context: EventTarget, type: string, listener: (event: Event) => any, optionalArg?: any) => void;
         removeDelegate: (selector: any, context: any, type: any, listener?: any, optionalArg?: any) => void;
         delegateListener: (event: Event, optionalArg?: any) => void;
         delegateUseCapture: (event: Event) => any;
-        delegatedEvents: {};
-        documents: any[];
+        delegatedEvents: {
+            [type: string]: {
+                selectors: string[];
+                contexts: EventTarget[];
+                listeners: [(event: Event) => any, boolean, boolean][][];
+            };
+        };
+        documents: Document[];
         supportsOptions: boolean;
         supportsPassive: boolean;
         _elements: EventTarget[];
-        _targets: any[];
+        _targets: {
+            events: {
+                [type: string]: ((event: Event) => any)[];
+            };
+            typeCount: number;
+        }[];
         init(window: Window): void;
     };
     utils: typeof utils;
@@ -48,25 +59,28 @@ export declare class Scope {
     Interactable: typeof InteractableBase;
     interactables: InteractableSet;
     _win: Window;
-    document: any;
-    documents: any[];
+    document: Document;
+    documents: Array<{
+        doc: Document;
+        options: any;
+    }>;
+    constructor();
     init(window: Window): Scope;
     addDocument(doc: Document, options?: any): void | false;
-    removeDocument(doc: any): void;
-    onWindowUnload(event: any): void;
-    getDocIndex(doc: any): number;
-    getDocOptions(doc: any): any;
-    constructor();
+    removeDocument(doc: Document): void;
+    onWindowUnload(event: Event): void;
+    getDocIndex(doc: Document): number;
+    getDocOptions(doc: Document): any;
 }
 declare class InteractableSet {
     protected scope: Scope;
     signals: utils.Signals;
     list: InteractableBase[];
     constructor(scope: Scope);
-    new(target: any, options: any): InteractableBase;
-    indexOfElement(target: any, context: any): number;
+    new(target: Interact.Target, options: any): InteractableBase;
+    indexOfElement(target: Interact.Target, context: Document | Element): number;
     get(element: Interact.Target, options: any, dontCheckInContext?: boolean): InteractableBase;
-    forEachMatch(element: any, callback: any): any;
+    forEachMatch(element: Document | Element, callback: (interactable: any) => any): any;
 }
-export declare function initScope(scope: Scope, window: any): Scope;
+export declare function initScope(scope: Scope, window: Window): Scope;
 export {};

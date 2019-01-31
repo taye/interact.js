@@ -6,5 +6,5 @@ function install(scope) {
     holdRepeat.install(scope);
     interactableTargets.install(scope);
 }
-export { pointerEvents, holdRepeat, interactableTargets, install, };
+export { pointerEvents, holdRepeat, interactableTargets, install };
 //# sourceMappingURL=index.js.map

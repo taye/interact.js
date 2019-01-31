@@ -1,5 +1,5 @@
-import * as is from './is';
 import extend from './extend';
+import * as is from './is';
 export default function normalize(type, listener, result) {
     result = result || {};
     if (is.string(type) && type.search(' ') !== -1) {
@@ -24,7 +24,7 @@ export default function normalize(type, listener, result) {
     }
     else if (is.object(listener)) {
         for (const prefix in listener) {
-            const combinedTypes = split(prefix).map(p => `${type}${p}`);
+            const combinedTypes = split(prefix).map((p) => `${type}${p}`);
             normalize(combinedTypes, listener[prefix], result);
         }
     }

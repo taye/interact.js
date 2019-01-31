@@ -32,7 +32,7 @@ function install(scope) {
         eventMap.touchend = listeners.pointerUp;
         eventMap.touchcancel = listeners.pointerUp;
     }
-    eventMap.blur = event => {
+    eventMap.blur = (event) => {
         for (const interaction of scope.interactions.list) {
             interaction.documentBlur(event);
         }
@@ -68,7 +68,7 @@ function install(scope) {
     };
 }
 function doOnInteractions(method, scope) {
-    return (function (event) {
+    return function (event) {
         const interactions = scope.interactions.list;
         const pointerType = pointerUtils.getPointerType(event);
         const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event);
@@ -105,10 +105,10 @@ function doOnInteractions(method, scope) {
                 }
                 // try to ignore mouse events that are simulated by the browser
                 // after a touch event
-                invalidPointer = invalidPointer
-                    || (new Date().getTime() - scope.prevTouchTime < 500)
+                invalidPointer = invalidPointer ||
+                    (new Date().getTime() - scope.prevTouchTime < 500) ||
                     // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
-                    || event.timeStamp === 0;
+                    event.timeStamp === 0;
             }
             if (!invalidPointer) {
                 const searchDetails = {
@@ -133,7 +133,7 @@ function doOnInteractions(method, scope) {
         for (const [pointer, eventTarget, curEventTarget, interaction] of matches) {
             interaction[method](pointer, event, eventTarget, curEventTarget);
         }
-    });
+    };
 }
 function getInteraction(searchDetails) {
     const { pointerType, scope } = searchDetails;

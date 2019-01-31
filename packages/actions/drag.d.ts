@@ -1,21 +1,7 @@
 import { Scope } from '@interactjs/core/scope';
-declare module '@interactjs/core/Interactable' {
-    interface Interactable {
-        draggable?: (options: any) => Interactable | {
-            [key: string]: any;
-        };
-    }
-}
-declare module '@interactjs/core/defaultOptions' {
-    interface Defaults {
-        drag?: any;
-    }
-}
-declare module '@interactjs/core/scope' {
-    interface Actions {
-        drag?: typeof drag;
-    }
-}
+export declare type DraggableMethod = (options: Interact.DraggableOptions) => Interact.Interactable | {
+    [key: string]: any;
+};
 declare function install(scope: Scope): void;
 declare function beforeMove({ interaction }: {
     interaction: any;
@@ -69,10 +55,7 @@ declare const drag: {
     draggable: typeof draggable;
     beforeMove: typeof beforeMove;
     move: typeof move;
-    defaults: {
-        startAxis: string;
-        lockAxis: string;
-    };
+    defaults: import("../interactjs/types").DropzoneOptions;
     checker(_pointer: any, _event: any, interactable: any): {
         name: string;
         axis: any;

@@ -1,8 +1,6 @@
 class Signals {
     constructor() {
-        this.listeners = {
-        // signalName: [listeners],
-        };
+        this.listeners = {};
     }
     on(name, listener) {
         if (!this.listeners[name]) {

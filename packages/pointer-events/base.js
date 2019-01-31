@@ -27,7 +27,8 @@ const pointerEvents = {
     ],
 };
 function fire(arg) {
-    const { interaction, pointer, event, eventTarget, type = arg.pointerEvent.type, targets = collectEventTargets(arg), pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction), } = arg;
+    const { interaction, pointer, event, eventTarget, type = arg.pointerEvent.type, targets = collectEventTargets(arg), } = arg;
+    const { pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction), } = arg;
     const signalArg = {
         interaction,
         pointer,
@@ -48,9 +49,9 @@ function fire(arg) {
         pointerEvent.currentTarget = target.element;
         target.eventable.fire(pointerEvent);
         pointerEvent.addOrigin(origin);
-        if (pointerEvent.immediatePropagationStopped
-            || (pointerEvent.propagationStopped
-                && (i + 1) < targets.length && targets[i + 1].element !== pointerEvent.currentTarget)) {
+        if (pointerEvent.immediatePropagationStopped ||
+            (pointerEvent.propagationStopped &&
+                (i + 1) < targets.length && targets[i + 1].element !== pointerEvent.currentTarget)) {
             break;
         }
     }
@@ -60,7 +61,10 @@ function fire(arg) {
         // PointerEvent and use that as the prevTap
         const prevTap = pointerEvent.double
             ? fire({
-                interaction, pointer, event, eventTarget,
+                interaction,
+                pointer,
+                event,
+                eventTarget,
                 type: 'doubletap',
             })
             : pointerEvent;
@@ -73,9 +77,9 @@ function collectEventTargets({ interaction, pointer, event, eventTarget, type })
     const pointerIndex = interaction.getPointerIndex(pointer);
     const pointerInfo = interaction.pointers[pointerIndex];
     // do not fire a tap event if the pointer was moved before being lifted
-    if (type === 'tap' && (interaction.pointerWasMoved
+    if (type === 'tap' && (interaction.pointerWasMoved ||
         // or if the pointerup target is different to the pointerdown target
-        || !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
+        !(pointerInfo && pointerInfo.downTarget === eventTarget))) {
         return [];
     }
     const path = utils.dom.getPath(eventTarget);
@@ -94,7 +98,7 @@ function collectEventTargets({ interaction, pointer, event, eventTarget, type })
         signals.fire('collect-targets', signalArg);
     }
     if (type === 'hold') {
-        signalArg.targets = signalArg.targets.filter(target => target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration);
+        signalArg.targets = signalArg.targets.filter((target) => target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration);
     }
     return signalArg.targets;
 }
@@ -102,29 +106,32 @@ function install(scope) {
     const { interactions, } = scope;
     scope.pointerEvents = pointerEvents;
     scope.defaults.pointerEvents = pointerEvents.defaults;
-    interactions.signals.on('new', interaction => {
+    interactions.signals.on('new', (interaction) => {
         interaction.prevTap = null; // the most recent tap event on this interaction
         interaction.tapTime = 0; // time of the most recent tap event
     });
-    interactions.signals.on('update-pointer', function ({ down, pointerInfo }) {
+    interactions.signals.on('update-pointer', ({ down, pointerInfo }) => {
         if (!down && pointerInfo.hold) {
             return;
         }
         pointerInfo.hold = { duration: Infinity, timeout: null };
     });
-    interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget, duplicateMove }) {
+    interactions.signals.on('move', ({ interaction, pointer, event, eventTarget, duplicateMove }) => {
         const pointerIndex = interaction.getPointerIndex(pointer);
         if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
             if (interaction.pointerIsDown) {
                 clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
             }
             fire({
-                interaction, pointer, event, eventTarget,
+                interaction,
+                pointer,
+                event,
+                eventTarget,
                 type: 'move',
             });
         }
     });
-    interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget, pointerIndex }) {
+    interactions.signals.on('down', ({ interaction, pointer, event, eventTarget, pointerIndex }) => {
         const timer = interaction.pointers[pointerIndex].hold;
         const path = utils.dom.getPath(eventTarget);
         const signalArg = {
@@ -152,7 +159,7 @@ function install(scope) {
             }
         }
         timer.duration = minDuration;
-        timer.timeout = setTimeout(function () {
+        timer.timeout = setTimeout(() => {
             fire({
                 interaction,
                 eventTarget,
@@ -168,7 +175,7 @@ function install(scope) {
         }
     });
     for (const signalName of ['up', 'cancel']) {
-        interactions.signals.on(signalName, function ({ interaction, pointerIndex }) {
+        interactions.signals.on(signalName, ({ interaction, pointerIndex }) => {
             if (interaction.pointers[pointerIndex].hold) {
                 clearTimeout(interaction.pointers[pointerIndex].hold.timeout);
             }

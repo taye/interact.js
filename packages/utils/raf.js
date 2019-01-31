@@ -12,19 +12,20 @@ function init(window) {
         }
     }
     if (!request) {
-        request = callback => {
+        request = (callback) => {
             const currTime = new Date().getTime();
             const timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            const token = setTimeout(function () { callback(currTime + timeToCall); }, timeToCall);
+            // eslint-disable-next-line standard/no-callback-literal
+            const token = setTimeout(() => { callback(currTime + timeToCall); }, timeToCall);
             lastTime = currTime + timeToCall;
             return token;
         };
-        cancel = token => clearTimeout(token);
+        cancel = (token) => clearTimeout(token);
     }
 }
 export default {
-    request: callback => request(callback),
-    cancel: token => cancel(token),
+    request: (callback) => request(callback),
+    cancel: (token) => cancel(token),
     init,
 };
 //# sourceMappingURL=raf.js.map

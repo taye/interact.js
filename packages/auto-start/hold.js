@@ -2,10 +2,10 @@ function install(scope) {
     const { autoStart, interactions, defaults, } = scope;
     defaults.perAction.hold = 0;
     defaults.perAction.delay = 0;
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.autoStartHoldTimer = null;
     });
-    autoStart.signals.on('prepared', function ({ interaction }) {
+    autoStart.signals.on('prepared', ({ interaction }) => {
         const hold = getHoldDuration(interaction);
         if (hold > 0) {
             interaction.autoStartHoldTimer = setTimeout(() => {
@@ -13,13 +13,13 @@ function install(scope) {
             }, hold);
         }
     });
-    interactions.signals.on('move', function ({ interaction, duplicate }) {
+    interactions.signals.on('move', ({ interaction, duplicate }) => {
         if (interaction.pointerWasMoved && !duplicate) {
             clearTimeout(interaction.autoStartHoldTimer);
         }
     });
     // prevent regular down->move autoStart
-    autoStart.signals.on('before-start', function ({ interaction }) {
+    autoStart.signals.on('before-start', ({ interaction }) => {
         const hold = getHoldDuration(interaction);
         if (hold > 0) {
             interaction.prepared.name = null;

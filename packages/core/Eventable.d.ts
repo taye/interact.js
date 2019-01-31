@@ -1,6 +1,9 @@
+declare type Listener = (event: any) => any;
 declare class Eventable {
     options: any;
-    types: {};
+    types: {
+        [type: string]: Listener[];
+    };
     propagationStopped: boolean;
     immediatePropagationStopped: boolean;
     global: any;
@@ -8,7 +11,7 @@ declare class Eventable {
         [index: string]: any;
     });
     fire(event: any): void;
-    on(type: any, listener: any): void;
-    off(type: any, listener: any): void;
+    on(type: string, listener: Listener): void;
+    off(type: string, listener: Listener): void;
 }
 export default Eventable;

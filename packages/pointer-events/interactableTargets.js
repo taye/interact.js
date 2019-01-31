@@ -3,8 +3,8 @@ import extend from '@interactjs/utils/extend';
 import * as is from '@interactjs/utils/is';
 function install(scope) {
     const { pointerEvents, actions, Interactable, interactables, } = scope;
-    pointerEvents.signals.on('collect-targets', function ({ targets, element, type, eventTarget }) {
-        scope.interactables.forEachMatch(element, interactable => {
+    pointerEvents.signals.on('collect-targets', ({ targets, element, type, eventTarget }) => {
+        scope.interactables.forEachMatch(element, (interactable) => {
             const eventable = interactable.events;
             const options = eventable.options;
             if (eventable.types[type] &&
@@ -19,12 +19,12 @@ function install(scope) {
             }
         });
     });
-    interactables.signals.on('new', function ({ interactable }) {
+    interactables.signals.on('new', ({ interactable }) => {
         interactable.events.getRect = function (element) {
             return interactable.getRect(element);
         };
     });
-    interactables.signals.on('set', function ({ interactable, options }) {
+    interactables.signals.on('set', ({ interactable, options }) => {
         extend(interactable.events.options, pointerEvents.defaults);
         extend(interactable.events.options, options.pointerEvents || {});
     });

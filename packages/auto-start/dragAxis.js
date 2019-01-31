@@ -2,7 +2,7 @@ import { parentNode } from '@interactjs/utils/domUtils';
 import * as is from '@interactjs/utils/is';
 import autoStart from './base';
 function install(scope) {
-    scope.autoStart.signals.on('before-start', function ({ interaction, eventTarget, dx, dy }) {
+    scope.autoStart.signals.on('before-start', ({ interaction, eventTarget, dx, dy }) => {
         if (interaction.prepared.name !== 'drag') {
             return;
         }
@@ -26,13 +26,13 @@ function install(scope) {
                     return;
                 }
                 const options = interaction.target.options.drag;
-                if (!options.manualStart
-                    && interactable.testIgnoreAllow(options, element, eventTarget)) {
+                if (!options.manualStart &&
+                    interactable.testIgnoreAllow(options, element, eventTarget)) {
                     const action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
-                    if (action
-                        && action.name === 'drag'
-                        && checkStartAxis(currentAxis, interactable)
-                        && autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
+                    if (action &&
+                        action.name === 'drag' &&
+                        checkStartAxis(currentAxis, interactable) &&
+                        autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
                         return interactable;
                     }
                 }

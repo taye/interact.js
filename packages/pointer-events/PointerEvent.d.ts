@@ -1,10 +1,10 @@
 import Interaction from '@interactjs/core/Interaction';
 /** */
-export default class PointerEvent {
+export default class PointerEvent<T extends string> {
     interaction: Interaction;
     timeStamp: number;
     originalEvent: Interact.PointerEventType;
-    type: string;
+    type: T;
     pointerId: number;
     pointerType: string;
     target: Node | Window;
@@ -15,6 +15,7 @@ export default class PointerEvent {
     clientX: number;
     clientY: number;
     dt: number;
+    eventable: any;
     propagationStopped: boolean;
     immediatePropagationStopped: boolean;
     /** */

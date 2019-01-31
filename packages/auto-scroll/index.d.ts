@@ -20,14 +20,14 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start: (interaction: any) => void;
-    stop: () => void;
-    scroll: () => void;
-    check: (interactable: any, actionName: any) => any;
-    onInteractionMove: ({ interaction, pointer }: {
+    start(interaction: any): void;
+    stop(): void;
+    scroll(): void;
+    check(interactable: any, actionName: any): any;
+    onInteractionMove({ interaction, pointer }: {
         interaction: any;
         pointer: any;
-    }) => void;
+    }): void;
 };
 export declare function getContainer(value: any, interactable: any, element: any): any;
 export declare function getScroll(container: any): {

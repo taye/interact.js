@@ -1,7 +1,7 @@
-import gesture from './gesture';
-import resize from './resize';
 import drag from './drag';
 import drop from './drop';
+import gesture from './gesture';
+import resize from './resize';
 function install(scope) {
     gesture.install(scope);
     resize.install(scope);

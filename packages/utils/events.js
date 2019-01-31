@@ -5,13 +5,6 @@ import pExtend from './pointerExtend';
 import pointerUtils from './pointerUtils';
 const elements = [];
 const targets = [];
-// {
-//   type: {
-//     selectors: ['selector', ...],
-//     contexts : [document, ...],
-//     listeners: [[listener, capture, passive], ...]
-//   }
-//  }
 const delegatedEvents = {};
 const documents = [];
 function add(element, type, listener, optionalArg) {
@@ -81,9 +74,9 @@ function addDelegate(selector, context, type, listener, optionalArg) {
     const options = getOptions(optionalArg);
     if (!delegatedEvents[type]) {
         delegatedEvents[type] = {
-            selectors: [],
             contexts: [],
             listeners: [],
+            selectors: [],
         };
         // add delegate listener functions
         for (const doc of documents) {
@@ -94,8 +87,8 @@ function addDelegate(selector, context, type, listener, optionalArg) {
     const delegated = delegatedEvents[type];
     let index;
     for (index = delegated.selectors.length - 1; index >= 0; index--) {
-        if (delegated.selectors[index] === selector
-            && delegated.contexts[index] === context) {
+        if (delegated.selectors[index] === selector &&
+            delegated.contexts[index] === context) {
             break;
         }
     }
@@ -119,8 +112,8 @@ function removeDelegate(selector, context, type, listener, optionalArg) {
     // count from last index of delegated to 0
     for (index = delegated.selectors.length - 1; index >= 0; index--) {
         // look for matching selector and context Node
-        if (delegated.selectors[index] === selector
-            && delegated.contexts[index] === context) {
+        if (delegated.selectors[index] === selector &&
+            delegated.contexts[index] === context) {
             const listeners = delegated.listeners[index];
             // each item of the listeners array is an array: [function, capture, passive]
             for (let i = listeners.length - 1; i >= 0; i--) {
@@ -171,13 +164,12 @@ function delegateListener(event, optionalArg) {
         for (let i = 0; i < delegated.selectors.length; i++) {
             const selector = delegated.selectors[i];
             const context = delegated.contexts[i];
-            if (domUtils.matchesSelector(element, selector)
-                && domUtils.nodeContains(context, eventTarget)
-                && domUtils.nodeContains(context, element)) {
+            if (domUtils.matchesSelector(element, selector) &&
+                domUtils.nodeContains(context, eventTarget) &&
+                domUtils.nodeContains(context, element)) {
                 const listeners = delegated.listeners[i];
                 fakeEvent.currentTarget = element;
-                for (let j = 0; j < listeners.length; j++) {
-                    const [fn, capture, passive] = listeners[j];
+                for (const [fn, capture, passive] of listeners) {
                     if (capture === !!options.capture && passive === options.passive) {
                         fn(fakeEvent);
                     }

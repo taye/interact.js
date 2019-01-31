@@ -6,7 +6,7 @@ import { getWindow } from '@interactjs/utils/window';
 function install(scope) {
     const { interactions, defaults, actions, } = scope;
     scope.autoScroll = autoScroll;
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.autoScroll = null;
     });
     interactions.signals.on('stop', autoScroll.stop);
@@ -25,12 +25,13 @@ const autoScroll = {
     },
     interaction: null,
     i: null,
-    x: 0, y: 0,
+    x: 0,
+    y: 0,
     isScrolling: false,
     prevTime: 0,
     margin: 0,
     speed: 0,
-    start: function (interaction) {
+    start(interaction) {
         autoScroll.isScrolling = true;
         raf.cancel(autoScroll.i);
         interaction.autoScroll = autoScroll;
@@ -38,7 +39,7 @@ const autoScroll = {
         autoScroll.prevTime = new Date().getTime();
         autoScroll.i = raf.request(autoScroll.scroll);
     },
-    stop: function () {
+    stop() {
         autoScroll.isScrolling = false;
         if (autoScroll.interaction) {
             autoScroll.interaction.autoScroll = null;
@@ -46,7 +47,7 @@ const autoScroll = {
         raf.cancel(autoScroll.i);
     },
     // scroll the window by the values in scroll.x/y
-    scroll: function () {
+    scroll() {
         const { interaction } = autoScroll;
         const { target: interactable, element } = interaction;
         const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll;
@@ -93,13 +94,13 @@ const autoScroll = {
             autoScroll.i = raf.request(autoScroll.scroll);
         }
     },
-    check: function (interactable, actionName) {
+    check(interactable, actionName) {
         const options = interactable.options;
         return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
     },
-    onInteractionMove: function ({ interaction, pointer }) {
-        if (!(interaction.interacting()
-            && autoScroll.check(interaction.target, interaction.prepared.name))) {
+    onInteractionMove({ interaction, pointer }) {
+        if (!(interaction.interacting() &&
+            autoScroll.check(interaction.target, interaction.prepared.name))) {
             return;
         }
         if (interaction.simulation) {

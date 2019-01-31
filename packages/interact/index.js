@@ -8,7 +8,7 @@ import * as modifiers from '@interactjs/modifiers';
 import modifiersBase from '@interactjs/modifiers/base';
 import * as pointerEvents from '@interactjs/pointer-events';
 import reflow from '@interactjs/reflow';
-import { default as interact, scope } from './interact';
+import interact, { scope } from './interact';
 export function init(window) {
     scope.init(window);
     interact.use(interactablePreventDefault);
@@ -37,5 +37,5 @@ export function init(window) {
 // eslint-disable-next-line no-undef
 interact.version = init.version = process.env.npm_package_version;
 export default interact;
-export { interact };
+export { interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow, };
 //# sourceMappingURL=index.js.map

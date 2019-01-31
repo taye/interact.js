@@ -1,6 +1,7 @@
 import * as utils from '@interactjs/utils';
 import Interactable from './Interactable';
 import InteractEvent from './InteractEvent';
+import PointerInfo from './PointerInfo';
 export interface Action {
     name: 'drag' | 'resize' | 'gesture';
     axis?: 'x' | 'y' | 'xy';
@@ -30,7 +31,7 @@ export declare class Interaction {
     /**
      * @alias Interaction.prototype.move
      */
-    doMove: () => any;
+    doMove: (this: typeof utils) => any;
     coords: {
         start: {
             page: {
@@ -178,12 +179,5 @@ export declare class Interaction {
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: any): boolean;
 }
-export declare class PointerInfo {
-    id: number;
-    pointer: Interact.PointerType;
-    event: Interact.PointerEventType;
-    downTime: number;
-    downTarget: Node;
-    constructor(id: number, pointer: Interact.PointerType, event: Interact.PointerEventType, downTime: number, downTarget: Node);
-}
 export default Interaction;
+export { PointerInfo };

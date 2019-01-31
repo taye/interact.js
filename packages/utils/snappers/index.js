@@ -1,3 +1,3 @@
 import grid from './grid';
-export { grid, };
+export { grid };
 //# sourceMappingURL=index.js.map

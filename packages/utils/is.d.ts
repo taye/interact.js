@@ -3,7 +3,7 @@ export declare const docFrag: (thing: any) => thing is DocumentFragment;
 export declare const object: (thing: any) => thing is {
     [index: string]: any;
 };
-export declare const func: (thing: any) => thing is Function;
+export declare const func: (thing: any) => thing is (...args: any) => any;
 export declare const number: (thing: any) => thing is number;
 export declare const bool: (thing: any) => thing is boolean;
 export declare const string: (thing: any) => thing is string;

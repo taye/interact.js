@@ -38,8 +38,8 @@ function checkAndPreventDefault(interactable, scope, event) {
         return;
     }
     // don't preventDefault on editable elements
-    if (is.element(event.target)
-        && matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+    if (is.element(event.target) &&
+        matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
         return;
     }
     event.preventDefault();
@@ -74,9 +74,9 @@ export function install(scope) {
     // prevent native HTML5 drag on interact.js target elements
     scope.interactions.eventMap.dragstart = function preventNativeDrag(event) {
         for (const interaction of scope.interactions.list) {
-            if (interaction.element
-                && (interaction.element === event.target
-                    || nodeContains(interaction.element, event.target))) {
+            if (interaction.element &&
+                (interaction.element === event.target ||
+                    nodeContains(interaction.element, event.target))) {
                 interaction.target.checkAndPreventDefault(event);
                 return;
             }

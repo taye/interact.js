@@ -1,11 +1,10 @@
 import * as utils from '@interactjs/utils';
 import InteractableMethods from './InteractableMethods';
-;
 function install(scope) {
     const { interact, interactions, defaults, } = scope;
     interact.use(InteractableMethods);
     // set cursor style on mousedown
-    interactions.signals.on('down', function ({ interaction, pointer, event, eventTarget }) {
+    interactions.signals.on('down', ({ interaction, pointer, event, eventTarget }) => {
         if (interaction.interacting()) {
             return;
         }
@@ -13,29 +12,29 @@ function install(scope) {
         prepare(interaction, actionInfo, scope);
     });
     // set cursor style on mousemove
-    interactions.signals.on('move', function ({ interaction, pointer, event, eventTarget }) {
-        if (interaction.pointerType !== 'mouse'
-            || interaction.pointerIsDown
-            || interaction.interacting()) {
+    interactions.signals.on('move', ({ interaction, pointer, event, eventTarget }) => {
+        if (interaction.pointerType !== 'mouse' ||
+            interaction.pointerIsDown ||
+            interaction.interacting()) {
             return;
         }
         const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope);
         prepare(interaction, actionInfo, scope);
     });
-    interactions.signals.on('move', function (arg) {
+    interactions.signals.on('move', (arg) => {
         const { interaction, event } = arg;
-        if (!interaction.pointerIsDown
-            || interaction.interacting()
-            || !interaction.pointerWasMoved
-            || !interaction.prepared.name) {
+        if (!interaction.pointerIsDown ||
+            interaction.interacting() ||
+            !interaction.pointerWasMoved ||
+            !interaction.prepared.name) {
             return;
         }
         scope.autoStart.signals.fire('before-start', arg);
         const target = interaction.target;
         if (interaction.prepared.name && target) {
             // check manualStart and interaction limit
-            if (target.options[interaction.prepared.name].manualStart
-                || !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
+            if (target.options[interaction.prepared.name].manualStart ||
+                !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
                 interaction.stop(event);
             }
             else {
@@ -43,7 +42,7 @@ function install(scope) {
             }
         }
     });
-    interactions.signals.on('stop', function ({ interaction }) {
+    interactions.signals.on('stop', ({ interaction }) => {
         const target = interaction.target;
         if (target && target.options.styleCursor) {
             setCursor(interaction.element, '', scope);
@@ -72,7 +71,7 @@ function install(scope) {
      *
      * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
      */
-    interact /* FIXME */.maxInteractions = newValue => maxInteractions(newValue, scope);
+    interact /* FIXME */.maxInteractions = (newValue) => maxInteractions(newValue, scope);
     scope.autoStart = {
         // Allow this many interactions to happen simultaneously
         maxInteractions: Infinity,
@@ -84,10 +83,10 @@ function install(scope) {
 // Check if the current target supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction(action, interactable, element, eventTarget, scope) {
-    if (utils.is.object(action)
-        && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget)
-        && interactable.options[action.name].enabled
-        && withinInteractionLimit(interactable, element, action, scope)) {
+    if (utils.is.object(action) &&
+        interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
+        interactable.options[action.name].enabled &&
+        withinInteractionLimit(interactable, element, action, scope)) {
         return action;
     }
     return null;
@@ -120,8 +119,8 @@ function getActionInfo(interaction, pointer, event, eventTarget, scope) {
         matchElements = [];
         scope.interactables.forEachMatch(element, pushMatches);
         const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope);
-        if (actionInfo.action
-            && !actionInfo.target.options[actionInfo.action.name].manualStart) {
+        if (actionInfo.action &&
+            !actionInfo.target.options[actionInfo.action.name].manualStart) {
             return actionInfo;
         }
         element = utils.dom.parentNode(element);
@@ -140,7 +139,7 @@ function prepare(interaction, { action, target, element }, scope) {
         const cursor = action ? scope.actions[action.name].getCursor(action) : '';
         setCursor(interaction.element, cursor, scope);
     }
-    scope.autoStart.signals.fire('prepared', { interaction: interaction });
+    scope.autoStart.signals.fire('prepared', { interaction });
 }
 function withinInteractionLimit(interactable, element, action, scope) {
     const options = interactable.options;

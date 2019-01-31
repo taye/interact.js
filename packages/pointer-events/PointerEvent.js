@@ -21,10 +21,10 @@ export default class PointerEvent {
             const pointerIndex = interaction.getPointerIndex(pointer);
             this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
             const interval = this.timeStamp - interaction.tapTime;
-            this.double = !!(interaction.prevTap
-                && interaction.prevTap.type !== 'doubletap'
-                && interaction.prevTap.target === this.target
-                && interval < 500);
+            this.double = !!(interaction.prevTap &&
+                interaction.prevTap.type !== 'doubletap' &&
+                interaction.prevTap.target === this.target &&
+                interval < 500);
         }
         else if (type === 'doubletap') {
             this.dt = pointer.timeStamp - interaction.tapTime;

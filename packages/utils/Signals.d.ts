@@ -1,8 +1,10 @@
+declare type SignalListener = (signalArg: any, sinalName: string) => (void | boolean);
 declare class Signals {
-    listeners: {};
-    constructor();
-    on(name: any, listener: any): void;
-    off(name: any, listener: any): void;
-    fire(name: any, arg: any): void | false;
+    listeners: {
+        [signalName: string]: SignalListener[];
+    };
+    on(name: string, listener: SignalListener): void;
+    off(name: string, listener: SignalListener): void;
+    fire(name: string, arg: any): void | false;
 }
 export default Signals;

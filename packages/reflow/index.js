@@ -39,6 +39,7 @@ function reflow(interactable, action, scope) {
     const elements = is.string(interactable.target)
         ? arr.from(interactable._context.querySelectorAll(interactable.target))
         : [interactable.target];
+    // tslint:disable-next-line variable-name
     const Promise = win.window.Promise;
     const promises = Promise ? [] : null;
     for (const element of elements) {
@@ -46,7 +47,7 @@ function reflow(interactable, action, scope) {
         if (!rect) {
             break;
         }
-        const runningInteraction = arr.find(scope.interactions.list, interaction => {
+        const runningInteraction = arr.find(scope.interactions.list, (interaction) => {
             return interaction.interacting() &&
                 interaction.target === interactable &&
                 interaction.element === element &&
@@ -55,7 +56,7 @@ function reflow(interactable, action, scope) {
         let reflowPromise;
         if (runningInteraction) {
             runningInteraction.move();
-            reflowPromise = runningInteraction._reflowPromise || new Promise(resolve => {
+            reflowPromise = runningInteraction._reflowPromise || new Promise((resolve) => {
                 runningInteraction._reflowResolve = resolve;
             });
         }

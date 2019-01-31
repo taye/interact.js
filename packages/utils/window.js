@@ -11,9 +11,9 @@ export function init(window) {
     // create a TextNode
     const el = window.document.createTextNode('');
     // check if it's wrapped by a polyfill
-    if (el.ownerDocument !== window.document
-        && typeof window.wrap === 'function'
-        && window.wrap(el) === el) {
+    if (el.ownerDocument !== window.document &&
+        typeof window.wrap === 'function' &&
+        window.wrap(el) === el) {
         // use wrapped window
         window = window.wrap(window);
     }

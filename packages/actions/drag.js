@@ -90,7 +90,7 @@ function move({ iEvent, interaction }) {
  */
 function draggable(options) {
     if (is.object(options)) {
-        this.options.drag.enabled = options.enabled === false ? false : true;
+        this.options.drag.enabled = options.enabled !== false;
         this.setPerAction('drag', options);
         this.setOnEvents('drag', options);
         if (/^(xy|x|y|start)$/.test(options.lockAxis)) {

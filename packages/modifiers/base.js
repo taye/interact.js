@@ -3,7 +3,7 @@ function install(scope) {
     const { interactions, } = scope;
     scope.defaults.perAction.modifiers = [];
     scope.modifiers = {};
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.modifiers = {
             startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
             offsets: {},
@@ -11,8 +11,10 @@ function install(scope) {
             result: null,
         };
     });
-    interactions.signals.on('before-action-start', arg => start(arg, arg.interaction.coords.start.page, scope.modifiers));
-    interactions.signals.on('action-resume', arg => {
+    interactions.signals.on('before-action-start', (arg) => {
+        start(arg, arg.interaction.coords.start.page, scope.modifiers);
+    });
+    interactions.signals.on('action-resume', (arg) => {
         beforeMove(arg);
         start(arg, arg.interaction.coords.cur.page, scope.modifiers);
     });
@@ -218,7 +220,7 @@ function getModifierList(interaction, registeredModifiers) {
     const actionOptions = interaction.target.options[interaction.prepared.name];
     const actionModifiers = actionOptions.modifiers;
     if (actionModifiers && actionModifiers.length) {
-        return actionModifiers.map(modifier => {
+        return actionModifiers.map((modifier) => {
             if (!modifier.methods && modifier.type) {
                 return registeredModifiers[modifier.type](modifier);
             }
@@ -226,14 +228,14 @@ function getModifierList(interaction, registeredModifiers) {
         });
     }
     return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
-        .map(type => {
+        .map((type) => {
         const options = actionOptions[type];
         return options && options.enabled && {
             options,
             methods: options._methods,
         };
     })
-        .filter(m => !!m);
+        .filter((m) => !!m);
 }
 function shouldDo(options, preEnd, requireEndOnly, phase) {
     return options
@@ -251,7 +253,7 @@ function makeModifier(module, name) {
         beforeEnd: module.beforeEnd,
         stop: module.stop,
     };
-    const modifier = options => {
+    const modifier = (options) => {
         options = options || {};
         // add missing defaults to options
         options.enabled = options.enabled !== false;

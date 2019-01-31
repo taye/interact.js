@@ -1,4 +1,4 @@
-export default (grid) => {
+function createGrid(grid) {
     const coordFields = [
         ['x', 'y'],
         ['left', 'top'],
@@ -21,5 +21,6 @@ export default (grid) => {
         }
         return result;
     };
-};
+}
+export default createGrid;
 //# sourceMappingURL=grid.js.map

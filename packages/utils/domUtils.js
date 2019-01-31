@@ -1,7 +1,7 @@
-import win from './window';
 import browser from './browser';
-import * as is from './is';
 import domObjects from './domObjects';
+import * as is from './is';
+import win from './window';
 export function nodeContains(parent, child) {
     while (child) {
         if (child === parent) {
@@ -24,6 +24,7 @@ export function parentNode(node) {
     let parent = node.parentNode;
     if (is.docFrag(parent)) {
         // skip past #shado-root fragments
+        // tslint:disable-next-line
         while ((parent = parent.host) && is.docFrag(parent)) {
             continue;
         }
@@ -80,9 +81,9 @@ export function indexOfDeepestElement(elements) {
         }
         // if this element is an svg element and the current deepest is
         // an HTMLElement
-        if (deepestZone instanceof domObjects.HTMLElement
-            && dropzone instanceof domObjects.SVGElement
-            && !(dropzone instanceof domObjects.SVGSVGElement)) {
+        if (deepestZone instanceof domObjects.HTMLElement &&
+            dropzone instanceof domObjects.SVGElement &&
+            !(dropzone instanceof domObjects.SVGSVGElement)) {
             if (dropzone === deepestZone.parentNode) {
                 continue;
             }

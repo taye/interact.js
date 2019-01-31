@@ -1,20 +1,26 @@
+import InteractEvent from '@interactjs/core/InteractEvent';
 import { Scope } from '@interactjs/core/scope';
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
-        dropzone?: (options: any) => Interactable | {
+        dropzone: (options: any) => Interactable | {
             [key: string]: any;
         };
-        dropCheck?: (dragEvent: any, event: any, draggable: any, draggableElement: any, dropElement: any, rect: any) => boolean;
+        dropCheck: (dragEvent: InteractEvent, event: Interact.PointerEventType, draggable: Interactable, draggableElement: Element, dropElemen: Element, rect: any) => boolean;
     }
 }
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
-        dropStatus?: any;
+        dropStatus?: {
+            [key: string]: any;
+        };
     }
 }
 declare module '@interactjs/core/defaultOptions' {
     interface Defaults {
-        drop?: any;
+        drop?: Interact.DropzoneOptions;
+    }
+    interface Options {
+        drop?: Interact.DropzoneOptions;
     }
 }
 declare module '@interactjs/core/scope' {
@@ -24,7 +30,7 @@ declare module '@interactjs/core/scope' {
 }
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
-        dynamicDrop: (newValue?: boolean) => boolean | InteractStatic;
+        dynamicDrop: (newValue?: boolean) => boolean | typeof import('@interactjs/interact/interact').default;
     }
 }
 declare function install(scope: Scope): void;
@@ -49,10 +55,6 @@ declare const drop: {
     getDrop: typeof getDrop;
     getDropEvents: typeof getDropEvents;
     fireDropEvents: typeof fireDropEvents;
-    defaults: {
-        enabled: boolean;
-        accept: any;
-        overlap: string;
-    };
+    defaults: import("../../interactjs/types").DropzoneOptions;
 };
 export default drop;

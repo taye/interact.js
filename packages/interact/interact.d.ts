@@ -1,4 +1,6 @@
 /** @module interact */
+import { Options } from '@interactjs/core/defaultOptions';
+import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 export interface Plugin extends Partial<any> {
@@ -6,11 +8,12 @@ export interface Plugin extends Partial<any> {
 }
 declare module '@interactjs/core/scope' {
     interface Scope {
-        interact: typeof interactExport;
+        interact: InteractStatic;
         _plugins: Plugin[];
     }
 }
 export interface InteractStatic {
+    (target: Interact.Target, options?: Options): Interactable;
     on: typeof on;
     pointerMoveTolerance: typeof pointerMoveTolerance;
     stop: typeof stop;
@@ -35,14 +38,14 @@ export interface InteractStatic {
 declare const scope: Scope;
 /**
  * ```js
- * interact('#draggable').draggable(true);
+ * interact('#draggable').draggable(true)
  *
- * var rectables = interact('rect');
+ * var rectables = interact('rect')
  * rectables
  *   .gesturable(true)
  *   .on('gesturemove', function (event) {
  *       // ...
- *   });
+ *   })
  * ```
  *
  * The methods of this variable can be used to set elements as interactables
@@ -58,51 +61,15 @@ declare const scope: Scope;
  * or CSS selector
  * @return {Interactable}
  */
-export declare function interact<InteractStatic>(target: Interact.Target, options?: any): import("@interactjs/core/Interactable").Interactable;
-export declare namespace interact {
-    var use: typeof use;
-    var isSet: typeof isSet;
-    var on: typeof on;
-    var off: typeof off;
-    var debug: typeof debug;
-    var getPointerAverage: (pointers: PointerEvent[] | Event[]) => {
-        pageX: number;
-        pageY: number;
-        clientX: number;
-        clientY: number;
-        screenX: number;
-        screenY: number;
-    };
-    var getTouchBBox: (event: Event | PointerEvent[]) => {
-        x: number;
-        y: number;
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-    };
-    var getTouchDistance: (event: any, deltaSource: any) => number;
-    var getTouchAngle: (event: any, deltaSource: any) => number;
-    var getElementRect: typeof utils.dom.getElementRect;
-    var getElementClientRect: typeof utils.dom.getElementClientRect;
-    var matchesSelector: typeof utils.dom.matchesSelector;
-    var closest: typeof utils.dom.closest;
-    var supportsTouch: typeof supportsTouch;
-    var supportsPointerEvent: typeof supportsPointerEvent;
-    var stop: typeof stop;
-    var pointerMoveTolerance: typeof pointerMoveTolerance;
-    var addDocument: (doc: Document, options?: any) => false | void;
-    var removeDocument: (doc: any) => void;
-}
-declare function use(plugin: Plugin): typeof interact;
+export declare const interact: InteractStatic;
+declare function use(plugin: Plugin): InteractStatic;
 declare function isSet(element: Element, options?: any): boolean;
-declare function on(type: String | Interact.EventTypes, listener: Interact.Listeners, options?: any): typeof interact;
-declare function off(type: any, listener: any, options: any): typeof interact;
+declare function on(type: string | Interact.EventTypes, listener: Interact.Listeners, options?: any): InteractStatic;
+declare function off(type: any, listener: any, options: any): InteractStatic;
 declare function debug(): Scope;
 declare function supportsTouch(): boolean;
 declare function supportsPointerEvent(): boolean;
-declare function stop(): typeof interact;
-declare function pointerMoveTolerance(newValue: any): number | typeof interact;
-export declare const interactExport: InteractStatic & typeof interact;
+declare function stop(): InteractStatic;
+declare function pointerMoveTolerance(newValue: any): number | InteractStatic;
 export { scope };
-export default interactExport;
+export default interact;

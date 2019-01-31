@@ -3,26 +3,29 @@ import * as utils from '@interactjs/utils';
 import raf from '@interactjs/utils/raf';
 function install(scope) {
     const { interactions, defaults, } = scope;
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.inertia = {
             active: false,
             smoothEnd: false,
             allowResume: false,
             startEvent: null,
             upCoords: {},
-            xe: 0, ye: 0,
-            sx: 0, sy: 0,
+            xe: 0,
+            ye: 0,
+            sx: 0,
+            sy: 0,
             t0: 0,
-            vx0: 0, vys: 0,
+            vx0: 0,
+            vys: 0,
             duration: 0,
             lambda_v0: 0,
             one_ve_v0: 0,
             i: null,
         };
     });
-    interactions.signals.on('before-action-end', arg => release(arg, scope));
-    interactions.signals.on('down', arg => resume(arg, scope));
-    interactions.signals.on('stop', arg => stop(arg));
+    interactions.signals.on('before-action-end', (arg) => release(arg, scope));
+    interactions.signals.on('down', (arg) => resume(arg, scope));
+    interactions.signals.on('stop', (arg) => stop(arg));
     defaults.perAction.inertia = {
         enabled: false,
         resistance: 10,
@@ -47,7 +50,7 @@ function resume({ interaction, event, pointer, eventTarget }, scope) {
                 interaction.simulation = null;
                 // update pointers to the down event's coordinates
                 interaction.updatePointer(pointer, event, eventTarget, true);
-                utils.pointer.setCoords(interaction.coords.cur, interaction.pointers.map(p => p.pointer));
+                utils.pointer.setCoords(interaction.coords.cur, interaction.pointers.map((p) => p.pointer));
                 // fire appropriate signals
                 const signalArg = {
                     interaction,
@@ -77,17 +80,17 @@ function release({ interaction, event, noPreEnd }, scope) {
     let smoothEnd = false;
     let modifierResult;
     // check if inertia should be started
-    const inertiaPossible = (options && options.enabled
-        && interaction.prepared.name !== 'gesture'
-        && event !== state.startEvent);
-    const inertia = (inertiaPossible
-        && (now - interaction.coords.cur.timeStamp) < 50
-        && pointerSpeed > options.minSpeed
-        && pointerSpeed > options.endSpeed);
+    const inertiaPossible = (options && options.enabled &&
+        interaction.prepared.name !== 'gesture' &&
+        event !== state.startEvent);
+    const inertia = (inertiaPossible &&
+        (now - interaction.coords.cur.timeStamp) < 50 &&
+        pointerSpeed > options.minSpeed &&
+        pointerSpeed > options.endSpeed);
     const modifierArg = {
         interaction,
         pageCoords: utils.extend({}, interaction.coords.cur.page),
-        states: inertiaPossible && interaction.modifiers.states.map(modifierStatus => utils.extend({}, modifierStatus)),
+        states: inertiaPossible && interaction.modifiers.states.map((modifierStatus) => utils.extend({}, modifierStatus)),
         preEnd: true,
         requireEndOnly: true,
     };

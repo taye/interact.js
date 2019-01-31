@@ -7,14 +7,14 @@ const globalEvents = {};
 const scope = new Scope();
 /**
  * ```js
- * interact('#draggable').draggable(true);
+ * interact('#draggable').draggable(true)
  *
- * var rectables = interact('rect');
+ * var rectables = interact('rect')
  * rectables
  *   .gesturable(true)
  *   .on('gesturemove', function (event) {
  *       // ...
- *   });
+ *   })
  * ```
  *
  * The methods of this variable can be used to set elements as interactables
@@ -30,14 +30,14 @@ const scope = new Scope();
  * or CSS selector
  * @return {Interactable}
  */
-export function interact(target, options) {
+export const interact = function interact(target, options) {
     let interactable = scope.interactables.get(target, options);
     if (!interactable) {
         interactable = scope.interactables.new(target, options);
         interactable.events.global = globalEvents;
     }
     return interactable;
-}
+};
 scope._plugins = [];
 /**
  * Use a plugin
@@ -47,7 +47,7 @@ scope._plugins = [];
  * @param {Object} plugin
  * @param {function} plugin.install
  * @return {interact}
-*/
+ */
 interact.use = use;
 function use(plugin) {
     if (scope._plugins.indexOf(plugin) !== -1) {
@@ -57,7 +57,6 @@ function use(plugin) {
     scope._plugins.push(plugin);
     return interact;
 }
-;
 /**
  * Check if an element or selector has been set with the {@link interact}
  * function
@@ -67,12 +66,11 @@ function use(plugin) {
  * @param {Element} element The Element being searched for
  * @return {boolean} Indicates if the element or CSS selector was previously
  * passed to interact
-*/
+ */
 interact.isSet = isSet;
 function isSet(element, options) {
     return scope.interactables.indexOfElement(element, options && options.context) !== -1;
 }
-;
 /**
  * Add a global listener for an InteractEvent or adds a DOM event to `document`
  *
@@ -117,7 +115,6 @@ function on(type, listener, options) {
     }
     return interact;
 }
-;
 /**
  * Removes a global InteractEvent listener or DOM event from `document`
  *
@@ -152,17 +149,15 @@ function off(type, listener, options) {
     }
     else {
         let index;
-        if (type in globalEvents
-            && (index = globalEvents[type].indexOf(listener)) !== -1) {
+        if (type in globalEvents &&
+            (index = globalEvents[type].indexOf(listener)) !== -1) {
             globalEvents[type].splice(index, 1);
         }
     }
     return interact;
 }
-;
 /**
  * Returns an object which exposes internal data
-
  * @alias module:interact.debug
  *
  * @return {object} An object with properties that outline the current state
@@ -172,7 +167,6 @@ interact.debug = debug;
 function debug() {
     return scope;
 }
-;
 // expose the functions used to calculate multi-touch properties
 interact.getPointerAverage = utils.pointer.pointerAverage;
 interact.getTouchBBox = utils.pointer.touchBBox;
@@ -191,7 +185,6 @@ interact.supportsTouch = supportsTouch;
 function supportsTouch() {
     return browser.supportsTouch;
 }
-;
 /**
  * @alias module:interact.supportsPointerEvent
  *
@@ -201,7 +194,6 @@ interact.supportsPointerEvent = supportsPointerEvent;
 function supportsPointerEvent() {
     return browser.supportsPointerEvent;
 }
-;
 /**
  * Cancels all interactions (end events are not fired)
  *
@@ -216,7 +208,6 @@ function stop() {
     }
     return interact;
 }
-;
 /**
  * Returns or sets the distance the pointer must be moved before an action
  * sequence occurs. This also affects tolerance for tap events.
@@ -234,7 +225,6 @@ function pointerMoveTolerance(newValue) {
     }
     return scope.interactions.pointerMoveTolerance;
 }
-;
 scope.interactables.signals.on('unset', ({ interactable }) => {
     scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
     // Stop related interactions when an Interactable is unset
@@ -246,8 +236,7 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 });
 interact.addDocument = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
-export const interactExport = interact;
-scope.interact = interactExport;
+scope.interact = interact;
 export { scope };
-export default interactExport;
+export default interact;
 //# sourceMappingURL=interact.js.map

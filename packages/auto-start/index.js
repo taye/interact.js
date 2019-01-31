@@ -1,6 +1,6 @@
 import autoStart from './base';
-import hold from './hold';
 import dragAxis from './dragAxis';
+import hold from './hold';
 function install(scope) {
     autoStart.install(scope);
     hold.install(scope);

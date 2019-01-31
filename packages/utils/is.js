@@ -1,3 +1,4 @@
+// tslint:disable variable-name
 import isWindow from './isWindow';
 import win from './window';
 export const window = (thing) => thing === win.window || isWindow(thing);
@@ -13,13 +14,13 @@ export const element = (thing) => {
     }
     const _window = win.getWindow(thing) || win.window;
     return (/object|function/.test(typeof _window.Element)
-        ? thing instanceof _window.Element //DOM2
+        ? thing instanceof _window.Element // DOM2
         : thing.nodeType === 1 && typeof thing.nodeName === 'string');
 };
 export const plainObject = (thing) => object(thing) &&
     !!thing.constructor &&
     /function Object\b/.test(thing.constructor.toString());
-export const array = (thing) => (object(thing)
-    && (typeof thing.length !== 'undefined')
-    && func(thing.splice));
+export const array = (thing) => (object(thing) &&
+    (typeof thing.length !== 'undefined') &&
+    func(thing.splice));
 //# sourceMappingURL=is.js.map

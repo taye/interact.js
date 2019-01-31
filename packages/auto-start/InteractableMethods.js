@@ -4,7 +4,8 @@ import * as is from '@interactjs/utils/is';
 function install(scope) {
     const { 
     /** @lends Interactable */
-    Interactable, actions, } = scope;
+    Interactable, // tslint:disable-line no-shadowed-variable
+    actions, } = scope;
     Interactable.prototype.getAction = getAction;
     /**
      * ```js
@@ -128,9 +129,9 @@ function defaultActionChecker(interactable, pointer, event, interaction, element
     let action = null;
     for (const actionName of actions.names) {
         // check mouseButton setting if the pointer is down
-        if (interaction.pointerIsDown
-            && /mouse|pointer/.test(interaction.pointerType)
-            && (buttons & interactable.options[actionName].mouseButtons) === 0) {
+        if (interaction.pointerIsDown &&
+            /mouse|pointer/.test(interaction.pointerType) &&
+            (buttons & interactable.options[actionName].mouseButtons) === 0) {
             continue;
         }
         action = actions[actionName].checker(pointer, event, interactable, element, interaction, rect);
@@ -162,8 +163,8 @@ function actionChecker(checker) {
     return this.options.actionChecker;
 }
 function testIgnoreAllow(options, interactableElement, eventTarget) {
-    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget)
-        && this.testAllow(options.allowFrom, interactableElement, eventTarget));
+    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) &&
+        this.testAllow(options.allowFrom, interactableElement, eventTarget));
 }
 function testAllow(allowFrom, interactableElement, element) {
     if (!allowFrom) {

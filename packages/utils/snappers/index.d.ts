@@ -1,2 +1,2 @@
 import grid from './grid';
-export { grid, };
+export { grid };

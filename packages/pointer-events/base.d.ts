@@ -1,9 +1,32 @@
+import Eventable from '@interactjs/core/Eventable';
+import Interaction from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import PointerEvent from './PointerEvent';
+declare type EventTargetList = Array<{
+    eventable: Eventable;
+    element: Window | Document | Element;
+    props: {
+        [key: string]: any;
+    };
+}>;
 declare module '@interactjs/core/scope' {
     interface Scope {
-        pointerEvents?: typeof pointerEvents;
+        pointerEvents: typeof pointerEvents;
+    }
+}
+declare module '@interactjs/core/Interaction' {
+    interface Interaction {
+        prevTap?: PointerEvent<string>;
+        tapTime?: number;
+    }
+}
+declare module '@interactjs/core/PointerInfo' {
+    interface PointerInfo {
+        hold: {
+            duration: number;
+            timeout: any;
+        };
     }
 }
 declare module '@interactjs/core/defaultOptions' {
@@ -29,19 +52,28 @@ declare const pointerEvents: {
     };
     types: string[];
 };
-declare function fire(arg: any): any;
-declare function collectEventTargets({ interaction, pointer, event, eventTarget, type }: {
-    interaction: any;
-    pointer: any;
-    event: any;
-    eventTarget: any;
-    type: any;
-}): any[];
+declare function fire<T extends string>(arg: {
+    interaction: Interaction;
+    pointer: Interact.PointerType;
+    event: Interact.PointerEventType;
+    eventTarget: EventTarget;
+    targets?: EventTargetList;
+    pointerEvent?: PointerEvent<T>;
+    type: T;
+}): PointerEvent<string>;
+declare function collectEventTargets<T extends string>({ interaction, pointer, event, eventTarget, type }: {
+    interaction: Interaction;
+    pointer: Interact.PointerType;
+    event: Interact.PointerEventType;
+    eventTarget: EventTarget;
+    type: T;
+}): {
+    eventable: Eventable;
+    element: Element | Window | Document;
+    props: {
+        [key: string]: any;
+    };
+}[];
 declare function install(scope: Scope): void;
-declare function createSignalListener(type: any): ({ interaction, pointer, event, eventTarget }: {
-    interaction: any;
-    pointer: any;
-    event: any;
-    eventTarget: any;
-}) => void;
+declare function createSignalListener(type: string): ({ interaction, pointer, event, eventTarget }: any) => void;
 export default pointerEvents;

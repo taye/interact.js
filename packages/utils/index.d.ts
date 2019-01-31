@@ -2,13 +2,13 @@ import * as arr from './arr';
 import * as dom from './domUtils';
 import * as is from './is';
 import win from './window';
-export declare function warnOnce(method: any, message: any): () => any;
-export declare function _getQBezierValue(t: any, p1: any, p2: any, p3: any): number;
-export declare function getQuadraticCurvePoint(startX: any, startY: any, cpX: any, cpY: any, endX: any, endY: any, position: any): {
+export declare function warnOnce<T>(this: T, method: (...args: any) => any, message: string): (this: T) => any;
+export declare function _getQBezierValue(t: number, p1: number, p2: number, p3: number): number;
+export declare function getQuadraticCurvePoint(startX: number, startY: number, cpX: number, cpY: number, endX: number, endY: number, position: number): {
     x: number;
     y: number;
 };
-export declare function easeOutQuad(t: any, b: any, c: any, d: any): any;
+export declare function easeOutQuad(t: number, b: number, c: number, d: number): number;
 export declare function copyAction(dest: any, src: any): any;
 export { default as browser } from './browser';
 export { default as clone } from './clone';
@@ -21,4 +21,4 @@ export { default as pointer } from './pointerUtils';
 export { default as raf } from './raf';
 export { default as rect } from './rect';
 export { default as Signals } from './Signals';
-export { win, arr, dom, is, };
+export { win, arr, dom, is };

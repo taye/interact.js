@@ -20,10 +20,8 @@ export class Scope {
         this.Eventable = Eventable;
         this.InteractEvent = InteractEvent;
         this.interactables = new InteractableSet(this);
-        // main document
-        this.document = null;
         // all documents being listened to
-        this.documents = [ /* { doc, options } */];
+        this.documents = [];
         const scope = this;
         this.Interactable = class Interactable extends InteractableBase {
             get _defaults() { return scope.defaults; }
@@ -70,7 +68,7 @@ export class Scope {
         this.signals.fire('remove-document', { doc, window, scope: this, options });
     }
     onWindowUnload(event) {
-        this.removeDocument(event.currentTarget.document);
+        this.removeDocument(event.target);
     }
     getDocIndex(doc) {
         for (let i = 0; i < this.documents.length; i++) {
@@ -102,7 +100,7 @@ class InteractableSet {
         this.scope.interactables.signals.fire('new', {
             target,
             options,
-            interactable: interactable,
+            interactable,
             win: this.scope._win,
         });
         return interactable;
@@ -129,9 +127,9 @@ class InteractableSet {
                 // target is a selector and the element matches
                 ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
                 // target is the element
-                : element === interactable.target)
+                : element === interactable.target) &&
                 // the element is in context
-                && (interactable.inContext(element))) {
+                (interactable.inContext(element))) {
                 ret = callback(interactable);
             }
             if (ret !== undefined) {

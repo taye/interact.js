@@ -6,7 +6,7 @@ function install(scope) {
     interact, 
     /** @lends Interactable */
     Interactable, interactions, defaults, } = scope;
-    interactions.signals.on('after-action-start', function ({ interaction, event, iEvent: dragEvent }) {
+    interactions.signals.on('after-action-start', ({ interaction, event, iEvent: dragEvent }) => {
         if (interaction.prepared.name !== 'drag') {
             return;
         }
@@ -22,25 +22,25 @@ function install(scope) {
             fireActivationEvents(dropStatus.activeDrops, dropStatus.events.activate);
         }
     });
-    interactions.signals.on('action-move', arg => onEventCreated(arg, scope));
-    interactions.signals.on('action-end', arg => onEventCreated(arg, scope));
-    interactions.signals.on('after-action-move', function ({ interaction }) {
+    interactions.signals.on('action-move', (arg) => onEventCreated(arg, scope));
+    interactions.signals.on('action-end', (arg) => onEventCreated(arg, scope));
+    interactions.signals.on('after-action-move', ({ interaction }) => {
         if (interaction.prepared.name !== 'drag') {
             return;
         }
         fireDropEvents(interaction, interaction.dropStatus.events);
         interaction.dropStatus.events = {};
     });
-    interactions.signals.on('after-action-end', function ({ interaction }) {
+    interactions.signals.on('after-action-end', ({ interaction }) => {
         if (interaction.prepared.name === 'drag') {
             fireDropEvents(interaction, interaction.dropStatus.events);
         }
     });
-    interactions.signals.on('stop', function ({ interaction }) {
+    interactions.signals.on('stop', ({ interaction }) => {
         interaction.dropStatus.activeDrops = null;
         interaction.dropStatus.events = null;
     });
-    interactions.signals.on('new', function (interaction) {
+    interactions.signals.on('new', (interaction) => {
         interaction.dropStatus = {
             cur: {
                 dropzone: null,
@@ -55,7 +55,7 @@ function install(scope) {
             activeDrops: null,
         };
     });
-    interactions.signals.on('stop', function ({ interaction: { dropStatus } }) {
+    interactions.signals.on('stop', ({ interaction: { dropStatus } }) => {
         dropStatus.cur.dropzone = dropStatus.cur.element =
             dropStatus.prev.dropzone = dropStatus.prev.element = null;
         dropStatus.rejected = false;
@@ -131,9 +131,9 @@ function install(scope) {
      */
     interact.dynamicDrop = function (newValue) {
         if (utils.is.bool(newValue)) {
-            //if (dragging && scope.dynamicDrop !== newValue && !newValue) {
+            // if (dragging && scope.dynamicDrop !== newValue && !newValue) {
             //  calcRects(dropzones);
-            //}
+            // }
             scope.dynamicDrop = newValue;
             return interact;
         }
@@ -160,10 +160,10 @@ function collectDrops({ interactables }, draggableElement) {
         }
         const accept = dropzone.options.drop.accept;
         // test the draggable draggableElement against the dropzone's accept setting
-        if ((utils.is.element(accept) && accept !== draggableElement)
-            || (utils.is.string(accept)
-                && !utils.dom.matchesSelector(draggableElement, accept))
-            || (utils.is.func(accept) && !accept({ dropzone, draggableElement }))) {
+        if ((utils.is.element(accept) && accept !== draggableElement) ||
+            (utils.is.string(accept) &&
+                !utils.dom.matchesSelector(draggableElement, accept)) ||
+            (utils.is.func(accept) && !accept({ dropzone, draggableElement }))) {
             continue;
         }
         // query for new elements if necessary
@@ -305,7 +305,7 @@ function onEventCreated({ interaction, iEvent, event }, scope) {
 }
 function dropzoneMethod(interactable, options) {
     if (utils.is.object(options)) {
-        interactable.options.drop.enabled = options.enabled === false ? false : true;
+        interactable.options.drop.enabled = options.enabled !== false;
         if (options.listeners) {
             const normalized = utils.normalizeListeners(options.listeners);
             // rename 'drop' to '' as it will be prefixed with 'drop'
@@ -386,8 +386,8 @@ function dropCheckMethod(interactable, dragEvent, event, draggable, draggableEle
         dropped = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
     }
     if (dragRect && utils.is.number(dropOverlap)) {
-        const overlapArea = (Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left))
-            * Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top)));
+        const overlapArea = (Math.max(0, Math.min(rect.right, dragRect.right) - Math.max(rect.left, dragRect.left)) *
+            Math.max(0, Math.min(rect.bottom, dragRect.bottom) - Math.max(rect.top, dragRect.top)));
         const overlapRatio = overlapArea / (dragRect.width * dragRect.height);
         dropped = overlapRatio >= dropOverlap;
     }

@@ -1,11 +1,12 @@
 import Interactable from './Interactable';
+import Interaction from './Interaction';
 declare class InteractEvent {
     type: string;
     target: Element;
-    relatedTarget: Element;
+    relatedTarget: Element | null;
     currentTarget: Element;
-    screenX: number;
-    screenY: number;
+    screenX?: number;
+    screenY?: number;
     button: number;
     buttons: number;
     ctrlKey: boolean;
@@ -30,18 +31,18 @@ declare class InteractEvent {
     timeStamp: any;
     dragEnter?: Element;
     dragLeave?: Element;
-    axes: Interact.Point;
-    distance: number;
-    angle: number;
-    da: number;
-    scale: number;
-    ds: number;
-    box: Interact.Rect;
-    preEnd: boolean;
+    axes?: Interact.Point;
+    distance?: number;
+    angle?: number;
+    da?: number;
+    scale?: number;
+    ds?: number;
+    box?: Interact.Rect;
+    preEnd?: boolean;
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
     /** */
-    constructor(interaction: any, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string);
+    constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string);
     pageX: number;
     pageY: number;
     clientX: number;
