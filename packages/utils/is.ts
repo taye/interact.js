@@ -1,3 +1,5 @@
+// tslint:disable variable-name
+
 import isWindow from './isWindow';
 import win from './window';
 
@@ -10,17 +12,17 @@ export const docFrag = (thing: any): thing is DocumentFragment =>
 export const object = (thing: any): thing is { [index: string]: any } =>
   !!thing && (typeof thing === 'object');
 
-export const func = (thing: any): thing is Function =>
+export const func = (thing: any): thing is (...args: any) => any =>
   typeof thing === 'function';
 
 export const number = (thing: any): thing is number =>
-  typeof thing === 'number'  ;
+  typeof thing === 'number';
 
 export const bool = (thing: any): thing is boolean =>
-  typeof thing === 'boolean' ;
+  typeof thing === 'boolean';
 
 export const string = (thing: any): thing is string =>
-  typeof thing === 'string'  ;
+  typeof thing === 'string';
 
 export const element = (thing: any): thing is Element => {
   if (!thing || (typeof thing !== 'object')) { return false; }
@@ -28,7 +30,7 @@ export const element = (thing: any): thing is Element => {
   const _window = win.getWindow(thing) || win.window;
 
   return (/object|function/.test(typeof _window.Element)
-    ? thing instanceof _window.Element //DOM2
+    ? thing instanceof _window.Element // DOM2
     : thing.nodeType === 1 && typeof thing.nodeName === 'string');
 };
 

@@ -1,36 +1,37 @@
 import * as utils from '@interactjs/utils';
 import Interactable from './Interactable';
 import InteractEvent from './InteractEvent';
+import PointerInfo from './PointerInfo';
 
 export interface Action {
-  name: 'drag' | 'resize' | 'gesture'
-  axis?: 'x' | 'y' | 'xy'
-  edges?: Partial<Interact.Rect>
+  name: 'drag' | 'resize' | 'gesture';
+  axis?: 'x' | 'y' | 'xy';
+  edges?: Partial<Interact.Rect>;
 }
 
 export class Interaction {
   // current interactable being interacted with
-  target: Interactable = null
+  target: Interactable = null as any;
 
   // the target element of the interactable
-  element: Node = null
+  element: Node = null as any;
 
-  _signals: utils.Signals
+  _signals: utils.Signals;
 
   // action that's ready to be fired on next move event
   prepared: Action = {
-    name : null,
-    axis : null,
-    edges: null,
-  }
+    name : null as any,
+    axis : null as any,
+    edges: null as any,
+  };
 
   pointerType: string;
 
   // keep track of added pointers
-  pointers: PointerInfo[] = []
+  pointers: PointerInfo[] = [];
 
   // pointerdown/mousedown/touchstart event
-  downEvent: Interact.PointerEventType = null;
+  downEvent: Interact.PointerEventType = null as any;
 
   downPointer: Interact.PointerType = {} as Interact.PointerType;
 
@@ -39,13 +40,13 @@ export class Interaction {
     event: Interact.PointerEventType
     eventTarget: Node,
   } = {
-    pointer: null,
-    event: null,
-    eventTarget: null,
+    pointer: null as any,
+    event: null as any,
+    eventTarget: null as any,
   };
 
   // previous action event
-  prevEvent: InteractEvent = null;
+  prevEvent: InteractEvent = null as any;
 
   pointerIsDown = false;
   pointerWasMoved = false;
@@ -55,14 +56,14 @@ export class Interaction {
   simulation = null;
 
   get pointerMoveTolerance () {
-    return 1
+    return 1;
   }
 
   /**
    * @alias Interaction.prototype.move
    */
   doMove = utils.warnOnce(
-    function (signalArg) {
+    function (this: Interaction, signalArg: any) {
       this.move(signalArg);
     },
     'The interaction.doMove() method has been renamed to interaction.move()');
@@ -134,7 +135,7 @@ export class Interaction {
   start (action, target, element) {
     if (this.interacting()
         || !this.pointerIsDown
-        || this.pointers.length < (action.name === 'gesture'? 2 : 1)) {
+        || this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
       return;
     }
 
@@ -242,7 +243,7 @@ export class Interaction {
       pointerIndex = this.updatePointer(pointer, event, eventTarget, false);
     }
 
-    this._signals.fire(/cancel$/i.test(event.type)? 'cancel' : 'up', {
+    this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
       pointer,
       pointerIndex,
       event,
@@ -301,7 +302,7 @@ export class Interaction {
   }
 
   currentAction () {
-    return this._interacting? this.prepared.name: null;
+    return this._interacting ? this.prepared.name : null;
   }
 
   interacting () {
@@ -450,14 +451,5 @@ export class Interaction {
   }
 }
 
-export class PointerInfo {
-  constructor (
-    public id: number,
-    public pointer: Interact.PointerType,
-    public event: Interact.PointerEventType,
-    public downTime: number,
-    public downTarget: Node,
-  ) {}
-}
-
 export default Interaction;
+export { PointerInfo };

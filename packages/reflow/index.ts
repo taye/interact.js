@@ -1,10 +1,12 @@
+import { Action, Interaction } from '@interactjs/core/Interaction';
 import { newInteraction } from '@interactjs/core/interactions';
 import { Scope } from '@interactjs/core/scope';
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils';
+type Interactable = import ('@interactjs/core/Interactable').default;
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow?: (Action) => ReturnType<typeof reflow>
+    reflow: (action: Action) => ReturnType<typeof reflow>;
   }
 }
 
@@ -50,13 +52,14 @@ export function install (scope: Scope) {
   };
 }
 
-function reflow (interactable, action, scope: Scope) {
+function reflow (interactable: Interactable, action: Action, scope: Scope) {
   const elements = is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target];
 
-  const Promise = win.window.Promise;
-  const promises = Promise ? [] : null;
+  // tslint:disable-next-line variable-name
+  const Promise = (win.window as any).Promise;
+  const promises: Array<Promise<null>> | null = Promise ? [] : null;
 
   for (const element of elements) {
     const rect = interactable.getRect(element);
@@ -65,18 +68,18 @@ function reflow (interactable, action, scope: Scope) {
 
     const runningInteraction = arr.find(
       scope.interactions.list,
-      interaction => {
+      (interaction: Interaction) => {
         return interaction.interacting() &&
           interaction.target === interactable &&
           interaction.element === element &&
           interaction.prepared.name === action.name;
       });
-    let reflowPromise;
+    let reflowPromise: Promise<null>;
 
     if (runningInteraction) {
       runningInteraction.move();
 
-      reflowPromise = runningInteraction._reflowPromise || new Promise(resolve => {
+      reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
         runningInteraction._reflowResolve = resolve;
       });
     }
@@ -100,7 +103,7 @@ function reflow (interactable, action, scope: Scope) {
   return promises && Promise.all(promises).then(() => interactable);
 }
 
-function startReflow (scope: Scope, interactable, element, action, event) {
+function startReflow (scope: Scope, interactable: Interactable, element: Element, action: Action, event: any) {
   const interaction = newInteraction({ pointerType: 'reflow' }, scope);
   const signalArg = {
     interaction,
@@ -118,8 +121,8 @@ function startReflow (scope: Scope, interactable, element, action, event) {
 
   interaction._doPhase(signalArg);
 
-  const reflowPromise = win.window.Promise
-    ? new win.window.Promise((resolve) => {
+  const reflowPromise = (win.window as unknown as any).Promise
+    ? new (win.window as unknown as any).Promise((resolve: any) => {
       interaction._reflowResolve = resolve;
     })
     : null;

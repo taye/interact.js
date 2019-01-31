@@ -1,7 +1,7 @@
-import win        from './window';
-import browser    from './browser';
-import * as is    from './is';
+import browser from './browser';
 import domObjects from './domObjects';
+import * as is from './is';
+import win from './window';
 
 export function nodeContains (parent, child) {
   while (child) {
@@ -30,6 +30,7 @@ export function parentNode (node) {
 
   if (is.docFrag(parent)) {
     // skip past #shado-root fragments
+    // tslint:disable-next-line
     while ((parent = (parent as any).host) && is.docFrag(parent)) {
       continue;
     }
@@ -55,7 +56,7 @@ export function indexOfDeepestElement (elements) {
   let dropzoneParents = [];
   let dropzone;
   let deepestZone = elements[0];
-  let index = deepestZone? 0: -1;
+  let index = deepestZone ? 0 : -1;
   let parent;
   let child;
   let i;

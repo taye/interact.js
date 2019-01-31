@@ -2,7 +2,7 @@ import { parentNode } from '@interactjs/utils/domUtils';
 import * as is from '@interactjs/utils/is';
 import autoStart from './base';
 
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope;
 
 function install (scope: Scope) {
   scope.autoStart.signals.on('before-start',  function ({ interaction, eventTarget, dx, dy }) {

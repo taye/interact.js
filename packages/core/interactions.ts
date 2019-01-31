@@ -10,23 +10,23 @@ import { Scope } from './scope';
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    Interaction: typeof InteractionBase
+    Interaction: typeof InteractionBase;
     interactions: {
       signals: Signals
       new: (options: any) => InteractionBase
       list: InteractionBase[]
-      listeners: { [type: string]: Function }
+      listeners: { [type: string]: Interact.Listener }
       eventMap: any
       pointerMoveTolerance: number
-    }
-    actions: Actions
-    prevTouchTime: number
+    };
+    actions: Actions;
+    prevTouchTime: number;
   }
 
   interface Actions {
-    names: string[]
-    methodDict: { [key: string]: string }
-    eventTypes: string[]
+    names: string[];
+    methodDict: { [key: string]: string };
+    eventTypes: string[];
   }
 }
 
@@ -45,7 +45,7 @@ function install (scope: Scope) {
   }
 
   const pEventTypes = browser.pEventTypes;
-  const eventMap = {} as { [key: string]: Function};
+  const eventMap = {} as { [key: string]: Interact.Listener };
 
   if (domObjects.PointerEvent) {
     eventMap[pEventTypes.down  ] = listeners.pointerDown;

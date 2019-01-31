@@ -4,11 +4,11 @@ import raf from '@interactjs/utils/raf';
 import { getStringOptionResult } from '@interactjs/utils/rect';
 import { getWindow } from '@interactjs/utils/window';
 
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope;
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    autoScroll: typeof autoScroll
+    autoScroll: typeof autoScroll;
   }
 }
 
@@ -54,7 +54,7 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start: function (interaction) {
+  start (interaction) {
     autoScroll.isScrolling = true;
     raf.cancel(autoScroll.i);
 
@@ -64,7 +64,7 @@ const autoScroll = {
     autoScroll.i = raf.request(autoScroll.scroll);
   },
 
-  stop: function () {
+  stop () {
     autoScroll.isScrolling = false;
     if (autoScroll.interaction) {
       autoScroll.interaction.autoScroll = null;
@@ -73,7 +73,7 @@ const autoScroll = {
   },
 
   // scroll the window by the values in scroll.x/y
-  scroll: function () {
+  scroll () {
     const { interaction } = autoScroll;
     const { target: interactable, element } = interaction;
     const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll;
@@ -127,12 +127,12 @@ const autoScroll = {
       autoScroll.i = raf.request(autoScroll.scroll);
     }
   },
-  check: function (interactable, actionName) {
+  check (interactable, actionName) {
     const options = interactable.options;
 
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function ({ interaction, pointer }) {
+  onInteractionMove ({ interaction, pointer }) {
     if (!(interaction.interacting()
           && autoScroll.check(interaction.target, interaction.prepared.name))) {
       return;
@@ -167,8 +167,8 @@ const autoScroll = {
       bottom = pointer.clientY > rect.bottom - autoScroll.margin;
     }
 
-    autoScroll.x = (right ? 1: left? -1: 0);
-    autoScroll.y = (bottom? 1:  top? -1: 0);
+    autoScroll.x = (right ? 1 : left ? -1 : 0);
+    autoScroll.y = (bottom ? 1 :  top ? -1 : 0);
 
     if (!autoScroll.isScrolling) {
       // set the autoScroll properties to those of the target

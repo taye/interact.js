@@ -4,21 +4,24 @@ import * as is from './is';
 import pExtend from './pointerExtend';
 import pointerUtils from './pointerUtils';
 
+type Listener = (event: Event) => any;
 
 const elements: EventTarget[] = [];
-const targets = [];
+const targets: Array<{
+  events: { [type: string]: Listener[] },
+  typeCount: number,
+}> = [];
 
-// {
-//   type: {
-//     selectors: ['selector', ...],
-//     contexts : [document, ...],
-//     listeners: [[listener, capture, passive], ...]
-//   }
-//  }
-const delegatedEvents = {};
-const documents       = [];
+const delegatedEvents: {
+  [type: string]: {
+    selectors: string[],
+    contexts: EventTarget[],
+    listeners: Array<Array<[Listener, boolean, boolean]>>,
+  },
+} = {};
+const documents: Document[] = [];
 
-function add (element: EventTarget, type: string, listener: Function, optionalArg?: boolean | any) {
+function add (element: EventTarget, type: string, listener: Listener, optionalArg?: boolean | any) {
   const options = getOptions(optionalArg);
   let elementIndex = elements.indexOf(element);
   let target = targets[elementIndex];
@@ -39,12 +42,12 @@ function add (element: EventTarget, type: string, listener: Function, optionalAr
   }
 
   if (!contains(target.events[type], listener)) {
-    element.addEventListener(type, listener as any, events.supportsOptions? options : !!options.capture);
+    element.addEventListener(type, listener as any, events.supportsOptions ? options : !!options.capture);
     target.events[type].push(listener);
   }
 }
 
-function remove (element: EventTarget, type: string, listener?: 'all' | Function, optionalArg?: boolean | any) {
+function remove (element: EventTarget, type: string, listener?: 'all' | Listener, optionalArg?: boolean | any) {
   const options = getOptions(optionalArg);
   const elementIndex = elements.indexOf(element);
   const target = targets[elementIndex];
@@ -74,7 +77,7 @@ function remove (element: EventTarget, type: string, listener?: 'all' | Function
     else {
       for (let i = 0; i < len; i++) {
         if (target.events[type][i] === listener) {
-          element.removeEventListener(type, listener as any, events.supportsOptions? options : !!options.capture);
+          element.removeEventListener(type, listener as any, events.supportsOptions ? options : !!options.capture);
           target.events[type].splice(i, 1);
 
           break;
@@ -83,7 +86,7 @@ function remove (element: EventTarget, type: string, listener?: 'all' | Function
     }
 
     if (target.events[type] && target.events[type].length === 0) {
-      target.events[type] = null;
+      (target.events[type] as any) = null;
       target.typeCount--;
     }
   }
@@ -94,13 +97,13 @@ function remove (element: EventTarget, type: string, listener?: 'all' | Function
   }
 }
 
-function addDelegate (selector: string, context: EventTarget, type: string, listener: Function, optionalArg?: any) {
+function addDelegate (selector: string, context: EventTarget, type: string, listener: Listener, optionalArg?: any) {
   const options = getOptions(optionalArg);
   if (!delegatedEvents[type]) {
     delegatedEvents[type] = {
-      selectors: [],
       contexts : [],
       listeners: [],
+      selectors: [],
     };
 
     // add delegate listener functions
@@ -214,9 +217,7 @@ function delegateListener (event: Event, optionalArg?: any) {
 
         fakeEvent.currentTarget = element;
 
-        for (let j = 0; j < listeners.length; j++) {
-          const [fn, capture, passive] = listeners[j];
-
+        for (const [fn, capture, passive] of listeners) {
           if (capture === !!options.capture && passive === options.passive) {
             fn(fakeEvent);
           }
@@ -237,7 +238,7 @@ function preventOriginalDefault () {
 }
 
 function getOptions (param) {
-  return is.object(param)? param : { capture: param };
+  return is.object(param) ? param : { capture: param };
 }
 
 const events = {

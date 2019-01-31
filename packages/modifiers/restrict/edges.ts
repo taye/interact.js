@@ -17,7 +17,7 @@ import restrict from './pointer';
 
 declare module '@interactjs/core/Interaction' {
   interface Action {
-    linkedEdges?: { [key: string]: boolean }
+    linkedEdges?: { [key: string]: boolean };
   }
 }
 

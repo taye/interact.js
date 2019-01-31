@@ -1,16 +1,40 @@
+import Eventable from '@interactjs/core/Eventable';
+import Interaction from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import PointerEvent from './PointerEvent';
 
+type EventTargetList = Array<{
+  eventable: Eventable,
+  element: Window | Document | Element,
+  props: { [key: string]: any },
+}>;
+
 declare module '@interactjs/core/scope' {
   interface Scope {
-    pointerEvents?: typeof pointerEvents
+    pointerEvents: typeof pointerEvents;
+  }
+}
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    prevTap?: PointerEvent<string>;
+    tapTime?: number;
+  }
+}
+
+declare module '@interactjs/core/PointerInfo' {
+  interface PointerInfo {
+    hold: {
+      duration: number
+      timeout: any
+    };
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    pointerEvents?: any
+    pointerEvents?: any;
   }
 }
 
@@ -42,11 +66,22 @@ const pointerEvents = {
   ],
 };
 
-function fire (arg) {
+function fire<T extends string> (arg: {
+  interaction: Interaction,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
+  eventTarget: EventTarget,
+  targets?: EventTargetList,
+  pointerEvent?: PointerEvent<T>,
+  type: T
+}) {
   const {
     interaction, pointer, event, eventTarget,
-    type = arg.pointerEvent.type,
+    type = (arg as any).pointerEvent.type,
     targets = collectEventTargets(arg),
+  } = arg;
+
+  const {
     pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction),
   } = arg;
 
@@ -64,7 +99,7 @@ function fire (arg) {
     const target = targets[i];
 
     for (const prop in target.props || {}) {
-      pointerEvent[prop] = target.props[prop];
+      (pointerEvent as any)[prop] = target.props[prop];
     }
 
     const origin = utils.getOriginXY(target.eventable, target.element);
@@ -103,7 +138,13 @@ function fire (arg) {
   return pointerEvent;
 }
 
-function collectEventTargets ({ interaction, pointer, event, eventTarget, type }) {
+function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
+  interaction: Interaction,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
+  eventTarget: EventTarget,
+  type: T
+}) {
   const pointerIndex = interaction.getPointerIndex(pointer);
   const pointerInfo = interaction.pointers[pointerIndex];
 
@@ -122,7 +163,7 @@ function collectEventTargets ({ interaction, pointer, event, eventTarget, type }
     eventTarget,
     type,
     path,
-    targets: [],
+    targets: [] as EventTargetList,
     element: null,
   };
 
@@ -185,7 +226,7 @@ function install (scope: Scope) {
       event,
       eventTarget,
       type: 'hold',
-      targets: [],
+      targets: [] as EventTargetList,
       path,
       element: null,
     };
@@ -239,8 +280,8 @@ function install (scope: Scope) {
   }
 }
 
-function createSignalListener (type) {
-  return function ({ interaction, pointer, event, eventTarget }) {
+function createSignalListener (type: string) {
+  return function ({ interaction, pointer, event, eventTarget }: any) {
     fire({ interaction, eventTarget, pointer, event, type });
   };
 }

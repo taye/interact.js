@@ -15,7 +15,7 @@ function start (arg) {
   arg.state = {
     options: {
       relativePoints: [{
-        x: edges.left? 0 : 1,
+        x: edges.left ? 0 : 1,
         y: edges.top ? 0 : 1,
       }],
       origin: { x: 0, y: 0 },

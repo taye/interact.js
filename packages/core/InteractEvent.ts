@@ -3,63 +3,65 @@ import getOriginXY from '@interactjs/utils/getOriginXY';
 import hypot from '@interactjs/utils/hypot';
 import defaults from './defaultOptions';
 import Interactable from './Interactable';
+import Interaction from './Interaction';
 
 class InteractEvent {
-  type: string
-  target: Element
-  relatedTarget: Element
-  currentTarget: Element
-  screenX: number
-  screenY: number
-  button: number
-  buttons: number
-  ctrlKey: boolean
-  shiftKey: boolean
-  altKey: boolean
-  metaKey: boolean
+  type: string;
+  target: Element;
+  relatedTarget: Element | null;
+  currentTarget: Element;
+  screenX?: number;
+  screenY?: number;
+  button: number;
+  buttons: number;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+  metaKey: boolean;
   // added by interact.js
-  interactable: Interactable
-  interaction: any
-  page: Interact.Point
-  client: Interact.Point
-  delta: Interact.Point
-  x0: number
-  y0: number
-  t0: number
-  dt: number
-  duration: number
-  clientX0: number
-  clientY0: number
-  velocity: Interact.Point
-  speed: number
-  swipe: ReturnType<InteractEvent['getSwipe']>
-  timeStamp: any
+  interactable: Interactable;
+  interaction: any;
+  page: Interact.Point;
+  client: Interact.Point;
+  delta: Interact.Point;
+  x0: number;
+  y0: number;
+  t0: number;
+  dt: number;
+  duration: number;
+  clientX0: number;
+  clientY0: number;
+  velocity: Interact.Point;
+  speed: number;
+  swipe: ReturnType<InteractEvent['getSwipe']>;
+  timeStamp: any;
   // drag
-  dragEnter?: Element
-  dragLeave?: Element
+  dragEnter?: Element;
+  dragLeave?: Element;
   // resize
-  axes: Interact.Point
+  axes?: Interact.Point;
   // gestureend
-  distance: number
-  angle: number
-  da: number // angle change
-  scale: number // ratio of distance start to current event
-  ds: number // scale change
-  box: Interact.Rect // enclosing box of all points
-  preEnd: boolean
-  immediatePropagationStopped = false
-  propagationStopped = false
+  distance?: number;
+  angle?: number;
+  da?: number; // angle change
+  scale?: number; // ratio of distance start to current event
+  ds?: number; // scale change
+  box?: Interact.Rect; // enclosing box of all points
+  preEnd?: boolean;
+  immediatePropagationStopped = false;
+  propagationStopped = false;
 
   /** */
-  constructor (interaction, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string) {
-    element = element || interaction.element;
+  constructor (interaction: Interaction, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string) {
+    element = element || interaction.element as Element;
 
     const target      = interaction.target;
-    const deltaSource = (target && target.options || defaults).deltaSource;
+    // FIXME: add deltaSource to defaults
+    const deltaSource = ((target && target.options || defaults) as any).deltaSource as 'page' | 'client';
     const origin      = getOriginXY(target, element, actionName);
     const starting    = phase === 'start';
     const ending      = phase === 'end';
-    const prevEvent   = starting? this : interaction.prevEvent;
+    const prevEvent   = starting ? this : interaction.prevEvent;
     const coords      = starting
       ? interaction.coords.start
       : ending
@@ -118,27 +120,27 @@ class InteractEvent {
     this.velocity = extend({}, interaction.coords.velocity[deltaSource]);
     this.speed = hypot(this.velocity.x, this.velocity.y);
 
-    this.swipe = (ending || phase === 'inertiastart')? this.getSwipe() : null;
+    this.swipe = (ending || phase === 'inertiastart') ? this.getSwipe() : null;
   }
 
   get pageX () { return this.page.x; }
-  get pageY () { return this.page.y; }
   set pageX (value) { this.page.x = value; }
+  get pageY () { return this.page.y; }
   set pageY (value) { this.page.y = value; }
 
   get clientX () { return this.client.x; }
-  get clientY () { return this.client.y; }
   set clientX (value) { this.client.x = value; }
+  get clientY () { return this.client.y; }
   set clientY (value) { this.client.y = value; }
 
   get dx () { return this.delta.x; }
-  get dy () { return this.delta.y; }
   set dx (value) { this.delta.x = value; }
+  get dy () { return this.delta.y; }
   set dy (value) { this.delta.y = value; }
 
   get velocityX () { return this.velocity.x; }
-  get velocityY () { return this.velocity.y; }
   set velocityX (value) { this.velocity.x = value; }
+  get velocityY () { return this.velocity.y; }
   set velocityY (value) { this.velocity.y = value; }
 
   getSwipe () {

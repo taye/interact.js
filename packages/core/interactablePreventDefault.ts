@@ -11,7 +11,7 @@ function preventDefault (interactable, newValue) {
   }
 
   if (is.bool(newValue)) {
-    interactable.options.preventDefault = newValue? 'always' : 'never';
+    interactable.options.preventDefault = newValue ? 'always' : 'never';
     return interactable;
   }
 

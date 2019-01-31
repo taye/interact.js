@@ -2,11 +2,12 @@ import { Scope } from '@interactjs/core/scope';
 import { merge } from '@interactjs/utils/arr';
 import extend from '@interactjs/utils/extend';
 import * as is from '@interactjs/utils/is';
+type Interactable = import ('@interactjs/core/Interactable').default;
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    pointerEvents: typeof pointerEventsMethod
-    __backCompatOption: (string, any) => any
+    pointerEvents: typeof pointerEventsMethod;
+    __backCompatOption: (optionName: string, newValue: any) => any;
   }
 }
 
@@ -18,8 +19,8 @@ function install (scope: Scope) {
     interactables,
   } = scope;
 
-  pointerEvents.signals.on('collect-targets', function ({ targets, element, type, eventTarget }) {
-    scope.interactables.forEachMatch(element, interactable => {
+  pointerEvents.signals.on('collect-targets', ({ targets, element, type, eventTarget }: any) => {
+    scope.interactables.forEachMatch(element, (interactable: Interactable) => {
       const eventable = interactable.events;
       const options = eventable.options;
 
@@ -39,7 +40,7 @@ function install (scope: Scope) {
   });
 
   interactables.signals.on('new', function ({ interactable }) {
-    interactable.events.getRect = function (element) {
+    interactable.events.getRect = function (element: Element) {
       return interactable.getRect(element);
     };
   });
@@ -63,10 +64,10 @@ function install (scope: Scope) {
     }
 
     return ret;
-  }
+  };
 }
 
-function pointerEventsMethod (options) {
+function pointerEventsMethod (this: Interactable, options: any) {
   extend(this.events.options, options);
 
   return this;

@@ -52,3 +52,4 @@ overrides:
   files: '*.ts'
   rules:
     no-unused-vars: 0
+    node/no-missing-import: 0

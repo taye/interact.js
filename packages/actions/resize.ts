@@ -1,39 +1,23 @@
+import { Action, Interaction } from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
+type Interactable = import ('@interactjs/core/Interactable').default;
 
-export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
-
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    resizable?: (options: any) => Interactable | { [key: string]: any }
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    resize?: any
-  }
-}
-
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    resize?: typeof resize
-  }
-}
+export type EdgeName = 'top' | 'left' | 'bottom' | 'right';
 
 function install (scope: Scope) {
   const {
     actions,
     browser,
     /** @lends Interactable */
-    Interactable,
+    Interactable, // tslint:disable-line no-shadowed-variable
     interactions,
     defaults,
   } = scope;
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', function (interaction) {
+  interactions.signals.on('new', function (interaction: Interaction) {
     interaction.resizeAxes = 'xy';
   });
 
@@ -44,7 +28,7 @@ function install (scope: Scope) {
   interactions.signals.on('action-move', updateEventAxes);
 
   resize.cursors = initCursors(browser);
-  resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent? 20: 10;
+  resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10;
 
   /**
    * ```js
@@ -92,8 +76,8 @@ function install (scope: Scope) {
    * target of resize elements, or this Interactable
    */
   Interactable.prototype.resizable = function (options) {
-    return resizable(this, options, scope)
-  }
+    return resizable(this, options, scope);
+  };
 
   actions.resize = resize;
   actions.names.push('resize');
@@ -110,6 +94,7 @@ function install (scope: Scope) {
 }
 
 const resize = {
+  install,
   defaults: {
     square: false,
     preserveAspectRatio: false,
@@ -129,9 +114,16 @@ const resize = {
     // 'reposition' will keep the width/height positive by swapping
     // the top and bottom edges and/or swapping the left and right edges
     invert: 'none',
-  },
+  } as Interact.ResizableOptions,
 
-  checker: function (_pointer, _event, interactable, element, interaction, rect) {
+  checker (
+    _pointer: Interact.PointerType,
+    _event: Interact.PointerEventType,
+    interactable: Interactable,
+    element: Element,
+    interaction: Interaction,
+    rect: Interact.Rect
+  ) {
     if (!rect) { return null; }
 
     const page = utils.extend({}, interaction.coords.cur.page);
@@ -139,7 +131,7 @@ const resize = {
 
     if (options.resize.enabled) {
       const resizeOptions = options.resize;
-      const resizeEdges = { left: false, right: false, top: false, bottom: false };
+      const resizeEdges: { [edge: string]: boolean } = { left: false, right: false, top: false, bottom: false };
 
       // if using resize.edges
       if (utils.is.object(resizeOptions.edges)) {
@@ -170,7 +162,7 @@ const resize = {
         if (right || bottom) {
           return {
             name: 'resize',
-            axes: (right? 'x' : '') + (bottom? 'y' : ''),
+            axes: (right ? 'x' : '') + (bottom ? 'y' : ''),
           };
         }
       }
@@ -179,11 +171,12 @@ const resize = {
     return null;
   },
 
-  cursors: null as ReturnType<typeof initCursors>,
+  cursors: null as unknown as ReturnType<typeof initCursors>,
 
-  getCursor: function (action) {
+  getCursor (action: Action) {
+    const cursors = resize.cursors as { [key: string]: string };
     if (action.axis) {
-      return resize.cursors[action.name + action.axis];
+      return cursors[action.name + action.axis];
     }
     else if (action.edges) {
       let cursorKey = '';
@@ -195,8 +188,10 @@ const resize = {
         }
       }
 
-      return resize.cursors[cursorKey];
+      return cursors[cursorKey];
     }
+
+    return null;
   },
 
   defaultMargin: null as number,
@@ -204,7 +199,7 @@ const resize = {
 
 function resizable (interactable, options, scope: Scope) {
   if (utils.is.object(options)) {
-    interactable.options.resize.enabled = options.enabled === false? false: true;
+    interactable.options.resize.enabled = options.enabled === false ? false : true;
     interactable.setPerAction('resize', options);
     interactable.setOnEvents('resize', options);
 
@@ -230,7 +225,7 @@ function resizable (interactable, options, scope: Scope) {
     return interactable;
   }
   return interactable.options.resize;
-};
+}
 
 function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
   // false, '', undefined, null
@@ -239,26 +234,26 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width  = utils.is.number(rect.width )? rect.width  : rect.right  - rect.left;
-    const height = utils.is.number(rect.height)? rect.height : rect.bottom - rect.top ;
+    const width  = utils.is.number(rect.width ) ? rect.width  : rect.right  - rect.left;
+    const height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top;
 
     // don't use margin greater than half the relevent dimension
     margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2);
 
     if (width < 0) {
       if      (name === 'left' ) { name = 'right'; }
-      else if (name === 'right') { name = 'left' ; }
+      else if (name === 'right') { name = 'left';  }
     }
     if (height < 0) {
       if      (name === 'top'   ) { name = 'bottom'; }
-      else if (name === 'bottom') { name = 'top'   ; }
+      else if (name === 'bottom') { name = 'top';    }
     }
 
-    if (name === 'left'  ) { return page.x < ((width  >= 0? rect.left: rect.right ) + margin); }
-    if (name === 'top'   ) { return page.y < ((height >= 0? rect.top : rect.bottom) + margin); }
+    if (name === 'left'  ) { return page.x < ((width  >= 0 ? rect.left : rect.right ) + margin); }
+    if (name === 'top'   ) { return page.y < ((height >= 0 ? rect.top : rect.bottom) + margin); }
 
-    if (name === 'right' ) { return page.x > ((width  >= 0? rect.right : rect.left) - margin); }
-    if (name === 'bottom') { return page.y > ((height >= 0? rect.bottom: rect.top ) - margin); }
+    if (name === 'right' ) { return page.x > ((width  >= 0 ? rect.right : rect.left) - margin); }
+    if (name === 'bottom') { return page.y > ((height >= 0 ? rect.bottom : rect.top ) - margin); }
   }
 
   // the remaining checks require an element
@@ -298,7 +293,7 @@ function initCursors (browser) {
     bottomright: 'nwse-resize',
     topright   : 'nesw-resize',
     bottomleft : 'nesw-resize',
-  })
+  });
 }
 
 function start ({ iEvent, interaction }) {
@@ -421,7 +416,7 @@ function move ({ iEvent, interaction }) {
   }
 
   inverted.width  = inverted.right  - inverted.left;
-  inverted.height = inverted.bottom - inverted.top ;
+  inverted.height = inverted.bottom - inverted.top;
 
   for (const edge in inverted) {
     deltaRect[edge] = inverted[edge] - previous[edge];
@@ -458,4 +453,4 @@ function updateEventAxes ({ interaction, iEvent, action }) {
   }
 }
 
-export default { install };
+export default resize;

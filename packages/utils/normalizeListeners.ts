@@ -1,7 +1,11 @@
+import extend from './extend';
 import * as is from './is';
-import extend  from './extend';
 
-export default function normalize (type, listener?, result?) {
+export default function normalize (
+  type: Interact.Listener | string,
+  listener?: Interact.Listeners,
+  result?: { [type: string]: Interact.Listener[]
+}) {
   result = result || {};
 
   if (is.string(type) && type.search(' ') !== -1) {
@@ -28,7 +32,7 @@ export default function normalize (type, listener?, result?) {
     }
   }
   else if (is.object(listener)) {
-    for (const prefix in listener) {
+    for (const prefix in listener as Interact.Listener) {
       const combinedTypes = split(prefix).map(p => `${type}${p}`);
 
       normalize(combinedTypes, listener[prefix], result);

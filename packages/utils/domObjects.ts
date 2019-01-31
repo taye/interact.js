@@ -1,16 +1,29 @@
-const domObjects = {
+const domObjects: {
+  init: any,
+  document: Document,
+  DocumentFragment: typeof DocumentFragment,
+  SVGElement: typeof SVGElement,
+  SVGSVGElement: typeof SVGSVGElement,
+  SVGElementInstance: any,
+  Element: typeof Element,
+  HTMLElement: typeof HTMLElement,
+  Event: typeof Event,
+  Touch: typeof Touch,
+  PointerEvent: typeof PointerEvent,
+}
+= {
   init,
-  document: null as Document,
-  DocumentFragment: null as typeof DocumentFragment,
-  SVGElement: null as typeof SVGElement,
-  SVGSVGElement: null as typeof SVGSVGElement,
+  document: null as any,
+  DocumentFragment: null as any,
+  SVGElement: null as any,
+  SVGSVGElement: null as any,
   // eslint-disable-next-line no-undef
-  SVGElementInstance: null as typeof SVGElementInstance,
-  Element: null as typeof Element,
-  HTMLElement: null as typeof HTMLElement,
-  Event: null as typeof Event,
-  Touch: null as typeof Touch,
-  PointerEvent: null as typeof PointerEvent,
+  SVGElementInstance: null as any,
+  Element: null as any,
+  HTMLElement: null as any,
+  Event: null as any,
+  Touch: null as any,
+  PointerEvent: null as any,
 };
 
 function blank () {}

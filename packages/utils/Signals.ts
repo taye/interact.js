@@ -1,12 +1,11 @@
+type SignalListener = (signalArg: any, sinalName: string) => (void | boolean);
+
 class Signals {
-  listeners = {
-    // signalName: [listeners],
-  };
+  listeners: {
+    [signalName: string]: SignalListener[],
+  } = {};
 
-  constructor () {
-  }
-
-  on (name, listener) {
+  on (name: string, listener: SignalListener) {
     if (!this.listeners[name]) {
       this.listeners[name] = [listener];
       return;
@@ -15,7 +14,7 @@ class Signals {
     this.listeners[name].push(listener);
   }
 
-  off (name, listener) {
+  off (name: string, listener: SignalListener) {
     if (!this.listeners[name]) { return; }
 
     const index = this.listeners[name].indexOf(listener);
@@ -25,7 +24,7 @@ class Signals {
     }
   }
 
-  fire (name, arg): void | false {
+  fire (name: string, arg: any): void | false {
     const targetListeners = this.listeners[name];
 
     if (!targetListeners) { return; }

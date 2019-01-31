@@ -30,6 +30,6 @@ function createGrid ( grid: (Interact.Rect | Interact.Point) & { range?: number,
 
     return result;
   };
-};
+}
 
 export default createGrid;

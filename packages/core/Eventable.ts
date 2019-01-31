@@ -1,8 +1,11 @@
-import * as arr  from '@interactjs/utils/arr';
-import extend    from '@interactjs/utils/extend';
+import * as arr from '@interactjs/utils/arr';
+import extend from '@interactjs/utils/extend';
 import normalize from '@interactjs/utils/normalizeListeners';
+import InteractEvent from './InteractEvent';
 
-function fireUntilImmediateStopped (event, listeners) {
+type Listener = (event: any) => any;
+
+function fireUntilImmediateStopped (event: InteractEvent, listeners: Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break; }
 
@@ -12,7 +15,9 @@ function fireUntilImmediateStopped (event, listeners) {
 
 class Eventable {
   options: any;
-  types = {};
+  types: {
+    [type: string]: Listener[]
+  } = {};
   propagationStopped = false;
   immediatePropagationStopped = false;
   global: any;
@@ -26,6 +31,7 @@ class Eventable {
     const global = this.global;
 
     // Interactable#on() listeners
+    // tslint:disable no-conditional-assignment
     if ((listeners = this.types[event.type])) {
       fireUntilImmediateStopped(event, listeners);
     }
@@ -36,7 +42,7 @@ class Eventable {
     }
   }
 
-  on (type, listener) {
+  on (type: string, listener: Listener) {
     const listeners = normalize(type, listener);
 
     for (type in listeners) {
@@ -44,7 +50,7 @@ class Eventable {
     }
   }
 
-  off (type, listener) {
+  off (type: string, listener: Listener) {
     const listeners = normalize(type, listener);
 
     for (type in listeners) {

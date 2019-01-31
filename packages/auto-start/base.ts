@@ -1,6 +1,6 @@
 import * as utils from '@interactjs/utils';
 import InteractableMethods from './InteractableMethods';
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope;
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
@@ -10,32 +10,32 @@ declare module '@interactjs/interact/interact' {
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    autoStart: AutoStart
-    maxInteractions: (...args: any) => any
+    autoStart: AutoStart;
+    maxInteractions: (...args: any) => any;
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
-    manualStart?: false,
-    max?: number,
-    maxPerElement?: number,
-    allowFrom?: string | Element,
-    ignoreFrom?: string | Element,
+    manualStart?: boolean;
+    max?: number;
+    maxPerElement?: number;
+    allowFrom?: string | Element;
+    ignoreFrom?: string | Element;
 
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
-    mouseButtons?: 0 | 1 | 2 | 4 | 16,
+    mouseButtons?: 0 | 1 | 2 | 4 | 16;
   }
 }
 
 export interface AutoStart {
   // Allow this many interactions to happen simultaneously
-  maxInteractions: number,
-  withinInteractionLimit: typeof withinInteractionLimit,
-  cursorElement: Element,
-  signals: utils.Signals,
-};
+  maxInteractions: number;
+  withinInteractionLimit: typeof withinInteractionLimit;
+  cursorElement: Element;
+  signals: utils.Signals;
+}
 
 function install (scope: Scope) {
   const {
@@ -213,11 +213,11 @@ function prepare (interaction, { action, target, element }, scope) {
   utils.copyAction(interaction.prepared, action);
 
   if (target && target.options.styleCursor) {
-    const cursor = action? scope.actions[action.name].getCursor(action) : '';
+    const cursor = action ? scope.actions[action.name].getCursor(action) : '';
     setCursor(interaction.element, cursor, scope);
   }
 
-  scope.autoStart.signals.fire('prepared', { interaction: interaction });
+  scope.autoStart.signals.fire('prepared', { interaction });
 }
 
 function withinInteractionLimit (interactable, element, action, scope) {

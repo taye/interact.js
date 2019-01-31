@@ -2,25 +2,6 @@ import InteractEvent from '@interactjs/core/InteractEvent';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 
-
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    gesturable?: (options: any) => Interactable | { [key: string]: any }
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    gesture?: any
-  }
-}
-
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    gesture?: typeof gesture
-  }
-}
-
 function install (scope: Scope) {
   const {
     actions,
@@ -54,7 +35,7 @@ function install (scope: Scope) {
    */
   Interactable.prototype.gesturable = function (options) {
     if (utils.is.object(options)) {
-      this.options.gesture.enabled = options.enabled === false? false: true;
+      this.options.gesture.enabled = options.enabled === false ? false : true;
       this.setPerAction('gesture', options);
       this.setOnEvents('gesture', options);
 
@@ -105,10 +86,11 @@ function install (scope: Scope) {
 }
 
 const gesture = {
+  install,
   defaults: {
   },
 
-  checker: function (_pointer, _event, _interactable, _element, interaction) {
+  checker (_pointer, _event, _interactable, _element, interaction) {
     if (interaction.pointers.length >= 2) {
       return { name: 'gesture' };
     }
@@ -116,7 +98,7 @@ const gesture = {
     return null;
   },
 
-  getCursor: function () {
+  getCursor () {
     return '';
   },
 };
@@ -187,4 +169,4 @@ function updateGestureProps ({ interaction, iEvent, event, phase }) {
   }
 }
 
-export default { install };
+export default gesture;

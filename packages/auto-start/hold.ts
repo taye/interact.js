@@ -1,4 +1,4 @@
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope;
 
 function install (scope: Scope) {
   const {

@@ -2,23 +2,7 @@ import { Scope } from '@interactjs/core/scope';
 import * as arr from '@interactjs/utils/arr';
 import * as is from '@interactjs/utils/is';
 
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    draggable?: (options: any) => Interactable | { [key: string]: any }
-  }
-}
-
-declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    drag?: any
-  }
-}
-
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    drag?: typeof drag
-  }
-}
+export type DraggableMethod = (options: Interact.DraggableOptions) => Interact.Interactable | { [key: string]: any };
 
 function install (scope: Scope) {
   const {
@@ -126,7 +110,7 @@ function move ({ iEvent, interaction }) {
  */
 function draggable (options) {
   if (is.object(options)) {
-    this.options.drag.enabled = options.enabled === false? false: true;
+    this.options.drag.enabled = options.enabled === false ? false : true;
     this.setPerAction('drag', options);
     this.setOnEvents('drag', options);
 
@@ -157,7 +141,7 @@ const drag = {
   defaults: {
     startAxis : 'xy',
     lockAxis  : 'xy',
-  },
+  } as Interact.DropzoneOptions,
 
   checker (_pointer, _event, interactable) {
     const dragOptions = interactable.options.drag;

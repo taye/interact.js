@@ -1,6 +1,6 @@
-import win from './window';
-import * as is from './is';
 import domObjects from './domObjects';
+import * as is from './is';
+import win from './window';
 
 const browser = {
   init,
@@ -78,7 +78,7 @@ function init (window) {
     : null);
 
   // because Webkit and Opera still use 'mousewheel' event type
-  browser.wheelEvent = 'onmousewheel' in domObjects.document? 'mousewheel': 'wheel';
+  browser.wheelEvent = 'onmousewheel' in domObjects.document ? 'mousewheel' : 'wheel';
 }
 
 export default browser;

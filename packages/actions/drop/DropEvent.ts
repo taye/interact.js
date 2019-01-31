@@ -4,17 +4,17 @@ import Interaction from '@interactjs/core/Interaction';
 import * as arr from '@interactjs/utils/arr';
 
 class DropEvent {
-  type: string
-  target: Element
-  currentTarget: Element
-  dropzone: Interactable
-  dragEvent: InteractEvent
-  relatedTarget: Element
-  interaction: Interaction
-  draggable: Interactable
-  timeStamp: number
-  propagationStopped = false
-  immediatePropagationStopped = false
+  type: string;
+  target: Element;
+  currentTarget: Element;
+  dropzone: Interactable;
+  dragEvent: InteractEvent;
+  relatedTarget: Element;
+  interaction: Interaction;
+  draggable: Interactable;
+  timeStamp: number;
+  propagationStopped = false;
+  immediatePropagationStopped = false;
 
   /**
    * Class of events fired on dropzones during drags with acceptable targets.

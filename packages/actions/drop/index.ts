@@ -1,35 +1,46 @@
+import InteractEvent from '@interactjs/core/InteractEvent';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import DropEvent from './DropEvent';
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    dropzone?: (options: any) => Interactable | { [key: string]: any }
-    dropCheck?: (dragEvent, event, draggable, draggableElement, dropElement, rect) => boolean
+    dropzone: (options: any) => Interactable | { [key: string]: any };
+    dropCheck: (
+      dragEvent: InteractEvent,
+      event: Interact.PointerEventType,
+      draggable: Interactable,
+      draggableElement: Element,
+      dropElemen: Element,
+      rect: any
+    ) => boolean;
   }
 }
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    dropStatus?
+    dropStatus?: { [key: string]: any };
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    drop?: any
+    drop?: Interact.DropzoneOptions;
+  }
+  interface Options {
+    drop?: Interact.DropzoneOptions;
   }
 }
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    dynamicDrop?: boolean
+    dynamicDrop?: boolean;
   }
 }
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
-    dynamicDrop: (newValue?: boolean) => boolean | InteractStatic
+    dynamicDrop: (newValue?: boolean) => boolean | typeof import ('@interactjs/interact/interact').default;
   }
 }
 
@@ -178,11 +189,11 @@ function install (scope: Scope) {
    * before start
    * @return {boolean | interact} The current setting or interact
    */
-  interact.dynamicDrop = function (newValue) {
+  interact.dynamicDrop = function (newValue?: boolean) {
     if (utils.is.bool(newValue)) {
-      //if (dragging && scope.dynamicDrop !== newValue && !newValue) {
+      // if (dragging && scope.dynamicDrop !== newValue && !newValue) {
       //  calcRects(dropzones);
-      //}
+      // }
 
       scope.dynamicDrop = newValue;
 
@@ -390,9 +401,9 @@ function onEventCreated ({ interaction, iEvent, event }, scope) {
   dropStatus.events = getDropEvents(interaction, event, dragEvent);
 }
 
-function dropzoneMethod (interactable, options) {
+function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions) {
   if (utils.is.object(options)) {
-    interactable.options.drop.enabled = options.enabled === false? false: true;
+    interactable.options.drop.enabled = options.enabled === false ? false : true;
 
     if (options.listeners) {
       const normalized = utils.normalizeListeners(options.listeners);
@@ -421,7 +432,7 @@ function dropzoneMethod (interactable, options) {
     if (utils.is.func(options.ondragleave)     ) { interactable.on('dragleave'     , options.ondragleave     ); }
     if (utils.is.func(options.ondropmove)      ) { interactable.on('dropmove'      , options.ondropmove      ); }
 
-    if (/^(pointer|center)$/.test(options.overlap)) {
+    if (/^(pointer|center)$/.test(options.overlap as string)) {
       interactable.options.drop.overlap = options.overlap;
     }
     else if (utils.is.number(options.overlap)) {
@@ -509,7 +520,7 @@ const drop = {
     enabled: false,
     accept : null,
     overlap: 'pointer',
-  },
+  } as Interact.DropzoneOptions,
 };
 
 export default drop;

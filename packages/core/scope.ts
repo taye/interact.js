@@ -15,7 +15,7 @@ const {
   events,
 } = utils;
 
-export type Defaults = typeof defaults
+export type Defaults = typeof defaults;
 
 export function createScope () {
   return new Scope();
@@ -23,31 +23,55 @@ export function createScope () {
 
 export class Scope {
     // FIXME Signals
-    signals = new Signals()
-    browser = browser
-    events = events
-    utils = utils
-    defaults: Defaults = utils.clone(defaults) as Defaults
-    Eventable = Eventable
+    signals = new Signals();
+    browser = browser;
+    events = events;
+    utils = utils;
+    defaults: Defaults = utils.clone(defaults) as Defaults;
+    Eventable = Eventable;
 
-    InteractEvent = InteractEvent
-    Interactable: typeof InteractableBase
-    interactables = new InteractableSet(this)
+    InteractEvent = InteractEvent;
+    Interactable!: typeof InteractableBase;
+    interactables = new InteractableSet(this);
 
     // main window
-    _win: Window
+    _win!: Window;
 
     // main document
-    document = null
+    document!: Document;
 
     // all documents being listened to
-    documents = [/* { doc, options } */]
+    documents: Array<{ doc: Document, options: any }> = [];
+
+    constructor () {
+      const scope = this as Scope;
+
+      (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
+        get _defaults () { return scope.defaults; }
+
+        set (options: any) {
+          super.set(options);
+
+          scope.interactables.signals.fire('set', {
+            options,
+            interactable: this,
+          });
+
+          return this;
+        }
+
+        unset () {
+          super.unset();
+          scope.interactables.signals.fire('unset', { interactable: this });
+        }
+      };
+    }
 
     init (window: Window) {
       return initScope(this, window);
     }
 
-    addDocument (doc: Document, options?): void | false {
+    addDocument (doc: Document, options?: any): void | false {
       // do nothing if document is already known
       if (this.getDocIndex(doc) !== -1) { return false; }
 
@@ -67,7 +91,7 @@ export class Scope {
       this.signals.fire('add-document', { doc, window, scope: this, options });
     }
 
-    removeDocument (doc) {
+    removeDocument (doc: Document) {
       const index = this.getDocIndex(doc);
 
       const window = win.getWindow(doc);
@@ -81,11 +105,11 @@ export class Scope {
       this.signals.fire('remove-document', { doc, window, scope: this, options });
     }
 
-    onWindowUnload (event) {
-      this.removeDocument(event.currentTarget.document);
+    onWindowUnload (event: Event) {
+      this.removeDocument(event.target as Document);
     }
 
-    getDocIndex (doc) {
+    getDocIndex (doc: Document) {
       for (let i = 0; i < this.documents.length; i++) {
         if (this.documents[i].doc === doc) {
           return i;
@@ -95,46 +119,22 @@ export class Scope {
       return -1;
     }
 
-    getDocOptions (doc) {
+    getDocOptions (doc: Document) {
       const docIndex = this.getDocIndex(doc);
 
       return docIndex === -1 ? null : this.documents[docIndex].options;
     }
-
-    constructor () {
-      const scope = this;
-
-      (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
-        get _defaults () { return scope.defaults; }
-
-        set (options) {
-          super.set(options);
-
-          scope.interactables.signals.fire('set', {
-            options,
-            interactable: this,
-          });
-
-          return this;
-        }
-
-        unset () {
-          super.unset();
-          scope.interactables.signals.fire('unset', { interactable: this });
-        }
-      }
-    }
 }
 
 class InteractableSet {
-  signals = new utils.Signals()
+  signals = new utils.Signals();
 
   // all set interactables
-  list: InteractableBase[] = []
+  list: InteractableBase[] = [];
 
   constructor (protected scope: Scope) {}
 
-  new (target, options) {
+  new (target: Interact.Target, options: any): InteractableBase {
     options = utils.extend(options || {}, {
       actions: this.scope.actions,
     });
@@ -147,14 +147,14 @@ class InteractableSet {
     this.scope.interactables.signals.fire('new', {
       target,
       options,
-      interactable: interactable,
+      interactable,
       win: this.scope._win,
     });
 
     return interactable;
   }
 
-  indexOfElement (target, context) {
+  indexOfElement (target: Interact.Target, context: Document | Element) {
     context = context || this.scope.document;
 
     const list = this.list;
@@ -173,10 +173,10 @@ class InteractableSet {
   get (element: Interact.Target, options, dontCheckInContext?: boolean) {
     const ret = this.list[this.indexOfElement(element, options && options.context)];
 
-    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element))? ret : null;
+    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null;
   }
 
-  forEachMatch (element, callback) {
+  forEachMatch (element: Document | Element, callback: (interactable: any) => any) {
     for (const interactable of this.list) {
       let ret;
 
@@ -198,7 +198,7 @@ class InteractableSet {
 
 }
 
-export function initScope (scope: Scope, window) {
+export function initScope (scope: Scope, window: Window) {
   win.init(window);
   domObjects.init(window);
   browser.init(window);

@@ -7,19 +7,20 @@ import extend from '@interactjs/utils/extend';
 import * as is from '@interactjs/utils/is';
 import normalizeListeners from '@interactjs/utils/normalizeListeners';
 import { getWindow } from '@interactjs/utils/window';
+import { Defaults, Options } from './defaultOptions';
 import Eventable from './Eventable';
 
 
 /** */
 export class Interactable implements Partial<Eventable> {
-  protected get _defaults () {
+  protected get _defaults (): Defaults {
     return {
       base: {},
       perAction: {},
     };
   }
 
-  options: any;
+  options!: Options;
   _actions: any;
   readonly target: Interact.Target;
   events = new Eventable();
@@ -28,17 +29,17 @@ export class Interactable implements Partial<Eventable> {
   _doc: Document;
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext) {
+  constructor (target: Interact.Target, options: any, defaultContext: Element | Node) {
     this._actions = options.actions;
     this.target   = target;
     this._context = options.context || defaultContext;
-    this._win     = getWindow(trySelector(target)? this._context : target);
+    this._win     = getWindow(trySelector(target) ? this._context : target);
     this._doc     = this._win.document;
 
     this.set(options);
   }
 
-  setOnEvents (actionName, phases) {
+  setOnEvents (actionName: string, phases: { [phase: string]: Interact.Listeners }) {
     if (is.func(phases.onstart)       ) { this.on(`${actionName}start`       , phases.onstart       ); }
     if (is.func(phases.onmove)        ) { this.on(`${actionName}move`        , phases.onmove        ); }
     if (is.func(phases.onend)         ) { this.on(`${actionName}end`         , phases.onend         ); }
@@ -57,7 +58,7 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  setPerAction (actionName, options) {
+  setPerAction (actionName, options: Options) {
     const defaults = this._defaults;
 
     // for all the default per-action options
@@ -84,7 +85,7 @@ export class Interactable implements Partial<Eventable> {
 
         // set anabled field to true if it exists in the defaults
         if (is.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
-          actionOptions[optionName].enabled = optionValue.enabled === false? false : true;
+          actionOptions[optionName].enabled = optionValue.enabled === false ? false : true;
         }
       }
       // if the option value is a boolean and the default is an object

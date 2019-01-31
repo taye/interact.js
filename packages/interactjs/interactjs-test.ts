@@ -10,7 +10,7 @@ interact('.drag-and-resize')
     snap: {
       targets: [
         { x: 100, y: 200 },
-        function (x, y) { return { x: x % 20, y: y }; }
+        function (x: number, y: number) { return { x: x % 20, y }; }
       ]}
   })
   .resizable({
@@ -26,7 +26,7 @@ interact('li', {
   .draggable({ /* ... */ });
 
 // Action options
-const target = 'li'
+const target = 'li';
 interact(target)
   .draggable({
     max          : 1,
@@ -60,7 +60,7 @@ interact(target)
   });
 
 // autoscroll
-const element = 'li'
+const element = 'li';
 interact(element)
   .draggable({
     autoScroll: true,
@@ -83,12 +83,12 @@ interact(target).resizable({
   axis: 'x'
 });
 
-const handleEl = 'li'
+const handleEl = 'li';
 interact(target).resizable({
   edges: {
     top   : true,       // Use pointer coords to check for resize.
     left  : false,      // Disable resizing from left edge.
-    bottom: '.resize-s',// Resize if pointer target matches selector
+    bottom: '.resize-s', // Resize if pointer target matches selector
     right : handleEl    // Resize if pointer target is the given Element
   }
 });
@@ -116,14 +116,14 @@ interact(target).dropzone({
 
 // dropzone checker
 interact(target).dropzone({
-  checker: function (
-    _dragEvent,           // related dragmove or dragend
-    _event,               // Touch, Pointer or Mouse Event
-    dropped,              // bool default checker result
-    _dropzone,            // dropzone Interactable
-    dropElement,          // dropzone elemnt
-    _draggable,           // draggable Interactable
-    _draggableElement) {  // draggable element
+  checker (
+    _dragEvent: Element,          // related dragmove or dragend
+    _event: Event,                // Touch, Pointer or Mouse Event
+    dropped: boolean,             // bool default checker result
+    _dropzone: Interact.Interactable,      // dropzone Interactable
+    dropElement: Element,         // dropzone elemnt
+    _draggable: Interact.Interactable,     // draggable Interactable
+    _draggableElement: Element) { // draggable element
 
 
     // only allow drops into empty dropzone elements
@@ -131,8 +131,8 @@ interact(target).dropzone({
   }
 });
 
-interact.dynamicDrop()
-interact.dynamicDrop(false)
+interact.dynamicDrop();
+interact.dynamicDrop(false);
 
 // Events
 function listener (event) {
@@ -161,11 +161,11 @@ interact(target).draggable({
 
 interact.on(['dragmove', 'resizestart'], listener);
 
-const dropTarget = 'div'
+const dropTarget = 'div';
 // Drop Events
 interact(dropTarget)
   .dropzone({
-    ondrop: function (event) {
+    ondrop (event) {
       alert(event.relatedTarget.id
             + ' was dropped into '
             + event.target.id);

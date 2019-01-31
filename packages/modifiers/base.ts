@@ -4,13 +4,13 @@ import extend from '@interactjs/utils/extend';
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    modifiers?: any
+    modifiers?: any;
   }
 }
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    modifiers?: any
+    modifiers?: any;
   }
 }
 
@@ -31,8 +31,9 @@ function install (scope: Scope) {
     };
   });
 
-  interactions.signals.on('before-action-start' , arg =>
-    start(arg, arg.interaction.coords.start.page, scope.modifiers));
+  interactions.signals.on('before-action-start' , arg => {
+    start(arg, arg.interaction.coords.start.page, scope.modifiers);
+  });
 
   interactions.signals.on('action-resume', arg => {
     beforeMove(arg);
@@ -84,10 +85,10 @@ function start (
   const modifierList = getModifierList(interaction, registeredModifiers);
   const states = prepareStates(modifierList);
 
-  const rect = extend({}, interactable.getRect(element as Element)) as  Interact.Rect & Interact.Rect2
+  const rect = extend({}, interactable.getRect(element as Element)) as  Interact.Rect & Interact.Rect2;
 
   if (!('width'  in rect)) { rect.width  = rect.right  - rect.left; }
-  if (!('height' in rect)) { rect.height = rect.bottom - rect.top ; }
+  if (!('height' in rect)) { rect.height = rect.bottom - rect.top;  }
 
   const startOffset = getRectOffset(rect, pageCoords);
 

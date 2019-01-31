@@ -1,42 +1,45 @@
 /** @module interact */
 
+import { Options } from '@interactjs/core/defaultOptions';
+import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import browser from '@interactjs/utils/browser';
 import events from '@interactjs/utils/events';
 
 export interface Plugin extends Partial<any>{
-  install ( scope: any ) : void // TODO: Add typings for scope
+  install (scope: any): void;
 }
 
 declare module '@interactjs/core/scope' {
   interface Scope {
-    interact: typeof interactExport
-    _plugins: Plugin[]
+    interact: InteractStatic;
+    _plugins: Plugin[];
   }
 }
 
 export interface InteractStatic {
-  on: typeof on
-  pointerMoveTolerance: typeof pointerMoveTolerance
-  stop: typeof stop
-  supportsPointerEvent: typeof supportsPointerEvent
-  supportsTouch: typeof supportsTouch
-  debug: typeof debug
-  off: typeof off
-  isSet: typeof isSet
-  use: typeof use
-  getPointerAverage: typeof utils.pointer.pointerAverage
-  getTouchBBox: typeof utils.pointer.touchBBox
-  getTouchDistance: typeof utils.pointer.touchDistance
-  getTouchAngle: typeof utils.pointer.touchAngle
-  getElementRect: typeof utils.dom.getElementRect
-  getElementClientRect: typeof utils.dom.getElementClientRect
-  matchesSelector: typeof utils.dom.matchesSelector
-  closest: typeof utils.dom.closest
-  addDocument: typeof scope.addDocument
-  removeDocument: typeof scope.removeDocument
-  version: string
+  (target: Interact.Target, options?: Options): Interactable;
+  on: typeof on;
+  pointerMoveTolerance: typeof pointerMoveTolerance;
+  stop: typeof stop;
+  supportsPointerEvent: typeof supportsPointerEvent;
+  supportsTouch: typeof supportsTouch;
+  debug: typeof debug;
+  off: typeof off;
+  isSet: typeof isSet;
+  use: typeof use;
+  getPointerAverage: typeof utils.pointer.pointerAverage;
+  getTouchBBox: typeof utils.pointer.touchBBox;
+  getTouchDistance: typeof utils.pointer.touchDistance;
+  getTouchAngle: typeof utils.pointer.touchAngle;
+  getElementRect: typeof utils.dom.getElementRect;
+  getElementClientRect: typeof utils.dom.getElementClientRect;
+  matchesSelector: typeof utils.dom.matchesSelector;
+  closest: typeof utils.dom.closest;
+  addDocument: typeof scope.addDocument;
+  removeDocument: typeof scope.removeDocument;
+  version: string;
 }
 
 const globalEvents: any = {};
@@ -44,14 +47,14 @@ const scope = new Scope();
 
 /**
  * ```js
- * interact('#draggable').draggable(true);
+ * interact('#draggable').draggable(true)
  *
- * var rectables = interact('rect');
+ * var rectables = interact('rect')
  * rectables
  *   .gesturable(true)
  *   .on('gesturemove', function (event) {
  *       // ...
- *   });
+ *   })
  * ```
  *
  * The methods of this variable can be used to set elements as interactables
@@ -67,7 +70,7 @@ const scope = new Scope();
  * or CSS selector
  * @return {Interactable}
  */
-export function interact<InteractStatic> (target: Interact.Target, options?: any) {
+export const interact: InteractStatic = function interact (target: Interact.Target, options?: any) {
   let interactable = scope.interactables.get(target, options);
 
 
@@ -77,7 +80,7 @@ export function interact<InteractStatic> (target: Interact.Target, options?: any
   }
 
   return interactable;
-}
+} as InteractStatic;
 
 scope._plugins = [];
 
@@ -89,7 +92,7 @@ scope._plugins = [];
  * @param {Object} plugin
  * @param {function} plugin.install
  * @return {interact}
-*/
+ */
 interact.use = use;
 function use (plugin: Plugin) {
   if (scope._plugins.indexOf(plugin) !== -1) {
@@ -99,7 +102,7 @@ function use (plugin: Plugin) {
   plugin.install(scope);
   scope._plugins.push(plugin);
   return interact;
-};
+}
 
 /**
  * Check if an element or selector has been set with the {@link interact}
@@ -110,11 +113,11 @@ function use (plugin: Plugin) {
  * @param {Element} element The Element being searched for
  * @return {boolean} Indicates if the element or CSS selector was previously
  * passed to interact
-*/
+ */
 interact.isSet = isSet;
 function isSet (element: Element, options?: any) {
   return scope.interactables.indexOfElement(element, options && options.context) !== -1;
-};
+}
 
 /**
  * Add a global listener for an InteractEvent or adds a DOM event to `document`
@@ -128,7 +131,7 @@ function isSet (element: Element, options?: any) {
  * @return {object} interact
  */
 interact.on = on;
-function on (type: String | Interact.EventTypes, listener: Interact.Listeners, options?) {
+function on (type: string | Interact.EventTypes, listener: Interact.Listeners, options?) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
@@ -143,7 +146,7 @@ function on (type: String | Interact.EventTypes, listener: Interact.Listeners, o
 
   if (utils.is.object(type)) {
     for (const prop in type) {
-      interact.on(prop, type[prop], listener);
+      interact.on(prop, (type as Interact.EventTypes)[prop], listener);
     }
 
     return interact;
@@ -161,11 +164,11 @@ function on (type: String | Interact.EventTypes, listener: Interact.Listeners, o
   }
   // If non InteractEvent type, addEventListener to document
   else {
-    events.add(scope.document, type, listener as Function, { options });
+    events.add(scope.document, type, listener as Interact.Listener, { options });
   }
 
   return interact;
-};
+}
 
 /**
  * Removes a global InteractEvent listener or DOM event from `document`
@@ -214,11 +217,10 @@ function off (type, listener, options) {
   }
 
   return interact;
-};
+}
 
 /**
  * Returns an object which exposes internal data
-
  * @alias module:interact.debug
  *
  * @return {object} An object with properties that outline the current state
@@ -227,7 +229,7 @@ function off (type, listener, options) {
 interact.debug = debug;
 function debug () {
   return scope;
-};
+}
 
 // expose the functions used to calculate multi-touch properties
 interact.getPointerAverage  = utils.pointer.pointerAverage;
@@ -248,7 +250,7 @@ interact.closest              = utils.dom.closest;
 interact.supportsTouch = supportsTouch;
 function supportsTouch () {
   return browser.supportsTouch;
-};
+}
 
 /**
  * @alias module:interact.supportsPointerEvent
@@ -258,7 +260,7 @@ function supportsTouch () {
 interact.supportsPointerEvent = supportsPointerEvent;
 function supportsPointerEvent () {
   return browser.supportsPointerEvent;
-};
+}
 
 /**
  * Cancels all interactions (end events are not fired)
@@ -274,7 +276,7 @@ function stop () {
   }
 
   return interact;
-};
+}
 
 /**
  * Returns or sets the distance the pointer must be moved before an action
@@ -294,7 +296,7 @@ function pointerMoveTolerance (newValue) {
   }
 
   return scope.interactions.pointerMoveTolerance;
-};
+}
 
 scope.interactables.signals.on('unset', ({ interactable }) => {
   scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1);
@@ -310,8 +312,7 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 interact.addDocument    = scope.addDocument;
 interact.removeDocument = scope.removeDocument;
 
-export const interactExport = interact as InteractStatic & typeof interact
-scope.interact = interactExport;
+scope.interact = interact;
 
 export { scope };
-export default interactExport;
+export default interact;

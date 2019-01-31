@@ -6,7 +6,7 @@ import * as is from './is';
 import pointerExtend from './pointerExtend';
 
 const pointerUtils = {
-  copyCoords: function (dest, src) {
+  copyCoords (dest, src) {
     dest.page = dest.page || {};
     dest.page.x = src.page.x;
     dest.page.y = src.page.y;
@@ -18,7 +18,7 @@ const pointerUtils = {
     dest.timeStamp = src.timeStamp;
   },
 
-  setCoordDeltas: function (targetObj, prev, cur) {
+  setCoordDeltas (targetObj, prev, cur) {
     targetObj.page.x    = cur.page.x    - prev.page.x;
     targetObj.page.y    = cur.page.y    - prev.page.y;
     targetObj.client.x  = cur.client.x  - prev.client.x;
@@ -36,12 +36,12 @@ const pointerUtils = {
     targetObj.timeStamp = dt;
   },
 
-  isNativePointer: function  (pointer) {
+  isNativePointer  (pointer) {
     return (pointer instanceof dom.Event || pointer instanceof dom.Touch);
   },
 
   // Get specified X/Y coords for mouse or event.touches[0]
-  getXY: function (type, pointer, xy) {
+  getXY (type, pointer, xy) {
     xy = xy || {};
     type = type || 'page';
 
@@ -51,7 +51,7 @@ const pointerUtils = {
     return xy;
   },
 
-  getPageXY: function (pointer: Interact.PointerType, page?: Interact.Point) {
+  getPageXY (pointer: Interact.PointerType, page?: Interact.Point) {
     page = page || { x: 0, y: 0 };
 
     // Opera Mobile handles the viewport and scrolling oddly
@@ -68,7 +68,7 @@ const pointerUtils = {
     return page;
   },
 
-  getClientXY: function (pointer, client) {
+  getClientXY (pointer, client) {
     client = client || {};
 
     if (browser.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
@@ -82,11 +82,11 @@ const pointerUtils = {
     return client;
   },
 
-  getPointerId: function (pointer) {
-    return is.number(pointer.pointerId)? pointer.pointerId : pointer.identifier;
+  getPointerId (pointer) {
+    return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
   },
 
-  setCoords: function (targetObj, pointers: any[], timeStamp?: number) {
+  setCoords (targetObj, pointers: any[], timeStamp?: number) {
     const pointer = (pointers.length > 1
       ? pointerUtils.pointerAverage(pointers)
       : pointers[0]);
@@ -101,12 +101,12 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
 
-    targetObj.timeStamp = is.number(timeStamp) ? timeStamp :new Date().getTime();
+    targetObj.timeStamp = is.number(timeStamp) ? timeStamp : new Date().getTime();
   },
 
-  pointerExtend: pointerExtend,
+  pointerExtend,
 
-  getTouchPair: function (event) {
+  getTouchPair (event) {
     const touches = [];
 
     // array of touches is supplied
@@ -135,7 +135,7 @@ const pointerUtils = {
     return touches;
   },
 
-  pointerAverage: function (pointers: PointerEvent[] | Event[]) {
+  pointerAverage (pointers: PointerEvent[] | Event[]) {
     const average = {
       pageX  : 0,
       pageY  : 0,
@@ -157,7 +157,7 @@ const pointerUtils = {
     return average;
   },
 
-  touchBBox: function (event: Event | PointerEvent[]) {
+  touchBBox (event: Event | PointerEvent[]) {
     if (!(event as any).length &&
         !((event as TouchEvent).touches &&
           (event as TouchEvent).touches.length > 1)) {
@@ -180,7 +180,7 @@ const pointerUtils = {
     };
   },
 
-  touchDistance: function (event, deltaSource) {
+  touchDistance (event, deltaSource) {
     const sourceX = deltaSource + 'X';
     const sourceY = deltaSource + 'Y';
     const touches = pointerUtils.getTouchPair(event);
@@ -192,7 +192,7 @@ const pointerUtils = {
     return hypot(dx, dy);
   },
 
-  touchAngle: function (event, deltaSource) {
+  touchAngle (event, deltaSource) {
     const sourceX = deltaSource + 'X';
     const sourceY = deltaSource + 'Y';
     const touches = pointerUtils.getTouchPair(event);
@@ -203,11 +203,11 @@ const pointerUtils = {
     return  angle;
   },
 
-  getPointerType: function (pointer) {
+  getPointerType (pointer) {
     return is.string(pointer.pointerType)
       ? pointer.pointerType
       : is.number(pointer.pointerType)
-        ? [undefined, undefined,'touch', 'pen', 'mouse'][pointer.pointerType]
+        ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType]
         // if the PointerEvent API isn't available, then the "pointer" must
         // be either a MouseEvent, TouchEvent, or Touch object
         : /touch/.test(pointer.type) || pointer instanceof domObjects.Touch
@@ -216,7 +216,7 @@ const pointerUtils = {
   },
 
   // [ event.target, event.currentTarget ]
-  getEventTargets: function (event) {
+  getEventTargets (event) {
     const path = is.func(event.composedPath) ? event.composedPath() : event.path;
 
     return [
@@ -233,7 +233,7 @@ const pointerUtils = {
     };
   },
 
-  coordsToEvent: function ({ page, client, timeStamp }) {
+  coordsToEvent ({ page, client, timeStamp }) {
     return {
       page,
       client,

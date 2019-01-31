@@ -1,8 +1,8 @@
-import modifiers  from '@interactjs/modifiers/base';
+import modifiers from '@interactjs/modifiers/base';
 import * as utils from '@interactjs/utils';
-import raf        from '@interactjs/utils/raf';
+import raf from '@interactjs/utils/raf';
 
-type Scope = import('@interactjs/core/scope').Scope;
+type Scope = import ('@interactjs/core/scope').Scope;
 
 function install (scope: Scope) {
   const {

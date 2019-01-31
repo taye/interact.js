@@ -59,7 +59,7 @@ function set ({ interaction, coords, state }) {
   state.realX = page.x;
   state.realY = page.y;
 
-  let len = options.targets? options.targets.length : 0;
+  let len = options.targets ? options.targets.length : 0;
 
   for (const offset of offsets) {
 
@@ -81,7 +81,7 @@ function set ({ interaction, coords, state }) {
         x: utils.is.number(target.x) ? (target.x + offset.x) : relativeX,
         y: utils.is.number(target.y) ? (target.y + offset.y) : relativeY,
 
-        range: utils.is.number(target.range)? target.range: options.range,
+        range: utils.is.number(target.range) ? target.range : options.range,
       });
     }
   }

@@ -52,5 +52,14 @@ export function init (window: Window): typeof interact {
 interact.version = init.version = process.env.npm_package_version;
 
 export default interact;
-export { interact };
+export {
+  interact,
+  actions,
+  autoScroll,
+  interactablePreventDefault,
+  inertia,
+  modifiersBase as modifiers,
+  pointerEvents,
+  reflow,
+};
 

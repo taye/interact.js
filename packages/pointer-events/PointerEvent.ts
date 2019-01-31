@@ -2,23 +2,24 @@ import Interaction from '@interactjs/core/Interaction';
 import pointerUtils from '@interactjs/utils/pointerUtils';
 
 /** */
-export default class PointerEvent {
-  interaction: Interaction
-  timeStamp: number
-  originalEvent: Interact.PointerEventType
-  type: string
-  pointerId: number
-  pointerType: string
-  target: Node | Window
-  currentTarget: Node | Window
-  double: boolean
-  pageX: number
-  pageY: number
-  clientX: number
-  clientY: number
-  dt: number
-  propagationStopped = false
-  immediatePropagationStopped = false
+export default class PointerEvent<T extends string> {
+  interaction: Interaction;
+  timeStamp: number;
+  originalEvent: Interact.PointerEventType;
+  type: T;
+  pointerId: number;
+  pointerType: string;
+  target: Node | Window;
+  currentTarget: Node | Window;
+  double: boolean;
+  pageX: number;
+  pageY: number;
+  clientX: number;
+  clientY: number;
+  dt: number;
+  eventable: any;
+  propagationStopped = false;
+  immediatePropagationStopped = false;
 
   /** */
   constructor (type, pointer, event, eventTarget, interaction) {
