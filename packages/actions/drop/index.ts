@@ -25,7 +25,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    drop?: Interact.DropzoneOptions
+    drop: Interact.DropzoneOptions
   }
   interface Options {
     drop?: Interact.DropzoneOptions
@@ -40,7 +40,7 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
-    dynamicDrop: (newValue?: boolean) => boolean | typeof import ('@interactjs/interact/interact').default
+    dynamicDrop: (newValue?: boolean) => boolean | Interact.interact
   }
 }
 
@@ -158,7 +158,7 @@ function install (scope: Scope) {
    * @param {boolean | object | null} [options] The new options to be set.
    * @return {boolean | Interactable} The current setting or this Interactable
    */
-  Interactable.prototype.dropzone = function (options) {
+  Interactable.prototype.dropzone = function (this: Interact.Interactable, options) {
     return dropzoneMethod(this, options)
   }
 
@@ -177,7 +177,7 @@ function install (scope: Scope) {
    * }
    * ```
    */
-  Interactable.prototype.dropCheck = function (dragEvent, event, draggable, draggableElement, dropElement, rect) {
+  Interactable.prototype.dropCheck = function (this: Interact.Interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
     return dropCheckMethod(this, dragEvent, event, draggable, draggableElement, dropElement, rect)
   }
 
@@ -456,7 +456,15 @@ function dropzoneMethod (interactable: Interact.Interactable, options: Interact.
   return interactable.options.drop
 }
 
-function dropCheckMethod (interactable, dragEvent, event, draggable, draggableElement, dropElement, rect) {
+function dropCheckMethod (
+  interactable: Interact.Interactable,
+  dragEvent: InteractEvent,
+  event: Interact.PointerEventType,
+  draggable: Interact.Interactable,
+  draggableElement: Element,
+  dropElement: Element,
+  rect: any
+) {
   let dropped = false
 
   // if the dropzone has no rect (eg. display: none)

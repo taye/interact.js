@@ -1,5 +1,3 @@
-/* browser entry point */
-
 import * as actions from '@interactjs/actions'
 import autoScroll from '@interactjs/auto-scroll'
 import * as autoStart from '@interactjs/auto-start'

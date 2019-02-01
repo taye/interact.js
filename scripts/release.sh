@@ -83,10 +83,17 @@ run_build() {
   echo_funcname
 
   # copy license file
-  npx lerna exec --no-private -- cp -v $ROOT/LICENSE .
+  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . &&
+
+  # copy README
+  cp $ROOT/README.md packages/interactjs/ &&
 
   # generate .js and .d.ts files
-  npx tsc --emitDeclarationOnly false -p $ROOT
+  npx tsc --emitDeclarationOnly false -p $ROOT &&
+
+  # copy .npmignore to all packages
+  npx lerna exec --no-private -- "echo '# copied from ../../.npmignore' > .npmignore
+    cat ../../.npmignore >> .npmignore" &&
 
   # build packages
   npx lerna run --no-private build -- $BUILD_ARG || exit $?

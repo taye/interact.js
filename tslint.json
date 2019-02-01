@@ -18,6 +18,7 @@
       "no-empty": false,
       "no-inferrable-types": [true, "ignore-properties"],
       "no-namespace": false,
+      "no-reference": false,
       "no-shadowed-variable": false,
       "object-literal-shorthand": true,
       "object-literal-sort-keys": false,

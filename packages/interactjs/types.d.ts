@@ -5,20 +5,23 @@
 
 import { Options as _Options } from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
-import _Interaction from '@interactjs/core/Interaction'
-import { Action } from '@interactjs/core/Interaction'
-import interact from '@interactjs/interact/interact'
+import _InteractEvent from '@interactjs/core/InteractEvent'
+import _Interaction, { Action } from '@interactjs/core/Interaction'
+import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
 
 declare namespace Interact {
   export type Target = Window | Document | Element | string
   export type interact = typeof interact
+  export type Plugin = _Plugin
   export type Interactable = _Interactable
   export type Interaction = _Interaction
+  export type InteractEvent = _InteractEvent
   export type Options = _Options
 
   export interface Point {
     x: number
     y: number
+    [index: string]: number
   }
 
   export interface SnapPosition {
@@ -32,6 +35,7 @@ declare namespace Interact {
     left: number
     bottom: number
     right: number
+    [index: string]: number
   }
 
   export interface Rect2 {
@@ -39,15 +43,16 @@ declare namespace Interact {
     y: number
     width: number
     height: number
+    [index: string]: number
   }
 
   export interface Rect3 {
     width: number
     height: number
+    [index: string]: number
   }
 
-  export type SnapFunction = ( x: number, y: number ) => SnapPosition
-
+  export type SnapFunction = (x: number, y: number) => SnapPosition
 
   export type SnapTarget = SnapPosition | SnapFunction
   export interface SnapOptions {
@@ -100,6 +105,7 @@ declare namespace Interact {
     left?: boolean | CSSSelector | DOMElement
     bottom?: boolean | CSSSelector | DOMElement
     right?: boolean | CSSSelector | DOMElement
+    [key: string]: boolean | CSSSelector | DOMElement;
   }
 
   export type CommonOptions = Options
@@ -134,29 +140,29 @@ declare namespace Interact {
   ) => boolean
 
   export interface ResizableOptions extends Options {
-    snapSize?: SnapOptions
-    restrictSize?: RestrictSizeOption
     square?: boolean
-    edges?: EdgeOptions
+    preserveAspectRatio: boolean,
+    edges?: EdgeOptions | null
     // deprecated
     axis?: 'x' | 'y' | 'xy'
     //
     invert?: 'none' | 'negate' | 'reposition'
+    margin: number,
     squareResize?: boolean
     oninertiastart?: Listeners
   }
 
   export type GesturableOptions = Options
 
-  export type ActionChecker =
-    ( pointerEvent: any
-    , defaultAction: string
-    , interactable: Interactable
-    , element: DOMElement
-    , interaction: Interaction
-    ) => Action
+  export type ActionChecker = (
+    pointerEvent: any,
+    defaultAction: string,
+    interactable: Interactable,
+    element: DOMElement,
+    interaction: Interaction,
+  ) => Action
 
-  export type OriginFunction = ( target: DOMElement )  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
+  export type OriginFunction = (target: DOMElement)  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
 
   export interface PointerEventsOptions {
     holdDuration?: number
@@ -165,7 +171,7 @@ declare namespace Interact {
     origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction
   }
 
-  export type RectChecker = ( element: Element )  => Partial<Rect & Rect3>
+  export type RectChecker = (element: Element)  => Partial<Rect & Rect3>
 
   export type PointerEventType = MouseEvent | TouchEvent | PointerEvent
   export type PointerType = MouseEvent | Touch | PointerEvent
@@ -176,7 +182,6 @@ declare namespace Interact {
 
   export type Listener = (...args: any) => any
   export type Listeners = Listener | Listener[]
-
 
   export type OnEventName =
     'dragstart'

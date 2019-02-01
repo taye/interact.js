@@ -1,7 +1,6 @@
 import { Action, Interaction } from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
-type Interactable = import ('@interactjs/core/Interactable').default
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 
@@ -75,7 +74,7 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of resize elements, or this Interactable
    */
-  Interactable.prototype.resizable = function (options) {
+  Interactable.prototype.resizable = function (this: Interact.Interactable, options) {
     return resizable(this, options, scope)
   }
 
@@ -119,7 +118,7 @@ const resize = {
   checker (
     _pointer: Interact.PointerType,
     _event: Interact.PointerEventType,
-    interactable: Interactable,
+    interactable: Interact.Interactable,
     element: Element,
     interaction: Interaction,
     rect: Interact.Rect
@@ -194,10 +193,10 @@ const resize = {
     return null
   },
 
-  defaultMargin: null as number,
+  defaultMargin: null as unknown as number,
 }
 
-function resizable (interactable, options, scope: Scope) {
+function resizable (interactable: Interact.Interactable, options: Interact.Options, scope: Scope) {
   if (utils.is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
     interactable.setPerAction('resize', options)
@@ -227,7 +226,7 @@ function resizable (interactable, options, scope: Scope) {
   return interactable.options.resize
 }
 
-function checkResizeEdge (name, value, page, element, interactableElement, rect, margin) {
+function checkResizeEdge (name: string, value: any, page: Interact.Point, element: Node, interactableElement: Element, rect: Interact.Rect, margin: number) {
   // false, '', undefined, null
   if (!value) { return false }
 
@@ -241,11 +240,11 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2)
 
     if (width < 0) {
-      if      (name === 'left') { name = 'right' }
+      if      (name === 'left')  { name = 'right' }
       else if (name === 'right') { name = 'left'  }
     }
     if (height < 0) {
-      if      (name === 'top') { name = 'bottom' }
+      if      (name === 'top')    { name = 'bottom' }
       else if (name === 'bottom') { name = 'top'    }
     }
 
@@ -266,7 +265,7 @@ function checkResizeEdge (name, value, page, element, interactableElement, rect,
     : utils.dom.matchesUpTo(element, value, interactableElement)
 }
 
-function initCursors (browser) {
+function initCursors (browser: typeof import('@interactjs/utils/browser').default) {
   return (browser.isIe9 ? {
     x : 'e-resize',
     y : 's-resize',

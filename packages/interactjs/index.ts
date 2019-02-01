@@ -1,3 +1,4 @@
+/// <reference path="./types.d.ts" />
 import interact, { init as initInteract } from '@interactjs/interact'
 import * as modifiers from '@interactjs/modifiers'
 import extend from '@interactjs/utils/extend'

@@ -16,16 +16,16 @@ export class Interactable implements Partial<Eventable> {
     return {
       base: {},
       perAction: {},
-    }
+    } as Defaults
   }
 
-  options!: Options
-  _actions: any
+  options!: Required<Options>
+  readonly _actions: any
   readonly target: Interact.Target
-  events = new Eventable()
-  _context: Element
-  _win: Window
-  _doc: Document
+  readonly events = new Eventable()
+  readonly _context: Element
+  readonly _win: Window
+  readonly _doc: Document
 
   /** */
   constructor (target: Interact.Target, options: any, defaultContext: Element | Node) {
@@ -288,7 +288,7 @@ export class Interactable implements Partial<Eventable> {
       options = {}
     }
 
-    this.options = clone(defaults.base)
+    this.options = clone(defaults.base) as Required<Options>
 
     for (const actionName in this._actions.methodDict) {
       const methodName = this._actions.methodDict[actionName]

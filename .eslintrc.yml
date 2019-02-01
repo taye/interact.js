@@ -11,36 +11,42 @@ parser: '@typescript-eslint/parser'
 parserOptions:
   sourceType: module
   ecmaVersion: 2018
+  project: './tsconfig.json'
 
 plugins:
   - '@typescript-eslint'
+  - '@typescript-eslint/tslint'
 
 rules:
-  brace-style: 0
-  comma-dangle: [2, 'always-multiline']
-  comma-style: [2, last]
-  guard-for-in: 0
-  key-spacing: 0
-  linebreak-style: [2, unix]
-  no-caller: 2
-  no-console: 0
-  no-empty: 0
-  no-multi-spaces: 0
-  no-shadow: 2
-  no-useless-constructor: 0
-  no-var: 2
-  node/no-extraneous-import: [2, { allowModules: ['@interactjs/_dev'] }]
-  node/no-missing-import: 2
-  node/no-unsupported-features/es-syntax: 0
-  prefer-arrow-callback: [2, { allowNamedFunctions: true }]
-  prefer-const: 2
-  standard/array-bracket-even-spacing: 0
-  standard/computed-property-even-spacing: 0
-  standard/object-curly-even-spacing: 0
+  brace-style: off
+  comma-dangle: [error, 'always-multiline']
+  comma-style: [error, last]
+  guard-for-in: off
+  key-spacing: off
+  linebreak-style: [error, unix]
+  no-caller: error
+  no-console: off
+  no-empty: off
+  no-multi-spaces: off
+  no-shadow: error
+  no-useless-constructor: off
+  no-var: error
+  node/no-extraneous-import: [error, { allowModules: ['@interactjs/_dev'] }]
+  node/no-missing-import: error
+  node/no-unsupported-features/es-syntax: off
+  prefer-arrow-callback: [error, { allowNamedFunctions: true }]
+  prefer-const: error
+  standard/array-bracket-even-spacing: off
+  standard/computed-property-even-spacing: off
+  standard/object-curly-even-spacing: off
+  '@typescript-eslint/interface-name-prefix': [error, 'never']
+  '@typescript-eslint/member-accessibility': off
+  '@typescript-eslint/no-empty-interface': error
+  '@typescript-eslint/no-inferrable-types': [error, { ignoreProperties: true }]
 
 overrides:
   files: '*.ts'
   rules:
-    no-unused-vars: 0
-    no-use-before-define: 0
-    node/no-missing-import: 0
+    no-unused-vars: off
+    no-use-before-define: off
+    node/no-missing-import: off

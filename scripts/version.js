@@ -1,23 +1,23 @@
-const child_process = require('child_process');
-const fs            = require('fs');
-const semver        = require('semver');
-const gitRev        = require('./gitRev');
+const childProcess = require('child_process')
+const fs           = require('fs')
+const semver       = require('semver')
+const gitRev       = require('./gitRev')
 
 const version = {
   get ({ updateMetadata = true } = {}) {
-    const pkg = JSON.parse(fs.readFileSync('package.json').toString());
+    const pkg = JSON.parse(fs.readFileSync('package.json').toString())
 
-    const parsed = semver.parse(pkg.version);
-    const dirty = child_process.execSync(`
+    const parsed = semver.parse(pkg.version)
+    const dirty = childProcess.execSync(`
       git diff-index --quiet HEAD -- . ':!dist' ':!package.json' &&
       git diff --quiet -- . ':!dist' ||
-      echo -dirty`).toString().trim();
-    const matchedMetadata = parsed.raw.match(/[+].*$/);
+      echo -dirty`).toString().trim()
+    const matchedMetadata = parsed.raw.match(/[+].*$/)
     const newMetadata = updateMetadata
       ? `+sha.${gitRev.short()}`.trim()
-      : matchedMetadata? matchedMetadata[0] : '';
+      : matchedMetadata ? matchedMetadata[0] : ''
 
-    return `v${parsed.version}${newMetadata}${dirty}`;
+    return `v${parsed.version}${newMetadata}${dirty}`
   },
 
   bump ({
@@ -25,35 +25,35 @@ const version = {
     release = 'minor',
     prereleaseId,
   }) {
-    const semverArgs = [prev, release, prereleaseId];
+    const semverArgs = [prev, release, prereleaseId]
 
-    let newVersion = semver.inc(...semverArgs);
+    let newVersion = semver.inc(...semverArgs)
 
     if (newVersion === null) {
-      throw `Invalid args to semver.inc (${semverArgs.join()})`;
+      throw Error(`Invalid args to semver.inc (${semverArgs.join()})`)
     }
 
     if (release === 'prerelease') {
-      newVersion += `+sha.${gitRev.short()}`;
+      newVersion += `+sha.${gitRev.short()}`
     }
 
-    return newVersion;
+    return newVersion
   },
 
   write (newVersion) {
-    const pkgFile = 'package.json';
+    const pkgFile = 'package.json'
 
-    const pkg = JSON.parse(fs.readFileSync(pkgFile).toString());
-    pkg.version = newVersion;
+    const pkg = JSON.parse(fs.readFileSync(pkgFile).toString())
+    pkg.version = newVersion
 
     for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f] || {})) {
       for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
-        deps[name] = newVersion;
+        deps[name] = newVersion
       }
     }
 
-    fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+    fs.writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`)
   },
-};
+}
 
-module.exports = version;
+module.exports = version
