@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-const { existsSync } = require('fs');
+const { existsSync } = require('fs')
 
-const jsExt = /\.js$/;
-const dtsExt = /\.d\.ts$/;
+const jsExt = /\.js$/
+const dtsExt = /\.d\.ts$/
 
 function isNotGenerated (source) {
-  return !dtsExt.test(source) && !(jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')));
+  return !dtsExt.test(source) && !(jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')))
 }
 
 const argv = require('yargs')
@@ -18,26 +18,26 @@ const argv = require('yargs')
     array: true,
     default: getSources,
   })
-  .argv;
+  .argv
 
 function getSources () {
-  const glob = require('glob');
+  const glob = require('glob')
 
   const jsAndTs = [
-    '+(packages|src|examples|test)/**/*.js',
-    '+(packages|src|examples|test)/**/*.ts',
+    '+(packages|src|scripts|examples|test)/**/*.js',
+    '+(packages|src|scripts|examples|test)/**/*.ts',
     './*.js',
   ].reduce((acc, pattern) => [
     ...acc,
     ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
-  ], []);
+  ], [])
 
-  return jsAndTs.filter(source => isNotGenerated(source));
+  return jsAndTs.filter(source => isNotGenerated(source))
 }
 
-const CLIEngine = require('eslint').CLIEngine;
+const CLIEngine = require('eslint').CLIEngine
 
-console.log('Linting...');
+console.log('Linting...')
 
 const cli = new CLIEngine({
   fix: argv.fix,
@@ -45,17 +45,17 @@ const cli = new CLIEngine({
   rules: {
     'node/no-missing-import': 0,
   },
-});
+})
 
-const report = cli.executeOnFiles(argv.sources);
-const errors = CLIEngine.getErrorResults(report.results);
+const report = cli.executeOnFiles(argv.sources)
+const errors = CLIEngine.getErrorResults(report.results)
 
-console.log(cli.getFormatter('table')(errors));
+console.log(cli.getFormatter('table')(errors))
 
 if (argv.failOnError && errors.length) {
-  throw 'Test failed';
+  throw Error('Test failed')
 }
 
 if (argv.fix) {
-  CLIEngine.outputFixes(report);
+  CLIEngine.outputFixes(report)
 }
