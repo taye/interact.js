@@ -1,6 +1,7 @@
 // Type definitions for interact.js
 // Project: http://interactjs.io/
 // Definitions by: Gaspard Bucher <feature-space.com>
+//                  Taye Adeyemi <taye.me>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 import { Options as _Options } from '@interactjs/core/defaultOptions'

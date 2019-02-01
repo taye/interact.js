@@ -41,19 +41,12 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@interactjs/actions": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/auto-scroll": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/auto-start": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/core": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/inertia": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/interact": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/modifiers": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/pointer-events": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/reflow": "1.4.0-alpha.22+sha.63d7e78",
-    "@interactjs/utils": "1.4.0-alpha.22+sha.63d7e78"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.22+sha.63d7e78"
+    "@interactjs/_dev": "1.4.0-alpha.22+sha.63d7e78",
+    "@interactjs/interact": "1.4.0-alpha.22+sha.63d7e78",
+    "@interactjs/modifiers": "1.4.0-alpha.22+sha.63d7e78",
+    "@interactjs/utils": "1.4.0-alpha.22+sha.63d7e78"
   },
   "_dev": {
     "entries": "./index.ts",
