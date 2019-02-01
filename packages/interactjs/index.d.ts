@@ -1,3 +1,4 @@
+/// <reference path="types.d.ts" />
 import interact from '@interactjs/interact';
 import * as snappers from '@interactjs/utils/snappers';
 declare module '@interactjs/interact/interact' {

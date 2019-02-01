@@ -1,5 +1,5 @@
 import { Scope } from '@interactjs/core/scope';
-export declare type DraggableMethod = (options: Interact.DraggableOptions) => Interact.Interactable | {
+export declare type DraggableMethod = (options?: Interact.DraggableOptions) => Interact.Interactable | {
     [key: string]: any;
 };
 declare function install(scope: Scope): void;
@@ -49,7 +49,7 @@ declare function move({ iEvent, interaction }: {
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-declare function draggable(options: any): any;
+declare function draggable(this: Interact.Interactable, options?: Interact.DraggableOptions): import("../interactjs/types").DraggableOptions | import("@interactjs/core/Interactable").Interactable;
 declare const drag: {
     install: typeof install;
     draggable: typeof draggable;

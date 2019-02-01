@@ -4,7 +4,7 @@ import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 export interface Plugin extends Partial<any> {
-    install(scope: any): void;
+    install(scope: Scope): void;
 }
 declare module '@interactjs/core/scope' {
     interface Scope {

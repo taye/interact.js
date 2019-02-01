@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.21+sha.cdc1d5f-dirty
+ * interact.js v1.4.0-alpha.22+sha.63d7e78-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8844,7 +8844,6 @@ function ___interopRequireDefault_23(obj) { return obj && obj.__esModule ? obj :
 
 function ___interopRequireWildcard_23(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-/* browser entry point */
 function __init_23(window) {
   _interact.scope.init(window);
 
@@ -8884,7 +8883,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.21";
+_interact.default.version = __init_23.version = "1.4.0-alpha.22";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

@@ -3,13 +3,13 @@ import Eventable from './Eventable';
 /** */
 export declare class Interactable implements Partial<Eventable> {
     protected readonly _defaults: Defaults;
-    options: Options;
-    _actions: any;
+    options: Required<Options>;
+    readonly _actions: any;
     readonly target: Interact.Target;
-    events: Eventable;
-    _context: Element;
-    _win: Window;
-    _doc: Document;
+    readonly events: Eventable;
+    readonly _context: Element;
+    readonly _win: Window;
+    readonly _doc: Document;
     /** */
     constructor(target: Interact.Target, options: any, defaultContext: Element | Node);
     setOnEvents(actionName: string, phases: {

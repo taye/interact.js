@@ -17,7 +17,7 @@ declare module '@interactjs/core/Interaction' {
 }
 declare module '@interactjs/core/defaultOptions' {
     interface Defaults {
-        drop?: Interact.DropzoneOptions;
+        drop: Interact.DropzoneOptions;
     }
     interface Options {
         drop?: Interact.DropzoneOptions;
@@ -30,7 +30,7 @@ declare module '@interactjs/core/scope' {
 }
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
-        dynamicDrop: (newValue?: boolean) => boolean | typeof import('@interactjs/interact/interact').default;
+        dynamicDrop: (newValue?: boolean) => boolean | Interact.interact;
     }
 }
 declare function install(scope: Scope): void;
