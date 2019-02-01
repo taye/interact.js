@@ -4,3 +4,4 @@ coverage
 **.d.ts
 **/node_modules
 **/lerna-debug.log
+packages/*/.npmignore
