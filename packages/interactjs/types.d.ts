@@ -5,8 +5,8 @@
 
 import { Options as _Options } from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
-import _Interaction from '@interactjs/core/Interaction'
-import { Action } from '@interactjs/core/Interaction'
+import _InteractEvent from '@interactjs/core/InteractEvent'
+import _Interaction, { Action } from '@interactjs/core/Interaction'
 import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
 
 declare namespace Interact {
@@ -15,6 +15,7 @@ declare namespace Interact {
   export type Plugin = _Plugin
   export type Interactable = _Interactable
   export type Interaction = _Interaction
+  export type InteractEvent = _InteractEvent
   export type Options = _Options
 
   export interface Point {
@@ -181,7 +182,6 @@ declare namespace Interact {
 
   export type Listener = (...args: any) => any
   export type Listeners = Listener | Listener[]
-
 
   export type OnEventName =
     'dragstart'

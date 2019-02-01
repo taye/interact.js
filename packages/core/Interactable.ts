@@ -16,7 +16,7 @@ export class Interactable implements Partial<Eventable> {
     return {
       base: {},
       perAction: {},
-    }
+    } as Defaults
   }
 
   options!: Required<Options>
@@ -288,7 +288,7 @@ export class Interactable implements Partial<Eventable> {
       options = {}
     }
 
-    this.options = clone(defaults.base)
+    this.options = clone(defaults.base) as Required<Options>
 
     for (const actionName in this._actions.methodDict) {
       const methodName = this._actions.methodDict[actionName]

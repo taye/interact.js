@@ -73,4 +73,3 @@ declare module '@interactjs/core/scope' {
     gesture?: typeof gesture
   }
 }
-

@@ -6,7 +6,14 @@ const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
 
 function isNotGenerated (source) {
-  return !dtsExt.test(source) && !(jsExt.test(source) && existsSync(source.replace(jsExt, '.ts')))
+  if (dtsExt.test(source) && existsSync(source.replace(dtsExt, '.ts'))) {
+    return false
+  }
+  if (jsExt.test(source) && existsSync(source.replace(jsExt, '.ts'))) {
+    return false
+  }
+
+  return true
 }
 
 const argv = require('yargs')

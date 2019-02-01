@@ -51,7 +51,7 @@ const pointerUtils = {
     return xy
   },
 
-  getPageXY (pointer: Interact.PointerType, page?: Interact.Point) {
+  getPageXY (pointer: Interact.PointerType | Interact.InteractEvent, page?: Interact.Point) {
     page = page || { x: 0, y: 0 }
 
     // Opera Mobile handles the viewport and scrolling oddly
