@@ -1,76 +1,76 @@
-import drag, { DraggableMethod } from '@interactjs/actions/drag';
-import gesture from '@interactjs/actions/gesture';
-import resize from '@interactjs/actions/resize';
+import drag, { DraggableMethod } from './drag'
+import gesture from './gesture'
+import resize from './resize'
 
 // drag
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    draggable: DraggableMethod;
+    draggable: DraggableMethod
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    drag?: Interact.DraggableOptions;
+    drag: Interact.DraggableOptions
   }
   interface Options {
-    drag?: Interact.DraggableOptions;
+    drag?: Interact.DraggableOptions
   }
 }
 
 declare module '@interactjs/core/scope' {
   interface Actions {
-    drag?: typeof drag;
+    drag?: typeof drag
   }
 }
 
 // resize
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    resizable: (options: any) => Interactable | { [key: string]: any };
+    resizable: (options?: any) => Interactable | { [key: string]: any }
   }
 }
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    resizeAxes: 'x' | 'y' | 'xy';
+    resizeAxes: 'x' | 'y' | 'xy'
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    resize?: Interact.ResizableOptions;
+    resize: Interact.ResizableOptions
   }
   interface Options {
-    resize?: Interact.ResizableOptions;
+    resize?: Interact.ResizableOptions
   }
 }
 
 declare module '@interactjs/core/scope' {
   interface Actions {
-    resize?: typeof resize;
+    resize?: typeof resize
   }
 }
 
 // gesture
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    gesturable: (options: any) => Interactable | { [key: string]: any };
+    gesturable: (options?: any) => Interactable | { [key: string]: any }
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface Defaults {
-    gesture?: Interact.GesturableOptions;
+    gesture: Interact.GesturableOptions
   }
   interface Options {
-    gesture?: Interact.GesturableOptions;
+    gesture?: Interact.GesturableOptions
   }
 }
 
 declare module '@interactjs/core/scope' {
   interface Actions {
-    gesture?: typeof gesture;
+    gesture?: typeof gesture
   }
 }
 

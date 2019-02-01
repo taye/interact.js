@@ -33,7 +33,7 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of gesture events, or this Interactable
    */
-  Interactable.prototype.gesturable = function (options) {
+  Interactable.prototype.gesturable = function (this: Interact.Interactable, options) {
     if (utils.is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
       this.setPerAction('gesture', options)
@@ -48,7 +48,7 @@ function install (scope: Scope) {
       return this
     }
 
-    return this.options.gesture
+    return this.options.gesture as Interact.Options
   }
 
   interactions.signals.on('action-start', updateGestureProps)
@@ -90,7 +90,7 @@ const gesture = {
   defaults: {
   },
 
-  checker (_pointer, _event, _interactable, _element, interaction) {
+  checker (_pointer, _event, _interactable, _element, interaction: { pointers: { length: number; }; }) {
     if (interaction.pointers.length >= 2) {
       return { name: 'gesture' }
     }
