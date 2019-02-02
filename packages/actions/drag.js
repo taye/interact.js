@@ -17,7 +17,7 @@ function install(scope) {
         'dragend',
     ]);
     actions.methodDict.drag = 'draggable';
-    defaults.drag = drag.defaults;
+    defaults.actions.drag = drag.defaults;
 }
 function beforeMove({ interaction }) {
     if (interaction.prepared.name !== 'drag') {

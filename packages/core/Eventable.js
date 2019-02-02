@@ -42,8 +42,8 @@ class Eventable {
             if (!eventList || !eventList.length) {
                 continue;
             }
-            for (listener of listeners[type]) {
-                const index = eventList.indexOf(listener);
+            for (const subListener of listeners[type]) {
+                const index = eventList.indexOf(subListener);
                 if (index !== -1) {
                     eventList.splice(index, 1);
                 }

@@ -151,14 +151,10 @@ function removeDelegate(selector, context, type, listener, optionalArg) {
 // listener is added to a selector interactable
 function delegateListener(event, optionalArg) {
     const options = getOptions(optionalArg);
-    const fakeEvent = {};
+    const fakeEvent = new FakeEvent(event);
     const delegated = delegatedEvents[event.type];
     const [eventTarget] = (pointerUtils.getEventTargets(event));
     let element = eventTarget;
-    // duplicate the event so that currentTarget can be changed
-    pExtend(fakeEvent, event);
-    fakeEvent.originalEvent = event;
-    fakeEvent.preventDefault = preventOriginalDefault;
     // climb up document tree looking for selector matches
     while (is.element(element)) {
         for (let i = 0; i < delegated.selectors.length; i++) {
@@ -182,11 +178,24 @@ function delegateListener(event, optionalArg) {
 function delegateUseCapture(event) {
     return delegateListener.call(this, event, true);
 }
-function preventOriginalDefault() {
-    this.originalEvent.preventDefault();
-}
 function getOptions(param) {
     return is.object(param) ? param : { capture: param };
+}
+export class FakeEvent {
+    constructor(originalEvent) {
+        this.originalEvent = originalEvent;
+        // duplicate the event so that currentTarget can be changed
+        pExtend(this, originalEvent);
+    }
+    preventOriginalDefault() {
+        this.originalEvent.preventDefault();
+    }
+    stopPropagation() {
+        this.originalEvent.stopPropagation();
+    }
+    stopImmediatePropagation() {
+        this.originalEvent.stopImmediatePropagation();
+    }
 }
 const events = {
     add,

@@ -105,7 +105,7 @@ function collectEventTargets({ interaction, pointer, event, eventTarget, type })
 function install(scope) {
     const { interactions, } = scope;
     scope.pointerEvents = pointerEvents;
-    scope.defaults.pointerEvents = pointerEvents.defaults;
+    scope.defaults.actions.pointerEvents = pointerEvents.defaults;
     interactions.signals.on('new', (interaction) => {
         interaction.prevTap = null; // the most recent tap event on this interaction
         interaction.tapTime = 0; // time of the most recent tap event

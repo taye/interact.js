@@ -1,7 +1,7 @@
 {
   "name": "@interactjs/_dev",
   "private": "true",
-  "version": "1.4.0-alpha.23+sha.69f8af9",
+  "version": "1.4.0-alpha.24+sha.1196d35",
   "bin": {
     "_dev": "scripts/_dev",
     "@build": "scripts/build.js",

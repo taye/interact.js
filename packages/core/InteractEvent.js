@@ -2,7 +2,7 @@ import extend from '@interactjs/utils/extend';
 import getOriginXY from '@interactjs/utils/getOriginXY';
 import hypot from '@interactjs/utils/hypot';
 import defaults from './defaultOptions';
-class InteractEvent {
+export class InteractEvent {
     /** */
     constructor(interaction, event, actionName, phase, element, related, preEnd, type) {
         this.immediatePropagationStopped = false;

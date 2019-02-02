@@ -149,7 +149,7 @@ function install(scope) {
     ]);
     actions.methodDict.drop = 'dropzone';
     scope.dynamicDrop = false;
-    defaults.drop = drop.defaults;
+    defaults.actions.drop = drop.defaults;
 }
 function collectDrops({ interactables }, draggableElement) {
     const drops = [];

@@ -1,6 +1,6 @@
 import Interactable from './Interactable';
 import Interaction from './Interaction';
-declare class InteractEvent {
+export declare class InteractEvent {
     type: string;
     target: Element;
     relatedTarget: Element | null;

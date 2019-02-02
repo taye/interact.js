@@ -62,7 +62,7 @@ function install(scope) {
         'gestureend',
     ]);
     actions.methodDict.gesture = 'gesturable';
-    defaults.gesture = gesture.defaults;
+    defaults.actions.gesture = gesture.defaults;
 }
 const gesture = {
     install,

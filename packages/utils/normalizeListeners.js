@@ -1,31 +1,31 @@
 import extend from './extend';
 import * as is from './is';
-export default function normalize(type, listener, result) {
+export default function normalize(type, listeners, result) {
     result = result || {};
     if (is.string(type) && type.search(' ') !== -1) {
         type = split(type);
     }
     if (is.array(type)) {
-        return type.reduce((acc, t) => extend(acc, normalize(t, listener, result)), {});
+        return type.reduce((acc, t) => extend(acc, normalize(t, listeners, result)), result);
     }
     // ({ type: fn }) -> ('', { type: fn })
     if (is.object(type)) {
-        listener = type;
+        listeners = type;
         type = '';
     }
-    if (is.func(listener)) {
+    if (is.func(listeners)) {
         result[type] = result[type] || [];
-        result[type].push(listener);
+        result[type].push(listeners);
     }
-    else if (is.array(listener)) {
-        for (const l of listener) {
+    else if (is.array(listeners)) {
+        for (const l of listeners) {
             normalize(type, l, result);
         }
     }
-    else if (is.object(listener)) {
-        for (const prefix in listener) {
+    else if (is.object(listeners)) {
+        for (const prefix in listeners) {
             const combinedTypes = split(prefix).map((p) => `${type}${p}`);
-            normalize(combinedTypes, listener[prefix], result);
+            normalize(combinedTypes, listeners[prefix], result);
         }
     }
     return result;

@@ -5,7 +5,7 @@ declare const pointerUtils: {
     setCoordVelocity(targetObj: any, delta: any): void;
     isNativePointer(pointer: any): boolean;
     getXY(type: any, pointer: any, xy: any): any;
-    getPageXY(pointer: Touch | MouseEvent | PointerEvent | import("../core/InteractEvent").default, page?: import("../interactjs/types").Point): import("../interactjs/types").Point;
+    getPageXY(pointer: Touch | MouseEvent | PointerEvent | import("@interactjs/core/InteractEvent").InteractEvent, page?: import("../interactjs/types").Point): import("../interactjs/types").Point;
     getClientXY(pointer: any, client: any): any;
     getPointerId(pointer: any): any;
     setCoords(targetObj: any, pointers: any[], timeStamp?: number): void;

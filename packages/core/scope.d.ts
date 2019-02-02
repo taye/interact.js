@@ -27,9 +27,9 @@ export declare class Scope {
         wheelEvent: string;
     };
     events: {
-        add: (element: EventTarget, type: string, listener: (event: Event) => any, optionalArg?: any) => void;
-        remove: (element: EventTarget, type: string, listener?: "all" | ((event: Event) => any), optionalArg?: any) => void;
-        addDelegate: (selector: string, context: EventTarget, type: string, listener: (event: Event) => any, optionalArg?: any) => void;
+        add: (element: EventTarget, type: string, listener: (event: Event | import("../utils/events").FakeEvent) => any, optionalArg?: any) => void;
+        remove: (element: EventTarget, type: string, listener?: "all" | ((event: Event | import("../utils/events").FakeEvent) => any), optionalArg?: any) => void;
+        addDelegate: (selector: string, context: EventTarget, type: string, listener: (event: Event | import("../utils/events").FakeEvent) => any, optionalArg?: any) => void;
         removeDelegate: (selector: any, context: any, type: any, listener?: any, optionalArg?: any) => void;
         delegateListener: (event: Event, optionalArg?: any) => void;
         delegateUseCapture: (event: Event) => any;
@@ -37,7 +37,7 @@ export declare class Scope {
             [type: string]: {
                 selectors: string[];
                 contexts: EventTarget[];
-                listeners: [(event: Event) => any, boolean, boolean][][];
+                listeners: [(event: Event | import("../utils/events").FakeEvent) => any, boolean, boolean][][];
             };
         };
         documents: Document[];
@@ -46,7 +46,7 @@ export declare class Scope {
         _elements: EventTarget[];
         _targets: {
             events: {
-                [type: string]: ((event: Event) => any)[];
+                [type: string]: ((event: Event | import("../utils/events").FakeEvent) => any)[];
             };
             typeCount: number;
         }[];

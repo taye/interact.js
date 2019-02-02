@@ -7,6 +7,7 @@ export const defaults = {
         enabled: false,
         origin: { x: 0, y: 0 },
     },
+    actions: {},
 };
 export default defaults;
 //# sourceMappingURL=defaultOptions.js.map

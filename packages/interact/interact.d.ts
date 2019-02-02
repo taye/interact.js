@@ -64,7 +64,7 @@ declare const scope: Scope;
 export declare const interact: InteractStatic;
 declare function use(plugin: Plugin): InteractStatic;
 declare function isSet(element: Element, options?: any): boolean;
-declare function on(type: string | Interact.EventTypes, listener: Interact.Listeners, options?: any): InteractStatic;
+declare function on(type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: any): InteractStatic;
 declare function off(type: any, listener: any, options: any): InteractStatic;
 declare function debug(): Scope;
 declare function supportsTouch(): boolean;

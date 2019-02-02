@@ -10,6 +10,15 @@ declare module '@interactjs/core/Interaction' {
         modifiers?: any;
     }
 }
+declare module '@interactjs/core/defaultOptions' {
+    interface PerActionDefaults {
+        modifiers?: any[];
+    }
+    interface Options {
+        drag?: Interact.DraggableOptions;
+        modifiers?: any[];
+    }
+}
 declare function install(scope: Scope): void;
 declare function startAll(arg: any): void;
 declare function getRectOffset(rect: any, coords: any): {

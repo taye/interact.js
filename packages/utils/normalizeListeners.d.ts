@@ -1,3 +1,4 @@
-export default function normalize(type: Interact.Listener | string, listener?: Interact.Listeners, result?: {
+export interface NormalizedListeners {
     [type: string]: Interact.Listener[];
-}): any;
+}
+export default function normalize(type: Interact.EventTypes, listeners?: Interact.ListenersArg | Interact.ListenersArg[], result?: NormalizedListeners): NormalizedListeners;

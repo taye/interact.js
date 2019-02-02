@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.23+sha.69f8af9-dirty
+ * interact.js v1.4.0-alpha.24+sha.1196d35-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -242,7 +242,7 @@ function install(scope) {
   actions.names.push('drag');
   arr.merge(actions.eventTypes, ['dragstart', 'dragmove', 'draginertiastart', 'dragresume', 'dragend']);
   actions.methodDict.drag = 'draggable';
-  defaults.drag = drag.defaults;
+  defaults.actions.drag = drag.defaults;
 }
 
 function beforeMove(_ref) {
@@ -1248,7 +1248,7 @@ var _$events_46 = {};
 Object.defineProperty(_$events_46, "__esModule", {
   value: true
 });
-_$events_46.default = void 0;
+_$events_46.default = _$events_46.FakeEvent = void 0;
 
 /* removed: var _$arr_41 = require("./arr"); */;
 
@@ -1263,6 +1263,12 @@ var _pointerUtils = ___interopRequireDefault_46(_$pointerUtils_56);
 function ___interopRequireDefault_46(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function ___interopRequireWildcard_46(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function ___classCallCheck_46(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function ___defineProperties_46(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function ___createClass_46(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_46(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_46(Constructor, staticProps); return Constructor; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
@@ -1447,18 +1453,14 @@ function removeDelegate(selector, context, type, listener, optionalArg) {
 
 function delegateListener(event, optionalArg) {
   var options = getOptions(optionalArg);
-  var fakeEvent = {};
+  var fakeEvent = new FakeEvent(event);
   var delegated = delegatedEvents[event.type];
 
   var _pointerUtils$getEven = _pointerUtils.default.getEventTargets(event),
       _pointerUtils$getEven2 = _slicedToArray(_pointerUtils$getEven, 1),
       eventTarget = _pointerUtils$getEven2[0];
 
-  var element = eventTarget; // duplicate the event so that currentTarget can be changed
-
-  (0, ___pointerExtend_46.default)(fakeEvent, event);
-  fakeEvent.originalEvent = event;
-  fakeEvent.preventDefault = preventOriginalDefault; // climb up document tree looking for selector matches
+  var element = eventTarget; // climb up document tree looking for selector matches
 
   while (__is_46.element(element)) {
     for (var i = 0; i < delegated.selectors.length; i++) {
@@ -1495,16 +1497,44 @@ function delegateUseCapture(event) {
   return delegateListener.call(this, event, true);
 }
 
-function preventOriginalDefault() {
-  this.originalEvent.preventDefault();
-}
-
 function getOptions(param) {
   return __is_46.object(param) ? param : {
     capture: param
   };
 }
 
+var FakeEvent =
+/*#__PURE__*/
+function () {
+  function FakeEvent(originalEvent) {
+    ___classCallCheck_46(this, FakeEvent);
+
+    this.originalEvent = originalEvent; // duplicate the event so that currentTarget can be changed
+
+    (0, ___pointerExtend_46.default)(this, originalEvent);
+  }
+
+  ___createClass_46(FakeEvent, [{
+    key: "preventOriginalDefault",
+    value: function preventOriginalDefault() {
+      this.originalEvent.preventDefault();
+    }
+  }, {
+    key: "stopPropagation",
+    value: function stopPropagation() {
+      this.originalEvent.stopPropagation();
+    }
+  }, {
+    key: "stopImmediatePropagation",
+    value: function stopImmediatePropagation() {
+      this.originalEvent.stopImmediatePropagation();
+    }
+  }]);
+
+  return FakeEvent;
+}();
+
+_$events_46.FakeEvent = FakeEvent;
 var events = {
   add: add,
   remove: __remove_46,
@@ -1680,7 +1710,7 @@ function ___interopRequireWildcard_54(obj) { if (obj && obj.__esModule) { return
 
 function ___interopRequireDefault_54(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function normalize(type, listener, result) {
+function normalize(type, listeners, result) {
   result = result || {};
 
   if (__is_54.string(type) && type.search(' ') !== -1) {
@@ -1689,33 +1719,33 @@ function normalize(type, listener, result) {
 
   if (__is_54.array(type)) {
     return type.reduce(function (acc, t) {
-      return (0, ___extend_54.default)(acc, normalize(t, listener, result));
-    }, {});
+      return (0, ___extend_54.default)(acc, normalize(t, listeners, result));
+    }, result);
   } // ({ type: fn }) -> ('', { type: fn })
 
 
   if (__is_54.object(type)) {
-    listener = type;
+    listeners = type;
     type = '';
   }
 
-  if (__is_54.func(listener)) {
+  if (__is_54.func(listeners)) {
     result[type] = result[type] || [];
-    result[type].push(listener);
-  } else if (__is_54.array(listener)) {
-    for (var _i = 0; _i < listener.length; _i++) {
+    result[type].push(listeners);
+  } else if (__is_54.array(listeners)) {
+    for (var _i = 0; _i < listeners.length; _i++) {
       var _ref;
 
-      _ref = listener[_i];
+      _ref = listeners[_i];
       var l = _ref;
       normalize(type, l, result);
     }
-  } else if (__is_54.object(listener)) {
-    for (var prefix in listener) {
+  } else if (__is_54.object(listeners)) {
+    for (var prefix in listeners) {
       var combinedTypes = split(prefix).map(function (p) {
         return "".concat(type).concat(p);
       });
-      normalize(combinedTypes, listener[prefix], result);
+      normalize(combinedTypes, listeners[prefix], result);
     }
   }
 
@@ -2130,7 +2160,7 @@ function __install_3(scope) {
   utils.arr.merge(actions.eventTypes, ['dragenter', 'dragleave', 'dropactivate', 'dropdeactivate', 'dropmove', 'drop']);
   actions.methodDict.drop = 'dropzone';
   scope.dynamicDrop = false;
-  defaults.drop = drop.defaults;
+  defaults.actions.drop = drop.defaults;
 }
 
 function collectDrops(_ref6, draggableElement) {
@@ -2486,7 +2516,8 @@ var defaults = {
       x: 0,
       y: 0
     }
-  }
+  },
+  actions: {}
 };
 _$defaultOptions_18.defaults = defaults;
 var ___default_18 = defaults;
@@ -2498,7 +2529,7 @@ var _$InteractEvent_14 = {};
 Object.defineProperty(_$InteractEvent_14, "__esModule", {
   value: true
 });
-_$InteractEvent_14.default = void 0;
+_$InteractEvent_14.default = _$InteractEvent_14.InteractEvent = void 0;
 
 var ___extend_14 = ___interopRequireDefault_14(_$extend_47);
 
@@ -2711,6 +2742,7 @@ function () {
   return InteractEvent;
 }();
 
+_$InteractEvent_14.InteractEvent = InteractEvent;
 var ___default_14 = InteractEvent;
 _$InteractEvent_14.default = ___default_14;
 
@@ -2798,7 +2830,7 @@ function __install_4(scope) {
   actions.names.push('gesture');
   __utils_4.arr.merge(actions.eventTypes, ['gesturestart', 'gesturemove', 'gestureend']);
   actions.methodDict.gesture = 'gesturable';
-  defaults.gesture = gesture.defaults;
+  defaults.actions.gesture = gesture.defaults;
 }
 
 var gesture = {
@@ -2977,7 +3009,7 @@ function __install_6(scope) {
   actions.names.push('resize');
   __utils_6.arr.merge(actions.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeresume', 'resizeend']);
   actions.methodDict.resize = 'resizable';
-  defaults.resize = resize.defaults;
+  defaults.actions.resize = resize.defaults;
 }
 
 var resize = {
@@ -3078,7 +3110,7 @@ function resizable(interactable, options, scope) {
     if (/^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis;
     } else if (options.axis === null) {
-      interactable.options.resize.axis = scope.defaults.resize.axis;
+      interactable.options.resize.axis = scope.defaults.actions.resize.axis;
     }
 
     if (__utils_6.is.bool(options.preserveAspectRatio)) {
@@ -5297,8 +5329,11 @@ function () {
         }
 
         for (var _i2 = 0; _i2 < listeners[type].length; _i2++) {
-          listener = listeners[type][_i2];
-          var index = eventList.indexOf(listener);
+          var _ref2;
+
+          _ref2 = listeners[type][_i2];
+          var subListener = _ref2;
+          var index = eventList.indexOf(subListener);
 
           if (index !== -1) {
             eventList.splice(index, 1);
@@ -8250,7 +8285,7 @@ function collectEventTargets(_ref) {
 function __install_35(scope) {
   var interactions = scope.interactions;
   scope.pointerEvents = pointerEvents;
-  scope.defaults.pointerEvents = pointerEvents.defaults;
+  scope.defaults.actions.pointerEvents = pointerEvents.defaults;
   interactions.signals.on('new', function (interaction) {
     interaction.prevTap = null; // the most recent tap event on this interaction
 
@@ -8883,7 +8918,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.23";
+_interact.default.version = __init_23.version = "1.4.0-alpha.24";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

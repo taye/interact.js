@@ -1,9 +1,7 @@
-declare type Listener = (event: any) => any;
+import { NormalizedListeners } from '@interactjs/utils/normalizeListeners';
 declare class Eventable {
     options: any;
-    types: {
-        [type: string]: Listener[];
-    };
+    types: NormalizedListeners;
     propagationStopped: boolean;
     immediatePropagationStopped: boolean;
     global: any;
@@ -11,7 +9,7 @@ declare class Eventable {
         [index: string]: any;
     });
     fire(event: any): void;
-    on(type: string, listener: Listener): void;
-    off(type: string, listener: Listener): void;
+    on(type: string, listener: Interact.ListenersArg): void;
+    off(type: string, listener: Interact.ListenersArg): void;
 }
 export default Eventable;

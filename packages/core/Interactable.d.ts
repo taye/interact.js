@@ -13,7 +13,7 @@ export declare class Interactable implements Partial<Eventable> {
     /** */
     constructor(target: Interact.Target, options: any, defaultContext: Element | Node);
     setOnEvents(actionName: string, phases: {
-        [phase: string]: Interact.Listeners;
+        [phase: string]: Interact.ListenersArg;
     }): this;
     updatePerActionListeners(actionName: any, prev: any, cur: any): void;
     setPerAction(actionName: any, options: Options): void;
@@ -86,7 +86,7 @@ export declare class Interactable implements Partial<Eventable> {
      * @return {Interactable} this Interactable
      */
     fire(iEvent: any): this;
-    _onOff(method: any, typeArg: any, listenerArg: any, options: any): this;
+    _onOff(method: 'on' | 'off', typeArg: Interact.EventTypes, listenerArg?: Interact.ListenersArg | null, options?: any): this;
     /**
      * Binds a listener for an InteractEvent, pointerEvent or DOM event.
      *
@@ -97,7 +97,7 @@ export declare class Interactable implements Partial<Eventable> {
      * addEventListener
      * @return {Interactable} This Interactable
      */
-    on(types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any): this;
+    on(types: Interact.EventTypes, listener?: Interact.ListenersArg, options?: any): this;
     /**
      * Removes an InteractEvent, pointerEvent or DOM event listener.
      *
@@ -108,7 +108,7 @@ export declare class Interactable implements Partial<Eventable> {
      * removeEventListener
      * @return {Interactable} This Interactable
      */
-    off(types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any): this;
+    off(types: string | string[] | Interact.EventTypes, listener?: Interact.ListenersArg, options?: any): this;
     /**
      * Reset the options of this Interactable
      *
