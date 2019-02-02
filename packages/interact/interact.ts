@@ -130,7 +130,7 @@ function isSet (element: Element, options?: any) {
  * @return {object} interact
  */
 interact.on = on
-function on (type: string | Interact.EventTypes, listener: Interact.Listeners, options?) {
+function on (type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?) {
   if (utils.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/)
   }

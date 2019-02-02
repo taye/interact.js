@@ -31,7 +31,7 @@ function install (scope: Scope) {
   ])
   actions.methodDict.drag = 'draggable'
 
-  defaults.drag = drag.defaults
+  defaults.actions.drag = drag.defaults
 }
 
 function beforeMove ({ interaction }) {

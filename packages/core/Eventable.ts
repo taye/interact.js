@@ -1,11 +1,9 @@
 import * as arr from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
-import normalize from '@interactjs/utils/normalizeListeners'
+import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
 import InteractEvent from './InteractEvent'
 
-type Listener = (event: any) => any
-
-function fireUntilImmediateStopped (event: InteractEvent, listeners: Listener[]) {
+function fireUntilImmediateStopped (event: InteractEvent, listeners: Interact.Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break }
 
@@ -15,9 +13,7 @@ function fireUntilImmediateStopped (event: InteractEvent, listeners: Listener[])
 
 class Eventable {
   options: any
-  types: {
-    [type: string]: Listener[]
-  } = {}
+  types: NormalizedListeners = {}
   propagationStopped = false
   immediatePropagationStopped = false
   global: any
@@ -42,7 +38,7 @@ class Eventable {
     }
   }
 
-  on (type: string, listener: Listener) {
+  on (type: string, listener: Interact.ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -50,7 +46,7 @@ class Eventable {
     }
   }
 
-  off (type: string, listener: Listener) {
+  off (type: string, listener: Interact.ListenersArg) {
     const listeners = normalize(type, listener)
 
     for (type in listeners) {
@@ -58,8 +54,8 @@ class Eventable {
 
       if (!eventList || !eventList.length) { continue }
 
-      for (listener of listeners[type]) {
-        const index = eventList.indexOf(listener)
+      for (const subListener of listeners[type]) {
+        const index = eventList.indexOf(subListener)
 
         if (index !== -1) {
           eventList.splice(index, 1)

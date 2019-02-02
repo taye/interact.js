@@ -10,10 +10,7 @@ declare module '@interactjs/core/Interactable' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    drag: Interact.DraggableOptions
-  }
-  interface Options {
+  interface ActionDefaults {
     drag?: Interact.DraggableOptions
   }
 }
@@ -31,6 +28,13 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
+declare module '@interactjs/core/InteractEvent' {
+  interface InteractEvent {
+    deltaRect?: Interact.Rect
+    rect?: Interact.Rect
+  }
+}
+
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
@@ -38,10 +42,7 @@ declare module '@interactjs/core/Interaction' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    resize: Interact.ResizableOptions
-  }
-  interface Options {
+  interface ActionDefaults {
     resize?: Interact.ResizableOptions
   }
 }
@@ -60,10 +61,7 @@ declare module '@interactjs/core/Interactable' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    gesture: Interact.GesturableOptions
-  }
-  interface Options {
+  interface ActionDefaults {
     gesture?: Interact.GesturableOptions
   }
 }

@@ -38,7 +38,7 @@ export class Interactable implements Partial<Eventable> {
     this.set(options)
   }
 
-  setOnEvents (actionName: string, phases: { [phase: string]: Interact.Listeners }) {
+  setOnEvents (actionName: string, phases: { [phase: string]: Interact.ListenersArg }) {
     if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
     if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
     if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
@@ -216,7 +216,7 @@ export class Interactable implements Partial<Eventable> {
     return this
   }
 
-  _onOff (method, typeArg, listenerArg, options) {
+  _onOff (method: 'on' | 'off', typeArg: Interact.EventTypes, listenerArg?: Interact.ListenersArg | null, options?: any) {
     if (is.object(typeArg) && !is.array(typeArg)) {
       options = listenerArg
       listenerArg = null
@@ -257,7 +257,7 @@ export class Interactable implements Partial<Eventable> {
    * addEventListener
    * @return {Interactable} This Interactable
    */
-  on (types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any) {
+  on (types: Interact.EventTypes, listener?: Interact.ListenersArg, options?: any) {
     return this._onOff('on', types, listener, options)
   }
 
@@ -271,7 +271,7 @@ export class Interactable implements Partial<Eventable> {
    * removeEventListener
    * @return {Interactable} This Interactable
    */
-  off (types: string | string[] | Interact.EventTypes, listener?: Interact.Listeners, options?: any) {
+  off (types: string | string[] | Interact.EventTypes, listener?: Interact.ListenersArg, options?: any) {
     return this._onOff('off', types, listener, options)
   }
 

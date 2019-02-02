@@ -5,7 +5,7 @@ import defaults from './defaultOptions'
 import Interactable from './Interactable'
 import Interaction from './Interaction'
 
-class InteractEvent {
+export class InteractEvent {
   type: string
   target: Element
   relatedTarget: Element | null

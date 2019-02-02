@@ -89,7 +89,7 @@ function install (scope: Scope) {
   ])
   actions.methodDict.resize = 'resizable'
 
-  defaults.resize = resize.defaults
+  defaults.actions.resize = resize.defaults
 }
 
 const resize = {
@@ -206,7 +206,7 @@ function resizable (interactable: Interact.Interactable, options: Interact.Optio
       interactable.options.resize.axis = options.axis
     }
     else if (options.axis === null) {
-      interactable.options.resize.axis = scope.defaults.resize.axis
+      interactable.options.resize.axis = scope.defaults.actions.resize.axis
     }
 
     if (utils.is.bool(options.preserveAspectRatio)) {
