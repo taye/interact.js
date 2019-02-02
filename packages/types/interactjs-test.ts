@@ -147,6 +147,11 @@ interact(target)
     gestureend: listener,
   })
 
+interact.on('resize', (event: Interact.InteractEvent) => {
+  const { rect, deltaRect } = event
+  alert(JSON.stringify({ rect, deltaRect }))
+})
+
 interact(target).resizable({
   listeners: [
     { start: listener, move: listener },

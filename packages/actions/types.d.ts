@@ -28,6 +28,13 @@ declare module '@interactjs/core/Interactable' {
   }
 }
 
+declare module '@interactjs/core/InteractEvent' {
+  interface InteractEvent {
+    deltaRect?: Interact.Rect
+    rect?: Interact.Rect
+  }
+}
+
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
