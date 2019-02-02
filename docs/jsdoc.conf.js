@@ -1,10 +1,9 @@
-const packagesDir = `${__dirname}/../packages`;
-const glob = require('glob');
-const ignore = ['**/node_modules/**', '**/tests/**', '**/*.d.ts', '**/dist/**'];
+const packagesDir = `${__dirname}/../packages`
+const glob = require('glob')
+const ignore = ['**/node_modules/**', '**/tests/**', '**/*.d.ts', '**/dist/**']
 const include = [...new Set([
-  ...glob.sync(`${packagesDir}/**/*.js`, { ignore }),
   ...glob.sync(`${packagesDir}/**/*.ts`, { ignore }),
-])];
+])]
 
 module.exports = {
   source: {
@@ -39,4 +38,4 @@ module.exports = {
   templates: {
     cleverLinks: true,
   },
-};
+}

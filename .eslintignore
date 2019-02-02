@@ -1,3 +1,4 @@
-dist
-node_modules
 examples
+dist
+coverage
+node_modules
