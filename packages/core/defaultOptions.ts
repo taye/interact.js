@@ -33,6 +33,8 @@ export const defaults: Defaults = {
     enabled: false,
     origin: { x: 0, y: 0 },
   },
-} as Defaults
+
+  actions: {},
+}
 
 export default defaults
