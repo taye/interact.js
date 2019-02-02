@@ -140,13 +140,22 @@ function listener (event) {
 
 interact(target)
   .on('dragstart', listener)
-  // cannot type this. This option has been removed from type definition
-  // .on('dragmove dragend', listener)
+  .on('dragmove dragend', listener)
   .on(['resizemove', 'resizeend'], listener)
   .on({
     gesturestart: listener,
     gestureend: listener,
   })
+
+interact(target).resizable({
+  listeners: [
+    { start: listener, move: listener },
+  ],
+})
+
+interact(target).draggable({
+  listeners: { start: listener, end: listener },
+})
 
 interact(target).draggable({
   onstart: listener,

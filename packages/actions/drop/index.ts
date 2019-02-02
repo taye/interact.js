@@ -24,10 +24,7 @@ declare module '@interactjs/core/Interaction' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    drop: Interact.DropzoneOptions
-  }
-  interface Options {
+  interface ActionDefaults {
     drop?: Interact.DropzoneOptions
   }
 }
@@ -214,7 +211,7 @@ function install (scope: Scope) {
 
   scope.dynamicDrop = false
 
-  defaults.drop = drop.defaults
+  defaults.actions.drop = drop.defaults
 }
 
 function collectDrops ({ interactables }, draggableElement) {

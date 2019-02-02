@@ -1,11 +1,15 @@
 import extend from './extend'
 import * as is from './is'
 
+export interface NormalizedListeners {
+  [type: string]: Interact.Listener[]
+}
+
 export default function normalize (
-  type: Interact.Listener | string,
-  listener?: Interact.Listeners,
-  result?: { [type: string]: Interact.Listener[]
-}) {
+  type: Interact.EventTypes,
+  listeners?: Interact.ListenersArg | Interact.ListenersArg[],
+  result?: NormalizedListeners,
+): NormalizedListeners {
   result = result || {}
 
   if (is.string(type) && type.search(' ') !== -1) {
@@ -13,35 +17,38 @@ export default function normalize (
   }
 
   if (is.array(type)) {
-    return type.reduce((acc, t) => extend(acc, normalize(t, listener, result)), {})
+    return type.reduce<NormalizedListeners>(
+      (acc, t) => extend(acc, normalize(t, listeners, result)),
+      result
+    )
   }
 
   // ({ type: fn }) -> ('', { type: fn })
   if (is.object(type)) {
-    listener = type
+    listeners = type
     type = ''
   }
 
-  if (is.func(listener)) {
+  if (is.func(listeners)) {
     result[type] = result[type] || []
-    result[type].push(listener)
+    result[type].push(listeners)
   }
-  else if (is.array(listener)) {
-    for (const l of listener) {
+  else if (is.array(listeners)) {
+    for (const l of listeners) {
       normalize(type, l, result)
     }
   }
-  else if (is.object(listener)) {
-    for (const prefix in listener as Interact.Listener) {
+  else if (is.object(listeners)) {
+    for (const prefix in listeners) {
       const combinedTypes = split(prefix).map((p) => `${type}${p}`)
 
-      normalize(combinedTypes, listener[prefix], result)
+      normalize(combinedTypes, listeners[prefix], result)
     }
   }
 
-  return result
+  return result as NormalizedListeners
 }
 
-function split (type) {
+function split (type: string) {
   return type.trim().split(/ +/)
 }

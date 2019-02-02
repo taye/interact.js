@@ -1,22 +1,27 @@
 export interface Defaults {
   base: BaseDefaults
   perAction: PerActionDefaults
+  actions: ActionDefaults
 }
 
-export interface BaseDefaults extends SubDefaults {
+export interface ActionDefaults {
+  [key: string]: Options
+}
+
+export interface BaseDefaults {
   preventDefault?: 'auto' | 'never' | string
   deltaSource?: 'page' | 'client'
-}
-export interface PerActionDefaults extends SubDefaults {
-  enabled?: boolean
-  origin?: Interact.Point | string | Element
-}
-
-export interface SubDefaults {
   [key: string]: any
 }
 
-export interface Options extends BaseDefaults, PerActionDefaults {}
+export interface PerActionDefaults {
+  enabled?: boolean
+  origin?: Interact.Point | string | Element
+  listeners?: Interact.Listeners
+  [key: string]: any
+}
+
+export interface Options extends BaseDefaults, PerActionDefaults, ActionDefaults {}
 
 export const defaults: Defaults = {
   base: {

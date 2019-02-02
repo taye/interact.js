@@ -33,10 +33,7 @@ declare module '@interactjs/core/PointerInfo' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
-  interface Defaults {
-    pointerEvents: any
-  }
-  interface Options {
+  interface ActionDefaults {
     pointerEvents?: any
   }
 }
@@ -193,7 +190,7 @@ function install (scope: Scope) {
   } = scope
 
   scope.pointerEvents = pointerEvents
-  scope.defaults.pointerEvents = pointerEvents.defaults
+  scope.defaults.actions.pointerEvents = pointerEvents.defaults
 
   interactions.signals.on('new', (interaction) => {
     interaction.prevTap    = null  // the most recent tap event on this interaction

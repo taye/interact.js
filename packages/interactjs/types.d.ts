@@ -106,14 +106,14 @@ declare namespace Interact {
     left?: boolean | CSSSelector | DOMElement
     bottom?: boolean | CSSSelector | DOMElement
     right?: boolean | CSSSelector | DOMElement
-    [key: string]: boolean | CSSSelector | DOMElement;
+    [key: string]: boolean | CSSSelector | DOMElement
   }
 
   export type CommonOptions = Options
 
   export interface DraggableOptions extends Options {
     axis?: 'x' | 'y'
-    oninertiastart?: Listeners
+    oninertiastart?: ListenersArg
   }
 
   export interface DropzoneOptions extends Options {
@@ -122,12 +122,12 @@ declare namespace Interact {
     overlap?: 'pointer' | 'center' | number
     checker?: DropFunctionChecker
 
-    ondropactivate?: Interact.Listeners
-    ondropdeactivate?: Interact.Listeners
-    ondragenter?: Interact.Listeners
-    ondragleave?: Interact.Listeners
-    ondropmove?: Interact.Listeners
-    ondrop?: Interact.Listeners
+    ondropactivate?: Interact.ListenersArg
+    ondropdeactivate?: Interact.ListenersArg
+    ondragenter?: Interact.ListenersArg
+    ondragleave?: Interact.ListenersArg
+    ondropmove?: Interact.ListenersArg
+    ondrop?: Interact.ListenersArg
   }
 
   export type DropFunctionChecker = (
@@ -150,7 +150,7 @@ declare namespace Interact {
     invert?: 'none' | 'negate' | 'reposition'
     margin: number,
     squareResize?: boolean
-    oninertiastart?: Listeners
+    oninertiastart?: ListenersArg
   }
 
   export type GesturableOptions = Options
@@ -177,12 +177,14 @@ declare namespace Interact {
   export type PointerEventType = MouseEvent | TouchEvent | PointerEvent
   export type PointerType = MouseEvent | Touch | PointerEvent
 
-  export type EventTypes = string | string[] | {
-    [index: string]: EventTypes | Listeners
-  }
+  export type EventTypes = string | ListenerMap | (string | ListenerMap)[]
 
   export type Listener = (...args: any) => any
-  export type Listeners = Listener | Listener[]
+  export type Listeners = ListenerMap | ListenerMap[]
+  export type ListenersArg = Listener | ListenerMap | (Listener | ListenerMap)[]
+  export interface ListenerMap {
+    [index: string]: ListenersArg | ListenersArg[]
+  }
 
   export type OnEventName =
     'dragstart'
@@ -213,32 +215,32 @@ declare namespace Interact {
     | 'hold'
 
   export interface OnEventFunctions {
-    dragstart?: Listeners
-    dragmove?: Listeners
-    draginertiastart?: Listeners
-    dragend?: Listeners
-    resizestart?: Listeners
-    resizemove?: Listeners
-    resizeinertiastart?: Listeners
-    resizeend?: Listeners
-    gesturestart?: Listeners
-    gesturemove?: Listeners
-    gestureend?: Listeners
+    dragstart?: ListenersArg
+    dragmove?: ListenersArg
+    draginertiastart?: ListenersArg
+    dragend?: ListenersArg
+    resizestart?: ListenersArg
+    resizemove?: ListenersArg
+    resizeinertiastart?: ListenersArg
+    resizeend?: ListenersArg
+    gesturestart?: ListenersArg
+    gesturemove?: ListenersArg
+    gestureend?: ListenersArg
     // drop
-    dropactivate?: Listeners
-    dropdeactivate?: Listeners
-    dragenter?: Listeners
-    dragleave?: Listeners
-    dropmove?: Listeners
-    drop?: Listeners
+    dropactivate?: ListenersArg
+    dropdeactivate?: ListenersArg
+    dragenter?: ListenersArg
+    dragleave?: ListenersArg
+    dropmove?: ListenersArg
+    drop?: ListenersArg
     // pointer events
-    down?: Listeners
-    move?: Listeners
-    up?: Listeners
-    cancel?: Listeners
-    tap?: Listeners
-    doubletap?: Listeners
-    hold?: Listeners
+    down?: ListenersArg
+    move?: ListenersArg
+    up?: ListenersArg
+    cancel?: ListenersArg
+    tap?: ListenersArg
+    doubletap?: ListenersArg
+    hold?: ListenersArg
   }
 
   export type OnEvent = OnEventName | OnEventName[]

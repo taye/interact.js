@@ -14,6 +14,16 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
+declare module '@interactjs/core/defaultOptions' {
+  interface PerActionDefaults {
+    modifiers?: any[]
+  }
+  interface Options {
+    drag?: Interact.DraggableOptions
+    modifiers?: any[]
+  }
+}
+
 function install (scope: Scope) {
   const {
     interactions,
