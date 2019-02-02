@@ -4,13 +4,17 @@
 //                  Taye Adeyemi <taye.me>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-import { Options as _Options } from '@interactjs/core/defaultOptions'
+import { BaseDefaults, Options as _Options, PerActionDefaults } from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractEvent from '@interactjs/core/InteractEvent'
 import _Interaction, { Action } from '@interactjs/core/Interaction'
 import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
 
 declare namespace Interact {
+  type OrBoolean<T> = {
+    [P in keyof T]: T[P] | boolean;
+  }
+
   export type Target = Window | Document | Element | string
   export type interact = typeof interact
   export type Plugin = _Plugin
@@ -109,7 +113,7 @@ declare namespace Interact {
     [key: string]: boolean | CSSSelector | DOMElement
   }
 
-  export type CommonOptions = Options
+  export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {}
 
   export interface DraggableOptions extends Options {
     axis?: 'x' | 'y'
@@ -142,13 +146,13 @@ declare namespace Interact {
 
   export interface ResizableOptions extends Options {
     square?: boolean
-    preserveAspectRatio: boolean,
+    preserveAspectRatio?: boolean,
     edges?: EdgeOptions | null
     // deprecated
     axis?: 'x' | 'y' | 'xy'
     //
     invert?: 'none' | 'negate' | 'reposition'
-    margin: number,
+    margin?: number,
     squareResize?: boolean
     oninertiastart?: ListenersArg
   }
@@ -177,11 +181,11 @@ declare namespace Interact {
   export type PointerEventType = MouseEvent | TouchEvent | PointerEvent
   export type PointerType = MouseEvent | Touch | PointerEvent
 
-  export type EventTypes = string | ListenerMap | (string | ListenerMap)[]
+  export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
 
   export type Listener = (...args: any) => any
   export type Listeners = ListenerMap | ListenerMap[]
-  export type ListenersArg = Listener | ListenerMap | (Listener | ListenerMap)[]
+  export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
   export interface ListenerMap {
     [index: string]: ListenersArg | ListenersArg[]
   }

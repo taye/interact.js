@@ -3,9 +3,11 @@ import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 import DropEvent from './DropEvent'
 
+export type DropzoneMethod = (options?: Interact.DropzoneOptions | boolean) => Interact.Interactable | Interact.DropzoneOptions
+
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    dropzone: (options: any) => Interactable | { [key: string]: any }
+    dropzone: DropzoneMethod
     dropCheck: (
       dragEvent: InteractEvent,
       event: Interact.PointerEventType,
@@ -397,7 +399,7 @@ function onEventCreated ({ interaction, iEvent, event }, scope) {
   dropStatus.events = getDropEvents(interaction, event, dragEvent)
 }
 
-function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions) {
+function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean) {
   if (utils.is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
 

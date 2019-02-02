@@ -48,6 +48,7 @@ interact(target)
     restrict     : {/* ... */},
     inertia      : {/* ... */},
     autoScroll   : {/* ... */},
+    margin       : 50,
 
     square       : true || false,
     axis         : 'x' || 'y',

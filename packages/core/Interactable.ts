@@ -57,7 +57,7 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  setPerAction (actionName, options: Options) {
+  setPerAction (actionName, options: Interact.OrBoolean<Options>) {
     const defaults = this._defaults
 
     // for all the default per-action options
@@ -281,7 +281,7 @@ export class Interactable implements Partial<Eventable> {
    * @param {object} options The new settings to apply
    * @return {object} This Interactable
    */
-  set (options) {
+  set (options: Interact.OptionsArg) {
     const defaults = this._defaults
 
     if (!is.object(options)) {

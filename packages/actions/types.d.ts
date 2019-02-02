@@ -1,6 +1,6 @@
 import drag, { DraggableMethod } from './drag'
-import gesture from './gesture'
-import resize from './resize'
+import gesture, { GesturableMethod } from './gesture'
+import resize, { ResizableMethod } from './resize'
 
 // drag
 declare module '@interactjs/core/Interactable' {
@@ -24,7 +24,7 @@ declare module '@interactjs/core/scope' {
 // resize
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    resizable: (options?: any) => Interactable | { [key: string]: any }
+    resizable: ResizableMethod
   }
 }
 
@@ -56,7 +56,7 @@ declare module '@interactjs/core/scope' {
 // gesture
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    gesturable: (options?: any) => Interactable | { [key: string]: any }
+    gesturable: GesturableMethod
   }
 }
 
