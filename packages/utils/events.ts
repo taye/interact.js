@@ -4,7 +4,7 @@ import * as is from './is'
 import pExtend from './pointerExtend'
 import pointerUtils from './pointerUtils'
 
-type Listener = (event: Event) => any
+type Listener = (event: Event | FakeEvent) => any
 
 const elements: EventTarget[] = []
 const targets: Array<{
@@ -191,16 +191,10 @@ function removeDelegate (selector, context, type, listener?, optionalArg?: any) 
 // listener is added to a selector interactable
 function delegateListener (event: Event, optionalArg?: any) {
   const options = getOptions(optionalArg)
-  const fakeEvent = {} as any
+  const fakeEvent = new FakeEvent(event)
   const delegated = delegatedEvents[event.type]
   const [eventTarget] = (pointerUtils.getEventTargets(event))
   let element = eventTarget
-
-  // duplicate the event so that currentTarget can be changed
-  pExtend(fakeEvent, event)
-
-  fakeEvent.originalEvent = event
-  fakeEvent.preventDefault = preventOriginalDefault
 
   // climb up document tree looking for selector matches
   while (is.element(element)) {
@@ -231,12 +225,29 @@ function delegateUseCapture (event: Event) {
   return delegateListener.call(this, event, true)
 }
 
-function preventOriginalDefault () {
-  this.originalEvent.preventDefault()
-}
-
 function getOptions (param) {
   return is.object(param) ? param : { capture: param }
+}
+
+export class FakeEvent implements Partial<Event> {
+  currentTarget: EventTarget
+
+  constructor (public originalEvent) {
+    // duplicate the event so that currentTarget can be changed
+    pExtend(this, originalEvent)
+  }
+
+  preventOriginalDefault () {
+    this.originalEvent.preventDefault()
+  }
+
+  stopPropagation () {
+    this.originalEvent.stopPropagation()
+  }
+
+  stopImmediatePropagation () {
+    this.originalEvent.stopImmediatePropagation()
+  }
 }
 
 const events = {
