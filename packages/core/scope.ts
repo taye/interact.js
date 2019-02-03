@@ -21,113 +21,113 @@ export function createScope () {
 }
 
 export class Scope {
-    // FIXME Signals
-    signals = new Signals()
-    browser = browser
-    events = events
-    utils = utils
-    defaults: Defaults = utils.clone(defaults) as Defaults
-    Eventable = Eventable
-    actions: Actions = {
-      names: [],
-      methodDict: {},
-      eventTypes: [],
+  // FIXME Signals
+  signals = new Signals()
+  browser = browser
+  events = events
+  utils = utils
+  defaults: Defaults = utils.clone(defaults) as Defaults
+  Eventable = Eventable
+  actions: Actions = {
+    names: [],
+    methodDict: {},
+    eventTypes: [],
+  }
+
+  InteractEvent = InteractEvent
+  Interactable!: typeof InteractableBase
+  interactables = new InteractableSet(this)
+
+  // main window
+  _win!: Window
+
+  // main document
+  document!: Document
+
+  // all documents being listened to
+  documents: Array<{ doc: Document, options: any }> = []
+
+  constructor () {
+    const scope = this as Scope;
+
+    (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
+      get _defaults () { return scope.defaults }
+
+      set (options: any) {
+        super.set(options)
+
+        scope.interactables.signals.fire('set', {
+          options,
+          interactable: this,
+        })
+
+        return this
+      }
+
+      unset () {
+        super.unset()
+        scope.interactables.signals.fire('unset', { interactable: this })
+      }
+    }
+  }
+
+  init (window: Window) {
+    return initScope(this, window)
+  }
+
+  addDocument (doc: Document, options?: any): void | false {
+    // do nothing if document is already known
+    if (this.getDocIndex(doc) !== -1) { return false }
+
+    const window = win.getWindow(doc)
+
+    options = options ? utils.extend({}, options) : {}
+
+    this.documents.push({ doc, options })
+    events.documents.push(doc)
+
+    // don't add an unload event for the main document
+    // so that the page may be cached in browser history
+    if (doc !== this.document) {
+      events.add(window, 'unload', this.onWindowUnload)
     }
 
-    InteractEvent = InteractEvent
-    Interactable!: typeof InteractableBase
-    interactables = new InteractableSet(this)
+    this.signals.fire('add-document', { doc, window, scope: this, options })
+  }
 
-    // main window
-    _win!: Window
+  removeDocument (doc: Document) {
+    const index = this.getDocIndex(doc)
 
-    // main document
-    document!: Document
+    const window = win.getWindow(doc)
+    const options = this.documents[index].options
 
-    // all documents being listened to
-    documents: Array<{ doc: Document, options: any }> = []
+    events.remove(window, 'unload', this.onWindowUnload)
 
-    constructor () {
-      const scope = this as Scope;
+    this.documents.splice(index, 1)
+    events.documents.splice(index, 1)
 
-      (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
-        get _defaults () { return scope.defaults }
+    this.signals.fire('remove-document', { doc, window, scope: this, options })
+  }
 
-        set (options: any) {
-          super.set(options)
+  onWindowUnload (event: Event) {
+    this.removeDocument(event.target as Document)
+  }
 
-          scope.interactables.signals.fire('set', {
-            options,
-            interactable: this,
-          })
-
-          return this
-        }
-
-        unset () {
-          super.unset()
-          scope.interactables.signals.fire('unset', { interactable: this })
-        }
+  getDocIndex (doc: Document) {
+    for (let i = 0; i < this.documents.length; i++) {
+      if (this.documents[i].doc === doc) {
+        return i
       }
     }
 
-    init (window: Window) {
-      return initScope(this, window)
-    }
+    return -1
+  }
 
-    addDocument (doc: Document, options?: any): void | false {
-      // do nothing if document is already known
-      if (this.getDocIndex(doc) !== -1) { return false }
+  getDocOptions (doc: Document) {
+    const docIndex = this.getDocIndex(doc)
 
-      const window = win.getWindow(doc)
-
-      options = options ? utils.extend({}, options) : {}
-
-      this.documents.push({ doc, options })
-      events.documents.push(doc)
-
-      // don't add an unload event for the main document
-      // so that the page may be cached in browser history
-      if (doc !== this.document) {
-        events.add(window, 'unload', this.onWindowUnload)
-      }
-
-      this.signals.fire('add-document', { doc, window, scope: this, options })
-    }
-
-    removeDocument (doc: Document) {
-      const index = this.getDocIndex(doc)
-
-      const window = win.getWindow(doc)
-      const options = this.documents[index].options
-
-      events.remove(window, 'unload', this.onWindowUnload)
-
-      this.documents.splice(index, 1)
-      events.documents.splice(index, 1)
-
-      this.signals.fire('remove-document', { doc, window, scope: this, options })
-    }
-
-    onWindowUnload (event: Event) {
-      this.removeDocument(event.target as Document)
-    }
-
-    getDocIndex (doc: Document) {
-      for (let i = 0; i < this.documents.length; i++) {
-        if (this.documents[i].doc === doc) {
-          return i
-        }
-      }
-
-      return -1
-    }
-
-    getDocOptions (doc: Document) {
-      const docIndex = this.getDocIndex(doc)
-
-      return docIndex === -1 ? null : this.documents[docIndex].options
-    }
+    return docIndex === -1 ? null : this.documents[docIndex].options
+  }
 }
 
 class InteractableSet {
