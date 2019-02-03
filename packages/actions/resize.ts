@@ -5,6 +5,37 @@ import * as utils from '@interactjs/utils'
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 export type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOptions> | boolean) => Interact.Interactable | Interact.ResizableOptions
 
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    resizable: ResizableMethod
+  }
+}
+
+declare module '@interactjs/core/InteractEvent' {
+  interface InteractEvent {
+    deltaRect?: Interact.Rect
+    rect?: Interact.Rect
+  }
+}
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    resizeAxes: 'x' | 'y' | 'xy'
+  }
+}
+
+declare module '@interactjs/core/defaultOptions' {
+  interface ActionDefaults {
+    resize?: Interact.ResizableOptions
+  }
+}
+
+declare module '@interactjs/core/scope' {
+  interface Actions {
+    resize?: typeof resize
+  }
+}
+
 function install (scope: Scope) {
   const {
     actions,

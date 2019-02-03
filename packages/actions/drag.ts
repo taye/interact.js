@@ -2,6 +2,24 @@ import { Scope } from '@interactjs/core/scope'
 import * as arr from '@interactjs/utils/arr'
 import * as is from '@interactjs/utils/is'
 
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    draggable: DraggableMethod
+  }
+}
+
+declare module '@interactjs/core/defaultOptions' {
+  interface ActionDefaults {
+    drag?: Interact.DraggableOptions
+  }
+}
+
+declare module '@interactjs/core/scope' {
+  interface Actions {
+    drag?: typeof drag
+  }
+}
+
 export type DraggableMethod = (options?: Interact.OrBoolean<Interact.DraggableOptions> | boolean)
   => Interact.Interactable | Interact.DropzoneOptions
 

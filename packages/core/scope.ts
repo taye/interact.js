@@ -16,6 +16,12 @@ const {
 
 export type Defaults = typeof defaults
 
+export interface Actions {
+  names: string[]
+  methodDict: { [key: string]: string }
+  eventTypes: string[]
+}
+
 export function createScope () {
   return new Scope()
 }

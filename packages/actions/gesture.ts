@@ -4,6 +4,24 @@ import * as utils from '@interactjs/utils'
 
 export type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions
 
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    gesturable: GesturableMethod
+  }
+}
+
+declare module '@interactjs/core/defaultOptions' {
+  interface ActionDefaults {
+    gesture?: Interact.GesturableOptions
+  }
+}
+
+declare module '@interactjs/core/scope' {
+  interface Actions {
+    gesture?: typeof gesture
+  }
+}
+
 function install (scope: Scope) {
   const {
     actions,

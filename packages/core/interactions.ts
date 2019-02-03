@@ -20,12 +20,6 @@ declare module '@interactjs/core/scope' {
     }
     prevTouchTime: number
   }
-
-  interface Actions {
-    names: string[]
-    methodDict: { [key: string]: string }
-    eventTypes: string[]
-  }
 }
 
 const methodNames = [
