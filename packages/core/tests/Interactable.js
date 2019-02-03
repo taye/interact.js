@@ -14,7 +14,7 @@ test('Interactable copies and extends defaults', t => {
     this.setPerAction('test', options)
   }
 
-  defaults.test = {
+  defaults.actions.test = {
     fromDefault: { a: 1, b: 2 },
     specified: { c: 1, d: 2 },
   }
@@ -26,12 +26,12 @@ test('Interactable copies and extends defaults', t => {
 
   t.deepEqual(interactable.options.test.specified, specified.specified,
     'specified options are properly set')
-  t.deepEqual(interactable.options.test.fromDefault, defaults.test.fromDefault,
+  t.deepEqual(interactable.options.test.fromDefault, defaults.actions.test.fromDefault,
     'default options are properly set')
-  t.notEqual(interactable.options.test.fromDefault, defaults.test.fromDefault,
+  t.notEqual(interactable.options.test.fromDefault, defaults.actions.test.fromDefault,
     'defaults are not aliased')
 
-  defaults.test.fromDefault.c = 3
+  defaults.actions.test.fromDefault.c = 3
   t.notOk('c' in interactable.options.test.fromDefault,
     'modifying defaults does not affect constructed interactables')
 
@@ -52,7 +52,7 @@ test('Interactable copies and extends per action defaults', t => {
     fromDefault: { a: 1, b: 2 },
     specified: null,
   }
-  defaults.test = { testModifier: defaults.perAction.testModifier }
+  defaults.actions.test = { testModifier: defaults.perAction.testModifier }
 
   const div = d('div')
   const interactable = scope.interactables.new(div, {})
@@ -83,7 +83,7 @@ test('Interactable copies and extends per action defaults', t => {
   // Undo global changes
   delete scope.actions
   delete Interactable.prototype.test
-  delete defaults.test
+  delete defaults.actions.test
   delete defaults.perAction.testModifier
 
   t.end()
@@ -101,7 +101,7 @@ test('Interactable.updatePerActionListeners', t => {
     this.setPerAction('test', options)
   }
 
-  scope.defaults.test = {}
+  scope.defaults.actions.test = {}
 
   const interactable = scope.interactables.new('target')
 

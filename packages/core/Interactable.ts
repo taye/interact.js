@@ -9,6 +9,7 @@ import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
 import { Defaults, Options } from './defaultOptions'
 import Eventable from './Eventable'
+import { Actions } from './scope'
 
 /** */
 export class Interactable implements Partial<Eventable> {
@@ -16,11 +17,12 @@ export class Interactable implements Partial<Eventable> {
     return {
       base: {},
       perAction: {},
-    } as Defaults
+      actions: {},
+    }
   }
 
   options!: Required<Options>
-  readonly _actions: any
+  readonly _actions: Actions
   readonly target: Interact.Target
   readonly events = new Eventable()
   readonly _context: Element
@@ -294,7 +296,7 @@ export class Interactable implements Partial<Eventable> {
       const methodName = this._actions.methodDict[actionName]
 
       this.options[actionName] = {}
-      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults[actionName]))
+      this.setPerAction(actionName, extend(extend({}, defaults.perAction), defaults.actions[actionName]))
 
       this[methodName](options[actionName])
     }

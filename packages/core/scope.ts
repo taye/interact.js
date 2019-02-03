@@ -28,6 +28,11 @@ export class Scope {
     utils = utils
     defaults: Defaults = utils.clone(defaults) as Defaults
     Eventable = Eventable
+    actions: Actions = {
+      names: [],
+      methodDict: {},
+      eventTypes: [],
+    }
 
     InteractEvent = InteractEvent
     Interactable!: typeof InteractableBase
@@ -140,10 +145,9 @@ class InteractableSet {
     const interactable = new this.scope.Interactable(target, options, this.scope.document)
 
     this.scope.addDocument(interactable._doc)
+    this.list.push(interactable)
 
-    this.scope.interactables.list.push(interactable)
-
-    this.scope.interactables.signals.fire('new', {
+    this.signals.fire('new', {
       target,
       options,
       interactable,
