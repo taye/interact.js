@@ -1,5 +1,12 @@
 type Scope = import ('@interactjs/core/scope').Scope
 
+declare module '@interactjs/core/defaultOptions' {
+  interface PerActionDefaults {
+    hold?: number
+    delay?: number
+  }
+}
+
 function install (scope: Scope) {
   const {
     autoStart,

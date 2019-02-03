@@ -4,6 +4,19 @@ import raf from '@interactjs/utils/raf'
 
 type Scope = import ('@interactjs/core/scope').Scope
 
+declare module '@interactjs/core/defaultOptions' {
+  interface PerActionDefaults {
+    inertia?: {
+      enabled?: boolean,
+      resistance?: number,        // the lambda in exponential decay
+      minSpeed?: number,          // target speed must be above this for inertia to start
+      endSpeed?: number,          // the speed at which inertia is slow enough to stop
+      allowResume?: true,         // allow resuming an action in inertia phase
+      smoothEndDuration?: number, // animate to snap/restrict endOnly if there's no inertia
+    }
+  }
+}
+
 function install (scope: Scope) {
   const {
     interactions,

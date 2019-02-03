@@ -3,6 +3,7 @@ import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
+export type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOptions> | boolean) => Interact.Interactable | Interact.ResizableOptions
 
 function install (scope: Scope) {
   const {
@@ -74,7 +75,7 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of resize elements, or this Interactable
    */
-  Interactable.prototype.resizable = function (this: Interact.Interactable, options) {
+  Interactable.prototype.resizable = function (this: Interact.Interactable, options: Interact.RestrictOption | boolean) {
     return resizable(this, options, scope)
   }
 
@@ -196,13 +197,13 @@ const resize = {
   defaultMargin: null as unknown as number,
 }
 
-function resizable (interactable: Interact.Interactable, options: Interact.Options, scope: Scope) {
+function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
   if (utils.is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
     interactable.setPerAction('resize', options)
     interactable.setOnEvents('resize', options)
 
-    if (/^x$|^y$|^xy$/.test(options.axis)) {
+    if (/^x$|^y$|^xy$/.test(options.axis as string)) {
       interactable.options.resize.axis = options.axis
     }
     else if (options.axis === null) {

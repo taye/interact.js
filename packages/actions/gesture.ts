@@ -2,6 +2,8 @@ import InteractEvent from '@interactjs/core/InteractEvent'
 import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
+export type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions
+
 function install (scope: Scope) {
   const {
     actions,
@@ -33,7 +35,7 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of gesture events, or this Interactable
    */
-  Interactable.prototype.gesturable = function (this: Interact.Interactable, options) {
+  Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
     if (utils.is.object(options)) {
       this.options.gesture.enabled = options.enabled !== false
       this.setPerAction('gesture', options)

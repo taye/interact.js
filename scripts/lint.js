@@ -31,9 +31,8 @@ function getSources () {
   const glob = require('glob')
 
   const jsAndTs = [
-    '+(packages|src|scripts|examples|test)/**/*.js',
-    '+(packages|src|scripts|examples|test)/**/*.ts',
-    './*.js',
+    '**/*.js',
+    '**/*.ts',
   ].reduce((acc, pattern) => [
     ...acc,
     ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
