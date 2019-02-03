@@ -1,10 +1,11 @@
 import { Defaults, Options } from './defaultOptions';
 import Eventable from './Eventable';
+import { Actions } from './scope';
 /** */
 export declare class Interactable implements Partial<Eventable> {
     protected readonly _defaults: Defaults;
     options: Required<Options>;
-    readonly _actions: any;
+    readonly _actions: Actions;
     readonly target: Interact.Target;
     readonly events: Eventable;
     readonly _context: Element;
@@ -16,7 +17,7 @@ export declare class Interactable implements Partial<Eventable> {
         [phase: string]: Interact.ListenersArg;
     }): this;
     updatePerActionListeners(actionName: any, prev: any, cur: any): void;
-    setPerAction(actionName: any, options: Options): void;
+    setPerAction(actionName: any, options: Interact.OrBoolean<Options>): void;
     /**
      * The default function to get an Interactables bounding rect. Can be
      * overridden using {@link Interactable.rectChecker}.
@@ -115,7 +116,7 @@ export declare class Interactable implements Partial<Eventable> {
      * @param {object} options The new settings to apply
      * @return {object} This Interactable
      */
-    set(options: any): this;
+    set(options: Interact.OptionsArg): this;
     /**
      * Remove this interactable from the list of interactables and remove it's
      * action capabilities and event listeners

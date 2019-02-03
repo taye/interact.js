@@ -25,12 +25,9 @@
  *   },
  * });
  */
-import { Scope } from '@interactjs/core/scope';
-declare function install(scope: Scope): void;
 declare function start(arg: any): any;
 declare function set(arg: any): void;
 declare const snapEdges: {
-    install: typeof install;
     start: typeof start;
     set: typeof set;
     defaults: {

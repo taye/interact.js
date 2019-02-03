@@ -1,4 +1,5 @@
 import { Scope } from '@interactjs/core/scope';
+export declare type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions;
 declare function install(scope: Scope): void;
 declare const gesture: {
     install: typeof install;

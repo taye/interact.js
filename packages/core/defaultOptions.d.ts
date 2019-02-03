@@ -15,9 +15,10 @@ export interface PerActionDefaults {
     enabled?: boolean;
     origin?: Interact.Point | string | Element;
     listeners?: Interact.Listeners;
-    [key: string]: any;
 }
-export interface Options extends BaseDefaults, PerActionDefaults, ActionDefaults {
+export interface Options extends BaseDefaults, PerActionDefaults {
+}
+export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {
 }
 export declare const defaults: Defaults;
 export default defaults;

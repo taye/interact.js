@@ -4,14 +4,14 @@ declare module '@interactjs/core/scope' {
         autoScroll: typeof autoScroll;
     }
 }
+declare module '@interactjs/core/defaultOptions' {
+    interface PerActionDefaults {
+        autoScroll?: Interact.AutoScrollOption;
+    }
+}
 declare function install(scope: Scope): void;
 declare const autoScroll: {
-    defaults: {
-        enabled: boolean;
-        margin: number;
-        container: Element | Window;
-        speed: number;
-    };
+    defaults: import("../interactjs/types").AutoScrollOption;
     interaction: any;
     i: any;
     x: number;

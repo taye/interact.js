@@ -1,6 +1,7 @@
 import { Action, Interaction } from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 export declare type EdgeName = 'top' | 'left' | 'bottom' | 'right';
+export declare type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOptions> | boolean) => Interact.Interactable | Interact.ResizableOptions;
 declare function install(scope: Scope): void;
 declare const resize: {
     install: typeof install;

@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.24+sha.1196d35-dirty
+ * interact.js v1.4.0-alpha.25+sha.c3a67ce-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5689,7 +5689,7 @@ function () {
       for (var actionName in this._actions.methodDict) {
         var methodName = this._actions.methodDict[actionName];
         this.options[actionName] = {};
-        this.setPerAction(actionName, (0, ___extend_15.default)((0, ___extend_15.default)({}, defaults.perAction), defaults[actionName]));
+        this.setPerAction(actionName, (0, ___extend_15.default)((0, ___extend_15.default)({}, defaults.perAction), defaults.actions[actionName]));
         this[methodName](options[actionName]);
       }
 
@@ -5741,7 +5741,8 @@ function () {
     get: function get() {
       return {
         base: {},
-        perAction: {}
+        perAction: {},
+        actions: {}
       };
     }
   }]);
@@ -6779,6 +6780,11 @@ function () {
     this.utils = __utils_21;
     this.defaults = __utils_21.clone(___defaultOptions_21.default);
     this.Eventable = ___Eventable_21.default;
+    this.actions = {
+      names: [],
+      methodDict: {},
+      eventTypes: []
+    };
     this.InteractEvent = ___InteractEvent_21.default;
     this.interactables = new InteractableSet(this); // all documents being listened to
 
@@ -6925,8 +6931,8 @@ function () {
       });
       var interactable = new this.scope.Interactable(target, options, this.scope.document);
       this.scope.addDocument(interactable._doc);
-      this.scope.interactables.list.push(interactable);
-      this.scope.interactables.signals.fire('new', {
+      this.list.push(interactable);
+      this.signals.fire('new', {
         target: target,
         options: options,
         interactable: interactable,
@@ -7959,11 +7965,6 @@ function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj :
  *   },
  * });
  */
-function __install_31(scope) {
-  var defaults = scope.defaults;
-  defaults.perAction.snapEdges = snapEdges.defaults;
-}
-
 function __start_31(arg) {
   var edges = arg.interaction.prepared.edges;
 
@@ -7980,7 +7981,6 @@ function __set_31(arg) {
 }
 
 var snapEdges = {
-  install: __install_31,
   start: __start_31,
   set: __set_31,
   defaults: (0, ___extend_31.default)((0, ___clone_31.default)(_size.default.defaults), {
@@ -8918,7 +8918,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.24";
+_interact.default.version = __init_23.version = "1.4.0-alpha.25";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

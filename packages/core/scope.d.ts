@@ -55,6 +55,7 @@ export declare class Scope {
     utils: typeof utils;
     defaults: Defaults;
     Eventable: typeof Eventable;
+    actions: Actions;
     InteractEvent: typeof InteractEvent;
     Interactable: typeof InteractableBase;
     interactables: InteractableSet;
