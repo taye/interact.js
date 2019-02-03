@@ -18,7 +18,6 @@ declare module '@interactjs/core/scope' {
       eventMap: any
       pointerMoveTolerance: number
     }
-    actions: Actions
     prevTouchTime: number
   }
 
@@ -96,12 +95,6 @@ function install (scope: Scope) {
     listeners,
     eventMap,
     pointerMoveTolerance: 1,
-  }
-
-  scope.actions = {
-    names: [],
-    methodDict: {},
-    eventTypes: [],
   }
 }
 
