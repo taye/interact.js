@@ -52,6 +52,14 @@ slider
   })
 ```
 
+<iframe height="265" style="width: 100%;" scrolling="no" title="interact.js
+simple slider"
+src="https://codepen.io/taye/embed/GgpxNq/?height=265&theme-id=dark&default-tab=result"
+frameborder="no" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href='https://codepen.io/taye/pen/GgpxNq/'>interact.js simple slider</a> by Taye A
+  (<a href='https://codepen.io/taye'>@taye</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
 Installation
 ============
 
