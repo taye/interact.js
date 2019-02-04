@@ -1,5 +1,5 @@
 import { Action, Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
+import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
@@ -8,13 +8,6 @@ export type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOp
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     resizable: ResizableMethod
-  }
-}
-
-declare module '@interactjs/core/InteractEvent' {
-  interface InteractEvent {
-    deltaRect?: Interact.Rect
-    rect?: Interact.Rect
   }
 }
 
@@ -32,8 +25,20 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface Actions {
-    resize?: typeof resize
+    [ActionName.Resize]?: typeof resize
   }
+
+  // eslint-disable-next-line no-shadow
+  enum ActionName {
+    Resize = 'resize'
+  }
+}
+
+(ActionName as any).Resize = 'resize'
+
+export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
+  deltaRect?: Interact.Rect
+  rect?: Interact.Rect
 }
 
 function install (scope: Scope) {
@@ -48,7 +53,7 @@ function install (scope: Scope) {
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', (interaction: Interaction) => {
+  interactions.signals.on('new', (interaction) => {
     interaction.resizeAxes = 'xy'
   })
 
@@ -110,8 +115,8 @@ function install (scope: Scope) {
     return resizable(this, options, scope)
   }
 
-  actions.resize = resize
-  actions.names.push('resize')
+  actions[ActionName.Resize] = resize
+  actions.names.push(ActionName.Resize)
   utils.arr.merge(actions.eventTypes, [
     'resizestart',
     'resizemove',
@@ -297,7 +302,7 @@ function checkResizeEdge (name: string, value: any, page: Interact.Point, elemen
     : utils.dom.matchesUpTo(element, value, interactableElement)
 }
 
-function initCursors (browser: typeof import('@interactjs/utils/browser').default) {
+function initCursors (browser: typeof import ('@interactjs/utils/browser').default) {
   return (browser.isIe9 ? {
     x : 'e-resize',
     y : 's-resize',

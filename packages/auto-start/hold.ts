@@ -7,6 +7,12 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    autoStartHoldTimer?: any
+  }
+}
+
 function install (scope: Scope) {
   const {
     autoStart,

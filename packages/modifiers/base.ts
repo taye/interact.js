@@ -42,12 +42,12 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('before-action-start', (arg) => {
-    start(arg, arg.interaction.coords.start.page, scope.modifiers)
+    start(arg as any, arg.interaction.coords.start.page, scope.modifiers)
   })
 
   interactions.signals.on('action-resume', (arg) => {
-    beforeMove(arg)
-    start(arg, arg.interaction.coords.cur.page, scope.modifiers)
+    beforeMove(arg as any)
+    start(arg as any, arg.interaction.coords.cur.page, scope.modifiers)
   })
 
   interactions.signals.on('before-action-move', beforeMove)
@@ -56,8 +56,8 @@ function install (scope: Scope) {
   interactions.signals.on('before-action-start', setCoords)
   interactions.signals.on('before-action-move', setCoords)
 
-  interactions.signals.on('after-action-start', restoreCoords)
-  interactions.signals.on('after-action-move', restoreCoords)
+  interactions.signals.on('after-action-start', restoreCoords as any)
+  interactions.signals.on('after-action-move', restoreCoords as any)
   interactions.signals.on('stop', stop)
 }
 
@@ -95,7 +95,7 @@ function start (
   const modifierList = getModifierList(interaction, registeredModifiers)
   const states = prepareStates(modifierList)
 
-  const rect = extend({}, interactable.getRect(element as Element)) as  Interact.Rect & Interact.Rect2
+  const rect = extend({}, interactable.getRect(element)) as  Interact.Rect & Interact.Rect2
 
   if (!('width'  in rect)) { rect.width  = rect.right  - rect.left }
   if (!('height' in rect)) { rect.height = rect.bottom - rect.top  }

@@ -1,12 +1,18 @@
+import Interactable from '@interactjs/core/Interactable'
 import { Action, Interaction } from '@interactjs/core/Interaction'
 import { newInteraction } from '@interactjs/core/interactions'
 import { Scope } from '@interactjs/core/scope'
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
-type Interactable = import ('@interactjs/core/Interactable').default
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     reflow: (action: Action) => ReturnType<typeof reflow>
+  }
+}
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    _reflowResolve: () => void
   }
 }
 
@@ -15,6 +21,7 @@ export function install (scope: Scope) {
     actions,
     interactions,
     /** @lends Interactable */
+    // eslint-disable-next-line no-shadow
     Interactable,
   } = scope
 

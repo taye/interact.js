@@ -1,4 +1,4 @@
-import { Scope } from '@interactjs/core/scope'
+import { ActionName, Scope } from '@interactjs/core/scope'
 import * as arr from '@interactjs/utils/arr'
 import * as is from '@interactjs/utils/is'
 
@@ -16,9 +16,18 @@ declare module '@interactjs/core/defaultOptions' {
 
 declare module '@interactjs/core/scope' {
   interface Actions {
-    drag?: typeof drag
+    [ActionName.Drag]?: typeof drag
+  }
+
+  // eslint-disable-next-line no-shadow
+  enum ActionName {
+    Drag = 'drag'
   }
 }
+
+(ActionName as any).Drag = 'drag'
+
+export type DragEvent = Interact.InteractEvent<ActionName.Drag>
 
 export type DraggableMethod = (options?: Interact.OrBoolean<Interact.DraggableOptions> | boolean)
   => Interact.Interactable | Interact.DropzoneOptions
@@ -40,7 +49,7 @@ function install (scope: Scope) {
   Interactable.prototype.draggable = drag.draggable
 
   actions.drag = drag
-  actions.names.push('drag')
+  actions.names.push(ActionName.Drag)
   arr.merge(actions.eventTypes, [
     'dragstart',
     'dragmove',

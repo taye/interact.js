@@ -63,6 +63,7 @@ function install (scope: Scope) {
     dropStatus.activeDrops = null
     dropStatus.events = null
 
+    // TODO: maybe Interaction<T: Window | Document | Element> { element: T }
     if (!scope.dynamicDrop) {
       dropStatus.activeDrops = getActiveDrops(scope, interaction.element)
     }
@@ -74,8 +75,9 @@ function install (scope: Scope) {
     }
   })
 
-  interactions.signals.on('action-move', (arg) => onEventCreated(arg, scope))
-  interactions.signals.on('action-end', (arg) => onEventCreated(arg, scope))
+  // FIXME proper signal types
+  interactions.signals.on('action-move', (arg) => onEventCreated(arg as any, scope))
+  interactions.signals.on('action-end', (arg) => onEventCreated(arg as any, scope))
 
   interactions.signals.on('after-action-move', ({ interaction }) => {
     if (interaction.prepared.name !== 'drag') { return }

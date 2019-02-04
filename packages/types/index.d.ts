@@ -3,11 +3,14 @@
 // Definitions by: Gaspard Bucher <feature-space.com>
 //                  Taye Adeyemi <taye.me>
 
+import * as actions from '@interactjs/actions'
 import { BaseDefaults, Options as _Options, PerActionDefaults } from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
-import _InteractEvent from '@interactjs/core/InteractEvent'
+import _InteractEvent, { EventPhase as _EventPhase } from '@interactjs/core/InteractEvent'
 import _Interaction, { Action } from '@interactjs/core/Interaction'
+import { ActionName as _ActionName } from '@interactjs/core/scope'
 import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
+import { SignalArg as _SignalArg } from '@interactjs/utils/Signals'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -19,8 +22,18 @@ declare namespace Interact {
   export type Plugin = _Plugin
   export type Interactable = _Interactable
   export type Interaction = _Interaction
-  export type InteractEvent = _InteractEvent
+  export type InteractEvent<
+    T extends _ActionName = _ActionName,
+    P extends _EventPhase = _EventPhase,
+  > = _InteractEvent<T, P>
+  export type EventPhase = _EventPhase
   export type Options = _Options
+  export type ActionName = _ActionName
+  export type SignalArg = _SignalArg
+
+  export type DragEvent = actions.DragEvent
+  export type ResizeEvent = actions.ResizeEvent
+  export type GestureEvent = actions.GestureEvent
 
   export interface Point {
     x: number
@@ -177,8 +190,8 @@ declare namespace Interact {
 
   export type RectChecker = (element: Element)  => Partial<Rect & Rect3>
 
-  export type PointerEventType = MouseEvent | TouchEvent | PointerEvent
-  export type PointerType = MouseEvent | Touch | PointerEvent
+  export type PointerEventType = MouseEvent | TouchEvent | PointerEvent | InteractEvent
+  export type PointerType = MouseEvent | Touch | PointerEvent | InteractEvent
 
   export type EventTypes = string | ListenerMap | Array<(string | ListenerMap)>
 

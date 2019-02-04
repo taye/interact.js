@@ -241,7 +241,7 @@ export class Interactable implements Partial<Eventable> {
         }
         // remove listener from this Interatable's element
         else {
-          (events[addRemove] as typeof events.remove)(this.target as Element, type, listener, options)
+          (events[addRemove] as typeof events.remove)(this.target, type, listener, options)
         }
       }
     }

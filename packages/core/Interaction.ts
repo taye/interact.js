@@ -1,28 +1,28 @@
 import * as utils from '@interactjs/utils'
 import Interactable from './Interactable'
-import InteractEvent from './InteractEvent'
+import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
 
 export interface Action {
-  name: 'drag' | 'resize' | 'gesture'
+  name: Interact.ActionName
   axis?: 'x' | 'y' | 'xy'
   edges?: Partial<Interact.Rect>
 }
 
 export class Interaction {
   // current interactable being interacted with
-  target: Interactable = null as any
+  target: Interactable = null
 
   // the target element of the interactable
-  element: Node = null as any
+  element: Element = null
 
   _signals: utils.Signals
 
   // action that's ready to be fired on next move event
   prepared: Action = {
-    name : null as any,
-    axis : null as any,
-    edges: null as any,
+    name : null,
+    axis : null,
+    edges: null,
   }
 
   pointerType: string
@@ -31,7 +31,7 @@ export class Interaction {
   pointers: PointerInfo[] = []
 
   // pointerdown/mousedown/touchstart event
-  downEvent: Interact.PointerEventType = null as any
+  downEvent: Interact.PointerEventType = null
 
   downPointer: Interact.PointerType = {} as Interact.PointerType
 
@@ -40,13 +40,13 @@ export class Interaction {
     event: Interact.PointerEventType
     eventTarget: Node,
   } = {
-    pointer: null as any,
-    event: null as any,
-    eventTarget: null as any,
+    pointer: null,
+    event: null,
+    eventTarget: null,
   }
 
   // previous action event
-  prevEvent: InteractEvent = null as any
+  prevEvent: InteractEvent = null
 
   pointerIsDown = false
   pointerWasMoved = false
@@ -221,7 +221,7 @@ export class Interaction {
    * snap/restrict has been changed and you want a movement with the new
    * settings.
    */
-  move (signalArg) {
+  move (signalArg?) {
     signalArg = utils.extend({
       pointer: this._latestPointer.pointer,
       event: this._latestPointer.event,
@@ -414,10 +414,10 @@ export class Interaction {
     this._latestPointer.eventTarget = eventTarget
   }
 
-  _createPreparedEvent (event, phase, preEnd, type) {
+  _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string) {
     const actionName = this.prepared.name
 
-    return new InteractEvent(this, event, actionName, phase, this.element as Element, null, preEnd, type)
+    return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type)
   }
 
   _fireEvent (iEvent) {
