@@ -1,4 +1,3 @@
-import Interaction from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import extend from '@interactjs/utils/extend'
 
@@ -87,8 +86,8 @@ function getRectOffset (rect, coords) {
 }
 
 function start (
-  { interaction, phase }: { interaction: Interaction, phase: string },
-  pageCoords,
+  { interaction, phase }: Interact.SignalArg,
+  pageCoords: Interact.Point,
   registeredModifiers,
 ) {
   const { target: interactable, element } = interaction
@@ -105,7 +104,7 @@ function start (
   interaction.modifiers.startOffset = startOffset
   interaction.modifiers.startDelta = { x: 0, y: 0 }
 
-  const arg = {
+  const arg: Partial<Interact.SignalArg> = {
     interaction,
     interactable,
     element,
@@ -129,7 +128,7 @@ function start (
   return result
 }
 
-function setAll (arg) {
+function setAll (arg: Partial<Interact.SignalArg>) {
   const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg
 
   const states = skipModifiers

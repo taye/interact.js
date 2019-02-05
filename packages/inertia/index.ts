@@ -142,7 +142,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
   const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
   let smoothEnd = false
-  let modifierResult
+  let modifierResult: ReturnType<typeof modifiers.setAll>
 
   // check if inertia should be started
   const inertiaPossible = (options && options.enabled &&
@@ -168,7 +168,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
   if (inertiaPossible && !inertia) {
     modifierResult = modifiers.setAll(modifierArg)
 
-    if (modifierResult.shouldMove) {
+    if (modifierResult.changed) {
       smoothEnd = true
     }
   }
