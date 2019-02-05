@@ -1,4 +1,15 @@
 declare type Scope = import('@interactjs/core/scope').Scope;
+declare module '@interactjs/core/InteractEvent' {
+    enum EventPhase {
+        Resume = "resume",
+        InertiaStart = "inertiastart"
+    }
+}
+declare module '@interactjs/core/Interaction' {
+    interface Interaction {
+        inertia?: any;
+    }
+}
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
         inertia?: {
@@ -12,10 +23,10 @@ declare module '@interactjs/core/defaultOptions' {
     }
 }
 declare function install(scope: Scope): void;
-declare function calcInertia(interaction: any, state: any): void;
-declare function inertiaTick(interaction: any): void;
-declare function smothEndTick(interaction: any): void;
-declare function updateInertiaCoords(interaction: any): void;
+declare function calcInertia(interaction: Interact.Interaction, state: any): void;
+declare function inertiaTick(interaction: Interact.Interaction): void;
+declare function smothEndTick(interaction: Interact.Interaction): void;
+declare function updateInertiaCoords(interaction: Interact.Interaction): void;
 declare const _default: {
     install: typeof install;
     calcInertia: typeof calcInertia;

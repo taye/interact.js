@@ -1,15 +1,15 @@
 import * as utils from '@interactjs/utils';
 import Interactable from './Interactable';
-import InteractEvent from './InteractEvent';
+import InteractEvent, { EventPhase } from './InteractEvent';
 import PointerInfo from './PointerInfo';
 export interface Action {
-    name: 'drag' | 'resize' | 'gesture';
+    name: Interact.ActionName;
     axis?: 'x' | 'y' | 'xy';
     edges?: Partial<Interact.Rect>;
 }
 export declare class Interaction {
     target: Interactable;
-    element: Node;
+    element: Element;
     _signals: utils.Signals;
     prepared: Action;
     pointerType: string;
@@ -146,7 +146,7 @@ export declare class Interaction {
      * snap/restrict has been changed and you want a movement with the new
      * settings.
      */
-    move(signalArg: any): void;
+    move(signalArg?: any): void;
     pointerUp(pointer: any, event: any, eventTarget: any, curEventTarget: any): void;
     documentBlur(event: any): void;
     /**
@@ -166,7 +166,7 @@ export declare class Interaction {
      * @param {PointerEvent} [event]
      */
     end(event: any): void;
-    currentAction(): "drag" | "resize" | "gesture";
+    currentAction(): import("@interactjs/core/scope").ActionName;
     interacting(): boolean;
     /** */
     stop(): void;
@@ -175,7 +175,7 @@ export declare class Interaction {
     updatePointer(pointer: any, event: any, eventTarget: any, down: any): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
-    _createPreparedEvent(event: any, phase: any, preEnd: any, type: any): InteractEvent;
+    _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<import("@interactjs/core/scope").ActionName, EventPhase>;
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: any): boolean;
 }

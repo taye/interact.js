@@ -11,7 +11,7 @@ declare module '@interactjs/core/defaultOptions' {
 }
 declare function install(scope: Scope): void;
 declare const autoScroll: {
-    defaults: import("../interactjs/types").AutoScrollOption;
+    defaults: import("../types").AutoScrollOption;
     interaction: any;
     i: any;
     x: number;

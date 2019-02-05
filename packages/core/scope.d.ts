@@ -3,8 +3,17 @@ import defaults from './defaultOptions';
 import Eventable from './Eventable';
 import InteractableBase from './Interactable';
 import InteractEvent from './InteractEvent';
-export declare type Defaults = typeof defaults;
+export declare enum ActionName {
+}
+export interface Actions {
+    names: ActionName[];
+    methodDict: {
+        [key: string]: string;
+    };
+    eventTypes: string[];
+}
 export declare function createScope(): Scope;
+export declare type Defaults = typeof defaults;
 export declare class Scope {
     signals: utils.Signals;
     browser: {

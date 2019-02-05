@@ -51,6 +51,6 @@ declare const drop: {
     getDrop: typeof getDrop;
     getDropEvents: typeof getDropEvents;
     fireDropEvents: typeof fireDropEvents;
-    defaults: import("../../interactjs/types").DropzoneOptions;
+    defaults: import("../../types").DropzoneOptions;
 };
 export default drop;

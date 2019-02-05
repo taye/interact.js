@@ -5,6 +5,11 @@ declare module '@interactjs/core/defaultOptions' {
         delay?: number;
     }
 }
+declare module '@interactjs/core/Interaction' {
+    interface Interaction {
+        autoStartHoldTimer?: any;
+    }
+}
 declare function install(scope: Scope): void;
 declare function getHoldDuration(interaction: any): any;
 declare const _default: {

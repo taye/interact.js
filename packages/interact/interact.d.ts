@@ -3,8 +3,9 @@ import { Options } from '@interactjs/core/defaultOptions';
 import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
-export interface Plugin extends Partial<any> {
+export interface Plugin {
     install(scope: Scope): void;
+    [key: string]: any;
 }
 declare module '@interactjs/core/scope' {
     interface Scope {

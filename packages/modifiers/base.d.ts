@@ -1,4 +1,3 @@
-import Interaction from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 declare module '@interactjs/core/scope' {
     interface Scope {
@@ -27,23 +26,20 @@ declare function getRectOffset(rect: any, coords: any): {
     right: number;
     bottom: number;
 };
-declare function start({ interaction, phase }: {
-    interaction: Interaction;
-    phase: string;
-}, pageCoords: any, registeredModifiers: any): {
+declare function start({ interaction, phase }: Interact.SignalArg, pageCoords: Interact.Point, registeredModifiers: any): {
     delta: {
         x: number;
         y: number;
     };
-    coords: any;
+    coords: import("../types").Point;
     changed: boolean;
 };
-declare function setAll(arg: any): {
+declare function setAll(arg: Partial<Interact.SignalArg>): {
     delta: {
         x: number;
         y: number;
     };
-    coords: any;
+    coords: import("../types").Point;
     changed: boolean;
 };
 declare function prepareStates(modifierList: any): any[];

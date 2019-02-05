@@ -28,7 +28,7 @@ declare const restrictEdges: {
         bottom: number;
         right: number;
     };
-    getRestrictionRect: (value: any, interaction: any, coords?: import("../../interactjs/types").Point) => any;
+    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types").Point) => any;
     start: typeof start;
     set: typeof set;
     defaults: {

@@ -14,15 +14,7 @@ declare module '@interactjs/core/scope' {
             eventMap: any;
             pointerMoveTolerance: number;
         };
-        actions: Actions;
         prevTouchTime: number;
-    }
-    interface Actions {
-        names: string[];
-        methodDict: {
-            [key: string]: string;
-        };
-        eventTypes: string[];
     }
 }
 declare function install(scope: Scope): void;

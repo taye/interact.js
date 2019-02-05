@@ -1,4 +1,23 @@
-import { Scope } from '@interactjs/core/scope';
+import { ActionName, Scope } from '@interactjs/core/scope';
+declare module '@interactjs/core/Interactable' {
+    interface Interactable {
+        draggable: DraggableMethod;
+    }
+}
+declare module '@interactjs/core/defaultOptions' {
+    interface ActionDefaults {
+        drag?: Interact.DraggableOptions;
+    }
+}
+declare module '@interactjs/core/scope' {
+    interface Actions {
+        [ActionName.Drag]?: typeof drag;
+    }
+    enum ActionName {
+        Drag = "drag"
+    }
+}
+export declare type DragEvent = Interact.InteractEvent<ActionName.Drag>;
 export declare type DraggableMethod = (options?: Interact.OrBoolean<Interact.DraggableOptions> | boolean) => Interact.Interactable | Interact.DropzoneOptions;
 declare function install(scope: Scope): void;
 declare function beforeMove({ interaction }: {
@@ -47,13 +66,13 @@ declare function move({ iEvent, interaction }: {
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-declare function draggable(this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): import("../interactjs/types").DraggableOptions | import("@interactjs/core/Interactable").Interactable;
+declare function draggable(this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): import("@interactjs/core/Interactable").Interactable | import("../types").DraggableOptions;
 declare const drag: {
     install: typeof install;
     draggable: typeof draggable;
     beforeMove: typeof beforeMove;
     move: typeof move;
-    defaults: import("../interactjs/types").DropzoneOptions;
+    defaults: import("../types").DropzoneOptions;
     checker(_pointer: any, _event: any, interactable: any): {
         name: string;
         axis: any;

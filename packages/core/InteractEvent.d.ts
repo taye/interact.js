@@ -1,6 +1,12 @@
 import Interactable from './Interactable';
 import Interaction from './Interaction';
-export declare class InteractEvent {
+export declare enum EventPhase {
+    Start = "start",
+    Move = "move",
+    End = "end",
+    _NONE = ""
+}
+export declare class InteractEvent<T extends Interact.ActionName = Interact.ActionName, P extends EventPhase = EventPhase._NONE> {
     type: string;
     target: Element;
     relatedTarget: Element | null;
@@ -27,7 +33,7 @@ export declare class InteractEvent {
     clientY0: number;
     velocity: Interact.Point;
     speed: number;
-    swipe: ReturnType<InteractEvent['getSwipe']>;
+    swipe: ReturnType<InteractEvent<T>['getSwipe']>;
     timeStamp: any;
     dragEnter?: Element;
     dragLeave?: Element;
@@ -42,7 +48,7 @@ export declare class InteractEvent {
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
     /** */
-    constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string);
+    constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Element, related?: Element, preEnd?: boolean, type?: string);
     pageX: number;
     pageY: number;
     clientX: number;

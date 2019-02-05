@@ -1,20 +1,20 @@
 {
   "name": "@interactjs/types",
-  "version": "1.4.0-alpha.25+sha.c3a67ce",
+  "version": "1.4.0-alpha.26+sha.ae18425",
   "dependencies": {
-    "@interactjs/actions": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/auto-scroll": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/auto-start": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/core": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/inertia": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/interact": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/modifiers": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/pointer-events": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/reflow": "1.4.0-alpha.25+sha.c3a67ce",
-    "@interactjs/utils": "1.4.0-alpha.25+sha.c3a67ce"
+    "@interactjs/actions": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/auto-scroll": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/auto-start": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/core": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/inertia": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/interact": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/modifiers": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/pointer-events": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/reflow": "1.4.0-alpha.26+sha.ae18425",
+    "@interactjs/utils": "1.4.0-alpha.26+sha.ae18425"
   },
   "devDependencies": {
-    "interactjs": "1.4.0-alpha.25+sha.c3a67ce"
+    "interactjs": "^1.4.0-alpha.26"
   },
   "publishConfig": {
     "access": "public"
