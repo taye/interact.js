@@ -2,8 +2,9 @@ import * as utils from '@interactjs/utils';
 import Interactable from './Interactable';
 import InteractEvent, { EventPhase } from './InteractEvent';
 import PointerInfo from './PointerInfo';
+import { ActionName } from './scope';
 export interface Action {
-    name: Interact.ActionName;
+    name: ActionName;
     axis?: 'x' | 'y' | 'xy';
     edges?: Partial<Interact.Rect>;
 }
@@ -166,7 +167,7 @@ export declare class Interaction {
      * @param {PointerEvent} [event]
      */
     end(event: any): void;
-    currentAction(): import("@interactjs/core/scope").ActionName;
+    currentAction(): ActionName;
     interacting(): boolean;
     /** */
     stop(): void;
@@ -175,7 +176,7 @@ export declare class Interaction {
     updatePointer(pointer: any, event: any, eventTarget: any, down: any): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
-    _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<import("@interactjs/core/scope").ActionName, EventPhase>;
+    _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<ActionName, EventPhase>;
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: any): boolean;
 }

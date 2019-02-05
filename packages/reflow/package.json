@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/reflow",
-  "version": "1.4.0-alpha.26+sha.ae18425",
+  "version": "1.4.0-alpha.27+sha.12b8f8f",
   "peerDependencies": {
-    "@interactjs/core": "1.4.0-alpha.26+sha.ae18425",
-    "@interactjs/utils": "1.4.0-alpha.26+sha.ae18425"
+    "@interactjs/core": "1.4.0-alpha.27+sha.12b8f8f",
+    "@interactjs/utils": "1.4.0-alpha.27+sha.12b8f8f"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.26+sha.ae18425",
-    "@interactjs/core": "1.4.0-alpha.26+sha.ae18425",
-    "@interactjs/utils": "1.4.0-alpha.26+sha.ae18425"
+    "@interactjs/_dev": "1.4.0-alpha.27+sha.12b8f8f",
+    "@interactjs/core": "1.4.0-alpha.27+sha.12b8f8f",
+    "@interactjs/utils": "1.4.0-alpha.27+sha.12b8f8f"
   },
   "publishConfig": {
     "access": "public"

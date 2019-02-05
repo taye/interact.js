@@ -7,7 +7,7 @@ declare module '@interactjs/core/Interactable' {
 }
 declare module '@interactjs/core/defaultOptions' {
     interface ActionDefaults {
-        gesture?: Interact.GesturableOptions;
+        gesture: Interact.GesturableOptions;
     }
 }
 declare module '@interactjs/core/scope' {
