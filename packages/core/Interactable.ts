@@ -7,7 +7,7 @@ import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import normalizeListeners from '@interactjs/utils/normalizeListeners'
 import { getWindow } from '@interactjs/utils/window'
-import { Defaults, Options } from './defaultOptions'
+import { ActionDefaults, Defaults, Options } from './defaultOptions'
 import Eventable from './Eventable'
 import { Actions } from './scope'
 
@@ -17,7 +17,7 @@ export class Interactable implements Partial<Eventable> {
     return {
       base: {},
       perAction: {},
-      actions: {},
+      actions: {} as ActionDefaults,
     }
   }
 

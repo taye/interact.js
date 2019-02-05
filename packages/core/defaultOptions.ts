@@ -34,7 +34,7 @@ export const defaults: Defaults = {
     origin: { x: 0, y: 0 },
   },
 
-  actions: {},
+  actions: {} as ActionDefaults,
 }
 
 export default defaults

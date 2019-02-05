@@ -2,9 +2,10 @@ import * as utils from '@interactjs/utils'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
+import { ActionName } from './scope'
 
 export interface Action {
-  name: Interact.ActionName
+  name: ActionName
   axis?: 'x' | 'y' | 'xy'
   edges?: Partial<Interact.Rect>
 }

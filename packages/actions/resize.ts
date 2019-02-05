@@ -19,7 +19,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    resize?: Interact.ResizableOptions
+    resize: Interact.ResizableOptions
   }
 }
 
