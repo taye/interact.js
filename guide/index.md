@@ -33,8 +33,8 @@ const slider = interact('.slider')    // target elements with the "slider" class
 
 slider
   // Step 2
-  .origin('self')                     // (0, 0) will be the element's top-left
   .draggable({                        // make the element fire drag events
+    origin: 'self',                   // (0, 0) will be the element's top-left
     inertia: true,                    // start inertial movement if thrown
     modifiers: [
       interact.modifiers.restrict({
