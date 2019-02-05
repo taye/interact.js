@@ -2,10 +2,12 @@
   "name": "@interactjs/inertia",
   "version": "1.4.0-alpha.25+sha.c3a67ce",
   "peerDependencies": {
+    "@interactjs/core": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/modifiers": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/utils": "1.4.0-alpha.25+sha.c3a67ce"
   },
   "devDependencies": {
+    "@interactjs/core": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/_dev": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/modifiers": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/utils": "1.4.0-alpha.25+sha.c3a67ce"

@@ -13,6 +13,9 @@
     "@interactjs/reflow": "1.4.0-alpha.25+sha.c3a67ce",
     "@interactjs/utils": "1.4.0-alpha.25+sha.c3a67ce"
   },
+  "devDependencies": {
+    "interactjs": "1.4.0-alpha.25+sha.c3a67ce"
+  },
   "publishConfig": {
     "access": "public"
   }

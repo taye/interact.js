@@ -65,7 +65,7 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('move', (arg) => {
-    const { interaction, event } = arg
+    const { interaction } = arg
 
     if (!interaction.pointerIsDown ||
         interaction.interacting() ||
@@ -82,7 +82,7 @@ function install (scope: Scope) {
       // check manualStart and interaction limit
       if (target.options[interaction.prepared.name].manualStart ||
           !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
-        interaction.stop(event)
+        interaction.stop()
       }
       else {
         interaction.start(interaction.prepared, target, interaction.element)

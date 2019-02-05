@@ -1,8 +1,23 @@
+import { EventPhase } from '@interactjs/core/InteractEvent'
 import modifiers from '@interactjs/modifiers/base'
 import * as utils from '@interactjs/utils'
 import raf from '@interactjs/utils/raf'
 
 type Scope = import ('@interactjs/core/scope').Scope
+
+declare module '@interactjs/core/InteractEvent' {
+  // eslint-disable-next-line no-shadow
+  enum EventPhase {
+    Resume = 'resume',
+    InertiaStart = 'inertiastart',
+  }
+}
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    inertia?: any
+  }
+}
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
@@ -16,6 +31,9 @@ declare module '@interactjs/core/defaultOptions' {
     }
   }
 }
+
+(EventPhase as any).Resume = 'resume';
+(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Scope) {
   const {
@@ -48,9 +66,10 @@ function install (scope: Scope) {
     }
   })
 
-  interactions.signals.on('before-action-end', (arg) => release(arg, scope))
-  interactions.signals.on('down', (arg) => resume(arg, scope))
-  interactions.signals.on('stop', (arg) => stop(arg))
+  // FIXME proper signal typing
+  interactions.signals.on('before-action-end', (arg) => release(arg as any, scope))
+  interactions.signals.on('down', (arg) => resume(arg as any, scope))
+  interactions.signals.on('stop', (arg) => stop(arg as any))
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -62,7 +81,7 @@ function install (scope: Scope) {
   }
 }
 
-function resume ({ interaction, event, pointer, eventTarget }, scope: Scope) {
+function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalArg, scope: Scope) {
   const state = interaction.inertia
 
   // Check if the down event hits the current inertia target
@@ -94,7 +113,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope: Scope) {
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, 'resume', interaction.element)
+          interaction, event, interaction.prepared.name, EventPhase.Resume, interaction.element)
 
         interaction._fireEvent(resumeEvent)
 
@@ -107,7 +126,7 @@ function resume ({ interaction, event, pointer, eventTarget }, scope: Scope) {
   }
 }
 
-function release ({ interaction, event, noPreEnd }, scope: Scope) {
+function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd }: Interact.SignalArg, scope: Scope) {
   const state = interaction.inertia
 
   if (!interaction.interacting() ||
@@ -123,7 +142,7 @@ function release ({ interaction, event, noPreEnd }, scope: Scope) {
   const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
   let smoothEnd = false
-  let modifierResult
+  let modifierResult: ReturnType<typeof modifiers.setAll>
 
   // check if inertia should be started
   const inertiaPossible = (options && options.enabled &&
@@ -149,7 +168,7 @@ function release ({ interaction, event, noPreEnd }, scope: Scope) {
   if (inertiaPossible && !inertia) {
     modifierResult = modifiers.setAll(modifierArg)
 
-    if (modifierResult.shouldMove) {
+    if (modifierResult.changed) {
       smoothEnd = true
     }
   }
@@ -159,7 +178,13 @@ function release ({ interaction, event, noPreEnd }, scope: Scope) {
   utils.pointer.copyCoords(state.upCoords, interaction.coords.cur)
 
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(
-    interaction, event, interaction.prepared.name, 'inertiastart', interaction.element)
+    interaction,
+    event,
+    // FIXME add proper typing Action.name
+    interaction.prepared.name as T,
+    EventPhase.InertiaStart,
+    interaction.element,
+  )
 
   state.t0 = now
 
@@ -201,9 +226,8 @@ function release ({ interaction, event, noPreEnd }, scope: Scope) {
   return false
 }
 
-function stop ({ interaction }) {
+function stop ({ interaction }: Interact.SignalArg) {
   const state = interaction.inertia
-
   if (state.active) {
     raf.cancel(state.i)
     state.active = false
@@ -211,7 +235,7 @@ function stop ({ interaction }) {
   }
 }
 
-function calcInertia (interaction, state) {
+function calcInertia (interaction: Interact.Interaction, state) {
   const options = getOptions(interaction)
   const lambda = options.resistance
   const inertiaDur = -Math.log(options.endSpeed / state.v0) / lambda
@@ -229,7 +253,7 @@ function calcInertia (interaction, state) {
   state.one_ve_v0 = 1 - options.endSpeed / state.v0
 }
 
-function inertiaTick (interaction) {
+function inertiaTick (interaction: Interact.Interaction) {
   updateInertiaCoords(interaction)
   utils.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur)
   utils.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta)
@@ -274,7 +298,7 @@ function inertiaTick (interaction) {
   utils.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur)
 }
 
-function smothEndTick (interaction) {
+function smothEndTick (interaction: Interact.Interaction) {
   updateInertiaCoords(interaction)
 
   const state = interaction.inertia
@@ -302,7 +326,7 @@ function smothEndTick (interaction) {
   }
 }
 
-function updateInertiaCoords (interaction) {
+function updateInertiaCoords (interaction: Interact.Interaction) {
   const state = interaction.inertia
 
   // return if inertia isn't running

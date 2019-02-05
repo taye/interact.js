@@ -7,8 +7,9 @@ import * as utils from '@interactjs/utils'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 
-export interface Plugin extends Partial<any> {
+export interface Plugin {
   install (scope: Scope): void
+  [key: string]: any
 }
 
 declare module '@interactjs/core/scope' {

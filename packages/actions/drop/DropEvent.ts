@@ -1,6 +1,7 @@
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interaction from '@interactjs/core/Interaction'
+import { ActionName } from '@interactjs/core/scope'
 import * as arr from '@interactjs/utils/arr'
 
 class DropEvent {
@@ -8,7 +9,7 @@ class DropEvent {
   target: Element
   currentTarget: Element
   dropzone: Interactable
-  dragEvent: InteractEvent
+  dragEvent: InteractEvent<ActionName.Drag>
   relatedTarget: Element
   interaction: Interaction
   draggable: Interactable

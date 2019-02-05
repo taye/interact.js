@@ -1,3 +1,4 @@
+import { ActionName } from '@interactjs/core/scope'
 import { parentNode } from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
 import autoStart from './base'
@@ -51,7 +52,7 @@ function install (scope: Scope) {
         const interactable = scope.interactables.forEachMatch(element, getDraggable)
 
         if (interactable) {
-          interaction.prepared.name = 'drag'
+          interaction.prepared.name = ActionName.Drag
           interaction.target = interactable
           interaction.element = element
           break

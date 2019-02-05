@@ -14,11 +14,20 @@ const {
   events,
 } = utils
 
-export type Defaults = typeof defaults
+export enum ActionName {
+}
+
+export interface Actions {
+  names: ActionName[]
+  methodDict: { [key: string]: string }
+  eventTypes: string[]
+}
 
 export function createScope () {
   return new Scope()
 }
+
+export type Defaults = typeof defaults
 
 export class Scope {
   // FIXME Signals

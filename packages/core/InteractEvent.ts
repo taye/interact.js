@@ -5,7 +5,17 @@ import defaults from './defaultOptions'
 import Interactable from './Interactable'
 import Interaction from './Interaction'
 
-export class InteractEvent {
+export enum EventPhase {
+  Start = 'start',
+  Move = 'move',
+  End = 'end',
+  _NONE = '',
+}
+
+export class InteractEvent<
+  T extends Interact.ActionName = Interact.ActionName,
+  P extends EventPhase = EventPhase._NONE,
+> {
   type: string
   target: Element
   relatedTarget: Element | null
@@ -33,7 +43,7 @@ export class InteractEvent {
   clientY0: number
   velocity: Interact.Point
   speed: number
-  swipe: ReturnType<InteractEvent['getSwipe']>
+  swipe: ReturnType<InteractEvent<T>['getSwipe']>
   timeStamp: any
   // drag
   dragEnter?: Element
@@ -52,8 +62,17 @@ export class InteractEvent {
   propagationStopped = false
 
   /** */
-  constructor (interaction: Interaction, event: Interact.PointerEventType, actionName: string, phase: string, element: Element, related?: Element, preEnd?: boolean, type?: string) {
-    element = element || interaction.element as Element
+  constructor (
+    interaction: Interaction,
+    event: Interact.PointerEventType,
+    actionName: T,
+    phase: P,
+    element: Element,
+    related?: Element,
+    preEnd?: boolean,
+    type?: string,
+  ) {
+    element = element || interaction.element
 
     const target      = interaction.target
     // FIXME: add deltaSource to defaults

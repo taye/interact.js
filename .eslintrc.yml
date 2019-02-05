@@ -45,8 +45,9 @@ rules:
   '@typescript-eslint/no-inferrable-types': [error, { ignoreProperties: true }]
 
 overrides:
-  files: '*.ts'
-  rules:
-    no-unused-vars: off
-    no-use-before-define: off
-    node/no-missing-import: off
+  -
+    files: ['*.ts']
+    rules:
+      no-unused-vars: off
+      no-use-before-define: off
+      node/no-missing-import: off

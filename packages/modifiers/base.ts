@@ -1,4 +1,3 @@
-import Interaction from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
 import extend from '@interactjs/utils/extend'
 
@@ -42,12 +41,12 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('before-action-start', (arg) => {
-    start(arg, arg.interaction.coords.start.page, scope.modifiers)
+    start(arg as any, arg.interaction.coords.start.page, scope.modifiers)
   })
 
   interactions.signals.on('action-resume', (arg) => {
-    beforeMove(arg)
-    start(arg, arg.interaction.coords.cur.page, scope.modifiers)
+    beforeMove(arg as any)
+    start(arg as any, arg.interaction.coords.cur.page, scope.modifiers)
   })
 
   interactions.signals.on('before-action-move', beforeMove)
@@ -56,8 +55,8 @@ function install (scope: Scope) {
   interactions.signals.on('before-action-start', setCoords)
   interactions.signals.on('before-action-move', setCoords)
 
-  interactions.signals.on('after-action-start', restoreCoords)
-  interactions.signals.on('after-action-move', restoreCoords)
+  interactions.signals.on('after-action-start', restoreCoords as any)
+  interactions.signals.on('after-action-move', restoreCoords as any)
   interactions.signals.on('stop', stop)
 }
 
@@ -87,15 +86,15 @@ function getRectOffset (rect, coords) {
 }
 
 function start (
-  { interaction, phase }: { interaction: Interaction, phase: string },
-  pageCoords,
+  { interaction, phase }: Interact.SignalArg,
+  pageCoords: Interact.Point,
   registeredModifiers,
 ) {
   const { target: interactable, element } = interaction
   const modifierList = getModifierList(interaction, registeredModifiers)
   const states = prepareStates(modifierList)
 
-  const rect = extend({}, interactable.getRect(element as Element)) as  Interact.Rect & Interact.Rect2
+  const rect = extend({}, interactable.getRect(element)) as  Interact.Rect & Interact.Rect2
 
   if (!('width'  in rect)) { rect.width  = rect.right  - rect.left }
   if (!('height' in rect)) { rect.height = rect.bottom - rect.top  }
@@ -105,7 +104,7 @@ function start (
   interaction.modifiers.startOffset = startOffset
   interaction.modifiers.startDelta = { x: 0, y: 0 }
 
-  const arg = {
+  const arg: Partial<Interact.SignalArg> = {
     interaction,
     interactable,
     element,
@@ -129,7 +128,7 @@ function start (
   return result
 }
 
-function setAll (arg) {
+function setAll (arg: Partial<Interact.SignalArg>) {
   const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg
 
   const states = skipModifiers

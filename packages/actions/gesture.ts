@@ -1,8 +1,35 @@
 import InteractEvent from '@interactjs/core/InteractEvent'
-import { Scope } from '@interactjs/core/scope'
+import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
 export type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    gesturable: GesturableMethod
+  }
+}
+
+declare module '@interactjs/core/defaultOptions' {
+  interface ActionDefaults {
+    gesture?: Interact.GesturableOptions
+  }
+}
+
+declare module '@interactjs/core/scope' {
+  interface Actions {
+    [ActionName.Gesture]?: typeof gesture
+  }
+
+  // eslint-disable-next-line no-shadow
+  enum ActionName {
+    Gesture = 'gesture'
+  }
+}
+
+(ActionName as any).Gesture = 'gesture'
+
+export type GestureEvent = Interact.InteractEvent<ActionName.Gesture>
 
 function install (scope: Scope) {
   const {
@@ -75,8 +102,8 @@ function install (scope: Scope) {
     }
   })
 
-  actions.gesture = gesture
-  actions.names.push('gesture')
+  actions[ActionName.Gesture] = gesture
+  actions.names.push(ActionName.Gesture)
   utils.arr.merge(actions.eventTypes, [
     'gesturestart',
     'gesturemove',

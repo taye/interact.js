@@ -1,9 +1,8 @@
-/// <reference path="./types.d.ts" />
 import { Scope } from '@interactjs/core/scope'
-import drag from './drag'
+import drag, { DragEvent } from './drag'
 import drop from './drop'
-import gesture from './gesture'
-import resize from './resize'
+import gesture, { GestureEvent } from './gesture'
+import resize, { ResizeEvent } from './resize'
 
 function install (scope: Scope) {
   gesture.install(scope)
@@ -14,8 +13,11 @@ function install (scope: Scope) {
 
 export {
   gesture,
+  GestureEvent,
   resize,
+  ResizeEvent,
   drag,
+  DragEvent,
   drop,
   install,
 }
