@@ -27,8 +27,8 @@ function init (window) {
   const navigator  = win.window.navigator
 
   // Does the browser support touch input?
-  browser.supportsTouch = !!(('ontouchstart' in window) || is.func(window.DocumentTouch)) &&
-    domObjects.document instanceof window.DocumentTouch
+  browser.supportsTouch = ('ontouchstart' in window) ||
+    (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)
 
   // Does the browser support PointerEvents
   browser.supportsPointerEvent = !!domObjects.PointerEvent
