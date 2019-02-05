@@ -10,7 +10,7 @@ declare module '@interactjs/core/Interactable' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    drag?: Interact.DraggableOptions
+    drag: Interact.DraggableOptions
   }
 }
 

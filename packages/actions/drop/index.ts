@@ -27,7 +27,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface ActionDefaults {
-    drop?: Interact.DropzoneOptions
+    drop: Interact.DropzoneOptions
   }
 }
 
