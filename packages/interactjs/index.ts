@@ -1,7 +1,8 @@
-import interact, { init as initInteract } from '@interactjs/interact'
-import * as modifiers from '@interactjs/modifiers'
-import extend from '@interactjs/utils/extend'
-import * as snappers from '@interactjs/utils/snappers'
+/* tslint:disable no-var-requires */
+const { default: interact, init: initInteract } = require('@interactjs/interact')
+const modifiers = require('@interactjs/modifiers')
+const { default: extend } = require('@interactjs/utils/extend')
+const snappers = require('@interactjs/utils/snappers')
 
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
@@ -15,7 +16,7 @@ if (typeof window === 'object' && !!window) {
   init(window)
 }
 
-export function init (win: Window) {
+function init (win: Window) {
   initInteract(win)
 
   return interact.use({
@@ -27,8 +28,13 @@ export function init (win: Window) {
   })
 }
 
-export default interact
+module.exports = interact
+module.exports.default = interact
+module.exports.init = init
 
-if (typeof module === 'object' && !!module) {
-  module.exports = interact
+declare module 'interactjs' {
+  export default interact
+
+  const _init: typeof init
+  export { _init as init }
 }
