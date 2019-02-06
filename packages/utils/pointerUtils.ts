@@ -157,7 +157,7 @@ const pointerUtils = {
     return average
   },
 
-  touchBBox (event: Event | PointerEvent[]) {
+  touchBBox (event: Event | Array<(Interact.PointerType) | TouchEvent>) {
     if (!(event as any).length &&
         !((event as TouchEvent).touches &&
           (event as TouchEvent).touches.length > 1)) {
@@ -175,6 +175,8 @@ const pointerUtils = {
       y: minY,
       left: minX,
       top: minY,
+      right: maxX,
+      bottom: maxY,
       width: maxX - minX,
       height: maxY - minY,
     }

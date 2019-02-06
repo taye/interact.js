@@ -7,7 +7,7 @@ import * as actions from '@interactjs/actions'
 import { BaseDefaults, Options as _Options, PerActionDefaults } from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractEvent, { EventPhase as _EventPhase } from '@interactjs/core/InteractEvent'
-import _Interaction, { Action } from '@interactjs/core/Interaction'
+import _Interaction, { ActionProps as _ActionProps } from '@interactjs/core/Interaction'
 import { ActionName as _ActionName } from '@interactjs/core/scope'
 import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
 import { SignalArg as _SignalArg } from '@interactjs/utils/Signals'
@@ -20,11 +20,12 @@ declare namespace Interact {
   export type Target = Window | Document | Element | string
   export type interact = typeof interact
   export type Plugin = _Plugin
+  export type ActionProps = _ActionProps
   export type Interactable = _Interactable
-  export type Interaction = _Interaction
+  export type Interaction<T extends _ActionName = any> = _Interaction<T>
   export type InteractEvent<
-    T extends _ActionName = _ActionName,
-    P extends _EventPhase = _EventPhase,
+    T extends _ActionName = any,
+    P extends _EventPhase = any,
   > = _InteractEvent<T, P>
   export type EventPhase = _EventPhase
   export type Options = _Options
@@ -177,7 +178,7 @@ declare namespace Interact {
     interactable: Interactable,
     element: DOMElement,
     interaction: Interaction,
-  ) => Action
+  ) => ActionProps
 
   export type OriginFunction = (target: DOMElement)  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
 

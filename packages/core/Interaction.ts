@@ -4,13 +4,13 @@ import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
 import { ActionName } from './scope'
 
-export interface Action {
-  name: ActionName
+export interface ActionProps<T extends ActionName = any> {
+  name: T
   axis?: 'x' | 'y' | 'xy'
   edges?: Partial<Interact.Rect>
 }
 
-export class Interaction {
+export class Interaction<T extends ActionName = any> {
   // current interactable being interacted with
   target: Interactable = null
 
@@ -20,7 +20,7 @@ export class Interaction {
   _signals: utils.Signals
 
   // action that's ready to be fired on next move event
-  prepared: Action = {
+  prepared: ActionProps<T> = {
     name : null,
     axis : null,
     edges: null,
@@ -47,7 +47,7 @@ export class Interaction {
   }
 
   // previous action event
-  prevEvent: InteractEvent = null
+  prevEvent: InteractEvent<T> = null
 
   pointerIsDown = false
   pointerWasMoved = false

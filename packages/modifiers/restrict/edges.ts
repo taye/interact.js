@@ -15,7 +15,7 @@ import rectUtils from '@interactjs/utils/rect'
 import restrict from './pointer'
 
 declare module '@interactjs/core/Interaction' {
-  interface Action {
+  interface ActionProps {
     linkedEdges?: { [key: string]: boolean }
   }
 }

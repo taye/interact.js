@@ -4,6 +4,18 @@ import * as utils from '@interactjs/utils'
 
 export type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions
 
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    gesture?: {
+      startAngle: number
+      startDistance: number
+      prevScale: number
+      prevAngle: number
+      prevDistance: number
+    }
+  }
+}
+
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     gesturable: GesturableMethod
@@ -29,7 +41,21 @@ declare module '@interactjs/core/scope' {
 
 (ActionName as any).Gesture = 'gesture'
 
-export type GestureEvent = Interact.InteractEvent<ActionName.Gesture>
+export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture> {
+  distance: number
+  angle: number
+  da: number // angle change
+  scale: number // ratio of distance start to current event
+  ds: number // scale change
+  box: Interact.Rect // enclosing box of all points
+  touches: Interact.PointerType[]
+}
+
+export interface GestureSignalArg extends Interact.SignalArg {
+  iEvent: GestureEvent
+  interaction: Interact.Interaction<ActionName.Gesture>
+  event: Interact.PointerEventType | GestureEvent
+}
 
 function install (scope: Scope) {
   const {
@@ -160,7 +186,7 @@ function move ({ iEvent, interaction }) {
   }
 }
 
-function updateGestureProps ({ interaction, iEvent, event, phase }) {
+function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
   const pointers = interaction.pointers.map((p) => p.pointer)
@@ -168,7 +194,7 @@ function updateGestureProps ({ interaction, iEvent, event, phase }) {
   const ending = phase === 'end'
   const deltaSource = interaction.target.options.deltaSource
 
-  iEvent.touches = [pointers[0].pointer, pointers[1].pointer]
+  iEvent.touches = [pointers[0], pointers[1]]
 
   if (starting) {
     iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
@@ -179,11 +205,13 @@ function updateGestureProps ({ interaction, iEvent, event, phase }) {
     iEvent.da       = 0
   }
   else if (ending || event instanceof InteractEvent) {
-    iEvent.distance = interaction.prevEvent.distance
-    iEvent.box      = interaction.prevEvent.box
-    iEvent.scale    = interaction.prevEvent.scale
+    const prevEvent = interaction.prevEvent as GestureEvent
+
+    iEvent.distance = prevEvent.distance
+    iEvent.box      = prevEvent.box
+    iEvent.scale    = prevEvent.scale
     iEvent.ds       = iEvent.scale - 1
-    iEvent.angle    = interaction.prevEvent.angle
+    iEvent.angle    = prevEvent.angle
     iEvent.da       = iEvent.angle - interaction.gesture.startAngle
   }
   else {

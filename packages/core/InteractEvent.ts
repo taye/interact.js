@@ -4,6 +4,7 @@ import hypot from '@interactjs/utils/hypot'
 import defaults from './defaultOptions'
 import Interactable from './Interactable'
 import Interaction from './Interaction'
+import { ActionName } from './scope'
 
 export enum EventPhase {
   Start = 'start',
@@ -13,7 +14,7 @@ export enum EventPhase {
 }
 
 export class InteractEvent<
-  T extends Interact.ActionName = Interact.ActionName,
+  T extends ActionName = any,
   P extends EventPhase = EventPhase._NONE,
 > {
   type: string
@@ -30,7 +31,7 @@ export class InteractEvent<
   metaKey: boolean
   // added by interact.js
   interactable: Interactable
-  interaction: any
+  interaction: Interaction<T>
   page: Interact.Point
   client: Interact.Point
   delta: Interact.Point
@@ -50,13 +51,6 @@ export class InteractEvent<
   dragLeave?: Element
   // resize
   axes?: Interact.Point
-  // gestureend
-  distance?: number
-  angle?: number
-  da?: number // angle change
-  scale?: number // ratio of distance start to current event
-  ds?: number // scale change
-  box?: Interact.Rect // enclosing box of all points
   preEnd?: boolean
   immediatePropagationStopped = false
   propagationStopped = false

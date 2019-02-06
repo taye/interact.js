@@ -1,4 +1,4 @@
-import { Action, Interaction } from '@interactjs/core/Interaction'
+import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
@@ -209,7 +209,7 @@ const resize = {
 
   cursors: null as unknown as ReturnType<typeof initCursors>,
 
-  getCursor (action: Action) {
+  getCursor (action: ActionProps) {
     const cursors = resize.cursors as { [key: string]: string }
     if (action.axis) {
       return cursors[action.name + action.axis]
