@@ -1,5 +1,6 @@
 import interact, { init as initInteract } from '@interactjs/interact'
 import * as modifiers from '@interactjs/modifiers'
+import '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import * as snappers from '@interactjs/utils/snappers'
 

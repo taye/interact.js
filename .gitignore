@@ -2,7 +2,7 @@ dist
 coverage
 .nyc_output
 **/*.d.ts
-!packages/types/index.d.ts
+!packages/types/types.d.ts
 **/node_modules
 **/lerna-debug.log
 packages/*/.npmignore
