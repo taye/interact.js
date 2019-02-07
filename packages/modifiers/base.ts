@@ -172,7 +172,7 @@ function prepareStates (modifierList) {
   const states = []
 
   for (let index = 0; index < modifierList.length; index++) {
-    const { options, methods } = modifierList[index]
+    const { options, methods, name } = modifierList[index]
 
     if (options && options.enabled === false) { continue }
 
@@ -180,6 +180,7 @@ function prepareStates (modifierList) {
       options,
       methods,
       index,
+      name,
     }
 
     states.push(state)
@@ -353,7 +354,7 @@ function makeModifier (module, name) {
       }
     }
 
-    return { options, methods }
+    return { options, methods, name }
   }
 
   if (typeof name === 'string') {

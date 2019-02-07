@@ -282,7 +282,7 @@ export class Interaction<T extends ActionName = any> {
    *
    * @param {PointerEvent} [event]
    */
-  end (event) {
+  end (event?: Interact.PointerEventType) {
     this._ending = true
     event = event || this._latestPointer.event
     let endPhaseResult
