@@ -63,8 +63,6 @@ frameborder="no" allowtransparency="true" allowfullscreen="true">
 Installation
 ============
 
-Install with npm
-
 ```sh
 $ npm install --save interactjs
 ```
@@ -102,33 +100,54 @@ pointing to their servers.
 `interact` is exposed as a CommonJS module, an AMD module, or a global variable
 depending on what the environment supports.
 
-Modifiers
+Drag, Resize and Gesture Actions
+================================
+
+The `Interactable` methods `draggable()`, `resizable()` and `gesturable()` are
+used to enable and configure actions for target elements. They all have some
+common options as well as some action-specific options and event properties.
+
+The common options for all actions include:
+
+ - A `modifiers` array for applying snap, restrict, etc. to the action events
+ - A `listeners` array or object for adding action event listener functions.
+ - `onstart`, `onmove` and `onend` functions to add single listeners for action
+   start, move and end events respectively.
+
+Drag and resize actions (**but not gesture**) can also have an `inertia`
+property which may be a `boolean` to enable or diable inertia, or an object with
+inertia configuration.
+
+Draggable
+==========
+
+<!-- TODO -->
+ - for watching the pointer go down, move, then go back up
+ - combined with dropzones
+
+Dropzone
 =========
 
-```js
-// create a restrict modifier to prevent dragging an element out of its parent
-const restrictToParent = interact.modifiers.restrict({
-  restriction: 'parent',
-  elementRect: { left: 0, right: 0, top: 1, bottom: 1 },
-})
+<!-- TODO -->
+ - use this to define elements that other draggable elements can be moved into
+ - doesn't actually re-parent the draggable elements; that's up to you
 
-// create a snap modifier which changes the event coordinates to the closest
-// corner of a grid
-const snap100x100 = interact.modifiers.snap({
-  targets: [interact.snappers.grid({ x: 100, y: 100 })],
-  relativePoints: [{ x: 0.5, y: 0.5 }],
-}),
+Resizable
+==========
 
-// apply the restrict and then the snap modifiers to drag events
-interact(target).draggable({
-  modifiers: [restrictToParent, snap100x100],
-})
-```
+<!-- TODO -->
+ - for watching the size and position of an element while the pointer is used to
+   move one or two of the element's edges
+ - `event.rect` and `event.deltaRect`
+ - there are some modifiers that are specifically for resizing which change the
+   way the element's edges and size are updated in response to the pointer
 
-You can use `modifiers` to change the coordinates of action events. The options
-object passed to the action methods can have a `modifiers` array which will be
-applied to events of that action type. **Modifers in the array are applied
-sequentially** and their order may affect the final result.
+Gesturable
+==========
+
+<!-- TODO -->
+ - for 2-finger gestures
+ - provide angle, scale and distance
 
 [slider-demo]: https://codepen.io/taye/pen/GgpxNq
 [npm]: https://docs.npmjs.com/about-npm/
