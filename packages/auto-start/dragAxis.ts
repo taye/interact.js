@@ -17,7 +17,7 @@ function install (scope: Scope) {
     const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy')
 
     interaction.prepared.axis = targetOptions.lockAxis === 'start'
-      ? currentAxis[0] // always lock to one axis even if currentAxis === 'xy'
+      ? currentAxis[0]  as 'x' | 'y' // always lock to one axis even if currentAxis === 'xy'
       : targetOptions.lockAxis
 
     // if the movement isn't in the startAxis of the interactable

@@ -21,16 +21,16 @@ export class Interactable implements Partial<Eventable> {
     }
   }
 
-  options!: Required<Options>
+  readonly options!: Required<Options>
   readonly _actions: Actions
   readonly target: Interact.Target
   readonly events = new Eventable()
-  readonly _context: Element
+  readonly _context: Document | Element
   readonly _win: Window
   readonly _doc: Document
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext: Element | Node) {
+  constructor (target: Interact.Target, options: any, defaultContext: Document | Element) {
     this._actions = options.actions
     this.target   = target
     this._context = options.context || defaultContext
@@ -40,7 +40,7 @@ export class Interactable implements Partial<Eventable> {
     this.set(options)
   }
 
-  setOnEvents (actionName: string, phases: { [phase: string]: Interact.ListenersArg }) {
+  setOnEvents (actionName: string, phases: NonNullable<any>) {
     if (is.func(phases.onstart)) { this.on(`${actionName}start`, phases.onstart) }
     if (is.func(phases.onmove)) { this.on(`${actionName}move`, phases.onmove) }
     if (is.func(phases.onend)) { this.on(`${actionName}end`, phases.onend) }
@@ -135,7 +135,7 @@ export class Interactable implements Partial<Eventable> {
     }
 
     if (checker === null) {
-      delete this.options.getRect
+      delete this.getRect
 
       return this
     }
@@ -290,7 +290,7 @@ export class Interactable implements Partial<Eventable> {
       options = {}
     }
 
-    this.options = clone(defaults.base) as Required<Options>
+    (this.options as Required<Options>) = clone(defaults.base) as Required<Options>
 
     for (const actionName in this._actions.methodDict) {
       const methodName = this._actions.methodDict[actionName]

@@ -1,23 +1,24 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/helpers'
 import interactions from '@interactjs/core/interactions'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+import { ActionName } from '@interactjs/core/scope'
+import * as helpers from '@interactjs/core/tests/helpers'
 import { extend } from '@interactjs/utils'
+import pointerUtils from '@interactjs/utils/pointerUtils'
 import drag from '../drag'
 
-test('drag action init', t => {
+test('drag action init', (t) => {
   const scope = helpers.mockScope()
 
   drag.install(scope)
 
-  t.ok(scope.actions.names.includes('drag'), '"drag" in actions.names')
+  t.ok(scope.actions.names.includes(ActionName.Drag), '"drag" in actions.names')
   t.equal(scope.actions.methodDict.drag, 'draggable')
   t.equal(typeof scope.Interactable.prototype.draggable, 'function')
 
   t.end()
 })
 
-test('Interactable.draggable method', t => {
+test('Interactable.draggable method', (t) => {
   const interactable = {
     options: {
       drag: {},
@@ -25,7 +26,7 @@ test('Interactable.draggable method', t => {
     draggable: drag.draggable,
     setPerAction: () => { calledSetPerAction = true },
     setOnEvents: () => { calledSetOnEvents = true },
-  }
+  } as unknown as Interact.Interactable
   let calledSetPerAction = false
   let calledSetOnEvents = false
 
@@ -58,9 +59,8 @@ test('Interactable.draggable method', t => {
   }
 
   for (const axis in axisSettings) {
-    for (let i = 0; i < axisSettings[axis].length; i++) {
+    for (const value of axisSettings[axis]) {
       const options = {}
-      const value = axisSettings[axis][i]
 
       options[axis] = value
 
@@ -75,7 +75,7 @@ test('Interactable.draggable method', t => {
   t.end()
 })
 
-test('drag axis', t => {
+test('drag axis', (t) => {
   const scope = helpers.mockScope()
 
   interactions.install(scope)
@@ -88,8 +88,8 @@ test('drag axis', t => {
       drag: {},
     },
     target: element,
-  }
-  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' }
+  } as Interact.Interactable
+  const iEvent = { page: {}, client: {}, delta: {}, type: 'dragmove' } as Interact.InteractEvent
 
   const opposites = { x: 'y', y: 'x' }
   const eventCoords = {
@@ -103,7 +103,7 @@ test('drag axis', t => {
   interaction.prepared = { name: 'drag', axis: 'xy' }
   interaction.target = interactable
 
-  t.test('xy (any direction)', tt => {
+  t.test('xy (any direction)', (tt) => {
     scope.interactions.signals.fire('before-action-move', { interaction })
 
     tt.deepEqual(interaction.coords.start, coords.start,
@@ -122,9 +122,9 @@ test('drag axis', t => {
   for (const axis in opposites) {
     const opposite = opposites[axis]
 
-    t.test(axis + '-axis', tt => {
+    t.test(axis + '-axis', (tt) => {
       resetCoords()
-      interaction.prepared.axis = axis
+      interaction.prepared.axis = axis as any
 
       scope.interactions.signals.fire('action-move', { iEvent, interaction })
 

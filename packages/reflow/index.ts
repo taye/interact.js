@@ -1,12 +1,12 @@
 import Interactable from '@interactjs/core/Interactable'
-import { Action, Interaction } from '@interactjs/core/Interaction'
+import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { newInteraction } from '@interactjs/core/interactions'
 import { Scope } from '@interactjs/core/scope'
 import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    reflow: (action: Action) => ReturnType<typeof reflow>
+    reflow: (action: ActionProps) => ReturnType<typeof reflow>
   }
 }
 
@@ -59,7 +59,7 @@ export function install (scope: Scope) {
   }
 }
 
-function reflow (interactable: Interactable, action: Action, scope: Scope) {
+function reflow (interactable: Interactable, action: ActionProps, scope: Scope) {
   const elements = is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target]
@@ -110,7 +110,7 @@ function reflow (interactable: Interactable, action: Action, scope: Scope) {
   return promises && Promise.all(promises).then(() => interactable)
 }
 
-function startReflow (scope: Scope, interactable: Interactable, element: Element, action: Action, event: any) {
+function startReflow (scope: Scope, interactable: Interactable, element: Element, action: ActionProps, event: any) {
   const interaction = newInteraction({ pointerType: 'reflow' }, scope)
   const signalArg = {
     interaction,

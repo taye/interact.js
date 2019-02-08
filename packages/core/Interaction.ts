@@ -4,13 +4,15 @@ import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
 import { ActionName } from './scope'
 
-export interface Action {
-  name: ActionName
+export interface ActionProps<T extends ActionName = any> {
+  name: T
   axis?: 'x' | 'y' | 'xy'
-  edges?: Partial<Interact.Rect>
+  edges?: {
+    [edge in keyof Interact.Rect]?: boolean
+  }
 }
 
-export class Interaction {
+export class Interaction<T extends ActionName = any> {
   // current interactable being interacted with
   target: Interactable = null
 
@@ -20,7 +22,7 @@ export class Interaction {
   _signals: utils.Signals
 
   // action that's ready to be fired on next move event
-  prepared: Action = {
+  prepared: ActionProps<T> = {
     name : null,
     axis : null,
     edges: null,
@@ -47,7 +49,7 @@ export class Interaction {
   }
 
   // previous action event
-  prevEvent: InteractEvent = null
+  prevEvent: InteractEvent<T> = null
 
   pointerIsDown = false
   pointerWasMoved = false
@@ -83,11 +85,11 @@ export class Interaction {
   }
 
   /** */
-  constructor ({ pointerType, signals }: { pointerType: string, signals: utils.Signals }) {
+  constructor ({ pointerType, signals }: { pointerType?: string, signals: utils.Signals }) {
     this._signals = signals
     this.pointerType = pointerType
 
-    this._signals.fire('new', this)
+    this._signals.fire('new', { interaction: this })
   }
 
   pointerDown (pointer, event, eventTarget) {
@@ -147,7 +149,7 @@ export class Interaction {
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
-      phase: 'start',
+      phase: EventPhase.Start,
     })
   }
 
@@ -231,7 +233,7 @@ export class Interaction {
       noBefore: false,
     }, signalArg || {})
 
-    signalArg.phase = 'move'
+    signalArg.phase = EventPhase.Move
 
     this._doPhase(signalArg)
   }
@@ -282,7 +284,7 @@ export class Interaction {
    *
    * @param {PointerEvent} [event]
    */
-  end (event) {
+  end (event?: Interact.PointerEventType) {
     this._ending = true
     event = event || this._latestPointer.event
     let endPhaseResult
@@ -291,7 +293,7 @@ export class Interaction {
       endPhaseResult = this._doPhase({
         event,
         interaction: this,
-        phase: 'end',
+        phase: EventPhase.End,
       })
     }
 
@@ -333,7 +335,7 @@ export class Interaction {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer, event, eventTarget, down) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean) {
     const id = utils.pointer.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -429,7 +431,7 @@ export class Interaction {
     }
   }
 
-  _doPhase (signalArg) {
+  _doPhase (signalArg: Partial<Interact.SignalArg>) {
     const { event, phase, preEnd, type } = signalArg
 
     if (!signalArg.noBefore) {

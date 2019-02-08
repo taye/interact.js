@@ -29,8 +29,7 @@ declare module '@interactjs/core/scope' {
 
 export type DragEvent = Interact.InteractEvent<ActionName.Drag>
 
-export type DraggableMethod = (options?: Interact.OrBoolean<Interact.DraggableOptions> | boolean)
-  => Interact.Interactable | Interact.DropzoneOptions
+export type DraggableMethod = Interact.ActionMethod<Interact.DraggableOptions>
 
 function install (scope: Scope) {
   const {
@@ -48,7 +47,7 @@ function install (scope: Scope) {
 
   Interactable.prototype.draggable = drag.draggable
 
-  actions.drag = drag
+  actions[ActionName.Drag] = drag
   actions.names.push(ActionName.Drag)
   arr.merge(actions.eventTypes, [
     'dragstart',
@@ -136,7 +135,7 @@ function move ({ iEvent, interaction }) {
  * @return {boolean | Interactable} boolean indicating if this can be the
  * target of drag events, or this Interctable
  */
-function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean) {
+const draggable: DraggableMethod = function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): any {
   if (is.object(options)) {
     this.options.drag.enabled = options.enabled !== false
     this.setPerAction('drag', options)

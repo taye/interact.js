@@ -1,21 +1,21 @@
 import test from '@interactjs/_dev/test/test'
-import { mockSignals } from '@interactjs/core/tests/helpers'
 import Interaction from '@interactjs/core/Interaction'
+import { mockSignals } from '@interactjs/core/tests/helpers'
 import restrictEdges from '../../restrict/edges'
 
-test('restrictEdges', t => {
-  const interaction = new Interaction({ signals: mockSignals() })
-  interaction.prepared = {}
+test('restrictEdges', (t) => {
+  const interaction = new Interaction({ signals: mockSignals() } as any)
+  interaction.prepared = {} as any
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true }
-  interaction.resizeRects = {}
-  interaction.resizeRects.inverted = { x: 10, y: 20, width: 300, height: 200 }
+  interaction.resizeRects = {} as any
+  interaction.resizeRects.inverted = { x: 10, y: 20, width: 300, height: 200 } as any
   interaction._interacting = true
 
-  const options = { enabled: true }
+  const options: any = { enabled: true }
   const coords = { x: 40, y: 40 }
   const offset = { top: 0, left: 0, bottom: 0, right: 0 }
   const state = { options, offset }
-  const arg = { interaction, state }
+  const arg = { interaction, state } as any
 
   arg.coords = { ...coords }
 
@@ -68,7 +68,7 @@ test('restrictEdges', t => {
     getRect () {
       return { top: 500, left: 900 }
     },
-  }
+  } as any
 
   options.offset = 'self'
   restrictEdges.start(arg)

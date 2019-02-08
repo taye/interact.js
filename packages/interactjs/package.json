@@ -40,6 +40,9 @@
     "SVG"
   ],
   "license": "MIT",
+  "dependencies": {
+    "@interactjs/types": "1.4.0-alpha.27+sha.12b8f8f"
+  },
   "devDependencies": {
     "@interactjs/_dev": "1.4.0-alpha.27+sha.12b8f8f",
     "@interactjs/interact": "1.4.0-alpha.27+sha.12b8f8f",

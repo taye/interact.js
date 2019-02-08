@@ -1,9 +1,10 @@
-import { Action, Interaction } from '@interactjs/core/Interaction'
+import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
-export type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOptions> | boolean) => Interact.Interactable | Interact.ResizableOptions
+
+export type ResizableMethod = Interact.ActionMethod<Interact.ResizableOptions>
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -14,6 +15,13 @@ declare module '@interactjs/core/Interactable' {
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
+    resizeRects: {
+      start: Interact.Rect
+      current: Interact.Rect
+      inverted: Interact.Rect
+      previous: Interact.Rect
+      delta: Interact.Rect
+    }
   }
 }
 
@@ -111,9 +119,9 @@ function install (scope: Scope) {
    * @return {boolean | Interactable} A boolean indicating if this can be the
    * target of resize elements, or this Interactable
    */
-  Interactable.prototype.resizable = function (this: Interact.Interactable, options: Interact.RestrictOption | boolean) {
+  Interactable.prototype.resizable = function (this: Interact.Interactable, options: Interact.ResizableOptions | boolean) {
     return resizable(this, options, scope)
-  }
+  } as ResizableMethod
 
   actions[ActionName.Resize] = resize
   actions.names.push(ActionName.Resize)
@@ -209,7 +217,7 @@ const resize = {
 
   cursors: null as unknown as ReturnType<typeof initCursors>,
 
-  getCursor (action: Action) {
+  getCursor (action: ActionProps) {
     const cursors = resize.cursors as { [key: string]: string }
     if (action.axis) {
       return cursors[action.name + action.axis]
@@ -239,7 +247,7 @@ function resizable (interactable: Interact.Interactable, options: Interact.OrBoo
     interactable.setPerAction('resize', options)
     interactable.setOnEvents('resize', options)
 
-    if (/^x$|^y$|^xy$/.test(options.axis as string)) {
+    if (utils.is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis
     }
     else if (options.axis === null) {
@@ -332,7 +340,7 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
   })
 }
 
-function start ({ iEvent, interaction }) {
+function start ({ iEvent, interaction }: Interact.SignalArg) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
@@ -378,10 +386,10 @@ function start ({ iEvent, interaction }) {
       bottom: 0,
       height: 0,
     },
-  }
+  };
 
-  iEvent.rect = interaction.resizeRects.inverted
-  iEvent.deltaRect = interaction.resizeRects.delta
+  (iEvent as ResizeEvent).rect = interaction.resizeRects.inverted;
+  (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
 }
 
 function move ({ iEvent, interaction }) {

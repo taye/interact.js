@@ -2,14 +2,14 @@ import test from '@interactjs/_dev/test/test'
 import * as utils from '@interactjs/utils'
 import DropEvent from '../../drop/DropEvent'
 
-const dz1 = { target: 'dz1', fire (event) { this.fired = event } }
-const dz2 = { target: 'dz2', fire (event) { this.fired = event } }
-const el1 = Symbol('el1')
-const el2 = Symbol('el2')
-const interactable = Symbol('interactable')
-const dragElement = Symbol('drag-el')
+const dz1: any = { target: 'dz1', fire (event) { this.fired = event } }
+const dz2: any = { target: 'dz2', fire (event) { this.fired = event } }
+const el1: any = Symbol('el1')
+const el2: any = Symbol('el2')
+const interactable: any = Symbol('interactable')
+const dragElement: any = Symbol('drag-el')
 
-test('DropEvent constructor', t => {
+test('DropEvent constructor', (t) => {
   const interaction = { dropStatus: {} }
   const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
 
@@ -38,8 +38,8 @@ test('DropEvent constructor', t => {
   t.end()
 })
 
-test('DropEvent.reject()', t => {
-  const interaction = { dropStatus: {} }
+test('DropEvent.reject()', (t) => {
+  const interaction: any = { dropStatus: {} }
   const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
 
   utils.extend(interaction.dropStatus, {
@@ -95,7 +95,7 @@ test('DropEvent.reject()', t => {
   t.end()
 })
 
-test('DropEvent.stop[Immediate]Propagation()', t => {
+test('DropEvent.stop[Immediate]Propagation()', (t) => {
   const dropEvent = new DropEvent({ cur: {} }, {}, 'dragmove')
 
   t.notOk(dropEvent.propagationStopped || dropEvent.immediatePropagationStopped)

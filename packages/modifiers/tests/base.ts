@@ -3,14 +3,14 @@ import * as helpers from '@interactjs/core/tests/helpers'
 import * as utils from '@interactjs/utils'
 import modifiersBase from '../base'
 
-test('modifiers/base', t => {
+test('modifiers/base', (t) => {
   const scope = helpers.mockScope()
 
   modifiersBase.install(scope)
   scope.actions.eventTypes.push('teststart', 'testmove', 'testend')
 
   // eslint-disable-next-line new-cap
-  const interaction = new scope.interactions.new({})
+  const interaction = scope.interactions.new({})
 
   t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
 
@@ -30,11 +30,11 @@ test('modifiers/base', t => {
     clientY: 500,
     target: element,
   }
-  const options = { target: { x: 100, y: 100 }, setStart: true }
+  const options: any = { target: { x: 100, y: 100 }, setStart: true }
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('teststart testmove testend', event => firedEvents.push(event))
+  interactable.on('teststart testmove testend', (event) => firedEvents.push(event))
   interaction.pointerDown(startEvent, startEvent, element)
 
   interactable.options.test = {

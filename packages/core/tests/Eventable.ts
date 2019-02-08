@@ -5,7 +5,10 @@ test('Eventable', t => {
   const eventable = new Eventable()
   const type = 'TEST'
 
-  const testEvent = { type }
+  const testEvent = {
+    type,
+    immediatePropagationStopped: false,
+  }
   let firedEvent
   const listener = event => { firedEvent = event }
 

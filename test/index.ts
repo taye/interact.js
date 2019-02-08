@@ -1,12 +1,16 @@
-require('../babel-register')
+// tslint:disable no-var-requires
+
+require('ts-node/register')
 
 const glob = require('glob')
 const path = require('path')
 
 const globOptions = { ignore: '**/node_modules/**' }
 
+const [, , ...fileArgs] = process.argv
+
 function getMatches (pattern) {
-  return new Promise((resolve, reject) => {
+  return new Promise<string[]>((resolve, reject) => {
     glob(
       pattern,
       globOptions,
@@ -18,15 +22,8 @@ function getMatches (pattern) {
   })
 }
 
-Promise.all(
-  [
-    '**/tests/**/*.js',
-    '**/tests/**/*.ts',
-    '**/*.spec.js',
-    '**/*.spec.ts',
-  ].map(getMatches)
-).then(([tests, specs]) => {
-  for (const file of new Set([...tests, ...specs])) {
+(fileArgs.length ? Promise.resolve(fileArgs) : getMatches('**/tests/**/*.ts')).then((tests) => {
+  for (const file of tests) {
     require(path.resolve(file))
   }
 })

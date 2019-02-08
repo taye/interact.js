@@ -12,6 +12,12 @@ declare module '@interactjs/core/scope' {
   }
 }
 
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    autoScroll?: typeof autoScroll
+  }
+}
+
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     autoScroll?: Interact.AutoScrollOption
@@ -27,7 +33,7 @@ function install (scope: Scope) {
 
   scope.autoScroll = autoScroll
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', ({ interaction }) => {
     interaction.autoScroll = null
   })
 
@@ -61,7 +67,7 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start (interaction) {
+  start (interaction: Interact.Interaction) {
     autoScroll.isScrolling = true
     raf.cancel(autoScroll.i)
 

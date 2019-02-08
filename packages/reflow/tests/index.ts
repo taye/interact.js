@@ -1,7 +1,7 @@
-import test from '@interactjs/_dev/test/test'
+import interactions from '@interactjs/core/interactions'
 import * as helpers from '@interactjs/core/tests/helpers'
 import win from '@interactjs/utils/window'
-import interactions from '@interactjs/core/interactions'
+import test from '@interactjs/_dev/test/test'
 import reflow from '../'
 
 test('reflow', t => {
@@ -22,10 +22,10 @@ test('reflow', t => {
   const interactable = scope.interactables.new(win.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
 
-  interactable.fire = iEvent => fired.push(iEvent)
-  interactable.target = {}
+  interactable.fire = (iEvent => { fired.push(iEvent) }) as any
+  (interactable.target as any) = {}
   interactable.options.test = {}
-  interactable.rectChecker(() => rect)
+  interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords
   scope.interactions.signals.on('before-action-move', ({ interaction }) => {
@@ -94,8 +94,8 @@ test('async reflow', async t => {
 
   const interactable = scope.interactables.new(win.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
-  interactable.rectChecker(() => rect)
-  interactable.fire = iEvent => { reflowEvent = iEvent }
+  interactable.rectChecker(() => ({ ...rect }))
+  interactable.fire = (iEvent => { reflowEvent = iEvent }) as any
 
   reflow.install(scope)
 

@@ -17,10 +17,6 @@ declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     modifiers?: any[]
   }
-  interface Options {
-    drag?: Interact.DraggableOptions
-    modifiers?: any[]
-  }
 }
 
 function install (scope: Scope) {
@@ -31,7 +27,7 @@ function install (scope: Scope) {
   scope.defaults.perAction.modifiers = []
   scope.modifiers = {}
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', ({ interaction }) => {
     interaction.modifiers = {
       startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       offsets    : {},
@@ -172,7 +168,7 @@ function prepareStates (modifierList) {
   const states = []
 
   for (let index = 0; index < modifierList.length; index++) {
-    const { options, methods } = modifierList[index]
+    const { options, methods, name } = modifierList[index]
 
     if (options && options.enabled === false) { continue }
 
@@ -180,6 +176,7 @@ function prepareStates (modifierList) {
       options,
       methods,
       index,
+      name,
     }
 
     states.push(state)
@@ -332,7 +329,7 @@ function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: 
     : !requireEndOnly
 }
 
-function makeModifier (module, name) {
+function makeModifier (module, name?: string) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -353,7 +350,7 @@ function makeModifier (module, name) {
       }
     }
 
-    return { options, methods }
+    return { options, methods, name }
   }
 
   if (typeof name === 'string') {

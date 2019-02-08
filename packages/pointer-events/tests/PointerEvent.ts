@@ -1,9 +1,8 @@
-import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/helpers'
-
-import pointerUtils from '@interactjs/utils/pointerUtils'
 import Interaction from '@interactjs/core/Interaction'
+import * as helpers from '@interactjs/core/tests/helpers'
+import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
+import test from '@interactjs/_dev/test/test'
 import PointerEvent from '../PointerEvent'
 
 test('PointerEvent constructor', t => {
@@ -19,9 +18,9 @@ test('PointerEvent constructor', t => {
   const event = {
     testEventProp,
   }
-  const interaction = new Interaction({ signals: new Signals() })
+  const interaction = new Interaction({ signals: new Signals() } as any)
   const eventTarget = {}
-  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction)
+  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,
     'pointerEvent is extended form pointer')
@@ -47,7 +46,7 @@ test('PointerEvent constructor', t => {
 })
 
 test('PointerEvent methods', t => {
-  const methodContexts = {}
+  const methodContexts = {} as any
   const event = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
     .reduce((acc, methodName) => {
       acc[methodName] = function () { methodContexts[methodName] = this }

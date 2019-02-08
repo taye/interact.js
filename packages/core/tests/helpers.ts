@@ -1,8 +1,8 @@
+import { doc } from '@interactjs/_dev/test/domator'
 import * as utils from '@interactjs/utils'
 import Signals from '@interactjs/utils/Signals'
-import { createScope } from '../scope'
 import Eventable from '../Eventable'
-import { doc } from '@interactjs/_dev/test/domator'
+import { createScope } from '../scope'
 
 let counter = 0
 
@@ -15,7 +15,7 @@ export function uniqueProps (obj) {
     if (!obj.hasOwnProperty(prop)) { continue }
 
     if (utils.is.object(obj)) {
-      uniqueProps(obj[obj])
+      uniqueProps(obj[prop])
     }
     else {
       obj[prop] = (counter++)
@@ -23,9 +23,7 @@ export function uniqueProps (obj) {
   }
 }
 
-export function newCoordsSet (n) {
-  n = n || 0
-
+export function newCoordsSet (n = 0) {
   return {
     start: {
       page     : { x: n++, y: n++ },
@@ -55,35 +53,25 @@ export function newCoordsSet (n) {
   }
 }
 
-export function newPointer (n) {
-  n = n || 50
-
+export function newPointer (n = 50) {
   return {
     pointerId: n++,
     pageX: n++,
     pageY: n++,
     clientX: n++,
     clientY: n++,
-  }
+  } as Interact.PointerType
 }
 
-export function mockScope (options) {
-  options = options || {}
-
+export function mockScope (options = {} as any) {
   const document = options.document || doc
   const window = document.defaultView
 
   const scope = createScope().init(window)
 
-  Object.assign(scope, {
-    actions: {
-      names: [],
-      methodDict: {},
-      eventTypes: [],
-    },
-  }, options)
+  scope.interact = Object.assign(() => {}, { use () {} }) as any
 
-  return scope
+  return scope as any
 }
 
 export function mockSignals () {
@@ -91,10 +79,10 @@ export function mockSignals () {
     on () {},
     off () {},
     fire () {},
-  }
+  } as unknown as any
 }
 
-export function mockInteractable (props) {
+export function mockInteractable (props = {}) {
   return Object.assign(
     {
       _signals: new Signals(),
@@ -116,7 +104,7 @@ export function mockInteractable (props) {
         this.events.fire(event)
       },
     },
-    props)
+    props) as any
 }
 
 export function getProps (src, props) {

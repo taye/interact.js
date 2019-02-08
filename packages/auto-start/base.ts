@@ -16,6 +16,11 @@ declare module '@interactjs/core/scope' {
 }
 
 declare module '@interactjs/core/defaultOptions' {
+  interface BaseDefaults {
+    actionChecker?
+    styleCursor?
+  }
+
   interface PerActionDefaults {
     manualStart?: boolean
     max?: number

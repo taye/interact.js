@@ -1,7 +1,7 @@
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import events from '@interactjs/utils/events'
-import finder from '@interactjs/utils/interactionFinder'
+import finder, { SearchDetails } from '@interactjs/utils/interactionFinder'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import InteractionBase from './Interaction'
@@ -106,7 +106,7 @@ function doOnInteractions (method, scope) {
       for (const changedTouch of event.changedTouches) {
         const pointer = changedTouch
         const pointerId = pointerUtils.getPointerId(pointer)
-        const searchDetails = {
+        const searchDetails: SearchDetails = {
           pointer,
           pointerId,
           pointerType,
@@ -171,7 +171,7 @@ function doOnInteractions (method, scope) {
   }
 }
 
-function getInteraction (searchDetails) {
+function getInteraction (searchDetails: SearchDetails) {
   const { pointerType, scope } = searchDetails
 
   const foundInteraction = finder.search(searchDetails)

@@ -1,3 +1,9 @@
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    holdIntervalHandle?: any
+  }
+}
+
 function install (scope) {
   const {
     pointerEvents,

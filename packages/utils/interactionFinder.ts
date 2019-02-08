@@ -1,5 +1,15 @@
 import * as utils from './index'
 
+export interface SearchDetails {
+  pointer: Interact.PointerType
+  pointerId: number
+  pointerType: string
+  eventType: string
+  eventTarget: Window | Document | Element
+  curEventTarget: Window | Document | Element
+  scope: Interact.Scope
+}
+
 const finder = {
   methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
 
@@ -14,7 +24,7 @@ const finder = {
   },
 
   // try to resume simulation with a new pointer
-  simulationResume ({ pointerType, eventType, eventTarget, scope }) {
+  simulationResume ({ pointerType, eventType, eventTarget, scope }: SearchDetails) {
     if (!/down|start/i.test(eventType)) {
       return null
     }
@@ -38,7 +48,7 @@ const finder = {
   },
 
   // if it's a mouse or pen interaction
-  mouseOrPen ({ pointerId, pointerType, eventType, scope }) {
+  mouseOrPen ({ pointerId, pointerType, eventType, scope }: SearchDetails) {
     if (pointerType !== 'mouse' && pointerType !== 'pen') {
       return null
     }
@@ -80,16 +90,18 @@ const finder = {
   },
 
   // get interaction that has this pointer
-  hasPointer ({ pointerId, scope }) {
+  hasPointer ({ pointerId, scope }: SearchDetails) {
     for (const interaction of scope.interactions.list) {
       if (hasPointerId(interaction, pointerId)) {
         return interaction
       }
     }
+
+    return null
   },
 
   // get first idle interaction with a matching pointerType
-  idle ({ pointerType, scope }) {
+  idle ({ pointerType, scope }: SearchDetails) {
     for (const interaction of scope.interactions.list) {
       // if there's already a pointer held down
       if (interaction.pointers.length === 1) {
