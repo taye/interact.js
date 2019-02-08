@@ -11,7 +11,7 @@
     "@run_test": "scripts/test.sh"
   },
   "scripts": {
-    "bootstrap": "npx lerna bootstrap",
+    "bootstrap": "npx lerna bootstrap --ci",
     "start": "cd packages/interactjs; ../../scripts/build.js --watch",
     "build": "cd packages/interactjs; ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",

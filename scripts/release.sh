@@ -50,7 +50,7 @@ merge_to_release() {
   # clear package links
   git clean -fdX packages/*
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
-  npx lerna bootstrap || quit "bootstrapping failed" $?
+  npm run bootstrap || quit "bootstrapping failed" $?
 }
 
 run_tests() {
@@ -107,7 +107,7 @@ run_build() {
 }
 
 bootstrap() {
-  npx lerna run bootstrap
+  npm run bootstrap
 }
 
 commit_and_tag() {
