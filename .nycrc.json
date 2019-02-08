@@ -5,11 +5,14 @@
   "branches": 33,
   "functions": 50,
   "include": [
+    "packages/**/*.ts"
+  ],
+  "exclude": [
     "**/*.spec.ts"
   ],
-  "extensions": [
-    "js",
-    "ts"
+  "extension": [
+    ".js",
+    ".ts"
   ],
   "reporter": [
     "text",

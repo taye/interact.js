@@ -69,7 +69,6 @@
     "through2": "latest",
     "tslint": "latest",
     "typescript": "latest",
-    "typescript-eslint-parser": "latest",
     "uglify-js": "latest",
     "watchify": "latest",
     "yargs": "latest"
