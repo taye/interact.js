@@ -39,8 +39,6 @@ InteractEvent.signals.on('new', function ({ iEvent, interaction }) {
 
   iEvent.ds = iEvent.scale - interaction.gesture.scale;
 
-  interaction.target.fire(iEvent);
-
   interaction.gesture.prevAngle = iEvent.angle;
   interaction.gesture.prevDistance = iEvent.distance;
 
