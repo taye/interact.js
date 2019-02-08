@@ -126,9 +126,6 @@ function install (scope: Scope) {
     interaction.dropStatus.events = null
   })
 
-  interactions.signals.on('new', (interaction) => {
-  })
-
   interactions.signals.on('stop', ({ interaction: { dropStatus } }) => {
     dropStatus.cur.dropzone = dropStatus.cur.element =
       dropStatus.prev.dropzone = dropStatus.prev.element = null

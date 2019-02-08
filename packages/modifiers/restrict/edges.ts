@@ -14,12 +14,6 @@ import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
 import restrict from './pointer'
 
-declare module '@interactjs/core/Interaction' {
-  interface ActionProps {
-    linkedEdges?: { [key: string]: boolean }
-  }
-}
-
 const { getRestrictionRect } = restrict
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
@@ -51,7 +45,7 @@ function set ({ coords, interaction, state }: {
   state: any
 }) {
   const { offset, options } = state
-  const edges = interaction.prepared.linkedEdges || interaction.prepared.edges
+  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges
 
   if (!edges) {
     return
