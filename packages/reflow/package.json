@@ -8,7 +8,8 @@
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
     "@interactjs/core": "0.0.0",
-    "@interactjs/utils": "0.0.0"
+    "@interactjs/utils": "0.0.0",
+    "promise-polyfill": "latest"
   },
   "publishConfig": {
     "access": "public"

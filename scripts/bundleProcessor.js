@@ -49,10 +49,11 @@ module.exports = function bundleProcessor ({
     write(raw)
 
     const minifiedResult = uglify.minify(raw.code, {
-      fromString: true,
-      inSourceMap: raw.map,
-      outSourceMap: `${filenames.min}.map`,
-      sourceMapIncludeSources: true,
+      sourceMap: {
+        content: raw.map,
+        url: `${filenames.min}.map`,
+        includeSources: true,
+      },
     })
 
     const headerOpts = getHeaderOpts(minHeaderFile, filenames.min, minifiedResult.code, JSON.parse(minifiedResult.map))

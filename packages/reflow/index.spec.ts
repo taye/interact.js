@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import interactions from '@interactjs/core/interactions'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import win from '@interactjs/utils/window'
+import PromisePolyfill from 'promise-polyfill'
 import reflow from './'
 
 test('reflow', (t) => {
@@ -19,7 +19,7 @@ test('reflow', (t) => {
   )
 
   const fired = []
-  const interactable = scope.interactables.new(win.window)
+  const interactable = scope.interactables.new(scope.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
 
   interactable.fire = ((iEvent) => { fired.push(iEvent) }) as any
@@ -92,30 +92,47 @@ test('async reflow', async (t) => {
   let reflowEvent
   let promise
 
-  const interactable = scope.interactables.new(win.window)
+  const interactable = scope.interactables.new(scope.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
   interactable.fire = ((iEvent) => { reflowEvent = iEvent }) as any
 
   reflow.install(scope)
 
+  // test with Promise implementation
+  scope.window.Promise = PromisePolyfill
+
   promise = interactable.reflow({ name: 'test' })
-  t.ok(promise instanceof win.window.Promise, 'method returns a Promise')
+  t.ok(promise instanceof scope.window.Promise, 'method returns a Promise if available')
   t.notOk(reflowEvent.interaction.interacting(), 'reflow may end synchronously')
 
   t.equal(await promise, interactable, 'returned Promise resolves to interactable')
 
+  let stoppedFromTimeout
   // block the end of the reflow interaction and stop it after a timeout
   scope.interactions.signals.on('before-action-end', ({ interaction }) => {
-    setTimeout(() => interaction.stop(), 0)
+    setTimeout(() => { interaction.stop(); stoppedFromTimeout = true }, 0)
     return false
   })
 
+  stoppedFromTimeout = false
   promise = interactable.reflow({ name: 'test' })
 
-  t.ok(reflowEvent.interaction.interacting(), 'interaction continues if end is blocked')
+  t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked')
   await promise
-  t.notOk(reflowEvent.interaction.interacting(), 'interaction is stopped after promise is resolved')
+  t.notOk(reflowEvent.interaction.interacting() && stoppedFromTimeout, 'interaction is stopped after promise is resolved')
+
+  // test without Promise implementation
+  stoppedFromTimeout = false
+  scope.window.Promise = undefined
+
+  promise = interactable.reflow({ name: 'test' })
+  t.equal(promise, null, 'method returns null if no Proise is avilable')
+  t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked without Promise')
+
+  setTimeout(() => {
+    t.notOk(reflowEvent.interaction.interacting() || !stoppedFromTimeout, 'interaction is stopped after timeout without Promised')
+  }, 0)
 
   t.end()
 })

@@ -51,7 +51,3 @@ overrides:
       no-unused-vars: off
       no-use-before-define: off
       node/no-missing-import: off
-  -
-    files: '**/*.spec.ts'
-    rules:
-      no-restricted-syntax: off

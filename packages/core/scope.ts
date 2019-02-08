@@ -53,6 +53,9 @@ export class Scope {
   // main document
   document!: Document
 
+  // main window
+  window!: Window
+
   // all documents being listened to
   documents: Array<{ doc: Document, options: any }> = []
 
@@ -218,6 +221,7 @@ export function initScope (scope: Scope, window: Window) {
 
   interactions.install(scope)
   scope.document = window.document
+  scope.window = window
 
   return scope
 }

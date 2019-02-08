@@ -1,10 +1,10 @@
-import { jsdom } from '@interactjs/_dev/test/domator'
+import { JSDOM } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import interactions from '@interactjs/core/interactions'
 import interact, { scope } from './interact'
 
 test('interact export', (t) => {
-  scope.init(jsdom('').defaultView)
+  scope.init(new JSDOM('').window)
   interactions.install(scope)
 
   const interactable1 = interact('selector')
@@ -22,8 +22,8 @@ test('interact export', (t) => {
   const constructsUniqueMessage =
     'unique contexts make unique interactables with identical targets'
 
-  const doc1 = jsdom('')
-  const doc2 = jsdom('')
+  const doc1 = new JSDOM('').window.document
+  const doc2 = new JSDOM('').window.document
   const results = [
     ['repeat', doc1],
     ['repeat', doc2],
