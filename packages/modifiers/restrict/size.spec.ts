@@ -1,12 +1,12 @@
 import test from '@interactjs/_dev/test/test'
 import { mockSignals } from '@interactjs/core/tests/_helpers'
 
-import rectUtils from '@interactjs/utils/rect'
 import Interaction from '@interactjs/core/Interaction'
-import base from '../../base'
-import restrictSize from '../../restrict/size'
+import rectUtils from '@interactjs/utils/rect'
+import base from './../base'
+import restrictSize from './../restrict/size'
 
-test('restrictSize', t => {
+test('restrictSize', (t) => {
   const edges = { left: true, top: true }
   const rect = { left: 0, top: 0, right: 200, bottom: 300 }
   const interaction = new Interaction({ signals: mockSignals() } as any)
