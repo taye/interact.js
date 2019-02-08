@@ -22,6 +22,11 @@ declare module '@interactjs/core/Interaction' {
       previous: Interact.Rect
       delta: Interact.Rect
     }
+    resizeStartAspectRatio: number
+  }
+
+  interface ActionProps {
+    _linkedEdges?: { [key: string]: boolean }
   }
 }
 
