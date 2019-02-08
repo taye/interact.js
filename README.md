@@ -1,11 +1,12 @@
 <a href="http://interactjs.io"><img alt="interact.js" src="https://c4d6f7d727e094887e93-4ea74b676357550bd514a6a5b344c625.ssl.cf2.rackcdn.com/ijs-solid.svg" height="70px" width="100%"></a>
 
-JavaScript drag and drop, resizing and multi-touch gestures with inertia and
-snapping for modern browsers (and also IE9+).
+### JavaScript drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+).
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/taye/interact.js)
-[![Build Status](https://travis-ci.org/taye/interact.js.svg?branch=master)](https://travis-ci.org/taye/interact.js)
-[![Test Coverage](https://codeclimate.com/github/taye/interact.js/badges/coverage.svg)](https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage)
+<center>
+<a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
+<a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
+<a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
+</center>
 
 Features include:
 
