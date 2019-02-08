@@ -7,11 +7,13 @@ interact(window)
 
 interact('.drag-and-resize')
   .draggable({
-    snap: {
+    modifiers: [{
+      type: 'snap',
       targets: [
         { x: 100, y: 200 },
         function (x: number, y: number) { return { x: x % 20, y } },
-      ] },
+      ],
+    }],
   })
   .resizable({
     inertia: true,
@@ -32,20 +34,18 @@ interact(target)
     max          : 1,
     maxPerElement: 2,
     manualStart  : true,
-    snap         : {/* ... */},
-    restrict     : {/* ... */},
+    modifiers    : [],
     inertia      : {/* ... */},
     autoScroll   : {/* ... */},
 
-    axis         : 'x' || 'y',
-
+    lockAxis     : 'x' || 'y' || 'start',
+    startAxis    : 'x' || 'y',
   })
   .resizable({
     max          : 1,
     maxPerElement: 2,
     manualStart  : true,
-    snap         : {/* ... */},
-    restrict     : {/* ... */},
+    modifiers    : [],
     inertia      : {/* ... */},
     autoScroll   : {/* ... */},
     margin       : 50,
@@ -57,7 +57,7 @@ interact(target)
     max          : 1,
     maxPerElement: 2,
     manualStart  : true,
-    restrict     : {/* ... */},
+    modifiers    : [],
   })
 
 // autoscroll

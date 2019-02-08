@@ -1,17 +1,20 @@
+// tslint:disable no-empty-interface
+
 export interface Defaults {
   base: BaseDefaults
   perAction: PerActionDefaults
   actions: ActionDefaults
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ActionDefaults {
-  [key: string]: Options
 }
 
 export interface BaseDefaults {
   preventDefault?: 'auto' | 'never' | string
   deltaSource?: 'page' | 'client'
-  [key: string]: any
+  context?: Window | Document | Element
+   [key: string]: any
 }
 
 export interface PerActionDefaults {
@@ -20,7 +23,12 @@ export interface PerActionDefaults {
   listeners?: Interact.Listeners
 }
 
-export interface Options extends BaseDefaults, PerActionDefaults {}
+export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
+  [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>
+}
+
+// export interface Options extends BaseDefaults, PerActionDefaults {}
+
 export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {}
 
 export const defaults: Defaults = {

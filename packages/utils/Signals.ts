@@ -37,7 +37,7 @@ class Signals {
     }
   }
 
-  fire (name: string, arg: any): void | false {
+  fire (name: string, arg: Partial<SignalArg>): void | false {
     const targetListeners = this.listeners[name]
 
     if (!targetListeners) { return }

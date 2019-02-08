@@ -7,7 +7,9 @@ import { ActionName } from './scope'
 export interface ActionProps<T extends ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
-  edges?: Partial<Interact.Rect>
+  edges?: {
+    [edge in keyof Interact.Rect]?: boolean
+  }
 }
 
 export class Interaction<T extends ActionName = any> {
@@ -83,11 +85,11 @@ export class Interaction<T extends ActionName = any> {
   }
 
   /** */
-  constructor ({ pointerType, signals }: { pointerType: string, signals: utils.Signals }) {
+  constructor ({ pointerType, signals }: { pointerType?: string, signals: utils.Signals }) {
     this._signals = signals
     this.pointerType = pointerType
 
-    this._signals.fire('new', this)
+    this._signals.fire('new', { interaction: this })
   }
 
   pointerDown (pointer, event, eventTarget) {
@@ -147,7 +149,7 @@ export class Interaction<T extends ActionName = any> {
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
-      phase: 'start',
+      phase: EventPhase.Start,
     })
   }
 
@@ -231,7 +233,7 @@ export class Interaction<T extends ActionName = any> {
       noBefore: false,
     }, signalArg || {})
 
-    signalArg.phase = 'move'
+    signalArg.phase = EventPhase.Move
 
     this._doPhase(signalArg)
   }
@@ -291,7 +293,7 @@ export class Interaction<T extends ActionName = any> {
       endPhaseResult = this._doPhase({
         event,
         interaction: this,
-        phase: 'end',
+        phase: EventPhase.End,
       })
     }
 
@@ -333,7 +335,7 @@ export class Interaction<T extends ActionName = any> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer, event, eventTarget, down) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean) {
     const id = utils.pointer.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -429,7 +431,7 @@ export class Interaction<T extends ActionName = any> {
     }
   }
 
-  _doPhase (signalArg) {
+  _doPhase (signalArg: Partial<Interact.SignalArg>) {
     const { event, phase, preEnd, type } = signalArg
 
     if (!signalArg.noBefore) {

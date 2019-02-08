@@ -234,7 +234,7 @@ const pointerUtils = {
     }
   },
 
-  coordsToEvent ({ page, client, timeStamp }) {
+  coordsToEvent ({ page, client, timeStamp }: any) {
     return {
       page,
       client,

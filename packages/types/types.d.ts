@@ -4,13 +4,13 @@
 //                  Taye Adeyemi <taye.me>
 
 import * as actions from '@interactjs/actions'
-import { BaseDefaults, Options as _Options, PerActionDefaults } from '@interactjs/core/defaultOptions'
+import * as defaults from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
-import _InteractEvent, { EventPhase as _EventPhase } from '@interactjs/core/InteractEvent'
-import _Interaction, { ActionProps as _ActionProps } from '@interactjs/core/Interaction'
-import { ActionName as _ActionName } from '@interactjs/core/scope'
+import * as iEvent from '@interactjs/core/InteractEvent'
+import * as interaction from '@interactjs/core/Interaction'
+import * as scope from '@interactjs/core/scope'
 import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
-import { SignalArg as _SignalArg } from '@interactjs/utils/Signals'
+import * as signals from '@interactjs/utils/Signals'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -20,17 +20,19 @@ declare namespace Interact {
   export type Target = Window | Document | Element | string
   export type interact = typeof interact
   export type Plugin = _Plugin
-  export type ActionProps = _ActionProps
+  export type ActionProps = interaction.ActionProps
   export type Interactable = _Interactable
-  export type Interaction<T extends _ActionName = any> = _Interaction<T>
+  export type Scope = scope.Scope
+  export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
   export type InteractEvent<
-    T extends _ActionName = any,
-    P extends _EventPhase = any,
-  > = _InteractEvent<T, P>
-  export type EventPhase = _EventPhase
-  export type Options = _Options
-  export type ActionName = _ActionName
-  export type SignalArg = _SignalArg
+    T extends scope.ActionName = any,
+    P extends iEvent.EventPhase = any,
+  > = iEvent.InteractEvent<T, P>
+  export type EventPhase = iEvent.EventPhase
+  export type Options = defaults.Options
+  export type ActionName = scope.ActionName
+  export type SignalArg<T extends scope.ActionName = any> = signals.SignalArg<T>
+  export type SignalListener = signals.SignalListener
 
   export type DragEvent = actions.DragEvent
   export type ResizeEvent = actions.ResizeEvent
@@ -126,15 +128,28 @@ declare namespace Interact {
     [key: string]: boolean | CSSSelector | DOMElement
   }
 
-  export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {}
+  export interface ActionMethod<T> {
+    (this: Interact.Interactable): T
+    // eslint-disable-next-line no-undef
+    (this: Interact.Interactable, options: Partial<Interact.OrBoolean<T>> | boolean): typeof this
+  }
+
+  export interface OptionsArg extends defaults.BaseDefaults, Interact.OrBoolean<defaults.PerActionDefaults> {}
 
   export interface DraggableOptions extends Options {
-    axis?: 'x' | 'y'
+    startAxis?: 'x' | 'y' | 'xy'
+    lockAxis?: 'x' | 'y' | 'xy' | 'start'
     oninertiastart?: ListenersArg
+    onstart?: Interact.ListenersArg
+    onmove?: Interact.ListenersArg
+    onend?: Interact.ListenersArg
   }
 
   export interface DropzoneOptions extends Options {
-    accept?: string
+    accept?: string | Element | (({ dropzone, draggableElement }: {
+      dropzone: Interact.Interactable,
+      draggableElement: Element
+    }) => boolean)
     // How the overlap is checked on the drop zone
     overlap?: 'pointer' | 'center' | number
     checker?: DropFunctionChecker
@@ -168,9 +183,16 @@ declare namespace Interact {
     margin?: number,
     squareResize?: boolean
     oninertiastart?: ListenersArg
+    onstart?: Interact.ListenersArg
+    onmove?: Interact.ListenersArg
+    onend?: Interact.ListenersArg
   }
 
-  export type GesturableOptions = Options
+  export interface GesturableOptions extends Options {
+    onstart?: Interact.ListenersArg
+    onmove?: Interact.ListenersArg
+    onend?: Interact.ListenersArg
+  }
 
   export type ActionChecker = (
     pointerEvent: any,

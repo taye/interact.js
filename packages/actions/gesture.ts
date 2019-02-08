@@ -2,7 +2,7 @@ import InteractEvent from '@interactjs/core/InteractEvent'
 import { ActionName, Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 
-export type GesturableMethod = (options?: Interact.GesturableOptions | boolean) => Interact.Interactable | Interact.GesturableOptions
+export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
@@ -104,7 +104,7 @@ function install (scope: Scope) {
     }
 
     return this.options.gesture as Interact.Options
-  }
+  } as GesturableMethod
 
   interactions.signals.on('action-start', updateGestureProps)
   interactions.signals.on('action-move', updateGestureProps)

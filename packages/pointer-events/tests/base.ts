@@ -1,10 +1,9 @@
-import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/helpers'
-import interactions from '@interactjs/core/interactions'
-
+import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
-import Eventable     from '@interactjs/core/Eventable'
+import interactions from '@interactjs/core/interactions'
+import * as helpers from '@interactjs/core/tests/helpers'
 import Signals from '@interactjs/utils/Signals'
+import test from '@interactjs/_dev/test/test'
 import pointerEvents from '../base'
 
 test('pointerEvents.types', t => {
@@ -45,7 +44,8 @@ test('pointerEvents.fire', t => {
       props: {
         TEST_PROP,
       },
-    }] })
+    }],
+  } as any)
 
   t.ok(firedEvent instanceof pointerEvents.PointerEvent,
     'Fired event is an instance of pointerEvents.PointerEvent')
@@ -60,10 +60,10 @@ test('pointerEvents.fire', t => {
 
   const tapTime = 500
   const interaction = Object.assign(
-    new Interaction({ signals: new Signals() }),
+    new Interaction({ signals: new Signals() } as any),
     { tapTime: -1, prevTap: null })
 
-  interaction.updatePointer({}, {})
+  interaction.updatePointer({} as any, {} as any, null)
 
   const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
     timeStamp: tapTime,
@@ -75,7 +75,8 @@ test('pointerEvents.fire', t => {
     targets: [{
       eventable,
       element,
-    }] })
+    }],
+  } as any)
 
   t.equal(interaction.tapTime, tapTime,
     'interaction.tapTime is updated')
@@ -102,12 +103,12 @@ test('pointerEvents.collectEventTargets', t => {
 
   pointerEvents.signals.on('collect-targets', onCollect)
   pointerEvents.collectEventTargets({
-    interaction: new Interaction({ signals: helpers.mockSignals() }),
+    interaction: new Interaction({ signals: helpers.mockSignals() } as any),
     pointer: {},
     event: {},
     eventTarget: {},
     type,
-  })
+  } as any)
 
   t.deepEqual(collectedTargets, [target])
 
@@ -124,7 +125,7 @@ test('pointerEvents Interaction update-pointer signal', t => {
 
   const interaction = scope.interactions.new({})
   const initialHold = { duration: Infinity, timeout: null }
-  const event = {}
+  const event = {} as Interact.PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
   t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer')
@@ -157,13 +158,13 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   ]
 
   for (const id of ids) {
-    const index = interaction.updatePointer({ pointerId: id }, {}, true)
+    const index = interaction.updatePointer({ pointerId: id } as Interact.PointerType, {} as Interact.PointerEventType, null, true)
     // use the ids as the pointerInfo.hold value for this test
-    interaction.pointers[index].hold = id
+    interaction.pointers[index].hold = id as any
   }
 
   for (const removal of removals) {
-    interaction.removePointer({ pointerId: removal.id })
+    interaction.removePointer({ pointerId: removal.id } as any, null)
 
     t.deepEqual(interaction.pointers.map(p => p.hold), removal.remain,
       `${removal.message} - remaining interaction.holdTimers is correct`)

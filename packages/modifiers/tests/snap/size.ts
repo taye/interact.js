@@ -4,10 +4,11 @@ import Interaction from '@interactjs/core/Interaction'
 import snapSize from '../../snap/size'
 
 test('modifiers/snapSize', t => {
-  const interaction = new Interaction({ signals: mockSignals() })
+  const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.target = mockInteractable()
-  interaction.target.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 })
+  interaction.target.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
   interaction.prepared = {
+    name: null,
     edges: { top: true, left: true, bottom: false, right: false },
   }
   interaction._interacting = true

@@ -1,6 +1,6 @@
-import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/helpers'
 import pointerUtils from '@interactjs/utils/pointerUtils'
+import test from '@interactjs/_dev/test/test'
 import resize from '../resize'
 
 test('resize', t => {

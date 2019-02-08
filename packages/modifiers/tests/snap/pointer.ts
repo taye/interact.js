@@ -5,9 +5,9 @@ import Interaction from '@interactjs/core/Interaction'
 import snap from '../../snap/pointer'
 
 test('modifiers/snap', t => {
-  const interaction = new Interaction({ signals: mockSignals() })
+  const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.target = mockInteractable()
-  interaction.prepared = {}
+  interaction.prepared = {} as any
   interaction._interacting = true
 
   let funcArgs = null
@@ -40,7 +40,7 @@ test('modifiers/snap', t => {
     coords: { ...pageCoords },
     rect: { top: 0, left: 0, bottom: 100, right: 100, width: 100, height: 100 },
     startOffset: { top: 0, left: 0, bottom: 0, right: 0 },
-  }
+  } as any
 
   snap.start(arg)
   snap.set(arg)

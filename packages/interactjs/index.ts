@@ -29,6 +29,8 @@ export function init (win: Window) {
 }
 
 export default interact
+interact['default'] = interact // tslint:disable-line no-string-literal
+interact['init'] = init // tslint:disable-line no-string-literal
 
 if (typeof module === 'object' && !!module) {
   module.exports = interact

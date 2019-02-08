@@ -1,7 +1,7 @@
+import interactions from '@interactjs/core/interactions'
 import { jsdom } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import interact, { scope } from '../interact'
-import interactions from '@interactjs/core/interactions'
 
 test('interact export', t => {
   scope.init(jsdom('').defaultView)

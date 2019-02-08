@@ -1,8 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/helpers'
-import Signals from '@interactjs/utils/Signals'
 import Eventable from '@interactjs/core/Eventable'
 import interactions from '@interactjs/core/interactions'
+import * as helpers from '@interactjs/core/tests/helpers'
+import Signals from '@interactjs/utils/Signals'
+import pointerEvents from '../base'
 import holdRepeat from '../holdRepeat'
 
 function mockScope () {
@@ -16,12 +17,14 @@ function mockScope () {
   })
 }
 
-test('holdRepeat count', t => {
+test('holdRepeat count', (t) => {
   const scope = mockScope()
   const pointerEvent = {
     type: 'hold',
+    count: 0,
   }
 
+  pointerEvents.install(scope)
   holdRepeat.install(scope)
 
   scope.pointerEvents.signals.fire('new', { pointerEvent })
@@ -35,9 +38,10 @@ test('holdRepeat count', t => {
   t.end()
 })
 
-test('holdRepeat onFired', t => {
+test('holdRepeat onFired', (t) => {
   const scope = mockScope()
   interactions.install(scope)
+  pointerEvents.install(scope)
   holdRepeat.install(scope)
 
   const interaction = scope.interactions.new({})

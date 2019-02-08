@@ -139,7 +139,7 @@ export class Scope {
   }
 }
 
-class InteractableSet {
+export class InteractableSet {
   signals = new utils.Signals()
 
   // all set interactables
@@ -147,7 +147,7 @@ class InteractableSet {
 
   constructor (protected scope: Scope) {}
 
-  new (target: Interact.Target, options: any): InteractableBase {
+  new (target: Interact.Target, options?: any): InteractableBase {
     options = utils.extend(options || {}, {
       actions: this.scope.actions,
     })

@@ -28,7 +28,7 @@ declare module '@interactjs/core/defaultOptions' {
       endSpeed?: number,          // the speed at which inertia is slow enough to stop
       allowResume?: true,         // allow resuming an action in inertia phase
       smoothEndDuration?: number, // animate to snap/restrict endOnly if there's no inertia
-    }
+    } | boolean // FIXME
   }
 }
 
@@ -41,7 +41,7 @@ function install (scope: Scope) {
     defaults,
   } = scope
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', ({ interaction }) => {
     interaction.inertia = {
       active     : false,
       smoothEnd  : false,

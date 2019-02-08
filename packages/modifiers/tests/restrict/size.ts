@@ -9,11 +9,11 @@ import restrictSize from '../../restrict/size'
 test('restrictSize', t => {
   const edges = { left: true, top: true }
   const rect = { left: 0, top: 0, right: 200, bottom: 300 }
-  const interaction = new Interaction({ signals: mockSignals() })
+  const interaction = new Interaction({ signals: mockSignals() } as any)
 
-  interaction.prepared = {}
+  interaction.prepared = { name: null }
   interaction.prepared.edges = edges
-  interaction.resizeRects = {}
+  interaction.resizeRects = {} as any
   interaction.resizeRects.inverted = rectUtils.xywhToTlbr(rect)
   interaction.modifiers = {}
   interaction._interacting = true
@@ -35,6 +35,7 @@ test('restrictSize', t => {
     coords: startCoords,
     pageCoords: startCoords,
     options,
+    state: null,
   }
 
   interaction.modifiers.startOffset = base.getRectOffset(rect, startCoords)
