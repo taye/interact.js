@@ -1,3 +1,4 @@
+import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
 import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
@@ -21,7 +22,23 @@ declare module '@interactjs/core/Interactable' {
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    dropStatus?: { [key: string]: any }
+    dropStatus?: {
+      cur: {
+        dropzone: Interactable,   // the dropzone a drag target might be dropped into
+        element: Element,         // the element at the time of checking
+      },
+      prev: {
+        dropzone: Interactable,   // the dropzone that was recently dragged away from
+        element: Element,         // the element at the time of checking
+      },
+      rejected: boolean,          // wheather the potential drop was rejected from a listener
+      events: any,                // the drop events related to the current drag event
+      activeDrops: Array<{
+        dropzone: Interactable
+        Element: Element
+        rect: Interact.Rect
+      }>,
+    }
   }
 }
 
@@ -49,7 +66,7 @@ function install (scope: Scope) {
     /** @lends module:interact */
     interact,
     /** @lends Interactable */
-    Interactable,
+    Interactable, // eslint-disable-line no-shadow
     interactions,
     defaults,
   } = scope
@@ -57,7 +74,19 @@ function install (scope: Scope) {
   interactions.signals.on('after-action-start', ({ interaction, event, iEvent: dragEvent }) => {
     if (interaction.prepared.name !== 'drag') { return }
 
-    const { dropStatus } = interaction
+    const dropStatus = interaction.dropStatus = interaction.dropStatus || {
+      cur: {
+        dropzone: null,
+        element: null,
+      },
+      prev: {
+        dropzone: null,
+        element: null,
+      },
+      rejected: null,
+      events: null,
+      activeDrops: null,
+    }
 
     // reset active dropzones
     dropStatus.activeDrops = null
@@ -98,19 +127,6 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('new', (interaction) => {
-    interaction.dropStatus = {
-      cur: {
-        dropzone : null,  // the dropzone a drag target might be dropped into
-        element  : null,  // the element at the time of checking
-      },
-      prev: {
-        dropzone : null,  // the dropzone that was recently dragged away from
-        element  : null,  // the element at the time of checking
-      },
-      rejected   : false, // wheather the potential drop was rejected from a listener
-      events     : null,  // the drop events related to the current drag event
-      activeDrops: null,  // an array of { dropzone, element, rect }
-    }
   })
 
   interactions.signals.on('stop', ({ interaction: { dropStatus } }) => {
