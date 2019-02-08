@@ -19,7 +19,7 @@ declare module '@interactjs/core/defaultOptions' {
             endSpeed?: number;
             allowResume?: true;
             smoothEndDuration?: number;
-        };
+        } | boolean;
     }
 }
 declare function install(scope: Scope): void;

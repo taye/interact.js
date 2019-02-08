@@ -13,10 +13,6 @@ declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
         modifiers?: any[];
     }
-    interface Options {
-        drag?: Interact.DraggableOptions;
-        modifiers?: any[];
-    }
 }
 declare function install(scope: Scope): void;
 declare function startAll(arg: any): void;
@@ -31,7 +27,7 @@ declare function start({ interaction, phase }: Interact.SignalArg, pageCoords: I
         x: number;
         y: number;
     };
-    coords: import("../types").Point;
+    coords: import("../types/types").Point;
     changed: boolean;
 };
 declare function setAll(arg: Partial<Interact.SignalArg>): {
@@ -39,7 +35,7 @@ declare function setAll(arg: Partial<Interact.SignalArg>): {
         x: number;
         y: number;
     };
-    coords: import("../types").Point;
+    coords: import("../types/types").Point;
     changed: boolean;
 };
 declare function prepareStates(modifierList: any): any[];
@@ -53,7 +49,7 @@ declare function beforeEnd(arg: any): void | false;
 declare function stop(arg: any): void;
 declare function getModifierList(interaction: any, registeredModifiers: any): any;
 declare function shouldDo(options: any, preEnd?: boolean, requireEndOnly?: boolean, phase?: string): any;
-declare function makeModifier(module: any, name: any): {
+declare function makeModifier(module: any, name?: string): {
     (options: any): {
         options: any;
         methods: {
@@ -62,6 +58,7 @@ declare function makeModifier(module: any, name: any): {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {

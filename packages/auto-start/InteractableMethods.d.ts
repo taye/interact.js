@@ -1,7 +1,7 @@
 declare type Scope = import('@interactjs/core/scope').Scope;
-type Interaction = import('@interactjs/core/Interaction').default;
-type Interactable = import('@interactjs/core/Interactable').default;
-type IgnoreValue = string | Element | boolean;
+declare type Interaction = import('@interactjs/core/Interaction').default;
+declare type Interactable = import('@interactjs/core/Interactable').default;
+declare type IgnoreValue = string | Element | boolean;
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         getAction: typeof getAction;

@@ -4,6 +4,11 @@ declare module '@interactjs/core/scope' {
         autoScroll: typeof autoScroll;
     }
 }
+declare module '@interactjs/core/Interaction' {
+    interface Interaction {
+        autoScroll?: typeof autoScroll;
+    }
+}
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
         autoScroll?: Interact.AutoScrollOption;
@@ -11,7 +16,7 @@ declare module '@interactjs/core/defaultOptions' {
 }
 declare function install(scope: Scope): void;
 declare const autoScroll: {
-    defaults: import("../types").AutoScrollOption;
+    defaults: import("../types/types").AutoScrollOption;
     interaction: any;
     i: any;
     x: number;
@@ -20,7 +25,7 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start(interaction: any): void;
+    start(interaction: import("@interactjs/core/Interaction").Interaction<any>): void;
     stop(): void;
     scroll(): void;
     check(interactable: any, actionName: any): any;

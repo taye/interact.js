@@ -1,6 +1,6 @@
 export declare type SignalListener = (signalArg: PartialSignalArg, sinalName: string) => (void | boolean);
 export interface SignalArg<T extends Interact.ActionName = any> {
-    interaction: Interact.Interaction;
+    interaction: Interact.Interaction<T>;
     Interactable: Interact.Interactable;
     iEvent: Interact.InteractEvent<T>;
     element: Window | Document | Element;
@@ -16,6 +16,6 @@ declare class Signals {
     };
     on(name: string, listener: SignalListener): void;
     off(name: string, listener: SignalListener): void;
-    fire(name: string, arg: any): void | false;
+    fire(name: string, arg: Partial<SignalArg>): void | false;
 }
 export default Signals;

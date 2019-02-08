@@ -1,3 +1,4 @@
+import Interactable from '@interactjs/core/Interactable';
 import InteractEvent from '@interactjs/core/InteractEvent';
 import { Scope } from '@interactjs/core/scope';
 export declare type DropzoneMethod = (options?: Interact.DropzoneOptions | boolean) => Interact.Interactable | Interact.DropzoneOptions;
@@ -10,7 +11,21 @@ declare module '@interactjs/core/Interactable' {
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
         dropStatus?: {
-            [key: string]: any;
+            cur: {
+                dropzone: Interactable;
+                element: Element;
+            };
+            prev: {
+                dropzone: Interactable;
+                element: Element;
+            };
+            rejected: boolean;
+            events: any;
+            activeDrops: Array<{
+                dropzone: Interactable;
+                Element: Element;
+                rect: Interact.Rect;
+            }>;
         };
     }
 }
@@ -51,6 +66,6 @@ declare const drop: {
     getDrop: typeof getDrop;
     getDropEvents: typeof getDropEvents;
     fireDropEvents: typeof fireDropEvents;
-    defaults: import("../../types").DropzoneOptions;
+    defaults: import("../../types/types").DropzoneOptions;
 };
 export default drop;

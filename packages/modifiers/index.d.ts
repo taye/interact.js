@@ -7,6 +7,7 @@ export declare const snap: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {
@@ -25,6 +26,7 @@ export declare const snapSize: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {
@@ -43,6 +45,7 @@ export declare const snapEdges: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {
@@ -61,6 +64,7 @@ export declare const restrict: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {
@@ -79,6 +83,7 @@ export declare const restrictEdges: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {
@@ -97,6 +102,7 @@ export declare const restrictSize: {
             beforeEnd: any;
             stop: any;
         };
+        name: string;
     };
     _defaults: any;
     _methods: {

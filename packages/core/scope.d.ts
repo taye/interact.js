@@ -82,15 +82,14 @@ export declare class Scope {
     getDocIndex(doc: Document): number;
     getDocOptions(doc: Document): any;
 }
-declare class InteractableSet {
+export declare class InteractableSet {
     protected scope: Scope;
     signals: utils.Signals;
     list: InteractableBase[];
     constructor(scope: Scope);
-    new(target: Interact.Target, options: any): InteractableBase;
+    new(target: Interact.Target, options?: any): InteractableBase;
     indexOfElement(target: Interact.Target, context: Document | Element): number;
     get(element: Interact.Target, options: any, dontCheckInContext?: boolean): InteractableBase;
     forEachMatch(element: Document | Element, callback: (interactable: any) => any): any;
 }
 export declare function initScope(scope: Scope, window: Window): Scope;
-export {};

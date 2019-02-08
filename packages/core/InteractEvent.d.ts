@@ -1,12 +1,13 @@
 import Interactable from './Interactable';
 import Interaction from './Interaction';
+import { ActionName } from './scope';
 export declare enum EventPhase {
     Start = "start",
     Move = "move",
     End = "end",
     _NONE = ""
 }
-export declare class InteractEvent<T extends Interact.ActionName = Interact.ActionName, P extends EventPhase = EventPhase._NONE> {
+export declare class InteractEvent<T extends ActionName = any, P extends EventPhase = EventPhase._NONE> {
     type: string;
     target: Element;
     relatedTarget: Element | null;
@@ -20,7 +21,7 @@ export declare class InteractEvent<T extends Interact.ActionName = Interact.Acti
     altKey: boolean;
     metaKey: boolean;
     interactable: Interactable;
-    interaction: any;
+    interaction: Interaction<T>;
     page: Interact.Point;
     client: Interact.Point;
     delta: Interact.Point;
@@ -38,12 +39,6 @@ export declare class InteractEvent<T extends Interact.ActionName = Interact.Acti
     dragEnter?: Element;
     dragLeave?: Element;
     axes?: Interact.Point;
-    distance?: number;
-    angle?: number;
-    da?: number;
-    scale?: number;
-    ds?: number;
-    box?: Interact.Rect;
     preEnd?: boolean;
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
@@ -63,10 +58,10 @@ export declare class InteractEvent<T extends Interact.ActionName = Interact.Acti
         left: boolean;
         right: boolean;
         angle: number;
-        speed: any;
+        speed: number;
         velocity: {
-            x: any;
-            y: any;
+            x: number;
+            y: number;
         };
     };
     preventDefault(): void;

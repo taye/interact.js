@@ -5,7 +5,7 @@ declare const pointerUtils: {
     setCoordVelocity(targetObj: any, delta: any): void;
     isNativePointer(pointer: any): boolean;
     getXY(type: any, pointer: any, xy: any): any;
-    getPageXY(pointer: import("../types").PointerType, page?: import("../types").Point): import("../types").Point;
+    getPageXY(pointer: import("../types/types").PointerType, page?: import("../types/types").Point): import("../types/types").Point;
     getClientXY(pointer: any, client: any): any;
     getPointerId(pointer: any): any;
     setCoords(targetObj: any, pointers: any[], timeStamp?: number): void;
@@ -19,11 +19,13 @@ declare const pointerUtils: {
         screenX: number;
         screenY: number;
     };
-    touchBBox(event: Event | PointerEvent[]): {
+    touchBBox(event: Event | (Touch | MouseEvent | PointerEvent | TouchEvent | import("@interactjs/core/InteractEvent").InteractEvent<any, any>)[]): {
         x: number;
         y: number;
         left: number;
         top: number;
+        right: number;
+        bottom: number;
         width: number;
         height: number;
     };
@@ -42,11 +44,7 @@ declare const pointerUtils: {
         };
         timeStamp: number;
     };
-    coordsToEvent({ page, client, timeStamp }: {
-        page: any;
-        client: any;
-        timeStamp: any;
-    }): {
+    coordsToEvent({ page, client, timeStamp }: any): {
         page: any;
         client: any;
         timeStamp: any;

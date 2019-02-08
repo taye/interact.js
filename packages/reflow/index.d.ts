@@ -1,9 +1,9 @@
 import Interactable from '@interactjs/core/Interactable';
-import { Action } from '@interactjs/core/Interaction';
+import { ActionProps } from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
-        reflow: (action: Action) => ReturnType<typeof reflow>;
+        reflow: (action: ActionProps) => ReturnType<typeof reflow>;
     }
 }
 declare module '@interactjs/core/Interaction' {
@@ -12,7 +12,7 @@ declare module '@interactjs/core/Interaction' {
     }
 }
 export declare function install(scope: Scope): void;
-declare function reflow(interactable: Interactable, action: Action, scope: Scope): any;
+declare function reflow(interactable: Interactable, action: ActionProps, scope: Scope): any;
 declare const _default: {
     install: typeof install;
 };

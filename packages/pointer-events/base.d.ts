@@ -31,7 +31,7 @@ declare module '@interactjs/core/PointerInfo' {
 }
 declare module '@interactjs/core/defaultOptions' {
     interface ActionDefaults {
-        pointerEvents?: any;
+        pointerEvents: Interact.Options;
     }
 }
 declare const pointerEvents: {

@@ -1,4 +1,5 @@
 import interact from '@interactjs/interact';
+import '@interactjs/types';
 import * as snappers from '@interactjs/utils/snappers';
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {

@@ -3,16 +3,18 @@ import Interactable from './Interactable';
 import InteractEvent, { EventPhase } from './InteractEvent';
 import PointerInfo from './PointerInfo';
 import { ActionName } from './scope';
-export interface Action {
-    name: ActionName;
+export interface ActionProps<T extends ActionName = any> {
+    name: T;
     axis?: 'x' | 'y' | 'xy';
-    edges?: Partial<Interact.Rect>;
+    edges?: {
+        [edge in keyof Interact.Rect]?: boolean;
+    };
 }
-export declare class Interaction {
+export declare class Interaction<T extends ActionName = any> {
     target: Interactable;
     element: Element;
     _signals: utils.Signals;
-    prepared: Action;
+    prepared: ActionProps<T>;
     pointerType: string;
     pointers: PointerInfo[];
     downEvent: Interact.PointerEventType;
@@ -22,7 +24,7 @@ export declare class Interaction {
         event: Interact.PointerEventType;
         eventTarget: Node;
     };
-    prevEvent: InteractEvent;
+    prevEvent: InteractEvent<T>;
     pointerIsDown: boolean;
     pointerWasMoved: boolean;
     _interacting: boolean;
@@ -92,7 +94,7 @@ export declare class Interaction {
     };
     /** */
     constructor({ pointerType, signals }: {
-        pointerType: string;
+        pointerType?: string;
         signals: utils.Signals;
     });
     pointerDown(pointer: any, event: any, eventTarget: any): void;
@@ -166,19 +168,19 @@ export declare class Interaction {
      *
      * @param {PointerEvent} [event]
      */
-    end(event: any): void;
-    currentAction(): ActionName;
+    end(event?: Interact.PointerEventType): void;
+    currentAction(): T;
     interacting(): boolean;
     /** */
     stop(): void;
     getPointerIndex(pointer: any): number;
     getPointerInfo(pointer: any): PointerInfo;
-    updatePointer(pointer: any, event: any, eventTarget: any, down: any): number;
+    updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
-    _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<ActionName, EventPhase>;
+    _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;
     _fireEvent(iEvent: any): void;
-    _doPhase(signalArg: any): boolean;
+    _doPhase(signalArg: Partial<Interact.SignalArg>): boolean;
 }
 export default Interaction;
 export { PointerInfo };

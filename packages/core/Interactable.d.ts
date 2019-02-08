@@ -4,18 +4,16 @@ import { Actions } from './scope';
 /** */
 export declare class Interactable implements Partial<Eventable> {
     protected readonly _defaults: Defaults;
-    options: Required<Options>;
+    readonly options: Required<Options>;
     readonly _actions: Actions;
     readonly target: Interact.Target;
     readonly events: Eventable;
-    readonly _context: Element;
+    readonly _context: Document | Element;
     readonly _win: Window;
     readonly _doc: Document;
     /** */
-    constructor(target: Interact.Target, options: any, defaultContext: Element | Node);
-    setOnEvents(actionName: string, phases: {
-        [phase: string]: Interact.ListenersArg;
-    }): this;
+    constructor(target: Interact.Target, options: any, defaultContext: Document | Element);
+    setOnEvents(actionName: string, phases: NonNullable<any>): this;
     updatePerActionListeners(actionName: any, prev: any, cur: any): void;
     setPerAction(actionName: any, options: Interact.OrBoolean<Options>): void;
     /**
@@ -76,7 +74,7 @@ export declare class Interactable implements Partial<Eventable> {
      *
      * @return {Node} The context Node of this Interactable
      */
-    context(): Element;
+    context(): Element | Document;
     inContext(element: any): boolean;
     /**
      * Calls listeners for the given InteractEvent type bound globally

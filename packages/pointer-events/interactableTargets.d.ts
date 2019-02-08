@@ -1,5 +1,5 @@
 import { Scope } from '@interactjs/core/scope';
-type Interactable = import('@interactjs/core/Interactable').default;
+declare type Interactable = import('@interactjs/core/Interactable').default;
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         pointerEvents: typeof pointerEventsMethod;

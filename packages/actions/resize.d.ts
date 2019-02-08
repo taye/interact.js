@@ -1,7 +1,7 @@
-import { Action, Interaction } from '@interactjs/core/Interaction';
+import { ActionProps, Interaction } from '@interactjs/core/Interaction';
 import { ActionName, Scope } from '@interactjs/core/scope';
 export declare type EdgeName = 'top' | 'left' | 'bottom' | 'right';
-export declare type ResizableMethod = (options?: Interact.OrBoolean<Interact.ResizableOptions> | boolean) => Interact.Interactable | Interact.ResizableOptions;
+export declare type ResizableMethod = Interact.ActionMethod<Interact.ResizableOptions>;
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         resizable: ResizableMethod;
@@ -10,6 +10,19 @@ declare module '@interactjs/core/Interactable' {
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
         resizeAxes: 'x' | 'y' | 'xy';
+        resizeRects: {
+            start: Interact.Rect;
+            current: Interact.Rect;
+            inverted: Interact.Rect;
+            previous: Interact.Rect;
+            delta: Interact.Rect;
+        };
+        resizeStartAspectRatio: number;
+    }
+    interface ActionProps {
+        _linkedEdges?: {
+            [key: string]: boolean;
+        };
     }
 }
 declare module '@interactjs/core/defaultOptions' {
@@ -32,8 +45,8 @@ export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
 declare function install(scope: Scope): void;
 declare const resize: {
     install: typeof install;
-    defaults: import("../types").ResizableOptions;
-    checker(_pointer: import("../types").PointerType, _event: import("../types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: Element, interaction: Interaction, rect: import("../types").Rect): {
+    defaults: import("../types/types").ResizableOptions;
+    checker(_pointer: import("../types/types").PointerType, _event: import("../types/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: Element, interaction: Interaction<any>, rect: import("../types/types").Rect): {
         name: string;
         edges: {
             [edge: string]: boolean;
@@ -57,7 +70,7 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor(action: Action): string;
+    getCursor(action: ActionProps<any>): string;
     defaultMargin: number;
 };
 export default resize;

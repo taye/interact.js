@@ -1,11 +1,4 @@
 import Interaction from '@interactjs/core/Interaction';
-declare module '@interactjs/core/Interaction' {
-    interface Action {
-        linkedEdges?: {
-            [key: string]: boolean;
-        };
-    }
-}
 declare function start({ interaction, state }: {
     interaction: Interaction;
     state: any;
@@ -28,7 +21,7 @@ declare const restrictEdges: {
         bottom: number;
         right: number;
     };
-    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types").Point) => any;
+    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types/types").Point) => any;
     start: typeof start;
     set: typeof set;
     defaults: {

@@ -4,11 +4,11 @@ export interface Defaults {
     actions: ActionDefaults;
 }
 export interface ActionDefaults {
-    [key: string]: Options;
 }
 export interface BaseDefaults {
     preventDefault?: 'auto' | 'never' | string;
     deltaSource?: 'page' | 'client';
+    context?: Window | Document | Element;
     [key: string]: any;
 }
 export interface PerActionDefaults {
@@ -16,8 +16,9 @@ export interface PerActionDefaults {
     origin?: Interact.Point | string | Element;
     listeners?: Interact.Listeners;
 }
-export interface Options extends BaseDefaults, PerActionDefaults {
-}
+export declare type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {
+    [P in keyof ActionDefaults]?: Partial<ActionDefaults[P]>;
+};
 export interface OptionsArg extends BaseDefaults, Interact.OrBoolean<PerActionDefaults> {
 }
 export declare const defaults: Defaults;
