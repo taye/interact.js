@@ -43,9 +43,12 @@ merge_to_release() {
 
   echo "checking out the '$RELEASE_BRANCH' branch"
   git checkout $RELEASE_BRANCH || exit $?
+  git pull --ff-only
 
   # delete generated .js and d.ts files
   npx tsc --build --clean $ROOT
+  # clear package links
+  git clean -fdX packages/*
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
   npx lerna bootstrap || quit "bootstrapping failed" $?
 }
