@@ -5,17 +5,19 @@
   "branches": 33,
   "functions": 50,
   "include": [
-    "packages"
+    "**/*.spec.ts"
   ],
-  "exclude": [
-    "**/_*",
-    "**/tests"
+  "extensions": [
+    "js",
+    "ts"
   ],
   "reporter": [
     "text",
     "lcov"
   ],
   "require": [
+    "ts-node/register",
+    "./packages/types/index.ts"
   ],
   "sourceMap": false,
   "instrument": false

@@ -1,10 +1,10 @@
-import Signals from '@interactjs/utils/Signals'
 import test from '@interactjs/_dev/test/test'
-import Interaction from '../Interaction'
-import interactions from '../interactions'
-import * as helpers from './helpers'
+import Signals from '@interactjs/utils/Signals'
+import Interaction from './Interaction'
+import interactions from './interactions'
+import * as helpers from './tests/_helpers'
 
-test('interactions', t => {
+test('interactions', (t) => {
   let scope = helpers.mockScope()
 
   interactions.install(scope)
@@ -44,7 +44,7 @@ test('interactions', t => {
   t.end()
 })
 
-test('interactions document event options', t => {
+test('interactions document event options', (t) => {
   const scope = helpers.mockScope()
   const doc = scope.document
 

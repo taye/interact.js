@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import { mockSignals, mockInteractable } from '@interactjs/core/tests/helpers'
 import Interaction from '@interactjs/core/Interaction'
-import snapSize from '../../snap/size'
+import { mockInteractable, mockSignals } from '@interactjs/core/tests/_helpers'
+import snapSize from '../snap/size'
 
-test('modifiers/snapSize', t => {
+test('modifiers/snapSize', (t) => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.target = mockInteractable()
   interaction.target.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)

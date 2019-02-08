@@ -1,9 +1,9 @@
-import * as helpers from '@interactjs/core/tests/helpers'
-import pointerUtils from '@interactjs/utils/pointerUtils'
 import test from '@interactjs/_dev/test/test'
-import resize from '../resize'
+import * as helpers from '@interactjs/core/tests/_helpers'
+import pointerUtils from '@interactjs/utils/pointerUtils'
+import resize from './resize'
 
-test('resize', t => {
+test('resize', (t) => {
   const scope = helpers.mockScope()
 
   resize.install(scope)

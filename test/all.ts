@@ -1,11 +1,8 @@
 // tslint:disable no-var-requires
-
-require('ts-node/register')
-
 const glob = require('glob')
 const path = require('path')
 
-const globOptions = { ignore: '**/node_modules/**' }
+const globOptions = { ignore: ['**/node_modules/**', '**/_*'] }
 
 const [, , ...fileArgs] = process.argv
 
@@ -22,7 +19,7 @@ function getMatches (pattern) {
   })
 }
 
-(fileArgs.length ? Promise.resolve(fileArgs) : getMatches('**/tests/**/*.ts')).then((tests) => {
+(fileArgs.length ? Promise.resolve(fileArgs) : getMatches('**/*.spec.ts')).then((tests) => {
   for (const file of tests) {
     require(path.resolve(file))
   }

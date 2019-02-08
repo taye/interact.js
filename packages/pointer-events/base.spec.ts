@@ -1,10 +1,10 @@
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import interactions from '@interactjs/core/interactions'
-import * as helpers from '@interactjs/core/tests/helpers'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import Signals from '@interactjs/utils/Signals'
 import test from '@interactjs/_dev/test/test'
-import pointerEvents from '../base'
+import pointerEvents from './base'
 
 test('pointerEvents.types', t => {
   t.deepEqual(pointerEvents.types,

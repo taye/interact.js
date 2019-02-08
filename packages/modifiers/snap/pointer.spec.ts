@@ -1,10 +1,10 @@
 import test from '@interactjs/_dev/test/test'
-import { mockSignals, mockInteractable } from '@interactjs/core/tests/helpers'
+import { mockInteractable, mockSignals } from '@interactjs/core/tests/_helpers'
 
 import Interaction from '@interactjs/core/Interaction'
-import snap from '../../snap/pointer'
+import snap from '../snap/pointer'
 
-test('modifiers/snap', t => {
+test('modifiers/snap', (t) => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.target = mockInteractable()
   interaction.prepared = {} as any

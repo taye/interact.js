@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
 import * as utils from '@interactjs/utils'
 import Signals from '@interactjs/utils/Signals'
@@ -67,11 +68,11 @@ export function mockScope (options = {} as any) {
   const document = options.document || doc
   const window = document.defaultView
 
-  const scope = createScope().init(window)
+  const scope: any = createScope().init(window)
 
   scope.interact = Object.assign(() => {}, { use () {} }) as any
 
-  return scope as any
+  return scope
 }
 
 export function mockSignals () {

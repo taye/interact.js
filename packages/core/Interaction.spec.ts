@@ -1,10 +1,10 @@
 import test from '@interactjs/_dev/test/test'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
-import InteractEvent from '../InteractEvent'
-import Interaction from '../Interaction'
-import interactions from '../interactions'
-import * as helpers from './helpers'
+import InteractEvent from './InteractEvent'
+import Interaction from './Interaction'
+import interactions from './interactions'
+import * as helpers from './tests/_helpers'
 
 const makeInteractionAndSignals = () => new Interaction({ signals: new Signals() } as any)
 
@@ -141,6 +141,8 @@ test('Interaction.updatePointer', (t) => {
 
     st.end()
   })
+
+  t.end()
 })
 
 test('Interaction.removePointer', (t) => {

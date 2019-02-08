@@ -1,9 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/helpers'
 import interactions from '@interactjs/core/interactions'
-import drop from '../../drop'
+import * as helpers from '@interactjs/core/tests/_helpers'
+import drop from '../drop'
 
-test('actions/drop options', t => {
+test('actions/drop options', (t) => {
   const scope = helpers.mockScope()
   scope.interact = {}
   interactions.install(scope)

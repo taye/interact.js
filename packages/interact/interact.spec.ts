@@ -1,9 +1,9 @@
-import interactions from '@interactjs/core/interactions'
 import { jsdom } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
-import interact, { scope } from '../interact'
+import interactions from '@interactjs/core/interactions'
+import interact, { scope } from './interact'
 
-test('interact export', t => {
+test('interact export', (t) => {
   scope.init(jsdom('').defaultView)
   interactions.install(scope)
 
@@ -53,9 +53,7 @@ test('interact export', t => {
 
   t.pass(getsUniqueMessage)
 
-  scope.interactables.list.forEach(i => i.unset())
-
-  delete scope.Interactable
+  scope.interactables.list.forEach((i) => i.unset())
 
   t.end()
 })

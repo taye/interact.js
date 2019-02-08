@@ -1,9 +1,9 @@
 import Interaction from '@interactjs/core/Interaction'
-import * as helpers from '@interactjs/core/tests/helpers'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import test from '@interactjs/_dev/test/test'
-import PointerEvent from '../PointerEvent'
+import PointerEvent from './PointerEvent'
 
 test('PointerEvent constructor', t => {
   const type = 'TEST_EVENT'
