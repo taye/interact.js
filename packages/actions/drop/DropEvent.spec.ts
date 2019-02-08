@@ -10,10 +10,10 @@ const interactable: any = Symbol('interactable')
 const dragElement: any = Symbol('drag-el')
 
 test('DropEvent constructor', (t) => {
-  const interaction = { dropStatus: {} }
+  const interaction: any = { dropState: {} }
   const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
 
-  utils.extend(interaction.dropStatus, {
+  utils.extend(interaction.dropState, {
     activeDrops: [
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
@@ -23,26 +23,26 @@ test('DropEvent constructor', (t) => {
     events: {},
   })
 
-  const dropmove = new DropEvent(interaction.dropStatus, dragEvent, 'dropmove')
+  const dropmove = new DropEvent(interaction.dropState, dragEvent, 'dropmove')
 
-  t.equal(dropmove.target, el1, 'dropmove uses dropStatus.cur.element')
-  t.equal(dropmove.dropzone, dz1, 'dropmove uses dropStatus.cur.dropzone')
+  t.equal(dropmove.target, el1, 'dropmove uses dropState.cur.element')
+  t.equal(dropmove.dropzone, dz1, 'dropmove uses dropState.cur.dropzone')
   t.equal(dropmove.relatedTarget, dragElement)
 
-  const dragleave = new DropEvent(interaction.dropStatus, dragEvent, 'dragleave')
+  const dragleave = new DropEvent(interaction.dropState, dragEvent, 'dragleave')
 
-  t.equal(dragleave.target, el2, 'dropmove uses dropStatus.prev.element')
-  t.equal(dragleave.dropzone, dz2, 'dropmove uses dropStatus.prev.dropzone')
+  t.equal(dragleave.target, el2, 'dropmove uses dropState.prev.element')
+  t.equal(dragleave.dropzone, dz2, 'dropmove uses dropState.prev.dropzone')
   t.equal(dragleave.relatedTarget, dragElement)
 
   t.end()
 })
 
 test('DropEvent.reject()', (t) => {
-  const interaction: any = { dropStatus: {} }
+  const interaction: any = { dropState: {} }
   const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
 
-  utils.extend(interaction.dropStatus, {
+  utils.extend(interaction.dropState, {
     activeDrops: [
       { dropzone: dz1, element: el1 },
       { dropzone: dz2, element: el2 },
@@ -52,7 +52,7 @@ test('DropEvent.reject()', (t) => {
     events: {},
   })
 
-  const dropactivate = new DropEvent(interaction.dropStatus, dragEvent, 'dropactivate')
+  const dropactivate = new DropEvent(interaction.dropState, dragEvent, 'dropactivate')
 
   dropactivate.dropzone = dz1
   dropactivate.target = el1
@@ -64,31 +64,31 @@ test('DropEvent.reject()', (t) => {
   t.equal(dz1.fired.type, 'dropdeactivate', 'dropdeactivate is fired on rejected dropzone')
 
   t.deepEqual(
-    interaction.dropStatus.activeDrops,
+    interaction.dropState.activeDrops,
     [{ dropzone: dz2, element: el2 }],
     'activeDrop of rejected dropactivate event is removed')
 
   t.deepEqual(
-    interaction.dropStatus.cur,
+    interaction.dropState.cur,
     { dropzone: null, element: null },
-    'dropStatus.cur dropzone and element are set to null after rejecting dropactivate')
+    'dropState.cur dropzone and element are set to null after rejecting dropactivate')
 
-  utils.extend(interaction.dropStatus, {
+  utils.extend(interaction.dropState, {
     cur : { dropzone: dz1, element: el1 },
     prev: { dropzone: null, element: null },
     events: {},
   })
 
-  const dropmove = new DropEvent(interaction.dropStatus, dragEvent, 'dropmove')
+  const dropmove = new DropEvent(interaction.dropState, dragEvent, 'dropmove')
 
   dropmove.reject()
 
   t.deepEqual(
-    interaction.dropStatus.cur,
+    interaction.dropState.cur,
     { dropzone: dz1, element: el1 },
-    'dropStatus.cur remains the same after rejecting non activate event')
+    'dropState.cur remains the same after rejecting non activate event')
 
-  t.ok(interaction.dropStatus.rejected, 'dropStatus.rejected === true')
+  t.ok(interaction.dropState.rejected, 'dropState.rejected === true')
 
   t.equal(dz1.fired.type, 'dragleave', 'dragleave is fired on rejected dropzone')
 
@@ -96,7 +96,7 @@ test('DropEvent.reject()', (t) => {
 })
 
 test('DropEvent.stop[Immediate]Propagation()', (t) => {
-  const dropEvent = new DropEvent({ cur: {} }, {}, 'dragmove')
+  const dropEvent = new DropEvent({ cur: {} } as any, {}, 'dragmove')
 
   t.notOk(dropEvent.propagationStopped || dropEvent.immediatePropagationStopped)
 
