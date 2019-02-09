@@ -233,8 +233,8 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', (t) => {
 test('Interaction.pointerDown', (t) => {
   const interaction = makeInteractionAndSignals()
   const coords = helpers.newCoordsSet()
-  const eventTarget = {}
-  const event = {
+  const eventTarget = {} as Element
+  const event: any = {
     type: 'down',
     target: eventTarget,
   }
@@ -271,7 +271,7 @@ test('Interaction.pointerDown', (t) => {
     'pointer is added'
   )
 
-  t.deepEqual(interaction.downPointer, {}, 'downPointer is not updated')
+  t.deepEqual(interaction.downPointer, {} as any, 'downPointer is not updated')
 
   t.deepEqual(interaction.coords.start, coords.start, 'coords.start are not modified')
   t.deepEqual(interaction.coords.cur,   coords.cur,   'coords.cur   are not modified')
@@ -433,7 +433,7 @@ test('Interaction createPreparedEvent', (t) => {
 test('Interaction fireEvent', (t) => {
   const interaction = new Interaction({ signals: helpers.mockSignals() })
   const interactable = helpers.mockInteractable()
-  const iEvent = {}
+  const iEvent = {} as Interact.InteractEvent
   let firedEvent
 
   // this method should be called from actions.firePrepared

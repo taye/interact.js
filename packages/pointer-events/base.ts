@@ -25,7 +25,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/PointerInfo' {
   interface PointerInfo {
-    hold: {
+    hold?: {
       duration: number
       timeout: any
     }
