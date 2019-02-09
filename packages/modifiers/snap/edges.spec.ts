@@ -6,8 +6,8 @@ import snapEdges from '../snap/edges'
 test('modifiers/snapEdges', (t) => {
   mockScope()
   const interaction = new Interaction({ signals: mockSignals() } as any)
-  interaction.target = mockInteractable()
-  interaction.target.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
+  interaction.interactable = mockInteractable()
+  interaction.interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
   interaction._interacting = true
 
   const target0 = Object.freeze({
@@ -25,7 +25,7 @@ test('modifiers/snapEdges', (t) => {
   const pageCoords = Object.freeze({ x: 0, y: 0 })
   const arg = {
     interaction,
-    interactable: interaction.target,
+    interactable: interaction.interactable,
     state: null,
     pageCoords,
     coords: { ...pageCoords },

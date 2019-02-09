@@ -23,7 +23,7 @@ test('autoStart/hold', (t) => {
   const holdDuration = 1000
   const actionName = 'TEST_ACTION'
   const interaction: any = {
-    target: { options: { [actionName]: { hold: holdDuration } } },
+    interactable: { options: { [actionName]: { hold: holdDuration } } },
     prepared: { name: actionName },
   }
 
@@ -34,8 +34,8 @@ test('autoStart/hold', (t) => {
 
   const delayDuration = 500
 
-  interaction.target.options[actionName].delay = delayDuration
-  delete interaction.target.options[actionName].hold
+  interaction.interactable.options[actionName].delay = delayDuration
+  delete interaction.interactable.options[actionName].hold
 
   t.equal(
     autoStartHold.getHoldDuration(interaction),

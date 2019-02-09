@@ -350,8 +350,8 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     return
   }
 
-  const startRect = interaction.target.getRect(interaction.element)
-  const resizeOptions = interaction.target.options.resize
+  const startRect = interaction.interactable.getRect(interaction.element)
+  const resizeOptions = interaction.interactable.options.resize
 
   /*
    * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
@@ -400,7 +400,7 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
 function move ({ iEvent, interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
-  const resizeOptions = interaction.target.options.resize
+  const resizeOptions = interaction.interactable.options.resize
   const invert = resizeOptions.invert
   const invertible = invert === 'reposition' || invert === 'negate'
 
@@ -483,7 +483,7 @@ function move ({ iEvent, interaction }) {
 function updateEventAxes ({ interaction, iEvent, action }) {
   if (action !== 'resize' || !interaction.resizeAxes) { return }
 
-  const options = interaction.target.options
+  const options = interaction.interactable.options
 
   if (options.resize.square) {
     if (interaction.resizeAxes === 'y') {

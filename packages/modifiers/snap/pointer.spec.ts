@@ -6,7 +6,7 @@ import snap from '../snap/pointer'
 
 test('modifiers/snap', (t) => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
-  interaction.target = mockInteractable()
+  interaction.interactable = mockInteractable()
   interaction.prepared = {} as any
   interaction._interacting = true
 

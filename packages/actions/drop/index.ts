@@ -298,7 +298,7 @@ function getActiveDrops (scope: Scope, dragElement: Element) {
   return activeDrops
 }
 
-function getDrop ({ dropState, target: draggable, element: dragElement }: Partial<Interact.Interaction>, dragEvent, pointerEvent) {
+function getDrop ({ dropState, interactable: draggable, element: dragElement }: Partial<Interact.Interaction>, dragEvent, pointerEvent) {
   const validDrops = []
 
   // collect all dropzones and their elements which qualify for a drop

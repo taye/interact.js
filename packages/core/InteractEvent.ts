@@ -68,7 +68,7 @@ export class InteractEvent<
   ) {
     element = element || interaction.element
 
-    const target      = interaction.target
+    const target      = interaction.interactable
     // FIXME: add deltaSource to defaults
     const deltaSource = (((target && target.options) || defaults) as any).deltaSource as 'page' | 'client'
     const origin      = getOriginXY(target, element, actionName)

@@ -81,10 +81,10 @@ function install (scope: Scope) {
     signals,
     // all active and idle interactions
     list: [],
-    new (options) {
+    new (options: { pointerType?: string, signals?: Signals }) {
       options.signals = signals
 
-      return new scope.Interaction(options)
+      return new scope.Interaction(options as Required<typeof options>)
     },
     listeners,
     eventMap,

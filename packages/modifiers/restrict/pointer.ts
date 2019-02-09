@@ -44,9 +44,9 @@ function set ({ coords, interaction, state }) {
 
 function getRestrictionRect (value, interaction, coords?: Interact.Point) {
   if (is.func(value)) {
-    return rectUtils.resolveRectLike(value, interaction.target, interaction.element, [coords.x, coords.y, interaction])
+    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction])
   } else {
-    return rectUtils.resolveRectLike(value, interaction.target, interaction.element)
+    return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element)
   }
 }
 

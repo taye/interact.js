@@ -173,7 +173,7 @@ function move ({ iEvent, interaction }) {
 
   iEvent.ds = iEvent.scale - interaction.gesture.scale
 
-  interaction.target.fire(iEvent)
+  interaction.interactable.fire(iEvent)
 
   interaction.gesture.prevAngle = iEvent.angle
   interaction.gesture.prevDistance = iEvent.distance
@@ -192,7 +192,7 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
   const pointers = interaction.pointers.map((p) => p.pointer)
   const starting = phase === 'start'
   const ending = phase === 'end'
-  const deltaSource = interaction.target.options.deltaSource
+  const deltaSource = interaction.interactable.options.deltaSource
 
   iEvent.touches = [pointers[0], pointers[1]]
 

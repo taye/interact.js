@@ -80,7 +80,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
       scope.interactions.list,
       (interaction: Interaction) => {
         return interaction.interacting() &&
-          interaction.target === interactable &&
+          interaction.interactable === interactable &&
           interaction.element === element &&
           interaction.prepared.name === action.name
       })
@@ -125,7 +125,7 @@ function startReflow (scope: Scope, interactable: Interactable, element: Element
     phase: 'reflow',
   }
 
-  interaction.target = interactable
+  interaction.interactable = interactable
   interaction.element = element
   interaction.prepared = extend({}, action)
   interaction.prevEvent = event

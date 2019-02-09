@@ -88,7 +88,7 @@ const autoScroll = {
   // scroll the window by the values in scroll.x/y
   scroll () {
     const { interaction } = autoScroll
-    const { target: interactable, element } = interaction
+    const { interactable, element } = interaction
     const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll
     const container = getContainer(options.container, interactable, element)
     const now = new Date().getTime()
@@ -147,7 +147,7 @@ const autoScroll = {
   },
   onInteractionMove ({ interaction, pointer }) {
     if (!(interaction.interacting() &&
-          autoScroll.check(interaction.target, interaction.prepared.name))) {
+          autoScroll.check(interaction.interactable, interaction.prepared.name))) {
       return
     }
 
@@ -161,7 +161,7 @@ const autoScroll = {
     let bottom
     let left
 
-    const { target: interactable, element } = interaction
+    const { interactable, element } = interaction
     const options = interactable.options[interaction.prepared.name].autoScroll
     const container = getContainer(options.container, interactable, element)
 
@@ -210,7 +210,7 @@ export function getScrollSize (container) {
 }
 
 export function getScrollSizeDelta ({ interaction, element }, func) {
-  const scrollOptions = interaction && interaction.target.options[interaction.prepared.name].autoScroll
+  const scrollOptions = interaction && interaction.interactable.options[interaction.prepared.name].autoScroll
 
   if (!scrollOptions || !scrollOptions.enabled) {
     func()
@@ -219,7 +219,7 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
 
   const scrollContainer = getContainer(
     scrollOptions.container,
-    interaction.target,
+    interaction.interactable,
     element
   )
 

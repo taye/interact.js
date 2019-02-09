@@ -329,7 +329,7 @@ test('Interaction.start', (t) => {
   const interaction = makeInteractionAndSignals()
   const action = { name: 'TEST' }
   const target = helpers.mockInteractable()
-  const element = {}
+  const element: any = {}
   const pointer = helpers.newPointer()
   const event = {}
 
@@ -360,7 +360,7 @@ test('Interaction.start', (t) => {
   interaction.start(action, target, element)
 
   t.equal(interaction.prepared.name, action.name, 'action is prepared')
-  t.equal(interaction.target, target, 'interaction.target is updated')
+  t.equal(interaction.interactable, target, 'interaction.interactable is updated')
   t.equal(interaction.element, element, 'interaction.element is updated')
 
   // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
@@ -383,7 +383,7 @@ test('stop interaction from start event', (t) => {
   const interaction = scope.interactions.new({})
   const interactable = helpers.mockInteractable()
 
-  interaction.target = interactable
+  interaction.interactable = interactable
   interaction.element = interactable.element
   interaction.prepared = { name: 'TEST' }
 
@@ -409,7 +409,7 @@ test('Interaction createPreparedEvent', (t) => {
   const phase = 'TEST_PHASE'
 
   interaction.prepared = action
-  interaction.target = interactable
+  interaction.interactable = interactable
   interaction.element = interactable.element
   interaction.prevEvent = { page: {}, client: {}, velocity: {} }
 
@@ -441,7 +441,7 @@ test('Interaction fireEvent', (t) => {
     firedEvent = event
   }
 
-  interaction.target = interactable
+  interaction.interactable = interactable
   interaction._fireEvent(iEvent)
 
   t.equal(firedEvent, iEvent,

@@ -12,7 +12,7 @@ function install (scope: Scope) {
     // check if a drag is in the correct axis
     const absX = Math.abs(dx)
     const absY = Math.abs(dy)
-    const targetOptions = interaction.target.options.drag
+    const targetOptions = interaction.interactable.options.drag
     const startAxis = targetOptions.startAxis
     const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy')
 
@@ -29,9 +29,9 @@ function install (scope: Scope) {
       let element = eventTarget
 
       const getDraggable = function (interactable) {
-        if (interactable === interaction.target) { return }
+        if (interactable === interaction.interactable) { return }
 
-        const options = interaction.target.options.drag
+        const options = interaction.interactable.options.drag
 
         if (!options.manualStart &&
             interactable.testIgnoreAllow(options, element, eventTarget)) {
@@ -53,7 +53,7 @@ function install (scope: Scope) {
 
         if (interactable) {
           interaction.prepared.name = ActionName.Drag
-          interaction.target = interactable
+          interaction.interactable = interactable
           interaction.element = element
           break
         }

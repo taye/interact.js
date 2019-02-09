@@ -5,8 +5,8 @@ import snapSize from '../snap/size'
 
 test('modifiers/snapSize', (t) => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
-  interaction.target = mockInteractable()
-  interaction.target.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
+  interaction.interactable = mockInteractable()
+  interaction.interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
   interaction.prepared = {
     name: null,
     edges: { top: true, left: true, bottom: false, right: false },
@@ -28,7 +28,7 @@ test('modifiers/snapSize', (t) => {
   const pageCoords = Object.freeze({ x: 10, y: 20 })
   const arg = {
     interaction,
-    interactable: interaction.target,
+    interactable: interaction.interactable,
     state,
     pageCoords,
     coords: { ...pageCoords },

@@ -81,7 +81,7 @@ function install (scope: Scope) {
 
     scope.autoStart.signals.fire('before-start', arg)
 
-    const target = interaction.target
+    const target = interaction.interactable
 
     if (interaction.prepared.name && target) {
       // check manualStart and interaction limit
@@ -96,7 +96,7 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('stop', ({ interaction }) => {
-    const target = interaction.target
+    const target = interaction.interactable
 
     if (target && target.options.styleCursor) {
       setCursor(interaction.element, '', scope)
@@ -209,11 +209,11 @@ function getActionInfo (interaction, pointer, event, eventTarget, scope) {
 function prepare (interaction, { action, target, element }, scope) {
   action = action || {}
 
-  if (interaction.target && interaction.target.options.styleCursor) {
+  if (interaction.interactable && interaction.interactable.options.styleCursor) {
     setCursor(interaction.element, '', scope)
   }
 
-  interaction.target = target
+  interaction.interactable = target
   interaction.element = element
   utils.copyAction(interaction.prepared, action)
 
@@ -248,7 +248,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
       return false
     }
 
-    if (interaction.target !== interactable) { continue }
+    if (interaction.interactable !== interactable) { continue }
 
     targetCount += otherAction === action.name ? 1 : 0
 

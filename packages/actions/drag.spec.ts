@@ -101,7 +101,7 @@ test('drag axis', (t) => {
 
   resetCoords()
   interaction.prepared = { name: 'drag', axis: 'xy' }
-  interaction.target = interactable
+  interaction.interact = interactable
 
   t.test('xy (any direction)', (tt) => {
     scope.interactions.signals.fire('before-action-move', { interaction })

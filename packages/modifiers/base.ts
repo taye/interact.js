@@ -86,7 +86,7 @@ function start (
   pageCoords: Interact.Point,
   registeredModifiers,
 ) {
-  const { target: interactable, element } = interaction
+  const { interactable, element } = interaction
   const modifierList = getModifierList(interaction, registeredModifiers)
   const states = prepareStates(modifierList)
 
@@ -186,7 +186,7 @@ function prepareStates (modifierList) {
 }
 
 function beforeMove ({ interaction, phase, preEnd, skipModifiers }): void | false {
-  const { target: interactable, element } = interaction
+  const { interactable, element } = interaction
   const modifierResult = setAll(
     {
       interaction,
@@ -249,7 +249,7 @@ function stop (arg) {
 
   const modifierArg = extend({
     states,
-    interactable: interaction.target,
+    interactable: interaction.interactable,
     element: interaction.element,
   }, arg)
 
@@ -295,7 +295,7 @@ function restoreCoords ({ interaction: { coords, modifiers } }) {
 }
 
 function getModifierList (interaction, registeredModifiers) {
-  const actionOptions = interaction.target.options[interaction.prepared.name]
+  const actionOptions = interaction.interactable.options[interaction.prepared.name]
   const actionModifiers = actionOptions.modifiers
 
   if (actionModifiers && actionModifiers.length) {
