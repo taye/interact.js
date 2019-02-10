@@ -17,8 +17,6 @@
     "lint": "scripts/lint.js",
     "test": "scripts/lint.js --fail-on-error && scripts/test.sh",
     "docs": "node docs --go",
-    "precommit": "npm run lint -- --fail-on-error",
-    "prepush": "tsc -b -f; npm test",
     "release": "cd packages/interactjs; sh ../../scripts/release.sh",
     "pre-release": "npm run release -- prerelease",
     "bump": "scripts/bump.js $@"
@@ -76,5 +74,11 @@
   },
   "devDependencies": {
     "ts-node": "^8.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint -- --fail-on-error",
+      "pre-push": "tsc -b -f; npm test"
+    }
   }
 }
