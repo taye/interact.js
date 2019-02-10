@@ -8,6 +8,11 @@ engines:
         - javascript
         - typescript
 
+plugins:
+  eslint:
+    enabled: true
+    channel: eslint-5
+
 ratings:
   paths:
     - "packages/**/*.ts"
@@ -16,5 +21,6 @@ exclude_paths:
   - "**/examples/"
   - "**/build/"
   - "**/docs/"
+  - "**/_*"
   - "**/*.spec.ts"
   - "**/*.d.ts"
