@@ -11,17 +11,12 @@
     "**/*.spec.ts"
   ],
   "extension": [
-    ".js",
     ".ts"
   ],
   "reporter": [
     "text",
     "lcov"
   ],
-  "require": [
-    "ts-node/register",
-    "./packages/types/index.ts"
-  ],
-  "sourceMap": false,
-  "instrument": false
+  "sourceMap": true,
+  "instrument": true
 }
