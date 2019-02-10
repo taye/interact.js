@@ -6,14 +6,15 @@ engines:
     config:
       languages:
         - javascript
+        - typescript
 
 ratings:
   paths:
-    - "src/**"
+    - "packages/**/*.ts"
 
 exclude_paths:
   - "**/examples/"
   - "**/build/"
   - "**/docs/"
-  - "**/tests/"
+  - "**/*.spec.ts"
   - "**/*.d.ts"
