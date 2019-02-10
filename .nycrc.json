@@ -8,7 +8,8 @@
     "packages/**/*.ts"
   ],
   "exclude": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/_*"
   ],
   "extension": [
     ".ts"
