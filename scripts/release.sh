@@ -7,7 +7,7 @@ BUILD_ARG="--no-metadata"
 ROOT=$(dirname $(readlink -f $0))/..
 
 if [[ $NEW_VERSION == "prerelease" ]]; then
-  RELEASE_BRANCH="unstable"
+  RELEASE_BRANCH="next"
   BUILD_ARG="--metadata"
 fi
 
@@ -21,7 +21,7 @@ main() {
     commit_and_tag &&
     push_and_publish &&
 
-  # leave the "unstable" branch
+  # leave the release branch
   quit
 }
 
@@ -126,15 +126,15 @@ push_and_publish() {
   # push branch and tags to git origin
   git push --no-verify && git push --no-verify origin $NEW_TAG &&
 
-  if [[ $RELEASE_BRANCH == "unstable" ]]; then
+  if [[ $RELEASE_BRANCH == "next" ]]; then
     # publish to npm with "next" tag
-    git tag --force next &&
-      git push --no-verify -f origin next &&
-      npx lerna exec --no-private -- npm publish --tag next
+    npx lerna exec --no-private -- npm publish --tag next
   else
     # publish with default "latest" tag
     npx lerna exec --no-private -- npm publish
   fi
+
+  git push --no-verify -f origin $RELEASE_BRANCH &&
 
   cd $ROOT
 }
