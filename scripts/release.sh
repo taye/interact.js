@@ -58,7 +58,7 @@ merge_to_release() {
 run_tests() {
   echo_funcname
 
-  npm tsc_lint_test || quit "tests have failed" $?
+  npm run tsc_lint_test || quit "tests have failed" $?
 }
 
 bump_version() {
@@ -130,7 +130,7 @@ push_and_publish() {
     npx lerna exec --no-private -- npm publish
   fi
 
-  git push --no-verify -f origin $RELEASE_BRANCH &&
+  git push --no-verify -f origin $RELEASE_BRANCH
 }
 
 echo_funcname() {
