@@ -45,10 +45,11 @@ merge_to_release() {
   git checkout $RELEASE_BRANCH || exit $?
   git pull --ff-only
 
-  # delete generated .js and d.ts files
+  # clean repo
   npx tsc --build --clean $ROOT
-  # clear package links
-  git clean -fdX packages/*
+  git clean -fdX
+
+
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
   npm run bootstrap || quit "bootstrapping failed" $?
 }
@@ -56,7 +57,7 @@ merge_to_release() {
 run_tests() {
   echo_funcname
 
-  npx lerna run test || quit "tests have failed" $?
+  npm tsc_lint_test || quit "tests have failed" $?
   cd $ROOT
 }
 

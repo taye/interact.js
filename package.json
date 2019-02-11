@@ -15,7 +15,8 @@
     "start": "cd packages/interactjs; ../../scripts/build.js --watch",
     "build": "cd packages/interactjs; ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",
-    "test": "scripts/lint.js --fail-on-error && scripts/test.sh",
+    "test": "scripts/test.sh",
+    "tsc_lint_test": "tsc -b -f && npm run lint -- --fail-on-error && npm test",
     "docs": "node docs --go",
     "release": "cd packages/interactjs; sh ../../scripts/release.sh",
     "pre-release": "npm run release -- prerelease",
@@ -73,12 +74,12 @@
     "yargs": "latest"
   },
   "devDependencies": {
-    "ts-node": "^8.0.2"
+    "ts-node": "latest"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint -- --fail-on-error",
-      "pre-push": "tsc -b -f; npm test"
+      "pre-push": "npm run tsc_lint_test"
     }
   }
 }
