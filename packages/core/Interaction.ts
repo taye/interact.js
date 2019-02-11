@@ -96,7 +96,7 @@ export class Interaction<T extends ActionName = any> {
     this._signals.fire('new', { interaction: this })
   }
 
-  pointerDown (pointer, event, eventTarget) {
+  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
 
     this._signals.fire('down', {
@@ -157,7 +157,7 @@ export class Interaction<T extends ActionName = any> {
     })
   }
 
-  pointerMove (pointer, event, eventTarget) {
+  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false)
       utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer))
@@ -243,7 +243,7 @@ export class Interaction<T extends ActionName = any> {
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer, event, eventTarget, curEventTarget) {
+  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, curEventTarget: EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
@@ -339,7 +339,7 @@ export class Interaction<T extends ActionName = any> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean) {
     const id = utils.pointer.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]

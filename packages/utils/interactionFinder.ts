@@ -5,8 +5,8 @@ export interface SearchDetails {
   pointerId: number
   pointerType: string
   eventType: string
-  eventTarget: Window | Document | Element
-  curEventTarget: Window | Document | Element
+  eventTarget: Interact.EventTarget
+  curEventTarget: Interact.EventTarget
   scope: Interact.Scope
 }
 

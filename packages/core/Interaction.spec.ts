@@ -172,8 +172,8 @@ test('Interaction.removePointer', (t) => {
 test('Interaction.pointer{Down,Move,Up} updatePointer', (t) => {
   const signals = new Signals()
   const interaction = new Interaction({ signals } as any)
-  const eventTarget = {}
-  const pointer = {
+  const eventTarget: any = {}
+  const pointer: any = {
     target: eventTarget,
     pointerId: 0,
   }
@@ -331,7 +331,7 @@ test('Interaction.start', (t) => {
   const target = helpers.mockInteractable()
   const element: any = {}
   const pointer = helpers.newPointer()
-  const event = {}
+  const event: any = {}
 
   interaction.start(action, target, element)
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')

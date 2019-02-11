@@ -7,11 +7,11 @@ export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     gesture?: {
-      startAngle: number
-      startDistance: number
-      prevScale: number
-      prevAngle: number
-      prevDistance: number
+      angle: number,          // angle from first to second touch
+      distance: number,
+      scale: number,          // gesture.distance / gesture.startDistance
+      startAngle: number,     // angle of line joining two touches
+      startDistance: number,  // distance between two touches of touchStart
     }
   }
 }
@@ -110,21 +110,13 @@ function install (scope: Scope) {
   interactions.signals.on('action-move', updateGestureProps)
   interactions.signals.on('action-end', updateGestureProps)
 
-  interactions.signals.on('action-start', start)
-  interactions.signals.on('action-move', move)
-
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', ({ interaction }) => {
     interaction.gesture = {
-      start: { x: 0, y: 0 },
-
-      startDistance: 0,   // distance between two touches of touchStart
-      prevDistance : 0,
-      distance     : 0,
-
-      scale: 1,           // gesture.distance / gesture.startDistance
-
-      startAngle: 0,      // angle of line joining two touches
-      prevAngle : 0,      // angle of the previous gesture event
+      angle: 0,
+      distance: 0,
+      scale: 1,
+      startAngle: 0,
+      startDistance: 0,
     }
   })
 
@@ -158,34 +150,6 @@ const gesture = {
   },
 }
 
-function start ({ iEvent, interaction }) {
-  if (interaction.prepared.name !== 'gesture') { return }
-
-  iEvent.ds = 0
-
-  interaction.gesture.startDistance = interaction.gesture.prevDistance = iEvent.distance
-  interaction.gesture.startAngle = interaction.gesture.prevAngle = iEvent.angle
-  interaction.gesture.scale = 1
-}
-
-function move ({ iEvent, interaction }) {
-  if (interaction.prepared.name !== 'gesture') { return }
-
-  iEvent.ds = iEvent.scale - interaction.gesture.scale
-
-  interaction.interactable.fire(iEvent)
-
-  interaction.gesture.prevAngle = iEvent.angle
-  interaction.gesture.prevDistance = iEvent.distance
-
-  if (iEvent.scale !== Infinity &&
-      iEvent.scale !== null &&
-      iEvent.scale !== undefined &&
-      !isNaN(iEvent.scale)) {
-    interaction.gesture.scale = iEvent.scale
-  }
-}
-
 function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
@@ -203,6 +167,9 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
     iEvent.ds       = 0
     iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
     iEvent.da       = 0
+
+    interaction.gesture.startDistance = iEvent.distance
+    interaction.gesture.startAngle = iEvent.angle
   }
   else if (ending || event instanceof InteractEvent) {
     const prevEvent = interaction.prevEvent as GestureEvent
@@ -210,9 +177,9 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
     iEvent.distance = prevEvent.distance
     iEvent.box      = prevEvent.box
     iEvent.scale    = prevEvent.scale
-    iEvent.ds       = iEvent.scale - 1
+    iEvent.ds       = 0
     iEvent.angle    = prevEvent.angle
-    iEvent.da       = iEvent.angle - interaction.gesture.startAngle
+    iEvent.da       = 0
   }
   else {
     iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
@@ -220,8 +187,18 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
     iEvent.scale    = iEvent.distance / interaction.gesture.startDistance
     iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
 
-    iEvent.ds = iEvent.scale - interaction.gesture.prevScale
-    iEvent.da = iEvent.angle - interaction.gesture.prevAngle
+    iEvent.ds = iEvent.scale - interaction.gesture.scale
+    iEvent.da = iEvent.angle - interaction.gesture.angle
+  }
+
+  interaction.gesture.distance = iEvent.distance
+  interaction.gesture.angle = iEvent.angle
+  interaction.gesture.scale = iEvent.scale
+
+  if (utils.is.number(iEvent.scale) &&
+      iEvent.scale !== Infinity &&
+      !isNaN(iEvent.scale)) {
+    interaction.gesture.scale = iEvent.scale
   }
 }
 

@@ -6,7 +6,7 @@ import PointerEvent from './PointerEvent'
 
 type EventTargetList = Array<{
   eventable: Eventable,
-  element: Window | Document | Element,
+  element: Interact.EventTarget,
   props: { [key: string]: any },
 }>
 

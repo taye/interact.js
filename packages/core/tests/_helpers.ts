@@ -108,9 +108,9 @@ export function mockInteractable (props = {}) {
     props) as any
 }
 
-export function getProps (src, props) {
+export function getProps<T extends {}, K extends keyof T> (src: T, props: K[]) {
   return props.reduce((acc, prop) => {
     acc[prop] = src[prop]
     return acc
-  }, {})
+  }, {} as Pick<T, K>)
 }

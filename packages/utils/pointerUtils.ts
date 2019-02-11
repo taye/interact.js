@@ -234,8 +234,8 @@ const pointerUtils = {
     }
   },
 
-  coordsToEvent ({ page, client, timeStamp }: any) {
-    return {
+  coordsToEvent ({ page, client, timeStamp }: { page: Interact.Point, client: Interact.Point, timeStamp?: number }) {
+    const event = {
       page,
       client,
       timeStamp,
@@ -244,6 +244,8 @@ const pointerUtils = {
       get clientX () { return client.x },
       get clientY () { return client.y },
     }
+
+    return event as typeof event & Interact.PointerType & Interact.PointerEventType
   },
 }
 

@@ -98,7 +98,6 @@ function install (scope: Scope) {
     dropState.activeDrops = null
     dropState.events = null
 
-    // TODO: maybe Interaction<T: Window | Document | Element> { element: T }
     if (!scope.dynamicDrop) {
       dropState.activeDrops = getActiveDrops(scope, interaction.element)
     }
