@@ -12,7 +12,7 @@ declare module '@interactjs/core/Interaction' {
     }
 }
 export declare function install(scope: Scope): void;
-declare function reflow(interactable: Interactable, action: ActionProps, scope: Scope): any;
+declare function reflow(interactable: Interactable, action: ActionProps, scope: Scope): Promise<Interactable>;
 declare const _default: {
     install: typeof install;
 };

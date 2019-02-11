@@ -3,11 +3,11 @@ export declare type GesturableMethod = Interact.ActionMethod<Interact.Gesturable
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
         gesture?: {
+            angle: number;
+            distance: number;
+            scale: number;
             startAngle: number;
             startDistance: number;
-            prevScale: number;
-            prevAngle: number;
-            prevDistance: number;
         };
     }
 }

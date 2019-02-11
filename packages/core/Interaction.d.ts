@@ -10,8 +10,11 @@ export interface ActionProps<T extends ActionName = any> {
         [edge in keyof Interact.Rect]?: boolean;
     };
 }
+export interface StartAction extends ActionProps {
+    name: ActionName | string;
+}
 export declare class Interaction<T extends ActionName = any> {
-    target: Interactable;
+    interactable: Interactable;
     element: Element;
     _signals: utils.Signals;
     prepared: ActionProps<T>;
@@ -97,7 +100,7 @@ export declare class Interaction<T extends ActionName = any> {
         pointerType?: string;
         signals: utils.Signals;
     });
-    pointerDown(pointer: any, event: any, eventTarget: any): void;
+    pointerDown(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
     /**
      * ```js
      * interact(target)
@@ -129,8 +132,8 @@ export declare class Interaction<T extends ActionName = any> {
      * @param {Element} element The DOM Element to target
      * @return {object} interact
      */
-    start(action: any, target: any, element: any): void;
-    pointerMove(pointer: any, event: any, eventTarget: any): void;
+    start(action: StartAction, target: Interactable, element: Element): void;
+    pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
     /**
      * ```js
      * interact(target)
@@ -150,7 +153,7 @@ export declare class Interaction<T extends ActionName = any> {
      * settings.
      */
     move(signalArg?: any): void;
-    pointerUp(pointer: any, event: any, eventTarget: any, curEventTarget: any): void;
+    pointerUp(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, curEventTarget: EventTarget): void;
     documentBlur(event: any): void;
     /**
      * ```js
@@ -175,7 +178,7 @@ export declare class Interaction<T extends ActionName = any> {
     stop(): void;
     getPointerIndex(pointer: any): number;
     getPointerInfo(pointer: any): PointerInfo;
-    updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean): number;
+    updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
     _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;

@@ -1,14 +1,14 @@
 {
   "name": "@interactjs/pointer-events",
-  "version": "1.4.0-alpha.28+sha.e624c4d",
+  "version": "1.4.0-alpha.29+sha.7c21d3d",
   "peerDependencies": {
-    "@interactjs/core": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d"
+    "@interactjs/core": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/utils": "1.4.0-alpha.29+sha.7c21d3d"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/core": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d"
+    "@interactjs/_dev": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/core": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/utils": "1.4.0-alpha.29+sha.7c21d3d"
   },
   "publishConfig": {
     "access": "public"

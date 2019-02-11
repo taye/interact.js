@@ -63,10 +63,10 @@ class DropEvent {
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
-  constructor (dropStatus, dragEvent, type) {
+  constructor (dropState: Interaction['dropState'], dragEvent, type) {
     const { element, dropzone } = type === 'dragleave'
-      ? dropStatus.prev
-      : dropStatus.cur
+      ? dropState.prev
+      : dropState.cur
 
     this.type          = type
     this.target        = element
@@ -87,35 +87,35 @@ class DropEvent {
    * dropzone element and more.
    */
   reject () {
-    const { dropStatus } = this.interaction
+    const { dropState } = this.interaction
 
     if (
       (this.type !== 'dropactivate') &amp;&amp; (
         !this.dropzone ||
-        dropStatus.cur.dropzone !== this.dropzone ||
-        dropStatus.cur.element !== this.target)) {
+        dropState.cur.dropzone !== this.dropzone ||
+        dropState.cur.element !== this.target)) {
       return
     }
 
-    dropStatus.prev.dropzone = this.dropzone
-    dropStatus.prev.element = this.target
+    dropState.prev.dropzone = this.dropzone
+    dropState.prev.element = this.target
 
-    dropStatus.rejected = true
-    dropStatus.events.enter = null
+    dropState.rejected = true
+    dropState.events.enter = null
 
     this.stopImmediatePropagation()
 
     if (this.type === 'dropactivate') {
-      const activeDrops = dropStatus.activeDrops
+      const activeDrops = dropState.activeDrops
       const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
         dropzone === this.dropzone &amp;&amp; element === this.target)
 
-      dropStatus.activeDrops = [
+      dropState.activeDrops = [
         ...activeDrops.slice(0, index),
         ...activeDrops.slice(index + 1),
       ]
 
-      const deactivateEvent = new DropEvent(dropStatus, this.dragEvent, 'dropdeactivate')
+      const deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate')
 
       deactivateEvent.dropzone = this.dropzone
       deactivateEvent.target = this.target
@@ -123,7 +123,7 @@ class DropEvent {
       this.dropzone.fire(deactivateEvent)
     }
     else {
-      this.dropzone.fire(new DropEvent(dropStatus, this.dragEvent, 'dragleave'))
+      this.dropzone.fire(new DropEvent(dropState, this.dragEvent, 'dragleave'))
     }
   }
 

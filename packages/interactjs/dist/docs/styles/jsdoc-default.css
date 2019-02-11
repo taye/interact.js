@@ -295,8 +295,8 @@ blockquote {
   padding: 0;
   min-width: initial; }
   #main > * , #main .article > * {
-    padding-left: 10px;
-    padding-right: 10px; }
+    padding-left: 8px;
+    padding-right: 8px; }
 
 header {
   display: block; }
@@ -489,7 +489,6 @@ footer {
     font-size: 12px;
     line-height: 18px;
     display: block;
-    background-color: #eee;
     color: #4D4E53; }
     .prettyprint code:empty:before {
       content: ''; }
@@ -510,11 +509,9 @@ footer {
     .prettyprint.linenums ol {
       padding-left: 0; }
     .prettyprint.linenums li {
-      border-left: 3px #ddd solid; }
+      border-left: 2px #444 solid; }
       .prettyprint.linenums li.selected {
-        background-color: lightyellow; }
-        .prettyprint.linenums li.selected * {
-          background-color: lightyellow; }
+        background-color: #555; }
       .prettyprint.linenums li * {
         -webkit-user-select: text;
         -moz-user-select: text;
@@ -717,11 +714,12 @@ dl.param-type {
 
 section > header,
 .subsection-title,
-.section-method > *:not(.params):not(.description):not(.prettyprint),
-.description > *:not(.prettyprint),
+.section-method > *:not(.params):not(.description):not(.prettyprint):not(ol):not(ul),
+.description > *:not(.prettyprint):not(ol):not(ul),
 footer {
-  padding-left: 10px;
-  padding-right: 10px; }
+  padding-left: 8px;
+  padding-right: 8px;
+  margin: 0; }
 
 table.params {
   width: auto;
@@ -738,12 +736,12 @@ table.params {
   background-color: #292929;
   color: #c5c8c6;
   border-radius: 0; }
-  .prettyprint > code {
+  .prettyprint code {
     position: relative;
     border: none;
     border-radius: 0;
     width: 100%;
-    background-color: #292929;
+    background-color: transparent;
     color: #c5c8c6;
     border-radius: 0; }
 
@@ -756,14 +754,14 @@ table.params {
   border-radius: 0; }
 
 @media only screen and (min-width: 1001px) {
-  #main > *:not(section), .subsection-title,
+  #main > *:not(section), #main .prettyprint:not(.source), .subsection-title,
   .section-examples,
   .section-method > *:not(.params):not(.description),
   .description > *,
   .article > *,
   footer {
-    width: 50%;
-    margin-right: 50%; }
+    width: calc(50% - 8px);
+    margin-right: calc(50% + 8px); }
   #main .description .prettyprint.source, #main .description blockquote, #main .article > .prettyprint.source, #main .article > blockquote {
     width: 50%;
     margin: 0 0 10px;

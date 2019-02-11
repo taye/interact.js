@@ -17,7 +17,7 @@ declare class DropEvent {
     /**
      * Class of events fired on dropzones during drags with acceptable targets.
      */
-    constructor(dropStatus: any, dragEvent: any, type: any);
+    constructor(dropState: Interaction['dropState'], dragEvent: any, type: any);
     /**
      * If this is a `dropactivate` event, the dropzone element will be
      * deactivated.

@@ -10,7 +10,7 @@ declare module '@interactjs/core/Interactable' {
 }
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
-        dropStatus?: {
+        dropState?: {
             cur: {
                 dropzone: Interactable;
                 element: Element;
@@ -23,7 +23,7 @@ declare module '@interactjs/core/Interaction' {
             events: any;
             activeDrops: Array<{
                 dropzone: Interactable;
-                Element: Element;
+                element: Element;
                 rect: Interact.Rect;
             }>;
         };
@@ -46,12 +46,12 @@ declare module '@interactjs/interact/interact' {
 }
 declare function install(scope: Scope): void;
 declare function getActiveDrops(scope: Scope, dragElement: Element): any[];
-declare function getDrop({ dropStatus, target: draggable, element: dragElement }: {
-    dropStatus: any;
-    target: any;
-    element: any;
-}, dragEvent: any, pointerEvent: any): any;
-declare function getDropEvents(interaction: any, _pointerEvent: any, dragEvent: any): {
+declare function getDrop({ dropState, interactable: draggable, element: dragElement }: Partial<Interact.Interaction>, dragEvent: any, pointerEvent: any): {
+    dropzone: Interactable;
+    element: Element;
+    rect: import("../../types/types").Rect;
+};
+declare function getDropEvents(interaction: Interact.Interaction, _pointerEvent: any, dragEvent: any): {
     enter: any;
     leave: any;
     activate: any;
@@ -59,7 +59,7 @@ declare function getDropEvents(interaction: any, _pointerEvent: any, dragEvent: 
     move: any;
     drop: any;
 };
-declare function fireDropEvents(interaction: any, events: any): void;
+declare function fireDropEvents(interaction: Interact.Interaction, events: any): void;
 declare const drop: {
     install: typeof install;
     getActiveDrops: typeof getActiveDrops;

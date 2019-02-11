@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.4.0-alpha.28+sha.e624c4d",
+  "version": "1.4.0-alpha.29+sha.7c21d3d",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -41,13 +41,13 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@interactjs/types": "1.4.0-alpha.28+sha.e624c4d"
+    "@interactjs/types": "1.4.0-alpha.29+sha.7c21d3d"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/interact": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/modifiers": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d"
+    "@interactjs/_dev": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/interact": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/modifiers": "1.4.0-alpha.29+sha.7c21d3d",
+    "@interactjs/utils": "1.4.0-alpha.29+sha.7c21d3d"
   },
   "_dev": {
     "entries": "./index.ts",

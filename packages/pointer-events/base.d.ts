@@ -5,7 +5,7 @@ import * as utils from '@interactjs/utils';
 import PointerEvent from './PointerEvent';
 declare type EventTargetList = Array<{
     eventable: Eventable;
-    element: Window | Document | Element;
+    element: Interact.EventTarget;
     props: {
         [key: string]: any;
     };
@@ -23,7 +23,7 @@ declare module '@interactjs/core/Interaction' {
 }
 declare module '@interactjs/core/PointerInfo' {
     interface PointerInfo {
-        hold: {
+        hold?: {
             duration: number;
             timeout: any;
         };
@@ -69,7 +69,7 @@ declare function collectEventTargets<T extends string>({ interaction, pointer, e
     type: T;
 }): {
     eventable: Eventable;
-    element: Element | Window | Document;
+    element: import("../types/types").EventTarget;
     props: {
         [key: string]: any;
     };

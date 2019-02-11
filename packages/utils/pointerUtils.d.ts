@@ -44,14 +44,138 @@ declare const pointerUtils: {
         };
         timeStamp: number;
     };
-    coordsToEvent({ page, client, timeStamp }: any): {
-        page: any;
-        client: any;
-        timeStamp: any;
-        readonly pageX: any;
-        readonly pageY: any;
-        readonly clientX: any;
-        readonly clientY: any;
-    };
+    coordsToEvent({ page, client, timeStamp }: {
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp?: number;
+    }): ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & Touch & MouseEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & Touch & PointerEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & Touch & TouchEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & Touch & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & MouseEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & MouseEvent & PointerEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & MouseEvent & TouchEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & MouseEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & PointerEvent & MouseEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & PointerEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & PointerEvent & TouchEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & PointerEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & MouseEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & PointerEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & TouchEvent) | ({
+        page: import("../types/types").Point;
+        client: import("../types/types").Point;
+        timeStamp: number;
+        readonly pageX: number;
+        readonly pageY: number;
+        readonly clientX: number;
+        readonly clientY: number;
+    } & import("@interactjs/core/InteractEvent").InteractEvent<any, any>);
 };
 export default pointerUtils;

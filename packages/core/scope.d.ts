@@ -70,6 +70,7 @@ export declare class Scope {
     interactables: InteractableSet;
     _win: Window;
     document: Document;
+    window: Window;
     documents: Array<{
         doc: Document;
         options: any;
