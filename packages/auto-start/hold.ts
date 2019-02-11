@@ -32,7 +32,7 @@ function install (scope: Scope) {
 
     if (hold > 0) {
       interaction.autoStartHoldTimer = setTimeout(() => {
-        interaction.start(interaction.prepared, interaction.target, interaction.element)
+        interaction.start(interaction.prepared, interaction.interactable, interaction.element)
       }, hold)
     }
   })
@@ -58,7 +58,7 @@ function getHoldDuration (interaction) {
 
   if (!actionName) { return null }
 
-  const options = interaction.target.options
+  const options = interaction.interactable.options
 
   return options[actionName].hold || options[actionName].delay
 }

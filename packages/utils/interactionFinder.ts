@@ -5,8 +5,8 @@ export interface SearchDetails {
   pointerId: number
   pointerType: string
   eventType: string
-  eventTarget: Window | Document | Element
-  curEventTarget: Window | Document | Element
+  eventTarget: Interact.EventTarget
+  curEventTarget: Interact.EventTarget
   scope: Interact.Scope
 }
 
@@ -105,7 +105,7 @@ const finder = {
     for (const interaction of scope.interactions.list) {
       // if there's already a pointer held down
       if (interaction.pointers.length === 1) {
-        const target = interaction.target
+        const target = interaction.interactable
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
         if (target && !target.options.gesture.enabled) {

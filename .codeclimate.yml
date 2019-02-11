@@ -6,14 +6,21 @@ engines:
     config:
       languages:
         - javascript
+        - typescript
+
+plugins:
+  eslint:
+    enabled: true
+    channel: eslint-5
 
 ratings:
   paths:
-    - "src/**"
+    - "packages/**/*.ts"
 
 exclude_paths:
   - "**/examples/"
   - "**/build/"
   - "**/docs/"
-  - "**/tests/"
+  - "**/_*"
+  - "**/*.spec.ts"
   - "**/*.d.ts"

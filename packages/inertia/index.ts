@@ -192,7 +192,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
   state.allowResume = options.allowResume
   interaction.simulation = state
 
-  interaction.target.fire(state.startEvent)
+  interaction.interactable.fire(state.startEvent)
 
   if (inertia) {
     state.vx0 = interaction.coords.velocity.client.x
@@ -343,8 +343,11 @@ function updateInertiaCoords (interaction: Interact.Interaction) {
   } ])
 }
 
-function getOptions ({ target, prepared }) {
-  return target && target.options && prepared.name && target.options[prepared.name].inertia
+function getOptions ({ interactable, prepared }: Interact.Interaction) {
+  return interactable &&
+    interactable.options &&
+    prepared.name &&
+    interactable.options[prepared.name].inertia
 }
 
 export default {

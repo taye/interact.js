@@ -47,7 +47,7 @@ function start ({ interaction, interactable, element, rect, state, startOffset }
 function set ({ interaction, coords, state }) {
   const { options, offsets } = state
 
-  const origin = utils.getOriginXY(interaction.target, interaction.element, interaction.prepared.name)
+  const origin = utils.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
   const page = utils.extend({}, coords)
   const targets = []
   let target

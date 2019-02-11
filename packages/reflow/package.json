@@ -8,7 +8,8 @@
   "devDependencies": {
     "@interactjs/_dev": "1.4.0-alpha.28+sha.e624c4d",
     "@interactjs/core": "1.4.0-alpha.28+sha.e624c4d",
-    "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d"
+    "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d",
+    "promise-polyfill": "latest"
   },
   "publishConfig": {
     "access": "public"

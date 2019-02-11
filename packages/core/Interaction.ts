@@ -12,9 +12,13 @@ export interface ActionProps<T extends ActionName = any> {
   }
 }
 
+export interface StartAction extends ActionProps {
+  name: ActionName | string
+}
+
 export class Interaction<T extends ActionName = any> {
   // current interactable being interacted with
-  target: Interactable = null
+  interactable: Interactable = null
 
   // the target element of the interactable
   element: Element = null
@@ -92,7 +96,7 @@ export class Interaction<T extends ActionName = any> {
     this._signals.fire('new', { interaction: this })
   }
 
-  pointerDown (pointer, event, eventTarget) {
+  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
 
     this._signals.fire('down', {
@@ -135,16 +139,16 @@ export class Interaction<T extends ActionName = any> {
    * @param {Element} element The DOM Element to target
    * @return {object} interact
    */
-  start (action, target, element) {
+  start (action: StartAction, target: Interactable, element: Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
-        this.pointers.length < (action.name === 'gesture' ? 2 : 1)) {
+        this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1)) {
       return
     }
 
     utils.copyAction(this.prepared, action)
 
-    this.target       = target
+    this.interactable = target
     this.element      = element
     this._interacting = this._doPhase({
       interaction: this,
@@ -153,7 +157,7 @@ export class Interaction<T extends ActionName = any> {
     })
   }
 
-  pointerMove (pointer, event, eventTarget) {
+  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false)
       utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer))
@@ -239,7 +243,7 @@ export class Interaction<T extends ActionName = any> {
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer, event, eventTarget, curEventTarget) {
+  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, curEventTarget: EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
@@ -316,7 +320,7 @@ export class Interaction<T extends ActionName = any> {
   stop () {
     this._signals.fire('stop', { interaction: this })
 
-    this.target = this.element = null
+    this.interactable = this.element = null
 
     this._interacting = false
     this.prepared.name = this.prevEvent = null
@@ -335,7 +339,7 @@ export class Interaction<T extends ActionName = any> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Window | Document | Element, down?: boolean) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean) {
     const id = utils.pointer.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -424,7 +428,7 @@ export class Interaction<T extends ActionName = any> {
   }
 
   _fireEvent (iEvent) {
-    this.target.fire(iEvent)
+    this.interactable.fire(iEvent)
 
     if (!this.prevEvent || iEvent.timeStamp >= this.prevEvent.timeStamp) {
       this.prevEvent = iEvent

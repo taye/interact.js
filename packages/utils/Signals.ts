@@ -1,10 +1,10 @@
-export type SignalListener = (signalArg: PartialSignalArg, sinalName: string) => (void | boolean)
+export type SignalListener = (signalArg: PartialSignalArg, sinalName?: string) => (void | boolean)
 
 export interface SignalArg<T extends Interact.ActionName = any> {
   interaction: Interact.Interaction<T>
   Interactable: Interact.Interactable
   iEvent: Interact.InteractEvent<T>
-  element: Window | Document | Element
+  element: Interact.EventTarget
   coords: Interact.Point
   event: Interact.PointerEventType
   phase: Interact.EventPhase

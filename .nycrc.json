@@ -1,0 +1,23 @@
+{
+  "per-file": false,
+  "statements": 53,
+  "lines": 53,
+  "branches": 33,
+  "functions": 50,
+  "include": [
+    "packages/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "**/_*"
+  ],
+  "extension": [
+    ".ts"
+  ],
+  "reporter": [
+    "text",
+    "lcov"
+  ],
+  "sourceMap": true,
+  "instrument": true
+}

@@ -14,7 +14,7 @@
     "@interactjs/utils": "1.4.0-alpha.28+sha.e624c4d"
   },
   "devDependencies": {
-    "interactjs": "^1.4.0-alpha.28"
+    "@interactjs/_dev": "^1.4.0-alpha.28"
   },
   "publishConfig": {
     "access": "public"

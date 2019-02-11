@@ -33,7 +33,10 @@ export function install (scope: Scope) {
   // remove completed reflow interactions
   interactions.signals.on('stop', ({ interaction }) => {
     if (interaction.pointerType === 'reflow') {
-      interaction._reflowResolve()
+      if (interaction._reflowResolve) {
+        interaction._reflowResolve()
+      }
+
       arr.remove(scope.interactions.list, interaction)
     }
   })
@@ -59,7 +62,7 @@ export function install (scope: Scope) {
   }
 }
 
-function reflow (interactable: Interactable, action: ActionProps, scope: Scope) {
+function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise<Interactable> {
   const elements = is.string(interactable.target)
     ? arr.from(interactable._context.querySelectorAll(interactable.target))
     : [interactable.target]
@@ -77,7 +80,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope) 
       scope.interactions.list,
       (interaction: Interaction) => {
         return interaction.interacting() &&
-          interaction.target === interactable &&
+          interaction.interactable === interactable &&
           interaction.element === element &&
           interaction.prepared.name === action.name
       })
@@ -86,9 +89,11 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope) 
     if (runningInteraction) {
       runningInteraction.move()
 
-      reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
-        runningInteraction._reflowResolve = resolve
-      })
+      if (promises) {
+        reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
+          runningInteraction._reflowResolve = resolve
+        })
+      }
     }
     else {
       const xywh = rectUtils.tlbrToXywh(rect)
@@ -120,7 +125,7 @@ function startReflow (scope: Scope, interactable: Interactable, element: Element
     phase: 'reflow',
   }
 
-  interaction.target = interactable
+  interaction.interactable = interactable
   interaction.element = element
   interaction.prepared = extend({}, action)
   interaction.prevEvent = event

@@ -6,7 +6,7 @@ import PointerEvent from './PointerEvent'
 
 type EventTargetList = Array<{
   eventable: Eventable,
-  element: Window | Document | Element,
+  element: Interact.EventTarget,
   props: { [key: string]: any },
 }>
 
@@ -25,7 +25,7 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/PointerInfo' {
   interface PointerInfo {
-    hold: {
+    hold?: {
       duration: number
       timeout: any
     }

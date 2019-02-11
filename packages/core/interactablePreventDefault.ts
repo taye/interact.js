@@ -56,8 +56,8 @@ function checkAndPreventDefault (interactable, scope, event) {
 }
 
 function onInteractionEvent ({ interaction, event }) {
-  if (interaction.target) {
-    interaction.target.checkAndPreventDefault(event)
+  if (interaction.interactable) {
+    interaction.interactable.checkAndPreventDefault(event)
   }
 }
 
@@ -93,7 +93,7 @@ export function install (scope) {
       if (interaction.element &&
         (interaction.element === event.target ||
           nodeContains(interaction.element, event.target))) {
-        interaction.target.checkAndPreventDefault(event)
+        interaction.interactable.checkAndPreventDefault(event)
         return
       }
     }

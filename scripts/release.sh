@@ -1,3 +1,4 @@
+#!/usr/bin/sh
 PATH=$PATH:$PWD/node_modules/.bin
 
 NEW_VERSION=$1
@@ -7,7 +8,7 @@ BUILD_ARG="--no-metadata"
 ROOT=$(dirname $(readlink -f $0))/..
 
 if [[ $NEW_VERSION == "prerelease" ]]; then
-  RELEASE_BRANCH="unstable"
+  RELEASE_BRANCH="next"
   BUILD_ARG="--metadata"
 fi
 
@@ -21,7 +22,7 @@ main() {
     commit_and_tag &&
     push_and_publish &&
 
-  # leave the "unstable" branch
+  # leave the release branch
   quit
 }
 
@@ -45,19 +46,19 @@ merge_to_release() {
   git checkout $RELEASE_BRANCH || exit $?
   git pull --ff-only
 
-  # delete generated .js and d.ts files
+  # clean repo
   npx tsc --build --clean $ROOT
-  # clear package links
-  git clean -fdX packages/*
+  git clean -fdX
+
+
   git merge --no-ff --no-edit $INITIAL_BRANCH || quit "failed to merge branches" $?
-  npx lerna bootstrap || quit "bootstrapping failed" $?
+  npm run bootstrap || quit "bootstrapping failed" $?
 }
 
 run_tests() {
   echo_funcname
 
-  npx lerna run test || quit "tests have failed" $?
-  cd $ROOT
+  npm tsc_lint_test || quit "tests have failed" $?
 }
 
 bump_version() {
@@ -80,8 +81,6 @@ bump_version() {
   npx lerna version --no-git-tag-version $NEW_VERSION &&
     npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION > /dev/null ||
     quit "failed to bump version" 1
-
-  cd $ROOT
 }
 
 run_build() {
@@ -102,12 +101,10 @@ run_build() {
 
   # build packages
   npx lerna run --no-private build -- $BUILD_ARG || exit $?
-
-  cd $ROOT
 }
 
 bootstrap() {
-  npx lerna run bootstrap
+  npm run bootstrap
 }
 
 commit_and_tag() {
@@ -125,17 +122,15 @@ push_and_publish() {
   # push branch and tags to git origin
   git push --no-verify && git push --no-verify origin $NEW_TAG &&
 
-  if [[ $RELEASE_BRANCH == "unstable" ]]; then
+  if [[ $RELEASE_BRANCH == "next" ]]; then
     # publish to npm with "next" tag
-    git tag --force next &&
-      git push --no-verify -f origin next &&
-      npx lerna exec --no-private -- npm publish --tag next
+    npx lerna exec --no-private -- npm publish --tag next
   else
     # publish with default "latest" tag
     npx lerna exec --no-private -- npm publish
   fi
 
-  cd $ROOT
+  git push --no-verify -f origin $RELEASE_BRANCH &&
 }
 
 echo_funcname() {
