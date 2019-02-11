@@ -193,7 +193,6 @@ function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSigna
 
   interaction.gesture.distance = iEvent.distance
   interaction.gesture.angle = iEvent.angle
-  interaction.gesture.scale = iEvent.scale
 
   if (utils.is.number(iEvent.scale) &&
       iEvent.scale !== Infinity &&
