@@ -1,3 +1,4 @@
+#!/usr/bin/sh
 PATH=$PATH:$PWD/node_modules/.bin
 
 NEW_VERSION=$1
@@ -58,7 +59,6 @@ run_tests() {
   echo_funcname
 
   npm tsc_lint_test || quit "tests have failed" $?
-  cd $ROOT
 }
 
 bump_version() {
@@ -81,8 +81,6 @@ bump_version() {
   npx lerna version --no-git-tag-version $NEW_VERSION &&
     npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION > /dev/null ||
     quit "failed to bump version" 1
-
-  cd $ROOT
 }
 
 run_build() {
@@ -103,8 +101,6 @@ run_build() {
 
   # build packages
   npx lerna run --no-private build -- $BUILD_ARG || exit $?
-
-  cd $ROOT
 }
 
 bootstrap() {
@@ -135,8 +131,6 @@ push_and_publish() {
   fi
 
   git push --no-verify -f origin $RELEASE_BRANCH &&
-
-  cd $ROOT
 }
 
 echo_funcname() {
