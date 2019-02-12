@@ -121,19 +121,22 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('after-action-end', ({ interaction }) => {
-    if (interaction.prepared.name === 'drag') {
-      fireDropEvents(interaction, interaction.dropState.events)
-    }
+    if (interaction.prepared.name !== 'drag') { return }
+
+    fireDropEvents(interaction, interaction.dropState.events)
   })
 
   interactions.signals.on('stop', ({ interaction }) => {
-    interaction.dropState.activeDrops = null
-    interaction.dropState.events = null
-  })
+    if (interaction.prepared.name !== 'drag') { return }
 
-  interactions.signals.on('stop', ({ interaction: { dropState } }) => {
-    dropState.cur.dropzone = dropState.cur.element =
-      dropState.prev.dropzone = dropState.prev.element = null
+    const { dropState } = interaction
+
+    dropState.activeDrops = null
+    dropState.events = null
+    dropState.cur.dropzone = null
+    dropState.cur.element = null
+    dropState.prev.dropzone = null
+    dropState.prev.element = null
     dropState.rejected = false
   })
 
