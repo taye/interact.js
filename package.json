@@ -16,7 +16,7 @@
     "build": "cd packages/interactjs; ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",
     "test": "scripts/test.sh",
-    "tsc_lint_test": "tsc -b -f && npm run lint -- --fail-on-error && npm test",
+    "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
     "docs": "node docs --go",
     "release": "sh ./scripts/release.sh",
     "pre-release": "npm run release -- prerelease",
