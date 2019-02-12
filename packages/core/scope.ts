@@ -83,6 +83,8 @@ export class Scope {
     }
   }
 
+  onWindowUnload = (event: BeforeUnloadEvent) => this.removeDocument(event.target as Document)
+
   init (window: Window) {
     return initScope(this, window)
   }
@@ -119,10 +121,6 @@ export class Scope {
     events.documents.splice(index, 1)
 
     this.signals.fire('remove-document', { doc, window, scope: this, options })
-  }
-
-  onWindowUnload (event: Event) {
-    this.removeDocument(event.target as Document)
   }
 
   getDocIndex (doc: Document) {
