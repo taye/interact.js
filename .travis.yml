@@ -6,6 +6,5 @@ addons:
     repo_token: 9c6558805c8a00ef83371f4dcd82bfc765d2eac147a7442164f8cc1b401d43de
 install:
   - npm run bootstrap
-script: tsc -b --clean; npm test
 after_success:
   - npx codeclimate-test-reporter < ./coverage/lcov.info
