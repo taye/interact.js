@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.29+sha.7c21d3d-dirty
+ * interact.js v1.4.0-alpha.30+sha.bdc493e-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -75,6 +75,8 @@ var Scope =
 /*#__PURE__*/
 function () {
   function Scope() {
+    var _this = this;
+
     _classCallCheck(this, Scope);
 
     // FIXME Signals
@@ -93,6 +95,11 @@ function () {
     this.interactables = new InteractableSet(this); // all documents being listened to
 
     this.documents = [];
+
+    this.onWindowUnload = function (event) {
+      return _this.removeDocument(event.target);
+    };
+
     var scope = this;
 
     this.Interactable =
@@ -185,11 +192,6 @@ function () {
         scope: this,
         options: options
       });
-    }
-  }, {
-    key: "onWindowUnload",
-    value: function onWindowUnload(event) {
-      this.removeDocument(event.target);
     }
   }, {
     key: "getDocIndex",
@@ -4106,18 +4108,26 @@ function __install_3(scope) {
   interactions.signals.on('after-action-end', function (_ref4) {
     var interaction = _ref4.interaction;
 
-    if (interaction.prepared.name === 'drag') {
-      fireDropEvents(interaction, interaction.dropState.events);
+    if (interaction.prepared.name !== 'drag') {
+      return;
     }
+
+    fireDropEvents(interaction, interaction.dropState.events);
   });
   interactions.signals.on('stop', function (_ref5) {
     var interaction = _ref5.interaction;
-    interaction.dropState.activeDrops = null;
-    interaction.dropState.events = null;
-  });
-  interactions.signals.on('stop', function (_ref6) {
-    var dropState = _ref6.interaction.dropState;
-    dropState.cur.dropzone = dropState.cur.element = dropState.prev.dropzone = dropState.prev.element = null;
+
+    if (interaction.prepared.name !== 'drag') {
+      return;
+    }
+
+    var dropState = interaction.dropState;
+    dropState.activeDrops = null;
+    dropState.events = null;
+    dropState.cur.dropzone = null;
+    dropState.cur.element = null;
+    dropState.prev.dropzone = null;
+    dropState.prev.element = null;
     dropState.rejected = false;
   });
   /**
@@ -4212,15 +4222,15 @@ function __install_3(scope) {
   defaults.actions.drop = drop.defaults;
 }
 
-function collectDrops(_ref7, draggableElement) {
-  var interactables = _ref7.interactables;
+function collectDrops(_ref6, draggableElement) {
+  var interactables = _ref6.interactables;
   var drops = []; // collect all dropzones and their elements which qualify for a drop
 
   for (var _i = 0; _i < interactables.list.length; _i++) {
-    var _ref8;
+    var _ref7;
 
-    _ref8 = interactables.list[_i];
-    var dropzone = _ref8;
+    _ref7 = interactables.list[_i];
+    var dropzone = _ref7;
 
     if (!dropzone.options.drop.enabled) {
       continue;
@@ -4239,10 +4249,10 @@ function collectDrops(_ref7, draggableElement) {
     var dropElements = __utils_3.is.string(dropzone.target) ? dropzone._context.querySelectorAll(dropzone.target) : __utils_3.is.array(dropzone.target) ? dropzone.target : [dropzone.target];
 
     for (var _i2 = 0; _i2 < dropElements.length; _i2++) {
-      var _ref9;
+      var _ref8;
 
-      _ref9 = dropElements[_i2];
-      var dropzoneElement = _ref9;
+      _ref8 = dropElements[_i2];
+      var dropzoneElement = _ref8;
 
       if (dropzoneElement !== draggableElement) {
         drops.push({
@@ -4259,12 +4269,12 @@ function collectDrops(_ref7, draggableElement) {
 function fireActivationEvents(activeDrops, event) {
   // loop through all active dropzones and trigger event
   for (var _i3 = 0; _i3 < activeDrops.length; _i3++) {
-    var _ref10;
+    var _ref9;
 
-    _ref10 = activeDrops[_i3];
-    var _ref11 = _ref10,
-        dropzone = _ref11.dropzone,
-        element = _ref11.element;
+    _ref9 = activeDrops[_i3];
+    var _ref10 = _ref9,
+        dropzone = _ref10.dropzone,
+        element = _ref10.element;
     event.dropzone = dropzone; // set current element as event target
 
     event.target = element;
@@ -4281,30 +4291,30 @@ function getActiveDrops(scope, dragElement) {
   var activeDrops = collectDrops(scope, dragElement);
 
   for (var _i4 = 0; _i4 < activeDrops.length; _i4++) {
-    var _ref12;
+    var _ref11;
 
-    _ref12 = activeDrops[_i4];
-    var activeDrop = _ref12;
+    _ref11 = activeDrops[_i4];
+    var activeDrop = _ref11;
     activeDrop.rect = activeDrop.dropzone.getRect(activeDrop.element);
   }
 
   return activeDrops;
 }
 
-function getDrop(_ref13, dragEvent, pointerEvent) {
-  var dropState = _ref13.dropState,
-      draggable = _ref13.interactable,
-      dragElement = _ref13.element;
+function getDrop(_ref12, dragEvent, pointerEvent) {
+  var dropState = _ref12.dropState,
+      draggable = _ref12.interactable,
+      dragElement = _ref12.element;
   var validDrops = []; // collect all dropzones and their elements which qualify for a drop
 
   for (var _i5 = 0; _i5 < dropState.activeDrops.length; _i5++) {
-    var _ref14;
+    var _ref13;
 
-    _ref14 = dropState.activeDrops[_i5];
-    var _ref15 = _ref14,
-        dropzone = _ref15.dropzone,
-        dropzoneElement = _ref15.element,
-        rect = _ref15.rect;
+    _ref13 = dropState.activeDrops[_i5];
+    var _ref14 = _ref13,
+        dropzone = _ref14.dropzone,
+        dropzoneElement = _ref14.element,
+        rect = _ref14.rect;
     validDrops.push(dropzone.dropCheck(dragEvent, pointerEvent, draggable, dragElement, dropzoneElement, rect) ? dropzoneElement : null);
   } // get the most appropriate dropzone based on DOM depth and order
 
@@ -4401,10 +4411,10 @@ function fireDropEvents(interaction, events) {
   dropState.prev.element = cur.element;
 }
 
-function onEventCreated(_ref16, scope) {
-  var interaction = _ref16.interaction,
-      iEvent = _ref16.iEvent,
-      event = _ref16.event;
+function onEventCreated(_ref15, scope) {
+  var interaction = _ref15.interaction,
+      iEvent = _ref15.iEvent,
+      event = _ref15.event;
 
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') {
     return;
@@ -4695,7 +4705,6 @@ function updateGestureProps(_ref2) {
 
   interaction.gesture.distance = iEvent.distance;
   interaction.gesture.angle = iEvent.angle;
-  interaction.gesture.scale = iEvent.scale;
 
   if (__utils_4.is.number(iEvent.scale) && iEvent.scale !== Infinity && !isNaN(iEvent.scale)) {
     interaction.gesture.scale = iEvent.scale;
@@ -8956,7 +8965,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.29";
+_interact.default.version = __init_23.version = "1.4.0-alpha.30";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

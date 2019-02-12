@@ -76,10 +76,10 @@ export declare class Scope {
         options: any;
     }>;
     constructor();
+    onWindowUnload: (event: BeforeUnloadEvent) => void;
     init(window: Window): Scope;
     addDocument(doc: Document, options?: any): void | false;
     removeDocument(doc: Document): void;
-    onWindowUnload(event: Event): void;
     getDocIndex(doc: Document): number;
     getDocOptions(doc: Document): any;
 }
