@@ -8,7 +8,7 @@ import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 
 export interface Plugin {
-  install (scope: Scope): void
+  install (scope: Scope, options?: any): void
   [key: string]: any
 }
 
@@ -94,12 +94,12 @@ scope._plugins = []
  * @return {interact}
  */
 interact.use = use
-function use (plugin: Plugin) {
+function use (plugin: Plugin, options?: { [key: string]: any }) {
   if (scope._plugins.indexOf(plugin) !== -1) {
     return interact
   }
 
-  plugin.install(scope)
+  plugin.install(scope, options)
   scope._plugins.push(plugin)
   return interact
 }

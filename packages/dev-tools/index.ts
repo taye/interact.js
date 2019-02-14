@@ -2,7 +2,33 @@
 /* global process */
 import * as utils from '@interactjs/utils'
 
-export function _touchAction (element) {
+declare module '@interactjs/core/scope' {
+  interface Scope {
+    logger: Logger
+  }
+}
+
+export interface Logger {
+  warn: (...args: any[]) => void
+  error: (...args: any[]) => void
+  log: (...args: any[]) => void
+}
+
+export const links = {
+  touchAction: '\nhttps://developer.mozilla.org/en-US/docs/Web/CSS/touch-action',
+}
+
+// eslint-disable-next-line no-restricted-syntax
+export function install (scope: Interact.Scope, { logger = console }: { logger?: Logger } = {}) {
+  scope.logger = logger
+  scope.interactions.signals.on('action-start', ({ interaction }) => {
+    touchAction(interaction.element, scope.logger)
+  })
+}
+
+export const touchActionMessage = '[interact.js] Consider adding CSS "touch-action: none" to this element\n'
+
+export function _touchAction (element, logger: Console) {
   let parent = element
 
   while (utils.is.element(parent)) {
@@ -15,14 +41,18 @@ export function _touchAction (element) {
     parent = utils.dom.parentNode(parent)
   }
 
-  console.warn(
+  logger.warn(
     '[interact.js] Consider adding CSS "touch-action: none" to this element\n',
     element,
-    '\nhttps://developer.mozilla.org/en-US/docs/Web/CSS/touch-action')
+    links.touchAction)
 }
 
-export const touchAction = (element) => {
+export const touchAction = (element, logger) => {
   if (process.env.NODE_ENV !== 'production') {
-    _touchAction(element)
+    _touchAction(element, logger)
   }
+}
+
+export default {
+  install,
 }

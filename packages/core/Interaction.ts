@@ -1,4 +1,3 @@
-import * as devTools from '@interactjs/dev-tools'
 import * as utils from '@interactjs/utils'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
@@ -151,8 +150,6 @@ export class Interaction<T extends ActionName = any> {
         !interactable.options[action.name].enabled) {
       return
     }
-
-    devTools.touchAction(element)
 
     utils.copyAction(this.prepared, action)
 
