@@ -7,7 +7,7 @@ test('modifiers/base', (t) => {
   const scope = helpers.mockScope()
 
   modifiersBase.install(scope)
-  scope.actions.eventTypes.push('teststart', 'testmove', 'testend')
+  scope.actions.eventTypes.push('TESTstart', 'TESTmove', 'TESTend')
 
   // eslint-disable-next-line new-cap
   const interaction = scope.interactions.new({})
@@ -34,10 +34,11 @@ test('modifiers/base', (t) => {
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('teststart testmove testend', (event) => firedEvents.push(event))
+  interactable.on('TESTstart TESTmove TESTend', (event) => firedEvents.push(event))
   interaction.pointerDown(startEvent, startEvent, element)
 
-  interactable.options.test = {
+  interactable.options.TEST = {
+    enabled: true,
     modifiers: [
       {
         options,
@@ -46,7 +47,7 @@ test('modifiers/base', (t) => {
     ],
   }
 
-  interaction.start({ name: 'test' }, interactable, element)
+  interaction.start({ name: 'TEST' }, interactable, element)
 
   t.ok(
     options.started,
@@ -105,13 +106,13 @@ test('modifiers/base', (t) => {
   // don't set start
   options.setStart = null
   // add second modifier
-  interactable.options.test.modifiers.push({
+  interactable.options.TEST.modifiers.push({
     options,
     methods: doubleModifier,
   })
 
   interaction.pointerDown(startEvent, startEvent, element)
-  interaction.start({ name: 'test' }, interactable, element)
+  interaction.start({ name: 'TEST' }, interactable, element)
 
   t.notOk(
     options.setted,
@@ -139,13 +140,14 @@ test('modifiers/base', (t) => {
   scope.modifiers.target = modifiersBase.makeModifier(targetModifier)
   options.type = 'target'
   options.started = false
-  interactable.options.test = {
+  interactable.options.TEST = {
+    enabled: true,
     modifiers: [
       options,
     ],
   }
   interaction.stop()
-  interaction.start({ name: 'test' }, interactable, element)
+  interaction.start({ name: 'TEST' }, interactable, element)
 
   t.ok(options.started, 'gets `scpe.modifiers[options.type]`')
 

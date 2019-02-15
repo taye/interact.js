@@ -27,7 +27,7 @@ test('Interactable.gesturable method', (t) => {
 
   const interaction = scope.interactions.new({})
   const element = scope.document.body
-  const interactable = scope.interactables.new(element)
+  const interactable = scope.interactables.new(element).gesturable(true)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   const touches = [
     utils.pointer.coordsToEvent(utils.pointer.newCoords()),

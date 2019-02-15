@@ -143,18 +143,19 @@ export class Interaction<T extends ActionName = any> {
    * @param {Element} element The DOM Element to target
    * @return {object} interact
    */
-  start (action: StartAction, target: Interactable, element: Element) {
+  start (action: StartAction, interactable: Interactable, element: Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
-        this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1)) {
+        this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1) ||
+        !interactable.options[action.name].enabled) {
       return
     }
 
     utils.copyAction(this.prepared, action)
 
-    this.interactable = target
+    this.interactable = interactable
     this.element      = element
-    this.rect         = target.getRect(element)
+    this.rect         = interactable.getRect(element)
     this.edges        = this.prepared.edges
     this._interacting = this._doPhase({
       interaction: this,

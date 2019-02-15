@@ -9,7 +9,7 @@ test('reflow', (t) => {
 
   interactions.install(scope)
 
-  Object.assign(scope.actions, { test: {}, names: ['test'] })
+  Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
   reflow.install(scope)
 
@@ -24,7 +24,7 @@ test('reflow', (t) => {
 
   interactable.fire = ((iEvent) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}
-  interactable.options.test = {}
+  interactable.options.TEST = { enabled: true }
   interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords
@@ -35,13 +35,13 @@ test('reflow', (t) => {
     }
   })
 
-  interactable.reflow({ name: 'test' })
+  interactable.reflow({ name: 'TEST' })
 
   const phases = ['reflow', 'start', 'move', 'end']
 
   for (const index in phases) {
     const phase = phases[index]
-    t.equal(fired[index].type, `test${phase}`, `event #${index} is ${phase}`)
+    t.equal(fired[index].type, `TEST${phase}`, `event #${index} is ${phase}`)
   }
 
   const interaction = fired[0].interaction
@@ -87,7 +87,7 @@ test('async reflow', async (t) => {
 
   interactions.install(scope)
 
-  Object.assign(scope.actions, { test: {}, names: ['test'] })
+  Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
   let reflowEvent
   let promise
@@ -96,13 +96,14 @@ test('async reflow', async (t) => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
   interactable.fire = ((iEvent) => { reflowEvent = iEvent }) as any
+  interactable.options.TEST = { enabled: true }
 
   reflow.install(scope)
 
   // test with Promise implementation
   scope.window.Promise = PromisePolyfill
 
-  promise = interactable.reflow({ name: 'test' })
+  promise = interactable.reflow({ name: 'TEST' })
   t.ok(promise instanceof scope.window.Promise, 'method returns a Promise if available')
   t.notOk(reflowEvent.interaction.interacting(), 'reflow may end synchronously')
 
@@ -116,7 +117,7 @@ test('async reflow', async (t) => {
   })
 
   stoppedFromTimeout = false
-  promise = interactable.reflow({ name: 'test' })
+  promise = interactable.reflow({ name: 'TEST' })
 
   t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked')
   await promise
@@ -126,7 +127,7 @@ test('async reflow', async (t) => {
   stoppedFromTimeout = false
   scope.window.Promise = undefined
 
-  promise = interactable.reflow({ name: 'test' })
+  promise = interactable.reflow({ name: 'TEST' })
   t.equal(promise, null, 'method returns null if no Proise is avilable')
   t.ok(reflowEvent.interaction.interacting() && !stoppedFromTimeout, 'interaction continues if end is blocked without Promise')
 
