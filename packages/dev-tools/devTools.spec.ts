@@ -4,7 +4,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
 import * as devTools from './'
 
-test('devTools "touch-action: none"', (t) => {
+test('devTools', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
   const logs: Array<{ args: any[], type: keyof devTools.Logger }> = []
 
@@ -34,6 +34,21 @@ test('devTools "touch-action: none"', (t) => {
     logs[0],
     { args: [devTools.touchActionMessage, element, devTools.links.touchAction], type: 'warn' },
     'warning about missing touchAction')
+
+  t.deepEqual(
+    logs[1],
+    { args: [devTools.noListenersMessage, 'drag', interactable], type: 'warn' },
+    'warning about missing move listeners')
+
+  interaction.stop()
+
+  element.style.touchAction = 'none'
+  interactable.on('dragmove', () => {})
+
+  t.equal(
+    logs.length,
+    2,
+    'no warnings when issues are resolved')
 
   t.end()
 })
