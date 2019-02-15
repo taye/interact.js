@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.30+sha.bdc493e-dirty
+ * interact.js v1.4.0-alpha.31+sha.6f00f8c-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -730,14 +730,16 @@ function () {
 
   }, {
     key: "start",
-    value: function start(action, target, element) {
-      if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === _scope.ActionName.Gesture ? 2 : 1)) {
+    value: function start(action, interactable, element) {
+      if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === _scope.ActionName.Gesture ? 2 : 1) || !interactable.options[action.name].enabled) {
         return;
       }
 
       utils.copyAction(this.prepared, action);
-      this.interactable = target;
+      this.interactable = interactable;
       this.element = element;
+      this.rect = interactable.getRect(element);
+      this.edges = this.prepared.edges;
       this._interacting = this._doPhase({
         interaction: this,
         event: this.downEvent,
@@ -1045,6 +1047,34 @@ function () {
       }
 
       var iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
+
+      var rect = this.rect;
+
+      if (rect) {
+        // update the rect modifications
+        var edges = this.edges || this.prepared.edges || {
+          left: true,
+          right: true,
+          top: true,
+          bottom: true
+        };
+
+        if (edges.top) {
+          rect.top += iEvent.delta.y;
+        }
+
+        if (edges.bottom) {
+          rect.bottom += iEvent.delta.y;
+        }
+
+        if (edges.left) {
+          rect.left += iEvent.delta.x;
+        }
+
+        if (edges.right) {
+          rect.right += iEvent.delta.x;
+        }
+      }
 
       this._signals.fire("action-".concat(phase), signalArg);
 
@@ -5730,7 +5760,9 @@ function __install_9(scope) {
   var interact = scope.interact,
       interactions = scope.interactions,
       defaults = scope.defaults;
-  interact.use(_InteractableMethods.default); // set cursor style on mousedown
+
+  _InteractableMethods.default.install(scope); // set cursor style on mousedown
+
 
   interactions.signals.on('down', function (_ref) {
     var interaction = _ref.interaction,
@@ -5767,22 +5799,22 @@ function __install_9(scope) {
     }
 
     scope.autoStart.signals.fire('before-start', arg);
-    var target = interaction.interactable;
+    var interactable = interaction.interactable;
 
-    if (interaction.prepared.name && target) {
+    if (interaction.prepared.name && interactable) {
       // check manualStart and interaction limit
-      if (target.options[interaction.prepared.name].manualStart || !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
+      if (interactable.options[interaction.prepared.name].manualStart || !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
         interaction.stop();
       } else {
-        interaction.start(interaction.prepared, target, interaction.element);
+        interaction.start(interaction.prepared, interactable, interaction.element);
       }
     }
   });
   interactions.signals.on('stop', function (_ref3) {
     var interaction = _ref3.interaction;
-    var target = interaction.interactable;
+    var interactable = interaction.interactable;
 
-    if (target && target.options.styleCursor) {
+    if (interactable && interactable.options.styleCursor) {
       setCursor(interaction.element, '', scope);
     }
   });
@@ -5810,9 +5842,7 @@ function __install_9(scope) {
    * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
    */
 
-  interact
-  /* FIXME */
-  .maxInteractions = function (newValue) {
+  interact.maxInteractions = function (newValue) {
     return maxInteractions(newValue, scope);
   };
 
@@ -5823,7 +5853,7 @@ function __install_9(scope) {
     cursorElement: null,
     signals: new __utils_9.Signals()
   };
-} // Check if the current target supports the action.
+} // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
 
 
@@ -5844,7 +5874,7 @@ function validateSelector(interaction, pointer, event, matches, matchElements, e
     if (action) {
       return {
         action: action,
-        target: match,
+        interactable: match,
         element: matchElement
       };
     }
@@ -5852,7 +5882,7 @@ function validateSelector(interaction, pointer, event, matches, matchElements, e
 
   return {
     action: null,
-    target: null,
+    interactable: null,
     element: null
   };
 }
@@ -5873,7 +5903,7 @@ function getActionInfo(interaction, pointer, event, eventTarget, scope) {
     scope.interactables.forEachMatch(element, pushMatches);
     var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope);
 
-    if (actionInfo.action && !actionInfo.target.options[actionInfo.action.name].manualStart) {
+    if (actionInfo.action && !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
       return actionInfo;
     }
 
@@ -5882,14 +5912,14 @@ function getActionInfo(interaction, pointer, event, eventTarget, scope) {
 
   return {
     action: null,
-    target: null,
+    interactable: null,
     element: null
   };
 }
 
 function prepare(interaction, _ref4, scope) {
   var action = _ref4.action,
-      target = _ref4.target,
+      interactable = _ref4.interactable,
       element = _ref4.element;
   action = action || {};
 
@@ -5897,11 +5927,12 @@ function prepare(interaction, _ref4, scope) {
     setCursor(interaction.element, '', scope);
   }
 
-  interaction.interactable = target;
+  interaction.interactable = interactable;
   interaction.element = element;
   __utils_9.copyAction(interaction.prepared, action);
+  interaction.rect = interactable && action.name ? interactable.getRect(element) : null;
 
-  if (target && target.options.styleCursor) {
+  if (interactable && interactable.options.styleCursor) {
     var cursor = action ? scope.actions[action.name].getCursor(action) : '';
     setCursor(interaction.element, cursor, scope);
   }
@@ -5917,8 +5948,8 @@ function withinInteractionLimit(interactable, element, action, scope) {
   var maxPerElement = options[action.name].maxPerElement;
   var autoStartMax = scope.autoStart.maxInteractions;
   var activeInteractions = 0;
-  var targetCount = 0;
-  var targetElementCount = 0; // no actions if any of these values == 0
+  var interactableCount = 0;
+  var elementCount = 0; // no actions if any of these values == 0
 
   if (!(maxActions && maxPerElement && autoStartMax)) {
     return false;
@@ -5945,16 +5976,16 @@ function withinInteractionLimit(interactable, element, action, scope) {
       continue;
     }
 
-    targetCount += otherAction === action.name ? 1 : 0;
+    interactableCount += otherAction === action.name ? 1 : 0;
 
-    if (targetCount >= maxActions) {
+    if (interactableCount >= maxActions) {
       return false;
     }
 
     if (interaction.element === element) {
-      targetElementCount++;
+      elementCount++;
 
-      if (otherAction === action.name && targetElementCount >= maxPerElement) {
+      if (otherAction === action.name && elementCount >= maxPerElement) {
         return false;
       }
     }
@@ -6409,7 +6440,7 @@ function __start_26(_ref3, pageCoords, registeredModifiers) {
       element = interaction.element;
   var modifierList = getModifierList(interaction, registeredModifiers);
   var states = prepareStates(modifierList);
-  var rect = (0, ___extend_26.default)({}, interactable.getRect(element));
+  var rect = (0, ___extend_26.default)({}, interaction.rect);
 
   if (!('width' in rect)) {
     rect.width = rect.right - rect.left;
@@ -8965,7 +8996,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.30";
+_interact.default.version = __init_23.version = "1.4.0-alpha.31";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

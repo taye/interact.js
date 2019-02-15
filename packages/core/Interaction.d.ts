@@ -16,6 +16,10 @@ export interface StartAction extends ActionProps {
 export declare class Interaction<T extends ActionName = any> {
     interactable: Interactable;
     element: Element;
+    rect: Interact.Rect & Interact.Rect3;
+    edges: {
+        [P in keyof Interact.Rect]?: boolean;
+    };
     _signals: utils.Signals;
     prepared: ActionProps<T>;
     pointerType: string;
@@ -132,7 +136,7 @@ export declare class Interaction<T extends ActionName = any> {
      * @param {Element} element The DOM Element to target
      * @return {object} interact
      */
-    start(action: StartAction, target: Interactable, element: Element): void;
+    start(action: StartAction, interactable: Interactable, element: Element): void;
     pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
     /**
      * ```js

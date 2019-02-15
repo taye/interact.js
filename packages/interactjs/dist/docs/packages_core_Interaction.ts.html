@@ -65,6 +65,10 @@ export class Interaction&lt;T extends ActionName = any> {
 
   // the target element of the interactable
   element: Element = null
+  rect: Interact.Rect &amp; Interact.Rect3
+  edges: {
+    [P in keyof Interact.Rect]?: boolean
+  }
 
   _signals: utils.Signals
 
@@ -182,17 +186,20 @@ export class Interaction&lt;T extends ActionName = any> {
    * @param {Element} element The DOM Element to target
    * @return {object} interact
    */
-  start (action: StartAction, target: Interactable, element: Element) {
+  start (action: StartAction, interactable: Interactable, element: Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
-        this.pointers.length &lt; (action.name === ActionName.Gesture ? 2 : 1)) {
+        this.pointers.length &lt; (action.name === ActionName.Gesture ? 2 : 1) ||
+        !interactable.options[action.name].enabled) {
       return
     }
 
     utils.copyAction(this.prepared, action)
 
-    this.interactable = target
+    this.interactable = interactable
     this.element      = element
+    this.rect         = interactable.getRect(element)
+    this.edges        = this.prepared.edges
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
@@ -490,6 +497,17 @@ export class Interaction&lt;T extends ActionName = any> {
     }
 
     const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)
+    const { rect } = this
+
+    if (rect) {
+      // update the rect modifications
+      const edges = this.edges || this.prepared.edges || { left: true, right: true, top: true, bottom: true }
+
+      if (edges.top)    { rect.top    += iEvent.delta.y }
+      if (edges.bottom) { rect.bottom += iEvent.delta.y }
+      if (edges.left)   { rect.left   += iEvent.delta.x }
+      if (edges.right)  { rect.right  += iEvent.delta.x }
+    }
 
     this._signals.fire(`action-${phase}`, signalArg)
 
