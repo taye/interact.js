@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '@interactjs/actions/drag'
+import { drag, resize } from '@interactjs/actions'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
 import * as devTools from './'
@@ -21,10 +21,13 @@ test('devTools', (t) => {
   })
 
   drag.install(scope)
+  resize.install(scope)
 
-  const element = scope.document.body
+  const element = scope.document.body.appendChild(scope.document.createElement('div'))
   const event = utils.pointer.coordsToEvent(utils.pointer.newCoords())
-  const interactable = scope.interactables.new(element).draggable(true)
+  const interactable = scope.interactables.new(element)
+    .draggable(true)
+    .resizable({ onmove: () => {} })
   const interaction = scope.interactions.new({})
 
   interaction.pointerDown(event, event, element)
@@ -42,12 +45,34 @@ test('devTools', (t) => {
 
   interaction.stop()
 
+  // resolve touchAction
   element.style.touchAction = 'none'
+  // resolve missing listeners
   interactable.on('dragmove', () => {})
+
+  interaction.start({ name: 'resize' }, interactable, element)
+  interaction.pointerMove(event, event, element)
+  interaction.end()
+
+  t.deepEqual(
+    logs[2],
+    { args: [devTools.boxSizingMessage, element, devTools.links.boxSizing], type: 'warn' },
+    'warning about resizing without "box-sizing: none"')
+
+  // resolve boxSizing
+  element.style.boxSizing = 'border-box'
+
+  interaction.start({ name: 'resize' }, interactable, element)
+  interaction.move({ event, pointer: event })
+  interaction.end()
+
+  interaction.start({ name: 'drag' }, interactable, element)
+  interaction.pointerMove(event, event, element)
+  interaction.end()
 
   t.equal(
     logs.length,
-    2,
+    3,
     'no warnings when issues are resolved')
 
   t.end()
