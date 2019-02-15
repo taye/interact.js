@@ -8,6 +8,7 @@
   "devDependencies": {
     "@interactjs/_dev": "1.4.0-alpha.30+sha.bdc493e",
     "@interactjs/core": "1.4.0-alpha.30+sha.bdc493e",
+    "@interactjs/actions": "1.4.0-alpha.30+sha.bdc493e",
     "@interactjs/utils": "1.4.0-alpha.30+sha.bdc493e"
   },
   "publishConfig": {

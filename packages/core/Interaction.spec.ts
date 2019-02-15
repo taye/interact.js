@@ -328,26 +328,31 @@ test('Interaction.pointerDown', (t) => {
 test('Interaction.start', (t) => {
   const interaction = makeInteractionAndSignals()
   const action = { name: 'TEST' }
-  const target = helpers.mockInteractable()
+  const interactable = helpers.mockInteractable()
   const element: any = {}
   const pointer = helpers.newPointer()
   const event: any = {}
 
-  interaction.start(action, target, element)
+  interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if !pointerIsDown')
 
   // pointers is still empty
   interaction.pointerIsDown = true
-  interaction.start(action, target, element)
+  interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if too few pointers are down')
 
   interaction.pointerDown(pointer, event, null)
 
   interaction._interacting = true
-  interaction.start(action, target, element)
+  interaction.start(action, interactable, element)
   t.equal(interaction.prepared.name, null, 'do nothing if already interacting')
 
   interaction._interacting = false
+
+  interactable.options[action.name] = { enabled: false }
+  interaction.start(action, interactable, element)
+  t.equal(interaction.prepared.name, null, 'do nothing if action is not enabled')
+  interactable.options[action.name] = { enabled: true }
 
   let signalArg
   // let interactingInStartListener;
@@ -357,10 +362,10 @@ test('Interaction.start', (t) => {
   }
 
   interaction._signals.on('action-start', signalListener)
-  interaction.start(action, target, element)
+  interaction.start(action, interactable, element)
 
   t.equal(interaction.prepared.name, action.name, 'action is prepared')
-  t.equal(interaction.interactable, target, 'interaction.interactable is updated')
+  t.equal(interaction.interactable, interactable, 'interaction.interactable is updated')
   t.equal(interaction.element, element, 'interaction.element is updated')
 
   // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');

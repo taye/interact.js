@@ -1,6 +1,5 @@
 import * as utils from '@interactjs/utils'
 import InteractableMethods from './InteractableMethods'
-type Scope = import ('@interactjs/core/scope').Scope
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
@@ -38,18 +37,18 @@ export interface AutoStart {
   // Allow this many interactions to happen simultaneously
   maxInteractions: number
   withinInteractionLimit: typeof withinInteractionLimit
-  cursorElement: Element
+  cursorElement: HTMLElement
   signals: utils.Signals
 }
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     interact,
     interactions,
     defaults,
   } = scope
 
-  interact.use(InteractableMethods)
+  InteractableMethods.install(scope)
 
   // set cursor style on mousedown
   interactions.signals.on('down', ({ interaction, pointer, event, eventTarget }) => {
@@ -81,25 +80,25 @@ function install (scope: Scope) {
 
     scope.autoStart.signals.fire('before-start', arg)
 
-    const target = interaction.interactable
+    const { interactable } = interaction
 
-    if (interaction.prepared.name && target) {
+    if (interaction.prepared.name && interactable) {
       // check manualStart and interaction limit
-      if (target.options[interaction.prepared.name].manualStart ||
-          !withinInteractionLimit(target, interaction.element, interaction.prepared, scope)) {
+      if (interactable.options[interaction.prepared.name].manualStart ||
+          !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
         interaction.stop()
       }
       else {
-        interaction.start(interaction.prepared, target, interaction.element)
+        interaction.start(interaction.prepared, interactable, interaction.element)
       }
     }
   })
 
   interactions.signals.on('stop', ({ interaction }) => {
-    const target = interaction.interactable
+    const { interactable } = interaction
 
-    if (target && target.options.styleCursor) {
-      setCursor(interaction.element, '', scope)
+    if (interactable && interactable.options.styleCursor) {
+      setCursor(interaction.element as HTMLElement, '', scope)
     }
   })
 
@@ -116,7 +115,7 @@ function install (scope: Scope) {
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
     mouseButtons: 1,
-  });
+  })
 
   /**
    * Returns or sets the maximum number of concurrent interactions allowed.  By
@@ -129,7 +128,7 @@ function install (scope: Scope) {
    *
    * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
    */
-  (interact as any /* FIXME */).maxInteractions = (newValue) => maxInteractions(newValue, scope)
+  interact.maxInteractions = (newValue) => maxInteractions(newValue, scope)
 
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously
@@ -140,7 +139,7 @@ function install (scope: Scope) {
   }
 }
 
-// Check if the current target supports the action.
+// Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable, element, eventTarget, scope) {
   if (utils.is.object(action) &&
@@ -153,7 +152,7 @@ function validateAction (action, interactable, element, eventTarget, scope) {
   return null
 }
 
-function validateSelector (interaction, pointer, event, matches, matchElements, eventTarget, scope) {
+function validateSelector (interaction: Interact.Interaction, pointer, event, matches: Interact.Interactable[], matchElements: Element[], eventTarget: Element, scope: Interact.Scope) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
     const matchElement = matchElements[i]
@@ -167,16 +166,16 @@ function validateSelector (interaction, pointer, event, matches, matchElements, 
     if (action) {
       return {
         action,
-        target: match,
+        interactable: match,
         element: matchElement,
       }
     }
   }
 
-  return { action: null, target: null, element: null }
+  return { action: null, interactable: null, element: null }
 }
 
-function getActionInfo (interaction, pointer, event, eventTarget, scope) {
+function getActionInfo (interaction: Interact.Interaction, pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Element, scope: Interact.Scope) {
   let matches = []
   let matchElements = []
 
@@ -196,43 +195,47 @@ function getActionInfo (interaction, pointer, event, eventTarget, scope) {
     const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope)
 
     if (actionInfo.action &&
-      !actionInfo.target.options[actionInfo.action.name].manualStart) {
+      !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
       return actionInfo
     }
 
     element = utils.dom.parentNode(element)
   }
 
-  return { action: null, target: null, element: null }
+  return { action: null, interactable: null, element: null }
 }
 
-function prepare (interaction, { action, target, element }, scope) {
+function prepare (interaction: Interact.Interaction, { action, interactable, element }, scope: Interact.Scope) {
   action = action || {}
 
   if (interaction.interactable && interaction.interactable.options.styleCursor) {
-    setCursor(interaction.element, '', scope)
+    setCursor(interaction.element as HTMLElement, '', scope)
   }
 
-  interaction.interactable = target
+  interaction.interactable = interactable
   interaction.element = element
   utils.copyAction(interaction.prepared, action)
 
-  if (target && target.options.styleCursor) {
+  interaction.rect = interactable && action.name
+    ? interactable.getRect(element)
+    : null
+
+  if (interactable && interactable.options.styleCursor) {
     const cursor = action ? scope.actions[action.name].getCursor(action) : ''
-    setCursor(interaction.element, cursor, scope)
+    setCursor(interaction.element as HTMLElement, cursor, scope)
   }
 
   scope.autoStart.signals.fire('prepared', { interaction })
 }
 
-function withinInteractionLimit (interactable, element, action, scope) {
+function withinInteractionLimit (interactable: Interact.Interactable, element: Element, action, scope: Interact.Scope) {
   const options = interactable.options
   const maxActions = options[action.name].max
   const maxPerElement = options[action.name].maxPerElement
   const autoStartMax = scope.autoStart.maxInteractions
   let activeInteractions = 0
-  let targetCount = 0
-  let targetElementCount = 0
+  let interactableCount = 0
+  let elementCount = 0
 
   // no actions if any of these values == 0
   if (!(maxActions && maxPerElement && autoStartMax)) { return false }
@@ -250,16 +253,16 @@ function withinInteractionLimit (interactable, element, action, scope) {
 
     if (interaction.interactable !== interactable) { continue }
 
-    targetCount += otherAction === action.name ? 1 : 0
+    interactableCount += otherAction === action.name ? 1 : 0
 
-    if (targetCount >= maxActions) {
+    if (interactableCount >= maxActions) {
       return false
     }
 
     if (interaction.element === element) {
-      targetElementCount++
+      elementCount++
 
-      if (otherAction === action.name && targetElementCount >= maxPerElement) {
+      if (otherAction === action.name && elementCount >= maxPerElement) {
         return false
       }
     }
@@ -268,7 +271,7 @@ function withinInteractionLimit (interactable, element, action, scope) {
   return autoStartMax > 0
 }
 
-function maxInteractions (newValue, scope) {
+function maxInteractions (newValue, scope: Interact.Scope) {
   if (utils.is.number(newValue)) {
     scope.autoStart.maxInteractions = newValue
 
@@ -278,7 +281,7 @@ function maxInteractions (newValue, scope) {
   return scope.autoStart.maxInteractions
 }
 
-function setCursor (element, cursor, scope) {
+function setCursor (element: HTMLElement, cursor, scope: Interact.Scope) {
   if (scope.autoStart.cursorElement) {
     scope.autoStart.cursorElement.style.cursor = ''
   }

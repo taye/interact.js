@@ -90,7 +90,7 @@ function start (
   const modifierList = getModifierList(interaction, registeredModifiers)
   const states = prepareStates(modifierList)
 
-  const rect = extend({}, interactable.getRect(element)) as  Interact.Rect & Interact.Rect2
+  const rect = extend({}, interaction.rect)
 
   if (!('width'  in rect)) { rect.width  = rect.right  - rect.left }
   if (!('height' in rect)) { rect.height = rect.bottom - rect.top  }
