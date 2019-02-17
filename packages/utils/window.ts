@@ -1,13 +1,13 @@
 import isWindow from './isWindow'
 
 const win = {
-  realWindow: undefined,
-  window: undefined,
+  realWindow: undefined as Window,
+  window: undefined as Window,
   getWindow,
   init,
 }
 
-export function init (window) {
+export function init (window: Window & { wrap?: (...args) => any }) {
   // get wrapped window if using Shadow DOM polyfill
 
   win.realWindow = window
