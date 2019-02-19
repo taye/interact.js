@@ -53,6 +53,22 @@ test('interact export', (t) => {
 
   t.pass(getsUniqueMessage)
 
+  const doc3 = new JSDOM('').window.document
+
+  const prevDocCount = scope.documents.length
+
+  interact.addDocument(doc3, { events: { passive: false } })
+  t.deepEqual(
+    scope.documents[prevDocCount],
+    { doc: doc3, options: { events: { passive: false } } },
+    'interact.addDocument() adds to scope with options')
+
+  interact.removeDocument(doc3)
+  t.equal(
+    scope.documents.length,
+    prevDocCount,
+    'interact.removeDocument() removes document from scope')
+
   scope.interactables.list.forEach((i) => i.unset())
 
   t.end()

@@ -23,7 +23,7 @@ const browser = {
 }
 
 function init (window) {
-  const Element = domObjects.Element as any
+  const Element = domObjects.Element
   const navigator  = win.window.navigator
 
   // Does the browser support touch input?
@@ -44,7 +44,7 @@ function init (window) {
   // Opera Mobile must be handled differently
   browser.isOperaMobile = (navigator.appName === 'Opera' &&
     browser.supportsTouch &&
-    navigator.userAgent.match('Presto'))
+    /Presto/.test(navigator.userAgent))
 
   // prefix matchesSelector
   browser.prefixedMatchesSelector = 'matches' in Element.prototype
