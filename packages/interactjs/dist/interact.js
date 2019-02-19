@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.31+sha.6f00f8c-dirty
+ * interact.js v1.4.0-alpha.32+sha.7899eaa-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1604,7 +1604,7 @@ function __init_43(window) {
   browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion);
   browser.isIe9 = /MSIE 9/.test(navigator.userAgent); // Opera Mobile must be handled differently
 
-  browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && navigator.userAgent.match('Presto'); // prefix matchesSelector
+  browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent); // prefix matchesSelector
 
   browser.prefixedMatchesSelector = 'matches' in Element.prototype ? 'matches' : 'webkitMatchesSelector' in Element.prototype ? 'webkitMatchesSelector' : 'mozMatchesSelector' in Element.prototype ? 'mozMatchesSelector' : 'oMatchesSelector' in Element.prototype ? 'oMatchesSelector' : 'msMatchesSelector';
   browser.pEventTypes = _domObjects.default.PointerEvent ? _domObjects.default.PointerEvent === window.MSPointerEvent ? {
@@ -7396,8 +7396,15 @@ scope.interactables.signals.on('unset', function (_ref4) {
     }
   }
 });
-interact.addDocument = scope.addDocument;
-interact.removeDocument = scope.removeDocument;
+
+interact.addDocument = function (doc, options) {
+  return scope.addDocument(doc, options);
+};
+
+interact.removeDocument = function (doc) {
+  return scope.removeDocument(doc);
+};
+
 scope.interact = interact;
 var ___default_24 = interact;
 _$interact_24.default = ___default_24;
@@ -8996,7 +9003,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.31";
+_interact.default.version = __init_23.version = "1.4.0-alpha.32";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 
