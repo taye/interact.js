@@ -1,14 +1,14 @@
 ### Todo:
 
  [ ] Draggable
- [ ] Resizable
+ [x] Resizable
  [ ] Gesturable
- [ ] Snap
+ [x] Snap
  [ ] Restrict
  [x] Inertia
  [x] Auto Scroll
  [x] Pointer Events
- [ ] Reflow
+ [x] Reflow
  [ ] Interactable context
  [ ] iFrames
  [ ] fix hyperlinks

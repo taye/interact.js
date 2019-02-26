@@ -40,20 +40,6 @@ setting their `endOnly` option to `true`. When an `endOnly` modifier is used
 with an action that has `inertia` enabled, the event coordinates will be
 smoothly moved from the up coords to the modified coords.
 
-Snapping
-========
-
-```js
-const mySnap = interact.modifiers.snap({
-  targets: [
-    { x: 200, y: 200 },
-    { x: 250, y: 350 },
-  ]
-})
-```
-The `snap` modifier changes the pointer coordinates to specified targets when
-they are within range.
-
 ---
 
 TODO:
