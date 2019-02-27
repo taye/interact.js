@@ -142,8 +142,7 @@ function install (scope: Interact.Scope) {
 // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
 function validateAction (action, interactable, element, eventTarget, scope) {
-  if (utils.is.object(action) &&
-      interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
+  if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
       interactable.options[action.name].enabled &&
       withinInteractionLimit(interactable, element, action, scope)) {
     return action
@@ -152,12 +151,16 @@ function validateAction (action, interactable, element, eventTarget, scope) {
   return null
 }
 
-function validateSelector (interaction: Interact.Interaction, pointer, event, matches: Interact.Interactable[], matchElements: Element[], eventTarget: Element, scope: Interact.Scope) {
+function validateMatches (interaction: Interact.Interaction, pointer, event, matches: Interact.Interactable[], matchElements: Element[], eventTarget: Element, scope: Interact.Scope) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
     const matchElement = matchElements[i]
+    const matchAction = match.getAction(pointer, event, interaction, matchElement)
+
+    if (!matchAction) { continue }
+
     const action = validateAction(
-      match.getAction(pointer, event, interaction, matchElement),
+      matchAction,
       match,
       matchElement,
       eventTarget,
@@ -192,7 +195,7 @@ function getActionInfo (interaction: Interact.Interaction, pointer: Interact.Poi
 
     scope.interactables.forEachMatch(element, pushMatches)
 
-    const actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope)
+    const actionInfo = validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope)
 
     if (actionInfo.action &&
       !actionInfo.interactable.options[actionInfo.action.name].manualStart) {

@@ -37,7 +37,7 @@ export function easeOutQuad (t: number, b: number, c: number, d: number) {
   return -c * t * (t - 2) + b
 }
 
-export function copyAction (dest: any, src: any) {
+export function copyAction (dest: Interact.ActionProps, src: Interact.ActionProps) {
   dest.name  = src.name
   dest.axis  = src.axis
   dest.edges = src.edges

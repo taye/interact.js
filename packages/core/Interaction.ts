@@ -148,7 +148,7 @@ export class Interaction<T extends ActionName = any> {
         !this.pointerIsDown ||
         this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1) ||
         !interactable.options[action.name].enabled) {
-      return
+      return false
     }
 
     utils.copyAction(this.prepared, action)
@@ -162,6 +162,8 @@ export class Interaction<T extends ActionName = any> {
       event: this.downEvent,
       phase: EventPhase.Start,
     })
+
+    return this._interacting
   }
 
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
