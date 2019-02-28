@@ -3,7 +3,7 @@ Snapping
 
 interact.js has 3 snap modifiers:
 
- - `snap` which is best suited to drag actions,
+ - pointer coordinate-based `snap` which is best suited to drag actions,
  - `snapSize` which works only on resize actions and let's you set targets for
    the size of the target elemnt,
  - and `snapEdges` which is similar to `snapSize`, but let's you set the target

@@ -39,23 +39,3 @@ Modifiers can be set to apply only to the last move event in an interaction by
 setting their `endOnly` option to `true`. When an `endOnly` modifier is used
 with an action that has `inertia` enabled, the event coordinates will be
 smoothly moved from the up coords to the modified coords.
-
----
-
-TODO:
-=====
-
-`snapSize`
-----------
-
-`snapEdges`
------------
-
-Restriction
-===========
-
-`restrictEdges`
----------------
-
-`restrictSize`
---------------
