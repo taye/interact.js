@@ -118,22 +118,36 @@ Drag and resize actions (**but not gesture**) can also have an `inertia`
 property which may be a `boolean` to enable or diable inertia, or an object with
 inertia configuration.
 
+`InteractEvent`s have the following properties common to all action types:
+
+| InteractEvent property  | Description                                       |
+| ----------------------- | --------------------------------------------------|
+| `target`                | The element that is being interacted with         |
+| `interactable`          | The Interactable that is being interacted with    |
+| `interaction`           | The Interaction that the event belongs to         |
+| `x0`, `y0`              | Page x and y coordinates of the starting event    |
+| `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
+| `dx`, `dy`              | Change in coordinates of the mouse/touch          |
+| `velocityX`, `velocityY`| The Velocity of the pointer                       |
+| `speed`                 | The speed of the pointer                          |
+| `timeStamp`             | The time of creation of the event object          |
+
 Draggable
-==========
+---------
 
 <!-- TODO -->
  - for watching the pointer go down, move, then go back up
  - combined with dropzones
 
 Dropzone
-=========
+--------
 
 <!-- TODO -->
  - use this to define elements that other draggable elements can be moved into
  - doesn't actually re-parent the draggable elements; that's up to you
 
 Resizable
-==========
+---------
 
 <!-- TODO -->
  - for watching the size and position of an element while the pointer is used to
@@ -143,7 +157,7 @@ Resizable
    way the element's edges and size are updated in response to the pointer
 
 Gesturable
-==========
+----------
 
 <!-- TODO -->
  - for 2-finger gestures

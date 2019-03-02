@@ -120,7 +120,7 @@ The dropzone events are plain objects with the following properties:
 
 
 Pointer Events
---------------
+==============
 
 ```javascript
 interact(target).on('hold', function (event) {

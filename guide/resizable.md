@@ -15,7 +15,13 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 `resizestart`, `rect` will be identical to the rect returned by
 `interactable.getRect(element)` and `deltaRect` will have all-zero properties.
 
-Resizable options has an `edges` property which specifies the edges of the
+| Resize Event property   |                                                   |
+| ----------------------- | --------------------------------------------------|
+| `edges`                 | The edges of the element that are being changed   |
+| `rect`                  | An object with the new dimensions of the target   |
+| `deltaRect`             | The change in dimensions since the previous event |
+
+Resizable options have an `edges` property which specifies the edges of the
 element which can be resized from (top, left, bottom or right).
 
 ```html

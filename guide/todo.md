@@ -11,6 +11,7 @@
  [x] Pointer Events
  [x] Reflow
  [ ] Action hold
+ [ ] Ignore/Allow
  [ ] Interactable context
  [ ] iFrames
  [ ] fix hyperlinks

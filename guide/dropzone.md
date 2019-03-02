@@ -7,6 +7,34 @@ DOM to re-parent elements. You will have to do this in your own event listeners
 if you need this.
 
 ```javascript
+interact(dropTarget)
+  .dropzone({
+    ondrop: function (event) {
+      alert(event.relatedTarget.id
+            + ' was dropped into '
+            + event.target.id)
+    }
+  })
+  .on('dropactivate', function (event) {
+    event.target.classList.add('drop-activated')
+  })
+```
+
+Dropzone events are plain objects with the following properties:
+
+| Property                | Description                                       |
+| ----------------------- | --------------------------------------------------|
+| `target`                | The dropzone element                              |
+| `dropzone`              | The dropzone Interactable                         |
+|                         |                                                   |
+| `relatedTarget`         | The element that's being dragged                  |
+| `draggable`             | The Interactable that's being dragged             |
+|                         |                                                   |
+| `dragEvent`             | The related drag event – drag{start,move,end}     |
+| `timeStamp`             | Time of the event                                 |
+| `type`                  | The event type                                    |
+
+```javascript
 interact('.dropzone').dropzone({
   accept: '.drag0, .drag1',
 });
