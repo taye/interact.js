@@ -3,15 +3,17 @@
  [x] Draggable
  [x] Dropzone
  [x] Resizable
- [ ] Gesturable
+ [x] Gesturable
  [x] Snap
  [x] Restrict
  [x] Inertia
- [x] Auto Scroll
+ [ ] Auto Scroll
  [x] Pointer Events
  [x] Reflow
+ [ ] fix hyperlinks
+
+#### Examples
  [ ] Action hold
  [ ] Ignore/Allow
  [ ] Interactable context
  [ ] iFrames
- [ ] fix hyperlinks

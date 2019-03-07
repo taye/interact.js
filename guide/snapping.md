@@ -13,8 +13,8 @@ When creating snap modifiers the options have an array of `targets`. The action
 events will be snapped to the closest target of this array which is within
 range.
 
-`itneract.modifiers.snap()`
----------------------------
+`interact.modifiers.snap()`
+===========================
 
 The `snap` modifier changes the pointer coordinates to specified targets when
 they are within range.
@@ -36,7 +36,8 @@ yield intuitive results.
 `snap` targets have `x` and `y` number props and an optional `range` number
 property.
 
-### relativePoints
+`relativePoints`
+----------------
 
 ```javascript
 interact(element).draggable({
@@ -64,7 +65,8 @@ There are effectively `targets.length * max( relativePoints.length, 1 )` snap
 targets while snap calculations are done. Snap functions are called multiple
 times with the coordinates at each `relativePoint`.
 
-### offset
+`offset`
+--------
 
 ```javascript
 interact(element1).draggable({
@@ -96,8 +98,8 @@ modifier. The value may be:
  - or `'parent'` which will use the top-left coordinates of the target's parent
    element
 
-`itneract.modifiers.snapSize()`
--------------------------------
+`interact.modifiers.snapSize()`
+===============================
 
 ```js
 interact(target).resizable({
@@ -119,8 +121,8 @@ The `snapSize` modifier snaps the *dimensions* of targets when resizing. A
 `y` number props *or* `width` and `height` number props as well as an optional
 `range`.
 
-`itneract.modifiers.snapEdges()`
---------------------------------
+`interact.modifiers.snapEdges()`
+================================
 
 ```js
 interact(target).resizable({
@@ -163,7 +165,8 @@ If a target omits an axis or edge prop, then the corresponding axis will not be
 changed. For example, if a target is defined as `{ y: 100, range Infinity }`
 then the snapped movement will be horizontal at `(100, pointerEventPageX)`.
 
-## Snap grids
+Snap grids
+----------
 
 ```javascript
 var gridTarget = interact.createSnapGrid({
@@ -194,7 +197,8 @@ The properties of the grid are:
  - `limit` (optional): an object with `top`, `left`, `width` and `height` props
    to set the bounds of the grid
 
-### range
+`range`
+-------
 
 ```javascript
 interact(element).draggable({

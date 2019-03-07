@@ -84,10 +84,9 @@ interact('.movable-box')
 
 The `allowFrom` option lets you specify a target CSS selecctor or Element which
 must be the target of the pointer down event in order for the action to start.
-This option available for drag, resize and gesture, as well as
-[`pointerEvents`](#pointer-events) (down, move, hold, etc.). Using the
-`allowFrom` option, you may specify handles for each action separately and for
-all your pointerEvents listeners.
+This option available for drag, resize and gesture, as well as `pointerEvents`
+(down, move, hold, etc.). Using the `allowFrom` option, you may specify handles
+for each action separately and for all your pointerEvents listeners.
 
 `ingoreFrom`
 ------------

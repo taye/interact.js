@@ -1,3 +1,6 @@
+Resizable
+=========
+
 ```javascript
 interact(target)
   .resizable({
@@ -66,8 +69,8 @@ Resize handle elements must be children of the resizable element. If you need
 the handles to be outside the target element, then you will need to use
 [`Interaction#start`](interaction-start).
 
-resize invert
--------------
+`invert`
+--------
 
 ```javascript
 interact(target).resizable({

@@ -1,5 +1,5 @@
-Dragging
-========
+Draggable
+=========
 
 ```html
 <div id="draggable"> Draggable Element </div>
@@ -34,8 +34,8 @@ draggable, create an interactable with your desired target then call the
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
 
-lockAxis and startAxis
-----------------------
+`lockAxis` and `startAxis`
+--------------------------
 
 ```javascript
 // lock the drag to the starting direction

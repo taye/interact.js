@@ -1,5 +1,5 @@
-Gesture
-=======
+Gesturable
+==========
 
 ```html
 <div id="rotate-area">

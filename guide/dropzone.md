@@ -20,16 +20,17 @@ interact(dropTarget)
   })
 ```
 
+Dropzone Events
+---------------
+
 Dropzone events are plain objects with the following properties:
 
 | Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `target`                | The dropzone element                              |
 | `dropzone`              | The dropzone Interactable                         |
-|                         |                                                   |
 | `relatedTarget`         | The element that's being dragged                  |
 | `draggable`             | The Interactable that's being dragged             |
-|                         |                                                   |
 | `dragEvent`             | The related drag event – drag{start,move,end}     |
 | `timeStamp`             | Time of the event                                 |
 | `type`                  | The event type                                    |
@@ -39,6 +40,9 @@ interact('.dropzone').dropzone({
   accept: '.drag0, .drag1',
 });
 ```
+
+`accept`
+--------
 
 The dropzone `accept` option is a CSS selector or element which must match the
 dragged element in order for drop events to be fired.
@@ -56,6 +60,9 @@ The `overlap` option sets how drops are checked for. The allowed values are:
  - a number from 0-1 which is the (intersection area) / (draggable area).  e.g.
  `0.5` for drop to happen when half of the area of the draggable is over the
  dropzone
+
+`checker`
+---------
 
 The `checker` option is a function that you set to additionally check if a
 dragged element can be dropped into a dropzone.
@@ -78,10 +85,12 @@ interact(target).dropzone({
 
 The checker function takes the following arguments:
 
- - **dragEvent**: related dragmove or dragend event
- - **event**: The user move/up/end Event related to the dragEvent
- - **dropped**: The value from the default drop checker
- - **dropzone**: The dropzone interactable
- - **dropElement**: The dropzone element
- - **draggable**: The Interactable being dragged
- - **draggableElement**: The actual element that's being dragged
+| arg                     | Description                                       |
+| ----------------------- | --------------------------------------------------|
+| `dragEvent`             | related dragmove or dragend event                 |
+| `event`                 | The user move/up/end Event related to the dragEvent
+| `dropped`               | The value from the default drop checker           |
+| `dropzone`              | The dropzone interactable                         |
+| `dropElement`           | The dropzone element                              |
+| `draggable`             | The Interactable being dragged                    |
+| `draggableElement`      | The actual element that's being dragged           |

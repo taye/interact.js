@@ -48,7 +48,10 @@ such as `pageX/Y`, `clientX/Y`, modifier keys etc. but also some properties
 providing information about the change in coordinates and event specific data.
 The table below displays all of these events.
 
-| Common                  |                                                   |
+Common
+------
+
+|                         |                                                   |
 | ----------------------- | --------------------------------------------------|
 | `target`                | The element that is being interacted with         |
 | `interactable`          | The Interactable that is being interacted with    |
@@ -60,19 +63,28 @@ The table below displays all of these events.
 | `speed`                 | The speed of the pointer                          |
 | `timeStamp`             | The time of creation of the event object          |
 
-| Drag                    |                                                   |
+Drag
+----
+
+|                         |                                                   |
 | ----------------------- | --------------------------------------------------|
 | **dragmove**            |                                                   |
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
 
-| Resize                  |                                                   |
+Resize
+------
+
+|                         |                                                   |
 | ----------------------- | --------------------------------------------------|
 | `edges`                 | The edges of the element that are being changed   |
 | `rect`                  | An object with the new dimensions of the target   |
 | `deltaRect`             | The change in dimensions since the previous event |
 
-| Gesture                 |                                                   |
+Gesture
+-------
+
+|                         |                                                   |
 | ----------------------- | --------------------------------------------------|
 | `distance`              | The distance between the event's first two touches|
 | `angle`                 | The angle of the line made by the two touches     |
@@ -110,10 +122,8 @@ The dropzone events are plain objects with the following properties:
 | ----------------------- | --------------------------------------------------|
 | `target`                | The dropzone element                              |
 | `dropzone`              | The dropzone Interactable                         |
-|                         |                                                   |
 | `relatedTarget`         | The element that's being dragged                  |
 | `draggable`             | The Interactable that's being dragged             |
-|                         |                                                   |
 | `dragEvent`             | The related drag event – drag{start,move,end}     |
 | `timeStamp`             | Time of the event                                 |
 | `type`                  | The event type                                    |
@@ -136,8 +146,8 @@ interact(target).on('hold', function (event) {
  - `doubletap`
  - `hold`
 
-I call these `pointerEvents` because they present the events roughly as the
-real `PointerEvent` interface does, specifically:
+I call these `pointerEvents` (with a lower case "p") because they present the
+events roughly as the real `PointerEvent` interface does, specifically:
 
  - `event.pointerId` provides the `TouchEvent#identifier` or
  `PointerEvent#pointerId` or `undefined` for MouseEvents
@@ -145,13 +155,14 @@ real `PointerEvent` interface does, specifically:
  - There are no simulated mouse events after touch events
 
 <aside class="notice">
-  The properties of the events may vary across browsers and devices depending
-  on which event interface is supported. For Example, a <code>down</code> event
+  The properties of the events may vary across browsers and devices depending on
+  which event interfaces are supported. For Example, a <code>down</code> event
   from a <code>touchstart</code> will not provide tilt or pressure as specified
   in the <code>PointerEvent</code> interface.
 </aside>
 
-### Configuring pointer events
+Configuring pointer events
+--------------------------
 
 ```javascript
 interact(target).pointerEvents({
@@ -162,18 +173,19 @@ interact(target).pointerEvents({
 })
 ```
 
-`pointerEvent` are not snapped or restricted, but can be modified with the
+`pointerEvent`s are not snapped or restricted, but can be modified with the
 origin modifications. `tap` events have a `dt` property which is the time
 between the related `down` and `up` events. For `doubletap` `dt` is the time
 between the two previous taps.  `dt` for `hold` events is the length of time
 that the pointer has been held down for (around 600ms).
 
-### fast click
+Fast click
+----------
+
 ```javascript
 // fast click
 interact('a[href]').on('tap', function (event) {
   window.location.href = event.currentTarget.href
-
   event.preventDefault()
 })
 ```

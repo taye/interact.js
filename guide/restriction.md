@@ -8,7 +8,7 @@ interact.js has 3 restriction modifiers:
   - and element edge-based `restrictEdges` (resize only)
 
 `interact.modifiers.restrict()`
--------------------------------
+===============================
 
 ```javascript
 interact(target)
@@ -35,7 +35,8 @@ The value can be:
  - a CSS selector string – if one of the parents of the target element matches
  this selector, it's rect will be used as the restriction area.
 
-### elementRect
+`elementRect`
+-------------
 
 With the `restrict` variant, restricting is by default relative to the pointer
 coordinates so that the action coordinates, not the element's dimensions, will
@@ -59,8 +60,8 @@ and 1 means the bottom.
 `{ top: 0.25, left: 0.25, bottom: 0.75, right: 0.75 }` would result in a quarter
 of the element being allowed to hang over the restriction edges.
 
-`restrictSize`
---------------
+`interact.modifiers.restrictSize()`
+===================================
 
 ```javascript
 interact(target).resizable({
@@ -76,8 +77,8 @@ interact(target).resizable({
 `restrictSize` lets you specify the minimum and maximum dimensions that the
 target element must have when resizing.
 
-`restrictEdges`
----------------
+`interact.modifiers.restrictEdges()`
+====================================
 
 ```javascript
 interact(target).resizable({
