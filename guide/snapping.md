@@ -150,9 +150,23 @@ modifiers. If multiple targets are within range, the closest target is used.
 
 ```js
 interact.modifiers.snap({
-  targets: [(x, y) => {
-    return { x: x * 2, y: y +100 }
-  }]
+  targets: [
+    function (
+      // the x and y page coordinates,
+      x, y,
+      // the current interaction
+      interaction,
+      // the offset information with relativePoint if set
+      { x: offsetX, y: offsetY, relativePoint, index: relativePointIndex },
+      // the index of this function in the options.targets array
+      index) {
+      return {
+        x: x,
+        y: (75 + 50 * Math.sin(x * 0.04)),
+        range: 40,
+      }
+    }
+  ]
 })
 ```
 
