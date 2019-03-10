@@ -1,28 +1,28 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.4.0-alpha.33+sha.5701f0f",
+  "version": "1.4.0-beta",
   "peerDependencies": {
-    "@interactjs/actions": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/auto-scroll": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/auto-start": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/core": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/inertia": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/modifiers": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/pointer-events": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/reflow": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/utils": "1.4.0-alpha.33+sha.5701f0f"
+    "@interactjs/actions": "1.4.0-beta",
+    "@interactjs/auto-scroll": "1.4.0-beta",
+    "@interactjs/auto-start": "1.4.0-beta",
+    "@interactjs/core": "1.4.0-beta",
+    "@interactjs/inertia": "1.4.0-beta",
+    "@interactjs/modifiers": "1.4.0-beta",
+    "@interactjs/pointer-events": "1.4.0-beta",
+    "@interactjs/reflow": "1.4.0-beta",
+    "@interactjs/utils": "1.4.0-beta"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/actions": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/auto-scroll": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/auto-start": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/core": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/inertia": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/modifiers": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/pointer-events": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/reflow": "1.4.0-alpha.33+sha.5701f0f",
-    "@interactjs/utils": "1.4.0-alpha.33+sha.5701f0f"
+    "@interactjs/_dev": "1.4.0-beta",
+    "@interactjs/actions": "1.4.0-beta",
+    "@interactjs/auto-scroll": "1.4.0-beta",
+    "@interactjs/auto-start": "1.4.0-beta",
+    "@interactjs/core": "1.4.0-beta",
+    "@interactjs/inertia": "1.4.0-beta",
+    "@interactjs/modifiers": "1.4.0-beta",
+    "@interactjs/pointer-events": "1.4.0-beta",
+    "@interactjs/reflow": "1.4.0-beta",
+    "@interactjs/utils": "1.4.0-beta"
   },
   "publishConfig": {
     "access": "public"

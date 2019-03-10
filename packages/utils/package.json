@@ -1,8 +1,8 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.4.0-alpha.33+sha.5701f0f",
+  "version": "1.4.0-beta",
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.33+sha.5701f0f"
+    "@interactjs/_dev": "1.4.0-beta"
   },
   "publishConfig": {
     "access": "public"
