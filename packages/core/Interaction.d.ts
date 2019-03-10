@@ -136,7 +136,7 @@ export declare class Interaction<T extends ActionName = any> {
      * @param {Element} element The DOM Element to target
      * @return {object} interact
      */
-    start(action: StartAction, interactable: Interactable, element: Element): void;
+    start(action: StartAction, interactable: Interactable, element: Element): boolean;
     pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
     /**
      * ```js

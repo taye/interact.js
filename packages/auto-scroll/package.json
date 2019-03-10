@@ -1,12 +1,12 @@
 {
   "name": "@interactjs/auto-scroll",
-  "version": "1.4.0-alpha.32+sha.7899eaa",
+  "version": "1.4.0-alpha.33+sha.5701f0f",
   "peerDependencies": {
-    "@interactjs/utils": "1.4.0-alpha.32+sha.7899eaa"
+    "@interactjs/utils": "1.4.0-alpha.33+sha.5701f0f"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-alpha.32+sha.7899eaa",
-    "@interactjs/utils": "1.4.0-alpha.32+sha.7899eaa"
+    "@interactjs/_dev": "1.4.0-alpha.33+sha.5701f0f",
+    "@interactjs/utils": "1.4.0-alpha.33+sha.5701f0f"
   },
   "publishConfig": {
     "access": "public"

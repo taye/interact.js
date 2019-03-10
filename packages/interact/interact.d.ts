@@ -4,7 +4,7 @@ import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 export interface Plugin {
-    install(scope: Scope): void;
+    install(scope: Scope, options?: any): void;
     [key: string]: any;
 }
 declare module '@interactjs/core/scope' {
@@ -63,7 +63,9 @@ declare const scope: Scope;
  * @return {Interactable}
  */
 export declare const interact: InteractStatic;
-declare function use(plugin: Plugin): InteractStatic;
+declare function use(plugin: Plugin, options?: {
+    [key: string]: any;
+}): InteractStatic;
 declare function isSet(element: Element, options?: any): boolean;
 declare function on(type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: any): InteractStatic;
 declare function off(type: any, listener: any, options: any): InteractStatic;

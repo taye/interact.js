@@ -21,7 +21,7 @@ declare module '@interactjs/core/Interaction' {
     }
 }
 declare function install(scope: Scope): void;
-declare function getAction(this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element): any;
+declare function getAction(this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element): Interact.ActionProps;
 declare function styleCursor(this: Interactable, newValue?: boolean): any;
 declare function actionChecker(this: Interactable, checker: any): any;
 declare function testIgnoreAllow(this: Interactable, options: {

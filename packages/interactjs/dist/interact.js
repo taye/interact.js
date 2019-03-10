@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-alpha.32+sha.7899eaa-dirty
+ * interact.js v1.4.0-alpha.33+sha.5701f0f-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -732,7 +732,7 @@ function () {
     key: "start",
     value: function start(action, interactable, element) {
       if (this.interacting() || !this.pointerIsDown || this.pointers.length < (action.name === _scope.ActionName.Gesture ? 2 : 1) || !interactable.options[action.name].enabled) {
-        return;
+        return false;
       }
 
       utils.copyAction(this.prepared, action);
@@ -745,6 +745,7 @@ function () {
         event: this.downEvent,
         phase: _InteractEvent.EventPhase.Start
       });
+      return this._interacting;
     }
   }, {
     key: "pointerMove",
@@ -5858,18 +5859,24 @@ function __install_9(scope) {
 
 
 function validateAction(action, interactable, element, eventTarget, scope) {
-  if (__utils_9.is.object(action) && interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action, scope)) {
+  if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) && interactable.options[action.name].enabled && withinInteractionLimit(interactable, element, action, scope)) {
     return action;
   }
 
   return null;
 }
 
-function validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope) {
+function validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope) {
   for (var i = 0, len = matches.length; i < len; i++) {
     var match = matches[i];
     var matchElement = matchElements[i];
-    var action = validateAction(match.getAction(pointer, event, interaction, matchElement), match, matchElement, eventTarget, scope);
+    var matchAction = match.getAction(pointer, event, interaction, matchElement);
+
+    if (!matchAction) {
+      continue;
+    }
+
+    var action = validateAction(matchAction, match, matchElement, eventTarget, scope);
 
     if (action) {
       return {
@@ -5901,7 +5908,7 @@ function getActionInfo(interaction, pointer, event, eventTarget, scope) {
     matches = [];
     matchElements = [];
     scope.interactables.forEachMatch(element, pushMatches);
-    var actionInfo = validateSelector(interaction, pointer, event, matches, matchElements, eventTarget, scope);
+    var actionInfo = validateMatches(interaction, pointer, event, matches, matchElements, eventTarget, scope);
 
     if (actionInfo.action && !actionInfo.interactable.options[actionInfo.action.name].manualStart) {
       return actionInfo;
@@ -7152,12 +7159,12 @@ scope._plugins = [];
 
 interact.use = use;
 
-function use(plugin) {
+function use(plugin, options) {
   if (scope._plugins.indexOf(plugin) !== -1) {
     return interact;
   }
 
-  plugin.install(scope);
+  plugin.install(scope, options);
 
   scope._plugins.push(plugin);
 
@@ -9003,7 +9010,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-alpha.32";
+_interact.default.version = __init_23.version = "1.4.0-alpha.33";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

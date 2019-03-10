@@ -31,9 +31,7 @@ export interface AutoStart {
     signals: utils.Signals;
 }
 declare function install(scope: Interact.Scope): void;
-declare function validateAction(action: any, interactable: any, element: any, eventTarget: any, scope: any): {
-    [index: string]: any;
-};
+declare function validateAction(action: any, interactable: any, element: any, eventTarget: any, scope: any): any;
 declare function withinInteractionLimit(interactable: Interact.Interactable, element: Element, action: any, scope: Interact.Scope): boolean;
 declare function maxInteractions(newValue: any, scope: Interact.Scope): any;
 declare const _default: {
