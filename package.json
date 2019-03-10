@@ -68,13 +68,11 @@
     "tape": "latest",
     "through2": "latest",
     "tslint": "latest",
+    "ts-node": "^8.0.2",
     "typescript": "latest",
     "uglify-js": "latest",
     "watchify": "latest",
     "yargs": "latest"
-  },
-  "devDependencies": {
-    "ts-node": "latest"
   },
   "husky": {
     "hooks": {
