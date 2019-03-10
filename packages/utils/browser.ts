@@ -57,7 +57,7 @@ function init (window) {
           ? 'oMatchesSelector'
           : 'msMatchesSelector'
 
-  browser.pEventTypes = (domObjects.PointerEvent
+  browser.pEventTypes = (domObjects.PointerEvent && (navigator.maxTouchPoints || navigator.msMaxTouchPoints)
     ? (domObjects.PointerEvent === window.MSPointerEvent
       ? {
         up:     'MSPointerUp',
