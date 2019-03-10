@@ -7,6 +7,7 @@
   <div align="center">
   <a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
   <a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
+  <a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg"</a>
   <a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
   </div>
 </h2>

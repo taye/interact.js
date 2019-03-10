@@ -1,9 +1,9 @@
 {
   "per-file": false,
-  "statements": 53,
-  "lines": 53,
-  "branches": 33,
-  "functions": 50,
+  "statements": 64,
+  "branches": 48,
+  "functions": 58,
+  "lines": 64,
   "include": [
     "packages/**/*.ts"
   ],

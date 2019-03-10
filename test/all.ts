@@ -21,7 +21,7 @@ function getMatches (pattern) {
   })
 }
 
-(fileArgs.length ? Promise.resolve(fileArgs.filter((f) => f === '--')) : getMatches('**/*.spec.ts')).then((tests) => {
+(fileArgs.length ? Promise.resolve(fileArgs.filter((f) => f !== '--')) : getMatches('**/*.spec.ts')).then((tests) => {
   for (const file of tests) {
     require(path.resolve(file))
   }

@@ -1,0 +1,13 @@
+{
+  "name": "@interactjs/dev-tools",
+  "version": "0.0.0",
+  "dependencies": {
+    "@interactjs/utils": "1.4.0-alpha.32+sha.7899eaa"
+  },
+  "devDependencies": {
+    "@interactjs/_dev": "1.4.0-alpha.32+sha.7899eaa",
+    "@interactjs/actions": "1.4.0-alpha.32+sha.7899eaa",
+    "@interactjs/core": "1.4.0-alpha.32+sha.7899eaa",
+    "@interactjs/utils": "1.4.0-alpha.32+sha.7899eaa"
+  }
+}

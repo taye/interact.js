@@ -1,11 +1,11 @@
-**interact.js is a JavaScript library for drag and drop, resizing and
-multi-touch gestures with inertia and snapping for modern browsers** (and also
-IE9+).
+<h3>
+interact.js is a JavaScript library for drag and drop, resizing and multi-touch
+gestures with inertia and snapping for modern browsers (and also IE9+).
+</h3>
 
-What it tries to do is **present pointer input data consistently** across
-different browsers and devices and provide convenient ways to **pretend that the
-user's pointer moved in a way that it wasn't really moved** (snapping, inertia,
-etc.).
+Its aim is to **present pointer input data consistently** across different
+browsers and devices and provide convenient ways to **pretend that the user's
+pointer moved in a way that it wasn't really moved** (snapping, inertia, etc.).
 
 The `interact` function takes an element or a CSS selector string returns an
 `Interactable` object which has various methods to configure actions and event
@@ -52,7 +52,7 @@ slider
   })
 ```
 
-<iframe height="265" style="width: 100%;" scrolling="no" title="interact.js
+<iframe height="265" style="width: 100%; height: 256px" scrolling="no" title="interact.js
 simple slider"
 src="https://codepen.io/taye/embed/GgpxNq/?height=265&theme-id=dark&default-tab=result"
 frameborder="no" allowtransparency="true" allowfullscreen="true">
@@ -62,6 +62,9 @@ frameborder="no" allowtransparency="true" allowfullscreen="true">
 
 Installation
 ============
+
+NPM
+---
 
 ```sh
 $ npm install --save interactjs
@@ -76,13 +79,6 @@ const interact = require('interactjs')
 
 If you're using [npm](npm), install the package as a dependency with `npm install
 interactjs` then import or require the package in your JavaScript file.
-
-```sh
-$ npm install --save-dev @interactjs/types
-```
-
-If you're using TypeScript, also install the `@interactjs/types` package as a
-dev dependency.
 
 CDN
 ---
@@ -100,6 +96,15 @@ pointing to their servers.
 `interact` is exposed as a CommonJS module, an AMD module, or a global variable
 depending on what the environment supports.
 
+```sh
+# install just the type definitions
+$ npm install --save-dev @interactjs/types
+```
+
+If you're using the library only through a CDN and want the TypeScript type
+definitions for development, you can install the `@interactjs/types` package as
+a dev dependency.
+
 Drag, Resize and Gesture Actions
 ================================
 
@@ -114,26 +119,40 @@ The common options for all actions include:
  - `onstart`, `onmove` and `onend` functions to add single listeners for action
    start, move and end events respectively.
 
-Drag and resize actions (**but not gesture**) can also have an `inertia`
+Drag and resize actions (but not gesture) can also have an `inertia`
 property which may be a `boolean` to enable or diable inertia, or an object with
 inertia configuration.
 
+`InteractEvent`s have the following properties common to all action types:
+
+| InteractEvent property  | Description                                       |
+| ----------------------- | --------------------------------------------------|
+| `target`                | The element that is being interacted with         |
+| `interactable`          | The Interactable that is being interacted with    |
+| `interaction`           | The Interaction that the event belongs to         |
+| `x0`, `y0`              | Page x and y coordinates of the starting event    |
+| `clientX0`, `clientY0`  | Client x and y coordinates of the starting event  |
+| `dx`, `dy`              | Change in coordinates of the mouse/touch          |
+| `velocityX`, `velocityY`| The Velocity of the pointer                       |
+| `speed`                 | The speed of the pointer                          |
+| `timeStamp`             | The time of creation of the event object          |
+
 Draggable
-==========
+---------
 
 <!-- TODO -->
  - for watching the pointer go down, move, then go back up
  - combined with dropzones
 
 Dropzone
-=========
+--------
 
 <!-- TODO -->
  - use this to define elements that other draggable elements can be moved into
  - doesn't actually re-parent the draggable elements; that's up to you
 
 Resizable
-==========
+---------
 
 <!-- TODO -->
  - for watching the size and position of an element while the pointer is used to
@@ -143,7 +162,7 @@ Resizable
    way the element's edges and size are updated in response to the pointer
 
 Gesturable
-==========
+----------
 
 <!-- TODO -->
  - for 2-finger gestures

@@ -1,17 +1,13 @@
-engines:
+plugins:
   eslint:
     enabled: true
+    channel: eslint-5
   duplication:
     enabled: true
     config:
       languages:
         - javascript
         - typescript
-
-plugins:
-  eslint:
-    enabled: true
-    channel: eslint-5
 
 ratings:
   paths:

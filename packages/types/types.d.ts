@@ -21,7 +21,7 @@ declare namespace Interact {
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
   export type Plugin = _Plugin
-  export type ActionProps = interaction.ActionProps
+  export type ActionProps<T extends ActionName = any> = interaction.ActionProps<T>
   export type Interactable = _Interactable
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>

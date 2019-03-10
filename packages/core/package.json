@@ -2,6 +2,7 @@
   "name": "@interactjs/core",
   "version": "1.4.0-alpha.32+sha.7899eaa",
   "peerDependencies": {
+    "@interactjs/dev-tools": "1.4.0-alpha.32+sha.7899eaa",
     "@interactjs/utils": "1.4.0-alpha.32+sha.7899eaa"
   },
   "devDependencies": {

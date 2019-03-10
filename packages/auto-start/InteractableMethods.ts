@@ -152,7 +152,7 @@ function install (scope: Scope) {
   }
 }
 
-function getAction (this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element) {
+function getAction (this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element): Interact.ActionProps {
   const action = this.defaultActionChecker(pointer, event, interaction, element)
 
   if (this.options.actionChecker) {
