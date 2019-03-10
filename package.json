@@ -12,8 +12,8 @@
   },
   "scripts": {
     "bootstrap": "npx lerna bootstrap --ci",
-    "start": "cd packages/interactjs; ../../scripts/build.js --watch",
-    "build": "cd packages/interactjs; ../../scripts/build.js --docs",
+    "start": "cd packages/interactjs; NODE_ENV=development ../../scripts/build.js --watch",
+    "build": "cd packages/interactjs; NODE_ENV=production ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",
     "test": "scripts/test.sh",
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",

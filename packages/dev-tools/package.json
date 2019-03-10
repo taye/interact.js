@@ -1,15 +1,13 @@
 {
-  "name": "@interactjs/core",
+  "name": "@interactjs/dev-tools",
   "version": "0.0.0",
-  "peerDependencies": {
-    "@interactjs/dev-tools": "0.0.0",
+  "dependencies": {
     "@interactjs/utils": "0.0.0"
   },
   "devDependencies": {
     "@interactjs/_dev": "0.0.0",
+    "@interactjs/actions": "0.0.0",
+    "@interactjs/core": "0.0.0",
     "@interactjs/utils": "0.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }
