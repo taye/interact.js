@@ -31,7 +31,9 @@ function init (window) {
     (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)
 
   // Does the browser support PointerEvents
-  browser.supportsPointerEvent = !!domObjects.PointerEvent
+  browser.supportsPointerEvent = domObjects.PointerEvent === window.MSPointerEvent
+    ? (navigator.maxTouchPoints || navigator.msMaxTouchPoints) > 0
+    : !!domObjects.PointerEvent
 
   browser.isIOS = (/iP(hone|od|ad)/.test(navigator.platform))
 
@@ -57,7 +59,7 @@ function init (window) {
           ? 'oMatchesSelector'
           : 'msMatchesSelector'
 
-  browser.pEventTypes = (domObjects.PointerEvent && (navigator.maxTouchPoints || navigator.msMaxTouchPoints)
+  browser.pEventTypes = (browser.supportsPointerEvent
     ? (domObjects.PointerEvent === window.MSPointerEvent
       ? {
         up:     'MSPointerUp',
