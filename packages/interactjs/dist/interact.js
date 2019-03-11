@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-beta.0+sha.f18d2a5-dirty
+ * interact.js v1.4.0-beta.1+sha.f216353-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1599,7 +1599,7 @@ function __init_43(window) {
 
   browser.supportsTouch = 'ontouchstart' in window || __is_43.func(window.DocumentTouch) && _domObjects.default.document instanceof window.DocumentTouch; // Does the browser support PointerEvents
 
-  browser.supportsPointerEvent = !!_domObjects.default.PointerEvent;
+  browser.supportsPointerEvent = _domObjects.default.PointerEvent === window.MSPointerEvent ? (navigator.maxTouchPoints || navigator.msMaxTouchPoints) > 0 : !!_domObjects.default.PointerEvent;
   browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform); // scrolling doesn't change the result of getClientRects on iOS 7
 
   browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion);
@@ -1608,7 +1608,7 @@ function __init_43(window) {
   browser.isOperaMobile = navigator.appName === 'Opera' && browser.supportsTouch && /Presto/.test(navigator.userAgent); // prefix matchesSelector
 
   browser.prefixedMatchesSelector = 'matches' in Element.prototype ? 'matches' : 'webkitMatchesSelector' in Element.prototype ? 'webkitMatchesSelector' : 'mozMatchesSelector' in Element.prototype ? 'mozMatchesSelector' : 'oMatchesSelector' in Element.prototype ? 'oMatchesSelector' : 'msMatchesSelector';
-  browser.pEventTypes = _domObjects.default.PointerEvent && (navigator.maxTouchPoints || navigator.msMaxTouchPoints) ? _domObjects.default.PointerEvent === window.MSPointerEvent ? {
+  browser.pEventTypes = browser.supportsPointerEvent ? _domObjects.default.PointerEvent === window.MSPointerEvent ? {
     up: 'MSPointerUp',
     down: 'MSPointerDown',
     over: 'mouseover',
@@ -9010,7 +9010,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-beta.0";
+_interact.default.version = __init_23.version = "1.4.0-beta.1";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

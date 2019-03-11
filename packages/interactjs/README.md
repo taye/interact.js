@@ -7,7 +7,7 @@
   <div align="center">
   <a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
   <a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
-  <a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg"</a>
+  <a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg"></a>
   <a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
   </div>
 </h2>
@@ -26,9 +26,9 @@ Features include:
 Installation
 ------------
 
-* [npm](https://www.npmjs.org/): `npm install interactjs`
-* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@1.3/dist/interact.min.js"></script>`
-* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@1.3/dist/interact.min.js"></script>`
+* [npm](https://www.npmjs.org/): `npm install interactjs@next`
+* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@next/dist/interact.min.js"></script>`
+* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@next/dist/interact.min.js"></script>`
 * [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.npm" % "interactjs" % version)`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
