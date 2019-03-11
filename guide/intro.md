@@ -67,7 +67,7 @@ NPM
 ---
 
 ```sh
-$ npm install --save interactjs
+$ npm install --save interactjs@next
 ```
 
 ```js
@@ -78,7 +78,7 @@ const interact = require('interactjs')
 ```
 
 If you're using [npm](npm), install the package as a dependency with `npm install
-interactjs` then import or require the package in your JavaScript file.
+interactjs@next` then import or require the package in your JavaScript file.
 
 CDN
 ---

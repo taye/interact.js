@@ -26,9 +26,9 @@ Features include:
 Installation
 ------------
 
-* [npm](https://www.npmjs.org/): `npm install interactjs`
-* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@1.3/dist/interact.min.js"></script>`
-* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@1.3/dist/interact.min.js"></script>`
+* [npm](https://www.npmjs.org/): `npm install interactjs@next`
+* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@next/dist/interact.min.js"></script>`
+* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@next/dist/interact.min.js"></script>`
 * [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.npm" % "interactjs" % version)`
 * Direct download the latest version: http://interactjs.io/#download
   * **Rails 4** app development (using Rails Asset Pipeline)
