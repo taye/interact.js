@@ -25,7 +25,8 @@ The basic steps to setting up your targets are:
  2. Configure it to enable actions and add modifiers, inertia, etc.
  3. Add event listeners to provide visual feedback and update your app's state.
 
-For example, here's some code for [a very simple slider input][slider-demo]:
+For example, here's some code for [a very simple slider
+input](https://codepen.io/taye/pen/GgpxNq):
 
 ```js
 // Step 1
@@ -77,8 +78,9 @@ import interact from 'interactjs'
 const interact = require('interactjs')
 ```
 
-If you're using [npm](npm), install the package as a dependency with `npm install
-interactjs@next` then import or require the package in your JavaScript file.
+If you're using [npm](https://docs.npmjs.com/about-npm/), install the package as
+a dependency with `npm install interactjs@next` then import or require the
+package in your JavaScript file.
 
 CDN
 ---
@@ -167,6 +169,3 @@ Gesturable
 <!-- TODO -->
  - for 2-finger gestures
  - provide angle, scale and distance
-
-[slider-demo]: https://codepen.io/taye/pen/GgpxNq
-[npm]: https://docs.npmjs.com/about-npm/
