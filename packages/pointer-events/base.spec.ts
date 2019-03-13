@@ -1,12 +1,12 @@
+import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
-import interactions from '@interactjs/core/interactions'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import Signals from '@interactjs/utils/Signals'
-import test from '@interactjs/_dev/test/test'
+import pointerUtils from '@interactjs/utils/pointerUtils'
 import pointerEvents from './base'
+import interactableTargets from './interactableTargets'
 
-test('pointerEvents.types', t => {
+test('pointerEvents.types', (t) => {
   t.deepEqual(pointerEvents.types,
     [
       'down',
@@ -22,7 +22,9 @@ test('pointerEvents.types', t => {
   t.end()
 })
 
-test('pointerEvents.fire', t => {
+test('pointerEvents.fire', (t) => {
+  const scope: Interact.Scope = helpers.mockScope()
+
   const eventable = new Eventable(pointerEvents.defaults)
   const type = 'TEST'
   const element = {}
@@ -30,7 +32,7 @@ test('pointerEvents.fire', t => {
   const TEST_PROP = ['TEST_PROP']
   let firedEvent
 
-  eventable.on(type, event => { firedEvent = event })
+  eventable.on(type, (event) => { firedEvent = event })
 
   pointerEvents.fire({
     type,
@@ -60,7 +62,7 @@ test('pointerEvents.fire', t => {
 
   const tapTime = 500
   const interaction = Object.assign(
-    new Interaction({ signals: new Signals() } as any),
+    scope.interactions.new({}),
     { tapTime: -1, prevTap: null })
 
   interaction.updatePointer({} as any, {} as any, null)
@@ -86,7 +88,7 @@ test('pointerEvents.fire', t => {
   t.end()
 })
 
-test('pointerEvents.collectEventTargets', t => {
+test('pointerEvents.collectEventTargets', (t) => {
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
   const target = {
@@ -117,10 +119,9 @@ test('pointerEvents.collectEventTargets', t => {
   t.end()
 })
 
-test('pointerEvents Interaction update-pointer signal', t => {
-  const scope = helpers.mockScope()
+test('pointerEvents Interaction update-pointer signal', (t) => {
+  const scope: Interact.Scope = helpers.mockScope()
 
-  interactions.install(scope)
   pointerEvents.install(scope)
 
   const interaction = scope.interactions.new({})
@@ -128,23 +129,22 @@ test('pointerEvents Interaction update-pointer signal', t => {
   const event = {} as Interact.PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer')
+  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold], 'set hold info for move on new pointer')
 
   interaction.removePointer(helpers.newPointer(0), event)
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold])
+  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold])
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true)
-  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold, initialHold])
+  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold, initialHold])
 
   t.end()
 })
 
-test('pointerEvents Interaction remove-pointer signal', t => {
-  const scope = helpers.mockScope()
+test('pointerEvents Interaction remove-pointer signal', (t) => {
+  const scope: Interact.Scope = helpers.mockScope()
 
-  interactions.install(scope)
   pointerEvents.install(scope)
 
   const interaction = scope.interactions.new({})
@@ -166,9 +166,47 @@ test('pointerEvents Interaction remove-pointer signal', t => {
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
-    t.deepEqual(interaction.pointers.map(p => p.hold), removal.remain,
+    t.deepEqual(interaction.pointers.map((p) => p.hold as unknown as number), removal.remain,
       `${removal.message} - remaining interaction.holdTimers is correct`)
   }
+
+  t.end()
+})
+
+test('pointerEvents down move up tap', (t) => {
+  const scope: Interact.Scope = helpers.mockScope()
+
+  pointerEvents.install(scope)
+  interactableTargets.install(scope)
+
+  const interaction = scope.interactions.new({})
+  const coords = {
+    page     : { x: 0, y: 0 },
+    client   : { x: 0, y: 0 },
+    timeStamp: Date.now(),
+  }
+  const event = Object.assign({ target: scope.document.body }, pointerUtils.coordsToEvent(coords))
+  const interactable = scope.interactables.new(event.target)
+  const fired: Event[] = []
+
+  for (const type of pointerEvents.types) {
+    interactable.on(type, (e) => fired.push(e))
+  }
+
+  interaction.pointerDown(event, event, event.target)
+  interaction.pointerMove(event, event, event.target)
+
+  t.deepEqual(
+    fired.map((e) => e.type),
+    ['down'],
+    'duplicate move event is not fired')
+
+  interaction.pointerUp(event, event, scope.document.body, event.target)
+
+  t.deepEqual(
+    fired.map((e) => e.type),
+    ['down', 'up', 'tap'],
+    'tap event is fired after down and up event')
 
   t.end()
 })

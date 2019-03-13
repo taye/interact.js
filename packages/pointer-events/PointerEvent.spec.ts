@@ -1,11 +1,11 @@
+import test from '@interactjs/_dev/test/test'
 import Interaction from '@interactjs/core/Interaction'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
-import test from '@interactjs/_dev/test/test'
 import PointerEvent from './PointerEvent'
 
-test('PointerEvent constructor', t => {
+test('PointerEvent constructor', (t) => {
   const type = 'TEST_EVENT'
   const pointerId = -100
   const testPointerProp = ['TEST_POINTER_PROP']
@@ -45,7 +45,7 @@ test('PointerEvent constructor', t => {
   t.end()
 })
 
-test('PointerEvent methods', t => {
+test('PointerEvent methods', (t) => {
   const methodContexts = {} as any
   const event = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
     .reduce((acc, methodName) => {
