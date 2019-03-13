@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-beta.1+sha.f216353-dirty
+ * interact.js v1.4.0-beta.2+sha.49c75af-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -9010,7 +9010,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-beta.1";
+_interact.default.version = __init_23.version = "1.4.0-beta.2";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 
