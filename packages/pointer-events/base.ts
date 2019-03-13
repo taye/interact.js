@@ -267,12 +267,6 @@ function install (scope: Scope) {
     }, minDuration)
   })
 
-  interactions.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
-    if (!interaction.pointerWasMoved) {
-      fire({ interaction, eventTarget, pointer, event, type: 'tap' })
-    }
-  })
-
   for (const signalName of ['up', 'cancel']) {
     interactions.signals.on(signalName, ({ interaction, pointerIndex }) => {
       if (interaction.pointers[pointerIndex].hold) {
@@ -284,6 +278,12 @@ function install (scope: Scope) {
   for (let i = 0; i < simpleSignals.length; i++) {
     interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]))
   }
+
+  interactions.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
+    if (!interaction.pointerWasMoved) {
+      fire({ interaction, eventTarget, pointer, event, type: 'tap' })
+    }
+  })
 }
 
 function createSignalListener (type: string) {
