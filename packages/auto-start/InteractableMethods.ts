@@ -1,5 +1,4 @@
 import { warnOnce } from '@interactjs/utils'
-import * as domUtils from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
 
 // TODO: there seems to be a @babel/preset-typescript bug causing regular import
@@ -9,17 +8,12 @@ type Actions = import ('@interactjs/core/scope').Actions
 type Interaction = import ('@interactjs/core/Interaction').default
 type Interactable = import ('@interactjs/core/Interactable').default
 
-type IgnoreValue = string | Element | boolean
-
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
     getAction: typeof getAction
     defaultActionChecker: (pointer: any, event: any, interaction: any, element: any) => any
     styleCursor: typeof styleCursor
     actionChecker: typeof actionChecker
-    testIgnoreAllow: typeof testIgnoreAllow
-    testAllow: typeof testAllow
-    testIgnore: typeof testIgnore
     ignoreFrom: (...args: any) => boolean
     allowFrom: (...args: any) => boolean
   }
@@ -98,12 +92,6 @@ function install (scope: Scope) {
   Interactable.prototype.allowFrom = warnOnce(function (this: Interactable, newValue) {
     return this._backCompatOption('allowFrom', newValue)
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).')
-
-  Interactable.prototype.testIgnore = testIgnore
-
-  Interactable.prototype.testAllow = testAllow
-
-  Interactable.prototype.testIgnoreAllow = testIgnoreAllow
 
   /**
    * ```js
@@ -218,39 +206,6 @@ function actionChecker (this: Interactable, checker: any) {
   }
 
   return this.options.actionChecker
-}
-
-function testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, interactableElement: Element, eventTarget: Element) {
-  return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) &&
-          this.testAllow(options.allowFrom, interactableElement, eventTarget))
-}
-
-function testAllow (this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element) {
-  if (!allowFrom) { return true }
-
-  if (!is.element(element)) { return false }
-
-  if (is.string(allowFrom)) {
-    return domUtils.matchesUpTo(element, allowFrom, interactableElement)
-  }
-  else if (is.element(allowFrom)) {
-    return domUtils.nodeContains(allowFrom, element)
-  }
-
-  return false
-}
-
-function testIgnore (this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element) {
-  if (!ignoreFrom || !is.element(element)) { return false }
-
-  if (is.string(ignoreFrom)) {
-    return domUtils.matchesUpTo(element, ignoreFrom, interactableElement)
-  }
-  else if (is.element(ignoreFrom)) {
-    return domUtils.nodeContains(ignoreFrom, element)
-  }
-
-  return false
 }
 
 export default { install }
