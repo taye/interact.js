@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-beta.2+sha.49c75af-dirty
+ * interact.js v1.4.0-beta.3+sha.8e29236-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -3108,6 +3108,45 @@ function () {
     value: function inContext(element) {
       return this._context === element.ownerDocument || (0, _$domUtils_46.nodeContains)(this._context, element);
     }
+  }, {
+    key: "testIgnoreAllow",
+    value: function testIgnoreAllow(options, interactableElement, eventTarget) {
+      return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
+    }
+  }, {
+    key: "testAllow",
+    value: function testAllow(allowFrom, interactableElement, element) {
+      if (!allowFrom) {
+        return true;
+      }
+
+      if (!__is_15.element(element)) {
+        return false;
+      }
+
+      if (__is_15.string(allowFrom)) {
+        return (0, _$domUtils_46.matchesUpTo)(element, allowFrom, interactableElement);
+      } else if (__is_15.element(allowFrom)) {
+        return (0, _$domUtils_46.nodeContains)(allowFrom, element);
+      }
+
+      return false;
+    }
+  }, {
+    key: "testIgnore",
+    value: function testIgnore(ignoreFrom, interactableElement, element) {
+      if (!ignoreFrom || !__is_15.element(element)) {
+        return false;
+      }
+
+      if (__is_15.string(ignoreFrom)) {
+        return (0, _$domUtils_46.matchesUpTo)(element, ignoreFrom, interactableElement);
+      } else if (__is_15.element(ignoreFrom)) {
+        return (0, _$domUtils_46.nodeContains)(ignoreFrom, element);
+      }
+
+      return false;
+    }
     /**
      * Calls listeners for the given InteractEvent type bound globally
      * and directly to this Interactable
@@ -5513,8 +5552,6 @@ _$InteractableMethods_8.default = void 0;
 
 /* removed: var _$utils_51 = require("@interactjs/utils"); */;
 
-var __domUtils_8 = ___interopRequireWildcard_8(_$domUtils_46);
-
 var __is_8 = ___interopRequireWildcard_8(_$is_53);
 
 function ___interopRequireWildcard_8(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
@@ -5582,9 +5619,6 @@ function __install_8(scope) {
   Interactable.prototype.allowFrom = (0, _$utils_51.warnOnce)(function (newValue) {
     return this._backCompatOption('allowFrom', newValue);
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
-  Interactable.prototype.testIgnore = testIgnore;
-  Interactable.prototype.testAllow = testAllow;
-  Interactable.prototype.testIgnoreAllow = testIgnoreAllow;
   /**
    * ```js
    * interact('.resize-drag')
@@ -5698,42 +5732,6 @@ function actionChecker(checker) {
   }
 
   return this.options.actionChecker;
-}
-
-function testIgnoreAllow(options, interactableElement, eventTarget) {
-  return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
-}
-
-function testAllow(allowFrom, interactableElement, element) {
-  if (!allowFrom) {
-    return true;
-  }
-
-  if (!__is_8.element(element)) {
-    return false;
-  }
-
-  if (__is_8.string(allowFrom)) {
-    return __domUtils_8.matchesUpTo(element, allowFrom, interactableElement);
-  } else if (__is_8.element(allowFrom)) {
-    return __domUtils_8.nodeContains(allowFrom, element);
-  }
-
-  return false;
-}
-
-function testIgnore(ignoreFrom, interactableElement, element) {
-  if (!ignoreFrom || !__is_8.element(element)) {
-    return false;
-  }
-
-  if (__is_8.string(ignoreFrom)) {
-    return __domUtils_8.matchesUpTo(element, ignoreFrom, interactableElement);
-  } else if (__is_8.element(ignoreFrom)) {
-    return __domUtils_8.nodeContains(ignoreFrom, element);
-  }
-
-  return false;
 }
 
 var ___default_8 = {
@@ -8470,22 +8468,6 @@ function __install_35(scope) {
       });
     }, minDuration);
   });
-  interactions.signals.on('up', function (_ref9) {
-    var interaction = _ref9.interaction,
-        pointer = _ref9.pointer,
-        event = _ref9.event,
-        eventTarget = _ref9.eventTarget;
-
-    if (!interaction.pointerWasMoved) {
-      fire({
-        interaction: interaction,
-        eventTarget: eventTarget,
-        pointer: pointer,
-        event: event,
-        type: 'tap'
-      });
-    }
-  });
   var _arr = ['up', 'cancel'];
 
   for (var _i4 = 0; _i4 < _arr.length; _i4++) {
@@ -8503,6 +8485,23 @@ function __install_35(scope) {
   for (var i = 0; i < simpleSignals.length; i++) {
     interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
   }
+
+  interactions.signals.on('up', function (_ref9) {
+    var interaction = _ref9.interaction,
+        pointer = _ref9.pointer,
+        event = _ref9.event,
+        eventTarget = _ref9.eventTarget;
+
+    if (!interaction.pointerWasMoved) {
+      fire({
+        interaction: interaction,
+        eventTarget: eventTarget,
+        pointer: pointer,
+        event: event,
+        type: 'tap'
+      });
+    }
+  });
 }
 
 function createSignalListener(type) {
@@ -9010,7 +9009,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-beta.2";
+_interact.default.version = __init_23.version = "1.4.0-beta.3";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

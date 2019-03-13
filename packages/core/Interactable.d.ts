@@ -1,6 +1,7 @@
 import { Defaults, Options } from './defaultOptions';
 import Eventable from './Eventable';
 import { Actions } from './scope';
+declare type IgnoreValue = string | Element | boolean;
 /** */
 export declare class Interactable implements Partial<Eventable> {
     protected readonly _defaults: Defaults;
@@ -76,6 +77,12 @@ export declare class Interactable implements Partial<Eventable> {
      */
     context(): Element | Document;
     inContext(element: any): boolean;
+    testIgnoreAllow(this: Interactable, options: {
+        ignoreFrom: IgnoreValue;
+        allowFrom: IgnoreValue;
+    }, interactableElement: Element, eventTarget: Element): any;
+    testAllow(this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element): any;
+    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element): any;
     /**
      * Calls listeners for the given InteractEvent type bound globally
      * and directly to this Interactable

@@ -1,28 +1,28 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.4.0-beta.2+sha.49c75af",
+  "version": "1.4.0-beta.3+sha.8e29236",
   "peerDependencies": {
-    "@interactjs/actions": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/auto-scroll": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/auto-start": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/core": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/inertia": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/modifiers": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/pointer-events": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/reflow": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/utils": "1.4.0-beta.2+sha.49c75af"
+    "@interactjs/actions": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/auto-scroll": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/auto-start": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/core": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/inertia": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/modifiers": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/pointer-events": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/reflow": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/utils": "1.4.0-beta.3+sha.8e29236"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/actions": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/auto-scroll": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/auto-start": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/core": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/inertia": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/modifiers": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/pointer-events": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/reflow": "1.4.0-beta.2+sha.49c75af",
-    "@interactjs/utils": "1.4.0-beta.2+sha.49c75af"
+    "@interactjs/_dev": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/actions": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/auto-scroll": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/auto-start": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/core": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/inertia": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/modifiers": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/pointer-events": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/reflow": "1.4.0-beta.3+sha.8e29236",
+    "@interactjs/utils": "1.4.0-beta.3+sha.8e29236"
   },
   "publishConfig": {
     "access": "public"

@@ -18,7 +18,7 @@ Features include:
  - **multi-touch**, simultaneous interactions
  - cross browser and device, supporting the **desktop and mobile** versions of
    Chrome, Firefox and Opera as well as **Internet Explorer 9+**
- - interaction with [**SVG**](http://interactjs.io/images/star.svg) elements
+ - interaction with [**SVG**](http://interactjs.io/#use_in_svg_files) elements
  - being **standalone and customizable**
  - **not modifying the DOM** except to change the cursor (but you can disable
    that)
