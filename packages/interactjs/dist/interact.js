@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-beta.3+sha.8e29236-dirty
+ * interact.js v1.4.0-beta.4+sha.d8836bd-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1599,7 +1599,7 @@ function __init_43(window) {
 
   browser.supportsTouch = 'ontouchstart' in window || __is_43.func(window.DocumentTouch) && _domObjects.default.document instanceof window.DocumentTouch; // Does the browser support PointerEvents
 
-  browser.supportsPointerEvent = _domObjects.default.PointerEvent === window.MSPointerEvent ? (navigator.maxTouchPoints || navigator.msMaxTouchPoints) > 0 : !!_domObjects.default.PointerEvent;
+  browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!_domObjects.default.PointerEvent;
   browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform); // scrolling doesn't change the result of getClientRects on iOS 7
 
   browser.isIOS7 = /iP(hone|od|ad)/.test(navigator.platform) && /OS 7[^\d]/.test(navigator.appVersion);
@@ -9009,7 +9009,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-beta.3";
+_interact.default.version = __init_23.version = "1.4.0-beta.4";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 
