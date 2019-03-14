@@ -31,9 +31,7 @@ function init (window) {
     (is.func(window.DocumentTouch) && domObjects.document instanceof window.DocumentTouch)
 
   // Does the browser support PointerEvents
-  browser.supportsPointerEvent = domObjects.PointerEvent === window.MSPointerEvent
-    ? (navigator.maxTouchPoints || navigator.msMaxTouchPoints) > 0
-    : !!domObjects.PointerEvent
+  browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!domObjects.PointerEvent
 
   browser.isIOS = (/iP(hone|od|ad)/.test(navigator.platform))
 
