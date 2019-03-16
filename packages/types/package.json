@@ -6,6 +6,7 @@
     "@interactjs/auto-scroll": "1.4.0-beta.4+sha.d8836bd",
     "@interactjs/auto-start": "1.4.0-beta.4+sha.d8836bd",
     "@interactjs/core": "1.4.0-beta.4+sha.d8836bd",
+    "@interactjs/dev-tools": "1.4.0-beta.4+sha.d8836bd",
     "@interactjs/inertia": "1.4.0-beta.4+sha.d8836bd",
     "@interactjs/interact": "1.4.0-beta.4+sha.d8836bd",
     "@interactjs/modifiers": "1.4.0-beta.4+sha.d8836bd",
