@@ -1,12 +1,12 @@
 {
   "name": "@interactjs/auto-scroll",
-  "version": "1.4.0-beta.4+sha.d8836bd",
+  "version": "1.4.0-rc",
   "peerDependencies": {
     "@interactjs/utils": "1.4.0-beta.4+sha.d8836bd"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-beta.4+sha.d8836bd",
-    "@interactjs/utils": "1.4.0-beta.4+sha.d8836bd"
+    "@interactjs/_dev": "^1.4.0-rc",
+    "@interactjs/utils": "^1.4.0-rc"
   },
   "publishConfig": {
     "access": "public"
