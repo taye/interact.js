@@ -1,13 +1,10 @@
 import test from '@interactjs/_dev/test/test'
-import interactions from '@interactjs/core/interactions'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import PromisePolyfill from 'promise-polyfill'
 import reflow from './'
 
 test('reflow', (t) => {
   const scope = helpers.mockScope()
-
-  interactions.install(scope)
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
@@ -84,8 +81,6 @@ test('reflow', (t) => {
 
 test('async reflow', async (t) => {
   const scope = helpers.mockScope()
-
-  interactions.install(scope)
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 

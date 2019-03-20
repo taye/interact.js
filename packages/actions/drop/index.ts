@@ -4,7 +4,10 @@ import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 import DropEvent from './DropEvent'
 
-export type DropzoneMethod = (options?: Interact.DropzoneOptions | boolean) => Interact.Interactable | Interact.DropzoneOptions
+export interface DropzoneMethod {
+  (options: Interact.DropzoneOptions | boolean): Interact.Interactable
+  (): Interact.DropzoneOptions
+}
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -97,11 +100,7 @@ function install (scope: Scope) {
     // reset active dropzones
     dropState.activeDrops = null
     dropState.events = null
-
-    if (!scope.dynamicDrop) {
-      dropState.activeDrops = getActiveDrops(scope, interaction.element)
-    }
-
+    dropState.activeDrops = getActiveDrops(scope, interaction.element)
     dropState.events = getDropEvents(interaction, event, dragEvent)
 
     if (dropState.events.activate) {
@@ -180,7 +179,7 @@ function install (scope: Scope) {
    * @param {boolean | object | null} [options] The new options to be set.
    * @return {boolean | Interactable} The current setting or this Interactable
    */
-  Interactable.prototype.dropzone = function (this: Interact.Interactable, options) {
+  Interactable.prototype.dropzone = function (this: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
     return dropzoneMethod(this, options)
   }
 
@@ -422,7 +421,9 @@ function onEventCreated ({ interaction, iEvent, event }: Interact.SignalArg, sco
   dropState.events = getDropEvents(interaction, event, dragEvent)
 }
 
-function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean) {
+function dropzoneMethod (interactable: Interact.Interactable): Interact.DropzoneOptions
+function dropzoneMethod (interactable: Interact.Interactable, options: Interact.DropzoneOptions | boolean)
+function dropzoneMethod (interactable: Interact.Interactable, options?: Interact.DropzoneOptions | boolean) {
   if (utils.is.object(options)) {
     interactable.options.drop.enabled = options.enabled !== false
 
