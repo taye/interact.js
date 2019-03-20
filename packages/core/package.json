@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/core",
-  "version": "1.4.0-rc",
+  "version": "1.4.0-rc.0+sha.8dd437f",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.4.0-beta.4+sha.d8836bd",
-    "@interactjs/utils": "1.4.0-beta.4+sha.d8836bd"
+    "@interactjs/dev-tools": "1.4.0-rc.0+sha.8dd437f",
+    "@interactjs/utils": "1.4.0-rc.0+sha.8dd437f"
   },
   "devDependencies": {
-    "@interactjs/_dev": "^1.4.0-rc",
-    "@interactjs/utils": "^1.4.0-rc"
+    "@interactjs/_dev": "1.4.0-rc.0+sha.8dd437f",
+    "@interactjs/utils": "1.4.0-rc.0+sha.8dd437f"
   },
   "publishConfig": {
     "access": "public"

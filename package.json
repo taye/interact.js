@@ -1,7 +1,7 @@
 {
   "name": "@interactjs/_dev",
   "private": "true",
-  "version": "1.4.0-rc",
+  "version": "1.4.0-rc.0+sha.8dd437f",
   "bin": {
     "_dev": "scripts/_dev",
     "@build": "scripts/build.js",
@@ -67,8 +67,8 @@
     "tap-spec": "latest",
     "tape": "latest",
     "through2": "latest",
-    "tslint": "latest",
     "ts-node": "8.0.2",
+    "tslint": "latest",
     "typescript": "latest",
     "uglify-js": "latest",
     "watchify": "latest",

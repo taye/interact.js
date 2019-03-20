@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-beta.4+sha.d8836bd-dirty
+ * interact.js v1.4.0-rc.0+sha.8dd437f-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -4147,11 +4147,7 @@ function __install_3(scope) {
 
     dropState.activeDrops = null;
     dropState.events = null;
-
-    if (!scope.dynamicDrop) {
-      dropState.activeDrops = getActiveDrops(scope, interaction.element);
-    }
-
+    dropState.activeDrops = getActiveDrops(scope, interaction.element);
     dropState.events = getDropEvents(interaction, event, dragEvent);
 
     if (dropState.events.activate) {
@@ -9009,7 +9005,7 @@ function __init_23(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-beta.4";
+_interact.default.version = __init_23.version = "1.4.0-rc.0";
 var ___default_23 = _interact.default;
 _$interact_23.default = ___default_23;
 

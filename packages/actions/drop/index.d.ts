@@ -1,7 +1,10 @@
 import Interactable from '@interactjs/core/Interactable';
 import InteractEvent from '@interactjs/core/InteractEvent';
 import { Scope } from '@interactjs/core/scope';
-export declare type DropzoneMethod = (options?: Interact.DropzoneOptions | boolean) => Interact.Interactable | Interact.DropzoneOptions;
+export interface DropzoneMethod {
+    (options: Interact.DropzoneOptions | boolean): Interact.Interactable;
+    (): Interact.DropzoneOptions;
+}
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         dropzone: DropzoneMethod;
