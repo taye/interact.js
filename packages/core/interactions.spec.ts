@@ -7,8 +7,6 @@ import * as helpers from './tests/_helpers'
 test('interactions', (t) => {
   let scope = helpers.mockScope()
 
-  interactions.install(scope)
-
   const interaction = interactions.newInteraction(
     { pointerType: 'TEST' },
     scope
@@ -16,8 +14,6 @@ test('interactions', (t) => {
 
   t.equal(scope.interactions.list[0], interaction,
     'new Interaction is pushed to scope.interactions')
-
-  interactions.install(scope)
 
   t.ok(scope.interactions instanceof Object, 'interactions object added to scope')
 
@@ -28,7 +24,6 @@ test('interactions', (t) => {
 
   scope = helpers.mockScope()
 
-  interactions.install(scope)
   const newInteraction = scope.interactions.new({})
 
   t.assert(typeof scope.interactions === 'object')

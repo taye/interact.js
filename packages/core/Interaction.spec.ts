@@ -3,7 +3,6 @@ import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import InteractEvent from './InteractEvent'
 import Interaction from './Interaction'
-import interactions from './interactions'
 import * as helpers from './tests/_helpers'
 
 const makeInteractionAndSignals = () => new Interaction({ signals: new Signals() } as any)
@@ -384,7 +383,6 @@ test('Interaction.start', (t) => {
 test('stop interaction from start event', (t) => {
   const scope = helpers.mockScope()
 
-  interactions.install(scope)
   const interaction = scope.interactions.new({})
   const interactable = helpers.mockInteractable()
 
@@ -405,8 +403,6 @@ test('stop interaction from start event', (t) => {
 
 test('Interaction createPreparedEvent', (t) => {
   const scope = helpers.mockScope()
-
-  interactions.install(scope)
 
   const interaction = scope.interactions.new({})
   const interactable = helpers.mockInteractable()

@@ -1,11 +1,9 @@
 import { JSDOM } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
-import interactions from '@interactjs/core/interactions'
 import interact, { scope } from './interact'
 
 test('interact export', (t) => {
   scope.init(new JSDOM('').window)
-  interactions.install(scope)
 
   const interactable1 = interact('selector')
   t.assert(interactable1 instanceof scope.Interactable,

@@ -1,5 +1,4 @@
 import test from '@interactjs/_dev/test/test'
-import interactions from '@interactjs/core/interactions'
 import { ActionName } from '@interactjs/core/scope'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import { extend } from '@interactjs/utils'
@@ -78,7 +77,6 @@ test('Interactable.draggable method', (t) => {
 test('drag axis', (t) => {
   const scope = helpers.mockScope()
 
-  interactions.install(scope)
   drag.install(scope)
 
   const interaction = scope.interactions.new({})

@@ -1,12 +1,10 @@
 import test from '@interactjs/_dev/test/test'
-import interactions from '@interactjs/core/interactions'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import drop from '../drop'
 
 test('actions/drop options', (t) => {
   const scope = helpers.mockScope()
   scope.interact = {}
-  interactions.install(scope)
   drop.install(scope)
 
   const interactable = scope.interactables.new('test')
