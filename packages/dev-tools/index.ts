@@ -96,5 +96,6 @@ function parentHasStyle (element: Element, prop: keyof CSSStyleDeclaration, styl
 }
 
 export default {
+  id: 'dev-tools',
   install,
 }

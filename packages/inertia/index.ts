@@ -351,6 +351,7 @@ function getOptions ({ interactable, prepared }: Interact.Interaction) {
 }
 
 export default {
+  id: 'inertia',
   install,
   calcInertia,
   inertiaTick,

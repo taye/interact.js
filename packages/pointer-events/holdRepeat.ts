@@ -59,5 +59,6 @@ function endHoldRepeat ({ interaction }) {
 }
 
 export default {
+  id: 'pointer-events/holdRepeat',
   install,
 }

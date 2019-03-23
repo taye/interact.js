@@ -72,4 +72,7 @@ function install (scope: Scope) {
   }
 }
 
-export default { install }
+export default {
+  id: 'auto-start/dragAxis',
+  install,
+}

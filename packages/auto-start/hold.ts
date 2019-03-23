@@ -64,6 +64,7 @@ function getHoldDuration (interaction) {
 }
 
 export default {
+  id: 'auto-start/hold',
   install,
   getHoldDuration,
 }

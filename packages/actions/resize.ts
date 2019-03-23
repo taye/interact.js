@@ -143,6 +143,7 @@ function install (scope: Scope) {
 }
 
 const resize = {
+  id: 'actions/resize',
   install,
   defaults: {
     square: false,

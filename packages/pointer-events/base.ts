@@ -43,6 +43,7 @@ const simpleSignals = [ 'down', 'up', 'cancel' ]
 const simpleEvents  = [ 'down', 'up', 'cancel' ]
 
 const pointerEvents = {
+  id: 'pointer-events/base',
   install,
   signals,
   PointerEvent,

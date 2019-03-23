@@ -133,6 +133,7 @@ function install (scope: Scope) {
 }
 
 const gesture = {
+  id: 'actions/gesture',
   install,
   defaults: {
   },

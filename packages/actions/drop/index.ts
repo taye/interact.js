@@ -539,6 +539,7 @@ function dropCheckMethod (
 }
 
 const drop = {
+  id: 'actions/draop',
   install,
   getActiveDrops,
   getDrop,
