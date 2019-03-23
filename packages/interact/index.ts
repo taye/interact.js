@@ -2,6 +2,7 @@ import * as actions from '@interactjs/actions'
 import autoScroll from '@interactjs/auto-scroll'
 import * as autoStart from '@interactjs/auto-start'
 import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
+import devTools from '@interactjs/dev-tools'
 import inertia from '@interactjs/inertia'
 import * as modifiers from '@interactjs/modifiers'
 import modifiersBase from '@interactjs/modifiers/base'
@@ -42,6 +43,11 @@ export function init (window: Window): typeof interact {
 
   // reflow
   interact.use(reflow)
+
+  // eslint-disable-next-line no-undef
+  if (process.env.NODE_ENV !== 'production') {
+    interact.use(devTools)
+  }
 
   return interact
 }
