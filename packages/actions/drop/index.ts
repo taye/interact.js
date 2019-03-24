@@ -2,6 +2,7 @@ import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
 import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
+import drag from '../drag'
 import DropEvent from './DropEvent'
 
 export interface DropzoneMethod {
@@ -73,6 +74,8 @@ function install (scope: Scope) {
     interactions,
     defaults,
   } = scope
+
+  scope.usePlugin(drag)
 
   interactions.signals.on('before-action-start', ({ interaction }) => {
     if (interaction.prepared.name !== 'drag') { return }
@@ -539,7 +542,7 @@ function dropCheckMethod (
 }
 
 const drop = {
-  id: 'actions/draop',
+  id: 'actions/drop',
   install,
   getActiveDrops,
   getDrop,

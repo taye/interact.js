@@ -39,7 +39,7 @@ function install (scope: Scope) {
             interaction.downPointer, interaction.downEvent, interaction, element)
 
           if (action &&
-              action.name === 'drag' &&
+              action.name === ActionName.Drag &&
               checkStartAxis(currentAxis, interactable) &&
               autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
             return interactable
@@ -66,7 +66,7 @@ function install (scope: Scope) {
   function checkStartAxis (startAxis, interactable) {
     if (!interactable) { return false }
 
-    const thisAxis = interactable.options.drag.startAxis
+    const thisAxis = interactable.options[ActionName.Drag].startAxis
 
     return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis)
   }

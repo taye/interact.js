@@ -1,3 +1,4 @@
+import { PerActionDefaults } from '@interactjs/core/defaultOptions'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import { Scope } from '@interactjs/core/scope'
@@ -9,6 +10,14 @@ type EventTargetList = Array<{
   element: Interact.EventTarget,
   props: { [key: string]: any },
 }>
+
+export interface PointerEventOptions extends PerActionDefaults {
+  enabled?: undefined // not used
+  holdDuration?: number,
+  ignoreFrom?: any,
+  allowFrom?: any,
+  origin?: Interact.Point | string | Element
+}
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -42,6 +51,13 @@ const signals       = new utils.Signals()
 const simpleSignals = [ 'down', 'up', 'cancel' ]
 const simpleEvents  = [ 'down', 'up', 'cancel' ]
 
+const defaults: PointerEventOptions = {
+  holdDuration: 600,
+  ignoreFrom  : null,
+  allowFrom   : null,
+  origin      : { x: 0, y: 0 },
+}
+
 const pointerEvents = {
   id: 'pointer-events/base',
   install,
@@ -50,12 +66,7 @@ const pointerEvents = {
   fire,
   collectEventTargets,
   createSignalListener,
-  defaults: {
-    holdDuration: 600,
-    ignoreFrom  : null,
-    allowFrom   : null,
-    origin      : { x: 0, y: 0 },
-  },
+  defaults,
   types: [
     'down',
     'move',

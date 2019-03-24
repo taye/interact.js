@@ -159,4 +159,4 @@ function startReflow (scope: Scope, interactable: Interactable, element: Element
 export default {
   id: 'reflow',
   install,
-}
+} as Interact.Plugin

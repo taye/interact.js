@@ -381,4 +381,4 @@ export default {
   getModifierList,
   getRectOffset,
   makeModifier,
-}
+} as Interact.Plugin

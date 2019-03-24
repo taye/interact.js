@@ -9,7 +9,7 @@ import _Interactable from '@interactjs/core/Interactable'
 import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
-import interact, { Plugin as _Plugin } from '@interactjs/interact/interact'
+import interact from '@interactjs/interact/interact'
 import * as signals from '@interactjs/utils/Signals'
 
 declare namespace Interact {
@@ -20,7 +20,7 @@ declare namespace Interact {
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
-  export type Plugin = _Plugin
+  export type Plugin = scope.Plugin
   export type ActionProps<T extends ActionName = any> = interaction.ActionProps<T>
   export type Interactable = _Interactable
   export type Scope = scope.Scope
