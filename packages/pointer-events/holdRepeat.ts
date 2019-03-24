@@ -1,17 +1,27 @@
+import basePlugin from './base'
+
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     holdIntervalHandle?: any
   }
 }
 
-function install (scope) {
+declare module '@interactjs/pointer-events/base' {
+  interface PointerEventOptions {
+    holdRepeatInterval?: number
+  }
+}
+
+function install (scope: Interact.Scope) {
   const {
     pointerEvents,
     interactions,
   } = scope
 
+  scope.usePlugin(basePlugin)
+
   pointerEvents.signals.on('new', onNew)
-  pointerEvents.signals.on('fired', (arg) => onFired(arg, pointerEvents))
+  pointerEvents.signals.on('fired', (arg) => onFired(arg as any, pointerEvents))
 
   for (const signal of ['move', 'up', 'cancel', 'endall']) {
     interactions.signals.on(signal, endHoldRepeat)
@@ -61,4 +71,4 @@ function endHoldRepeat ({ interaction }) {
 export default {
   id: 'pointer-events/holdRepeat',
   install,
-}
+} as Interact.Plugin

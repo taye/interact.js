@@ -2,13 +2,20 @@ Draggable
 =========
 
 ```html
-<div id="draggable"> Draggable Element </div>
+<div class="draggable"> Draggable Element </div>
+```
+
+```css
+.draggable {
+  touch-action: none;
+  user-select: none;
+}
 ```
 
 ```js
 const position = { x: 0, y: 0 }
 
-interact('#draggable').draggable({
+interact('.draggable').draggable({
   listeners: {
     start (event) {
       console.log(event.type, event.target)
@@ -33,6 +40,12 @@ draggable, create an interactable with your desired target then call the
 | ----------------------- | --------------------------------------------------|
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
 | `dragLeave`             | The dropzone this Interactable was dragged out of |
+
+<aside class="notice">
+Remember to use CSS `touch-action: none` to prevent the browser from panning
+when the user drags with a touch pointer, and `user-select: none` to disable
+text selection.
+</aside>
 
 `lockAxis` and `startAxis`
 --------------------------

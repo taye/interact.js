@@ -21,6 +21,8 @@ export interface PerActionDefaults {
   enabled?: boolean
   origin?: Interact.Point | string | Element
   listeners?: Interact.Listeners
+  allowFrom?: string | Element
+  ignoreFrom?: string | Element
 }
 
 export type Options = Partial<BaseDefaults> & Partial<PerActionDefaults> & {

@@ -1,4 +1,4 @@
-type Scope = import ('@interactjs/core/scope').Scope
+import basePlugin from './base'
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
@@ -13,12 +13,14 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     autoStart,
     interactions,
     defaults,
   } = scope
+
+  scope.usePlugin(basePlugin)
 
   defaults.perAction.hold = 0
   defaults.perAction.delay = 0

@@ -300,4 +300,4 @@ export default {
   maxInteractions,
   withinInteractionLimit,
   validateAction,
-}
+} as Interact.Plugin

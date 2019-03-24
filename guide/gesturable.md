@@ -10,6 +10,13 @@ Gesturable
 </div>
 ```
 
+```css
+.draggable {
+  touch-action: none;
+  user-select: none;
+}
+```
+
 ```js
 var angle = 0;
 
@@ -42,3 +49,9 @@ the following properties:
 | `scale`                 | The ratio of the distance of the start event to the distance of the current event |
 | `ds`                    | The change in scale since the previous event      |
 | `box`                   | A box enclosing all touch points                  |
+
+<aside class="notice">
+Remember to use CSS `touch-action: none` to prevent the browser from panning
+when the user drags with a touch pointer, and `user-select: none` to disable
+text selection.
+</aside>

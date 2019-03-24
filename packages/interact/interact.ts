@@ -7,17 +7,9 @@ import * as utils from '@interactjs/utils'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 
-export interface Plugin {
-  id?: string
-  install (scope: Scope, options?: any): void
-  [key: string]: any
-}
-
 declare module '@interactjs/core/scope' {
   interface Scope {
     interact: InteractStatic
-    _plugins: Plugin[]
-    _pluginMap: { [id: string]: Plugin }
   }
 }
 
@@ -84,13 +76,6 @@ export const interact: InteractStatic = function interact (target: Interact.Targ
   return interactable
 } as InteractStatic
 
-scope._plugins = []
-scope._pluginMap = {}
-
-function pluginIsInstalled (plugin: Plugin) {
-  return scope._pluginMap[plugin.id] || scope._plugins.indexOf(plugin) !== -1
-}
-
 /**
  * Use a plugin
  *
@@ -101,15 +86,8 @@ function pluginIsInstalled (plugin: Plugin) {
  * @return {interact}
  */
 interact.use = use
-function use (plugin: Plugin, options?: { [key: string]: any }) {
-  if (pluginIsInstalled(plugin)) {
-    return interact
-  }
-
-  plugin.install(scope, options)
-  scope._plugins.push(plugin)
-
-  if (plugin.id) { scope._pluginMap[plugin.id] = plugin }
+function use (plugin: Interact.Plugin, options?: { [key: string]: any }) {
+  scope.usePlugin(plugin, options)
 
   return interact
 }

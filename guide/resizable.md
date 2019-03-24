@@ -27,6 +27,12 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 Resizable options have an `edges` property which specifies the edges of the
 element which can be resized from (top, left, bottom or right).
 
+<aside class="notice">
+Remember to use CSS `touch-action: none` to prevent the browser from panning
+when the user drags with a touch pointer, and `user-select: none` to disable
+text selection.
+</aside>
+
 ```html
 <div data-x=0 data-y=0 class="resizable">
   <!-- top-left resize handle -->

@@ -160,7 +160,7 @@ const draggable: DraggableMethod = function draggable (this: Interact.Interactab
   return this.options.drag
 }
 
-const drag = {
+const drag: Interact.Plugin = {
   id: 'actions/drag',
   install,
   draggable,

@@ -41,6 +41,8 @@ function install (scope: Scope) {
     defaults,
   } = scope
 
+  scope.usePlugin(modifiers)
+
   interactions.signals.on('new', ({ interaction }) => {
     interaction.inertia = {
       active     : false,

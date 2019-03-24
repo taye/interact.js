@@ -29,6 +29,12 @@ export function createScope () {
 
 export type Defaults = typeof defaults
 
+export interface Plugin {
+  id?: string
+  install (scope: Scope, options?: any): void
+  [key: string]: any
+}
+
 export class Scope {
   // FIXME Signals
   signals = new Signals()
@@ -59,6 +65,9 @@ export class Scope {
   // all documents being listened to
   documents: Array<{ doc: Document, options: any }> = []
 
+  _plugins: Plugin[] = []
+  _pluginMap: { [id: string]: Plugin } = {}
+
   constructor () {
     const scope = this as Scope;
 
@@ -87,6 +96,23 @@ export class Scope {
 
   init (window: Window) {
     return initScope(this, window)
+  }
+
+  pluginIsInstalled (plugin: Plugin) {
+    return this._pluginMap[plugin.id] || this._plugins.indexOf(plugin) !== -1
+  }
+
+  usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
+    if (this.pluginIsInstalled(plugin)) {
+      return this
+    }
+
+    plugin.install(this, options)
+    this._plugins.push(plugin)
+
+    if (plugin.id) { this._pluginMap[plugin.id] = plugin }
+
+    return this
   }
 
   addDocument (doc: Document, options?: any): void | false {
