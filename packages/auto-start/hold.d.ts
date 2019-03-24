@@ -13,6 +13,7 @@ declare module '@interactjs/core/Interaction' {
 declare function install(scope: Scope): void;
 declare function getHoldDuration(interaction: any): any;
 declare const _default: {
+    id: string;
     install: typeof install;
     getHoldDuration: typeof getHoldDuration;
 };

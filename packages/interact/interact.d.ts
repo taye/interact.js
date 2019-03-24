@@ -4,6 +4,7 @@ import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 export interface Plugin {
+    id?: string;
     install(scope: Scope, options?: any): void;
     [key: string]: any;
 }
@@ -11,6 +12,9 @@ declare module '@interactjs/core/scope' {
     interface Scope {
         interact: InteractStatic;
         _plugins: Plugin[];
+        _pluginMap: {
+            [id: string]: Plugin;
+        };
     }
 }
 export interface InteractStatic {

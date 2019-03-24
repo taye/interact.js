@@ -51,6 +51,7 @@ export declare function getScrollSizeDelta({ interaction, element }: {
     y: number;
 };
 declare const _default: {
+    id: string;
     install: typeof install;
 };
 export default _default;

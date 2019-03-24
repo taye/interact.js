@@ -28,6 +28,7 @@ declare function move({ iEvent, interaction }: {
     interaction: any;
 }): void;
 declare const drag: {
+    id: string;
     install: typeof install;
     draggable: import("../types/types").ActionMethod<import("../types/types").DraggableOptions>;
     beforeMove: typeof beforeMove;

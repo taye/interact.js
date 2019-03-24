@@ -28,6 +28,7 @@ declare function inertiaTick(interaction: Interact.Interaction): void;
 declare function smothEndTick(interaction: Interact.Interaction): void;
 declare function updateInertiaCoords(interaction: Interact.Interaction): void;
 declare const _default: {
+    id: string;
     install: typeof install;
     calcInertia: typeof calcInertia;
     inertiaTick: typeof inertiaTick;

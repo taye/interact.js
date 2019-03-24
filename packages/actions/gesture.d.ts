@@ -45,6 +45,7 @@ export interface GestureSignalArg extends Interact.SignalArg {
 }
 declare function install(scope: Scope): void;
 declare const gesture: {
+    id: string;
     install: typeof install;
     defaults: {};
     checker(_pointer: any, _event: any, _interactable: any, _element: any, interaction: {

@@ -35,6 +35,7 @@ declare module '@interactjs/core/defaultOptions' {
     }
 }
 declare const pointerEvents: {
+    id: string;
     install: typeof install;
     signals: utils.Signals;
     PointerEvent: typeof PointerEvent;

@@ -21,6 +21,7 @@ declare function getAction(this: Interactable, pointer: Interact.PointerType, ev
 declare function styleCursor(this: Interactable, newValue?: boolean): any;
 declare function actionChecker(this: Interactable, checker: any): any;
 declare const _default: {
+    id: string;
     install: typeof install;
 };
 export default _default;

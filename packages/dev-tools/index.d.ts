@@ -22,6 +22,7 @@ export declare function touchAction({ element }: Interact.Interaction, logger: L
 export declare function boxSizing(interaction: Interact.Interaction, logger: Logger): void;
 export declare function noListeners(interaction: Interact.Interaction, logger: Logger): void;
 declare const _default: {
+    id: string;
     install: (scope: import("@interactjs/core/scope").Scope, { logger }?: {
         logger?: Logger;
     }) => void;

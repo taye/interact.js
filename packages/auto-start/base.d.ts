@@ -35,6 +35,7 @@ declare function validateAction(action: any, interactable: any, element: any, ev
 declare function withinInteractionLimit(interactable: Interact.Interactable, element: Element, action: any, scope: Interact.Scope): boolean;
 declare function maxInteractions(newValue: any, scope: Interact.Scope): any;
 declare const _default: {
+    id: string;
     install: typeof install;
     maxInteractions: typeof maxInteractions;
     withinInteractionLimit: typeof withinInteractionLimit;

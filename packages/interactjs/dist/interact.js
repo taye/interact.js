@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-rc.0+sha.8dd437f-dirty
+ * interact.js v1.4.0-rc.1+sha.27a9693-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -17,9 +17,9 @@ Object.defineProperty(exports, "__esModule", {
 /* common-shake removed: exports.initScope = */ void initScope;
 /* common-shake removed: exports.InteractableSet = */ exports.Scope = exports.ActionName = void 0;
 
-var utils = _interopRequireWildcard(_$utils_51);
+var utils = _interopRequireWildcard(_$utils_52);
 
-var _domObjects = _interopRequireDefault(_$domObjects_45);
+var _domObjects = _interopRequireDefault(_$domObjects_46);
 
 var _defaultOptions = _interopRequireDefault(_$defaultOptions_18);
 
@@ -323,17 +323,17 @@ Object.defineProperty(exports, "__esModule", {
 exports.newInteraction = newInteraction;
 exports.default = void 0;
 
-var _browser = _interopRequireDefault(_$browser_43);
+var _browser = _interopRequireDefault(_$browser_44);
 
-var _domObjects = _interopRequireDefault(_$domObjects_45);
+var _domObjects = _interopRequireDefault(_$domObjects_46);
 
-var _events = _interopRequireDefault(_$events_47);
+var _events = _interopRequireDefault(_$events_48);
 
-var _interactionFinder = _interopRequireDefault(_$interactionFinder_52);
+var _interactionFinder = _interopRequireDefault(_$interactionFinder_53);
 
-var _pointerUtils = _interopRequireDefault(_$pointerUtils_57);
+var _pointerUtils = _interopRequireDefault(_$pointerUtils_58);
 
-var _Signals = _interopRequireDefault(_$Signals_41);
+var _Signals = _interopRequireDefault(_$Signals_42);
 
 var _Interaction = _interopRequireDefault(_$Interaction_16({}));
 
@@ -578,6 +578,7 @@ function onDocSignal(_ref3, signalName) {
 }
 
 var _default = {
+  id: 'core/interactions',
   install: install,
   onDocSignal: onDocSignal,
   doOnInteractions: doOnInteractions,
@@ -601,7 +602,7 @@ Object.defineProperty(exports, "PointerInfo", {
 });
 exports.default = exports.Interaction = void 0;
 
-var utils = _interopRequireWildcard(_$utils_51);
+var utils = _interopRequireWildcard(_$utils_52);
 
 var _InteractEvent = _interopRequireWildcard(_$InteractEvent_14);
 
@@ -1100,19 +1101,19 @@ var _default = Interaction;
 exports.default = _default;
 
 });
-var _$arr_42 = {};
+var _$arr_43 = {};
 "use strict";
 
-Object.defineProperty(_$arr_42, "__esModule", {
+Object.defineProperty(_$arr_43, "__esModule", {
   value: true
 });
-_$arr_42.contains = contains;
-_$arr_42.remove = remove;
-_$arr_42.merge = merge;
-_$arr_42.from = from;
-_$arr_42.findIndex = findIndex;
-_$arr_42.find = find;
-_$arr_42.some = some;
+_$arr_43.contains = contains;
+_$arr_43.remove = remove;
+_$arr_43.merge = merge;
+_$arr_43.from = from;
+_$arr_43.findIndex = findIndex;
+_$arr_43.find = find;
+_$arr_43.some = some;
 
 function contains(array, target) {
   return array.indexOf(target) !== -1;
@@ -1156,13 +1157,13 @@ function some(array, func) {
   return findIndex(array, func) !== -1;
 }
 
-var _$extend_48 = {};
+var _$extend_49 = {};
 "use strict";
 
-Object.defineProperty(_$extend_48, "__esModule", {
+Object.defineProperty(_$extend_49, "__esModule", {
   value: true
 });
-_$extend_48.default = extend;
+_$extend_49.default = extend;
 
 function extend(dest, source) {
   for (var prop in source) {
@@ -1172,31 +1173,31 @@ function extend(dest, source) {
   return dest;
 }
 
-var _$isWindow_54 = {};
+var _$isWindow_55 = {};
 "use strict";
 
-Object.defineProperty(_$isWindow_54, "__esModule", {
+Object.defineProperty(_$isWindow_55, "__esModule", {
   value: true
 });
-_$isWindow_54.default = void 0;
+_$isWindow_55.default = void 0;
 
 var _default = function _default(thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-_$isWindow_54.default = _default;
+_$isWindow_55.default = _default;
 
-var _$window_62 = {};
+var _$window_63 = {};
 "use strict";
 
-Object.defineProperty(_$window_62, "__esModule", {
+Object.defineProperty(_$window_63, "__esModule", {
   value: true
 });
-_$window_62.init = init;
-_$window_62.getWindow = getWindow;
-_$window_62.default = void 0;
+_$window_63.init = init;
+_$window_63.getWindow = getWindow;
+_$window_63.default = void 0;
 
-var _isWindow = _interopRequireDefault(_$isWindow_54);
+var _isWindow = _interopRequireDefault(_$isWindow_55);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1238,66 +1239,66 @@ function getWindow(node) {
 }
 
 win.init = init;
-var ___default_62 = win;
-_$window_62.default = ___default_62;
+var ___default_63 = win;
+_$window_63.default = ___default_63;
 
-var _$is_53 = {};
+var _$is_54 = {};
 "use strict";
 
-Object.defineProperty(_$is_53, "__esModule", {
+Object.defineProperty(_$is_54, "__esModule", {
   value: true
 });
-_$is_53.array = _$is_53.plainObject = _$is_53.element = _$is_53.string = _$is_53.bool = _$is_53.number = _$is_53.func = _$is_53.object = _$is_53.docFrag = _$is_53.window = void 0;
+_$is_54.array = _$is_54.plainObject = _$is_54.element = _$is_54.string = _$is_54.bool = _$is_54.number = _$is_54.func = _$is_54.object = _$is_54.docFrag = _$is_54.window = void 0;
 
-var ___isWindow_53 = ___interopRequireDefault_53(_$isWindow_54);
+var ___isWindow_54 = ___interopRequireDefault_54(_$isWindow_55);
 
-var _window2 = ___interopRequireDefault_53(_$window_62);
+var _window2 = ___interopRequireDefault_54(_$window_63);
 
-function ___interopRequireDefault_53(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_54(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-var __window_53 = function window(thing) {
-  return thing === _window2.default.window || (0, ___isWindow_53.default)(thing);
+var __window_54 = function window(thing) {
+  return thing === _window2.default.window || (0, ___isWindow_54.default)(thing);
 };
 
-_$is_53.window = __window_53;
+_$is_54.window = __window_54;
 
 var docFrag = function docFrag(thing) {
   return object(thing) && thing.nodeType === 11;
 };
 
-_$is_53.docFrag = docFrag;
+_$is_54.docFrag = docFrag;
 
 var object = function object(thing) {
   return !!thing && _typeof(thing) === 'object';
 };
 
-_$is_53.object = object;
+_$is_54.object = object;
 
 var func = function func(thing) {
   return typeof thing === 'function';
 };
 
-_$is_53.func = func;
+_$is_54.func = func;
 
 var number = function number(thing) {
   return typeof thing === 'number';
 };
 
-_$is_53.number = number;
+_$is_54.number = number;
 
 var bool = function bool(thing) {
   return typeof thing === 'boolean';
 };
 
-_$is_53.bool = bool;
+_$is_54.bool = bool;
 
 var string = function string(thing) {
   return typeof thing === 'string';
 };
 
-_$is_53.string = string;
+_$is_54.string = string;
 
 var element = function element(thing) {
   if (!thing || _typeof(thing) !== 'object') {
@@ -1310,35 +1311,35 @@ var element = function element(thing) {
   : thing.nodeType === 1 && typeof thing.nodeName === 'string';
 };
 
-_$is_53.element = element;
+_$is_54.element = element;
 
 var plainObject = function plainObject(thing) {
   return object(thing) && !!thing.constructor && /function Object\b/.test(thing.constructor.toString());
 };
 
-_$is_53.plainObject = plainObject;
+_$is_54.plainObject = plainObject;
 
 var array = function array(thing) {
   return object(thing) && typeof thing.length !== 'undefined' && func(thing.splice);
 };
 
-_$is_53.array = array;
+_$is_54.array = array;
 
-var _$normalizeListeners_55 = {};
+var _$normalizeListeners_56 = {};
 "use strict";
 
-Object.defineProperty(_$normalizeListeners_55, "__esModule", {
+Object.defineProperty(_$normalizeListeners_56, "__esModule", {
   value: true
 });
-_$normalizeListeners_55.default = normalize;
+_$normalizeListeners_56.default = normalize;
 
-var _extend = ___interopRequireDefault_55(_$extend_48);
+var _extend = ___interopRequireDefault_56(_$extend_49);
 
-var is = _interopRequireWildcard(_$is_53);
+var is = _interopRequireWildcard(_$is_54);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_55(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_56(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function normalize(type, listeners, result) {
   result = result || {};
@@ -1394,11 +1395,11 @@ Object.defineProperty(_$Eventable_13, "__esModule", {
 });
 _$Eventable_13.default = void 0;
 
-var arr = ___interopRequireWildcard_13(_$arr_42);
+var arr = ___interopRequireWildcard_13(_$arr_43);
 
-var ___extend_13 = ___interopRequireDefault_13(_$extend_48);
+var ___extend_13 = ___interopRequireDefault_13(_$extend_49);
 
-var _normalizeListeners = ___interopRequireDefault_13(_$normalizeListeners_55);
+var _normalizeListeners = ___interopRequireDefault_13(_$normalizeListeners_56);
 
 function ___interopRequireDefault_13(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1521,15 +1522,15 @@ _$defaultOptions_18.defaults = defaults;
 var ___default_18 = defaults;
 _$defaultOptions_18.default = ___default_18;
 
-var _$domObjects_45 = {};
+var _$domObjects_46 = {};
 "use strict";
 
-Object.defineProperty(_$domObjects_45, "__esModule", {
+Object.defineProperty(_$domObjects_46, "__esModule", {
   value: true
 });
-_$domObjects_45.default = void 0;
+_$domObjects_46.default = void 0;
 var domObjects = {
-  init: __init_45,
+  init: __init_46,
   document: null,
   DocumentFragment: null,
   SVGElement: null,
@@ -1545,10 +1546,10 @@ var domObjects = {
 
 function blank() {}
 
-var ___default_45 = domObjects;
-_$domObjects_45.default = ___default_45;
+var ___default_46 = domObjects;
+_$domObjects_46.default = ___default_46;
 
-function __init_45(window) {
+function __init_46(window) {
   var win = window;
   domObjects.document = win.document;
   domObjects.DocumentFragment = win.DocumentFragment || blank;
@@ -1562,26 +1563,26 @@ function __init_45(window) {
   domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 }
 
-var _$browser_43 = {};
+var _$browser_44 = {};
 "use strict";
 
-Object.defineProperty(_$browser_43, "__esModule", {
+Object.defineProperty(_$browser_44, "__esModule", {
   value: true
 });
-_$browser_43.default = void 0;
+_$browser_44.default = void 0;
 
-var _domObjects = ___interopRequireDefault_43(_$domObjects_45);
+var _domObjects = ___interopRequireDefault_44(_$domObjects_46);
 
-var __is_43 = ___interopRequireWildcard_43(_$is_53);
+var __is_44 = ___interopRequireWildcard_44(_$is_54);
 
-var _window = ___interopRequireDefault_43(_$window_62);
+var _window = ___interopRequireDefault_44(_$window_63);
 
-function ___interopRequireWildcard_43(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_44(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_43(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_44(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var browser = {
-  init: __init_43,
+  init: __init_44,
   supportsTouch: null,
   supportsPointerEvent: null,
   isIOS7: null,
@@ -1593,11 +1594,11 @@ var browser = {
   wheelEvent: null
 };
 
-function __init_43(window) {
+function __init_44(window) {
   var Element = _domObjects.default.Element;
   var navigator = _window.default.window.navigator; // Does the browser support touch input?
 
-  browser.supportsTouch = 'ontouchstart' in window || __is_43.func(window.DocumentTouch) && _domObjects.default.document instanceof window.DocumentTouch; // Does the browser support PointerEvents
+  browser.supportsTouch = 'ontouchstart' in window || __is_44.func(window.DocumentTouch) && _domObjects.default.document instanceof window.DocumentTouch; // Does the browser support PointerEvents
 
   browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!_domObjects.default.PointerEvent;
   browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform); // scrolling doesn't change the result of getClientRects on iOS 7
@@ -1627,39 +1628,39 @@ function __init_43(window) {
   browser.wheelEvent = 'onmousewheel' in _domObjects.default.document ? 'mousewheel' : 'wheel';
 }
 
-var ___default_43 = browser;
-_$browser_43.default = ___default_43;
+var ___default_44 = browser;
+_$browser_44.default = ___default_44;
 
-var _$domUtils_46 = {};
+var _$domUtils_47 = {};
 "use strict";
 
-Object.defineProperty(_$domUtils_46, "__esModule", {
+Object.defineProperty(_$domUtils_47, "__esModule", {
   value: true
 });
-_$domUtils_46.nodeContains = nodeContains;
-_$domUtils_46.closest = closest;
-_$domUtils_46.parentNode = parentNode;
-_$domUtils_46.matchesSelector = matchesSelector;
-_$domUtils_46.indexOfDeepestElement = indexOfDeepestElement;
-_$domUtils_46.matchesUpTo = matchesUpTo;
-_$domUtils_46.getActualElement = getActualElement;
-_$domUtils_46.getScrollXY = getScrollXY;
-_$domUtils_46.getElementClientRect = getElementClientRect;
-_$domUtils_46.getElementRect = getElementRect;
-_$domUtils_46.getPath = getPath;
-_$domUtils_46.trySelector = trySelector;
+_$domUtils_47.nodeContains = nodeContains;
+_$domUtils_47.closest = closest;
+_$domUtils_47.parentNode = parentNode;
+_$domUtils_47.matchesSelector = matchesSelector;
+_$domUtils_47.indexOfDeepestElement = indexOfDeepestElement;
+_$domUtils_47.matchesUpTo = matchesUpTo;
+_$domUtils_47.getActualElement = getActualElement;
+_$domUtils_47.getScrollXY = getScrollXY;
+_$domUtils_47.getElementClientRect = getElementClientRect;
+_$domUtils_47.getElementRect = getElementRect;
+_$domUtils_47.getPath = getPath;
+_$domUtils_47.trySelector = trySelector;
 
-var _browser = ___interopRequireDefault_46(_$browser_43);
+var _browser = ___interopRequireDefault_47(_$browser_44);
 
-var ___domObjects_46 = ___interopRequireDefault_46(_$domObjects_45);
+var ___domObjects_47 = ___interopRequireDefault_47(_$domObjects_46);
 
-var __is_46 = ___interopRequireWildcard_46(_$is_53);
+var __is_47 = ___interopRequireWildcard_47(_$is_54);
 
-var ___window_46 = ___interopRequireDefault_46(_$window_62);
+var ___window_47 = ___interopRequireDefault_47(_$window_63);
 
-function ___interopRequireWildcard_46(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_47(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_46(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_47(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function nodeContains(parent, child) {
   while (child) {
@@ -1674,7 +1675,7 @@ function nodeContains(parent, child) {
 }
 
 function closest(element, selector) {
-  while (__is_46.element(element)) {
+  while (__is_47.element(element)) {
     if (matchesSelector(element, selector)) {
       return element;
     }
@@ -1688,10 +1689,10 @@ function closest(element, selector) {
 function parentNode(node) {
   var parent = node.parentNode;
 
-  if (__is_46.docFrag(parent)) {
+  if (__is_47.docFrag(parent)) {
     // skip past #shado-root fragments
     // tslint:disable-next-line
-    while ((parent = parent.host) && __is_46.docFrag(parent)) {
+    while ((parent = parent.host) && __is_47.docFrag(parent)) {
       continue;
     }
 
@@ -1703,7 +1704,7 @@ function parentNode(node) {
 
 function matchesSelector(element, selector) {
   // remove /deep/ from selectors if shadowDOM polyfill is used
-  if (___window_46.default.window !== ___window_46.default.realWindow) {
+  if (___window_47.default.window !== ___window_47.default.realWindow) {
     selector = selector.replace(/\/deep\//g, ' ');
   }
 
@@ -1757,7 +1758,7 @@ function indexOfDeepestElement(elements) {
     // an HTMLElement
 
 
-    if (deepestZone instanceof ___domObjects_46.default.HTMLElement && dropzone instanceof ___domObjects_46.default.SVGElement && !(dropzone instanceof ___domObjects_46.default.SVGSVGElement)) {
+    if (deepestZone instanceof ___domObjects_47.default.HTMLElement && dropzone instanceof ___domObjects_47.default.SVGElement && !(dropzone instanceof ___domObjects_47.default.SVGSVGElement)) {
       if (dropzone === deepestZone.parentNode) {
         continue;
       }
@@ -1801,7 +1802,7 @@ function indexOfDeepestElement(elements) {
 }
 
 function matchesUpTo(element, selector, limit) {
-  while (__is_46.element(element)) {
+  while (__is_47.element(element)) {
     if (matchesSelector(element, selector)) {
       return true;
     }
@@ -1817,11 +1818,11 @@ function matchesUpTo(element, selector, limit) {
 }
 
 function getActualElement(element) {
-  return element instanceof ___domObjects_46.default.SVGElementInstance ? element.correspondingUseElement : element;
+  return element instanceof ___domObjects_47.default.SVGElementInstance ? element.correspondingUseElement : element;
 }
 
 function getScrollXY(relevantWindow) {
-  relevantWindow = relevantWindow || ___window_46.default.window;
+  relevantWindow = relevantWindow || ___window_47.default.window;
   return {
     x: relevantWindow.scrollX || relevantWindow.document.documentElement.scrollLeft,
     y: relevantWindow.scrollY || relevantWindow.document.documentElement.scrollTop
@@ -1829,7 +1830,7 @@ function getScrollXY(relevantWindow) {
 }
 
 function getElementClientRect(element) {
-  var clientRect = element instanceof ___domObjects_46.default.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
+  var clientRect = element instanceof ___domObjects_47.default.SVGElement ? element.getBoundingClientRect() : element.getClientRects()[0];
   return clientRect && {
     left: clientRect.left,
     right: clientRect.right,
@@ -1844,7 +1845,7 @@ function getElementRect(element) {
   var clientRect = getElementClientRect(element);
 
   if (!_browser.default.isIOS7 && clientRect) {
-    var scroll = getScrollXY(___window_46.default.getWindow(element));
+    var scroll = getScrollXY(___window_47.default.getWindow(element));
     clientRect.left += scroll.x;
     clientRect.right += scroll.x;
     clientRect.top += scroll.y;
@@ -1866,50 +1867,50 @@ function getPath(element) {
 }
 
 function trySelector(value) {
-  if (!__is_46.string(value)) {
+  if (!__is_47.string(value)) {
     return false;
   } // an exception will be raised if it is invalid
 
 
-  ___domObjects_46.default.document.querySelector(value);
+  ___domObjects_47.default.document.querySelector(value);
 
   return true;
 }
 
-var _$rect_59 = {};
+var _$rect_60 = {};
 "use strict";
 
-Object.defineProperty(_$rect_59, "__esModule", {
+Object.defineProperty(_$rect_60, "__esModule", {
   value: true
 });
-_$rect_59.getStringOptionResult = getStringOptionResult;
-_$rect_59.resolveRectLike = resolveRectLike;
-_$rect_59.rectToXY = rectToXY;
-_$rect_59.xywhToTlbr = xywhToTlbr;
-_$rect_59.tlbrToXywh = tlbrToXywh;
-_$rect_59.default = void 0;
+_$rect_60.getStringOptionResult = getStringOptionResult;
+_$rect_60.resolveRectLike = resolveRectLike;
+_$rect_60.rectToXY = rectToXY;
+_$rect_60.xywhToTlbr = xywhToTlbr;
+_$rect_60.tlbrToXywh = tlbrToXywh;
+_$rect_60.default = void 0;
 
-/* removed: var _$domUtils_46 = require("./domUtils"); */;
+/* removed: var _$domUtils_47 = require("./domUtils"); */;
 
-var ___extend_59 = ___interopRequireDefault_59(_$extend_48);
+var ___extend_60 = ___interopRequireDefault_60(_$extend_49);
 
-var __is_59 = ___interopRequireWildcard_59(_$is_53);
+var __is_60 = ___interopRequireWildcard_60(_$is_54);
 
-function ___interopRequireWildcard_59(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_60(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_59(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_60(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function getStringOptionResult(value, interactable, element) {
-  if (!__is_59.string(value)) {
+  if (!__is_60.string(value)) {
     return null;
   }
 
   if (value === 'parent') {
-    value = (0, _$domUtils_46.parentNode)(element);
+    value = (0, _$domUtils_47.parentNode)(element);
   } else if (value === 'self') {
     value = interactable.getRect(element);
   } else {
-    value = (0, _$domUtils_46.closest)(element, value);
+    value = (0, _$domUtils_47.closest)(element, value);
   }
 
   return value;
@@ -1918,12 +1919,12 @@ function getStringOptionResult(value, interactable, element) {
 function resolveRectLike(value, interactable, element, functionArgs) {
   value = getStringOptionResult(value, interactable, element) || value;
 
-  if (__is_59.func(value)) {
+  if (__is_60.func(value)) {
     value = value.apply(null, functionArgs);
   }
 
-  if (__is_59.element(value)) {
-    value = (0, _$domUtils_46.getElementRect)(value);
+  if (__is_60.element(value)) {
+    value = (0, _$domUtils_47.getElementRect)(value);
   }
 
   return value;
@@ -1938,7 +1939,7 @@ function rectToXY(rect) {
 
 function xywhToTlbr(rect) {
   if (rect && !('left' in rect && 'top' in rect)) {
-    rect = (0, ___extend_59.default)({}, rect);
+    rect = (0, ___extend_60.default)({}, rect);
     rect.left = rect.x || 0;
     rect.top = rect.y || 0;
     rect.right = rect.right || rect.left + rect.width;
@@ -1950,7 +1951,7 @@ function xywhToTlbr(rect) {
 
 function tlbrToXywh(rect) {
   if (rect && !('x' in rect && 'y' in rect)) {
-    rect = (0, ___extend_59.default)({}, rect);
+    rect = (0, ___extend_60.default)({}, rect);
     rect.x = rect.left || 0;
     rect.y = rect.top || 0;
     rect.width = rect.width || rect.right - rect.x;
@@ -1960,49 +1961,49 @@ function tlbrToXywh(rect) {
   return rect;
 }
 
-var ___default_59 = {
+var ___default_60 = {
   getStringOptionResult: getStringOptionResult,
   resolveRectLike: resolveRectLike,
   rectToXY: rectToXY,
   xywhToTlbr: xywhToTlbr,
   tlbrToXywh: tlbrToXywh
 };
-_$rect_59.default = ___default_59;
+_$rect_60.default = ___default_60;
 
-var _$getOriginXY_49 = {};
+var _$getOriginXY_50 = {};
 "use strict";
 
-Object.defineProperty(_$getOriginXY_49, "__esModule", {
+Object.defineProperty(_$getOriginXY_50, "__esModule", {
   value: true
 });
-_$getOriginXY_49.default = ___default_49;
+_$getOriginXY_50.default = ___default_50;
 
-/* removed: var _$rect_59 = require("./rect"); */;
+/* removed: var _$rect_60 = require("./rect"); */;
 
-function ___default_49(target, element, action) {
+function ___default_50(target, element, action) {
   var actionOptions = target.options[action];
   var actionOrigin = actionOptions && actionOptions.origin;
   var origin = actionOrigin || target.options.origin;
-  var originRect = (0, _$rect_59.resolveRectLike)(origin, target, element, [target && element]);
-  return (0, _$rect_59.rectToXY)(originRect) || {
+  var originRect = (0, _$rect_60.resolveRectLike)(origin, target, element, [target && element]);
+  return (0, _$rect_60.rectToXY)(originRect) || {
     x: 0,
     y: 0
   };
 }
 
-var _$hypot_50 = {};
+var _$hypot_51 = {};
 "use strict";
 
-Object.defineProperty(_$hypot_50, "__esModule", {
+Object.defineProperty(_$hypot_51, "__esModule", {
   value: true
 });
-_$hypot_50.default = void 0;
+_$hypot_51.default = void 0;
 
-var ___default_50 = function _default(x, y) {
+var ___default_51 = function _default(x, y) {
   return Math.sqrt(x * x + y * y);
 };
 
-_$hypot_50.default = ___default_50;
+_$hypot_51.default = ___default_51;
 
 var _$InteractEvent_14 = {};
 "use strict";
@@ -2012,11 +2013,11 @@ Object.defineProperty(_$InteractEvent_14, "__esModule", {
 });
 _$InteractEvent_14.default = _$InteractEvent_14.InteractEvent = _$InteractEvent_14.EventPhase = void 0;
 
-var ___extend_14 = ___interopRequireDefault_14(_$extend_48);
+var ___extend_14 = ___interopRequireDefault_14(_$extend_49);
 
-var _getOriginXY = ___interopRequireDefault_14(_$getOriginXY_49);
+var _getOriginXY = ___interopRequireDefault_14(_$getOriginXY_50);
 
-var _hypot = ___interopRequireDefault_14(_$hypot_50);
+var _hypot = ___interopRequireDefault_14(_$hypot_51);
 
 var _defaultOptions = ___interopRequireDefault_14(_$defaultOptions_18);
 
@@ -2237,19 +2238,19 @@ _$InteractEvent_14.InteractEvent = InteractEvent;
 var ___default_14 = InteractEvent;
 _$InteractEvent_14.default = ___default_14;
 
-var _$clone_44 = {};
+var _$clone_45 = {};
 "use strict";
 
-Object.defineProperty(_$clone_44, "__esModule", {
+Object.defineProperty(_$clone_45, "__esModule", {
   value: true
 });
-_$clone_44.default = clone;
+_$clone_45.default = clone;
 
-var __arr_44 = ___interopRequireWildcard_44(_$arr_42);
+var __arr_45 = ___interopRequireWildcard_45(_$arr_43);
 
-var __is_44 = ___interopRequireWildcard_44(_$is_53);
+var __is_45 = ___interopRequireWildcard_45(_$is_54);
 
-function ___interopRequireWildcard_44(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_45(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function clone(source) {
   var dest = {};
@@ -2257,10 +2258,10 @@ function clone(source) {
   for (var prop in source) {
     var value = source[prop];
 
-    if (__is_44.plainObject(value)) {
+    if (__is_45.plainObject(value)) {
       dest[prop] = clone(value);
-    } else if (__is_44.array(value)) {
-      dest[prop] = __arr_44.from(value);
+    } else if (__is_45.array(value)) {
+      dest[prop] = __arr_45.from(value);
     } else {
       dest[prop] = value;
     }
@@ -2269,14 +2270,14 @@ function clone(source) {
   return dest;
 }
 
-var _$pointerExtend_56 = {};
+var _$pointerExtend_57 = {};
 "use strict";
 
-Object.defineProperty(_$pointerExtend_56, "__esModule", {
+Object.defineProperty(_$pointerExtend_57, "__esModule", {
   value: true
 });
-_$pointerExtend_56.pointerExtend = pointerExtend;
-_$pointerExtend_56.default = void 0;
+_$pointerExtend_57.pointerExtend = pointerExtend;
+_$pointerExtend_57.default = void 0;
 
 function pointerExtend(dest, source) {
   for (var prop in source) {
@@ -2301,32 +2302,32 @@ function pointerExtend(dest, source) {
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
 };
-var ___default_56 = pointerExtend;
-_$pointerExtend_56.default = ___default_56;
+var ___default_57 = pointerExtend;
+_$pointerExtend_57.default = ___default_57;
 
-var _$pointerUtils_57 = {};
+var _$pointerUtils_58 = {};
 "use strict";
 
-Object.defineProperty(_$pointerUtils_57, "__esModule", {
+Object.defineProperty(_$pointerUtils_58, "__esModule", {
   value: true
 });
-_$pointerUtils_57.default = void 0;
+_$pointerUtils_58.default = void 0;
 
-var ___browser_57 = ___interopRequireDefault_57(_$browser_43);
+var ___browser_58 = ___interopRequireDefault_58(_$browser_44);
 
-var ___domObjects_57 = ___interopRequireDefault_57(_$domObjects_45);
+var ___domObjects_58 = ___interopRequireDefault_58(_$domObjects_46);
 
-var domUtils = ___interopRequireWildcard_57(_$domUtils_46);
+var domUtils = ___interopRequireWildcard_58(_$domUtils_47);
 
-var ___hypot_57 = ___interopRequireDefault_57(_$hypot_50);
+var ___hypot_58 = ___interopRequireDefault_58(_$hypot_51);
 
-var __is_57 = ___interopRequireWildcard_57(_$is_53);
+var __is_58 = ___interopRequireWildcard_58(_$is_54);
 
-var _pointerExtend = ___interopRequireDefault_57(_$pointerExtend_56);
+var _pointerExtend = ___interopRequireDefault_58(_$pointerExtend_57);
 
-function ___interopRequireWildcard_57(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_58(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_57(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_58(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var pointerUtils = {
   copyCoords: function copyCoords(dest, src) {
@@ -2354,7 +2355,7 @@ var pointerUtils = {
     targetObj.timeStamp = dt;
   },
   isNativePointer: function isNativePointer(pointer) {
-    return pointer instanceof ___domObjects_57.default.Event || pointer instanceof ___domObjects_57.default.Touch;
+    return pointer instanceof ___domObjects_58.default.Event || pointer instanceof ___domObjects_58.default.Touch;
   },
   // Get specified X/Y coords for mouse or event.touches[0]
   getXY: function getXY(type, pointer, xy) {
@@ -2370,7 +2371,7 @@ var pointerUtils = {
       y: 0
     }; // Opera Mobile handles the viewport and scrolling oddly
 
-    if (___browser_57.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+    if (___browser_58.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
       pointerUtils.getXY('screen', pointer, page);
       page.x += window.scrollX;
       page.y += window.scrollY;
@@ -2383,7 +2384,7 @@ var pointerUtils = {
   getClientXY: function getClientXY(pointer, client) {
     client = client || {};
 
-    if (___browser_57.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
+    if (___browser_58.default.isOperaMobile && pointerUtils.isNativePointer(pointer)) {
       // Opera Mobile handles the viewport and scrolling oddly
       pointerUtils.getXY('screen', pointer, client);
     } else {
@@ -2393,7 +2394,7 @@ var pointerUtils = {
     return client;
   },
   getPointerId: function getPointerId(pointer) {
-    return __is_57.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
+    return __is_58.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier;
   },
   setCoords: function setCoords(targetObj, pointers, timeStamp) {
     var pointer = pointers.length > 1 ? pointerUtils.pointerAverage(pointers) : pointers[0];
@@ -2404,13 +2405,13 @@ var pointerUtils = {
     pointerUtils.getClientXY(pointer, tmpXY);
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
-    targetObj.timeStamp = __is_57.number(timeStamp) ? timeStamp : new Date().getTime();
+    targetObj.timeStamp = __is_58.number(timeStamp) ? timeStamp : new Date().getTime();
   },
   pointerExtend: _pointerExtend.default,
   getTouchPair: function getTouchPair(event) {
     var touches = []; // array of touches is supplied
 
-    if (__is_57.array(event)) {
+    if (__is_58.array(event)) {
       touches[0] = event[0];
       touches[1] = event[1];
     } // an event
@@ -2485,7 +2486,7 @@ var pointerUtils = {
     var touches = pointerUtils.getTouchPair(event);
     var dx = touches[0][sourceX] - touches[1][sourceX];
     var dy = touches[0][sourceY] - touches[1][sourceY];
-    return (0, ___hypot_57.default)(dx, dy);
+    return (0, ___hypot_58.default)(dx, dy);
   },
   touchAngle: function touchAngle(event, deltaSource) {
     var sourceX = deltaSource + 'X';
@@ -2497,13 +2498,13 @@ var pointerUtils = {
     return angle;
   },
   getPointerType: function getPointerType(pointer) {
-    return __is_57.string(pointer.pointerType) ? pointer.pointerType : __is_57.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType] // if the PointerEvent API isn't available, then the "pointer" must
+    return __is_58.string(pointer.pointerType) ? pointer.pointerType : __is_58.number(pointer.pointerType) ? [undefined, undefined, 'touch', 'pen', 'mouse'][pointer.pointerType] // if the PointerEvent API isn't available, then the "pointer" must
     // be either a MouseEvent, TouchEvent, or Touch object
-    : /touch/.test(pointer.type) || pointer instanceof ___domObjects_57.default.Touch ? 'touch' : 'mouse';
+    : /touch/.test(pointer.type) || pointer instanceof ___domObjects_58.default.Touch ? 'touch' : 'mouse';
   },
   // [ event.target, event.currentTarget ]
   getEventTargets: function getEventTargets(event) {
-    var path = __is_57.func(event.composedPath) ? event.composedPath() : event.path;
+    var path = __is_58.func(event.composedPath) ? event.composedPath() : event.path;
     return [domUtils.getActualElement(path ? path[0] : event.target), domUtils.getActualElement(event.currentTarget)];
   },
   newCoords: function newCoords() {
@@ -2548,36 +2549,36 @@ var pointerUtils = {
     return event;
   }
 };
-var ___default_57 = pointerUtils;
-_$pointerUtils_57.default = ___default_57;
+var ___default_58 = pointerUtils;
+_$pointerUtils_58.default = ___default_58;
 
-var _$events_47 = {};
+var _$events_48 = {};
 "use strict";
 
-Object.defineProperty(_$events_47, "__esModule", {
+Object.defineProperty(_$events_48, "__esModule", {
   value: true
 });
-_$events_47.default = _$events_47.FakeEvent = void 0;
+_$events_48.default = _$events_48.FakeEvent = void 0;
 
-/* removed: var _$arr_42 = require("./arr"); */;
+/* removed: var _$arr_43 = require("./arr"); */;
 
-var __domUtils_47 = ___interopRequireWildcard_47(_$domUtils_46);
+var __domUtils_48 = ___interopRequireWildcard_48(_$domUtils_47);
 
-var __is_47 = ___interopRequireWildcard_47(_$is_53);
+var __is_48 = ___interopRequireWildcard_48(_$is_54);
 
-var ___pointerExtend_47 = ___interopRequireDefault_47(_$pointerExtend_56);
+var ___pointerExtend_48 = ___interopRequireDefault_48(_$pointerExtend_57);
 
-var _pointerUtils = ___interopRequireDefault_47(_$pointerUtils_57);
+var _pointerUtils = ___interopRequireDefault_48(_$pointerUtils_58);
 
-function ___interopRequireDefault_47(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_48(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_47(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_48(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___classCallCheck_47(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function ___classCallCheck_48(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function ___defineProperties_47(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function ___defineProperties_48(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function ___createClass_47(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_47(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_47(Constructor, staticProps); return Constructor; }
+function ___createClass_48(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_48(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_48(Constructor, staticProps); return Constructor; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
@@ -2611,13 +2612,13 @@ function add(element, type, listener, optionalArg) {
     target.typeCount++;
   }
 
-  if (!(0, _$arr_42.contains)(target.events[type], listener)) {
+  if (!(0, _$arr_43.contains)(target.events[type], listener)) {
     element.addEventListener(type, listener, events.supportsOptions ? options : !!options.capture);
     target.events[type].push(listener);
   }
 }
 
-function __remove_47(element, type, listener, optionalArg) {
+function __remove_48(element, type, listener, optionalArg) {
   var options = getOptions(optionalArg);
   var elementIndex = elements.indexOf(element);
   var target = targets[elementIndex];
@@ -2629,7 +2630,7 @@ function __remove_47(element, type, listener, optionalArg) {
   if (type === 'all') {
     for (type in target.events) {
       if (target.events.hasOwnProperty(type)) {
-        __remove_47(element, type, 'all');
+        __remove_48(element, type, 'all');
       }
     }
 
@@ -2641,7 +2642,7 @@ function __remove_47(element, type, listener, optionalArg) {
 
     if (listener === 'all') {
       for (var i = 0; i < len; i++) {
-        __remove_47(element, type, target.events[type][i], options);
+        __remove_48(element, type, target.events[type][i], options);
       }
 
       return;
@@ -2737,8 +2738,8 @@ function removeDelegate(selector, context, type, listener, optionalArg) {
             delegated.contexts.splice(index, 1);
             delegated.listeners.splice(index, 1); // remove delegate function from context
 
-            __remove_47(context, type, delegateListener);
-            __remove_47(context, type, delegateUseCapture, true); // remove the arrays if they are empty
+            __remove_48(context, type, delegateListener);
+            __remove_48(context, type, delegateUseCapture, true); // remove the arrays if they are empty
 
             if (!delegated.selectors.length) {
               delegatedEvents[type] = null;
@@ -2771,12 +2772,12 @@ function delegateListener(event, optionalArg) {
 
   var element = eventTarget; // climb up document tree looking for selector matches
 
-  while (__is_47.element(element)) {
+  while (__is_48.element(element)) {
     for (var i = 0; i < delegated.selectors.length; i++) {
       var selector = delegated.selectors[i];
       var context = delegated.contexts[i];
 
-      if (__domUtils_47.matchesSelector(element, selector) && __domUtils_47.nodeContains(context, eventTarget) && __domUtils_47.nodeContains(context, element)) {
+      if (__domUtils_48.matchesSelector(element, selector) && __domUtils_48.nodeContains(context, eventTarget) && __domUtils_48.nodeContains(context, element)) {
         var listeners = delegated.listeners[i];
         fakeEvent.currentTarget = element;
 
@@ -2798,7 +2799,7 @@ function delegateListener(event, optionalArg) {
       }
     }
 
-    element = __domUtils_47.parentNode(element);
+    element = __domUtils_48.parentNode(element);
   }
 }
 
@@ -2807,7 +2808,7 @@ function delegateUseCapture(event) {
 }
 
 function getOptions(param) {
-  return __is_47.object(param) ? param : {
+  return __is_48.object(param) ? param : {
     capture: param
   };
 }
@@ -2816,14 +2817,14 @@ var FakeEvent =
 /*#__PURE__*/
 function () {
   function FakeEvent(originalEvent) {
-    ___classCallCheck_47(this, FakeEvent);
+    ___classCallCheck_48(this, FakeEvent);
 
     this.originalEvent = originalEvent; // duplicate the event so that currentTarget can be changed
 
-    (0, ___pointerExtend_47.default)(this, originalEvent);
+    (0, ___pointerExtend_48.default)(this, originalEvent);
   }
 
-  ___createClass_47(FakeEvent, [{
+  ___createClass_48(FakeEvent, [{
     key: "preventOriginalDefault",
     value: function preventOriginalDefault() {
       this.originalEvent.preventDefault();
@@ -2843,10 +2844,10 @@ function () {
   return FakeEvent;
 }();
 
-_$events_47.FakeEvent = FakeEvent;
+_$events_48.FakeEvent = FakeEvent;
 var events = {
   add: add,
-  remove: __remove_47,
+  remove: __remove_48,
   addDelegate: addDelegate,
   removeDelegate: removeDelegate,
   delegateListener: delegateListener,
@@ -2870,8 +2871,8 @@ var events = {
     });
   }
 };
-var ___default_47 = events;
-_$events_47.default = ___default_47;
+var ___default_48 = events;
+_$events_48.default = ___default_48;
 
 var _$Interactable_15 = {};
 "use strict";
@@ -2881,23 +2882,23 @@ Object.defineProperty(_$Interactable_15, "__esModule", {
 });
 _$Interactable_15.default = _$Interactable_15.Interactable = void 0;
 
-var __arr_15 = ___interopRequireWildcard_15(_$arr_42);
+var __arr_15 = ___interopRequireWildcard_15(_$arr_43);
 
-var ___browser_15 = ___interopRequireDefault_15(_$browser_43);
+var ___browser_15 = ___interopRequireDefault_15(_$browser_44);
 
-var _clone = ___interopRequireDefault_15(_$clone_44);
+var _clone = ___interopRequireDefault_15(_$clone_45);
 
-/* removed: var _$domUtils_46 = require("@interactjs/utils/domUtils"); */;
+/* removed: var _$domUtils_47 = require("@interactjs/utils/domUtils"); */;
 
-var _events = ___interopRequireDefault_15(_$events_47);
+var _events = ___interopRequireDefault_15(_$events_48);
 
-var ___extend_15 = ___interopRequireDefault_15(_$extend_48);
+var ___extend_15 = ___interopRequireDefault_15(_$extend_49);
 
-var __is_15 = ___interopRequireWildcard_15(_$is_53);
+var __is_15 = ___interopRequireWildcard_15(_$is_54);
 
-var ___normalizeListeners_15 = ___interopRequireDefault_15(_$normalizeListeners_55);
+var ___normalizeListeners_15 = ___interopRequireDefault_15(_$normalizeListeners_56);
 
-/* removed: var _$window_62 = require("@interactjs/utils/window"); */;
+/* removed: var _$window_63 = require("@interactjs/utils/window"); */;
 
 var _Eventable = ___interopRequireDefault_15(_$Eventable_13);
 
@@ -2923,7 +2924,7 @@ function () {
     this._actions = options.actions;
     this.target = target;
     this._context = options.context || defaultContext;
-    this._win = (0, _$window_62.getWindow)((0, _$domUtils_46.trySelector)(target) ? this._context : target);
+    this._win = (0, _$window_63.getWindow)((0, _$domUtils_47.trySelector)(target) ? this._context : target);
     this._doc = this._win.document;
     this.set(options);
   }
@@ -3011,7 +3012,7 @@ function () {
         element = element || this._context.querySelector(this.target);
       }
 
-      return (0, _$domUtils_46.getElementRect)(element);
+      return (0, _$domUtils_47.getElementRect)(element);
     }
     /**
      * Returns or sets the function used to calculate the interactable's
@@ -3040,7 +3041,7 @@ function () {
   }, {
     key: "_backCompatOption",
     value: function _backCompatOption(optionName, newValue) {
-      if ((0, _$domUtils_46.trySelector)(newValue) || __is_15.object(newValue)) {
+      if ((0, _$domUtils_47.trySelector)(newValue) || __is_15.object(newValue)) {
         this.options[optionName] = newValue;
 
         for (var _i = 0; _i < this._actions.names.length; _i++) {
@@ -3106,7 +3107,7 @@ function () {
   }, {
     key: "inContext",
     value: function inContext(element) {
-      return this._context === element.ownerDocument || (0, _$domUtils_46.nodeContains)(this._context, element);
+      return this._context === element.ownerDocument || (0, _$domUtils_47.nodeContains)(this._context, element);
     }
   }, {
     key: "testIgnoreAllow",
@@ -3125,9 +3126,9 @@ function () {
       }
 
       if (__is_15.string(allowFrom)) {
-        return (0, _$domUtils_46.matchesUpTo)(element, allowFrom, interactableElement);
+        return (0, _$domUtils_47.matchesUpTo)(element, allowFrom, interactableElement);
       } else if (__is_15.element(allowFrom)) {
-        return (0, _$domUtils_46.nodeContains)(allowFrom, element);
+        return (0, _$domUtils_47.nodeContains)(allowFrom, element);
       }
 
       return false;
@@ -3140,9 +3141,9 @@ function () {
       }
 
       if (__is_15.string(ignoreFrom)) {
-        return (0, _$domUtils_46.matchesUpTo)(element, ignoreFrom, interactableElement);
+        return (0, _$domUtils_47.matchesUpTo)(element, ignoreFrom, interactableElement);
       } else if (__is_15.element(ignoreFrom)) {
-        return (0, _$domUtils_46.nodeContains)(ignoreFrom, element);
+        return (0, _$domUtils_47.nodeContains)(ignoreFrom, element);
       }
 
       return false;
@@ -3341,30 +3342,30 @@ _$PointerInfo_17.PointerInfo = PointerInfo;
 var ___default_17 = PointerInfo;
 _$PointerInfo_17.default = ___default_17;
 
-var _$Signals_41 = {};
+var _$Signals_42 = {};
 "use strict";
 
-Object.defineProperty(_$Signals_41, "__esModule", {
+Object.defineProperty(_$Signals_42, "__esModule", {
   value: true
 });
-_$Signals_41.default = void 0;
+_$Signals_42.default = void 0;
 
-function ___classCallCheck_41(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function ___classCallCheck_42(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function ___defineProperties_41(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function ___defineProperties_42(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function ___createClass_41(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_41(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_41(Constructor, staticProps); return Constructor; }
+function ___createClass_42(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_42(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_42(Constructor, staticProps); return Constructor; }
 
 var Signals =
 /*#__PURE__*/
 function () {
   function Signals() {
-    ___classCallCheck_41(this, Signals);
+    ___classCallCheck_42(this, Signals);
 
     this.listeners = {};
   }
 
-  ___createClass_41(Signals, [{
+  ___createClass_42(Signals, [{
     key: "on",
     value: function on(name, listener) {
       if (!this.listeners[name]) {
@@ -3412,23 +3413,23 @@ function () {
   return Signals;
 }();
 
-var ___default_41 = Signals;
-_$Signals_41.default = ___default_41;
+var ___default_42 = Signals;
+_$Signals_42.default = ___default_42;
 
-var _$raf_58 = {};
+var _$raf_59 = {};
 "use strict";
 
-Object.defineProperty(_$raf_58, "__esModule", {
+Object.defineProperty(_$raf_59, "__esModule", {
   value: true
 });
-_$raf_58.default = void 0;
+_$raf_59.default = void 0;
 var lastTime = 0;
 
 var _request;
 
 var _cancel;
 
-function __init_58(window) {
+function __init_59(window) {
   _request = window.requestAnimationFrame;
   _cancel = window.cancelAnimationFrame;
 
@@ -3460,148 +3461,148 @@ function __init_58(window) {
   }
 }
 
-var ___default_58 = {
+var ___default_59 = {
   request: function request(callback) {
     return _request(callback);
   },
   cancel: function cancel(token) {
     return _cancel(token);
   },
-  init: __init_58
+  init: __init_59
 };
-_$raf_58.default = ___default_58;
+_$raf_59.default = ___default_59;
 
-var _$utils_51 = {};
+var _$utils_52 = {};
 "use strict";
 
-Object.defineProperty(_$utils_51, "__esModule", {
+Object.defineProperty(_$utils_52, "__esModule", {
   value: true
 });
-_$utils_51.warnOnce = warnOnce;
-_$utils_51._getQBezierValue = _getQBezierValue;
-_$utils_51.getQuadraticCurvePoint = getQuadraticCurvePoint;
-_$utils_51.easeOutQuad = easeOutQuad;
-_$utils_51.copyAction = copyAction;
-Object.defineProperty(_$utils_51, "win", {
+_$utils_52.warnOnce = warnOnce;
+_$utils_52._getQBezierValue = _getQBezierValue;
+_$utils_52.getQuadraticCurvePoint = getQuadraticCurvePoint;
+_$utils_52.easeOutQuad = easeOutQuad;
+_$utils_52.copyAction = copyAction;
+Object.defineProperty(_$utils_52, "win", {
   enumerable: true,
   get: function get() {
-    return ___window_51.default;
+    return ___window_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "browser", {
+Object.defineProperty(_$utils_52, "browser", {
   enumerable: true,
   get: function get() {
-    return ___browser_51.default;
+    return ___browser_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "clone", {
+Object.defineProperty(_$utils_52, "clone", {
   enumerable: true,
   get: function get() {
-    return ___clone_51.default;
+    return ___clone_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "events", {
+Object.defineProperty(_$utils_52, "events", {
   enumerable: true,
   get: function get() {
-    return ___events_51.default;
+    return ___events_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "extend", {
+Object.defineProperty(_$utils_52, "extend", {
   enumerable: true,
   get: function get() {
-    return ___extend_51.default;
+    return ___extend_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "getOriginXY", {
+Object.defineProperty(_$utils_52, "getOriginXY", {
   enumerable: true,
   get: function get() {
-    return ___getOriginXY_51.default;
+    return ___getOriginXY_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "hypot", {
+Object.defineProperty(_$utils_52, "hypot", {
   enumerable: true,
   get: function get() {
-    return ___hypot_51.default;
+    return ___hypot_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "normalizeListeners", {
+Object.defineProperty(_$utils_52, "normalizeListeners", {
   enumerable: true,
   get: function get() {
-    return ___normalizeListeners_51.default;
+    return ___normalizeListeners_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "pointer", {
+Object.defineProperty(_$utils_52, "pointer", {
   enumerable: true,
   get: function get() {
-    return ___pointerUtils_51.default;
+    return ___pointerUtils_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "raf", {
+Object.defineProperty(_$utils_52, "raf", {
   enumerable: true,
   get: function get() {
     return _raf.default;
   }
 });
-Object.defineProperty(_$utils_51, "rect", {
+Object.defineProperty(_$utils_52, "rect", {
   enumerable: true,
   get: function get() {
-    return ___rect_51.default;
+    return ___rect_52.default;
   }
 });
-Object.defineProperty(_$utils_51, "Signals", {
+Object.defineProperty(_$utils_52, "Signals", {
   enumerable: true,
   get: function get() {
     return _Signals.default;
   }
 });
-_$utils_51.is = _$utils_51.dom = _$utils_51.arr = void 0;
+_$utils_52.is = _$utils_52.dom = _$utils_52.arr = void 0;
 
-var __arr_51 = ___interopRequireWildcard_51(_$arr_42);
+var __arr_52 = ___interopRequireWildcard_52(_$arr_43);
 
-_$utils_51.arr = __arr_51;
+_$utils_52.arr = __arr_52;
 
-var dom = ___interopRequireWildcard_51(_$domUtils_46);
+var dom = ___interopRequireWildcard_52(_$domUtils_47);
 
-_$utils_51.dom = dom;
+_$utils_52.dom = dom;
 
-var __is_51 = ___interopRequireWildcard_51(_$is_53);
+var __is_52 = ___interopRequireWildcard_52(_$is_54);
 
-_$utils_51.is = __is_51;
+_$utils_52.is = __is_52;
 
-var ___window_51 = ___interopRequireDefault_51(_$window_62);
+var ___window_52 = ___interopRequireDefault_52(_$window_63);
 
-var ___browser_51 = ___interopRequireDefault_51(_$browser_43);
+var ___browser_52 = ___interopRequireDefault_52(_$browser_44);
 
-var ___clone_51 = ___interopRequireDefault_51(_$clone_44);
+var ___clone_52 = ___interopRequireDefault_52(_$clone_45);
 
-var ___events_51 = ___interopRequireDefault_51(_$events_47);
+var ___events_52 = ___interopRequireDefault_52(_$events_48);
 
-var ___extend_51 = ___interopRequireDefault_51(_$extend_48);
+var ___extend_52 = ___interopRequireDefault_52(_$extend_49);
 
-var ___getOriginXY_51 = ___interopRequireDefault_51(_$getOriginXY_49);
+var ___getOriginXY_52 = ___interopRequireDefault_52(_$getOriginXY_50);
 
-var ___hypot_51 = ___interopRequireDefault_51(_$hypot_50);
+var ___hypot_52 = ___interopRequireDefault_52(_$hypot_51);
 
-var ___normalizeListeners_51 = ___interopRequireDefault_51(_$normalizeListeners_55);
+var ___normalizeListeners_52 = ___interopRequireDefault_52(_$normalizeListeners_56);
 
-var ___pointerUtils_51 = ___interopRequireDefault_51(_$pointerUtils_57);
+var ___pointerUtils_52 = ___interopRequireDefault_52(_$pointerUtils_58);
 
-var _raf = ___interopRequireDefault_51(_$raf_58);
+var _raf = ___interopRequireDefault_52(_$raf_59);
 
-var ___rect_51 = ___interopRequireDefault_51(_$rect_59);
+var ___rect_52 = ___interopRequireDefault_52(_$rect_60);
 
-var _Signals = ___interopRequireDefault_51(_$Signals_41);
+var _Signals = ___interopRequireDefault_52(_$Signals_42);
 
-function ___interopRequireDefault_51(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_52(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_51(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_52(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 function warnOnce(method, message) {
   var warned = false; // eslint-disable-next-line no-shadow
 
   return function () {
     if (!warned) {
-      ___window_51.default.window.console.warn(message);
+      ___window_52.default.window.console.warn(message);
 
       warned = true;
     }
@@ -3636,17 +3637,17 @@ function copyAction(dest, src) {
   return dest;
 }
 
-var _$interactionFinder_52 = {};
+var _$interactionFinder_53 = {};
 "use strict";
 
-Object.defineProperty(_$interactionFinder_52, "__esModule", {
+Object.defineProperty(_$interactionFinder_53, "__esModule", {
   value: true
 });
-_$interactionFinder_52.default = void 0;
+_$interactionFinder_53.default = void 0;
 
-var __utils_52 = ___interopRequireWildcard_52(_$utils_51);
+var __utils_53 = ___interopRequireWildcard_53(_$utils_52);
 
-function ___interopRequireWildcard_52(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_53(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 var finder = {
   methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
@@ -3688,7 +3689,7 @@ var finder = {
             return interaction;
           }
 
-          element = __utils_52.dom.parentNode(element);
+          element = __utils_53.dom.parentNode(element);
         }
       }
     }
@@ -3804,14 +3805,14 @@ var finder = {
 };
 
 function hasPointerId(interaction, pointerId) {
-  return __utils_52.arr.some(interaction.pointers, function (_ref11) {
+  return __utils_53.arr.some(interaction.pointers, function (_ref11) {
     var id = _ref11.id;
     return id === pointerId;
   });
 }
 
-var ___default_52 = finder;
-_$interactionFinder_52.default = ___default_52;
+var ___default_53 = finder;
+_$interactionFinder_53.default = ___default_53;
 
 var _$drag_1 = {};
 "use strict";
@@ -3823,9 +3824,9 @@ _$drag_1.default = void 0;
 
 var ___scope_1 = _$scope_21({});
 
-var __arr_1 = ___interopRequireWildcard_1(_$arr_42);
+var __arr_1 = ___interopRequireWildcard_1(_$arr_43);
 
-var __is_1 = ___interopRequireWildcard_1(_$is_53);
+var __is_1 = ___interopRequireWildcard_1(_$is_54);
 
 function ___interopRequireWildcard_1(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -3954,6 +3955,7 @@ var draggable = function draggable(options) {
 };
 
 var drag = {
+  id: 'actions/drag',
   install: __install_1,
   draggable: draggable,
   beforeMove: beforeMove,
@@ -3984,7 +3986,7 @@ Object.defineProperty(_$DropEvent_2, "__esModule", {
 });
 _$DropEvent_2.default = void 0;
 
-var __arr_2 = ___interopRequireWildcard_2(_$arr_42);
+var __arr_2 = ___interopRequireWildcard_2(_$arr_43);
 
 function ___interopRequireWildcard_2(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -4099,7 +4101,7 @@ Object.defineProperty(_$drop_3, "__esModule", {
 });
 _$drop_3.default = void 0;
 
-var __utils_3 = ___interopRequireWildcard_3(_$utils_51);
+var __utils_3 = ___interopRequireWildcard_3(_$utils_52);
 
 var _DropEvent = ___interopRequireDefault_3(_$DropEvent_2);
 
@@ -4609,6 +4611,7 @@ function dropCheckMethod(interactable, dragEvent, event, draggable, draggableEle
 }
 
 var drop = {
+  id: 'actions/draop',
   install: __install_3,
   getActiveDrops: getActiveDrops,
   getDrop: getDrop,
@@ -4635,7 +4638,7 @@ var ___InteractEvent_4 = ___interopRequireDefault_4(_$InteractEvent_14);
 
 var ___scope_4 = _$scope_21({});
 
-var __utils_4 = ___interopRequireWildcard_4(_$utils_51);
+var __utils_4 = ___interopRequireWildcard_4(_$utils_52);
 
 function ___interopRequireWildcard_4(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -4709,6 +4712,7 @@ function __install_4(scope) {
 }
 
 var gesture = {
+  id: 'actions/gesture',
   install: __install_4,
   defaults: {},
   checker: function checker(_pointer, _event, _interactable, _element, interaction) {
@@ -4790,7 +4794,7 @@ _$resize_6.default = void 0;
 
 var ___scope_6 = _$scope_21({});
 
-var __utils_6 = ___interopRequireWildcard_6(_$utils_51);
+var __utils_6 = ___interopRequireWildcard_6(_$utils_52);
 
 function ___interopRequireWildcard_6(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -4870,6 +4874,7 @@ function __install_6(scope) {
 }
 
 var resize = {
+  id: 'actions/resize',
   install: __install_6,
   defaults: {
     square: false,
@@ -5279,6 +5284,7 @@ Object.defineProperty(_$actions_5, "resize", {
     return _resize.default;
   }
 });
+_$actions_5.id = void 0;
 
 var _drag = ___interopRequireDefault_5(_$drag_1);
 
@@ -5300,6 +5306,9 @@ function __install_5(scope) {
   _drop.default.install(scope);
 }
 
+var id = 'actions';
+_$actions_5.id = id;
+
 var _$autoScroll_7 = {};
 "use strict";
 
@@ -5312,15 +5321,15 @@ _$autoScroll_7.getScrollSize = getScrollSize;
 _$autoScroll_7.getScrollSizeDelta = getScrollSizeDelta;
 _$autoScroll_7.default = void 0;
 
-var __domUtils_7 = ___interopRequireWildcard_7(_$domUtils_46);
+var __domUtils_7 = ___interopRequireWildcard_7(_$domUtils_47);
 
-var __is_7 = ___interopRequireWildcard_7(_$is_53);
+var __is_7 = ___interopRequireWildcard_7(_$is_54);
 
-var ___raf_7 = ___interopRequireDefault_7(_$raf_58);
+var ___raf_7 = ___interopRequireDefault_7(_$raf_59);
 
-/* removed: var _$rect_59 = require("@interactjs/utils/rect"); */;
+/* removed: var _$rect_60 = require("@interactjs/utils/rect"); */;
 
-/* removed: var _$window_62 = require("@interactjs/utils/window"); */;
+/* removed: var _$window_63 = require("@interactjs/utils/window"); */;
 
 function ___interopRequireDefault_7(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5485,7 +5494,7 @@ var autoScroll = {
 };
 
 function getContainer(value, interactable, element) {
-  return (__is_7.string(value) ? (0, _$rect_59.getStringOptionResult)(value, interactable, element) : value) || (0, _$window_62.getWindow)(element);
+  return (__is_7.string(value) ? (0, _$rect_60.getStringOptionResult)(value, interactable, element) : value) || (0, _$window_63.getWindow)(element);
 }
 
 function getScroll(container) {
@@ -5534,6 +5543,7 @@ function getScrollSizeDelta(_ref3, func) {
 }
 
 var ___default_7 = {
+  id: 'auto-scroll',
   install: __install_7
 };
 _$autoScroll_7.default = ___default_7;
@@ -5546,9 +5556,9 @@ Object.defineProperty(_$InteractableMethods_8, "__esModule", {
 });
 _$InteractableMethods_8.default = void 0;
 
-/* removed: var _$utils_51 = require("@interactjs/utils"); */;
+/* removed: var _$utils_52 = require("@interactjs/utils"); */;
 
-var __is_8 = ___interopRequireWildcard_8(_$is_53);
+var __is_8 = ___interopRequireWildcard_8(_$is_54);
 
 function ___interopRequireWildcard_8(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -5585,7 +5595,7 @@ function __install_8(scope) {
    * Interactable
    */
 
-  Interactable.prototype.ignoreFrom = (0, _$utils_51.warnOnce)(function (newValue) {
+  Interactable.prototype.ignoreFrom = (0, _$utils_52.warnOnce)(function (newValue) {
     return this._backCompatOption('ignoreFrom', newValue);
   }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).');
   /**
@@ -5612,7 +5622,7 @@ function __install_8(scope) {
    * Interactable
    */
 
-  Interactable.prototype.allowFrom = (0, _$utils_51.warnOnce)(function (newValue) {
+  Interactable.prototype.allowFrom = (0, _$utils_52.warnOnce)(function (newValue) {
     return this._backCompatOption('allowFrom', newValue);
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).');
   /**
@@ -5731,6 +5741,7 @@ function actionChecker(checker) {
 }
 
 var ___default_8 = {
+  id: 'auto-start/interactableMethods',
   install: __install_8
 };
 _$InteractableMethods_8.default = ___default_8;
@@ -5743,7 +5754,7 @@ Object.defineProperty(_$base_9, "__esModule", {
 });
 _$base_9.default = void 0;
 
-var __utils_9 = ___interopRequireWildcard_9(_$utils_51);
+var __utils_9 = ___interopRequireWildcard_9(_$utils_52);
 
 var _InteractableMethods = ___interopRequireDefault_9(_$InteractableMethods_8);
 
@@ -6015,6 +6026,7 @@ function setCursor(element, cursor, scope) {
 }
 
 var ___default_9 = {
+  id: 'auto-start/base',
   install: __install_9,
   maxInteractions: maxInteractions,
   withinInteractionLimit: withinInteractionLimit,
@@ -6032,9 +6044,9 @@ _$dragAxis_10.default = void 0;
 
 var ___scope_10 = _$scope_21({});
 
-/* removed: var _$domUtils_46 = require("@interactjs/utils/domUtils"); */;
+/* removed: var _$domUtils_47 = require("@interactjs/utils/domUtils"); */;
 
-var __is_10 = ___interopRequireWildcard_10(_$is_53);
+var __is_10 = ___interopRequireWildcard_10(_$is_54);
 
 var _base = ___interopRequireDefault_10(_$base_9);
 
@@ -6095,7 +6107,7 @@ function __install_10(scope) {
           break;
         }
 
-        element = (0, _$domUtils_46.parentNode)(element);
+        element = (0, _$domUtils_47.parentNode)(element);
       }
     }
   });
@@ -6111,6 +6123,7 @@ function __install_10(scope) {
 }
 
 var ___default_10 = {
+  id: 'auto-start/dragAxis',
   install: __install_10
 };
 _$dragAxis_10.default = ___default_10;
@@ -6173,6 +6186,7 @@ function getHoldDuration(interaction) {
 }
 
 var ___default_11 = {
+  id: 'auto-start/hold',
   install: __install_11,
   getHoldDuration: getHoldDuration
 };
@@ -6203,6 +6217,7 @@ Object.defineProperty(_$autoStart_12, "hold", {
     return _hold.default;
   }
 });
+_$autoStart_12.id = void 0;
 
 var ___base_12 = ___interopRequireDefault_12(_$base_9);
 
@@ -6220,6 +6235,9 @@ function __install_12(scope) {
   _dragAxis.default.install(scope);
 }
 
+var __id_12 = 'auto-start';
+_$autoStart_12.id = __id_12;
+
 var _$interactablePreventDefault_19 = {};
 "use strict";
 
@@ -6229,13 +6247,13 @@ Object.defineProperty(_$interactablePreventDefault_19, "__esModule", {
 _$interactablePreventDefault_19.install = __install_19;
 _$interactablePreventDefault_19.default = void 0;
 
-/* removed: var _$domUtils_46 = require("@interactjs/utils/domUtils"); */;
+/* removed: var _$domUtils_47 = require("@interactjs/utils/domUtils"); */;
 
-var ___events_19 = ___interopRequireDefault_19(_$events_47);
+var ___events_19 = ___interopRequireDefault_19(_$events_48);
 
-var __is_19 = ___interopRequireWildcard_19(_$is_53);
+var __is_19 = ___interopRequireWildcard_19(_$is_54);
 
-/* removed: var _$window_62 = require("@interactjs/utils/window"); */;
+/* removed: var _$window_63 = require("@interactjs/utils/window"); */;
 
 function ___interopRequireWildcard_19(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -6272,7 +6290,7 @@ function checkAndPreventDefault(interactable, scope, event) {
 
 
   if (___events_19.default.supportsPassive && /^touch(start|move)$/.test(event.type)) {
-    var doc = (0, _$window_62.getWindow)(event.target).document;
+    var doc = (0, _$window_63.getWindow)(event.target).document;
     var docOptions = scope.getDocOptions(doc);
 
     if (!(docOptions && docOptions.events) || docOptions.events.passive !== false) {
@@ -6286,7 +6304,7 @@ function checkAndPreventDefault(interactable, scope, event) {
   } // don't preventDefault on editable elements
 
 
-  if (__is_19.element(event.target) && (0, _$domUtils_46.matchesSelector)(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
+  if (__is_19.element(event.target) && (0, _$domUtils_47.matchesSelector)(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
     return;
   }
 
@@ -6339,7 +6357,7 @@ function __install_19(scope) {
       _ref2 = scope.interactions.list[_i2];
       var interaction = _ref2;
 
-      if (interaction.element && (interaction.element === event.target || (0, _$domUtils_46.nodeContains)(interaction.element, event.target))) {
+      if (interaction.element && (interaction.element === event.target || (0, _$domUtils_47.nodeContains)(interaction.element, event.target))) {
         interaction.interactable.checkAndPreventDefault(event);
         return;
       }
@@ -6348,31 +6366,137 @@ function __install_19(scope) {
 }
 
 var ___default_19 = {
+  id: 'core/interactablePreventDefault',
   install: __install_19
 };
 _$interactablePreventDefault_19.default = ___default_19;
 
-var _$base_26 = {};
+var _$devTools_22 = {};
 "use strict";
 
-Object.defineProperty(_$base_26, "__esModule", {
+Object.defineProperty(_$devTools_22, "__esModule", {
   value: true
 });
-_$base_26.default = void 0;
+_$devTools_22.touchAction = touchAction;
+_$devTools_22.boxSizing = boxSizing;
+_$devTools_22.noListeners = noListeners;
+_$devTools_22.default = _$devTools_22.noListenersMessage = _$devTools_22.boxSizingMessage = _$devTools_22.touchActionMessage = _$devTools_22.install = _$devTools_22.links = void 0;
 
-var ___extend_26 = ___interopRequireDefault_26(_$extend_48);
+var ___domObjects_22 = ___interopRequireDefault_22(_$domObjects_46);
 
-function ___interopRequireDefault_26(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/* removed: var _$domUtils_47 = require("@interactjs/utils/domUtils"); */;
 
-function ___slicedToArray_26(arr, i) { return ___arrayWithHoles_26(arr) || ___iterableToArrayLimit_26(arr, i) || ___nonIterableRest_26(); }
+var __is_22 = ___interopRequireWildcard_22(_$is_54);
 
-function ___nonIterableRest_26() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+var ___window_22 = ___interopRequireDefault_22(_$window_63);
 
-function ___iterableToArrayLimit_26(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function ___interopRequireWildcard_22(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___arrayWithHoles_26(arr) { if (Array.isArray(arr)) return arr; }
+function ___interopRequireDefault_22(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function __install_26(scope) {
+/* eslint-disable no-console */
+
+/* global process */
+var links = {
+  touchAction: 'https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action',
+  boxSizing: 'https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing'
+};
+_$devTools_22.links = links;
+var __install_22 = undefined === 'production' ? function () {} // eslint-disable-next-line no-restricted-syntax
+: function install(scope) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      logger = _ref.logger;
+
+  logger = logger || console;
+
+  if (undefined !== 'production') {
+    scope.logger = logger;
+    scope.interactions.signals.on('action-start', function (_ref2) {
+      var interaction = _ref2.interaction;
+      touchAction(interaction, scope.logger);
+      boxSizing(interaction, scope.logger);
+      noListeners(interaction, scope.logger);
+    });
+  }
+};
+_$devTools_22.install = __install_22;
+var touchActionMessage = '[interact.js] Consider adding CSS "touch-action: none" to this element\n';
+_$devTools_22.touchActionMessage = touchActionMessage;
+var boxSizingMessage = '[interact.js] Consider adding CSS "box-sizing: border-box" to this resizable element';
+_$devTools_22.boxSizingMessage = boxSizingMessage;
+var noListenersMessage = '[interact.js] There are no listeners set for this action';
+_$devTools_22.noListenersMessage = noListenersMessage;
+
+function touchAction(_ref3, logger) {
+  var element = _ref3.element;
+
+  if (!parentHasStyle(element, 'touchAction', /pan-|pinch|none/)) {
+    logger.warn(touchActionMessage, element, links.touchAction);
+  }
+}
+
+function boxSizing(interaction, logger) {
+  var element = interaction.element;
+
+  if (interaction.prepared.name === 'resize' && element instanceof ___domObjects_22.default.HTMLElement && !hasStyle(element, 'boxSizing', /border-box/)) {
+    logger.warn(boxSizingMessage, element, links.boxSizing);
+  }
+}
+
+function noListeners(interaction, logger) {
+  var actionName = interaction.prepared.name;
+  var moveListeners = interaction.interactable.events.types["".concat(actionName, "move")] || [];
+
+  if (!moveListeners.length) {
+    logger.warn(noListenersMessage, actionName, interaction.interactable);
+  }
+}
+
+function hasStyle(element, prop, styleRe) {
+  return styleRe.test(element.style[prop] || ___window_22.default.window.getComputedStyle(element)[prop]);
+}
+
+function parentHasStyle(element, prop, styleRe) {
+  var parent = element;
+
+  while (__is_22.element(parent)) {
+    if (hasStyle(parent, prop, styleRe)) {
+      return true;
+    }
+
+    parent = (0, _$domUtils_47.parentNode)(parent);
+  }
+
+  return false;
+}
+
+var ___default_22 = {
+  id: 'dev-tools',
+  install: __install_22
+};
+_$devTools_22.default = ___default_22;
+
+var _$base_27 = {};
+"use strict";
+
+Object.defineProperty(_$base_27, "__esModule", {
+  value: true
+});
+_$base_27.default = void 0;
+
+var ___extend_27 = ___interopRequireDefault_27(_$extend_49);
+
+function ___interopRequireDefault_27(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ___slicedToArray_27(arr, i) { return ___arrayWithHoles_27(arr) || ___iterableToArrayLimit_27(arr, i) || ___nonIterableRest_27(); }
+
+function ___nonIterableRest_27() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function ___iterableToArrayLimit_27(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function ___arrayWithHoles_27(arr) { if (Array.isArray(arr)) return arr; }
+
+function __install_27(scope) {
   var interactions = scope.interactions;
   scope.defaults.perAction.modifiers = [];
   scope.modifiers = {};
@@ -6391,13 +6515,13 @@ function __install_26(scope) {
     };
   });
   interactions.signals.on('before-action-start', function (arg) {
-    __start_26(arg, arg.interaction.coords.start.page, scope.modifiers);
+    __start_27(arg, arg.interaction.coords.start.page, scope.modifiers);
   });
   interactions.signals.on('action-resume', function (arg) {
-    __beforeMove_26(arg);
-    __start_26(arg, arg.interaction.coords.cur.page, scope.modifiers);
+    __beforeMove_27(arg);
+    __start_27(arg, arg.interaction.coords.cur.page, scope.modifiers);
   });
-  interactions.signals.on('before-action-move', __beforeMove_26);
+  interactions.signals.on('before-action-move', __beforeMove_27);
   interactions.signals.on('before-action-end', beforeEnd);
   interactions.signals.on('before-action-start', setCoords);
   interactions.signals.on('before-action-move', setCoords);
@@ -6434,14 +6558,14 @@ function getRectOffset(rect, coords) {
   };
 }
 
-function __start_26(_ref3, pageCoords, registeredModifiers) {
+function __start_27(_ref3, pageCoords, registeredModifiers) {
   var interaction = _ref3.interaction,
       phase = _ref3.phase;
   var interactable = interaction.interactable,
       element = interaction.element;
   var modifierList = getModifierList(interaction, registeredModifiers);
   var states = prepareStates(modifierList);
-  var rect = (0, ___extend_26.default)({}, interaction.rect);
+  var rect = (0, ___extend_27.default)({}, interaction.rect);
 
   if (!('width' in rect)) {
     rect.width = rect.right - rect.left;
@@ -6472,7 +6596,7 @@ function __start_26(_ref3, pageCoords, registeredModifiers) {
   interaction.modifiers.states = states;
   interaction.modifiers.result = null;
   startAll(arg);
-  arg.pageCoords = (0, ___extend_26.default)({}, interaction.coords.start.page);
+  arg.pageCoords = (0, ___extend_27.default)({}, interaction.coords.start.page);
   var result = interaction.modifiers.result = setAll(arg);
   return result;
 }
@@ -6485,8 +6609,8 @@ function setAll(arg) {
       rect = arg.rect,
       skipModifiers = arg.skipModifiers;
   var states = skipModifiers ? arg.states.slice(interaction.modifiers.skip) : arg.states;
-  arg.coords = (0, ___extend_26.default)({}, arg.pageCoords);
-  arg.rect = (0, ___extend_26.default)({}, rect);
+  arg.coords = (0, ___extend_27.default)({}, arg.pageCoords);
+  arg.rect = (0, ___extend_27.default)({}, rect);
   var result = {
     delta: {
       x: 0,
@@ -6543,7 +6667,7 @@ function prepareStates(modifierList) {
   return states;
 }
 
-function __beforeMove_26(_ref5) {
+function __beforeMove_27(_ref5) {
   var interaction = _ref5.interaction,
       phase = _ref5.phase,
       preEnd = _ref5.preEnd,
@@ -6616,7 +6740,7 @@ function stop(arg) {
     return;
   }
 
-  var modifierArg = (0, ___extend_26.default)({
+  var modifierArg = (0, ___extend_27.default)({
     states: states,
     interactable: interaction.interactable,
     element: interaction.element
@@ -6649,13 +6773,13 @@ function setCoords(arg) {
   var curDelta = result.delta;
 
   if (phase === 'start') {
-    (0, ___extend_26.default)(interaction.modifiers.startDelta, result.delta);
+    (0, ___extend_27.default)(interaction.modifiers.startDelta, result.delta);
   }
 
   var _arr = [[startCoords, startDelta], [curCoords, curDelta]];
 
   for (var _i5 = 0; _i5 < _arr.length; _i5++) {
-    var _arr$_i = ___slicedToArray_26(_arr[_i5], 2),
+    var _arr$_i = ___slicedToArray_27(_arr[_i5], 2),
         coordsSet = _arr$_i[0],
         delta = _arr$_i[1];
 
@@ -6675,7 +6799,7 @@ function restoreCoords(_ref8) {
   var _arr2 = [[coords.start, startDelta], [coords.cur, curDelta]];
 
   for (var _i6 = 0; _i6 < _arr2.length; _i6++) {
-    var _arr2$_i = ___slicedToArray_26(_arr2[_i6], 2),
+    var _arr2$_i = ___slicedToArray_27(_arr2[_i6], 2),
         coordsSet = _arr2$_i[0],
         delta = _arr2$_i[1];
 
@@ -6754,13 +6878,14 @@ function makeModifier(module, name) {
   return modifier;
 }
 
-var ___default_26 = {
-  install: __install_26,
+var ___default_27 = {
+  id: 'modifiers/base',
+  install: __install_27,
   startAll: startAll,
   setAll: setAll,
   prepareStates: prepareStates,
-  start: __start_26,
-  beforeMove: __beforeMove_26,
+  start: __start_27,
+  beforeMove: __beforeMove_27,
   beforeEnd: beforeEnd,
   stop: stop,
   shouldDo: shouldDo,
@@ -6768,32 +6893,32 @@ var ___default_26 = {
   getRectOffset: getRectOffset,
   makeModifier: makeModifier
 };
-_$base_26.default = ___default_26;
+_$base_27.default = ___default_27;
 
-var _$inertia_22 = {};
+var _$inertia_23 = {};
 "use strict";
 
-Object.defineProperty(_$inertia_22, "__esModule", {
+Object.defineProperty(_$inertia_23, "__esModule", {
   value: true
 });
-_$inertia_22.default = void 0;
+_$inertia_23.default = void 0;
 
 /* removed: var _$InteractEvent_14 = require("@interactjs/core/InteractEvent"); */;
 
-var ___base_22 = ___interopRequireDefault_22(_$base_26);
+var ___base_23 = ___interopRequireDefault_23(_$base_27);
 
-var __utils_22 = ___interopRequireWildcard_22(_$utils_51);
+var __utils_23 = ___interopRequireWildcard_23(_$utils_52);
 
-var ___raf_22 = ___interopRequireDefault_22(_$raf_58);
+var ___raf_23 = ___interopRequireDefault_23(_$raf_59);
 
-function ___interopRequireWildcard_22(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_23(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_22(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_23(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _$InteractEvent_14.EventPhase.Resume = 'resume';
 _$InteractEvent_14.EventPhase.InertiaStart = 'inertiastart';
 
-function __install_22(scope) {
+function __install_23(scope) {
   var interactions = scope.interactions,
       defaults = scope.defaults;
   interactions.signals.on('new', function (_ref) {
@@ -6825,7 +6950,7 @@ function __install_22(scope) {
     return resume(arg, scope);
   });
   interactions.signals.on('stop', function (arg) {
-    return __stop_22(arg);
+    return __stop_23(arg);
   });
   defaults.perAction.inertia = {
     enabled: false,
@@ -6847,17 +6972,17 @@ function resume(_ref2, scope) {
   if (state.active) {
     var element = eventTarget; // climb up the DOM tree from the event target
 
-    while (__utils_22.is.element(element)) {
+    while (__utils_23.is.element(element)) {
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        ___raf_22.default.cancel(state.i);
+        ___raf_23.default.cancel(state.i);
 
         state.active = false;
         interaction.simulation = null; // update pointers to the down event's coordinates
 
         interaction.updatePointer(pointer, event, eventTarget, true);
-        __utils_22.pointer.setCoords(interaction.coords.cur, interaction.pointers.map(function (p) {
+        __utils_23.pointer.setCoords(interaction.coords.cur, interaction.pointers.map(function (p) {
           return p.pointer;
         })); // fire appropriate signals
 
@@ -6870,11 +6995,11 @@ function resume(_ref2, scope) {
 
         interaction._fireEvent(resumeEvent);
 
-        __utils_22.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
+        __utils_23.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
         break;
       }
 
-      element = __utils_22.dom.parentNode(element);
+      element = __utils_23.dom.parentNode(element);
     }
   }
 }
@@ -6889,10 +7014,10 @@ function release(_ref3, scope) {
     return null;
   }
 
-  var options = __getOptions_22(interaction);
+  var options = __getOptions_23(interaction);
   var now = new Date().getTime();
   var velocityClient = interaction.coords.velocity.client;
-  var pointerSpeed = __utils_22.hypot(velocityClient.x, velocityClient.y);
+  var pointerSpeed = __utils_23.hypot(velocityClient.x, velocityClient.y);
   var smoothEnd = false;
   var modifierResult; // check if inertia should be started
 
@@ -6900,16 +7025,16 @@ function release(_ref3, scope) {
   var inertia = inertiaPossible && now - interaction.coords.cur.timeStamp < 50 && pointerSpeed > options.minSpeed && pointerSpeed > options.endSpeed;
   var modifierArg = {
     interaction: interaction,
-    pageCoords: __utils_22.extend({}, interaction.coords.cur.page),
+    pageCoords: __utils_23.extend({}, interaction.coords.cur.page),
     states: inertiaPossible && interaction.modifiers.states.map(function (modifierStatus) {
-      return __utils_22.extend({}, modifierStatus);
+      return __utils_23.extend({}, modifierStatus);
     }),
     preEnd: true,
     requireEndOnly: true
   }; // smoothEnd
 
   if (inertiaPossible && !inertia) {
-    modifierResult = ___base_22.default.setAll(modifierArg);
+    modifierResult = ___base_23.default.setAll(modifierArg);
 
     if (modifierResult.changed) {
       smoothEnd = true;
@@ -6920,7 +7045,7 @@ function release(_ref3, scope) {
     return null;
   }
 
-  __utils_22.pointer.copyCoords(state.upCoords, interaction.coords.cur);
+  __utils_23.pointer.copyCoords(state.upCoords, interaction.coords.cur);
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(interaction, event, // FIXME add proper typing Action.name
   interaction.prepared.name, _$InteractEvent_14.EventPhase.InertiaStart, interaction.element);
   state.t0 = now;
@@ -6934,13 +7059,13 @@ function release(_ref3, scope) {
     state.vy0 = interaction.coords.velocity.client.y;
     state.v0 = pointerSpeed;
     calcInertia(interaction, state);
-    __utils_22.extend(modifierArg.pageCoords, interaction.coords.cur.page);
+    __utils_23.extend(modifierArg.pageCoords, interaction.coords.cur.page);
     modifierArg.pageCoords.x += state.xe;
     modifierArg.pageCoords.y += state.ye;
-    modifierResult = ___base_22.default.setAll(modifierArg);
+    modifierResult = ___base_23.default.setAll(modifierArg);
     state.modifiedXe += modifierResult.delta.x;
     state.modifiedYe += modifierResult.delta.y;
-    state.i = ___raf_22.default.request(function () {
+    state.i = ___raf_23.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
@@ -6948,7 +7073,7 @@ function release(_ref3, scope) {
     state.xe = modifierResult.delta.x;
     state.ye = modifierResult.delta.y;
     state.sx = state.sy = 0;
-    state.i = ___raf_22.default.request(function () {
+    state.i = ___raf_23.default.request(function () {
       return smothEndTick(interaction);
     });
   }
@@ -6956,12 +7081,12 @@ function release(_ref3, scope) {
   return false;
 }
 
-function __stop_22(_ref4) {
+function __stop_23(_ref4) {
   var interaction = _ref4.interaction;
   var state = interaction.inertia;
 
   if (state.active) {
-    ___raf_22.default.cancel(state.i);
+    ___raf_23.default.cancel(state.i);
 
     state.active = false;
     interaction.simulation = null;
@@ -6969,7 +7094,7 @@ function __stop_22(_ref4) {
 }
 
 function calcInertia(interaction, state) {
-  var options = __getOptions_22(interaction);
+  var options = __getOptions_23(interaction);
   var lambda = options.resistance;
   var inertiaDur = -Math.log(options.endSpeed / state.v0) / lambda;
   state.x0 = interaction.prevEvent.page.x;
@@ -6985,10 +7110,10 @@ function calcInertia(interaction, state) {
 
 function inertiaTick(interaction) {
   updateInertiaCoords(interaction);
-  __utils_22.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
-  __utils_22.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
+  __utils_23.pointer.setCoordDeltas(interaction.coords.delta, interaction.coords.prev, interaction.coords.cur);
+  __utils_23.pointer.setCoordVelocity(interaction.coords.velocity, interaction.coords.delta);
   var state = interaction.inertia;
-  var options = __getOptions_22(interaction);
+  var options = __getOptions_23(interaction);
   var lambda = options.resistance;
   var t = new Date().getTime() / 1000 - state.t0;
 
@@ -6999,13 +7124,13 @@ function inertiaTick(interaction) {
       state.sx = state.xe * progress;
       state.sy = state.ye * progress;
     } else {
-      var quadPoint = __utils_22.getQuadraticCurvePoint(0, 0, state.xe, state.ye, state.modifiedXe, state.modifiedYe, progress);
+      var quadPoint = __utils_23.getQuadraticCurvePoint(0, 0, state.xe, state.ye, state.modifiedXe, state.modifiedYe, progress);
       state.sx = quadPoint.x;
       state.sy = quadPoint.y;
     }
 
     interaction.move();
-    state.i = ___raf_22.default.request(function () {
+    state.i = ___raf_23.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
@@ -7017,7 +7142,7 @@ function inertiaTick(interaction) {
     interaction.simulation = null;
   }
 
-  __utils_22.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
+  __utils_23.pointer.copyCoords(interaction.coords.prev, interaction.coords.cur);
 }
 
 function smothEndTick(interaction) {
@@ -7025,14 +7150,14 @@ function smothEndTick(interaction) {
   var state = interaction.inertia;
   var t = new Date().getTime() - state.t0;
 
-  var _getOptions = __getOptions_22(interaction),
+  var _getOptions = __getOptions_23(interaction),
       duration = _getOptions.smoothEndDuration;
 
   if (t < duration) {
-    state.sx = __utils_22.easeOutQuad(t, 0, state.xe, duration);
-    state.sy = __utils_22.easeOutQuad(t, 0, state.ye, duration);
+    state.sx = __utils_23.easeOutQuad(t, 0, state.xe, duration);
+    state.sy = __utils_23.easeOutQuad(t, 0, state.ye, duration);
     interaction.move();
-    state.i = ___raf_22.default.request(function () {
+    state.i = ___raf_23.default.request(function () {
       return smothEndTick(interaction);
     });
   } else {
@@ -7054,7 +7179,7 @@ function updateInertiaCoords(interaction) {
 
   var pageUp = state.upCoords.page;
   var clientUp = state.upCoords.client;
-  __utils_22.pointer.setCoords(interaction.coords.cur, [{
+  __utils_23.pointer.setCoords(interaction.coords.cur, [{
     pageX: pageUp.x + state.sx,
     pageY: pageUp.y + state.sy,
     clientX: clientUp.x + state.sx,
@@ -7062,44 +7187,45 @@ function updateInertiaCoords(interaction) {
   }]);
 }
 
-function __getOptions_22(_ref5) {
+function __getOptions_23(_ref5) {
   var interactable = _ref5.interactable,
       prepared = _ref5.prepared;
   return interactable && interactable.options && prepared.name && interactable.options[prepared.name].inertia;
 }
 
-var ___default_22 = {
-  install: __install_22,
+var ___default_23 = {
+  id: 'inertia',
+  install: __install_23,
   calcInertia: calcInertia,
   inertiaTick: inertiaTick,
   smothEndTick: smothEndTick,
   updateInertiaCoords: updateInertiaCoords
 };
-_$inertia_22.default = ___default_22;
+_$inertia_23.default = ___default_23;
 
-var _$interact_24 = {};
+var _$interact_25 = {};
 "use strict";
 
-Object.defineProperty(_$interact_24, "__esModule", {
+Object.defineProperty(_$interact_25, "__esModule", {
   value: true
 });
-_$interact_24.default = _$interact_24.scope = _$interact_24.interact = void 0;
+_$interact_25.default = _$interact_25.scope = _$interact_25.interact = void 0;
 
-var ___scope_24 = _$scope_21({});
+var ___scope_25 = _$scope_21({});
 
-var __utils_24 = ___interopRequireWildcard_24(_$utils_51);
+var __utils_25 = ___interopRequireWildcard_25(_$utils_52);
 
-var ___browser_24 = ___interopRequireDefault_24(_$browser_43);
+var ___browser_25 = ___interopRequireDefault_25(_$browser_44);
 
-var ___events_24 = ___interopRequireDefault_24(_$events_47);
+var ___events_25 = ___interopRequireDefault_25(_$events_48);
 
-function ___interopRequireDefault_24(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_25(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_24(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_25(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
 /** @module interact */
 var globalEvents = {};
-var scope = new ___scope_24.Scope();
+var scope = new ___scope_25.Scope();
 /**
  * ```js
  * interact('#draggable').draggable(true)
@@ -7126,7 +7252,7 @@ var scope = new ___scope_24.Scope();
  * @return {Interactable}
  */
 
-_$interact_24.scope = scope;
+_$interact_25.scope = scope;
 
 var interact = function interact(target, options) {
   var interactable = scope.interactables.get(target, options);
@@ -7139,8 +7265,13 @@ var interact = function interact(target, options) {
   return interactable;
 };
 
-_$interact_24.interact = interact;
+_$interact_25.interact = interact;
 scope._plugins = [];
+scope._pluginMap = {};
+
+function pluginIsInstalled(plugin) {
+  return scope._pluginMap[plugin.id] || scope._plugins.indexOf(plugin) !== -1;
+}
 /**
  * Use a plugin
  *
@@ -7151,16 +7282,21 @@ scope._plugins = [];
  * @return {interact}
  */
 
+
 interact.use = use;
 
 function use(plugin, options) {
-  if (scope._plugins.indexOf(plugin) !== -1) {
+  if (pluginIsInstalled(plugin)) {
     return interact;
   }
 
   plugin.install(scope, options);
 
   scope._plugins.push(plugin);
+
+  if (plugin.id) {
+    scope._pluginMap[plugin.id] = plugin;
+  }
 
   return interact;
 }
@@ -7197,11 +7333,11 @@ function isSet(element, options) {
 interact.on = on;
 
 function on(type, listener, options) {
-  if (__utils_24.is.string(type) && type.search(' ') !== -1) {
+  if (__utils_25.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (__utils_24.is.array(type)) {
+  if (__utils_25.is.array(type)) {
     for (var _i = 0; _i < type.length; _i++) {
       var _ref;
 
@@ -7213,7 +7349,7 @@ function on(type, listener, options) {
     return interact;
   }
 
-  if (__utils_24.is.object(type)) {
+  if (__utils_25.is.object(type)) {
     for (var prop in type) {
       interact.on(prop, type[prop], listener);
     }
@@ -7222,7 +7358,7 @@ function on(type, listener, options) {
   } // if it is an InteractEvent type, add listener to globalEvents
 
 
-  if (__utils_24.arr.contains(scope.actions.eventTypes, type)) {
+  if (__utils_25.arr.contains(scope.actions.eventTypes, type)) {
     // if this type of event was never bound
     if (!globalEvents[type]) {
       globalEvents[type] = [listener];
@@ -7231,7 +7367,7 @@ function on(type, listener, options) {
     }
   } // If non InteractEvent type, addEventListener to document
   else {
-      ___events_24.default.add(scope.document, type, listener, {
+      ___events_25.default.add(scope.document, type, listener, {
         options: options
       });
     }
@@ -7255,11 +7391,11 @@ function on(type, listener, options) {
 interact.off = off;
 
 function off(type, listener, options) {
-  if (__utils_24.is.string(type) && type.search(' ') !== -1) {
+  if (__utils_25.is.string(type) && type.search(' ') !== -1) {
     type = type.trim().split(/ +/);
   }
 
-  if (__utils_24.is.array(type)) {
+  if (__utils_25.is.array(type)) {
     for (var _i2 = 0; _i2 < type.length; _i2++) {
       var _ref2;
 
@@ -7271,7 +7407,7 @@ function off(type, listener, options) {
     return interact;
   }
 
-  if (__utils_24.is.object(type)) {
+  if (__utils_25.is.object(type)) {
     for (var prop in type) {
       interact.off(prop, type[prop], listener);
     }
@@ -7279,8 +7415,8 @@ function off(type, listener, options) {
     return interact;
   }
 
-  if (!__utils_24.arr.contains(scope.actions.eventTypes, type)) {
-    ___events_24.default.remove(scope.document, type, listener, options);
+  if (!__utils_25.arr.contains(scope.actions.eventTypes, type)) {
+    ___events_25.default.remove(scope.document, type, listener, options);
   } else {
     var index;
 
@@ -7307,14 +7443,14 @@ function debug() {
 } // expose the functions used to calculate multi-touch properties
 
 
-interact.getPointerAverage = __utils_24.pointer.pointerAverage;
-interact.getTouchBBox = __utils_24.pointer.touchBBox;
-interact.getTouchDistance = __utils_24.pointer.touchDistance;
-interact.getTouchAngle = __utils_24.pointer.touchAngle;
-interact.getElementRect = __utils_24.dom.getElementRect;
-interact.getElementClientRect = __utils_24.dom.getElementClientRect;
-interact.matchesSelector = __utils_24.dom.matchesSelector;
-interact.closest = __utils_24.dom.closest;
+interact.getPointerAverage = __utils_25.pointer.pointerAverage;
+interact.getTouchBBox = __utils_25.pointer.touchBBox;
+interact.getTouchDistance = __utils_25.pointer.touchDistance;
+interact.getTouchAngle = __utils_25.pointer.touchAngle;
+interact.getElementRect = __utils_25.dom.getElementRect;
+interact.getElementClientRect = __utils_25.dom.getElementClientRect;
+interact.matchesSelector = __utils_25.dom.matchesSelector;
+interact.closest = __utils_25.dom.closest;
 /**
  * @alias module:interact.supportsTouch
  *
@@ -7324,7 +7460,7 @@ interact.closest = __utils_24.dom.closest;
 interact.supportsTouch = supportsTouch;
 
 function supportsTouch() {
-  return ___browser_24.default.supportsTouch;
+  return ___browser_25.default.supportsTouch;
 }
 /**
  * @alias module:interact.supportsPointerEvent
@@ -7336,7 +7472,7 @@ function supportsTouch() {
 interact.supportsPointerEvent = supportsPointerEvent;
 
 function supportsPointerEvent() {
-  return ___browser_24.default.supportsPointerEvent;
+  return ___browser_25.default.supportsPointerEvent;
 }
 /**
  * Cancels all interactions (end events are not fired)
@@ -7347,9 +7483,9 @@ function supportsPointerEvent() {
  */
 
 
-interact.stop = __stop_24;
+interact.stop = __stop_25;
 
-function __stop_24() {
+function __stop_25() {
   for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
     var _ref3;
 
@@ -7374,7 +7510,7 @@ function __stop_24() {
 interact.pointerMoveTolerance = pointerMoveTolerance;
 
 function pointerMoveTolerance(newValue) {
-  if (__utils_24.is.number(newValue)) {
+  if (__utils_25.is.number(newValue)) {
     scope.interactions.pointerMoveTolerance = newValue;
     return interact;
   }
@@ -7407,26 +7543,26 @@ interact.removeDocument = function (doc) {
 };
 
 scope.interact = interact;
-var ___default_24 = interact;
-_$interact_24.default = ___default_24;
+var ___default_25 = interact;
+_$interact_25.default = ___default_25;
 
-var _$pointer_29 = {};
+var _$pointer_30 = {};
 "use strict";
 
-Object.defineProperty(_$pointer_29, "__esModule", {
+Object.defineProperty(_$pointer_30, "__esModule", {
   value: true
 });
-_$pointer_29.default = void 0;
+_$pointer_30.default = void 0;
 
-var __is_29 = ___interopRequireWildcard_29(_$is_53);
+var __is_30 = ___interopRequireWildcard_30(_$is_54);
 
-var ___rect_29 = ___interopRequireDefault_29(_$rect_59);
+var ___rect_30 = ___interopRequireDefault_30(_$rect_60);
 
-function ___interopRequireDefault_29(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_30(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_29(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_30(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function __start_29(_ref) {
+function __start_30(_ref) {
   var rect = _ref.rect,
       startOffset = _ref.startOffset,
       state = _ref.state;
@@ -7472,15 +7608,15 @@ function set(_ref2) {
 }
 
 function getRestrictionRect(value, interaction, coords) {
-  if (__is_29.func(value)) {
-    return ___rect_29.default.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction]);
+  if (__is_30.func(value)) {
+    return ___rect_30.default.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction]);
   } else {
-    return ___rect_29.default.resolveRectLike(value, interaction.interactable, interaction.element);
+    return ___rect_30.default.resolveRectLike(value, interaction.interactable, interaction.element);
   }
 }
 
 var restrict = {
-  start: __start_29,
+  start: __start_30,
   set: set,
   getRestrictionRect: getRestrictionRect,
   defaults: {
@@ -7489,24 +7625,24 @@ var restrict = {
     elementRect: null
   }
 };
-var ___default_29 = restrict;
-_$pointer_29.default = ___default_29;
+var ___default_30 = restrict;
+_$pointer_30.default = ___default_30;
 
-var _$edges_28 = {};
+var _$edges_29 = {};
 "use strict";
 
-Object.defineProperty(_$edges_28, "__esModule", {
+Object.defineProperty(_$edges_29, "__esModule", {
   value: true
 });
-_$edges_28.default = void 0;
+_$edges_29.default = void 0;
 
-var ___extend_28 = ___interopRequireDefault_28(_$extend_48);
+var ___extend_29 = ___interopRequireDefault_29(_$extend_49);
 
-var ___rect_28 = ___interopRequireDefault_28(_$rect_59);
+var ___rect_29 = ___interopRequireDefault_29(_$rect_60);
 
-var _pointer = ___interopRequireDefault_28(_$pointer_29);
+var _pointer = ___interopRequireDefault_29(_$pointer_30);
 
-function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_29(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This module adds the options.resize.restrictEdges setting which sets min and
 // max for the top, left, bottom and right edges of the target being resized.
@@ -7518,7 +7654,7 @@ function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj :
 //     outer: { top:   0, left:   0, right: 600, bottom: 600 },
 //   },
 // });
-var __getRestrictionRect_28 = _pointer.default.getRestrictionRect;
+var __getRestrictionRect_29 = _pointer.default.getRestrictionRect;
 var noInner = {
   top: +Infinity,
   left: +Infinity,
@@ -7532,7 +7668,7 @@ var noOuter = {
   right: +Infinity
 };
 
-function __start_28(_ref) {
+function __start_29(_ref) {
   var interaction = _ref.interaction,
       state = _ref.state;
   var options = state.options;
@@ -7540,8 +7676,8 @@ function __start_28(_ref) {
   var offset;
 
   if (options) {
-    var offsetRect = __getRestrictionRect_28(options.offset, interaction, interaction.coords.start.page);
-    offset = ___rect_28.default.rectToXY(offsetRect);
+    var offsetRect = __getRestrictionRect_29(options.offset, interaction, interaction.coords.start.page);
+    offset = ___rect_29.default.rectToXY(offsetRect);
   }
 
   offset = offset || {
@@ -7556,7 +7692,7 @@ function __start_28(_ref) {
   };
 }
 
-function __set_28(_ref2) {
+function __set_29(_ref2) {
   var coords = _ref2.coords,
       interaction = _ref2.interaction,
       state = _ref2.state;
@@ -7568,9 +7704,9 @@ function __set_28(_ref2) {
     return;
   }
 
-  var page = (0, ___extend_28.default)({}, coords);
-  var inner = __getRestrictionRect_28(options.inner, interaction, page) || {};
-  var outer = __getRestrictionRect_28(options.outer, interaction, page) || {};
+  var page = (0, ___extend_29.default)({}, coords);
+  var inner = __getRestrictionRect_29(options.inner, interaction, page) || {};
+  var outer = __getRestrictionRect_29(options.outer, interaction, page) || {};
   fixRect(inner, noInner);
   fixRect(outer, noOuter);
 
@@ -7604,9 +7740,9 @@ function fixRect(rect, defaults) {
 var restrictEdges = {
   noInner: noInner,
   noOuter: noOuter,
-  getRestrictionRect: __getRestrictionRect_28,
-  start: __start_28,
-  set: __set_28,
+  getRestrictionRect: __getRestrictionRect_29,
+  start: __start_29,
+  set: __set_29,
   defaults: {
     enabled: false,
     inner: null,
@@ -7614,24 +7750,24 @@ var restrictEdges = {
     offset: null
   }
 };
-var ___default_28 = restrictEdges;
-_$edges_28.default = ___default_28;
+var ___default_29 = restrictEdges;
+_$edges_29.default = ___default_29;
 
-var _$size_30 = {};
+var _$size_31 = {};
 "use strict";
 
-Object.defineProperty(_$size_30, "__esModule", {
+Object.defineProperty(_$size_31, "__esModule", {
   value: true
 });
-_$size_30.default = void 0;
+_$size_31.default = void 0;
 
-var ___extend_30 = ___interopRequireDefault_30(_$extend_48);
+var ___extend_31 = ___interopRequireDefault_31(_$extend_49);
 
-var ___rect_30 = ___interopRequireDefault_30(_$rect_59);
+var ___rect_31 = ___interopRequireDefault_31(_$rect_60);
 
-var _edges = ___interopRequireDefault_30(_$edges_28);
+var _edges = ___interopRequireDefault_31(_$edges_29);
 
-function ___interopRequireDefault_30(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This module adds the options.resize.restrictSize setting which sets min and
 // max width and height for the target being resized.
@@ -7652,11 +7788,11 @@ var noMax = {
   height: +Infinity
 };
 
-function __start_30(arg) {
+function __start_31(arg) {
   return _edges.default.start(arg);
 }
 
-function __set_30(arg) {
+function __set_31(arg) {
   var interaction = arg.interaction,
       state = arg.state;
   var options = state.options;
@@ -7666,15 +7802,15 @@ function __set_30(arg) {
     return;
   }
 
-  var rect = ___rect_30.default.xywhToTlbr(interaction.resizeRects.inverted);
+  var rect = ___rect_31.default.xywhToTlbr(interaction.resizeRects.inverted);
 
-  var minSize = ___rect_30.default.tlbrToXywh(_edges.default.getRestrictionRect(options.min, interaction)) || noMin;
-  var maxSize = ___rect_30.default.tlbrToXywh(_edges.default.getRestrictionRect(options.max, interaction)) || noMax;
+  var minSize = ___rect_31.default.tlbrToXywh(_edges.default.getRestrictionRect(options.min, interaction)) || noMin;
+  var maxSize = ___rect_31.default.tlbrToXywh(_edges.default.getRestrictionRect(options.max, interaction)) || noMax;
   state.options = {
     enabled: options.enabled,
     endOnly: options.endOnly,
-    inner: (0, ___extend_30.default)({}, _edges.default.noInner),
-    outer: (0, ___extend_30.default)({}, _edges.default.noOuter)
+    inner: (0, ___extend_31.default)({}, _edges.default.noInner),
+    outer: (0, ___extend_31.default)({}, _edges.default.noOuter)
   };
 
   if (edges.top) {
@@ -7699,30 +7835,30 @@ function __set_30(arg) {
 }
 
 var restrictSize = {
-  start: __start_30,
-  set: __set_30,
+  start: __start_31,
+  set: __set_31,
   defaults: {
     enabled: false,
     min: null,
     max: null
   }
 };
-var ___default_30 = restrictSize;
-_$size_30.default = ___default_30;
+var ___default_31 = restrictSize;
+_$size_31.default = ___default_31;
 
-var _$pointer_32 = {};
+var _$pointer_33 = {};
 "use strict";
 
-Object.defineProperty(_$pointer_32, "__esModule", {
+Object.defineProperty(_$pointer_33, "__esModule", {
   value: true
 });
-_$pointer_32.default = void 0;
+_$pointer_33.default = void 0;
 
-var __utils_32 = ___interopRequireWildcard_32(_$utils_51);
+var __utils_33 = ___interopRequireWildcard_33(_$utils_52);
 
-function ___interopRequireWildcard_32(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_33(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function __start_32(_ref) {
+function __start_33(_ref) {
   var interaction = _ref.interaction,
       interactable = _ref.interactable,
       element = _ref.element,
@@ -7731,8 +7867,8 @@ function __start_32(_ref) {
       startOffset = _ref.startOffset;
   var options = state.options;
   var offsets = [];
-  var optionsOrigin = __utils_32.rect.rectToXY(__utils_32.rect.resolveRectLike(options.origin));
-  var origin = optionsOrigin || __utils_32.getOriginXY(interactable, element, interaction.prepared.name);
+  var optionsOrigin = __utils_33.rect.rectToXY(__utils_33.rect.resolveRectLike(options.origin));
+  var origin = optionsOrigin || __utils_33.getOriginXY(interactable, element, interaction.prepared.name);
   var snapOffset;
 
   if (options.offset === 'startCoords') {
@@ -7741,8 +7877,8 @@ function __start_32(_ref) {
       y: interaction.coords.start.page.y - origin.y
     };
   } else {
-    var offsetRect = __utils_32.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
-    snapOffset = __utils_32.rect.rectToXY(offsetRect) || {
+    var offsetRect = __utils_33.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
+    snapOffset = __utils_33.rect.rectToXY(offsetRect) || {
       x: 0,
       y: 0
     };
@@ -7761,7 +7897,7 @@ function __start_32(_ref) {
       });
     }
   } else {
-    offsets.push(__utils_32.extend({
+    offsets.push(__utils_33.extend({
       index: 0,
       relativePoint: null
     }, snapOffset));
@@ -7770,14 +7906,14 @@ function __start_32(_ref) {
   state.offsets = offsets;
 }
 
-function __set_32(_ref2) {
+function __set_33(_ref2) {
   var interaction = _ref2.interaction,
       coords = _ref2.coords,
       state = _ref2.state;
   var options = state.options,
       offsets = state.offsets;
-  var origin = __utils_32.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name);
-  var page = __utils_32.extend({}, coords);
+  var origin = __utils_33.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name);
+  var page = __utils_33.extend({}, coords);
   var targets = [];
   var target;
   var i;
@@ -7798,7 +7934,7 @@ function __set_32(_ref2) {
     for (var index = 0; index < options.targets.length; index++) {
       var snapTarget = options.targets[index];
 
-      if (__utils_32.is.func(snapTarget)) {
+      if (__utils_33.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction, offset, index);
       } else {
         target = snapTarget;
@@ -7809,9 +7945,9 @@ function __set_32(_ref2) {
       }
 
       targets.push({
-        x: __utils_32.is.number(target.x) ? target.x + offset.x : relativeX,
-        y: __utils_32.is.number(target.y) ? target.y + offset.y : relativeY,
-        range: __utils_32.is.number(target.range) ? target.range : options.range
+        x: __utils_33.is.number(target.x) ? target.x + offset.x : relativeX,
+        y: __utils_33.is.number(target.y) ? target.y + offset.y : relativeY,
+        range: __utils_33.is.number(target.range) ? target.range : options.range
       });
     }
   }
@@ -7830,7 +7966,7 @@ function __set_32(_ref2) {
     var range = target.range;
     var dx = target.x - page.x;
     var dy = target.y - page.y;
-    var distance = __utils_32.hypot(dx, dy);
+    var distance = __utils_33.hypot(dx, dy);
     var inRange = distance <= range; // Infinite targets count as being out of range
     // compared to non infinite ones that are in range
 
@@ -7863,8 +7999,8 @@ function __set_32(_ref2) {
 }
 
 var snap = {
-  start: __start_32,
-  set: __set_32,
+  start: __start_33,
+  set: __set_33,
   defaults: {
     enabled: false,
     range: Infinity,
@@ -7873,36 +8009,36 @@ var snap = {
     relativePoints: null
   }
 };
-var ___default_32 = snap;
-_$pointer_32.default = ___default_32;
+var ___default_33 = snap;
+_$pointer_33.default = ___default_33;
 
-var _$size_33 = {};
+var _$size_34 = {};
 "use strict";
 
-Object.defineProperty(_$size_33, "__esModule", {
+Object.defineProperty(_$size_34, "__esModule", {
   value: true
 });
-_$size_33.default = void 0;
+_$size_34.default = void 0;
 
-var ___extend_33 = ___interopRequireDefault_33(_$extend_48);
+var ___extend_34 = ___interopRequireDefault_34(_$extend_49);
 
-var __is_33 = ___interopRequireWildcard_33(_$is_53);
+var __is_34 = ___interopRequireWildcard_34(_$is_54);
 
-var ___pointer_33 = ___interopRequireDefault_33(_$pointer_32);
+var ___pointer_34 = ___interopRequireDefault_34(_$pointer_33);
 
-function ___interopRequireWildcard_33(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_34(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_33(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_34(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___slicedToArray_33(arr, i) { return ___arrayWithHoles_33(arr) || ___iterableToArrayLimit_33(arr, i) || ___nonIterableRest_33(); }
+function ___slicedToArray_34(arr, i) { return ___arrayWithHoles_34(arr) || ___iterableToArrayLimit_34(arr, i) || ___nonIterableRest_34(); }
 
-function ___nonIterableRest_33() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function ___nonIterableRest_34() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-function ___iterableToArrayLimit_33(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function ___iterableToArrayLimit_34(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
-function ___arrayWithHoles_33(arr) { if (Array.isArray(arr)) return arr; }
+function ___arrayWithHoles_34(arr) { if (Array.isArray(arr)) return arr; }
 
-function __start_33(arg) {
+function __start_34(arg) {
   var interaction = arg.interaction,
       state = arg.state;
   var options = state.options;
@@ -7928,13 +8064,13 @@ function __start_33(arg) {
   };
   state.targetFields = state.targetFields || [['width', 'height'], ['x', 'y']];
 
-  ___pointer_33.default.start(arg);
+  ___pointer_34.default.start(arg);
 
   state.offsets = arg.state.offsets;
   arg.state = state;
 }
 
-function __set_33(arg) {
+function __set_34(arg) {
   var interaction = arg.interaction,
       state = arg.state,
       coords = arg.coords;
@@ -7944,7 +8080,7 @@ function __set_33(arg) {
     x: coords.x - offsets[0].x,
     y: coords.y - offsets[0].y
   };
-  state.options = (0, ___extend_33.default)({}, options);
+  state.options = (0, ___extend_34.default)({}, options);
   state.options.targets = [];
 
   for (var _i = 0; _i < (options.targets || []).length; _i++) {
@@ -7954,7 +8090,7 @@ function __set_33(arg) {
     var snapTarget = _ref;
     var target = void 0;
 
-    if (__is_33.func(snapTarget)) {
+    if (__is_34.func(snapTarget)) {
       target = snapTarget(relative.x, relative.y, interaction);
     } else {
       target = snapTarget;
@@ -7970,7 +8106,7 @@ function __set_33(arg) {
       _ref2 = state.targetFields[_i2];
 
       var _ref3 = _ref2,
-          _ref4 = ___slicedToArray_33(_ref3, 2),
+          _ref4 = ___slicedToArray_34(_ref3, 2),
           xField = _ref4[0],
           yField = _ref4[1];
 
@@ -7984,14 +8120,14 @@ function __set_33(arg) {
     state.options.targets.push(target);
   }
 
-  ___pointer_33.default.set(arg);
+  ___pointer_34.default.set(arg);
 
   state.options = options;
 }
 
 var snapSize = {
-  start: __start_33,
-  set: __set_33,
+  start: __start_34,
+  set: __set_34,
   defaults: {
     enabled: false,
     range: Infinity,
@@ -7999,24 +8135,24 @@ var snapSize = {
     offset: null
   }
 };
-var ___default_33 = snapSize;
-_$size_33.default = ___default_33;
+var ___default_34 = snapSize;
+_$size_34.default = ___default_34;
 
-var _$edges_31 = {};
+var _$edges_32 = {};
 "use strict";
 
-Object.defineProperty(_$edges_31, "__esModule", {
+Object.defineProperty(_$edges_32, "__esModule", {
   value: true
 });
-_$edges_31.default = void 0;
+_$edges_32.default = void 0;
 
-var ___clone_31 = ___interopRequireDefault_31(_$clone_44);
+var ___clone_32 = ___interopRequireDefault_32(_$clone_45);
 
-var ___extend_31 = ___interopRequireDefault_31(_$extend_48);
+var ___extend_32 = ___interopRequireDefault_32(_$extend_49);
 
-var _size = ___interopRequireDefault_31(_$size_33);
+var _size = ___interopRequireDefault_32(_$size_34);
 
-function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_32(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * @module modifiers/snapEdges
@@ -8045,7 +8181,7 @@ function ___interopRequireDefault_31(obj) { return obj && obj.__esModule ? obj :
  *   },
  * });
  */
-function __start_31(arg) {
+function __start_32(arg) {
   var edges = arg.interaction.prepared.edges;
 
   if (!edges) {
@@ -8056,78 +8192,78 @@ function __start_31(arg) {
   return _size.default.start(arg);
 }
 
-function __set_31(arg) {
+function __set_32(arg) {
   return _size.default.set(arg);
 }
 
 var snapEdges = {
-  start: __start_31,
-  set: __set_31,
-  defaults: (0, ___extend_31.default)((0, ___clone_31.default)(_size.default.defaults), {
+  start: __start_32,
+  set: __set_32,
+  defaults: (0, ___extend_32.default)((0, ___clone_32.default)(_size.default.defaults), {
     offset: {
       x: 0,
       y: 0
     }
   })
 };
-var ___default_31 = snapEdges;
-_$edges_31.default = ___default_31;
+var ___default_32 = snapEdges;
+_$edges_32.default = ___default_32;
 
-var _$modifiers_27 = {};
+var _$modifiers_28 = {};
 "use strict";
 
-Object.defineProperty(_$modifiers_27, "__esModule", {
+Object.defineProperty(_$modifiers_28, "__esModule", {
   value: true
 });
-_$modifiers_27.restrictSize = _$modifiers_27.restrictEdges = _$modifiers_27.restrict = _$modifiers_27.snapEdges = _$modifiers_27.snapSize = _$modifiers_27.snap = void 0;
+_$modifiers_28.restrictSize = _$modifiers_28.restrictEdges = _$modifiers_28.restrict = _$modifiers_28.snapEdges = _$modifiers_28.snapSize = _$modifiers_28.snap = void 0;
 
-var ___base_27 = ___interopRequireDefault_27(_$base_26);
+var ___base_28 = ___interopRequireDefault_28(_$base_27);
 
-var ___edges_27 = ___interopRequireDefault_27(_$edges_28);
+var ___edges_28 = ___interopRequireDefault_28(_$edges_29);
 
-var ___pointer_27 = ___interopRequireDefault_27(_$pointer_29);
+var ___pointer_28 = ___interopRequireDefault_28(_$pointer_30);
 
-var ___size_27 = ___interopRequireDefault_27(_$size_30);
+var ___size_28 = ___interopRequireDefault_28(_$size_31);
 
-var _edges2 = ___interopRequireDefault_27(_$edges_31);
+var _edges2 = ___interopRequireDefault_28(_$edges_32);
 
-var _pointer2 = ___interopRequireDefault_27(_$pointer_32);
+var _pointer2 = ___interopRequireDefault_28(_$pointer_33);
 
-var _size2 = ___interopRequireDefault_27(_$size_33);
+var _size2 = ___interopRequireDefault_28(_$size_34);
 
-function ___interopRequireDefault_27(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var __makeModifier_27 = ___base_27.default.makeModifier;
-var __snap_27 = __makeModifier_27(_pointer2.default, 'snap');
-_$modifiers_27.snap = __snap_27;
-var __snapSize_27 = __makeModifier_27(_size2.default, 'snapSize');
-_$modifiers_27.snapSize = __snapSize_27;
-var __snapEdges_27 = __makeModifier_27(_edges2.default, 'snapEdges');
-_$modifiers_27.snapEdges = __snapEdges_27;
-var __restrict_27 = __makeModifier_27(___pointer_27.default, 'restrict');
-_$modifiers_27.restrict = __restrict_27;
-var __restrictEdges_27 = __makeModifier_27(___edges_27.default, 'restrictEdges');
-_$modifiers_27.restrictEdges = __restrictEdges_27;
-var __restrictSize_27 = __makeModifier_27(___size_27.default, 'restrictSize');
-_$modifiers_27.restrictSize = __restrictSize_27;
+var __makeModifier_28 = ___base_28.default.makeModifier;
+var __snap_28 = __makeModifier_28(_pointer2.default, 'snap');
+_$modifiers_28.snap = __snap_28;
+var __snapSize_28 = __makeModifier_28(_size2.default, 'snapSize');
+_$modifiers_28.snapSize = __snapSize_28;
+var __snapEdges_28 = __makeModifier_28(_edges2.default, 'snapEdges');
+_$modifiers_28.snapEdges = __snapEdges_28;
+var __restrict_28 = __makeModifier_28(___pointer_28.default, 'restrict');
+_$modifiers_28.restrict = __restrict_28;
+var __restrictEdges_28 = __makeModifier_28(___edges_28.default, 'restrictEdges');
+_$modifiers_28.restrictEdges = __restrictEdges_28;
+var __restrictSize_28 = __makeModifier_28(___size_28.default, 'restrictSize');
+_$modifiers_28.restrictSize = __restrictSize_28;
 
-var _$PointerEvent_34 = {};
+var _$PointerEvent_35 = {};
 "use strict";
 
-Object.defineProperty(_$PointerEvent_34, "__esModule", {
+Object.defineProperty(_$PointerEvent_35, "__esModule", {
   value: true
 });
-_$PointerEvent_34.default = void 0;
+_$PointerEvent_35.default = void 0;
 
-var ___pointerUtils_34 = ___interopRequireDefault_34(_$pointerUtils_57);
+var ___pointerUtils_35 = ___interopRequireDefault_35(_$pointerUtils_58);
 
-function ___interopRequireDefault_34(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_35(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___classCallCheck_34(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function ___classCallCheck_35(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function ___defineProperties_34(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function ___defineProperties_35(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function ___createClass_34(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_34(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_34(Constructor, staticProps); return Constructor; }
+function ___createClass_35(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_35(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_35(Constructor, staticProps); return Constructor; }
 
 /** */
 var PointerEvent =
@@ -8135,23 +8271,23 @@ var PointerEvent =
 function () {
   /** */
   function PointerEvent(type, pointer, event, eventTarget, interaction) {
-    ___classCallCheck_34(this, PointerEvent);
+    ___classCallCheck_35(this, PointerEvent);
 
     this.propagationStopped = false;
     this.immediatePropagationStopped = false;
 
-    ___pointerUtils_34.default.pointerExtend(this, event);
+    ___pointerUtils_35.default.pointerExtend(this, event);
 
     if (event !== pointer) {
-      ___pointerUtils_34.default.pointerExtend(this, pointer);
+      ___pointerUtils_35.default.pointerExtend(this, pointer);
     }
 
     this.interaction = interaction;
     this.timeStamp = new Date().getTime();
     this.originalEvent = event;
     this.type = type;
-    this.pointerId = ___pointerUtils_34.default.getPointerId(pointer);
-    this.pointerType = ___pointerUtils_34.default.getPointerType(pointer);
+    this.pointerId = ___pointerUtils_35.default.getPointerId(pointer);
+    this.pointerType = ___pointerUtils_35.default.getPointerType(pointer);
     this.target = eventTarget;
     this.currentTarget = null;
 
@@ -8165,7 +8301,7 @@ function () {
     }
   }
 
-  ___createClass_34(PointerEvent, [{
+  ___createClass_35(PointerEvent, [{
     key: "subtractOrigin",
     value: function subtractOrigin(_ref) {
       var originX = _ref.x,
@@ -8219,29 +8355,30 @@ function () {
   return PointerEvent;
 }();
 
-_$PointerEvent_34.default = PointerEvent;
+_$PointerEvent_35.default = PointerEvent;
 
-var _$base_35 = {};
+var _$base_36 = {};
 "use strict";
 
-Object.defineProperty(_$base_35, "__esModule", {
+Object.defineProperty(_$base_36, "__esModule", {
   value: true
 });
-_$base_35.default = void 0;
+_$base_36.default = void 0;
 
-var __utils_35 = ___interopRequireWildcard_35(_$utils_51);
+var __utils_36 = ___interopRequireWildcard_36(_$utils_52);
 
-var _PointerEvent = ___interopRequireDefault_35(_$PointerEvent_34);
+var _PointerEvent = ___interopRequireDefault_36(_$PointerEvent_35);
 
-function ___interopRequireDefault_35(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_36(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_35(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_36(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-var signals = new __utils_35.Signals();
+var signals = new __utils_36.Signals();
 var simpleSignals = ['down', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'cancel'];
 var pointerEvents = {
-  install: __install_35,
+  id: 'pointer-events/base',
+  install: __install_36,
   signals: signals,
   PointerEvent: _PointerEvent.default,
   fire: fire,
@@ -8287,7 +8424,7 @@ function fire(arg) {
       pointerEvent[prop] = target.props[prop];
     }
 
-    var origin = __utils_35.getOriginXY(target.eventable, target.element);
+    var origin = __utils_36.getOriginXY(target.eventable, target.element);
     pointerEvent.subtractOrigin(origin);
     pointerEvent.eventable = target.eventable;
     pointerEvent.currentTarget = target.element;
@@ -8332,7 +8469,7 @@ function collectEventTargets(_ref) {
     return [];
   }
 
-  var path = __utils_35.dom.getPath(eventTarget);
+  var path = __utils_36.dom.getPath(eventTarget);
   var signalArg = {
     interaction: interaction,
     pointer: pointer,
@@ -8362,7 +8499,7 @@ function collectEventTargets(_ref) {
   return signalArg.targets;
 }
 
-function __install_35(scope) {
+function __install_36(scope) {
   var interactions = scope.interactions;
   scope.pointerEvents = pointerEvents;
   scope.defaults.actions.pointerEvents = pointerEvents.defaults;
@@ -8414,7 +8551,7 @@ function __install_35(scope) {
         eventTarget = _ref6.eventTarget,
         pointerIndex = _ref6.pointerIndex;
     var timer = interaction.pointers[pointerIndex].hold;
-    var path = __utils_35.dom.getPath(eventTarget);
+    var path = __utils_36.dom.getPath(eventTarget);
     var signalArg = {
       interaction: interaction,
       pointer: pointer,
@@ -8516,18 +8653,18 @@ function createSignalListener(type) {
   };
 }
 
-var ___default_35 = pointerEvents;
-_$base_35.default = ___default_35;
+var ___default_36 = pointerEvents;
+_$base_36.default = ___default_36;
 
-var _$holdRepeat_36 = {};
+var _$holdRepeat_37 = {};
 "use strict";
 
-Object.defineProperty(_$holdRepeat_36, "__esModule", {
+Object.defineProperty(_$holdRepeat_37, "__esModule", {
   value: true
 });
-_$holdRepeat_36.default = void 0;
+_$holdRepeat_37.default = void 0;
 
-function __install_36(scope) {
+function __install_37(scope) {
   var pointerEvents = scope.pointerEvents,
       interactions = scope.interactions;
   pointerEvents.signals.on('new', onNew);
@@ -8596,30 +8733,31 @@ function endHoldRepeat(_ref3) {
   }
 }
 
-var ___default_36 = {
-  install: __install_36
+var ___default_37 = {
+  id: 'pointer-events/holdRepeat',
+  install: __install_37
 };
-_$holdRepeat_36.default = ___default_36;
+_$holdRepeat_37.default = ___default_37;
 
-var _$interactableTargets_38 = {};
+var _$interactableTargets_39 = {};
 "use strict";
 
-Object.defineProperty(_$interactableTargets_38, "__esModule", {
+Object.defineProperty(_$interactableTargets_39, "__esModule", {
   value: true
 });
-_$interactableTargets_38.default = void 0;
+_$interactableTargets_39.default = void 0;
 
-/* removed: var _$arr_42 = require("@interactjs/utils/arr"); */;
+/* removed: var _$arr_43 = require("@interactjs/utils/arr"); */;
 
-var ___extend_38 = ___interopRequireDefault_38(_$extend_48);
+var ___extend_39 = ___interopRequireDefault_39(_$extend_49);
 
-var __is_38 = ___interopRequireWildcard_38(_$is_53);
+var __is_39 = ___interopRequireWildcard_39(_$is_54);
 
-function ___interopRequireWildcard_38(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_39(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___interopRequireDefault_38(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_39(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function __install_38(scope) {
+function __install_39(scope) {
   var pointerEvents = scope.pointerEvents,
       actions = scope.actions,
       Interactable = scope.Interactable,
@@ -8633,7 +8771,7 @@ function __install_38(scope) {
       var eventable = interactable.events;
       var options = eventable.options;
 
-      if (eventable.types[type] && eventable.types[type].length && __is_38.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+      if (eventable.types[type] && eventable.types[type].length && __is_39.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
         targets.push({
           element: element,
           eventable: eventable,
@@ -8654,10 +8792,10 @@ function __install_38(scope) {
   interactables.signals.on('set', function (_ref3) {
     var interactable = _ref3.interactable,
         options = _ref3.options;
-    (0, ___extend_38.default)(interactable.events.options, pointerEvents.defaults);
-    (0, ___extend_38.default)(interactable.events.options, options.pointerEvents || {});
+    (0, ___extend_39.default)(interactable.events.options, pointerEvents.defaults);
+    (0, ___extend_39.default)(interactable.events.options, options.pointerEvents || {});
   });
-  (0, _$arr_42.merge)(actions.eventTypes, pointerEvents.types);
+  (0, _$arr_43.merge)(actions.eventTypes, pointerEvents.types);
   Interactable.prototype.pointerEvents = pointerEventsMethod;
   var __backCompatOption = Interactable.prototype._backCompatOption;
 
@@ -8673,71 +8811,76 @@ function __install_38(scope) {
 }
 
 function pointerEventsMethod(options) {
-  (0, ___extend_38.default)(this.events.options, options);
+  (0, ___extend_39.default)(this.events.options, options);
   return this;
 }
 
-var ___default_38 = {
-  install: __install_38
+var ___default_39 = {
+  id: 'pointer-events/interactableTargets',
+  install: __install_39
 };
-_$interactableTargets_38.default = ___default_38;
+_$interactableTargets_39.default = ___default_39;
 
-var _$pointerEvents_37 = {};
+var _$pointerEvents_38 = {};
 "use strict";
 
-Object.defineProperty(_$pointerEvents_37, "__esModule", {
+Object.defineProperty(_$pointerEvents_38, "__esModule", {
   value: true
 });
-_$pointerEvents_37.install = __install_37;
-Object.defineProperty(_$pointerEvents_37, "pointerEvents", {
+_$pointerEvents_38.install = __install_38;
+Object.defineProperty(_$pointerEvents_38, "pointerEvents", {
   enumerable: true,
   get: function get() {
-    return ___base_37.default;
+    return ___base_38.default;
   }
 });
-Object.defineProperty(_$pointerEvents_37, "holdRepeat", {
+Object.defineProperty(_$pointerEvents_38, "holdRepeat", {
   enumerable: true,
   get: function get() {
     return _holdRepeat.default;
   }
 });
-Object.defineProperty(_$pointerEvents_37, "interactableTargets", {
+Object.defineProperty(_$pointerEvents_38, "interactableTargets", {
   enumerable: true,
   get: function get() {
     return _interactableTargets.default;
   }
 });
+_$pointerEvents_38.id = void 0;
 
-var ___base_37 = ___interopRequireDefault_37(_$base_35);
+var ___base_38 = ___interopRequireDefault_38(_$base_36);
 
-var _holdRepeat = ___interopRequireDefault_37(_$holdRepeat_36);
+var _holdRepeat = ___interopRequireDefault_38(_$holdRepeat_37);
 
-var _interactableTargets = ___interopRequireDefault_37(_$interactableTargets_38);
+var _interactableTargets = ___interopRequireDefault_38(_$interactableTargets_39);
 
-function ___interopRequireDefault_37(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_38(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function __install_37(scope) {
-  ___base_37.default.install(scope);
+function __install_38(scope) {
+  ___base_38.default.install(scope);
 
   _holdRepeat.default.install(scope);
 
   _interactableTargets.default.install(scope);
 }
 
-var _$reflow_39 = {};
+var __id_38 = 'pointer-events';
+_$pointerEvents_38.id = __id_38;
+
+var _$reflow_40 = {};
 "use strict";
 
-Object.defineProperty(_$reflow_39, "__esModule", {
+Object.defineProperty(_$reflow_40, "__esModule", {
   value: true
 });
-_$reflow_39.install = __install_39;
-_$reflow_39.default = void 0;
+_$reflow_40.install = __install_40;
+_$reflow_40.default = void 0;
 
-var ___interactions_39 = _$interactions_20({});
+var ___interactions_40 = _$interactions_20({});
 
-/* removed: var _$utils_51 = require("@interactjs/utils"); */;
+/* removed: var _$utils_52 = require("@interactjs/utils"); */;
 
-function __install_39(scope) {
+function __install_40(scope) {
   var actions = scope.actions,
       interactions = scope.interactions,
       Interactable = scope.Interactable; // add action reflow event types
@@ -8759,7 +8902,7 @@ function __install_39(scope) {
         interaction._reflowResolve();
       }
 
-      _$utils_51.arr.remove(scope.interactions.list, interaction);
+      _$utils_52.arr.remove(scope.interactions.list, interaction);
     }
   });
   /**
@@ -8785,9 +8928,9 @@ function __install_39(scope) {
 }
 
 function reflow(interactable, action, scope) {
-  var elements = _$utils_51.is.string(interactable.target) ? _$utils_51.arr.from(interactable._context.querySelectorAll(interactable.target)) : [interactable.target]; // tslint:disable-next-line variable-name
+  var elements = _$utils_52.is.string(interactable.target) ? _$utils_52.arr.from(interactable._context.querySelectorAll(interactable.target)) : [interactable.target]; // tslint:disable-next-line variable-name
 
-  var Promise = _$utils_51.win.window.Promise;
+  var Promise = _$utils_52.win.window.Promise;
   var promises = Promise ? [] : null;
 
   var _loop = function _loop() {
@@ -8799,7 +8942,7 @@ function reflow(interactable, action, scope) {
       return "break";
     }
 
-    var runningInteraction = _$utils_51.arr.find(scope.interactions.list, function (interaction) {
+    var runningInteraction = _$utils_52.arr.find(scope.interactions.list, function (interaction) {
       return interaction.interacting() && interaction.interactable === interactable && interaction.element === element && interaction.prepared.name === action.name;
     });
 
@@ -8814,7 +8957,7 @@ function reflow(interactable, action, scope) {
         });
       }
     } else {
-      var xywh = _$utils_51.rect.tlbrToXywh(rect);
+      var xywh = _$utils_52.rect.tlbrToXywh(rect);
 
       var coords = {
         page: {
@@ -8828,7 +8971,7 @@ function reflow(interactable, action, scope) {
         timeStamp: Date.now()
       };
 
-      var event = _$utils_51.pointer.coordsToEvent(coords);
+      var event = _$utils_52.pointer.coordsToEvent(coords);
 
       reflowPromise = startReflow(scope, interactable, element, action, event);
     }
@@ -8852,7 +8995,7 @@ function reflow(interactable, action, scope) {
 }
 
 function startReflow(scope, interactable, element, action, event) {
-  var interaction = (0, ___interactions_39.newInteraction)({
+  var interaction = (0, ___interactions_40.newInteraction)({
     pointerType: 'reflow'
   }, scope);
   var signalArg = {
@@ -8864,13 +9007,13 @@ function startReflow(scope, interactable, element, action, event) {
   };
   interaction.interactable = interactable;
   interaction.element = element;
-  interaction.prepared = (0, _$utils_51.extend)({}, action);
+  interaction.prepared = (0, _$utils_52.extend)({}, action);
   interaction.prevEvent = event;
   interaction.updatePointer(event, event, element, true);
 
   interaction._doPhase(signalArg);
 
-  var reflowPromise = _$utils_51.win.window.Promise ? new _$utils_51.win.window.Promise(function (resolve) {
+  var reflowPromise = _$utils_52.win.window.Promise ? new _$utils_52.win.window.Promise(function (resolve) {
     interaction._reflowResolve = resolve;
   }) : null;
   interaction._reflowPromise = reflowPromise;
@@ -8888,85 +9031,88 @@ function startReflow(scope, interactable, element, action, event) {
   return reflowPromise;
 }
 
-var ___default_39 = {
-  install: __install_39
+var ___default_40 = {
+  id: 'reflow',
+  install: __install_40
 };
-_$reflow_39.default = ___default_39;
+_$reflow_40.default = ___default_40;
 
-var _$interact_23 = {};
+var _$interact_24 = {};
 "use strict";
 
-Object.defineProperty(_$interact_23, "__esModule", {
+Object.defineProperty(_$interact_24, "__esModule", {
   value: true
 });
-_$interact_23.init = __init_23;
-Object.defineProperty(_$interact_23, "autoScroll", {
+_$interact_24.init = __init_24;
+Object.defineProperty(_$interact_24, "autoScroll", {
   enumerable: true,
   get: function get() {
     return _autoScroll.default;
   }
 });
-Object.defineProperty(_$interact_23, "interactablePreventDefault", {
+Object.defineProperty(_$interact_24, "interactablePreventDefault", {
   enumerable: true,
   get: function get() {
     return _interactablePreventDefault.default;
   }
 });
-Object.defineProperty(_$interact_23, "inertia", {
+Object.defineProperty(_$interact_24, "inertia", {
   enumerable: true,
   get: function get() {
     return _inertia.default;
   }
 });
-Object.defineProperty(_$interact_23, "modifiers", {
+Object.defineProperty(_$interact_24, "modifiers", {
   enumerable: true,
   get: function get() {
-    return ___base_23.default;
+    return ___base_24.default;
   }
 });
-Object.defineProperty(_$interact_23, "reflow", {
+Object.defineProperty(_$interact_24, "reflow", {
   enumerable: true,
   get: function get() {
     return _reflow.default;
   }
 });
-Object.defineProperty(_$interact_23, "interact", {
+Object.defineProperty(_$interact_24, "interact", {
   enumerable: true,
   get: function get() {
     return _interact.default;
   }
 });
-_$interact_23.pointerEvents = _$interact_23.actions = _$interact_23.default = void 0;
+_$interact_24.pointerEvents = _$interact_24.actions = _$interact_24.default = void 0;
 
-var actions = ___interopRequireWildcard_23(_$actions_5);
+var actions = ___interopRequireWildcard_24(_$actions_5);
 
-_$interact_23.actions = actions;
+_$interact_24.actions = actions;
 
-var _autoScroll = ___interopRequireDefault_23(_$autoScroll_7);
+var _autoScroll = ___interopRequireDefault_24(_$autoScroll_7);
 
-var autoStart = ___interopRequireWildcard_23(_$autoStart_12);
+var autoStart = ___interopRequireWildcard_24(_$autoStart_12);
 
-var _interactablePreventDefault = ___interopRequireDefault_23(_$interactablePreventDefault_19);
+var _interactablePreventDefault = ___interopRequireDefault_24(_$interactablePreventDefault_19);
 
-var _inertia = ___interopRequireDefault_23(_$inertia_22);
+var _devTools = ___interopRequireDefault_24(_$devTools_22);
 
-var modifiers = ___interopRequireWildcard_23(_$modifiers_27);
+var _inertia = ___interopRequireDefault_24(_$inertia_23);
 
-var ___base_23 = ___interopRequireDefault_23(_$base_26);
+var modifiers = ___interopRequireWildcard_24(_$modifiers_28);
 
-var __pointerEvents_23 = ___interopRequireWildcard_23(_$pointerEvents_37);
+var ___base_24 = ___interopRequireDefault_24(_$base_27);
 
-_$interact_23.pointerEvents = __pointerEvents_23;
+var __pointerEvents_24 = ___interopRequireWildcard_24(_$pointerEvents_38);
 
-var _reflow = ___interopRequireDefault_23(_$reflow_39);
+_$interact_24.pointerEvents = __pointerEvents_24;
 
-var _interact = ___interopRequireWildcard_23(_$interact_24);
+var _reflow = ___interopRequireDefault_24(_$reflow_40);
 
-function ___interopRequireDefault_23(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _interact = ___interopRequireWildcard_24(_$interact_25);
 
-function ___interopRequireWildcard_23(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireDefault_24(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function __init_23(window) {
+function ___interopRequireWildcard_24(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+
+function __init_24(window) {
   _interact.scope.init(window);
 
   _interact.default.use(_interactablePreventDefault.default); // inertia
@@ -8975,7 +9121,7 @@ function __init_23(window) {
   _interact.default.use(_inertia.default); // pointerEvents
 
 
-  _interact.default.use(__pointerEvents_23); // autoStart, hold
+  _interact.default.use(__pointerEvents_24); // autoStart, hold
 
 
   _interact.default.use(autoStart); // drag and drop, resize, gesture
@@ -8984,7 +9130,7 @@ function __init_23(window) {
   _interact.default.use(actions); // snap, resize, etc.
 
 
-  _interact.default.use(___base_23.default); // for backwrads compatibility
+  _interact.default.use(___base_24.default); // for backwrads compatibility
 
 
   for (var type in modifiers) {
@@ -8999,39 +9145,44 @@ function __init_23(window) {
   _interact.default.use(_autoScroll.default); // reflow
 
 
-  _interact.default.use(_reflow.default);
+  _interact.default.use(_reflow.default); // eslint-disable-next-line no-undef
+
+
+  if (undefined !== 'production') {
+    _interact.default.use(_devTools.default);
+  }
 
   return _interact.default;
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_23.version = "1.4.0-rc.0";
-var ___default_23 = _interact.default;
-_$interact_23.default = ___default_23;
+_interact.default.version = __init_24.version = "1.4.0-rc.1";
+var ___default_24 = _interact.default;
+_$interact_24.default = ___default_24;
 
-var _$types_40 = {};
+var _$types_41 = {};
 /// <reference path="./types.d.ts" />
 "use strict";
 
-var _$grid_60 = {};
+var _$grid_61 = {};
 "use strict";
 
-Object.defineProperty(_$grid_60, "__esModule", {
+Object.defineProperty(_$grid_61, "__esModule", {
   value: true
 });
-_$grid_60.default = void 0;
+_$grid_61.default = void 0;
 
-function ___slicedToArray_60(arr, i) { return ___arrayWithHoles_60(arr) || ___iterableToArrayLimit_60(arr, i) || ___nonIterableRest_60(); }
+function ___slicedToArray_61(arr, i) { return ___arrayWithHoles_61(arr) || ___iterableToArrayLimit_61(arr, i) || ___nonIterableRest_61(); }
 
-function ___nonIterableRest_60() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+function ___nonIterableRest_61() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
 
-function ___iterableToArrayLimit_60(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function ___iterableToArrayLimit_61(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
-function ___arrayWithHoles_60(arr) { if (Array.isArray(arr)) return arr; }
+function ___arrayWithHoles_61(arr) { if (Array.isArray(arr)) return arr; }
 
 function createGrid(grid) {
   var coordFields = [['x', 'y'], ['left', 'top'], ['right', 'bottom'], ['width', 'height']].filter(function (_ref) {
-    var _ref2 = ___slicedToArray_60(_ref, 2),
+    var _ref2 = ___slicedToArray_61(_ref, 2),
         xField = _ref2[0],
         yField = _ref2[1];
 
@@ -9061,7 +9212,7 @@ function createGrid(grid) {
       _ref3 = coordFields[_i2];
 
       var _ref4 = _ref3,
-          _ref5 = ___slicedToArray_60(_ref4, 2),
+          _ref5 = ___slicedToArray_61(_ref4, 2),
           xField = _ref5[0],
           yField = _ref5[1];
 
@@ -9075,78 +9226,79 @@ function createGrid(grid) {
   };
 }
 
-var ___default_60 = createGrid;
-_$grid_60.default = ___default_60;
+var ___default_61 = createGrid;
+_$grid_61.default = ___default_61;
 
-var _$snappers_61 = {};
+var _$snappers_62 = {};
 "use strict";
 
-Object.defineProperty(_$snappers_61, "__esModule", {
+Object.defineProperty(_$snappers_62, "__esModule", {
   value: true
 });
-Object.defineProperty(_$snappers_61, "grid", {
+Object.defineProperty(_$snappers_62, "grid", {
   enumerable: true,
   get: function get() {
     return _grid.default;
   }
 });
 
-var _grid = ___interopRequireDefault_61(_$grid_60);
+var _grid = ___interopRequireDefault_62(_$grid_61);
 
-function ___interopRequireDefault_61(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _$index_25 = { exports: {} };
+var _$index_26 = { exports: {} };
 "use strict";
 
-Object.defineProperty(_$index_25.exports, "__esModule", {
+Object.defineProperty(_$index_26.exports, "__esModule", {
   value: true
 });
-_$index_25.exports.init = __init_25;
-_$index_25.exports.default = void 0;
+_$index_26.exports.init = __init_26;
+_$index_26.exports.default = void 0;
 
-var ___interact_25 = ___interopRequireWildcard_25(_$interact_23);
+var ___interact_26 = ___interopRequireWildcard_26(_$interact_24);
 
-var __modifiers_25 = ___interopRequireWildcard_25(_$modifiers_27);
+var __modifiers_26 = ___interopRequireWildcard_26(_$modifiers_28);
 
-_$types_40;
+_$types_41;
 
-var ___extend_25 = ___interopRequireDefault_25(_$extend_48);
+var ___extend_26 = ___interopRequireDefault_26(_$extend_49);
 
-var snappers = ___interopRequireWildcard_25(_$snappers_61);
+var snappers = ___interopRequireWildcard_26(_$snappers_62);
 
-function ___interopRequireDefault_25(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function ___interopRequireDefault_26(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function ___interopRequireWildcard_25(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+function ___interopRequireWildcard_26(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
-function ___typeof_25(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_25 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_25 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_25(obj); }
+function ___typeof_26(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_26 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_26 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_26(obj); }
 
-if ((typeof window === "undefined" ? "undefined" : ___typeof_25(window)) === 'object' && !!window) {
-  __init_25(window);
+if ((typeof window === "undefined" ? "undefined" : ___typeof_26(window)) === 'object' && !!window) {
+  __init_26(window);
 }
 
-function __init_25(win) {
-  (0, ___interact_25.init)(win);
-  return ___interact_25.default.use({
+function __init_26(win) {
+  (0, ___interact_26.init)(win);
+  return ___interact_26.default.use({
+    id: 'interactjs',
     install: function install(scope) {
-      ___interact_25.default.modifiers = (0, ___extend_25.default)(scope.modifiers, __modifiers_25);
-      ___interact_25.default.snappers = snappers;
-      ___interact_25.default.createSnapGrid = ___interact_25.default.snappers.grid;
+      ___interact_26.default.modifiers = (0, ___extend_26.default)(scope.modifiers, __modifiers_26);
+      ___interact_26.default.snappers = snappers;
+      ___interact_26.default.createSnapGrid = ___interact_26.default.snappers.grid;
     }
   });
 }
 
-var ___default_25 = ___interact_25.default;
-_$index_25.exports.default = ___default_25;
-___interact_25.default['default'] = ___interact_25.default; // tslint:disable-line no-string-literal
+var ___default_26 = ___interact_26.default;
+_$index_26.exports.default = ___default_26;
+___interact_26.default['default'] = ___interact_26.default; // tslint:disable-line no-string-literal
 
-___interact_25.default['init'] = __init_25; // tslint:disable-line no-string-literal
+___interact_26.default['init'] = __init_26; // tslint:disable-line no-string-literal
 
-if (("object" === "undefined" ? "undefined" : ___typeof_25(_$index_25)) === 'object' && !!_$index_25) {
-  _$index_25.exports = ___interact_25.default;
+if (("object" === "undefined" ? "undefined" : ___typeof_26(_$index_26)) === 'object' && !!_$index_26) {
+  _$index_26.exports = ___interact_26.default;
 }
 
-_$index_25 = _$index_25.exports
-return _$index_25;
+_$index_26 = _$index_26.exports
+return _$index_26;
 
 });
 

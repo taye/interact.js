@@ -26,6 +26,7 @@ declare function onDocSignal({ doc, scope, options }: {
     options: any;
 }, signalName: any): void;
 declare const _default: {
+    id: string;
     install: typeof install;
     onDocSignal: typeof onDocSignal;
     doOnInteractions: typeof doOnInteractions;

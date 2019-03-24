@@ -44,6 +44,7 @@ export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
 }
 declare function install(scope: Scope): void;
 declare const resize: {
+    id: string;
     install: typeof install;
     defaults: import("../types/types").ResizableOptions;
     checker(_pointer: import("../types/types").PointerType, _event: import("../types/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: Element, interaction: Interaction<any>, rect: import("../types/types").Rect): {

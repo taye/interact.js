@@ -64,6 +64,7 @@ declare function getDropEvents(interaction: Interact.Interaction, _pointerEvent:
 };
 declare function fireDropEvents(interaction: Interact.Interaction, events: any): void;
 declare const drop: {
+    id: string;
     install: typeof install;
     getActiveDrops: typeof getActiveDrops;
     getDrop: typeof getDrop;

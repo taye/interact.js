@@ -69,6 +69,7 @@ declare function makeModifier(module: any, name?: string): {
     };
 };
 declare const _default: {
+    id: string;
     install: typeof install;
     startAll: typeof startAll;
     setAll: typeof setAll;
