@@ -161,6 +161,7 @@ const draggable: DraggableMethod = function draggable (this: Interact.Interactab
 }
 
 const drag = {
+  id: 'actions/drag',
   install,
   draggable,
   beforeMove,

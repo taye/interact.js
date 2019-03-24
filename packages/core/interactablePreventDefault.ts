@@ -102,4 +102,7 @@ export function install (scope) {
 
 export type Install = typeof install
 
-export default { install }
+export default {
+  id: 'core/interactablePreventDefault',
+  install,
+}

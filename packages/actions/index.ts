@@ -11,7 +11,11 @@ function install (scope: Scope) {
   drop.install(scope)
 }
 
+const id = 'actions'
+
 export {
+  id,
+  install,
   gesture,
   GestureEvent,
   resize,
@@ -19,5 +23,4 @@ export {
   drag,
   DragEvent,
   drop,
-  install,
 }

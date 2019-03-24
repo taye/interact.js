@@ -295,6 +295,7 @@ function setCursor (element: HTMLElement, cursor, scope: Interact.Scope) {
 }
 
 export default {
+  id: 'auto-start/base',
   install,
   maxInteractions,
   withinInteractionLimit,

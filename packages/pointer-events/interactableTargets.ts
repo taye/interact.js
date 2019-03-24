@@ -73,5 +73,6 @@ function pointerEventsMethod (this: Interactable, options: any) {
 }
 
 export default {
+  id: 'pointer-events/interactableTargets',
   install,
 }

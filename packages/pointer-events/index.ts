@@ -8,4 +8,6 @@ function install (scope) {
   interactableTargets.install(scope)
 }
 
-export { pointerEvents, holdRepeat, interactableTargets, install }
+const id = 'pointer-events'
+
+export { id, pointerEvents, holdRepeat, interactableTargets, install }

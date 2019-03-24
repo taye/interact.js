@@ -156,4 +156,7 @@ function startReflow (scope: Scope, interactable: Interactable, element: Element
   return reflowPromise
 }
 
-export default { install }
+export default {
+  id: 'reflow',
+  install,
+}

@@ -368,6 +368,7 @@ function makeModifier (module, name?: string) {
 }
 
 export default {
+  id: 'modifiers/base',
   install,
   startAll,
   setAll,

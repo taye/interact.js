@@ -20,6 +20,7 @@ export function init (win: Window) {
   initInteract(win)
 
   return interact.use({
+    id: 'interactjs',
     install (scope) {
       interact.modifiers = extend(scope.modifiers, modifiers)
       interact.snappers = snappers

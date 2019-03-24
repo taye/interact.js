@@ -69,5 +69,19 @@ test('interact export', (t) => {
 
   scope.interactables.list.forEach((i) => i.unset())
 
+  const plugin1 = { id: 'test-1', install () { plugin1.count++ }, count: 0 }
+  const plugin2 = { id: undefined, install () { plugin2.count++ }, count: 0 }
+
+  interact.use(plugin1)
+  interact.use(plugin2)
+
+  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'new plugin install methods are called')
+
+  interact.use({ ...plugin1 })
+  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'different plugin object with same id not installed')
+
+  interact.use(plugin2)
+  t.deepEqual([plugin1.count, plugin2.count], [1, 1], 'plugin without id not re-installed')
+
   t.end()
 })

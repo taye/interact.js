@@ -212,6 +212,7 @@ function onDocSignal ({ doc, scope, options }, signalName) {
 }
 
 export default {
+  id: 'core/interactions',
   install,
   onDocSignal,
   doOnInteractions,

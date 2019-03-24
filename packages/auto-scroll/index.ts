@@ -233,4 +233,7 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
   }
 }
 
-export default { install }
+export default {
+  id: 'auto-scroll',
+  install,
+}

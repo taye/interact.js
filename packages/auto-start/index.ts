@@ -8,9 +8,12 @@ function install (scope) {
   dragAxis.install(scope)
 }
 
+const id = 'auto-start'
+
 export {
+  id,
+  install,
   autoStart,
   hold,
   dragAxis,
-  install,
 }

@@ -208,4 +208,7 @@ function actionChecker (this: Interactable, checker: any) {
   return this.options.actionChecker
 }
 
-export default { install }
+export default {
+  id: 'auto-start/interactableMethods',
+  install,
+}
