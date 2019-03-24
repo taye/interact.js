@@ -1,3 +1,4 @@
+import { PerActionDefaults } from '@interactjs/core/defaultOptions';
 import Eventable from '@interactjs/core/Eventable';
 import Interaction from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
@@ -10,6 +11,13 @@ declare type EventTargetList = Array<{
         [key: string]: any;
     };
 }>;
+export interface PointerEventOptions extends PerActionDefaults {
+    enabled?: undefined;
+    holdDuration?: number;
+    ignoreFrom?: any;
+    allowFrom?: any;
+    origin?: Interact.Point | string | Element;
+}
 declare module '@interactjs/core/scope' {
     interface Scope {
         pointerEvents: typeof pointerEvents;
@@ -42,15 +50,7 @@ declare const pointerEvents: {
     fire: typeof fire;
     collectEventTargets: typeof collectEventTargets;
     createSignalListener: typeof createSignalListener;
-    defaults: {
-        holdDuration: number;
-        ignoreFrom: any;
-        allowFrom: any;
-        origin: {
-            x: number;
-            y: number;
-        };
-    };
+    defaults: PointerEventOptions;
     types: string[];
 };
 declare function fire<T extends string>(arg: {

@@ -3,9 +3,10 @@ declare module '@interactjs/core/Interaction' {
         holdIntervalHandle?: any;
     }
 }
-declare function install(scope: any): void;
-declare const _default: {
-    id: string;
-    install: typeof install;
-};
+declare module '@interactjs/pointer-events/base' {
+    interface PointerEventOptions {
+        holdRepeatInterval?: number;
+    }
+}
+declare const _default: import("@interactjs/core/scope").Plugin;
 export default _default;

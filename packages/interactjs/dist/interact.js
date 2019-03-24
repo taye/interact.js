@@ -1,5 +1,5 @@
 /**
- * interact.js v1.4.0-rc.1+sha.27a9693-dirty
+ * interact.js v1.4.0-rc.2+sha.033f15b-dirty
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -95,6 +95,8 @@ function () {
     this.interactables = new InteractableSet(this); // all documents being listened to
 
     this.documents = [];
+    this._plugins = [];
+    this._pluginMap = {};
 
     this.onWindowUnload = function (event) {
       return _this.removeDocument(event.target);
@@ -148,6 +150,28 @@ function () {
     key: "init",
     value: function init(window) {
       return initScope(this, window);
+    }
+  }, {
+    key: "pluginIsInstalled",
+    value: function pluginIsInstalled(plugin) {
+      return this._pluginMap[plugin.id] || this._plugins.indexOf(plugin) !== -1;
+    }
+  }, {
+    key: "usePlugin",
+    value: function usePlugin(plugin, options) {
+      if (this.pluginIsInstalled(plugin)) {
+        return this;
+      }
+
+      plugin.install(this, options);
+
+      this._plugins.push(plugin);
+
+      if (plugin.id) {
+        this._pluginMap[plugin.id] = plugin;
+      }
+
+      return this;
     }
   }, {
     key: "addDocument",
@@ -4103,6 +4127,8 @@ _$drop_3.default = void 0;
 
 var __utils_3 = ___interopRequireWildcard_3(_$utils_52);
 
+var _drag = ___interopRequireDefault_3(_$drag_1);
+
 var _DropEvent = ___interopRequireDefault_3(_$DropEvent_2);
 
 function ___interopRequireDefault_3(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -4115,6 +4141,7 @@ function __install_3(scope) {
       Interactable = scope.Interactable,
       interactions = scope.interactions,
       defaults = scope.defaults;
+  scope.usePlugin(_drag.default);
   interactions.signals.on('before-action-start', function (_ref) {
     var interaction = _ref.interaction;
 
@@ -4611,7 +4638,7 @@ function dropCheckMethod(interactable, dragEvent, event, draggable, draggableEle
 }
 
 var drop = {
-  id: 'actions/draop',
+  id: 'actions/drop',
   install: __install_3,
   getActiveDrops: getActiveDrops,
   getDrop: getDrop,
@@ -5263,7 +5290,7 @@ _$actions_5.install = __install_5;
 Object.defineProperty(_$actions_5, "drag", {
   enumerable: true,
   get: function get() {
-    return _drag.default;
+    return ___drag_5.default;
   }
 });
 Object.defineProperty(_$actions_5, "drop", {
@@ -5286,7 +5313,7 @@ Object.defineProperty(_$actions_5, "resize", {
 });
 _$actions_5.id = void 0;
 
-var _drag = ___interopRequireDefault_5(_$drag_1);
+var ___drag_5 = ___interopRequireDefault_5(_$drag_1);
 
 var _drop = ___interopRequireDefault_5(_$drop_3);
 
@@ -5301,7 +5328,7 @@ function __install_5(scope) {
 
   _resize.default.install(scope);
 
-  _drag.default.install(scope);
+  ___drag_5.default.install(scope);
 
   _drop.default.install(scope);
 }
@@ -6090,7 +6117,7 @@ function __install_10(scope) {
         if (!options.manualStart && interactable.testIgnoreAllow(options, element, eventTarget)) {
           var action = interactable.getAction(interaction.downPointer, interaction.downEvent, interaction, element);
 
-          if (action && action.name === 'drag' && checkStartAxis(currentAxis, interactable) && _base.default.validateAction(action, interactable, element, eventTarget, scope)) {
+          if (action && action.name === ___scope_10.ActionName.Drag && checkStartAxis(currentAxis, interactable) && _base.default.validateAction(action, interactable, element, eventTarget, scope)) {
             return interactable;
           }
         }
@@ -6117,7 +6144,7 @@ function __install_10(scope) {
       return false;
     }
 
-    var thisAxis = interactable.options.drag.startAxis;
+    var thisAxis = interactable.options[___scope_10.ActionName.Drag].startAxis;
     return startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis;
   }
 }
@@ -6136,10 +6163,15 @@ Object.defineProperty(_$hold_11, "__esModule", {
 });
 _$hold_11.default = void 0;
 
+var ___base_11 = ___interopRequireDefault_11(_$base_9);
+
+function ___interopRequireDefault_11(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function __install_11(scope) {
   var autoStart = scope.autoStart,
       interactions = scope.interactions,
       defaults = scope.defaults;
+  scope.usePlugin(___base_11.default);
   defaults.perAction.hold = 0;
   defaults.perAction.delay = 0;
   interactions.signals.on('new', function (interaction) {
@@ -6921,6 +6953,7 @@ _$InteractEvent_14.EventPhase.InertiaStart = 'inertiastart';
 function __install_23(scope) {
   var interactions = scope.interactions,
       defaults = scope.defaults;
+  scope.usePlugin(___base_23.default);
   interactions.signals.on('new', function (_ref) {
     var interaction = _ref.interaction;
     interaction.inertia = {
@@ -7264,14 +7297,6 @@ var interact = function interact(target, options) {
 
   return interactable;
 };
-
-_$interact_25.interact = interact;
-scope._plugins = [];
-scope._pluginMap = {};
-
-function pluginIsInstalled(plugin) {
-  return scope._pluginMap[plugin.id] || scope._plugins.indexOf(plugin) !== -1;
-}
 /**
  * Use a plugin
  *
@@ -7283,21 +7308,11 @@ function pluginIsInstalled(plugin) {
  */
 
 
+_$interact_25.interact = interact;
 interact.use = use;
 
 function use(plugin, options) {
-  if (pluginIsInstalled(plugin)) {
-    return interact;
-  }
-
-  plugin.install(scope, options);
-
-  scope._plugins.push(plugin);
-
-  if (plugin.id) {
-    scope._pluginMap[plugin.id] = plugin;
-  }
-
+  scope.usePlugin(plugin, options);
   return interact;
 }
 /**
@@ -8376,6 +8391,15 @@ function ___interopRequireWildcard_36(obj) { if (obj && obj.__esModule) { return
 var signals = new __utils_36.Signals();
 var simpleSignals = ['down', 'up', 'cancel'];
 var simpleEvents = ['down', 'up', 'cancel'];
+var __defaults_36 = {
+  holdDuration: 600,
+  ignoreFrom: null,
+  allowFrom: null,
+  origin: {
+    x: 0,
+    y: 0
+  }
+};
 var pointerEvents = {
   id: 'pointer-events/base',
   install: __install_36,
@@ -8384,15 +8408,7 @@ var pointerEvents = {
   fire: fire,
   collectEventTargets: collectEventTargets,
   createSignalListener: createSignalListener,
-  defaults: {
-    holdDuration: 600,
-    ignoreFrom: null,
-    allowFrom: null,
-    origin: {
-      x: 0,
-      y: 0
-    }
-  },
+  defaults: __defaults_36,
   types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
 };
 
@@ -8664,9 +8680,14 @@ Object.defineProperty(_$holdRepeat_37, "__esModule", {
 });
 _$holdRepeat_37.default = void 0;
 
+var ___base_37 = ___interopRequireDefault_37(_$base_36);
+
+function ___interopRequireDefault_37(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function __install_37(scope) {
   var pointerEvents = scope.pointerEvents,
       interactions = scope.interactions;
+  scope.usePlugin(___base_37.default);
   pointerEvents.signals.on('new', onNew);
   pointerEvents.signals.on('fired', function (arg) {
     return onFired(arg, pointerEvents);
@@ -9156,7 +9177,7 @@ function __init_24(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_24.version = "1.4.0-rc.1";
+_interact.default.version = __init_24.version = "1.4.0-rc.2";
 var ___default_24 = _interact.default;
 _$interact_24.default = ___default_24;
 

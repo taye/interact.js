@@ -3,18 +3,9 @@ import { Options } from '@interactjs/core/defaultOptions';
 import Interactable from '@interactjs/core/Interactable';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
-export interface Plugin {
-    id?: string;
-    install(scope: Scope, options?: any): void;
-    [key: string]: any;
-}
 declare module '@interactjs/core/scope' {
     interface Scope {
         interact: InteractStatic;
-        _plugins: Plugin[];
-        _pluginMap: {
-            [id: string]: Plugin;
-        };
     }
 }
 export interface InteractStatic {
@@ -67,7 +58,7 @@ declare const scope: Scope;
  * @return {Interactable}
  */
 export declare const interact: InteractStatic;
-declare function use(plugin: Plugin, options?: {
+declare function use(plugin: Interact.Plugin, options?: {
     [key: string]: any;
 }): InteractStatic;
 declare function isSet(element: Element, options?: any): boolean;

@@ -1,4 +1,3 @@
-declare type Scope = import('@interactjs/core/scope').Scope;
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
         hold?: number;
@@ -10,7 +9,7 @@ declare module '@interactjs/core/Interaction' {
         autoStartHoldTimer?: any;
     }
 }
-declare function install(scope: Scope): void;
+declare function install(scope: Interact.Scope): void;
 declare function getHoldDuration(interaction: any): any;
 declare const _default: {
     id: string;
