@@ -13,8 +13,8 @@ When creating snap modifiers the options have an array of `targets`. The action
 events will be snapped to the closest target of this array which is within
 range.
 
-`interact.modifiers.snap()`
-===========================
+`snap()`
+========
 
 The `snap` modifier changes the pointer coordinates to specified targets when
 they are within range.
@@ -98,8 +98,8 @@ modifier. The value may be:
  - or `'parent'` which will use the top-left coordinates of the target's parent
    element
 
-`interact.modifiers.snapSize()`
-===============================
+`snapSize()`
+============
 
 ```js
 interact(target).resizable({
@@ -121,8 +121,8 @@ The `snapSize` modifier snaps the *dimensions* of targets when resizing. A
 `y` number props *or* `width` and `height` number props as well as an optional
 `range`.
 
-`interact.modifiers.snapEdges()`
-================================
+`snapEdges()`
+=============
 
 ```js
 interact(target).resizable({
