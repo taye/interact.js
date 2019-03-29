@@ -1,6 +1,7 @@
 *.ts
 !*.d.ts
 *.spec.ts
+*.spec.js
 dist/docs
 tests
 guide

@@ -1,8 +1,6 @@
-const gitRev = require('./gitRev')
 const version = require('./version')
 
-module.exports = (input, versionOptions) => [
-  [ /[{]VERSION[}]/g, version.get(versionOptions) ],
+module.exports = (input) => [
+  [ /[{]VERSION[}]/g, version.get() ],
   [ /[{]YEAR[}]/g, new Date().getFullYear() ],
-  [ /[{]GIT_REV[}]/g, gitRev.short() ],
 ].reduce((result, [rx, str]) => result.replace(rx, str), input)

@@ -1,30 +1,30 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.4.0-rc.2+sha.033f15b",
+  "version": "1.4.0-rc.3",
   "peerDependencies": {
-    "@interactjs/actions": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/auto-scroll": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/auto-start": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/core": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/dev-tools": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/inertia": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/modifiers": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/pointer-events": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/reflow": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/utils": "1.4.0-rc.2+sha.033f15b"
+    "@interactjs/actions": "1.4.0-rc.2",
+    "@interactjs/auto-scroll": "1.4.0-rc.2",
+    "@interactjs/auto-start": "1.4.0-rc.2",
+    "@interactjs/core": "1.4.0-rc.2",
+    "@interactjs/dev-tools": "1.4.0-rc.2",
+    "@interactjs/inertia": "1.4.0-rc.2",
+    "@interactjs/modifiers": "1.4.0-rc.2",
+    "@interactjs/pointer-events": "1.4.0-rc.2",
+    "@interactjs/reflow": "1.4.0-rc.2",
+    "@interactjs/utils": "1.4.0-rc.2"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/actions": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/auto-scroll": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/auto-start": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/core": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/dev-tools": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/inertia": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/modifiers": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/pointer-events": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/reflow": "1.4.0-rc.2+sha.033f15b",
-    "@interactjs/utils": "1.4.0-rc.2+sha.033f15b"
+    "@interactjs/_dev": "1.4.0-rc.3",
+    "@interactjs/actions": "1.4.0-rc.3",
+    "@interactjs/auto-scroll": "1.4.0-rc.3",
+    "@interactjs/auto-start": "1.4.0-rc.3",
+    "@interactjs/core": "1.4.0-rc.3",
+    "@interactjs/dev-tools": "1.4.0-rc.3",
+    "@interactjs/inertia": "1.4.0-rc.3",
+    "@interactjs/modifiers": "1.4.0-rc.3",
+    "@interactjs/pointer-events": "1.4.0-rc.3",
+    "@interactjs/reflow": "1.4.0-rc.3",
+    "@interactjs/utils": "1.4.0-rc.3"
   },
   "publishConfig": {
     "access": "public"
