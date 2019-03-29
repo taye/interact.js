@@ -13,7 +13,6 @@ module.exports = function bundleProcessor ({
   minHeaderFile,
   destDir,
   name,
-  metadata,
 }) {
   mkdirp(destDir)
 
@@ -69,7 +68,7 @@ module.exports = function bundleProcessor ({
       code,
       map,
       headerFilename,
-      replacer: input => replacer(input, { updateMetadata: metadata }),
+      replacer: input => replacer(input),
     }
   }
 }

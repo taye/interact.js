@@ -6,7 +6,6 @@ const argv = require('yargs')
   .default({
     watch: false,
     docs: false,
-    metadata: true,
     debug: true,
     headerFile: require.resolve('./header.js'),
     minHeaderFile: require.resolve('./minHeader.js'),

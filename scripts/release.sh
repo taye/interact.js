@@ -1,22 +1,18 @@
 #!/usr/bin/sh
 PATH=$PATH:$PWD/node_modules/.bin
 
-NEW_VERSION=$1
-RELEASE_BRANCH="stable"
-BUILD_ARG="--no-metadata"
+RELEASE_BRANCH=$1
+NEW_VERSION=$2
 
 ROOT=$(dirname $(readlink -f $0))/..
-
-if [[ $NEW_VERSION == "prerelease" ]]; then
-  RELEASE_BRANCH="next"
-  BUILD_ARG="--metadata"
-fi
+INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 main() {
   ensure_clean_index &&
+    check_args &&
+    bump_version &&
     merge_to_release &&
     run_tests &&
-    bump_version &&
     run_build &&
     bootstrap &&
     commit_and_tag &&
@@ -37,10 +33,38 @@ ensure_clean_index() {
   fi
 }
 
-merge_to_release() {
+check_args() {
   echo_funcname
 
-  INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  if [[ -z $RELEASE_BRANCH ]] | [[ -z $NEW_VERSION ]]; then
+    quit "Missing args. Usage: release.sh release_branch new_version" 1
+  fi
+}
+
+bump_version() {
+  echo_funcname
+
+  npx lerna version --no-git-tag-version --exact $NEW_VERSION ||
+    quit "failed to bump version" 1
+
+  # copy license file
+  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
+    quit "failed to copy LICENSE"
+
+  NEW_VERSION=$(node $ROOT/scripts/version.js)
+  NEW_TAG="v$(semver clean $NEW_VERSION)"
+
+  # if the version tag already exists
+  if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
+    quit "$NEW_TAG tag already exists" 1
+  fi
+
+  git add .
+  git commit -m "chore: bump version to ${NEW_VERSION}"
+}
+
+merge_to_release() {
+  echo_funcname
 
   echo "checking out the '$RELEASE_BRANCH' branch"
   git checkout $RELEASE_BRANCH || exit $?
@@ -61,33 +85,8 @@ run_tests() {
   npm run tsc_lint_test || quit "tests have failed" $?
 }
 
-bump_version() {
-  echo_funcname
-
-  # bump the version in package.json
-  NEW_VERSION=$($ROOT/scripts/bump.js $NEW_VERSION)
-
-  if [[ -z $NEW_VERSION ]]; then
-    quit "failed to bump version" 1
-  fi
-
-  NEW_TAG="v$(semver clean $NEW_VERSION)"
-
-  # if the version tag already exists
-  if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
-    quit "$NEW_TAG tag already exists" 1
-  fi
-
-  npx lerna version --no-git-tag-version $NEW_VERSION &&
-    npx lerna exec -- $ROOT/scripts/bump.js $NEW_VERSION > /dev/null ||
-    quit "failed to bump version" 1
-}
-
 run_build() {
   echo_funcname
-
-  # copy license file
-  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . &&
 
   # copy README
   cp $ROOT/README.md packages/interactjs/ &&
@@ -100,7 +99,7 @@ run_build() {
     cat ../../.npmignore >> .npmignore" &&
 
   # build packages
-  npx lerna run --no-private build -- $BUILD_ARG || exit $?
+  npx lerna run --no-private build || exit $?
 }
 
 bootstrap() {
@@ -112,7 +111,7 @@ commit_and_tag() {
 
   # commit and add new version tag
   git add --all &&
-    git commit -m "v$NEW_VERSION" &&
+    git commit -m $NEW_TAG &&
     git tag $NEW_TAG
 }
 
@@ -126,16 +125,13 @@ push_and_publish() {
     # publish to npm with "next" tag
     npx lerna exec --no-private -- npm publish --tag next
   else
-    # publish with default "latest" tag
+    # publish with default tag
     npx lerna exec --no-private -- npm publish
   fi
-
-  git push --no-verify -f origin $RELEASE_BRANCH
 }
 
 echo_funcname() {
   echo -e "\n==== ${FUNCNAME[1]} ====\n"
-  pwd
 }
 
 quit() {
@@ -147,7 +143,7 @@ quit() {
     fi
   fi
 
-  git checkout $INITIAL_BRANCH > /dev/null
+  git checkout -q $INITIAL_BRANCH > /dev/null
   exit $2
 }
 

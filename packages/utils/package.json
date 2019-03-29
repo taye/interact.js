@@ -1,8 +1,8 @@
 {
   "name": "@interactjs/utils",
-  "version": "0.0.0",
+  "version": "1.4.0-rc.2",
   "devDependencies": {
-    "@interactjs/_dev": "0.0.0"
+    "@interactjs/_dev": "1.4.0-rc.2"
   },
   "publishConfig": {
     "access": "public"
