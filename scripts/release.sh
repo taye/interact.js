@@ -10,7 +10,7 @@ INITIAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 main() {
   ensure_clean_index &&
     check_args &&
-    bump_version &&
+    check_version &&
     merge_to_release &&
     run_tests &&
     run_build &&
@@ -36,20 +36,13 @@ ensure_clean_index() {
 check_args() {
   echo_funcname
 
-  if [[ -z $RELEASE_BRANCH ]] | [[ -z $NEW_VERSION ]]; then
-    quit "Missing args. Usage: release.sh release_branch new_version" 1
+  if [[ -z $RELEASE_BRANCH ]]; then
+    quit "Missing release branch arg" 1
   fi
 }
 
-bump_version() {
+check_version() {
   echo_funcname
-
-  npx lerna version --no-git-tag-version --exact $NEW_VERSION ||
-    quit "failed to bump version" 1
-
-  # copy license file
-  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
-    quit "failed to copy LICENSE"
 
   NEW_VERSION=$(node $ROOT/scripts/version.js)
   NEW_TAG="v$(semver clean $NEW_VERSION)"
@@ -58,9 +51,6 @@ bump_version() {
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
     quit "$NEW_TAG tag already exists" 1
   fi
-
-  git add .
-  git commit -m "chore: bump version to ${NEW_VERSION}"
 }
 
 merge_to_release() {
@@ -90,6 +80,10 @@ run_build() {
 
   # copy README
   cp $ROOT/README.md packages/interactjs/ &&
+
+  # copy license file
+  npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
+    quit "failed to copy LICENSE"
 
   # generate .js and .d.ts files
   npx tsc --emitDeclarationOnly false -p $ROOT &&
