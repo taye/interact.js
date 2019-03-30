@@ -100,7 +100,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
       const coords = {
         page     : { x: xywh.x, y: xywh.y },
         client   : { x: xywh.x, y: xywh.y },
-        timeStamp: Date.now(),
+        timeStamp: scope.now(),
       }
 
       const event = pointerUtils.coordsToEvent(coords)

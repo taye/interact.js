@@ -32,6 +32,7 @@ function install (scope: Scope) {
   } = scope
 
   scope.autoScroll = autoScroll
+  autoScroll.now = () => scope.now()
 
   interactions.signals.on('new', ({ interaction }) => {
     interaction.autoScroll = null
@@ -39,7 +40,7 @@ function install (scope: Scope) {
 
   interactions.signals.on('stop', autoScroll.stop)
 
-  interactions.signals.on('action-move', autoScroll.onInteractionMove)
+  interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg, scope))
 
   actions.eventTypes.push('autoscroll')
   defaults.perAction.autoScroll = autoScroll.defaults
@@ -57,6 +58,8 @@ const autoScroll = {
     speed    : 300,
   } as Interact.AutoScrollOption,
 
+  now: Date.now,
+
   interaction: null,
   i: null,    // the handle returned by window.setInterval
   x: 0,
@@ -67,13 +70,13 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start (interaction: Interact.Interaction) {
+  start (interaction: Interact.Interaction, scope: Interact.Scope) {
     autoScroll.isScrolling = true
     raf.cancel(autoScroll.i)
 
     interaction.autoScroll = autoScroll
     autoScroll.interaction = interaction
-    autoScroll.prevTime = Date.now()
+    autoScroll.prevTime = scope.now()
     autoScroll.i = raf.request(autoScroll.scroll)
   },
 
@@ -91,7 +94,7 @@ const autoScroll = {
     const { interactable, element } = interaction
     const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll
     const container = getContainer(options.container, interactable, element)
-    const now = Date.now()
+    const now = this.scope.now()
     // change in time in seconds
     const dt = (now - autoScroll.prevTime) / 1000
     // displacement
@@ -145,7 +148,7 @@ const autoScroll = {
 
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled
   },
-  onInteractionMove ({ interaction, pointer }) {
+  onInteractionMove ({ interaction, pointer }, scope: Interact.Scope) {
     if (!(interaction.interacting() &&
           autoScroll.check(interaction.interactable, interaction.prepared.name))) {
       return
@@ -188,7 +191,7 @@ const autoScroll = {
       autoScroll.margin = options.margin
       autoScroll.speed  = options.speed
 
-      autoScroll.start(interaction)
+      autoScroll.start(interaction, scope)
     }
   },
 }

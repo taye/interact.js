@@ -164,6 +164,10 @@ export class Scope {
 
     return docIndex === -1 ? null : this.documents[docIndex].options
   }
+
+  now () {
+    return ((this.window as any).Date as typeof Date || Date).now()
+  }
 }
 
 export class InteractableSet {

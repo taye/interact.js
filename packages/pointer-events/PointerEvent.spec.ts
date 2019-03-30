@@ -20,7 +20,7 @@ test('PointerEvent constructor', (t) => {
   } as any
   const interaction = new Interaction({ signals: new Signals() } as any)
   const eventTarget = {} as Element
-  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction) as any
+  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,
     'pointerEvent is extended form pointer')
@@ -52,7 +52,7 @@ test('PointerEvent methods', (t) => {
       acc[methodName] = function () { methodContexts[methodName] = this }
       return acc
     }, helpers.newPointer())
-  const pointerEvent = new PointerEvent('TEST', {} as any, event, null, {} as any)
+  const pointerEvent = new PointerEvent('TEST', {} as any, event, null, {} as any, 0)
 
   pointerEvent.preventDefault()
   t.equal(methodContexts.preventDefault, event,

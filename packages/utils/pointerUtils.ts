@@ -86,7 +86,7 @@ const pointerUtils = {
     return is.number(pointer.pointerId) ? pointer.pointerId : pointer.identifier
   },
 
-  setCoords (targetObj, pointers: any[], timeStamp?: number) {
+  setCoords (targetObj, pointers: any[], timeStamp: number) {
     const pointer = (pointers.length > 1
       ? pointerUtils.pointerAverage(pointers)
       : pointers[0])
@@ -101,7 +101,7 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x
     targetObj.client.y = tmpXY.y
 
-    targetObj.timeStamp = is.number(timeStamp) ? timeStamp : Date.now()
+    targetObj.timeStamp = timeStamp
   },
 
   pointerExtend,

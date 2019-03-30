@@ -86,7 +86,7 @@ function fire<T extends string> (arg: {
   targets?: EventTargetList,
   pointerEvent?: PointerEvent<T>,
   type: T
-}) {
+}, scope: Interact.Scope) {
   const {
     interaction, pointer, event, eventTarget,
     type = (arg as any).pointerEvent.type,
@@ -94,7 +94,7 @@ function fire<T extends string> (arg: {
   } = arg
 
   const {
-    pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction),
+    pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, scope.now()),
   } = arg
 
   const signalArg = {
@@ -143,7 +143,7 @@ function fire<T extends string> (arg: {
         event,
         eventTarget,
         type: 'doubletap',
-      })
+      }, scope)
       : pointerEvent
 
     interaction.prevTap = prevTap
@@ -231,7 +231,7 @@ function install (scope: Scope) {
         event,
         eventTarget,
         type: 'move',
-      })
+      }, scope)
     }
   })
 
@@ -275,7 +275,7 @@ function install (scope: Scope) {
         pointer,
         event,
         type: 'hold',
-      })
+      }, scope)
     }, minDuration)
   })
 
@@ -288,19 +288,19 @@ function install (scope: Scope) {
   }
 
   for (let i = 0; i < simpleSignals.length; i++) {
-    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]))
+    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i], scope))
   }
 
   interactions.signals.on('up', ({ interaction, pointer, event, eventTarget }) => {
     if (!interaction.pointerWasMoved) {
-      fire({ interaction, eventTarget, pointer, event, type: 'tap' })
+      fire({ interaction, eventTarget, pointer, event, type: 'tap' }, scope)
     }
   })
 }
 
-function createSignalListener (type: string) {
+function createSignalListener (type: string, scope) {
   return function ({ interaction, pointer, event, eventTarget }: any) {
-    fire({ interaction, eventTarget, pointer, event, type })
+    fire({ interaction, eventTarget, pointer, event, type }, scope)
   }
 }
 

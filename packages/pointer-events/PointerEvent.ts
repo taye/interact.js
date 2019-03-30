@@ -28,6 +28,7 @@ export default class PointerEvent<T extends string> {
     event: Interact.PointerEventType,
     eventTarget: Interact.EventTarget,
     interaction: Interact.Interaction,
+    timeStamp: number,
   ) {
     pointerUtils.pointerExtend(this, event)
 
@@ -37,7 +38,7 @@ export default class PointerEvent<T extends string> {
 
     this.interaction = interaction
 
-    this.timeStamp     = Date.now()
+    this.timeStamp     = timeStamp
     this.originalEvent = event
     this.type          = type
     this.pointerId     = pointerUtils.getPointerId(pointer)

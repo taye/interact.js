@@ -103,7 +103,8 @@ function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalAr
         interaction.updatePointer(pointer, event, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
-          interaction.pointers.map((p) => p.pointer)
+          interaction.pointers.map((p) => p.pointer),
+          interaction._now()
         )
 
         // fire appropriate signals
@@ -139,7 +140,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
 
   const options = getOptions(interaction)
 
-  const now = Date.now()
+  const now = interaction._now()
   const { client: velocityClient } = interaction.coords.velocity
   const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
@@ -263,7 +264,7 @@ function inertiaTick (interaction: Interact.Interaction) {
   const state = interaction.inertia
   const options = getOptions(interaction)
   const lambda = options.resistance
-  const t = Date.now() / 1000 - state.t0
+  const t = interaction._now() / 1000 - state.t0
 
   if (t < state.te) {
     const progress =  1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0
@@ -304,7 +305,7 @@ function smothEndTick (interaction: Interact.Interaction) {
   updateInertiaCoords(interaction)
 
   const state = interaction.inertia
-  const t = Date.now() - state.t0
+  const t = interaction._now() - state.t0
   const { smoothEndDuration: duration } = getOptions(interaction)
 
   if (t < duration) {
@@ -342,7 +343,7 @@ function updateInertiaCoords (interaction: Interact.Interaction) {
     pageY  : pageUp.y   + state.sy,
     clientX: clientUp.x + state.sx,
     clientY: clientUp.y + state.sy,
-  } ])
+  } ], interaction._now())
 }
 
 function getOptions ({ interactable, prepared }: Interact.Interaction) {

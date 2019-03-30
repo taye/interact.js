@@ -46,7 +46,7 @@ test('pointerEvents.fire', (t) => {
         TEST_PROP,
       },
     }],
-  } as any)
+  } as any, scope)
 
   t.ok(firedEvent instanceof pointerEvents.PointerEvent,
     'Fired event is an instance of pointerEvents.PointerEvent')
@@ -66,7 +66,7 @@ test('pointerEvents.fire', (t) => {
 
   interaction.updatePointer({} as any, {} as any, null)
 
-  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {} as any, {} as any, null, interaction), {
+  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {} as any, {} as any, null, interaction, 0), {
     timeStamp: tapTime,
   })
 
@@ -77,7 +77,7 @@ test('pointerEvents.fire', (t) => {
       eventable,
       element,
     }],
-  } as any)
+  } as any, scope)
 
   t.equal(interaction.tapTime, tapTime,
     'interaction.tapTime is updated')
