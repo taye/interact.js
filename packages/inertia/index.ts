@@ -3,8 +3,6 @@ import modifiers from '@interactjs/modifiers/base'
 import * as utils from '@interactjs/utils'
 import raf from '@interactjs/utils/raf'
 
-type Scope = import ('@interactjs/core/scope').Scope
-
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
   enum EventPhase {
@@ -15,7 +13,36 @@ declare module '@interactjs/core/InteractEvent' {
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    inertia?: any
+    inertia?: {
+      active: boolean
+      smoothEnd: boolean
+      allowResume: boolean
+
+      startEvent?: Interact.InteractEvent
+      upCoords: {
+        page: Interact.Point
+        client: Interact.Point
+        timeStamp: number
+      }
+
+      xe?: number
+      ye?: number
+      sx?: number
+      sy?: number
+
+      t0?: number
+      te?: number
+      v0?: number
+      vx0?: number
+      vy0?: number
+      duration?: number
+      modifiedXe?: number
+      modifiedYe?: number
+
+      lambda_v0?: number // eslint-disable-line camelcase
+      one_ve_v0?: number // eslint-disable-line camelcase
+      timeout: any
+    }
   }
 }
 
@@ -35,7 +62,7 @@ declare module '@interactjs/core/defaultOptions' {
 (EventPhase as any).Resume = 'resume';
 (EventPhase as any).InertiaStart = 'inertiastart'
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     interactions,
     defaults,
@@ -46,23 +73,8 @@ function install (scope: Scope) {
       active     : false,
       smoothEnd  : false,
       allowResume: false,
-
-      startEvent: null,
-      upCoords  : {},
-
-      xe: 0,
-      ye: 0,
-      sx: 0,
-      sy: 0,
-
-      t0: 0,
-      vx0: 0,
-      vys: 0,
-      duration: 0,
-
-      lambda_v0: 0,
-      one_ve_v0: 0,
-      i  : null,
+      upCoords   : {} as any,
+      timeout    : null,
     }
   })
 
@@ -83,7 +95,10 @@ function install (scope: Scope) {
   scope.usePlugin(modifiers)
 }
 
-function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalArg, scope: Scope) {
+function resume (
+  { interaction, event, pointer, eventTarget }: Interact.SignalArg,
+  scope: Interact.Scope
+) {
   const state = interaction.inertia
 
   // Check if the down event hits the current inertia target
@@ -95,7 +110,7 @@ function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalAr
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        raf.cancel(state.i)
+        raf.cancel(state.timeout)
         state.active = false
         interaction.simulation = null
 
@@ -129,7 +144,10 @@ function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalAr
   }
 }
 
-function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd }: Interact.SignalArg, scope: Scope) {
+function release<T extends Interact.ActionName> (
+  { interaction, event, noPreEnd }: Interact.SignalArg,
+  scope: Interact.Scope
+) {
   const state = interaction.inertia
 
   if (!interaction.interacting() ||
@@ -164,11 +182,14 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
       (modifierStatus) => utils.extend({}, modifierStatus)
     ),
     preEnd: true,
-    requireEndOnly: true,
+    prevCoords: undefined,
+    requireEndOnly: null,
   }
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
+    modifierArg.prevCoords = interaction.prevEvent.page
+    modifierArg.requireEndOnly = false
     modifierResult = modifiers.setAll(modifierArg)
 
     if (modifierResult.changed) {
@@ -208,13 +229,15 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
 
     modifierArg.pageCoords.x += state.xe
     modifierArg.pageCoords.y += state.ye
+    modifierArg.prevCoords = undefined
+    modifierArg.requireEndOnly = true
 
     modifierResult = modifiers.setAll(modifierArg)
 
     state.modifiedXe += modifierResult.delta.x
     state.modifiedYe += modifierResult.delta.y
 
-    state.i = raf.request(() => inertiaTick(interaction))
+    state.timeout = raf.request(() => inertiaTick(interaction))
   }
   else {
     state.smoothEnd = true
@@ -223,7 +246,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
 
     state.sx = state.sy = 0
 
-    state.i = raf.request(() => smothEndTick(interaction))
+    state.timeout = raf.request(() => smothEndTick(interaction))
   }
 
   return false
@@ -232,7 +255,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
 function stop ({ interaction }: Interact.SignalArg) {
   const state = interaction.inertia
   if (state.active) {
-    raf.cancel(state.i)
+    raf.cancel(state.timeout)
     state.active = false
     interaction.simulation = null
   }
@@ -286,7 +309,7 @@ function inertiaTick (interaction: Interact.Interaction) {
 
     interaction.move()
 
-    state.i = raf.request(() => inertiaTick(interaction))
+    state.timeout = raf.request(() => inertiaTick(interaction))
   }
   else {
     state.sx = state.modifiedXe
@@ -314,7 +337,7 @@ function smothEndTick (interaction: Interact.Interaction) {
 
     interaction.move()
 
-    state.i = raf.request(() => smothEndTick(interaction))
+    state.timeout = raf.request(() => smothEndTick(interaction))
   }
   else {
     state.sx = state.xe
