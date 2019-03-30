@@ -33,10 +33,10 @@ test('Interactable.gesturable method', (t) => {
     utils.pointer.coordsToEvent(utils.pointer.newCoords()),
     utils.pointer.coordsToEvent(utils.pointer.newCoords()),
   ].map(
-    (touch, index) => Object.assign(touch, {
+    (touch, index) => Object.assign(touch.coords, {
       pointerId: index,
       client: touch.page,
-    })
+    }) && touch
   )
   const events: Interact.GestureEvent[] = []
 

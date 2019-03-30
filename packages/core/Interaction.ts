@@ -47,7 +47,7 @@ export class Interaction<T extends ActionName = any> {
   downPointer: Interact.PointerType = {} as Interact.PointerType
 
   _latestPointer: {
-    pointer: EventTarget
+    pointer: Interact.EventTarget
     event: Interact.PointerEventType
     eventTarget: Node,
   } = {

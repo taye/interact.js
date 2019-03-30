@@ -82,7 +82,7 @@ function fire<T extends string> (arg: {
   interaction: Interaction,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  eventTarget: EventTarget,
+  eventTarget: Interact.EventTarget,
   targets?: EventTargetList,
   pointerEvent?: PointerEvent<T>,
   type: T
@@ -157,7 +157,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
   interaction: Interaction,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  eventTarget: EventTarget,
+  eventTarget: Interact.EventTarget,
   type: T
 }) {
   const pointerIndex = interaction.getPointerIndex(pointer)

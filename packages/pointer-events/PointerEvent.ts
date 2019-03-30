@@ -22,7 +22,13 @@ export default class PointerEvent<T extends string> {
   immediatePropagationStopped = false
 
   /** */
-  constructor (type, pointer, event, eventTarget, interaction) {
+  constructor (
+    type: T,
+    pointer: Interact.PointerType | PointerEvent<any>,
+    event: Interact.PointerEventType,
+    eventTarget: Interact.EventTarget,
+    interaction: Interact.Interaction,
+  ) {
     pointerUtils.pointerExtend(this, event)
 
     if (event !== pointer) {
@@ -51,7 +57,7 @@ export default class PointerEvent<T extends string> {
         interval < 500)
     }
     else if (type === 'doubletap') {
-      this.dt = pointer.timeStamp - interaction.tapTime
+      this.dt = (pointer as PointerEvent<'tap'>).timeStamp - interaction.tapTime
     }
   }
 

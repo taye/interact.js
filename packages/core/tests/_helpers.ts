@@ -114,3 +114,39 @@ export function getProps<T extends {}, K extends keyof T> (src: T, props: K[]) {
     return acc
   }, {} as Pick<T, K>)
 }
+
+export function testEnv ({
+  plugins = [],
+  target,
+  rect = {  top: 0, left: 0, bottom: 0, right: 0  },
+}: {
+  plugins?: Interact.Plugin[],
+  target?: Interact.Target,
+  rect?: Interact.Rect,
+} = {}) {
+  const scope: Interact.Scope = mockScope()
+
+  for (const plugin of plugins) {
+    scope.usePlugin(plugin)
+  }
+
+  target = target || scope.document.body
+
+  const interaction = scope.interactions.new({})
+  const interactable = scope.interactables.new(target)
+  const coords = utils.pointer.newCoords();
+
+  (coords as any).target = target
+  const event = utils.pointer.coordsToEvent(coords)
+
+  interactable.rectChecker(() => ({ ...rect }))
+
+  return {
+    scope,
+    interaction,
+    target,
+    interactable,
+    coords,
+    event,
+  }
+}
