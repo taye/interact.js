@@ -1,13 +1,14 @@
 import test from '@interactjs/_dev/test/test'
-import Interaction from '@interactjs/core/Interaction'
-import { mockInteractable, mockScope, mockSignals } from '@interactjs/core/tests/_helpers'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import snapEdges from '../snap/edges'
 
-test('modifiers/snapEdges', (t) => {
-  mockScope()
-  const interaction = new Interaction({ signals: mockSignals() } as any)
-  interaction.interactable = mockInteractable()
-  interaction.interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)
+test('modifiers/snap/edges', (t) => {
+  const rect = { top: 0, left: 0, bottom: 100, right: 100 }
+  const {
+    interaction,
+    interactable,
+  } = helpers.testEnv({ rect })
+  interaction.interactable = interactable
   interaction._interacting = true
 
   const target0 = Object.freeze({

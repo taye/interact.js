@@ -247,7 +247,7 @@ test('Interaction.pointerDown', (t) => {
   interaction._signals.on('down', signalListener)
 
   const pointerCoords: any = { page: {}, client: {} }
-  pointerUtils.setCoords(pointerCoords, [pointer])
+  pointerUtils.setCoords(pointerCoords, [pointer], event.timeStamp)
 
   for (const prop in coords) {
     pointerUtils.copyCoords(interaction.coords[prop], coords[prop])

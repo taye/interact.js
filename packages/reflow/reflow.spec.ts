@@ -4,11 +4,14 @@ import PromisePolyfill from 'promise-polyfill'
 import reflow from './'
 
 test('reflow', (t) => {
-  const scope = helpers.mockScope()
+  const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
+
+  const {
+    scope,
+    interactable,
+  } = helpers.testEnv({ plugins: [reflow], rect })
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
-
-  reflow.install(scope)
 
   t.ok(
     scope.Interactable.prototype.reflow instanceof Function,
@@ -16,8 +19,6 @@ test('reflow', (t) => {
   )
 
   const fired = []
-  const interactable = scope.interactables.new(scope.window)
-  const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
 
   interactable.fire = ((iEvent) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}

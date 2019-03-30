@@ -11,6 +11,9 @@ const argv = require('yargs')
     minHeaderFile: require.resolve('./minHeader.js'),
     name: 'index',
   })
+  .boolean('watch')
+  .boolean('docs')
+  .boolean('debug')
   .option('entries', {
     required: true,
     array: 'true',

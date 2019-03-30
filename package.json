@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.4.0-rc.3",
+  "version": "1.4.0-rc.4",
   "private": true,
   "bin": {
     "@build": "scripts/build.js",
@@ -14,10 +14,11 @@
     "build": "cd packages/interactjs; NODE_ENV=production ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",
     "test": "scripts/test.sh",
+    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS=--inspect npm run test",
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
     "docs": "node docs --go",
     "release": "sh ./scripts/release.sh",
-    "bump": "npx lerna version --no-git-tag-version --exact $@"
+    "bump": "npx lerna version --no-git-tag-version --exact && git add -p -- lerna.json package.json **/package.json && git commit"
   },
   "dependencies": {
     "@babel/core": "latest",

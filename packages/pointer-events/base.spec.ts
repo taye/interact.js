@@ -2,7 +2,6 @@ import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import pointerUtils from '@interactjs/utils/pointerUtils'
 import pointerEvents from './base'
 import interactableTargets from './interactableTargets'
 
@@ -47,7 +46,7 @@ test('pointerEvents.fire', (t) => {
         TEST_PROP,
       },
     }],
-  } as any)
+  } as any, scope)
 
   t.ok(firedEvent instanceof pointerEvents.PointerEvent,
     'Fired event is an instance of pointerEvents.PointerEvent')
@@ -67,7 +66,7 @@ test('pointerEvents.fire', (t) => {
 
   interaction.updatePointer({} as any, {} as any, null)
 
-  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {}, {}, null, interaction), {
+  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {} as any, {} as any, null, interaction, 0), {
     timeStamp: tapTime,
   })
 
@@ -78,7 +77,7 @@ test('pointerEvents.fire', (t) => {
       eventable,
       element,
     }],
-  } as any)
+  } as any, scope)
 
   t.equal(interaction.tapTime, tapTime,
     'interaction.tapTime is updated')
@@ -174,18 +173,12 @@ test('pointerEvents Interaction remove-pointer signal', (t) => {
 })
 
 test('pointerEvents down move up tap', (t) => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const {
+    scope,
+    interaction,
+    event,
+  } = helpers.testEnv({ plugins: [pointerEvents, interactableTargets ] })
 
-  pointerEvents.install(scope)
-  interactableTargets.install(scope)
-
-  const interaction = scope.interactions.new({})
-  const coords = {
-    page     : { x: 0, y: 0 },
-    client   : { x: 0, y: 0 },
-    timeStamp: Date.now(),
-  }
-  const event = Object.assign({ target: scope.document.body }, pointerUtils.coordsToEvent(coords))
   const interactable = scope.interactables.new(event.target)
   const fired: Event[] = []
 

@@ -4,32 +4,32 @@ import * as utils from '@interactjs/utils'
 import modifiersBase from './base'
 
 test('modifiers/base', (t) => {
-  const scope = helpers.mockScope()
+  const {
+    scope,
+    target,
+    interaction,
+    interactable,
+  } = helpers.testEnv({ plugins: [modifiersBase] })
 
-  modifiersBase.install(scope)
   scope.actions.eventTypes.push('TESTstart', 'TESTmove', 'TESTend')
-
-  // eslint-disable-next-line new-cap
-  const interaction = scope.interactions.new({})
 
   t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
 
-  const element = utils.win.window.document.documentElement
-  const interactable = scope.interactables.new(element)
+  const element = target as Element
   const startEvent = {
     pageX: 100,
     pageY: 200,
     clientX: 100,
     clientY: 200,
     target: element,
-  }
+  } as any
   const moveEvent = {
     pageX: 400,
     pageY: 500,
     clientX: 400,
     clientY: 500,
     target: element,
-  }
+  } as any
   const options: any = { target: { x: 100, y: 100 }, setStart: true }
   let firedEvents = []
 

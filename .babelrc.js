@@ -2,7 +2,7 @@ const _devDir = __dirname;
 
 module.exports = {
   "presets": [
-    "@babel/preset-env",
+    ...process.env.NODE_ENV === 'testing' ? [] : ["@babel/preset-env"],
     "@babel/preset-typescript",
   ],
   "plugins": [

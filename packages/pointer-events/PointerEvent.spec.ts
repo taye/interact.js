@@ -13,14 +13,14 @@ test('PointerEvent constructor', (t) => {
     pointerId,
     testPointerProp,
     pointerType: 'TEST_POINTER_TYPE',
-  }
+  } as any
   const testEventProp = ['TEST_EVENT_PROP']
   const event = {
     testEventProp,
-  }
+  } as any
   const interaction = new Interaction({ signals: new Signals() } as any)
-  const eventTarget = {}
-  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction) as any
+  const eventTarget = {} as Element
+  const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,
     'pointerEvent is extended form pointer')
@@ -47,12 +47,12 @@ test('PointerEvent constructor', (t) => {
 
 test('PointerEvent methods', (t) => {
   const methodContexts = {} as any
-  const event = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
+  const event: any = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
     .reduce((acc, methodName) => {
       acc[methodName] = function () { methodContexts[methodName] = this }
       return acc
     }, helpers.newPointer())
-  const pointerEvent = new PointerEvent('TEST', {}, event, null, {})
+  const pointerEvent = new PointerEvent('TEST', {} as any, event, null, {} as any, 0)
 
   pointerEvent.preventDefault()
   t.equal(methodContexts.preventDefault, event,

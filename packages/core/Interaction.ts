@@ -47,7 +47,7 @@ export class Interaction<T extends ActionName = any> {
   downPointer: Interact.PointerType = {} as Interact.PointerType
 
   _latestPointer: {
-    pointer: EventTarget
+    pointer: Interact.EventTarget
     event: Interact.PointerEventType
     eventTarget: Node,
   } = {
@@ -169,7 +169,7 @@ export class Interaction<T extends ActionName = any> {
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget) {
     if (!this.simulation) {
       this.updatePointer(pointer, event, eventTarget, false)
-      utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer))
+      utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer), this._now())
     }
 
     const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
@@ -377,7 +377,7 @@ export class Interaction<T extends ActionName = any> {
       this.pointerIsDown = true
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.coords.start, this.pointers.map((p) => p.pointer))
+        utils.pointer.setCoords(this.coords.start, this.pointers.map((p) => p.pointer), this._now())
 
         utils.pointer.copyCoords(this.coords.cur, this.coords.start)
         utils.pointer.copyCoords(this.coords.prev, this.coords.start)
@@ -476,6 +476,8 @@ export class Interaction<T extends ActionName = any> {
 
     return true
   }
+
+  _now () { return Date.now() }
 }
 
 export default Interaction

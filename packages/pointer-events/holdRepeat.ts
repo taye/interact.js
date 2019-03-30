@@ -21,7 +21,7 @@ function install (scope: Interact.Scope) {
   scope.usePlugin(basePlugin)
 
   pointerEvents.signals.on('new', onNew)
-  pointerEvents.signals.on('fired', (arg) => onFired(arg as any, pointerEvents))
+  pointerEvents.signals.on('fired', (arg) => onFired(arg as any, scope))
 
   for (const signal of ['move', 'up', 'cancel', 'endall']) {
     interactions.signals.on(signal, endHoldRepeat)
@@ -38,7 +38,10 @@ function onNew ({ pointerEvent }) {
   pointerEvent.count = (pointerEvent.count || 0) + 1
 }
 
-function onFired ({ interaction, pointerEvent, eventTarget, targets }, pointerEvents) {
+function onFired (
+  { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArg,
+  scope: Interact.Scope
+) {
   if (pointerEvent.type !== 'hold' || !targets.length) { return }
 
   // get the repeat interval from the first eventable
@@ -49,13 +52,13 @@ function onFired ({ interaction, pointerEvent, eventTarget, targets }, pointerEv
 
   // set a timeout to fire the holdrepeat event
   interaction.holdIntervalHandle = setTimeout(() => {
-    pointerEvents.fire({
+    scope.pointerEvents.fire({
       interaction,
       eventTarget,
       type: 'hold',
       pointer: pointerEvent,
       event: pointerEvent,
-    })
+    }, scope)
   }, interval)
 }
 

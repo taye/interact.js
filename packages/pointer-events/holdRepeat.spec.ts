@@ -17,14 +17,12 @@ function mockScope () {
 }
 
 test('holdRepeat count', (t) => {
-  const scope = mockScope()
   const pointerEvent = {
     type: 'hold',
     count: 0,
   }
 
-  pointerEvents.install(scope)
-  holdRepeat.install(scope)
+  const { scope } = helpers.testEnv({ plugins: [pointerEvents, holdRepeat] })
 
   scope.pointerEvents.signals.fire('new', { pointerEvent })
   t.equal(pointerEvent.count, 1, 'first hold count is 1 with count previously undefined')

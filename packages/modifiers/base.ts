@@ -125,7 +125,17 @@ function start (
 }
 
 function setAll (arg: Partial<Interact.SignalArg>) {
-  const { interaction, phase, preEnd, requireEndOnly, rect, skipModifiers } = arg
+  const {
+    interaction,
+    prevCoords = interaction.modifiers.result
+      ? interaction.modifiers.result.coords
+      : interaction.coords.prev.page,
+    phase,
+    preEnd,
+    requireEndOnly,
+    rect,
+    skipModifiers,
+  } = arg
 
   const states = skipModifiers
     ? arg.states.slice(interaction.modifiers.skip)
@@ -153,13 +163,7 @@ function setAll (arg: Partial<Interact.SignalArg>) {
   result.delta.x = arg.coords.x - arg.pageCoords.x
   result.delta.y = arg.coords.y - arg.pageCoords.y
 
-  const prevCoords = interaction.modifiers.result
-    ? interaction.modifiers.result.coords
-    : interaction.coords.prev.page
-
-  result.changed = (
-    prevCoords.x !== result.coords.x ||
-    prevCoords.y !== result.coords.y)
+  result.changed = prevCoords.x !== result.coords.x || prevCoords.y !== result.coords.y
 
   return result
 }
@@ -284,7 +288,10 @@ function setCoords (arg) {
 }
 
 function restoreCoords ({ interaction: { coords, modifiers } }) {
-  const { startDelta, result: { delta: curDelta } } = modifiers
+  if (!modifiers.result) { return }
+
+  const { startDelta } = modifiers
+  const { delta: curDelta } = modifiers.result
 
   for (const [coordsSet, delta] of [[coords.start, startDelta], [coords.cur, curDelta]]) {
     coordsSet.page.x -= delta.x

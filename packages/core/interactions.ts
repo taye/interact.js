@@ -76,6 +76,8 @@ function install (scope: Scope) {
     set pointerMoveTolerance (value) {
       scope.interactions.pointerMoveTolerance = value
     }
+
+    _now () { return scope.now() }
   }
   scope.interactions = {
     signals,
@@ -101,7 +103,7 @@ function doOnInteractions (method, scope) {
     const matches = [] // [ [pointer, interaction], ...]
 
     if (browser.supportsTouch && /touch/.test(event.type)) {
-      scope.prevTouchTime = new Date().getTime()
+      scope.prevTouchTime = scope.now()
 
       for (const changedTouch of event.changedTouches) {
         const pointer = changedTouch
@@ -137,7 +139,7 @@ function doOnInteractions (method, scope) {
         // try to ignore mouse events that are simulated by the browser
         // after a touch event
         invalidPointer = invalidPointer ||
-          (new Date().getTime() - scope.prevTouchTime < 500) ||
+          (scope.now() - scope.prevTouchTime < 500) ||
           // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
           event.timeStamp === 0
       }
