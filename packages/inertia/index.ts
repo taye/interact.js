@@ -41,8 +41,6 @@ function install (scope: Scope) {
     defaults,
   } = scope
 
-  scope.usePlugin(modifiers)
-
   interactions.signals.on('new', ({ interaction }) => {
     interaction.inertia = {
       active     : false,
@@ -81,6 +79,8 @@ function install (scope: Scope) {
     allowResume      : true,  // allow resuming an action in inertia phase
     smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
   }
+
+  scope.usePlugin(modifiers)
 }
 
 function resume ({ interaction, event, pointer, eventTarget }: Interact.SignalArg, scope: Scope) {
