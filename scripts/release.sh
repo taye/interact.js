@@ -112,9 +112,6 @@ commit_and_tag() {
 push_and_publish() {
   echo_funcname
 
-  # push branch and tags to git origin
-  git push --no-verify && git push --no-verify origin $NEW_TAG &&
-
   if [[ $RELEASE_BRANCH == "next" ]]; then
     # publish to npm with "next" tag
     npx lerna exec --no-private -- npm publish --tag next
@@ -122,6 +119,9 @@ push_and_publish() {
     # publish with default tag
     npx lerna exec --no-private -- npm publish
   fi
+
+  # push branch and tags to git origin
+  git push --no-verify && git push --no-verify origin $NEW_TAG &&
 }
 
 echo_funcname() {
