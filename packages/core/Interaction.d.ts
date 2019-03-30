@@ -27,7 +27,7 @@ export declare class Interaction<T extends ActionName = any> {
     downEvent: Interact.PointerEventType;
     downPointer: Interact.PointerType;
     _latestPointer: {
-        pointer: EventTarget;
+        pointer: Interact.EventTarget;
         event: Interact.PointerEventType;
         eventTarget: Node;
     };
@@ -188,6 +188,7 @@ export declare class Interaction<T extends ActionName = any> {
     _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: Partial<Interact.SignalArg>): boolean;
+    _now(): number;
 }
 export default Interaction;
 export { PointerInfo };

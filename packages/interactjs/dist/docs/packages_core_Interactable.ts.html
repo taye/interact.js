@@ -44,7 +44,7 @@
             <pre class="prettyprint source linenums"><code>import * as arr from '@interactjs/utils/arr'
 import browser from '@interactjs/utils/browser'
 import clone from '@interactjs/utils/clone'
-import { getElementRect, nodeContains, trySelector } from '@interactjs/utils/domUtils'
+import { getElementRect, matchesUpTo, nodeContains, trySelector } from '@interactjs/utils/domUtils'
 import events from '@interactjs/utils/events'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
@@ -53,6 +53,8 @@ import { getWindow } from '@interactjs/utils/window'
 import { ActionDefaults, Defaults, Options } from './defaultOptions'
 import Eventable from './Eventable'
 import { Actions } from './scope'
+
+type IgnoreValue = string | Element | boolean
 
 /** */
 export class Interactable implements Partial&lt;Eventable> {
@@ -245,6 +247,39 @@ export class Interactable implements Partial&lt;Eventable> {
   inContext (element) {
     return (this._context === element.ownerDocument ||
             nodeContains(this._context, element))
+  }
+
+  testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, interactableElement: Element, eventTarget: Element) {
+    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) &amp;&amp;
+            this.testAllow(options.allowFrom, interactableElement, eventTarget))
+  }
+
+  testAllow (this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element) {
+    if (!allowFrom) { return true }
+
+    if (!is.element(element)) { return false }
+
+    if (is.string(allowFrom)) {
+      return matchesUpTo(element, allowFrom, interactableElement)
+    }
+    else if (is.element(allowFrom)) {
+      return nodeContains(allowFrom, element)
+    }
+
+    return false
+  }
+
+  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element) {
+    if (!ignoreFrom || !is.element(element)) { return false }
+
+    if (is.string(ignoreFrom)) {
+      return matchesUpTo(element, ignoreFrom, interactableElement)
+    }
+    else if (is.element(ignoreFrom)) {
+      return nodeContains(ignoreFrom, element)
+    }
+
+    return false
   }
 
   /**

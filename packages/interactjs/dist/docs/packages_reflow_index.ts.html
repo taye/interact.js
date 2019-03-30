@@ -143,7 +143,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
       const coords = {
         page     : { x: xywh.x, y: xywh.y },
         client   : { x: xywh.x, y: xywh.y },
-        timeStamp: Date.now(),
+        timeStamp: scope.now(),
       }
 
       const event = pointerUtils.coordsToEvent(coords)
@@ -199,7 +199,10 @@ function startReflow (scope: Scope, interactable: Interactable, element: Element
   return reflowPromise
 }
 
-export default { install }
+export default {
+  id: 'reflow',
+  install,
+} as Interact.Plugin
 </code></pre>
         </article>
     </section>

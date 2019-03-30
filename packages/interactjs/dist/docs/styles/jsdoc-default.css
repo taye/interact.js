@@ -651,7 +651,7 @@ dl.param-type {
     .nav-trigger:checked + label.plus {
       transform: scale(0.75) rotate(45deg); }
   .nav-trigger:checked ~ nav {
-    left: 0 !important; }
+    transform: none !important; }
   .nav-trigger:checked ~ .overlay {
     display: block; }
 
@@ -678,17 +678,12 @@ dl.param-type {
   body {
     overflow-x: hidden; }
   nav {
-    background: #FFF;
     width: 240px;
     height: 100%;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: -240px;
+    transform: translateX(-240px);
     z-index: 3;
     padding: 0 10px;
-    transition: left 0.2s; }
+    transition: transform 0.2s; }
   .navicon-button {
     display: inline-block;
     position: fixed;

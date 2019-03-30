@@ -50,15 +50,9 @@ import * as utils from '@interactjs/utils'
 import browser from '@interactjs/utils/browser'
 import events from '@interactjs/utils/events'
 
-export interface Plugin {
-  install (scope: Scope): void
-  [key: string]: any
-}
-
 declare module '@interactjs/core/scope' {
   interface Scope {
     interact: InteractStatic
-    _plugins: Plugin[]
   }
 }
 
@@ -125,8 +119,6 @@ export const interact: InteractStatic = function interact (target: Interact.Targ
   return interactable
 } as InteractStatic
 
-scope._plugins = []
-
 /**
  * Use a plugin
  *
@@ -137,13 +129,9 @@ scope._plugins = []
  * @return {interact}
  */
 interact.use = use
-function use (plugin: Plugin) {
-  if (scope._plugins.indexOf(plugin) !== -1) {
-    return interact
-  }
+function use (plugin: Interact.Plugin, options?: { [key: string]: any }) {
+  scope.usePlugin(plugin, options)
 
-  plugin.install(scope)
-  scope._plugins.push(plugin)
   return interact
 }
 
@@ -352,8 +340,8 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
   }
 })
 
-interact.addDocument    = scope.addDocument
-interact.removeDocument = scope.removeDocument
+interact.addDocument = (doc, options) => scope.addDocument(doc, options)
+interact.removeDocument = (doc) => scope.removeDocument(doc)
 
 scope.interact = interact
 

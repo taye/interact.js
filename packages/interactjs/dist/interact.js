@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.3
+ * interact.js 1.4.0-rc.4
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -234,6 +234,11 @@ function () {
       var docIndex = this.getDocIndex(doc);
       return docIndex === -1 ? null : this.documents[docIndex].options;
     }
+  }, {
+    key: "now",
+    value: function now() {
+      return (this.window.Date || Date).now();
+    }
   }]);
 
   return Scope;
@@ -445,6 +450,11 @@ function install(scope) {
     }
 
     _createClass(Interaction, [{
+      key: "_now",
+      value: function _now() {
+        return scope.now();
+      }
+    }, {
       key: "pointerMoveTolerance",
       get: function get() {
         return scope.interactions.pointerMoveTolerance;
@@ -485,7 +495,7 @@ function doOnInteractions(method, scope) {
     var matches = []; // [ [pointer, interaction], ...]
 
     if (_browser.default.supportsTouch && /touch/.test(event.type)) {
-      scope.prevTouchTime = new Date().getTime();
+      scope.prevTouchTime = scope.now();
 
       for (var _i3 = 0; _i3 < event.changedTouches.length; _i3++) {
         var _ref2;
@@ -519,7 +529,7 @@ function doOnInteractions(method, scope) {
         // after a touch event
 
 
-        invalidPointer = invalidPointer || new Date().getTime() - scope.prevTouchTime < 500 || // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
+        invalidPointer = invalidPointer || scope.now() - scope.prevTouchTime < 500 || // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
         event.timeStamp === 0;
       }
 
@@ -779,7 +789,7 @@ function () {
         this.updatePointer(pointer, event, eventTarget, false);
         utils.pointer.setCoords(this.coords.cur, this.pointers.map(function (p) {
           return p.pointer;
-        }));
+        }), this._now());
       }
 
       var duplicateMove = this.coords.cur.page.x === this.coords.prev.page.x && this.coords.cur.page.y === this.coords.prev.page.y && this.coords.cur.client.x === this.coords.prev.client.x && this.coords.cur.client.y === this.coords.prev.client.y;
@@ -988,7 +998,7 @@ function () {
         if (!this.interacting()) {
           utils.pointer.setCoords(this.coords.start, this.pointers.map(function (p) {
             return p.pointer;
-          }));
+          }), this._now());
           utils.pointer.copyCoords(this.coords.cur, this.coords.start);
           utils.pointer.copyCoords(this.coords.prev, this.coords.start);
           utils.pointer.pointerExtend(this.downPointer, pointer);
@@ -1109,6 +1119,11 @@ function () {
       this._signals.fire("after-action-".concat(phase), signalArg);
 
       return true;
+    }
+  }, {
+    key: "_now",
+    value: function _now() {
+      return Date.now();
     }
   }, {
     key: "pointerMoveTolerance",
@@ -2429,7 +2444,7 @@ var pointerUtils = {
     pointerUtils.getClientXY(pointer, tmpXY);
     targetObj.client.x = tmpXY.x;
     targetObj.client.y = tmpXY.y;
-    targetObj.timeStamp = __is_58.number(timeStamp) ? timeStamp : new Date().getTime();
+    targetObj.timeStamp = timeStamp;
   },
   pointerExtend: _pointerExtend.default,
   getTouchPair: function getTouchPair(event) {
@@ -2544,29 +2559,44 @@ var pointerUtils = {
       timeStamp: 0
     };
   },
-  coordsToEvent: function coordsToEvent(_ref2) {
-    var page = _ref2.page,
-        client = _ref2.client,
-        timeStamp = _ref2.timeStamp;
+  coordsToEvent: function coordsToEvent(coords) {
     var event = {
-      page: page,
-      client: client,
-      timeStamp: timeStamp,
+      coords: coords,
+
+      get page() {
+        return this.coords.page;
+      },
+
+      get client() {
+        return this.coords.client;
+      },
+
+      get timeStamp() {
+        return this.coords.timeStamp;
+      },
 
       get pageX() {
-        return page.x;
+        return this.coords.page.x;
       },
 
       get pageY() {
-        return page.y;
+        return this.coords.page.y;
       },
 
       get clientX() {
-        return client.x;
+        return this.coords.client.x;
       },
 
       get clientY() {
-        return client.y;
+        return this.coords.client.y;
+      },
+
+      get pointerId() {
+        return this.coords.pointerId;
+      },
+
+      get target() {
+        return this.coords.target;
       }
 
     };
@@ -3469,7 +3499,7 @@ function __init_59(window) {
 
   if (!_request) {
     _request = function request(callback) {
-      var currTime = new Date().getTime();
+      var currTime = Date.now();
       var timeToCall = Math.max(0, 16 - (currTime - lastTime)); // eslint-disable-next-line standard/no-callback-literal
 
       var token = setTimeout(function () {
@@ -5367,12 +5397,19 @@ function __install_7(scope) {
       defaults = scope.defaults,
       actions = scope.actions;
   scope.autoScroll = autoScroll;
+
+  autoScroll.now = function () {
+    return scope.now();
+  };
+
   interactions.signals.on('new', function (_ref) {
     var interaction = _ref.interaction;
     interaction.autoScroll = null;
   });
   interactions.signals.on('stop', autoScroll.stop);
-  interactions.signals.on('action-move', autoScroll.onInteractionMove);
+  interactions.signals.on('action-move', function (arg) {
+    return autoScroll.onInteractionMove(arg, scope);
+  });
   actions.eventTypes.push('autoscroll');
   defaults.perAction.autoScroll = autoScroll.defaults;
 }
@@ -5386,6 +5423,7 @@ var autoScroll = {
     // the scroll speed in pixels per second
     speed: 300
   },
+  now: Date.now,
   interaction: null,
   i: null,
   x: 0,
@@ -5394,14 +5432,14 @@ var autoScroll = {
   prevTime: 0,
   margin: 0,
   speed: 0,
-  start: function start(interaction) {
+  start: function start(interaction, scope) {
     autoScroll.isScrolling = true;
 
     ___raf_7.default.cancel(autoScroll.i);
 
     interaction.autoScroll = autoScroll;
     autoScroll.interaction = interaction;
-    autoScroll.prevTime = new Date().getTime();
+    autoScroll.prevTime = scope.now();
     autoScroll.i = ___raf_7.default.request(autoScroll.scroll);
   },
   stop: function stop() {
@@ -5420,7 +5458,7 @@ var autoScroll = {
         element = interaction.element;
     var options = interactable.options[autoScroll.interaction.prepared.name].autoScroll;
     var container = getContainer(options.container, interactable, element);
-    var now = new Date().getTime(); // change in time in seconds
+    var now = this.scope.now(); // change in time in seconds
 
     var dt = (now - autoScroll.prevTime) / 1000; // displacement
 
@@ -5473,7 +5511,7 @@ var autoScroll = {
     var options = interactable.options;
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function onInteractionMove(_ref2) {
+  onInteractionMove: function onInteractionMove(_ref2, scope) {
     var interaction = _ref2.interaction,
         pointer = _ref2.pointer;
 
@@ -5515,7 +5553,7 @@ var autoScroll = {
       // set the autoScroll properties to those of the target
       autoScroll.margin = options.margin;
       autoScroll.speed = options.speed;
-      autoScroll.start(interaction);
+      autoScroll.start(interaction, scope);
     }
   }
 };
@@ -6635,6 +6673,8 @@ function __start_27(_ref3, pageCoords, registeredModifiers) {
 
 function setAll(arg) {
   var interaction = arg.interaction,
+      _arg$prevCoords = arg.prevCoords,
+      prevCoords = _arg$prevCoords === void 0 ? interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.coords.prev.page : _arg$prevCoords,
       phase = arg.phase,
       preEnd = arg.preEnd,
       requireEndOnly = arg.requireEndOnly,
@@ -6669,7 +6709,6 @@ function setAll(arg) {
 
   result.delta.x = arg.coords.x - arg.pageCoords.x;
   result.delta.y = arg.coords.y - arg.pageCoords.y;
-  var prevCoords = interaction.modifiers.result ? interaction.modifiers.result.coords : interaction.coords.prev.page;
   result.changed = prevCoords.x !== result.coords.x || prevCoords.y !== result.coords.y;
   return result;
 }
@@ -6826,8 +6865,13 @@ function restoreCoords(_ref8) {
   var _ref8$interaction = _ref8.interaction,
       coords = _ref8$interaction.coords,
       modifiers = _ref8$interaction.modifiers;
-  var startDelta = modifiers.startDelta,
-      curDelta = modifiers.result.delta;
+
+  if (!modifiers.result) {
+    return;
+  }
+
+  var startDelta = modifiers.startDelta;
+  var curDelta = modifiers.result.delta;
   var _arr2 = [[coords.start, startDelta], [coords.cur, curDelta]];
 
   for (var _i6 = 0; _i6 < _arr2.length; _i6++) {
@@ -6953,26 +6997,14 @@ _$InteractEvent_14.EventPhase.InertiaStart = 'inertiastart';
 function __install_23(scope) {
   var interactions = scope.interactions,
       defaults = scope.defaults;
-  scope.usePlugin(___base_23.default);
   interactions.signals.on('new', function (_ref) {
     var interaction = _ref.interaction;
     interaction.inertia = {
       active: false,
       smoothEnd: false,
       allowResume: false,
-      startEvent: null,
       upCoords: {},
-      xe: 0,
-      ye: 0,
-      sx: 0,
-      sy: 0,
-      t0: 0,
-      vx0: 0,
-      vys: 0,
-      duration: 0,
-      lambda_v0: 0,
-      one_ve_v0: 0,
-      i: null
+      timeout: null
     };
   }); // FIXME proper signal typing
 
@@ -6993,6 +7025,7 @@ function __install_23(scope) {
     allowResume: true,
     smoothEndDuration: 300
   };
+  scope.usePlugin(___base_23.default);
 }
 
 function resume(_ref2, scope) {
@@ -7009,7 +7042,7 @@ function resume(_ref2, scope) {
       // if interaction element is the current inertia target element
       if (element === interaction.element) {
         // stop inertia
-        ___raf_23.default.cancel(state.i);
+        ___raf_23.default.cancel(state.timeout);
 
         state.active = false;
         interaction.simulation = null; // update pointers to the down event's coordinates
@@ -7017,7 +7050,7 @@ function resume(_ref2, scope) {
         interaction.updatePointer(pointer, event, eventTarget, true);
         __utils_23.pointer.setCoords(interaction.coords.cur, interaction.pointers.map(function (p) {
           return p.pointer;
-        })); // fire appropriate signals
+        }), interaction._now()); // fire appropriate signals
 
         var signalArg = {
           interaction: interaction
@@ -7048,7 +7081,9 @@ function release(_ref3, scope) {
   }
 
   var options = __getOptions_23(interaction);
-  var now = new Date().getTime();
+
+  var now = interaction._now();
+
   var velocityClient = interaction.coords.velocity.client;
   var pointerSpeed = __utils_23.hypot(velocityClient.x, velocityClient.y);
   var smoothEnd = false;
@@ -7063,10 +7098,13 @@ function release(_ref3, scope) {
       return __utils_23.extend({}, modifierStatus);
     }),
     preEnd: true,
-    requireEndOnly: true
+    prevCoords: undefined,
+    requireEndOnly: null
   }; // smoothEnd
 
   if (inertiaPossible && !inertia) {
+    modifierArg.prevCoords = interaction.prevEvent.page;
+    modifierArg.requireEndOnly = false;
     modifierResult = ___base_23.default.setAll(modifierArg);
 
     if (modifierResult.changed) {
@@ -7095,10 +7133,12 @@ function release(_ref3, scope) {
     __utils_23.extend(modifierArg.pageCoords, interaction.coords.cur.page);
     modifierArg.pageCoords.x += state.xe;
     modifierArg.pageCoords.y += state.ye;
+    modifierArg.prevCoords = undefined;
+    modifierArg.requireEndOnly = true;
     modifierResult = ___base_23.default.setAll(modifierArg);
     state.modifiedXe += modifierResult.delta.x;
     state.modifiedYe += modifierResult.delta.y;
-    state.i = ___raf_23.default.request(function () {
+    state.timeout = ___raf_23.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
@@ -7106,7 +7146,7 @@ function release(_ref3, scope) {
     state.xe = modifierResult.delta.x;
     state.ye = modifierResult.delta.y;
     state.sx = state.sy = 0;
-    state.i = ___raf_23.default.request(function () {
+    state.timeout = ___raf_23.default.request(function () {
       return smothEndTick(interaction);
     });
   }
@@ -7119,7 +7159,7 @@ function __stop_23(_ref4) {
   var state = interaction.inertia;
 
   if (state.active) {
-    ___raf_23.default.cancel(state.i);
+    ___raf_23.default.cancel(state.timeout);
 
     state.active = false;
     interaction.simulation = null;
@@ -7148,7 +7188,7 @@ function inertiaTick(interaction) {
   var state = interaction.inertia;
   var options = __getOptions_23(interaction);
   var lambda = options.resistance;
-  var t = new Date().getTime() / 1000 - state.t0;
+  var t = interaction._now() / 1000 - state.t0;
 
   if (t < state.te) {
     var progress = 1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0;
@@ -7163,7 +7203,7 @@ function inertiaTick(interaction) {
     }
 
     interaction.move();
-    state.i = ___raf_23.default.request(function () {
+    state.timeout = ___raf_23.default.request(function () {
       return inertiaTick(interaction);
     });
   } else {
@@ -7181,7 +7221,7 @@ function inertiaTick(interaction) {
 function smothEndTick(interaction) {
   updateInertiaCoords(interaction);
   var state = interaction.inertia;
-  var t = new Date().getTime() - state.t0;
+  var t = interaction._now() - state.t0;
 
   var _getOptions = __getOptions_23(interaction),
       duration = _getOptions.smoothEndDuration;
@@ -7190,7 +7230,7 @@ function smothEndTick(interaction) {
     state.sx = __utils_23.easeOutQuad(t, 0, state.xe, duration);
     state.sy = __utils_23.easeOutQuad(t, 0, state.ye, duration);
     interaction.move();
-    state.i = ___raf_23.default.request(function () {
+    state.timeout = ___raf_23.default.request(function () {
       return smothEndTick(interaction);
     });
   } else {
@@ -7217,7 +7257,7 @@ function updateInertiaCoords(interaction) {
     pageY: pageUp.y + state.sy,
     clientX: clientUp.x + state.sx,
     clientY: clientUp.y + state.sy
-  }]);
+  }], interaction._now());
 }
 
 function __getOptions_23(_ref5) {
@@ -8285,7 +8325,7 @@ var PointerEvent =
 /*#__PURE__*/
 function () {
   /** */
-  function PointerEvent(type, pointer, event, eventTarget, interaction) {
+  function PointerEvent(type, pointer, event, eventTarget, interaction, timeStamp) {
     ___classCallCheck_35(this, PointerEvent);
 
     this.propagationStopped = false;
@@ -8298,7 +8338,7 @@ function () {
     }
 
     this.interaction = interaction;
-    this.timeStamp = new Date().getTime();
+    this.timeStamp = timeStamp;
     this.originalEvent = event;
     this.type = type;
     this.pointerId = ___pointerUtils_35.default.getPointerId(pointer);
@@ -8412,7 +8452,7 @@ var pointerEvents = {
   types: ['down', 'move', 'up', 'cancel', 'tap', 'doubletap', 'hold']
 };
 
-function fire(arg) {
+function fire(arg, scope) {
   var interaction = arg.interaction,
       pointer = arg.pointer,
       event = arg.event,
@@ -8422,7 +8462,7 @@ function fire(arg) {
       _arg$targets = arg.targets,
       targets = _arg$targets === void 0 ? collectEventTargets(arg) : _arg$targets;
   var _arg$pointerEvent = arg.pointerEvent,
-      pointerEvent = _arg$pointerEvent === void 0 ? new _PointerEvent.default(type, pointer, event, eventTarget, interaction) : _arg$pointerEvent;
+      pointerEvent = _arg$pointerEvent === void 0 ? new _PointerEvent.default(type, pointer, event, eventTarget, interaction, scope.now()) : _arg$pointerEvent;
   var signalArg = {
     interaction: interaction,
     pointer: pointer,
@@ -8463,7 +8503,7 @@ function fire(arg) {
       event: event,
       eventTarget: eventTarget,
       type: 'doubletap'
-    }) : pointerEvent;
+    }, scope) : pointerEvent;
     interaction.prevTap = prevTap;
     interaction.tapTime = prevTap.timeStamp;
   }
@@ -8557,7 +8597,7 @@ function __install_36(scope) {
         event: event,
         eventTarget: eventTarget,
         type: 'move'
-      });
+      }, scope);
     }
   });
   interactions.signals.on('down', function (_ref6) {
@@ -8614,7 +8654,7 @@ function __install_36(scope) {
         pointer: pointer,
         event: event,
         type: 'hold'
-      });
+      }, scope);
     }, minDuration);
   });
   var _arr = ['up', 'cancel'];
@@ -8632,7 +8672,7 @@ function __install_36(scope) {
   }
 
   for (var i = 0; i < simpleSignals.length; i++) {
-    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i]));
+    interactions.signals.on(simpleSignals[i], createSignalListener(simpleEvents[i], scope));
   }
 
   interactions.signals.on('up', function (_ref9) {
@@ -8648,12 +8688,12 @@ function __install_36(scope) {
         pointer: pointer,
         event: event,
         type: 'tap'
-      });
+      }, scope);
     }
   });
 }
 
-function createSignalListener(type) {
+function createSignalListener(type, scope) {
   return function (_ref11) {
     var interaction = _ref11.interaction,
         pointer = _ref11.pointer,
@@ -8665,7 +8705,7 @@ function createSignalListener(type) {
       pointer: pointer,
       event: event,
       type: type
-    });
+    }, scope);
   };
 }
 
@@ -8690,7 +8730,7 @@ function __install_37(scope) {
   scope.usePlugin(___base_37.default);
   pointerEvents.signals.on('new', onNew);
   pointerEvents.signals.on('fired', function (arg) {
-    return onFired(arg, pointerEvents);
+    return onFired(arg, scope);
   });
   var _arr = ['move', 'up', 'cancel', 'endall'];
 
@@ -8714,7 +8754,7 @@ function onNew(_ref) {
   pointerEvent.count = (pointerEvent.count || 0) + 1;
 }
 
-function onFired(_ref2, pointerEvents) {
+function onFired(_ref2, scope) {
   var interaction = _ref2.interaction,
       pointerEvent = _ref2.pointerEvent,
       eventTarget = _ref2.eventTarget,
@@ -8733,13 +8773,13 @@ function onFired(_ref2, pointerEvents) {
 
 
   interaction.holdIntervalHandle = setTimeout(function () {
-    pointerEvents.fire({
+    scope.pointerEvents.fire({
       interaction: interaction,
       eventTarget: eventTarget,
       type: 'hold',
       pointer: pointerEvent,
       event: pointerEvent
-    });
+    }, scope);
   }, interval);
 }
 
@@ -8989,7 +9029,7 @@ function reflow(interactable, action, scope) {
           x: xywh.x,
           y: xywh.y
         },
-        timeStamp: Date.now()
+        timeStamp: scope.now()
       };
 
       var event = _$utils_52.pointer.coordsToEvent(coords);
@@ -9177,7 +9217,7 @@ function __init_24(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_24.version = "1.4.0-rc.3";
+_interact.default.version = __init_24.version = "1.4.0-rc.4";
 var ___default_24 = _interact.default;
 _$interact_24.default = ___default_24;
 

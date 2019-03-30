@@ -57,16 +57,16 @@ declare function fire<T extends string>(arg: {
     interaction: Interaction;
     pointer: Interact.PointerType;
     event: Interact.PointerEventType;
-    eventTarget: EventTarget;
+    eventTarget: Interact.EventTarget;
     targets?: EventTargetList;
     pointerEvent?: PointerEvent<T>;
     type: T;
-}): PointerEvent<string>;
+}, scope: Interact.Scope): PointerEvent<any>;
 declare function collectEventTargets<T extends string>({ interaction, pointer, event, eventTarget, type }: {
     interaction: Interaction;
     pointer: Interact.PointerType;
     event: Interact.PointerEventType;
-    eventTarget: EventTarget;
+    eventTarget: Interact.EventTarget;
     type: T;
 }): {
     eventable: Eventable;
@@ -76,5 +76,5 @@ declare function collectEventTargets<T extends string>({ interaction, pointer, e
     };
 }[];
 declare function install(scope: Scope): void;
-declare function createSignalListener(type: string): ({ interaction, pointer, event, eventTarget }: any) => void;
+declare function createSignalListener(type: string, scope: any): ({ interaction, pointer, event, eventTarget }: any) => void;
 export default pointerEvents;

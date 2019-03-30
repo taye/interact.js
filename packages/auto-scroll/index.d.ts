@@ -17,6 +17,7 @@ declare module '@interactjs/core/defaultOptions' {
 declare function install(scope: Scope): void;
 declare const autoScroll: {
     defaults: import("../types/types").AutoScrollOption;
+    now: () => number;
     interaction: any;
     i: any;
     x: number;
@@ -25,14 +26,14 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start(interaction: import("@interactjs/core/Interaction").Interaction<any>): void;
+    start(interaction: import("@interactjs/core/Interaction").Interaction<any>, scope: import("@interactjs/core/scope").Scope): void;
     stop(): void;
     scroll(): void;
     check(interactable: any, actionName: any): any;
     onInteractionMove({ interaction, pointer }: {
         interaction: any;
         pointer: any;
-    }): void;
+    }, scope: import("@interactjs/core/scope").Scope): void;
 };
 export declare function getContainer(value: any, interactable: any, element: any): any;
 export declare function getScroll(container: any): {

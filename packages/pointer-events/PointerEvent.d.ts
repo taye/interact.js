@@ -19,7 +19,7 @@ export default class PointerEvent<T extends string> {
     propagationStopped: boolean;
     immediatePropagationStopped: boolean;
     /** */
-    constructor(type: any, pointer: any, event: any, eventTarget: any, interaction: any);
+    constructor(type: T, pointer: Interact.PointerType | PointerEvent<any>, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, interaction: Interact.Interaction, timeStamp: number);
     subtractOrigin({ x: originX, y: originY }: {
         x: any;
         y: any;

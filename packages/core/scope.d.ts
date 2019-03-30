@@ -95,6 +95,7 @@ export declare class Scope {
     removeDocument(doc: Document): void;
     getDocIndex(doc: Document): number;
     getDocOptions(doc: Document): any;
+    now(): number;
 }
 export declare class InteractableSet {
     protected scope: Scope;
