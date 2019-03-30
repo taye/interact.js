@@ -101,7 +101,7 @@ const pointerUtils = {
     targetObj.client.x = tmpXY.x
     targetObj.client.y = tmpXY.y
 
-    targetObj.timeStamp = is.number(timeStamp) ? timeStamp : new Date().getTime()
+    targetObj.timeStamp = is.number(timeStamp) ? timeStamp : Date.now()
   },
 
   pointerExtend,

@@ -139,7 +139,7 @@ function release<T extends Interact.ActionName> ({ interaction, event, noPreEnd 
 
   const options = getOptions(interaction)
 
-  const now = new Date().getTime()
+  const now = Date.now()
   const { client: velocityClient } = interaction.coords.velocity
   const pointerSpeed = utils.hypot(velocityClient.x, velocityClient.y)
 
@@ -263,7 +263,7 @@ function inertiaTick (interaction: Interact.Interaction) {
   const state = interaction.inertia
   const options = getOptions(interaction)
   const lambda = options.resistance
-  const t = new Date().getTime() / 1000 - state.t0
+  const t = Date.now() / 1000 - state.t0
 
   if (t < state.te) {
     const progress =  1 - (Math.exp(-lambda * t) - state.lambda_v0) / state.one_ve_v0
@@ -304,7 +304,7 @@ function smothEndTick (interaction: Interact.Interaction) {
   updateInertiaCoords(interaction)
 
   const state = interaction.inertia
-  const t = new Date().getTime() - state.t0
+  const t = Date.now() - state.t0
   const { smoothEndDuration: duration } = getOptions(interaction)
 
   if (t < duration) {

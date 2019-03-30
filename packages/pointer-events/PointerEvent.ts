@@ -31,7 +31,7 @@ export default class PointerEvent<T extends string> {
 
     this.interaction = interaction
 
-    this.timeStamp     = new Date().getTime()
+    this.timeStamp     = Date.now()
     this.originalEvent = event
     this.type          = type
     this.pointerId     = pointerUtils.getPointerId(pointer)
