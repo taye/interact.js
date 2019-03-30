@@ -5,8 +5,6 @@ let canvas,
   width = 800,
   height = 800,
   status,
-  prevX = 0,
-  prevY = 0,
   blue = '#2299ee',
   lightBlue = '#88ccff',
   tango = '#ff4400',
@@ -28,6 +26,8 @@ let canvas,
   {x: 250, y: 250, range: Infinity},
 ];
 
+const prevCoords = { x: 0, y: 0 }
+const cursorRadius = 10
 
 function drawGrid (grid, gridOffset, range) {
   if (!grid.x || !grid.y) { return; }
@@ -123,24 +123,28 @@ window.CanvasRenderingContext2D.prototype.circle = circle;
 function dragMove (event) {
   const snap = event.snap;
 
-  context.clearRect(0, 0, width, height);
+  context.clearRect(
+    prevCoords.x - cursorRadius - 2,
+    prevCoords.y - cursorRadius - 2,
+    cursorRadius * 2 + 4,
+    cursorRadius * 2 + 4);
 
   if (snap && snap.range !== Infinity && typeof snap.x === 'number' && typeof snap.y === 'number') {
     context.circle(snap.x, snap.y, snap.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
   }
 
-  context.circle(event.pageX, event.pageY, 10, tango).fill();
+  context.circle(event.pageX, event.pageY, cursorRadius, tango).fill();
 
-  prevX = event.pageX;
-  prevY = event.pageY;
+  prevCoords.x = event.pageX;
+  prevCoords.y = event.pageY;
 }
 
 function dragEnd (event) {
   context.clearRect(0, 0, width, height);
-  context.circle(event.pageX, event.pageY, 10, tango).fill();
+  context.circle(event.pageX, event.pageY, cursorRadius, tango).fill();
 
-  prevX = event.pageX;
-  prevY = event.pageY;
+  prevCoords.x = event.pageX;
+  prevCoords.y = event.pageY;
 }
 
 function anchorDragStart (event) {
