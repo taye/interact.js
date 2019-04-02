@@ -107,10 +107,10 @@ export class Scope {
       return this
     }
 
+    if (plugin.id) { this._pluginMap[plugin.id] = plugin }
+
     plugin.install(this, options)
     this._plugins.push(plugin)
-
-    if (plugin.id) { this._pluginMap[plugin.id] = plugin }
 
     return this
   }
