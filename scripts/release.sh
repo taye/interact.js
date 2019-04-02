@@ -121,7 +121,7 @@ push_and_publish() {
   fi
 
   # push branch and tags to git origin
-  git push --no-verify && git push --no-verify origin $NEW_TAG &&
+  git push --no-verify && git push --no-verify origin $NEW_TAG
 }
 
 echo_funcname() {
