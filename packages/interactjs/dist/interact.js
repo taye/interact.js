@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.4
+ * interact.js 1.4.0-rc.5
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -163,13 +163,13 @@ function () {
         return this;
       }
 
-      plugin.install(this, options);
-
-      this._plugins.push(plugin);
-
       if (plugin.id) {
         this._pluginMap[plugin.id] = plugin;
       }
+
+      plugin.install(this, options);
+
+      this._plugins.push(plugin);
 
       return this;
     }
@@ -9217,7 +9217,7 @@ function __init_24(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact.default.version = __init_24.version = "1.4.0-rc.4";
+_interact.default.version = __init_24.version = "1.4.0-rc.5";
 var ___default_24 = _interact.default;
 _$interact_24.default = ___default_24;
 
