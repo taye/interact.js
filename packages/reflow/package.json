@@ -1,14 +1,11 @@
 {
   "name": "@interactjs/reflow",
-  "version": "1.4.0-rc.5",
+  "version": "1.4.0-rc.6",
   "peerDependencies": {
-    "@interactjs/core": "1.4.0-rc.2",
-    "@interactjs/utils": "1.4.0-rc.2"
+    "@interactjs/core": "1.4.0-rc.6",
+    "@interactjs/utils": "1.4.0-rc.6"
   },
   "devDependencies": {
-    "@interactjs/_dev": "1.4.0-rc.5",
-    "@interactjs/core": "1.4.0-rc.5",
-    "@interactjs/utils": "1.4.0-rc.5",
     "promise-polyfill": "latest"
   },
   "publishConfig": {

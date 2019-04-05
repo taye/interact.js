@@ -1,15 +1,20 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.4.0-rc.5",
+  "version": "1.4.0-rc.6",
   "private": true,
+  "workspaces": [
+    ".",
+    "./packages/*"
+  ],
   "bin": {
     "@build": "scripts/build.js",
     "@docs": "docs/index.js",
     "@lint": "scripts/lint.js",
-    "@run_test": "scripts/test.sh"
+    "@run_test": "scripts/test.sh",
+    "@version": "scripts/version.js"
   },
   "scripts": {
-    "bootstrap": "npx lerna bootstrap --ci",
+    "bootstrap": "npx yarn install",
     "start": "cd packages/interactjs; NODE_ENV=development ../../scripts/build.js --watch",
     "build": "cd packages/interactjs; NODE_ENV=production ../../scripts/build.js --docs",
     "lint": "scripts/lint.js",
@@ -18,7 +23,7 @@
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
     "docs": "node docs --go",
     "release": "sh ./scripts/release.sh",
-    "bump": "npx lerna version --no-git-tag-version --exact && git add -p -- lerna.json package.json packages/*/package.json && git commit"
+    "version": "scripts/version.js"
   },
   "dependencies": {
     "@babel/core": "latest",
@@ -70,7 +75,8 @@
     "typescript": "latest",
     "uglify-js": "latest",
     "watchify": "latest",
-    "yargs": "latest"
+    "yargs": "latest",
+    "yarn": "latest"
   },
   "husky": {
     "hooks": {
