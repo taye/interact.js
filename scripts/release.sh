@@ -89,7 +89,7 @@ run_build() {
   npx tsc --emitDeclarationOnly false -p $ROOT &&
 
   # copy .npmignore to all packages
-  npx lerna exec --no-private -- "echo '# copied from ../../.npmignore' > .npmignore
+  npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat ../../.npmignore >> .npmignore" &&
 
   # build packages

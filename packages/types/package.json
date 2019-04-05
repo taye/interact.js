@@ -14,9 +14,6 @@
     "@interactjs/reflow": "1.4.0-rc.5",
     "@interactjs/utils": "1.4.0-rc.5"
   },
-  "devDependencies": {
-    "@interactjs/_dev": "1.4.0-rc.5"
-  },
   "publishConfig": {
     "access": "public"
   }

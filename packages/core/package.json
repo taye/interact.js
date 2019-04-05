@@ -2,11 +2,7 @@
   "name": "@interactjs/core",
   "version": "1.4.0-rc.5",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.4.0-rc.2",
-    "@interactjs/utils": "1.4.0-rc.2"
-  },
-  "devDependencies": {
-    "@interactjs/_dev": "1.4.0-rc.5",
+    "@interactjs/dev-tools": "1.4.0-rc.5",
     "@interactjs/utils": "1.4.0-rc.5"
   },
   "publishConfig": {
