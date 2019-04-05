@@ -61,7 +61,7 @@ export declare const interact: InteractStatic;
 declare function use(plugin: Interact.Plugin, options?: {
     [key: string]: any;
 }): InteractStatic;
-declare function isSet(element: Element, options?: any): boolean;
+declare function isSet(target: Element, options?: any): boolean;
 declare function on(type: string | Interact.EventTypes, listener: Interact.ListenersArg, options?: any): InteractStatic;
 declare function off(type: any, listener: any, options: any): InteractStatic;
 declare function debug(): Scope;

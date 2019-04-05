@@ -2,6 +2,7 @@ import * as utils from '@interactjs/utils';
 import defaults from './defaultOptions';
 import Eventable from './Eventable';
 import InteractableBase from './Interactable';
+import InteractableSet from './InteractableSet';
 import InteractEvent from './InteractEvent';
 export declare enum ActionName {
 }
@@ -20,6 +21,7 @@ export interface Plugin {
     [key: string]: any;
 }
 export declare class Scope {
+    id: string;
     signals: utils.Signals;
     browser: {
         init: (window: any) => void;
@@ -96,15 +98,5 @@ export declare class Scope {
     getDocIndex(doc: Document): number;
     getDocOptions(doc: Document): any;
     now(): number;
-}
-export declare class InteractableSet {
-    protected scope: Scope;
-    signals: utils.Signals;
-    list: InteractableBase[];
-    constructor(scope: Scope);
-    new(target: Interact.Target, options?: any): InteractableBase;
-    indexOfElement(target: Interact.Target, context: Document | Element): number;
-    get(element: Interact.Target, options: any, dontCheckInContext?: boolean): InteractableBase;
-    forEachMatch(element: Document | Element, callback: (interactable: any) => any): any;
 }
 export declare function initScope(scope: Scope, window: Window): Scope;
