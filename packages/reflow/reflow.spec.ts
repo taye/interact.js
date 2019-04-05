@@ -94,7 +94,7 @@ test('async reflow', async (t) => {
   interactable.fire = ((iEvent) => { reflowEvent = iEvent }) as any
   interactable.options.TEST = { enabled: true }
 
-  reflow.install(scope)
+  scope.usePlugin(reflow)
 
   // test with Promise implementation
   scope.window.Promise = PromisePolyfill

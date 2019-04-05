@@ -11,7 +11,7 @@ function getGestureProps (event: Interact.GestureEvent) {
 test('gesture action init', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
 
-  gesture.install(scope)
+  scope.usePlugin(gesture)
 
   t.ok(scope.actions.names.includes(ActionName.Gesture), '"gesture" in actions.names')
   t.equal(scope.actions.methodDict.gesture, 'gesturable')
@@ -23,7 +23,7 @@ test('gesture action init', (t) => {
 test('Interactable.gesturable method', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
 
-  gesture.install(scope)
+  scope.usePlugin(gesture)
 
   const interaction = scope.interactions.new({})
   const element = scope.document.body

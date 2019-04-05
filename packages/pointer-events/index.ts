@@ -3,9 +3,9 @@ import holdRepeat from './holdRepeat'
 import interactableTargets from './interactableTargets'
 
 function install (scope) {
-  pointerEvents.install(scope)
-  holdRepeat.install(scope)
-  interactableTargets.install(scope)
+  scope.usePlugin(pointerEvents)
+  scope.usePlugin(holdRepeat)
+  scope.usePlugin(interactableTargets)
 }
 
 const id = 'pointer-events'

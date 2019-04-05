@@ -48,7 +48,7 @@ function install (scope: Interact.Scope) {
     defaults,
   } = scope
 
-  InteractableMethods.install(scope)
+  scope.usePlugin(InteractableMethods)
 
   // set cursor style on mousedown
   interactions.signals.on('down', ({ interaction, pointer, event, eventTarget }) => {

@@ -7,8 +7,8 @@ import autoStart from './base'
 test('autoStart', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
 
-  autoStart.install(scope)
-  drag.install(scope)
+  scope.usePlugin(autoStart)
+  scope.usePlugin(drag)
 
   const interaction = scope.interactions.new({})
   const element = scope.document.body

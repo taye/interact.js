@@ -37,8 +37,8 @@ test('holdRepeat count', (t) => {
 
 test('holdRepeat onFired', (t) => {
   const scope = mockScope()
-  pointerEvents.install(scope)
-  holdRepeat.install(scope)
+  scope.usePlugin(pointerEvents)
+  scope.usePlugin(holdRepeat)
 
   const interaction = scope.interactions.new({})
   const pointerEvent = {

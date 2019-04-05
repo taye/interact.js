@@ -5,10 +5,10 @@ import gesture, { GestureEvent } from './gesture'
 import resize, { ResizeEvent } from './resize'
 
 function install (scope: Scope) {
-  gesture.install(scope)
-  resize.install(scope)
-  drag.install(scope)
-  drop.install(scope)
+  scope.usePlugin(gesture)
+  scope.usePlugin(resize)
+  scope.usePlugin(drag)
+  scope.usePlugin(drop)
 }
 
 const id = 'actions'
