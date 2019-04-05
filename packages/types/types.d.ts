@@ -6,6 +6,7 @@
 import * as actions from '@interactjs/actions'
 import * as defaults from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
+import _InteractableSet from '@interactjs/core/InteractableSet'
 import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
@@ -23,6 +24,7 @@ declare namespace Interact {
   export type Plugin = scope.Plugin
   export type ActionProps<T extends ActionName = any> = interaction.ActionProps<T>
   export type Interactable = _Interactable
+  export type __InteractableSet = _InteractableSet
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
   export type InteractEvent<

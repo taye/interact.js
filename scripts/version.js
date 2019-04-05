@@ -14,18 +14,18 @@ if (!module.parent) {
   const fs = require('fs')
   const glob = require('glob')
 
-  const [,, version, prereleaseId] = process.argv
+  const [,, versionChange, prereleaseId] = process.argv
   const oldVersion = module.exports.get()
 
-  if (version) {
-    if (/^(major|minor|patch|premajor|preminor|prepatch|prerelease)$/.test(version)) {
-      newVersion = semver.inc(oldVersion, version, prereleaseId)
+  if (versionChange) {
+    if (/^(major|minor|patch|premajor|preminor|prepatch|prerelease)$/.test(versionChange)) {
+      newVersion = semver.inc(oldVersion, versionChange, prereleaseId)
     }
     else {
-      newVersion = semver.clean(version)
+      newVersion = semver.clean(versionChange)
 
       if (newVersion === null) {
-        throw Error(`Invalid version "${version}"`)
+        throw Error(`Invalid version change "${oldVersion}" -> "${versionChange}"`)
       }
     }
 
@@ -34,9 +34,9 @@ if (!module.parent) {
     for (const file of ['package.json', ...glob.sync('packages/*/package.json')]) {
       const pkg = require(path.resolve(file))
 
-      versionTable.push([pkg.name, pkg.version, version])
+      versionTable.push({ package: pkg.name, old: pkg.version, new: newVersion })
 
-      pkg.version = version
+      pkg.version = newVersion
 
       for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f]).filter(Boolean)) {
         for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {

@@ -103,8 +103,8 @@ function use (plugin: Interact.Plugin, options?: { [key: string]: any }) {
  * passed to interact
  */
 interact.isSet = isSet
-function isSet (element: Element, options?: any) {
-  return scope.interactables.indexOfElement(element, options && options.context) !== -1
+function isSet (target: Element, options?: any) {
+  return !!scope.interactables.get(target, options && options.context)
 }
 
 /**

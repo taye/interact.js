@@ -6,6 +6,7 @@ export NODE_ENV=test
 export TS_NODE_TRANSPILE_ONLY=${TS_NODE_TRANSPILE_ONLY:-0}
 export TS_NODE_PRETTY=${TS_NODE_PRETTY:-1}
 export TS_NODE_COMPILER_OPTIONS=${TS_NODE_COMPILER_OPTIONS:-"{ \"module\": \"commonjs\" }"}
+export TS_NODE_PROJECT=${TS_NODE_PROJECT:-"$PWD/tsconfig.json"}
 
 report=0
 
