@@ -3,9 +3,9 @@ import dragAxis from './dragAxis'
 import hold from './hold'
 
 function install (scope) {
-  autoStart.install(scope)
-  hold.install(scope)
-  dragAxis.install(scope)
+  scope.usePlugin(autoStart)
+  scope.usePlugin(hold)
+  scope.usePlugin(dragAxis)
 }
 
 const id = 'auto-start'

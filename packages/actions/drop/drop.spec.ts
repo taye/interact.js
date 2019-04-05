@@ -7,7 +7,7 @@ import drop from '../drop'
 test('actions/drop options', (t) => {
   const scope = helpers.mockScope()
   scope.interact = {}
-  drop.install(scope)
+  scope.usePlugin(drop)
 
   const interactable = scope.interactables.new({ pointerType: 'test' })
 
@@ -37,8 +37,8 @@ test('actions/drop options', (t) => {
 test('actions/drop start', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
   scope.interact = {} as any
-  drag.install(scope)
-  drop.install(scope)
+  scope.usePlugin(drag)
+  scope.usePlugin(drop)
 
   let interaction
   const draggable = scope.interactables.new(scope.document.body).draggable({})

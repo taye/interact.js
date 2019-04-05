@@ -12,7 +12,7 @@ test('devTools', (t) => {
     logs.push({ args, type })
   }
 
-  devTools.install(scope, {
+  scope.usePlugin(devTools, {
     logger: {
       warn (...args) { log(args, 'warn') },
       log (...args) { log(args, 'log') },
@@ -20,8 +20,8 @@ test('devTools', (t) => {
     },
   })
 
-  drag.install(scope)
-  resize.install(scope)
+  scope.usePlugin(drag)
+  scope.usePlugin(resize)
 
   const element = scope.document.body.appendChild(scope.document.createElement('div'))
   const event = utils.pointer.coordsToEvent(utils.pointer.newCoords())

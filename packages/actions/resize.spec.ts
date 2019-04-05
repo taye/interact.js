@@ -6,7 +6,7 @@ import resize from './resize'
 test('resize', (t) => {
   const scope = helpers.mockScope()
 
-  resize.install(scope)
+  scope.usePlugin(resize)
 
   t.ok(scope.actions.names.includes('resize'), '"resize" in actions.names')
   t.equal(scope.actions.methodDict.resize, 'resizable')

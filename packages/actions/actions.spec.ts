@@ -8,7 +8,7 @@ test('actions integration', (t) => {
   const event = pointerUtils.coordsToEvent(pointerUtils.newCoords())
   const element = scope.document.body
 
-  actions.install(scope)
+  scope.usePlugin(actions)
 
   const interactable = scope.interactables.new(element)
   // make a dropzone

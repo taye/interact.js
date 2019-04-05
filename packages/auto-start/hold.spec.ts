@@ -14,8 +14,8 @@ test('autoStart/hold', (t) => {
     },
   })
   const autoStartHold = hold
-  autoStart.install(scope)
-  autoStartHold.install(scope)
+  scope.usePlugin(autoStart)
+  scope.usePlugin(autoStartHold)
 
   t.equal(scope.defaults.perAction.hold, 0, 'sets scope.defaults.perAction.hold')
   t.equal(scope.defaults.perAction.delay, 0, 'backwards compatible "delay" alias.')

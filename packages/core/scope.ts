@@ -247,7 +247,7 @@ export function initScope (scope: Scope, window: Window) {
   raf.init(window)
   events.init(window)
 
-  interactions.install(scope)
+  scope.usePlugin(interactions)
   scope.document = window.document
   scope.window = window
 
