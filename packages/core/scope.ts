@@ -3,6 +3,7 @@ import domObjects from '@interactjs/utils/domObjects'
 import defaults from './defaultOptions'
 import Eventable from './Eventable'
 import InteractableBase from './Interactable'
+import InteractableSet from './InteractableSet'
 import InteractEvent from './InteractEvent'
 import interactions from './interactions'
 
@@ -36,7 +37,7 @@ export interface Plugin {
 }
 
 export class Scope {
-  // FIXME Signals
+  id = `__interact_scope_${Math.floor(Math.random() * 100)}`
   signals = new Signals()
   browser = browser
   events = events
@@ -167,76 +168,6 @@ export class Scope {
 
   now () {
     return ((this.window as any).Date as typeof Date || Date).now()
-  }
-}
-
-export class InteractableSet {
-  signals = new utils.Signals()
-
-  // all set interactables
-  list: InteractableBase[] = []
-
-  constructor (protected scope: Scope) {}
-
-  new (target: Interact.Target, options?: any): InteractableBase {
-    options = utils.extend(options || {}, {
-      actions: this.scope.actions,
-    })
-    const interactable = new this.scope.Interactable(target, options, this.scope.document)
-
-    this.scope.addDocument(interactable._doc)
-    this.list.push(interactable)
-
-    this.signals.fire('new', {
-      target,
-      options,
-      interactable,
-      win: this.scope._win,
-    })
-
-    return interactable
-  }
-
-  indexOfElement (target: Interact.Target, context: Document | Element) {
-    context = context || this.scope.document
-
-    const list = this.list
-
-    for (let i = 0; i < list.length; i++) {
-      const interactable = list[i]
-
-      if (interactable.target === target && interactable._context === context) {
-        return i
-      }
-    }
-
-    return -1
-  }
-
-  get (element: Interact.Target, options, dontCheckInContext?: boolean) {
-    const ret = this.list[this.indexOfElement(element, options && options.context)]
-
-    return ret && (utils.is.string(element) || dontCheckInContext || ret.inContext(element)) ? ret : null
-  }
-
-  forEachMatch (element: Document | Element, callback: (interactable: any) => any) {
-    for (const interactable of this.list) {
-      let ret
-
-      if ((utils.is.string(interactable.target)
-      // target is a selector and the element matches
-        ? (utils.is.element(element) && utils.dom.matchesSelector(element, interactable.target))
-        // target is the element
-        : element === interactable.target) &&
-        // the element is in context
-        (interactable.inContext(element))) {
-        ret = callback(interactable)
-      }
-
-      if (ret !== undefined) {
-        return ret
-      }
-    }
   }
 }
 
