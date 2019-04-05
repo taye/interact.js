@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.6
+ * interact.js 1.4.0-rc.7
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -334,9 +334,7 @@ function initScope(scope, window) {
   browser.init(window);
   raf.init(window);
   events.init(window);
-
-  _interactions["default"].install(scope);
-
+  scope.usePlugin(_interactions["default"]);
   scope.document = window.document;
   scope.window = window;
   return scope;
@@ -5354,13 +5352,10 @@ var _resize = ___interopRequireDefault_5(_$resize_6);
 function ___interopRequireDefault_5(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function __install_5(scope) {
-  _gesture["default"].install(scope);
-
-  _resize["default"].install(scope);
-
-  ___drag_5["default"].install(scope);
-
-  _drop["default"].install(scope);
+  scope.usePlugin(_gesture["default"]);
+  scope.usePlugin(_resize["default"]);
+  scope.usePlugin(___drag_5["default"]);
+  scope.usePlugin(_drop["default"]);
 }
 
 var id = 'actions';
@@ -5831,9 +5826,7 @@ function __install_9(scope) {
   var interact = scope.interact,
       interactions = scope.interactions,
       defaults = scope.defaults;
-
-  _InteractableMethods["default"].install(scope); // set cursor style on mousedown
-
+  scope.usePlugin(_InteractableMethods["default"]); // set cursor style on mousedown
 
   interactions.signals.on('down', function (_ref) {
     var interaction = _ref.interaction,
@@ -6298,11 +6291,9 @@ var _hold = ___interopRequireDefault_12(_$hold_11);
 function ___interopRequireDefault_12(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function __install_12(scope) {
-  ___base_12["default"].install(scope);
-
-  _hold["default"].install(scope);
-
-  _dragAxis["default"].install(scope);
+  scope.usePlugin(___base_12["default"]);
+  scope.usePlugin(_hold["default"]);
+  scope.usePlugin(_dragAxis["default"]);
 }
 
 var __id_12 = 'auto-start';
@@ -8918,11 +8909,9 @@ var _interactableTargets = ___interopRequireDefault_38(_$interactableTargets_39)
 function ___interopRequireDefault_38(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function __install_38(scope) {
-  ___base_38["default"].install(scope);
-
-  _holdRepeat["default"].install(scope);
-
-  _interactableTargets["default"].install(scope);
+  scope.usePlugin(___base_38["default"]);
+  scope.usePlugin(_holdRepeat["default"]);
+  scope.usePlugin(_interactableTargets["default"]);
 }
 
 var __id_38 = 'pointer-events';
@@ -9217,7 +9206,7 @@ function __init_24(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_24.version = "1.4.0-rc.6";
+_interact["default"].version = __init_24.version = "1.4.0-rc.7";
 var ___default_24 = _interact["default"];
 _$interact_24["default"] = ___default_24;
 
