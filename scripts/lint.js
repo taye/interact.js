@@ -55,11 +55,18 @@ const cli = new CLIEngine({
 
 const report = cli.executeOnFiles(argv.sources)
 const errors = CLIEngine.getErrorResults(report.results)
+const formatted = cli.getFormatter('table')(errors)
 
-console.log(cli.getFormatter('table')(errors))
+if (errors.length) {
+  console.error(formatted)
 
-if (argv.failOnError && errors.length) {
-  throw Error('Test failed')
+  if (argv.failOnError) {
+    // eslint-disable-next-line no-throw-literal
+    throw 'The lint errors above were found'
+  }
+}
+else {
+  console.log(formatted)
 }
 
 if (argv.fix) {
