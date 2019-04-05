@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/core",
-  "version": "1.4.0-rc.7",
+  "version": "1.4.0-rc.8",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.4.0-rc.7",
-    "@interactjs/utils": "1.4.0-rc.7"
+    "@interactjs/dev-tools": "1.4.0-rc.8",
+    "@interactjs/utils": "1.4.0-rc.8"
   },
   "publishConfig": {
     "access": "public"

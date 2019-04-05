@@ -40,7 +40,7 @@ function install (scope: Scope) {
 
   interactions.signals.on('stop', autoScroll.stop)
 
-  interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg, scope))
+  interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg))
 
   actions.eventTypes.push('autoscroll')
   defaults.perAction.autoScroll = autoScroll.defaults
@@ -70,13 +70,13 @@ const autoScroll = {
   margin: 0,
   speed: 0,
 
-  start (interaction: Interact.Interaction, scope: Interact.Scope) {
+  start (interaction: Interact.Interaction) {
     autoScroll.isScrolling = true
     raf.cancel(autoScroll.i)
 
     interaction.autoScroll = autoScroll
     autoScroll.interaction = interaction
-    autoScroll.prevTime = scope.now()
+    autoScroll.prevTime = this.now()
     autoScroll.i = raf.request(autoScroll.scroll)
   },
 
@@ -94,7 +94,7 @@ const autoScroll = {
     const { interactable, element } = interaction
     const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll
     const container = getContainer(options.container, interactable, element)
-    const now = this.scope.now()
+    const now = this.now()
     // change in time in seconds
     const dt = (now - autoScroll.prevTime) / 1000
     // displacement
@@ -148,7 +148,7 @@ const autoScroll = {
 
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled
   },
-  onInteractionMove ({ interaction, pointer }, scope: Interact.Scope) {
+  onInteractionMove ({ interaction, pointer }) {
     if (!(interaction.interacting() &&
           autoScroll.check(interaction.interactable, interaction.prepared.name))) {
       return
@@ -191,7 +191,7 @@ const autoScroll = {
       autoScroll.margin = options.margin
       autoScroll.speed  = options.speed
 
-      autoScroll.start(interaction, scope)
+      autoScroll.start(interaction)
     }
   },
 }
