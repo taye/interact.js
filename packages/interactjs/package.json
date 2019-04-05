@@ -43,6 +43,11 @@
   "dependencies": {
     "@interactjs/types": "1.4.0-rc.9"
   },
+  "devDependencies": {
+    "@interactjs/interact": "1.4.0-rc.9",
+    "@interactjs/modifiers": "1.4.0-rc.9",
+    "@interactjs/utils": "1.4.0-rc.9"
+  },
   "_dev": {
     "entries": "./index.ts",
     "standalone": "interact",
