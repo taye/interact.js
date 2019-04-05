@@ -26,14 +26,14 @@ declare const autoScroll: {
     prevTime: number;
     margin: number;
     speed: number;
-    start(interaction: import("@interactjs/core/Interaction").Interaction<any>, scope: import("@interactjs/core/scope").Scope): void;
+    start(interaction: import("@interactjs/core/Interaction").Interaction<any>): void;
     stop(): void;
     scroll(): void;
     check(interactable: any, actionName: any): any;
     onInteractionMove({ interaction, pointer }: {
         interaction: any;
         pointer: any;
-    }, scope: import("@interactjs/core/scope").Scope): void;
+    }): void;
 };
 export declare function getContainer(value: any, interactable: any, element: any): any;
 export declare function getScroll(container: any): {

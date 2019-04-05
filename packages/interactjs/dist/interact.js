@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.7
+ * interact.js 1.4.0-rc.8
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5403,7 +5403,7 @@ function __install_7(scope) {
   });
   interactions.signals.on('stop', autoScroll.stop);
   interactions.signals.on('action-move', function (arg) {
-    return autoScroll.onInteractionMove(arg, scope);
+    return autoScroll.onInteractionMove(arg);
   });
   actions.eventTypes.push('autoscroll');
   defaults.perAction.autoScroll = autoScroll.defaults;
@@ -5427,14 +5427,14 @@ var autoScroll = {
   prevTime: 0,
   margin: 0,
   speed: 0,
-  start: function start(interaction, scope) {
+  start: function start(interaction) {
     autoScroll.isScrolling = true;
 
     ___raf_7["default"].cancel(autoScroll.i);
 
     interaction.autoScroll = autoScroll;
     autoScroll.interaction = interaction;
-    autoScroll.prevTime = scope.now();
+    autoScroll.prevTime = this.now();
     autoScroll.i = ___raf_7["default"].request(autoScroll.scroll);
   },
   stop: function stop() {
@@ -5453,7 +5453,7 @@ var autoScroll = {
         element = interaction.element;
     var options = interactable.options[autoScroll.interaction.prepared.name].autoScroll;
     var container = getContainer(options.container, interactable, element);
-    var now = this.scope.now(); // change in time in seconds
+    var now = this.now(); // change in time in seconds
 
     var dt = (now - autoScroll.prevTime) / 1000; // displacement
 
@@ -5506,7 +5506,7 @@ var autoScroll = {
     var options = interactable.options;
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function onInteractionMove(_ref2, scope) {
+  onInteractionMove: function onInteractionMove(_ref2) {
     var interaction = _ref2.interaction,
         pointer = _ref2.pointer;
 
@@ -5548,7 +5548,7 @@ var autoScroll = {
       // set the autoScroll properties to those of the target
       autoScroll.margin = options.margin;
       autoScroll.speed = options.speed;
-      autoScroll.start(interaction, scope);
+      autoScroll.start(interaction);
     }
   }
 };
@@ -9206,7 +9206,7 @@ function __init_24(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_24.version = "1.4.0-rc.7";
+_interact["default"].version = __init_24.version = "1.4.0-rc.8";
 var ___default_24 = _interact["default"];
 _$interact_24["default"] = ___default_24;
 
