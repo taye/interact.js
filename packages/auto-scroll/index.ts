@@ -76,7 +76,7 @@ const autoScroll = {
 
     interaction.autoScroll = autoScroll
     autoScroll.interaction = interaction
-    autoScroll.prevTime = this.now()
+    autoScroll.prevTime = autoScroll.now()
     autoScroll.i = raf.request(autoScroll.scroll)
   },
 
@@ -94,7 +94,7 @@ const autoScroll = {
     const { interactable, element } = interaction
     const options = interactable.options[autoScroll.interaction.prepared.name].autoScroll
     const container = getContainer(options.container, interactable, element)
-    const now = this.now()
+    const now = autoScroll.now()
     // change in time in seconds
     const dt = (now - autoScroll.prevTime) / 1000
     // displacement
