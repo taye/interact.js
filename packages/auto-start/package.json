@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/auto-start",
-  "version": "1.4.0-rc.8",
+  "version": "1.4.0-rc.9",
   "peerDependencies": {
-    "@interactjs/core": "1.4.0-rc.8",
-    "@interactjs/utils": "1.4.0-rc.8"
+    "@interactjs/core": "1.4.0-rc.9",
+    "@interactjs/utils": "1.4.0-rc.9"
   },
   "publishConfig": {
     "access": "public"

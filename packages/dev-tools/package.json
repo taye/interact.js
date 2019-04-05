@@ -1,8 +1,8 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.4.0-rc.8",
+  "version": "1.4.0-rc.9",
   "dependencies": {
-    "@interactjs/utils": "1.4.0-rc.8"
+    "@interactjs/utils": "1.4.0-rc.9"
   },
   "publishConfig": {
     "access": "public"
