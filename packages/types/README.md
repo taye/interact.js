@@ -1,7 +1,5 @@
-This package lists all the `@interactjs/*` packages as dependencies so that
-the corresponding modules are available for referencing from .d.ts files
-
-```shell
-npm install interactjs
-npm install --save-dev @interactjs/types
-```
+<h2>
+This package is an internal part of
+[interactjs](https://www.npmjs.com/package/interactjs) and is not meant to be
+used independently as each update may introduce breaking changes
+</h2>
