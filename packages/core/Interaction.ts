@@ -22,7 +22,7 @@ export class Interaction<T extends ActionName = any> {
 
   // the target element of the interactable
   element: Element = null
-  rect: Interact.Rect & Interact.Rect3
+  rect: Interact.Rect & Interact.Size
   edges: {
     [P in keyof Interact.Rect]?: boolean
   }
@@ -466,6 +466,9 @@ export class Interaction<T extends ActionName = any> {
       if (edges.bottom) { rect.bottom += iEvent.delta.y }
       if (edges.left)   { rect.left   += iEvent.delta.x }
       if (edges.right)  { rect.right  += iEvent.delta.x }
+
+      rect.width = rect.right - rect.left
+      rect.height = rect.bottom - rect.top
     }
 
     this._signals.fire(`action-${phase}`, signalArg)

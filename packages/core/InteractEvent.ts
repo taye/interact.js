@@ -35,6 +35,7 @@ export class InteractEvent<
   page: Interact.Point
   client: Interact.Point
   delta: Interact.Point
+  rect: Required<Interact.Rect>
   x0: number
   y0: number
   t0: number
@@ -83,6 +84,7 @@ export class InteractEvent<
 
     this.page      = extend({}, coords.page)
     this.client    = extend({}, coords.client)
+    this.rect      = extend({}, interaction.rect)
     this.timeStamp = coords.timeStamp
 
     if (!ending) {

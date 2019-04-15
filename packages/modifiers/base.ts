@@ -45,14 +45,13 @@ function install (scope: Scope) {
     start(arg as any, arg.interaction.coords.cur.page, scope.modifiers)
   })
 
+  interactions.signals.on('after-action-move', restoreCoords as any)
   interactions.signals.on('before-action-move', beforeMove)
-  interactions.signals.on('before-action-end', beforeEnd)
 
   interactions.signals.on('before-action-start', setCoords)
-  interactions.signals.on('before-action-move', setCoords)
-
   interactions.signals.on('after-action-start', restoreCoords as any)
-  interactions.signals.on('after-action-move', restoreCoords as any)
+
+  interactions.signals.on('before-action-end', beforeEnd)
   interactions.signals.on('stop', stop)
 }
 
@@ -146,6 +145,12 @@ function setAll (arg: Partial<Interact.SignalArg>) {
 
   const result = {
     delta: { x: 0, y: 0 },
+    rectDelta: {
+      left  : 0,
+      right : 0,
+      top   : 0,
+      bottom: 0,
+    },
     coords: arg.coords,
     changed: true,
   }
@@ -163,7 +168,23 @@ function setAll (arg: Partial<Interact.SignalArg>) {
   result.delta.x = arg.coords.x - arg.pageCoords.x
   result.delta.y = arg.coords.y - arg.pageCoords.y
 
-  result.changed = prevCoords.x !== result.coords.x || prevCoords.y !== result.coords.y
+  let rectChanged = false
+
+  if (rect) {
+    result.rectDelta.left   = arg.rect.left - rect.left
+    result.rectDelta.right  = arg.rect.right - rect.right
+    result.rectDelta.top    = arg.rect.top - rect.top
+    result.rectDelta.bottom = arg.rect.bottom - rect.bottom
+
+    rectChanged = result.rectDelta.left !== 0 ||
+      result.rectDelta.right !== 0 ||
+      result.rectDelta.top !== 0 ||
+      result.rectDelta.bottom !== 0
+  }
+
+  result.changed = prevCoords.x !== result.coords.x ||
+    prevCoords.y !== result.coords.y ||
+    rectChanged
 
   return result
 }
@@ -189,7 +210,8 @@ function prepareStates (modifierList) {
   return states
 }
 
-function beforeMove ({ interaction, phase, preEnd, skipModifiers }): void | false {
+function beforeMove (arg: Interact.SignalArg): void | false {
+  const { interaction, phase, preEnd, skipModifiers } = arg
   const { interactable, element } = interaction
   const modifierResult = setAll(
     {
@@ -199,7 +221,7 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }): void | fals
       preEnd,
       phase,
       pageCoords: interaction.coords.cur.page,
-      rect: interactable.getRect(element),
+      rect: interaction.rect,
       states: interaction.modifiers.states,
       requireEndOnly: false,
       skipModifiers,
@@ -212,6 +234,8 @@ function beforeMove ({ interaction, phase, preEnd, skipModifiers }): void | fals
   if (!modifierResult.changed && interaction.interacting()) {
     return false
   }
+
+  setCoords(arg)
 }
 
 function beforeEnd (arg): void | false {
@@ -285,13 +309,24 @@ function setCoords (arg) {
     coordsSet.client.x += delta.x
     coordsSet.client.y += delta.y
   }
+
+  const { rectDelta } = interaction.modifiers.result
+  const rect = arg.rect || interaction.rect
+
+  rect.left   += rectDelta.left
+  rect.right  += rectDelta.right
+  rect.top    += rectDelta.top
+  rect.bottom += rectDelta.bottom
+
+  rect.width = rect.right - rect.left
+  rect.height = rect.bottom - rect.top
 }
 
-function restoreCoords ({ interaction: { coords, modifiers } }) {
+function restoreCoords ({ interaction: { coords, rect, modifiers } }: Interact.SignalArg) {
   if (!modifiers.result) { return }
 
   const { startDelta } = modifiers
-  const { delta: curDelta } = modifiers.result
+  const { delta: curDelta, rectDelta } = modifiers.result
 
   for (const [coordsSet, delta] of [[coords.start, startDelta], [coords.cur, curDelta]]) {
     coordsSet.page.x -= delta.x
@@ -299,6 +334,11 @@ function restoreCoords ({ interaction: { coords, modifiers } }) {
     coordsSet.client.x -= delta.x
     coordsSet.client.y -= delta.y
   }
+
+  rect.left -= rectDelta.left
+  rect.right -= rectDelta.right
+  rect.top -= rectDelta.top
+  rect.bottom -= rectDelta.bottom
 }
 
 function getModifierList (interaction, registeredModifiers) {
@@ -336,7 +376,7 @@ function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: 
     : !requireEndOnly
 }
 
-function makeModifier (module, name?: string) {
+function makeModifier<Options extends { [key: string]: any }> (module: { defaults: Options, [key: string]: any }, name?: string) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -345,7 +385,7 @@ function makeModifier (module, name?: string) {
     stop: module.stop,
   }
 
-  const modifier = (options) => {
+  const modifier = (options: Partial<Options>) => {
     options = options || {}
 
     // add missing defaults to options
@@ -389,3 +429,7 @@ export default {
   getRectOffset,
   makeModifier,
 } as Interact.Plugin
+
+export {
+  makeModifier,
+}
