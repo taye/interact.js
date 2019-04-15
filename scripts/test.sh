@@ -1,5 +1,5 @@
 #!/bin/sh
-PKG_DIR=$(dirname $(readlink -f $0))/..
+PKG_DIR=$(dirname $(dirname $(readlink -f $0)))
 
 export PATH=$PKG_DIR/node_modules/.bin:$PWD/node_modules/.bin:$PATH
 export NODE_ENV=test
@@ -17,11 +17,14 @@ report=0
   EXEC_COMMAND=${EXEC_COMMAND:=node}
 }
 
+ENTRY_FILE=${ENTRY_FILE:-$PKG_DIR/test/all.ts}
+EXEC_ARGS=${EXEC_ARGS:="--require $PKG_DIR/test/babel-register"}
+
 NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
   $EXEC_COMMAND \
-  --require ts-node/register \
+  $EXEC_ARGS \
   --require $PKG_DIR/packages/types/index.ts \
-  $PKG_DIR/test/all.ts $@ |
+  $ENTRY_FILE $@ |
   tap-spec
 
 test_code=$?

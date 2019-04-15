@@ -1,26 +1,31 @@
-const _devDir = __dirname;
-
 module.exports = {
-  "presets": [
-    ...process.env.NODE_ENV === 'testing' ? [] : ["@babel/preset-env"],
-    "@babel/preset-typescript",
-  ],
-  "plugins": [
-    ["@babel/plugin-transform-runtime", {
-      helpers: false,
-      regenerator: false,
-    }],
-    [`${_devDir}/babel-transform-for-of-array`, { "loose": true }],
-    '@babel/plugin-proposal-class-properties',
+  presets: [
+    ...process.env.NODE_ENV === 'test'
+      ? []
+      : [require('@babel/preset-env').default],
+    require('@babel/preset-typescript').default,
   ],
 
-  "env": {
-    "test": {
-      "plugins": ["istanbul"],
-    }
-  },
-  "extensions": [
-    ".ts",
-    ".js",
+  plugins:
+    process.env.NODE_ENV !== 'production'
+      ? [
+        require('./babel-transform-for-of-array'),
+        require('@babel/plugin-proposal-class-properties').default,
+        require('@babel/plugin-transform-modules-commonjs').default,
+      ]
+      : [
+        require('./babel-transform-for-of-array'),
+        [require('@babel/plugin-transform-runtime').default, {
+          helpers: false,
+          regenerator: false,
+        }],
+        require('@babel/plugin-proposal-class-properties').default,
+      ],
+
+  ignore: [/\/node_modules\/(?!@interactjs\/)/],
+
+  extensions: [
+    '.ts',
+    '.js',
   ]
 }
