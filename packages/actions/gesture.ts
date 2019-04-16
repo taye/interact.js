@@ -76,9 +76,9 @@ function install (scope: Scope) {
    *     // See the explanation in {@link Interactable.draggable} example
    *     max: Infinity,
    *     maxPerElement: 1,
-   * });
+   * })
    *
-   * var isGestureable = interact(element).gesturable();
+   * var isGestureable = interact(element).gesturable()
    * ```
    *
    * Gets or sets whether multitouch gestures can be performed on the target

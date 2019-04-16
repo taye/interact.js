@@ -43,12 +43,12 @@ export function install (scope: Scope) {
 
   /**
    * ```js
-   * const interactable = interact(target);
-   * const drag = { name: drag, axis: 'x' };
-   * const resize = { name: resize, edges: { left: true, bottom: true };
+   * const interactable = interact(target)
+   * const drag = { name: drag, axis: 'x' }
+   * const resize = { name: resize, edges: { left: true, bottom: true }
    *
-   * interactable.reflow(drag);
-   * interactable.reflow(resize);
+   * interactable.reflow(drag)
+   * interactable.reflow(resize)
    * ```
    *
    * Start an action sequence to re-apply modifiers, check drops, etc.

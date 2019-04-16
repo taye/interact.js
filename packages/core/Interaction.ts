@@ -121,14 +121,14 @@ export class Interaction<T extends ActionName = any> {
    *   })
    *   // start dragging after the user holds the pointer down
    *   .on('hold', function (event) {
-   *     var interaction = event.interaction;
+   *     var interaction = event.interaction
    *
    *     if (!interaction.interacting()) {
    *       interaction.start({ name: 'drag' },
    *                         event.interactable,
-   *                         event.currentTarget);
+   *                         event.currentTarget)
    *     }
-   * });
+   * })
    * ```
    *
    * Start an action with the given Interactable and Element as tartgets. The
@@ -226,11 +226,11 @@ export class Interaction<T extends ActionName = any> {
    *   .on('dragmove', function (event) {
    *     if (someCondition) {
    *       // change the snap settings
-   *       event.interactable.draggable({ snap: { targets: [] }});
+   *       event.interactable.draggable({ snap: { targets: [] }})
    *       // fire another move event with re-calculated snap
-   *       event.interaction.move();
+   *       event.interaction.move()
    *     }
-   *   });
+   *   })
    * ```
    *
    * Force a move of the current action at the same coordinates. Useful if
@@ -288,11 +288,11 @@ export class Interaction<T extends ActionName = any> {
    *   .on('move', function (event) {
    *     if (event.pageX > 1000) {
    *       // end the current action
-   *       event.interaction.end();
+   *       event.interaction.end()
    *       // stop all further listeners from being called
-   *       event.stopImmediatePropagation();
+   *       event.stopImmediatePropagation()
    *     }
-   *   });
+   *   })
    * ```
    *
    * @param {PointerEvent} [event]

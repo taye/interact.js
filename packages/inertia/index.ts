@@ -59,8 +59,8 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
-(EventPhase as any).Resume = 'resume';
-(EventPhase as any).InertiaStart = 'inertiastart'
+;(EventPhase as any).Resume = 'resume'
+;(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Interact.Scope) {
   const {

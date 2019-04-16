@@ -393,8 +393,8 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     },
   }
 
-  iEvent.rect = interaction.resizeRects.inverted;
-  (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
+  iEvent.rect = interaction.resizeRects.inverted
+  ; (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
 }
 
 function move ({ iEvent, interaction }) {

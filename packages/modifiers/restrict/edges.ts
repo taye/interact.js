@@ -7,7 +7,7 @@
 //     inner: { top: 200, left: 200, right: 400, bottom: 400 },
 //     outer: { top:   0, left:   0, right: 600, bottom: 600 },
 //   },
-// });
+// })
 
 import Interaction from '@interactjs/core/Interaction'
 import extend from '@interactjs/utils/extend'

@@ -7,7 +7,7 @@
 //     min: { width: -600, height: -600 },
 //     max: { width:  600, height:  600 },
 //   },
-// });
+// })
 
 import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
