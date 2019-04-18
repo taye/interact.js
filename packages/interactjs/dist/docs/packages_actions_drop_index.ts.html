@@ -240,7 +240,7 @@ function install (scope: Scope) {
    *                       draggable,         // draggable Interactable
    *                       draggableElement) {// draggable element
    *
-   *   return dropped &amp;&amp; event.target.hasAttribute('allow-drop');
+   *   return dropped &amp;&amp; event.target.hasAttribute('allow-drop')
    * }
    * ```
    */
@@ -259,7 +259,7 @@ function install (scope: Scope) {
   interact.dynamicDrop = function (newValue?: boolean) {
     if (utils.is.bool(newValue)) {
       // if (dragging &amp;&amp; scope.dynamicDrop !== newValue &amp;&amp; !newValue) {
-      //  calcRects(dropzones);
+      //  calcRects(dropzones)
       // }
 
       scope.dynamicDrop = newValue

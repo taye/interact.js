@@ -25,6 +25,7 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     page: Interact.Point;
     client: Interact.Point;
     delta: Interact.Point;
+    rect: Required<Interact.Rect>;
     x0: number;
     y0: number;
     t0: number;

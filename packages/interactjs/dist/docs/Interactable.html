@@ -171,16 +171,16 @@
 
   if (interact.matchesSelector(event.target, '.drag-handle') {
     // force drag with handle target
-    action.name = drag;
+    action.name = drag
   }
   else {
     // resize from the top and right edges
-    action.name  = 'resize';
-    action.edges = { top: true, right: true };
+    action.name  = 'resize'
+    action.edges = { top: true, right: true }
   }
 
-  return action;
-});
+  return action
+})
 </code></pre>
 <p>Gets or sets the function used to check action to be performed on
 pointerDown</p>
@@ -309,7 +309,7 @@ or for `pointerEvents`</li></ul></dd>
     allowFrom: '.resize-handle',
   .pointerEvents({
     allowFrom: '.handle',,
-  });</code></pre>
+  })</code></pre>
 
 
 </div>
@@ -323,9 +323,9 @@ or for `pointerEvents`</li></ul></dd>
 
 
 <div class="description">
-    <pre class="prettyprint source lang-js"><code>interact(element, { ignoreFrom: document.getElementById('no-action') });
+    <pre class="prettyprint source lang-js"><code>interact(element, { ignoreFrom: document.getElementById('no-action') })
 // or
-interact(element).ignoreFrom('input, textarea, a');
+interact(element).ignoreFrom('input, textarea, a')
 </code></pre>
 </div>
 
@@ -393,7 +393,7 @@ or for `pointerEvents`</li></ul></dd>
   })
   .pointerEvents({
     ignoreFrom: '[no-pointer]',
-  });</code></pre>
+  })</code></pre>
 
 
 </div>
@@ -792,7 +792,7 @@ interacting; Use 'page' if you want autoScroll to work</p>
     // max number of drags that can target the same element+Interactable
     // 1 by default
     maxPerElement: 2
-});
+})
 
 var isDraggable = interact('element').draggable(); // true
 </code></pre>
@@ -987,7 +987,7 @@ target of drag events, or this Interctable</p>
                       draggable,         // draggable Interactable
                       draggableElement) {// draggable element
 
-  return dropped && event.target.hasAttribute('allow-drop');
+  return dropped && event.target.hasAttribute('allow-drop')
 }
 </code></pre>
 </div>
@@ -1458,9 +1458,9 @@ Interactable</p>
     // See the explanation in <code>Interactable.draggable</code> example
     max: Infinity,
     maxPerElement: 1,
-});
+})
 
-var isGestureable = interact(element).gesturable();
+var isGestureable = interact(element).gesturable()
 </code></pre>
 <p>Gets or sets whether multitouch gestures can be performed on the target</p>
 </div>
@@ -2697,12 +2697,12 @@ bounding rectangle. See <code>Interactable.getRect</code></p>
 
 
 <div class="description">
-    <pre class="prettyprint source lang-js"><code>const interactable = interact(target);
-const drag = { name: drag, axis: 'x' };
-const resize = { name: resize, edges: { left: true, bottom: true };
+    <pre class="prettyprint source lang-js"><code>const interactable = interact(target)
+const drag = { name: drag, axis: 'x' }
+const resize = { name: resize, edges: { left: true, bottom: true }
 
-interactable.reflow(drag);
-interactable.reflow(resize);
+interactable.reflow(drag)
+interactable.reflow(resize)
 </code></pre>
 <p>Start an action sequence to re-apply modifiers, check drops, etc.</p>
 </div>
@@ -2740,7 +2740,7 @@ interactable.reflow(resize);
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="packages_reflow_index.ts.html">packages/reflow/index.ts</a>, <a href="packages_reflow_index.ts.html#line44">line 44</a>
+        <a href="packages_reflow_index.ts.html">packages/reflow/index.ts</a>, <a href="packages_reflow_index.ts.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -2942,9 +2942,9 @@ interactable.reflow(resize);
   // See the explanation in the <code>Interactable.draggable</code> example
   max: Infinity,
   maxPerElement: 1,
-});
+})
 
-var isResizeable = interact(element).resizable();
+var isResizeable = interact(element).resizable()
 </code></pre>
 <p>Gets or sets whether resize actions can be performed on the target</p>
 </div>
@@ -2982,7 +2982,7 @@ var isResizeable = interact(element).resizable();
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="packages_actions_resize.ts.html">packages/actions/resize.ts</a>, <a href="packages_actions_resize.ts.html#line82">line 82</a>
+        <a href="packages_actions_resize.ts.html">packages/actions/resize.ts</a>, <a href="packages_actions_resize.ts.html#line81">line 81</a>
     </li></ul></dd>
     
 

@@ -11,11 +11,11 @@ declare module '@interactjs/core/Interaction' {
     interface Interaction {
         resizeAxes: 'x' | 'y' | 'xy';
         resizeRects: {
-            start: Interact.Rect;
+            start: Required<Interact.Rect>;
             current: Interact.Rect;
-            inverted: Interact.Rect;
-            previous: Interact.Rect;
-            delta: Interact.Rect;
+            inverted: Required<Interact.Rect>;
+            previous: Required<Interact.Rect>;
+            delta: Required<Interact.Rect>;
         };
         resizeStartAspectRatio: number;
     }
@@ -39,8 +39,7 @@ declare module '@interactjs/core/scope' {
     }
 }
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
-    deltaRect?: Interact.Rect;
-    rect?: Interact.Rect;
+    deltaRect?: Required<Interact.Rect>;
 }
 declare function install(scope: Scope): void;
 declare const resize: {

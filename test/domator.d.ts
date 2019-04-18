@@ -1,5 +1,5 @@
 import domator from 'domator';
-import { JSDOM } from 'jsdom';
-declare const doc: any;
+declare let JSDOM: any;
+declare let doc: any;
 export { domator, doc, JSDOM, };
 export default domator;

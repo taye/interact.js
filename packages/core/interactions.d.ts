@@ -19,7 +19,6 @@ declare module '@interactjs/core/scope' {
 }
 declare function install(scope: Scope): void;
 declare function doOnInteractions(method: any, scope: any): (event: any) => void;
-export declare function newInteraction(options: any, scope: any): any;
 declare function onDocSignal({ doc, scope, options }: {
     doc: any;
     scope: any;
@@ -30,7 +29,6 @@ declare const _default: {
     install: typeof install;
     onDocSignal: typeof onDocSignal;
     doOnInteractions: typeof doOnInteractions;
-    newInteraction: typeof newInteraction;
     methodNames: string[];
 };
 export default _default;

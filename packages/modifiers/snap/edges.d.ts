@@ -10,7 +10,7 @@
  *   snapEdges: {
  *     targets: [interact.snappers.grid({ x: 100, y: 50 })],
  *   },
- * });
+ * })
  *
  * interact(target).resizable({
  *   snapEdges: {
@@ -23,7 +23,7 @@
  *       }),
  *     ],
  *   },
- * });
+ * })
  */
 declare function start(arg: any): any;
 declare function set(arg: any): void;

@@ -8,7 +8,13 @@ declare module '@interactjs/core/Interactable' {
 }
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
+        _reflowPromise: Promise<void>;
         _reflowResolve: () => void;
+    }
+}
+declare module '@interactjs/core/InteractEvent' {
+    enum EventPhase {
+        Reflow = "reflow"
     }
 }
 export declare function install(scope: Scope): void;

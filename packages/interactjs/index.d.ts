@@ -4,7 +4,9 @@ import * as snappers from '@interactjs/utils/snappers';
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
         modifiers?: any;
-        snappers?: typeof snappers;
+        snappers?: typeof snappers & {
+            [key: string]: any;
+        };
         createSnapGrid?: typeof snappers.grid;
     }
 }
