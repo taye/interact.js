@@ -70,9 +70,9 @@ export class Scope {
   _pluginMap: { [id: string]: Plugin } = {}
 
   constructor () {
-    const scope = this as Scope;
+    const scope = this as Scope
 
-    (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
+    ; (this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
       get _defaults () { return scope.defaults }
 
       set (options: any) {
@@ -88,6 +88,12 @@ export class Scope {
 
       unset () {
         super.unset()
+        for (const interaction of scope.interactions.list) {
+          if (interaction.interactable === this) {
+            interaction.stop()
+          }
+        }
+
         scope.interactables.signals.fire('unset', { interactable: this })
       }
     }

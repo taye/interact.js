@@ -354,10 +354,10 @@ test('Interaction.start', (t) => {
   interactable.options[action.name] = { enabled: true }
 
   let signalArg
-  // let interactingInStartListener;
+  // let interactingInStartListener
   const signalListener = (arg) => {
     signalArg = arg
-    // interactingInStartListener = arg.interaction.interacting();
+    // interactingInStartListener = arg.interaction.interacting()
   }
 
   interaction._signals.on('action-start', signalListener)
@@ -367,15 +367,15 @@ test('Interaction.start', (t) => {
   t.equal(interaction.interactable, interactable, 'interaction.interactable is updated')
   t.equal(interaction.element, element, 'interaction.element is updated')
 
-  // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal');
+  // t.assert(interactingInStartListener, 'interaction is interacting during action-start signal')
   t.assert(interaction.interacting(), 'interaction is interacting after start method')
   t.equal(signalArg.interaction, interaction, 'interaction in signal arg')
   t.equal(signalArg.event, event, 'event (interaction.downEvent) in signal arg')
 
   interaction._interacting = false
 
-  // interaction.start(action, target, element);
-  // t.deepEqual(scope.interactions.list, [interaction], 'interaction is added back to scope');
+  // interaction.start(action, target, element)
+  // t.deepEqual(scope.interactions.list, [interaction], 'interaction is added back to scope')
 
   t.end()
 })

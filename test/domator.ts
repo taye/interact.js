@@ -1,9 +1,15 @@
 import domator from 'domator'
-import { JSDOM } from 'jsdom'
 
-const doc = typeof window === 'undefined'
-  ? new JSDOM('<!DOCTYPE html><html><body></body></html>').window.document
-  : window.document
+let JSDOM
+let doc
+
+if (typeof window === 'undefined') {
+  // tslint:disable-next-line no-var-requires
+  JSDOM = require('jsdom').JSDOM
+  doc = new JSDOM('<!DOCTYPE html><html><body></body></html>').window.document
+} else {
+  doc = window.document
+}
 
 domator.setDocument(doc)
 

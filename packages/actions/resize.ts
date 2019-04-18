@@ -16,11 +16,11 @@ declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
     resizeRects: {
-      start: Interact.Rect
+      start: Required<Interact.Rect>
       current: Interact.Rect
-      inverted: Interact.Rect
-      previous: Interact.Rect
-      delta: Interact.Rect
+      inverted: Required<Interact.Rect>
+      previous: Required<Interact.Rect>
+      delta: Required<Interact.Rect>
     }
     resizeStartAspectRatio: number
   }
@@ -50,8 +50,7 @@ declare module '@interactjs/core/scope' {
 (ActionName as any).Resize = 'resize'
 
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
-  deltaRect?: Interact.Rect
-  rect?: Interact.Rect
+  deltaRect?: Required<Interact.Rect>
 }
 
 function install (scope: Scope) {
@@ -111,9 +110,9 @@ function install (scope: Scope) {
    *   // See the explanation in the {@link Interactable.draggable} example
    *   max: Infinity,
    *   maxPerElement: 1,
-   * });
+   * })
    *
-   * var isResizeable = interact(element).resizable();
+   * var isResizeable = interact(element).resizable()
    * ```
    *
    * Gets or sets whether resize actions can be performed on the target
@@ -351,7 +350,7 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     return
   }
 
-  const startRect = interaction.interactable.getRect(interaction.element)
+  const startRect = interaction.rect
   const resizeOptions = interaction.interactable.options.resize
 
   /*
@@ -392,10 +391,10 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
       bottom: 0,
       height: 0,
     },
-  };
+  }
 
-  (iEvent as ResizeEvent).rect = interaction.resizeRects.inverted;
-  (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
+  iEvent.rect = interaction.resizeRects.inverted
+  ; (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
 }
 
 function move ({ iEvent, interaction }) {

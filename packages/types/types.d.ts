@@ -58,21 +58,20 @@ declare namespace Interact {
     left: number
     bottom: number
     right: number
-    [index: string]: number
+    width?: number
+    height?: number
   }
 
-  export interface Rect2 {
+  export interface Dimensions {
     x: number
     y: number
     width: number
     height: number
-    [index: string]: number
   }
 
-  export interface Rect3 {
+  export interface Size {
     width: number
     height: number
-    [index: string]: number
   }
 
   export type SnapFunction = (x: number, y: number) => SnapPosition
@@ -111,7 +110,7 @@ declare namespace Interact {
 
   export interface RestrictOption {
     // where to drag over
-    restriction?: Rect | Rect2 | CSSSelector | DOMElement | 'self' | 'parent'
+    restriction?: Rect | Dimensions | CSSSelector | DOMElement | 'self' | 'parent'
     // what part of self is allowed to drag over
     elementRect?: Rect
     // restrict just before the end drag
@@ -119,8 +118,8 @@ declare namespace Interact {
   }
 
   export interface RestrictSizeOption {
-    min?: Rect3
-    max?: Rect3
+    min?: Size
+    max?: Size
   }
 
   export interface EdgeOptions {
@@ -214,7 +213,7 @@ declare namespace Interact {
     origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction
   }
 
-  export type RectChecker = (element: Element)  => Partial<Rect & Rect3>
+  export type RectChecker = (element: Element)  => Rect
 
   export type PointerEventType = MouseEvent | TouchEvent | PointerEvent | InteractEvent
   export type PointerType = MouseEvent | Touch | PointerEvent | InteractEvent

@@ -134,9 +134,9 @@ export function testEnv ({
 
   const interaction = scope.interactions.new({})
   const interactable = scope.interactables.new(target)
-  const coords = utils.pointer.newCoords();
+  const coords = utils.pointer.newCoords()
 
-  (coords as any).target = target
+  ; (coords as any).target = target
   const event = utils.pointer.coordsToEvent(coords)
 
   interactable.rectChecker(() => ({ ...rect }))

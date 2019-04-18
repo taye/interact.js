@@ -52,11 +52,11 @@ export class Interactable implements Partial<Eventable> {
   }
 
   updatePerActionListeners (actionName, prev, cur) {
-    if (is.array(prev)) {
+    if (is.array(prev) || is.object(prev)) {
       this.off(actionName, prev)
     }
 
-    if (is.array(cur)) {
+    if (is.array(cur) || is.object(cur)) {
       this.on(actionName, cur)
     }
   }

@@ -120,7 +120,7 @@ function move ({ iEvent, interaction }) {
  *     // max number of drags that can target the same element+Interactable
  *     // 1 by default
  *     maxPerElement: 2
- * });
+ * })
  *
  * var isDraggable = interact('element').draggable(); // true
  * ```

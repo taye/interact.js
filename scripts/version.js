@@ -40,7 +40,11 @@ if (!module.parent) {
 
       for (const deps of ['dependencies', 'peerDependencies', 'devDependencies'].map(f => pkg[f]).filter(Boolean)) {
         for (const name of Object.keys(deps).filter(n => /@?interactjs\//.test(n))) {
-          deps[name] = newVersion
+          if (deps[name] === oldVersion) {
+            deps[name] = newVersion
+          } else {
+            console.warn(`${file}: not updating "${name}" from "${deps[name]}"`)
+          }
         }
       }
 

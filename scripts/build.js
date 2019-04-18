@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 const path = require('path')
+
+process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${path.resolve(__dirname, '..', 'node_modules')}`
+require('module').Module._initPaths()
+
 const argv = require('yargs')
   .config()
   .pkgConf('_dev')
@@ -25,6 +29,7 @@ const argv = require('yargs')
     required: true,
     coerce: path.resolve,
   })
+  .string('babelrc')
   .argv
 
 const dir = path.join(__dirname, '..')
@@ -43,11 +48,22 @@ const plugins = (() => {
       require('errorify'),
     ]
   }
-  return [
-    require('browser-pack-flat/plugin'),
-    require('common-shakeify'),
-  ]
+
+  return process.env.NODE_ENV === 'production'
+    ? [
+      require('browser-pack-flat/plugin'),
+      require('common-shakeify'),
+    ]
+    : []
 })()
+
+let babelrc
+
+try {
+  babelrc = require(path.resolve(argv.babelrc))
+} catch (e) {
+  babelrc = require('../.babelrc')
+}
 
 const b = browserify(argv.entries, {
   extensions,
@@ -62,7 +78,7 @@ const b = browserify(argv.entries, {
       sourceType: 'module',
       global: true,
       extensions,
-      ...require('../.babelrc'),
+      ...babelrc,
     } ],
     [ require('envify'), {
       global: true,
@@ -74,7 +90,7 @@ const b = browserify(argv.entries, {
 
   cache: {},
   packageCache: {},
-})
+}).exclude('jsdom')
 
 if (argv.watch) {
   b.on('update', update)

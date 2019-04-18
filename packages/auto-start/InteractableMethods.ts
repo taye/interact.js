@@ -36,9 +36,9 @@ function install (scope: Scope) {
 
   /**
    * ```js
-   * interact(element, { ignoreFrom: document.getElementById('no-action') });
+   * interact(element, { ignoreFrom: document.getElementById('no-action') })
    * // or
-   * interact(element).ignoreFrom('input, textarea, a');
+   * interact(element).ignoreFrom('input, textarea, a')
    * ```
    * @deprecated
    * If the target of the `mousedown`, `pointerdown` or `touchstart` event or any
@@ -55,7 +55,7 @@ function install (scope: Scope) {
    *   })
    *   .pointerEvents({
    *     ignoreFrom: '[no-pointer]',
-   *   });
+   *   })
    *
    * @param {string | Element | null} [newValue] a CSS selector string, an
    * Element or `null` to not ignore any elements
@@ -82,7 +82,7 @@ function install (scope: Scope) {
    *     allowFrom: '.resize-handle',
    *   .pointerEvents({
    *     allowFrom: '.handle',,
-   *   });
+   *   })
    *
    * @param {string | Element | null} [newValue] a CSS selector string, an
    * Element or `null` to allow from any element
@@ -102,16 +102,16 @@ function install (scope: Scope) {
    *
    *   if (interact.matchesSelector(event.target, '.drag-handle') {
    *     // force drag with handle target
-   *     action.name = drag;
+   *     action.name = drag
    *   }
    *   else {
    *     // resize from the top and right edges
-   *     action.name  = 'resize';
-   *     action.edges = { top: true, right: true };
+   *     action.name  = 'resize'
+   *     action.edges = { top: true, right: true }
    *   }
    *
-   *   return action;
-   * });
+   *   return action
+   * })
    * ```
    *
    * Gets or sets the function used to check action to be performed on

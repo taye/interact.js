@@ -86,7 +86,10 @@ function install (scope: Scope) {
     new (options: { pointerType?: string, signals?: Signals }) {
       options.signals = signals
 
-      return new scope.Interaction(options as Required<typeof options>)
+      const interaction = new scope.Interaction(options as Required<typeof options>)
+
+      scope.interactions.list.push(interaction)
+      return interaction
     },
     listeners,
     eventMap,
@@ -181,14 +184,7 @@ function getInteraction (searchDetails: SearchDetails) {
 
   scope.interactions.signals.fire('find', signalArg)
 
-  return signalArg.interaction || newInteraction({ pointerType }, scope)
-}
-
-export function newInteraction (options, scope) {
-  const interaction = scope.interactions.new(options)
-
-  scope.interactions.list.push(interaction)
-  return interaction
+  return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
@@ -218,6 +214,5 @@ export default {
   install,
   onDocSignal,
   doOnInteractions,
-  newInteraction,
   methodNames,
 }
