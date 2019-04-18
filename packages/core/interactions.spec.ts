@@ -7,10 +7,7 @@ import * as helpers from './tests/_helpers'
 test('interactions', (t) => {
   let scope = helpers.mockScope()
 
-  const interaction = interactions.newInteraction(
-    { pointerType: 'TEST' },
-    scope
-  )
+  const interaction = scope.interactions.new({ pointerType: 'TEST' })
 
   t.equal(scope.interactions.list[0], interaction,
     'new Interaction is pushed to scope.interactions')

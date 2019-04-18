@@ -88,6 +88,12 @@ export class Scope {
 
       unset () {
         super.unset()
+        for (const interaction of scope.interactions.list) {
+          if (interaction.interactable === this) {
+            interaction.stop()
+          }
+        }
+
         scope.interactables.signals.fire('unset', { interactable: this })
       }
     }
