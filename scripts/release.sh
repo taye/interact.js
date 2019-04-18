@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/usr/bin/bash
 PATH=$PATH:$PWD/node_modules/.bin
 
 RELEASE_BRANCH=$1
