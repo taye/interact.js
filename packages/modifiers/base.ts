@@ -55,31 +55,6 @@ function install (scope: Scope) {
   interactions.signals.on('stop', stop)
 }
 
-function startAll (arg) {
-  for (const state of arg.states) {
-    if (state.methods.start) {
-      arg.state = state
-      state.methods.start(arg)
-    }
-  }
-}
-
-function getRectOffset (rect, coords) {
-  return rect
-    ? {
-      left  : coords.x - rect.left,
-      top   : coords.y - rect.top,
-      right : rect.right  - coords.x,
-      bottom: rect.bottom - coords.y,
-    }
-    : {
-      left  : 0,
-      top   : 0,
-      right : 0,
-      bottom: 0,
-    }
-}
-
 function start (
   { interaction, phase }: Interact.SignalArg,
   pageCoords: Interact.Point,
@@ -123,11 +98,21 @@ function start (
   return result
 }
 
-function setAll (arg: Partial<Interact.SignalArg>) {
+export function startAll (arg) {
+  for (const state of arg.states) {
+    if (state.methods.start) {
+      arg.state = state
+      state.methods.start(arg)
+    }
+  }
+}
+
+export function setAll (arg: Partial<Interact.SignalArg>) {
   const {
     interaction,
-    prevCoords = interaction.modifiers.result
-      ? interaction.modifiers.result.coords
+    modifiersState = interaction.modifiers,
+    prevCoords = modifiersState.result
+      ? modifiersState.result.coords
       : interaction.coords.prev.page,
     phase,
     preEnd,
@@ -137,7 +122,7 @@ function setAll (arg: Partial<Interact.SignalArg>) {
   } = arg
 
   const states = skipModifiers
-    ? arg.states.slice(interaction.modifiers.skip)
+    ? arg.states.slice(modifiersState.skip)
     : arg.states
 
   arg.coords = extend({}, arg.pageCoords)
@@ -187,27 +172,6 @@ function setAll (arg: Partial<Interact.SignalArg>) {
     rectChanged
 
   return result
-}
-
-function prepareStates (modifierList) {
-  const states = []
-
-  for (let index = 0; index < modifierList.length; index++) {
-    const { options, methods, name } = modifierList[index]
-
-    if (options && options.enabled === false) { continue }
-
-    const state = {
-      options,
-      methods,
-      index,
-      name,
-    }
-
-    states.push(state)
-  }
-
-  return states
 }
 
 function beforeMove (arg: Interact.SignalArg): void | false {
@@ -292,6 +256,53 @@ function stop (arg) {
   arg.interaction.modifiers.states = null
 }
 
+function getModifierList (interaction, registeredModifiers) {
+  const actionOptions = interaction.interactable.options[interaction.prepared.name]
+  const actionModifiers = actionOptions.modifiers
+
+  if (actionModifiers && actionModifiers.length) {
+    return actionModifiers.map((modifier) => {
+      if (!modifier.methods && modifier.type) {
+        return registeredModifiers[modifier.type](modifier)
+      }
+
+      return modifier
+    })
+  }
+
+  return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
+    .map((type) => {
+      const options = actionOptions[type]
+
+      return options && options.enabled && {
+        options,
+        methods: options._methods,
+      }
+    })
+    .filter((m) => !!m)
+}
+
+export function prepareStates (modifierList) {
+  const states = []
+
+  for (let index = 0; index < modifierList.length; index++) {
+    const { options, methods, name } = modifierList[index]
+
+    if (options && options.enabled === false) { continue }
+
+    const state = {
+      options,
+      methods,
+      index,
+      name,
+    }
+
+    states.push(state)
+  }
+
+  return states
+}
+
 function setCoords (arg) {
   const { interaction, phase } = arg
   const curCoords = arg.curCoords || interaction.coords.cur
@@ -341,32 +352,6 @@ function restoreCoords ({ interaction: { coords, rect, modifiers } }: Interact.S
   rect.bottom -= rectDelta.bottom
 }
 
-function getModifierList (interaction, registeredModifiers) {
-  const actionOptions = interaction.interactable.options[interaction.prepared.name]
-  const actionModifiers = actionOptions.modifiers
-
-  if (actionModifiers && actionModifiers.length) {
-    return actionModifiers.map((modifier) => {
-      if (!modifier.methods && modifier.type) {
-        return registeredModifiers[modifier.type](modifier)
-      }
-
-      return modifier
-    })
-  }
-
-  return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
-    .map((type) => {
-      const options = actionOptions[type]
-
-      return options && options.enabled && {
-        options,
-        methods: options._methods,
-      }
-    })
-    .filter((m) => !!m)
-}
-
 function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: string) {
   return options
     ? options.enabled !== false &&
@@ -374,6 +359,22 @@ function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: 
       (!requireEndOnly || options.endOnly) &&
       (options.setStart || phase !== 'start')
     : !requireEndOnly
+}
+
+function getRectOffset (rect, coords) {
+  return rect
+    ? {
+      left  : coords.x - rect.left,
+      top   : coords.y - rect.top,
+      right : rect.right  - coords.x,
+      bottom: rect.bottom - coords.y,
+    }
+    : {
+      left  : 0,
+      top   : 0,
+      right : 0,
+      bottom: 0,
+    }
 }
 
 function makeModifier<Options extends { [key: string]: any }> (module: { defaults: Options, [key: string]: any }, name?: string) {
