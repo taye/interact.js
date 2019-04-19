@@ -18,6 +18,8 @@ function start ({ interaction, interactable, element, rect, state, startOffset }
     const offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction])
 
     snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 }
+    snapOffset.x += origin.x
+    snapOffset.y += origin.y
   }
 
   const relativePoints = options.relativePoints || []
