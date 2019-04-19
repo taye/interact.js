@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 PKG_DIR=$(dirname $(dirname $(readlink -f $0)))
 
 export PATH=$PKG_DIR/node_modules/.bin:$PWD/node_modules/.bin:$PATH
@@ -29,7 +29,7 @@ NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
 
 test_code=$?
 
-if [ $report == 1 ]; then
+if [[ $report == 1 ]]; then
   nyc report; nyc check-coverage
 fi
 
