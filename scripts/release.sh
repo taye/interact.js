@@ -47,6 +47,10 @@ check_version() {
   NEW_VERSION=$(node $ROOT/scripts/version.js)
   NEW_TAG="v$(semver clean $NEW_VERSION)"
 
+  if [[ $NEW_TAG == v ]]; then
+    quit "failed parse version from '$NEW_VERSION'" 1
+  fi
+
   # if the version tag already exists
   if [[ $(git tag -l $NEW_TAG) == $NEW_TAG ]]; then
     quit "$NEW_TAG tag already exists" 1
