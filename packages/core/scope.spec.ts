@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import * as helpers from './tests/_helpers'
 
 test('scope', (t) => {
   const {
@@ -11,7 +11,6 @@ test('scope', (t) => {
 
   interactable.options.test = { enabled: true }
 
-  console.log(scope.interactions.list.length)
   interaction.pointerDown(event, event, scope.document.body)
   interaction.start({ name: 'test' }, interactable, scope.document.body)
 
@@ -21,7 +20,6 @@ test('scope', (t) => {
 
   const stopped = !interaction._interacting
 
-  console.log({ started, stopped })
   t.ok(started && stopped, 'interaction is stopped on interactable.unset()')
 
   t.end()
