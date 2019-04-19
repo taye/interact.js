@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.10
+ * interact.js 1.4.0-rc.11
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5131,7 +5131,7 @@ function init(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = init.version = "1.4.0-rc.10";
+_interact["default"].version = init.version = "1.4.0-rc.11";
 var _default = _interact["default"];
 exports["default"] = _default;
 
@@ -6421,6 +6421,8 @@ function start(_ref) {
       x: 0,
       y: 0
     };
+    snapOffset.x += origin.x;
+    snapOffset.y += origin.y;
   }
 
   var relativePoints = options.relativePoints || [];
