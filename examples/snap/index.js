@@ -27,6 +27,7 @@ let canvas,
 ];
 
 const prevCoords = { x: 0, y: 0 }
+let prevClosest = { target: { x: 0, y: 0 }, range: 0 }
 const cursorRadius = 10
 
 function drawGrid (grid, gridOffset, range) {
@@ -121,7 +122,8 @@ function circle (x, y, radius, color) {
 window.CanvasRenderingContext2D.prototype.circle = circle;
 
 function dragMove (event) {
-  const snap = event.snap;
+  const snap = event.interaction.modifiers.states.find((m) => m.name === 'snap');
+  const closest = snap && snap.closest
 
   context.clearRect(
     prevCoords.x - cursorRadius - 2,
@@ -129,14 +131,21 @@ function dragMove (event) {
     cursorRadius * 2 + 4,
     cursorRadius * 2 + 4);
 
-  if (snap && snap.range !== Infinity && typeof snap.x === 'number' && typeof snap.y === 'number') {
-    context.circle(snap.x, snap.y, snap.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
+  context.clearRect(
+    prevClosest.target.x - prevClosest.range - 2,
+    prevClosest.target.y - prevClosest.range - 2,
+    prevClosest.range * 2 + 4,
+    prevClosest.range * 2 + 4);
+
+  if (closest && closest.range !== Infinity) {
+    context.circle(closest.target.x, closest.target.y, closest.range + 1, 'rgba(102, 225, 117, 0.8)').fill();
   }
 
   context.circle(event.pageX, event.pageY, cursorRadius, tango).fill();
 
   prevCoords.x = event.pageX;
   prevCoords.y = event.pageY;
+  prevClosest = closest || prevClosest;
 }
 
 function dragEnd (event) {
@@ -166,7 +175,7 @@ function anchorDragMove (event) {
 }
 
 function anchorDragEnd (event) {
-  interact(canvas).draggable({ snap: { enabled: true } });
+  interact(canvas).draggable(true);
   draggingAnchor = null;
 }
 
@@ -227,13 +236,15 @@ function modeChange (event) {
         enabled: status.inertia.checked,
         zeroResumeDelta: false,
       },
-      snap: {
-        targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
-        enabled: !status.offMode.checked,
-        endOnly: status.endOnly.checked,
-        offset: status.relative.checked? 'startCoords' : null,
-      },
-    });
+      modifiers: [
+        interact.modifiers.snap({
+          targets: status.gridMode.checked? [gridFunc] : status.anchorMode.checked? anchors : null,
+          enabled: !status.offMode.checked,
+          endOnly: status.endOnly.checked,
+          offset: status.relative.checked? 'startCoords' : null,
+        })
+      ]
+    })
 
   if (!status.relative.checked) {
     snapOffset.x = snapOffset.y = 0;
@@ -260,12 +271,6 @@ interact(document).on('DOMContentLoaded', function () {
   context = canvas.getContext('2d');
 
   interact(canvas)
-    .draggable({
-      restrict: {
-        enabled: true,
-        restriction: 'self',
-      },
-    })
     .on('move down', function (event) {
       if ((event.type === 'down' || !event.interaction.pointerIsDown) && status.relative.checked) {
         const rect = interact.getElementRect(canvas);
