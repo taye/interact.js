@@ -278,13 +278,15 @@ function getModifierList (interaction, registeredModifiers) {
   const actionModifiers = actionOptions.modifiers
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers.map((modifier) => {
-      if (!modifier.methods && modifier.type) {
-        return registeredModifiers[modifier.type](modifier)
-      }
+    return actionModifiers
+      .filter((modifier) => !modifier.options || modifier.options.enabled !== false)
+      .map((modifier) => {
+        if (!modifier.methods && modifier.type) {
+          return registeredModifiers[modifier.type](modifier)
+        }
 
-      return modifier
-    })
+        return modifier
+      })
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
