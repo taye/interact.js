@@ -1,17 +1,15 @@
+import BaseEvent from '@interactjs/core/BaseEvent'
 import Interactable from '@interactjs/core/Interactable'
 import InteractEvent from '@interactjs/core/InteractEvent'
 import Interaction from '@interactjs/core/Interaction'
 import { ActionName } from '@interactjs/core/scope'
 import * as arr from '@interactjs/utils/arr'
 
-class DropEvent {
-  type: string
+class DropEvent extends BaseEvent {
   target: Element
-  currentTarget: Element
   dropzone: Interactable
   dragEvent: InteractEvent<ActionName.Drag>
   relatedTarget: Element
-  interaction: Interaction
   draggable: Interactable
   timeStamp: number
   propagationStopped = false
@@ -20,7 +18,9 @@ class DropEvent {
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
-  constructor (dropState: Interaction['dropState'], dragEvent, type) {
+  constructor (dropState: Interaction['dropState'], dragEvent: InteractEvent, type: string) {
+    super(dragEvent._interaction)
+
     const { element, dropzone } = type === 'dragleave'
       ? dropState.prev
       : dropState.cur
@@ -31,7 +31,6 @@ class DropEvent {
     this.dropzone      = dropzone
     this.dragEvent     = dragEvent
     this.relatedTarget = dragEvent.target
-    this.interaction   = dragEvent.interaction
     this.draggable     = dragEvent.interactable
     this.timeStamp     = dragEvent.timeStamp
   }
@@ -44,7 +43,7 @@ class DropEvent {
    * dropzone element and more.
    */
   reject () {
-    const { dropState } = this.interaction
+    const { dropState } = this._interaction
 
     if (
       (this.type !== 'dropactivate') && (

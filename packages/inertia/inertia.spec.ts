@@ -37,7 +37,7 @@ test('inertia', (t) => {
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
   t.ok(interaction.inertia.active, 'thrown: inertia is activated')
 
-  interactable.draggable({ modifiers: [testModifier] })
+  interactable.draggable({ modifiers: [testModifier as any] })
 
   // test inertia with { endOnly: true } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })

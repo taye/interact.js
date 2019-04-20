@@ -23,6 +23,6 @@ module.exports = ({ stdio = 'inherit' } = {}) => {
   console.log(' done.')
 }
 
-if (process.argv.includes('--go'))  {
+if (!module.parent)  {
   module.exports()
 }

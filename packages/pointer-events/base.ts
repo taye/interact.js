@@ -116,13 +116,13 @@ function fire<T extends string> (arg: {
 
     const origin = utils.getOriginXY(target.eventable, target.element)
 
-    pointerEvent.subtractOrigin(origin)
+    pointerEvent._subtractOrigin(origin)
     pointerEvent.eventable = target.eventable
     pointerEvent.currentTarget = target.element
 
     target.eventable.fire(pointerEvent)
 
-    pointerEvent.addOrigin(origin)
+    pointerEvent._addOrigin(origin)
 
     if (pointerEvent.immediatePropagationStopped ||
         (pointerEvent.propagationStopped &&

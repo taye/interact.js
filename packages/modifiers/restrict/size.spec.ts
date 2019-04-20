@@ -15,7 +15,7 @@ test('restrictSize', (t) => {
   interaction.prepared.edges = edges
   interaction.resizeRects = {} as any
   interaction.resizeRects.inverted = rectUtils.xywhToTlbr(rect)
-  interaction.modifiers = {}
+  interaction.modifiers = {} as any
   interaction._interacting = true
 
   const options = {

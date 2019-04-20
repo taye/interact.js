@@ -16,6 +16,17 @@ export interface StartAction extends ActionProps {
   name: ActionName | string
 }
 
+export type InteractionProxy = Pick<Interaction,
+  'pointerIsDown' |
+  'pointerWasMoved' |
+  'start' |
+  'move' |
+  'end' |
+  'stop' |
+  'interacting' |
+  '_proxy'
+>
+
 export class Interaction<T extends ActionName = any> {
   // current interactable being interacted with
   interactable: Interactable = null
@@ -63,6 +74,7 @@ export class Interaction<T extends ActionName = any> {
   pointerWasMoved = false
   _interacting = false
   _ending = false
+  _proxy: InteractionProxy = null
 
   simulation = null
 
@@ -96,6 +108,19 @@ export class Interaction<T extends ActionName = any> {
   constructor ({ pointerType, signals }: { pointerType?: string, signals: utils.Signals }) {
     this._signals = signals
     this.pointerType = pointerType
+
+    const that = this
+
+    this._proxy = {
+      get pointerIsDown () { return that.pointerIsDown },
+      get pointerWasMoved () { return that.pointerWasMoved },
+      start (action, i, e) { return that.start(action, i, e) },
+      move (arg) { return that.move(arg) },
+      end (event) { return that.end(event) },
+      stop () { return that.stop() },
+      interacting () { return that.interacting() },
+      get _proxy () { return this },
+    }
 
     this._signals.fire('new', { interaction: this })
   }
@@ -243,7 +268,6 @@ export class Interaction<T extends ActionName = any> {
       event: this._latestPointer.event,
       eventTarget: this._latestPointer.eventTarget,
       interaction: this,
-      noBefore: false,
     }, signalArg || {})
 
     signalArg.phase = EventPhase.Move
@@ -446,13 +470,10 @@ export class Interaction<T extends ActionName = any> {
 
   _doPhase (signalArg: Partial<Interact.SignalArg>) {
     const { event, phase, preEnd, type } = signalArg
+    const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg)
 
-    if (!signalArg.noBefore) {
-      const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg)
-
-      if (beforeResult === false) {
-        return false
-      }
+    if (beforeResult === false) {
+      return false
     }
 
     const iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type)

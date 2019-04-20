@@ -9,13 +9,30 @@ declare module '@interactjs/core/scope' {
 
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
-    modifiers?: any
+    modifiers?: {
+      states: any[]
+      result?: {
+        delta: {
+          x: number
+          y: number
+        }
+        rectDelta: {
+          left: number
+          right: number
+          top: number
+          bottom: number
+        }
+        coords: Interact.Point
+        changed: boolean
+      }
+      [index: string]: any
+    }
   }
 }
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
-    modifiers?: any[]
+    modifiers?: Array<ReturnType<typeof makeModifier>>
   }
 }
 
@@ -261,13 +278,15 @@ function getModifierList (interaction, registeredModifiers) {
   const actionModifiers = actionOptions.modifiers
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers.map((modifier) => {
-      if (!modifier.methods && modifier.type) {
-        return registeredModifiers[modifier.type](modifier)
-      }
+    return actionModifiers
+      .filter((modifier) => !modifier.options || modifier.options.enabled !== false)
+      .map((modifier) => {
+        if (!modifier.methods && modifier.type) {
+          return registeredModifiers[modifier.type](modifier)
+        }
 
-      return modifier
-    })
+        return modifier
+      })
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
@@ -356,7 +375,7 @@ function shouldDo (options, preEnd?: boolean, requireEndOnly?: boolean, phase?: 
   return options
     ? options.enabled !== false &&
       (preEnd || !options.endOnly) &&
-      (!requireEndOnly || options.endOnly) &&
+      (!requireEndOnly || options.endOnly || options.alwaysOnEnd) &&
       (options.setStart || phase !== 'start')
     : !requireEndOnly
 }
@@ -386,7 +405,7 @@ function makeModifier<Options extends { [key: string]: any }> (module: { default
     stop: module.stop,
   }
 
-  const modifier = (options: Partial<Options>) => {
+  const modifier = (options?: Partial<Options>) => {
     options = options || {}
 
     // add missing defaults to options

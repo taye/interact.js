@@ -1,8 +1,8 @@
 import extend from '@interactjs/utils/extend'
 import getOriginXY from '@interactjs/utils/getOriginXY'
 import hypot from '@interactjs/utils/hypot'
+import BaseEvent from './BaseEvent'
 import defaults from './defaultOptions'
-import Interactable from './Interactable'
 import Interaction from './Interaction'
 import { ActionName } from './scope'
 
@@ -16,11 +16,10 @@ export enum EventPhase {
 export class InteractEvent<
   T extends ActionName = any,
   P extends EventPhase = EventPhase._NONE,
-> {
-  type: string
+> extends BaseEvent<T> {
   target: Element
-  relatedTarget: Element | null
   currentTarget: Element
+  relatedTarget: Element
   screenX?: number
   screenY?: number
   button: number
@@ -29,9 +28,6 @@ export class InteractEvent<
   shiftKey: boolean
   altKey: boolean
   metaKey: boolean
-  // added by interact.js
-  interactable: Interactable
-  interaction: Interaction<T>
   page: Interact.Point
   client: Interact.Point
   delta: Interact.Point
@@ -53,8 +49,6 @@ export class InteractEvent<
   // resize
   axes?: Interact.Point
   preEnd?: boolean
-  immediatePropagationStopped = false
-  propagationStopped = false
 
   /** */
   constructor (
@@ -67,6 +61,8 @@ export class InteractEvent<
     preEnd?: boolean,
     type?: string,
   ) {
+    super(interaction)
+
     element = element || interaction.element
 
     const target      = interaction.interactable
@@ -106,7 +102,6 @@ export class InteractEvent<
     this.relatedTarget = related || null
     this.preEnd        = preEnd
     this.type          = type || (actionName + (phase || ''))
-    this.interaction   = interaction
     this.interactable  = target
 
     this.t0 = starting
@@ -159,7 +154,7 @@ export class InteractEvent<
   set velocityY (value) { this.velocity.y = value }
 
   getSwipe () {
-    const interaction = this.interaction
+    const interaction = this._interaction
 
     if (interaction.prevEvent.speed < 600 ||
         this.timeStamp - interaction.prevEvent.timeStamp > 150) {

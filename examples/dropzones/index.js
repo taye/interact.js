@@ -12,25 +12,27 @@ interact('.js-drag')
     },
   })
   .on('dragstart', function (event) {
-    event.interaction.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
-    event.interaction.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
+    const interaction = event._interaction
+    interaction.x = parseInt(event.target.getAttribute('data-x'), 10) || 0;
+    interaction.y = parseInt(event.target.getAttribute('data-y'), 10) || 0;
   })
   .on('dragmove', function (event) {
-    event.interaction.x += event.dx;
-    event.interaction.y += event.dy;
+    const interaction = event._interaction
+    interaction.x += event.dx;
+    interaction.y += event.dy;
 
     if (transformProp) {
       event.target.style[transformProp] =
-        'translate(' + event.interaction.x + 'px, ' + event.interaction.y + 'px)';
+        'translate(' + interaction.x + 'px, ' + interaction.y + 'px)';
     }
     else {
-      event.target.style.left = event.interaction.x + 'px';
-      event.target.style.top  = event.interaction.y + 'px';
+      event.target.style.left = interaction.x + 'px';
+      event.target.style.top  = interaction.y + 'px';
     }
   })
   .on('dragend', function (event) {
-    event.target.setAttribute('data-x', event.interaction.x);
-    event.target.setAttribute('data-y', event.interaction.y);
+    event.target.setAttribute('data-x', interaction.x);
+    event.target.setAttribute('data-y', interaction.y);
   });
 
 // setup drop areas.

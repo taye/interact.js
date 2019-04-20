@@ -35,7 +35,7 @@ test('PointerEvent constructor', (t) => {
     'pointerId is set correctly')
   t.equal(pointerEvent.originalEvent, event,
     'originalEvent is set correctly')
-  t.equal(pointerEvent.interaction, interaction,
+  t.equal(pointerEvent.interaction, interaction._proxy,
     'interaction is set correctly')
   t.equal(pointerEvent.target, eventTarget,
     'target is set correctly')
@@ -75,14 +75,14 @@ test('PointerEvent methods', (t) => {
     'stopImmediatePropagation sets immediatePropagationStopped to true')
 
   const origin = { x: 20, y: 30 }
-  pointerEvent.subtractOrigin(origin)
+  pointerEvent._subtractOrigin(origin)
 
   t.equal(pointerEvent.pageX,   event.pageX   - origin.x, 'subtractOrigin updates pageX correctly')
   t.equal(pointerEvent.pageY,   event.pageY   - origin.y, 'subtractOrigin updates pageY correctly')
   t.equal(pointerEvent.clientX, event.clientX - origin.x, 'subtractOrigin updates clientX correctly')
   t.equal(pointerEvent.clientY, event.clientY - origin.y, 'subtractOrigin updates clientY correctly')
 
-  pointerEvent.addOrigin(origin)
+  pointerEvent._addOrigin(origin)
   t.ok(['pageX', 'pageY', 'clientX', 'clientY'].reduce((allEqual, prop) => allEqual && pointerEvent[prop] === event[prop], true),
     'addOrigin with the subtracted origin reverts to original coordinates')
 

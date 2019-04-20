@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
 import * as utils from '@interactjs/utils'
+import { MockCoords } from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import Eventable from '../Eventable'
 import { createScope } from '../scope'
@@ -134,9 +135,9 @@ export function testEnv ({
 
   const interaction = scope.interactions.new({})
   const interactable = scope.interactables.new(target)
-  const coords = utils.pointer.newCoords()
+  const coords = utils.pointer.newCoords() as MockCoords
 
-  ; (coords as any).target = target
+  coords.target = target
   const event = utils.pointer.coordsToEvent(coords)
 
   interactable.rectChecker(() => ({ ...rect }))
