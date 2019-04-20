@@ -234,13 +234,7 @@ const pointerUtils = {
     }
   },
 
-  coordsToEvent (coords: {
-    page: Interact.Point,
-    client: Interact.Point,
-    timeStamp?: number,
-    pointerId?: any,
-    target?: any,
-  }) {
+  coordsToEvent (coords: MockCoords) {
     const event = {
       coords,
       get page () { return this.coords.page },
@@ -252,6 +246,8 @@ const pointerUtils = {
       get clientY () { return this.coords.client.y },
       get pointerId () { return this.coords.pointerId },
       get target () { return this.coords.target },
+      get type () { return this.coords.type },
+      get pointerType () { return this.coords.pointerType },
     }
 
     return event as typeof event & Interact.PointerType & Interact.PointerEventType
@@ -259,3 +255,13 @@ const pointerUtils = {
 }
 
 export default pointerUtils
+
+export interface MockCoords {
+  page: Interact.Point
+  client: Interact.Point
+  timeStamp?: number
+  pointerId?: any
+  target?: any
+  type?: string
+  pointerType?: string
+}
