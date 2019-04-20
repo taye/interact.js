@@ -1,10 +1,10 @@
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
 import events from '@interactjs/utils/events'
-import finder, { SearchDetails } from '@interactjs/utils/interactionFinder'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import InteractionBase from './Interaction'
+import finder, { SearchDetails } from './interactionFinder'
 import { Scope } from './scope'
 
 declare module '@interactjs/core/scope' {

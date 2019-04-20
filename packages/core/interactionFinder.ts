@@ -1,4 +1,5 @@
-import * as utils from './index'
+import { some } from '@interactjs/utils/arr'
+import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {
   pointer: Interact.PointerType
@@ -39,7 +40,7 @@ const finder = {
           if (element === interaction.element) {
             return interaction
           }
-          element = utils.dom.parentNode(element)
+          element = dom.parentNode(element)
         }
       }
     }
@@ -127,7 +128,7 @@ const finder = {
 }
 
 function hasPointerId (interaction, pointerId) {
-  return utils.arr.some(interaction.pointers, ({ id }) => id === pointerId)
+  return some(interaction.pointers, ({ id }) => id === pointerId)
 }
 
 export default finder
