@@ -122,7 +122,7 @@ function circle (x, y, radius, color) {
 window.CanvasRenderingContext2D.prototype.circle = circle;
 
 function dragMove (event) {
-  const snap = event.interaction.modifiers.states.find((m) => m.name === 'snap');
+  const snap = event._interaction.modifiers.states.find((m) => m.name === 'snap');
   const closest = snap && snap.closest
 
   context.clearRect(

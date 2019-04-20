@@ -1,16 +1,12 @@
-import Interaction from '@interactjs/core/Interaction'
+import BaseEvent from '@interactjs/core/BaseEvent'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 
 /** */
-export default class PointerEvent<T extends string> {
-  interaction: Interaction
-  timeStamp: number
-  originalEvent: Interact.PointerEventType
+export default class PointerEvent<T extends string> extends BaseEvent {
   type: T
+  originalEvent: Interact.PointerEventType
   pointerId: number
   pointerType: string
-  target: Node | Window
-  currentTarget: Node | Window
   double: boolean
   pageX: number
   pageY: number
@@ -18,8 +14,6 @@ export default class PointerEvent<T extends string> {
   clientY: number
   dt: number
   eventable: any
-  propagationStopped = false
-  immediatePropagationStopped = false
 
   /** */
   constructor (
@@ -30,13 +24,12 @@ export default class PointerEvent<T extends string> {
     interaction: Interact.Interaction,
     timeStamp: number,
   ) {
+    super(interaction)
     pointerUtils.pointerExtend(this, event)
 
     if (event !== pointer) {
       pointerUtils.pointerExtend(this, pointer)
     }
-
-    this.interaction = interaction
 
     this.timeStamp     = timeStamp
     this.originalEvent = event
@@ -62,7 +55,7 @@ export default class PointerEvent<T extends string> {
     }
   }
 
-  subtractOrigin ({ x: originX, y: originY }) {
+  _subtractOrigin ({ x: originX, y: originY }) {
     this.pageX   -= originX
     this.pageY   -= originY
     this.clientX -= originX
@@ -71,7 +64,7 @@ export default class PointerEvent<T extends string> {
     return this
   }
 
-  addOrigin ({ x: originX, y: originY }) {
+  _addOrigin ({ x: originX, y: originY }) {
     this.pageX   += originX
     this.pageY   += originY
     this.clientX += originX
@@ -85,19 +78,5 @@ export default class PointerEvent<T extends string> {
    */
   preventDefault () {
     this.originalEvent.preventDefault()
-  }
-
-  /**
-   * Don't call listeners on the remaining targets
-   */
-  stopPropagation () {
-    this.propagationStopped = true
-  }
-
-  /**
-   * Don't call any other listeners (even on the current target)
-   */
-  stopImmediatePropagation () {
-    this.immediatePropagationStopped = this.propagationStopped = true
   }
 }

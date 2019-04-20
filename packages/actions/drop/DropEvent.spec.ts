@@ -1,4 +1,5 @@
 import test from '@interactjs/_dev/test/test'
+import InteractEvent from '@interactjs/core/InteractEvent'
 import * as utils from '@interactjs/utils'
 import DropEvent from '../drop/DropEvent'
 
@@ -11,7 +12,12 @@ const dragElement: any = Symbol('drag-el')
 
 test('DropEvent constructor', (t) => {
   const interaction: any = { dropState: {} }
-  const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
+  const dragEvent = Object.freeze({
+    interactable,
+    _interaction: interaction,
+    target: dragElement,
+    timeStamp: 10,
+  }) as InteractEvent
 
   utils.extend(interaction.dropState, {
     activeDrops: [
@@ -40,7 +46,12 @@ test('DropEvent constructor', (t) => {
 
 test('DropEvent.reject()', (t) => {
   const interaction: any = { dropState: {} }
-  const dragEvent = Object.freeze({ interaction, interactable, target: dragElement, timeStamp: 10 })
+  const dragEvent = Object.freeze({
+    interactable,
+    _interaction: interaction,
+    target: dragElement,
+    timeStamp: 10,
+  }) as InteractEvent
 
   utils.extend(interaction.dropState, {
     activeDrops: [
@@ -96,7 +107,7 @@ test('DropEvent.reject()', (t) => {
 })
 
 test('DropEvent.stop[Immediate]Propagation()', (t) => {
-  const dropEvent = new DropEvent({ cur: {} } as any, {}, 'dragmove')
+  const dropEvent = new DropEvent({ cur: {} } as any, {} as any, 'dragmove')
 
   t.notOk(dropEvent.propagationStopped || dropEvent.immediatePropagationStopped)
 

@@ -42,7 +42,7 @@ test('reflow', (t) => {
     t.equal(fired[index].type, `TEST${phase}`, `event #${index} is ${phase}`)
   }
 
-  const interaction = fired[0].interaction
+  const interaction = fired[0]._interaction
 
   t.deepEqual(
     interaction.coords.start.page,
