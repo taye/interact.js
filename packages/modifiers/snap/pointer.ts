@@ -12,8 +12,8 @@ function start (arg: Interact.SignalArg) {
 
   if (options.offset === 'startCoords') {
     snapOffset = {
-      x: interaction.coords.start.page.x - origin.x,
-      y: interaction.coords.start.page.y - origin.y,
+      x: interaction.coords.start.page.x,
+      y: interaction.coords.start.page.y,
     }
   }
   else  {
@@ -81,8 +81,8 @@ function set (arg: Interact.SignalArg) {
       if (!target) { continue }
 
       targets.push({
-        x: utils.is.number(target.x) ? (target.x + offset.x) : relativeX,
-        y: utils.is.number(target.y) ? (target.y + offset.y) : relativeY,
+        x: (utils.is.number(target.x) ? target.x : relativeX) + offset.x,
+        y: (utils.is.number(target.y) ? target.y : relativeY) + offset.y,
 
         range: utils.is.number(target.range) ? target.range : options.range,
       })
