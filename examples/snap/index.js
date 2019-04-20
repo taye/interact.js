@@ -281,8 +281,7 @@ interact(document).on('DOMContentLoaded', function () {
         drawSnap(interact(canvas).draggable().snap);
       }
     })
-    .origin('self')
-    .draggable(true);
+    .draggable({ origin: 'self' });
 
   guidesCanvas = document.getElementById('grid');
   guidesCanvas.width = width;

@@ -8,13 +8,14 @@ interact(window)
 
 interact('.drag-and-resize')
   .draggable({
-    modifiers: [{
-      type: 'snap',
-      targets: [
-        { x: 100, y: 200 },
-        function (x: number, y: number) { return { x: x % 20, y } },
-      ],
-    }],
+    modifiers: [
+      interact.modifiers.snap({
+        targets: [
+          { x: 100, y: 200 },
+          function (x: number, y: number) { return { x: x % 20, y } },
+        ],
+      }),
+    ],
   })
   .resizable({
     inertia: true,

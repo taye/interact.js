@@ -1,10 +1,12 @@
 import * as utils from '@interactjs/utils'
 
-function start ({ interaction, interactable, element, rect, state, startOffset }) {
+function start (arg: Interact.SignalArg) {
+  const { interaction, interactable, element, rect, state, startOffset } = arg
   const { options } = state
   const offsets = []
-  const optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin))
-  const origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name)
+  const origin = options.offsetWithOrigin
+    ? getOrigin(arg)
+    : { x: 0, y: 0 }
 
   let snapOffset
 
@@ -46,28 +48,28 @@ function start ({ interaction, interactable, element, rect, state, startOffset }
   state.offsets = offsets
 }
 
-function set ({ interaction, coords, state }) {
+function set (arg: Interact.SignalArg) {
+  const { interaction, coords, state } = arg
   const { options, offsets } = state
 
   const origin = utils.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name)
   const page = utils.extend({}, coords)
   const targets = []
   let target
-  let i
 
-  page.x -= origin.x
-  page.y -= origin.y
+  if (!options.offsetWithOrigin) {
+    page.x -= origin.x
+    page.y -= origin.y
+  }
 
   state.realX = page.x
   state.realY = page.y
-
-  let len = options.targets ? options.targets.length : 0
 
   for (const offset of offsets) {
     const relativeX = page.x - offset.x
     const relativeY = page.y - offset.y
 
-    for (let index = 0; index < options.targets.length; index++) {
+    for (let index = 0, len = options.targets.length; index < len; index++) {
       const snapTarget = options.targets[index]
       if (utils.is.func(snapTarget)) {
         target = snapTarget(relativeX, relativeY, interaction, offset, index)
@@ -96,7 +98,7 @@ function set ({ interaction, coords, state }) {
     dy: 0,
   }
 
-  for (i = 0, len = targets.length; i < len; i++) {
+  for (let i = 0, len = targets.length; i < len; i++) {
     target = targets[i]
 
     const range = target.range
@@ -141,6 +143,19 @@ function set ({ interaction, coords, state }) {
   state.closest = closest
 }
 
+function getOrigin (arg: Partial<Interact.SignalArg>) {
+  const optionsOrigin = utils.rect.rectToXY(
+    utils.rect.resolveRectLike(arg.state.options.origin)
+  )
+  const origin = optionsOrigin || utils.getOriginXY(
+    arg.interactable,
+    arg.interaction.element,
+    arg.interaction.prepared.name,
+  )
+
+  return origin
+}
+
 const snap = {
   start,
   set,
@@ -149,6 +164,7 @@ const snap = {
     range  : Infinity,
     targets: null,
     offset: null,
+    offsetWithOrigin: true,
 
     relativePoints: null,
   },
