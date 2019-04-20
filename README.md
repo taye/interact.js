@@ -6,7 +6,7 @@
 
   <div align="center">
   <a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
-  <a href="https://cdn.jsdelivr.net/npm/interactjs/"><img src="https://data.jsdelivr.com/v1/package/npm/interactjs/badge" alt="jsDelivr"></a>
+  <a href="https://www.jsdelivr.com/package/npm/interactjs"><img src="https://data.jsdelivr.com/v1/package/npm/interactjs/badge" alt="jsDelivr"></a>
   <a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
   <a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg" alt="Maintainability"></a>
   <a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
@@ -39,6 +39,9 @@ Installation
 
 ### Typescript definitions
 
+The project is written in Typescript and the npm package includes the type
+definitions, but if you need the typings alone, you can install them with:
+
 ```
 npm install --save-dev @interactjs/types
 ```
@@ -46,7 +49,7 @@ npm install --save-dev @interactjs/types
 Documentation
 -------------
 
-Visit http://interactjs.io/docs for the API documentation.
+http://interactjs.io/docs
 
 Example
 -------
