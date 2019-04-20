@@ -13,6 +13,7 @@ export interface ActionProps<T extends ActionName = any> {
 export interface StartAction extends ActionProps {
     name: ActionName | string;
 }
+export declare type InteractionProxy = Pick<Interaction, 'pointerIsDown' | 'pointerWasMoved' | 'start' | 'move' | 'end' | 'stop' | 'interacting' | '_proxy'>;
 export declare class Interaction<T extends ActionName = any> {
     interactable: Interactable;
     element: Element;
@@ -36,6 +37,7 @@ export declare class Interaction<T extends ActionName = any> {
     pointerWasMoved: boolean;
     _interacting: boolean;
     _ending: boolean;
+    _proxy: InteractionProxy;
     simulation: any;
     readonly pointerMoveTolerance: number;
     /**

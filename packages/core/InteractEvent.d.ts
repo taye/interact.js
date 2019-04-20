@@ -1,4 +1,4 @@
-import Interactable from './Interactable';
+import BaseEvent from './BaseEvent';
 import Interaction from './Interaction';
 import { ActionName } from './scope';
 export declare enum EventPhase {
@@ -7,11 +7,10 @@ export declare enum EventPhase {
     End = "end",
     _NONE = ""
 }
-export declare class InteractEvent<T extends ActionName = any, P extends EventPhase = EventPhase._NONE> {
-    type: string;
+export declare class InteractEvent<T extends ActionName = any, P extends EventPhase = EventPhase._NONE> extends BaseEvent<T> {
     target: Element;
-    relatedTarget: Element | null;
     currentTarget: Element;
+    relatedTarget: Element;
     screenX?: number;
     screenY?: number;
     button: number;
@@ -20,8 +19,6 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     shiftKey: boolean;
     altKey: boolean;
     metaKey: boolean;
-    interactable: Interactable;
-    interaction: Interaction<T>;
     page: Interact.Point;
     client: Interact.Point;
     delta: Interact.Point;
@@ -41,8 +38,6 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     dragLeave?: Element;
     axes?: Interact.Point;
     preEnd?: boolean;
-    immediatePropagationStopped: boolean;
-    propagationStopped: boolean;
     /** */
     constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Element, related?: Element, preEnd?: boolean, type?: string);
     pageX: number;

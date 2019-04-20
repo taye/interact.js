@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Global - Documentation</title>
+    <title>packages/core/BaseEvent.ts - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,262 +31,66 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">packages/core/BaseEvent.ts</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-        
-        </h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Interactable from './Interactable'
+import Interaction from './Interaction'
+import { ActionName } from './scope'
 
-<article>
-    <div class="container-overview">
-    
-        
+export enum EventPhase {
+  Start = 'start',
+  Move = 'move',
+  End = 'end',
+  _NONE = '',
+}
 
-        
+export class BaseEvent&lt;T extends ActionName = any> {
+  type: string
+  target: EventTarget
+  currentTarget: EventTarget
+  interactable: Interactable
+  _interaction: Interaction&lt;T>
+  timeStamp: any
+  immediatePropagationStopped = false
+  propagationStopped = false
 
+  get interaction () {
+    return this._interaction._proxy
+  }
 
-<dl class="details">
+  constructor (interaction) {
+    this._interaction = interaction
+  }
 
-    
+  preventDefault () {}
 
-    
+  /**
+   * Don't call any other listeners (even on the current target)
+   */
+  stopPropagation () {
+    this.propagationStopped = true
+  }
 
-    
+  /**
+   * Don't call listeners on the remaining targets
+   */
+  stopImmediatePropagation () {
+    this.immediatePropagationStopped = this.propagationStopped = true
+  }
+}
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<div class="section-members">
-<h4 class="name" id="interact"><span class="type-signature">(constant) </span>interact<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <pre class="prettyprint source lang-js"><code>interact('#draggable').draggable(true)
-
-var rectables = interact('rect')
-rectables
-  .gesturable(true)
-  .on('gesturemove', function (event) {
-      // ...
-  })
+export default BaseEvent
 </code></pre>
-<p>The methods of this variable can be used to set elements as interactables
-and also to change various default settings.</p>
-<p>Calling it as a function and passing an element or a valid CSS selector
-string returns an Interactable object which has various methods to configure
-it.</p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="packages_interact_interact.ts.html">packages/interact/interact.ts</a>, <a href="packages_interact_interact.ts.html#line43">line 43</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-</div>
-
-        
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-<div class="section-method">
-
-    
-
-    <h4 class="name" id="preventDefault"><span class="type-signature"></span>preventDefault<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Prevent the default behaviour of the original Event</p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="packages_pointer-events_PointerEvent.ts.html">packages/pointer-events/PointerEvent.ts</a>, <a href="packages_pointer-events_PointerEvent.ts.html#line76">line 76</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</div>
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+        </article>
+    </section>
 
 
 

@@ -1,3 +1,4 @@
+import { MockCoords } from '@interactjs/utils/pointerUtils';
 export declare function unique(): number;
 export declare function uniqueProps(obj: any): void;
 export declare function newCoordsSet(n?: number): {
@@ -71,25 +72,9 @@ export declare function testEnv({ plugins, target, rect, }?: {
     interaction: import("@interactjs/core/Interaction").Interaction<any>;
     target: import("../../types/types").Target;
     interactable: import("@interactjs/core/Interactable").Interactable;
-    coords: {
-        page: {
-            x: number;
-            y: number;
-        };
-        client: {
-            x: number;
-            y: number;
-        };
-        timeStamp: number;
-    };
+    coords: MockCoords;
     event: ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -99,14 +84,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & Touch & MouseEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -116,14 +97,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & Touch & PointerEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -133,14 +110,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & Touch & TouchEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -150,14 +123,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & Touch & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -167,14 +136,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & MouseEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -184,14 +149,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & MouseEvent & PointerEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -201,14 +162,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & MouseEvent & TouchEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -218,14 +175,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & MouseEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -235,14 +188,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & PointerEvent & MouseEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -252,14 +201,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & PointerEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -269,14 +214,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & PointerEvent & TouchEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -286,14 +227,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & PointerEvent & import("@interactjs/core/InteractEvent").InteractEvent<any, any>) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -303,14 +240,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & MouseEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -320,14 +253,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & PointerEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -337,14 +266,10 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & import("@interactjs/core/InteractEvent").InteractEvent<any, any> & TouchEvent) | ({
-        coords: {
-            page: import("../../types/types").Point;
-            client: import("../../types/types").Point;
-            timeStamp?: number;
-            pointerId?: any;
-            target?: any;
-        };
+        coords: MockCoords;
         readonly page: any;
         readonly client: any;
         readonly timeStamp: any;
@@ -354,5 +279,7 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly clientY: any;
         readonly pointerId: any;
         readonly target: any;
+        readonly type: any;
+        readonly pointerType: any;
     } & import("@interactjs/core/InteractEvent").InteractEvent<any, any>);
 };

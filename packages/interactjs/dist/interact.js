@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.11
+ * interact.js 1.4.0-rc.12
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -169,7 +169,7 @@ var drag = {
 var _default = drag;
 exports["default"] = _default;
 
-},{"@interactjs/core/scope":22,"@interactjs/utils/arr":44,"@interactjs/utils/is":55}],2:[function(require,module,exports){
+},{"@interactjs/core/scope":24,"@interactjs/utils/arr":46,"@interactjs/utils/is":56}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -177,9 +177,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _BaseEvent2 = _interopRequireDefault(require("@interactjs/core/BaseEvent"));
+
 var arr = _interopRequireWildcard(require("@interactjs/utils/arr"));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
@@ -195,31 +201,46 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 var DropEvent =
 /*#__PURE__*/
-function () {
+function (_BaseEvent) {
+  _inherits(DropEvent, _BaseEvent);
+
   /**
    * Class of events fired on dropzones during drags with acceptable targets.
    */
   function DropEvent(dropState, dragEvent, type) {
+    var _this;
+
     _classCallCheck(this, DropEvent);
 
-    this.propagationStopped = false;
-    this.immediatePropagationStopped = false;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(DropEvent).call(this, dragEvent._interaction));
+    _this.propagationStopped = false;
+    _this.immediatePropagationStopped = false;
 
     var _ref = type === 'dragleave' ? dropState.prev : dropState.cur,
         element = _ref.element,
         dropzone = _ref.dropzone;
 
-    this.type = type;
-    this.target = element;
-    this.currentTarget = element;
-    this.dropzone = dropzone;
-    this.dragEvent = dragEvent;
-    this.relatedTarget = dragEvent.target;
-    this.interaction = dragEvent.interaction;
-    this.draggable = dragEvent.interactable;
-    this.timeStamp = dragEvent.timeStamp;
+    _this.type = type;
+    _this.target = element;
+    _this.currentTarget = element;
+    _this.dropzone = dropzone;
+    _this.dragEvent = dragEvent;
+    _this.relatedTarget = dragEvent.target;
+    _this.draggable = dragEvent.interactable;
+    _this.timeStamp = dragEvent.timeStamp;
+    return _this;
   }
   /**
    * If this is a `dropactivate` event, the dropzone element will be
@@ -233,9 +254,9 @@ function () {
   _createClass(DropEvent, [{
     key: "reject",
     value: function reject() {
-      var _this = this;
+      var _this2 = this;
 
-      var dropState = this.interaction.dropState;
+      var dropState = this._interaction.dropState;
 
       if (this.type !== 'dropactivate' && (!this.dropzone || dropState.cur.dropzone !== this.dropzone || dropState.cur.element !== this.target)) {
         return;
@@ -252,7 +273,7 @@ function () {
         var index = arr.findIndex(activeDrops, function (_ref2) {
           var dropzone = _ref2.dropzone,
               element = _ref2.element;
-          return dropzone === _this.dropzone && element === _this.target;
+          return dropzone === _this2.dropzone && element === _this2.target;
         });
         dropState.activeDrops = [].concat(_toConsumableArray(activeDrops.slice(0, index)), _toConsumableArray(activeDrops.slice(index + 1)));
         var deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate');
@@ -279,12 +300,12 @@ function () {
   }]);
 
   return DropEvent;
-}();
+}(_BaseEvent2["default"]);
 
 var _default = DropEvent;
 exports["default"] = _default;
 
-},{"@interactjs/utils/arr":44}],3:[function(require,module,exports){
+},{"@interactjs/core/BaseEvent":13,"@interactjs/utils/arr":46}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -820,7 +841,7 @@ var drop = {
 var _default = drop;
 exports["default"] = _default;
 
-},{"../drag":1,"./DropEvent":2,"@interactjs/utils":53}],4:[function(require,module,exports){
+},{"../drag":1,"./DropEvent":2,"@interactjs/utils":55}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -978,7 +999,7 @@ function updateGestureProps(_ref2) {
 var _default = gesture;
 exports["default"] = _default;
 
-},{"@interactjs/core/InteractEvent":14,"@interactjs/core/scope":22,"@interactjs/utils":53}],5:[function(require,module,exports){
+},{"@interactjs/core/InteractEvent":15,"@interactjs/core/scope":24,"@interactjs/utils":55}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1500,7 +1521,7 @@ function updateEventAxes(_ref3) {
 var _default = resize;
 exports["default"] = _default;
 
-},{"@interactjs/core/scope":22,"@interactjs/utils":53}],7:[function(require,module,exports){
+},{"@interactjs/core/scope":24,"@interactjs/utils":55}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1747,7 +1768,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils/domUtils":48,"@interactjs/utils/is":55,"@interactjs/utils/raf":60,"@interactjs/utils/rect":61,"@interactjs/utils/window":64}],8:[function(require,module,exports){
+},{"@interactjs/utils/domUtils":50,"@interactjs/utils/is":56,"@interactjs/utils/raf":61,"@interactjs/utils/rect":62,"@interactjs/utils/window":65}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1945,7 +1966,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils":53,"@interactjs/utils/is":55}],9:[function(require,module,exports){
+},{"@interactjs/utils":55,"@interactjs/utils/is":56}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2231,7 +2252,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"./InteractableMethods":8,"@interactjs/utils":53}],10:[function(require,module,exports){
+},{"./InteractableMethods":8,"@interactjs/utils":55}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2325,7 +2346,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"./base":9,"@interactjs/core/scope":22,"@interactjs/utils/domUtils":48,"@interactjs/utils/is":55}],11:[function(require,module,exports){
+},{"./base":9,"@interactjs/core/scope":24,"@interactjs/utils/domUtils":50,"@interactjs/utils/is":56}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2444,6 +2465,76 @@ exports.id = id;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = exports.BaseEvent = exports.EventPhase = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var EventPhase;
+exports.EventPhase = EventPhase;
+
+(function (EventPhase) {
+  EventPhase["Start"] = "start";
+  EventPhase["Move"] = "move";
+  EventPhase["End"] = "end";
+  EventPhase["_NONE"] = "";
+})(EventPhase || (exports.EventPhase = EventPhase = {}));
+
+var BaseEvent =
+/*#__PURE__*/
+function () {
+  function BaseEvent(interaction) {
+    _classCallCheck(this, BaseEvent);
+
+    this.immediatePropagationStopped = false;
+    this.propagationStopped = false;
+    this._interaction = interaction;
+  }
+
+  _createClass(BaseEvent, [{
+    key: "preventDefault",
+    value: function preventDefault() {}
+    /**
+     * Don't call any other listeners (even on the current target)
+     */
+
+  }, {
+    key: "stopPropagation",
+    value: function stopPropagation() {
+      this.propagationStopped = true;
+    }
+    /**
+     * Don't call listeners on the remaining targets
+     */
+
+  }, {
+    key: "stopImmediatePropagation",
+    value: function stopImmediatePropagation() {
+      this.immediatePropagationStopped = this.propagationStopped = true;
+    }
+  }, {
+    key: "interaction",
+    get: function get() {
+      return this._interaction._proxy;
+    }
+  }]);
+
+  return BaseEvent;
+}();
+
+exports.BaseEvent = BaseEvent;
+var _default = BaseEvent;
+exports["default"] = _default;
+
+},{}],14:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 
 var arr = _interopRequireWildcard(require("@interactjs/utils/arr"));
@@ -2547,7 +2638,7 @@ function () {
 var _default = Eventable;
 exports["default"] = _default;
 
-},{"@interactjs/utils/arr":44,"@interactjs/utils/extend":50,"@interactjs/utils/normalizeListeners":57}],14:[function(require,module,exports){
+},{"@interactjs/utils/arr":46,"@interactjs/utils/extend":52,"@interactjs/utils/normalizeListeners":58}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2561,15 +2652,29 @@ var _getOriginXY = _interopRequireDefault(require("@interactjs/utils/getOriginXY
 
 var _hypot = _interopRequireDefault(require("@interactjs/utils/hypot"));
 
+var _BaseEvent2 = _interopRequireDefault(require("./BaseEvent"));
+
 var _defaultOptions = _interopRequireDefault(require("./defaultOptions"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 var EventPhase;
 exports.EventPhase = EventPhase;
@@ -2583,13 +2688,16 @@ exports.EventPhase = EventPhase;
 
 var InteractEvent =
 /*#__PURE__*/
-function () {
+function (_BaseEvent) {
+  _inherits(InteractEvent, _BaseEvent);
+
   /** */
   function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
+    var _this;
+
     _classCallCheck(this, InteractEvent);
 
-    this.immediatePropagationStopped = false;
-    this.propagationStopped = false;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(InteractEvent).call(this, interaction));
     element = element || interaction.element;
     var target = interaction.interactable; // FIXME: add deltaSource to defaults
 
@@ -2597,67 +2705,67 @@ function () {
     var origin = (0, _getOriginXY["default"])(target, element, actionName);
     var starting = phase === 'start';
     var ending = phase === 'end';
-    var prevEvent = starting ? this : interaction.prevEvent;
+    var prevEvent = starting ? _assertThisInitialized(_this) : interaction.prevEvent;
     var coords = starting ? interaction.coords.start : ending ? {
       page: prevEvent.page,
       client: prevEvent.client,
       timeStamp: interaction.coords.cur.timeStamp
     } : interaction.coords.cur;
-    this.page = (0, _extend["default"])({}, coords.page);
-    this.client = (0, _extend["default"])({}, coords.client);
-    this.rect = (0, _extend["default"])({}, interaction.rect);
-    this.timeStamp = coords.timeStamp;
+    _this.page = (0, _extend["default"])({}, coords.page);
+    _this.client = (0, _extend["default"])({}, coords.client);
+    _this.rect = (0, _extend["default"])({}, interaction.rect);
+    _this.timeStamp = coords.timeStamp;
 
     if (!ending) {
-      this.page.x -= origin.x;
-      this.page.y -= origin.y;
-      this.client.x -= origin.x;
-      this.client.y -= origin.y;
+      _this.page.x -= origin.x;
+      _this.page.y -= origin.y;
+      _this.client.x -= origin.x;
+      _this.client.y -= origin.y;
     }
 
-    this.ctrlKey = event.ctrlKey;
-    this.altKey = event.altKey;
-    this.shiftKey = event.shiftKey;
-    this.metaKey = event.metaKey;
-    this.button = event.button;
-    this.buttons = event.buttons;
-    this.target = element;
-    this.currentTarget = element;
-    this.relatedTarget = related || null;
-    this.preEnd = preEnd;
-    this.type = type || actionName + (phase || '');
-    this.interaction = interaction;
-    this.interactable = target;
-    this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
-    this.x0 = interaction.coords.start.page.x - origin.x;
-    this.y0 = interaction.coords.start.page.y - origin.y;
-    this.clientX0 = interaction.coords.start.client.x - origin.x;
-    this.clientY0 = interaction.coords.start.client.y - origin.y;
+    _this.ctrlKey = event.ctrlKey;
+    _this.altKey = event.altKey;
+    _this.shiftKey = event.shiftKey;
+    _this.metaKey = event.metaKey;
+    _this.button = event.button;
+    _this.buttons = event.buttons;
+    _this.target = element;
+    _this.currentTarget = element;
+    _this.relatedTarget = related || null;
+    _this.preEnd = preEnd;
+    _this.type = type || actionName + (phase || '');
+    _this.interactable = target;
+    _this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
+    _this.x0 = interaction.coords.start.page.x - origin.x;
+    _this.y0 = interaction.coords.start.page.y - origin.y;
+    _this.clientX0 = interaction.coords.start.client.x - origin.x;
+    _this.clientY0 = interaction.coords.start.client.y - origin.y;
 
     if (starting || ending) {
-      this.delta = {
+      _this.delta = {
         x: 0,
         y: 0
       };
     } else {
-      this.delta = {
-        x: this[deltaSource].x - prevEvent[deltaSource].x,
-        y: this[deltaSource].y - prevEvent[deltaSource].y
+      _this.delta = {
+        x: _this[deltaSource].x - prevEvent[deltaSource].x,
+        y: _this[deltaSource].y - prevEvent[deltaSource].y
       };
     }
 
-    this.dt = interaction.coords.delta.timeStamp;
-    this.duration = this.timeStamp - this.t0; // velocity and speed in pixels per second
+    _this.dt = interaction.coords.delta.timeStamp;
+    _this.duration = _this.timeStamp - _this.t0; // velocity and speed in pixels per second
 
-    this.velocity = (0, _extend["default"])({}, interaction.coords.velocity[deltaSource]);
-    this.speed = (0, _hypot["default"])(this.velocity.x, this.velocity.y);
-    this.swipe = ending || phase === 'inertiastart' ? this.getSwipe() : null;
+    _this.velocity = (0, _extend["default"])({}, interaction.coords.velocity[deltaSource]);
+    _this.speed = (0, _hypot["default"])(_this.velocity.x, _this.velocity.y);
+    _this.swipe = ending || phase === 'inertiastart' ? _this.getSwipe() : null;
+    return _this;
   }
 
   _createClass(InteractEvent, [{
     key: "getSwipe",
     value: function getSwipe() {
-      var interaction = this.interaction;
+      var interaction = this._interaction;
 
       if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
         return null;
@@ -2775,13 +2883,13 @@ function () {
   }]);
 
   return InteractEvent;
-}();
+}(_BaseEvent2["default"]);
 
 exports.InteractEvent = InteractEvent;
 var _default = InteractEvent;
 exports["default"] = _default;
 
-},{"./defaultOptions":19,"@interactjs/utils/extend":50,"@interactjs/utils/getOriginXY":51,"@interactjs/utils/hypot":52}],15:[function(require,module,exports){
+},{"./BaseEvent":13,"./defaultOptions":20,"@interactjs/utils/extend":52,"@interactjs/utils/getOriginXY":53,"@interactjs/utils/hypot":54}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3225,7 +3333,7 @@ exports.Interactable = Interactable;
 var _default = Interactable;
 exports["default"] = _default;
 
-},{"./Eventable":13,"@interactjs/utils/arr":44,"@interactjs/utils/browser":45,"@interactjs/utils/clone":46,"@interactjs/utils/domUtils":48,"@interactjs/utils/events":49,"@interactjs/utils/extend":50,"@interactjs/utils/is":55,"@interactjs/utils/normalizeListeners":57,"@interactjs/utils/window":64}],16:[function(require,module,exports){
+},{"./Eventable":14,"@interactjs/utils/arr":46,"@interactjs/utils/browser":47,"@interactjs/utils/clone":48,"@interactjs/utils/domUtils":50,"@interactjs/utils/events":51,"@interactjs/utils/extend":52,"@interactjs/utils/is":56,"@interactjs/utils/normalizeListeners":58,"@interactjs/utils/window":65}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3361,7 +3469,7 @@ function () {
 
 exports["default"] = InteractableSet;
 
-},{"@interactjs/utils/Signals":43,"@interactjs/utils/arr":44,"@interactjs/utils/domUtils":48,"@interactjs/utils/extend":50,"@interactjs/utils/is":55}],17:[function(require,module,exports){
+},{"@interactjs/utils/Signals":45,"@interactjs/utils/arr":46,"@interactjs/utils/domUtils":50,"@interactjs/utils/extend":52,"@interactjs/utils/is":56}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3429,6 +3537,7 @@ function () {
     this.pointerWasMoved = false;
     this._interacting = false;
     this._ending = false;
+    this._proxy = null;
     this.simulation = null;
     /**
      * @alias Interaction.prototype.move
@@ -3451,6 +3560,37 @@ function () {
     };
     this._signals = signals;
     this.pointerType = pointerType;
+    var that = this;
+    this._proxy = {
+      get pointerIsDown() {
+        return that.pointerIsDown;
+      },
+
+      get pointerWasMoved() {
+        return that.pointerWasMoved;
+      },
+
+      start: function start(action, i, e) {
+        return that.start(action, i, e);
+      },
+      move: function move(arg) {
+        return that.move(arg);
+      },
+      end: function end(event) {
+        return that.end(event);
+      },
+      stop: function stop() {
+        return that.stop();
+      },
+      interacting: function interacting() {
+        return that.interacting();
+      },
+
+      get _proxy() {
+        return this;
+      }
+
+    };
 
     this._signals.fire('new', {
       interaction: this
@@ -3597,8 +3737,7 @@ function () {
         pointer: this._latestPointer.pointer,
         event: this._latestPointer.event,
         eventTarget: this._latestPointer.eventTarget,
-        interaction: this,
-        noBefore: false
+        interaction: this
       }, signalArg || {});
       signalArg.phase = _InteractEvent.EventPhase.Move;
 
@@ -3813,12 +3952,10 @@ function () {
           preEnd = signalArg.preEnd,
           type = signalArg.type;
 
-      if (!signalArg.noBefore) {
-        var beforeResult = this._signals.fire("before-action-".concat(phase), signalArg);
+      var beforeResult = this._signals.fire("before-action-".concat(phase), signalArg);
 
-        if (beforeResult === false) {
-          return false;
-        }
+      if (beforeResult === false) {
+        return false;
       }
 
       var iEvent = signalArg.iEvent = this._createPreparedEvent(event, phase, preEnd, type);
@@ -3881,7 +4018,7 @@ exports.Interaction = Interaction;
 var _default = Interaction;
 exports["default"] = _default;
 
-},{"./InteractEvent":14,"./PointerInfo":18,"./scope":22,"@interactjs/utils":53}],18:[function(require,module,exports){
+},{"./InteractEvent":15,"./PointerInfo":19,"./scope":24,"@interactjs/utils":55}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3905,7 +4042,7 @@ exports.PointerInfo = PointerInfo;
 var _default = PointerInfo;
 exports["default"] = _default;
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3931,7 +4068,7 @@ exports.defaults = defaults;
 var _default = defaults;
 exports["default"] = _default;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4064,7 +4201,186 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils/domUtils":48,"@interactjs/utils/events":49,"@interactjs/utils/is":55,"@interactjs/utils/window":64}],21:[function(require,module,exports){
+},{"@interactjs/utils/domUtils":50,"@interactjs/utils/events":51,"@interactjs/utils/is":56,"@interactjs/utils/window":65}],22:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _arr = require("@interactjs/utils/arr");
+
+var dom = _interopRequireWildcard(require("@interactjs/utils/domUtils"));
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+var finder = {
+  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
+  search: function search(details) {
+    for (var _i = 0; _i < finder.methodOrder.length; _i++) {
+      var _ref;
+
+      _ref = finder.methodOrder[_i];
+      var method = _ref;
+      var interaction = finder[method](details);
+
+      if (interaction) {
+        return interaction;
+      }
+    }
+  },
+  // try to resume simulation with a new pointer
+  simulationResume: function simulationResume(_ref2) {
+    var pointerType = _ref2.pointerType,
+        eventType = _ref2.eventType,
+        eventTarget = _ref2.eventTarget,
+        scope = _ref2.scope;
+
+    if (!/down|start/i.test(eventType)) {
+      return null;
+    }
+
+    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
+      var _ref3;
+
+      _ref3 = scope.interactions.list[_i2];
+      var interaction = _ref3;
+      var element = eventTarget;
+
+      if (interaction.simulation && interaction.simulation.allowResume && interaction.pointerType === pointerType) {
+        while (element) {
+          // if the element is the interaction element
+          if (element === interaction.element) {
+            return interaction;
+          }
+
+          element = dom.parentNode(element);
+        }
+      }
+    }
+
+    return null;
+  },
+  // if it's a mouse or pen interaction
+  mouseOrPen: function mouseOrPen(_ref4) {
+    var pointerId = _ref4.pointerId,
+        pointerType = _ref4.pointerType,
+        eventType = _ref4.eventType,
+        scope = _ref4.scope;
+
+    if (pointerType !== 'mouse' && pointerType !== 'pen') {
+      return null;
+    }
+
+    var firstNonActive;
+
+    for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
+      var _ref5;
+
+      _ref5 = scope.interactions.list[_i3];
+      var interaction = _ref5;
+
+      if (interaction.pointerType === pointerType) {
+        // if it's a down event, skip interactions with running simulations
+        if (interaction.simulation && !hasPointerId(interaction, pointerId)) {
+          continue;
+        } // if the interaction is active, return it immediately
+
+
+        if (interaction.interacting()) {
+          return interaction;
+        } // otherwise save it and look for another active interaction
+        else if (!firstNonActive) {
+            firstNonActive = interaction;
+          }
+      }
+    } // if no active mouse interaction was found use the first inactive mouse
+    // interaction
+
+
+    if (firstNonActive) {
+      return firstNonActive;
+    } // find any mouse or pen interaction.
+    // ignore the interaction if the eventType is a *down, and a simulation
+    // is active
+
+
+    for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
+      var _ref6;
+
+      _ref6 = scope.interactions.list[_i4];
+      var _interaction = _ref6;
+
+      if (_interaction.pointerType === pointerType && !(/down/i.test(eventType) && _interaction.simulation)) {
+        return _interaction;
+      }
+    }
+
+    return null;
+  },
+  // get interaction that has this pointer
+  hasPointer: function hasPointer(_ref7) {
+    var pointerId = _ref7.pointerId,
+        scope = _ref7.scope;
+
+    for (var _i5 = 0; _i5 < scope.interactions.list.length; _i5++) {
+      var _ref8;
+
+      _ref8 = scope.interactions.list[_i5];
+      var interaction = _ref8;
+
+      if (hasPointerId(interaction, pointerId)) {
+        return interaction;
+      }
+    }
+
+    return null;
+  },
+  // get first idle interaction with a matching pointerType
+  idle: function idle(_ref9) {
+    var pointerType = _ref9.pointerType,
+        scope = _ref9.scope;
+
+    for (var _i6 = 0; _i6 < scope.interactions.list.length; _i6++) {
+      var _ref10;
+
+      _ref10 = scope.interactions.list[_i6];
+      var interaction = _ref10;
+
+      // if there's already a pointer held down
+      if (interaction.pointers.length === 1) {
+        var target = interaction.interactable; // don't add this pointer if there is a target interactable and it
+        // isn't gesturable
+
+        if (target && !target.options.gesture.enabled) {
+          continue;
+        }
+      } // maximum of 2 pointers per interaction
+      else if (interaction.pointers.length >= 2) {
+          continue;
+        }
+
+      if (!interaction.interacting() && pointerType === interaction.pointerType) {
+        return interaction;
+      }
+    }
+
+    return null;
+  }
+};
+
+function hasPointerId(interaction, pointerId) {
+  return (0, _arr.some)(interaction.pointers, function (_ref11) {
+    var id = _ref11.id;
+    return id === pointerId;
+  });
+}
+
+var _default = finder;
+exports["default"] = _default;
+
+},{"@interactjs/utils/arr":46,"@interactjs/utils/domUtils":50}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4078,13 +4394,13 @@ var _domObjects = _interopRequireDefault(require("@interactjs/utils/domObjects")
 
 var _events = _interopRequireDefault(require("@interactjs/utils/events"));
 
-var _interactionFinder = _interopRequireDefault(require("@interactjs/utils/interactionFinder"));
-
 var _pointerUtils = _interopRequireDefault(require("@interactjs/utils/pointerUtils"));
 
 var _Signals = _interopRequireDefault(require("@interactjs/utils/Signals"));
 
 var _Interaction = _interopRequireDefault(require("./Interaction"));
+
+var _interactionFinder = _interopRequireDefault(require("./interactionFinder"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -4336,7 +4652,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"./Interaction":17,"@interactjs/utils/Signals":43,"@interactjs/utils/browser":45,"@interactjs/utils/domObjects":47,"@interactjs/utils/events":49,"@interactjs/utils/interactionFinder":54,"@interactjs/utils/pointerUtils":59}],22:[function(require,module,exports){
+},{"./Interaction":18,"./interactionFinder":22,"@interactjs/utils/Signals":45,"@interactjs/utils/browser":47,"@interactjs/utils/domObjects":49,"@interactjs/utils/events":51,"@interactjs/utils/pointerUtils":60}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4602,7 +4918,7 @@ function initScope(scope, window) {
   return scope;
 }
 
-},{"./Eventable":13,"./InteractEvent":14,"./Interactable":15,"./InteractableSet":16,"./defaultOptions":19,"./interactions":21,"@interactjs/utils":53,"@interactjs/utils/domObjects":47}],23:[function(require,module,exports){
+},{"./Eventable":14,"./InteractEvent":15,"./Interactable":16,"./InteractableSet":17,"./defaultOptions":20,"./interactions":23,"@interactjs/utils":55,"@interactjs/utils/domObjects":49}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4707,7 +5023,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils/domObjects":47,"@interactjs/utils/domUtils":48,"@interactjs/utils/is":55,"@interactjs/utils/window":64}],24:[function(require,module,exports){
+},{"@interactjs/utils/domObjects":49,"@interactjs/utils/domUtils":50,"@interactjs/utils/is":56,"@interactjs/utils/window":65}],26:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5012,7 +5328,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/core/InteractEvent":14,"@interactjs/modifiers/base":28,"@interactjs/utils":53,"@interactjs/utils/raf":60}],25:[function(require,module,exports){
+},{"@interactjs/core/InteractEvent":15,"@interactjs/modifiers/base":30,"@interactjs/utils":55,"@interactjs/utils/raf":61}],27:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5131,11 +5447,11 @@ function init(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = init.version = "1.4.0-rc.11";
+_interact["default"].version = init.version = "1.4.0-rc.12";
 var _default = _interact["default"];
 exports["default"] = _default;
 
-},{"./interact":26,"@interactjs/actions":5,"@interactjs/auto-scroll":7,"@interactjs/auto-start":12,"@interactjs/core/interactablePreventDefault":20,"@interactjs/dev-tools":23,"@interactjs/inertia":24,"@interactjs/modifiers":29,"@interactjs/modifiers/base":28,"@interactjs/pointer-events":39,"@interactjs/reflow":41}],26:[function(require,module,exports){
+},{"./interact":28,"@interactjs/actions":5,"@interactjs/auto-scroll":7,"@interactjs/auto-start":12,"@interactjs/core/interactablePreventDefault":21,"@interactjs/dev-tools":25,"@interactjs/inertia":26,"@interactjs/modifiers":31,"@interactjs/modifiers/base":30,"@interactjs/pointer-events":41,"@interactjs/reflow":43}],28:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5460,7 +5776,7 @@ scope.interact = interact;
 var _default = interact;
 exports["default"] = _default;
 
-},{"@interactjs/core/scope":22,"@interactjs/utils":53,"@interactjs/utils/browser":45,"@interactjs/utils/events":49}],27:[function(require,module,exports){
+},{"@interactjs/core/scope":24,"@interactjs/utils":55,"@interactjs/utils/browser":47,"@interactjs/utils/events":51}],29:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5511,7 +5827,7 @@ if ((typeof module === "undefined" ? "undefined" : _typeof(module)) === 'object'
   module.exports = _interact["default"];
 }
 
-},{"@interactjs/interact":25,"@interactjs/modifiers":29,"@interactjs/types":42,"@interactjs/utils/extend":50,"@interactjs/utils/snappers":63}],28:[function(require,module,exports){
+},{"@interactjs/interact":27,"@interactjs/modifiers":31,"@interactjs/types":44,"@interactjs/utils/extend":52,"@interactjs/utils/snappers":64}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5787,7 +6103,9 @@ function getModifierList(interaction, registeredModifiers) {
   var actionModifiers = actionOptions.modifiers;
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers.map(function (modifier) {
+    return actionModifiers.filter(function (modifier) {
+      return !modifier.options || modifier.options.enabled !== false;
+    }).map(function (modifier) {
       if (!modifier.methods && modifier.type) {
         return registeredModifiers[modifier.type](modifier);
       }
@@ -5903,7 +6221,7 @@ function restoreCoords(_ref7) {
 }
 
 function shouldDo(options, preEnd, requireEndOnly, phase) {
-  return options ? options.enabled !== false && (preEnd || !options.endOnly) && (!requireEndOnly || options.endOnly) && (options.setStart || phase !== 'start') : !requireEndOnly;
+  return options ? options.enabled !== false && (preEnd || !options.endOnly) && (!requireEndOnly || options.endOnly || options.alwaysOnEnd) && (options.setStart || phase !== 'start') : !requireEndOnly;
 }
 
 function getRectOffset(rect, coords) {
@@ -5976,7 +6294,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils/extend":50}],29:[function(require,module,exports){
+},{"@interactjs/utils/extend":52}],31:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6014,7 +6332,7 @@ exports.restrictEdges = restrictEdges;
 var restrictSize = makeModifier(_size["default"], 'restrictSize');
 exports.restrictSize = restrictSize;
 
-},{"./base":28,"./restrict/edges":30,"./restrict/pointer":31,"./restrict/size":32,"./snap/edges":33,"./snap/pointer":34,"./snap/size":35}],30:[function(require,module,exports){
+},{"./base":30,"./restrict/edges":32,"./restrict/pointer":33,"./restrict/size":34,"./snap/edges":35,"./snap/pointer":36,"./snap/size":37}],32:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6139,7 +6457,7 @@ var restrictEdges = {
 var _default = restrictEdges;
 exports["default"] = _default;
 
-},{"./pointer":31,"@interactjs/utils/extend":50,"@interactjs/utils/rect":61}],31:[function(require,module,exports){
+},{"./pointer":33,"@interactjs/utils/extend":52,"@interactjs/utils/rect":62}],33:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6221,7 +6539,7 @@ var restrict = {
 var _default = restrict;
 exports["default"] = _default;
 
-},{"@interactjs/utils/is":55,"@interactjs/utils/rect":61}],32:[function(require,module,exports){
+},{"@interactjs/utils/is":56,"@interactjs/utils/rect":62}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6314,7 +6632,7 @@ var restrictSize = {
 var _default = restrictSize;
 exports["default"] = _default;
 
-},{"./edges":30,"@interactjs/utils/extend":50,"@interactjs/utils/rect":61}],33:[function(require,module,exports){
+},{"./edges":32,"@interactjs/utils/extend":52,"@interactjs/utils/rect":62}],35:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6385,7 +6703,7 @@ var snapEdges = {
 var _default = snapEdges;
 exports["default"] = _default;
 
-},{"./size":35,"@interactjs/utils/clone":46,"@interactjs/utils/extend":50}],34:[function(require,module,exports){
+},{"./size":37,"@interactjs/utils/clone":48,"@interactjs/utils/extend":52}],36:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6397,23 +6715,25 @@ var utils = _interopRequireWildcard(require("@interactjs/utils"));
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
-function start(_ref) {
-  var interaction = _ref.interaction,
-      interactable = _ref.interactable,
-      element = _ref.element,
-      rect = _ref.rect,
-      state = _ref.state,
-      startOffset = _ref.startOffset;
+function start(arg) {
+  var interaction = arg.interaction,
+      interactable = arg.interactable,
+      element = arg.element,
+      rect = arg.rect,
+      state = arg.state,
+      startOffset = arg.startOffset;
   var options = state.options;
   var offsets = [];
-  var optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(options.origin));
-  var origin = optionsOrigin || utils.getOriginXY(interactable, element, interaction.prepared.name);
+  var origin = options.offsetWithOrigin ? getOrigin(arg) : {
+    x: 0,
+    y: 0
+  };
   var snapOffset;
 
   if (options.offset === 'startCoords') {
     snapOffset = {
-      x: interaction.coords.start.page.x - origin.x,
-      y: interaction.coords.start.page.y - origin.y
+      x: interaction.coords.start.page.x,
+      y: interaction.coords.start.page.y
     };
   } else {
     var offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction]);
@@ -6447,32 +6767,34 @@ function start(_ref) {
   state.offsets = offsets;
 }
 
-function set(_ref2) {
-  var interaction = _ref2.interaction,
-      coords = _ref2.coords,
-      state = _ref2.state;
+function set(arg) {
+  var interaction = arg.interaction,
+      coords = arg.coords,
+      state = arg.state;
   var options = state.options,
       offsets = state.offsets;
   var origin = utils.getOriginXY(interaction.interactable, interaction.element, interaction.prepared.name);
   var page = utils.extend({}, coords);
   var targets = [];
   var target;
-  var i;
-  page.x -= origin.x;
-  page.y -= origin.y;
+
+  if (!options.offsetWithOrigin) {
+    page.x -= origin.x;
+    page.y -= origin.y;
+  }
+
   state.realX = page.x;
   state.realY = page.y;
-  var len = options.targets ? options.targets.length : 0;
 
   for (var _i = 0; _i < offsets.length; _i++) {
-    var _ref3;
+    var _ref;
 
-    _ref3 = offsets[_i];
-    var offset = _ref3;
+    _ref = offsets[_i];
+    var offset = _ref;
     var relativeX = page.x - offset.x;
     var relativeY = page.y - offset.y;
 
-    for (var index = 0; index < options.targets.length; index++) {
+    for (var index = 0, _len = options.targets.length; index < _len; index++) {
       var snapTarget = options.targets[index];
 
       if (utils.is.func(snapTarget)) {
@@ -6486,8 +6808,8 @@ function set(_ref2) {
       }
 
       targets.push({
-        x: utils.is.number(target.x) ? target.x + offset.x : relativeX,
-        y: utils.is.number(target.y) ? target.y + offset.y : relativeY,
+        x: (utils.is.number(target.x) ? target.x : relativeX) + offset.x,
+        y: (utils.is.number(target.y) ? target.y : relativeY) + offset.y,
         range: utils.is.number(target.range) ? target.range : options.range
       });
     }
@@ -6502,7 +6824,7 @@ function set(_ref2) {
     dy: 0
   };
 
-  for (i = 0, len = targets.length; i < len; i++) {
+  for (var i = 0, len = targets.length; i < len; i++) {
     target = targets[i];
     var range = target.range;
     var dx = target.x - page.x;
@@ -6539,6 +6861,12 @@ function set(_ref2) {
   state.closest = closest;
 }
 
+function getOrigin(arg) {
+  var optionsOrigin = utils.rect.rectToXY(utils.rect.resolveRectLike(arg.state.options.origin));
+  var origin = optionsOrigin || utils.getOriginXY(arg.interactable, arg.interaction.element, arg.interaction.prepared.name);
+  return origin;
+}
+
 var snap = {
   start: start,
   set: set,
@@ -6547,13 +6875,14 @@ var snap = {
     range: Infinity,
     targets: null,
     offset: null,
+    offsetWithOrigin: true,
     relativePoints: null
   }
 };
 var _default = snap;
 exports["default"] = _default;
 
-},{"@interactjs/utils":53}],35:[function(require,module,exports){
+},{"@interactjs/utils":55}],37:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6679,7 +7008,7 @@ var snapSize = {
 var _default = snapSize;
 exports["default"] = _default;
 
-},{"./pointer":34,"@interactjs/utils/extend":50,"@interactjs/utils/is":55}],36:[function(require,module,exports){
+},{"./pointer":36,"@interactjs/utils/extend":52,"@interactjs/utils/is":56}],38:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6687,9 +7016,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _BaseEvent2 = _interopRequireDefault(require("@interactjs/core/BaseEvent"));
+
 var _pointerUtils = _interopRequireDefault(require("@interactjs/utils/pointerUtils"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -6697,45 +7030,59 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
 /** */
 var PointerEvent =
 /*#__PURE__*/
-function () {
+function (_BaseEvent) {
+  _inherits(PointerEvent, _BaseEvent);
+
   /** */
   function PointerEvent(type, pointer, event, eventTarget, interaction, timeStamp) {
+    var _this;
+
     _classCallCheck(this, PointerEvent);
 
-    this.propagationStopped = false;
-    this.immediatePropagationStopped = false;
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(PointerEvent).call(this, interaction));
 
-    _pointerUtils["default"].pointerExtend(this, event);
+    _pointerUtils["default"].pointerExtend(_assertThisInitialized(_this), event);
 
     if (event !== pointer) {
-      _pointerUtils["default"].pointerExtend(this, pointer);
+      _pointerUtils["default"].pointerExtend(_assertThisInitialized(_this), pointer);
     }
 
-    this.interaction = interaction;
-    this.timeStamp = timeStamp;
-    this.originalEvent = event;
-    this.type = type;
-    this.pointerId = _pointerUtils["default"].getPointerId(pointer);
-    this.pointerType = _pointerUtils["default"].getPointerType(pointer);
-    this.target = eventTarget;
-    this.currentTarget = null;
+    _this.timeStamp = timeStamp;
+    _this.originalEvent = event;
+    _this.type = type;
+    _this.pointerId = _pointerUtils["default"].getPointerId(pointer);
+    _this.pointerType = _pointerUtils["default"].getPointerType(pointer);
+    _this.target = eventTarget;
+    _this.currentTarget = null;
 
     if (type === 'tap') {
       var pointerIndex = interaction.getPointerIndex(pointer);
-      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime;
-      var interval = this.timeStamp - interaction.tapTime;
-      this["double"] = !!(interaction.prevTap && interaction.prevTap.type !== 'doubletap' && interaction.prevTap.target === this.target && interval < 500);
+      _this.dt = _this.timeStamp - interaction.pointers[pointerIndex].downTime;
+      var interval = _this.timeStamp - interaction.tapTime;
+      _this["double"] = !!(interaction.prevTap && interaction.prevTap.type !== 'doubletap' && interaction.prevTap.target === _this.target && interval < 500);
     } else if (type === 'doubletap') {
-      this.dt = pointer.timeStamp - interaction.tapTime;
+      _this.dt = pointer.timeStamp - interaction.tapTime;
     }
+
+    return _this;
   }
 
   _createClass(PointerEvent, [{
-    key: "subtractOrigin",
-    value: function subtractOrigin(_ref) {
+    key: "_subtractOrigin",
+    value: function _subtractOrigin(_ref) {
       var originX = _ref.x,
           originY = _ref.y;
       this.pageX -= originX;
@@ -6745,8 +7092,8 @@ function () {
       return this;
     }
   }, {
-    key: "addOrigin",
-    value: function addOrigin(_ref2) {
+    key: "_addOrigin",
+    value: function _addOrigin(_ref2) {
       var originX = _ref2.x,
           originY = _ref2.y;
       this.pageX += originX;
@@ -6764,32 +7111,14 @@ function () {
     value: function preventDefault() {
       this.originalEvent.preventDefault();
     }
-    /**
-     * Don't call listeners on the remaining targets
-     */
-
-  }, {
-    key: "stopPropagation",
-    value: function stopPropagation() {
-      this.propagationStopped = true;
-    }
-    /**
-     * Don't call any other listeners (even on the current target)
-     */
-
-  }, {
-    key: "stopImmediatePropagation",
-    value: function stopImmediatePropagation() {
-      this.immediatePropagationStopped = this.propagationStopped = true;
-    }
   }]);
 
   return PointerEvent;
-}();
+}(_BaseEvent2["default"]);
 
 exports["default"] = PointerEvent;
 
-},{"@interactjs/utils/pointerUtils":59}],37:[function(require,module,exports){
+},{"@interactjs/core/BaseEvent":13,"@interactjs/utils/pointerUtils":60}],39:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6858,11 +7187,14 @@ function fire(arg, scope) {
     }
 
     var origin = utils.getOriginXY(target.eventable, target.element);
-    pointerEvent.subtractOrigin(origin);
+
+    pointerEvent._subtractOrigin(origin);
+
     pointerEvent.eventable = target.eventable;
     pointerEvent.currentTarget = target.element;
     target.eventable.fire(pointerEvent);
-    pointerEvent.addOrigin(origin);
+
+    pointerEvent._addOrigin(origin);
 
     if (pointerEvent.immediatePropagationStopped || pointerEvent.propagationStopped && i + 1 < targets.length && targets[i + 1].element !== pointerEvent.currentTarget) {
       break;
@@ -7089,7 +7421,7 @@ function createSignalListener(type, scope) {
 var _default = pointerEvents;
 exports["default"] = _default;
 
-},{"./PointerEvent":36,"@interactjs/utils":53}],38:[function(require,module,exports){
+},{"./PointerEvent":38,"@interactjs/utils":55}],40:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7177,7 +7509,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"./base":37}],39:[function(require,module,exports){
+},{"./base":39}],41:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7221,7 +7553,7 @@ function install(scope) {
 var id = 'pointer-events';
 exports.id = id;
 
-},{"./base":37,"./holdRepeat":38,"./interactableTargets":40}],40:[function(require,module,exports){
+},{"./base":39,"./holdRepeat":40,"./interactableTargets":42}],42:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7303,7 +7635,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/utils/arr":44,"@interactjs/utils/extend":50,"@interactjs/utils/is":55}],41:[function(require,module,exports){
+},{"@interactjs/utils/arr":46,"@interactjs/utils/extend":52,"@interactjs/utils/is":56}],43:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7475,11 +7807,11 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"@interactjs/core/InteractEvent":14,"@interactjs/utils":53}],42:[function(require,module,exports){
+},{"@interactjs/core/InteractEvent":15,"@interactjs/utils":55}],44:[function(require,module,exports){
 /// <reference path="./types.d.ts" />
 "use strict";
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7553,7 +7885,7 @@ function () {
 var _default = Signals;
 exports["default"] = _default;
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7609,7 +7941,7 @@ function some(array, func) {
   return findIndex(array, func) !== -1;
 }
 
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7677,7 +8009,7 @@ function init(window) {
 var _default = browser;
 exports["default"] = _default;
 
-},{"./domObjects":47,"./is":55,"./window":64}],46:[function(require,module,exports){
+},{"./domObjects":49,"./is":56,"./window":65}],48:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7709,7 +8041,7 @@ function clone(source) {
   return dest;
 }
 
-},{"./arr":44,"./is":55}],47:[function(require,module,exports){
+},{"./arr":46,"./is":56}],49:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7750,7 +8082,7 @@ function init(window) {
   domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 }
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -7996,7 +8328,7 @@ function trySelector(value) {
   return true;
 }
 
-},{"./browser":45,"./domObjects":47,"./is":55,"./window":64}],49:[function(require,module,exports){
+},{"./browser":47,"./domObjects":49,"./is":56,"./window":65}],51:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8318,7 +8650,7 @@ var events = {
 var _default = events;
 exports["default"] = _default;
 
-},{"./arr":44,"./domUtils":48,"./is":55,"./pointerExtend":58,"./pointerUtils":59}],50:[function(require,module,exports){
+},{"./arr":46,"./domUtils":50,"./is":56,"./pointerExtend":59,"./pointerUtils":60}],52:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8334,7 +8666,7 @@ function extend(dest, source) {
   return dest;
 }
 
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8355,7 +8687,7 @@ function _default(target, element, action) {
   };
 }
 
-},{"./rect":61}],52:[function(require,module,exports){
+},{"./rect":62}],54:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8369,7 +8701,7 @@ var _default = function _default(x, y) {
 
 exports["default"] = _default;
 
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8534,184 +8866,7 @@ function copyAction(dest, src) {
   return dest;
 }
 
-},{"./Signals":43,"./arr":44,"./browser":45,"./clone":46,"./domUtils":48,"./events":49,"./extend":50,"./getOriginXY":51,"./hypot":52,"./is":55,"./normalizeListeners":57,"./pointerUtils":59,"./raf":60,"./rect":61,"./window":64}],54:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-var utils = _interopRequireWildcard(require("./index"));
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-var finder = {
-  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
-  search: function search(details) {
-    for (var _i = 0; _i < finder.methodOrder.length; _i++) {
-      var _ref;
-
-      _ref = finder.methodOrder[_i];
-      var method = _ref;
-      var interaction = finder[method](details);
-
-      if (interaction) {
-        return interaction;
-      }
-    }
-  },
-  // try to resume simulation with a new pointer
-  simulationResume: function simulationResume(_ref2) {
-    var pointerType = _ref2.pointerType,
-        eventType = _ref2.eventType,
-        eventTarget = _ref2.eventTarget,
-        scope = _ref2.scope;
-
-    if (!/down|start/i.test(eventType)) {
-      return null;
-    }
-
-    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
-      var _ref3;
-
-      _ref3 = scope.interactions.list[_i2];
-      var interaction = _ref3;
-      var element = eventTarget;
-
-      if (interaction.simulation && interaction.simulation.allowResume && interaction.pointerType === pointerType) {
-        while (element) {
-          // if the element is the interaction element
-          if (element === interaction.element) {
-            return interaction;
-          }
-
-          element = utils.dom.parentNode(element);
-        }
-      }
-    }
-
-    return null;
-  },
-  // if it's a mouse or pen interaction
-  mouseOrPen: function mouseOrPen(_ref4) {
-    var pointerId = _ref4.pointerId,
-        pointerType = _ref4.pointerType,
-        eventType = _ref4.eventType,
-        scope = _ref4.scope;
-
-    if (pointerType !== 'mouse' && pointerType !== 'pen') {
-      return null;
-    }
-
-    var firstNonActive;
-
-    for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
-      var _ref5;
-
-      _ref5 = scope.interactions.list[_i3];
-      var interaction = _ref5;
-
-      if (interaction.pointerType === pointerType) {
-        // if it's a down event, skip interactions with running simulations
-        if (interaction.simulation && !hasPointerId(interaction, pointerId)) {
-          continue;
-        } // if the interaction is active, return it immediately
-
-
-        if (interaction.interacting()) {
-          return interaction;
-        } // otherwise save it and look for another active interaction
-        else if (!firstNonActive) {
-            firstNonActive = interaction;
-          }
-      }
-    } // if no active mouse interaction was found use the first inactive mouse
-    // interaction
-
-
-    if (firstNonActive) {
-      return firstNonActive;
-    } // find any mouse or pen interaction.
-    // ignore the interaction if the eventType is a *down, and a simulation
-    // is active
-
-
-    for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
-      var _ref6;
-
-      _ref6 = scope.interactions.list[_i4];
-      var _interaction = _ref6;
-
-      if (_interaction.pointerType === pointerType && !(/down/i.test(eventType) && _interaction.simulation)) {
-        return _interaction;
-      }
-    }
-
-    return null;
-  },
-  // get interaction that has this pointer
-  hasPointer: function hasPointer(_ref7) {
-    var pointerId = _ref7.pointerId,
-        scope = _ref7.scope;
-
-    for (var _i5 = 0; _i5 < scope.interactions.list.length; _i5++) {
-      var _ref8;
-
-      _ref8 = scope.interactions.list[_i5];
-      var interaction = _ref8;
-
-      if (hasPointerId(interaction, pointerId)) {
-        return interaction;
-      }
-    }
-
-    return null;
-  },
-  // get first idle interaction with a matching pointerType
-  idle: function idle(_ref9) {
-    var pointerType = _ref9.pointerType,
-        scope = _ref9.scope;
-
-    for (var _i6 = 0; _i6 < scope.interactions.list.length; _i6++) {
-      var _ref10;
-
-      _ref10 = scope.interactions.list[_i6];
-      var interaction = _ref10;
-
-      // if there's already a pointer held down
-      if (interaction.pointers.length === 1) {
-        var target = interaction.interactable; // don't add this pointer if there is a target interactable and it
-        // isn't gesturable
-
-        if (target && !target.options.gesture.enabled) {
-          continue;
-        }
-      } // maximum of 2 pointers per interaction
-      else if (interaction.pointers.length >= 2) {
-          continue;
-        }
-
-      if (!interaction.interacting() && pointerType === interaction.pointerType) {
-        return interaction;
-      }
-    }
-
-    return null;
-  }
-};
-
-function hasPointerId(interaction, pointerId) {
-  return utils.arr.some(interaction.pointers, function (_ref11) {
-    var id = _ref11.id;
-    return id === pointerId;
-  });
-}
-
-var _default = finder;
-exports["default"] = _default;
-
-},{"./index":53}],55:[function(require,module,exports){
+},{"./Signals":45,"./arr":46,"./browser":47,"./clone":48,"./domUtils":50,"./events":51,"./extend":52,"./getOriginXY":53,"./hypot":54,"./is":56,"./normalizeListeners":58,"./pointerUtils":60,"./raf":61,"./rect":62,"./window":65}],56:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8794,7 +8949,7 @@ var array = function array(thing) {
 
 exports.array = array;
 
-},{"./isWindow":56,"./window":64}],56:[function(require,module,exports){
+},{"./isWindow":57,"./window":65}],57:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8808,7 +8963,7 @@ var _default = function _default(thing) {
 
 exports["default"] = _default;
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8870,7 +9025,7 @@ function split(type) {
   return type.trim().split(/ +/);
 }
 
-},{"./extend":50,"./is":55}],58:[function(require,module,exports){
+},{"./extend":52,"./is":56}],59:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8905,7 +9060,7 @@ pointerExtend.prefixedPropREs = {
 var _default = pointerExtend;
 exports["default"] = _default;
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9158,6 +9313,14 @@ var pointerUtils = {
 
       get target() {
         return this.coords.target;
+      },
+
+      get type() {
+        return this.coords.type;
+      },
+
+      get pointerType() {
+        return this.coords.pointerType;
       }
 
     };
@@ -9167,7 +9330,7 @@ var pointerUtils = {
 var _default = pointerUtils;
 exports["default"] = _default;
 
-},{"./browser":45,"./domObjects":47,"./domUtils":48,"./hypot":52,"./is":55,"./pointerExtend":58}],60:[function(require,module,exports){
+},{"./browser":47,"./domObjects":49,"./domUtils":50,"./hypot":54,"./is":56,"./pointerExtend":59}],61:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9223,7 +9386,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9316,7 +9479,7 @@ var _default = {
 };
 exports["default"] = _default;
 
-},{"./domUtils":48,"./extend":50,"./is":55}],62:[function(require,module,exports){
+},{"./domUtils":50,"./extend":52,"./is":56}],63:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9381,7 +9544,7 @@ function createGrid(grid) {
 var _default = createGrid;
 exports["default"] = _default;
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9398,7 +9561,7 @@ var _grid = _interopRequireDefault(require("./grid"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-},{"./grid":62}],64:[function(require,module,exports){
+},{"./grid":63}],65:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9453,7 +9616,7 @@ win.init = init;
 var _default = win;
 exports["default"] = _default;
 
-},{"./isWindow":56}]},{},[27])(27)
+},{"./isWindow":57}]},{},[29])(29)
 });
 
 

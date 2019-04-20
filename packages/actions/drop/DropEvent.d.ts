@@ -1,15 +1,13 @@
+import BaseEvent from '@interactjs/core/BaseEvent';
 import Interactable from '@interactjs/core/Interactable';
 import InteractEvent from '@interactjs/core/InteractEvent';
 import Interaction from '@interactjs/core/Interaction';
 import { ActionName } from '@interactjs/core/scope';
-declare class DropEvent {
-    type: string;
+declare class DropEvent extends BaseEvent {
     target: Element;
-    currentTarget: Element;
     dropzone: Interactable;
     dragEvent: InteractEvent<ActionName.Drag>;
     relatedTarget: Element;
-    interaction: Interaction;
     draggable: Interactable;
     timeStamp: number;
     propagationStopped: boolean;
@@ -17,7 +15,7 @@ declare class DropEvent {
     /**
      * Class of events fired on dropzones during drags with acceptable targets.
      */
-    constructor(dropState: Interaction['dropState'], dragEvent: any, type: any);
+    constructor(dropState: Interaction['dropState'], dragEvent: InteractEvent, type: string);
     /**
      * If this is a `dropactivate` event, the dropzone element will be
      * deactivated.

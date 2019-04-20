@@ -5,12 +5,29 @@ declare module '@interactjs/core/scope' {
 }
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
-        modifiers?: any;
+        modifiers?: {
+            states: any[];
+            result?: {
+                delta: {
+                    x: number;
+                    y: number;
+                };
+                rectDelta: {
+                    left: number;
+                    right: number;
+                    top: number;
+                    bottom: number;
+                };
+                coords: Interact.Point;
+                changed: boolean;
+            };
+            [index: string]: any;
+        };
     }
 }
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
-        modifiers?: any[];
+        modifiers?: Array<ReturnType<typeof makeModifier>>;
     }
 }
 export declare function startAll(arg: any): void;
@@ -35,7 +52,7 @@ declare function makeModifier<Options extends {
     defaults: Options;
     [key: string]: any;
 }, name?: string): {
-    (options: Partial<Options>): {
+    (options?: Partial<Options>): {
         options: Partial<Options>;
         methods: {
             start: any;
