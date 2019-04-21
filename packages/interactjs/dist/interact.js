@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.12
+ * interact.js 1.4.0-rc.13
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5447,7 +5447,7 @@ function init(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = init.version = "1.4.0-rc.12";
+_interact["default"].version = init.version = "1.4.0-rc.13";
 var _default = _interact["default"];
 exports["default"] = _default;
 
