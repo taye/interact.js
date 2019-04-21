@@ -107,6 +107,17 @@ If you're using the library only through a CDN and want the TypeScript type
 definitions for development, you can install the `@interactjs/types` package as
 a dev dependency.
 
+Ruby on Rails
+-------------
+
+[Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
+package manager, so you can add interact.js to you app by running
+`yarn&nbsp;install&nbsp;interactjs`. Then require the library with:
+
+```rb
+//= require interactjs/interact
+```
+
 Drag, Resize and Gesture Actions
 ================================
 
