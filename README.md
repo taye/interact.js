@@ -27,15 +27,13 @@ Features include:
 Installation
 ------------
 
-* [npm](https://www.npmjs.org/): `npm install interactjs@next`
-* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs@next/dist/interact.min.js"></script>`
-* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs@next/dist/interact.min.js"></script>`
+* [npm](https://www.npmjs.org/): `npm install interactjs`
+* [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>`
+* [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>`
+* [Rails 5.1+](https://rubyonrails.org/):
+  1. `yarn install interactjs`
+  2. `//= require interactjs/interact`
 * [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.npm" % "interactjs" % version)`
-* Direct download the latest version: http://interactjs.io/#download
-  * **Rails 4** app development (using Rails Asset Pipeline)
-    * Download the file interact.js (development version) into a new sub-directory: vendor/assets/javascripts/interact
-    * Add ```//= require interact/interact``` in app/assets/javascripts/application.js (above ```//= require_tree .```)
-    * Restart the Rails server
 
 ### Typescript definitions
 

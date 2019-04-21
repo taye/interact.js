@@ -68,7 +68,7 @@ NPM
 ---
 
 ```sh
-$ npm install --save interactjs@next
+$ npm install --save interactjs
 ```
 
 ```js
@@ -79,20 +79,20 @@ const interact = require('interactjs')
 ```
 
 If you're using [npm](https://docs.npmjs.com/about-npm/), install the package as
-a dependency with `npm install interactjs@next` then import or require the
+a dependency with `npm install interactjs` then import or require the
 package in your JavaScript file.
 
 CDN
 ---
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/interactjs@next/dist/interact.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 <!-- or -->
-<script src="https://unpkg.com/interactjs@next/dist/interact.min.js"></script>
+<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
 ```
 
 You can also use the [jsDelivr](https://www.jsdelivr.com/package/npm/interactjs)
-or [unpkg](https://unpkg.com/interactjs@next) CDNs by adding a `<script>` tag
+or [unpkg](https://unpkg.com/interactjs) CDNs by adding a `<script>` tag
 pointing to their servers.
 
 `interact` is exposed as a CommonJS module, an AMD module, or a global variable
@@ -106,6 +106,17 @@ $ npm install --save-dev @interactjs/types
 If you're using the library only through a CDN and want the TypeScript type
 definitions for development, you can install the `@interactjs/types` package as
 a dev dependency.
+
+Ruby on Rails
+-------------
+
+[Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
+package manager, so you can add interact.js to you app by running
+`yarn&nbsp;install&nbsp;interactjs`. Then require the library with:
+
+```rb
+//= require interactjs/interact
+```
 
 Drag, Resize and Gesture Actions
 ================================
