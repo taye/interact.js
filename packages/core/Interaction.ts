@@ -468,6 +468,12 @@ export class Interaction<T extends ActionName = any> {
     this._latestPointer.eventTarget = eventTarget
   }
 
+  destroy () {
+    this._latestPointer.pointer = null
+    this._latestPointer.event = null
+    this._latestPointer.eventTarget = null
+  }
+
   _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string) {
     const actionName = this.prepared.name
 

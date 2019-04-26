@@ -22,6 +22,10 @@ export default class InteractableSet {
         : target[this.scope.id]
 
       targetMappings.splice(targetMappings.findIndex((m) => m.context === context), 1)
+      if (interactable.target[scope.id]) {
+        interactable.target[scope.id].context = null
+        interactable.target[scope.id].interactable = null
+      }
     })
   }
 
