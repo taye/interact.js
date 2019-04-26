@@ -38,6 +38,14 @@ function install (scope: Scope) {
     interaction.autoScroll = null
   })
 
+  interactions.signals.on('unset', ({ interaction }) => {
+    interaction.autoScroll = null
+    autoScroll.stop()
+    if (autoScroll.interaction) {
+      autoScroll.interaction = null
+    }
+  })
+
   interactions.signals.on('stop', autoScroll.stop)
 
   interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg))
