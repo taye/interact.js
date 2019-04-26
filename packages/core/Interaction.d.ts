@@ -187,6 +187,7 @@ export declare class Interaction<T extends ActionName = any> {
     updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
+    destroy(): void;
     _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: Partial<Interact.SignalArg>): boolean;
