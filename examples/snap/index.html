@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>interact.js drag snapping</title>
+<meta name="description" content="A demonstration of interact.js drag snapping" />
+<meta name="author" content="Taye Adeyemi" />
+<script type="text/javascript" src="../../packages/interactjs/dist/interact.js"></script>
+<script type="text/javascript" src="index.js"></script>
+<link rel="stylesheet" href="index.css" type="text/css"/>
+</head>
+<body>
+<canvas id="grid"> Your browser does not support the HTML5 canvas</canvas>
+<canvas id="drag"> </canvas>
+
+<div id="status">
+    <div id="controls">
+    <section id="sliders">
+        <h3> grid spacing </h3>
+        <input id="grid-x" type="range" value="500" min="20" max="500" title="x-axis">
+        <input id="grid-y" type="range" value="500" min="20" max="500" title="x-axis">
+        <br>
+        <h3> grid offset </h3>
+        <input id="offset-x" type="range" value="240" min="0" max="500" title="x-axis">
+        <input id="offset-y" type="range" value="240" min="0" max="500" title="x-axis">
+        <br>
+        <h3> snap range </h3>
+        <input id="snap-range" type="range" min="-1" value="-1" min="10" max="150" title="snap range">
+    </section>
+        <br>
+        <section id="modes">
+        <h3> snap mode </h3>
+            <label for="off-mode" class="snap-mode">
+                Off
+                <input id="off-mode" type="radio" name="snap-mode" checked="true"> 
+            </label> <br>
+            <label for="grid-mode" class="snap-mode">
+                Grid Mode 
+                <input id="grid-mode" type="radio" name="snap-mode" checked="true"> 
+            </label> <br>
+            <label for="anchor-mode" class="snap-mode">
+                Anchor Mode 
+                <input id="anchor-mode" type="radio" name="snap-mode">
+            </label>
+            <br>
+            <br>
+
+            <label for="end-only">
+                Snap at end only
+                <input id="end-only" type="checkbox" checked>
+            </label>
+
+            <label for="inertia">
+                Inertia
+                <input id="inertia" type="checkbox">
+            </label>
+
+            <label for="relative">
+                Relative to "startCoords"
+                <input id="relative" type="checkbox">
+            </label>
+            <br>
+            <br>
+
+            <label for="drag-anchors" style="display: none">
+                Anchor drag mode
+                <input id="drag-anchors" type="checkbox" >
+            </label>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+

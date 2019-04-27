@@ -1,2 +1,5 @@
 coverage
-node_modules
+.nyc_output
+**/node_modules
+**/lerna-debug.log
+packages/*/.npmignore

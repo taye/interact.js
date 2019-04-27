@@ -1,0 +1,73 @@
+body {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-family: "Arial", sans-serif;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  margin: 20px;
+  padding: 0;
+
+  touch-action: none;
+}
+
+#status {
+  width: 20%;
+  height: 100%;
+  position: fixed;
+  right: 0;
+  top: 0;
+
+  padding: 5px 5px;
+  border: none;
+  border-left: solid 8px #3a6bff;
+
+  background-color: rgba(0, 143, 179, 0.298);
+  text-align: center;
+  font-size: 1.4em;
+}
+
+#status h3 {
+  font-size: 1.1em;
+  margin: 3px 0px 0px 0px;
+  padding: 0;
+  line-height: 22px;
+  text-transform: capitalize;
+  font-weight: normal
+}
+
+#status input[type=radio], #status input[type=checkbox] {
+  float: right;
+}
+
+#status [type=range] {
+  margin: auto;
+  width: 90%;
+}
+
+#status [disabled] {
+  cursor: default;
+}
+
+#status label {
+  float: left;
+  cursor: pointer;
+  width: 95%;
+  text-align: left;
+}
+
+#modes,#sliders {
+  overflow: hidden;
+  width: 100%;
+  margin: auto;
+}
+
+#modes.disabled label.snap-mode {
+  cursor: default;
+  color: gray;
+}

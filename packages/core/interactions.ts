@@ -1,0 +1,218 @@
+import browser from '@interactjs/utils/browser'
+import domObjects from '@interactjs/utils/domObjects'
+import events from '@interactjs/utils/events'
+import pointerUtils from '@interactjs/utils/pointerUtils'
+import Signals from '@interactjs/utils/Signals'
+import InteractionBase from './Interaction'
+import finder, { SearchDetails } from './interactionFinder'
+import { Scope } from './scope'
+
+declare module '@interactjs/core/scope' {
+  interface Scope {
+    Interaction: typeof InteractionBase
+    interactions: {
+      signals: Signals
+      new: (options: any) => InteractionBase
+      list: InteractionBase[]
+      listeners: { [type: string]: Interact.Listener }
+      eventMap: any
+      pointerMoveTolerance: number
+    }
+    prevTouchTime: number
+  }
+}
+
+const methodNames = [
+  'pointerDown', 'pointerMove', 'pointerUp',
+  'updatePointer', 'removePointer', 'windowBlur',
+]
+
+function install (scope: Scope) {
+  const signals = new Signals()
+
+  const listeners = {} as any
+
+  for (const method of methodNames) {
+    listeners[method] = doOnInteractions(method, scope)
+  }
+
+  const pEventTypes = browser.pEventTypes
+  const eventMap = {} as { [key: string]: Interact.Listener }
+
+  if (domObjects.PointerEvent) {
+    eventMap[pEventTypes.down  ] = listeners.pointerDown
+    eventMap[pEventTypes.move  ] = listeners.pointerMove
+    eventMap[pEventTypes.up    ] = listeners.pointerUp
+    eventMap[pEventTypes.cancel] = listeners.pointerUp
+  }
+  else {
+    eventMap.mousedown   = listeners.pointerDown
+    eventMap.mousemove   = listeners.pointerMove
+    eventMap.mouseup     = listeners.pointerUp
+
+    eventMap.touchstart  = listeners.pointerDown
+    eventMap.touchmove   = listeners.pointerMove
+    eventMap.touchend    = listeners.pointerUp
+    eventMap.touchcancel = listeners.pointerUp
+  }
+
+  eventMap.blur = (event) => {
+    for (const interaction of scope.interactions.list) {
+      interaction.documentBlur(event)
+    }
+  }
+
+  scope.signals.on('add-document', onDocSignal)
+  scope.signals.on('remove-document', onDocSignal)
+
+  // for ignoring browser's simulated mouse events
+  scope.prevTouchTime = 0
+
+  scope.Interaction = class Interaction extends InteractionBase {
+    get pointerMoveTolerance () {
+      return scope.interactions.pointerMoveTolerance
+    }
+
+    set pointerMoveTolerance (value) {
+      scope.interactions.pointerMoveTolerance = value
+    }
+
+    _now () { return scope.now() }
+  }
+  scope.interactions = {
+    signals,
+    // all active and idle interactions
+    list: [],
+    new (options: { pointerType?: string, signals?: Signals }) {
+      options.signals = signals
+
+      const interaction = new scope.Interaction(options as Required<typeof options>)
+
+      scope.interactions.list.push(interaction)
+      return interaction
+    },
+    listeners,
+    eventMap,
+    pointerMoveTolerance: 1,
+  }
+}
+
+function doOnInteractions (method, scope) {
+  return function (event) {
+    const interactions = scope.interactions.list
+
+    const pointerType = pointerUtils.getPointerType(event)
+    const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event)
+    const matches = [] // [ [pointer, interaction], ...]
+
+    if (browser.supportsTouch && /touch/.test(event.type)) {
+      scope.prevTouchTime = scope.now()
+
+      for (const changedTouch of event.changedTouches) {
+        const pointer = changedTouch
+        const pointerId = pointerUtils.getPointerId(pointer)
+        const searchDetails: SearchDetails = {
+          pointer,
+          pointerId,
+          pointerType,
+          eventType: event.type,
+          eventTarget,
+          curEventTarget,
+          scope,
+        }
+        const interaction = getInteraction(searchDetails)
+
+        matches.push([
+          searchDetails.pointer,
+          searchDetails.eventTarget,
+          searchDetails.curEventTarget,
+          interaction,
+        ])
+      }
+    }
+    else {
+      let invalidPointer = false
+
+      if (!browser.supportsPointerEvent && /mouse/.test(event.type)) {
+        // ignore mouse events while touch interactions are active
+        for (let i = 0; i < interactions.length && !invalidPointer; i++) {
+          invalidPointer = interactions[i].pointerType !== 'mouse' && interactions[i].pointerIsDown
+        }
+
+        // try to ignore mouse events that are simulated by the browser
+        // after a touch event
+        invalidPointer = invalidPointer ||
+          (scope.now() - scope.prevTouchTime < 500) ||
+          // on iOS and Firefox Mobile, MouseEvent.timeStamp is zero if simulated
+          event.timeStamp === 0
+      }
+
+      if (!invalidPointer) {
+        const searchDetails = {
+          pointer: event,
+          pointerId: pointerUtils.getPointerId(event),
+          pointerType,
+          eventType: event.type,
+          curEventTarget,
+          eventTarget,
+          scope,
+        }
+
+        const interaction = getInteraction(searchDetails)
+
+        matches.push([
+          searchDetails.pointer,
+          searchDetails.eventTarget,
+          searchDetails.curEventTarget,
+          interaction,
+        ])
+      }
+    }
+
+    // eslint-disable-next-line no-shadow
+    for (const [pointer, eventTarget, curEventTarget, interaction] of matches) {
+      interaction[method](pointer, event, eventTarget, curEventTarget)
+    }
+  }
+}
+
+function getInteraction (searchDetails: SearchDetails) {
+  const { pointerType, scope } = searchDetails
+
+  const foundInteraction = finder.search(searchDetails)
+  const signalArg = { interaction: foundInteraction, searchDetails }
+
+  scope.interactions.signals.fire('find', signalArg)
+
+  return signalArg.interaction || scope.interactions.new({ pointerType })
+}
+
+function onDocSignal ({ doc, scope, options }, signalName) {
+  const { eventMap } = scope.interactions
+  const eventMethod = signalName.indexOf('add') === 0
+    ? events.add : events.remove
+
+  if (scope.browser.isIOS && !options.events) {
+    options.events = { passive: false }
+  }
+
+  // delegate event listener
+  for (const eventType in events.delegatedEvents) {
+    eventMethod(doc, eventType, events.delegateListener)
+    eventMethod(doc, eventType, events.delegateUseCapture, true)
+  }
+
+  const eventOptions = options && options.events
+
+  for (const eventType in eventMap) {
+    eventMethod(doc, eventType, eventMap[eventType], eventOptions)
+  }
+}
+
+export default {
+  id: 'core/interactions',
+  install,
+  onDocSignal,
+  doOnInteractions,
+  methodNames,
+}

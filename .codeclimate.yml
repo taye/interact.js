@@ -1,20 +1,22 @@
-engines:
+plugins:
   eslint:
     enabled: true
+    channel: eslint-5
   duplication:
     enabled: true
     config:
       languages:
         - javascript
+        - typescript
 
 ratings:
   paths:
-    - "src/**"
+    - "packages/**/*.ts"
 
 exclude_paths:
- - "examples/*"
- - "docs/*"
- - "gulp/*"
- - "test/*"
- - "gulpfile.js"
- - "karma.conf.js"
+  - "**/examples/"
+  - "**/build/"
+  - "**/docs/"
+  - "**/_*"
+  - "**/*.spec.ts"
+  - "**/*.d.ts"

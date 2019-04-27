@@ -1,0 +1,40 @@
+div.demo-node:before {
+	content         : attr(id);
+	border-bottom   : 2px solid red;
+}
+
+div.demo-node {
+    position        : absolute;
+	border-radius   : 10px;
+	border          : 5px solid #333333;
+	border          : 5px solid #333333;
+	width           : 230px;
+	height          : 200px;
+	padding         : 15px;
+	margin          : 15px;
+	overflow        : auto;
+	background-color: #2288FF;
+  box-sizing: border-box;
+
+    touch-action: none;
+}
+
+ellipse {
+    fill            : #EEEE00;
+    stroke          : #000000;
+    stroke-width    : 3px;
+
+    touch-action: none;
+}
+
+svg text.title {
+   transform        : translate(0px, 20px);
+
+   touch-action: none;
+}
+
+svg text.eventData {
+   transform        : translate(0px, -10px);
+
+   touch-action: none;
+}

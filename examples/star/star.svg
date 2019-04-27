@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet href="index.css" type="text/css"?>
+<svg id="svg-edit-demo" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<script type="text/javascript" xlink:href="../../packages/interactjs/dist/interact.js"/>
+<script type="text/javascript" xlink:href="index.js"/>
+<defs>
+    <circle id="point-handle"
+        r="10" x="0" y="0"
+        stroke-width="4"
+        fill="#fff"
+        fill-opacity="0.4"
+        stroke="#fff"/>
+</defs>
+<polygon id="edit-star"
+    stroke="#29e"
+    stroke-width="20"
+    stroke-linejoin="round"
+    fill="none"
+    points="260.8676170428898331,219.7770876399966369 297.8074659814675442,334.6204278639912673 200.0000000000000000,264.0000000000000000 102.1925340185324700,334.6204278639912673 139.1323829571101669,219.7770876399966369 41.7441956884864567,148.5795721360087214 162.3817438532817334,148.2229123600033631 200.0000000000000284,33.5999999999999943 237.6182561467182950,148.2229123600033631 358.2558043115135433,148.5795721360087498"/>
+</svg>

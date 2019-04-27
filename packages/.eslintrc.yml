@@ -1,0 +1,25 @@
+extends: '../.eslintrc.yml'
+
+env:
+  browser: true
+  node: false
+
+rules:
+  no-console: 2
+  strict: [2, never]
+
+  no-restricted-syntax:
+    - error
+    - selector: :matches(ArrowFunctionExpression,FunctionExpression,FunctionDeclaration) > AssignmentPattern
+      message: Using default parameters is not allowed.
+    - Generator
+#   - RestElement
+    - ExperimentalRestProperty
+    - ExperimentalSpreadProperty
+
+overrides:
+  -
+    files: '**/*.spec.ts'
+    rules:
+      no-restricted-syntax: off
+      no-console: 0

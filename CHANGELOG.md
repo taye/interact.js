@@ -1,17 +1,25 @@
-## v1.3.2
- - fixed issues with action options ([PR
-   #567](https://github.com/taye/interact.js/pull/567), [issue
-   #570](https://github.com/taye/interact.js/issues/570))
+## v1.4.0-alpha
+ - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610).
+ - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
+ - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
+ - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620).
+ - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625).
+ - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639).
 
-## v1.3.1
- - fixed iOS preventDefault passive event issue ([issue
-   #561](https://github.com/taye/interact.js/issues/561))
+## v1.3.4
+ - fixed iOS preventDefault passive event issue ([issue #631](https://github.com/taye/interact.js/issues/631))
+
+
+## v1.3.3
+ - fixed issues with action options ([PR #567](https://github.com/taye/interact.js/pull/567), [issue #570](https://github.com/taye/interact.js/issues/570))
+
+## v1.3.2
+ - fixed iOS preventDefault passive event issue ([issue #561](https://github.com/taye/interact.js/issues/561))
 
 ## v1.3.1
  - allowed calling `draggable.unset()` during `dragend` and `drop` event
    listeners ([issue #560](https://github.com/taye/interact.js/issues/560))
- - allowed snap to be enabled with falsey targets value [issue
-   #562](https://github.com/taye/interact.js/issues/562)
+ - allowed snap to be enabled with falsey targets value [issue #562](https://github.com/taye/interact.js/issues/562)
 
 ## v1.3.0
 

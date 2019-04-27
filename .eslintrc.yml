@@ -1,0 +1,53 @@
+extends:
+  - 'standard'
+
+env:
+  commonjs: true
+  es6: true
+  node: true
+
+parser: '@typescript-eslint/parser'
+
+parserOptions:
+  sourceType: module
+  ecmaVersion: 2018
+  project: './tsconfig.json'
+
+plugins:
+  - '@typescript-eslint'
+  - '@typescript-eslint/tslint'
+
+rules:
+  brace-style: off
+  comma-dangle: [error, 'always-multiline']
+  comma-style: [error, last]
+  guard-for-in: off
+  key-spacing: off
+  linebreak-style: [error, unix]
+  no-caller: error
+  no-console: off
+  no-empty: off
+  no-multi-spaces: off
+  no-shadow: error
+  no-useless-constructor: off
+  no-var: error
+  node/no-extraneous-import: [error, { allowModules: ['@interactjs/_dev'] }]
+  node/no-missing-import: error
+  node/no-unsupported-features/es-syntax: off
+  prefer-arrow-callback: [error, { allowNamedFunctions: true }]
+  prefer-const: error
+  standard/array-bracket-even-spacing: off
+  standard/computed-property-even-spacing: off
+  standard/object-curly-even-spacing: off
+  '@typescript-eslint/interface-name-prefix': [error, 'never']
+  '@typescript-eslint/member-accessibility': off
+  '@typescript-eslint/no-empty-interface': error
+  '@typescript-eslint/no-inferrable-types': [error, { ignoreProperties: true }]
+
+overrides:
+  -
+    files: '*.ts'
+    rules:
+      no-unused-vars: off
+      no-use-before-define: off
+      node/no-missing-import: off
