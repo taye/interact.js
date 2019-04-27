@@ -18,7 +18,7 @@ Resize events have `rect` and `deltaRect` properties. `rect` is updated on each
 `resizestart`, `rect` will be identical to the rect returned by
 `interactable.getRect(element)` and `deltaRect` will have all-zero properties.
 
-| Event property          | Description                                       |
+| Resize Event property   | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `edges`                 | The edges of the element that are being changed   |
 | `rect`                  | An object with the new dimensions of the target   |

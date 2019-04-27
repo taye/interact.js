@@ -38,7 +38,7 @@ interact('#rotate-area').gesturable({
 
 Gesture events are triggered when two pointers go down and are moved.  In
 gesture events, page and client coordinates are the averages of touch
-coordinates and vlocity is calculated from these averages. The events also have
+coordinates and velocity is calculated from these averages. The events also have
 the following properties:
 
 | Gesture Event property  | Description                                       |
