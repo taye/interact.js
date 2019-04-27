@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/reflow/index.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent.html">DropEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DropEvent.html#reject">reject</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/reflow/index.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import Interactable from '@interactjs/core/Interactable'
+import { EventPhase } from '@interactjs/core/InteractEvent'
+import { ActionProps, Interaction } from '@interactjs/core/Interaction'
+import { Scope } from '@interactjs/core/scope'
+import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    reflow: (action: ActionProps) => ReturnType&lt;typeof reflow>
+  }
+}
+
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    _reflowPromise: Promise&lt;void>
+    _reflowResolve: () => void
+  }
+}
+
+declare module '@interactjs/core/InteractEvent' {
+  // eslint-disable-next-line no-shadow
+  enum EventPhase {
+    Reflow = 'reflow',
+  }
+}
+
+(EventPhase as any).Reflow = 'reflow'
+
+export function install (scope: Scope) {
+  const {
+    actions,
+    interactions,
+    /** @lends Interactable */
+    // eslint-disable-next-line no-shadow
+    Interactable,
+  } = scope
+
+  // add action reflow event types
+  for (const actionName of actions.names) {
+    actions.eventTypes.push(`${actionName}reflow`)
+  }
+
+  // remove completed reflow interactions
+  interactions.signals.on('stop', ({ interaction }) => {
+    if (interaction.pointerType === EventPhase.Reflow) {
+      if (interaction._reflowResolve) {
+        interaction._reflowResolve()
+      }
+
+      arr.remove(scope.interactions.list, interaction)
+    }
+  })
+
+  /**
+   * ```js
+   * const interactable = interact(target)
+   * const drag = { name: drag, axis: 'x' }
+   * const resize = { name: resize, edges: { left: true, bottom: true }
+   *
+   * interactable.reflow(drag)
+   * interactable.reflow(resize)
+   * ```
+   *
+   * Start an action sequence to re-apply modifiers, check drops, etc.
+   *
+   * @param { Object } action The action to begin
+   * @param { string } action.name The name of the action
+   * @returns { Promise&lt;Interactable> }
+   */
+  Interactable.prototype.reflow = function (action) {
+    return reflow(this, action, scope)
+  }
+}
+
+function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise&lt;Interactable> {
+  const elements = is.string(interactable.target)
+    ? arr.from(interactable._context.querySelectorAll(interactable.target))
+    : [interactable.target]
+
+  // tslint:disable-next-line variable-name
+  const Promise = (win.window as any).Promise
+  const promises: Array&lt;Promise&lt;null>> | null = Promise ? [] : null
+
+  for (const element of elements) {
+    const rect = interactable.getRect(element)
+
+    if (!rect) { break }
+
+    const runningInteraction = arr.find(
+      scope.interactions.list,
+      (interaction: Interaction) => {
+        return interaction.interacting() &amp;&amp;
+          interaction.interactable === interactable &amp;&amp;
+          interaction.element === element &amp;&amp;
+          interaction.prepared.name === action.name
+      })
+    let reflowPromise: Promise&lt;null>
+
+    if (runningInteraction) {
+      runningInteraction.move()
+
+      if (promises) {
+        reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
+          runningInteraction._reflowResolve = resolve
+        })
+      }
+    }
+    else {
+      const xywh = rectUtils.tlbrToXywh(rect)
+      const coords = {
+        page     : { x: xywh.x, y: xywh.y },
+        client   : { x: xywh.x, y: xywh.y },
+        timeStamp: scope.now(),
+      }
+
+      const event = pointerUtils.coordsToEvent(coords)
+      reflowPromise = startReflow(scope, interactable, element, action, event)
+    }
+
+    if (promises) {
+      promises.push(reflowPromise)
+    }
+  }
+
+  return promises &amp;&amp; Promise.all(promises).then(() => interactable)
+}
+
+function startReflow (scope: Scope, interactable: Interactable, element: Element, action: ActionProps, event: any) {
+  const interaction = scope.interactions.new({ pointerType: 'reflow' })
+  const signalArg = {
+    interaction,
+    event,
+    pointer: event,
+    eventTarget: element,
+    phase: EventPhase.Reflow,
+  }
+
+  interaction.interactable = interactable
+  interaction.element = element
+  interaction.prepared = extend({}, action)
+  interaction.prevEvent = event
+  interaction.updatePointer(event, event, element, true)
+
+  interaction._doPhase(signalArg)
+
+  const reflowPromise = (win.window as unknown as any).Promise
+    ? new (win.window as unknown as any).Promise((resolve: any) => {
+      interaction._reflowResolve = resolve
+    })
+    : null
+
+  interaction._reflowPromise = reflowPromise
+  interaction.start(action, interactable, element)
+
+  if (interaction._interacting) {
+    interaction.move(signalArg)
+    interaction.end(event)
+  }
+  else {
+    interaction.stop()
+  }
+
+  interaction.removePointer(event, event)
+  interaction.pointerIsDown = false
+
+  return reflowPromise
+}
+
+export default {
+  id: 'reflow',
+  install,
+} as Interact.Plugin
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.0-rc.13
+ * interact.js 1.4.0
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1852,7 +1852,7 @@ function install(scope) {
    *   .draggable(true)
    *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
    *
-   *   if (interact.matchesSelector(event.target, '.drag-handle') {
+   *   if (interact.matchesSelector(event.target, '.drag-handle')) {
    *     // force drag with handle target
    *     action.name = drag
    *   }
@@ -1866,7 +1866,7 @@ function install(scope) {
    * })
    * ```
    *
-   * Gets or sets the function used to check action to be performed on
+   * Returns or sets the function used to check action to be performed on
    * pointerDown
    *
    * @param {function | null} [checker] A function which takes a pointer event,
@@ -5447,7 +5447,7 @@ function init(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = init.version = "1.4.0-rc.13";
+_interact["default"].version = init.version = "1.4.0";
 var _default = _interact["default"];
 exports["default"] = _default;
 

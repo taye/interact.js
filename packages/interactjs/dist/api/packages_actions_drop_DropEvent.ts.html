@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>packages/actions/drop/DropEvent.ts - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="DropEvent.html">DropEvent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="DropEvent.html#reject">reject</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Interactable.html">Interactable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#context">context</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#deltaSource">deltaSource</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#draggable">draggable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropCheck">dropCheck</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#dropzone">dropzone</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#fire">fire</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#gesturable">gesturable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#getRect">getRect</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#off">off</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#on">on</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#origin">origin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#rectChecker">rectChecker</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#reflow">reflow</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#resizable">resizable</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#set">set</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Interactable.html#unset">unset</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="InteractEvent_InteractEvent.html">InteractEvent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="module.exports.html">exports</a></span></li><li class="nav-heading">Modules</li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-interact.html">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="module-interact.html#.maxInteractions">maxInteractions</a></span></li><li class="nav-heading"><span class="nav-item-type type-module">M</span><span class="nav-item-name"><a href="module-modifiers_snapEdges.html">modifiers/snapEdges</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li><li class="nav-item"><span class="nav-item-type type-member">M</span><span class="nav-item-name"><a href="global.html#interact">interact</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="global.html#preventDefault">preventDefault</a></span></li>
+</nav>
+
+<div class="code-col-bg"></div>
+
+<div id="main">
+    
+    <h1 class="page-title">packages/actions/drop/DropEvent.ts</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseEvent from '@interactjs/core/BaseEvent'
+import Interactable from '@interactjs/core/Interactable'
+import InteractEvent from '@interactjs/core/InteractEvent'
+import Interaction from '@interactjs/core/Interaction'
+import { ActionName } from '@interactjs/core/scope'
+import * as arr from '@interactjs/utils/arr'
+
+class DropEvent extends BaseEvent {
+  target: Element
+  dropzone: Interactable
+  dragEvent: InteractEvent&lt;ActionName.Drag>
+  relatedTarget: Element
+  draggable: Interactable
+  timeStamp: number
+  propagationStopped = false
+  immediatePropagationStopped = false
+
+  /**
+   * Class of events fired on dropzones during drags with acceptable targets.
+   */
+  constructor (dropState: Interaction['dropState'], dragEvent: InteractEvent, type: string) {
+    super(dragEvent._interaction)
+
+    const { element, dropzone } = type === 'dragleave'
+      ? dropState.prev
+      : dropState.cur
+
+    this.type          = type
+    this.target        = element
+    this.currentTarget = element
+    this.dropzone      = dropzone
+    this.dragEvent     = dragEvent
+    this.relatedTarget = dragEvent.target
+    this.draggable     = dragEvent.interactable
+    this.timeStamp     = dragEvent.timeStamp
+  }
+
+  /**
+   * If this is a `dropactivate` event, the dropzone element will be
+   * deactivated.
+   *
+   * If this is a `dragmove` or `dragenter`, a `dragleave` will be fired on the
+   * dropzone element and more.
+   */
+  reject () {
+    const { dropState } = this._interaction
+
+    if (
+      (this.type !== 'dropactivate') &amp;&amp; (
+        !this.dropzone ||
+        dropState.cur.dropzone !== this.dropzone ||
+        dropState.cur.element !== this.target)) {
+      return
+    }
+
+    dropState.prev.dropzone = this.dropzone
+    dropState.prev.element = this.target
+
+    dropState.rejected = true
+    dropState.events.enter = null
+
+    this.stopImmediatePropagation()
+
+    if (this.type === 'dropactivate') {
+      const activeDrops = dropState.activeDrops
+      const index = arr.findIndex(activeDrops, ({ dropzone, element }) =>
+        dropzone === this.dropzone &amp;&amp; element === this.target)
+
+      dropState.activeDrops = [
+        ...activeDrops.slice(0, index),
+        ...activeDrops.slice(index + 1),
+      ]
+
+      const deactivateEvent = new DropEvent(dropState, this.dragEvent, 'dropdeactivate')
+
+      deactivateEvent.dropzone = this.dropzone
+      deactivateEvent.target = this.target
+
+      this.dropzone.fire(deactivateEvent)
+    }
+    else {
+      this.dropzone.fire(new DropEvent(dropState, this.dragEvent, 'dragleave'))
+    }
+  }
+
+  preventDefault () {}
+
+  stopPropagation () {
+    this.propagationStopped = true
+  }
+
+  stopImmediatePropagation () {
+    this.immediatePropagationStopped = this.propagationStopped = true
+  }
+}
+
+export default DropEvent
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
