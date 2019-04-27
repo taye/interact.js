@@ -3,7 +3,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const mkdirp = require('mkdirp')
 
-const confPath = require.resolve('../docs/jsdoc.conf')
+const confPath = require.resolve('./jsdoc.conf')
 const destination = require(confPath).opts.destination
 
 mkdirp.sync(destination)

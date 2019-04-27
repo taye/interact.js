@@ -51,7 +51,7 @@ The table below displays all of these events.
 Common
 ------
 
-|                         |                                                   |
+| Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `target`                | The element that is being interacted with         |
 | `interactable`          | The Interactable that is being interacted with    |
@@ -66,7 +66,7 @@ Common
 Drag
 ----
 
-|                         |                                                   |
+| Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | **dragmove**            |                                                   |
 | `dragEnter`             | The dropzone this Interactable was dragged over   |
@@ -75,7 +75,7 @@ Drag
 Resize
 ------
 
-|                         |                                                   |
+| Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `edges`                 | The edges of the element that are being changed   |
 | `rect`                  | An object with the new dimensions of the target   |
@@ -84,7 +84,7 @@ Resize
 Gesture
 -------
 
-|                         |                                                   |
+| Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `distance`              | The distance between the event's first two touches|
 | `angle`                 | The angle of the line made by the two touches     |
@@ -118,7 +118,7 @@ Dropzones can receive the following events: `dropactivate`, `dropdeactivate`,
 
 The dropzone events are plain objects with the following properties:
 
-|                         |                                                   |
+| Property                | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `target`                | The dropzone element                              |
 | `dropzone`              | The dropzone Interactable                         |

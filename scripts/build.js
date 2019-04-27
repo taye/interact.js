@@ -104,7 +104,7 @@ else {
 
 function update (ids) {
   if (argv.docs) {
-    require('../docs')({
+    require('../jsdoc')({
       stdio: ['ignore', 'ignore', 'inherit'],
     })
   }

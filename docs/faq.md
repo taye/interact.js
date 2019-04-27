@@ -59,8 +59,8 @@ There's no direct API to drag a clone of the target element. However, you can
 use [`Interaction#start`][interaction-start] to change the target of an
 interaction to any element that you create.
 
-Remove/destroy/release an Interactable
-======================
+Remove / destroy / release
+==========================
 
 ```javascript
 interact(target)
@@ -86,9 +86,9 @@ Changing dropzones while dragging
 interact.dynamicDrop(true);
 ```
 
-If you're adding/removing dropzone elements or changing their dimensions while
-dragging, you may need to change the [`dynamicDrop`][dynamic-drop] setting to
-true so that the dropzones rects are recalculated after every `dragmove`.
+If you're adding or removing dropzone elements or changing their dimensions
+while dragging, you may need to change the [`dynamicDrop`][dynamic-drop] setting
+to true so that the dropzones rects are recalculated after every `dragmove`.
 
 Drag handle
 ===========
@@ -133,8 +133,8 @@ interact('.item')
 Use the `ignoreFrom` option to prevent actions from starting if the pointer
 went down on an element matching the given selector or HTMLElement.
 
-Revert/restore/undo drag position
-=================================
+Revert / restore / undo drag position
+=====================================
 
 There's no direct API to revert a dragged element to it's position before the
 drag. To do this, you must store the position at `dragstart` and change the

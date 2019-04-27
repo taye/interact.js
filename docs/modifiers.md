@@ -39,3 +39,8 @@ Modifiers can be set to apply only to the last move event in an interaction by
 setting their `endOnly` option to `true`. When an `endOnly` modifier is used
 with an action that has `inertia` enabled, the event coordinates will be
 smoothly moved from the up coords to the modified coords.
+
+interact.js comes with a vew different types of modifiers for
+<router-link to="snapping">snapping</router-link> and
+<router-link to="restriction">restricting</router-link>
+elements.

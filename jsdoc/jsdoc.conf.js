@@ -13,7 +13,7 @@ module.exports = {
   },
 
   opts: {
-    destination: `${packagesDir}/interactjs/dist/docs/`,
+    destination: `${packagesDir}/interactjs/dist/api/`,
     recurse: true,
   },
 

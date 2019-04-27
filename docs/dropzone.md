@@ -85,7 +85,7 @@ interact(target).dropzone({
 
 The checker function takes the following arguments:
 
-| arg                     | Description                                       |
+| Arg                     | Description                                       |
 | ----------------------- | --------------------------------------------------|
 | `dragEvent`             | related dragmove or dragend event                 |
 | `event`                 | The user move/up/end Event related to the dragEvent
