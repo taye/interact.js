@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.4.0-rc.13",
+  "version": "1.4.0",
   "private": true,
   "workspaces": [
     ".",
@@ -8,7 +8,7 @@
   ],
   "bin": {
     "@build": "scripts/build.js",
-    "@docs": "docs/index.js",
+    "@docs": "jsdoc/index.js",
     "@lint": "scripts/lint.js",
     "@run_test": "scripts/test.sh",
     "@version": "scripts/version.js"
@@ -21,7 +21,7 @@
     "test": "scripts/test.sh",
     "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS=--inspect npm run test",
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
-    "docs": "node docs",
+    "docs": "node jsdoc/index.js",
     "release": "sh ./scripts/release.sh",
     "version": "scripts/version.js"
   },

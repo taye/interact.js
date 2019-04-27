@@ -1,7 +1,7 @@
-<h3>
+<p class="title is-3">
 interact.js is a JavaScript library for drag and drop, resizing and multi-touch
 gestures with inertia and snapping for modern browsers (and also IE9+).
-</h3>
+</p>
 
 Its aim is to **present pointer input data consistently** across different
 browsers and devices and provide convenient ways to **pretend that the user's
@@ -28,6 +28,8 @@ The basic steps to setting up your targets are:
 For example, here's some code for [a very simple slider
 input](https://codepen.io/taye/pen/GgpxNq):
 
+<LiveDemo :demoHtml="require('@/demos/slider.html')" :removeNext="1" class="box"/>
+
 ```js
 // Step 1
 const slider = interact('.slider')    // target elements with the "slider" class
@@ -53,14 +55,6 @@ slider
   })
 ```
 
-<iframe height="265" style="width: 100%; height: 256px" scrolling="no" title="interact.js
-simple slider"
-src="https://codepen.io/taye/embed/GgpxNq/?height=265&theme-id=dark&default-tab=result"
-frameborder="no" allowtransparency="true" allowfullscreen="true">
-  See the Pen <a href='https://codepen.io/taye/pen/GgpxNq/'>interact.js simple slider</a> by Taye A
-  (<a href='https://codepen.io/taye'>@taye</a>) on <a href='https://codepen.io'>CodePen</a>.
-</iframe>
-
 Installation
 ============
 
@@ -80,7 +74,7 @@ const interact = require('interactjs')
 
 If you're using [npm](https://docs.npmjs.com/about-npm/), install the package as
 a dependency with `npm install interactjs` then import or require the
-package in your JavaScript file.
+package in your JavaScript files.
 
 CDN
 ---
@@ -111,8 +105,8 @@ Ruby on Rails
 -------------
 
 [Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
-package manager, so you can add interact.js to you app by running
-`yarn&nbsp;install&nbsp;interactjs`. Then require the library with:
+package manager, so you can add interact.js to you app by running `yarn install
+interactjs`. Then require the library with:
 
 ```rb
 //= require interactjs/interact
@@ -150,22 +144,19 @@ inertia configuration.
 | `speed`                 | The speed of the pointer                          |
 | `timeStamp`             | The time of creation of the event object          |
 
-Draggable
----------
+<h2 class="title is-3"><router-link to="draggable">Draggable</router-link></h2>
 
 <!-- TODO -->
  - for watching the pointer go down, move, then go back up
  - combined with dropzones
 
-Dropzone
---------
+<h2 class="title is-3"><router-link to="dropzone">Dropzone</router-link></h2>
 
 <!-- TODO -->
  - use this to define elements that other draggable elements can be moved into
  - doesn't actually re-parent the draggable elements; that's up to you
 
-Resizable
----------
+<h2 class="title is-3"><router-link to="resizable">Resizable</router-link></h2>
 
 <!-- TODO -->
  - for watching the size and position of an element while the pointer is used to
@@ -174,8 +165,7 @@ Resizable
  - there are some modifiers that are specifically for resizing which change the
    way the element's edges and size are updated in response to the pointer
 
-Gesturable
-----------
+<h2 class="title is-3"><router-link to="gesturable">Gesturable</router-link></h2>
 
 <!-- TODO -->
  - for 2-finger gestures

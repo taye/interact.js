@@ -29,7 +29,7 @@ NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
 
 test_code=$?
 
-if [[ $report == 1 ]]; then
+if [[ "${test_code}${report}" == "01" ]]; then
   nyc report; nyc check-coverage
 fi
 

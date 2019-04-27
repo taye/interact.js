@@ -100,7 +100,7 @@ function install (scope: Scope) {
    *   .draggable(true)
    *   .actionChecker(function (pointer, event, action, interactable, element, interaction) {
    *
-   *   if (interact.matchesSelector(event.target, '.drag-handle') {
+   *   if (interact.matchesSelector(event.target, '.drag-handle')) {
    *     // force drag with handle target
    *     action.name = drag
    *   }
@@ -114,7 +114,7 @@ function install (scope: Scope) {
    * })
    * ```
    *
-   * Gets or sets the function used to check action to be performed on
+   * Returns or sets the function used to check action to be performed on
    * pointerDown
    *
    * @param {function | null} [checker] A function which takes a pointer event,

@@ -1,14 +1,22 @@
-## v1.4.0-alpha
- - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610).
- - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
- - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613).
- - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620).
- - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625).
- - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639).
+## v1.4.0
 
-## v1.3.4
+Most notablly:
+
+ - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+ - `dropEvent.reject()` [PR #613](https://github.com/taye/interact.js/pull/613)
+ - snapEdges modifier [PR #620](https://github.com/taye/interact.js/pull/620)
+ - per-action modifiers array [PR #625](https://github.com/taye/interact.js/pull/625)
+ - autoStart set cursor on both target and &lt;html&gt; [PR #639](https://github.com/taye/interact.js/pull/639)
+ - inertia: rename resume event to `${action}resume`
+ - `interactable.reflow(action)` to re-run modifiers, drop, etc [PR #610](https://github.com/taye/interact.js/pull/610)
+ - added `options.listeners` array/object for actions
+ - `snapEdges` modifier [PR #620](https://github.com/taye/interact.js/pull/620)
  - fixed iOS preventDefault passive event issue ([issue #631](https://github.com/taye/interact.js/issues/631))
+ - added `console.warn` messages for common, easily detected issues
+ - improved docs
+ - various fixes
 
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.3.4...v1.4.0).
 
 ## v1.3.3
  - fixed issues with action options ([PR #567](https://github.com/taye/interact.js/pull/567), [issue #570](https://github.com/taye/interact.js/issues/570))
@@ -69,7 +77,7 @@ Most notably:
  - added `restrictEdges`, `restrictSize` and `snapSize` resize modifiers ([PR
    #455](https://github.com/taye/interact.js/pull/455))
 
-Full list of [changes on Github](https://github.com/taye/interact.js/compare/1.2.6...master).
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.6...v1.3.0).
 
 ## 1.2.6
 
@@ -92,7 +100,7 @@ See [PR #260](https://github.com/taye/interact.js/pull/260).
  - iPad 1, iOS 5.1.1 error "undefined is not a function" when autoScroll is set
    to true ([PR #194](https://github.com/taye/interact.js/pull/194))
 
-Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...master)
+Full list of [changes on Github](https://github.com/taye/interact.js/compare/v1.2.5...v1.2.6)
 
 ## 1.2.5
 
