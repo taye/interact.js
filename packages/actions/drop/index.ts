@@ -133,13 +133,15 @@ function install (scope: Scope) {
 
     const { dropState } = interaction
 
-    dropState.activeDrops = null
-    dropState.events = null
-    dropState.cur.dropzone = null
-    dropState.cur.element = null
-    dropState.prev.dropzone = null
-    dropState.prev.element = null
-    dropState.rejected = false
+    if (dropState) {
+      dropState.activeDrops = null
+      dropState.events = null
+      dropState.cur.dropzone = null
+      dropState.cur.element = null
+      dropState.prev.dropzone = null
+      dropState.prev.element = null
+      dropState.rejected = false
+    }
   })
 
   /**
