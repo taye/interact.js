@@ -14,12 +14,12 @@
     "main": "index"
   },
   "description": "Drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+)",
-  "homepage": "http://interactjs.io",
+  "homepage": "https://interactjs.io",
   "authors": [
     {
       "name": "Taye Adeyemi",
       "email": "dev@taye.me",
-      "url": "http://taye.me"
+      "url": "https://taye.me"
     }
   ],
   "keywords": [
