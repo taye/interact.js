@@ -96,8 +96,8 @@ run_build() {
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat ../../.npmignore >> .npmignore" &&
 
-  # build packages
-  npx lerna run --no-private build || exit $?
+  # build interactjs bundle
+  npm run build || exit $?
 }
 
 bootstrap() {
