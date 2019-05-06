@@ -6,9 +6,6 @@
     "url": "https://github.com/taye/interact.js.git"
   },
   "main": "index.ts",
-  "scripts": {
-    "build": "@build --docs"
-  },
   "jsdelivr": "dist/interact.min.js",
   "jspm": {
     "main": "index"
