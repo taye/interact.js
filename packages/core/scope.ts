@@ -92,7 +92,7 @@ export class Scope {
           if (interaction.interactable === this) {
             interaction.stop()
           }
-          scope.interactions.signals.fire('unset', { interaction })
+          scope.interactions.signals.fire('destroy', { interaction })
           interaction.destroy()
         }
 
