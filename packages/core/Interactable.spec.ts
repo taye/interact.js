@@ -36,6 +36,29 @@ test('Interactable copies and extends defaults', (t) => {
   t.end()
 })
 
+test('Interactable unset correctly', (t) => {
+  const scope = helpers.mockScope() as any
+  const { defaults } = scope
+
+  const div = d('div')
+  const interactable = scope.interactables.new(div)
+
+  const mappingInfo = div[scope.id][0]
+
+  scope.interactables.signals.fire('unset', { interactable })
+
+  t.strictEqual(mappingInfo.context, null,
+    'unset mappingInfo context')
+
+  t.strictEqual(mappingInfo.interactable, null,
+    'unset mappingInfo interactable')
+
+  t.strictEqual(div[scope.id].length, 0,
+    'unset target are removed')
+
+  t.end()
+})
+
 test('Interactable copies and extends per action defaults', (t) => {
   const scope = helpers.mockScope()
   const { defaults } = scope

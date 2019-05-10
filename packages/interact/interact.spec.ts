@@ -16,6 +16,8 @@ test('interact export', (t) => {
   interactable1.unset()
   t.equal(scope.interactables.list.length, 0,
     'unset interactables are removed')
+  t.strictEqual(scope.interactions.list.length, 0,
+    'unset interactions are removed')
 
   const constructsUniqueMessage =
     'unique contexts make unique interactables with identical targets'

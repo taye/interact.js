@@ -30,7 +30,7 @@ test('Interaction constructor', (t) => {
 
   for (const coordField in interaction.coords) {
     t.deepEqual(interaction.coords[coordField], zeroCoords,
-      `nteraction.coords.${coordField} set to zero`)
+      `interaction.coords.${coordField} set to zero`)
   }
 
   t.equal(interaction.pointerType, testType,
@@ -46,6 +46,27 @@ test('Interaction constructor', (t) => {
   for (const prop of 'pointerIsDown pointerWasMoved _interacting mouse'.split(' ')) {
     t.notOk(interaction[prop], `interaction.${prop} is false`)
   }
+
+  t.end()
+})
+
+test('Interaction destroy', (t) => {
+  const interaction = makeInteractionAndSignals()
+  const pointer = { pointerId: 10 } as any
+  const event = {} as any
+
+  interaction.updatePointer(pointer, event, null)
+
+  interaction.destroy()
+
+  t.strictEqual(interaction._latestPointer.pointer, null,
+    'interaction._latestPointer.pointer is null')
+
+  t.strictEqual(interaction._latestPointer.event, null,
+    'interaction._latestPointer.event is null')
+
+  t.strictEqual(interaction._latestPointer.eventTarget, null,
+    'interaction._latestPointer.eventTarget is null')
 
   t.end()
 })
