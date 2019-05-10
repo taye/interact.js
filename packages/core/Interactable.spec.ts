@@ -38,7 +38,6 @@ test('Interactable copies and extends defaults', (t) => {
 
 test('Interactable unset correctly', (t) => {
   const scope = helpers.mockScope() as any
-  const { defaults } = scope
 
   const div = d('div')
   const interactable = scope.interactables.new(div)
