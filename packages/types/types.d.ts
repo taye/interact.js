@@ -136,6 +136,12 @@ declare namespace Interact {
     (this: Interact.Interactable, options: Partial<Interact.OrBoolean<T>> | boolean): typeof this
   }
 
+  export interface OptionMethod<T> {
+    (this: Interact.Interactable): T
+    // eslint-disable-next-line no-undef
+    (this: Interact.Interactable, options: T): typeof this
+  }
+
   export interface OptionsArg extends defaults.BaseDefaults, Interact.OrBoolean<defaults.PerActionDefaults> {}
 
   export interface DraggableOptions extends Options {
