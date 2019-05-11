@@ -2,11 +2,11 @@ import test from '@interactjs/_dev/test/test'
 import { drag, resize } from '@interactjs/actions'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
-import * as devTools from './'
+import devTools, { Logger } from './'
 
 test('devTools', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
-  const logs: Array<{ args: any[], type: keyof devTools.Logger }> = []
+  const logs: Array<{ args: any[], type: keyof Logger }> = []
 
   function log (args, type) {
     logs.push({ args, type })
