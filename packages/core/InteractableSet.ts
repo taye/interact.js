@@ -21,7 +21,13 @@ export default class InteractableSet {
         ? this.selectorMap[target]
         : target[this.scope.id]
 
-      targetMappings.splice(targetMappings.findIndex((m) => m.context === context), 1)
+      const targetIndex = targetMappings.findIndex((m) => m.context === context)
+      if (targetMappings[targetIndex]) {
+        // Destroying mappingInfo's context and interactable
+        targetMappings[targetIndex].context = null
+        targetMappings[targetIndex].interactable = null
+      }
+      targetMappings.splice(targetIndex, 1)
     })
   }
 

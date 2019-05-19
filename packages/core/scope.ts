@@ -92,7 +92,11 @@ export class Scope {
           if (interaction.interactable === this) {
             interaction.stop()
           }
+          scope.interactions.signals.fire('destroy', { interaction })
+          interaction.destroy()
         }
+
+        scope.interactions.list = []
 
         scope.interactables.signals.fire('unset', { interactable: this })
       }
