@@ -25,7 +25,7 @@ interact('.draggable').draggable({
       position.y += event.dy
 
       event.target.style.transform =
-        `transform(${position.x}, ${position.y})`
+        `translate(${position.x}px, ${position.y}px)`
     },
   }
 })
