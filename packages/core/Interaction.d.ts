@@ -13,7 +13,22 @@ export interface ActionProps<T extends ActionName = any> {
 export interface StartAction extends ActionProps {
     name: ActionName | string;
 }
-export declare type InteractionProxy = Pick<Interaction, 'pointerIsDown' | 'pointerWasMoved' | 'start' | 'move' | 'end' | 'stop' | 'interacting' | '_proxy'>;
+export declare enum _ProxyValues {
+    interactable = "",
+    element = "",
+    prepared = "",
+    pointerIsDown = "",
+    pointerWasMoved = "",
+    _proxy = ""
+}
+export declare enum _ProxyMethods {
+    start = "",
+    move = "",
+    end = "",
+    stop = "",
+    interacting = ""
+}
+export declare type _InteractionProxy = Pick<Interaction, keyof typeof _ProxyValues | keyof typeof _ProxyMethods>;
 export declare class Interaction<T extends ActionName = any> {
     interactable: Interactable;
     element: Element;
@@ -37,7 +52,7 @@ export declare class Interaction<T extends ActionName = any> {
     pointerWasMoved: boolean;
     _interacting: boolean;
     _ending: boolean;
-    _proxy: InteractionProxy;
+    _proxy: _InteractionProxy;
     simulation: any;
     readonly pointerMoveTolerance: number;
     /**
@@ -187,6 +202,7 @@ export declare class Interaction<T extends ActionName = any> {
     updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean): number;
     removePointer(pointer: any, event: any): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
+    destroy(): void;
     _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;
     _fireEvent(iEvent: any): void;
     _doPhase(signalArg: Partial<Interact.SignalArg>): boolean;

@@ -12,5 +12,5 @@ export default class InteractableSet {
     constructor(scope: Interact.Scope);
     new(target: Interact.Target, options?: any): Interact.Interactable;
     get(target: Interact.Target, options: any): any;
-    forEachMatch(element: Document | Element, callback: (interactable: any) => any): any;
+    forEachMatch(node: Document | Element, callback: (interactable: any) => any): any;
 }

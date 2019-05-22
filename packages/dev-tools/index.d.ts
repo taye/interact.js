@@ -3,28 +3,56 @@ declare module '@interactjs/core/scope' {
         logger: Logger;
     }
 }
+declare module '@interactjs/core/defaultOptions' {
+    interface BaseDefaults {
+        devTools?: DevToolsOptions;
+    }
+}
+declare module '@interactjs/core/Interactable' {
+    interface Interactable {
+        devTools?: Interact.OptionMethod<DevToolsOptions>;
+    }
+}
+export interface DevToolsOptions {
+    ignore: {
+        [P in keyof typeof CheckName]?: boolean;
+    };
+}
 export interface Logger {
     warn: (...args: any[]) => void;
     error: (...args: any[]) => void;
     log: (...args: any[]) => void;
 }
-export declare const links: {
-    touchAction: string;
-    boxSizing: string;
-};
-export declare const install: (scope: import("@interactjs/core/scope").Scope, { logger }?: {
+export interface Check {
+    name: string;
+    text: string;
+    perform: (interaction: Interact.Interaction) => boolean;
+    getInfo: (interaction: Interact.Interaction) => any[];
+}
+declare enum CheckName {
+    touchAction = "",
+    boxSizing = "",
+    noListeners = ""
+}
+declare function install(scope: Interact.Scope, { logger }?: {
     logger?: Logger;
-}) => void;
-export declare const touchActionMessage = "[interact.js] Consider adding CSS \"touch-action: none\" to this element\n";
-export declare const boxSizingMessage = "[interact.js] Consider adding CSS \"box-sizing: border-box\" to this resizable element";
-export declare const noListenersMessage = "[interact.js] There are no listeners set for this action";
-export declare function touchAction({ element }: Interact.Interaction, logger: Logger): void;
-export declare function boxSizing(interaction: Interact.Interaction, logger: Logger): void;
-export declare function noListeners(interaction: Interact.Interaction, logger: Logger): void;
-declare const _default: {
+}): void;
+declare const defaultExport: {
     id: string;
-    install: (scope: import("@interactjs/core/scope").Scope, { logger }?: {
-        logger?: Logger;
-    }) => void;
+    install: () => void;
+    checks?: undefined;
+    CheckName?: undefined;
+    links?: undefined;
+    prefix?: undefined;
+} | {
+    id: string;
+    install: typeof install;
+    checks: Check[];
+    CheckName: typeof CheckName;
+    links: {
+        touchAction: string;
+        boxSizing: string;
+    };
+    prefix: string;
 };
-export default _default;
+export default defaultExport;

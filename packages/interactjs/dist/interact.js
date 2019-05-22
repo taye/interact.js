@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.1
+ * interact.js 1.4.2
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -142,8 +142,14 @@ function () {
             if (interaction.interactable === this) {
               interaction.stop();
             }
+
+            scope.interactions.signals.fire('destroy', {
+              interaction: interaction
+            });
+            interaction.destroy();
           }
 
+          scope.interactions.list = [];
           scope.interactables.signals.fire('unset', {
             interactable: this
           });
@@ -559,7 +565,7 @@ Object.defineProperty(exports, "PointerInfo", {
     return _PointerInfo["default"];
   }
 });
-exports["default"] = exports.Interaction = void 0;
+exports["default"] = exports.Interaction = exports._ProxyMethods = exports._ProxyValues = void 0;
 
 var utils = _interopRequireWildcard(_$utils_55);
 
@@ -579,11 +585,38 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var _ProxyValues;
+
+exports._ProxyValues = _ProxyValues;
+
+(function (_ProxyValues) {
+  _ProxyValues["interactable"] = "";
+  _ProxyValues["element"] = "";
+  _ProxyValues["prepared"] = "";
+  _ProxyValues["pointerIsDown"] = "";
+  _ProxyValues["pointerWasMoved"] = "";
+  _ProxyValues["_proxy"] = "";
+})(_ProxyValues || (exports._ProxyValues = _ProxyValues = {}));
+
+var _ProxyMethods;
+
+exports._ProxyMethods = _ProxyMethods;
+
+(function (_ProxyMethods) {
+  _ProxyMethods["start"] = "";
+  _ProxyMethods["move"] = "";
+  _ProxyMethods["end"] = "";
+  _ProxyMethods["stop"] = "";
+  _ProxyMethods["interacting"] = "";
+})(_ProxyMethods || (exports._ProxyMethods = _ProxyMethods = {}));
+
 var Interaction =
 /*#__PURE__*/
 function () {
   /** */
   function Interaction(_ref) {
+    var _this = this;
+
     var pointerType = _ref.pointerType,
         signals = _ref.signals;
 
@@ -639,36 +672,31 @@ function () {
     this._signals = signals;
     this.pointerType = pointerType;
     var that = this;
-    this._proxy = {
-      get pointerIsDown() {
-        return that.pointerIsDown;
-      },
+    this._proxy = {};
 
-      get pointerWasMoved() {
-        return that.pointerWasMoved;
-      },
-
-      start: function start(action, i, e) {
-        return that.start(action, i, e);
-      },
-      move: function move(arg) {
-        return that.move(arg);
-      },
-      end: function end(event) {
-        return that.end(event);
-      },
-      stop: function stop() {
-        return that.stop();
-      },
-      interacting: function interacting() {
-        return that.interacting();
-      },
-
-      get _proxy() {
-        return this;
-      }
-
+    var _loop = function _loop(key) {
+      Object.defineProperty(_this._proxy, key, {
+        get: function get() {
+          return that[key];
+        }
+      });
     };
+
+    for (var key in _ProxyValues) {
+      _loop(key);
+    }
+
+    var _loop2 = function _loop2(key) {
+      Object.defineProperty(_this._proxy, key, {
+        value: function value() {
+          return that[key].apply(that, arguments);
+        }
+      });
+    };
+
+    for (var key in _ProxyMethods) {
+      _loop2(key);
+    }
 
     this._signals.fire('new', {
       interaction: this
@@ -1006,6 +1034,13 @@ function () {
       this._latestPointer.pointer = pointer;
       this._latestPointer.event = event;
       this._latestPointer.eventTarget = eventTarget;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      this._latestPointer.pointer = null;
+      this._latestPointer.event = null;
+      this._latestPointer.eventTarget = null;
     }
   }, {
     key: "_createPreparedEvent",
@@ -1775,7 +1810,11 @@ function matchesSelector(element, selector) {
   }
 
   return element[_browser["default"].prefixedMatchesSelector](selector);
-} // Test for the element that's "above" all other qualifiers
+}
+
+var getParent = function getParent(el) {
+  return el.parentNode ? el.parentNode : el.host;
+}; // Test for the element that's "above" all other qualifiers
 
 
 function indexOfDeepestElement(elements) {
@@ -1816,9 +1855,9 @@ function indexOfDeepestElement(elements) {
     if (!deepestZoneParents.length) {
       parent = deepestZone;
 
-      while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
+      while (getParent(parent) && getParent(parent) !== parent.ownerDocument) {
         deepestZoneParents.unshift(parent);
-        parent = parent.parentNode;
+        parent = getParent(parent);
       }
     } // if this element is an svg element and the current deepest is
     // an HTMLElement
@@ -1838,7 +1877,7 @@ function indexOfDeepestElement(elements) {
 
     while (parent.parentNode !== parent.ownerDocument) {
       dropzoneParents.unshift(parent);
-      parent = parent.parentNode;
+      parent = getParent(parent);
     }
 
     n = 0; // get (position of last common ancestor) + 1
@@ -1921,12 +1960,12 @@ function getElementRect(element) {
   return clientRect;
 }
 
-function getPath(element) {
+function getPath(node) {
   var path = [];
 
-  while (element) {
-    path.push(element);
-    element = parentNode(element);
+  while (node) {
+    path.push(node);
+    node = parentNode(node);
   }
 
   return path;
@@ -3218,12 +3257,12 @@ function () {
     }
   }, {
     key: "testIgnoreAllow",
-    value: function testIgnoreAllow(options, interactableElement, eventTarget) {
-      return !this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) && this.testAllow(options.allowFrom, interactableElement, eventTarget);
+    value: function testIgnoreAllow(options, targetNode, eventTarget) {
+      return !this.testIgnore(options.ignoreFrom, targetNode, eventTarget) && this.testAllow(options.allowFrom, targetNode, eventTarget);
     }
   }, {
     key: "testAllow",
-    value: function testAllow(allowFrom, interactableElement, element) {
+    value: function testAllow(allowFrom, targetNode, element) {
       if (!allowFrom) {
         return true;
       }
@@ -3233,7 +3272,7 @@ function () {
       }
 
       if (__is_16.string(allowFrom)) {
-        return (0, _$domUtils_50.matchesUpTo)(element, allowFrom, interactableElement);
+        return (0, _$domUtils_50.matchesUpTo)(element, allowFrom, targetNode);
       } else if (__is_16.element(allowFrom)) {
         return (0, _$domUtils_50.nodeContains)(allowFrom, element);
       }
@@ -3242,13 +3281,13 @@ function () {
     }
   }, {
     key: "testIgnore",
-    value: function testIgnore(ignoreFrom, interactableElement, element) {
+    value: function testIgnore(ignoreFrom, targetNode, element) {
       if (!ignoreFrom || !__is_16.element(element)) {
         return false;
       }
 
       if (__is_16.string(ignoreFrom)) {
-        return (0, _$domUtils_50.matchesUpTo)(element, ignoreFrom, interactableElement);
+        return (0, _$domUtils_50.matchesUpTo)(element, ignoreFrom, targetNode);
       } else if (__is_16.element(ignoreFrom)) {
         return (0, _$domUtils_50.nodeContains)(ignoreFrom, element);
       }
@@ -3545,9 +3584,17 @@ function () {
       var target = interactable.target,
           context = interactable._context;
       var targetMappings = __is_17.string(target) ? _this.selectorMap[target] : target[_this.scope.id];
-      targetMappings.splice(targetMappings.findIndex(function (m) {
+      var targetIndex = targetMappings.findIndex(function (m) {
         return m.context === context;
-      }), 1);
+      });
+
+      if (targetMappings[targetIndex]) {
+        // Destroying mappingInfo's context and interactable
+        targetMappings[targetIndex].context = null;
+        targetMappings[targetIndex].interactable = null;
+      }
+
+      targetMappings.splice(targetIndex, 1);
     });
   }
 
@@ -3608,7 +3655,7 @@ function () {
     }
   }, {
     key: "forEachMatch",
-    value: function forEachMatch(element, callback) {
+    value: function forEachMatch(node, callback) {
       for (var _i = 0; _i < this.list.length; _i++) {
         var _ref2;
 
@@ -3617,9 +3664,9 @@ function () {
         var ret = void 0;
 
         if ((__is_17.string(interactable.target) // target is a selector and the element matches
-        ? __is_17.element(element) && __domUtils_17.matchesSelector(element, interactable.target) : // target is the element
-        element === interactable.target) && // the element is in context
-        interactable.inContext(element)) {
+        ? __is_17.element(node) && __domUtils_17.matchesSelector(node, interactable.target) : // target is the element
+        node === interactable.target) && // the element is in context
+        interactable.inContext(node)) {
           ret = callback(interactable);
         }
 
@@ -4459,13 +4506,16 @@ function __install_3(scope) {
     }
 
     var dropState = interaction.dropState;
-    dropState.activeDrops = null;
-    dropState.events = null;
-    dropState.cur.dropzone = null;
-    dropState.cur.element = null;
-    dropState.prev.dropzone = null;
-    dropState.prev.element = null;
-    dropState.rejected = false;
+
+    if (dropState) {
+      dropState.activeDrops = null;
+      dropState.events = null;
+      dropState.cur.dropzone = null;
+      dropState.cur.element = null;
+      dropState.prev.dropzone = null;
+      dropState.prev.element = null;
+      dropState.rejected = false;
+    }
   });
   /**
    *
@@ -5615,6 +5665,15 @@ function __install_7(scope) {
     var interaction = _ref.interaction;
     interaction.autoScroll = null;
   });
+  interactions.signals.on('destroy', function (_ref2) {
+    var interaction = _ref2.interaction;
+    interaction.autoScroll = null;
+    autoScroll.stop();
+
+    if (autoScroll.interaction) {
+      autoScroll.interaction = null;
+    }
+  });
   interactions.signals.on('stop', autoScroll.stop);
   interactions.signals.on('action-move', function (arg) {
     return autoScroll.onInteractionMove(arg);
@@ -5720,9 +5779,9 @@ var autoScroll = {
     var options = interactable.options;
     return options[actionName].autoScroll && options[actionName].autoScroll.enabled;
   },
-  onInteractionMove: function onInteractionMove(_ref2) {
-    var interaction = _ref2.interaction,
-        pointer = _ref2.pointer;
+  onInteractionMove: function onInteractionMove(_ref3) {
+    var interaction = _ref3.interaction,
+        pointer = _ref3.pointer;
 
     if (!(interaction.interacting() && autoScroll.check(interaction.interactable, interaction.prepared.name))) {
       return;
@@ -5793,9 +5852,9 @@ function getScrollSize(container) {
   };
 }
 
-function getScrollSizeDelta(_ref3, func) {
-  var interaction = _ref3.interaction,
-      element = _ref3.element;
+function getScrollSizeDelta(_ref4, func) {
+  var interaction = _ref4.interaction,
+      element = _ref4.element;
   var scrollOptions = interaction && interaction.interactable.options[interaction.prepared.name].autoScroll;
 
   if (!scrollOptions || !scrollOptions.enabled) {
@@ -6652,14 +6711,13 @@ var _$devTools_25 = {};
 Object.defineProperty(_$devTools_25, "__esModule", {
   value: true
 });
-_$devTools_25.touchAction = touchAction;
-_$devTools_25.boxSizing = boxSizing;
-_$devTools_25.noListeners = noListeners;
-_$devTools_25["default"] = _$devTools_25.noListenersMessage = _$devTools_25.boxSizingMessage = _$devTools_25.touchActionMessage = _$devTools_25.install = _$devTools_25.links = void 0;
+_$devTools_25["default"] = void 0;
 
 var ___domObjects_25 = ___interopRequireDefault_25(_$domObjects_49);
 
 /* removed: var _$domUtils_50 = require("@interactjs/utils/domUtils"); */;
+
+var ___extend_25 = ___interopRequireDefault_25(_$extend_52);
 
 var __is_25 = ___interopRequireWildcard_25(_$is_56);
 
@@ -6669,63 +6727,102 @@ function ___interopRequireWildcard_25(obj) { if (obj && obj.__esModule) { return
 
 function ___interopRequireDefault_25(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-/* eslint-disable no-console */
+function ___toConsumableArray_25(arr) { return ___arrayWithoutHoles_25(arr) || ___iterableToArray_25(arr) || ___nonIterableSpread_25(); }
 
-/* global process */
+function ___nonIterableSpread_25() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function ___iterableToArray_25(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function ___arrayWithoutHoles_25(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+var CheckName;
+
+(function (CheckName) {
+  CheckName["touchAction"] = "";
+  CheckName["boxSizing"] = "";
+  CheckName["noListeners"] = "";
+})(CheckName || (CheckName = {}));
+
+var prefix = '[interact.js] ';
 var links = {
   touchAction: 'https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action',
   boxSizing: 'https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing'
 };
-_$devTools_25.links = links;
-var __install_25 = "production" === 'production' ? function () {} // eslint-disable-next-line no-restricted-syntax
-: function install(scope) {
+var isProduction = "production" === 'production'; // eslint-disable-next-line no-restricted-syntax
+
+function __install_25(scope) {
   var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
       logger = _ref.logger;
 
+  var interactions = scope.interactions,
+      Interactable = scope.Interactable,
+      defaults = scope.defaults;
   logger = logger || console;
+  interactions.signals.on('action-start', function (_ref2) {
+    var interaction = _ref2.interaction;
 
-  if ("production" !== 'production') {
-    scope.logger = logger;
-    scope.interactions.signals.on('action-start', function (_ref2) {
-      var interaction = _ref2.interaction;
-      touchAction(interaction, scope.logger);
-      boxSizing(interaction, scope.logger);
-      noListeners(interaction, scope.logger);
-    });
-  }
-};
-_$devTools_25.install = __install_25;
-var touchActionMessage = '[interact.js] Consider adding CSS "touch-action: none" to this element\n';
-_$devTools_25.touchActionMessage = touchActionMessage;
-var boxSizingMessage = '[interact.js] Consider adding CSS "box-sizing: border-box" to this resizable element';
-_$devTools_25.boxSizingMessage = boxSizingMessage;
-var noListenersMessage = '[interact.js] There are no listeners set for this action';
-_$devTools_25.noListenersMessage = noListenersMessage;
+    for (var _i = 0; _i < checks.length; _i++) {
+      var _ref3;
 
-function touchAction(_ref3, logger) {
-  var element = _ref3.element;
+      _ref3 = checks[_i];
+      var check = _ref3;
+      var options = interaction.interactable && interaction.interactable.options[interaction.prepared.name];
 
-  if (!parentHasStyle(element, 'touchAction', /pan-|pinch|none/)) {
-    logger.warn(touchActionMessage, element, links.touchAction);
-  }
+      if (!(options && options.devTools && options.devTools.ignore[check.name]) && check.perform(interaction)) {
+        var _logger;
+
+        (_logger = logger).warn.apply(_logger, [prefix + check.text].concat(___toConsumableArray_25(check.getInfo(interaction))));
+      }
+    }
+  });
+  defaults.base.devTools = {
+    ignore: {}
+  };
+
+  Interactable.prototype.devTools = function (options) {
+    if (options) {
+      (0, ___extend_25["default"])(this.options.devTools, options);
+      return this;
+    }
+
+    return this.options.devTools;
+  };
 }
 
-function boxSizing(interaction, logger) {
-  var element = interaction.element;
-
-  if (interaction.prepared.name === 'resize' && element instanceof ___domObjects_25["default"].HTMLElement && !hasStyle(element, 'boxSizing', /border-box/)) {
-    logger.warn(boxSizingMessage, element, links.boxSizing);
+var checks = [{
+  name: 'touchAction',
+  perform: function perform(_ref4) {
+    var element = _ref4.element;
+    return !parentHasStyle(element, 'touchAction', /pan-|pinch|none/);
+  },
+  getInfo: function getInfo(_ref5) {
+    var element = _ref5.element;
+    return [element, links.touchAction];
+  },
+  text: 'Consider adding CSS "touch-action: none" to this element\n'
+}, {
+  name: 'boxSizing',
+  perform: function perform(interaction) {
+    var element = interaction.element;
+    return interaction.prepared.name === 'resize' && element instanceof ___domObjects_25["default"].HTMLElement && !hasStyle(element, 'boxSizing', /border-box/);
+  },
+  text: 'Consider adding CSS "box-sizing: border-box" to this resizable element',
+  getInfo: function getInfo(_ref6) {
+    var element = _ref6.element;
+    return [element, links.boxSizing];
   }
-}
-
-function noListeners(interaction, logger) {
-  var actionName = interaction.prepared.name;
-  var moveListeners = interaction.interactable.events.types["".concat(actionName, "move")] || [];
-
-  if (!moveListeners.length) {
-    logger.warn(noListenersMessage, actionName, interaction.interactable);
-  }
-}
+}, {
+  name: 'noListeners',
+  perform: function perform(interaction) {
+    var actionName = interaction.prepared.name;
+    var moveListeners = interaction.interactable.events.types["".concat(actionName, "move")] || [];
+    return !moveListeners.length;
+  },
+  getInfo: function getInfo(interaction) {
+    return [interaction.prepared.name, interaction.interactable];
+  },
+  text: 'There are no listeners set for this action'
+}];
 
 function hasStyle(element, prop, styleRe) {
   return styleRe.test(element.style[prop] || ___window_25["default"].window.getComputedStyle(element)[prop]);
@@ -6745,10 +6842,19 @@ function parentHasStyle(element, prop, styleRe) {
   return false;
 }
 
-var ___default_25 = {
-  id: 'dev-tools',
-  install: __install_25
+var __id_25 = 'dev-tools';
+var defaultExport = isProduction ? {
+  id: __id_25,
+  install: function install() {}
+} : {
+  id: __id_25,
+  install: __install_25,
+  checks: checks,
+  CheckName: CheckName,
+  links: links,
+  prefix: prefix
 };
+var ___default_25 = defaultExport;
 _$devTools_25["default"] = ___default_25;
 
 var _$base_30 = {};
@@ -8797,15 +8903,15 @@ function collectEventTargets(_ref) {
     type: type,
     path: path,
     targets: [],
-    element: null
+    node: null
   };
 
   for (var _i = 0; _i < path.length; _i++) {
     var _ref2;
 
     _ref2 = path[_i];
-    var element = _ref2;
-    signalArg.element = element;
+    var node = _ref2;
+    signalArg.node = node;
     signals.fire('collect-targets', signalArg);
   }
 
@@ -9075,10 +9181,6 @@ _$interactableTargets_42["default"] = void 0;
 
 var ___extend_42 = ___interopRequireDefault_42(_$extend_52);
 
-var __is_42 = ___interopRequireWildcard_42(_$is_56);
-
-function ___interopRequireWildcard_42(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
 function ___interopRequireDefault_42(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function __install_42(scope) {
@@ -9088,16 +9190,16 @@ function __install_42(scope) {
       interactables = scope.interactables;
   pointerEvents.signals.on('collect-targets', function (_ref) {
     var targets = _ref.targets,
-        element = _ref.element,
+        node = _ref.node,
         type = _ref.type,
         eventTarget = _ref.eventTarget;
-    scope.interactables.forEachMatch(element, function (interactable) {
+    scope.interactables.forEachMatch(node, function (interactable) {
       var eventable = interactable.events;
       var options = eventable.options;
 
-      if (eventable.types[type] && eventable.types[type].length && __is_42.element(element) && interactable.testIgnoreAllow(options, element, eventTarget)) {
+      if (eventable.types[type] && eventable.types[type].length && interactable.testIgnoreAllow(options, node, eventTarget)) {
         targets.push({
-          element: element,
+          node: node,
           eventable: eventable,
           props: {
             interactable: interactable
@@ -9480,7 +9582,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.1";
+_interact["default"].version = __init_27.version = "1.4.2";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

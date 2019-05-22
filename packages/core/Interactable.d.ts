@@ -80,9 +80,9 @@ export declare class Interactable implements Partial<Eventable> {
     testIgnoreAllow(this: Interactable, options: {
         ignoreFrom: IgnoreValue;
         allowFrom: IgnoreValue;
-    }, interactableElement: Element, eventTarget: Element): any;
-    testAllow(this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element): any;
-    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element): any;
+    }, targetNode: Node, eventTarget: Element): any;
+    testAllow(this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Element): any;
+    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Element): any;
     /**
      * Calls listeners for the given InteractEvent type bound globally
      * and directly to this Interactable

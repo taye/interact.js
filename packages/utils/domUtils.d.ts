@@ -3,7 +3,7 @@ export declare function closest(element: any, selector: any): Element;
 export declare function parentNode(node: any): any;
 export declare function matchesSelector(element: any, selector: any): any;
 export declare function indexOfDeepestElement(elements: any): number;
-export declare function matchesUpTo(element: any, selector: any, limit: any): any;
+export declare function matchesUpTo(element: Element, selector: string, limit: Node): any;
 export declare function getActualElement(element: any): any;
 export declare function getScrollXY(relevantWindow: any): {
     x: any;
@@ -25,5 +25,5 @@ export declare function getElementRect(element: any): {
     width: any;
     height: any;
 };
-export declare function getPath(element: any): any[];
+export declare function getPath(node: any): any[];
 export declare function trySelector(value: any): boolean;

@@ -16,7 +16,7 @@ export declare class BaseEvent<T extends ActionName = any> {
     timeStamp: any;
     immediatePropagationStopped: boolean;
     propagationStopped: boolean;
-    readonly interaction: Pick<Interaction<any>, "start" | "end" | "stop" | "pointerIsDown" | "pointerWasMoved" | "move" | "interacting" | "_proxy">;
+    readonly interaction: Pick<Interaction<any>, "start" | "end" | "stop" | "interactable" | "element" | "prepared" | "pointerIsDown" | "pointerWasMoved" | "_proxy" | "move" | "interacting">;
     constructor(interaction: any);
     preventDefault(): void;
     /**
