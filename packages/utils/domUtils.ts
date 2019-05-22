@@ -50,6 +50,8 @@ export function matchesSelector (element, selector) {
   return element[browser.prefixedMatchesSelector](selector)
 }
 
+const getParent = (el) => el.parentNode ? el.parentNode : el.host
+
 // Test for the element that's "above" all other qualifiers
 export function indexOfDeepestElement (elements) {
   let deepestZoneParents = []
@@ -90,9 +92,9 @@ export function indexOfDeepestElement (elements) {
 
     if (!deepestZoneParents.length) {
       parent = deepestZone
-      while (parent.parentNode && parent.parentNode !== parent.ownerDocument) {
+      while (getParent(parent) && getParent(parent) !== parent.ownerDocument) {
         deepestZoneParents.unshift(parent)
-        parent = parent.parentNode
+        parent = getParent(parent)
       }
     }
 
@@ -115,7 +117,7 @@ export function indexOfDeepestElement (elements) {
 
     while (parent.parentNode !== parent.ownerDocument) {
       dropzoneParents.unshift(parent)
-      parent = parent.parentNode
+      parent = getParent(parent)
     }
 
     n = 0
