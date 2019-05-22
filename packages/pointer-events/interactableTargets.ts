@@ -1,7 +1,7 @@
 import { Scope } from '@interactjs/core/scope'
 import { merge } from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+
 type Interactable = import ('@interactjs/core/Interactable').default
 
 declare module '@interactjs/core/Interactable' {
@@ -19,18 +19,17 @@ function install (scope: Scope) {
     interactables,
   } = scope
 
-  pointerEvents.signals.on('collect-targets', ({ targets, element, type, eventTarget }: any) => {
-    scope.interactables.forEachMatch(element, (interactable: Interactable) => {
+  pointerEvents.signals.on('collect-targets', ({ targets, node, type, eventTarget }: any) => {
+    scope.interactables.forEachMatch(node, (interactable: Interactable) => {
       const eventable = interactable.events
       const options = eventable.options
 
       if (
         eventable.types[type] &&
         eventable.types[type].length &&
-        is.element(element) &&
-        interactable.testIgnoreAllow(options, element, eventTarget)) {
+        interactable.testIgnoreAllow(options, node, eventTarget)) {
         targets.push({
-          element,
+          node,
           eventable,
           props: { interactable },
         })

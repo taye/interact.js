@@ -179,11 +179,11 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
     type,
     path,
     targets: [] as EventTargetList,
-    element: null,
+    node: null,
   }
 
-  for (const element of path) {
-    signalArg.element = element
+  for (const node of path) {
+    signalArg.node = node
 
     signals.fire('collect-targets', signalArg)
   }

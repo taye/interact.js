@@ -174,12 +174,11 @@ test('pointerEvents Interaction remove-pointer signal', (t) => {
 
 test('pointerEvents down move up tap', (t) => {
   const {
-    scope,
     interaction,
     event,
+    interactable,
   } = helpers.testEnv({ plugins: [pointerEvents, interactableTargets ] })
 
-  const interactable = scope.interactables.new(event.target)
   const fired: Event[] = []
 
   for (const type of pointerEvents.types) {
@@ -194,7 +193,7 @@ test('pointerEvents down move up tap', (t) => {
     ['down'],
     'duplicate move event is not fired')
 
-  interaction.pointerUp(event, event, scope.document.body, event.target)
+  interaction.pointerUp(event, event, event.target, event.target)
 
   t.deepEqual(
     fired.map((e) => e.type),

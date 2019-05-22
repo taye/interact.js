@@ -154,7 +154,7 @@ export function indexOfDeepestElement (elements) {
   return index
 }
 
-export function matchesUpTo (element, selector, limit) {
+export function matchesUpTo (element: Element, selector: string, limit: Node) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return true
@@ -214,12 +214,12 @@ export function getElementRect (element) {
   return clientRect
 }
 
-export function getPath (element) {
+export function getPath (node) {
   const path = []
 
-  while (element) {
-    path.push(element)
-    element = parentNode(element)
+  while (node) {
+    path.push(node)
+    node = parentNode(node)
   }
 
   return path
