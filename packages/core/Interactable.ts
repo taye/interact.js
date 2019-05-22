@@ -206,18 +206,18 @@ export class Interactable implements Partial<Eventable> {
             nodeContains(this._context, element))
   }
 
-  testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, interactableElement: Element, eventTarget: Element) {
-    return (!this.testIgnore(options.ignoreFrom, interactableElement, eventTarget) &&
-            this.testAllow(options.allowFrom, interactableElement, eventTarget))
+  testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, targetNode: Node, eventTarget: Element) {
+    return (!this.testIgnore(options.ignoreFrom, targetNode, eventTarget) &&
+            this.testAllow(options.allowFrom, targetNode, eventTarget))
   }
 
-  testAllow (this: Interactable, allowFrom: IgnoreValue, interactableElement: Element, element: Element) {
+  testAllow (this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Element) {
     if (!allowFrom) { return true }
 
     if (!is.element(element)) { return false }
 
     if (is.string(allowFrom)) {
-      return matchesUpTo(element, allowFrom, interactableElement)
+      return matchesUpTo(element, allowFrom, targetNode)
     }
     else if (is.element(allowFrom)) {
       return nodeContains(allowFrom, element)
@@ -226,11 +226,11 @@ export class Interactable implements Partial<Eventable> {
     return false
   }
 
-  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, interactableElement: Element, element: Element) {
+  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Element) {
     if (!ignoreFrom || !is.element(element)) { return false }
 
     if (is.string(ignoreFrom)) {
-      return matchesUpTo(element, ignoreFrom, interactableElement)
+      return matchesUpTo(element, ignoreFrom, targetNode)
     }
     else if (is.element(ignoreFrom)) {
       return nodeContains(ignoreFrom, element)

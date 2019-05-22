@@ -21,7 +21,13 @@ export default class InteractableSet {
         ? this.selectorMap[target]
         : target[this.scope.id]
 
-      targetMappings.splice(targetMappings.findIndex((m) => m.context === context), 1)
+      const targetIndex = targetMappings.findIndex((m) => m.context === context)
+      if (targetMappings[targetIndex]) {
+        // Destroying mappingInfo's context and interactable
+        targetMappings[targetIndex].context = null
+        targetMappings[targetIndex].interactable = null
+      }
+      targetMappings.splice(targetIndex, 1)
     })
   }
 
@@ -76,17 +82,17 @@ export default class InteractableSet {
     return found && found.interactable
   }
 
-  forEachMatch (element: Document | Element, callback: (interactable: any) => any) {
+  forEachMatch (node: Document | Element, callback: (interactable: any) => any) {
     for (const interactable of this.list) {
       let ret
 
       if ((is.string(interactable.target)
       // target is a selector and the element matches
-        ? (is.element(element) && domUtils.matchesSelector(element, interactable.target))
+        ? (is.element(node) && domUtils.matchesSelector(node, interactable.target))
         // target is the element
-        : element === interactable.target) &&
+        : node === interactable.target) &&
         // the element is in context
-        (interactable.inContext(element))) {
+        (interactable.inContext(node))) {
         ret = callback(interactable)
       }
 

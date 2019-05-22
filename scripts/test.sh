@@ -1,5 +1,9 @@
 #!/bin/bash
 PKG_DIR=$(dirname $(dirname $(readlink -f $0)))
+if [ -z "$PKG_DIR" ]
+then
+    PKG_DIR=$(dirname $(dirname $0))
+fi
 
 export PATH=$PKG_DIR/node_modules/.bin:$PWD/node_modules/.bin:$PATH
 export NODE_ENV=test

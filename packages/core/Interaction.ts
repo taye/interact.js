@@ -16,15 +16,26 @@ export interface StartAction extends ActionProps {
   name: ActionName | string
 }
 
-export type InteractionProxy = Pick<Interaction,
-  'pointerIsDown' |
-  'pointerWasMoved' |
-  'start' |
-  'move' |
-  'end' |
-  'stop' |
-  'interacting' |
-  '_proxy'
+export enum _ProxyValues {
+  interactable = '',
+  element = '',
+  prepared = '',
+  pointerIsDown = '',
+  pointerWasMoved = '',
+  _proxy = ''
+}
+
+export enum _ProxyMethods {
+  start = '',
+  move = '',
+  end = '',
+  stop = '',
+  interacting = ''
+}
+
+export type _InteractionProxy = Pick<
+  Interaction,
+  keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
 export class Interaction<T extends ActionName = any> {
@@ -74,7 +85,7 @@ export class Interaction<T extends ActionName = any> {
   pointerWasMoved = false
   _interacting = false
   _ending = false
-  _proxy: InteractionProxy = null
+  _proxy: _InteractionProxy = null
 
   simulation = null
 
@@ -111,15 +122,18 @@ export class Interaction<T extends ActionName = any> {
 
     const that = this
 
-    this._proxy = {
-      get pointerIsDown () { return that.pointerIsDown },
-      get pointerWasMoved () { return that.pointerWasMoved },
-      start (action, i, e) { return that.start(action, i, e) },
-      move (arg) { return that.move(arg) },
-      end (event) { return that.end(event) },
-      stop () { return that.stop() },
-      interacting () { return that.interacting() },
-      get _proxy () { return this },
+    this._proxy = {} as _InteractionProxy
+
+    for (const key in _ProxyValues) {
+      Object.defineProperty(this._proxy, key, {
+        get () { return that[key] },
+      })
+    }
+
+    for (const key in _ProxyMethods) {
+      Object.defineProperty(this._proxy, key, {
+        value: (...args) => that[key](...args),
+      })
     }
 
     this._signals.fire('new', { interaction: this })
@@ -452,6 +466,12 @@ export class Interaction<T extends ActionName = any> {
     this._latestPointer.pointer = pointer
     this._latestPointer.event = event
     this._latestPointer.eventTarget = eventTarget
+  }
+
+  destroy () {
+    this._latestPointer.pointer = null
+    this._latestPointer.event = null
+    this._latestPointer.eventTarget = null
   }
 
   _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string) {

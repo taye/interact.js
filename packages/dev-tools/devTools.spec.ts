@@ -2,11 +2,17 @@ import test from '@interactjs/_dev/test/test'
 import { drag, resize } from '@interactjs/actions'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
-import * as devTools from './'
+import devTools, { Check, Logger } from './'
+
+const { checks, links, prefix } = devTools
+const checkMap = checks.reduce((acc, check) => {
+  acc[check.name] = check
+  return acc
+}, {} as { [name: string]: Check})
 
 test('devTools', (t) => {
   const scope: Interact.Scope = helpers.mockScope()
-  const logs: Array<{ args: any[], type: keyof devTools.Logger }> = []
+  const logs: Array<{ args: any[], type: keyof Logger }> = []
 
   function log (args, type) {
     logs.push({ args, type })
@@ -32,15 +38,14 @@ test('devTools', (t) => {
 
   interaction.pointerDown(event, event, element)
   interaction.start({ name: 'drag' }, interactable, element)
-
   t.deepEqual(
     logs[0],
-    { args: [devTools.touchActionMessage, element, devTools.links.touchAction], type: 'warn' },
+    { args: [prefix + checkMap.touchAction.text, element, links.touchAction], type: 'warn' },
     'warning about missing touchAction')
 
   t.deepEqual(
     logs[1],
-    { args: [devTools.noListenersMessage, 'drag', interactable], type: 'warn' },
+    { args: [prefix + checkMap.noListeners.text, 'drag', interactable], type: 'warn' },
     'warning about missing move listeners')
 
   interaction.stop()
@@ -56,7 +61,7 @@ test('devTools', (t) => {
 
   t.deepEqual(
     logs[2],
-    { args: [devTools.boxSizingMessage, element, devTools.links.boxSizing], type: 'warn' },
+    { args: [prefix + checkMap.boxSizing.text, element, links.boxSizing], type: 'warn' },
     'warning about resizing without "box-sizing: none"')
 
   // resolve boxSizing
@@ -74,6 +79,22 @@ test('devTools', (t) => {
     logs.length,
     3,
     'no warnings when issues are resolved')
+
+  // re-introduce boxSizing issue
+  element.style.boxSizing = ''
+
+  interaction.start({ name: 'drag' }, interactable, element)
+  interaction.end()
+
+  interactable.options.devTools.ignore = { boxSizing: true }
+
+  interaction.start({ name: 'drag' }, interactable, element)
+  interaction.end()
+
+  t.equal(
+    logs.length,
+    3,
+    'no warning with options.devTools.ignore')
 
   t.end()
 })

@@ -2,6 +2,7 @@
 /* global process */
 import domObjects from '@interactjs/utils/domObjects'
 import { parentNode } from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import win from '@interactjs/utils/window'
 
@@ -11,71 +12,135 @@ declare module '@interactjs/core/scope' {
   }
 }
 
+declare module '@interactjs/core/defaultOptions' {
+  interface BaseDefaults {
+    devTools?: DevToolsOptions
+  }
+}
+
+declare module '@interactjs/core/Interactable' {
+  interface Interactable {
+    devTools?: Interact.OptionMethod<DevToolsOptions>
+  }
+}
+
+export interface DevToolsOptions {
+  ignore: { [P in keyof typeof CheckName]?: boolean }
+}
+
 export interface Logger {
   warn: (...args: any[]) => void
   error: (...args: any[]) => void
   log: (...args: any[]) => void
 }
 
-export const links = {
+export interface Check {
+  name: string
+  text: string
+  perform: (interaction: Interact.Interaction) => boolean
+  getInfo: (interaction: Interact.Interaction) => any[]
+}
+
+enum CheckName {
+  touchAction = '',
+  boxSizing = '',
+  noListeners = '',
+}
+
+const prefix  = '[interact.js] '
+const links = {
   touchAction: 'https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action',
   boxSizing: 'https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing',
 }
 
-export const install = process.env.NODE_ENV === 'production'
-  ? () => {}
-  // eslint-disable-next-line no-restricted-syntax
-  : function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
-    logger = logger || console
-    if (process.env.NODE_ENV !== 'production') {
-      scope.logger = logger
-      scope.interactions.signals.on('action-start', ({ interaction }) => {
-        touchAction(interaction, scope.logger)
-        boxSizing(interaction, scope.logger)
-        noListeners(interaction, scope.logger)
-      })
+const isProduction = process.env.NODE_ENV === 'production'
+
+// eslint-disable-next-line no-restricted-syntax
+function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
+  const {
+    interactions,
+    Interactable,
+    defaults,
+  } = scope
+  logger = logger || console
+
+  interactions.signals.on('action-start', ({ interaction }) => {
+    for (const check of checks) {
+      const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
+
+      if (
+        !(options && options.devTools && options.devTools.ignore[check.name]) &&
+        check.perform(interaction)
+      ) {
+        logger.warn(prefix + check.text, ...check.getInfo(interaction))
+      }
     }
+  })
+
+  defaults.base.devTools = {
+    ignore: {},
   }
 
-export const touchActionMessage = '[interact.js] Consider adding CSS "touch-action: none" to this element\n'
-export const boxSizingMessage = '[interact.js] Consider adding CSS "box-sizing: border-box" to this resizable element'
-export const noListenersMessage = '[interact.js] There are no listeners set for this action'
+  Interactable.prototype.devTools = function (options?) {
+    if (options) {
+      extend(this.options.devTools, options)
+      return this
+    }
 
-export function touchAction ({ element }: Interact.Interaction, logger: Logger) {
-  if (!parentHasStyle(element, 'touchAction', /pan-|pinch|none/)) {
-    logger.warn(
-      touchActionMessage,
-      element,
-      links.touchAction)
-  }
-}
-
-export function boxSizing (interaction: Interact.Interaction, logger: Logger) {
-  const { element } = interaction
-
-  if (
-    interaction.prepared.name === 'resize' &&
-    element instanceof domObjects.HTMLElement &&
-    !hasStyle(element, 'boxSizing', /border-box/)
-  ) {
-    logger.warn(
-      boxSizingMessage,
-      element,
-      links.boxSizing)
+    return this.options.devTools
   }
 }
 
-export function noListeners (interaction: Interact.Interaction, logger: Logger) {
-  const actionName = interaction.prepared.name
-  const moveListeners = interaction.interactable.events.types[`${actionName}move`] || []
+const checks: Check[] = [
+  {
+    name: 'touchAction',
+    perform ({ element }) {
+      return !parentHasStyle(element, 'touchAction', /pan-|pinch|none/)
+    },
+    getInfo ({ element }) {
+      return [
+        element,
+        links.touchAction,
+      ]
+    },
+    text: 'Consider adding CSS "touch-action: none" to this element\n',
+  },
 
-  if (!moveListeners.length) {
-    logger.warn(
-      noListenersMessage,
-      actionName,
-      interaction.interactable)
-  }
-}
+  {
+    name: 'boxSizing',
+    perform (interaction) {
+      const { element } = interaction
+
+      return interaction.prepared.name === 'resize' &&
+        element instanceof domObjects.HTMLElement &&
+        !hasStyle(element, 'boxSizing', /border-box/)
+    },
+    text: 'Consider adding CSS "box-sizing: border-box" to this resizable element',
+    getInfo ({ element }) {
+      return [
+        element,
+        links.boxSizing,
+      ]
+    },
+  },
+
+  {
+    name: 'noListeners',
+    perform (interaction) {
+      const actionName = interaction.prepared.name
+      const moveListeners = interaction.interactable.events.types[`${actionName}move`] || []
+
+      return !moveListeners.length
+    },
+    getInfo (interaction) {
+      return [
+        interaction.prepared.name,
+        interaction.interactable,
+      ]
+    },
+    text: 'There are no listeners set for this action',
+  },
+]
 
 function hasStyle (element: HTMLElement, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
   return styleRe.test(element.style[prop] || win.window.getComputedStyle(element)[prop])
@@ -95,7 +160,16 @@ function parentHasStyle (element: Element, prop: keyof CSSStyleDeclaration, styl
   return false
 }
 
-export default {
-  id: 'dev-tools',
-  install,
-}
+const id = 'dev-tools'
+const defaultExport = isProduction
+  ? { id, install: () => {} }
+  : {
+    id,
+    install,
+    checks,
+    CheckName,
+    links,
+    prefix,
+  }
+
+export default defaultExport
