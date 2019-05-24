@@ -1,4 +1,17 @@
-## v1.4.0
+## v1.4.3
+
+ - destroy only relevant interactions on interactable.unset()
+
+## v1.4.2
+
+ - @jf-m fixed memory leaks and a bug on interactions stop [PR #715](https://github.com/taye/interact.js/pull/715)
+ - fixed dropzones in shadow DOM [PR #722](https://github.com/taye/interact.js/pull/722)
+
+## v1.4.1
+
+ - fixed scripts to run bundle optimizations and fix issues with browserify
+
+# v1.4.0
 
 Most notablly:
 
