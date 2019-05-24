@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.2
+ * interact.js 1.4.3
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -141,15 +141,13 @@ function () {
 
             if (interaction.interactable === this) {
               interaction.stop();
+              scope.interactions.signals.fire('destroy', {
+                interaction: interaction
+              });
+              interaction.destroy();
             }
-
-            scope.interactions.signals.fire('destroy', {
-              interaction: interaction
-            });
-            interaction.destroy();
           }
 
-          scope.interactions.list = [];
           scope.interactables.signals.fire('unset', {
             interactable: this
           });
@@ -9582,7 +9580,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.2";
+_interact["default"].version = __init_27.version = "1.4.3";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
