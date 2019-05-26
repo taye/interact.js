@@ -1,5 +1,6 @@
 import browser from '@interactjs/utils/browser'
 import domObjects from '@interactjs/utils/domObjects'
+import { nodeContains } from '@interactjs/utils/domUtils'
 import events from '@interactjs/utils/events'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
@@ -15,7 +16,7 @@ declare module '@interactjs/core/scope' {
       new: (options: any) => InteractionBase
       list: InteractionBase[]
       listeners: { [type: string]: Interact.Listener }
-      eventMap: any
+      eventMap: Array<{ type: string, listener: Interact.Listener }>
       pointerMoveTolerance: number
     }
     prevTouchTime: number
@@ -37,30 +38,39 @@ function install (scope: Scope) {
   }
 
   const pEventTypes = browser.pEventTypes
-  const eventMap = {} as { [key: string]: Interact.Listener }
+  let eventMap: typeof scope.interactions.eventMap
 
   if (domObjects.PointerEvent) {
-    eventMap[pEventTypes.down  ] = listeners.pointerDown
-    eventMap[pEventTypes.move  ] = listeners.pointerMove
-    eventMap[pEventTypes.up    ] = listeners.pointerUp
-    eventMap[pEventTypes.cancel] = listeners.pointerUp
+    eventMap = [
+      { type: pEventTypes.down,   listener: releasePointersOnRemovedEls },
+      { type: pEventTypes.down,   listener: listeners.pointerDown },
+      { type: pEventTypes.move,   listener: listeners.pointerMove },
+      { type: pEventTypes.up,     listener: listeners.pointerUp },
+      { type: pEventTypes.cancel, listener: listeners.pointerUp },
+    ]
   }
   else {
-    eventMap.mousedown   = listeners.pointerDown
-    eventMap.mousemove   = listeners.pointerMove
-    eventMap.mouseup     = listeners.pointerUp
+    eventMap = [
+      { type: 'mousedown', listener: listeners.pointerDown },
+      { type: 'mousemove', listener: listeners.pointerMove },
+      { type: 'mouseup', listener: listeners.pointerUp },
 
-    eventMap.touchstart  = listeners.pointerDown
-    eventMap.touchmove   = listeners.pointerMove
-    eventMap.touchend    = listeners.pointerUp
-    eventMap.touchcancel = listeners.pointerUp
+      { type: 'touchstart', listener: releasePointersOnRemovedEls },
+      { type: 'touchstart', listener: listeners.pointerDown },
+      { type: 'touchmove', listener: listeners.pointerMove },
+      { type: 'touchend', listener: listeners.pointerUp },
+      { type: 'touchcancel', listener: listeners.pointerUp },
+    ]
   }
 
-  eventMap.blur = (event) => {
-    for (const interaction of scope.interactions.list) {
-      interaction.documentBlur(event)
-    }
-  }
+  eventMap.push({
+    type: 'blur',
+    listener (event) {
+      for (const interaction of scope.interactions.list) {
+        interaction.documentBlur(event)
+      }
+    },
+  })
 
   scope.signals.on('add-document', onDocSignal)
   scope.signals.on('remove-document', onDocSignal)
@@ -79,6 +89,7 @@ function install (scope: Scope) {
 
     _now () { return scope.now() }
   }
+
   scope.interactions = {
     signals,
     // all active and idle interactions
@@ -95,6 +106,25 @@ function install (scope: Scope) {
     eventMap,
     pointerMoveTolerance: 1,
   }
+
+  function releasePointersOnRemovedEls () {
+    // for all inactive touch interactions with pointers down
+    for (const interaction of scope.interactions.list) {
+      if (!interaction.pointerIsDown ||
+        interaction.pointerType !== 'touch' ||
+        interaction._interacting) {
+        continue
+      }
+
+      // if a pointer is down on an element that is no longer in the DOM tree
+      for (const pointer of interaction.pointers) {
+        if (!scope.documents.some(({ doc }) => nodeContains(doc, pointer.downTarget))) {
+          // remove the pointer from the interaction
+          interaction.removePointer(pointer.pointer, pointer.event)
+        }
+      }
+    }
+  }
 }
 
 function doOnInteractions (method, scope) {
@@ -105,7 +135,7 @@ function doOnInteractions (method, scope) {
     const [eventTarget, curEventTarget] = pointerUtils.getEventTargets(event)
     const matches = [] // [ [pointer, interaction], ...]
 
-    if (browser.supportsTouch && /touch/.test(event.type)) {
+    if (/^touch/.test(event.type)) {
       scope.prevTouchTime = scope.now()
 
       for (const changedTouch of event.changedTouches) {
@@ -204,8 +234,8 @@ function onDocSignal ({ doc, scope, options }, signalName) {
 
   const eventOptions = options && options.events
 
-  for (const eventType in eventMap) {
-    eventMethod(doc, eventType, eventMap[eventType], eventOptions)
+  for (const { type, listener } of eventMap) {
+    eventMethod(doc, type, listener, eventOptions)
   }
 }
 

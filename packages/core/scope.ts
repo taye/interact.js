@@ -88,11 +88,17 @@ export class Scope {
 
       unset () {
         super.unset()
-        for (const interaction of scope.interactions.list) {
+        for (let i = scope.interactions.list.length - 1; i >= 0; i--) {
+          const interaction = scope.interactions.list[i]
+
           if (interaction.interactable === this) {
             interaction.stop()
             scope.interactions.signals.fire('destroy', { interaction })
             interaction.destroy()
+
+            if (scope.interactions.list.length > 2) {
+              scope.interactions.list.splice(i, 1)
+            }
           }
         }
 

@@ -61,3 +61,44 @@ test('interactions document event options', (t) => {
 
   t.end()
 })
+
+test('interactions removes pointers on targeting removed elements', (t) => {
+  const {
+    interaction,
+    scope,
+  } = helpers.testEnv()
+
+  const { TouchEvent, Touch = function (_t) { return _t } } = scope.window as any
+  const div1 = scope.document.body.appendChild(scope.document.createElement('div'))
+  const div2 = scope.document.body.appendChild(scope.document.createElement('div'))
+
+  const touch1Init = { bubbles: true, changedTouches: [new Touch({ identifier: 1, target: div1 })] }
+  const touch2Init = { bubbles: true, changedTouches: [new Touch({ identifier: 2, target: div2 })] }
+
+  interaction.pointerType = 'touch'
+  div1.dispatchEvent(new TouchEvent('touchstart', touch1Init))
+  div1.dispatchEvent(new TouchEvent('touchmove', touch1Init))
+
+  t.equal(
+    scope.interactions.list.length,
+    1)
+
+  t.equal(interaction.pointers.length, 1, 'down pointer added to interaction')
+  t.equal(interaction._latestPointer.eventTarget, div1, '_latestPointer target is down target')
+
+  div1.remove()
+
+  div2.dispatchEvent(new TouchEvent('touchstart', touch2Init))
+
+  t.deepEqual(
+    scope.interactions.list,
+    [interaction],
+    'interaction with removed element is reused for new pointer')
+
+  t.equal(
+    interaction.pointers.length,
+    1,
+    'pointer on removed element is removed from existing interaction and new pointerdown is added')
+
+  t.end()
+})
