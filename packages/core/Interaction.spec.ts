@@ -178,7 +178,7 @@ test('Interaction.removePointer', (t) => {
   ids.forEach((pointerId) => interaction.updatePointer({ pointerId } as any, {} as any, null))
 
   for (const removal of removals) {
-    interaction.removePointer({ pointerId: removal.id }, null)
+    interaction.removePointer({ pointerId: removal.id } as Interact.PointerType, null)
 
     t.deepEqual(
       interaction.pointers.map((p) => p.id),
