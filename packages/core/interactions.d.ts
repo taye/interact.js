@@ -11,7 +11,10 @@ declare module '@interactjs/core/scope' {
             listeners: {
                 [type: string]: Interact.Listener;
             };
-            eventMap: any;
+            eventMap: Array<{
+                type: string;
+                listener: Interact.Listener;
+            }>;
             pointerMoveTolerance: number;
         };
         prevTouchTime: number;

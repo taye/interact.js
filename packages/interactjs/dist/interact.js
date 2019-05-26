@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.3
+ * interact.js 1.4.4
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -133,11 +133,8 @@ function () {
         value: function unset() {
           _get(_getPrototypeOf(Interactable.prototype), "unset", this).call(this);
 
-          for (var _i = 0; _i < scope.interactions.list.length; _i++) {
-            var _ref;
-
-            _ref = scope.interactions.list[_i];
-            var interaction = _ref;
+          for (var i = scope.interactions.list.length - 1; i >= 0; i--) {
+            var interaction = scope.interactions.list[i];
 
             if (interaction.interactable === this) {
               interaction.stop();
@@ -145,6 +142,10 @@ function () {
                 interaction: interaction
               });
               interaction.destroy();
+
+              if (scope.interactions.list.length > 2) {
+                scope.interactions.list.splice(i, 1);
+              }
             }
           }
 
@@ -290,6 +291,8 @@ var _browser = _interopRequireDefault(_$browser_47);
 
 var _domObjects = _interopRequireDefault(_$domObjects_49);
 
+/* removed: var _$domUtils_50 = require("@interactjs/utils/domUtils"); */;
+
 var _events = _interopRequireDefault(_$events_51);
 
 var _pointerUtils = _interopRequireDefault(_$pointerUtils_60);
@@ -340,33 +343,65 @@ function install(scope) {
   }
 
   var pEventTypes = _browser["default"].pEventTypes;
-  var eventMap = {};
+  var eventMap;
 
   if (_domObjects["default"].PointerEvent) {
-    eventMap[pEventTypes.down] = listeners.pointerDown;
-    eventMap[pEventTypes.move] = listeners.pointerMove;
-    eventMap[pEventTypes.up] = listeners.pointerUp;
-    eventMap[pEventTypes.cancel] = listeners.pointerUp;
+    eventMap = [{
+      type: pEventTypes.down,
+      listener: releasePointersOnRemovedEls
+    }, {
+      type: pEventTypes.down,
+      listener: listeners.pointerDown
+    }, {
+      type: pEventTypes.move,
+      listener: listeners.pointerMove
+    }, {
+      type: pEventTypes.up,
+      listener: listeners.pointerUp
+    }, {
+      type: pEventTypes.cancel,
+      listener: listeners.pointerUp
+    }];
   } else {
-    eventMap.mousedown = listeners.pointerDown;
-    eventMap.mousemove = listeners.pointerMove;
-    eventMap.mouseup = listeners.pointerUp;
-    eventMap.touchstart = listeners.pointerDown;
-    eventMap.touchmove = listeners.pointerMove;
-    eventMap.touchend = listeners.pointerUp;
-    eventMap.touchcancel = listeners.pointerUp;
+    eventMap = [{
+      type: 'mousedown',
+      listener: listeners.pointerDown
+    }, {
+      type: 'mousemove',
+      listener: listeners.pointerMove
+    }, {
+      type: 'mouseup',
+      listener: listeners.pointerUp
+    }, {
+      type: 'touchstart',
+      listener: releasePointersOnRemovedEls
+    }, {
+      type: 'touchstart',
+      listener: listeners.pointerDown
+    }, {
+      type: 'touchmove',
+      listener: listeners.pointerMove
+    }, {
+      type: 'touchend',
+      listener: listeners.pointerUp
+    }, {
+      type: 'touchcancel',
+      listener: listeners.pointerUp
+    }];
   }
 
-  eventMap.blur = function (event) {
-    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
-      var _ref;
+  eventMap.push({
+    type: 'blur',
+    listener: function listener(event) {
+      for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
+        var _ref;
 
-      _ref = scope.interactions.list[_i2];
-      var interaction = _ref;
-      interaction.documentBlur(event);
+        _ref = scope.interactions.list[_i2];
+        var interaction = _ref;
+        interaction.documentBlur(event);
+      }
     }
-  };
-
+  });
   scope.signals.on('add-document', onDocSignal);
   scope.signals.on('remove-document', onDocSignal); // for ignoring browser's simulated mouse events
 
@@ -415,6 +450,40 @@ function install(scope) {
     eventMap: eventMap,
     pointerMoveTolerance: 1
   };
+
+  function releasePointersOnRemovedEls() {
+    // for all inactive touch interactions with pointers down
+    for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
+      var _ref2;
+
+      _ref2 = scope.interactions.list[_i3];
+      var interaction = _ref2;
+
+      if (!interaction.pointerIsDown || interaction.pointerType !== 'touch' || interaction._interacting) {
+        continue;
+      } // if a pointer is down on an element that is no longer in the DOM tree
+
+
+      var _loop = function _loop() {
+        _ref3 = interaction.pointers[_i4];
+        var pointer = _ref3;
+
+        if (!scope.documents.some(function (_ref4) {
+          var doc = _ref4.doc;
+          return (0, _$domUtils_50.nodeContains)(doc, pointer.downTarget);
+        })) {
+          // remove the pointer from the interaction
+          interaction.removePointer(pointer.pointer, pointer.event);
+        }
+      };
+
+      for (var _i4 = 0; _i4 < interaction.pointers.length; _i4++) {
+        var _ref3;
+
+        _loop();
+      }
+    }
+  }
 }
 
 function doOnInteractions(method, scope) {
@@ -430,14 +499,14 @@ function doOnInteractions(method, scope) {
 
     var matches = []; // [ [pointer, interaction], ...]
 
-    if (_browser["default"].supportsTouch && /touch/.test(event.type)) {
+    if (/^touch/.test(event.type)) {
       scope.prevTouchTime = scope.now();
 
-      for (var _i3 = 0; _i3 < event.changedTouches.length; _i3++) {
-        var _ref2;
+      for (var _i5 = 0; _i5 < event.changedTouches.length; _i5++) {
+        var _ref5;
 
-        _ref2 = event.changedTouches[_i3];
-        var changedTouch = _ref2;
+        _ref5 = event.changedTouches[_i5];
+        var changedTouch = _ref5;
         var pointer = changedTouch;
 
         var pointerId = _pointerUtils["default"].getPointerId(pointer);
@@ -487,8 +556,8 @@ function doOnInteractions(method, scope) {
     } // eslint-disable-next-line no-shadow
 
 
-    for (var _i4 = 0; _i4 < matches.length; _i4++) {
-      var _matches$_i = _slicedToArray(matches[_i4], 4),
+    for (var _i6 = 0; _i6 < matches.length; _i6++) {
+      var _matches$_i = _slicedToArray(matches[_i6], 4),
           _pointer = _matches$_i[0],
           _eventTarget = _matches$_i[1],
           _curEventTarget = _matches$_i[2],
@@ -515,10 +584,10 @@ function getInteraction(searchDetails) {
   });
 }
 
-function onDocSignal(_ref3, signalName) {
-  var doc = _ref3.doc,
-      scope = _ref3.scope,
-      options = _ref3.options;
+function onDocSignal(_ref6, signalName) {
+  var doc = _ref6.doc,
+      scope = _ref6.scope,
+      options = _ref6.options;
   var eventMap = scope.interactions.eventMap;
   var eventMethod = signalName.indexOf('add') === 0 ? _events["default"].add : _events["default"].remove;
 
@@ -536,8 +605,14 @@ function onDocSignal(_ref3, signalName) {
 
   var eventOptions = options && options.events;
 
-  for (var _eventType in eventMap) {
-    eventMethod(doc, _eventType, eventMap[_eventType], eventOptions);
+  for (var _i7 = 0; _i7 < eventMap.length; _i7++) {
+    var _ref7;
+
+    _ref7 = eventMap[_i7];
+    var _ref8 = _ref7,
+        type = _ref8.type,
+        listener = _ref8.listener;
+    eventMethod(doc, type, listener, eventOptions);
   }
 }
 
@@ -1142,7 +1217,6 @@ _$arr_46.merge = merge;
 _$arr_46.from = from;
 _$arr_46.findIndex = findIndex;
 _$arr_46.find = find;
-_$arr_46.some = some;
 
 function contains(array, target) {
   return array.indexOf(target) !== -1;
@@ -1180,10 +1254,6 @@ function findIndex(array, func) {
 
 function find(array, func) {
   return array[findIndex(array, func)];
-}
-
-function some(array, func) {
-  return findIndex(array, func) !== -1;
 }
 
 var _$extend_52 = {};
@@ -3933,8 +4003,6 @@ Object.defineProperty(_$interactionFinder_22, "__esModule", {
 });
 _$interactionFinder_22["default"] = void 0;
 
-/* removed: var _$arr_46 = require("@interactjs/utils/arr"); */;
-
 var __dom_22 = ___interopRequireWildcard_22(_$domUtils_50);
 
 function ___interopRequireWildcard_22(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
@@ -4095,7 +4163,7 @@ var finder = {
 };
 
 function hasPointerId(interaction, pointerId) {
-  return (0, _$arr_46.some)(interaction.pointers, function (_ref11) {
+  return interaction.pointers.some(function (_ref11) {
     var id = _ref11.id;
     return id === pointerId;
   });
@@ -9580,7 +9648,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.3";
+_interact["default"].version = __init_27.version = "1.4.4";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

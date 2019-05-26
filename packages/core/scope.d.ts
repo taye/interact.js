@@ -45,14 +45,14 @@ export declare class Scope {
     events: {
         add: (element: EventTarget, type: string, listener: (event: Event | import("../utils/events").FakeEvent) => any, optionalArg?: any) => void;
         remove: (element: EventTarget, type: string, listener?: "all" | ((event: Event | import("../utils/events").FakeEvent) => any), optionalArg?: any) => void;
-        addDelegate: (selector: string, context: EventTarget, type: string, listener: (event: Event | import("../utils/events").FakeEvent) => any, optionalArg?: any) => void;
+        addDelegate: (selector: string, context: Node, type: string, listener: (event: Event | import("../utils/events").FakeEvent) => any, optionalArg?: any) => void;
         removeDelegate: (selector: any, context: any, type: any, listener?: any, optionalArg?: any) => void;
         delegateListener: (event: Event, optionalArg?: any) => void;
         delegateUseCapture: (event: Event) => any;
         delegatedEvents: {
             [type: string]: {
                 selectors: string[];
-                contexts: EventTarget[];
+                contexts: Node[];
                 listeners: [(event: Event | import("../utils/events").FakeEvent) => any, boolean, boolean][][];
             };
         };

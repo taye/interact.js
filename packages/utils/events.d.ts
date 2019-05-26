@@ -1,7 +1,7 @@
 declare type Listener = (event: Event | FakeEvent) => any;
 declare function add(element: EventTarget, type: string, listener: Listener, optionalArg?: boolean | any): void;
 declare function remove(element: EventTarget, type: string, listener?: 'all' | Listener, optionalArg?: boolean | any): void;
-declare function addDelegate(selector: string, context: EventTarget, type: string, listener: Listener, optionalArg?: any): void;
+declare function addDelegate(selector: string, context: Node, type: string, listener: Listener, optionalArg?: any): void;
 declare function removeDelegate(selector: any, context: any, type: any, listener?: any, optionalArg?: any): void;
 declare function delegateListener(event: Event, optionalArg?: any): void;
 declare function delegateUseCapture(event: Event): any;
@@ -23,7 +23,7 @@ declare const events: {
     delegatedEvents: {
         [type: string]: {
             selectors: string[];
-            contexts: EventTarget[];
+            contexts: Node[];
             listeners: [Listener, boolean, boolean][][];
         };
     };

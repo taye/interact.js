@@ -121,7 +121,7 @@ export declare class Interaction<T extends ActionName = any> {
         pointerType?: string;
         signals: utils.Signals;
     });
-    pointerDown(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
+    pointerDown(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node): void;
     /**
      * ```js
      * interact(target)
@@ -154,7 +154,7 @@ export declare class Interaction<T extends ActionName = any> {
      * @return {object} interact
      */
     start(action: StartAction, interactable: Interactable, element: Element): boolean;
-    pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget): void;
+    pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node): void;
     /**
      * ```js
      * interact(target)
@@ -174,7 +174,7 @@ export declare class Interaction<T extends ActionName = any> {
      * settings.
      */
     move(signalArg?: any): void;
-    pointerUp(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, curEventTarget: EventTarget): void;
+    pointerUp(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, curEventTarget: EventTarget): void;
     documentBlur(event: any): void;
     /**
      * ```js
@@ -199,8 +199,8 @@ export declare class Interaction<T extends ActionName = any> {
     stop(): void;
     getPointerIndex(pointer: any): number;
     getPointerInfo(pointer: any): PointerInfo;
-    updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: EventTarget, down?: boolean): number;
-    removePointer(pointer: any, event: any): void;
+    updatePointer(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, down?: boolean): number;
+    removePointer(pointer: Interact.PointerType, event: Interact.PointerEventType): void;
     _updateLatestPointer(pointer: any, event: any, eventTarget: any): void;
     destroy(): void;
     _createPreparedEvent(event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string): InteractEvent<T, EventPhase>;
