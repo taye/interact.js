@@ -1,4 +1,3 @@
-import { some } from '@interactjs/utils/arr'
 import * as dom from '@interactjs/utils/domUtils'
 
 export interface SearchDetails {
@@ -127,8 +126,8 @@ const finder = {
   },
 }
 
-function hasPointerId (interaction, pointerId) {
-  return some(interaction.pointers, ({ id }) => id === pointerId)
+function hasPointerId (interaction: Interact.Interaction, pointerId: number) {
+  return interaction.pointers.some(({ id }) => id === pointerId)
 }
 
 export default finder

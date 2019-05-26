@@ -444,7 +444,7 @@ export class Interaction<T extends ActionName = any> {
     return pointerIndex
   }
 
-  removePointer (pointer, event) {
+  removePointer (pointer: Interact.PointerType, event: Interact.PointerEventType) {
     const pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) { return }

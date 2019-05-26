@@ -3,7 +3,7 @@ import domObjects from './domObjects'
 import * as is from './is'
 import win from './window'
 
-export function nodeContains (parent, child) {
+export function nodeContains (parent: Node, child: Node) {
   while (child) {
     if (child === parent) {
       return true

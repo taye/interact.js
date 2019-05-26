@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/pointer-events",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "peerDependencies": {
-    "@interactjs/core": "1.4.3",
-    "@interactjs/utils": "1.4.3"
+    "@interactjs/core": "1.4.4",
+    "@interactjs/utils": "1.4.4"
   },
   "publishConfig": {
     "access": "public"
