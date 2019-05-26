@@ -15,7 +15,7 @@ const targets: Array<{
 const delegatedEvents: {
   [type: string]: {
     selectors: string[],
-    contexts: EventTarget[],
+    contexts: Node[],
     listeners: Array<Array<[Listener, boolean, boolean]>>,
   },
 } = {}
@@ -97,7 +97,7 @@ function remove (element: EventTarget, type: string, listener?: 'all' | Listener
   }
 }
 
-function addDelegate (selector: string, context: EventTarget, type: string, listener: Listener, optionalArg?: any) {
+function addDelegate (selector: string, context: Node, type: string, listener: Listener, optionalArg?: any) {
   const options = getOptions(optionalArg)
   if (!delegatedEvents[type]) {
     delegatedEvents[type] = {
