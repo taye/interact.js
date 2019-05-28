@@ -25,7 +25,7 @@ interact(target)
 
 `interact`'s `modifiers` let you change the coordinates of action events. The
 options object passed to action methods can have a `modifiers` array which will
-be applied to events of that action type. **Modifers in the array are applied
+be applied to events of that action type. **Modifiers in the array are applied
 sequentially** and their order may affect the final result.
 
 ```js
