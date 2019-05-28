@@ -94,7 +94,7 @@ Gesture
 | `box`                   | A box enclosing all touch points                  |
 
 In gesture events, page and client coordinates are the averages of touch
-coordinates and vlocity is calculated from these averages.
+coordinates and velocity is calculated from these averages.
 
 Drop Events
 ===========
