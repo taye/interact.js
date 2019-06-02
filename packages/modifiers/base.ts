@@ -436,11 +436,6 @@ function makeModifier<
   }
 
   if (typeof name === 'string') {
-    Object.defineProperty(
-      modifier,
-      'name',
-      { value: name })
-
     // for backwrads compatibility
     modifier._defaults = defaults
     modifier._methods = methods
