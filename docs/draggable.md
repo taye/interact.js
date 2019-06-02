@@ -33,7 +33,7 @@ interact('.draggable').draggable({
 
 Dragging is the simplest action interactj.s provides. To make an element
 draggable, create an interactable with your desired target then call the
-`draggable` method with the options that you need. In adition to the common
+`draggable` method with the options that you need. In addition to the common
 `InteractEvent` properties, `dragmove` events also have:
 
 | `dragmove` property     | Description                                       |
