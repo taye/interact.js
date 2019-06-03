@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/inertia",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "peerDependencies": {
-    "@interactjs/core": "1.4.4",
-    "@interactjs/modifiers": "1.4.4",
-    "@interactjs/utils": "1.4.4"
+    "@interactjs/core": "1.4.5",
+    "@interactjs/modifiers": "1.4.5",
+    "@interactjs/utils": "1.4.5"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.4.4"
+    "@interactjs/actions": "1.4.5"
   },
   "publishConfig": {
     "access": "public"
