@@ -7,6 +7,9 @@ declare module '@interactjs/core/Interaction' {
     interface Interaction {
         modifiers?: {
             states: any[];
+            offsets: any;
+            startOffset: any;
+            startDelta: Interact.Point;
             result?: {
                 delta: {
                     x: number;
@@ -21,7 +24,7 @@ declare module '@interactjs/core/Interaction' {
                 coords: Interact.Point;
                 changed: boolean;
             };
-            [index: string]: any;
+            endPrevented: boolean;
         };
     }
 }
@@ -47,6 +50,7 @@ export declare function setAll(arg: Partial<Interact.SignalArg>): {
 };
 export declare function prepareStates(modifierList: any): any[];
 declare function makeModifier<Options extends {
+    enabled?: boolean;
     [key: string]: any;
 }>(module: {
     defaults: Options;

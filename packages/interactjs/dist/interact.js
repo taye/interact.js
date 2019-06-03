@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.4
+ * interact.js 1.4.5
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -843,7 +843,7 @@ function () {
   }, {
     key: "pointerMove",
     value: function pointerMove(pointer, event, eventTarget) {
-      if (!this.simulation) {
+      if (!this.simulation && !(this.modifiers && this.modifiers.endPrevented)) {
         this.updatePointer(pointer, event, eventTarget, false);
         utils.pointer.setCoords(this.coords.cur, this.pointers.map(function (p) {
           return p.pointer;
@@ -1256,20 +1256,45 @@ function find(array, func) {
   return array[findIndex(array, func)];
 }
 
-var _$extend_52 = {};
+var _$domObjects_49 = {};
 "use strict";
 
-Object.defineProperty(_$extend_52, "__esModule", {
+Object.defineProperty(_$domObjects_49, "__esModule", {
   value: true
 });
-_$extend_52["default"] = extend;
+_$domObjects_49["default"] = void 0;
+var domObjects = {
+  init: init,
+  document: null,
+  DocumentFragment: null,
+  SVGElement: null,
+  SVGSVGElement: null,
+  // eslint-disable-next-line no-undef
+  SVGElementInstance: null,
+  Element: null,
+  HTMLElement: null,
+  Event: null,
+  Touch: null,
+  PointerEvent: null
+};
 
-function extend(dest, source) {
-  for (var prop in source) {
-    dest[prop] = source[prop];
-  }
+function blank() {}
 
-  return dest;
+var _default = domObjects;
+_$domObjects_49["default"] = _default;
+
+function init(window) {
+  var win = window;
+  domObjects.document = win.document;
+  domObjects.DocumentFragment = win.DocumentFragment || blank;
+  domObjects.SVGElement = win.SVGElement || blank;
+  domObjects.SVGSVGElement = win.SVGSVGElement || blank;
+  domObjects.SVGElementInstance = win.SVGElementInstance || blank;
+  domObjects.Element = win.Element || blank;
+  domObjects.HTMLElement = win.HTMLElement || domObjects.Element;
+  domObjects.Event = win.Event;
+  domObjects.Touch = win.Touch || blank;
+  domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
 }
 
 var _$isWindow_57 = {};
@@ -1280,11 +1305,11 @@ Object.defineProperty(_$isWindow_57, "__esModule", {
 });
 _$isWindow_57["default"] = void 0;
 
-var _default = function _default(thing) {
+var ___default_57 = function _default(thing) {
   return !!(thing && thing.Window) && thing instanceof thing.Window;
 };
 
-_$isWindow_57["default"] = _default;
+_$isWindow_57["default"] = ___default_57;
 
 var _$window_65 = {};
 "use strict";
@@ -1292,7 +1317,7 @@ var _$window_65 = {};
 Object.defineProperty(_$window_65, "__esModule", {
   value: true
 });
-_$window_65.init = init;
+_$window_65.init = __init_65;
 _$window_65.getWindow = getWindow;
 _$window_65["default"] = void 0;
 
@@ -1304,10 +1329,10 @@ var win = {
   realWindow: undefined,
   window: undefined,
   getWindow: getWindow,
-  init: init
+  init: __init_65
 };
 
-function init(window) {
+function __init_65(window) {
   // get wrapped window if using Shadow DOM polyfill
   win.realWindow = window; // create a TextNode
 
@@ -1325,7 +1350,7 @@ if (typeof window === 'undefined') {
   win.window = undefined;
   win.realWindow = undefined;
 } else {
-  init(window);
+  __init_65(window);
 }
 
 function getWindow(node) {
@@ -1337,7 +1362,7 @@ function getWindow(node) {
   return rootNode.defaultView || win.window;
 }
 
-win.init = init;
+win.init = __init_65;
 var ___default_65 = win;
 _$window_65["default"] = ___default_65;
 
@@ -1424,314 +1449,6 @@ var array = function array(thing) {
 
 _$is_56.array = array;
 
-var _$normalizeListeners_58 = {};
-"use strict";
-
-Object.defineProperty(_$normalizeListeners_58, "__esModule", {
-  value: true
-});
-_$normalizeListeners_58["default"] = normalize;
-
-var _extend = ___interopRequireDefault_58(_$extend_52);
-
-var is = _interopRequireWildcard(_$is_56);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-function ___interopRequireDefault_58(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function normalize(type, listeners, result) {
-  result = result || {};
-
-  if (is.string(type) && type.search(' ') !== -1) {
-    type = split(type);
-  }
-
-  if (is.array(type)) {
-    return type.reduce(function (acc, t) {
-      return (0, _extend["default"])(acc, normalize(t, listeners, result));
-    }, result);
-  } // ({ type: fn }) -> ('', { type: fn })
-
-
-  if (is.object(type)) {
-    listeners = type;
-    type = '';
-  }
-
-  if (is.func(listeners)) {
-    result[type] = result[type] || [];
-    result[type].push(listeners);
-  } else if (is.array(listeners)) {
-    for (var _i = 0; _i < listeners.length; _i++) {
-      var _ref;
-
-      _ref = listeners[_i];
-      var l = _ref;
-      normalize(type, l, result);
-    }
-  } else if (is.object(listeners)) {
-    for (var prefix in listeners) {
-      var combinedTypes = split(prefix).map(function (p) {
-        return "".concat(type).concat(p);
-      });
-      normalize(combinedTypes, listeners[prefix], result);
-    }
-  }
-
-  return result;
-}
-
-function split(type) {
-  return type.trim().split(/ +/);
-}
-
-var _$Eventable_14 = {};
-"use strict";
-
-Object.defineProperty(_$Eventable_14, "__esModule", {
-  value: true
-});
-_$Eventable_14["default"] = void 0;
-
-var arr = ___interopRequireWildcard_14(_$arr_46);
-
-var ___extend_14 = ___interopRequireDefault_14(_$extend_52);
-
-var _normalizeListeners = ___interopRequireDefault_14(_$normalizeListeners_58);
-
-function ___interopRequireDefault_14(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function ___interopRequireWildcard_14(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function fireUntilImmediateStopped(event, listeners) {
-  for (var _i = 0; _i < listeners.length; _i++) {
-    var _ref;
-
-    _ref = listeners[_i];
-    var listener = _ref;
-
-    if (event.immediatePropagationStopped) {
-      break;
-    }
-
-    listener(event);
-  }
-}
-
-var Eventable =
-/*#__PURE__*/
-function () {
-  function Eventable(options) {
-    _classCallCheck(this, Eventable);
-
-    this.types = {};
-    this.propagationStopped = false;
-    this.immediatePropagationStopped = false;
-    this.options = (0, ___extend_14["default"])({}, options || {});
-  }
-
-  _createClass(Eventable, [{
-    key: "fire",
-    value: function fire(event) {
-      var listeners;
-      var global = this.global; // Interactable#on() listeners
-      // tslint:disable no-conditional-assignment
-
-      if (listeners = this.types[event.type]) {
-        fireUntilImmediateStopped(event, listeners);
-      } // interact.on() listeners
-
-
-      if (!event.propagationStopped && global && (listeners = global[event.type])) {
-        fireUntilImmediateStopped(event, listeners);
-      }
-    }
-  }, {
-    key: "on",
-    value: function on(type, listener) {
-      var listeners = (0, _normalizeListeners["default"])(type, listener);
-
-      for (type in listeners) {
-        this.types[type] = arr.merge(this.types[type] || [], listeners[type]);
-      }
-    }
-  }, {
-    key: "off",
-    value: function off(type, listener) {
-      var listeners = (0, _normalizeListeners["default"])(type, listener);
-
-      for (type in listeners) {
-        var eventList = this.types[type];
-
-        if (!eventList || !eventList.length) {
-          continue;
-        }
-
-        for (var _i2 = 0; _i2 < listeners[type].length; _i2++) {
-          var _ref2;
-
-          _ref2 = listeners[type][_i2];
-          var subListener = _ref2;
-          var index = eventList.indexOf(subListener);
-
-          if (index !== -1) {
-            eventList.splice(index, 1);
-          }
-        }
-      }
-    }
-  }]);
-
-  return Eventable;
-}();
-
-var ___default_14 = Eventable;
-_$Eventable_14["default"] = ___default_14;
-
-var _$BaseEvent_13 = {};
-"use strict";
-
-Object.defineProperty(_$BaseEvent_13, "__esModule", {
-  value: true
-});
-_$BaseEvent_13["default"] = _$BaseEvent_13.BaseEvent = _$BaseEvent_13.EventPhase = void 0;
-
-function ___classCallCheck_13(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function ___defineProperties_13(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function ___createClass_13(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_13(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_13(Constructor, staticProps); return Constructor; }
-
-var EventPhase;
-_$BaseEvent_13.EventPhase = EventPhase;
-
-(function (EventPhase) {
-  EventPhase["Start"] = "start";
-  EventPhase["Move"] = "move";
-  EventPhase["End"] = "end";
-  EventPhase["_NONE"] = "";
-})(EventPhase || (_$BaseEvent_13.EventPhase = EventPhase = {}));
-
-var BaseEvent =
-/*#__PURE__*/
-function () {
-  function BaseEvent(interaction) {
-    ___classCallCheck_13(this, BaseEvent);
-
-    this.immediatePropagationStopped = false;
-    this.propagationStopped = false;
-    this._interaction = interaction;
-  }
-
-  ___createClass_13(BaseEvent, [{
-    key: "preventDefault",
-    value: function preventDefault() {}
-    /**
-     * Don't call any other listeners (even on the current target)
-     */
-
-  }, {
-    key: "stopPropagation",
-    value: function stopPropagation() {
-      this.propagationStopped = true;
-    }
-    /**
-     * Don't call listeners on the remaining targets
-     */
-
-  }, {
-    key: "stopImmediatePropagation",
-    value: function stopImmediatePropagation() {
-      this.immediatePropagationStopped = this.propagationStopped = true;
-    }
-  }, {
-    key: "interaction",
-    get: function get() {
-      return this._interaction._proxy;
-    }
-  }]);
-
-  return BaseEvent;
-}();
-
-_$BaseEvent_13.BaseEvent = BaseEvent;
-var ___default_13 = BaseEvent;
-_$BaseEvent_13["default"] = ___default_13;
-
-var _$defaultOptions_20 = {};
-"use strict";
-
-Object.defineProperty(_$defaultOptions_20, "__esModule", {
-  value: true
-});
-_$defaultOptions_20["default"] = _$defaultOptions_20.defaults = void 0;
-// tslint:disable no-empty-interface
-var defaults = {
-  base: {
-    preventDefault: 'auto',
-    deltaSource: 'page'
-  },
-  perAction: {
-    enabled: false,
-    origin: {
-      x: 0,
-      y: 0
-    }
-  },
-  actions: {}
-};
-_$defaultOptions_20.defaults = defaults;
-var ___default_20 = defaults;
-_$defaultOptions_20["default"] = ___default_20;
-
-var _$domObjects_49 = {};
-"use strict";
-
-Object.defineProperty(_$domObjects_49, "__esModule", {
-  value: true
-});
-_$domObjects_49["default"] = void 0;
-var domObjects = {
-  init: __init_49,
-  document: null,
-  DocumentFragment: null,
-  SVGElement: null,
-  SVGSVGElement: null,
-  // eslint-disable-next-line no-undef
-  SVGElementInstance: null,
-  Element: null,
-  HTMLElement: null,
-  Event: null,
-  Touch: null,
-  PointerEvent: null
-};
-
-function blank() {}
-
-var ___default_49 = domObjects;
-_$domObjects_49["default"] = ___default_49;
-
-function __init_49(window) {
-  var win = window;
-  domObjects.document = win.document;
-  domObjects.DocumentFragment = win.DocumentFragment || blank;
-  domObjects.SVGElement = win.SVGElement || blank;
-  domObjects.SVGSVGElement = win.SVGSVGElement || blank;
-  domObjects.SVGElementInstance = win.SVGElementInstance || blank;
-  domObjects.Element = win.Element || blank;
-  domObjects.HTMLElement = win.HTMLElement || domObjects.Element;
-  domObjects.Event = win.Event;
-  domObjects.Touch = win.Touch || blank;
-  domObjects.PointerEvent = win.PointerEvent || win.MSPointerEvent;
-}
-
 var _$browser_47 = {};
 "use strict";
 
@@ -1742,11 +1459,11 @@ _$browser_47["default"] = void 0;
 
 var _domObjects = ___interopRequireDefault_47(_$domObjects_49);
 
-var __is_47 = ___interopRequireWildcard_47(_$is_56);
+var is = _interopRequireWildcard(_$is_56);
 
 var _window = ___interopRequireDefault_47(_$window_65);
 
-function ___interopRequireWildcard_47(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
 function ___interopRequireDefault_47(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -1767,7 +1484,7 @@ function __init_47(window) {
   var Element = _domObjects["default"].Element;
   var navigator = _window["default"].window.navigator; // Does the browser support touch input?
 
-  browser.supportsTouch = 'ontouchstart' in window || __is_47.func(window.DocumentTouch) && _domObjects["default"].document instanceof window.DocumentTouch; // Does the browser support PointerEvents
+  browser.supportsTouch = 'ontouchstart' in window || is.func(window.DocumentTouch) && _domObjects["default"].document instanceof window.DocumentTouch; // Does the browser support PointerEvents
 
   browser.supportsPointerEvent = navigator.pointerEnabled !== false && !!_domObjects["default"].PointerEvent;
   browser.isIOS = /iP(hone|od|ad)/.test(navigator.platform); // scrolling doesn't change the result of getClientRects on iOS 7
@@ -2050,385 +1767,6 @@ function trySelector(value) {
   return true;
 }
 
-var _$rect_62 = {};
-"use strict";
-
-Object.defineProperty(_$rect_62, "__esModule", {
-  value: true
-});
-_$rect_62.getStringOptionResult = getStringOptionResult;
-_$rect_62.resolveRectLike = resolveRectLike;
-_$rect_62.rectToXY = rectToXY;
-_$rect_62.xywhToTlbr = xywhToTlbr;
-_$rect_62.tlbrToXywh = tlbrToXywh;
-_$rect_62["default"] = void 0;
-
-/* removed: var _$domUtils_50 = require("./domUtils"); */;
-
-var ___extend_62 = ___interopRequireDefault_62(_$extend_52);
-
-var __is_62 = ___interopRequireWildcard_62(_$is_56);
-
-function ___interopRequireWildcard_62(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function getStringOptionResult(value, interactable, element) {
-  if (!__is_62.string(value)) {
-    return null;
-  }
-
-  if (value === 'parent') {
-    value = (0, _$domUtils_50.parentNode)(element);
-  } else if (value === 'self') {
-    value = interactable.getRect(element);
-  } else {
-    value = (0, _$domUtils_50.closest)(element, value);
-  }
-
-  return value;
-}
-
-function resolveRectLike(value, interactable, element, functionArgs) {
-  value = getStringOptionResult(value, interactable, element) || value;
-
-  if (__is_62.func(value)) {
-    value = value.apply(null, functionArgs);
-  }
-
-  if (__is_62.element(value)) {
-    value = (0, _$domUtils_50.getElementRect)(value);
-  }
-
-  return value;
-}
-
-function rectToXY(rect) {
-  return rect && {
-    x: 'x' in rect ? rect.x : rect.left,
-    y: 'y' in rect ? rect.y : rect.top
-  };
-}
-
-function xywhToTlbr(rect) {
-  if (rect && !('left' in rect && 'top' in rect)) {
-    rect = (0, ___extend_62["default"])({}, rect);
-    rect.left = rect.x || 0;
-    rect.top = rect.y || 0;
-    rect.right = rect.right || rect.left + rect.width;
-    rect.bottom = rect.bottom || rect.top + rect.height;
-  }
-
-  return rect;
-}
-
-function tlbrToXywh(rect) {
-  if (rect && !('x' in rect && 'y' in rect)) {
-    rect = (0, ___extend_62["default"])({}, rect);
-    rect.x = rect.left || 0;
-    rect.y = rect.top || 0;
-    rect.width = rect.width || rect.right - rect.x;
-    rect.height = rect.height || rect.bottom - rect.y;
-  }
-
-  return rect;
-}
-
-var ___default_62 = {
-  getStringOptionResult: getStringOptionResult,
-  resolveRectLike: resolveRectLike,
-  rectToXY: rectToXY,
-  xywhToTlbr: xywhToTlbr,
-  tlbrToXywh: tlbrToXywh
-};
-_$rect_62["default"] = ___default_62;
-
-var _$getOriginXY_53 = {};
-"use strict";
-
-Object.defineProperty(_$getOriginXY_53, "__esModule", {
-  value: true
-});
-_$getOriginXY_53["default"] = ___default_53;
-
-/* removed: var _$rect_62 = require("./rect"); */;
-
-function ___default_53(target, element, action) {
-  var actionOptions = target.options[action];
-  var actionOrigin = actionOptions && actionOptions.origin;
-  var origin = actionOrigin || target.options.origin;
-  var originRect = (0, _$rect_62.resolveRectLike)(origin, target, element, [target && element]);
-  return (0, _$rect_62.rectToXY)(originRect) || {
-    x: 0,
-    y: 0
-  };
-}
-
-var _$hypot_54 = {};
-"use strict";
-
-Object.defineProperty(_$hypot_54, "__esModule", {
-  value: true
-});
-_$hypot_54["default"] = void 0;
-
-var ___default_54 = function _default(x, y) {
-  return Math.sqrt(x * x + y * y);
-};
-
-_$hypot_54["default"] = ___default_54;
-
-var _$InteractEvent_15 = {};
-"use strict";
-
-Object.defineProperty(_$InteractEvent_15, "__esModule", {
-  value: true
-});
-_$InteractEvent_15["default"] = _$InteractEvent_15.InteractEvent = _$InteractEvent_15.EventPhase = void 0;
-
-var ___extend_15 = ___interopRequireDefault_15(_$extend_52);
-
-var _getOriginXY = ___interopRequireDefault_15(_$getOriginXY_53);
-
-var _hypot = ___interopRequireDefault_15(_$hypot_54);
-
-var _BaseEvent2 = ___interopRequireDefault_15(_$BaseEvent_13);
-
-var _defaultOptions = ___interopRequireDefault_15(_$defaultOptions_20);
-
-function ___interopRequireDefault_15(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function ___typeof_15(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_15 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_15 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_15(obj); }
-
-function ___classCallCheck_15(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function ___defineProperties_15(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function ___createClass_15(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_15(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_15(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (___typeof_15(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-var __EventPhase_15;
-_$InteractEvent_15.EventPhase = __EventPhase_15;
-
-(function (EventPhase) {
-  EventPhase["Start"] = "start";
-  EventPhase["Move"] = "move";
-  EventPhase["End"] = "end";
-  EventPhase["_NONE"] = "";
-})(__EventPhase_15 || (_$InteractEvent_15.EventPhase = __EventPhase_15 = {}));
-
-var InteractEvent =
-/*#__PURE__*/
-function (_BaseEvent) {
-  _inherits(InteractEvent, _BaseEvent);
-
-  /** */
-  function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
-    var _this;
-
-    ___classCallCheck_15(this, InteractEvent);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(InteractEvent).call(this, interaction));
-    element = element || interaction.element;
-    var target = interaction.interactable; // FIXME: add deltaSource to defaults
-
-    var deltaSource = (target && target.options || _defaultOptions["default"]).deltaSource;
-    var origin = (0, _getOriginXY["default"])(target, element, actionName);
-    var starting = phase === 'start';
-    var ending = phase === 'end';
-    var prevEvent = starting ? _assertThisInitialized(_this) : interaction.prevEvent;
-    var coords = starting ? interaction.coords.start : ending ? {
-      page: prevEvent.page,
-      client: prevEvent.client,
-      timeStamp: interaction.coords.cur.timeStamp
-    } : interaction.coords.cur;
-    _this.page = (0, ___extend_15["default"])({}, coords.page);
-    _this.client = (0, ___extend_15["default"])({}, coords.client);
-    _this.rect = (0, ___extend_15["default"])({}, interaction.rect);
-    _this.timeStamp = coords.timeStamp;
-
-    if (!ending) {
-      _this.page.x -= origin.x;
-      _this.page.y -= origin.y;
-      _this.client.x -= origin.x;
-      _this.client.y -= origin.y;
-    }
-
-    _this.ctrlKey = event.ctrlKey;
-    _this.altKey = event.altKey;
-    _this.shiftKey = event.shiftKey;
-    _this.metaKey = event.metaKey;
-    _this.button = event.button;
-    _this.buttons = event.buttons;
-    _this.target = element;
-    _this.currentTarget = element;
-    _this.relatedTarget = related || null;
-    _this.preEnd = preEnd;
-    _this.type = type || actionName + (phase || '');
-    _this.interactable = target;
-    _this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
-    _this.x0 = interaction.coords.start.page.x - origin.x;
-    _this.y0 = interaction.coords.start.page.y - origin.y;
-    _this.clientX0 = interaction.coords.start.client.x - origin.x;
-    _this.clientY0 = interaction.coords.start.client.y - origin.y;
-
-    if (starting || ending) {
-      _this.delta = {
-        x: 0,
-        y: 0
-      };
-    } else {
-      _this.delta = {
-        x: _this[deltaSource].x - prevEvent[deltaSource].x,
-        y: _this[deltaSource].y - prevEvent[deltaSource].y
-      };
-    }
-
-    _this.dt = interaction.coords.delta.timeStamp;
-    _this.duration = _this.timeStamp - _this.t0; // velocity and speed in pixels per second
-
-    _this.velocity = (0, ___extend_15["default"])({}, interaction.coords.velocity[deltaSource]);
-    _this.speed = (0, _hypot["default"])(_this.velocity.x, _this.velocity.y);
-    _this.swipe = ending || phase === 'inertiastart' ? _this.getSwipe() : null;
-    return _this;
-  }
-
-  ___createClass_15(InteractEvent, [{
-    key: "getSwipe",
-    value: function getSwipe() {
-      var interaction = this._interaction;
-
-      if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
-        return null;
-      }
-
-      var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
-      var overlap = 22.5;
-
-      if (angle < 0) {
-        angle += 360;
-      }
-
-      var left = 135 - overlap <= angle && angle < 225 + overlap;
-      var up = 225 - overlap <= angle && angle < 315 + overlap;
-      var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
-      var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
-      return {
-        up: up,
-        down: down,
-        left: left,
-        right: right,
-        angle: angle,
-        speed: interaction.prevEvent.speed,
-        velocity: {
-          x: interaction.prevEvent.velocityX,
-          y: interaction.prevEvent.velocityY
-        }
-      };
-    }
-  }, {
-    key: "preventDefault",
-    value: function preventDefault() {}
-    /**
-     * Don't call listeners on the remaining targets
-     */
-
-  }, {
-    key: "stopImmediatePropagation",
-    value: function stopImmediatePropagation() {
-      this.immediatePropagationStopped = this.propagationStopped = true;
-    }
-    /**
-     * Don't call any other listeners (even on the current target)
-     */
-
-  }, {
-    key: "stopPropagation",
-    value: function stopPropagation() {
-      this.propagationStopped = true;
-    }
-  }, {
-    key: "pageX",
-    get: function get() {
-      return this.page.x;
-    },
-    set: function set(value) {
-      this.page.x = value;
-    }
-  }, {
-    key: "pageY",
-    get: function get() {
-      return this.page.y;
-    },
-    set: function set(value) {
-      this.page.y = value;
-    }
-  }, {
-    key: "clientX",
-    get: function get() {
-      return this.client.x;
-    },
-    set: function set(value) {
-      this.client.x = value;
-    }
-  }, {
-    key: "clientY",
-    get: function get() {
-      return this.client.y;
-    },
-    set: function set(value) {
-      this.client.y = value;
-    }
-  }, {
-    key: "dx",
-    get: function get() {
-      return this.delta.x;
-    },
-    set: function set(value) {
-      this.delta.x = value;
-    }
-  }, {
-    key: "dy",
-    get: function get() {
-      return this.delta.y;
-    },
-    set: function set(value) {
-      this.delta.y = value;
-    }
-  }, {
-    key: "velocityX",
-    get: function get() {
-      return this.velocity.x;
-    },
-    set: function set(value) {
-      this.velocity.x = value;
-    }
-  }, {
-    key: "velocityY",
-    get: function get() {
-      return this.velocity.y;
-    },
-    set: function set(value) {
-      this.velocity.y = value;
-    }
-  }]);
-
-  return InteractEvent;
-}(_BaseEvent2["default"]);
-
-_$InteractEvent_15.InteractEvent = InteractEvent;
-var ___default_15 = InteractEvent;
-_$InteractEvent_15["default"] = ___default_15;
-
 var _$clone_48 = {};
 "use strict";
 
@@ -2437,7 +1775,7 @@ Object.defineProperty(_$clone_48, "__esModule", {
 });
 _$clone_48["default"] = clone;
 
-var __arr_48 = ___interopRequireWildcard_48(_$arr_46);
+var arr = ___interopRequireWildcard_48(_$arr_46);
 
 var __is_48 = ___interopRequireWildcard_48(_$is_56);
 
@@ -2452,7 +1790,7 @@ function clone(source) {
     if (__is_48.plainObject(value)) {
       dest[prop] = clone(value);
     } else if (__is_48.array(value)) {
-      dest[prop] = __arr_48.from(value);
+      dest[prop] = arr.from(value);
     } else {
       dest[prop] = value;
     }
@@ -2496,6 +1834,20 @@ pointerExtend.prefixedPropREs = {
 var ___default_59 = pointerExtend;
 _$pointerExtend_59["default"] = ___default_59;
 
+var _$hypot_54 = {};
+"use strict";
+
+Object.defineProperty(_$hypot_54, "__esModule", {
+  value: true
+});
+_$hypot_54["default"] = void 0;
+
+var ___default_54 = function _default(x, y) {
+  return Math.sqrt(x * x + y * y);
+};
+
+_$hypot_54["default"] = ___default_54;
+
 var _$pointerUtils_60 = {};
 "use strict";
 
@@ -2510,7 +1862,7 @@ var ___domObjects_60 = ___interopRequireDefault_60(_$domObjects_49);
 
 var domUtils = ___interopRequireWildcard_60(_$domUtils_50);
 
-var ___hypot_60 = ___interopRequireDefault_60(_$hypot_54);
+var _hypot = ___interopRequireDefault_60(_$hypot_54);
 
 var __is_60 = ___interopRequireWildcard_60(_$is_56);
 
@@ -2677,7 +2029,7 @@ var pointerUtils = {
     var touches = pointerUtils.getTouchPair(event);
     var dx = touches[0][sourceX] - touches[1][sourceX];
     var dy = touches[0][sourceY] - touches[1][sourceY];
-    return (0, ___hypot_60["default"])(dx, dy);
+    return (0, _hypot["default"])(dx, dy);
   },
   touchAngle: function touchAngle(event, deltaSource) {
     var sourceX = deltaSource + 'X';
@@ -2788,11 +2140,11 @@ function ___interopRequireDefault_51(obj) { return obj && obj.__esModule ? obj :
 
 function ___interopRequireWildcard_51(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
-function ___classCallCheck_51(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function ___defineProperties_51(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
-function ___createClass_51(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_51(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_51(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
@@ -3031,14 +2383,14 @@ var FakeEvent =
 /*#__PURE__*/
 function () {
   function FakeEvent(originalEvent) {
-    ___classCallCheck_51(this, FakeEvent);
+    _classCallCheck(this, FakeEvent);
 
     this.originalEvent = originalEvent; // duplicate the event so that currentTarget can be changed
 
     (0, ___pointerExtend_51["default"])(this, originalEvent);
   }
 
-  ___createClass_51(FakeEvent, [{
+  _createClass(FakeEvent, [{
     key: "preventOriginalDefault",
     value: function preventOriginalDefault() {
       this.originalEvent.preventDefault();
@@ -3088,6 +2440,628 @@ var events = {
 var ___default_51 = events;
 _$events_51["default"] = ___default_51;
 
+var _$extend_52 = {};
+"use strict";
+
+Object.defineProperty(_$extend_52, "__esModule", {
+  value: true
+});
+_$extend_52["default"] = extend;
+
+function extend(dest, source) {
+  for (var prop in source) {
+    dest[prop] = source[prop];
+  }
+
+  return dest;
+}
+
+var _$rect_62 = {};
+"use strict";
+
+Object.defineProperty(_$rect_62, "__esModule", {
+  value: true
+});
+_$rect_62.getStringOptionResult = getStringOptionResult;
+_$rect_62.resolveRectLike = resolveRectLike;
+_$rect_62.rectToXY = rectToXY;
+_$rect_62.xywhToTlbr = xywhToTlbr;
+_$rect_62.tlbrToXywh = tlbrToXywh;
+_$rect_62["default"] = void 0;
+
+/* removed: var _$domUtils_50 = require("./domUtils"); */;
+
+var _extend = ___interopRequireDefault_62(_$extend_52);
+
+var __is_62 = ___interopRequireWildcard_62(_$is_56);
+
+function ___interopRequireWildcard_62(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function getStringOptionResult(value, interactable, element) {
+  if (!__is_62.string(value)) {
+    return null;
+  }
+
+  if (value === 'parent') {
+    value = (0, _$domUtils_50.parentNode)(element);
+  } else if (value === 'self') {
+    value = interactable.getRect(element);
+  } else {
+    value = (0, _$domUtils_50.closest)(element, value);
+  }
+
+  return value;
+}
+
+function resolveRectLike(value, interactable, element, functionArgs) {
+  value = getStringOptionResult(value, interactable, element) || value;
+
+  if (__is_62.func(value)) {
+    value = value.apply(null, functionArgs);
+  }
+
+  if (__is_62.element(value)) {
+    value = (0, _$domUtils_50.getElementRect)(value);
+  }
+
+  return value;
+}
+
+function rectToXY(rect) {
+  return rect && {
+    x: 'x' in rect ? rect.x : rect.left,
+    y: 'y' in rect ? rect.y : rect.top
+  };
+}
+
+function xywhToTlbr(rect) {
+  if (rect && !('left' in rect && 'top' in rect)) {
+    rect = (0, _extend["default"])({}, rect);
+    rect.left = rect.x || 0;
+    rect.top = rect.y || 0;
+    rect.right = rect.right || rect.left + rect.width;
+    rect.bottom = rect.bottom || rect.top + rect.height;
+  }
+
+  return rect;
+}
+
+function tlbrToXywh(rect) {
+  if (rect && !('x' in rect && 'y' in rect)) {
+    rect = (0, _extend["default"])({}, rect);
+    rect.x = rect.left || 0;
+    rect.y = rect.top || 0;
+    rect.width = rect.width || rect.right - rect.x;
+    rect.height = rect.height || rect.bottom - rect.y;
+  }
+
+  return rect;
+}
+
+var ___default_62 = {
+  getStringOptionResult: getStringOptionResult,
+  resolveRectLike: resolveRectLike,
+  rectToXY: rectToXY,
+  xywhToTlbr: xywhToTlbr,
+  tlbrToXywh: tlbrToXywh
+};
+_$rect_62["default"] = ___default_62;
+
+var _$getOriginXY_53 = {};
+"use strict";
+
+Object.defineProperty(_$getOriginXY_53, "__esModule", {
+  value: true
+});
+_$getOriginXY_53["default"] = ___default_53;
+
+/* removed: var _$rect_62 = require("./rect"); */;
+
+function ___default_53(target, element, action) {
+  var actionOptions = target.options[action];
+  var actionOrigin = actionOptions && actionOptions.origin;
+  var origin = actionOrigin || target.options.origin;
+  var originRect = (0, _$rect_62.resolveRectLike)(origin, target, element, [target && element]);
+  return (0, _$rect_62.rectToXY)(originRect) || {
+    x: 0,
+    y: 0
+  };
+}
+
+var _$normalizeListeners_58 = {};
+"use strict";
+
+Object.defineProperty(_$normalizeListeners_58, "__esModule", {
+  value: true
+});
+_$normalizeListeners_58["default"] = normalize;
+
+var ___extend_58 = ___interopRequireDefault_58(_$extend_52);
+
+var __is_58 = ___interopRequireWildcard_58(_$is_56);
+
+function ___interopRequireWildcard_58(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+function ___interopRequireDefault_58(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function normalize(type, listeners, result) {
+  result = result || {};
+
+  if (__is_58.string(type) && type.search(' ') !== -1) {
+    type = split(type);
+  }
+
+  if (__is_58.array(type)) {
+    return type.reduce(function (acc, t) {
+      return (0, ___extend_58["default"])(acc, normalize(t, listeners, result));
+    }, result);
+  } // ({ type: fn }) -> ('', { type: fn })
+
+
+  if (__is_58.object(type)) {
+    listeners = type;
+    type = '';
+  }
+
+  if (__is_58.func(listeners)) {
+    result[type] = result[type] || [];
+    result[type].push(listeners);
+  } else if (__is_58.array(listeners)) {
+    for (var _i = 0; _i < listeners.length; _i++) {
+      var _ref;
+
+      _ref = listeners[_i];
+      var l = _ref;
+      normalize(type, l, result);
+    }
+  } else if (__is_58.object(listeners)) {
+    for (var prefix in listeners) {
+      var combinedTypes = split(prefix).map(function (p) {
+        return "".concat(type).concat(p);
+      });
+      normalize(combinedTypes, listeners[prefix], result);
+    }
+  }
+
+  return result;
+}
+
+function split(type) {
+  return type.trim().split(/ +/);
+}
+
+var _$raf_61 = {};
+"use strict";
+
+Object.defineProperty(_$raf_61, "__esModule", {
+  value: true
+});
+_$raf_61["default"] = void 0;
+var lastTime = 0;
+
+var _request;
+
+var _cancel;
+
+function __init_61(window) {
+  _request = window.requestAnimationFrame;
+  _cancel = window.cancelAnimationFrame;
+
+  if (!_request) {
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+
+    for (var _i = 0; _i < vendors.length; _i++) {
+      var vendor = vendors[_i];
+      _request = window["".concat(vendor, "RequestAnimationFrame")];
+      _cancel = window["".concat(vendor, "CancelAnimationFrame")] || window["".concat(vendor, "CancelRequestAnimationFrame")];
+    }
+  }
+
+  if (!_request) {
+    _request = function request(callback) {
+      var currTime = Date.now();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime)); // eslint-disable-next-line standard/no-callback-literal
+
+      var token = setTimeout(function () {
+        callback(currTime + timeToCall);
+      }, timeToCall);
+      lastTime = currTime + timeToCall;
+      return token;
+    };
+
+    _cancel = function cancel(token) {
+      return clearTimeout(token);
+    };
+  }
+}
+
+var ___default_61 = {
+  request: function request(callback) {
+    return _request(callback);
+  },
+  cancel: function cancel(token) {
+    return _cancel(token);
+  },
+  init: __init_61
+};
+_$raf_61["default"] = ___default_61;
+
+var _$Signals_45 = {};
+"use strict";
+
+Object.defineProperty(_$Signals_45, "__esModule", {
+  value: true
+});
+_$Signals_45["default"] = void 0;
+
+function ___classCallCheck_45(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function ___defineProperties_45(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function ___createClass_45(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_45(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_45(Constructor, staticProps); return Constructor; }
+
+var Signals =
+/*#__PURE__*/
+function () {
+  function Signals() {
+    ___classCallCheck_45(this, Signals);
+
+    this.listeners = {};
+  }
+
+  ___createClass_45(Signals, [{
+    key: "on",
+    value: function on(name, listener) {
+      if (!this.listeners[name]) {
+        this.listeners[name] = [listener];
+        return;
+      }
+
+      this.listeners[name].push(listener);
+    }
+  }, {
+    key: "off",
+    value: function off(name, listener) {
+      if (!this.listeners[name]) {
+        return;
+      }
+
+      var index = this.listeners[name].indexOf(listener);
+
+      if (index !== -1) {
+        this.listeners[name].splice(index, 1);
+      }
+    }
+  }, {
+    key: "fire",
+    value: function fire(name, arg) {
+      var targetListeners = this.listeners[name];
+
+      if (!targetListeners) {
+        return;
+      }
+
+      for (var _i = 0; _i < targetListeners.length; _i++) {
+        var _ref;
+
+        _ref = targetListeners[_i];
+        var listener = _ref;
+
+        if (listener(arg, name) === false) {
+          return false;
+        }
+      }
+    }
+  }]);
+
+  return Signals;
+}();
+
+var ___default_45 = Signals;
+_$Signals_45["default"] = ___default_45;
+
+var _$utils_55 = {};
+"use strict";
+
+Object.defineProperty(_$utils_55, "__esModule", {
+  value: true
+});
+_$utils_55.warnOnce = warnOnce;
+_$utils_55._getQBezierValue = _getQBezierValue;
+_$utils_55.getQuadraticCurvePoint = getQuadraticCurvePoint;
+_$utils_55.easeOutQuad = easeOutQuad;
+_$utils_55.copyAction = copyAction;
+Object.defineProperty(_$utils_55, "win", {
+  enumerable: true,
+  get: function get() {
+    return ___window_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "browser", {
+  enumerable: true,
+  get: function get() {
+    return ___browser_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "clone", {
+  enumerable: true,
+  get: function get() {
+    return _clone["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "events", {
+  enumerable: true,
+  get: function get() {
+    return _events["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "extend", {
+  enumerable: true,
+  get: function get() {
+    return ___extend_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "getOriginXY", {
+  enumerable: true,
+  get: function get() {
+    return _getOriginXY["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "hypot", {
+  enumerable: true,
+  get: function get() {
+    return ___hypot_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "normalizeListeners", {
+  enumerable: true,
+  get: function get() {
+    return _normalizeListeners["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "pointer", {
+  enumerable: true,
+  get: function get() {
+    return ___pointerUtils_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "raf", {
+  enumerable: true,
+  get: function get() {
+    return _raf["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "rect", {
+  enumerable: true,
+  get: function get() {
+    return ___rect_55["default"];
+  }
+});
+Object.defineProperty(_$utils_55, "Signals", {
+  enumerable: true,
+  get: function get() {
+    return _Signals["default"];
+  }
+});
+_$utils_55.is = _$utils_55.dom = _$utils_55.arr = void 0;
+
+var __arr_55 = ___interopRequireWildcard_55(_$arr_46);
+
+_$utils_55.arr = __arr_55;
+
+var dom = ___interopRequireWildcard_55(_$domUtils_50);
+
+_$utils_55.dom = dom;
+
+var __is_55 = ___interopRequireWildcard_55(_$is_56);
+
+_$utils_55.is = __is_55;
+
+var ___window_55 = ___interopRequireDefault_55(_$window_65);
+
+var ___browser_55 = ___interopRequireDefault_55(_$browser_47);
+
+var _clone = ___interopRequireDefault_55(_$clone_48);
+
+var _events = ___interopRequireDefault_55(_$events_51);
+
+var ___extend_55 = ___interopRequireDefault_55(_$extend_52);
+
+var _getOriginXY = ___interopRequireDefault_55(_$getOriginXY_53);
+
+var ___hypot_55 = ___interopRequireDefault_55(_$hypot_54);
+
+var _normalizeListeners = ___interopRequireDefault_55(_$normalizeListeners_58);
+
+var ___pointerUtils_55 = ___interopRequireDefault_55(_$pointerUtils_60);
+
+var _raf = ___interopRequireDefault_55(_$raf_61);
+
+var ___rect_55 = ___interopRequireDefault_55(_$rect_62);
+
+var _Signals = ___interopRequireDefault_55(_$Signals_45);
+
+function ___interopRequireDefault_55(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ___interopRequireWildcard_55(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+function warnOnce(method, message) {
+  var warned = false; // eslint-disable-next-line no-shadow
+
+  return function () {
+    if (!warned) {
+      ___window_55["default"].window.console.warn(message);
+
+      warned = true;
+    }
+
+    return method.apply(this, arguments);
+  };
+} // http://stackoverflow.com/a/5634528/2280888
+
+
+function _getQBezierValue(t, p1, p2, p3) {
+  var iT = 1 - t;
+  return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
+}
+
+function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
+  return {
+    x: _getQBezierValue(position, startX, cpX, endX),
+    y: _getQBezierValue(position, startY, cpY, endY)
+  };
+} // http://gizma.com/easing/
+
+
+function easeOutQuad(t, b, c, d) {
+  t /= d;
+  return -c * t * (t - 2) + b;
+}
+
+function copyAction(dest, src) {
+  dest.name = src.name;
+  dest.axis = src.axis;
+  dest.edges = src.edges;
+  return dest;
+}
+
+var _$defaultOptions_20 = {};
+"use strict";
+
+Object.defineProperty(_$defaultOptions_20, "__esModule", {
+  value: true
+});
+_$defaultOptions_20["default"] = _$defaultOptions_20.defaults = void 0;
+// tslint:disable no-empty-interface
+var defaults = {
+  base: {
+    preventDefault: 'auto',
+    deltaSource: 'page'
+  },
+  perAction: {
+    enabled: false,
+    origin: {
+      x: 0,
+      y: 0
+    }
+  },
+  actions: {}
+};
+_$defaultOptions_20.defaults = defaults;
+var ___default_20 = defaults;
+_$defaultOptions_20["default"] = ___default_20;
+
+var _$Eventable_14 = {};
+"use strict";
+
+Object.defineProperty(_$Eventable_14, "__esModule", {
+  value: true
+});
+_$Eventable_14["default"] = void 0;
+
+var __arr_14 = ___interopRequireWildcard_14(_$arr_46);
+
+var ___extend_14 = ___interopRequireDefault_14(_$extend_52);
+
+var ___normalizeListeners_14 = ___interopRequireDefault_14(_$normalizeListeners_58);
+
+function ___interopRequireDefault_14(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ___interopRequireWildcard_14(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+function ___classCallCheck_14(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function ___defineProperties_14(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function ___createClass_14(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_14(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_14(Constructor, staticProps); return Constructor; }
+
+function fireUntilImmediateStopped(event, listeners) {
+  for (var _i = 0; _i < listeners.length; _i++) {
+    var _ref;
+
+    _ref = listeners[_i];
+    var listener = _ref;
+
+    if (event.immediatePropagationStopped) {
+      break;
+    }
+
+    listener(event);
+  }
+}
+
+var Eventable =
+/*#__PURE__*/
+function () {
+  function Eventable(options) {
+    ___classCallCheck_14(this, Eventable);
+
+    this.types = {};
+    this.propagationStopped = false;
+    this.immediatePropagationStopped = false;
+    this.options = (0, ___extend_14["default"])({}, options || {});
+  }
+
+  ___createClass_14(Eventable, [{
+    key: "fire",
+    value: function fire(event) {
+      var listeners;
+      var global = this.global; // Interactable#on() listeners
+      // tslint:disable no-conditional-assignment
+
+      if (listeners = this.types[event.type]) {
+        fireUntilImmediateStopped(event, listeners);
+      } // interact.on() listeners
+
+
+      if (!event.propagationStopped && global && (listeners = global[event.type])) {
+        fireUntilImmediateStopped(event, listeners);
+      }
+    }
+  }, {
+    key: "on",
+    value: function on(type, listener) {
+      var listeners = (0, ___normalizeListeners_14["default"])(type, listener);
+
+      for (type in listeners) {
+        this.types[type] = __arr_14.merge(this.types[type] || [], listeners[type]);
+      }
+    }
+  }, {
+    key: "off",
+    value: function off(type, listener) {
+      var listeners = (0, ___normalizeListeners_14["default"])(type, listener);
+
+      for (type in listeners) {
+        var eventList = this.types[type];
+
+        if (!eventList || !eventList.length) {
+          continue;
+        }
+
+        for (var _i2 = 0; _i2 < listeners[type].length; _i2++) {
+          var _ref2;
+
+          _ref2 = listeners[type][_i2];
+          var subListener = _ref2;
+          var index = eventList.indexOf(subListener);
+
+          if (index !== -1) {
+            eventList.splice(index, 1);
+          }
+        }
+      }
+    }
+  }]);
+
+  return Eventable;
+}();
+
+var ___default_14 = Eventable;
+_$Eventable_14["default"] = ___default_14;
+
 var _$Interactable_16 = {};
 "use strict";
 
@@ -3100,11 +3074,11 @@ var __arr_16 = ___interopRequireWildcard_16(_$arr_46);
 
 var ___browser_16 = ___interopRequireDefault_16(_$browser_47);
 
-var _clone = ___interopRequireDefault_16(_$clone_48);
+var ___clone_16 = ___interopRequireDefault_16(_$clone_48);
 
 /* removed: var _$domUtils_50 = require("@interactjs/utils/domUtils"); */;
 
-var _events = ___interopRequireDefault_16(_$events_51);
+var ___events_16 = ___interopRequireDefault_16(_$events_51);
 
 var ___extend_16 = ___interopRequireDefault_16(_$extend_52);
 
@@ -3195,7 +3169,7 @@ function () {
         } // if the option value is an object
         else if (!isArray && __is_16.plainObject(optionValue)) {
             // copy the object
-            actionOptions[optionName] = (0, ___extend_16["default"])(actionOptions[optionName] || {}, (0, _clone["default"])(optionValue)); // set anabled field to true if it exists in the defaults
+            actionOptions[optionName] = (0, ___extend_16["default"])(actionOptions[optionName] || {}, (0, ___clone_16["default"])(optionValue)); // set anabled field to true if it exists in the defaults
 
             if (__is_16.object(defaults.perAction[optionName]) && 'enabled' in defaults.perAction[optionName]) {
               actionOptions[optionName].enabled = optionValue.enabled !== false;
@@ -3404,10 +3378,10 @@ function () {
             this.events[method](type, listener);
           } // delegated event
           else if (__is_16.string(this.target)) {
-              _events["default"]["".concat(addRemove, "Delegate")](this.target, this._context, type, listener, options);
+              ___events_16["default"]["".concat(addRemove, "Delegate")](this.target, this._context, type, listener, options);
             } // remove listener from this Interatable's element
             else {
-                _events["default"][addRemove](this.target, type, listener, options);
+                ___events_16["default"][addRemove](this.target, type, listener, options);
               }
         }
       }
@@ -3462,7 +3436,7 @@ function () {
         options = {};
       }
 
-      this.options = (0, _clone["default"])(defaults.base);
+      this.options = (0, ___clone_16["default"])(defaults.base);
 
       for (var actionName in this._actions.methodDict) {
         var methodName = this._actions.methodDict[actionName];
@@ -3489,12 +3463,12 @@ function () {
   }, {
     key: "unset",
     value: function unset() {
-      _events["default"].remove(this.target, 'all');
+      ___events_16["default"].remove(this.target, 'all');
 
       if (__is_16.string(this.target)) {
         // remove delegated events
-        for (var type in _events["default"].delegatedEvents) {
-          var delegated = _events["default"].delegatedEvents[type];
+        for (var type in ___events_16["default"].delegatedEvents) {
+          var delegated = ___events_16["default"].delegatedEvents[type];
 
           if (delegated.selectors[0] === this.target && delegated.contexts[0] === this._context) {
             delegated.selectors.splice(0, 1);
@@ -3506,12 +3480,12 @@ function () {
             }
           }
 
-          _events["default"].remove(this._context, type, _events["default"].delegateListener);
+          ___events_16["default"].remove(this._context, type, ___events_16["default"].delegateListener);
 
-          _events["default"].remove(this._context, type, _events["default"].delegateUseCapture, true);
+          ___events_16["default"].remove(this._context, type, ___events_16["default"].delegateUseCapture, true);
         }
       } else {
-        _events["default"].remove(this.target, 'all');
+        ___events_16["default"].remove(this.target, 'all');
       }
     }
   }, {
@@ -3532,80 +3506,6 @@ _$Interactable_16.Interactable = Interactable;
 var ___default_16 = Interactable;
 _$Interactable_16["default"] = ___default_16;
 
-var _$Signals_45 = {};
-"use strict";
-
-Object.defineProperty(_$Signals_45, "__esModule", {
-  value: true
-});
-_$Signals_45["default"] = void 0;
-
-function ___classCallCheck_45(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function ___defineProperties_45(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function ___createClass_45(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_45(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_45(Constructor, staticProps); return Constructor; }
-
-var Signals =
-/*#__PURE__*/
-function () {
-  function Signals() {
-    ___classCallCheck_45(this, Signals);
-
-    this.listeners = {};
-  }
-
-  ___createClass_45(Signals, [{
-    key: "on",
-    value: function on(name, listener) {
-      if (!this.listeners[name]) {
-        this.listeners[name] = [listener];
-        return;
-      }
-
-      this.listeners[name].push(listener);
-    }
-  }, {
-    key: "off",
-    value: function off(name, listener) {
-      if (!this.listeners[name]) {
-        return;
-      }
-
-      var index = this.listeners[name].indexOf(listener);
-
-      if (index !== -1) {
-        this.listeners[name].splice(index, 1);
-      }
-    }
-  }, {
-    key: "fire",
-    value: function fire(name, arg) {
-      var targetListeners = this.listeners[name];
-
-      if (!targetListeners) {
-        return;
-      }
-
-      for (var _i = 0; _i < targetListeners.length; _i++) {
-        var _ref;
-
-        _ref = targetListeners[_i];
-        var listener = _ref;
-
-        if (listener(arg, name) === false) {
-          return false;
-        }
-      }
-    }
-  }]);
-
-  return Signals;
-}();
-
-var ___default_45 = Signals;
-_$Signals_45["default"] = ___default_45;
-
 var _$InteractableSet_17 = {};
 "use strict";
 
@@ -3622,7 +3522,7 @@ var ___extend_17 = ___interopRequireDefault_17(_$extend_52);
 
 var __is_17 = ___interopRequireWildcard_17(_$is_56);
 
-var _Signals = ___interopRequireDefault_17(_$Signals_45);
+var ___Signals_17 = ___interopRequireDefault_17(_$Signals_45);
 
 function ___interopRequireDefault_17(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -3643,7 +3543,7 @@ function () {
     ___classCallCheck_17(this, InteractableSet);
 
     this.scope = scope;
-    this.signals = new _Signals["default"](); // all set interactables
+    this.signals = new ___Signals_17["default"](); // all set interactables
 
     this.list = [];
     this.selectorMap = {};
@@ -3750,6 +3650,327 @@ function () {
 
 _$InteractableSet_17["default"] = InteractableSet;
 
+var _$BaseEvent_13 = {};
+"use strict";
+
+Object.defineProperty(_$BaseEvent_13, "__esModule", {
+  value: true
+});
+_$BaseEvent_13["default"] = _$BaseEvent_13.BaseEvent = _$BaseEvent_13.EventPhase = void 0;
+
+function ___classCallCheck_13(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function ___defineProperties_13(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function ___createClass_13(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_13(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_13(Constructor, staticProps); return Constructor; }
+
+var EventPhase;
+_$BaseEvent_13.EventPhase = EventPhase;
+
+(function (EventPhase) {
+  EventPhase["Start"] = "start";
+  EventPhase["Move"] = "move";
+  EventPhase["End"] = "end";
+  EventPhase["_NONE"] = "";
+})(EventPhase || (_$BaseEvent_13.EventPhase = EventPhase = {}));
+
+var BaseEvent =
+/*#__PURE__*/
+function () {
+  function BaseEvent(interaction) {
+    ___classCallCheck_13(this, BaseEvent);
+
+    this.immediatePropagationStopped = false;
+    this.propagationStopped = false;
+    this._interaction = interaction;
+  }
+
+  ___createClass_13(BaseEvent, [{
+    key: "preventDefault",
+    value: function preventDefault() {}
+    /**
+     * Don't call any other listeners (even on the current target)
+     */
+
+  }, {
+    key: "stopPropagation",
+    value: function stopPropagation() {
+      this.propagationStopped = true;
+    }
+    /**
+     * Don't call listeners on the remaining targets
+     */
+
+  }, {
+    key: "stopImmediatePropagation",
+    value: function stopImmediatePropagation() {
+      this.immediatePropagationStopped = this.propagationStopped = true;
+    }
+  }, {
+    key: "interaction",
+    get: function get() {
+      return this._interaction._proxy;
+    }
+  }]);
+
+  return BaseEvent;
+}();
+
+_$BaseEvent_13.BaseEvent = BaseEvent;
+var ___default_13 = BaseEvent;
+_$BaseEvent_13["default"] = ___default_13;
+
+var _$InteractEvent_15 = {};
+"use strict";
+
+Object.defineProperty(_$InteractEvent_15, "__esModule", {
+  value: true
+});
+_$InteractEvent_15["default"] = _$InteractEvent_15.InteractEvent = _$InteractEvent_15.EventPhase = void 0;
+
+var ___extend_15 = ___interopRequireDefault_15(_$extend_52);
+
+var ___getOriginXY_15 = ___interopRequireDefault_15(_$getOriginXY_53);
+
+var ___hypot_15 = ___interopRequireDefault_15(_$hypot_54);
+
+var _BaseEvent2 = ___interopRequireDefault_15(_$BaseEvent_13);
+
+var _defaultOptions = ___interopRequireDefault_15(_$defaultOptions_20);
+
+function ___interopRequireDefault_15(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ___typeof_15(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_15 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_15 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_15(obj); }
+
+function ___classCallCheck_15(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function ___defineProperties_15(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function ___createClass_15(Constructor, protoProps, staticProps) { if (protoProps) ___defineProperties_15(Constructor.prototype, protoProps); if (staticProps) ___defineProperties_15(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (___typeof_15(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+var __EventPhase_15;
+_$InteractEvent_15.EventPhase = __EventPhase_15;
+
+(function (EventPhase) {
+  EventPhase["Start"] = "start";
+  EventPhase["Move"] = "move";
+  EventPhase["End"] = "end";
+  EventPhase["_NONE"] = "";
+})(__EventPhase_15 || (_$InteractEvent_15.EventPhase = __EventPhase_15 = {}));
+
+var InteractEvent =
+/*#__PURE__*/
+function (_BaseEvent) {
+  _inherits(InteractEvent, _BaseEvent);
+
+  /** */
+  function InteractEvent(interaction, event, actionName, phase, element, related, preEnd, type) {
+    var _this;
+
+    ___classCallCheck_15(this, InteractEvent);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(InteractEvent).call(this, interaction));
+    element = element || interaction.element;
+    var target = interaction.interactable; // FIXME: add deltaSource to defaults
+
+    var deltaSource = (target && target.options || _defaultOptions["default"]).deltaSource;
+    var origin = (0, ___getOriginXY_15["default"])(target, element, actionName);
+    var starting = phase === 'start';
+    var ending = phase === 'end';
+    var prevEvent = starting ? _assertThisInitialized(_this) : interaction.prevEvent;
+    var coords = starting ? interaction.coords.start : ending ? {
+      page: prevEvent.page,
+      client: prevEvent.client,
+      timeStamp: interaction.coords.cur.timeStamp
+    } : interaction.coords.cur;
+    _this.page = (0, ___extend_15["default"])({}, coords.page);
+    _this.client = (0, ___extend_15["default"])({}, coords.client);
+    _this.rect = (0, ___extend_15["default"])({}, interaction.rect);
+    _this.timeStamp = coords.timeStamp;
+
+    if (!ending) {
+      _this.page.x -= origin.x;
+      _this.page.y -= origin.y;
+      _this.client.x -= origin.x;
+      _this.client.y -= origin.y;
+    }
+
+    _this.ctrlKey = event.ctrlKey;
+    _this.altKey = event.altKey;
+    _this.shiftKey = event.shiftKey;
+    _this.metaKey = event.metaKey;
+    _this.button = event.button;
+    _this.buttons = event.buttons;
+    _this.target = element;
+    _this.currentTarget = element;
+    _this.relatedTarget = related || null;
+    _this.preEnd = preEnd;
+    _this.type = type || actionName + (phase || '');
+    _this.interactable = target;
+    _this.t0 = starting ? interaction.pointers[interaction.pointers.length - 1].downTime : prevEvent.t0;
+    _this.x0 = interaction.coords.start.page.x - origin.x;
+    _this.y0 = interaction.coords.start.page.y - origin.y;
+    _this.clientX0 = interaction.coords.start.client.x - origin.x;
+    _this.clientY0 = interaction.coords.start.client.y - origin.y;
+
+    if (starting || ending) {
+      _this.delta = {
+        x: 0,
+        y: 0
+      };
+    } else {
+      _this.delta = {
+        x: _this[deltaSource].x - prevEvent[deltaSource].x,
+        y: _this[deltaSource].y - prevEvent[deltaSource].y
+      };
+    }
+
+    _this.dt = interaction.coords.delta.timeStamp;
+    _this.duration = _this.timeStamp - _this.t0; // velocity and speed in pixels per second
+
+    _this.velocity = (0, ___extend_15["default"])({}, interaction.coords.velocity[deltaSource]);
+    _this.speed = (0, ___hypot_15["default"])(_this.velocity.x, _this.velocity.y);
+    _this.swipe = ending || phase === 'inertiastart' ? _this.getSwipe() : null;
+    return _this;
+  }
+
+  ___createClass_15(InteractEvent, [{
+    key: "getSwipe",
+    value: function getSwipe() {
+      var interaction = this._interaction;
+
+      if (interaction.prevEvent.speed < 600 || this.timeStamp - interaction.prevEvent.timeStamp > 150) {
+        return null;
+      }
+
+      var angle = 180 * Math.atan2(interaction.prevEvent.velocityY, interaction.prevEvent.velocityX) / Math.PI;
+      var overlap = 22.5;
+
+      if (angle < 0) {
+        angle += 360;
+      }
+
+      var left = 135 - overlap <= angle && angle < 225 + overlap;
+      var up = 225 - overlap <= angle && angle < 315 + overlap;
+      var right = !left && (315 - overlap <= angle || angle < 45 + overlap);
+      var down = !up && 45 - overlap <= angle && angle < 135 + overlap;
+      return {
+        up: up,
+        down: down,
+        left: left,
+        right: right,
+        angle: angle,
+        speed: interaction.prevEvent.speed,
+        velocity: {
+          x: interaction.prevEvent.velocityX,
+          y: interaction.prevEvent.velocityY
+        }
+      };
+    }
+  }, {
+    key: "preventDefault",
+    value: function preventDefault() {}
+    /**
+     * Don't call listeners on the remaining targets
+     */
+
+  }, {
+    key: "stopImmediatePropagation",
+    value: function stopImmediatePropagation() {
+      this.immediatePropagationStopped = this.propagationStopped = true;
+    }
+    /**
+     * Don't call any other listeners (even on the current target)
+     */
+
+  }, {
+    key: "stopPropagation",
+    value: function stopPropagation() {
+      this.propagationStopped = true;
+    }
+  }, {
+    key: "pageX",
+    get: function get() {
+      return this.page.x;
+    },
+    set: function set(value) {
+      this.page.x = value;
+    }
+  }, {
+    key: "pageY",
+    get: function get() {
+      return this.page.y;
+    },
+    set: function set(value) {
+      this.page.y = value;
+    }
+  }, {
+    key: "clientX",
+    get: function get() {
+      return this.client.x;
+    },
+    set: function set(value) {
+      this.client.x = value;
+    }
+  }, {
+    key: "clientY",
+    get: function get() {
+      return this.client.y;
+    },
+    set: function set(value) {
+      this.client.y = value;
+    }
+  }, {
+    key: "dx",
+    get: function get() {
+      return this.delta.x;
+    },
+    set: function set(value) {
+      this.delta.x = value;
+    }
+  }, {
+    key: "dy",
+    get: function get() {
+      return this.delta.y;
+    },
+    set: function set(value) {
+      this.delta.y = value;
+    }
+  }, {
+    key: "velocityX",
+    get: function get() {
+      return this.velocity.x;
+    },
+    set: function set(value) {
+      this.velocity.x = value;
+    }
+  }, {
+    key: "velocityY",
+    get: function get() {
+      return this.velocity.y;
+    },
+    set: function set(value) {
+      this.velocity.y = value;
+    }
+  }]);
+
+  return InteractEvent;
+}(_BaseEvent2["default"]);
+
+_$InteractEvent_15.InteractEvent = InteractEvent;
+var ___default_15 = InteractEvent;
+_$InteractEvent_15["default"] = ___default_15;
+
 var _$PointerInfo_19 = {};
 "use strict";
 
@@ -3773,227 +3994,6 @@ var PointerInfo = function PointerInfo(id, pointer, event, downTime, downTarget)
 _$PointerInfo_19.PointerInfo = PointerInfo;
 var ___default_19 = PointerInfo;
 _$PointerInfo_19["default"] = ___default_19;
-
-var _$raf_61 = {};
-"use strict";
-
-Object.defineProperty(_$raf_61, "__esModule", {
-  value: true
-});
-_$raf_61["default"] = void 0;
-var lastTime = 0;
-
-var _request;
-
-var _cancel;
-
-function __init_61(window) {
-  _request = window.requestAnimationFrame;
-  _cancel = window.cancelAnimationFrame;
-
-  if (!_request) {
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-
-    for (var _i = 0; _i < vendors.length; _i++) {
-      var vendor = vendors[_i];
-      _request = window["".concat(vendor, "RequestAnimationFrame")];
-      _cancel = window["".concat(vendor, "CancelAnimationFrame")] || window["".concat(vendor, "CancelRequestAnimationFrame")];
-    }
-  }
-
-  if (!_request) {
-    _request = function request(callback) {
-      var currTime = Date.now();
-      var timeToCall = Math.max(0, 16 - (currTime - lastTime)); // eslint-disable-next-line standard/no-callback-literal
-
-      var token = setTimeout(function () {
-        callback(currTime + timeToCall);
-      }, timeToCall);
-      lastTime = currTime + timeToCall;
-      return token;
-    };
-
-    _cancel = function cancel(token) {
-      return clearTimeout(token);
-    };
-  }
-}
-
-var ___default_61 = {
-  request: function request(callback) {
-    return _request(callback);
-  },
-  cancel: function cancel(token) {
-    return _cancel(token);
-  },
-  init: __init_61
-};
-_$raf_61["default"] = ___default_61;
-
-var _$utils_55 = {};
-"use strict";
-
-Object.defineProperty(_$utils_55, "__esModule", {
-  value: true
-});
-_$utils_55.warnOnce = warnOnce;
-_$utils_55._getQBezierValue = _getQBezierValue;
-_$utils_55.getQuadraticCurvePoint = getQuadraticCurvePoint;
-_$utils_55.easeOutQuad = easeOutQuad;
-_$utils_55.copyAction = copyAction;
-Object.defineProperty(_$utils_55, "win", {
-  enumerable: true,
-  get: function get() {
-    return ___window_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "browser", {
-  enumerable: true,
-  get: function get() {
-    return ___browser_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "clone", {
-  enumerable: true,
-  get: function get() {
-    return ___clone_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "events", {
-  enumerable: true,
-  get: function get() {
-    return ___events_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "extend", {
-  enumerable: true,
-  get: function get() {
-    return ___extend_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "getOriginXY", {
-  enumerable: true,
-  get: function get() {
-    return ___getOriginXY_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "hypot", {
-  enumerable: true,
-  get: function get() {
-    return ___hypot_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "normalizeListeners", {
-  enumerable: true,
-  get: function get() {
-    return ___normalizeListeners_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "pointer", {
-  enumerable: true,
-  get: function get() {
-    return ___pointerUtils_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "raf", {
-  enumerable: true,
-  get: function get() {
-    return _raf["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "rect", {
-  enumerable: true,
-  get: function get() {
-    return ___rect_55["default"];
-  }
-});
-Object.defineProperty(_$utils_55, "Signals", {
-  enumerable: true,
-  get: function get() {
-    return ___Signals_55["default"];
-  }
-});
-_$utils_55.is = _$utils_55.dom = _$utils_55.arr = void 0;
-
-var __arr_55 = ___interopRequireWildcard_55(_$arr_46);
-
-_$utils_55.arr = __arr_55;
-
-var dom = ___interopRequireWildcard_55(_$domUtils_50);
-
-_$utils_55.dom = dom;
-
-var __is_55 = ___interopRequireWildcard_55(_$is_56);
-
-_$utils_55.is = __is_55;
-
-var ___window_55 = ___interopRequireDefault_55(_$window_65);
-
-var ___browser_55 = ___interopRequireDefault_55(_$browser_47);
-
-var ___clone_55 = ___interopRequireDefault_55(_$clone_48);
-
-var ___events_55 = ___interopRequireDefault_55(_$events_51);
-
-var ___extend_55 = ___interopRequireDefault_55(_$extend_52);
-
-var ___getOriginXY_55 = ___interopRequireDefault_55(_$getOriginXY_53);
-
-var ___hypot_55 = ___interopRequireDefault_55(_$hypot_54);
-
-var ___normalizeListeners_55 = ___interopRequireDefault_55(_$normalizeListeners_58);
-
-var ___pointerUtils_55 = ___interopRequireDefault_55(_$pointerUtils_60);
-
-var _raf = ___interopRequireDefault_55(_$raf_61);
-
-var ___rect_55 = ___interopRequireDefault_55(_$rect_62);
-
-var ___Signals_55 = ___interopRequireDefault_55(_$Signals_45);
-
-function ___interopRequireDefault_55(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function ___interopRequireWildcard_55(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-function warnOnce(method, message) {
-  var warned = false; // eslint-disable-next-line no-shadow
-
-  return function () {
-    if (!warned) {
-      ___window_55["default"].window.console.warn(message);
-
-      warned = true;
-    }
-
-    return method.apply(this, arguments);
-  };
-} // http://stackoverflow.com/a/5634528/2280888
-
-
-function _getQBezierValue(t, p1, p2, p3) {
-  var iT = 1 - t;
-  return iT * iT * p1 + 2 * iT * t * p2 + t * t * p3;
-}
-
-function getQuadraticCurvePoint(startX, startY, cpX, cpY, endX, endY, position) {
-  return {
-    x: _getQBezierValue(position, startX, cpX, endX),
-    y: _getQBezierValue(position, startY, cpY, endY)
-  };
-} // http://gizma.com/easing/
-
-
-function easeOutQuad(t, b, c, d) {
-  t /= d;
-  return -c * t * (t - 2) + b;
-}
-
-function copyAction(dest, src) {
-  dest.name = src.name;
-  dest.axis = src.axis;
-  dest.edges = src.edges;
-  return dest;
-}
 
 var _$interactionFinder_22 = {};
 "use strict";
@@ -6962,13 +6962,16 @@ function __install_30(scope) {
       },
       offsets: {},
       states: null,
-      result: null
+      result: null,
+      endPrevented: false,
+      startDelta: null
     };
   });
   interactions.signals.on('before-action-start', function (arg) {
     __start_30(arg, arg.interaction.coords.start.page, scope.modifiers);
   });
   interactions.signals.on('action-resume', function (arg) {
+    stop(arg);
     __beforeMove_30(arg);
     __start_30(arg, arg.interaction.coords.cur.page, scope.modifiers);
   });
@@ -7048,7 +7051,7 @@ function setAll(arg) {
       requireEndOnly = arg.requireEndOnly,
       rect = arg.rect,
       skipModifiers = arg.skipModifiers;
-  var states = skipModifiers ? arg.states.slice(modifiersState.skip) : arg.states;
+  var states = skipModifiers ? arg.states.slice(skipModifiers) : arg.states;
   arg.coords = (0, ___extend_30["default"])({}, arg.pageCoords);
   arg.rect = (0, ___extend_30["default"])({}, rect);
   var result = {
@@ -7149,6 +7152,7 @@ function beforeEnd(arg) {
     var endResult = methods.beforeEnd && methods.beforeEnd(arg);
 
     if (endResult === false) {
+      interaction.modifiers.endPrevented = true;
       return false;
     } // if the endOnly option is true for any modifier
 
@@ -7192,6 +7196,7 @@ function stop(arg) {
   }
 
   arg.interaction.modifiers.states = null;
+  arg.interaction.modifiers.endPrevented = false;
 }
 
 function getModifierList(interaction, registeredModifiers) {
@@ -7297,12 +7302,12 @@ function restoreCoords(_ref7) {
   var _modifiers$result = modifiers.result,
       curDelta = _modifiers$result.delta,
       rectDelta = _modifiers$result.rectDelta;
-  var _arr2 = [[coords.start, startDelta], [coords.cur, curDelta]];
+  var coordsAndDeltas = [[coords.start, startDelta], [coords.cur, curDelta]];
 
-  for (var _i6 = 0; _i6 < _arr2.length; _i6++) {
-    var _arr2$_i = ___slicedToArray_30(_arr2[_i6], 2),
-        coordsSet = _arr2$_i[0],
-        delta = _arr2$_i[1];
+  for (var _i6 = 0; _i6 < coordsAndDeltas.length; _i6++) {
+    var _coordsAndDeltas$_i = ___slicedToArray_30(coordsAndDeltas[_i6], 2),
+        coordsSet = _coordsAndDeltas$_i[0],
+        delta = _coordsAndDeltas$_i[1];
 
     coordsSet.page.x -= delta.x;
     coordsSet.page.y -= delta.y;
@@ -7344,9 +7349,8 @@ function makeModifier(module, name) {
   };
 
   var modifier = function modifier(options) {
-    options = options || {}; // add missing defaults to options
-
-    options.enabled = options.enabled !== false;
+    options = options || {};
+    options.enabled = options.enabled !== false; // add missing defaults to options
 
     for (var prop in defaults) {
       if (!(prop in options)) {
@@ -7362,10 +7366,7 @@ function makeModifier(module, name) {
   };
 
   if (typeof name === 'string') {
-    Object.defineProperty(modifier, 'name', {
-      value: name
-    }); // for backwrads compatibility
-
+    // for backwrads compatibility
     modifier._defaults = defaults;
     modifier._methods = methods;
   }
@@ -7694,331 +7695,6 @@ var ___default_26 = {
   updateInertiaCoords: updateInertiaCoords
 };
 _$inertia_26["default"] = ___default_26;
-
-var _$interact_28 = {};
-"use strict";
-
-Object.defineProperty(_$interact_28, "__esModule", {
-  value: true
-});
-_$interact_28["default"] = _$interact_28.scope = _$interact_28.interact = void 0;
-
-var ___scope_28 = _$scope_24({});
-
-var __utils_28 = ___interopRequireWildcard_28(_$utils_55);
-
-var ___browser_28 = ___interopRequireDefault_28(_$browser_47);
-
-var ___events_28 = ___interopRequireDefault_28(_$events_51);
-
-function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function ___interopRequireWildcard_28(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
-
-/** @module interact */
-var globalEvents = {};
-var scope = new ___scope_28.Scope();
-/**
- * ```js
- * interact('#draggable').draggable(true)
- *
- * var rectables = interact('rect')
- * rectables
- *   .gesturable(true)
- *   .on('gesturemove', function (event) {
- *       // ...
- *   })
- * ```
- *
- * The methods of this variable can be used to set elements as interactables
- * and also to change various default settings.
- *
- * Calling it as a function and passing an element or a valid CSS selector
- * string returns an Interactable object which has various methods to configure
- * it.
- *
- * @global
- *
- * @param {Element | string} target The HTML or SVG Element to interact with
- * or CSS selector
- * @return {Interactable}
- */
-
-_$interact_28.scope = scope;
-
-var interact = function interact(target, options) {
-  var interactable = scope.interactables.get(target, options);
-
-  if (!interactable) {
-    interactable = scope.interactables["new"](target, options);
-    interactable.events.global = globalEvents;
-  }
-
-  return interactable;
-};
-/**
- * Use a plugin
- *
- * @alias module:interact.use
- *
- * @param {Object} plugin
- * @param {function} plugin.install
- * @return {interact}
- */
-
-
-_$interact_28.interact = interact;
-interact.use = use;
-
-function use(plugin, options) {
-  scope.usePlugin(plugin, options);
-  return interact;
-}
-/**
- * Check if an element or selector has been set with the {@link interact}
- * function
- *
- * @alias module:interact.isSet
- *
- * @param {Element} element The Element being searched for
- * @return {boolean} Indicates if the element or CSS selector was previously
- * passed to interact
- */
-
-
-interact.isSet = isSet;
-
-function isSet(target, options) {
-  return !!scope.interactables.get(target, options && options.context);
-}
-/**
- * Add a global listener for an InteractEvent or adds a DOM event to `document`
- *
- * @alias module:interact.on
- *
- * @param {string | array | object} type The types of events to listen for
- * @param {function} listener The function event (s)
- * @param {object | boolean} [options] object or useCapture flag for
- * addEventListener
- * @return {object} interact
- */
-
-
-interact.on = on;
-
-function on(type, listener, options) {
-  if (__utils_28.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
-  }
-
-  if (__utils_28.is.array(type)) {
-    for (var _i = 0; _i < type.length; _i++) {
-      var _ref;
-
-      _ref = type[_i];
-      var eventType = _ref;
-      interact.on(eventType, listener, options);
-    }
-
-    return interact;
-  }
-
-  if (__utils_28.is.object(type)) {
-    for (var prop in type) {
-      interact.on(prop, type[prop], listener);
-    }
-
-    return interact;
-  } // if it is an InteractEvent type, add listener to globalEvents
-
-
-  if (__utils_28.arr.contains(scope.actions.eventTypes, type)) {
-    // if this type of event was never bound
-    if (!globalEvents[type]) {
-      globalEvents[type] = [listener];
-    } else {
-      globalEvents[type].push(listener);
-    }
-  } // If non InteractEvent type, addEventListener to document
-  else {
-      ___events_28["default"].add(scope.document, type, listener, {
-        options: options
-      });
-    }
-
-  return interact;
-}
-/**
- * Removes a global InteractEvent listener or DOM event from `document`
- *
- * @alias module:interact.off
- *
- * @param {string | array | object} type The types of events that were listened
- * for
- * @param {function} listener The listener function to be removed
- * @param {object | boolean} options [options] object or useCapture flag for
- * removeEventListener
- * @return {object} interact
- */
-
-
-interact.off = off;
-
-function off(type, listener, options) {
-  if (__utils_28.is.string(type) && type.search(' ') !== -1) {
-    type = type.trim().split(/ +/);
-  }
-
-  if (__utils_28.is.array(type)) {
-    for (var _i2 = 0; _i2 < type.length; _i2++) {
-      var _ref2;
-
-      _ref2 = type[_i2];
-      var eventType = _ref2;
-      interact.off(eventType, listener, options);
-    }
-
-    return interact;
-  }
-
-  if (__utils_28.is.object(type)) {
-    for (var prop in type) {
-      interact.off(prop, type[prop], listener);
-    }
-
-    return interact;
-  }
-
-  if (!__utils_28.arr.contains(scope.actions.eventTypes, type)) {
-    ___events_28["default"].remove(scope.document, type, listener, options);
-  } else {
-    var index;
-
-    if (type in globalEvents && (index = globalEvents[type].indexOf(listener)) !== -1) {
-      globalEvents[type].splice(index, 1);
-    }
-  }
-
-  return interact;
-}
-/**
- * Returns an object which exposes internal data
- * @alias module:interact.debug
- *
- * @return {object} An object with properties that outline the current state
- * and expose internal functions and variables
- */
-
-
-interact.debug = debug;
-
-function debug() {
-  return scope;
-} // expose the functions used to calculate multi-touch properties
-
-
-interact.getPointerAverage = __utils_28.pointer.pointerAverage;
-interact.getTouchBBox = __utils_28.pointer.touchBBox;
-interact.getTouchDistance = __utils_28.pointer.touchDistance;
-interact.getTouchAngle = __utils_28.pointer.touchAngle;
-interact.getElementRect = __utils_28.dom.getElementRect;
-interact.getElementClientRect = __utils_28.dom.getElementClientRect;
-interact.matchesSelector = __utils_28.dom.matchesSelector;
-interact.closest = __utils_28.dom.closest;
-/**
- * @alias module:interact.supportsTouch
- *
- * @return {boolean} Whether or not the browser supports touch input
- */
-
-interact.supportsTouch = supportsTouch;
-
-function supportsTouch() {
-  return ___browser_28["default"].supportsTouch;
-}
-/**
- * @alias module:interact.supportsPointerEvent
- *
- * @return {boolean} Whether or not the browser supports PointerEvents
- */
-
-
-interact.supportsPointerEvent = supportsPointerEvent;
-
-function supportsPointerEvent() {
-  return ___browser_28["default"].supportsPointerEvent;
-}
-/**
- * Cancels all interactions (end events are not fired)
- *
- * @alias module:interact.stop
- *
- * @return {object} interact
- */
-
-
-interact.stop = __stop_28;
-
-function __stop_28() {
-  for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
-    var _ref3;
-
-    _ref3 = scope.interactions.list[_i3];
-    var interaction = _ref3;
-    interaction.stop();
-  }
-
-  return interact;
-}
-/**
- * Returns or sets the distance the pointer must be moved before an action
- * sequence occurs. This also affects tolerance for tap events.
- *
- * @alias module:interact.pointerMoveTolerance
- *
- * @param {number} [newValue] The movement from the start position must be greater than this value
- * @return {interact | number}
- */
-
-
-interact.pointerMoveTolerance = pointerMoveTolerance;
-
-function pointerMoveTolerance(newValue) {
-  if (__utils_28.is.number(newValue)) {
-    scope.interactions.pointerMoveTolerance = newValue;
-    return interact;
-  }
-
-  return scope.interactions.pointerMoveTolerance;
-}
-
-scope.interactables.signals.on('unset', function (_ref4) {
-  var interactable = _ref4.interactable;
-  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1); // Stop related interactions when an Interactable is unset
-
-  for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
-    var _ref5;
-
-    _ref5 = scope.interactions.list[_i4];
-    var interaction = _ref5;
-
-    if (interaction.interactable === interactable && interaction.interacting() && interaction._ending) {
-      interaction.stop();
-    }
-  }
-});
-
-interact.addDocument = function (doc, options) {
-  return scope.addDocument(doc, options);
-};
-
-interact.removeDocument = function (doc) {
-  return scope.removeDocument(doc);
-};
-
-scope.interact = interact;
-var ___default_28 = interact;
-_$interact_28["default"] = ___default_28;
 
 var _$pointer_33 = {};
 "use strict";
@@ -9529,6 +9205,331 @@ var ___default_43 = {
 };
 _$reflow_43["default"] = ___default_43;
 
+var _$interact_28 = {};
+"use strict";
+
+Object.defineProperty(_$interact_28, "__esModule", {
+  value: true
+});
+_$interact_28["default"] = _$interact_28.scope = _$interact_28.interact = void 0;
+
+var ___scope_28 = _$scope_24({});
+
+var __utils_28 = ___interopRequireWildcard_28(_$utils_55);
+
+var ___browser_28 = ___interopRequireDefault_28(_$browser_47);
+
+var ___events_28 = ___interopRequireDefault_28(_$events_51);
+
+function ___interopRequireDefault_28(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function ___interopRequireWildcard_28(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
+
+/** @module interact */
+var globalEvents = {};
+var scope = new ___scope_28.Scope();
+/**
+ * ```js
+ * interact('#draggable').draggable(true)
+ *
+ * var rectables = interact('rect')
+ * rectables
+ *   .gesturable(true)
+ *   .on('gesturemove', function (event) {
+ *       // ...
+ *   })
+ * ```
+ *
+ * The methods of this variable can be used to set elements as interactables
+ * and also to change various default settings.
+ *
+ * Calling it as a function and passing an element or a valid CSS selector
+ * string returns an Interactable object which has various methods to configure
+ * it.
+ *
+ * @global
+ *
+ * @param {Element | string} target The HTML or SVG Element to interact with
+ * or CSS selector
+ * @return {Interactable}
+ */
+
+_$interact_28.scope = scope;
+
+var interact = function interact(target, options) {
+  var interactable = scope.interactables.get(target, options);
+
+  if (!interactable) {
+    interactable = scope.interactables["new"](target, options);
+    interactable.events.global = globalEvents;
+  }
+
+  return interactable;
+};
+/**
+ * Use a plugin
+ *
+ * @alias module:interact.use
+ *
+ * @param {Object} plugin
+ * @param {function} plugin.install
+ * @return {interact}
+ */
+
+
+_$interact_28.interact = interact;
+interact.use = use;
+
+function use(plugin, options) {
+  scope.usePlugin(plugin, options);
+  return interact;
+}
+/**
+ * Check if an element or selector has been set with the {@link interact}
+ * function
+ *
+ * @alias module:interact.isSet
+ *
+ * @param {Element} element The Element being searched for
+ * @return {boolean} Indicates if the element or CSS selector was previously
+ * passed to interact
+ */
+
+
+interact.isSet = isSet;
+
+function isSet(target, options) {
+  return !!scope.interactables.get(target, options && options.context);
+}
+/**
+ * Add a global listener for an InteractEvent or adds a DOM event to `document`
+ *
+ * @alias module:interact.on
+ *
+ * @param {string | array | object} type The types of events to listen for
+ * @param {function} listener The function event (s)
+ * @param {object | boolean} [options] object or useCapture flag for
+ * addEventListener
+ * @return {object} interact
+ */
+
+
+interact.on = on;
+
+function on(type, listener, options) {
+  if (__utils_28.is.string(type) && type.search(' ') !== -1) {
+    type = type.trim().split(/ +/);
+  }
+
+  if (__utils_28.is.array(type)) {
+    for (var _i = 0; _i < type.length; _i++) {
+      var _ref;
+
+      _ref = type[_i];
+      var eventType = _ref;
+      interact.on(eventType, listener, options);
+    }
+
+    return interact;
+  }
+
+  if (__utils_28.is.object(type)) {
+    for (var prop in type) {
+      interact.on(prop, type[prop], listener);
+    }
+
+    return interact;
+  } // if it is an InteractEvent type, add listener to globalEvents
+
+
+  if (__utils_28.arr.contains(scope.actions.eventTypes, type)) {
+    // if this type of event was never bound
+    if (!globalEvents[type]) {
+      globalEvents[type] = [listener];
+    } else {
+      globalEvents[type].push(listener);
+    }
+  } // If non InteractEvent type, addEventListener to document
+  else {
+      ___events_28["default"].add(scope.document, type, listener, {
+        options: options
+      });
+    }
+
+  return interact;
+}
+/**
+ * Removes a global InteractEvent listener or DOM event from `document`
+ *
+ * @alias module:interact.off
+ *
+ * @param {string | array | object} type The types of events that were listened
+ * for
+ * @param {function} listener The listener function to be removed
+ * @param {object | boolean} options [options] object or useCapture flag for
+ * removeEventListener
+ * @return {object} interact
+ */
+
+
+interact.off = off;
+
+function off(type, listener, options) {
+  if (__utils_28.is.string(type) && type.search(' ') !== -1) {
+    type = type.trim().split(/ +/);
+  }
+
+  if (__utils_28.is.array(type)) {
+    for (var _i2 = 0; _i2 < type.length; _i2++) {
+      var _ref2;
+
+      _ref2 = type[_i2];
+      var eventType = _ref2;
+      interact.off(eventType, listener, options);
+    }
+
+    return interact;
+  }
+
+  if (__utils_28.is.object(type)) {
+    for (var prop in type) {
+      interact.off(prop, type[prop], listener);
+    }
+
+    return interact;
+  }
+
+  if (!__utils_28.arr.contains(scope.actions.eventTypes, type)) {
+    ___events_28["default"].remove(scope.document, type, listener, options);
+  } else {
+    var index;
+
+    if (type in globalEvents && (index = globalEvents[type].indexOf(listener)) !== -1) {
+      globalEvents[type].splice(index, 1);
+    }
+  }
+
+  return interact;
+}
+/**
+ * Returns an object which exposes internal data
+ * @alias module:interact.debug
+ *
+ * @return {object} An object with properties that outline the current state
+ * and expose internal functions and variables
+ */
+
+
+interact.debug = debug;
+
+function debug() {
+  return scope;
+} // expose the functions used to calculate multi-touch properties
+
+
+interact.getPointerAverage = __utils_28.pointer.pointerAverage;
+interact.getTouchBBox = __utils_28.pointer.touchBBox;
+interact.getTouchDistance = __utils_28.pointer.touchDistance;
+interact.getTouchAngle = __utils_28.pointer.touchAngle;
+interact.getElementRect = __utils_28.dom.getElementRect;
+interact.getElementClientRect = __utils_28.dom.getElementClientRect;
+interact.matchesSelector = __utils_28.dom.matchesSelector;
+interact.closest = __utils_28.dom.closest;
+/**
+ * @alias module:interact.supportsTouch
+ *
+ * @return {boolean} Whether or not the browser supports touch input
+ */
+
+interact.supportsTouch = supportsTouch;
+
+function supportsTouch() {
+  return ___browser_28["default"].supportsTouch;
+}
+/**
+ * @alias module:interact.supportsPointerEvent
+ *
+ * @return {boolean} Whether or not the browser supports PointerEvents
+ */
+
+
+interact.supportsPointerEvent = supportsPointerEvent;
+
+function supportsPointerEvent() {
+  return ___browser_28["default"].supportsPointerEvent;
+}
+/**
+ * Cancels all interactions (end events are not fired)
+ *
+ * @alias module:interact.stop
+ *
+ * @return {object} interact
+ */
+
+
+interact.stop = __stop_28;
+
+function __stop_28() {
+  for (var _i3 = 0; _i3 < scope.interactions.list.length; _i3++) {
+    var _ref3;
+
+    _ref3 = scope.interactions.list[_i3];
+    var interaction = _ref3;
+    interaction.stop();
+  }
+
+  return interact;
+}
+/**
+ * Returns or sets the distance the pointer must be moved before an action
+ * sequence occurs. This also affects tolerance for tap events.
+ *
+ * @alias module:interact.pointerMoveTolerance
+ *
+ * @param {number} [newValue] The movement from the start position must be greater than this value
+ * @return {interact | number}
+ */
+
+
+interact.pointerMoveTolerance = pointerMoveTolerance;
+
+function pointerMoveTolerance(newValue) {
+  if (__utils_28.is.number(newValue)) {
+    scope.interactions.pointerMoveTolerance = newValue;
+    return interact;
+  }
+
+  return scope.interactions.pointerMoveTolerance;
+}
+
+scope.interactables.signals.on('unset', function (_ref4) {
+  var interactable = _ref4.interactable;
+  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1); // Stop related interactions when an Interactable is unset
+
+  for (var _i4 = 0; _i4 < scope.interactions.list.length; _i4++) {
+    var _ref5;
+
+    _ref5 = scope.interactions.list[_i4];
+    var interaction = _ref5;
+
+    if (interaction.interactable === interactable && interaction.interacting() && !interaction._ending) {
+      interaction.stop();
+    }
+  }
+});
+
+interact.addDocument = function (doc, options) {
+  return scope.addDocument(doc, options);
+};
+
+interact.removeDocument = function (doc) {
+  return scope.removeDocument(doc);
+};
+
+scope.interact = interact;
+var ___default_28 = interact;
+_$interact_28["default"] = ___default_28;
+
 var _$interact_27 = {};
 "use strict";
 
@@ -9648,7 +9649,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.4";
+_interact["default"].version = __init_27.version = "1.4.5";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

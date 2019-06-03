@@ -249,7 +249,7 @@ export class Interaction&lt;T extends ActionName = any> {
   }
 
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
-    if (!this.simulation) {
+    if (!this.simulation &amp;&amp; !(this.modifiers &amp;&amp; this.modifiers.endPrevented)) {
       this.updatePointer(pointer, event, eventTarget, false)
       utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer), this._now())
     }

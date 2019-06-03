@@ -58,13 +58,14 @@ var pixelSize = 16;
 interact('.rainbow-pixel-canvas')
   .origin('self')
   .draggable({
-    modifiers: [{
-      // snap to the corners of a grid
-      type: 'snap',
-      targets: [
-        interact.snappers.grid({ x: pixelSize, y: pixelSize }),
-      ],
-    }],
+    modifiers: [
+      interact.modifiers.snap({
+        // snap to the corners of a grid
+        targets: [
+          interact.snappers.grid({ x: pixelSize, y: pixelSize }),
+        ],
+      })
+    ],
   })
   // draw colored squares on move
   .on('dragmove', function (event) {
