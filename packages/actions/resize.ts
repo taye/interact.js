@@ -16,11 +16,11 @@ declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
     resizeRects: {
-      start: Required<Interact.Rect>
+      start: Interact.FullRect
       current: Interact.Rect
-      inverted: Required<Interact.Rect>
-      previous: Required<Interact.Rect>
-      delta: Required<Interact.Rect>
+      inverted: Interact.FullRect
+      previous: Interact.FullRect
+      delta: Interact.FullRect
     }
     resizeStartAspectRatio: number
   }
@@ -50,7 +50,7 @@ declare module '@interactjs/core/scope' {
 (ActionName as any).Resize = 'resize'
 
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
-  deltaRect?: Required<Interact.Rect>
+  deltaRect?: Interact.FullRect
 }
 
 function install (scope: Scope) {

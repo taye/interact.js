@@ -5,7 +5,7 @@ interact.js has 3 snap modifiers:
 
  - pointer coordinate-based `snap` which is best suited to drag actions,
  - `snapSize` which works only on resize actions and let's you set targets for
-   the size of the target elemnt,
+   the size of the target element,
  - and `snapEdges` which is similar to `snapSize`, but let's you set the target
    positions of the edges of the target element.
 
@@ -92,7 +92,7 @@ The `offset` option lets you shift the coordinates of the targets of a `snap`
 modifier. The value may be:
 
  - an object with `x` and `y` properties,
- - 'startCoords'` which will then use the `pageX` and `pageY` at the start of
+ - `'startCoords'` which will then use the `pageX` and `pageY` at the start of
    the action,
  - `'self'` which will use the target element's top-left coordinates,
  - or `'parent'` which will use the top-left coordinates of the target's parent
@@ -138,14 +138,14 @@ interact(target).resizable({
 ```
 
 The `snapSize` modifier snaps the *edges* of targets when resizing.  Its targets
-have eitehr `x` and `y` number props to snap the left/right and top/bottom edges
+have either `x` and `y` number props to snap the left/right and top/bottom edges
 respectively, `top`, `left`, `width` and `height` number props to snap each edge
 and an optional `range`.
 
 `targets` option
 ----------------
 
-The coordates of action events are compared to the targets of the provided snap
+The coordinates of action events are compared to the targets of the provided snap
 modifiers. If multiple targets are within range, the closest target is used.
 
 ```js

@@ -127,7 +127,7 @@ The common options for all actions include:
    start, move and end events respectively.
 
 Drag and resize actions (but not gesture) can also have an `inertia`
-property which may be a `boolean` to enable or diable inertia, or an object with
+property which may be a `boolean` to enable or disable inertia, or an object with
 inertia configuration.
 
 `InteractEvent`s have the following properties common to all action types:

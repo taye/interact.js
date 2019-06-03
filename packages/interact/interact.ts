@@ -291,7 +291,7 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 
   // Stop related interactions when an Interactable is unset
   for (const interaction of scope.interactions.list) {
-    if (interaction.interactable === interactable && interaction.interacting() && interaction._ending) {
+    if (interaction.interactable === interactable && interaction.interacting() && !interaction._ending) {
       interaction.stop()
     }
   }

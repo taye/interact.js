@@ -62,6 +62,8 @@ declare namespace Interact {
     height?: number
   }
 
+  export type FullRect = Required<Rect>
+
   export interface Dimensions {
     x: number
     y: number

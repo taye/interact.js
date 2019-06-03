@@ -73,7 +73,7 @@ interact(target).dropzone({
                      event,             // Touch, Pointer or Mouse Event
                      dropped,           // bool default checker result
                      dropzone,          // dropzone Interactable
-                     dropElement,       // dropzone elemnt
+                     dropElement,       // dropzone element
                      draggable,         // draggable Interactable
                      draggableElement) {// draggable element
 

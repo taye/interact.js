@@ -1,17 +1,17 @@
 {
   "name": "@interactjs/interact",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "peerDependencies": {
-    "@interactjs/actions": "1.4.4",
-    "@interactjs/auto-scroll": "1.4.4",
-    "@interactjs/auto-start": "1.4.4",
-    "@interactjs/core": "1.4.4",
-    "@interactjs/dev-tools": "1.4.4",
-    "@interactjs/inertia": "1.4.4",
-    "@interactjs/modifiers": "1.4.4",
-    "@interactjs/pointer-events": "1.4.4",
-    "@interactjs/reflow": "1.4.4",
-    "@interactjs/utils": "1.4.4"
+    "@interactjs/actions": "1.4.5",
+    "@interactjs/auto-scroll": "1.4.5",
+    "@interactjs/auto-start": "1.4.5",
+    "@interactjs/core": "1.4.5",
+    "@interactjs/dev-tools": "1.4.5",
+    "@interactjs/inertia": "1.4.5",
+    "@interactjs/modifiers": "1.4.5",
+    "@interactjs/pointer-events": "1.4.5",
+    "@interactjs/reflow": "1.4.5",
+    "@interactjs/utils": "1.4.5"
   },
   "publishConfig": {
     "access": "public"
