@@ -5,9 +5,9 @@ import { Scope } from '@interactjs/core/scope'
 import * as utils from '@interactjs/utils'
 import PointerEvent from './PointerEvent'
 
-type EventTargetList = Array<{
+export type EventTargetList = Array<{
+  node: Node,
   eventable: Eventable,
-  element: Interact.EventTarget,
   props: { [key: string]: any },
 }>
 
@@ -114,11 +114,11 @@ function fire<T extends string> (arg: {
       (pointerEvent as any)[prop] = target.props[prop]
     }
 
-    const origin = utils.getOriginXY(target.eventable, target.element)
+    const origin = utils.getOriginXY(target.eventable, target.node)
 
     pointerEvent._subtractOrigin(origin)
     pointerEvent.eventable = target.eventable
-    pointerEvent.currentTarget = target.element
+    pointerEvent.currentTarget = target.node
 
     target.eventable.fire(pointerEvent)
 
@@ -126,7 +126,7 @@ function fire<T extends string> (arg: {
 
     if (pointerEvent.immediatePropagationStopped ||
         (pointerEvent.propagationStopped &&
-            (i + 1) < targets.length && targets[i + 1].element !== pointerEvent.currentTarget)) {
+            (i + 1) < targets.length && targets[i + 1].node !== pointerEvent.currentTarget)) {
       break
     }
   }
