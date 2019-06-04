@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -38,12 +38,12 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@interactjs/types": "1.4.5"
+    "@interactjs/types": "1.4.6"
   },
   "devDependencies": {
-    "@interactjs/interact": "1.4.5",
-    "@interactjs/modifiers": "1.4.5",
-    "@interactjs/utils": "1.4.5"
+    "@interactjs/interact": "1.4.6",
+    "@interactjs/modifiers": "1.4.6",
+    "@interactjs/utils": "1.4.6"
   },
   "_dev": {
     "entries": "./index.ts",

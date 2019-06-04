@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/modifiers",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "peerDependencies": {
-    "@interactjs/core": "1.4.5",
-    "@interactjs/utils": "1.4.5"
+    "@interactjs/core": "1.4.6",
+    "@interactjs/utils": "1.4.6"
   },
   "publishConfig": {
     "access": "public"

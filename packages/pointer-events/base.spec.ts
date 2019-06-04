@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
 import Interaction from '@interactjs/core/Interaction'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import pointerEvents from './base'
+import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'
 
 test('pointerEvents.types', (t) => {
@@ -30,6 +30,13 @@ test('pointerEvents.fire', (t) => {
   const eventTarget = {}
   const TEST_PROP = ['TEST_PROP']
   let firedEvent
+  const targets: EventTargetList = [{
+    eventable,
+    node: element as Node,
+    props: {
+      TEST_PROP,
+    },
+  }]
 
   eventable.on(type, (event) => { firedEvent = event })
 
@@ -39,13 +46,7 @@ test('pointerEvents.fire', (t) => {
     pointer: {},
     event: {},
     interaction: {},
-    targets: [{
-      eventable,
-      element,
-      props: {
-        TEST_PROP,
-      },
-    }],
+    targets,
   } as any, scope)
 
   t.ok(firedEvent instanceof pointerEvents.PointerEvent,
@@ -91,12 +92,13 @@ test('pointerEvents.collectEventTargets', (t) => {
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
   const target = {
-    TEST_PROP,
+    node: {} as Node,
+    props: { TEST_PROP },
     eventable: new Eventable(pointerEvents.defaults),
   }
   let collectedTargets
 
-  function onCollect ({ targets }) {
+  function onCollect ({ targets }: { targets: EventTargetList }) {
     targets.push(target)
 
     collectedTargets = targets
