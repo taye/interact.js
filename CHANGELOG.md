@@ -1,3 +1,16 @@
+## v1.4.6
+
+ - fixed pointerEvents currentTarget
+
+## v1.4.5
+
+ - @0xflotus fixed typos in docs (#724)
+ - fixed error on iOS (#682)
+
+## v1.4.4
+
+ - fixed an issue with interactions lingering on removed elements (#723)
+
 ## v1.4.3
 
  - destroy only relevant interactions on interactable.unset()
