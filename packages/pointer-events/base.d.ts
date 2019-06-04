@@ -4,9 +4,9 @@ import Interaction from '@interactjs/core/Interaction';
 import { Scope } from '@interactjs/core/scope';
 import * as utils from '@interactjs/utils';
 import PointerEvent from './PointerEvent';
-declare type EventTargetList = Array<{
+export declare type EventTargetList = Array<{
+    node: Node;
     eventable: Eventable;
-    element: Interact.EventTarget;
     props: {
         [key: string]: any;
     };
@@ -69,8 +69,8 @@ declare function collectEventTargets<T extends string>({ interaction, pointer, e
     eventTarget: Interact.EventTarget;
     type: T;
 }): {
+    node: Node;
     eventable: Eventable;
-    element: import("../types/types").EventTarget;
     props: {
         [key: string]: any;
     };

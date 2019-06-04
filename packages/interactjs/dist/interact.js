@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.5
+ * interact.js 1.4.6
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8588,17 +8588,17 @@ function fire(arg, scope) {
       pointerEvent[prop] = target.props[prop];
     }
 
-    var origin = __utils_39.getOriginXY(target.eventable, target.element);
+    var origin = __utils_39.getOriginXY(target.eventable, target.node);
 
     pointerEvent._subtractOrigin(origin);
 
     pointerEvent.eventable = target.eventable;
-    pointerEvent.currentTarget = target.element;
+    pointerEvent.currentTarget = target.node;
     target.eventable.fire(pointerEvent);
 
     pointerEvent._addOrigin(origin);
 
-    if (pointerEvent.immediatePropagationStopped || pointerEvent.propagationStopped && i + 1 < targets.length && targets[i + 1].element !== pointerEvent.currentTarget) {
+    if (pointerEvent.immediatePropagationStopped || pointerEvent.propagationStopped && i + 1 < targets.length && targets[i + 1].node !== pointerEvent.currentTarget) {
       break;
     }
   }
@@ -9649,7 +9649,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.5";
+_interact["default"].version = __init_27.version = "1.4.6";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
