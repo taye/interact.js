@@ -1,8 +1,8 @@
 {
   "name": "@interactjs/auto-scroll",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "peerDependencies": {
-    "@interactjs/utils": "1.4.6"
+    "@interactjs/utils": "1.4.7"
   },
   "publishConfig": {
     "access": "public"

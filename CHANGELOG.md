@@ -1,3 +1,7 @@
+## v1.4.7
+
+ - fixed exports in generated typings (#726)
+
 ## v1.4.6
 
  - fixed pointerEvents currentTarget
