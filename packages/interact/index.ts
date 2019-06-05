@@ -10,8 +10,7 @@ import * as pointerEvents from '@interactjs/pointer-events'
 import reflow from '@interactjs/reflow'
 import interact, { scope } from './interact'
 
-// exporting init here due to #726
-function init (window: Window): typeof interact {
+export function init (window: Window) {
   scope.init(window)
 
   interact.use(interactablePreventDefault)
@@ -54,11 +53,10 @@ function init (window: Window): typeof interact {
 }
 
 // eslint-disable-next-line no-undef
-interact.version = init.version = process.env.npm_package_version
+interact.version = process.env.npm_package_version
 
 export default interact
 export {
-  init,
   interact,
   actions,
   autoScroll,

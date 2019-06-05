@@ -3,7 +3,7 @@ export interface PointerExtend {
   [prefix: string]: RegExp
 }
 
-export function pointerExtend<PointerExtend> (dest, source) {
+function pointerExtend (dest, source) {
   for (const prop in source) {
     const prefixedPropREs = pointerExtend.prefixedPropREs
     let deprecated = false
