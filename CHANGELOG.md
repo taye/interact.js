@@ -1,3 +1,7 @@
+## v1.4.8
+
+ - fixed exports in generated typings (#727)
+
 ## v1.4.7
 
  - fixed exports in generated typings (#726)
