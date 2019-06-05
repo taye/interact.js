@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.7
+ * interact.js 1.4.8
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1805,7 +1805,6 @@ var _$pointerExtend_59 = {};
 Object.defineProperty(_$pointerExtend_59, "__esModule", {
   value: true
 });
-_$pointerExtend_59.pointerExtend = pointerExtend;
 _$pointerExtend_59["default"] = void 0;
 
 function pointerExtend(dest, source) {
@@ -9605,7 +9604,6 @@ function ___interopRequireDefault_27(obj) { return obj && obj.__esModule ? obj :
 
 function ___interopRequireWildcard_27(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
-// exporting init here due to #726
 function __init_27(window) {
   _interact.scope.init(window);
 
@@ -9650,7 +9648,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = __init_27.version = "1.4.7";
+_interact["default"].version = "1.4.8";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

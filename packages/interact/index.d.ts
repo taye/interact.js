@@ -6,9 +6,6 @@ import modifiersBase from '@interactjs/modifiers/base';
 import * as pointerEvents from '@interactjs/pointer-events';
 import reflow from '@interactjs/reflow';
 import interact from './interact';
-declare function init(window: Window): typeof interact;
-declare namespace init {
-    var version: string;
-}
+export declare function init(window: Window): import("@interactjs/interact/interact").InteractStatic;
 export default interact;
-export { init, interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow, };
+export { interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow, };
