@@ -10,6 +10,5 @@ declare function init(window: Window): typeof interact;
 declare namespace init {
     var version: string;
 }
-export default init;
 export default interact;
-export { interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow, };
+export { init, interact, actions, autoScroll, interactablePreventDefault, inertia, modifiersBase as modifiers, pointerEvents, reflow, };
