@@ -1,3 +1,8 @@
+## v1.4.9
+
+ - fixed modifiers with inertia action-resume (#728)
+ - fixed docs for snap grid limits (#717)
+
 ## v1.4.8
 
  - fixed exports in generated typings (#727)
