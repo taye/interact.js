@@ -151,6 +151,16 @@ test('modifiers/base', (t) => {
 
   t.ok(options.started, 'gets `scpe.modifiers[options.type]`')
 
+  interaction.pointerMove(moveEvent, moveEvent, element)
+
+  t.doesNotThrow(() => {
+    interaction._signals.fire('action-resume', {
+      interaction,
+    })
+  })
+
+  interaction.stop()
+
   t.end()
 })
 

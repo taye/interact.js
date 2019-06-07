@@ -64,8 +64,8 @@ function install (scope: Scope) {
 
   interactions.signals.on('action-resume', (arg) => {
     stop(arg as Required<Interact.SignalArg>)
-    beforeMove(arg as Required<Interact.SignalArg>)
     start(arg as Required<Interact.SignalArg>, arg.interaction.coords.cur.page, scope.modifiers)
+    beforeMove(arg as Required<Interact.SignalArg>)
   })
 
   interactions.signals.on('after-action-move', restoreCoords as any)
