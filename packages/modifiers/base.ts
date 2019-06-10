@@ -369,9 +369,9 @@ function restoreCoords ({ interaction: { coords, rect, modifiers } }: Interact.S
   const coordsAndDeltas = [
     [coords.start, startDelta],
     [coords.cur, curDelta],
-  ] as const
+  ]
 
-  for (const [coordsSet, delta] of coordsAndDeltas) {
+  for (const [coordsSet, delta] of coordsAndDeltas as any) {
     coordsSet.page.x -= delta.x
     coordsSet.page.y -= delta.y
     coordsSet.client.x -= delta.x
