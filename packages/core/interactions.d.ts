@@ -11,7 +11,7 @@ declare module '@interactjs/core/scope' {
             listeners: {
                 [type: string]: Interact.Listener;
             };
-            eventMap: Array<{
+            docEvents: Array<{
                 type: string;
                 listener: Interact.Listener;
             }>;

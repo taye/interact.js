@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.9
+ * interact.js 1.4.10
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -343,10 +343,10 @@ function install(scope) {
   }
 
   var pEventTypes = _browser["default"].pEventTypes;
-  var eventMap;
+  var docEvents;
 
   if (_domObjects["default"].PointerEvent) {
-    eventMap = [{
+    docEvents = [{
       type: pEventTypes.down,
       listener: releasePointersOnRemovedEls
     }, {
@@ -363,7 +363,7 @@ function install(scope) {
       listener: listeners.pointerUp
     }];
   } else {
-    eventMap = [{
+    docEvents = [{
       type: 'mousedown',
       listener: listeners.pointerDown
     }, {
@@ -390,7 +390,7 @@ function install(scope) {
     }];
   }
 
-  eventMap.push({
+  docEvents.push({
     type: 'blur',
     listener: function listener(event) {
       for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
@@ -447,7 +447,7 @@ function install(scope) {
       return interaction;
     },
     listeners: listeners,
-    eventMap: eventMap,
+    docEvents: docEvents,
     pointerMoveTolerance: 1
   };
 
@@ -588,7 +588,7 @@ function onDocSignal(_ref6, signalName) {
   var doc = _ref6.doc,
       scope = _ref6.scope,
       options = _ref6.options;
-  var eventMap = scope.interactions.eventMap;
+  var docEvents = scope.interactions.docEvents;
   var eventMethod = signalName.indexOf('add') === 0 ? _events["default"].add : _events["default"].remove;
 
   if (scope.browser.isIOS && !options.events) {
@@ -605,10 +605,10 @@ function onDocSignal(_ref6, signalName) {
 
   var eventOptions = options && options.events;
 
-  for (var _i7 = 0; _i7 < eventMap.length; _i7++) {
+  for (var _i7 = 0; _i7 < docEvents.length; _i7++) {
     var _ref7;
 
-    _ref7 = eventMap[_i7];
+    _ref7 = docEvents[_i7];
     var _ref8 = _ref7,
         type = _ref8.type,
         listener = _ref8.listener;
@@ -6658,18 +6658,18 @@ function ___interopRequireWildcard_21(obj) { if (obj && obj.__esModule) { return
 
 function ___interopRequireDefault_21(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-function preventDefault(interactable, newValue) {
+function preventDefault(newValue) {
   if (/^(always|never|auto)$/.test(newValue)) {
-    interactable.options.preventDefault = newValue;
-    return interactable;
+    this.options.preventDefault = newValue;
+    return this;
   }
 
   if (__is_21.bool(newValue)) {
-    interactable.options.preventDefault = newValue ? 'always' : 'never';
-    return interactable;
+    this.options.preventDefault = newValue ? 'always' : 'never';
+    return this;
   }
 
-  return interactable.options.preventDefault;
+  return this.options.preventDefault;
 }
 
 function checkAndPreventDefault(interactable, scope, event) {
@@ -6733,9 +6733,7 @@ function __install_21(scope) {
    * @return {string | Interactable} The current setting or this Interactable
    */
 
-  Interactable.prototype.preventDefault = function (newValue) {
-    return preventDefault(this, newValue);
-  };
+  Interactable.prototype.preventDefault = preventDefault;
 
   Interactable.prototype.checkAndPreventDefault = function (event) {
     return checkAndPreventDefault(this, scope, event);
@@ -6749,19 +6747,22 @@ function __install_21(scope) {
   } // prevent native HTML5 drag on interact.js target elements
 
 
-  scope.interactions.eventMap.dragstart = function preventNativeDrag(event) {
-    for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
-      var _ref2;
+  scope.interactions.docEvents.push({
+    type: 'dragstart',
+    listener: function listener(event) {
+      for (var _i2 = 0; _i2 < scope.interactions.list.length; _i2++) {
+        var _ref2;
 
-      _ref2 = scope.interactions.list[_i2];
-      var interaction = _ref2;
+        _ref2 = scope.interactions.list[_i2];
+        var interaction = _ref2;
 
-      if (interaction.element && (interaction.element === event.target || (0, _$domUtils_50.nodeContains)(interaction.element, event.target))) {
-        interaction.interactable.checkAndPreventDefault(event);
-        return;
+        if (interaction.element && (interaction.element === event.target || (0, _$domUtils_50.nodeContains)(interaction.element, event.target))) {
+          interaction.interactable.checkAndPreventDefault(event);
+          return;
+        }
       }
     }
-  };
+  });
 }
 
 var ___default_21 = {
@@ -9648,7 +9649,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.4.9";
+_interact["default"].version = "1.4.10";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
