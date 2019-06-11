@@ -1,3 +1,7 @@
+## v1.4.10
+
+ - fixed regression of preventing native drag behaviour (#729)
+
 ## v1.4.9
 
  - fixed modifiers with inertia action-resume (#728)
