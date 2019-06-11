@@ -16,7 +16,7 @@ declare module '@interactjs/core/scope' {
       new: (options: any) => InteractionBase
       list: InteractionBase[]
       listeners: { [type: string]: Interact.Listener }
-      eventMap: Array<{ type: string, listener: Interact.Listener }>
+      docEvents: Array<{ type: string, listener: Interact.Listener }>
       pointerMoveTolerance: number
     }
     prevTouchTime: number
@@ -38,10 +38,10 @@ function install (scope: Scope) {
   }
 
   const pEventTypes = browser.pEventTypes
-  let eventMap: typeof scope.interactions.eventMap
+  let docEvents: typeof scope.interactions.docEvents
 
   if (domObjects.PointerEvent) {
-    eventMap = [
+    docEvents = [
       { type: pEventTypes.down,   listener: releasePointersOnRemovedEls },
       { type: pEventTypes.down,   listener: listeners.pointerDown },
       { type: pEventTypes.move,   listener: listeners.pointerMove },
@@ -50,7 +50,7 @@ function install (scope: Scope) {
     ]
   }
   else {
-    eventMap = [
+    docEvents = [
       { type: 'mousedown', listener: listeners.pointerDown },
       { type: 'mousemove', listener: listeners.pointerMove },
       { type: 'mouseup', listener: listeners.pointerUp },
@@ -63,7 +63,7 @@ function install (scope: Scope) {
     ]
   }
 
-  eventMap.push({
+  docEvents.push({
     type: 'blur',
     listener (event) {
       for (const interaction of scope.interactions.list) {
@@ -103,7 +103,7 @@ function install (scope: Scope) {
       return interaction
     },
     listeners,
-    eventMap,
+    docEvents,
     pointerMoveTolerance: 1,
   }
 
@@ -218,7 +218,7 @@ function getInteraction (searchDetails: SearchDetails) {
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
-  const { eventMap } = scope.interactions
+  const { docEvents } = scope.interactions
   const eventMethod = signalName.indexOf('add') === 0
     ? events.add : events.remove
 
@@ -234,7 +234,7 @@ function onDocSignal ({ doc, scope, options }, signalName) {
 
   const eventOptions = options && options.events
 
-  for (const { type, listener } of eventMap) {
+  for (const { type, listener } of docEvents) {
     eventMethod(doc, type, listener, eventOptions)
   }
 }
