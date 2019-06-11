@@ -5,6 +5,10 @@
     "@interactjs/dev-tools": "1.4.9",
     "@interactjs/utils": "1.4.9"
   },
+  "devDependencies": {
+    "@interactjs/actions": "1.4.9",
+    "@interactjs/auto-start": "1.4.9"
+  },
   "publishConfig": {
     "access": "public"
   }
