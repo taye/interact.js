@@ -29,7 +29,6 @@ const argv = require('yargs')
     required: true,
     coerce: path.resolve,
   })
-  .string('babelrc')
   .argv
 
 const dir = path.join(__dirname, '..')
@@ -60,7 +59,7 @@ const plugins = (() => {
 let babelrc
 
 try {
-  babelrc = require(path.resolve(argv.babelrc))
+  babelrc = require(path.join(process.cwd(), '.babelrc'))
 } catch (e) {
   babelrc = require('../.babelrc')
 }
