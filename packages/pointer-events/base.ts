@@ -246,11 +246,11 @@ function install (scope: Scope) {
       type: 'hold',
       targets: [] as EventTargetList,
       path,
-      element: null,
+      node: null,
     }
 
-    for (const element of path) {
-      signalArg.element = element
+    for (const node of path) {
+      signalArg.node = node
 
       signals.fire('collect-targets', signalArg)
     }

@@ -151,3 +151,7 @@ export function testEnv ({
     event,
   }
 }
+
+export function timeout (n) {
+  return new Promise((resolve) => setTimeout(resolve, n))
+}

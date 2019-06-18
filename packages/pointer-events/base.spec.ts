@@ -174,14 +174,14 @@ test('pointerEvents Interaction remove-pointer signal', (t) => {
   t.end()
 })
 
-test('pointerEvents down move up tap', (t) => {
+test('pointerEvents down hold up tap', async (t) => {
   const {
     interaction,
     event,
     interactable,
   } = helpers.testEnv({ plugins: [pointerEvents, interactableTargets ] })
 
-  const fired: Event[] = []
+  const fired: PointerEvent[] = []
 
   for (const type of pointerEvents.types) {
     interactable.on(type, (e) => fired.push(e))
@@ -195,12 +195,18 @@ test('pointerEvents down move up tap', (t) => {
     ['down'],
     'duplicate move event is not fired')
 
+  const holdTimer = interaction.pointers[0].hold
+
+  t.ok(!!holdTimer.timeout, 'hold timeout is set')
+
+  await helpers.timeout(holdTimer.duration)
+
   interaction.pointerUp(event, event, event.target, event.target)
 
   t.deepEqual(
     fired.map((e) => e.type),
-    ['down', 'up', 'tap'],
-    'tap event is fired after down and up event')
+    ['down', 'hold', 'up', 'tap'],
+    'tap event is fired after down, hold and up events')
 
   t.end()
 })
