@@ -1,3 +1,7 @@
+## v1.4.11
+
+ - fixed hold events (#730)
+
 ## v1.4.10
 
  - fixed regression of preventing native drag behaviour (#729)
