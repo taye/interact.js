@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.10
+ * interact.js 1.4.11
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -8727,15 +8727,15 @@ function __install_39(scope) {
       type: 'hold',
       targets: [],
       path: path,
-      element: null
+      node: null
     };
 
     for (var _i2 = 0; _i2 < path.length; _i2++) {
       var _ref7;
 
       _ref7 = path[_i2];
-      var element = _ref7;
-      signalArg.element = element;
+      var node = _ref7;
+      signalArg.node = node;
       signals.fire('collect-targets', signalArg);
     }
 
@@ -9649,7 +9649,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.4.10";
+_interact["default"].version = "1.4.11";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

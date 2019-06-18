@@ -283,3 +283,4 @@ export declare function testEnv({ plugins, target, rect, }?: {
         readonly pointerType: any;
     } & import("@interactjs/core/InteractEvent").InteractEvent<any, any>);
 };
+export declare function timeout(n: any): Promise<unknown>;
