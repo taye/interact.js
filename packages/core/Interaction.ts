@@ -85,6 +85,7 @@ export class Interaction<T extends ActionName = any> {
   pointerWasMoved = false
   _interacting = false
   _ending = false
+  _stopped = true
   _proxy: _InteractionProxy = null
 
   simulation = null
@@ -196,11 +197,12 @@ export class Interaction<T extends ActionName = any> {
     this.element      = element
     this.rect         = interactable.getRect(element)
     this.edges        = this.prepared.edges
+    this._stopped     = false
     this._interacting = this._doPhase({
       interaction: this,
       event: this.downEvent,
       phase: EventPhase.Start,
-    })
+    }) && !this._stopped
 
     return this._interacting
   }
@@ -370,6 +372,7 @@ export class Interaction<T extends ActionName = any> {
     this.interactable = this.element = null
 
     this._interacting = false
+    this._stopped = true
     this.prepared.name = this.prevEvent = null
   }
 
