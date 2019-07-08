@@ -1,4 +1,6 @@
 import test from '@interactjs/_dev/test/test'
+import drag from '@interactjs/actions/drag'
+import autoStart from '@interactjs/auto-start/base'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import InteractEvent from './InteractEvent'
@@ -402,22 +404,25 @@ test('Interaction.start', (t) => {
 })
 
 test('stop interaction from start event', (t) => {
-  const scope = helpers.mockScope()
+  const {
+    interaction,
+    interactable,
+    target,
+  } = helpers.testEnv({ plugins: [drag, autoStart] })
 
-  const interaction = scope.interactions.new({})
-  const interactable = helpers.mockInteractable()
+  let stoppedBeforeStartFired
 
-  interaction.interactable = interactable
-  interaction.element = interactable.element
-  interaction.prepared = { name: 'TEST' }
+  interactable.on('dragstart', (event) => {
+    stoppedBeforeStartFired = interaction._stopped
 
-  interactable.events.on('TESTstart', (event) => {
     event.interaction.stop()
   })
 
-  interaction._signals.fire('action-start', { interaction, event: {} })
+  interaction.start({ name: 'drag' }, interactable, target as HTMLElement)
 
+  t.notOk(stoppedBeforeStartFired, '!interaction._stopped in start listener')
   t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener')
+  t.ok(interaction._stopped, 'interaction._stopped after stop() in start listener')
 
   t.end()
 })

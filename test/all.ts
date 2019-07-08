@@ -4,7 +4,11 @@ require('../packages/types/index')
 const glob = require('glob')
 const path = require('path')
 
-const globOptions = { ignore: ['**/node_modules/**', '**/_*'] }
+const globOptions = {
+  ignore: ['**/node_modules/**', '**/_*'],
+  silent: true,
+  strict: false,
+}
 
 const [, , ...fileArgs] = process.argv
 

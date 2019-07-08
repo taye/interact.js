@@ -1,3 +1,7 @@
+## v1.4.12
+
+ - fixed errors from calling `interaction.stop()` in start event (#725)
+
 ## v1.4.11
 
  - fixed hold events (#730)

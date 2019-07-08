@@ -35,7 +35,10 @@ function getSources () {
     '**/*.ts',
   ].reduce((acc, pattern) => [
     ...acc,
-    ...glob.sync(pattern, { ignore: '**/node_modules/**' }),
+    ...glob.sync(pattern, {
+      ignore: '**/node_modules/**',
+      silent: true,
+    }),
   ], [])
 
   return jsAndTs.filter(source => isNotGenerated(source))
