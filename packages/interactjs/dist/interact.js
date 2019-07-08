@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.11
+ * interact.js 1.4.12
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -721,6 +721,7 @@ function () {
     this.pointerWasMoved = false;
     this._interacting = false;
     this._ending = false;
+    this._stopped = true;
     this._proxy = null;
     this.simulation = null;
     /**
@@ -833,11 +834,12 @@ function () {
       this.element = element;
       this.rect = interactable.getRect(element);
       this.edges = this.prepared.edges;
+      this._stopped = false;
       this._interacting = this._doPhase({
         interaction: this,
         event: this.downEvent,
         phase: _InteractEvent.EventPhase.Start
-      });
+      }) && !this._stopped;
       return this._interacting;
     }
   }, {
@@ -1017,6 +1019,7 @@ function () {
 
       this.interactable = this.element = null;
       this._interacting = false;
+      this._stopped = true;
       this.prepared.name = this.prevEvent = null;
     }
   }, {
@@ -5178,7 +5181,15 @@ _$resize_6["default"] = void 0;
 
 var ___scope_6 = _$scope_24({});
 
-var __utils_6 = ___interopRequireWildcard_6(_$utils_55);
+var __arr_6 = ___interopRequireWildcard_6(_$arr_46);
+
+var __dom_6 = ___interopRequireWildcard_6(_$domUtils_50);
+
+var ___extend_6 = ___interopRequireDefault_6(_$extend_52);
+
+var __is_6 = ___interopRequireWildcard_6(_$is_56);
+
+function ___interopRequireDefault_6(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function ___interopRequireWildcard_6(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
@@ -5252,7 +5263,7 @@ function __install_6(scope) {
 
   actions[___scope_6.ActionName.Resize] = resize;
   actions.names.push(___scope_6.ActionName.Resize);
-  __utils_6.arr.merge(actions.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeresume', 'resizeend']);
+  __arr_6.merge(actions.eventTypes, ['resizestart', 'resizemove', 'resizeinertiastart', 'resizeresume', 'resizeend']);
   actions.methodDict.resize = 'resizable';
   defaults.actions.resize = resize.defaults;
 }
@@ -5282,7 +5293,7 @@ var resize = {
       return null;
     }
 
-    var page = __utils_6.extend({}, interaction.coords.cur.page);
+    var page = (0, ___extend_6["default"])({}, interaction.coords.cur.page);
     var options = interactable.options;
 
     if (options.resize.enabled) {
@@ -5294,7 +5305,7 @@ var resize = {
         bottom: false
       }; // if using resize.edges
 
-      if (__utils_6.is.object(resizeOptions.edges)) {
+      if (__is_6.object(resizeOptions.edges)) {
         for (var edge in resizeEdges) {
           resizeEdges[edge] = checkResizeEdge(edge, resizeOptions.edges[edge], page, interaction._latestPointer.eventTarget, element, rect, resizeOptions.margin || this.defaultMargin);
         }
@@ -5348,27 +5359,27 @@ var resize = {
 };
 
 function resizable(interactable, options, scope) {
-  if (__utils_6.is.object(options)) {
+  if (__is_6.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false;
     interactable.setPerAction('resize', options);
     interactable.setOnEvents('resize', options);
 
-    if (__utils_6.is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
+    if (__is_6.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis;
     } else if (options.axis === null) {
       interactable.options.resize.axis = scope.defaults.actions.resize.axis;
     }
 
-    if (__utils_6.is.bool(options.preserveAspectRatio)) {
+    if (__is_6.bool(options.preserveAspectRatio)) {
       interactable.options.resize.preserveAspectRatio = options.preserveAspectRatio;
-    } else if (__utils_6.is.bool(options.square)) {
+    } else if (__is_6.bool(options.square)) {
       interactable.options.resize.square = options.square;
     }
 
     return interactable;
   }
 
-  if (__utils_6.is.bool(options)) {
+  if (__is_6.bool(options)) {
     interactable.options.resize.enabled = options;
     return interactable;
   }
@@ -5385,8 +5396,8 @@ function checkResizeEdge(name, value, page, element, interactableElement, rect, 
 
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    var width = __utils_6.is.number(rect.width) ? rect.width : rect.right - rect.left;
-    var height = __utils_6.is.number(rect.height) ? rect.height : rect.bottom - rect.top; // don't use margin greater than half the relevent dimension
+    var width = __is_6.number(rect.width) ? rect.width : rect.right - rect.left;
+    var height = __is_6.number(rect.height) ? rect.height : rect.bottom - rect.top; // don't use margin greater than half the relevent dimension
 
     margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2);
 
@@ -5424,13 +5435,13 @@ function checkResizeEdge(name, value, page, element, interactableElement, rect, 
   } // the remaining checks require an element
 
 
-  if (!__utils_6.is.element(element)) {
+  if (!__is_6.element(element)) {
     return false;
   }
 
-  return __utils_6.is.element(value) // the value is an element to use as a resize handle
+  return __is_6.element(value) // the value is an element to use as a resize handle
   ? value === element // otherwise check if element matches value as selector
-  : __utils_6.dom.matchesUpTo(element, value, interactableElement);
+  : __dom_6.matchesUpTo(element, value, interactableElement);
 }
 
 function initCursors(browser) {
@@ -5479,7 +5490,7 @@ function start(_ref) {
    */
 
   if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-    var linkedEdges = __utils_6.extend({}, interaction.prepared.edges);
+    var linkedEdges = (0, ___extend_6["default"])({}, interaction.prepared.edges);
     linkedEdges.top = linkedEdges.top || linkedEdges.left && !linkedEdges.bottom;
     linkedEdges.left = linkedEdges.left || linkedEdges.top && !linkedEdges.right;
     linkedEdges.bottom = linkedEdges.bottom || linkedEdges.right && !linkedEdges.top;
@@ -5496,9 +5507,9 @@ function start(_ref) {
 
   interaction.resizeRects = {
     start: startRect,
-    current: __utils_6.extend({}, startRect),
-    inverted: __utils_6.extend({}, startRect),
-    previous: __utils_6.extend({}, startRect),
+    current: (0, ___extend_6["default"])({}, startRect),
+    inverted: (0, ___extend_6["default"])({}, startRect),
+    previous: (0, ___extend_6["default"])({}, startRect),
     delta: {
       left: 0,
       right: 0,
@@ -5529,9 +5540,9 @@ function __move_6(_ref2) {
   var current = interaction.resizeRects.current;
   var inverted = interaction.resizeRects.inverted;
   var deltaRect = interaction.resizeRects.delta;
-  var previous = __utils_6.extend(interaction.resizeRects.previous, inverted);
+  var previous = (0, ___extend_6["default"])(interaction.resizeRects.previous, inverted);
   var originalEdges = edges;
-  var eventDelta = __utils_6.extend({}, iEvent.delta);
+  var eventDelta = (0, ___extend_6["default"])({}, iEvent.delta);
 
   if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
     // `resize.preserveAspectRatio` takes precedence over `resize.square`
@@ -5566,7 +5577,7 @@ function __move_6(_ref2) {
 
   if (invertible) {
     // if invertible, copy the current rect
-    __utils_6.extend(inverted, current);
+    (0, ___extend_6["default"])(inverted, current);
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
@@ -9649,7 +9660,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.4.11";
+_interact["default"].version = "1.4.12";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

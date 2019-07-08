@@ -52,6 +52,7 @@ export declare class Interaction<T extends ActionName = any> {
     pointerWasMoved: boolean;
     _interacting: boolean;
     _ending: boolean;
+    _stopped: boolean;
     _proxy: _InteractionProxy;
     simulation: any;
     readonly pointerMoveTolerance: number;
