@@ -223,10 +223,11 @@ const resize = {
     return null
   },
 
-  cursors: null as unknown as ReturnType<typeof initCursors>,
+  cursors: null as ReturnType<typeof initCursors>,
 
   getCursor (action: ActionProps) {
-    const cursors = resize.cursors as { [key: string]: string }
+    const cursors = resize.cursors
+
     if (action.axis) {
       return cursors[action.name + action.axis]
     }
@@ -246,7 +247,7 @@ const resize = {
     return null
   },
 
-  defaultMargin: null as unknown as number,
+  defaultMargin: null as number,
 }
 
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {

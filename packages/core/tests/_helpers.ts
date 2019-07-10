@@ -111,18 +111,21 @@ export function mockInteractable (props = {}) {
 
 export function getProps<T extends {}, K extends keyof T> (src: T, props: K[]) {
   return props.reduce((acc, prop) => {
-    acc[prop] = src[prop]
+    if (prop in src) {
+      acc[prop] = src[prop]
+    }
+
     return acc
   }, {} as Pick<T, K>)
 }
 
-export function testEnv ({
+export function testEnv<T extends Interact.Target = HTMLElement> ({
   plugins = [],
   target,
   rect = {  top: 0, left: 0, bottom: 0, right: 0  },
 }: {
   plugins?: Interact.Plugin[],
-  target?: Interact.Target,
+  target?: T,
   rect?: Interact.Rect,
 } = {}) {
   const scope: Interact.Scope = mockScope()
@@ -131,7 +134,9 @@ export function testEnv ({
     scope.usePlugin(plugin)
   }
 
-  target = target || scope.document.body
+  if (!target) {
+    (target as unknown as HTMLElement) = scope.document.body
+  }
 
   const interaction = scope.interactions.new({})
   const interactable = scope.interactables.new(target)
