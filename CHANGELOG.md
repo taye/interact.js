@@ -1,3 +1,7 @@
+## v1.4.13
+
+ - fixed restrictSize min and max function restrictions
+
 ## v1.4.12
 
  - fixed errors from calling `interaction.stop()` in start event (#725)
