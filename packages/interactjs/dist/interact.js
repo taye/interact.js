@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.12
+ * interact.js 1.4.13
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -7965,8 +7965,8 @@ function __set_34(arg) {
 
   var rect = ___rect_34["default"].xywhToTlbr(interaction.resizeRects.inverted);
 
-  var minSize = ___rect_34["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.min, interaction)) || noMin;
-  var maxSize = ___rect_34["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.max, interaction)) || noMax;
+  var minSize = ___rect_34["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.min, interaction, arg.coords)) || noMin;
+  var maxSize = ___rect_34["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.max, interaction, arg.coords)) || noMax;
   state.options = {
     enabled: options.enabled,
     endOnly: options.endOnly,
@@ -9660,7 +9660,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.4.12";
+_interact["default"].version = "1.4.13";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
