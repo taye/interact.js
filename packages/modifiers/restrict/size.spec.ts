@@ -1,15 +1,15 @@
 import test from '@interactjs/_dev/test/test'
-import { mockSignals } from '@interactjs/core/tests/_helpers'
-
-import Interaction from '@interactjs/core/Interaction'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import rectUtils from '@interactjs/utils/rect'
 import base from './../base'
 import restrictSize from './../restrict/size'
 
 test('restrictSize', (t) => {
+  const {
+    interaction,
+  } = helpers.testEnv()
   const edges = { left: true, top: true }
   const rect = { left: 0, top: 0, right: 200, bottom: 300 }
-  const interaction = new Interaction({ signals: mockSignals() } as any)
 
   interaction.prepared = { name: null }
   interaction.prepared.edges = edges
@@ -19,8 +19,8 @@ test('restrictSize', (t) => {
   interaction._interacting = true
 
   const options = {
-    min: { width:  60, height:  50 },
-    max: { width: 300, height: 350 },
+    min: { width:  60, height:  50 } as any,
+    max: { width: 300, height: 350 } as any,
   }
   const startCoords = Object.freeze({ x: 0, y: 0 })
   const offset = { top: 0, bottom: 0, left: 0, right: 0 }
@@ -59,6 +59,33 @@ test('restrictSize', (t) => {
   restrictSize.set(arg)
 
   t.deepEqual(arg.coords, { x: 140, y: 250 }, 'outside min')
+
+  // min and max function restrictions
+  let minFuncArgs
+  let maxFuncArgs
+
+  options.min = (...args) => {
+    minFuncArgs = args
+    return null
+  }
+  options.max = (...args) => {
+    maxFuncArgs = args
+    return null
+  }
+
+  restrictSize.set(arg)
+
+  t.deepEqual(
+    minFuncArgs,
+    [arg.coords.x, arg.coords.y, interaction],
+    'correct args are passed to min function restriction',
+  )
+
+  t.deepEqual(
+    maxFuncArgs,
+    [arg.coords.x, arg.coords.y, interaction],
+    'correct args are passed to max function restriction',
+  )
 
   t.end()
 })
