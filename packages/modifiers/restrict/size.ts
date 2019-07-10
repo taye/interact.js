@@ -31,8 +31,8 @@ function set (arg) {
 
   const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted)
 
-  const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin
-  const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax
+  const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction, arg.coords)) || noMin
+  const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction, arg.coords)) || noMax
 
   state.options = {
     enabled: options.enabled,
