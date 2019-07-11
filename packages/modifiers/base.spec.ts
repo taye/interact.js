@@ -136,28 +136,13 @@ test('modifiers/base', (t) => {
     { x: 200, y: 200 },
     'move event coords are modified by all modifiers')
 
-  // modifier options.type
-  scope.modifiers.target = modifiersBase.makeModifier(targetModifier)
-  options.type = 'target'
-  options.started = false
-  interactable.options.TEST = {
-    enabled: true,
-    modifiers: [
-      options,
-    ],
-  }
-  interaction.stop()
-  interaction.start({ name: 'TEST' }, interactable, element)
-
-  t.ok(options.started, 'gets `scpe.modifiers[options.type]`')
-
   interaction.pointerMove(moveEvent, moveEvent, element)
 
   t.doesNotThrow(() => {
     interaction._signals.fire('action-resume', {
       interaction,
     })
-  })
+  }, 'action-resume doesn\'t throw errors')
 
   interaction.stop()
 

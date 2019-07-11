@@ -15,11 +15,11 @@ export function init (window: Window) {
 
   interact.use(interactablePreventDefault)
 
-  // inertia
-  interact.use(inertia)
-
   // pointerEvents
   interact.use(pointerEvents)
+
+  // inertia
+  interact.use(inertia)
 
   // autoStart, hold
   interact.use(autoStart)

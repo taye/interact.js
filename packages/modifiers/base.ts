@@ -35,8 +35,19 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
-    modifiers?: Array<ReturnType<typeof makeModifier>>
+    modifiers?: Modifier[]
   }
+}
+
+export interface Modifier<Name extends string = any> {
+  options?: { enabled?: boolean, [key: string]: any }
+  methods: {
+    start?: (arg: Interact.SignalArg) => void
+    set: (arg: Interact.SignalArg) => void
+    beforeEnd?: (arg: Interact.SignalArg) => void
+    stop?: (arg: Interact.SignalArg) => void
+  },
+  name?: Name
 }
 
 function install (scope: Scope) {
@@ -45,7 +56,6 @@ function install (scope: Scope) {
   } = scope
 
   scope.defaults.perAction.modifiers = []
-  scope.modifiers = {}
 
   interactions.signals.on('new', ({ interaction }) => {
     interaction.modifiers = {
@@ -59,12 +69,12 @@ function install (scope: Scope) {
   })
 
   interactions.signals.on('before-action-start', (arg) => {
-    start(arg as any, arg.interaction.coords.start.page, scope.modifiers)
+    start(arg as any, arg.interaction.coords.start.page)
   })
 
   interactions.signals.on('action-resume', (arg) => {
     stop(arg as Required<Interact.SignalArg>)
-    start(arg as Required<Interact.SignalArg>, arg.interaction.coords.cur.page, scope.modifiers)
+    start(arg as Required<Interact.SignalArg>, arg.interaction.coords.cur.page)
     beforeMove(arg as Required<Interact.SignalArg>)
   })
 
@@ -81,10 +91,9 @@ function install (scope: Scope) {
 function start (
   { interaction, phase }: Interact.SignalArg,
   pageCoords: Interact.Point,
-  registeredModifiers,
 ) {
   const { interactable, element } = interaction
-  const modifierList = getModifierList(interaction, registeredModifiers)
+  const modifierList = getModifierList(interaction)
   const states = prepareStates(modifierList)
 
   const rect = extend({}, interaction.rect)
@@ -225,7 +234,7 @@ function beforeMove (arg: Interact.SignalArg): void | false {
   setCoords(arg)
 }
 
-function beforeEnd (arg): void | false {
+function beforeEnd (arg: Interact.SignalArg): void | false {
   const { interaction, event, noPreEnd } = arg
   const states = interaction.modifiers.states
 
@@ -281,20 +290,14 @@ function stop (arg: Interact.SignalArg) {
   arg.interaction.modifiers.endPrevented = false
 }
 
-function getModifierList (interaction, registeredModifiers) {
+function getModifierList (interaction) {
   const actionOptions = interaction.interactable.options[interaction.prepared.name]
   const actionModifiers = actionOptions.modifiers
 
   if (actionModifiers && actionModifiers.length) {
-    return actionModifiers
-      .filter((modifier) => !modifier.options || modifier.options.enabled !== false)
-      .map((modifier) => {
-        if (!modifier.methods && modifier.type) {
-          return registeredModifiers[modifier.type](modifier)
-        }
-
-        return modifier
-      })
+    return actionModifiers.filter(
+      (modifier) => !modifier.options || modifier.options.enabled !== false
+    )
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
@@ -410,8 +413,12 @@ function getRectOffset (rect, coords) {
 }
 
 function makeModifier<
-  Options extends { enabled?: boolean, [key: string]: any }
-> (module: { defaults: Options, [key: string]: any }, name?: string) {
+  Defaults extends { enabled?: boolean },
+  Name extends string
+> (
+  module: { defaults?: Defaults, [key: string]: any },
+  name?: Name
+) {
   const { defaults } = module
   const methods = {
     start: module.start,
@@ -420,7 +427,7 @@ function makeModifier<
     stop: module.stop,
   }
 
-  const modifier = (options?: Partial<Options>) => {
+  const modifier = (options?: Partial<Defaults>) => {
     options = options || {}
 
     options.enabled = options.enabled !== false
@@ -432,10 +439,12 @@ function makeModifier<
       }
     }
 
-    return { options, methods, name }
+    const m: Modifier<Name> = { options, methods, name }
+
+    return m
   }
 
-  if (typeof name === 'string') {
+  if (name && typeof name === 'string') {
     // for backwrads compatibility
     modifier._defaults = defaults
     modifier._methods = methods
@@ -458,7 +467,7 @@ export default {
   getModifierList,
   getRectOffset,
   makeModifier,
-} as Interact.Plugin
+}
 
 export {
   makeModifier,
