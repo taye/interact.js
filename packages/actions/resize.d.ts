@@ -70,7 +70,7 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor(action: ActionProps<any>): string;
+    getCursor(action: ActionProps<any>): any;
     defaultMargin: number;
 };
 export default resize;

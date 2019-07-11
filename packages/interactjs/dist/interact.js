@@ -1,5 +1,5 @@
 /**
- * interact.js 1.4.13
+ * interact.js 1.4.14
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -2482,23 +2482,21 @@ function ___interopRequireWildcard_62(obj) { if (obj && obj.__esModule) { return
 function ___interopRequireDefault_62(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function getStringOptionResult(value, interactable, element) {
-  if (!__is_62.string(value)) {
-    return null;
-  }
-
   if (value === 'parent') {
-    value = (0, _$domUtils_50.parentNode)(element);
-  } else if (value === 'self') {
-    value = interactable.getRect(element);
-  } else {
-    value = (0, _$domUtils_50.closest)(element, value);
+    return (0, _$domUtils_50.parentNode)(element);
   }
 
-  return value;
+  if (value === 'self') {
+    return interactable.getRect(element);
+  }
+
+  return (0, _$domUtils_50.closest)(element, value);
 }
 
 function resolveRectLike(value, interactable, element, functionArgs) {
-  value = getStringOptionResult(value, interactable, element) || value;
+  if (__is_62.string(value)) {
+    value = getStringOptionResult(value, interactable, element);
+  }
 
   if (__is_62.func(value)) {
     value = value.apply(null, functionArgs);
@@ -6961,7 +6959,6 @@ function ___arrayWithHoles_30(arr) { if (Array.isArray(arr)) return arr; }
 function __install_30(scope) {
   var interactions = scope.interactions;
   scope.defaults.perAction.modifiers = [];
-  scope.modifiers = {};
   interactions.signals.on('new', function (_ref) {
     var interaction = _ref.interaction;
     interaction.modifiers = {
@@ -6979,11 +6976,11 @@ function __install_30(scope) {
     };
   });
   interactions.signals.on('before-action-start', function (arg) {
-    __start_30(arg, arg.interaction.coords.start.page, scope.modifiers);
+    __start_30(arg, arg.interaction.coords.start.page);
   });
   interactions.signals.on('action-resume', function (arg) {
     stop(arg);
-    __start_30(arg, arg.interaction.coords.cur.page, scope.modifiers);
+    __start_30(arg, arg.interaction.coords.cur.page);
     __beforeMove_30(arg);
   });
   interactions.signals.on('after-action-move', restoreCoords);
@@ -6994,12 +6991,12 @@ function __install_30(scope) {
   interactions.signals.on('stop', stop);
 }
 
-function __start_30(_ref2, pageCoords, registeredModifiers) {
+function __start_30(_ref2, pageCoords) {
   var interaction = _ref2.interaction,
       phase = _ref2.phase;
   var interactable = interaction.interactable,
       element = interaction.element;
-  var modifierList = getModifierList(interaction, registeredModifiers);
+  var modifierList = getModifierList(interaction);
   var states = prepareStates(modifierList);
   var rect = (0, ___extend_30["default"])({}, interaction.rect);
 
@@ -7210,19 +7207,13 @@ function stop(arg) {
   arg.interaction.modifiers.endPrevented = false;
 }
 
-function getModifierList(interaction, registeredModifiers) {
+function getModifierList(interaction) {
   var actionOptions = interaction.interactable.options[interaction.prepared.name];
   var actionModifiers = actionOptions.modifiers;
 
   if (actionModifiers && actionModifiers.length) {
     return actionModifiers.filter(function (modifier) {
       return !modifier.options || modifier.options.enabled !== false;
-    }).map(function (modifier) {
-      if (!modifier.methods && modifier.type) {
-        return registeredModifiers[modifier.type](modifier);
-      }
-
-      return modifier;
     });
   }
 
@@ -7369,14 +7360,15 @@ function makeModifier(module, name) {
       }
     }
 
-    return {
+    var m = {
       options: options,
       methods: methods,
       name: name
     };
+    return m;
   };
 
-  if (typeof name === 'string') {
+  if (name && typeof name === 'string') {
     // for backwrads compatibility
     modifier._defaults = defaults;
     modifier._methods = methods;
@@ -9619,13 +9611,13 @@ function ___interopRequireWildcard_27(obj) { if (obj && obj.__esModule) { return
 function __init_27(window) {
   _interact.scope.init(window);
 
-  _interact["default"].use(_interactablePreventDefault["default"]); // inertia
+  _interact["default"].use(_interactablePreventDefault["default"]); // pointerEvents
 
 
-  _interact["default"].use(_inertia["default"]); // pointerEvents
+  _interact["default"].use(__pointerEvents_27); // inertia
 
 
-  _interact["default"].use(__pointerEvents_27); // autoStart, hold
+  _interact["default"].use(_inertia["default"]); // autoStart, hold
 
 
   _interact["default"].use(autoStart); // drag and drop, resize, gesture
@@ -9660,7 +9652,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.4.13";
+_interact["default"].version = "1.4.14";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
@@ -9783,8 +9775,8 @@ function __init_29(win) {
   (0, ___interact_29.init)(win);
   return ___interact_29["default"].use({
     id: 'interactjs',
-    install: function install(scope) {
-      ___interact_29["default"].modifiers = (0, ___extend_29["default"])(scope.modifiers, __modifiers_29);
+    install: function install() {
+      ___interact_29["default"].modifiers = (0, ___extend_29["default"])({}, __modifiers_29);
       ___interact_29["default"].snappers = snappers;
       ___interact_29["default"].createSnapGrid = ___interact_29["default"].snappers.grid;
     }

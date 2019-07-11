@@ -63,14 +63,14 @@ export declare function mockScope(options?: any): any;
 export declare function mockSignals(): any;
 export declare function mockInteractable(props?: {}): any;
 export declare function getProps<T extends {}, K extends keyof T>(src: T, props: K[]): Pick<T, K>;
-export declare function testEnv({ plugins, target, rect, }?: {
+export declare function testEnv<T extends Interact.Target = HTMLElement>({ plugins, target, rect, }?: {
     plugins?: Interact.Plugin[];
-    target?: Interact.Target;
+    target?: T;
     rect?: Interact.Rect;
 }): {
     scope: import("@interactjs/core/scope").Scope;
     interaction: import("@interactjs/core/Interaction").Interaction<any>;
-    target: import("../../types/types").Target;
+    target: T;
     interactable: import("@interactjs/core/Interactable").Interactable;
     coords: MockCoords;
     event: ({
