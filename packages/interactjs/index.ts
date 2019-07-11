@@ -1,12 +1,13 @@
 import interact, { init as initInteract } from '@interactjs/interact'
 import * as modifiers from '@interactjs/modifiers'
+import { Modifier } from '@interactjs/modifiers/base'
 import '@interactjs/types'
 import extend from '@interactjs/utils/extend'
 import * as snappers from '@interactjs/utils/snappers'
 
 declare module '@interactjs/interact/interact' {
     interface InteractStatic {
-        modifiers?: any
+        modifiers?: { [key: string]: (options?) => Modifier }
         snappers?: typeof snappers & { [key: string]: any }
         createSnapGrid?: typeof snappers.grid
     }
@@ -21,8 +22,8 @@ export function init (win: Window) {
 
   return interact.use({
     id: 'interactjs',
-    install (scope) {
-      interact.modifiers = extend(scope.modifiers, modifiers)
+    install () {
+      interact.modifiers = extend({}, modifiers)
       interact.snappers = snappers
       interact.createSnapGrid = interact.snappers.grid
     },
