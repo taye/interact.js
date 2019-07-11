@@ -1,20 +1,21 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils'
 import autoStart from './base'
 
 test('autoStart', (t) => {
-  const scope: Interact.Scope = helpers.mockScope()
-
-  scope.usePlugin(autoStart)
-  scope.usePlugin(drag)
-
-  const interaction = scope.interactions.new({})
-  const element = scope.document.body
-  const interactable = scope.interactables.new(element).draggable(true)
-  const event = utils.pointer.coordsToEvent(utils.pointer.newCoords())
   const rect = { top: 100, left: 200, bottom: 300, right: 400 }
+  const {
+    interaction,
+    interactable,
+    event,
+    target: element,
+  } = helpers.testEnv({
+    plugins: [autoStart, drag],
+    rect,
+  })
+
+  interactable.draggable(true)
   interactable.rectChecker(() => ({ ...rect }))
 
   interaction.pointerDown(event, event, element)
@@ -30,6 +31,29 @@ test('autoStart', (t) => {
     rect as any,
     'set interaction.rect'
   )
+
+  t.equal(element.style.cursor, 'move', 'sets drag cursor')
+
+  let checkerArgs
+
+  interactable.draggable({
+    cursorChecker (...args) {
+      checkerArgs = args
+
+      return 'custom-cursor'
+    },
+  })
+
+  interaction.pointerDown(event, event, element)
+
+  t.deepEqual(
+    checkerArgs,
+    [{ name: 'drag', axis: 'xy' }, interactable, element],
+    'calls cursorChecker with expected args'
+  )
+
+  interaction.pointerDown(event, event, element)
+  t.equal(element.style.cursor, 'custom-cursor', 'uses cursorChecker value')
 
   t.end()
 })

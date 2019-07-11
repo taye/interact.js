@@ -223,9 +223,21 @@ function prepare (interaction: Interact.Interaction, { action, interactable, ele
     ? interactable.getRect(element)
     : null
 
-  if (interactable && interactable.options.styleCursor) {
-    const cursor = action ? scope.actions[action.name].getCursor(action) : ''
-    setCursor(interaction.element as HTMLElement, cursor, scope)
+  if (interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor) {
+    let cursor = ''
+
+    if (action) {
+      const { cursorChecker } = interactable.options[action.name]
+
+      if (utils.is.func(cursorChecker)) {
+        cursor = cursorChecker(action, interactable, element)
+      }
+      else {
+        cursor = scope.actions[action.name].getCursor(action)
+      }
+    }
+
+    setCursor(interaction.element as HTMLElement, cursor || '', scope)
   }
 
   scope.autoStart.signals.fire('prepared', { interaction })

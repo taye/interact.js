@@ -132,6 +132,9 @@ declare namespace Interact {
     [key: string]: boolean | CSSSelector | DOMElement
   }
 
+  export type CursorChecker<T extends ActionName = any> =
+    (action: ActionProps, interactable: Interactable, element: Element) => string
+
   export interface ActionMethod<T> {
     (this: Interact.Interactable): T
     // eslint-disable-next-line no-undef
@@ -149,6 +152,7 @@ declare namespace Interact {
   export interface DraggableOptions extends Options {
     startAxis?: 'x' | 'y' | 'xy'
     lockAxis?: 'x' | 'y' | 'xy' | 'start'
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
@@ -192,6 +196,7 @@ declare namespace Interact {
     invert?: 'none' | 'negate' | 'reposition'
     margin?: number,
     squareResize?: boolean
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
