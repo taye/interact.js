@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/utils",
-  "version": "1.4.13",
+  "version": "1.4.14",
   "publishConfig": {
     "access": "public"
   }

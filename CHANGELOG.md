@@ -1,3 +1,9 @@
+## v1.4.14
+
+ - fixed issue with string restriction values that don't resolve to a rect
+   (#731)
+ - changed plugin order so that `pointer-events` is installed before `inertia`
+
 ## v1.4.13
 
  - fixed restrictSize min and max function restrictions
