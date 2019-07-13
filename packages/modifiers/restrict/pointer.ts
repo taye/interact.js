@@ -1,20 +1,23 @@
+import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import rectUtils from '@interactjs/utils/rect'
 
 function start ({ rect, startOffset, state }) {
   const { options } = state
   const { elementRect } = options
-  const offset = {} as { [key: string]: number }
+  const offset: Interact.Rect = extend({
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+  }, options.offset || {})
 
   if (rect && elementRect) {
-    offset.left = startOffset.left - (rect.width  * elementRect.left)
-    offset.top  = startOffset.top  - (rect.height * elementRect.top)
+    offset.left += startOffset.left - (rect.width  * elementRect.left)
+    offset.top  += startOffset.top  - (rect.height * elementRect.top)
 
-    offset.right  = startOffset.right  - (rect.width  * (1 - elementRect.right))
-    offset.bottom = startOffset.bottom - (rect.height * (1 - elementRect.bottom))
-  }
-  else {
-    offset.left = offset.top = offset.right = offset.bottom = 0
+    offset.right  += startOffset.right  - (rect.width  * (1 - elementRect.right))
+    offset.bottom += startOffset.bottom - (rect.height * (1 - elementRect.bottom))
   }
 
   state.offset = offset
@@ -58,6 +61,7 @@ const restrict = {
     enabled: false,
     restriction: null,
     elementRect: null,
+    offset: null,
   },
 }
 

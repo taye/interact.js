@@ -1,14 +1,3 @@
-// This module adds the options.resize.restrictSize setting which sets min and
-// max width and height for the target being resized.
-//
-// interact(target).resize({
-//   edges: { top: true, left: true },
-//   restrictSize: {
-//     min: { width: -600, height: -600 },
-//     max: { width:  600, height:  600 },
-//   },
-// })
-
 import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
 import restrictEdges from './edges'
