@@ -52,8 +52,8 @@ function set ({ coords, interaction, state }: {
   }
 
   const page = extend({}, coords)
-  const inner = getRestrictionRect(options.inner, interaction, page) || {}
-  const outer = getRestrictionRect(options.outer, interaction, page) || {}
+  const inner = getRestrictionRect(options.inner, interaction, page) || {} as Interact.Rect
+  const outer = getRestrictionRect(options.outer, interaction, page) || {} as Interact.Rect
 
   fixRect(inner, noInner)
   fixRect(outer, noOuter)

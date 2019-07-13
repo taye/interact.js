@@ -10,20 +10,19 @@ export function getStringOptionResult (value, interactable, element) {
   return closest(element, value)
 }
 
-export function resolveRectLike (value, interactable?, element?, functionArgs?) {
+export function resolveRectLike<T extends any[] = []> (value: Interact.RectResolvable<T>, interactable?, element?, functionArgs?: T) {
   if (is.string(value)) {
     value = getStringOptionResult(value, interactable, element)
   }
-
-  if (is.func(value)) {
-    value = value.apply(null, functionArgs)
+  else if (is.func(value)) {
+    value = value(...functionArgs)
   }
 
   if (is.element(value)) {
     value = getElementRect(value)
   }
 
-  return value
+  return value as Interact.Rect
 }
 
 export function rectToXY (rect) {
