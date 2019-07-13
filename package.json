@@ -19,7 +19,7 @@
     "build": "cd packages/interactjs; NODE_ENV=production ../../scripts/build.js --docs",
     "lint": "scripts/lint.js --fail-on-error",
     "test": "scripts/test.sh",
-    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='--inspect' npm run test",
+    "test:debug": "TEST_RUNNER=nodemon TEST_RUNNER_ARGS='-x node --inspect' npm run test",
     "tsc_lint_test": "tsc -b -f && tsc -b --clean && npm run lint -- --fail-on-error && npm test",
     "docs": "node jsdoc/index.js",
     "release": "sh ./scripts/release.sh",
