@@ -108,7 +108,7 @@ const finder = {
         const target = interaction.interactable
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
-        if (target && !target.options.gesture.enabled) {
+        if (target && !(target.options.gesture && target.options.gesture.enabled)) {
           continue
         }
       }
