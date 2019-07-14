@@ -3,7 +3,12 @@
 
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
-import snap from './pointer'
+import snap, { SnapOptions } from './pointer'
+
+export type SnapSizeOptions = Pick<
+  SnapOptions,
+  'targets' | 'offset' | 'endOnly' | 'enabled' | 'range'
+>
 
 function start (arg) {
   const { interaction, state } = arg
@@ -75,15 +80,18 @@ function set (arg) {
   state.options = options
 }
 
+const defaults: SnapSizeOptions = {
+  range: Infinity,
+  targets: null,
+  offset: null,
+  endOnly: false,
+  enabled: false,
+}
+
 const snapSize = {
   start,
   set,
-  defaults: {
-    enabled: false,
-    range  : Infinity,
-    targets: null,
-    offset: null,
-  },
+  defaults,
 }
 
 export default snapSize

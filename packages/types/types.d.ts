@@ -47,10 +47,9 @@ declare namespace Interact {
     [index: string]: number
   }
 
-  export interface SnapPosition {
-    x: number
-    y: number
-    range?: number
+  export interface Size {
+    width: number
+    height: number
   }
 
   export interface Rect {
@@ -64,34 +63,11 @@ declare namespace Interact {
 
   export type FullRect = Required<Rect>
 
-  export type RectFunction<T extends any[] = []> = (...args: T) => Interact.Rect
+  export type RectFunction<T extends any[]> = (...args: T) => Interact.Rect | Element
 
-  export type RectResolvable<T extends any[] = []> = Rect | string | Element | RectFunction<T>
+  export type RectResolvable<T extends any[]> = Rect | string | Element | RectFunction<T>
 
-  export interface Dimensions {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
-
-  export interface Size {
-    width: number
-    height: number
-  }
-
-  export type SnapFunction = (x: number, y: number) => SnapPosition
-
-  export type SnapTarget = SnapPosition | SnapFunction
-  export interface SnapOptions {
-    targets?: SnapTarget[]
-    // target range
-    range?: number
-    // self points for snappin [0,0] = top-left, [1,1] = bottom righ
-    relativePoints?: Point[]
-    // startCoords = offset snapping from drag start page position
-    offset?: Point | 'startCoords'
-  }
+  export type Dimensions = Point & Size
 
   export interface InertiaOption {
     resistance?: number
@@ -112,22 +88,6 @@ declare namespace Interact {
   export type AutoScrollOptions = AutoScrollOption | boolean
 
   export type CSSSelector = string
-
-  export interface RestrictOptions {
-    enabled?
-    // where to drag over
-    restriction?: Rect | Dimensions | CSSSelector | Element | 'self' | 'parent'
-    // what part of self is allowed to drag over
-    elementRect?: Rect
-    // restrict just before the end drag
-    endOnly?: boolean
-    offset?: Rect
-  }
-
-  export interface RestrictSizeOption {
-    min?: Size
-    max?: Size
-  }
 
   export interface EdgeOptions {
     top?: boolean | CSSSelector | Element

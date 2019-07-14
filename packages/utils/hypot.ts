@@ -1,1 +1,1 @@
-export default (x, y) =>  Math.sqrt(x * x + y * y)
+export default (x: number, y: number) =>  Math.sqrt(x * x + y * y)

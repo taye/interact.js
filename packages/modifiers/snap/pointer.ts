@@ -1,5 +1,32 @@
 import * as utils from '@interactjs/utils'
 
+export interface SnapPosition {
+  x: number
+  y: number
+  range?: number
+}
+
+export type SnapFunction = (
+  x: number,
+  y: number,
+  interaction: Interact.Interaction,
+  offset: Interact.Point,
+  index: number
+) => SnapPosition
+export type SnapTarget = SnapPosition | SnapFunction
+export interface SnapOptions {
+  targets: SnapTarget[]
+  // target range
+  range: number
+  // self points for snapping. [0,0] = top left, [1,1] = bottom right
+  relativePoints: Interact.Point[]
+  // startCoords = offset snapping from drag start page position
+  offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords'
+  offsetWithOrigin: boolean,
+  endOnly: boolean
+  enabled: boolean,
+}
+
 function start (arg: Interact.SignalArg) {
   const { interaction, interactable, element, rect, state, startOffset } = arg
   const { options } = state
@@ -156,18 +183,19 @@ function getOrigin (arg: Partial<Interact.SignalArg>) {
   return origin
 }
 
+const defaults: SnapOptions = {
+  range  : Infinity,
+  targets: null,
+  offset: null,
+  offsetWithOrigin: true,
+  relativePoints: null,
+  endOnly: false,
+  enabled: false,
+}
 const snap = {
   start,
   set,
-  defaults: {
-    enabled: false,
-    range  : Infinity,
-    targets: null,
-    offset: null,
-    offsetWithOrigin: true,
-
-    relativePoints: null,
-  },
+  defaults,
 }
 
 export default snap

@@ -2,6 +2,17 @@ import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import rectUtils from '@interactjs/utils/rect'
 
+export interface RestrictOptions {
+  // where to drag over
+  restriction: Interact.RectResolvable<[number, number, Interact.Interaction]>
+  // what part of self is allowed to drag over
+  elementRect: Interact.Rect
+  offset: Interact.Rect
+  // restrict just before the end drag
+  endOnly: boolean
+  enabled: boolean
+}
+
 function start ({ rect, startOffset, state, interaction, pageCoords }) {
   const { options } = state
   const { elementRect } = options
@@ -57,11 +68,12 @@ function getRestrictionRect (value, interaction, coords?: Interact.Point) {
   }
 }
 
-const defaults: Interact.RestrictOptions = {
-  enabled: false,
+const defaults: RestrictOptions = {
   restriction: null,
   elementRect: null,
   offset: null,
+  endOnly: false,
+  enabled: false,
 }
 
 const restrict = {

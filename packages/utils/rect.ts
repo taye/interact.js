@@ -10,7 +10,7 @@ export function getStringOptionResult (value, interactable, element) {
   return closest(element, value)
 }
 
-export function resolveRectLike<T extends any[] = []> (value: Interact.RectResolvable<T>, interactable?, element?, functionArgs?: T) {
+export function resolveRectLike<T extends any[]> (value: Interact.RectResolvable<T>, interactable?, element?, functionArgs?: T) {
   if (is.string(value)) {
     value = getStringOptionResult(value, interactable, element)
   }
