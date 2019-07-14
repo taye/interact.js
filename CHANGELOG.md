@@ -1,3 +1,7 @@
+## v1.5.1
+
+ - fixed typing issues (#738)
+
 ## v1.5.0
 
  - added `cursorChecker` option for drag and resize (#736)

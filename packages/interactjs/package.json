@@ -1,6 +1,6 @@
 {
   "name": "interactjs",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/taye/interact.js.git"
@@ -34,16 +34,17 @@
     "inertia",
     "grid",
     "autoscroll",
-    "SVG"
+    "SVG",
+    "interact"
   ],
   "license": "MIT",
   "dependencies": {
-    "@interactjs/types": "1.5.0"
+    "@interactjs/types": "1.5.1"
   },
   "devDependencies": {
-    "@interactjs/interact": "1.5.0",
-    "@interactjs/modifiers": "1.5.0",
-    "@interactjs/utils": "1.5.0"
+    "@interactjs/interact": "1.5.1",
+    "@interactjs/modifiers": "1.5.1",
+    "@interactjs/utils": "1.5.1"
   },
   "_dev": {
     "entries": "./index.ts",
