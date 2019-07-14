@@ -4,7 +4,7 @@ import rectUtils from '@interactjs/utils/rect'
 import base from './../base'
 import restrictSize from './../restrict/size'
 
-test('restrictSize', (t) => {
+test('restrictSize', t => {
   const {
     interaction,
   } = helpers.testEnv()

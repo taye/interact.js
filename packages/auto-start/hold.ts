@@ -25,7 +25,7 @@ function install (scope: Interact.Scope) {
   defaults.perAction.hold = 0
   defaults.perAction.delay = 0
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', interaction => {
     interaction.autoStartHoldTimer = null
   })
 

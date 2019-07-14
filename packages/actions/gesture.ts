@@ -154,7 +154,7 @@ const gesture = {
 function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
-  const pointers = interaction.pointers.map((p) => p.pointer)
+  const pointers = interaction.pointers.map(p => p.pointer)
   const starting = phase === 'start'
   const ending = phase === 'end'
   const deltaSource = interaction.interactable.options.deltaSource

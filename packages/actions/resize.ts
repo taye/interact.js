@@ -68,7 +68,7 @@ function install (scope: Scope) {
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', interaction => {
     interaction.resizeAxes = 'xy'
   })
 

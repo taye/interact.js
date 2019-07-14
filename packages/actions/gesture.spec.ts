@@ -8,7 +8,7 @@ function getGestureProps (event: Interact.GestureEvent) {
   return helpers.getProps(event, ['type', 'angle', 'distance', 'scale', 'ds', 'da'])
 }
 
-test('gesture action init', (t) => {
+test('gesture action init', t => {
   const scope: Interact.Scope = helpers.mockScope()
 
   scope.usePlugin(gesture)
@@ -20,7 +20,7 @@ test('gesture action init', (t) => {
   t.end()
 })
 
-test('Interactable.gesturable method', (t) => {
+test('Interactable.gesturable method', t => {
   const scope: Interact.Scope = helpers.mockScope()
 
   scope.usePlugin(gesture)

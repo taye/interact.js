@@ -2,7 +2,7 @@ import d from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import * as helpers from './tests/_helpers'
 
-test('Interactable copies and extends defaults', (t) => {
+test('Interactable copies and extends defaults', t => {
   const scope = helpers.mockScope() as any
   const { defaults } = scope
 
@@ -36,7 +36,7 @@ test('Interactable copies and extends defaults', (t) => {
   t.end()
 })
 
-test('Interactable unset correctly', (t) => {
+test('Interactable unset correctly', t => {
   const scope = helpers.mockScope() as any
 
   const div = d('div')
@@ -58,7 +58,7 @@ test('Interactable unset correctly', (t) => {
   t.end()
 })
 
-test('Interactable copies and extends per action defaults', (t) => {
+test('Interactable copies and extends per action defaults', t => {
   const scope = helpers.mockScope()
   const { defaults } = scope
 
@@ -103,7 +103,7 @@ test('Interactable copies and extends per action defaults', (t) => {
   t.end()
 })
 
-test('Interactable.updatePerActionListeners', (t) => {
+test('Interactable.updatePerActionListeners', t => {
   const scope = helpers.mockScope()
 
   let fired = []
@@ -128,16 +128,16 @@ test('Interactable.updatePerActionListeners', (t) => {
   })
 
   interactable.fire({ type: 'teststart' })
-  t.deepEqual(fired.map((e) => e.type), ['teststart'])
+  t.deepEqual(fired.map(e => e.type), ['teststart'])
 
   interactable.fire({ type: 'testmove' })
-  t.deepEqual(fired.map((e) => e.type), ['teststart', 'testmove'])
+  t.deepEqual(fired.map(e => e.type), ['teststart', 'testmove'])
 
   interactable.fire({ type: 'testnotadded' })
-  t.deepEqual(fired.map((e) => e.type), ['teststart', 'testmove'])
+  t.deepEqual(fired.map(e => e.type), ['teststart', 'testmove'])
 
   interactable.fire({ type: 'testend' })
-  t.deepEqual(fired.map((e) => e.type), ['teststart', 'testmove', 'testend'])
+  t.deepEqual(fired.map(e => e.type), ['teststart', 'testmove', 'testend'])
 
   fired = []
   interactable.setPerAction('test', {
@@ -147,7 +147,7 @@ test('Interactable.updatePerActionListeners', (t) => {
   interactable.fire({ type: 'teststart' })
   interactable.fire({ type: 'testmove' })
   interactable.fire({ type: 'testend' })
-  t.deepEqual(fired.map((e) => e.type), ['teststart'])
+  t.deepEqual(fired.map(e => e.type), ['teststart'])
 
   fired = []
   interactable.setPerAction('test', {

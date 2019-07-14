@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import Eventable from './Eventable'
 
-test('Eventable', (t) => {
+test('Eventable', t => {
   const eventable = new Eventable()
   const type = 'TEST'
 
@@ -10,7 +10,7 @@ test('Eventable', (t) => {
     immediatePropagationStopped: false,
   }
   let firedEvent
-  const listener = (event) => { firedEvent = event }
+  const listener = event => { firedEvent = event }
 
   eventable.on(type, listener)
   eventable.fire(testEvent)

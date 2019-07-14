@@ -10,7 +10,7 @@ const checkMap = checks.reduce((acc, check) => {
   return acc
 }, {} as { [name: string]: Check})
 
-test('devTools', (t) => {
+test('devTools', t => {
   const scope: Interact.Scope = helpers.mockScope()
   const logs: Array<{ args: any[], type: keyof Logger }> = []
 

@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import { indexOfDeepestElement } from './domUtils'
 
-test('utils/domUtils/indexOfDeepestElement', (t) => {
+test('utils/domUtils/indexOfDeepestElement', t => {
   const ownerDocument = {
     name: 'Owner Document',
     lastChild: null,

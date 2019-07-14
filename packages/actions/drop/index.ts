@@ -112,8 +112,8 @@ function install (scope: Scope) {
   })
 
   // FIXME proper signal types
-  interactions.signals.on('action-move', (arg) => onEventCreated(arg as any, scope))
-  interactions.signals.on('action-end', (arg) => onEventCreated(arg as any, scope))
+  interactions.signals.on('action-move', arg => onEventCreated(arg as any, scope))
+  interactions.signals.on('action-end', arg => onEventCreated(arg as any, scope))
 
   interactions.signals.on('after-action-move', ({ interaction }) => {
     if (interaction.prepared.name !== 'drag') { return }

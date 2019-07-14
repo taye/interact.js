@@ -2,7 +2,7 @@ import { JSDOM } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 import interact, { scope } from './interact'
 
-test('interact export', (t) => {
+test('interact export', t => {
   scope.init(new JSDOM('').window)
 
   const interactable1 = interact('selector')
@@ -69,7 +69,7 @@ test('interact export', (t) => {
     prevDocCount,
     'interact.removeDocument() removes document from scope')
 
-  scope.interactables.list.forEach((i) => i.unset())
+  scope.interactables.list.forEach(i => i.unset())
 
   const plugin1 = { id: 'test-1', install () { plugin1.count++ }, count: 0 }
   const plugin2 = { id: undefined, install () { plugin2.count++ }, count: 0 }

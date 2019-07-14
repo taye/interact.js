@@ -71,11 +71,11 @@ function install (scope: Scope) {
     }
   })
 
-  interactions.signals.on('before-action-start', (arg) => {
+  interactions.signals.on('before-action-start', arg => {
     start(arg as any, arg.interaction.coords.start.page)
   })
 
-  interactions.signals.on('action-resume', (arg) => {
+  interactions.signals.on('action-resume', arg => {
     stop(arg as Required<Interact.SignalArg>)
     start(arg as Required<Interact.SignalArg>, arg.interaction.coords.cur.page)
     beforeMove(arg as Required<Interact.SignalArg>)
@@ -299,12 +299,12 @@ function getModifierList (interaction) {
 
   if (actionModifiers && actionModifiers.length) {
     return actionModifiers.filter(
-      (modifier) => !modifier.options || modifier.options.enabled !== false
+      modifier => !modifier.options || modifier.options.enabled !== false
     )
   }
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize']
-    .map((type) => {
+    .map(type => {
       const options = actionOptions[type]
 
       return options && options.enabled && {
@@ -312,7 +312,7 @@ function getModifierList (interaction) {
         methods: options._methods,
       }
     })
-    .filter((m) => !!m)
+    .filter(m => !!m)
 }
 
 export function prepareStates (modifierList) {

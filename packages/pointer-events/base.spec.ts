@@ -5,7 +5,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'
 
-test('pointerEvents.types', (t) => {
+test('pointerEvents.types', t => {
   t.deepEqual(pointerEvents.types,
     [
       'down',
@@ -21,7 +21,7 @@ test('pointerEvents.types', (t) => {
   t.end()
 })
 
-test('pointerEvents.fire', (t) => {
+test('pointerEvents.fire', t => {
   const scope: Interact.Scope = helpers.mockScope()
 
   const eventable = new Eventable(pointerEvents.defaults)
@@ -38,7 +38,7 @@ test('pointerEvents.fire', (t) => {
     },
   }]
 
-  eventable.on(type, (event) => { firedEvent = event })
+  eventable.on(type, event => { firedEvent = event })
 
   pointerEvents.fire({
     type,
@@ -88,7 +88,7 @@ test('pointerEvents.fire', (t) => {
   t.end()
 })
 
-test('pointerEvents.collectEventTargets', (t) => {
+test('pointerEvents.collectEventTargets', t => {
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
   const target = {
@@ -120,7 +120,7 @@ test('pointerEvents.collectEventTargets', (t) => {
   t.end()
 })
 
-test('pointerEvents Interaction update-pointer signal', (t) => {
+test('pointerEvents Interaction update-pointer signal', t => {
   const scope: Interact.Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
@@ -130,20 +130,20 @@ test('pointerEvents Interaction update-pointer signal', (t) => {
   const event = {} as Interact.PointerEventType
 
   interaction.updatePointer(helpers.newPointer(0), event, null, false)
-  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold], 'set hold info for move on new pointer')
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold], 'set hold info for move on new pointer')
 
   interaction.removePointer(helpers.newPointer(0), event)
 
   interaction.updatePointer(helpers.newPointer(0), event, null, true)
-  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold])
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold])
 
   interaction.updatePointer(helpers.newPointer(5), event, null, true)
-  t.deepEqual(interaction.pointers.map((p) => p.hold), [initialHold, initialHold])
+  t.deepEqual(interaction.pointers.map(p => p.hold), [initialHold, initialHold])
 
   t.end()
 })
 
-test('pointerEvents Interaction remove-pointer signal', (t) => {
+test('pointerEvents Interaction remove-pointer signal', t => {
   const scope: Interact.Scope = helpers.mockScope()
 
   scope.usePlugin(pointerEvents)
@@ -167,14 +167,14 @@ test('pointerEvents Interaction remove-pointer signal', (t) => {
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
-    t.deepEqual(interaction.pointers.map((p) => p.hold as unknown as number), removal.remain,
+    t.deepEqual(interaction.pointers.map(p => p.hold as unknown as number), removal.remain,
       `${removal.message} - remaining interaction.pointers[i].hold are correct`)
   }
 
   t.end()
 })
 
-test('pointerEvents down hold up tap', async (t) => {
+test('pointerEvents down hold up tap', async t => {
   const {
     interaction,
     event,
@@ -184,14 +184,14 @@ test('pointerEvents down hold up tap', async (t) => {
   const fired: PointerEvent[] = []
 
   for (const type of pointerEvents.types) {
-    interactable.on(type, (e) => fired.push(e))
+    interactable.on(type, e => fired.push(e))
   }
 
   interaction.pointerDown(event, event, event.target)
   interaction.pointerMove(event, event, event.target)
 
   t.deepEqual(
-    fired.map((e) => e.type),
+    fired.map(e => e.type),
     ['down'],
     'duplicate move event is not fired')
 
@@ -204,7 +204,7 @@ test('pointerEvents down hold up tap', async (t) => {
   interaction.pointerUp(event, event, event.target, event.target)
 
   t.deepEqual(
-    fired.map((e) => e.type),
+    fired.map(e => e.type),
     ['down', 'hold', 'up', 'tap'],
     'tap event is fired after down, hold and up events')
 

@@ -1,7 +1,7 @@
 import { JSDOM } from '@interactjs/_dev/test/domator'
 import test from '@interactjs/_dev/test/test'
 
-test('typings', async (t) => {
+test('typings', async t => {
   let error
 
   const { window } = new JSDOM('')

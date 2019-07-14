@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import snapEdges from '../snap/edges'
 
-test('modifiers/snap/edges', (t) => {
+test('modifiers/snap/edges', t => {
   const rect = { top: 0, left: 0, bottom: 100, right: 100 }
   const {
     interaction,

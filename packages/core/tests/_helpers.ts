@@ -158,5 +158,5 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
 }
 
 export function timeout (n) {
-  return new Promise((resolve) => setTimeout(resolve, n))
+  return new Promise(resolve => setTimeout(resolve, n))
 }

@@ -3,7 +3,7 @@ import Interaction from '@interactjs/core/Interaction'
 import { mockSignals } from '@interactjs/core/tests/_helpers'
 import restrictEdges from '../restrict/edges'
 
-test('restrictEdges', (t) => {
+test('restrictEdges', t => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.prepared = {} as any
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true }

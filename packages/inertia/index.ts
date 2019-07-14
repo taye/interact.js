@@ -79,9 +79,9 @@ function install (scope: Interact.Scope) {
   })
 
   // FIXME proper signal typing
-  interactions.signals.on('before-action-end', (arg) => release(arg as any, scope))
-  interactions.signals.on('down', (arg) => resume(arg as any, scope))
-  interactions.signals.on('stop', (arg) => stop(arg as any))
+  interactions.signals.on('before-action-end', arg => release(arg as any, scope))
+  interactions.signals.on('down', arg => resume(arg as any, scope))
+  interactions.signals.on('stop', arg => stop(arg as any))
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -118,7 +118,7 @@ function resume (
         interaction.updatePointer(pointer, event, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
-          interaction.pointers.map((p) => p.pointer),
+          interaction.pointers.map(p => p.pointer),
           interaction._now()
         )
 
@@ -179,7 +179,7 @@ function release<T extends Interact.ActionName> (
     interaction,
     pageCoords: utils.extend({}, interaction.coords.cur.page),
     states: inertiaPossible && interaction.modifiers.states.map(
-      (modifierStatus) => utils.extend({}, modifierStatus)
+      modifierStatus => utils.extend({}, modifierStatus)
     ),
     preEnd: true,
     prevCoords: undefined,

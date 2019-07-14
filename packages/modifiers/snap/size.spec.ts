@@ -3,7 +3,7 @@ import Interaction from '@interactjs/core/Interaction'
 import { mockInteractable, mockSignals } from '@interactjs/core/tests/_helpers'
 import snapSize from '../snap/size'
 
-test('modifiers/snapSize', (t) => {
+test('modifiers/snapSize', t => {
   const interaction = new Interaction({ signals: mockSignals() } as any)
   interaction.interactable = mockInteractable()
   interaction.interactable.getRect = () => ({ top: 0, left: 0, bottom: 100, right: 100 } as any)

@@ -4,7 +4,7 @@ import { autoStart } from '@interactjs/auto-start'
 import interactablePreventDefault from './interactablePreventDefault'
 import * as helpers from './tests/_helpers'
 
-test('interactablePreventDefault', (t) => {
+test('interactablePreventDefault', t => {
   const {
     scope,
     interactable,

@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import snap from '../snap/pointer'
 
-test('modifiers/snap', (t) => {
+test('modifiers/snap', t => {
   const {
     interaction,
     interactable,

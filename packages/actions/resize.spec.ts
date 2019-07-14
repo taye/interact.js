@@ -3,7 +3,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import resize from './resize'
 
-test('resize', (t) => {
+test('resize', t => {
   const scope = helpers.mockScope()
 
   scope.usePlugin(resize)

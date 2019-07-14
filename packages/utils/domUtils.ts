@@ -50,7 +50,7 @@ export function matchesSelector (element, selector) {
   return element[browser.prefixedMatchesSelector](selector)
 }
 
-const getParent = (el) => el.parentNode ? el.parentNode : el.host
+const getParent = el => el.parentNode ? el.parentNode : el.host
 
 // Test for the element that's "above" all other qualifiers
 export function indexOfDeepestElement (elements) {

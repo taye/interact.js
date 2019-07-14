@@ -4,7 +4,7 @@ import pointerUtils from '@interactjs/utils/pointerUtils'
 import drag from '../drag'
 import drop from '../drop'
 
-test('actions/drop options', (t) => {
+test('actions/drop options', t => {
   const scope = helpers.mockScope()
   scope.interact = {}
   scope.usePlugin(drop)
@@ -34,7 +34,7 @@ test('actions/drop options', (t) => {
   t.end()
 })
 
-test('actions/drop start', (t) => {
+test('actions/drop start', t => {
   const scope: Interact.Scope = helpers.mockScope()
   scope.interact = {} as any
   scope.usePlugin(drag)
