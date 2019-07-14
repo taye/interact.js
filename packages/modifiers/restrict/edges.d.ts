@@ -1,4 +1,12 @@
 import Interaction from '@interactjs/core/Interaction';
+import { RestrictOptions } from './pointer';
+export interface RestrictEdgesOptions {
+    inner: RestrictOptions['restriction'];
+    outer: RestrictOptions['restriction'];
+    offset: RestrictOptions['offset'];
+    endOnly: boolean;
+    enabled: boolean;
+}
 declare function start({ interaction, state }: {
     interaction: Interaction;
     state: any;
@@ -24,11 +32,6 @@ declare const restrictEdges: {
     getRestrictionRect: (value: any, interaction: any, coords?: import("../../types/types").Point) => import("../../types/types").Rect;
     start: typeof start;
     set: typeof set;
-    defaults: {
-        enabled: boolean;
-        inner: any;
-        outer: any;
-        offset: any;
-    };
+    defaults: RestrictEdgesOptions;
 };
 export default restrictEdges;

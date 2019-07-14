@@ -1,5 +1,5 @@
 /**
- * interact.js 1.5.0
+ * interact.js 1.5.1
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -7810,10 +7810,11 @@ function getRestrictionRect(value, interaction, coords) {
 }
 
 var __defaults_33 = {
-  enabled: false,
   restriction: null,
   elementRect: null,
-  offset: null
+  offset: null,
+  endOnly: false,
+  enabled: false
 };
 var restrict = {
   start: __start_33,
@@ -7933,18 +7934,20 @@ function fixRect(rect, defaults) {
   return rect;
 }
 
+var __defaults_32 = {
+  inner: null,
+  outer: null,
+  offset: null,
+  endOnly: false,
+  enabled: false
+};
 var restrictEdges = {
   noInner: noInner,
   noOuter: noOuter,
   getRestrictionRect: __getRestrictionRect_32,
   start: __start_32,
   set: __set_32,
-  defaults: {
-    enabled: false,
-    inner: null,
-    outer: null,
-    offset: null
-  }
+  defaults: __defaults_32
 };
 var ___default_32 = restrictEdges;
 _$edges_32["default"] = ___default_32;
@@ -8055,14 +8058,16 @@ function __set_35(arg) {
   state.options = options;
 }
 
+var __defaults_35 = {
+  min: null,
+  max: null,
+  endOnly: false,
+  enabled: false
+};
 var restrictSize = {
   start: __start_35,
   set: __set_35,
-  defaults: {
-    enabled: false,
-    min: null,
-    max: null
-  }
+  defaults: __defaults_35
 };
 var ___default_35 = restrictSize;
 _$size_35["default"] = ___default_35;
@@ -8231,17 +8236,19 @@ function getOrigin(arg) {
   return origin;
 }
 
+var __defaults_37 = {
+  range: Infinity,
+  targets: null,
+  offset: null,
+  offsetWithOrigin: true,
+  relativePoints: null,
+  endOnly: false,
+  enabled: false
+};
 var snap = {
   start: __start_37,
   set: __set_37,
-  defaults: {
-    enabled: false,
-    range: Infinity,
-    targets: null,
-    offset: null,
-    offsetWithOrigin: true,
-    relativePoints: null
-  }
+  defaults: __defaults_37
 };
 var ___default_37 = snap;
 _$pointer_37["default"] = ___default_37;
@@ -8359,15 +8366,17 @@ function __set_38(arg) {
   state.options = options;
 }
 
+var __defaults_38 = {
+  range: Infinity,
+  targets: null,
+  offset: null,
+  endOnly: false,
+  enabled: false
+};
 var snapSize = {
   start: __start_38,
   set: __set_38,
-  defaults: {
-    enabled: false,
-    range: Infinity,
-    targets: null,
-    offset: null
-  }
+  defaults: __defaults_38
 };
 var ___default_38 = snapSize;
 _$size_38["default"] = ___default_38;
@@ -9724,7 +9733,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.5.0";
+_interact["default"].version = "1.5.1";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

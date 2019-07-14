@@ -1,27 +1,6 @@
 export declare const snap: {
-    (_options?: Partial<{
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-        offsetWithOrigin: boolean;
-        relativePoints: any;
-    }>): import("./base").Modifier<"snap", {
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-        offsetWithOrigin: boolean;
-        relativePoints: any;
-    }>;
-    _defaults: {
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-        offsetWithOrigin: boolean;
-        relativePoints: any;
-    };
+    (_options?: Partial<import("./snap/pointer").SnapOptions>): import("./base").Modifier<"snap", import("./snap/pointer").SnapOptions>;
+    _defaults: import("./snap/pointer").SnapOptions;
     _methods: {
         start: any;
         set: any;
@@ -30,23 +9,8 @@ export declare const snap: {
     };
 };
 export declare const snapSize: {
-    (_options?: Partial<{
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    }>): import("./base").Modifier<"snapSize", {
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    }>;
-    _defaults: {
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    };
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<"snapSize", Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;
@@ -55,38 +19,8 @@ export declare const snapSize: {
     };
 };
 export declare const snapEdges: {
-    (_options?: Partial<{
-        offset: {
-            x: number;
-            y: number;
-        };
-    } & Partial<{
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    }>>): import("./base").Modifier<"snapEdges", {
-        offset: {
-            x: number;
-            y: number;
-        };
-    } & Partial<{
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    }>>;
-    _defaults: {
-        offset: {
-            x: number;
-            y: number;
-        };
-    } & Partial<{
-        enabled: boolean;
-        range: number;
-        targets: any;
-        offset: any;
-    }>;
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<"snapEdges", Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;
@@ -95,8 +29,8 @@ export declare const snapEdges: {
     };
 };
 export declare const restrict: {
-    (_options?: Partial<import("../types/types").RestrictOptions>): import("./base").Modifier<"restrict", import("../types/types").RestrictOptions>;
-    _defaults: import("../types/types").RestrictOptions;
+    (_options?: Partial<import("./restrict/pointer").RestrictOptions>): import("./base").Modifier<"restrict", import("./restrict/pointer").RestrictOptions>;
+    _defaults: import("./restrict/pointer").RestrictOptions;
     _methods: {
         start: any;
         set: any;
@@ -105,14 +39,14 @@ export declare const restrict: {
     };
 };
 export declare const restrictRect: {
-    (_options?: Partial<import("../types/types").RestrictOptions & {
+    (_options?: Partial<import("./restrict/pointer").RestrictOptions & {
         elementRect: {
             top: number;
             left: number;
             bottom: number;
             right: number;
         };
-    }>): import("./base").Modifier<"restrictRect", import("../types/types").RestrictOptions & {
+    }>): import("./base").Modifier<"restrictRect", import("./restrict/pointer").RestrictOptions & {
         elementRect: {
             top: number;
             left: number;
@@ -120,7 +54,7 @@ export declare const restrictRect: {
             right: number;
         };
     }>;
-    _defaults: import("../types/types").RestrictOptions & {
+    _defaults: import("./restrict/pointer").RestrictOptions & {
         elementRect: {
             top: number;
             left: number;
@@ -136,23 +70,8 @@ export declare const restrictRect: {
     };
 };
 export declare const restrictEdges: {
-    (_options?: Partial<{
-        enabled: boolean;
-        inner: any;
-        outer: any;
-        offset: any;
-    }>): import("./base").Modifier<"restrictEdges", {
-        enabled: boolean;
-        inner: any;
-        outer: any;
-        offset: any;
-    }>;
-    _defaults: {
-        enabled: boolean;
-        inner: any;
-        outer: any;
-        offset: any;
-    };
+    (_options?: Partial<import("./restrict/edges").RestrictEdgesOptions>): import("./base").Modifier<"restrictEdges", import("./restrict/edges").RestrictEdgesOptions>;
+    _defaults: import("./restrict/edges").RestrictEdgesOptions;
     _methods: {
         start: any;
         set: any;
@@ -161,20 +80,8 @@ export declare const restrictEdges: {
     };
 };
 export declare const restrictSize: {
-    (_options?: Partial<{
-        enabled: boolean;
-        min: any;
-        max: any;
-    }>): import("./base").Modifier<"restrictSize", {
-        enabled: boolean;
-        min: any;
-        max: any;
-    }>;
-    _defaults: {
-        enabled: boolean;
-        min: any;
-        max: any;
-    };
+    (_options?: Partial<import("./restrict/size").RestrictSizeOptions>): import("./base").Modifier<"restrictSize", import("./restrict/size").RestrictSizeOptions>;
+    _defaults: import("./restrict/size").RestrictSizeOptions;
     _methods: {
         start: any;
         set: any;

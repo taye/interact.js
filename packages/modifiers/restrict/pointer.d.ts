@@ -1,3 +1,10 @@
+export interface RestrictOptions {
+    restriction: Interact.RectResolvable<[number, number, Interact.Interaction]>;
+    elementRect: Interact.Rect;
+    offset: Interact.Rect;
+    endOnly: boolean;
+    enabled: boolean;
+}
 declare function start({ rect, startOffset, state, interaction, pageCoords }: {
     rect: any;
     startOffset: any;
@@ -15,6 +22,6 @@ declare const restrict: {
     start: typeof start;
     set: typeof set;
     getRestrictionRect: typeof getRestrictionRect;
-    defaults: import("../../types/types").RestrictOptions;
+    defaults: RestrictOptions;
 };
 export default restrict;

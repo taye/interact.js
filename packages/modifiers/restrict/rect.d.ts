@@ -11,7 +11,7 @@ declare const restrictRect: {
         interaction: any;
         state: any;
     }) => void;
-    defaults: import("../../types/types").RestrictOptions & {
+    defaults: import("./pointer").RestrictOptions & {
         elementRect: {
             top: number;
             left: number;

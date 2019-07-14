@@ -1,2 +1,2 @@
-declare const _default: (x: any, y: any) => number;
+declare const _default: (x: number, y: number) => number;
 export default _default;
