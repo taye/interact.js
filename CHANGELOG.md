@@ -1,3 +1,9 @@
+## v1.5.0
+
+ - added `cursorChecker` option for drag and resize (#736)
+ - allowed restrictions larger than the target element (#735)
+ - added `interact.modifiers.restrictRect` with pre-set elementRect (#735)
+
 ## v1.4.14
 
  - fixed issue with string restriction values that don't resolve to a rect
