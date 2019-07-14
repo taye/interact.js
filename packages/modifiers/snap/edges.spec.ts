@@ -37,7 +37,7 @@ test('modifiers/snap/edges', t => {
   interaction.prepared.edges = { top: true, left: true }
 
   arg.state = { options }
-  snapEdges.start(arg)
+  snapEdges.start(arg as any)
   snapEdges.set(arg)
 
   t.deepEqual(
@@ -49,7 +49,7 @@ test('modifiers/snap/edges', t => {
   interaction.prepared.edges = { bottom: true, right: true }
 
   arg.state = { options }
-  snapEdges.start(arg)
+  snapEdges.start(arg as any)
   snapEdges.set(arg)
 
   t.deepEqual(

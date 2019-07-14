@@ -10,7 +10,7 @@ declare module '@interactjs/core/scope' {
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     modifiers?: {
-      states: any[]
+      states: ModifierState[]
       offsets: any
       startOffset: any
       startDelta: Interact.Point
@@ -40,17 +40,33 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 export interface Modifier<
-  Name extends string = any,
-  Defaults extends { enabled?: boolean } = any
+  Defaults = any,
+  Name extends string = any
 > {
   options?: Defaults
   methods: {
     start?: (arg: Interact.SignalArg) => void
     set: (arg: Interact.SignalArg) => void
-    beforeEnd?: (arg: Interact.SignalArg) => void
+    beforeEnd?: (arg: Interact.SignalArg) => boolean | void
     stop?: (arg: Interact.SignalArg) => void
   }
   name?: Name
+}
+
+export type ModifierState<
+  Defaults = {},
+  StateProps extends { [prop: string]: any } = {},
+  Name extends string = any
+> = {
+  options: Defaults
+  methods?: Modifier<Defaults>['methods']
+  index?: number
+  name?: Name
+} & StateProps
+
+export interface ModifierArg<State extends ModifierState> extends Interact.SignalArg {
+  state: State
+  pageCoords?: Interact.Point
 }
 
 function install (scope: Scope) {
@@ -134,7 +150,9 @@ function start (
 }
 
 export function startAll (arg) {
-  for (const state of arg.states) {
+  const states: ModifierState[] = arg.states
+
+  for (const state of states) {
     if (state.methods.start) {
       arg.state = state
       state.methods.start(arg)
@@ -307,7 +325,7 @@ function getModifierList (interaction) {
     .map(type => {
       const options = actionOptions[type]
 
-      return options && options.enabled && {
+      return options && (options.enabled !== false) && {
         options,
         methods: options._methods,
       }
@@ -315,22 +333,20 @@ function getModifierList (interaction) {
     .filter(m => !!m)
 }
 
-export function prepareStates (modifierList) {
-  const states = []
+export function prepareStates (modifierList: Modifier[]) {
+  const states: ModifierState[] = []
 
   for (let index = 0; index < modifierList.length; index++) {
     const { options, methods, name } = modifierList[index]
 
     if (options && options.enabled === false) { continue }
 
-    const state = {
+    states.push({
       options,
       methods,
       index,
       name,
-    }
-
-    states.push(state)
+    })
   }
 
   return states
@@ -416,7 +432,7 @@ function getRectOffset (rect, coords) {
 }
 
 function makeModifier<
-  Defaults extends { enabled?: boolean },
+  Defaults,
   Name extends string
 > (
   module: { defaults?: Defaults, [key: string]: any },
@@ -433,8 +449,6 @@ function makeModifier<
   const modifier = (_options?: Partial<Defaults>) => {
     const options: Defaults = (_options || {}) as Defaults
 
-    options.enabled = options.enabled !== false
-
     // add missing defaults to options
     for (const prop in defaults) {
       if (!(prop in options)) {
@@ -442,7 +456,7 @@ function makeModifier<
       }
     }
 
-    const m: Modifier<Name, Defaults> = { options, methods, name }
+    const m: Modifier<Defaults, Name> = { options, methods, name }
 
     return m
   }

@@ -7,9 +7,6 @@ import { ActionName } from './scope'
 export interface ActionProps<T extends ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
-  edges?: {
-    [edge in keyof Interact.Rect]?: boolean
-  }
 }
 
 export interface StartAction extends ActionProps {

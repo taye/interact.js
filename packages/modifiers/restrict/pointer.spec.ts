@@ -25,7 +25,7 @@ test('restrict larger than restriction', t => {
     pageCoords: { x: 0, y: 0 },
   }
 
-  restrict.start(arg)
+  restrict.start(arg as any)
 
   arg.coords = { x: 0, y: 0 }
   restrict.set(arg)

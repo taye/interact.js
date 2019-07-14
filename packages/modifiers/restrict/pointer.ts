@@ -1,6 +1,7 @@
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 import rectUtils from '@interactjs/utils/rect'
+import { ModifierArg, ModifierState } from '../base'
 
 export interface RestrictOptions {
   // where to drag over
@@ -10,10 +11,13 @@ export interface RestrictOptions {
   offset: Interact.Rect
   // restrict just before the end drag
   endOnly: boolean
-  enabled: boolean
 }
 
-function start ({ rect, startOffset, state, interaction, pageCoords }) {
+export type RestrictState = ModifierState<RestrictOptions, {
+  offset: Interact.Rect
+}>
+
+function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>) {
   const { options } = state
   const { elementRect } = options
   const offset: Interact.Rect = extend({
@@ -73,7 +77,6 @@ const defaults: RestrictOptions = {
   elementRect: null,
   offset: null,
   endOnly: false,
-  enabled: false,
 }
 
 const restrict = {

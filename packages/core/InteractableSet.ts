@@ -82,7 +82,7 @@ export default class InteractableSet {
     return found && found.interactable
   }
 
-  forEachMatch (node: Node, callback: (interactable: any) => any) {
+  forEachMatch<T> (node: Node, callback: (interactable: Interact.Interactable) => T): T | void {
     for (const interactable of this.list) {
       let ret
 

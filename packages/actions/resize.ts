@@ -29,7 +29,8 @@ declare module '@interactjs/core/Interaction' {
   }
 
   interface ActionProps {
-    _linkedEdges?: { [key: string]: boolean }
+    edges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
+    _linkedEdges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
   }
 }
 

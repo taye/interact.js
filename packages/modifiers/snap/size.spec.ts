@@ -34,7 +34,7 @@ test('modifiers/snapSize', t => {
     coords: { ...pageCoords },
   }
 
-  snapSize.start(arg)
+  snapSize.start(arg as any)
   snapSize.set(arg)
 
   t.deepEqual(
