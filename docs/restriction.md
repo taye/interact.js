@@ -4,6 +4,7 @@ Restrict
 interact.js has 3 restriction modifiers:
 
   - pointer coordinate-based `restrict`
+  - element rect-based restriction `restrictRect`
   - element size-based `restrictSize` (resize only)
   - and element edge-based `restrictEdges` (resize only)
 
@@ -35,27 +36,37 @@ The value can be:
  - a CSS selector string – if one of the parents of the target element matches
  this selector, it's rect will be used as the restriction area.
 
-`elementRect`
--------------
+`restrictRect()`
+----------------
 
 With the `restrict` variant, restricting is by default relative to the pointer
 coordinates so that the action coordinates, not the element's dimensions, will
-be kept within the restriction area. The `elementRect` option changes this so
+be kept within the restriction area. You can use the `restrictRect` variant so
 that the element's edges are considered while dragging.
 
 ```javascript
 interact(target).draggable({
     modifiers: [
-      interact.modifiers.restrict({
-        elementRect: { left: 0, right: 0, top: 1, bottom: 1 }
+      interact.modifiers.restrictRect({
+        restriction: 'parent'
       })
     ]
   })
 ```
 
-For the left and right properties, 0 means the left edge of the element and 1
-means the right edge. For top and bottom, 0 means the top edge of the element
-and 1 means the bottom.
+If the target element is larger than the restriction, then the element will be
+allowed to move around the restriction.
+
+### `elementRect`
+
+`restrictRect` is identical to `restrict`, but the `elementRect` option is set
+to a helpful default of `{ left: 0, right: 0, top: 1, bottom: 1 }`. The
+`elementRect` option specifies the area of the element to consider as its edges
+as scalar values from the top left edges to the bottom right.
+
+For the `left` and `right` properties, `0` means the left edge of the element
+and `1` means the right edge. For `top` and `bottom`, `0 means` the top edge of
+the element and 1 means the bottom.
 
 `{ top: 0.25, left: 0.25, bottom: 0.75, right: 0.75 }` would result in a quarter
 of the element being allowed to hang over the restriction edges.

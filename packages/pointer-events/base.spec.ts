@@ -168,7 +168,7 @@ test('pointerEvents Interaction remove-pointer signal', (t) => {
     interaction.removePointer({ pointerId: removal.id } as any, null)
 
     t.deepEqual(interaction.pointers.map((p) => p.hold as unknown as number), removal.remain,
-      `${removal.message} - remaining interaction.holdTimers is correct`)
+      `${removal.message} - remaining interaction.pointers[i].hold are correct`)
   }
 
   t.end()

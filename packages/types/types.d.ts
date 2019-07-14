@@ -64,6 +64,10 @@ declare namespace Interact {
 
   export type FullRect = Required<Rect>
 
+  export type RectFunction<T extends any[] = []> = (...args: T) => Interact.Rect
+
+  export type RectResolvable<T extends any[] = []> = Rect | string | Element | RectFunction<T>
+
   export interface Dimensions {
     x: number
     y: number
@@ -100,7 +104,7 @@ declare namespace Interact {
   export type InertiaOptions = InertiaOption | boolean
 
   export interface AutoScrollOption {
-    container?: DOMElement
+    container?: Element
     margin?: number
     distance?: number
     interval?: number
@@ -108,15 +112,16 @@ declare namespace Interact {
   export type AutoScrollOptions = AutoScrollOption | boolean
 
   export type CSSSelector = string
-  export type DOMElement = any
 
-  export interface RestrictOption {
+  export interface RestrictOptions {
+    enabled?
     // where to drag over
-    restriction?: Rect | Dimensions | CSSSelector | DOMElement | 'self' | 'parent'
+    restriction?: Rect | Dimensions | CSSSelector | Element | 'self' | 'parent'
     // what part of self is allowed to drag over
     elementRect?: Rect
     // restrict just before the end drag
     endOnly?: boolean
+    offset?: Rect
   }
 
   export interface RestrictSizeOption {
@@ -125,12 +130,15 @@ declare namespace Interact {
   }
 
   export interface EdgeOptions {
-    top?: boolean | CSSSelector | DOMElement
-    left?: boolean | CSSSelector | DOMElement
-    bottom?: boolean | CSSSelector | DOMElement
-    right?: boolean | CSSSelector | DOMElement
-    [key: string]: boolean | CSSSelector | DOMElement
+    top?: boolean | CSSSelector | Element
+    left?: boolean | CSSSelector | Element
+    bottom?: boolean | CSSSelector | Element
+    right?: boolean | CSSSelector | Element
+    [key: string]: boolean | CSSSelector | Element
   }
+
+  export type CursorChecker<T extends ActionName = any> =
+    (action: ActionProps, interactable: Interactable, element: Element) => string
 
   export interface ActionMethod<T> {
     (this: Interact.Interactable): T
@@ -149,6 +157,7 @@ declare namespace Interact {
   export interface DraggableOptions extends Options {
     startAxis?: 'x' | 'y' | 'xy'
     lockAxis?: 'x' | 'y' | 'xy' | 'start'
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
@@ -192,6 +201,7 @@ declare namespace Interact {
     invert?: 'none' | 'negate' | 'reposition'
     margin?: number,
     squareResize?: boolean
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
@@ -208,17 +218,17 @@ declare namespace Interact {
     pointerEvent: any,
     defaultAction: string,
     interactable: Interactable,
-    element: DOMElement,
+    element: Element,
     interaction: Interaction,
   ) => ActionProps
 
-  export type OriginFunction = (target: DOMElement)  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
+  export type OriginFunction = (target: Element)  => 'self' | 'parent' | Rect | Point | CSSSelector | Element
 
   export interface PointerEventsOptions {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction
+    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | Element | OriginFunction
   }
 
   export type RectChecker = (element: Element)  => Rect
@@ -295,7 +305,7 @@ declare namespace Interact {
   export type OnEvent = OnEventName | OnEventName[]
 
   export interface InteractOptions {
-    context?: DOMElement
+    context?: Element
   }
 }
 
