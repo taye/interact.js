@@ -9,6 +9,7 @@ test('autoStart', (t) => {
     interaction,
     interactable,
     event,
+    coords,
     target: element,
   } = helpers.testEnv({
     plugins: [autoStart, drag],
@@ -16,7 +17,8 @@ test('autoStart', (t) => {
   })
 
   interactable.draggable(true)
-  interactable.rectChecker(() => ({ ...rect }))
+  interaction.pointerType = coords.pointerType = 'mouse'
+  coords.buttons = 1
 
   interaction.pointerDown(event, event, element)
 
