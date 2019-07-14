@@ -12,7 +12,15 @@
 import Interaction from '@interactjs/core/Interaction'
 import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
-import restrict from './pointer'
+import restrict, { RestrictOptions } from './pointer'
+
+export interface RestrictEdgesOptions {
+  inner: RestrictOptions['restriction']
+  outer: RestrictOptions['restriction']
+  offset: RestrictOptions['offset']
+  endOnly: boolean
+  enabled: boolean
+}
 
 const { getRestrictionRect } = restrict
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
@@ -82,18 +90,21 @@ function fixRect (rect, defaults) {
   return rect
 }
 
+const defaults: RestrictEdgesOptions = {
+  inner: null,
+  outer: null,
+  offset: null,
+  endOnly: false,
+  enabled: false,
+}
+
 const restrictEdges = {
   noInner,
   noOuter,
   getRestrictionRect,
   start,
   set,
-  defaults: {
-    enabled: false,
-    inner: null,
-    outer: null,
-    offset: null,
-  },
+  defaults,
 }
 
 export default restrictEdges

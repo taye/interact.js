@@ -12,8 +12,36 @@ interact('.drag-and-resize')
       interact.modifiers.snap({
         targets: [
           { x: 100, y: 200 },
-          function (x: number, y: number) { return { x: x % 20, y } },
+          (x: number, y: number) => ({ x: x % 20, y }),
         ],
+        offset: 'startCoords',
+        relativePoints: [{ x: 0, y: 1 }],
+        endOnly: true,
+      }),
+      interact.modifiers.snapSize({
+        targets: [
+          { x: 100, y: 200 },
+          (x: number, y: number) => ({ x: x % 20, y }),
+        ],
+        endOnly: true,
+      }),
+      interact.modifiers.restrictRect({
+        restriction: 'parent',
+        endOnly: true,
+      }),
+      interact.modifiers.restrict({
+        restriction: (_) => ({ top: 0, left: 0, bottom: 1, right: 1 }),
+      }),
+      interact.modifiers.restrict({
+        restriction: (_) => document.body,
+      }),
+      interact.modifiers.restrictSize({
+        min: document.body,
+        max: 'parent',
+      }),
+      interact.modifiers.restrictEdges({
+        inner: document.body,
+        outer: 'parent',
       }),
     ],
   })
