@@ -1,5 +1,5 @@
 export declare function getStringOptionResult(value: any, interactable: any, element: any): any;
-export declare function resolveRectLike(value: any, interactable?: any, element?: any, functionArgs?: any): any;
+export declare function resolveRectLike<T extends any[] = []>(value: Interact.RectResolvable<T>, interactable?: any, element?: any, functionArgs?: T): import("../types/types").Rect;
 export declare function rectToXY(rect: any): {
     x: any;
     y: any;

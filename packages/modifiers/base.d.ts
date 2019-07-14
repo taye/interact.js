@@ -34,11 +34,10 @@ declare module '@interactjs/core/defaultOptions' {
         modifiers?: Modifier[];
     }
 }
-export interface Modifier<Name extends string = any> {
-    options?: {
-        enabled?: boolean;
-        [key: string]: any;
-    };
+export interface Modifier<Name extends string = any, Defaults extends {
+    enabled?: boolean;
+} = any> {
+    options?: Defaults;
     methods: {
         start?: (arg: Interact.SignalArg) => void;
         set: (arg: Interact.SignalArg) => void;
@@ -95,7 +94,7 @@ declare function makeModifier<Defaults extends {
     defaults?: Defaults;
     [key: string]: any;
 }, name?: Name): {
-    (options?: Partial<Defaults>): Modifier<Name>;
+    (_options?: Partial<Defaults>): Modifier<Name, Defaults>;
     _defaults: Defaults;
     _methods: {
         start: any;

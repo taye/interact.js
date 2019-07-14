@@ -1,12 +1,19 @@
 export declare const snap: {
-    (options?: Partial<{
+    (_options?: Partial<{
         enabled: boolean;
         range: number;
         targets: any;
         offset: any;
         offsetWithOrigin: boolean;
         relativePoints: any;
-    }>): import("./base").Modifier<"snap">;
+    }>): import("./base").Modifier<"snap", {
+        enabled: boolean;
+        range: number;
+        targets: any;
+        offset: any;
+        offsetWithOrigin: boolean;
+        relativePoints: any;
+    }>;
     _defaults: {
         enabled: boolean;
         range: number;
@@ -23,12 +30,17 @@ export declare const snap: {
     };
 };
 export declare const snapSize: {
-    (options?: Partial<{
+    (_options?: Partial<{
         enabled: boolean;
         range: number;
         targets: any;
         offset: any;
-    }>): import("./base").Modifier<"snapSize">;
+    }>): import("./base").Modifier<"snapSize", {
+        enabled: boolean;
+        range: number;
+        targets: any;
+        offset: any;
+    }>;
     _defaults: {
         enabled: boolean;
         range: number;
@@ -43,7 +55,7 @@ export declare const snapSize: {
     };
 };
 export declare const snapEdges: {
-    (options?: Partial<{
+    (_options?: Partial<{
         offset: {
             x: number;
             y: number;
@@ -53,7 +65,17 @@ export declare const snapEdges: {
         range: number;
         targets: any;
         offset: any;
-    }>>): import("./base").Modifier<"snapEdges">;
+    }>>): import("./base").Modifier<"snapEdges", {
+        offset: {
+            x: number;
+            y: number;
+        };
+    } & Partial<{
+        enabled: boolean;
+        range: number;
+        targets: any;
+        offset: any;
+    }>>;
     _defaults: {
         offset: {
             x: number;
@@ -73,15 +95,38 @@ export declare const snapEdges: {
     };
 };
 export declare const restrict: {
-    (options?: Partial<{
-        enabled: boolean;
-        restriction: any;
-        elementRect: any;
-    }>): import("./base").Modifier<"restrict">;
-    _defaults: {
-        enabled: boolean;
-        restriction: any;
-        elementRect: any;
+    (_options?: Partial<import("../types/types").RestrictOptions>): import("./base").Modifier<"restrict", import("../types/types").RestrictOptions>;
+    _defaults: import("../types/types").RestrictOptions;
+    _methods: {
+        start: any;
+        set: any;
+        beforeEnd: any;
+        stop: any;
+    };
+};
+export declare const restrictRect: {
+    (_options?: Partial<import("../types/types").RestrictOptions & {
+        elementRect: {
+            top: number;
+            left: number;
+            bottom: number;
+            right: number;
+        };
+    }>): import("./base").Modifier<"restrictRect", import("../types/types").RestrictOptions & {
+        elementRect: {
+            top: number;
+            left: number;
+            bottom: number;
+            right: number;
+        };
+    }>;
+    _defaults: import("../types/types").RestrictOptions & {
+        elementRect: {
+            top: number;
+            left: number;
+            bottom: number;
+            right: number;
+        };
     };
     _methods: {
         start: any;
@@ -91,12 +136,17 @@ export declare const restrict: {
     };
 };
 export declare const restrictEdges: {
-    (options?: Partial<{
+    (_options?: Partial<{
         enabled: boolean;
         inner: any;
         outer: any;
         offset: any;
-    }>): import("./base").Modifier<"restrictEdges">;
+    }>): import("./base").Modifier<"restrictEdges", {
+        enabled: boolean;
+        inner: any;
+        outer: any;
+        offset: any;
+    }>;
     _defaults: {
         enabled: boolean;
         inner: any;
@@ -111,11 +161,15 @@ export declare const restrictEdges: {
     };
 };
 export declare const restrictSize: {
-    (options?: Partial<{
+    (_options?: Partial<{
         enabled: boolean;
         min: any;
         max: any;
-    }>): import("./base").Modifier<"restrictSize">;
+    }>): import("./base").Modifier<"restrictSize", {
+        enabled: boolean;
+        min: any;
+        max: any;
+    }>;
     _defaults: {
         enabled: boolean;
         min: any;

@@ -268,26 +268,26 @@ const resize = {
 
   cursors: null as ReturnType&lt;typeof initCursors>,
 
-  getCursor (action: ActionProps) {
+  getCursor ({ edges, axis, name }: ActionProps) {
     const cursors = resize.cursors
+    let result: string = null
 
-    if (action.axis) {
-      return cursors[action.name + action.axis]
+    if (axis) {
+      result = cursors[name + axis]
     }
-    else if (action.edges) {
+    else if (edges) {
       let cursorKey = ''
-      const edgeNames = ['top', 'bottom', 'left', 'right']
 
-      for (let i = 0; i &lt; 4; i++) {
-        if (action.edges[edgeNames[i]]) {
-          cursorKey += edgeNames[i]
+      for (const edge of ['top', 'bottom', 'left', 'right']) {
+        if (edges[edge]) {
+          cursorKey += edge
         }
       }
 
-      return cursors[cursorKey]
+      result = cursors[cursorKey]
     }
 
-    return null
+    return result
   },
 
   defaultMargin: null as number,
