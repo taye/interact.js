@@ -27,7 +27,7 @@ declare module '@interactjs/core/Interaction' {
         }
         coords: Interact.Point
         changed: boolean
-      },
+      }
       endPrevented: boolean
     }
   }
