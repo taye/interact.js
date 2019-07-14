@@ -49,18 +49,18 @@ declare module '@interactjs/core/Interaction' {
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     inertia?: {
-      enabled?: boolean,
-      resistance?: number,        // the lambda in exponential decay
-      minSpeed?: number,          // target speed must be above this for inertia to start
-      endSpeed?: number,          // the speed at which inertia is slow enough to stop
-      allowResume?: true,         // allow resuming an action in inertia phase
-      smoothEndDuration?: number, // animate to snap/restrict endOnly if there's no inertia
+      enabled?: boolean
+      resistance?: number        // the lambda in exponential decay
+      minSpeed?: number          // target speed must be above this for inertia to start
+      endSpeed?: number          // the speed at which inertia is slow enough to stop
+      allowResume?: true         // allow resuming an action in inertia phase
+      smoothEndDuration?: number // animate to snap/restrict endOnly if there's no inertia
     } | boolean // FIXME
   }
 }
 
 (EventPhase as any).Resume = 'resume'
-; (EventPhase as any).InertiaStart = 'inertiastart'
+;(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Interact.Scope) {
   const {
@@ -361,12 +361,12 @@ function updateInertiaCoords (interaction: Interact.Interaction) {
   const pageUp   = state.upCoords.page
   const clientUp = state.upCoords.client
 
-  utils.pointer.setCoords(interaction.coords.cur, [ {
+  utils.pointer.setCoords(interaction.coords.cur, [{
     pageX  : pageUp.x   + state.sx,
     pageY  : pageUp.y   + state.sy,
     clientX: clientUp.x + state.sx,
     clientY: clientUp.y + state.sy,
-  } ], interaction._now())
+  }], interaction._now())
 }
 
 function getOptions ({ interactable, prepared }: Interact.Interaction) {

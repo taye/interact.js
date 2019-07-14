@@ -6,8 +6,8 @@ import * as is from '@interactjs/utils/is'
 import snap, { SnapOptions } from './pointer'
 
 export type SnapSizeOptions = Pick<
-  SnapOptions,
-  'targets' | 'offset' | 'endOnly' | 'enabled' | 'range'
+SnapOptions,
+'targets' | 'offset' | 'endOnly' | 'enabled' | 'range'
 >
 
 function start (arg) {

@@ -26,10 +26,10 @@ function install (scope: Scope) {
     type,
     eventTarget,
   }: {
-    targets: EventTargetList,
-    node: Node,
-    type: string,
-    eventTarget: Element,
+    targets: EventTargetList
+    node: Node
+    type: string
+    eventTarget: Element
   }) => {
     scope.interactables.forEachMatch(node, (interactable: Interactable) => {
       const eventable = interactable.events

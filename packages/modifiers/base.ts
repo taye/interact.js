@@ -49,7 +49,7 @@ export interface Modifier<
     set: (arg: Interact.SignalArg) => void
     beforeEnd?: (arg: Interact.SignalArg) => void
     stop?: (arg: Interact.SignalArg) => void
-  },
+  }
   name?: Name
 }
 

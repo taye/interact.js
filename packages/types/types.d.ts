@@ -126,7 +126,7 @@ declare namespace Interact {
 
   export interface DropzoneOptions extends Options {
     accept?: string | Element | (({ dropzone, draggableElement }: {
-      dropzone: Interact.Interactable,
+      dropzone: Interact.Interactable
       draggableElement: Element
     }) => boolean)
     // How the overlap is checked on the drop zone
@@ -153,13 +153,13 @@ declare namespace Interact {
 
   export interface ResizableOptions extends Options {
     square?: boolean
-    preserveAspectRatio?: boolean,
+    preserveAspectRatio?: boolean
     edges?: EdgeOptions | null
     // deprecated
     axis?: 'x' | 'y' | 'xy'
     //
     invert?: 'none' | 'negate' | 'reposition'
-    margin?: number,
+    margin?: number
     squareResize?: boolean
     cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg

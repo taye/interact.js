@@ -48,8 +48,8 @@ function start ({ interaction, state }: { interaction: Interaction, state: any }
 }
 
 function set ({ coords, interaction, state }: {
-  coords: Interact.Point,
-  interaction: Interaction,
+  coords: Interact.Point
+  interaction: Interaction
   state: any
 }) {
   const { offset, options } = state

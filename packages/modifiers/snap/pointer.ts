@@ -22,9 +22,9 @@ export interface SnapOptions {
   relativePoints: Interact.Point[]
   // startCoords = offset snapping from drag start page position
   offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords'
-  offsetWithOrigin: boolean,
+  offsetWithOrigin: boolean
   endOnly: boolean
-  enabled: boolean,
+  enabled: boolean
 }
 
 function start (arg: Interact.SignalArg) {

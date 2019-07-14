@@ -34,8 +34,8 @@ export enum _ProxyMethods {
 }
 
 export type _InteractionProxy = Pick<
-  Interaction,
-  keyof typeof _ProxyValues | keyof typeof _ProxyMethods
+Interaction,
+keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
 export class Interaction<T extends ActionName = any> {
@@ -71,7 +71,7 @@ export class Interaction<T extends ActionName = any> {
   _latestPointer: {
     pointer: Interact.EventTarget
     event: Interact.PointerEventType
-    eventTarget: Node,
+    eventTarget: Node
   } = {
     pointer: null,
     event: null,

@@ -72,17 +72,17 @@ const b = browserify(argv.entries, {
   standalone: argv.standalone,
 
   transform: [
-    [ require('babelify'), {
+    [require('babelify'), {
       babelrc: false,
       sourceType: 'module',
       global: true,
       extensions,
       ...babelrc,
-    } ],
-    [ require('envify'), {
+    }],
+    [require('envify'), {
       global: true,
       _: 'purge',
-    } ],
+    }],
   ],
 
   plugin: plugins,
