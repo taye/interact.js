@@ -107,7 +107,11 @@ interact(element)
 
 // axis
 interact(target).draggable({
-  axis: 'x',
+  startAxis: 'x',
+  lockAxis: 'y',
+}).draggable({
+  startAxis: 'xy',
+  lockAxis: 'x',
 })
 
 interact(target).resizable({

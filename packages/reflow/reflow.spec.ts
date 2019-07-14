@@ -22,7 +22,7 @@ test('reflow', (t) => {
 
   interactable.fire = ((iEvent) => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}
-  interactable.options.TEST = { enabled: true }
+  ;(interactable.options as any).TEST = { enabled: true }
   interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords

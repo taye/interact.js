@@ -9,7 +9,7 @@ test('scope', (t) => {
     event,
   } = helpers.testEnv()
 
-  interactable.options.test = { enabled: true }
+  ;(interactable.options as any).test = { enabled: true }
 
   interaction.pointerDown(event, event, scope.document.body)
   interaction.start({ name: 'test' }, interactable, scope.document.body)

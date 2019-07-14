@@ -9,7 +9,7 @@ test('modifiers/snap', (t) => {
   } = helpers.testEnv()
   const origin = { x: 120, y: 120 }
 
-  interactable.options.TEST = { origin }
+  ;(interactable.options as any).TEST = { origin }
   interaction.interactable = interactable
   interaction.prepared = { name: 'TEST' }
   interaction._interacting = true

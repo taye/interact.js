@@ -172,7 +172,7 @@ function set (arg: Interact.SignalArg) {
 
 function getOrigin (arg: Partial<Interact.SignalArg>) {
   const optionsOrigin = utils.rect.rectToXY(
-    utils.rect.resolveRectLike(arg.state.options.origin)
+    utils.rect.resolveRectLike(arg.state.options.origin, [arg.interaction.element])
   )
   const origin = optionsOrigin || utils.getOriginXY(
     arg.interactable,

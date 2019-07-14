@@ -37,7 +37,7 @@ test('modifiers/base', (t) => {
   interactable.on('TESTstart TESTmove TESTend', (event) => firedEvents.push(event))
   interaction.pointerDown(startEvent, startEvent, element)
 
-  interactable.options.TEST = {
+  ;(interactable.options as any).TEST = {
     enabled: true,
     modifiers: [
       {
@@ -106,7 +106,7 @@ test('modifiers/base', (t) => {
   // don't set start
   options.setStart = null
   // add second modifier
-  interactable.options.TEST.modifiers.push({
+  ;(interactable.options as any).TEST.modifiers.push({
     options,
     methods: doubleModifier,
   })
