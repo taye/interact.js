@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/reflow",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "peerDependencies": {
-    "@interactjs/core": "1.5.1",
-    "@interactjs/utils": "1.5.1"
+    "@interactjs/core": "1.5.2",
+    "@interactjs/utils": "1.5.2"
   },
   "devDependencies": {
     "promise-polyfill": "latest"
