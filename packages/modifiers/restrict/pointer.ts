@@ -29,16 +29,19 @@ function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierA
 
   if (rect && elementRect) {
     const restriction = getRestrictionRect(options.restriction, interaction, pageCoords)
-    const widthDiff = (restriction.right - restriction.left) - rect.width
-    const heightDiff = (restriction.bottom - restriction.top) - rect.height
 
-    if (widthDiff < 0) {
-      offset.left += widthDiff
-      offset.right += widthDiff
-    }
-    if (heightDiff < 0) {
-      offset.top += heightDiff
-      offset.bottom += heightDiff
+    if (restriction) {
+      const widthDiff = (restriction.right - restriction.left) - rect.width
+      const heightDiff = (restriction.bottom - restriction.top) - rect.height
+
+      if (widthDiff < 0) {
+        offset.left += widthDiff
+        offset.right += widthDiff
+      }
+      if (heightDiff < 0) {
+        offset.top += heightDiff
+        offset.bottom += heightDiff
+      }
     }
 
     offset.left += startOffset.left - (rect.width  * elementRect.left)

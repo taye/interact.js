@@ -12,7 +12,7 @@ test('restrict larger than restriction', t => {
   const restriction = { left: 100, top: 50, right: 150, bottom: 150 }
   const options = {
     ...restrict.defaults,
-    restriction,
+    restriction: null,
     elementRect: { left: 0, top: 0, right: 1, bottom: 1 },
   }
   const state = { options, offset: null }
@@ -25,6 +25,10 @@ test('restrict larger than restriction', t => {
     pageCoords: { x: 0, y: 0 },
   }
 
+  options.restriction = () => null
+  t.doesNotThrow(() => restrict.start(arg as any), 'no errors with null-resolving restriction')
+
+  options.restriction = restriction
   restrict.start(arg as any)
 
   arg.coords = { x: 0, y: 0 }
