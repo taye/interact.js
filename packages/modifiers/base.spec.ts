@@ -3,7 +3,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
 import modifiersBase from './base'
 
-test('modifiers/base', (t) => {
+test('modifiers/base', t => {
   const {
     scope,
     target,
@@ -34,10 +34,10 @@ test('modifiers/base', (t) => {
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('TESTstart TESTmove TESTend', (event) => firedEvents.push(event))
+  interactable.on('TESTstart TESTmove TESTend', event => firedEvents.push(event))
   interaction.pointerDown(startEvent, startEvent, element)
 
-  interactable.options.TEST = {
+  ;(interactable.options as any).TEST = {
     enabled: true,
     modifiers: [
       {
@@ -106,7 +106,7 @@ test('modifiers/base', (t) => {
   // don't set start
   options.setStart = null
   // add second modifier
-  interactable.options.TEST.modifiers.push({
+  ;(interactable.options as any).TEST.modifiers.push({
     options,
     methods: doubleModifier,
   })

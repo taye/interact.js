@@ -4,7 +4,7 @@ import Signals from '@interactjs/utils/Signals'
 import hold from './hold'
 import { autoStart } from './index'
 
-test('autoStart/hold', (t) => {
+test('autoStart/hold', t => {
   const scope = helpers.mockScope({
     autoStart: {
       defaults: {

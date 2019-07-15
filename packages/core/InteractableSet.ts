@@ -21,7 +21,7 @@ export default class InteractableSet {
         ? this.selectorMap[target]
         : target[this.scope.id]
 
-      const targetIndex = targetMappings.findIndex((m) => m.context === context)
+      const targetIndex = targetMappings.findIndex(m => m.context === context)
       if (targetMappings[targetIndex]) {
         // Destroying mappingInfo's context and interactable
         targetMappings[targetIndex].context = null
@@ -76,13 +76,13 @@ export default class InteractableSet {
 
     const found = arr.find(
       targetMappings,
-      (m) => m.context === context &&
+      m => m.context === context &&
         (isSelector || m.interactable.inContext(target)))
 
     return found && found.interactable
   }
 
-  forEachMatch (node: Node, callback: (interactable: any) => any) {
+  forEachMatch<T> (node: Node, callback: (interactable: Interact.Interactable) => T): T | void {
     for (const interactable of this.list) {
       let ret
 

@@ -6,7 +6,7 @@
     "jsRules": {},
     "rules": {
       "align": true,
-      "arrow-parens": true,
+      "arrow-parens": false,
       "forin": false,
       "interface-name": [true, "never-prefix"],
       "max-classes-per-file": false,
@@ -20,6 +20,7 @@
       "no-namespace": false,
       "no-reference": false,
       "no-shadowed-variable": false,
+      "object-literal-key-quotes": false,
       "object-literal-shorthand": true,
       "object-literal-sort-keys": false,
       "one-line": false,
@@ -29,7 +30,8 @@
       "space-before-function-paren": [true, "always"],
       "trailing-comma": false,
       "type-literal-delimiter": [false, "never"],
-      "variable-name": false
+      "variable-name": false,
+      "whitespace": false
     },
     "rulesDirectory": []
 }

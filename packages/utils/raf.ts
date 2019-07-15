@@ -16,7 +16,7 @@ function init (window) {
   }
 
   if (!request) {
-    request = (callback) => {
+    request = callback => {
       const currTime = Date.now()
       const timeToCall = Math.max(0, 16 - (currTime - lastTime))
       // eslint-disable-next-line standard/no-callback-literal
@@ -27,12 +27,12 @@ function init (window) {
       return token
     }
 
-    cancel = (token) => clearTimeout(token)
+    cancel = token => clearTimeout(token)
   }
 }
 
 export default {
-  request: (callback) => request(callback),
-  cancel: (token) => cancel(token),
+  request: callback => request(callback),
+  cancel: token => cancel(token),
   init,
 }

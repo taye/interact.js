@@ -2,14 +2,14 @@ import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import snap from '../snap/pointer'
 
-test('modifiers/snap', (t) => {
+test('modifiers/snap', t => {
   const {
     interaction,
     interactable,
   } = helpers.testEnv()
   const origin = { x: 120, y: 120 }
 
-  interactable.options.TEST = { origin }
+  ;(interactable.options as any).TEST = { origin }
   interaction.interactable = interactable
   interaction.prepared = { name: 'TEST' }
   interaction._interacting = true

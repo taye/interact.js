@@ -28,20 +28,20 @@ declare module '@interactjs/core/Interaction' {
   interface Interaction {
     dropState?: {
       cur: {
-        dropzone: Interactable,   // the dropzone a drag target might be dropped into
-        element: Element,         // the element at the time of checking
-      },
+        dropzone: Interactable    // the dropzone a drag target might be dropped into
+        element: Element          // the element at the time of checking
+      }
       prev: {
-        dropzone: Interactable,   // the dropzone that was recently dragged away from
-        element: Element,         // the element at the time of checking
-      },
-      rejected: boolean,          // wheather the potential drop was rejected from a listener
-      events: any,                // the drop events related to the current drag event
+        dropzone: Interactable    // the dropzone that was recently dragged away from
+        element: Element          // the element at the time of checking
+      }
+      rejected: boolean           // wheather the potential drop was rejected from a listener
+      events: any                 // the drop events related to the current drag event
       activeDrops: Array<{
         dropzone: Interactable
         element: Element
         rect: Interact.Rect
-      }>,
+      }>
     }
   }
 }
@@ -112,8 +112,8 @@ function install (scope: Scope) {
   })
 
   // FIXME proper signal types
-  interactions.signals.on('action-move', (arg) => onEventCreated(arg as any, scope))
-  interactions.signals.on('action-end', (arg) => onEventCreated(arg as any, scope))
+  interactions.signals.on('action-move', arg => onEventCreated(arg as any, scope))
+  interactions.signals.on('action-end', arg => onEventCreated(arg as any, scope))
 
   interactions.signals.on('after-action-move', ({ interaction }) => {
     if (interaction.prepared.name !== 'drag') { return }

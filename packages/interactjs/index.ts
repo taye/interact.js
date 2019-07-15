@@ -6,11 +6,11 @@ import extend from '@interactjs/utils/extend'
 import * as snappers from '@interactjs/utils/snappers'
 
 declare module '@interactjs/interact/interact' {
-    interface InteractStatic {
-        modifiers?: typeof modifiers & { [key: string]: (options?) => Modifier }
-        snappers?: typeof snappers & { [key: string]: any }
-        createSnapGrid?: typeof snappers.grid
-    }
+  interface InteractStatic {
+    modifiers?: typeof modifiers & { [key: string]: (options?) => Modifier }
+    snappers?: typeof snappers & { [key: string]: any }
+    createSnapGrid?: typeof snappers.grid
+  }
 }
 
 if (typeof window === 'object' && !!window) {

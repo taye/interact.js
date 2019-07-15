@@ -68,7 +68,7 @@ function install (scope: Interact.Scope) {
     prepare(interaction, actionInfo, scope)
   })
 
-  interactions.signals.on('move', (arg) => {
+  interactions.signals.on('move', arg => {
     const { interaction } = arg
 
     if (!interaction.pointerIsDown ||
@@ -128,7 +128,7 @@ function install (scope: Interact.Scope) {
    *
    * @param {number} [newValue] Any number. newValue <= 0 means no interactions.
    */
-  interact.maxInteractions = (newValue) => maxInteractions(newValue, scope)
+  interact.maxInteractions = newValue => maxInteractions(newValue, scope)
 
   scope.autoStart = {
     // Allow this many interactions to happen simultaneously

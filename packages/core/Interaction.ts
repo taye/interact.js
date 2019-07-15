@@ -7,9 +7,6 @@ import { ActionName } from './scope'
 export interface ActionProps<T extends ActionName = any> {
   name: T
   axis?: 'x' | 'y' | 'xy'
-  edges?: {
-    [edge in keyof Interact.Rect]?: boolean
-  }
 }
 
 export interface StartAction extends ActionProps {
@@ -34,8 +31,8 @@ export enum _ProxyMethods {
 }
 
 export type _InteractionProxy = Pick<
-  Interaction,
-  keyof typeof _ProxyValues | keyof typeof _ProxyMethods
+Interaction,
+keyof typeof _ProxyValues | keyof typeof _ProxyMethods
 >
 
 export class Interaction<T extends ActionName = any> {
@@ -71,7 +68,7 @@ export class Interaction<T extends ActionName = any> {
   _latestPointer: {
     pointer: Interact.EventTarget
     event: Interact.PointerEventType
-    eventTarget: Node,
+    eventTarget: Node
   } = {
     pointer: null,
     event: null,
@@ -210,7 +207,7 @@ export class Interaction<T extends ActionName = any> {
   pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
     if (!this.simulation && !(this.modifiers && this.modifiers.endPrevented)) {
       this.updatePointer(pointer, event, eventTarget, false)
-      utils.pointer.setCoords(this.coords.cur, this.pointers.map((p) => p.pointer), this._now())
+      utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
     }
 
     const duplicateMove = (this.coords.cur.page.x === this.coords.prev.page.x &&
@@ -382,7 +379,7 @@ export class Interaction<T extends ActionName = any> {
     // mouse and pen interactions may have only one pointer
     return (this.pointerType === 'mouse' || this.pointerType === 'pen')
       ? this.pointers.length - 1
-      : utils.arr.findIndex(this.pointers, (curPointer) => curPointer.id === pointerId)
+      : utils.arr.findIndex(this.pointers, curPointer => curPointer.id === pointerId)
   }
 
   getPointerInfo (pointer) {
@@ -418,7 +415,7 @@ export class Interaction<T extends ActionName = any> {
       this.pointerIsDown = true
 
       if (!this.interacting()) {
-        utils.pointer.setCoords(this.coords.start, this.pointers.map((p) => p.pointer), this._now())
+        utils.pointer.setCoords(this.coords.start, this.pointers.map(p => p.pointer), this._now())
 
         utils.pointer.copyCoords(this.coords.cur, this.coords.start)
         utils.pointer.copyCoords(this.coords.prev, this.coords.start)

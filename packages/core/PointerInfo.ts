@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-parameter-properties */
 export class PointerInfo {
   constructor (
     public id: number,

@@ -15,7 +15,7 @@ export type PartialSignalArg = Partial<SignalArg>
 
 class Signals {
   listeners: {
-    [signalName: string]: SignalListener[],
+    [signalName: string]: SignalListener[]
   } = {}
 
   on (name: string, listener: SignalListener) {

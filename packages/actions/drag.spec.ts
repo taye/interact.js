@@ -5,7 +5,7 @@ import { extend } from '@interactjs/utils'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import drag from './drag'
 
-test('drag action init', (t) => {
+test('drag action init', t => {
   const scope = helpers.mockScope()
 
   scope.usePlugin(drag)
@@ -17,7 +17,7 @@ test('drag action init', (t) => {
   t.end()
 })
 
-test('Interactable.draggable method', (t) => {
+test('Interactable.draggable method', t => {
   const interactable = {
     options: {
       drag: {},
@@ -74,7 +74,7 @@ test('Interactable.draggable method', (t) => {
   t.end()
 })
 
-test('drag axis', (t) => {
+test('drag axis', t => {
   const scope = helpers.mockScope()
 
   scope.usePlugin(drag)
@@ -101,7 +101,7 @@ test('drag axis', (t) => {
   interaction.prepared = { name: 'drag', axis: 'xy' }
   interaction.interact = interactable
 
-  t.test('xy (any direction)', (tt) => {
+  t.test('xy (any direction)', tt => {
     scope.interactions.signals.fire('before-action-move', { interaction })
 
     tt.deepEqual(interaction.coords.start, coords.start,
@@ -120,7 +120,7 @@ test('drag axis', (t) => {
   for (const axis in opposites) {
     const opposite = opposites[axis]
 
-    t.test(axis + '-axis', (tt) => {
+    t.test(axis + '-axis', tt => {
       resetCoords()
       interaction.prepared.axis = axis as any
 

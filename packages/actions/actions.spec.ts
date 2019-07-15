@@ -3,7 +3,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import * as actions from './index'
 
-test('actions integration', (t) => {
+test('actions integration', t => {
   const scope: Interact.Scope = helpers.mockScope()
   const event = pointerUtils.coordsToEvent(pointerUtils.newCoords())
   const element = scope.document.body

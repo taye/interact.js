@@ -3,7 +3,7 @@ import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import inertia from './'
 
-test('inertia', (t) => {
+test('inertia', t => {
   const {
     scope,
     interaction,

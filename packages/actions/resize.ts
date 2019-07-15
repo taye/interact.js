@@ -29,7 +29,8 @@ declare module '@interactjs/core/Interaction' {
   }
 
   interface ActionProps {
-    _linkedEdges?: { [key: string]: boolean }
+    edges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
+    _linkedEdges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
   }
 }
 
@@ -68,7 +69,7 @@ function install (scope: Scope) {
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', interaction => {
     interaction.resizeAxes = 'xy'
   })
 
@@ -398,7 +399,7 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
   }
 
   iEvent.rect = interaction.resizeRects.inverted
-  ; (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
+  ;(iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
 }
 
 function move ({ iEvent, interaction }) {

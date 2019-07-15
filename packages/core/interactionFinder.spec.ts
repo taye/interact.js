@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import finder from './interactionFinder'
 import * as helpers from './tests/_helpers'
 
-test('modifiers/snap', (t) => {
+test('modifiers/snap', t => {
   const {
     interactable,
     event,

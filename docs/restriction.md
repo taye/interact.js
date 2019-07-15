@@ -1,3 +1,7 @@
+---
+title: Restrict
+---
+
 Restrict
 ========
 

@@ -1,3 +1,7 @@
+---
+title: Intro
+---
+
 <p class="title is-3">
 interact.js is a JavaScript library for drag and drop, resizing and multi-touch
 gestures with inertia and snapping for modern browsers (and also IE9+).
@@ -105,7 +109,7 @@ Ruby on Rails
 -------------
 
 [Rails 5.1+](https://rubyonrails.org/) supports the [yarn](http://yarnpkg.com/)
-package manager, so you can add interact.js to you app by running `yarn install
+package manager, so you can add interact.js to you app by running `yarn add
 interactjs`. Then require the library with:
 
 ```rb

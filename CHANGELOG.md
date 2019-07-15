@@ -1,3 +1,8 @@
+## v1.5.2
+
+ - fixed null restriction issue (#737)
+ - improved typings for modifiers
+
 ## v1.5.1
 
  - fixed typing issues (#738)

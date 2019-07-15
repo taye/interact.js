@@ -1,3 +1,7 @@
+---
+title: Snapping
+---
+
 Snapping
 ========
 

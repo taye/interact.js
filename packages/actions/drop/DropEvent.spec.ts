@@ -10,7 +10,7 @@ const el2: any = Symbol('el2')
 const interactable: any = Symbol('interactable')
 const dragElement: any = Symbol('drag-el')
 
-test('DropEvent constructor', (t) => {
+test('DropEvent constructor', t => {
   const interaction: any = { dropState: {} }
   const dragEvent = Object.freeze({
     interactable,
@@ -44,7 +44,7 @@ test('DropEvent constructor', (t) => {
   t.end()
 })
 
-test('DropEvent.reject()', (t) => {
+test('DropEvent.reject()', t => {
   const interaction: any = { dropState: {} }
   const dragEvent = Object.freeze({
     interactable,
@@ -106,7 +106,7 @@ test('DropEvent.reject()', (t) => {
   t.end()
 })
 
-test('DropEvent.stop[Immediate]Propagation()', (t) => {
+test('DropEvent.stop[Immediate]Propagation()', t => {
   const dropEvent = new DropEvent({ cur: {} } as any, {} as any, 'dragmove')
 
   t.notOk(dropEvent.propagationStopped || dropEvent.immediatePropagationStopped)

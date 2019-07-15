@@ -8,16 +8,16 @@ type Listener = (event: Event | FakeEvent) => any
 
 const elements: EventTarget[] = []
 const targets: Array<{
-  events: { [type: string]: Listener[] },
-  typeCount: number,
+  events: { [type: string]: Listener[] }
+  typeCount: number
 }> = []
 
 const delegatedEvents: {
   [type: string]: {
-    selectors: string[],
-    contexts: Node[],
-    listeners: Array<Array<[Listener, boolean, boolean]>>,
-  },
+    selectors: string[]
+    contexts: Node[]
+    listeners: Array<Array<[Listener, boolean, boolean]>>
+  }
 } = {}
 const documents: Document[] = []
 

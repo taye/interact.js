@@ -124,9 +124,9 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
   target,
   rect = {  top: 0, left: 0, bottom: 0, right: 0  },
 }: {
-  plugins?: Interact.Plugin[],
-  target?: T,
-  rect?: Interact.Rect,
+  plugins?: Interact.Plugin[]
+  target?: T
+  rect?: Interact.Rect
 } = {}) {
   const scope: Interact.Scope = mockScope()
 
@@ -158,5 +158,5 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
 }
 
 export function timeout (n) {
-  return new Promise((resolve) => setTimeout(resolve, n))
+  return new Promise(resolve => setTimeout(resolve, n))
 }

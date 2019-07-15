@@ -11,7 +11,7 @@ export interface SearchDetails {
 }
 
 const finder = {
-  methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
+  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
 
   search (details) {
     for (const method of finder.methodOrder) {

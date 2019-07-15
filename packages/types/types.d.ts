@@ -79,22 +79,11 @@ declare namespace Interact {
   }
   export type InertiaOptions = InertiaOption | boolean
 
-  export interface AutoScrollOption {
-    container?: Element
-    margin?: number
-    distance?: number
-    interval?: number
-  }
-  export type AutoScrollOptions = AutoScrollOption | boolean
-
-  export type CSSSelector = string
-
   export interface EdgeOptions {
-    top?: boolean | CSSSelector | Element
-    left?: boolean | CSSSelector | Element
-    bottom?: boolean | CSSSelector | Element
-    right?: boolean | CSSSelector | Element
-    [key: string]: boolean | CSSSelector | Element
+    top?: boolean | string | Element
+    left?: boolean | string | Element
+    bottom?: boolean | string | Element
+    right?: boolean | string | Element
   }
 
   export type CursorChecker<T extends ActionName = any> =
@@ -126,7 +115,7 @@ declare namespace Interact {
 
   export interface DropzoneOptions extends Options {
     accept?: string | Element | (({ dropzone, draggableElement }: {
-      dropzone: Interact.Interactable,
+      dropzone: Interact.Interactable
       draggableElement: Element
     }) => boolean)
     // How the overlap is checked on the drop zone
@@ -153,13 +142,11 @@ declare namespace Interact {
 
   export interface ResizableOptions extends Options {
     square?: boolean
-    preserveAspectRatio?: boolean,
+    preserveAspectRatio?: boolean
     edges?: EdgeOptions | null
-    // deprecated
-    axis?: 'x' | 'y' | 'xy'
-    //
+    axis?: 'x' | 'y' | 'xy' // deprecated
     invert?: 'none' | 'negate' | 'reposition'
-    margin?: number,
+    margin?: number
     squareResize?: boolean
     cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
@@ -182,13 +169,13 @@ declare namespace Interact {
     interaction: Interaction,
   ) => ActionProps
 
-  export type OriginFunction = (target: Element)  => 'self' | 'parent' | Rect | Point | CSSSelector | Element
+  export type OriginFunction = (target: Element) => Rect
 
   export interface PointerEventsOptions {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | Element | OriginFunction
+    origin?: Rect | Point | string | Element | OriginFunction
   }
 
   export type RectChecker = (element: Element)  => Rect
@@ -203,69 +190,6 @@ declare namespace Interact {
   export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
   export interface ListenerMap {
     [index: string]: ListenersArg | ListenersArg[]
-  }
-
-  export type OnEventName =
-    'dragstart'
-    | 'dragmove'
-    | 'draginertiastart'
-    | 'dragend'
-    | 'resizestart'
-    | 'resizemove'
-    | 'resizeinertiastart'
-    | 'resizeend'
-    | 'gesturestart'
-    | 'gesturemove'
-    | 'gestureend'
-    // drop
-    | 'dropactivate'
-    | 'dropdeactivate'
-    | 'dragenter'
-    | 'dragleave'
-    | 'dropmove'
-    | 'drop'
-    // pointer events
-    | 'down'
-    | 'move'
-    | 'up'
-    | 'cancel'
-    | 'tap'
-    | 'doubletap'
-    | 'hold'
-
-  export interface OnEventFunctions {
-    dragstart?: ListenersArg
-    dragmove?: ListenersArg
-    draginertiastart?: ListenersArg
-    dragend?: ListenersArg
-    resizestart?: ListenersArg
-    resizemove?: ListenersArg
-    resizeinertiastart?: ListenersArg
-    resizeend?: ListenersArg
-    gesturestart?: ListenersArg
-    gesturemove?: ListenersArg
-    gestureend?: ListenersArg
-    // drop
-    dropactivate?: ListenersArg
-    dropdeactivate?: ListenersArg
-    dragenter?: ListenersArg
-    dragleave?: ListenersArg
-    dropmove?: ListenersArg
-    drop?: ListenersArg
-    // pointer events
-    down?: ListenersArg
-    move?: ListenersArg
-    up?: ListenersArg
-    cancel?: ListenersArg
-    tap?: ListenersArg
-    doubletap?: ListenersArg
-    hold?: ListenersArg
-  }
-
-  export type OnEvent = OnEventName | OnEventName[]
-
-  export interface InteractOptions {
-    context?: Element
   }
 }
 

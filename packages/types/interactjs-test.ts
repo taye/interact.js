@@ -30,10 +30,10 @@ interact('.drag-and-resize')
         endOnly: true,
       }),
       interact.modifiers.restrict({
-        restriction: (_) => ({ top: 0, left: 0, bottom: 1, right: 1 }),
+        restriction: _ => ({ top: 0, left: 0, bottom: 1, right: 1 }),
       }),
       interact.modifiers.restrict({
-        restriction: (_) => document.body,
+        restriction: _ => document.body,
       }),
       interact.modifiers.restrictSize({
         min: document.body,
@@ -107,7 +107,11 @@ interact(element)
 
 // axis
 interact(target).draggable({
-  axis: 'x',
+  startAxis: 'x',
+  lockAxis: 'y',
+}).draggable({
+  startAxis: 'xy',
+  lockAxis: 'x',
 })
 
 interact(target).resizable({
@@ -211,14 +215,14 @@ interact(dropTarget)
             event.target.id)
     },
   })
-  .on('dropactivate', (event) => {
+  .on('dropactivate', event => {
     event.target.classList.add('drop-activated')
   })
 
-interact(target).on('up', (_event) => {})
+interact(target).on('up', _event => {})
 
 // fast click
-interact('a[href]').on('tap', (event) => {
+interact('a[href]').on('tap', event => {
   window.location.href = event.currentTarget.href
 
   event.preventDefault()

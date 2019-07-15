@@ -2,7 +2,7 @@ import test from '@interactjs/_dev/test/test'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import restrict from '../restrict/pointer'
 
-test('restrict larger than restriction', (t) => {
+test('restrict larger than restriction', t => {
   const edges = { left: 0, top: 0, right: 200, bottom: 200 }
   const rect = { ...edges, width: 200, height: 200 }
   const {
@@ -12,7 +12,7 @@ test('restrict larger than restriction', (t) => {
   const restriction = { left: 100, top: 50, right: 150, bottom: 150 }
   const options = {
     ...restrict.defaults,
-    restriction,
+    restriction: null,
     elementRect: { left: 0, top: 0, right: 1, bottom: 1 },
   }
   const state = { options, offset: null }
@@ -25,7 +25,11 @@ test('restrict larger than restriction', (t) => {
     pageCoords: { x: 0, y: 0 },
   }
 
-  restrict.start(arg)
+  options.restriction = () => null
+  t.doesNotThrow(() => restrict.start(arg as any), 'no errors with null-resolving restriction')
+
+  options.restriction = restriction
+  restrict.start(arg as any)
 
   arg.coords = { x: 0, y: 0 }
   restrict.set(arg)

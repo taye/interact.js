@@ -20,8 +20,15 @@ declare module '@interactjs/core/Interaction' {
 
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
-    autoScroll?: Interact.AutoScrollOption
+    autoScroll?: AutoScrollOptions
   }
+}
+
+export interface AutoScrollOptions {
+  container?: Element
+  margin?: number
+  distance?: number
+  interval?: number
 }
 
 function install (scope: Scope) {
@@ -64,7 +71,7 @@ const autoScroll = {
 
     // the scroll speed in pixels per second
     speed    : 300,
-  } as Interact.AutoScrollOption,
+  } as AutoScrollOptions,
 
   now: Date.now,
 

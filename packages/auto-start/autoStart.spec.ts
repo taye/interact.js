@@ -3,7 +3,7 @@ import drag from '@interactjs/actions/drag'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import autoStart from './base'
 
-test('autoStart', (t) => {
+test('autoStart', t => {
   const rect = { top: 100, left: 200, bottom: 300, right: 400 }
   const {
     interaction,

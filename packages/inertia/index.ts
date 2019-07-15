@@ -49,18 +49,18 @@ declare module '@interactjs/core/Interaction' {
 declare module '@interactjs/core/defaultOptions' {
   interface PerActionDefaults {
     inertia?: {
-      enabled?: boolean,
-      resistance?: number,        // the lambda in exponential decay
-      minSpeed?: number,          // target speed must be above this for inertia to start
-      endSpeed?: number,          // the speed at which inertia is slow enough to stop
-      allowResume?: true,         // allow resuming an action in inertia phase
-      smoothEndDuration?: number, // animate to snap/restrict endOnly if there's no inertia
+      enabled?: boolean
+      resistance?: number        // the lambda in exponential decay
+      minSpeed?: number          // target speed must be above this for inertia to start
+      endSpeed?: number          // the speed at which inertia is slow enough to stop
+      allowResume?: true         // allow resuming an action in inertia phase
+      smoothEndDuration?: number // animate to snap/restrict endOnly if there's no inertia
     } | boolean // FIXME
   }
 }
 
 (EventPhase as any).Resume = 'resume'
-; (EventPhase as any).InertiaStart = 'inertiastart'
+;(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Interact.Scope) {
   const {
@@ -79,9 +79,9 @@ function install (scope: Interact.Scope) {
   })
 
   // FIXME proper signal typing
-  interactions.signals.on('before-action-end', (arg) => release(arg as any, scope))
-  interactions.signals.on('down', (arg) => resume(arg as any, scope))
-  interactions.signals.on('stop', (arg) => stop(arg as any))
+  interactions.signals.on('before-action-end', arg => release(arg as any, scope))
+  interactions.signals.on('down', arg => resume(arg as any, scope))
+  interactions.signals.on('stop', arg => stop(arg as any))
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -118,7 +118,7 @@ function resume (
         interaction.updatePointer(pointer, event, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
-          interaction.pointers.map((p) => p.pointer),
+          interaction.pointers.map(p => p.pointer),
           interaction._now()
         )
 
@@ -179,7 +179,7 @@ function release<T extends Interact.ActionName> (
     interaction,
     pageCoords: utils.extend({}, interaction.coords.cur.page),
     states: inertiaPossible && interaction.modifiers.states.map(
-      (modifierStatus) => utils.extend({}, modifierStatus)
+      modifierStatus => utils.extend({}, modifierStatus)
     ),
     preEnd: true,
     prevCoords: undefined,
@@ -361,12 +361,12 @@ function updateInertiaCoords (interaction: Interact.Interaction) {
   const pageUp   = state.upCoords.page
   const clientUp = state.upCoords.client
 
-  utils.pointer.setCoords(interaction.coords.cur, [ {
+  utils.pointer.setCoords(interaction.coords.cur, [{
     pageX  : pageUp.x   + state.sx,
     pageY  : pageUp.y   + state.sy,
     clientX: clientUp.x + state.sx,
     clientY: clientUp.y + state.sy,
-  } ], interaction._now())
+  }], interaction._now())
 }
 
 function getOptions ({ interactable, prepared }: Interact.Interaction) {

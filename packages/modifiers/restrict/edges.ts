@@ -9,24 +9,29 @@
 //   },
 // })
 
-import Interaction from '@interactjs/core/Interaction'
 import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
+import { ModifierArg, ModifierState } from '../base'
 import restrict, { RestrictOptions } from './pointer'
 
 export interface RestrictEdgesOptions {
   inner: RestrictOptions['restriction']
   outer: RestrictOptions['restriction']
-  offset: RestrictOptions['offset']
+  offset?: RestrictOptions['offset']
   endOnly: boolean
-  enabled: boolean
 }
+
+export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
+  inner: Interact.Rect
+  outer: Interact.Rect
+  offset: RestrictEdgesOptions['offset']
+}>
 
 const { getRestrictionRect } = restrict
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
 
-function start ({ interaction, state }: { interaction: Interaction, state: any }) {
+function start ({ interaction, state }: ModifierArg<RestrictEdgesState>) {
   const { options } = state
   const startOffset = interaction.modifiers.startOffset
   let offset
@@ -47,11 +52,7 @@ function start ({ interaction, state }: { interaction: Interaction, state: any }
   }
 }
 
-function set ({ coords, interaction, state }: {
-  coords: Interact.Point,
-  interaction: Interaction,
-  state: any
-}) {
+function set ({ coords, interaction, state }: ModifierArg<RestrictEdgesState>) {
   const { offset, options } = state
   const edges = interaction.prepared._linkedEdges || interaction.prepared.edges
 
@@ -95,7 +96,6 @@ const defaults: RestrictEdgesOptions = {
   outer: null,
   offset: null,
   endOnly: false,
-  enabled: false,
 }
 
 const restrictEdges = {
