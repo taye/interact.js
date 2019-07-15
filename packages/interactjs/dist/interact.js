@@ -1,5 +1,5 @@
 /**
- * interact.js 1.5.1
+ * interact.js 1.5.2
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -3791,8 +3791,7 @@ function (_BaseEvent) {
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(InteractEvent).call(this, interaction));
     element = element || interaction.element;
-    var target = interaction.interactable; // FIXME: add deltaSource to defaults
-
+    var target = interaction.interactable;
     var deltaSource = (target && target.options || _defaultOptions["default"]).deltaSource;
     var origin = (0, ___getOriginXY_15["default"])(target, element, actionName);
     var starting = phase === 'start';
@@ -3991,6 +3990,7 @@ _$PointerInfo_19["default"] = _$PointerInfo_19.PointerInfo = void 0;
 
 function ___classCallCheck_19(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/* eslint-disable @typescript-eslint/no-parameter-properties */
 var PointerInfo = function PointerInfo(id, pointer, event, downTime, downTarget) {
   ___classCallCheck_19(this, PointerInfo);
 
@@ -7062,10 +7062,12 @@ function __start_30(_ref2, pageCoords) {
 }
 
 function startAll(arg) {
-  for (var _i = 0; _i < arg.states.length; _i++) {
+  var states = arg.states;
+
+  for (var _i = 0; _i < states.length; _i++) {
     var _ref3;
 
-    _ref3 = arg.states[_i];
+    _ref3 = states[_i];
     var state = _ref3;
 
     if (state.methods.start) {
@@ -7246,7 +7248,7 @@ function getModifierList(interaction) {
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize'].map(function (type) {
     var options = actionOptions[type];
-    return options && options.enabled && {
+    return options && options.enabled !== false && {
       options: options,
       methods: options._methods
     };
@@ -7268,13 +7270,12 @@ function prepareStates(modifierList) {
       continue;
     }
 
-    var state = {
+    states.push({
       options: options,
       methods: methods,
       index: index,
       name: name
-    };
-    states.push(state);
+    });
   }
 
   return states;
@@ -7378,8 +7379,7 @@ function makeModifier(module, name) {
   };
 
   var modifier = function modifier(_options) {
-    var options = _options || {};
-    options.enabled = options.enabled !== false; // add missing defaults to options
+    var options = _options || {}; // add missing defaults to options
 
     for (var prop in defaults) {
       if (!(prop in options)) {
@@ -7761,17 +7761,20 @@ function __start_33(_ref) {
 
   if (rect && elementRect) {
     var restriction = getRestrictionRect(options.restriction, interaction, pageCoords);
-    var widthDiff = restriction.right - restriction.left - rect.width;
-    var heightDiff = restriction.bottom - restriction.top - rect.height;
 
-    if (widthDiff < 0) {
-      offset.left += widthDiff;
-      offset.right += widthDiff;
-    }
+    if (restriction) {
+      var widthDiff = restriction.right - restriction.left - rect.width;
+      var heightDiff = restriction.bottom - restriction.top - rect.height;
 
-    if (heightDiff < 0) {
-      offset.top += heightDiff;
-      offset.bottom += heightDiff;
+      if (widthDiff < 0) {
+        offset.left += widthDiff;
+        offset.right += widthDiff;
+      }
+
+      if (heightDiff < 0) {
+        offset.top += heightDiff;
+        offset.bottom += heightDiff;
+      }
     }
 
     offset.left += startOffset.left - rect.width * elementRect.left;
@@ -7813,8 +7816,7 @@ var __defaults_33 = {
   restriction: null,
   elementRect: null,
   offset: null,
-  endOnly: false,
-  enabled: false
+  endOnly: false
 };
 var restrict = {
   start: __start_33,
@@ -7938,8 +7940,7 @@ var __defaults_32 = {
   inner: null,
   outer: null,
   offset: null,
-  endOnly: false,
-  enabled: false
+  endOnly: false
 };
 var restrictEdges = {
   noInner: noInner,
@@ -8020,7 +8021,7 @@ function __set_35(arg) {
   var interaction = arg.interaction,
       state = arg.state;
   var options = state.options;
-  var edges = interaction.prepared.linkedEdges || interaction.prepared.edges;
+  var edges = interaction.prepared._linkedEdges || interaction.prepared.edges;
 
   if (!edges) {
     return;
@@ -8031,7 +8032,6 @@ function __set_35(arg) {
   var minSize = ___rect_35["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.min, interaction, arg.coords)) || noMin;
   var maxSize = ___rect_35["default"].tlbrToXywh(_edges["default"].getRestrictionRect(options.max, interaction, arg.coords)) || noMax;
   state.options = {
-    enabled: options.enabled,
     endOnly: options.endOnly,
     inner: (0, ___extend_35["default"])({}, _edges["default"].noInner),
     outer: (0, ___extend_35["default"])({}, _edges["default"].noOuter)
@@ -8061,8 +8061,7 @@ function __set_35(arg) {
 var __defaults_35 = {
   min: null,
   max: null,
-  endOnly: false,
-  enabled: false
+  endOnly: false
 };
 var restrictSize = {
   start: __start_35,
@@ -8231,7 +8230,7 @@ function __set_37(arg) {
 }
 
 function getOrigin(arg) {
-  var optionsOrigin = __utils_37.rect.rectToXY(__utils_37.rect.resolveRectLike(arg.state.options.origin));
+  var optionsOrigin = __utils_37.rect.rectToXY(__utils_37.rect.resolveRectLike(arg.state.options.origin, [arg.interaction.element]));
   var origin = optionsOrigin || __utils_37.getOriginXY(arg.interactable, arg.interaction.element, arg.interaction.prepared.name);
   return origin;
 }
@@ -8241,9 +8240,9 @@ var __defaults_37 = {
   targets: null,
   offset: null,
   offsetWithOrigin: true,
+  origin: null,
   relativePoints: null,
-  endOnly: false,
-  enabled: false
+  endOnly: false
 };
 var snap = {
   start: __start_37,
@@ -8291,15 +8290,16 @@ function __start_38(arg) {
 
   arg.state = {
     options: {
+      targets: null,
       relativePoints: [{
         x: edges.left ? 0 : 1,
         y: edges.top ? 0 : 1
       }],
+      offset: options.offset || 'self',
       origin: {
         x: 0,
         y: 0
       },
-      offset: options.offset || 'self',
       range: options.range
     }
   };
@@ -8370,8 +8370,7 @@ var __defaults_38 = {
   range: Infinity,
   targets: null,
   offset: null,
-  endOnly: false,
-  enabled: false
+  endOnly: false
 };
 var snapSize = {
   start: __start_38,
@@ -9733,7 +9732,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.5.1";
+_interact["default"].version = "1.5.2";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

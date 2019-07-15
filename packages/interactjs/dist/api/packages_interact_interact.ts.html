@@ -341,7 +341,7 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 })
 
 interact.addDocument = (doc, options) => scope.addDocument(doc, options)
-interact.removeDocument = (doc) => scope.removeDocument(doc)
+interact.removeDocument = doc => scope.removeDocument(doc)
 
 scope.interact = interact
 

@@ -1,5 +1,5 @@
 export declare const snap: {
-    (_options?: Partial<import("./snap/pointer").SnapOptions>): import("./base").Modifier<"snap", import("./snap/pointer").SnapOptions>;
+    (_options?: Partial<import("./snap/pointer").SnapOptions>): import("./base").Modifier<import("./snap/pointer").SnapOptions, "snap">;
     _defaults: import("./snap/pointer").SnapOptions;
     _methods: {
         start: any;
@@ -9,8 +9,8 @@ export declare const snap: {
     };
 };
 export declare const snapSize: {
-    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<"snapSize", Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>;
-    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">, "snapSize">;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;
@@ -19,8 +19,8 @@ export declare const snapSize: {
     };
 };
 export declare const snapEdges: {
-    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<"snapEdges", Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>;
-    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">, "snapEdges">;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;
@@ -29,7 +29,7 @@ export declare const snapEdges: {
     };
 };
 export declare const restrict: {
-    (_options?: Partial<import("./restrict/pointer").RestrictOptions>): import("./base").Modifier<"restrict", import("./restrict/pointer").RestrictOptions>;
+    (_options?: Partial<import("./restrict/pointer").RestrictOptions>): import("./base").Modifier<import("./restrict/pointer").RestrictOptions, "restrict">;
     _defaults: import("./restrict/pointer").RestrictOptions;
     _methods: {
         start: any;
@@ -46,14 +46,14 @@ export declare const restrictRect: {
             bottom: number;
             right: number;
         };
-    }>): import("./base").Modifier<"restrictRect", import("./restrict/pointer").RestrictOptions & {
+    }>): import("./base").Modifier<import("./restrict/pointer").RestrictOptions & {
         elementRect: {
             top: number;
             left: number;
             bottom: number;
             right: number;
         };
-    }>;
+    }, "restrictRect">;
     _defaults: import("./restrict/pointer").RestrictOptions & {
         elementRect: {
             top: number;
@@ -70,7 +70,7 @@ export declare const restrictRect: {
     };
 };
 export declare const restrictEdges: {
-    (_options?: Partial<import("./restrict/edges").RestrictEdgesOptions>): import("./base").Modifier<"restrictEdges", import("./restrict/edges").RestrictEdgesOptions>;
+    (_options?: Partial<import("./restrict/edges").RestrictEdgesOptions>): import("./base").Modifier<import("./restrict/edges").RestrictEdgesOptions, "restrictEdges">;
     _defaults: import("./restrict/edges").RestrictEdgesOptions;
     _methods: {
         start: any;
@@ -80,7 +80,7 @@ export declare const restrictEdges: {
     };
 };
 export declare const restrictSize: {
-    (_options?: Partial<import("./restrict/size").RestrictSizeOptions>): import("./base").Modifier<"restrictSize", import("./restrict/size").RestrictSizeOptions>;
+    (_options?: Partial<import("./restrict/size").RestrictSizeOptions>): import("./base").Modifier<import("./restrict/size").RestrictSizeOptions, "restrictSize">;
     _defaults: import("./restrict/size").RestrictSizeOptions;
     _methods: {
         start: any;

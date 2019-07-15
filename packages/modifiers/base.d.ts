@@ -7,7 +7,7 @@ declare module '@interactjs/core/scope' {
 declare module '@interactjs/core/Interaction' {
     interface Interaction {
         modifiers?: {
-            states: any[];
+            states: ModifierState[];
             offsets: any;
             startOffset: any;
             startDelta: Interact.Point;
@@ -34,17 +34,27 @@ declare module '@interactjs/core/defaultOptions' {
         modifiers?: Modifier[];
     }
 }
-export interface Modifier<Name extends string = any, Defaults extends {
-    enabled?: boolean;
-} = any> {
+export interface Modifier<Defaults = any, Name extends string = any> {
     options?: Defaults;
     methods: {
         start?: (arg: Interact.SignalArg) => void;
         set: (arg: Interact.SignalArg) => void;
-        beforeEnd?: (arg: Interact.SignalArg) => void;
+        beforeEnd?: (arg: Interact.SignalArg) => boolean | void;
         stop?: (arg: Interact.SignalArg) => void;
     };
     name?: Name;
+}
+export declare type ModifierState<Defaults = {}, StateProps extends {
+    [prop: string]: any;
+} = {}, Name extends string = any> = {
+    options: Defaults;
+    methods?: Modifier<Defaults>['methods'];
+    index?: number;
+    name?: Name;
+} & StateProps;
+export interface ModifierArg<State extends ModifierState> extends Interact.SignalArg {
+    state: State;
+    pageCoords?: Interact.Point;
 }
 declare function install(scope: Scope): void;
 declare function start({ interaction, phase }: Interact.SignalArg, pageCoords: Interact.Point): {
@@ -80,7 +90,17 @@ declare function beforeMove(arg: Interact.SignalArg): void | false;
 declare function beforeEnd(arg: Interact.SignalArg): void | false;
 declare function stop(arg: Interact.SignalArg): void;
 declare function getModifierList(interaction: any): any;
-export declare function prepareStates(modifierList: any): any[];
+export declare function prepareStates(modifierList: Modifier[]): {
+    options: {};
+    methods?: {
+        start?: (arg: import("../utils/Signals").SignalArg<any>) => void;
+        set: (arg: import("../utils/Signals").SignalArg<any>) => void;
+        beforeEnd?: (arg: import("../utils/Signals").SignalArg<any>) => boolean | void;
+        stop?: (arg: import("../utils/Signals").SignalArg<any>) => void;
+    };
+    index?: number;
+    name?: any;
+}[];
 declare function shouldDo(options: any, preEnd?: boolean, requireEndOnly?: boolean, phase?: string): any;
 declare function getRectOffset(rect: any, coords: any): {
     left: number;
@@ -88,13 +108,11 @@ declare function getRectOffset(rect: any, coords: any): {
     right: number;
     bottom: number;
 };
-declare function makeModifier<Defaults extends {
-    enabled?: boolean;
-}, Name extends string>(module: {
+declare function makeModifier<Defaults, Name extends string>(module: {
     defaults?: Defaults;
     [key: string]: any;
 }, name?: Name): {
-    (_options?: Partial<Defaults>): Modifier<Name, Defaults>;
+    (_options?: Partial<Defaults>): Modifier<Defaults, Name>;
     _defaults: Defaults;
     _methods: {
         start: any;

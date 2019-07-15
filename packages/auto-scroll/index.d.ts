@@ -11,12 +11,18 @@ declare module '@interactjs/core/Interaction' {
 }
 declare module '@interactjs/core/defaultOptions' {
     interface PerActionDefaults {
-        autoScroll?: Interact.AutoScrollOption;
+        autoScroll?: AutoScrollOptions;
     }
+}
+export interface AutoScrollOptions {
+    container?: Element;
+    margin?: number;
+    distance?: number;
+    interval?: number;
 }
 declare function install(scope: Scope): void;
 declare const autoScroll: {
-    defaults: import("../types/types").AutoScrollOption;
+    defaults: AutoScrollOptions;
     now: () => number;
     interaction: any;
     i: any;

@@ -1,17 +1,14 @@
+import { ModifierArg, ModifierState } from '../base';
 export interface RestrictOptions {
     restriction: Interact.RectResolvable<[number, number, Interact.Interaction]>;
     elementRect: Interact.Rect;
     offset: Interact.Rect;
     endOnly: boolean;
-    enabled: boolean;
 }
-declare function start({ rect, startOffset, state, interaction, pageCoords }: {
-    rect: any;
-    startOffset: any;
-    state: any;
-    interaction: any;
-    pageCoords: any;
-}): void;
+export declare type RestrictState = ModifierState<RestrictOptions, {
+    offset: Interact.Rect;
+}>;
+declare function start({ rect, startOffset, state, interaction, pageCoords }: ModifierArg<RestrictState>): void;
 declare function set({ coords, interaction, state }: {
     coords: any;
     interaction: any;

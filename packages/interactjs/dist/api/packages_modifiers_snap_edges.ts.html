@@ -71,9 +71,11 @@
 
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
+import { ModifierArg } from '../base'
+import { SnapState } from './pointer'
 import snapSize, { SnapSizeOptions } from './size'
 
-function start (arg) {
+function start (arg: ModifierArg&lt;SnapState>) {
   const edges = arg.interaction.prepared.edges
 
   if (!edges) { return null }

@@ -1,3 +1,4 @@
+import { ModifierArg, ModifierState } from '../base';
 export interface SnapPosition {
     x: number;
     y: number;
@@ -10,12 +11,20 @@ export interface SnapOptions {
     range: number;
     relativePoints: Interact.Point[];
     offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords';
-    offsetWithOrigin: boolean;
-    endOnly: boolean;
-    enabled: boolean;
+    offsetWithOrigin?: boolean;
+    origin: Interact.RectResolvable<[Element]> | Interact.Point;
+    endOnly?: boolean;
 }
-declare function start(arg: Interact.SignalArg): void;
-declare function set(arg: Interact.SignalArg): void;
+export declare type SnapState = ModifierState<SnapOptions, {
+    offsets?: Interact.Point[];
+    realX?: number;
+    realY?: number;
+    range?: number;
+    closest?: any;
+    targetFields?: string[][];
+}>;
+declare function start(arg: ModifierArg<SnapState>): void;
+declare function set(arg: ModifierArg<SnapState>): void;
 declare const snap: {
     start: typeof start;
     set: typeof set;

@@ -9,7 +9,6 @@ export interface BaseDefaults {
     preventDefault?: 'auto' | 'never' | string;
     deltaSource?: 'page' | 'client';
     context?: Window | Document | Element;
-    [key: string]: any;
 }
 export interface PerActionDefaults {
     enabled?: boolean;

@@ -1,11 +1,7 @@
 declare const restrictRect: {
-    start: ({ rect, startOffset, state, interaction, pageCoords }: {
-        rect: any;
-        startOffset: any;
-        state: any;
-        interaction: any;
-        pageCoords: any;
-    }) => void;
+    start: ({ rect, startOffset, state, interaction, pageCoords }: import("../base").ModifierArg<import("../base").ModifierState<import("./pointer").RestrictOptions, {
+        offset: import("../../types/types").Rect;
+    }, any>>) => void;
     set: ({ coords, interaction, state }: {
         coords: any;
         interaction: any;
