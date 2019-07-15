@@ -31,7 +31,7 @@ Installation
 * [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>`
 * [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>`
 * [Rails 5.1+](https://rubyonrails.org/):
-  1. `yarn install interactjs`
+  1. `yarn add interactjs`
   2. `//= require interactjs/interact`
 * [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.npm" % "interactjs" % version)`
 
