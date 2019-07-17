@@ -14,6 +14,7 @@ export interface SnapOptions {
     offsetWithOrigin?: boolean;
     origin: Interact.RectResolvable<[Element]> | Interact.Point;
     endOnly?: boolean;
+    enabled?: boolean;
 }
 export declare type SnapState = ModifierState<SnapOptions, {
     offsets?: Interact.Point[];

@@ -5,6 +5,7 @@ export interface RestrictEdgesOptions {
     outer: RestrictOptions['restriction'];
     offset?: RestrictOptions['offset'];
     endOnly: boolean;
+    enabled?: boolean;
 }
 export declare type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
     inner: Interact.Rect;

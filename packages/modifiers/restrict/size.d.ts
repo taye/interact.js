@@ -5,6 +5,7 @@ export interface RestrictSizeOptions {
     min?: Interact.Size | Interact.Point | RestrictOptions['restriction'];
     max?: Interact.Size | Interact.Point | RestrictOptions['restriction'];
     endOnly: boolean;
+    enabled?: boolean;
 }
 declare function start(arg: ModifierArg<RestrictEdgesState>): void;
 export declare type RestrictSizeState = RestrictEdgesState & ModifierState<RestrictSizeOptions & {

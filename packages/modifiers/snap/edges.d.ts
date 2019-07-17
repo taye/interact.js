@@ -32,6 +32,6 @@ declare function set(arg: any): void;
 declare const snapEdges: {
     start: typeof start;
     set: typeof set;
-    defaults: Pick<import("./pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">;
+    defaults: Pick<import("./pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
 };
 export default snapEdges;

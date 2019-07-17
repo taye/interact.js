@@ -4,6 +4,7 @@ export interface RestrictOptions {
     elementRect: Interact.Rect;
     offset: Interact.Rect;
     endOnly: boolean;
+    enabled?: boolean;
 }
 export declare type RestrictState = ModifierState<RestrictOptions, {
     offset: Interact.Rect;

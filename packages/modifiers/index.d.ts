@@ -9,8 +9,8 @@ export declare const snap: {
     };
 };
 export declare const snapSize: {
-    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">, "snapSize">;
-    _defaults: Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">;
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">, "snapSize">;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;
@@ -19,8 +19,8 @@ export declare const snapSize: {
     };
 };
 export declare const snapEdges: {
-    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">, "snapEdges">;
-    _defaults: Pick<import("./snap/pointer").SnapOptions, "offset" | "endOnly" | "targets" | "range">;
+    (_options?: Partial<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">>): import("./base").Modifier<Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">, "snapEdges">;
+    _defaults: Pick<import("./snap/pointer").SnapOptions, "enabled" | "offset" | "endOnly" | "targets" | "range">;
     _methods: {
         start: any;
         set: any;

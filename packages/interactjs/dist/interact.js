@@ -1,5 +1,5 @@
 /**
- * interact.js 1.5.2
+ * interact.js 1.5.3
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -7248,7 +7248,7 @@ function getModifierList(interaction) {
 
   return ['snap', 'snapSize', 'snapEdges', 'restrict', 'restrictEdges', 'restrictSize'].map(function (type) {
     var options = actionOptions[type];
-    return options && options.enabled !== false && {
+    return options && options.enabled && {
       options: options,
       methods: options._methods
     };
@@ -7816,7 +7816,8 @@ var __defaults_33 = {
   restriction: null,
   elementRect: null,
   offset: null,
-  endOnly: false
+  endOnly: false,
+  enabled: false
 };
 var restrict = {
   start: __start_33,
@@ -7940,7 +7941,8 @@ var __defaults_32 = {
   inner: null,
   outer: null,
   offset: null,
-  endOnly: false
+  endOnly: false,
+  enabled: false
 };
 var restrictEdges = {
   noInner: noInner,
@@ -8061,7 +8063,8 @@ function __set_35(arg) {
 var __defaults_35 = {
   min: null,
   max: null,
-  endOnly: false
+  endOnly: false,
+  enabled: false
 };
 var restrictSize = {
   start: __start_35,
@@ -8242,7 +8245,8 @@ var __defaults_37 = {
   offsetWithOrigin: true,
   origin: null,
   relativePoints: null,
-  endOnly: false
+  endOnly: false,
+  enabled: false
 };
 var snap = {
   start: __start_37,
@@ -8370,7 +8374,8 @@ var __defaults_38 = {
   range: Infinity,
   targets: null,
   offset: null,
-  endOnly: false
+  endOnly: false,
+  enabled: false
 };
 var snapSize = {
   start: __start_38,
@@ -9732,7 +9737,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.5.2";
+_interact["default"].version = "1.5.3";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
