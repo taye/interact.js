@@ -1,3 +1,7 @@
+## v1.5.3
+
+ - fixed issues with old modifiers API
+
 ## v1.5.2
 
  - fixed null restriction issue (#737)

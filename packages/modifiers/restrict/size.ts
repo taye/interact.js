@@ -11,6 +11,7 @@ export interface RestrictSizeOptions {
   min?: Interact.Size | Interact.Point | RestrictOptions['restriction']
   max?: Interact.Size | Interact.Point | RestrictOptions['restriction']
   endOnly: boolean
+  enabled?: boolean
 }
 
 function start (arg: ModifierArg<RestrictEdgesState>) {
@@ -69,6 +70,7 @@ const defaults: RestrictSizeOptions = {
   min: null,
   max: null,
   endOnly: false,
+  enabled: false,
 }
 
 const restrictSize = {

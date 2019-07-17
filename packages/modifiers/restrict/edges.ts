@@ -19,6 +19,7 @@ export interface RestrictEdgesOptions {
   outer: RestrictOptions['restriction']
   offset?: RestrictOptions['offset']
   endOnly: boolean
+  enabled?: boolean
 }
 
 export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
@@ -96,6 +97,7 @@ const defaults: RestrictEdgesOptions = {
   outer: null,
   offset: null,
   endOnly: false,
+  enabled: false,
 }
 
 const restrictEdges = {

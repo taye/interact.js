@@ -21,12 +21,15 @@ test('restrict larger than restriction', t => {
     state,
     rect,
     startOffset: rect,
-    coords: null,
+    coords: { x: 0, y: 0 },
     pageCoords: { x: 0, y: 0 },
   }
 
   options.restriction = () => null
-  t.doesNotThrow(() => restrict.start(arg as any), 'no errors with null-resolving restriction')
+  t.doesNotThrow(() => {
+    restrict.start(arg as any)
+    restrict.set(arg as any)
+  }, 'no errors with null-resolving restriction')
 
   options.restriction = restriction
   restrict.start(arg as any)

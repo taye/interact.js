@@ -26,6 +26,7 @@ export interface SnapOptions {
   offsetWithOrigin?: boolean
   origin: Interact.RectResolvable<[Element]> | Interact.Point
   endOnly?: boolean
+  enabled?: boolean
 }
 
 export type SnapState = ModifierState<SnapOptions, {
@@ -201,6 +202,7 @@ const defaults: SnapOptions = {
   origin: null,
   relativePoints: null,
   endOnly: false,
+  enabled: false,
 }
 const snap = {
   start,

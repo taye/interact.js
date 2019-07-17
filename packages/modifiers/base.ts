@@ -325,7 +325,7 @@ function getModifierList (interaction) {
     .map(type => {
       const options = actionOptions[type]
 
-      return options && (options.enabled !== false) && {
+      return options && options.enabled && {
         options,
         methods: options._methods,
       }
