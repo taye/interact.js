@@ -1,6 +1,6 @@
 {
   "name": "@interactjs/_dev",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
   "workspaces": [
     ".",
