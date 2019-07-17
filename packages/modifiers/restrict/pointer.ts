@@ -11,6 +11,7 @@ export interface RestrictOptions {
   offset: Interact.Rect
   // restrict just before the end drag
   endOnly: boolean
+  enabled?: boolean
 }
 
 export type RestrictState = ModifierState<RestrictOptions, {
@@ -80,6 +81,7 @@ const defaults: RestrictOptions = {
   elementRect: null,
   offset: null,
   endOnly: false,
+  enabled: false,
 }
 
 const restrict = {

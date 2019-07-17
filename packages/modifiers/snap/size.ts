@@ -8,7 +8,7 @@ import snap, { SnapOptions, SnapState } from './pointer'
 
 export type SnapSizeOptions = Pick<
 SnapOptions,
-'targets' | 'offset' | 'endOnly' | 'range'
+'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'
 >
 
 function start (arg: ModifierArg<SnapState>) {
@@ -87,6 +87,7 @@ const defaults: SnapSizeOptions = {
   targets: null,
   offset: null,
   endOnly: false,
+  enabled: false,
 }
 
 const snapSize = {
