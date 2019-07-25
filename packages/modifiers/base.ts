@@ -432,7 +432,7 @@ function getRectOffset (rect, coords) {
 }
 
 function makeModifier<
-  Defaults,
+  Defaults extends { enabled?: boolean },
   Name extends string
 > (
   module: { defaults?: Defaults, [key: string]: any },
@@ -448,6 +448,8 @@ function makeModifier<
 
   const modifier = (_options?: Partial<Defaults>) => {
     const options: Defaults = (_options || {}) as Defaults
+
+    options.enabled = options.enabled !== false
 
     // add missing defaults to options
     for (const prop in defaults) {
