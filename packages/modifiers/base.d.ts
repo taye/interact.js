@@ -108,7 +108,9 @@ declare function getRectOffset(rect: any, coords: any): {
     right: number;
     bottom: number;
 };
-declare function makeModifier<Defaults, Name extends string>(module: {
+declare function makeModifier<Defaults extends {
+    enabled?: boolean;
+}, Name extends string>(module: {
     defaults?: Defaults;
     [key: string]: any;
 }, name?: Name): {

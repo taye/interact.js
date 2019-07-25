@@ -1,5 +1,5 @@
 /**
- * interact.js 1.5.3
+ * interact.js 1.5.4
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -7379,7 +7379,8 @@ function makeModifier(module, name) {
   };
 
   var modifier = function modifier(_options) {
-    var options = _options || {}; // add missing defaults to options
+    var options = _options || {};
+    options.enabled = options.enabled !== false; // add missing defaults to options
 
     for (var prop in defaults) {
       if (!(prop in options)) {
@@ -9737,7 +9738,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.5.3";
+_interact["default"].version = "1.5.4";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
