@@ -1,3 +1,7 @@
+## v1.5.4
+
+ - fixed broken modifiers (#746)
+
 ## v1.5.3
 
  - fixed issues with old modifiers API
