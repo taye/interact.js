@@ -50,12 +50,23 @@ test('autoStart', t => {
 
   t.deepEqual(
     checkerArgs,
-    [{ name: 'drag', axis: 'xy' }, interactable, element],
+    [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, false],
     'calls cursorChecker with expected args'
   )
 
   interaction.pointerDown(event, event, element)
   t.equal(element.style.cursor, 'custom-cursor', 'uses cursorChecker value')
+
+  coords.page.x += 10
+  coords.client.x += 10
+  interaction.pointerMove(event, event, element)
+  t.ok(interaction._interacting, 'down -> move starts action')
+
+  t.deepEqual(
+    checkerArgs,
+    [{ name: 'drag', axis: 'xy', edges: undefined }, interactable, element, true],
+    'calls cursorChecker with true for interacting arg'
+  )
 
   t.end()
 })

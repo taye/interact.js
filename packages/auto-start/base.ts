@@ -37,7 +37,7 @@ export interface AutoStart {
   // Allow this many interactions to happen simultaneously
   maxInteractions: number
   withinInteractionLimit: typeof withinInteractionLimit
-  cursorElement: HTMLElement
+  cursorElement: Interact.Element
   signals: utils.Signals
 }
 
@@ -90,6 +90,7 @@ function install (scope: Interact.Scope) {
       }
       else {
         interaction.start(interaction.prepared, interactable, interaction.element)
+        setInteractionCursor(interaction, scope)
       }
     }
   })
@@ -98,7 +99,7 @@ function install (scope: Interact.Scope) {
     const { interactable } = interaction
 
     if (interactable && interactable.options.styleCursor) {
-      setCursor(interaction.element as HTMLElement, '', scope)
+      setCursor(interaction.element, '', scope)
     }
   })
 
@@ -141,7 +142,13 @@ function install (scope: Interact.Scope) {
 
 // Check if the current interactable supports the action.
 // If so, return the validated action. Otherwise, return null
-function validateAction (action, interactable, element, eventTarget, scope) {
+function validateAction (
+  action: Interact.ActionProps,
+  interactable: Interact.Interactable,
+  element: Interact.Element,
+  eventTarget: Interact.Element,
+  scope: Interact.Scope,
+) {
   if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
       interactable.options[action.name].enabled &&
       withinInteractionLimit(interactable, element, action, scope)) {
@@ -222,11 +229,20 @@ function getActionInfo (
   return { action: null, interactable: null, element: null }
 }
 
-function prepare (interaction: Interact.Interaction, { action, interactable, element }, scope: Interact.Scope) {
-  action = action || {}
+function prepare (
+  interaction: Interact.Interaction,
+  { action, interactable, element }: {
+    action: Interact.ActionProps
+    interactable: Interact.Interactable
+    element: Interact.Element
+  },
+  scope: Interact.Scope,
+) {
+  action = action || { name: null }
 
+  // clear previous target element cursor
   if (interaction.interactable && interaction.interactable.options.styleCursor) {
-    setCursor(interaction.element as HTMLElement, '', scope)
+    setCursor(interaction.element, '', scope)
   }
 
   interaction.interactable = interactable
@@ -237,22 +253,7 @@ function prepare (interaction: Interact.Interaction, { action, interactable, ele
     ? interactable.getRect(element)
     : null
 
-  if (interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor) {
-    let cursor = ''
-
-    if (action) {
-      const { cursorChecker } = interactable.options[action.name]
-
-      if (utils.is.func(cursorChecker)) {
-        cursor = cursorChecker(action, interactable, element)
-      }
-      else {
-        cursor = scope.actions[action.name].getCursor(action)
-      }
-    }
-
-    setCursor(interaction.element as HTMLElement, cursor || '', scope)
-  }
+  setInteractionCursor(interaction, scope)
 
   scope.autoStart.signals.fire('prepared', { interaction })
 }
@@ -310,7 +311,7 @@ function maxInteractions (newValue, scope: Interact.Scope) {
   return scope.autoStart.maxInteractions
 }
 
-function setCursor (element: HTMLElement, cursor, scope: Interact.Scope) {
+function setCursor (element: Interact.Element, cursor, scope: Interact.Scope) {
   if (scope.autoStart.cursorElement) {
     scope.autoStart.cursorElement.style.cursor = ''
   }
@@ -318,6 +319,29 @@ function setCursor (element: HTMLElement, cursor, scope: Interact.Scope) {
   element.ownerDocument.documentElement.style.cursor = cursor
   element.style.cursor = cursor
   scope.autoStart.cursorElement = cursor ? element : null
+}
+
+function setInteractionCursor (interaction: Interact.Interaction, scope: Interact.Scope) {
+  const { interactable, element, prepared } = interaction
+
+  if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
+    return
+  }
+
+  let cursor = ''
+
+  if (prepared.name) {
+    const cursorChecker: Interact.CursorChecker = interactable.options[prepared.name].cursorChecker
+
+    if (utils.is.func(cursorChecker)) {
+      cursor = cursorChecker(prepared, interactable, element, interaction._interacting)
+    }
+    else {
+      cursor = scope.actions[prepared.name].getCursor(prepared)
+    }
+  }
+
+  setCursor(interaction.element, cursor || '', scope)
 }
 
 export default {

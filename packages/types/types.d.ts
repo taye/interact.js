@@ -88,7 +88,7 @@ declare namespace Interact {
   }
 
   export type CursorChecker<T extends ActionName = any> =
-    (action: ActionProps, interactable: Interactable, element: Element) => string
+    (action: ActionProps, interactable: Interactable, element: Element, interacting: boolean) => string
 
   export interface ActionMethod<T> {
     (this: Interact.Interactable): T

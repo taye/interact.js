@@ -83,11 +83,11 @@ of `'start'` is used, then the drag will be locked to the starting direction.
 
 ```javascript
 interact(target).draggable({
-  cursorChecker: (action, interatable, element) => {
+  cursorChecker: (action, interatable, element, interacting) => {
     switch (action.axis) {
       case 'x': return 'ew-resize'
       case 'y': return 'ns-resize'
-      case 'xy': return 'grab'
+      default: return interacting ? 'grabbing' : 'grab'
     }
   }
 })
