@@ -1,3 +1,9 @@
+## v1.5.5
+
+ - avoided accessing deprecated event.mozPressure (#751)
+ - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
+ - added `interacting` arg to cursorChecker (#739)
+
 ## v1.5.4
 
  - fixed broken modifiers (#746)
