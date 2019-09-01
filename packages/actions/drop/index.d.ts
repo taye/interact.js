@@ -8,7 +8,7 @@ export interface DropzoneMethod {
 declare module '@interactjs/core/Interactable' {
     interface Interactable {
         dropzone: DropzoneMethod;
-        dropCheck: (dragEvent: InteractEvent, event: Interact.PointerEventType, draggable: Interactable, draggableElement: Element, dropElemen: Element, rect: any) => boolean;
+        dropCheck: (dragEvent: InteractEvent, event: Interact.PointerEventType, draggable: Interactable, draggableElement: Interact.Element, dropElemen: Interact.Element, rect: any) => boolean;
     }
 }
 declare module '@interactjs/core/Interaction' {
@@ -16,17 +16,17 @@ declare module '@interactjs/core/Interaction' {
         dropState?: {
             cur: {
                 dropzone: Interactable;
-                element: Element;
+                element: Interact.Element;
             };
             prev: {
                 dropzone: Interactable;
-                element: Element;
+                element: Interact.Element;
             };
             rejected: boolean;
             events: any;
             activeDrops: Array<{
                 dropzone: Interactable;
-                element: Element;
+                element: Interact.Element;
                 rect: Interact.Rect;
             }>;
         };
@@ -48,10 +48,10 @@ declare module '@interactjs/interact/interact' {
     }
 }
 declare function install(scope: Scope): void;
-declare function getActiveDrops(scope: Scope, dragElement: Element): any[];
+declare function getActiveDrops(scope: Scope, dragElement: Interact.Element): any[];
 declare function getDrop({ dropState, interactable: draggable, element: dragElement }: Partial<Interact.Interaction>, dragEvent: any, pointerEvent: any): {
     dropzone: Interactable;
-    element: Element;
+    element: import("../../types/types").Element;
     rect: import("../../types/types").Rect;
 };
 declare function getDropEvents(interaction: Interact.Interaction, _pointerEvent: any, dragEvent: any): {

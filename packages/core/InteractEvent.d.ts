@@ -8,9 +8,9 @@ export declare enum EventPhase {
     _NONE = ""
 }
 export declare class InteractEvent<T extends ActionName = any, P extends EventPhase = EventPhase._NONE> extends BaseEvent<T> {
-    target: Element;
-    currentTarget: Element;
-    relatedTarget: Element;
+    target: Interact.Element;
+    currentTarget: Interact.Element;
+    relatedTarget: Interact.Element;
     screenX?: number;
     screenY?: number;
     button: number;
@@ -34,12 +34,12 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     speed: number;
     swipe: ReturnType<InteractEvent<T>['getSwipe']>;
     timeStamp: any;
-    dragEnter?: Element;
-    dragLeave?: Element;
+    dragEnter?: Interact.Element;
+    dragLeave?: Interact.Element;
     axes?: Interact.Point;
     preEnd?: boolean;
     /** */
-    constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Element, related?: Element, preEnd?: boolean, type?: string);
+    constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Interact.Element, related?: Interact.Element, preEnd?: boolean, type?: string);
     pageX: number;
     pageY: number;
     clientX: number;

@@ -28,7 +28,7 @@ export declare enum _ProxyMethods {
 export declare type _InteractionProxy = Pick<Interaction, keyof typeof _ProxyValues | keyof typeof _ProxyMethods>;
 export declare class Interaction<T extends ActionName = any> {
     interactable: Interactable;
-    element: Element;
+    element: Interact.Element;
     rect: Interact.Rect & Interact.Size;
     edges: {
         [P in keyof Interact.Rect]?: boolean;
@@ -151,7 +151,7 @@ export declare class Interaction<T extends ActionName = any> {
      * @param {Element} element The DOM Element to target
      * @return {object} interact
      */
-    start(action: StartAction, interactable: Interactable, element: Element): boolean;
+    start(action: StartAction, interactable: Interactable, element: Interact.Element): boolean;
     pointerMove(pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node): void;
     /**
      * ```js

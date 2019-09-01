@@ -15,7 +15,7 @@ declare module '@interactjs/core/defaultOptions' {
     }
 }
 export interface AutoScrollOptions {
-    container?: Element;
+    container?: Window | HTMLElement;
     margin?: number;
     distance?: number;
     interval?: number;

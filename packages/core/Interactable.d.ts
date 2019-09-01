@@ -1,7 +1,7 @@
 import { Defaults, Options } from './defaultOptions';
 import Eventable from './Eventable';
 import { Actions } from './scope';
-declare type IgnoreValue = string | Element | boolean;
+declare type IgnoreValue = string | Interact.Element | boolean;
 /** */
 export declare class Interactable implements Partial<Eventable> {
     protected readonly _defaults: Defaults;
@@ -9,11 +9,11 @@ export declare class Interactable implements Partial<Eventable> {
     readonly _actions: Actions;
     readonly target: Interact.Target;
     readonly events: Eventable;
-    readonly _context: Document | Element;
+    readonly _context: Document | Interact.Element;
     readonly _win: Window;
     readonly _doc: Document;
     /** */
-    constructor(target: Interact.Target, options: any, defaultContext: Document | Element);
+    constructor(target: Interact.Target, options: any, defaultContext: Document | Interact.Element);
     setOnEvents(actionName: string, phases: NonNullable<any>): this;
     updatePerActionListeners(actionName: any, prev: any, cur: any): void;
     setPerAction(actionName: any, options: Interact.OrBoolean<Options>): void;
@@ -24,7 +24,7 @@ export declare class Interactable implements Partial<Eventable> {
      * @param {Element} [element] The element to measure.
      * @return {object} The object's bounding rectangle.
      */
-    getRect(element: Element): {
+    getRect(element: Interact.Element): {
         left: any;
         right: any;
         top: any;
@@ -40,7 +40,7 @@ export declare class Interactable implements Partial<Eventable> {
      * bounding rectangle. See {@link Interactable.getRect}
      * @return {function | object} The checker function or this Interactable
      */
-    rectChecker(checker: (element: Element) => any): this | ((element: Element) => {
+    rectChecker(checker: (element: Interact.Element) => any): this | ((element: import("../types/types").Element) => {
         left: any;
         right: any;
         top: any;
@@ -75,14 +75,14 @@ export declare class Interactable implements Partial<Eventable> {
      *
      * @return {Node} The context Node of this Interactable
      */
-    context(): Element | Document;
+    context(): HTMLElement | SVGElement | Document;
     inContext(element: any): boolean;
     testIgnoreAllow(this: Interactable, options: {
         ignoreFrom: IgnoreValue;
         allowFrom: IgnoreValue;
-    }, targetNode: Node, eventTarget: Element): any;
-    testAllow(this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Element): any;
-    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Element): any;
+    }, targetNode: Node, eventTarget: Interact.Element): any;
+    testAllow(this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Interact.Element): any;
+    testIgnore(this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Interact.Element): any;
     /**
      * Calls listeners for the given InteractEvent type bound globally
      * and directly to this Interactable

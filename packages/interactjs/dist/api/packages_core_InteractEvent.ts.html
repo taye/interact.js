@@ -60,9 +60,9 @@ export class InteractEvent&lt;
   T extends ActionName = any,
   P extends EventPhase = EventPhase._NONE,
 > extends BaseEvent&lt;T> {
-  target: Element
-  currentTarget: Element
-  relatedTarget: Element
+  target: Interact.Element
+  currentTarget: Interact.Element
+  relatedTarget: Interact.Element
   screenX?: number
   screenY?: number
   button: number
@@ -87,8 +87,8 @@ export class InteractEvent&lt;
   swipe: ReturnType&lt;InteractEvent&lt;T>['getSwipe']>
   timeStamp: any
   // drag
-  dragEnter?: Element
-  dragLeave?: Element
+  dragEnter?: Interact.Element
+  dragLeave?: Interact.Element
   // resize
   axes?: Interact.Point
   preEnd?: boolean
@@ -99,8 +99,8 @@ export class InteractEvent&lt;
     event: Interact.PointerEventType,
     actionName: T,
     phase: P,
-    element: Element,
-    related?: Element,
+    element: Interact.Element,
+    related?: Interact.Element,
     preEnd?: boolean,
     type?: string,
   ) {

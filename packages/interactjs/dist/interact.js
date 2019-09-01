@@ -1,5 +1,5 @@
 /**
- * interact.js 1.5.4
+ * interact.js 1.6.0
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -1545,7 +1545,7 @@ var ___domObjects_51 = ___interopRequireDefault_51(_$domObjects_50);
 
 var __is_51 = ___interopRequireWildcard_51(_$is_57);
 
-var ___window_51 = ___interopRequireDefault_51(_$window_66);
+var ___window_51 = ___interopRequireWildcard_51(_$window_66);
 
 function ___interopRequireWildcard_51(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj["default"] = obj; return newObj; } }
 
@@ -1607,17 +1607,13 @@ var getParent = function getParent(el) {
 
 function indexOfDeepestElement(elements) {
   var deepestZoneParents = [];
-  var dropzoneParents = [];
-  var dropzone;
   var deepestZone = elements[0];
   var index = deepestZone ? 0 : -1;
-  var parent;
-  var child;
   var i;
   var n;
 
   for (i = 1; i < elements.length; i++) {
-    dropzone = elements[i]; // an element might belong to multiple selector dropzones
+    var dropzone = elements[i]; // an element might belong to multiple selector dropzones
 
     if (!dropzone || dropzone === deepestZone) {
       continue;
@@ -1638,18 +1634,34 @@ function indexOfDeepestElement(elements) {
         deepestZone = dropzone;
         index = i;
         continue;
+      } // compare zIndex of siblings
+
+
+    if (dropzone.parentNode === deepestZone.parentNode) {
+      var deepestZIndex = parseInt((0, ___window_51.getWindow)(deepestZone).getComputedStyle(deepestZone).zIndex, 10) || 0;
+      var dropzoneZIndex = parseInt((0, ___window_51.getWindow)(dropzone).getComputedStyle(dropzone).zIndex, 10) || 0;
+
+      if (dropzoneZIndex >= deepestZIndex) {
+        deepestZone = dropzone;
+        index = i;
       }
+
+      continue;
+    } // populate the ancestry array for the latest deepest dropzone
+
 
     if (!deepestZoneParents.length) {
-      parent = deepestZone;
+      var _parent = deepestZone;
+      var parentParent = void 0;
 
-      while (getParent(parent) && getParent(parent) !== parent.ownerDocument) {
-        deepestZoneParents.unshift(parent);
-        parent = getParent(parent);
+      while ((parentParent = getParent(_parent)) && parentParent !== _parent.ownerDocument) {
+        deepestZoneParents.unshift(_parent);
+        _parent = parentParent;
       }
-    } // if this element is an svg element and the current deepest is
-    // an HTMLElement
+    }
 
+    var parent = void 0; // if this element is an svg element and the current deepest is an
+    // HTMLElement
 
     if (deepestZone instanceof ___domObjects_51["default"].HTMLElement && dropzone instanceof ___domObjects_51["default"].SVGElement && !(dropzone instanceof ___domObjects_51["default"].SVGSVGElement)) {
       if (dropzone === deepestZone.parentNode) {
@@ -1661,7 +1673,7 @@ function indexOfDeepestElement(elements) {
       parent = dropzone;
     }
 
-    dropzoneParents = [];
+    var dropzoneParents = [];
 
     while (parent.parentNode !== parent.ownerDocument) {
       dropzoneParents.unshift(parent);
@@ -1675,13 +1687,13 @@ function indexOfDeepestElement(elements) {
     }
 
     var parents = [dropzoneParents[n - 1], dropzoneParents[n], deepestZoneParents[n]];
-    child = parents[0].lastChild;
+    var child = parents[0].lastChild;
 
     while (child) {
       if (child === parents[1]) {
         deepestZone = dropzone;
         index = i;
-        deepestZoneParents = [];
+        deepestZoneParents = dropzoneParents;
         break;
       } else if (child === parents[2]) {
         break;
@@ -1831,7 +1843,8 @@ function pointerExtend(dest, source) {
 }
 
 pointerExtend.prefixedPropREs = {
-  webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/
+  webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
+  moz: /(Pressure)$/
 };
 var ___default_60 = pointerExtend;
 _$pointerExtend_60["default"] = ___default_60;
@@ -6234,6 +6247,7 @@ function __install_9(scope) {
         interaction.stop();
       } else {
         interaction.start(interaction.prepared, interactable, interaction.element);
+        setInteractionCursor(interaction, scope);
       }
     }
   });
@@ -6354,7 +6368,9 @@ function prepare(interaction, _ref4, scope) {
   var action = _ref4.action,
       interactable = _ref4.interactable,
       element = _ref4.element;
-  action = action || {};
+  action = action || {
+    name: null
+  }; // clear previous target element cursor
 
   if (interaction.interactable && interaction.interactable.options.styleCursor) {
     setCursor(interaction.element, '', scope);
@@ -6364,23 +6380,7 @@ function prepare(interaction, _ref4, scope) {
   interaction.element = element;
   __utils_9.copyAction(interaction.prepared, action);
   interaction.rect = interactable && action.name ? interactable.getRect(element) : null;
-
-  if (interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor) {
-    var cursor = '';
-
-    if (action) {
-      var cursorChecker = interactable.options[action.name].cursorChecker;
-
-      if (__utils_9.is.func(cursorChecker)) {
-        cursor = cursorChecker(action, interactable, element);
-      } else {
-        cursor = scope.actions[action.name].getCursor(action);
-      }
-    }
-
-    setCursor(interaction.element, cursor || '', scope);
-  }
-
+  setInteractionCursor(interaction, scope);
   scope.autoStart.signals.fire('prepared', {
     interaction: interaction
   });
@@ -6455,6 +6455,30 @@ function setCursor(element, cursor, scope) {
   element.ownerDocument.documentElement.style.cursor = cursor;
   element.style.cursor = cursor;
   scope.autoStart.cursorElement = cursor ? element : null;
+}
+
+function setInteractionCursor(interaction, scope) {
+  var interactable = interaction.interactable,
+      element = interaction.element,
+      prepared = interaction.prepared;
+
+  if (!(interaction.pointerType === 'mouse' && interactable && interactable.options.styleCursor)) {
+    return;
+  }
+
+  var cursor = '';
+
+  if (prepared.name) {
+    var cursorChecker = interactable.options[prepared.name].cursorChecker;
+
+    if (__utils_9.is.func(cursorChecker)) {
+      cursor = cursorChecker(prepared, interactable, element, interaction._interacting);
+    } else {
+      cursor = scope.actions[prepared.name].getCursor(prepared);
+    }
+  }
+
+  setCursor(interaction.element, cursor || '', scope);
 }
 
 var ___default_9 = {
@@ -9738,7 +9762,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.5.4";
+_interact["default"].version = "1.6.0";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

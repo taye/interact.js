@@ -5,7 +5,7 @@ export default class InteractableSet {
     list: Interact.Interactable[];
     selectorMap: {
         [selector: string]: Array<{
-            context: Document | Element;
+            context: Document | Interact.Element;
             interactable: Interact.Interactable;
         }>;
     };

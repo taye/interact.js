@@ -60,8 +60,8 @@ declare module '@interactjs/core/Interactable' {
       dragEvent: InteractEvent,
       event: Interact.PointerEventType,
       draggable: Interactable,
-      draggableElement: Element,
-      dropElemen: Element,
+      draggableElement: Interact.Element,
+      dropElemen: Interact.Element,
       rect: any
     ) => boolean
   }
@@ -72,17 +72,17 @@ declare module '@interactjs/core/Interaction' {
     dropState?: {
       cur: {
         dropzone: Interactable    // the dropzone a drag target might be dropped into
-        element: Element          // the element at the time of checking
+        element: Interact.Element // the element at the time of checking
       }
       prev: {
         dropzone: Interactable    // the dropzone that was recently dragged away from
-        element: Element          // the element at the time of checking
+        element: Interact.Element // the element at the time of checking
       }
       rejected: boolean           // wheather the potential drop was rejected from a listener
       events: any                 // the drop events related to the current drag event
       activeDrops: Array&lt;{
         dropzone: Interactable
-        element: Element
+        element: Interact.Element
         rect: Interact.Rect
       }>
     }
@@ -336,7 +336,7 @@ function fireActivationEvents (activeDrops, event) {
 // return a new array of possible drops. getActiveDrops should always be
 // called when a drag has just started or a drag event happens while
 // dynamicDrop is true
-function getActiveDrops (scope: Scope, dragElement: Element) {
+function getActiveDrops (scope: Scope, dragElement: Interact.Element) {
   // get dropzones and their elements that could receive the draggable
   const activeDrops = collectDrops(scope, dragElement)
 
@@ -532,8 +532,8 @@ function dropCheckMethod (
   dragEvent: InteractEvent,
   event: Interact.PointerEventType,
   draggable: Interact.Interactable,
-  draggableElement: Element,
-  dropElement: Element,
+  draggableElement: Interact.Element,
+  dropElement: Interact.Element,
   rect: any
 ) {
   let dropped = false

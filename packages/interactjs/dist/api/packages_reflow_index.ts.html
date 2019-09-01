@@ -168,7 +168,7 @@ function reflow (interactable: Interactable, action: ActionProps, scope: Scope):
   return promises &amp;&amp; Promise.all(promises).then(() => interactable)
 }
 
-function startReflow (scope: Scope, interactable: Interactable, element: Element, action: ActionProps, event: any) {
+function startReflow (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps, event: any) {
   const interaction = scope.interactions.new({ pointerType: 'reflow' })
   const signalArg = {
     interaction,
