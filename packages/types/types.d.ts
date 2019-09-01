@@ -18,6 +18,7 @@ declare namespace Interact {
     [P in keyof T]: T[P] | boolean;
   }
 
+  export type Element = HTMLElement | SVGElement
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact

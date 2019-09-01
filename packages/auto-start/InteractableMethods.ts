@@ -140,7 +140,13 @@ function install (scope: Scope) {
   }
 }
 
-function getAction (this: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element): Interact.ActionProps {
+function getAction (
+  this: Interactable,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
+  interaction: Interaction,
+  element: Interact.Element,
+): Interact.ActionProps {
   const action = this.defaultActionChecker(pointer, event, interaction, element)
 
   if (this.options.actionChecker) {
@@ -150,7 +156,14 @@ function getAction (this: Interactable, pointer: Interact.PointerType, event: In
   return action
 }
 
-function defaultActionChecker (interactable: Interactable, pointer: Interact.PointerType, event: Interact.PointerEventType, interaction: Interaction, element: Element, actions: Actions) {
+function defaultActionChecker (
+  interactable: Interactable,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
+  interaction: Interaction,
+  element: Interact.Element,
+  actions: Actions,
+) {
   const rect = interactable.getRect(element)
   const buttons = (event as MouseEvent).buttons || ({
     0: 1,

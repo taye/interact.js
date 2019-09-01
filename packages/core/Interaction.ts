@@ -40,7 +40,7 @@ export class Interaction<T extends ActionName = any> {
   interactable: Interactable = null
 
   // the target element of the interactable
-  element: Element = null
+  element: Interact.Element = null
   rect: Interact.Rect & Interact.Size
   edges: {
     [P in keyof Interact.Rect]?: boolean
@@ -180,7 +180,7 @@ export class Interaction<T extends ActionName = any> {
    * @param {Element} element The DOM Element to target
    * @return {object} interact
    */
-  start (action: StartAction, interactable: Interactable, element: Element) {
+  start (action: StartAction, interactable: Interactable, element: Interact.Element) {
     if (this.interacting() ||
         !this.pointerIsDown ||
         this.pointers.length < (action.name === ActionName.Gesture ? 2 : 1) ||

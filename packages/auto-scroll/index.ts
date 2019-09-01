@@ -25,7 +25,7 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 export interface AutoScrollOptions {
-  container?: Element
+  container?: Window | HTMLElement
   margin?: number
   distance?: number
   interval?: number
@@ -67,7 +67,7 @@ const autoScroll = {
     margin   : 60,
 
     // the item that is scrolled (Window or HTMLElement)
-    container: null as Window | Element,
+    container: null as AutoScrollOptions['container'],
 
     // the scroll speed in pixels per second
     speed    : 300,

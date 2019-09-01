@@ -11,7 +11,7 @@ export default class InteractableSet {
   list: Interact.Interactable[] = []
 
   selectorMap: {
-    [selector: string]: Array<{ context: Document | Element, interactable: Interact.Interactable }>
+    [selector: string]: Array<{ context: Document | Interact.Element, interactable: Interact.Interactable }>
   } = {}
 
   constructor (protected scope: Interact.Scope) {

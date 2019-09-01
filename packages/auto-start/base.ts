@@ -24,8 +24,8 @@ declare module '@interactjs/core/defaultOptions' {
     manualStart?: boolean
     max?: number
     maxPerElement?: number
-    allowFrom?: string | Element
-    ignoreFrom?: string | Element
+    allowFrom?: string | Interact.Element
+    ignoreFrom?: string | Interact.Element
 
     // only allow left button by default
     // see https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons#Return_value
@@ -151,7 +151,15 @@ function validateAction (action, interactable, element, eventTarget, scope) {
   return null
 }
 
-function validateMatches (interaction: Interact.Interaction, pointer, event, matches: Interact.Interactable[], matchElements: Element[], eventTarget: Element, scope: Interact.Scope) {
+function validateMatches (
+  interaction: Interact.Interaction,
+  pointer,
+  event,
+  matches: Interact.Interactable[],
+  matchElements: Interact.Element[],
+  eventTarget: Interact.Element,
+  scope: Interact.Scope,
+) {
   for (let i = 0, len = matches.length; i < len; i++) {
     const match = matches[i]
     const matchElement = matchElements[i]
@@ -178,7 +186,13 @@ function validateMatches (interaction: Interact.Interaction, pointer, event, mat
   return { action: null, interactable: null, element: null }
 }
 
-function getActionInfo (interaction: Interact.Interaction, pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Element, scope: Interact.Scope) {
+function getActionInfo (
+  interaction: Interact.Interaction,
+  pointer: Interact.PointerType,
+  event: Interact.PointerEventType,
+  eventTarget: Interact.Element,
+  scope: Interact.Scope,
+) {
   let matches = []
   let matchElements = []
 
@@ -243,7 +257,7 @@ function prepare (interaction: Interact.Interaction, { action, interactable, ele
   scope.autoStart.signals.fire('prepared', { interaction })
 }
 
-function withinInteractionLimit (interactable: Interact.Interactable, element: Element, action, scope: Interact.Scope) {
+function withinInteractionLimit (interactable: Interact.Interactable, element: Interact.Element, action, scope: Interact.Scope) {
   const options = interactable.options
   const maxActions = options[action.name].max
   const maxPerElement = options[action.name].maxPerElement

@@ -154,7 +154,7 @@ export function indexOfDeepestElement (elements) {
   return index
 }
 
-export function matchesUpTo (element: Element, selector: string, limit: Node) {
+export function matchesUpTo (element: Interact.Element, selector: string, limit: Node) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return true
