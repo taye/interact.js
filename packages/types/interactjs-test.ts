@@ -50,7 +50,7 @@ interact('.drag-and-resize')
   })
 
 // Selector context
-const myList = document.querySelector('#my-list')
+const myList: HTMLElement | SVGElement = document.querySelector('#my-list')
 
 interact('li', {
   context: myList,
@@ -152,13 +152,13 @@ interact(target).dropzone({
 // dropzone checker
 interact(target).dropzone({
   checker (
-    _dragEvent: Element,          // related dragmove or dragend
-    _event: Event,                // Touch, Pointer or Mouse Event
-    dropped: boolean,             // bool default checker result
-    _dropzone: Interact.Interactable,      // dropzone Interactable
-    dropElement: Element,         // dropzone elemnt
-    _draggable: Interact.Interactable,     // draggable Interactable
-    _draggableElement: Element) { // draggable element
+    _dragEvent: Interact.Element,           // related dragmove or dragend
+    _event: Event,                          // Touch, Pointer or Mouse Event
+    dropped: boolean,                       // bool default checker result
+    _dropzone: Interact.Interactable,       // dropzone Interactable
+    dropElement: Interact.Element,          // dropzone elemnt
+    _draggable: Interact.Interactable,      // draggable Interactable
+    _draggableElement: Interact.Element) {  // draggable element
     // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes()
   },

@@ -29,7 +29,7 @@ function install (scope: Scope) {
     targets: EventTargetList
     node: Node
     type: string
-    eventTarget: Element
+    eventTarget: Interact.Element
   }) => {
     scope.interactables.forEachMatch(node, (interactable: Interactable) => {
       const eventable = interactable.events
@@ -49,7 +49,7 @@ function install (scope: Scope) {
   })
 
   interactables.signals.on('new', ({ interactable }) => {
-    interactable.events.getRect = function (element: Element) {
+    interactable.events.getRect = function (element: Interact.Element) {
       return interactable.getRect(element)
     }
   })

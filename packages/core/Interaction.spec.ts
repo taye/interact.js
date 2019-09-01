@@ -255,7 +255,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
 test('Interaction.pointerDown', t => {
   const interaction = makeInteractionAndSignals()
   const coords = helpers.newCoordsSet()
-  const eventTarget = {} as Element
+  const eventTarget = {} as Interact.Element
   const event: any = {
     type: 'down',
     target: eventTarget,

@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/core",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "peerDependencies": {
-    "@interactjs/dev-tools": "1.5.4",
-    "@interactjs/utils": "1.5.4"
+    "@interactjs/dev-tools": "1.6.0",
+    "@interactjs/utils": "1.6.0"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.5.4",
-    "@interactjs/auto-start": "1.5.4"
+    "@interactjs/actions": "1.6.0",
+    "@interactjs/auto-start": "1.6.0"
   },
   "publishConfig": {
     "access": "public"

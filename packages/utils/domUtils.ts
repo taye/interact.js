@@ -1,7 +1,7 @@
 import browser from './browser'
 import domObjects from './domObjects'
 import * as is from './is'
-import win from './window'
+import win, { getWindow } from './window'
 
 export function nodeContains (parent: Node, child: Node) {
   while (child) {
@@ -53,19 +53,15 @@ export function matchesSelector (element, selector) {
 const getParent = el => el.parentNode ? el.parentNode : el.host
 
 // Test for the element that's "above" all other qualifiers
-export function indexOfDeepestElement (elements) {
+export function indexOfDeepestElement (elements: Interact.Element[] | NodeListOf<Element>) {
   let deepestZoneParents = []
-  let dropzoneParents = []
-  let dropzone
   let deepestZone = elements[0]
   let index = deepestZone ? 0 : -1
-  let parent
-  let child
   let i
   let n
 
   for (i = 1; i < elements.length; i++) {
-    dropzone = elements[i]
+    const dropzone = elements[i]
 
     // an element might belong to multiple selector dropzones
     if (!dropzone || dropzone === deepestZone) {
@@ -90,16 +86,34 @@ export function indexOfDeepestElement (elements) {
       continue
     }
 
+    // compare zIndex of siblings
+    if (dropzone.parentNode === deepestZone.parentNode) {
+      const deepestZIndex = parseInt(getWindow(deepestZone).getComputedStyle(deepestZone).zIndex, 10) || 0
+      const dropzoneZIndex = parseInt(getWindow(dropzone).getComputedStyle(dropzone).zIndex, 10) || 0
+
+      if (dropzoneZIndex >= deepestZIndex) {
+        deepestZone = dropzone
+        index = i
+      }
+
+      continue
+    }
+
+    // populate the ancestry array for the latest deepest dropzone
     if (!deepestZoneParents.length) {
-      parent = deepestZone
-      while (getParent(parent) && getParent(parent) !== parent.ownerDocument) {
+      let parent = deepestZone
+      let parentParent
+
+      while ((parentParent = getParent(parent)) && parentParent !== parent.ownerDocument) {
         deepestZoneParents.unshift(parent)
-        parent = getParent(parent)
+        parent = parentParent
       }
     }
 
-    // if this element is an svg element and the current deepest is
-    // an HTMLElement
+    let parent
+
+    // if this element is an svg element and the current deepest is an
+    // HTMLElement
     if (deepestZone instanceof domObjects.HTMLElement &&
         dropzone instanceof domObjects.SVGElement &&
         !(dropzone instanceof domObjects.SVGSVGElement)) {
@@ -113,7 +127,7 @@ export function indexOfDeepestElement (elements) {
       parent = dropzone
     }
 
-    dropzoneParents = []
+    const dropzoneParents = []
 
     while (parent.parentNode !== parent.ownerDocument) {
       dropzoneParents.unshift(parent)
@@ -133,13 +147,13 @@ export function indexOfDeepestElement (elements) {
       deepestZoneParents[n],
     ]
 
-    child = parents[0].lastChild
+    let child = parents[0].lastChild
 
     while (child) {
       if (child === parents[1]) {
         deepestZone = dropzone
         index = i
-        deepestZoneParents = []
+        deepestZoneParents = dropzoneParents
 
         break
       }
@@ -154,7 +168,7 @@ export function indexOfDeepestElement (elements) {
   return index
 }
 
-export function matchesUpTo (element: Element, selector: string, limit: Node) {
+export function matchesUpTo (element: Interact.Element, selector: string, limit: Node) {
   while (is.element(element)) {
     if (matchesSelector(element, selector)) {
       return true

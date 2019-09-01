@@ -106,7 +106,7 @@ to dimensions less than `0x0`. The possible values are:
 ```javascript
 interact(target).resizable({
   edges: { bottom: true, right: true },
-  cursorChecker: (action, interatable, element) => {
+  cursorChecker: (action, interatable, element, interacting) => {
     if (action.edges.bottom && action.edges.right) {
       return 'sw-resize'
     }

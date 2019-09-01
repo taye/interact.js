@@ -15,7 +15,7 @@ test('modifiers/base', t => {
 
   t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
 
-  const element = target as Element
+  const element = target as Interact.Element
   const startEvent = {
     pageX: 100,
     pageY: 200,

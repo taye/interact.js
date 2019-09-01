@@ -19,7 +19,7 @@ test('PointerEvent constructor', t => {
     testEventProp,
   } as any
   const interaction = new Interaction({ signals: new Signals() } as any)
-  const eventTarget = {} as Element
+  const eventTarget = {} as Interact.Element
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,

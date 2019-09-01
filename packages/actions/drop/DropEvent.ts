@@ -6,10 +6,10 @@ import { ActionName } from '@interactjs/core/scope'
 import * as arr from '@interactjs/utils/arr'
 
 class DropEvent extends BaseEvent {
-  target: Element
+  target: Interact.Element
   dropzone: Interactable
   dragEvent: InteractEvent<ActionName.Drag>
-  relatedTarget: Element
+  relatedTarget: Interact.Element
   draggable: Interactable
   timeStamp: number
   propagationStopped = false

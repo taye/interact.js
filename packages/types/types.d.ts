@@ -18,6 +18,7 @@ declare namespace Interact {
     [P in keyof T]: T[P] | boolean;
   }
 
+  export type Element = HTMLElement | SVGElement
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
@@ -87,7 +88,7 @@ declare namespace Interact {
   }
 
   export type CursorChecker<T extends ActionName = any> =
-    (action: ActionProps, interactable: Interactable, element: Element) => string
+    (action: ActionProps, interactable: Interactable, element: Element, interacting: boolean) => string
 
   export interface ActionMethod<T> {
     (this: Interact.Interactable): T

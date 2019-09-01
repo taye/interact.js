@@ -173,7 +173,7 @@ const resize = {
     _pointer: Interact.PointerType,
     _event: Interact.PointerEventType,
     interactable: Interact.Interactable,
-    element: Element,
+    element: Interact.Element,
     interaction: Interaction,
     rect: Interact.Rect
   ) {
@@ -281,7 +281,15 @@ function resizable (interactable: Interact.Interactable, options: Interact.OrBoo
   return interactable.options.resize
 }
 
-function checkResizeEdge (name: string, value: any, page: Interact.Point, element: Node, interactableElement: Element, rect: Interact.Rect, margin: number) {
+function checkResizeEdge (
+  name: string,
+  value: any,
+  page: Interact.Point,
+  element: Node,
+  interactableElement: Interact.Element,
+  rect: Interact.Rect,
+  margin: number,
+) {
   // false, '', undefined, null
   if (!value) { return false }
 

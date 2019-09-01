@@ -16,7 +16,7 @@ export interface PointerEventOptions extends PerActionDefaults {
   holdDuration?: number
   ignoreFrom?: any
   allowFrom?: any
-  origin?: Interact.Point | string | Element
+  origin?: Interact.Point | string | Interact.Element
 }
 
 declare module '@interactjs/core/scope' {
