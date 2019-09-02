@@ -363,7 +363,7 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     return
   }
 
-  const startRect = interaction.rect
+  const startRect = extend({}, interaction.rect)
   const resizeOptions = interaction.interactable.options.resize
 
   /*
@@ -393,7 +393,12 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
 
   interaction.resizeRects = {
     start     : startRect,
-    current   : extend({}, startRect),
+    current   : {
+      left: startRect.left,
+      right: startRect.right,
+      top: startRect.top,
+      bottom: startRect.bottom,
+    },
     inverted  : extend({}, startRect),
     previous  : extend({}, startRect),
     delta     : {
