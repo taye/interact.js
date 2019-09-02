@@ -1,4 +1,8 @@
-## v1.5.5
+## v1.6.1
+
+ - fixed resize without invert
+
+## v1.6.0
 
  - avoided accessing deprecated event.mozPressure (#751)
  - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
