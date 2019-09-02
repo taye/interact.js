@@ -7,6 +7,7 @@
  - avoided accessing deprecated event.mozPressure (#751)
  - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
  - added `interacting` arg to cursorChecker (#739)
+ - added zIndex compare for sibling dropzones
 
 ## v1.5.4
 
