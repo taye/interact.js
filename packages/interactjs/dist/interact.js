@@ -1,5 +1,5 @@
 /**
- * interact.js 1.6.0
+ * interact.js 1.6.1-0
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5507,7 +5507,7 @@ function start(_ref2) {
     return;
   }
 
-  var startRect = interaction.rect;
+  var startRect = (0, ___extend_6["default"])({}, interaction.rect);
   var resizeOptions = interaction.interactable.options.resize;
   /*
    * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
@@ -5534,7 +5534,12 @@ function start(_ref2) {
 
   interaction.resizeRects = {
     start: startRect,
-    current: (0, ___extend_6["default"])({}, startRect),
+    current: {
+      left: startRect.left,
+      right: startRect.right,
+      top: startRect.top,
+      bottom: startRect.bottom
+    },
     inverted: (0, ___extend_6["default"])({}, startRect),
     previous: (0, ___extend_6["default"])({}, startRect),
     delta: {
@@ -9762,7 +9767,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.6.0";
+_interact["default"].version = "1.6.1-0";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
