@@ -47,7 +47,7 @@ export class InteractEvent<
   dragEnter?: Interact.Element
   dragLeave?: Interact.Element
   // resize
-  axes?: Interact.Point
+  axes?: 'x' | 'y' | 'xy'
   preEnd?: boolean
 
   /** */

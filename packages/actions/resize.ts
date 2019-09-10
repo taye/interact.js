@@ -55,6 +55,7 @@ declare module '@interactjs/core/scope' {
 
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
   deltaRect?: Interact.FullRect
+  edges?: Interact.ActionProps['edges']
 }
 
 function install (scope: Scope) {
@@ -75,6 +76,7 @@ function install (scope: Scope) {
 
   interactions.signals.on('action-start', start)
   interactions.signals.on('action-move', move)
+  interactions.signals.on('action-end', end)
 
   interactions.signals.on('action-start', updateEventAxes)
   interactions.signals.on('action-move', updateEventAxes)
@@ -358,7 +360,7 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
   })
 }
 
-function start ({ iEvent, interaction }: Interact.SignalArg) {
+function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
@@ -411,11 +413,12 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     },
   }
 
+  iEvent.edges = interaction.prepared.edges
   iEvent.rect = interaction.resizeRects.inverted
-  ;(iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
+  iEvent.deltaRect = interaction.resizeRects.delta
 }
 
-function move ({ iEvent, interaction }) {
+function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
   const resizeOptions = interaction.interactable.options.resize
@@ -498,8 +501,16 @@ function move ({ iEvent, interaction }) {
   iEvent.deltaRect = deltaRect
 }
 
-function updateEventAxes ({ interaction, iEvent, action }) {
-  if (action !== 'resize' || !interaction.resizeAxes) { return }
+function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
+
+  iEvent.edges = interaction.prepared.edges
+  iEvent.rect = interaction.resizeRects.inverted
+  iEvent.deltaRect = interaction.resizeRects.delta
+}
+
+function updateEventAxes ({ iEvent, interaction, action }: { iEvent: ResizeEvent, interaction: Interaction, action: ActionName }) {
+  if (action !== ActionName.Resize || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
 

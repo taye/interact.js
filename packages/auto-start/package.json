@@ -1,12 +1,13 @@
 {
   "name": "@interactjs/auto-start",
-  "version": "1.6.1",
+  "version": "1.6.2",
+  "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.6.1",
-    "@interactjs/utils": "1.6.1"
+    "@interactjs/core": "1.6.2",
+    "@interactjs/utils": "1.6.2"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.6.1"
+    "@interactjs/actions": "1.6.2"
   },
   "publishConfig": {
     "access": "public"

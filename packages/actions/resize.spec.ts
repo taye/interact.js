@@ -67,6 +67,11 @@ test('resize', t => {
   )
 
   const zeroRect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 }
+  let resizeEvent: Interact.ResizeEvent = null
+
+  interactable.on('resizestart resizemove resizeend', e => {
+    resizeEvent = e
+  })
 
   coords.page.x = rect.right
   coords.page.y = rect.bottom
@@ -84,9 +89,11 @@ test('resize', t => {
     },
     'sets starting interaction.resizeRect props',
   )
+  t.ok(hasResizeProps(resizeEvent), 'resizestart event has extra resize props')
 
   coords.page.x = -100
   coords.page.y = -200
+  resizeEvent = null
   interaction.pointerMove(event, event, element)
 
   t.deepEqual(
@@ -100,6 +107,7 @@ test('resize', t => {
     },
     "invert: 'none'",
   )
+  t.ok(hasResizeProps(resizeEvent), 'resizemove event has extra resize props')
 
   interactable.options.resize.invert = 'reposition'
   interaction.move()
@@ -133,5 +141,13 @@ test('resize', t => {
     "invert: 'negate'",
   )
 
+  resizeEvent = null
+  interaction.end()
+  t.ok(hasResizeProps(resizeEvent), 'resizeend event has extra resize props')
+
   t.end()
 })
+
+function hasResizeProps (event: Interact.ResizeEvent) {
+  return !!(event.deltaRect && event.rect && event.edges)
+}

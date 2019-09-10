@@ -1,3 +1,8 @@
+## v1.6.2
+
+ - @mlucool added license field to package.json of sub modules (#755)
+ - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events (#754)
+
 ## v1.6.1
 
  - fixed resize without invert
