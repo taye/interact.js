@@ -1,6 +1,7 @@
 {
   "name": "@interactjs/core",
   "version": "1.6.1",
+  "license": "MIT",
   "peerDependencies": {
     "@interactjs/dev-tools": "1.6.1",
     "@interactjs/utils": "1.6.1"
