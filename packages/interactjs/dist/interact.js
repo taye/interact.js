@@ -1,5 +1,5 @@
 /**
- * interact.js 1.6.1
+ * interact.js 1.6.2
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -5228,6 +5228,7 @@ function __install_6(scope) {
   });
   interactions.signals.on('action-start', start);
   interactions.signals.on('action-move', __move_6);
+  interactions.signals.on('action-end', end);
   interactions.signals.on('action-start', updateEventAxes);
   interactions.signals.on('action-move', updateEventAxes);
   resize.cursors = initCursors(browser);
@@ -5551,6 +5552,7 @@ function start(_ref2) {
       height: 0
     }
   };
+  iEvent.edges = interaction.prepared.edges;
   iEvent.rect = interaction.resizeRects.inverted;
   iEvent.deltaRect = interaction.resizeRects.delta;
 }
@@ -5647,12 +5649,25 @@ function __move_6(_ref3) {
   iEvent.deltaRect = deltaRect;
 }
 
-function updateEventAxes(_ref4) {
-  var interaction = _ref4.interaction,
-      iEvent = _ref4.iEvent,
-      action = _ref4.action;
+function end(_ref4) {
+  var iEvent = _ref4.iEvent,
+      interaction = _ref4.interaction;
 
-  if (action !== 'resize' || !interaction.resizeAxes) {
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
+    return;
+  }
+
+  iEvent.edges = interaction.prepared.edges;
+  iEvent.rect = interaction.resizeRects.inverted;
+  iEvent.deltaRect = interaction.resizeRects.delta;
+}
+
+function updateEventAxes(_ref5) {
+  var iEvent = _ref5.iEvent,
+      interaction = _ref5.interaction,
+      action = _ref5.action;
+
+  if (action !== ___scope_6.ActionName.Resize || !interaction.resizeAxes) {
     return;
   }
 
@@ -9767,7 +9782,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.6.1";
+_interact["default"].version = "1.6.2";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 

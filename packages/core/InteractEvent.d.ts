@@ -36,7 +36,7 @@ export declare class InteractEvent<T extends ActionName = any, P extends EventPh
     timeStamp: any;
     dragEnter?: Interact.Element;
     dragLeave?: Interact.Element;
-    axes?: Interact.Point;
+    axes?: 'x' | 'y' | 'xy';
     preEnd?: boolean;
     /** */
     constructor(interaction: Interaction, event: Interact.PointerEventType, actionName: T, phase: P, element: Interact.Element, related?: Interact.Element, preEnd?: boolean, type?: string);

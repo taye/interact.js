@@ -43,6 +43,7 @@ declare module '@interactjs/core/scope' {
 }
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
     deltaRect?: Interact.FullRect;
+    edges?: Interact.ActionProps['edges'];
 }
 declare function install(scope: Scope): void;
 declare const resize: {
