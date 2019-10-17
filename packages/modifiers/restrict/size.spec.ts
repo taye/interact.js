@@ -29,7 +29,7 @@ test('restrictSize', t => {
     offset,
     methods: restrictSize,
   }
-  const arg = {
+  const arg: any = {
     interaction,
     states: [state],
     coords: startCoords,

@@ -70,6 +70,10 @@ declare namespace Interact {
 
   export type Dimensions = Point & Size
 
+  export interface HasGetRect {
+    getRect (element: Interact.Element): Interact.Rect
+  }
+
   export interface InertiaOption {
     resistance?: number
     minSpeed?: number
@@ -102,6 +106,7 @@ declare namespace Interact {
     (this: Interact.Interactable, options: T): typeof this
   }
 
+  export type PerActionDefaults = defaults.PerActionDefaults
   export interface OptionsArg extends defaults.BaseDefaults, Interact.OrBoolean<defaults.PerActionDefaults> {}
 
   export interface DraggableOptions extends Options {

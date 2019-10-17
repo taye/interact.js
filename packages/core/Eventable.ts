@@ -67,6 +67,10 @@ class Eventable {
       }
     }
   }
+
+  getRect (_element: Interact.Element) {
+    return null
+  }
 }
 
 export default Eventable

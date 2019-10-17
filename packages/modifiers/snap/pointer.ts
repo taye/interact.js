@@ -24,7 +24,7 @@ export interface SnapOptions {
   // startCoords = offset snapping from drag start page position
   offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords'
   offsetWithOrigin?: boolean
-  origin: Interact.RectResolvable<[Element]> | Interact.Point
+  origin: Interact.RectResolvable<[Interact.Element]> | Interact.Point
   endOnly?: boolean
   enabled?: boolean
 }
@@ -182,12 +182,13 @@ function set (arg: ModifierArg<SnapState>) {
 }
 
 function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
+  const { element } = arg.interaction
   const optionsOrigin = utils.rect.rectToXY(
-    utils.rect.resolveRectLike(arg.state.options.origin as any, [arg.interaction.element])
+    utils.rect.resolveRectLike(arg.state.options.origin as any, null, null, [element])
   )
   const origin = optionsOrigin || utils.getOriginXY(
     arg.interactable,
-    arg.interaction.element,
+    element,
     arg.interaction.prepared.name,
   )
 

@@ -41,14 +41,15 @@ declare module '@interactjs/core/defaultOptions' {
 
 export interface Modifier<
   Defaults = any,
+  State extends ModifierState = any,
   Name extends string = any
 > {
   options?: Defaults
   methods: {
-    start?: (arg: Interact.SignalArg) => void
-    set: (arg: Interact.SignalArg) => void
-    beforeEnd?: (arg: Interact.SignalArg) => boolean | void
-    stop?: (arg: Interact.SignalArg) => void
+    start?: (arg: ModifierArg<State>) => void
+    set: (arg: ModifierArg<State>) => void
+    beforeEnd?: (arg: ModifierArg<State>) => boolean
+    stop?: (arg: ModifierArg<State>) => void
   }
   name?: Name
 }
@@ -64,9 +65,21 @@ export type ModifierState<
   name?: Name
 } & StateProps
 
-export interface ModifierArg<State extends ModifierState> extends Interact.SignalArg {
-  state: State
+export interface ModifierArg<State extends ModifierState = ModifierState> extends Pick<Interact.SignalArg,
+'interaction' |
+'interactable' |
+'phase' |
+'rect'
+> {
+  states?: State[]
+  state?: State
+  element: Interact.Element
   pageCoords?: Interact.Point
+  prevCoords?: Interact.Point
+  coords?: Interact.Point
+  startOffset?: Interact.Rect
+  preEnd?: boolean
+  requireEndOnly?: boolean
 }
 
 function install (scope: Scope) {
@@ -87,14 +100,14 @@ function install (scope: Scope) {
     }
   })
 
-  interactions.signals.on('before-action-start', arg => {
-    start(arg as any, arg.interaction.coords.start.page)
+  interactions.signals.on('before-action-start', (arg: Interact.SignalArg) => {
+    start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page)
   })
 
-  interactions.signals.on('action-resume', arg => {
-    stop(arg as Required<Interact.SignalArg>)
-    start(arg as Required<Interact.SignalArg>, arg.interaction.coords.cur.page)
-    beforeMove(arg as Required<Interact.SignalArg>)
+  interactions.signals.on('action-resume', (arg: Interact.SignalArg) => {
+    stop(arg)
+    start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords)
+    beforeMove(arg)
   })
 
   interactions.signals.on('after-action-move', restoreCoords as any)
@@ -110,6 +123,7 @@ function install (scope: Scope) {
 function start (
   { interaction, phase }: Interact.SignalArg,
   pageCoords: Interact.Point,
+  prevCoords: Interact.Point,
 ) {
   const { interactable, element } = interaction
   const modifierList = getModifierList(interaction)
@@ -125,7 +139,7 @@ function start (
   interaction.modifiers.startOffset = startOffset
   interaction.modifiers.startDelta = { x: 0, y: 0 }
 
-  const arg: Partial<Interact.SignalArg> = {
+  const arg: ModifierArg<any> = {
     interaction,
     interactable,
     element,
@@ -136,20 +150,21 @@ function start (
     states,
     preEnd: false,
     requireEndOnly: false,
+    prevCoords: prevCoords || (interaction.modifiers.result
+      ? interaction.modifiers.result.coords
+      : interaction.coords.prev.page),
   }
 
   interaction.modifiers.states = states
   interaction.modifiers.result = null
   startAll(arg)
 
-  arg.pageCoords = extend({}, interaction.coords.start.page)
-
   const result = interaction.modifiers.result = setAll(arg)
 
   return result
 }
 
-export function startAll (arg) {
+export function startAll (arg: ModifierArg<any>) {
   const states: ModifierState[] = arg.states
 
   for (const state of states) {
@@ -162,21 +177,13 @@ export function startAll (arg) {
 
 export function setAll (arg: Partial<Interact.SignalArg>) {
   const {
-    interaction,
-    modifiersState = interaction.modifiers,
-    prevCoords = modifiersState.result
-      ? modifiersState.result.coords
-      : interaction.coords.prev.page,
+    prevCoords,
     phase,
     preEnd,
     requireEndOnly,
     rect,
-    skipModifiers,
+    states,
   } = arg
-
-  const states = skipModifiers
-    ? arg.states.slice(skipModifiers)
-    : arg.states
 
   arg.coords = extend({}, arg.pageCoords)
   arg.rect = extend({}, rect)
@@ -230,19 +237,26 @@ export function setAll (arg: Partial<Interact.SignalArg>) {
 function beforeMove (arg: Interact.SignalArg): void | false {
   const { interaction, phase, preEnd, skipModifiers } = arg
   const { interactable, element } = interaction
-  const modifierResult = setAll(
-    {
-      interaction,
-      interactable,
-      element,
-      preEnd,
-      phase,
-      pageCoords: interaction.coords.cur.page,
-      rect: interaction.rect,
-      states: interaction.modifiers.states,
-      requireEndOnly: false,
-      skipModifiers,
-    })
+
+  const states = skipModifiers
+    ? interaction.modifiers.states.slice(skipModifiers)
+    : interaction.modifiers.states
+  const prevCoords = arg.prevCoords || (interaction.modifiers.result
+    ? interaction.modifiers.result.coords
+    : interaction.coords.prev.page)
+
+  const modifierResult = setAll({
+    interaction,
+    interactable,
+    element,
+    preEnd,
+    phase,
+    pageCoords: arg.modifiedCoords || interaction.coords.cur.page,
+    prevCoords,
+    rect: interaction.rect,
+    states,
+    requireEndOnly: false,
+  })
 
   interaction.modifiers.result = modifierResult
 
@@ -252,6 +266,18 @@ function beforeMove (arg: Interact.SignalArg): void | false {
     return false
   }
 
+  if (arg.modifiedCoords) {
+    const { page } = interaction.coords.cur
+    const adjustment = {
+      x: arg.modifiedCoords.x - page.x,
+      y: arg.modifiedCoords.y - page.y,
+    }
+
+    modifierResult.coords.x += adjustment.x
+    modifierResult.coords.y += adjustment.y
+    modifierResult.delta.x += adjustment.x
+    modifierResult.delta.y += adjustment.y
+  }
   setCoords(arg)
 }
 
@@ -269,7 +295,7 @@ function beforeEnd (arg: Interact.SignalArg): void | false {
     arg.state = state
     const { options, methods } = state
 
-    const endResult = methods.beforeEnd && methods.beforeEnd(arg)
+    const endResult = methods.beforeEnd && methods.beforeEnd(arg as unknown as ModifierArg)
 
     if (endResult === false) {
       interaction.modifiers.endPrevented = true
@@ -293,10 +319,11 @@ function stop (arg: Interact.SignalArg) {
     return
   }
 
-  const modifierArg = extend({
+  const modifierArg: ModifierArg = extend({
     states,
     interactable: interaction.interactable,
     element: interaction.element,
+    rect: null,
   }, arg)
 
   restoreCoords(arg)
@@ -433,6 +460,7 @@ function getRectOffset (rect, coords) {
 
 function makeModifier<
   Defaults extends { enabled?: boolean },
+  State extends ModifierState,
   Name extends string
 > (
   module: { defaults?: Defaults, [key: string]: any },
@@ -458,7 +486,7 @@ function makeModifier<
       }
     }
 
-    const m: Modifier<Defaults, Name> = { options, methods, name }
+    const m: Modifier<Defaults, State, Name> = { options, methods, name }
 
     return m
   }

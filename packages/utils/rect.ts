@@ -2,17 +2,22 @@ import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'
 import * as is from './is'
 
-export function getStringOptionResult (value, interactable, element) {
+export function getStringOptionResult (value: any, target: Interact.HasGetRect, element) {
   if (value === 'parent') { return parentNode(element) }
 
-  if (value === 'self') { return interactable.getRect(element) }
+  if (value === 'self') { return target.getRect(element) }
 
   return closest(element, value)
 }
 
-export function resolveRectLike<T extends any[]> (value: Interact.RectResolvable<T>, interactable?, element?, functionArgs?: T) {
+export function resolveRectLike<T extends any[]> (
+  value: Interact.RectResolvable<T>,
+  target?: Interact.HasGetRect,
+  element?: Interact.Element,
+  functionArgs?: T
+) {
   if (is.string(value)) {
-    value = getStringOptionResult(value, interactable, element)
+    value = getStringOptionResult(value, target, element)
   }
   else if (is.func(value)) {
     value = value(...functionArgs)
