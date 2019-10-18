@@ -32,7 +32,7 @@ const argv = require('yargs')
   .argv
 
 const dir = path.join(__dirname, '..')
-const extensions = ['.ts', '.js']
+const extensions = ['.ts', '.tsx', '.js', '.jsx']
 
 process.env.NODE_PATH = `${process.env.NODE_PATH || ''}:${dir}/node_modules`
 require('module')._initPaths()
