@@ -1,5 +1,6 @@
 import test from '@interactjs/_dev/test/test'
 import drag from '@interactjs/actions/drag'
+import { EventPhase } from '@interactjs/core/InteractEvent'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import inertia from './'
 
@@ -15,19 +16,22 @@ test('inertia', t => {
   const element = target as HTMLElement
   const modifierChange = 5
   const testModifier = {
-    options: { endOnly: true },
-    methods: { set ({ coords: modifierCoords }) {
-      modifierCoords.x += modifierChange
-      modifierCoords.y += modifierChange
-      modifierCallCount++
-    } },
+    options: { endOnly: false },
+    methods: {
+      set ({ coords: modifierCoords, phase }) {
+        modifierCoords.x = modifierChange
+        modifierCoords.y = modifierChange
+        modifierCallPhases.push(phase)
+      },
+    },
   }
 
-  let modifierCallCount = 0
+  let fired = []
+  let modifierCallPhases = []
 
   coords.client = coords.page
   scope.now = () => coords.timeStamp
-  interactable.draggable({ inertia: true })
+  interactable.draggable({ inertia: true }).on('dragstart dragmove dragend draginertiastart', e => fired.push(e))
 
   // test inertia without modifiers or throw
   downStartMoveUp({ x: 100, y: 0, dt: 1000 })
@@ -39,14 +43,30 @@ test('inertia', t => {
 
   interactable.draggable({ modifiers: [testModifier as any] })
 
-  // test inertia with { endOnly: true } modifier and with throw
+  // test inertia with { endOnly: false } modifier and with throw
   downStartMoveUp({ x: 100, y: 0, dt: 10 })
-  t.equal(modifierCallCount, 1, '{ endOnly: true } && thrown: modifier is not called from pointerUp')
+  t.deepEqual(modifierCallPhases, [EventPhase.Move], '{ endOnly: false } && thrown: modifier is not called from pointerUp (requireEndOnly)')
   t.deepEqual(
-    helpers.getProps(interaction.inertia, ['modifiedXe', 'modifiedYe']),
+    fired.map(({ page, type }) => ({ ...page, type })),
+    [
+      { x: 0, y: 0, type: 'dragstart' },
+      { x: modifierChange, y: modifierChange, type: 'dragmove' },
+      { x: modifierChange, y: modifierChange, type: 'draginertiastart' },
+    ],
+    '{ endOnly: false } && thrown: move, inertiastart, and end InteractEvents are modified'
+  )
+
+  // test inertia with { endOnly: true } modifier and with throw
+  testModifier.options.endOnly = true
+  downStartMoveUp({ x: 100, y: 0, dt: 10 })
+  t.deepEqual(modifierCallPhases, [EventPhase.InertiaStart], '{ endOnly: true } && thrown: modifier is called from pointerUp')
+  const modified = helpers.getProps(interaction.inertia, ['modifiedXe', 'modifiedYe'])
+  t.deepEqual(
+    modified,
     {
-      modifiedXe: interaction.inertia.xe + modifierChange,
-      modifiedYe: interaction.inertia.ye + modifierChange,
+      // modified target minus move coords
+      modifiedXe: modifierChange - 100,
+      modifiedYe: modifierChange - 0,
     },
     '{ endOnly: true } && thrown: inertia target coords are correct')
 
@@ -54,19 +74,20 @@ test('inertia', t => {
   testModifier.options.endOnly = false
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.notOk(interaction.inertia.active, '{ endOnly: false } && !thrown: inertia smoothEnd is not activated')
-  t.equal(modifierCallCount, 2, '{ endOnly: false } && !thrown: modifier is called from pointerUp')
+  t.deepEqual(modifierCallPhases, [EventPhase.Move, EventPhase.InertiaStart], '{ endOnly: false } && !thrown: modifier is called from pointerUp')
 
   // test smoothEnd with { endOnly: true } modifier
   testModifier.options.endOnly = true
   downStartMoveUp({ x: 1, y: 0, dt: 1000 })
   t.ok(interaction.inertia.active, '{ endOnly: true } && !thrown: inertia smoothEnd is activated')
-  t.equal(modifierCallCount, 1, '{ endOnly: true } && !thrown: modifier is not called from pointerUp')
+  t.deepEqual(modifierCallPhases, [EventPhase.InertiaStart], '{ endOnly: true } && !thrown: modifier is called from pointerUp')
 
   interaction.stop()
   t.end()
 
   function downStartMoveUp ({ x, y, dt }) {
-    modifierCallCount = 0
+    fired = []
+    modifierCallPhases = []
     coords.timeStamp = 0
     interaction.stop()
 

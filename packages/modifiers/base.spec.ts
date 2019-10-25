@@ -146,6 +146,12 @@ test('modifiers/base', t => {
 
   interaction.stop()
 
+  interaction.pointerUp(moveEvent, moveEvent, element, element)
+  t.deepEqual(
+    interaction.coords.cur.page,
+    { x: moveEvent.pageX, y: moveEvent.pageY },
+    'interaction coords after stopping are as expected')
+
   t.end()
 })
 

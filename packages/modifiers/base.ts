@@ -227,7 +227,7 @@ export function setAll (arg: Partial<Interact.SignalArg>) {
       result.rectDelta.bottom !== 0
   }
 
-  result.changed = prevCoords.x !== result.coords.x ||
+  result.changed = !prevCoords || prevCoords.x !== result.coords.x ||
     prevCoords.y !== result.coords.y ||
     rectChanged
 
@@ -326,8 +326,6 @@ function stop (arg: Interact.SignalArg) {
     rect: null,
   }, arg)
 
-  restoreCoords(arg)
-
   for (const state of states) {
     modifierArg.state = state
 
@@ -379,10 +377,10 @@ export function prepareStates (modifierList: Modifier[]) {
   return states
 }
 
-function setCoords (arg) {
+export function setCoords (arg: { interaction: Interact.Interaction, phase: Interact.EventPhase, rect?: Interact.Rect }) {
   const { interaction, phase } = arg
-  const curCoords = arg.curCoords || interaction.coords.cur
-  const startCoords = arg.startCoords || interaction.coords.start
+  const curCoords = interaction.coords.cur
+  const startCoords = interaction.coords.start
   const { result, startDelta } = interaction.modifiers
   const curDelta = result.delta
 
@@ -390,7 +388,7 @@ function setCoords (arg) {
     extend(interaction.modifiers.startDelta, result.delta)
   }
 
-  for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]]) {
+  for (const [coordsSet, delta] of [[startCoords, startDelta], [curCoords, curDelta]] as const) {
     coordsSet.page.x   += delta.x
     coordsSet.page.y   += delta.y
     coordsSet.client.x += delta.x
@@ -409,7 +407,7 @@ function setCoords (arg) {
   rect.height = rect.bottom - rect.top
 }
 
-function restoreCoords ({ interaction: { coords, rect, modifiers } }: Interact.SignalArg) {
+export function restoreCoords ({ interaction: { coords, rect, modifiers } }: { interaction: Interact.Interaction }) {
   if (!modifiers.result) { return }
 
   const { startDelta } = modifiers
@@ -458,7 +456,7 @@ function getRectOffset (rect, coords) {
     }
 }
 
-function makeModifier<
+export function makeModifier<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
   Name extends string
@@ -513,9 +511,5 @@ export default {
   shouldDo,
   getModifierList,
   getRectOffset,
-  makeModifier,
-}
-
-export {
   makeModifier,
 }

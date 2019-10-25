@@ -1,5 +1,5 @@
 import { EventPhase } from '@interactjs/core/InteractEvent'
-import modifiers from '@interactjs/modifiers/base'
+import modifiers, { restoreCoords, setCoords } from '@interactjs/modifiers/base'
 import * as utils from '@interactjs/utils'
 import raf from '@interactjs/utils/raf'
 
@@ -78,10 +78,9 @@ function install (scope: Interact.Scope) {
     }
   })
 
-  // FIXME proper signal typing
-  interactions.signals.on('before-action-end', arg => release(arg as any, scope))
-  interactions.signals.on('down', arg => resume(arg as any, scope))
-  interactions.signals.on('stop', arg => stop(arg as any))
+  interactions.signals.on('before-action-end', (arg: Interact.SignalArg) => release(arg, scope))
+  interactions.signals.on('down', (arg: Interact.SignalArg) => resume(arg, scope))
+  interactions.signals.on('stop', stop)
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -125,6 +124,7 @@ function resume (
         // fire appropriate signals
         const signalArg = {
           interaction,
+          phase: EventPhase.Resume,
         }
 
         scope.interactions.signals.fire('action-resume', signalArg)
@@ -177,18 +177,21 @@ function release<T extends Interact.ActionName> (
 
   const modifierArg = {
     interaction,
-    pageCoords: utils.extend({}, interaction.coords.cur.page),
+    pageCoords: interaction.coords.cur.page,
     states: inertiaPossible && interaction.modifiers.states.map(
       modifierStatus => utils.extend({}, modifierStatus)
     ),
     preEnd: true,
-    prevCoords: undefined,
+    prevCoords: null,
     requireEndOnly: null,
+    phase: EventPhase.InertiaStart,
   }
 
   // smoothEnd
   if (inertiaPossible && !inertia) {
-    modifierArg.prevCoords = interaction.prevEvent.page
+    modifierArg.prevCoords = interaction.modifiers.result
+      ? interaction.modifiers.result.coords
+      : interaction.prevEvent.page
     modifierArg.requireEndOnly = false
     modifierResult = modifiers.setAll(modifierArg)
 
@@ -201,6 +204,7 @@ function release<T extends Interact.ActionName> (
 
   utils.pointer.copyCoords(state.upCoords, interaction.coords.cur)
 
+  setCoords(modifierArg)
   interaction.pointers[0].pointer = state.startEvent = new scope.InteractEvent(
     interaction,
     event,
@@ -209,6 +213,7 @@ function release<T extends Interact.ActionName> (
     EventPhase.InertiaStart,
     interaction.element,
   )
+  restoreCoords(modifierArg)
 
   state.t0 = now
 
@@ -229,7 +234,7 @@ function release<T extends Interact.ActionName> (
 
     modifierArg.pageCoords.x += state.xe
     modifierArg.pageCoords.y += state.ye
-    modifierArg.prevCoords = undefined
+    modifierArg.prevCoords = null
     modifierArg.requireEndOnly = true
 
     modifierResult = modifiers.setAll(modifierArg)
