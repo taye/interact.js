@@ -40,7 +40,7 @@ rules:
   standard/array-bracket-even-spacing: off
   standard/computed-property-even-spacing: off
   standard/object-curly-even-spacing: off
-  '@typescript-eslint/array-type': [error, 'array-simple']
+  '@typescript-eslint/array-type': [error, { default: 'array-simple' }]
   '@typescript-eslint/explicit-member-accessibility': off
   '@typescript-eslint/indent': [error, 2]
   '@typescript-eslint/interface-name-prefix': [error, 'never']

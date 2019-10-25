@@ -71,7 +71,7 @@
     "semver": "latest",
     "tap-spec": "latest",
     "tape": "latest",
-    "ts-node": "8.0.2",
+    "ts-node": "latest",
     "tslint": "latest",
     "typescript": "latest",
     "uglify-js": "latest",
