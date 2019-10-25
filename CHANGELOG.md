@@ -1,3 +1,6 @@
+## v1.6.3
+
+ - fixed issue with inertia resume with `endOnly: false` (#765)
 ## v1.6.2
 
  - @mlucool added license field to package.json of sub modules (#755)
