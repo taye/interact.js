@@ -3,9 +3,15 @@
 
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
-import snap from './pointer'
+import { ModifierArg } from '../base'
+import snap, { SnapOptions, SnapState } from './pointer'
 
-function start (arg) {
+export type SnapSizeOptions = Pick<
+SnapOptions,
+'targets' | 'offset' | 'endOnly' | 'range' | 'enabled'
+>
+
+function start (arg: ModifierArg<SnapState>) {
   const { interaction, state } = arg
   const { options } = state
   const edges = interaction.prepared.edges
@@ -14,12 +20,13 @@ function start (arg) {
 
   arg.state = {
     options: {
+      targets: null,
       relativePoints: [{
         x: edges.left ? 0 : 1,
         y: edges.top ? 0 : 1,
       }],
-      origin: { x: 0, y: 0 },
       offset: options.offset || 'self',
+      origin: { x: 0, y: 0 },
       range: options.range,
     },
   }
@@ -75,15 +82,18 @@ function set (arg) {
   state.options = options
 }
 
+const defaults: SnapSizeOptions = {
+  range: Infinity,
+  targets: null,
+  offset: null,
+  endOnly: false,
+  enabled: false,
+}
+
 const snapSize = {
   start,
   set,
-  defaults: {
-    enabled: false,
-    range  : Infinity,
-    targets: null,
-    offset: null,
-  },
+  defaults,
 }
 
 export default snapSize

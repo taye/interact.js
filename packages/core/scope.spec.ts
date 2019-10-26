@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import * as helpers from './tests/_helpers'
 
-test('scope', (t) => {
+test('scope', t => {
   const {
     scope,
     interactable,
@@ -9,7 +9,7 @@ test('scope', (t) => {
     event,
   } = helpers.testEnv()
 
-  interactable.options.test = { enabled: true }
+  ;(interactable.options as any).test = { enabled: true }
 
   interaction.pointerDown(event, event, scope.document.body)
   interaction.start({ name: 'test' }, interactable, scope.document.body)

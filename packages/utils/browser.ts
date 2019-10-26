@@ -12,12 +12,12 @@ const browser = {
   isOperaMobile: null as boolean,
   prefixedMatchesSelector: null as string,
   pEventTypes: null as {
-    up: string,
-    down: string,
-    over: string,
-    out: string,
-    move: string,
-    cancel: string,
+    up: string
+    down: string
+    over: string
+    out: string
+    move: string
+    cancel: string
   },
   wheelEvent: null as string,
 }

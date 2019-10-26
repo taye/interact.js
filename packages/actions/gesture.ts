@@ -7,11 +7,11 @@ export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     gesture?: {
-      angle: number,          // angle from first to second touch
-      distance: number,
-      scale: number,          // gesture.distance / gesture.startDistance
-      startAngle: number,     // angle of line joining two touches
-      startDistance: number,  // distance between two touches of touchStart
+      angle: number           // angle from first to second touch
+      distance: number
+      scale: number           // gesture.distance / gesture.startDistance
+      startAngle: number      // angle of line joining two touches
+      startDistance: number   // distance between two touches of touchStart
     }
   }
 }
@@ -138,7 +138,7 @@ const gesture = {
   defaults: {
   },
 
-  checker (_pointer, _event, _interactable, _element, interaction: { pointers: { length: number; }; }) {
+  checker (_pointer, _event, _interactable, _element, interaction: { pointers: { length: number } }) {
     if (interaction.pointers.length >= 2) {
       return { name: 'gesture' }
     }
@@ -154,7 +154,7 @@ const gesture = {
 function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
   if (interaction.prepared.name !== 'gesture') { return }
 
-  const pointers = interaction.pointers.map((p) => p.pointer)
+  const pointers = interaction.pointers.map(p => p.pointer)
   const starting = phase === 'start'
   const ending = phase === 'end'
   const deltaSource = interaction.interactable.options.deltaSource

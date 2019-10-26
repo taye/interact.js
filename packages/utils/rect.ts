@@ -2,36 +2,32 @@ import { closest, getElementRect, parentNode } from './domUtils'
 import extend from './extend'
 import * as is from './is'
 
-export function getStringOptionResult (value, interactable, element) {
-  if (!is.string(value)) {
-    return null
-  }
+export function getStringOptionResult (value: any, target: Interact.HasGetRect, element) {
+  if (value === 'parent') { return parentNode(element) }
 
-  if (value === 'parent') {
-    value = parentNode(element)
-  }
-  else if (value === 'self') {
-    value = interactable.getRect(element)
-  }
-  else {
-    value = closest(element, value)
-  }
+  if (value === 'self') { return target.getRect(element) }
 
-  return value
+  return closest(element, value)
 }
 
-export function resolveRectLike (value, interactable?, element?, functionArgs?) {
-  value = getStringOptionResult(value, interactable, element) || value
-
-  if (is.func(value)) {
-    value = value.apply(null, functionArgs)
+export function resolveRectLike<T extends any[]> (
+  value: Interact.RectResolvable<T>,
+  target?: Interact.HasGetRect,
+  element?: Interact.Element,
+  functionArgs?: T
+) {
+  if (is.string(value)) {
+    value = getStringOptionResult(value, target, element)
+  }
+  else if (is.func(value)) {
+    value = value(...functionArgs)
   }
 
   if (is.element(value)) {
     value = getElementRect(value)
   }
 
-  return value
+  return value as Interact.Rect
 }
 
 export function rectToXY (rect) {

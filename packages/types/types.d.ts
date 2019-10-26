@@ -18,6 +18,7 @@ declare namespace Interact {
     [P in keyof T]: T[P] | boolean;
   }
 
+  export type Element = HTMLElement | SVGElement
   export type EventTarget = Window | Document | Element
   export type Target = Interact.EventTarget | string
   export type interact = typeof interact
@@ -47,10 +48,9 @@ declare namespace Interact {
     [index: string]: number
   }
 
-  export interface SnapPosition {
-    x: number
-    y: number
-    range?: number
+  export interface Size {
+    width: number
+    height: number
   }
 
   export interface Rect {
@@ -64,29 +64,14 @@ declare namespace Interact {
 
   export type FullRect = Required<Rect>
 
-  export interface Dimensions {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
+  export type RectFunction<T extends any[]> = (...args: T) => Interact.Rect | Element
 
-  export interface Size {
-    width: number
-    height: number
-  }
+  export type RectResolvable<T extends any[]> = Rect | string | Element | RectFunction<T>
 
-  export type SnapFunction = (x: number, y: number) => SnapPosition
+  export type Dimensions = Point & Size
 
-  export type SnapTarget = SnapPosition | SnapFunction
-  export interface SnapOptions {
-    targets?: SnapTarget[]
-    // target range
-    range?: number
-    // self points for snappin [0,0] = top-left, [1,1] = bottom righ
-    relativePoints?: Point[]
-    // startCoords = offset snapping from drag start page position
-    offset?: Point | 'startCoords'
+  export interface HasGetRect {
+    getRect (element: Interact.Element): Interact.Rect
   }
 
   export interface InertiaOption {
@@ -99,38 +84,15 @@ declare namespace Interact {
   }
   export type InertiaOptions = InertiaOption | boolean
 
-  export interface AutoScrollOption {
-    container?: DOMElement
-    margin?: number
-    distance?: number
-    interval?: number
-  }
-  export type AutoScrollOptions = AutoScrollOption | boolean
-
-  export type CSSSelector = string
-  export type DOMElement = any
-
-  export interface RestrictOption {
-    // where to drag over
-    restriction?: Rect | Dimensions | CSSSelector | DOMElement | 'self' | 'parent'
-    // what part of self is allowed to drag over
-    elementRect?: Rect
-    // restrict just before the end drag
-    endOnly?: boolean
-  }
-
-  export interface RestrictSizeOption {
-    min?: Size
-    max?: Size
-  }
-
   export interface EdgeOptions {
-    top?: boolean | CSSSelector | DOMElement
-    left?: boolean | CSSSelector | DOMElement
-    bottom?: boolean | CSSSelector | DOMElement
-    right?: boolean | CSSSelector | DOMElement
-    [key: string]: boolean | CSSSelector | DOMElement
+    top?: boolean | string | Element
+    left?: boolean | string | Element
+    bottom?: boolean | string | Element
+    right?: boolean | string | Element
   }
+
+  export type CursorChecker<T extends ActionName = any> =
+    (action: ActionProps, interactable: Interactable, element: Element, interacting: boolean) => string
 
   export interface ActionMethod<T> {
     (this: Interact.Interactable): T
@@ -144,11 +106,13 @@ declare namespace Interact {
     (this: Interact.Interactable, options: T): typeof this
   }
 
+  export type PerActionDefaults = defaults.PerActionDefaults
   export interface OptionsArg extends defaults.BaseDefaults, Interact.OrBoolean<defaults.PerActionDefaults> {}
 
   export interface DraggableOptions extends Options {
     startAxis?: 'x' | 'y' | 'xy'
     lockAxis?: 'x' | 'y' | 'xy' | 'start'
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
@@ -157,7 +121,7 @@ declare namespace Interact {
 
   export interface DropzoneOptions extends Options {
     accept?: string | Element | (({ dropzone, draggableElement }: {
-      dropzone: Interact.Interactable,
+      dropzone: Interact.Interactable
       draggableElement: Element
     }) => boolean)
     // How the overlap is checked on the drop zone
@@ -184,14 +148,13 @@ declare namespace Interact {
 
   export interface ResizableOptions extends Options {
     square?: boolean
-    preserveAspectRatio?: boolean,
+    preserveAspectRatio?: boolean
     edges?: EdgeOptions | null
-    // deprecated
-    axis?: 'x' | 'y' | 'xy'
-    //
+    axis?: 'x' | 'y' | 'xy' // deprecated
     invert?: 'none' | 'negate' | 'reposition'
-    margin?: number,
+    margin?: number
     squareResize?: boolean
+    cursorChecker?: Interact.CursorChecker
     oninertiastart?: ListenersArg
     onstart?: Interact.ListenersArg
     onmove?: Interact.ListenersArg
@@ -208,17 +171,17 @@ declare namespace Interact {
     pointerEvent: any,
     defaultAction: string,
     interactable: Interactable,
-    element: DOMElement,
+    element: Element,
     interaction: Interaction,
   ) => ActionProps
 
-  export type OriginFunction = (target: DOMElement)  => 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement
+  export type OriginFunction = (target: Element) => Rect
 
   export interface PointerEventsOptions {
     holdDuration?: number
     allowFrom?: string
     ignoreFrom?: string
-    origin?: 'self' | 'parent' | Rect | Point | CSSSelector | DOMElement | OriginFunction
+    origin?: Rect | Point | string | Element | OriginFunction
   }
 
   export type RectChecker = (element: Element)  => Rect
@@ -233,69 +196,6 @@ declare namespace Interact {
   export type ListenersArg = Listener | ListenerMap | Array<(Listener | ListenerMap)>
   export interface ListenerMap {
     [index: string]: ListenersArg | ListenersArg[]
-  }
-
-  export type OnEventName =
-    'dragstart'
-    | 'dragmove'
-    | 'draginertiastart'
-    | 'dragend'
-    | 'resizestart'
-    | 'resizemove'
-    | 'resizeinertiastart'
-    | 'resizeend'
-    | 'gesturestart'
-    | 'gesturemove'
-    | 'gestureend'
-    // drop
-    | 'dropactivate'
-    | 'dropdeactivate'
-    | 'dragenter'
-    | 'dragleave'
-    | 'dropmove'
-    | 'drop'
-    // pointer events
-    | 'down'
-    | 'move'
-    | 'up'
-    | 'cancel'
-    | 'tap'
-    | 'doubletap'
-    | 'hold'
-
-  export interface OnEventFunctions {
-    dragstart?: ListenersArg
-    dragmove?: ListenersArg
-    draginertiastart?: ListenersArg
-    dragend?: ListenersArg
-    resizestart?: ListenersArg
-    resizemove?: ListenersArg
-    resizeinertiastart?: ListenersArg
-    resizeend?: ListenersArg
-    gesturestart?: ListenersArg
-    gesturemove?: ListenersArg
-    gestureend?: ListenersArg
-    // drop
-    dropactivate?: ListenersArg
-    dropdeactivate?: ListenersArg
-    dragenter?: ListenersArg
-    dragleave?: ListenersArg
-    dropmove?: ListenersArg
-    drop?: ListenersArg
-    // pointer events
-    down?: ListenersArg
-    move?: ListenersArg
-    up?: ListenersArg
-    cancel?: ListenersArg
-    tap?: ListenersArg
-    doubletap?: ListenersArg
-    hold?: ListenersArg
-  }
-
-  export type OnEvent = OnEventName | OnEventName[]
-
-  export interface InteractOptions {
-    context?: DOMElement
   }
 }
 

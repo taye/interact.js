@@ -1,3 +1,7 @@
+---
+title: Resizable
+---
+
 Resizable
 =========
 
@@ -95,6 +99,24 @@ to dimensions less than `0x0`. The possible values are:
  bottom edges and/or swapping the left and right edges
 
 [Demo on Codepen][resize-codepen]
+
+`cursorChecker`
+---------------
+
+```javascript
+interact(target).resizable({
+  edges: { bottom: true, right: true },
+  cursorChecker: (action, interactable, element, interacting) => {
+    if (action.edges.bottom && action.edges.right) {
+      return 'sw-resize'
+    }
+    // etc.
+  }
+})
+```
+
+You can tell interact.js which cursor to set on the target with a
+`cursorChecker` function.
 
 [interaction-start]: http://interactjs.io/api/#Interaction.start
 [resize-codepen]: http://codepen.io/taye/pen/LEpmOL

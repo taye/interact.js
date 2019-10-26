@@ -11,7 +11,7 @@ export interface SearchDetails {
 }
 
 const finder = {
-  methodOrder: [ 'simulationResume', 'mouseOrPen', 'hasPointer', 'idle' ],
+  methodOrder: ['simulationResume', 'mouseOrPen', 'hasPointer', 'idle'],
 
   search (details) {
     for (const method of finder.methodOrder) {
@@ -108,7 +108,7 @@ const finder = {
         const target = interaction.interactable
         // don't add this pointer if there is a target interactable and it
         // isn't gesturable
-        if (target && !target.options.gesture.enabled) {
+        if (target && !(target.options.gesture && target.options.gesture.enabled)) {
           continue
         }
       }

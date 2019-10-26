@@ -12,8 +12,36 @@ interact('.drag-and-resize')
       interact.modifiers.snap({
         targets: [
           { x: 100, y: 200 },
-          function (x: number, y: number) { return { x: x % 20, y } },
+          (x: number, y: number) => ({ x: x % 20, y }),
         ],
+        offset: 'startCoords',
+        relativePoints: [{ x: 0, y: 1 }],
+        endOnly: true,
+      }),
+      interact.modifiers.snapSize({
+        targets: [
+          { x: 100, y: 200 },
+          (x: number, y: number) => ({ x: x % 20, y }),
+        ],
+        endOnly: true,
+      }),
+      interact.modifiers.restrictRect({
+        restriction: 'parent',
+        endOnly: true,
+      }),
+      interact.modifiers.restrict({
+        restriction: _ => ({ top: 0, left: 0, bottom: 1, right: 1 }),
+      }),
+      interact.modifiers.restrict({
+        restriction: _ => document.body,
+      }),
+      interact.modifiers.restrictSize({
+        min: document.body,
+        max: 'parent',
+      }),
+      interact.modifiers.restrictEdges({
+        inner: document.body,
+        outer: 'parent',
       }),
     ],
   })
@@ -22,7 +50,7 @@ interact('.drag-and-resize')
   })
 
 // Selector context
-const myList = document.querySelector('#my-list')
+const myList: HTMLElement | SVGElement = document.querySelector('#my-list')
 
 interact('li', {
   context: myList,
@@ -79,7 +107,11 @@ interact(element)
 
 // axis
 interact(target).draggable({
-  axis: 'x',
+  startAxis: 'x',
+  lockAxis: 'y',
+}).draggable({
+  startAxis: 'xy',
+  lockAxis: 'x',
 })
 
 interact(target).resizable({
@@ -120,13 +152,13 @@ interact(target).dropzone({
 // dropzone checker
 interact(target).dropzone({
   checker (
-    _dragEvent: Element,          // related dragmove or dragend
-    _event: Event,                // Touch, Pointer or Mouse Event
-    dropped: boolean,             // bool default checker result
-    _dropzone: Interact.Interactable,      // dropzone Interactable
-    dropElement: Element,         // dropzone elemnt
-    _draggable: Interact.Interactable,     // draggable Interactable
-    _draggableElement: Element) { // draggable element
+    _dragEvent: Interact.Element,           // related dragmove or dragend
+    _event: Event,                          // Touch, Pointer or Mouse Event
+    dropped: boolean,                       // bool default checker result
+    _dropzone: Interact.Interactable,       // dropzone Interactable
+    dropElement: Interact.Element,          // dropzone elemnt
+    _draggable: Interact.Interactable,      // draggable Interactable
+    _draggableElement: Interact.Element) {  // draggable element
     // only allow drops into empty dropzone elements
     return dropped && !dropElement.hasChildNodes()
   },
@@ -183,14 +215,14 @@ interact(dropTarget)
             event.target.id)
     },
   })
-  .on('dropactivate', (event) => {
+  .on('dropactivate', event => {
     event.target.classList.add('drop-activated')
   })
 
-interact(target).on('up', (_event) => {})
+interact(target).on('up', _event => {})
 
 // fast click
-interact('a[href]').on('tap', (event) => {
+interact('a[href]').on('tap', event => {
   window.location.href = event.currentTarget.href
 
   event.preventDefault()

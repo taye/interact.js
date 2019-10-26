@@ -5,8 +5,8 @@ import { EventPhase, InteractEvent } from './InteractEvent'
 import { ActionName } from './scope'
 
 function fireUntilImmediateStopped<
-T extends ActionName,
-P extends EventPhase,
+  T extends ActionName,
+  P extends EventPhase,
 > (event: InteractEvent<T, P>, listeners: Interact.Listener[]) {
   for (const listener of listeners) {
     if (event.immediatePropagationStopped) { break }
@@ -66,6 +66,10 @@ class Eventable {
         }
       }
     }
+  }
+
+  getRect (_element: Interact.Element) {
+    return null
   }
 }
 

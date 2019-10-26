@@ -1,3 +1,76 @@
+## v1.6.3
+
+ - fixed issue with inertia resume with `endOnly: false` (#765)
+## v1.6.2
+
+ - @mlucool added license field to package.json of sub modules (#755)
+ - added `rect`, `deltaRect` and `edges` to resizestart and resizeend events (#754)
+
+## v1.6.1
+
+ - fixed resize without invert
+
+## v1.6.0
+
+ - avoided accessing deprecated event.mozPressure (#751)
+ - changed typings to use `HTMLElement | SVGElement` for `event.target` (#747)
+ - added `interacting` arg to cursorChecker (#739)
+ - added zIndex compare for sibling dropzones
+
+## v1.5.4
+
+ - fixed broken modifiers (#746)
+
+## v1.5.3
+
+ - fixed issues with old modifiers API
+
+## v1.5.2
+
+ - fixed null restriction issue (#737)
+ - improved typings for modifiers
+
+## v1.5.1
+
+ - fixed typing issues (#738)
+
+## v1.5.0
+
+ - added `cursorChecker` option for drag and resize (#736)
+ - allowed restrictions larger than the target element (#735)
+ - added `interact.modifiers.restrictRect` with pre-set elementRect (#735)
+
+## v1.4.14
+
+ - fixed issue with string restriction values that don't resolve to a rect
+   (#731)
+ - changed plugin order so that `pointer-events` is installed before `inertia`
+
+## v1.4.13
+
+ - fixed restrictSize min and max function restrictions
+
+## v1.4.12
+
+ - fixed errors from calling `interaction.stop()` in start event (#725)
+
+## v1.4.11
+
+ - fixed hold events (#730)
+
+## v1.4.10
+
+ - fixed regression of preventing native drag behaviour (#729)
+
+## v1.4.9
+
+ - fixed modifiers with inertia action-resume (#728)
+ - fixed docs for snap grid limits (#717)
+
+## v1.4.8
+
+ - fixed exports in generated typings (#727)
+
 ## v1.4.7
 
  - fixed exports in generated typings (#726)

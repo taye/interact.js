@@ -5,7 +5,7 @@ import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import PointerEvent from './PointerEvent'
 
-test('PointerEvent constructor', (t) => {
+test('PointerEvent constructor', t => {
   const type = 'TEST_EVENT'
   const pointerId = -100
   const testPointerProp = ['TEST_POINTER_PROP']
@@ -19,7 +19,7 @@ test('PointerEvent constructor', (t) => {
     testEventProp,
   } as any
   const interaction = new Interaction({ signals: new Signals() } as any)
-  const eventTarget = {} as Element
+  const eventTarget = {} as Interact.Element
   const pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, 0) as any
 
   t.equal(pointerEvent.testPointerProp, testPointerProp,
@@ -45,7 +45,7 @@ test('PointerEvent constructor', (t) => {
   t.end()
 })
 
-test('PointerEvent methods', (t) => {
+test('PointerEvent methods', t => {
   const methodContexts = {} as any
   const event: any = ['preventDefault', 'stopPropagation', 'stopImmediatePropagation']
     .reduce((acc, methodName) => {

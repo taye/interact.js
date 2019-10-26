@@ -28,9 +28,11 @@
 
 import clone from '@interactjs/utils/clone'
 import extend from '@interactjs/utils/extend'
-import snapSize from './size'
+import { ModifierArg } from '../base'
+import { SnapState } from './pointer'
+import snapSize, { SnapSizeOptions } from './size'
 
-function start (arg) {
+function start (arg: ModifierArg<SnapState>) {
   const edges = arg.interaction.prepared.edges
 
   if (!edges) { return null }
@@ -49,9 +51,9 @@ function set (arg) {
 const snapEdges = {
   start,
   set,
-  defaults: extend(clone(snapSize.defaults), {
+  defaults: extend(clone(snapSize.defaults) as SnapSizeOptions, {
     offset: { x: 0, y: 0 },
-  }),
+  } as unknown),
 }
 
 export default snapEdges

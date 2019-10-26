@@ -248,6 +248,7 @@ const pointerUtils = {
       get target () { return this.coords.target },
       get type () { return this.coords.type },
       get pointerType () { return this.coords.pointerType },
+      get buttons () { return this.coords.buttons },
     }
 
     return event as typeof event & Interact.PointerType & Interact.PointerEventType
@@ -264,4 +265,5 @@ export interface MockCoords {
   target?: any
   type?: string
   pointerType?: string
+  buttons?: number
 }

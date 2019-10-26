@@ -6,17 +6,17 @@ import * as utils from '@interactjs/utils'
 import PointerEvent from './PointerEvent'
 
 export type EventTargetList = Array<{
-  node: Node,
-  eventable: Eventable,
-  props: { [key: string]: any },
+  node: Node
+  eventable: Eventable
+  props: { [key: string]: any }
 }>
 
 export interface PointerEventOptions extends PerActionDefaults {
   enabled?: undefined // not used
-  holdDuration?: number,
-  ignoreFrom?: any,
-  allowFrom?: any,
-  origin?: Interact.Point | string | Element
+  holdDuration?: number
+  ignoreFrom?: any
+  allowFrom?: any
+  origin?: Interact.Point | string | Interact.Element
 }
 
 declare module '@interactjs/core/scope' {
@@ -48,8 +48,8 @@ declare module '@interactjs/core/defaultOptions' {
 }
 
 const signals       = new utils.Signals()
-const simpleSignals = [ 'down', 'up', 'cancel' ]
-const simpleEvents  = [ 'down', 'up', 'cancel' ]
+const simpleSignals = ['down', 'up', 'cancel']
+const simpleEvents  = ['down', 'up', 'cancel']
 
 const defaults: PointerEventOptions = {
   holdDuration: 600,
@@ -79,12 +79,12 @@ const pointerEvents = {
 }
 
 function fire<T extends string> (arg: {
-  interaction: Interaction,
-  pointer: Interact.PointerType,
-  event: Interact.PointerEventType,
-  eventTarget: Interact.EventTarget,
-  targets?: EventTargetList,
-  pointerEvent?: PointerEvent<T>,
+  interaction: Interaction
+  pointer: Interact.PointerType
+  event: Interact.PointerEventType
+  eventTarget: Interact.EventTarget
+  targets?: EventTargetList
+  pointerEvent?: PointerEvent<T>
   type: T
 }, scope: Interact.Scope) {
   const {
@@ -154,10 +154,10 @@ function fire<T extends string> (arg: {
 }
 
 function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
-  interaction: Interaction,
-  pointer: Interact.PointerType,
-  event: Interact.PointerEventType,
-  eventTarget: Interact.EventTarget,
+  interaction: Interaction
+  pointer: Interact.PointerType
+  event: Interact.PointerEventType
+  eventTarget: Interact.EventTarget
   type: T
 }) {
   const pointerIndex = interaction.getPointerIndex(pointer)
@@ -189,7 +189,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
   }
 
   if (type === 'hold') {
-    signalArg.targets = signalArg.targets.filter((target) =>
+    signalArg.targets = signalArg.targets.filter(target =>
       target.eventable.options.holdDuration === interaction.pointers[pointerIndex].hold.duration)
   }
 
@@ -246,11 +246,11 @@ function install (scope: Scope) {
       type: 'hold',
       targets: [] as EventTargetList,
       path,
-      element: null,
+      node: null,
     }
 
-    for (const element of path) {
-      signalArg.element = element
+    for (const node of path) {
+      signalArg.node = node
 
       signals.fire('collect-targets', signalArg)
     }

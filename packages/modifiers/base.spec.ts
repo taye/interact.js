@@ -3,7 +3,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import * as utils from '@interactjs/utils'
 import modifiersBase from './base'
 
-test('modifiers/base', (t) => {
+test('modifiers/base', t => {
   const {
     scope,
     target,
@@ -15,7 +15,7 @@ test('modifiers/base', (t) => {
 
   t.ok(utils.is.object(interaction.modifiers), 'modifiers prop is added new Interaction')
 
-  const element = target as Element
+  const element = target as Interact.Element
   const startEvent = {
     pageX: 100,
     pageY: 200,
@@ -34,10 +34,10 @@ test('modifiers/base', (t) => {
   let firedEvents = []
 
   interactable.rectChecker(() => ({ top: 0, left: 0, bottom: 50, right: 50 }))
-  interactable.on('TESTstart TESTmove TESTend', (event) => firedEvents.push(event))
+  interactable.on('TESTstart TESTmove TESTend', event => firedEvents.push(event))
   interaction.pointerDown(startEvent, startEvent, element)
 
-  interactable.options.TEST = {
+  ;(interactable.options as any).TEST = {
     enabled: true,
     modifiers: [
       {
@@ -106,7 +106,7 @@ test('modifiers/base', (t) => {
   // don't set start
   options.setStart = null
   // add second modifier
-  interactable.options.TEST.modifiers.push({
+  ;(interactable.options as any).TEST.modifiers.push({
     options,
     methods: doubleModifier,
   })
@@ -136,20 +136,21 @@ test('modifiers/base', (t) => {
     { x: 200, y: 200 },
     'move event coords are modified by all modifiers')
 
-  // modifier options.type
-  scope.modifiers.target = modifiersBase.makeModifier(targetModifier)
-  options.type = 'target'
-  options.started = false
-  interactable.options.TEST = {
-    enabled: true,
-    modifiers: [
-      options,
-    ],
-  }
-  interaction.stop()
-  interaction.start({ name: 'TEST' }, interactable, element)
+  interaction.pointerMove(moveEvent, moveEvent, element)
 
-  t.ok(options.started, 'gets `scpe.modifiers[options.type]`')
+  t.doesNotThrow(() => {
+    interaction._signals.fire('action-resume', {
+      interaction,
+    })
+  }, 'action-resume doesn\'t throw errors')
+
+  interaction.stop()
+
+  interaction.pointerUp(moveEvent, moveEvent, element, element)
+  t.deepEqual(
+    interaction.coords.cur.page,
+    { x: moveEvent.pageX, y: moveEvent.pageY },
+    'interaction coords after stopping are as expected')
 
   t.end()
 })

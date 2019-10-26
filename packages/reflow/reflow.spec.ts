@@ -3,7 +3,7 @@ import * as helpers from '@interactjs/core/tests/_helpers'
 import PromisePolyfill from 'promise-polyfill'
 import reflow from './'
 
-test('reflow', (t) => {
+test('reflow', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
 
   const {
@@ -20,9 +20,9 @@ test('reflow', (t) => {
 
   const fired = []
 
-  interactable.fire = ((iEvent) => { fired.push(iEvent) }) as any
+  interactable.fire = (iEvent => { fired.push(iEvent) }) as any
   (interactable.target as any) = {}
-  interactable.options.TEST = { enabled: true }
+  ;(interactable.options as any).TEST = { enabled: true }
   interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords
@@ -80,7 +80,7 @@ test('reflow', (t) => {
   t.end()
 })
 
-test('async reflow', async (t) => {
+test('async reflow', async t => {
   const scope = helpers.mockScope()
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
@@ -91,7 +91,7 @@ test('async reflow', async (t) => {
   const interactable = scope.interactables.new(scope.window)
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
-  interactable.fire = ((iEvent) => { reflowEvent = iEvent }) as any
+  interactable.fire = (iEvent => { reflowEvent = iEvent }) as any
   interactable.options.TEST = { enabled: true }
 
   scope.usePlugin(reflow)

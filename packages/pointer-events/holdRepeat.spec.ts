@@ -16,7 +16,7 @@ function mockScope () {
   })
 }
 
-test('holdRepeat count', (t) => {
+test('holdRepeat count', t => {
   const pointerEvent = {
     type: 'hold',
     count: 0,
@@ -35,7 +35,7 @@ test('holdRepeat count', (t) => {
   t.end()
 })
 
-test('holdRepeat onFired', (t) => {
+test('holdRepeat onFired', t => {
   const scope = mockScope()
   scope.usePlugin(pointerEvents)
   scope.usePlugin(holdRepeat)

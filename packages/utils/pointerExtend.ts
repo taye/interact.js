@@ -25,6 +25,7 @@ function pointerExtend (dest, source) {
 
 pointerExtend.prefixedPropREs = {
   webkit: /(Movement[XY]|Radius[XY]|RotationAngle|Force)$/,
+  moz: /(Pressure)$/,
 }
 
 export default pointerExtend

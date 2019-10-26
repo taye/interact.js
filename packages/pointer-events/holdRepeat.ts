@@ -21,7 +21,7 @@ function install (scope: Interact.Scope) {
   scope.usePlugin(basePlugin)
 
   pointerEvents.signals.on('new', onNew)
-  pointerEvents.signals.on('fired', (arg) => onFired(arg as any, scope))
+  pointerEvents.signals.on('fired', arg => onFired(arg as any, scope))
 
   for (const signal of ['move', 'up', 'cancel', 'endall']) {
     interactions.signals.on(signal, endHoldRepeat)

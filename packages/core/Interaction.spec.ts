@@ -1,4 +1,6 @@
 import test from '@interactjs/_dev/test/test'
+import drag from '@interactjs/actions/drag'
+import autoStart from '@interactjs/auto-start/base'
 import pointerUtils from '@interactjs/utils/pointerUtils'
 import Signals from '@interactjs/utils/Signals'
 import InteractEvent from './InteractEvent'
@@ -7,7 +9,7 @@ import * as helpers from './tests/_helpers'
 
 const makeInteractionAndSignals = () => new Interaction({ signals: new Signals() } as any)
 
-test('Interaction constructor', (t) => {
+test('Interaction constructor', t => {
   const testType = 'test'
   const signals = new Signals()
   const interaction = new Interaction({
@@ -50,7 +52,7 @@ test('Interaction constructor', (t) => {
   t.end()
 })
 
-test('Interaction destroy', (t) => {
+test('Interaction destroy', t => {
   const interaction = makeInteractionAndSignals()
   const pointer = { pointerId: 10 } as any
   const event = {} as any
@@ -71,10 +73,10 @@ test('Interaction destroy', (t) => {
   t.end()
 })
 
-test('Interaction.getPointerIndex', (t) => {
+test('Interaction.getPointerIndex', t => {
   const interaction = makeInteractionAndSignals()
 
-  interaction.pointers = [2, 4, 5, 0, -1].map((id) => ({ id })) as any
+  interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id })) as any
 
   interaction.pointers.forEach(({ id }, index) => {
     t.equal(interaction.getPointerIndex({ pointerId: id }), index)
@@ -83,8 +85,8 @@ test('Interaction.getPointerIndex', (t) => {
   t.end()
 })
 
-test('Interaction.updatePointer', (t) => {
-  t.test('no existing pointers', (st) => {
+test('Interaction.updatePointer', t => {
+  t.test('no existing pointers', st => {
     const interaction = makeInteractionAndSignals()
     const pointer = { pointerId: 10 } as any
     const event = {} as any
@@ -106,7 +108,7 @@ test('Interaction.updatePointer', (t) => {
     st.end()
   })
 
-  t.test('new pointer with exisiting pointer', (st) => {
+  t.test('new pointer with exisiting pointer', st => {
     const interaction = makeInteractionAndSignals()
     const existing: any = { pointerId: 0 }
     const event: any = {}
@@ -140,11 +142,11 @@ test('Interaction.updatePointer', (t) => {
     st.end()
   })
 
-  t.test('update existing pointers', (st) => {
+  t.test('update existing pointers', st => {
     const interaction = makeInteractionAndSignals()
 
-    const oldPointers = [-3, 10, 2].map((pointerId) => ({ pointerId }))
-    const newPointers = oldPointers.map((pointer) => ({ ...pointer, new: true }))
+    const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }))
+    const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }))
 
     oldPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
     newPointers.forEach((pointer: any) => interaction.updatePointer(pointer, pointer, null))
@@ -165,7 +167,7 @@ test('Interaction.updatePointer', (t) => {
   t.end()
 })
 
-test('Interaction.removePointer', (t) => {
+test('Interaction.removePointer', t => {
   const interaction = makeInteractionAndSignals()
   const ids = [0, 1, 2, 3]
   const removals = [
@@ -175,13 +177,13 @@ test('Interaction.removePointer', (t) => {
     { id: 1, remain: [       ], message: 'final' },
   ]
 
-  ids.forEach((pointerId) => interaction.updatePointer({ pointerId } as any, {} as any, null))
+  ids.forEach(pointerId => interaction.updatePointer({ pointerId } as any, {} as any, null))
 
   for (const removal of removals) {
     interaction.removePointer({ pointerId: removal.id } as Interact.PointerType, null)
 
     t.deepEqual(
-      interaction.pointers.map((p) => p.id),
+      interaction.pointers.map(p => p.id),
       removal.remain,
       `${removal.message} - remaining interaction.pointers is correct`)
   }
@@ -189,7 +191,7 @@ test('Interaction.removePointer', (t) => {
   t.end()
 })
 
-test('Interaction.pointer{Down,Move,Up} updatePointer', (t) => {
+test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   const signals = new Signals()
   const interaction = new Interaction({ signals } as any)
   const eventTarget: any = {}
@@ -199,8 +201,8 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', (t) => {
   }
   let info: any = {}
 
-  signals.on('update-pointer', (arg) => { info.updated = arg.pointerInfo })
-  signals.on('remove-pointer', (arg) => { info.removed = arg.pointerInfo })
+  signals.on('update-pointer', arg => { info.updated = arg.pointerInfo })
+  signals.on('remove-pointer', arg => { info.removed = arg.pointerInfo })
 
   interaction.coords.cur.timeStamp = 0
   const commonPointerInfo = {
@@ -250,10 +252,10 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', (t) => {
   t.end()
 })
 
-test('Interaction.pointerDown', (t) => {
+test('Interaction.pointerDown', t => {
   const interaction = makeInteractionAndSignals()
   const coords = helpers.newCoordsSet()
-  const eventTarget = {} as Element
+  const eventTarget = {} as Interact.Element
   const event: any = {
     type: 'down',
     target: eventTarget,
@@ -261,7 +263,7 @@ test('Interaction.pointerDown', (t) => {
   const pointer: any = helpers.newPointer()
   let signalArg
 
-  const signalListener = (arg) => {
+  const signalListener = arg => {
     signalArg = arg
   }
 
@@ -345,7 +347,7 @@ test('Interaction.pointerDown', (t) => {
   t.end()
 })
 
-test('Interaction.start', (t) => {
+test('Interaction.start', t => {
   const interaction = makeInteractionAndSignals()
   const action = { name: 'TEST' }
   const interactable = helpers.mockInteractable()
@@ -376,7 +378,7 @@ test('Interaction.start', (t) => {
 
   let signalArg
   // let interactingInStartListener
-  const signalListener = (arg) => {
+  const signalListener = arg => {
     signalArg = arg
     // interactingInStartListener = arg.interaction.interacting()
   }
@@ -401,28 +403,31 @@ test('Interaction.start', (t) => {
   t.end()
 })
 
-test('stop interaction from start event', (t) => {
-  const scope = helpers.mockScope()
+test('stop interaction from start event', t => {
+  const {
+    interaction,
+    interactable,
+    target,
+  } = helpers.testEnv({ plugins: [drag, autoStart] })
 
-  const interaction = scope.interactions.new({})
-  const interactable = helpers.mockInteractable()
+  let stoppedBeforeStartFired
 
-  interaction.interactable = interactable
-  interaction.element = interactable.element
-  interaction.prepared = { name: 'TEST' }
+  interactable.on('dragstart', event => {
+    stoppedBeforeStartFired = interaction._stopped
 
-  interactable.events.on('TESTstart', (event) => {
     event.interaction.stop()
   })
 
-  interaction._signals.fire('action-start', { interaction, event: {} })
+  interaction.start({ name: 'drag' }, interactable, target as HTMLElement)
 
+  t.notOk(stoppedBeforeStartFired, '!interaction._stopped in start listener')
   t.notOk(interaction.interacting(), 'interaction can be stopped from start event listener')
+  t.ok(interaction._stopped, 'interaction._stopped after stop() in start listener')
 
   t.end()
 })
 
-test('Interaction createPreparedEvent', (t) => {
+test('Interaction createPreparedEvent', t => {
   const scope = helpers.mockScope()
 
   const interaction = scope.interactions.new({})
@@ -452,14 +457,14 @@ test('Interaction createPreparedEvent', (t) => {
   t.end()
 })
 
-test('Interaction fireEvent', (t) => {
+test('Interaction fireEvent', t => {
   const interaction = new Interaction({ signals: helpers.mockSignals() })
   const interactable = helpers.mockInteractable()
   const iEvent = {} as Interact.InteractEvent
   let firedEvent
 
   // this method should be called from actions.firePrepared
-  interactable.fire = (event) => {
+  interactable.fire = event => {
     firedEvent = event
   }
 

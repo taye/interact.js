@@ -3,7 +3,7 @@ plugins:
     enabled: true
     channel: eslint-5
   duplication:
-    enabled: true
+    enabled: false
     config:
       languages:
         - javascript

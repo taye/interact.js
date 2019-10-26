@@ -1,3 +1,7 @@
+---
+title: Draggable
+---
+
 Draggable
 =========
 
@@ -31,7 +35,7 @@ interact('.draggable').draggable({
 })
 ```
 
-Dragging is the simplest action interactj.s provides. To make an element
+Dragging is the simplest action interact.js provides. To make an element
 draggable, create an interactable with your desired target then call the
 `draggable` method with the options that you need. In addition to the common
 `InteractEvent` properties, `dragmove` events also have:
@@ -73,3 +77,21 @@ action to start. Use `'x'` to require the user to start dragging horizontally or
 
 `lockAxis` causes the drag events to change only in the given axis. If a value
 of `'start'` is used, then the drag will be locked to the starting direction.
+
+`cursorChecker`
+---------------
+
+```javascript
+interact(target).draggable({
+  cursorChecker: (action, interactable, element, interacting) => {
+    switch (action.axis) {
+      case 'x': return 'ew-resize'
+      case 'y': return 'ns-resize'
+      default: return interacting ? 'grabbing' : 'grab'
+    }
+  }
+})
+```
+
+You can tell interact.js which cursor to set on the target with a
+`cursorChecker` function.

@@ -11,7 +11,7 @@ import { ActionDefaults, Defaults, Options } from './defaultOptions'
 import Eventable from './Eventable'
 import { Actions } from './scope'
 
-type IgnoreValue = string | Element | boolean
+type IgnoreValue = string | Interact.Element | boolean
 
 /** */
 export class Interactable implements Partial<Eventable> {
@@ -27,12 +27,12 @@ export class Interactable implements Partial<Eventable> {
   readonly _actions: Actions
   readonly target: Interact.Target
   readonly events = new Eventable()
-  readonly _context: Document | Element
+  readonly _context: Document | Interact.Element
   readonly _win: Window
   readonly _doc: Document
 
   /** */
-  constructor (target: Interact.Target, options: any, defaultContext: Document | Element) {
+  constructor (target: Interact.Target, options: any, defaultContext: Document | Interact.Element) {
     this._actions = options.actions
     this.target   = target
     this._context = options.context || defaultContext
@@ -109,7 +109,7 @@ export class Interactable implements Partial<Eventable> {
    * @param {Element} [element] The element to measure.
    * @return {object} The object's bounding rectangle.
    */
-  getRect (element: Element) {
+  getRect (element: Interact.Element) {
     element = element || (is.element(this.target)
       ? this.target
       : null)
@@ -129,7 +129,7 @@ export class Interactable implements Partial<Eventable> {
    * bounding rectangle. See {@link Interactable.getRect}
    * @return {function | object} The checker function or this Interactable
    */
-  rectChecker (checker: (element: Element) => any) {
+  rectChecker (checker: (element: Interact.Element) => any) {
     if (is.func(checker)) {
       this.getRect = checker
 
@@ -206,12 +206,22 @@ export class Interactable implements Partial<Eventable> {
             nodeContains(this._context, element))
   }
 
-  testIgnoreAllow (this: Interactable, options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue }, targetNode: Node, eventTarget: Element) {
+  testIgnoreAllow (
+    this: Interactable,
+    options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue },
+    targetNode: Node,
+    eventTarget: Interact.Element,
+  ) {
     return (!this.testIgnore(options.ignoreFrom, targetNode, eventTarget) &&
             this.testAllow(options.allowFrom, targetNode, eventTarget))
   }
 
-  testAllow (this: Interactable, allowFrom: IgnoreValue, targetNode: Node, element: Element) {
+  testAllow (
+    this: Interactable,
+    allowFrom: IgnoreValue,
+    targetNode: Node,
+    element: Interact.Element,
+  ) {
     if (!allowFrom) { return true }
 
     if (!is.element(element)) { return false }
@@ -226,7 +236,12 @@ export class Interactable implements Partial<Eventable> {
     return false
   }
 
-  testIgnore (this: Interactable, ignoreFrom: IgnoreValue, targetNode: Node, element: Element) {
+  testIgnore (
+    this: Interactable,
+    ignoreFrom: IgnoreValue,
+    targetNode: Node,
+    element: Interact.Element,
+  ) {
     if (!ignoreFrom || !is.element(element)) { return false }
 
     if (is.string(ignoreFrom)) {
@@ -274,7 +289,7 @@ export class Interactable implements Partial<Eventable> {
         else if (is.string(this.target)) {
           events[`${addRemove}Delegate`](this.target, this._context, type, listener, options)
         }
-        // remove listener from this Interatable's element
+        // remove listener from this Interactable's element
         else {
           (events[addRemove] as typeof events.remove)(this.target, type, listener, options)
         }

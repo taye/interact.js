@@ -1,29 +1,33 @@
-// This module adds the options.resize.restrictSize setting which sets min and
-// max width and height for the target being resized.
-//
-// interact(target).resize({
-//   edges: { top: true, left: true },
-//   restrictSize: {
-//     min: { width: -600, height: -600 },
-//     max: { width:  600, height:  600 },
-//   },
-// })
-
 import extend from '@interactjs/utils/extend'
 import rectUtils from '@interactjs/utils/rect'
-import restrictEdges from './edges'
+import { ModifierArg, ModifierState } from '../base'
+import restrictEdges, { RestrictEdgesState } from './edges'
+import { RestrictOptions } from './pointer'
 
 const noMin = { width: -Infinity, height: -Infinity }
 const noMax = { width: +Infinity, height: +Infinity }
 
-function start (arg) {
+export interface RestrictSizeOptions {
+  min?: Interact.Size | Interact.Point | RestrictOptions['restriction']
+  max?: Interact.Size | Interact.Point | RestrictOptions['restriction']
+  endOnly: boolean
+  enabled?: boolean
+}
+
+function start (arg: ModifierArg<RestrictEdgesState>) {
   return restrictEdges.start(arg)
 }
 
-function set (arg) {
+export type RestrictSizeState =
+  RestrictEdgesState & ModifierState<RestrictSizeOptions & { inner: Interact.Rect, outer: Interact.Rect }, {
+    min: Interact.Rect
+    max: Interact.Rect
+  }>
+
+function set (arg: ModifierArg<RestrictSizeState>) {
   const { interaction, state } = arg
   const { options } = state
-  const edges = interaction.prepared.linkedEdges || interaction.prepared.edges
+  const edges = interaction.prepared._linkedEdges || interaction.prepared.edges
 
   if (!edges) {
     return
@@ -31,11 +35,10 @@ function set (arg) {
 
   const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted)
 
-  const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction)) || noMin
-  const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction)) || noMax
+  const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction, arg.coords)) || noMin
+  const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction, arg.coords)) || noMax
 
   state.options = {
-    enabled: options.enabled,
     endOnly: options.endOnly,
     inner: extend({}, restrictEdges.noInner),
     outer: extend({}, restrictEdges.noOuter),
@@ -63,14 +66,17 @@ function set (arg) {
   state.options = options
 }
 
+const defaults: RestrictSizeOptions = {
+  min: null,
+  max: null,
+  endOnly: false,
+  enabled: false,
+}
+
 const restrictSize = {
   start,
   set,
-  defaults: {
-    enabled: false,
-    min: null,
-    max: null,
-  },
+  defaults,
 }
 
 export default restrictSize

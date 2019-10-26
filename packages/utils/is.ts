@@ -24,7 +24,7 @@ export const bool = (thing: any): thing is boolean =>
 export const string = (thing: any): thing is string =>
   typeof thing === 'string'
 
-export const element = (thing: any): thing is Element => {
+export const element = (thing: any): thing is Interact.Element => {
   if (!thing || (typeof thing !== 'object')) { return false }
 
   const _window = win.getWindow(thing) || win.window

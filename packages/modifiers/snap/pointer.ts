@@ -1,6 +1,44 @@
 import * as utils from '@interactjs/utils'
+import { ModifierArg, ModifierState } from '../base'
 
-function start (arg: Interact.SignalArg) {
+export interface SnapPosition {
+  x: number
+  y: number
+  range?: number
+}
+
+export type SnapFunction = (
+  x: number,
+  y: number,
+  interaction: Interact.Interaction,
+  offset: Interact.Point,
+  index: number
+) => SnapPosition
+export type SnapTarget = SnapPosition | SnapFunction
+export interface SnapOptions {
+  targets: SnapTarget[]
+  // target range
+  range: number
+  // self points for snapping. [0,0] = top left, [1,1] = bottom right
+  relativePoints: Interact.Point[]
+  // startCoords = offset snapping from drag start page position
+  offset: Interact.Point | Interact.RectResolvable<[Interact.Interaction]> | 'startCoords'
+  offsetWithOrigin?: boolean
+  origin: Interact.RectResolvable<[Interact.Element]> | Interact.Point
+  endOnly?: boolean
+  enabled?: boolean
+}
+
+export type SnapState = ModifierState<SnapOptions, {
+  offsets?: Interact.Point[]
+  realX?: number
+  realY?: number
+  range?: number
+  closest?: any
+  targetFields?: string[][]
+}>
+
+function start (arg: ModifierArg<SnapState>) {
   const { interaction, interactable, element, rect, state, startOffset } = arg
   const { options } = state
   const offsets = []
@@ -17,7 +55,7 @@ function start (arg: Interact.SignalArg) {
     }
   }
   else  {
-    const offsetRect = utils.rect.resolveRectLike(options.offset, interactable, element, [interaction])
+    const offsetRect = utils.rect.resolveRectLike(options.offset as any, interactable, element, [interaction])
 
     snapOffset = utils.rect.rectToXY(offsetRect) || { x: 0, y: 0 }
     snapOffset.x += origin.x
@@ -48,7 +86,7 @@ function start (arg: Interact.SignalArg) {
   state.offsets = offsets
 }
 
-function set (arg: Interact.SignalArg) {
+function set (arg: ModifierArg<SnapState>) {
   const { interaction, coords, state } = arg
   const { options, offsets } = state
 
@@ -143,31 +181,34 @@ function set (arg: Interact.SignalArg) {
   state.closest = closest
 }
 
-function getOrigin (arg: Partial<Interact.SignalArg>) {
+function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
+  const { element } = arg.interaction
   const optionsOrigin = utils.rect.rectToXY(
-    utils.rect.resolveRectLike(arg.state.options.origin)
+    utils.rect.resolveRectLike(arg.state.options.origin as any, null, null, [element])
   )
   const origin = optionsOrigin || utils.getOriginXY(
     arg.interactable,
-    arg.interaction.element,
+    element,
     arg.interaction.prepared.name,
   )
 
   return origin
 }
 
+const defaults: SnapOptions = {
+  range  : Infinity,
+  targets: null,
+  offset: null,
+  offsetWithOrigin: true,
+  origin: null,
+  relativePoints: null,
+  endOnly: false,
+  enabled: false,
+}
 const snap = {
   start,
   set,
-  defaults: {
-    enabled: false,
-    range  : Infinity,
-    targets: null,
-    offset: null,
-    offsetWithOrigin: true,
-
-    relativePoints: null,
-  },
+  defaults,
 }
 
 export default snap

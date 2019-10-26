@@ -2,16 +2,16 @@
 
 <h2>
   JavaScript drag and drop, resizing and multi-touch gestures with inertia and snapping for modern browsers (and also IE9+).
-  <br><br>
-
-  <div align="center">
-  <a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
-  <a href="https://www.jsdelivr.com/package/npm/interactjs"><img src="https://data.jsdelivr.com/v1/package/npm/interactjs/badge" alt="jsDelivr"></a>
-  <a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
-  <a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg" alt="Maintainability"></a>
-  <a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
-  </div>
 </h2>
+
+<div align="center">
+<a href="https://gitter.im/taye/interact.js"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
+<a href="https://www.jsdelivr.com/package/npm/interactjs"><img src="https://data.jsdelivr.com/v1/package/npm/interactjs/badge" alt="jsDelivr"></a>
+<a href="https://travis-ci.org/taye/interact.js"><img src="https://travis-ci.org/taye/interact.js.svg?branch=master" alt="Build Status"></a>
+<a href="https://codeclimate.com/github/taye/interact.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/0168aeaeed781a949088/maintainability.svg" alt="Maintainability"></a>
+<a href="https://codeclimate.com/github/taye/interact.js/code?sort=-test_coverage"><img src="https://codeclimate.com/github/taye/interact.js/badges/coverage.svg" alt="Test Coverage"></a>
+</div>
+<br>
 
 Features include:
 
@@ -31,7 +31,7 @@ Installation
 * [jsDelivr CDN](https://cdn.jsdelivr.net/npm/interactjs/): `<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>`
 * [unpkg CDN](https://unpkg.com/interactjs/): `<script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>`
 * [Rails 5.1+](https://rubyonrails.org/):
-  1. `yarn install interactjs`
+  1. `yarn add interactjs`
   2. `//= require interactjs/interact`
 * [Webjars SBT/Play 2](https://www.webjars.org/): `libraryDependencies ++= Seq("org.webjars.npm" % "interactjs" % version)`
 

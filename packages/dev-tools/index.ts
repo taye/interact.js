@@ -146,7 +146,7 @@ function hasStyle (element: HTMLElement, prop: keyof CSSStyleDeclaration, styleR
   return styleRe.test(element.style[prop] || win.window.getComputedStyle(element)[prop])
 }
 
-function parentHasStyle (element: Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
+function parentHasStyle (element: Interact.Element, prop: keyof CSSStyleDeclaration, styleRe: RegExp) {
   let parent = element as HTMLElement
 
   while (is.element(parent)) {

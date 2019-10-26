@@ -103,7 +103,7 @@ function use (plugin: Interact.Plugin, options?: { [key: string]: any }) {
  * passed to interact
  */
 interact.isSet = isSet
-function isSet (target: Element, options?: any) {
+function isSet (target: Interact.Element, options?: any) {
   return !!scope.interactables.get(target, options && options.context)
 }
 
@@ -298,7 +298,7 @@ scope.interactables.signals.on('unset', ({ interactable }) => {
 })
 
 interact.addDocument = (doc, options) => scope.addDocument(doc, options)
-interact.removeDocument = (doc) => scope.removeDocument(doc)
+interact.removeDocument = doc => scope.removeDocument(doc)
 
 scope.interact = interact
 

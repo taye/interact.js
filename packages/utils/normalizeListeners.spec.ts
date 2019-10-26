@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
 import normalizeListeners from './normalizeListeners'
 
-test('utils/normalizeListeners', (t) => {
+test('utils/normalizeListeners', t => {
   const a = () => {}
   const b = () => {}
   const c = () => {}
@@ -60,7 +60,7 @@ test('utils/normalizeListeners', (t) => {
     'object of { suffix: [fn, ...] } as type arg')
 
   t.deepEqual(
-    normalizeListeners({ '_1 _2': [a, b], '_3': [b, c] }),
+    normalizeListeners({ '_1 _2': [a, b], _3: [b, c] }),
     {
       _1: [a, b],
       _2: [a, b],
@@ -69,7 +69,7 @@ test('utils/normalizeListeners', (t) => {
     'object of { "suffix1 suffix2": [fn, ...], ... } as type arg')
 
   t.deepEqual(
-    normalizeListeners('prefix', { '_1 _2': [a, b], '_3': [b, c] }),
+    normalizeListeners('prefix', { '_1 _2': [a, b], _3: [b, c] }),
     {
       prefix_1: [a, b],
       prefix_2: [a, b],

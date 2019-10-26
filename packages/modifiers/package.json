@@ -1,9 +1,10 @@
 {
   "name": "@interactjs/modifiers",
-  "version": "1.4.8",
+  "version": "1.6.3",
+  "license": "MIT",
   "peerDependencies": {
-    "@interactjs/core": "1.4.8",
-    "@interactjs/utils": "1.4.8"
+    "@interactjs/core": "1.6.3",
+    "@interactjs/utils": "1.6.3"
   },
   "publishConfig": {
     "access": "public"

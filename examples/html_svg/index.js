@@ -174,25 +174,28 @@ function onReady () {
 
   interact('.interactive')
     .draggable({
-      snap: {
-        targets: [
-          { x: 0, y: 0, range: 100 },
-          // interact.snappers.elements({
-          //   targets: 'div.demo-node',
-          //   range: 100,
-          // }),
-          interact.createSnapGrid({ x: 100, y: 100 }),
-        ],
-        endOnly: true,
-        relativePoints: [
-          { x: 0, y: 0 },
-          // { x: 0.5, y: 0.5 },
-        ],
-      },
-      restrict: {
-        restriction: 'body',
-        elementRect: { top: 0, left: 0, right: 1, bottom: 1 },
-      },
+      modifiers: [
+        interact.modifiers.snap({
+          targets: [
+            { x: 0, y: 0, range: 100 },
+            // interact.snappers.elements({
+            //   targets: 'div.demo-node',
+            //   range: 100,
+            // }),
+            interact.createSnapGrid({ x: 100, y: 100 }),
+          ],
+          endOnly: true,
+          relativePoints: [
+            { x: 0, y: 0 },
+            // { x: 0.5, y: 0.5 },
+          ],
+        }),
+        interact.modifiers.restrict({
+          restriction: 'body',
+          elementRect: { top: 0, left: 0.5, bottom: 1, right: 1 },
+          offset: { top: -8, left: -8, bottom: -8, right: -8 }
+        }),
+      ],
       max: 2,
       autoScroll: true,
       inertia: true,
@@ -202,10 +205,11 @@ function onReady () {
       max: 2,
       inertia: { resistance: 40 },
       edges: { left: true, right: true, top: true, bottom: true },
-      snapSize: {
-        enabled: true,
-        targets: [ interact.createSnapGrid({ x: 100, y: 100 }) ],
-      },
+      modifiers: [
+        interact.modifiers.snapSize({
+          targets: [ interact.createSnapGrid({ x: 100, y: 100 }) ],
+        }),
+      ],
     })
     .dropzone({ ondrop: dropNode })
     // Display event properties for debugging

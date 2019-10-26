@@ -1,6 +1,9 @@
 import { ActionProps, Interaction } from '@interactjs/core/Interaction'
 import { ActionName, Scope } from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils'
+import * as arr from '@interactjs/utils/arr'
+import * as dom from '@interactjs/utils/domUtils'
+import extend from '@interactjs/utils/extend'
+import * as is from '@interactjs/utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 
@@ -26,7 +29,8 @@ declare module '@interactjs/core/Interaction' {
   }
 
   interface ActionProps {
-    _linkedEdges?: { [key: string]: boolean }
+    edges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
+    _linkedEdges?: { [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean }
   }
 }
 
@@ -51,6 +55,7 @@ declare module '@interactjs/core/scope' {
 
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
   deltaRect?: Interact.FullRect
+  edges?: Interact.ActionProps['edges']
 }
 
 function install (scope: Scope) {
@@ -65,12 +70,13 @@ function install (scope: Scope) {
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', (interaction) => {
+  interactions.signals.on('new', interaction => {
     interaction.resizeAxes = 'xy'
   })
 
   interactions.signals.on('action-start', start)
   interactions.signals.on('action-move', move)
+  interactions.signals.on('action-end', end)
 
   interactions.signals.on('action-start', updateEventAxes)
   interactions.signals.on('action-move', updateEventAxes)
@@ -129,7 +135,7 @@ function install (scope: Scope) {
 
   actions[ActionName.Resize] = resize
   actions.names.push(ActionName.Resize)
-  utils.arr.merge(actions.eventTypes, [
+  arr.merge(actions.eventTypes, [
     'resizestart',
     'resizemove',
     'resizeinertiastart',
@@ -169,13 +175,13 @@ const resize = {
     _pointer: Interact.PointerType,
     _event: Interact.PointerEventType,
     interactable: Interact.Interactable,
-    element: Element,
+    element: Interact.Element,
     interaction: Interaction,
     rect: Interact.Rect
   ) {
     if (!rect) { return null }
 
-    const page = utils.extend({}, interaction.coords.cur.page)
+    const page = extend({}, interaction.coords.cur.page)
     const options = interactable.options
 
     if (options.resize.enabled) {
@@ -183,7 +189,7 @@ const resize = {
       const resizeEdges: { [edge: string]: boolean } = { left: false, right: false, top: false, bottom: false }
 
       // if using resize.edges
-      if (utils.is.object(resizeOptions.edges)) {
+      if (is.object(resizeOptions.edges)) {
         for (const edge in resizeEdges) {
           resizeEdges[edge] = checkResizeEdge(edge,
             resizeOptions.edges[edge],
@@ -220,55 +226,56 @@ const resize = {
     return null
   },
 
-  cursors: null as unknown as ReturnType<typeof initCursors>,
+  cursors: null as ReturnType<typeof initCursors>,
 
-  getCursor (action: ActionProps) {
-    const cursors = resize.cursors as { [key: string]: string }
-    if (action.axis) {
-      return cursors[action.name + action.axis]
+  getCursor ({ edges, axis, name }: ActionProps) {
+    const cursors = resize.cursors
+    let result: string = null
+
+    if (axis) {
+      result = cursors[name + axis]
     }
-    else if (action.edges) {
+    else if (edges) {
       let cursorKey = ''
-      const edgeNames = ['top', 'bottom', 'left', 'right']
 
-      for (let i = 0; i < 4; i++) {
-        if (action.edges[edgeNames[i]]) {
-          cursorKey += edgeNames[i]
+      for (const edge of ['top', 'bottom', 'left', 'right']) {
+        if (edges[edge]) {
+          cursorKey += edge
         }
       }
 
-      return cursors[cursorKey]
+      result = cursors[cursorKey]
     }
 
-    return null
+    return result
   },
 
-  defaultMargin: null as unknown as number,
+  defaultMargin: null as number,
 }
 
 function resizable (interactable: Interact.Interactable, options: Interact.OrBoolean<Interact.ResizableOptions> | boolean, scope: Scope) {
-  if (utils.is.object(options)) {
+  if (is.object(options)) {
     interactable.options.resize.enabled = options.enabled !== false
     interactable.setPerAction('resize', options)
     interactable.setOnEvents('resize', options)
 
-    if (utils.is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
+    if (is.string(options.axis) && /^x$|^y$|^xy$/.test(options.axis)) {
       interactable.options.resize.axis = options.axis
     }
     else if (options.axis === null) {
       interactable.options.resize.axis = scope.defaults.actions.resize.axis
     }
 
-    if (utils.is.bool(options.preserveAspectRatio)) {
+    if (is.bool(options.preserveAspectRatio)) {
       interactable.options.resize.preserveAspectRatio = options.preserveAspectRatio
     }
-    else if (utils.is.bool(options.square)) {
+    else if (is.bool(options.square)) {
       interactable.options.resize.square = options.square
     }
 
     return interactable
   }
-  if (utils.is.bool(options)) {
+  if (is.bool(options)) {
     interactable.options.resize.enabled = options
 
     return interactable
@@ -276,15 +283,23 @@ function resizable (interactable: Interact.Interactable, options: Interact.OrBoo
   return interactable.options.resize
 }
 
-function checkResizeEdge (name: string, value: any, page: Interact.Point, element: Node, interactableElement: Element, rect: Interact.Rect, margin: number) {
+function checkResizeEdge (
+  name: string,
+  value: any,
+  page: Interact.Point,
+  element: Node,
+  interactableElement: Interact.Element,
+  rect: Interact.Rect,
+  margin: number,
+) {
   // false, '', undefined, null
   if (!value) { return false }
 
   // true value, use pointer coords and element rect
   if (value === true) {
     // if dimensions are negative, "switch" edges
-    const width  = utils.is.number(rect.width) ? rect.width  : rect.right  - rect.left
-    const height = utils.is.number(rect.height) ? rect.height : rect.bottom - rect.top
+    const width  = is.number(rect.width) ? rect.width  : rect.right  - rect.left
+    const height = is.number(rect.height) ? rect.height : rect.bottom - rect.top
 
     // don't use margin greater than half the relevent dimension
     margin = Math.min(margin, (name === 'left' || name === 'right' ? width : height) / 2)
@@ -306,13 +321,13 @@ function checkResizeEdge (name: string, value: any, page: Interact.Point, elemen
   }
 
   // the remaining checks require an element
-  if (!utils.is.element(element)) { return false }
+  if (!is.element(element)) { return false }
 
-  return utils.is.element(value)
+  return is.element(value)
   // the value is an element to use as a resize handle
     ? value === element
     // otherwise check if element matches value as selector
-    : utils.dom.matchesUpTo(element, value, interactableElement)
+    : dom.matchesUpTo(element, value, interactableElement)
 }
 
 function initCursors (browser: typeof import ('@interactjs/utils/browser').default) {
@@ -345,12 +360,12 @@ function initCursors (browser: typeof import ('@interactjs/utils/browser').defau
   })
 }
 
-function start ({ iEvent, interaction }: Interact.SignalArg) {
+function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) {
     return
   }
 
-  const startRect = interaction.rect
+  const startRect = extend({}, interaction.rect)
   const resizeOptions = interaction.interactable.options.resize
 
   /*
@@ -360,7 +375,7 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
    * on the active edges and the edge being interacted with.
    */
   if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-    const linkedEdges = utils.extend({}, interaction.prepared.edges)
+    const linkedEdges = extend({}, interaction.prepared.edges)
 
     linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom)
     linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right)
@@ -380,9 +395,14 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
 
   interaction.resizeRects = {
     start     : startRect,
-    current   : utils.extend({}, startRect),
-    inverted  : utils.extend({}, startRect),
-    previous  : utils.extend({}, startRect),
+    current   : {
+      left: startRect.left,
+      right: startRect.right,
+      top: startRect.top,
+      bottom: startRect.bottom,
+    },
+    inverted  : extend({}, startRect),
+    previous  : extend({}, startRect),
     delta     : {
       left: 0,
       right : 0,
@@ -393,11 +413,12 @@ function start ({ iEvent, interaction }: Interact.SignalArg) {
     },
   }
 
+  iEvent.edges = interaction.prepared.edges
   iEvent.rect = interaction.resizeRects.inverted
-  ; (iEvent as ResizeEvent).deltaRect = interaction.resizeRects.delta
+  iEvent.deltaRect = interaction.resizeRects.delta
 }
 
-function move ({ iEvent, interaction }) {
+function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
   const resizeOptions = interaction.interactable.options.resize
@@ -411,10 +432,10 @@ function move ({ iEvent, interaction }) {
   const current    = interaction.resizeRects.current
   const inverted   = interaction.resizeRects.inverted
   const deltaRect  = interaction.resizeRects.delta
-  const previous   = utils.extend(interaction.resizeRects.previous, inverted)
+  const previous   = extend(interaction.resizeRects.previous, inverted)
   const originalEdges = edges
 
-  const eventDelta = utils.extend({}, iEvent.delta)
+  const eventDelta = extend({}, iEvent.delta)
 
   if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
     // `resize.preserveAspectRatio` takes precedence over `resize.square`
@@ -440,7 +461,7 @@ function move ({ iEvent, interaction }) {
 
   if (invertible) {
     // if invertible, copy the current rect
-    utils.extend(inverted, current)
+    extend(inverted, current)
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
@@ -480,8 +501,16 @@ function move ({ iEvent, interaction }) {
   iEvent.deltaRect = deltaRect
 }
 
-function updateEventAxes ({ interaction, iEvent, action }) {
-  if (action !== 'resize' || !interaction.resizeAxes) { return }
+function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+  if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
+
+  iEvent.edges = interaction.prepared.edges
+  iEvent.rect = interaction.resizeRects.inverted
+  iEvent.deltaRect = interaction.resizeRects.delta
+}
+
+function updateEventAxes ({ iEvent, interaction, action }: { iEvent: ResizeEvent, interaction: Interaction, action: ActionName }) {
+  if (action !== ActionName.Resize || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
 
