@@ -8,7 +8,7 @@
     ],
     "allowJs": false,                         /* Allow javascript files to be compiled. */
     "declaration": true,                      /* Generates corresponding '.d.ts' file. */
-    "emitDeclarationOnly": true,
+    "emitDeclarationOnly": false,
     "esModuleInterop": true,
 
     "strict": false,                          /* Enable all strict type-checking options. */
