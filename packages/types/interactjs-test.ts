@@ -1,5 +1,5 @@
 // eslint-disable-next-line node/no-extraneous-import
-import interact from 'interactjs'
+import interact from '../interactjs/index'
 
 // Interactables
 interact(document.body)

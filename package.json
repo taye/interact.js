@@ -67,6 +67,7 @@
     "jsdom": "latest",
     "lerna": "latest",
     "mkdirp": "latest",
+    "nodemon": "latest",
     "nyc": "latest",
     "semver": "latest",
     "tap-spec": "latest",
