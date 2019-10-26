@@ -20,8 +20,11 @@ declare module '@interactjs/core/Interaction' {
         resizeStartAspectRatio: number;
     }
     interface ActionProps {
+        edges?: {
+            [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean;
+        };
         _linkedEdges?: {
-            [key: string]: boolean;
+            [edge in 'top' | 'left' | 'bottom' | 'right']?: boolean;
         };
     }
 }
@@ -40,13 +43,14 @@ declare module '@interactjs/core/scope' {
 }
 export interface ResizeEvent extends Interact.InteractEvent<ActionName.Resize> {
     deltaRect?: Interact.FullRect;
+    edges?: Interact.ActionProps['edges'];
 }
 declare function install(scope: Scope): void;
 declare const resize: {
     id: string;
     install: typeof install;
     defaults: import("../types/types").ResizableOptions;
-    checker(_pointer: import("../types/types").PointerType, _event: import("../types/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: Element, interaction: Interaction<any>, rect: import("../types/types").Rect): {
+    checker(_pointer: import("../types/types").PointerType, _event: import("../types/types").PointerEventType, interactable: import("@interactjs/core/Interactable").Interactable, element: import("../types/types").Element, interaction: Interaction<any>, rect: import("../types/types").Rect): {
         name: string;
         edges: {
             [edge: string]: boolean;
@@ -70,7 +74,7 @@ declare const resize: {
         topright: string;
         bottomleft: string;
     };
-    getCursor(action: ActionProps<any>): string;
+    getCursor({ edges, axis, name }: ActionProps<any>): string;
     defaultMargin: number;
 };
 export default resize;

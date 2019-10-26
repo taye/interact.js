@@ -4,10 +4,10 @@ import InteractEvent from '@interactjs/core/InteractEvent';
 import Interaction from '@interactjs/core/Interaction';
 import { ActionName } from '@interactjs/core/scope';
 declare class DropEvent extends BaseEvent {
-    target: Element;
+    target: Interact.Element;
     dropzone: Interactable;
     dragEvent: InteractEvent<ActionName.Drag>;
-    relatedTarget: Element;
+    relatedTarget: Interact.Element;
     draggable: Interactable;
     timeStamp: number;
     propagationStopped: boolean;

@@ -19,17 +19,17 @@ declare module '@interactjs/core/defaultOptions' {
         manualStart?: boolean;
         max?: number;
         maxPerElement?: number;
-        allowFrom?: string | Element;
-        ignoreFrom?: string | Element;
+        allowFrom?: string | Interact.Element;
+        ignoreFrom?: string | Interact.Element;
         mouseButtons?: 0 | 1 | 2 | 4 | 16;
     }
 }
 export interface AutoStart {
     maxInteractions: number;
     withinInteractionLimit: typeof withinInteractionLimit;
-    cursorElement: HTMLElement;
+    cursorElement: Interact.Element;
     signals: utils.Signals;
 }
-declare function withinInteractionLimit(interactable: Interact.Interactable, element: Element, action: any, scope: Interact.Scope): boolean;
+declare function withinInteractionLimit(interactable: Interact.Interactable, element: Interact.Element, action: any, scope: Interact.Scope): boolean;
 declare const _default: import("@interactjs/core/scope").Plugin;
 export default _default;

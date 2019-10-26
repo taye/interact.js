@@ -5,12 +5,12 @@ export default class InteractableSet {
     list: Interact.Interactable[];
     selectorMap: {
         [selector: string]: Array<{
-            context: Document | Element;
+            context: Document | Interact.Element;
             interactable: Interact.Interactable;
         }>;
     };
     constructor(scope: Interact.Scope);
     new(target: Interact.Target, options?: any): Interact.Interactable;
     get(target: Interact.Target, options: any): any;
-    forEachMatch(node: Node, callback: (interactable: any) => any): any;
+    forEachMatch<T>(node: Node, callback: (interactable: Interact.Interactable) => T): T | void;
 }

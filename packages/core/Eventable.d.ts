@@ -11,5 +11,6 @@ declare class Eventable {
     fire(event: any): void;
     on(type: string, listener: Interact.ListenersArg): void;
     off(type: string, listener: Interact.ListenersArg): void;
+    getRect(_element: Interact.Element): any;
 }
 export default Eventable;

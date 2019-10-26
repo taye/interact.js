@@ -1,13 +1,19 @@
-import Interaction from '@interactjs/core/Interaction';
-declare function start({ interaction, state }: {
-    interaction: Interaction;
-    state: any;
-}): void;
-declare function set({ coords, interaction, state }: {
-    coords: Interact.Point;
-    interaction: Interaction;
-    state: any;
-}): void;
+import { ModifierArg, ModifierState } from '../base';
+import { RestrictOptions } from './pointer';
+export interface RestrictEdgesOptions {
+    inner: RestrictOptions['restriction'];
+    outer: RestrictOptions['restriction'];
+    offset?: RestrictOptions['offset'];
+    endOnly: boolean;
+    enabled?: boolean;
+}
+export declare type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
+    inner: Interact.Rect;
+    outer: Interact.Rect;
+    offset: RestrictEdgesOptions['offset'];
+}>;
+declare function start({ interaction, state }: ModifierArg<RestrictEdgesState>): void;
+declare function set({ coords, interaction, state }: ModifierArg<RestrictEdgesState>): void;
 declare const restrictEdges: {
     noInner: {
         top: number;
@@ -21,14 +27,9 @@ declare const restrictEdges: {
         bottom: number;
         right: number;
     };
-    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types/types").Point) => any;
+    getRestrictionRect: (value: any, interaction: any, coords?: import("../../types/types").Point) => import("../../types/types").Rect;
     start: typeof start;
     set: typeof set;
-    defaults: {
-        enabled: boolean;
-        inner: any;
-        outer: any;
-        offset: any;
-    };
+    defaults: RestrictEdgesOptions;
 };
 export default restrictEdges;

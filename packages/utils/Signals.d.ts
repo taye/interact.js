@@ -1,7 +1,7 @@
 export declare type SignalListener = (signalArg: PartialSignalArg, sinalName?: string) => (void | boolean);
 export interface SignalArg<T extends Interact.ActionName = any> {
     interaction: Interact.Interaction<T>;
-    Interactable: Interact.Interactable;
+    interactable: Interact.Interactable;
     iEvent: Interact.InteractEvent<T>;
     element: Interact.EventTarget;
     coords: Interact.Point;
