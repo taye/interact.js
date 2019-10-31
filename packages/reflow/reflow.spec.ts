@@ -1,7 +1,7 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
 import PromisePolyfill from 'promise-polyfill'
-import reflow from './'
+import * as helpers from '../core/tests/_helpers'
+import reflow from './index'
 
 test('reflow', t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })

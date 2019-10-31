@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import * as helpers from '../../core/tests/_helpers'
 import restrict from '../restrict/pointer'
 
 test('restrict larger than restriction', t => {

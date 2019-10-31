@@ -1,8 +1,8 @@
-import { PerActionDefaults } from '@interactjs/core/defaultOptions'
-import Eventable from '@interactjs/core/Eventable'
-import Interaction from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils'
+import { PerActionDefaults } from '../core/defaultOptions'
+import Eventable from '../core/Eventable'
+import Interaction from '../core/Interaction'
+import { Scope } from '../core/scope'
+import * as utils from '../utils/index'
 import PointerEvent from './PointerEvent'
 
 export type EventTargetList = Array<{

@@ -1,12 +1,9 @@
-import { warnOnce } from '@interactjs/utils'
-import * as is from '@interactjs/utils/is'
+import { warnOnce } from '../utils/index'
+import * as is from '../utils/is'
 
 // TODO: there seems to be a @babel/preset-typescript bug causing regular import
 // syntax to remain in js output
-type Scope = import ('@interactjs/core/scope').Scope
 type Actions = import ('@interactjs/core/scope').Actions
-type Interaction = import ('@interactjs/core/Interaction').default
-type Interactable = import ('@interactjs/core/Interactable').default
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -25,7 +22,7 @@ declare module '@interactjs/core/Interaction' {
   }
 }
 
-function install (scope: Scope) {
+function install (scope: Interact.Scope) {
   const {
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
@@ -62,7 +59,7 @@ function install (scope: Scope) {
    * @return {string | Element | object} The current ignoreFrom value or this
    * Interactable
    */
-  Interactable.prototype.ignoreFrom = warnOnce(function (this: Interactable, newValue) {
+  Interactable.prototype.ignoreFrom = warnOnce(function (this: Interact.Interactable, newValue) {
     return this._backCompatOption('ignoreFrom', newValue)
   }, 'Interactable.ignoreFrom() has been deprecated. Use Interactble.draggable({ignoreFrom: newValue}).')
 
@@ -89,7 +86,7 @@ function install (scope: Scope) {
    * @return {string | Element | object} The current allowFrom value or this
    * Interactable
    */
-  Interactable.prototype.allowFrom = warnOnce(function (this: Interactable, newValue) {
+  Interactable.prototype.allowFrom = warnOnce(function (this: Interact.Interactable, newValue) {
     return this._backCompatOption('allowFrom', newValue)
   }, 'Interactable.allowFrom() has been deprecated. Use Interactble.draggable({allowFrom: newValue}).')
 
@@ -135,16 +132,16 @@ function install (scope: Scope) {
    */
   Interactable.prototype.styleCursor = styleCursor
 
-  Interactable.prototype.defaultActionChecker = function (this: Interactable, pointer, event, interaction, element) {
+  Interactable.prototype.defaultActionChecker = function (this: Interact.Interactable, pointer, event, interaction, element) {
     return defaultActionChecker(this, pointer, event, interaction, element, actions)
   }
 }
 
 function getAction (
-  this: Interactable,
+  this: Interact.Interactable,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  interaction: Interaction,
+  interaction: Interact.Interaction,
   element: Interact.Element,
 ): Interact.ActionProps {
   const action = this.defaultActionChecker(pointer, event, interaction, element)
@@ -157,10 +154,10 @@ function getAction (
 }
 
 function defaultActionChecker (
-  interactable: Interactable,
+  interactable: Interact.Interactable,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  interaction: Interaction,
+  interaction: Interact.Interaction,
   element: Interact.Element,
   actions: Actions,
 ) {
@@ -189,7 +186,7 @@ function defaultActionChecker (
   }
 }
 
-function styleCursor (this: Interactable, newValue?: boolean) {
+function styleCursor (this: Interact.Interactable, newValue?: boolean) {
   if (is.bool(newValue)) {
     this.options.styleCursor = newValue
 
@@ -205,7 +202,7 @@ function styleCursor (this: Interactable, newValue?: boolean) {
   return this.options.styleCursor
 }
 
-function actionChecker (this: Interactable, checker: any) {
+function actionChecker (this: Interact.Interactable, checker: any) {
   if (is.func(checker)) {
     this.options.actionChecker = checker
 

@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import * as helpers from '../core/tests/_helpers'
 import hold from './hold'
 
 test('autoStart/hold', t => {

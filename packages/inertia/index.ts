@@ -1,7 +1,7 @@
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import modifiers, { restoreCoords, setCoords } from '@interactjs/modifiers/base'
-import * as utils from '@interactjs/utils'
-import raf from '@interactjs/utils/raf'
+import { EventPhase } from '../core/InteractEvent'
+import modifiers, { restoreCoords, setCoords } from '../modifiers/base'
+import * as utils from '../utils/index'
+import raf from '../utils/raf'
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow

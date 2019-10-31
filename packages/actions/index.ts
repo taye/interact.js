@@ -1,6 +1,6 @@
-import { Scope } from '@interactjs/core/scope'
+import { Scope } from '../core/scope'
 import drag, { DragEvent } from './drag'
-import drop from './drop'
+import drop from './drop/index'
 import gesture, { GestureEvent } from './gesture'
 import resize, { ResizeEvent } from './resize'
 

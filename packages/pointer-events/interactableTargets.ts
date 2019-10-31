@@ -1,6 +1,6 @@
-import { Scope } from '@interactjs/core/scope'
-import { merge } from '@interactjs/utils/arr'
-import extend from '@interactjs/utils/extend'
+import { Scope } from '../core/scope'
+import { merge } from '../utils/arr'
+import extend from '../utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default
 
@@ -35,7 +35,7 @@ function install (scope: Scope) {
   }
 }
 
-function pointerEventsMethod (this: Interactable, options: any) {
+function pointerEventsMethod (this: Interact.Interactable, options: any) {
   extend(this.events.options, options)
 
   return this

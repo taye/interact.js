@@ -1,4 +1,4 @@
-import extend from '@interactjs/utils/extend'
+import extend from '../utils/extend'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

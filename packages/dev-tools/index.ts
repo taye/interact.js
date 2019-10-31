@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 /* global process */
-import domObjects from '@interactjs/utils/domObjects'
-import { parentNode } from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
-import win from '@interactjs/utils/window'
+import domObjects from '../utils/domObjects'
+import { parentNode } from '../utils/domUtils'
+import extend from '../utils/extend'
+import * as is from '../utils/is'
+import win from '../utils/window'
 
 declare module '@interactjs/core/scope' {
   interface Scope {

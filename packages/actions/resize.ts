@@ -1,9 +1,9 @@
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
-import * as dom from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import { ActionProps, Interaction } from '../core/Interaction'
+import { ActionName, Scope } from '../core/scope'
+import * as arr from '../utils/arr'
+import * as dom from '../utils/domUtils'
+import extend from '../utils/extend'
+import * as is from '../utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 

@@ -1,8 +1,8 @@
 import test from '@interactjs/_dev/test/test'
-import { ActionName } from '@interactjs/core/scope'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import { extend } from '@interactjs/utils'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+import { ActionName } from '../core/scope'
+import * as helpers from '../core/tests/_helpers'
+import { extend } from '../utils'
+import pointerUtils from '../utils/pointerUtils'
 import drag from './drag'
 
 test('drag action init', t => {

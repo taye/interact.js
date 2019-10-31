@@ -1,5 +1,5 @@
-import BaseEvent from '@interactjs/core/BaseEvent'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+import BaseEvent from '../core/BaseEvent'
+import pointerUtils from '../utils/pointerUtils'
 
 /** */
 export default class PointerEvent<T extends string> extends BaseEvent {

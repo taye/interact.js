@@ -1,6 +1,6 @@
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
-import * as is from '@interactjs/utils/is'
+import { ActionName, Scope } from '../core/scope'
+import * as arr from '../utils/arr'
+import * as is from '../utils/is'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {

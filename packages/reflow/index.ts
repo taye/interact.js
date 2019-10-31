@@ -1,8 +1,8 @@
-import Interactable from '@interactjs/core/Interactable'
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
-import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
+import Interactable from '../core/Interactable'
+import { EventPhase } from '../core/InteractEvent'
+import { ActionProps, Interaction } from '../core/Interaction'
+import { Scope } from '../core/scope'
+import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '../utils/index'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {

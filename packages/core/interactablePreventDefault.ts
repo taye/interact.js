@@ -1,7 +1,7 @@
-import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
-import * as is from '@interactjs/utils/is'
-import { getWindow } from '@interactjs/utils/window'
+import { matchesSelector, nodeContains } from '../utils/domUtils'
+import events from '../utils/events'
+import * as is from '../utils/is'
+import { getWindow } from '../utils/window'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {

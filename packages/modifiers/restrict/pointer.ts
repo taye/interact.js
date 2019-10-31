@@ -1,6 +1,6 @@
-import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
-import rectUtils from '@interactjs/utils/rect'
+import extend from '../../utils/extend'
+import * as is from '../../utils/is'
+import rectUtils from '../../utils/rect'
 import { ModifierArg, ModifierState } from '../base'
 
 export interface RestrictOptions {

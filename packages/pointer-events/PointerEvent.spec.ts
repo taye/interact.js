@@ -1,6 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+import * as helpers from '../core/tests/_helpers'
+import pointerUtils from '../utils/pointerUtils'
 import PointerEvent from './PointerEvent'
 
 test('PointerEvent constructor', t => {
