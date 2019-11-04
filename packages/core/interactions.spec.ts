@@ -24,10 +24,9 @@ test('interactions', t => {
   const newInteraction = scope.interactions.new({})
 
   t.assert(typeof scope.interactions === 'object')
-  t.assert(scope.interactions.signals instanceof Signals)
   t.assert(typeof scope.interactions.new === 'function')
   t.assert(newInteraction instanceof Interaction)
-  t.equal(newInteraction._signals, scope.interactions.signals)
+  t.equal(newInteraction._signals, scope.signals)
 
   t.assert(typeof scope.actions === 'object')
   t.deepEqual(scope.actions.names, [])
@@ -42,7 +41,7 @@ test('interactions document event options', t => {
 
   let options = {}
   scope.browser = { isIOS: false }
-  scope.signals.fire('add-document', { doc, scope, options })
+  scope.signals.fire('scope:add-document', { doc, scope, options })
 
   t.deepEqual(
     options,
@@ -52,7 +51,7 @@ test('interactions document event options', t => {
   options = {}
 
   scope.browser.isIOS = true
-  scope.signals.fire('add-document', { doc, scope, options })
+  scope.signals.fire('scope:add-document', { doc, scope, options })
 
   t.deepEqual(
     options,

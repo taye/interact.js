@@ -78,7 +78,7 @@ export class Scope {
       set (options: any) {
         super.set(options)
 
-        scope.interactables.signals.fire('set', {
+        scope.signals.fire('interactable:set', {
           options,
           interactable: this,
         })
@@ -93,7 +93,7 @@ export class Scope {
 
           if (interaction.interactable === this) {
             interaction.stop()
-            scope.interactions.signals.fire('destroy', { interaction })
+            scope.signals.fire('interactions:destroy', { interaction })
             interaction.destroy()
 
             if (scope.interactions.list.length > 2) {
@@ -102,7 +102,7 @@ export class Scope {
           }
         }
 
-        scope.interactables.signals.fire('unset', { interactable: this })
+        scope.signals.fire('interactable:unset', { interactable: this })
       }
     }
   }
@@ -147,7 +147,7 @@ export class Scope {
       events.add(window, 'unload', this.onWindowUnload)
     }
 
-    this.signals.fire('add-document', { doc, window, scope: this, options })
+    this.signals.fire('scope:add-document', { doc, window, scope: this, options })
   }
 
   removeDocument (doc: Document) {
@@ -161,7 +161,7 @@ export class Scope {
     this.documents.splice(index, 1)
     events.documents.splice(index, 1)
 
-    this.signals.fire('remove-document', { doc, window, scope: this, options })
+    this.signals.fire('scope:remove-document', { doc, window, scope: this, options })
   }
 
   getDocIndex (doc: Document) {

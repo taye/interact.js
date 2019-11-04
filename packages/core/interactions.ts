@@ -12,7 +12,6 @@ declare module '@interactjs/core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {
-      signals: Signals
       new: (options: any) => InteractionBase
       list: InteractionBase[]
       listeners: { [type: string]: Interact.Listener }
@@ -29,8 +28,7 @@ const methodNames = [
 ]
 
 function install (scope: Scope) {
-  const signals = new Signals()
-
+  const { signals } = scope
   const listeners = {} as any
 
   for (const method of methodNames) {
@@ -72,8 +70,10 @@ function install (scope: Scope) {
     },
   })
 
-  scope.signals.on('add-document', onDocSignal)
-  scope.signals.on('remove-document', onDocSignal)
+  signals.addHandler({
+    'scope:add-document': onDocSignal,
+    'scope:remove-document': onDocSignal,
+  })
 
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
@@ -91,7 +91,6 @@ function install (scope: Scope) {
   }
 
   scope.interactions = {
-    signals,
     // all active and idle interactions
     list: [],
     new (options: { pointerType?: string, signals?: Signals }) {
@@ -212,14 +211,14 @@ function getInteraction (searchDetails: SearchDetails) {
   const foundInteraction = finder.search(searchDetails)
   const signalArg = { interaction: foundInteraction, searchDetails }
 
-  scope.interactions.signals.fire('find', signalArg)
+  scope.signals.fire('interactions:find', signalArg)
 
   return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
 function onDocSignal ({ doc, scope, options }, signalName) {
   const { docEvents } = scope.interactions
-  const eventMethod = signalName.indexOf('add') === 0
+  const eventMethod = signalName === 'scope:add-document'
     ? events.add : events.remove
 
   if (scope.browser.isIOS && !options.events) {

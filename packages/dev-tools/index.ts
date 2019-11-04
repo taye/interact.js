@@ -58,23 +58,25 @@ const isProduction = process.env.NODE_ENV === 'production'
 // eslint-disable-next-line no-restricted-syntax
 function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
   const {
-    interactions,
     Interactable,
     defaults,
+    signals,
   } = scope
   logger = logger || console
 
-  interactions.signals.on('action-start', ({ interaction }) => {
-    for (const check of checks) {
-      const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
+  signals.addHandler({
+    'interactions:action-start': ({ interaction }) => {
+      for (const check of checks) {
+        const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
 
-      if (
-        !(options && options.devTools && options.devTools.ignore[check.name]) &&
-        check.perform(interaction)
-      ) {
-        logger.warn(prefix + check.text, ...check.getInfo(interaction))
+        if (
+          !(options && options.devTools && options.devTools.ignore[check.name]) &&
+          check.perform(interaction)
+        ) {
+          logger.warn(prefix + check.text, ...check.getInfo(interaction))
+        }
       }
-    }
+    },
   })
 
   defaults.base.devTools = {

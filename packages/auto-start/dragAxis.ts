@@ -6,7 +6,9 @@ import autoStart from './base'
 type Scope = import ('@interactjs/core/scope').Scope
 
 function install (scope: Scope) {
-  scope.autoStart.signals.on('before-start',  ({ interaction, eventTarget, dx, dy }) => {
+  scope.signals.addHandler({ 'autoStart:before-start': beforeStart })
+
+  function beforeStart ({ interaction, eventTarget, dx, dy }) {
     if (interaction.prepared.name !== 'drag') { return }
 
     // check if a drag is in the correct axis
@@ -61,7 +63,7 @@ function install (scope: Scope) {
         element = parentNode(element)
       }
     }
-  })
+  }
 
   function checkStartAxis (startAxis, interactable) {
     if (!interactable) { return false }

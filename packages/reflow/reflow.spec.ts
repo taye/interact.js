@@ -26,7 +26,7 @@ test('reflow', t => {
   interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords
-  scope.interactions.signals.on('before-action-move', ({ interaction }) => {
+  scope.signals.on('interactions:before-action-move', ({ interaction }) => {
     interaction.coords.cur.page = {
       x: rect.left + 100,
       y: rect.top - 50,
@@ -107,7 +107,7 @@ test('async reflow', async t => {
 
   let stoppedFromTimeout
   // block the end of the reflow interaction and stop it after a timeout
-  scope.interactions.signals.on('before-action-end', ({ interaction }) => {
+  scope.signals.on('interactions:before-action-end', ({ interaction }) => {
     setTimeout(() => { interaction.stop(); stoppedFromTimeout = true }, 0)
     return false
   })

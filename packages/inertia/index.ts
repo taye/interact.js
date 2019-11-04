@@ -64,23 +64,25 @@ declare module '@interactjs/core/defaultOptions' {
 
 function install (scope: Interact.Scope) {
   const {
-    interactions,
     defaults,
+    signals,
   } = scope
 
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.inertia = {
-      active     : false,
-      smoothEnd  : false,
-      allowResume: false,
-      upCoords   : {} as any,
-      timeout    : null,
-    }
-  })
+  signals.addHandler({
+    'interactions:new': ({ interaction }) => {
+      interaction.inertia = {
+        active     : false,
+        smoothEnd  : false,
+        allowResume: false,
+        upCoords   : {} as any,
+        timeout    : null,
+      }
+    },
 
-  interactions.signals.on('before-action-end', (arg: Interact.SignalArg) => release(arg, scope))
-  interactions.signals.on('down', (arg: Interact.SignalArg) => resume(arg, scope))
-  interactions.signals.on('stop', stop)
+    'interactions:before-action-end': (arg: Interact.SignalArg) => release(arg, scope),
+    'interactions:down': (arg: Interact.SignalArg) => resume(arg, scope),
+    'interactions:stop': stop,
+  })
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -127,7 +129,7 @@ function resume (
           phase: EventPhase.Resume,
         }
 
-        scope.interactions.signals.fire('action-resume', signalArg)
+        scope.signals.fire('interactions:action-resume', signalArg)
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(

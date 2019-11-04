@@ -35,15 +35,17 @@ function install (scope: Scope) {
   const {
     actions,
     Interactable,
-    interactions,
     defaults,
+    signals,
   } = scope
 
-  interactions.signals.on('before-action-move', beforeMove)
-  interactions.signals.on('action-resume', beforeMove)
+  signals.addHandler({
+    'interactions:before-action-move': beforeMove,
+    'interactions:action-resume': beforeMove,
 
-  // dragmove
-  interactions.signals.on('action-move', move)
+    // dragmove
+    'interactions:action-move': move,
+  })
 
   Interactable.prototype.draggable = drag.draggable
 

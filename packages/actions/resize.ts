@@ -66,20 +66,26 @@ function install (scope: Scope) {
     Interactable, // tslint:disable-line no-shadowed-variable
     interactions,
     defaults,
+    signals,
   } = scope
 
   // Less Precision with touch input
 
-  interactions.signals.on('new', interaction => {
-    interaction.resizeAxes = 'xy'
+  signals.addHandler({
+    'interactions:new': interaction => {
+      interaction.resizeAxes = 'xy'
+    },
+
+    'interactions:action-start': arg => {
+      start(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-move': arg => {
+      move(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-end': end,
   })
-
-  interactions.signals.on('action-start', start)
-  interactions.signals.on('action-move', move)
-  interactions.signals.on('action-end', end)
-
-  interactions.signals.on('action-start', updateEventAxes)
-  interactions.signals.on('action-move', updateEventAxes)
 
   resize.cursors = initCursors(browser)
   resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10

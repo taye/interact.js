@@ -29,10 +29,10 @@ declare module '@interactjs/core/InteractEvent' {
 export function install (scope: Scope) {
   const {
     actions,
-    interactions,
     /** @lends Interactable */
     // eslint-disable-next-line no-shadow
     Interactable,
+    signals,
   } = scope
 
   // add action reflow event types
@@ -40,15 +40,17 @@ export function install (scope: Scope) {
     actions.eventTypes.push(`${actionName}reflow`)
   }
 
-  // remove completed reflow interactions
-  interactions.signals.on('stop', ({ interaction }) => {
-    if (interaction.pointerType === EventPhase.Reflow) {
-      if (interaction._reflowResolve) {
-        interaction._reflowResolve()
-      }
+  signals.addHandler({
+    // remove completed reflow interactions
+    'interactions:stop': ({ interaction }) => {
+      if (interaction.pointerType === EventPhase.Reflow) {
+        if (interaction._reflowResolve) {
+          interaction._reflowResolve()
+        }
 
-      arr.remove(scope.interactions.list, interaction)
-    }
+        arr.remove(scope.interactions.list, interaction)
+      }
+    },
   })
 
   /**
@@ -65,7 +67,7 @@ export function install (scope: Scope) {
    *
    * @param { Object } action The action to begin
    * @param { string } action.name The name of the action
-   * @returns { Promise<Interactable> }
+   * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
    */
   Interactable.prototype.reflow = function (action) {
     return reflow(this, action, scope)

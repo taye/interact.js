@@ -15,9 +15,8 @@ declare module '@interactjs/core/Interaction' {
 
 function install (scope: Interact.Scope) {
   const {
-    autoStart,
-    interactions,
     defaults,
+    signals,
   } = scope
 
   scope.usePlugin(basePlugin)
@@ -25,33 +24,35 @@ function install (scope: Interact.Scope) {
   defaults.perAction.hold = 0
   defaults.perAction.delay = 0
 
-  interactions.signals.on('new', interaction => {
-    interaction.autoStartHoldTimer = null
-  })
+  signals.addHandler({
+    'interactions:new': interaction => {
+      interaction.autoStartHoldTimer = null
+    },
 
-  autoStart.signals.on('prepared', ({ interaction }) => {
-    const hold = getHoldDuration(interaction)
+    'autoStart:prepared': ({ interaction }) => {
+      const hold = getHoldDuration(interaction)
 
-    if (hold > 0) {
-      interaction.autoStartHoldTimer = setTimeout(() => {
-        interaction.start(interaction.prepared, interaction.interactable, interaction.element)
-      }, hold)
-    }
-  })
+      if (hold > 0) {
+        interaction.autoStartHoldTimer = setTimeout(() => {
+          interaction.start(interaction.prepared, interaction.interactable, interaction.element)
+        }, hold)
+      }
+    },
 
-  interactions.signals.on('move', ({ interaction, duplicate }) => {
-    if (interaction.pointerWasMoved && !duplicate) {
-      clearTimeout(interaction.autoStartHoldTimer)
-    }
-  })
+    'interactions:move': ({ interaction, duplicate }) => {
+      if (interaction.pointerWasMoved && !duplicate) {
+        clearTimeout(interaction.autoStartHoldTimer)
+      }
+    },
 
-  // prevent regular down->move autoStart
-  autoStart.signals.on('before-start', ({ interaction }) => {
-    const hold = getHoldDuration(interaction)
+    // prevent regular down->move autoStart
+    'autoStart:before-start': ({ interaction }) => {
+      const hold = getHoldDuration(interaction)
 
-    if (hold > 0) {
-      interaction.prepared.name = null
-    }
+      if (hold > 0) {
+        interaction.prepared.name = null
+      }
+    },
   })
 }
 

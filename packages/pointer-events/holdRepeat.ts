@@ -15,17 +15,21 @@ declare module '@interactjs/pointer-events/base' {
 function install (scope: Interact.Scope) {
   const {
     pointerEvents,
-    interactions,
+    signals,
   } = scope
 
   scope.usePlugin(basePlugin)
 
-  pointerEvents.signals.on('new', onNew)
-  pointerEvents.signals.on('fired', arg => onFired(arg as any, scope))
-
-  for (const signal of ['move', 'up', 'cancel', 'endall']) {
-    interactions.signals.on(signal, endHoldRepeat)
-  }
+  signals.addHandler(['move', 'up', 'cancel', 'endall'].reduce(
+    (acc, enderTypes) => {
+      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat
+      return acc
+    },
+    {
+      'pointerEvents:new': onNew,
+      'pointerEvents:fired': arg => onFired(arg as any, scope),
+    }
+  ))
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0

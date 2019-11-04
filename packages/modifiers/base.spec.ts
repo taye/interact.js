@@ -139,7 +139,7 @@ test('modifiers/base', t => {
   interaction.pointerMove(moveEvent, moveEvent, element)
 
   t.doesNotThrow(() => {
-    interaction._signals.fire('action-resume', {
+    interaction._signals.fire('interactions:action-resume', {
       interaction,
     })
   }, 'action-resume doesn\'t throw errors')

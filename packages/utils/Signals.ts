@@ -13,10 +13,18 @@ export interface SignalArg<T extends Interact.ActionName = any> {
 
 export type PartialSignalArg = Partial<SignalArg>
 
+interface HandlerMap { [index: string]: SignalListener }
+
 class Signals {
   listeners: {
     [signalName: string]: SignalListener[]
   } = {}
+
+  handlers: HandlerMap[] = []
+
+  addHandler (handlerMap: HandlerMap) {
+    this.handlers.push(handlerMap)
+  }
 
   on (name: string, listener: SignalListener) {
     if (!this.listeners[name]) {
@@ -38,6 +46,14 @@ class Signals {
   }
 
   fire (name: string, arg: Partial<SignalArg>): void | false {
+    for (const handler of this.handlers) {
+      if (handler[name]) {
+        if (handler[name](arg, name) === false) {
+          return false
+        }
+      }
+    }
+
     const targetListeners = this.listeners[name]
 
     if (!targetListeners) { return }

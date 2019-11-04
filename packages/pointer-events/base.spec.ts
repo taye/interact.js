@@ -89,6 +89,8 @@ test('pointerEvents.fire', t => {
 })
 
 test('pointerEvents.collectEventTargets', t => {
+  const { scope } = helpers.testEnv()
+
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
   const target = {
@@ -104,18 +106,18 @@ test('pointerEvents.collectEventTargets', t => {
     collectedTargets = targets
   }
 
-  pointerEvents.signals.on('collect-targets', onCollect)
+  scope.signals.on('pointerEvents:collect-targets', onCollect)
   pointerEvents.collectEventTargets({
     interaction: new Interaction({ signals: helpers.mockSignals() } as any),
     pointer: {},
     event: {},
     eventTarget: {},
     type,
-  } as any)
+  } as any, scope)
 
   t.deepEqual(collectedTargets, [target])
 
-  pointerEvents.signals.off('collect-targets', onCollect)
+  scope.signals.off('interactions:collect-targets', onCollect)
 
   t.end()
 })

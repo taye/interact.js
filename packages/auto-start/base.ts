@@ -44,63 +44,19 @@ export interface AutoStart {
 function install (scope: Interact.Scope) {
   const {
     interact,
-    interactions,
+    signals,
     defaults,
   } = scope
 
   scope.usePlugin(InteractableMethods)
 
-  // set cursor style on mousedown
-  interactions.signals.on('down', ({ interaction, pointer, event, eventTarget }) => {
-    if (interaction.interacting()) { return }
-
-    const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
-    prepare(interaction, actionInfo, scope)
-  })
-
-  // set cursor style on mousemove
-  interactions.signals.on('move', ({ interaction, pointer, event, eventTarget }) => {
-    if (interaction.pointerType !== 'mouse' ||
-        interaction.pointerIsDown ||
-        interaction.interacting()) { return }
-
-    const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
-    prepare(interaction, actionInfo, scope)
-  })
-
-  interactions.signals.on('move', arg => {
-    const { interaction } = arg
-
-    if (!interaction.pointerIsDown ||
-        interaction.interacting() ||
-        !interaction.pointerWasMoved ||
-        !interaction.prepared.name) {
-      return
-    }
-
-    scope.autoStart.signals.fire('before-start', arg)
-
-    const { interactable } = interaction
-
-    if (interaction.prepared.name && interactable) {
-      // check manualStart and interaction limit
-      if (interactable.options[interaction.prepared.name].manualStart ||
-          !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
-        interaction.stop()
-      }
-      else {
-        interaction.start(interaction.prepared, interactable, interaction.element)
-        setInteractionCursor(interaction, scope)
-      }
-    }
-  })
-
-  interactions.signals.on('stop', ({ interaction }) => {
-    const { interactable } = interaction
-
-    if (interactable && interactable.options.styleCursor) {
-      setCursor(interaction.element, '', scope)
-    }
+  signals.addHandler({
+    'interactions:down': arg => prepareOnDown(arg as Interact.SignalArg, scope),
+    'interactions:move': (arg: Interact.SignalArg) => {
+      prepareOnMove(arg, scope)
+      startOnMove(arg, scope)
+    },
+    'interactions:stop': arg => clearCursorOnStop(arg as Interact.SignalArg, scope),
   })
 
   defaults.base.actionChecker = null
@@ -137,6 +93,57 @@ function install (scope: Interact.Scope) {
     withinInteractionLimit,
     cursorElement: null,
     signals: new utils.Signals(),
+  }
+}
+
+function prepareOnDown ({ interaction, pointer, event, eventTarget }: Interact.SignalArg, scope: Interact.Scope) {
+  if (interaction.interacting()) { return }
+
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
+  prepare(interaction, actionInfo, scope)
+}
+
+function prepareOnMove ({ interaction, pointer, event, eventTarget }: Interact.SignalArg, scope: Interact.Scope) {
+  if (interaction.pointerType !== 'mouse' ||
+      interaction.pointerIsDown ||
+      interaction.interacting()) { return }
+
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
+  prepare(interaction, actionInfo, scope)
+}
+
+function startOnMove (arg: Interact.SignalArg, scope: Interact.Scope) {
+  const { interaction } = arg
+
+  if (!interaction.pointerIsDown ||
+      interaction.interacting() ||
+      !interaction.pointerWasMoved ||
+      !interaction.prepared.name) {
+    return
+  }
+
+  scope.signals.fire('autoStart:before-start', arg)
+
+  const { interactable } = interaction
+
+  if (interaction.prepared.name && interactable) {
+    // check manualStart and interaction limit
+    if (interactable.options[interaction.prepared.name].manualStart ||
+        !withinInteractionLimit(interactable, interaction.element, interaction.prepared, scope)) {
+      interaction.stop()
+    }
+    else {
+      interaction.start(interaction.prepared, interactable, interaction.element)
+      setInteractionCursor(interaction, scope)
+    }
+  }
+}
+
+function clearCursorOnStop ({ interaction }: { interaction: Interact.Interaction }, scope: Interact.Scope) {
+  const { interactable } = interaction
+
+  if (interactable && interactable.options.styleCursor) {
+    setCursor(interaction.element, '', scope)
   }
 }
 
@@ -255,7 +262,7 @@ function prepare (
 
   setInteractionCursor(interaction, scope)
 
-  scope.autoStart.signals.fire('prepared', { interaction })
+  scope.signals.fire('autoStart:prepared', { interaction })
 }
 
 function withinInteractionLimit (interactable: Interact.Interactable, element: Interact.Element, action, scope: Interact.Scope) {

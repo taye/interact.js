@@ -61,8 +61,8 @@ function install (scope: Scope) {
   const {
     actions,
     Interactable,
-    interactions,
     defaults,
+    signals,
   } = scope
 
   /**
@@ -106,18 +106,20 @@ function install (scope: Scope) {
     return this.options.gesture as Interact.Options
   } as GesturableMethod
 
-  interactions.signals.on('action-start', updateGestureProps)
-  interactions.signals.on('action-move', updateGestureProps)
-  interactions.signals.on('action-end', updateGestureProps)
+  signals.addHandler({
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
 
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.gesture = {
-      angle: 0,
-      distance: 0,
-      scale: 1,
-      startAngle: 0,
-      startDistance: 0,
-    }
+    'interactions:new': ({ interaction }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0,
+      }
+    },
   })
 
   actions[ActionName.Gesture] = gesture

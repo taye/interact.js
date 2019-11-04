@@ -33,29 +33,31 @@ export interface AutoScrollOptions {
 
 function install (scope: Scope) {
   const {
-    interactions,
     defaults,
     actions,
+    signals,
   } = scope
 
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
 
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.autoScroll = null
+  signals.addHandler({
+    'interactions:new': ({ interaction }) => {
+      interaction.autoScroll = null
+    },
+
+    'interactions:destroy': ({ interaction }) => {
+      interaction.autoScroll = null
+      autoScroll.stop()
+      if (autoScroll.interaction) {
+        autoScroll.interaction = null
+      }
+    },
+
+    'interactions:stop': autoScroll.stop,
+
+    'interactions:action-move': (arg: any) => autoScroll.onInteractionMove(arg),
   })
-
-  interactions.signals.on('destroy', ({ interaction }) => {
-    interaction.autoScroll = null
-    autoScroll.stop()
-    if (autoScroll.interaction) {
-      autoScroll.interaction = null
-    }
-  })
-
-  interactions.signals.on('stop', autoScroll.stop)
-
-  interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg))
 
   actions.eventTypes.push('autoscroll')
   defaults.perAction.autoScroll = autoScroll.defaults

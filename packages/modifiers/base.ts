@@ -84,40 +84,42 @@ export interface ModifierArg<State extends ModifierState = ModifierState> extend
 
 function install (scope: Scope) {
   const {
-    interactions,
+    signals,
   } = scope
 
   scope.defaults.perAction.modifiers = []
 
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.modifiers = {
-      startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
-      offsets: {},
-      states: null,
-      result: null,
-      endPrevented: false,
-      startDelta: null,
-    }
+  signals.addHandler({
+    'interactions:new': ({ interaction }) => {
+      interaction.modifiers = {
+        startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+        offsets: {},
+        states: null,
+        result: null,
+        endPrevented: null,
+        startDelta: null,
+      }
+    },
+
+    'interactions:before-action-start': (arg: Interact.SignalArg) => {
+      start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page)
+      setCoords(arg)
+    },
+
+    'interactions:action-resume': (arg: Interact.SignalArg) => {
+      stop(arg)
+      start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords)
+      beforeMove(arg)
+    },
+
+    'interactions:after-action-move': restoreCoords as any,
+    'interactions:before-action-move': beforeMove,
+
+    'interactions:after-action-start': restoreCoords as any,
+
+    'interactions:before-action-end': beforeEnd,
+    'interactions:stop': stop,
   })
-
-  interactions.signals.on('before-action-start', (arg: Interact.SignalArg) => {
-    start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page)
-  })
-
-  interactions.signals.on('action-resume', (arg: Interact.SignalArg) => {
-    stop(arg)
-    start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords)
-    beforeMove(arg)
-  })
-
-  interactions.signals.on('after-action-move', restoreCoords as any)
-  interactions.signals.on('before-action-move', beforeMove)
-
-  interactions.signals.on('before-action-start', setCoords)
-  interactions.signals.on('after-action-start', restoreCoords as any)
-
-  interactions.signals.on('before-action-end', beforeEnd)
-  interactions.signals.on('stop', stop)
 }
 
 function start (

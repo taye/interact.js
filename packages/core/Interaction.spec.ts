@@ -201,8 +201,8 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   }
   let info: any = {}
 
-  signals.on('update-pointer', arg => { info.updated = arg.pointerInfo })
-  signals.on('remove-pointer', arg => { info.removed = arg.pointerInfo })
+  signals.on('interactions:update-pointer', arg => { info.updated = arg.pointerInfo })
+  signals.on('interactions:remove-pointer', arg => { info.removed = arg.pointerInfo })
 
   interaction.coords.cur.timeStamp = 0
   const commonPointerInfo = {
@@ -267,7 +267,7 @@ test('Interaction.pointerDown', t => {
     signalArg = arg
   }
 
-  interaction._signals.on('down', signalListener)
+  interaction._signals.on('interactions:down', signalListener)
 
   const pointerCoords: any = { page: {}, client: {} }
   pointerUtils.setCoords(pointerCoords, [pointer], event.timeStamp)
@@ -383,7 +383,7 @@ test('Interaction.start', t => {
     // interactingInStartListener = arg.interaction.interacting()
   }
 
-  interaction._signals.on('action-start', signalListener)
+  interaction._signals.on('interactions:action-start', signalListener)
   interaction.start(action, interactable, element)
 
   t.equal(interaction.prepared.name, action.name, 'action is prepared')

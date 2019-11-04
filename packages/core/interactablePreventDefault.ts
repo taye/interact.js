@@ -70,7 +70,7 @@ function onInteractionEvent ({ interaction, event }: Interact.SignalArg) {
 
 export function install (scope: Interact.Scope) {
   /** @lends Interactable */
-  const Interactable = scope.Interactable
+  const { Interactable, signals } = scope
 
   /**
    * Returns or sets whether to prevent the browser's default behaviour in
@@ -88,9 +88,10 @@ export function install (scope: Interact.Scope) {
     return checkAndPreventDefault(this, scope, event)
   }
 
-  for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
-    scope.interactions.signals.on(eventSignal, onInteractionEvent)
-  }
+  signals.addHandler(['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
+    acc[`interactions:${eventType}`] = onInteractionEvent
+    return acc
+  }, {}))
 
   // prevent native HTML5 drag on interact.js target elements
   scope.interactions.docEvents.push({

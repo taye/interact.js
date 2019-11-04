@@ -44,7 +44,7 @@ test('Interactable unset correctly', t => {
 
   const mappingInfo = div[scope.id][0]
 
-  scope.interactables.signals.fire('unset', { interactable })
+  scope.signals.fire('interactable:unset', { interactable })
 
   t.strictEqual(mappingInfo.context, null,
     'unset mappingInfo context')

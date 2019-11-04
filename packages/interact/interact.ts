@@ -207,13 +207,6 @@ function off (type, listener, options) {
   return interact
 }
 
-/**
- * Returns an object which exposes internal data
- * @alias module:interact.debug
- *
- * @return {object} An object with properties that outline the current state
- * and expose internal functions and variables
- */
 interact.debug = debug
 function debug () {
   return scope
@@ -286,15 +279,17 @@ function pointerMoveTolerance (newValue) {
   return scope.interactions.pointerMoveTolerance
 }
 
-scope.interactables.signals.on('unset', ({ interactable }) => {
-  scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1)
+scope.signals.addHandler({
+  'interactable:unset': ({ interactable }) => {
+    scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1)
 
-  // Stop related interactions when an Interactable is unset
-  for (const interaction of scope.interactions.list) {
-    if (interaction.interactable === interactable && interaction.interacting() && !interaction._ending) {
-      interaction.stop()
+    // Stop related interactions when an Interactable is unset
+    for (const interaction of scope.interactions.list) {
+      if (interaction.interactable === interactable && interaction.interacting() && !interaction._ending) {
+        interaction.stop()
+      }
     }
-  }
+  },
 })
 
 interact.addDocument = (doc, options) => scope.addDocument(doc, options)

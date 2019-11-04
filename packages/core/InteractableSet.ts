@@ -2,11 +2,8 @@ import * as arr from '@interactjs/utils/arr'
 import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
-import Signals from '@interactjs/utils/Signals'
 
 export default class InteractableSet {
-  signals = new Signals()
-
   // all set interactables
   list: Interact.Interactable[] = []
 
@@ -15,7 +12,7 @@ export default class InteractableSet {
   } = {}
 
   constructor (protected scope: Interact.Scope) {
-    this.signals.on('unset', ({ interactable }) => {
+    scope.signals.on('interactable:unset', ({ interactable }) => {
       const { target, _context: context } = interactable
       const targetMappings = is.string(target)
         ? this.selectorMap[target]
@@ -55,7 +52,7 @@ export default class InteractableSet {
       target[this.scope.id].push(mappingInfo)
     }
 
-    this.signals.fire('new', {
+    this.scope.signals.fire('interactable:new', {
       target,
       options,
       interactable,
