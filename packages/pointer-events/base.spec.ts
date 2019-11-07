@@ -1,6 +1,5 @@
 import test from '@interactjs/_dev/test/test'
 import Eventable from '@interactjs/core/Eventable'
-import Interaction from '@interactjs/core/Interaction'
 import * as helpers from '@interactjs/core/tests/_helpers'
 import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'
@@ -89,7 +88,7 @@ test('pointerEvents.fire', t => {
 })
 
 test('pointerEvents.collectEventTargets', t => {
-  const { scope } = helpers.testEnv()
+  const { scope, interaction } = helpers.testEnv()
 
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
@@ -100,15 +99,18 @@ test('pointerEvents.collectEventTargets', t => {
   }
   let collectedTargets
 
-  function onCollect ({ targets }: { targets: EventTargetList }) {
+  function onCollect ({ targets }: { targets?: EventTargetList }) {
     targets.push(target)
 
     collectedTargets = targets
   }
 
-  scope.signals.on('pointerEvents:collect-targets', onCollect)
+  scope.addListeners({
+    'pointerEvents:collect-targets': onCollect,
+  })
+
   pointerEvents.collectEventTargets({
-    interaction: new Interaction({ signals: helpers.mockSignals() } as any),
+    interaction,
     pointer: {},
     event: {},
     eventTarget: {},
@@ -116,8 +118,6 @@ test('pointerEvents.collectEventTargets', t => {
   } as any, scope)
 
   t.deepEqual(collectedTargets, [target])
-
-  scope.signals.off('interactions:collect-targets', onCollect)
 
   t.end()
 })

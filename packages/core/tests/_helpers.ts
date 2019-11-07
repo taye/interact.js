@@ -2,8 +2,6 @@
 import { doc } from '@interactjs/_dev/test/domator'
 import * as utils from '@interactjs/utils'
 import { MockCoords } from '@interactjs/utils/pointerUtils'
-import Signals from '@interactjs/utils/Signals'
-import Eventable from '../Eventable'
 import { createScope } from '../scope'
 
 let counter = 0
@@ -74,39 +72,6 @@ export function mockScope (options = {} as any) {
   scope.interact = Object.assign(() => {}, { use () {} }) as any
 
   return scope
-}
-
-export function mockSignals () {
-  return {
-    on () {},
-    off () {},
-    fire () {},
-  } as unknown as any
-}
-
-export function mockInteractable (props = {}) {
-  return Object.assign(
-    {
-      _signals: new Signals(),
-      _actions: {
-        names: [],
-        methodDict: {},
-      },
-      options: {
-        deltaSource: 'page',
-      },
-      target: {},
-      events: new Eventable(),
-      getRect () {
-        return this.element
-          ? utils.dom.getElementClientRect(this.element)
-          : { left: 0, top: 0, right: 0, bottom: 0 }
-      },
-      fire (event) {
-        this.events.fire(event)
-      },
-    },
-    props) as any
 }
 
 export function getProps<T extends {}, K extends keyof T> (src: T, props: K[]) {

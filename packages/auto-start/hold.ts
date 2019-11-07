@@ -16,7 +16,6 @@ declare module '@interactjs/core/Interaction' {
 function install (scope: Interact.Scope) {
   const {
     defaults,
-    signals,
   } = scope
 
   scope.usePlugin(basePlugin)
@@ -24,8 +23,8 @@ function install (scope: Interact.Scope) {
   defaults.perAction.hold = 0
   defaults.perAction.delay = 0
 
-  signals.addHandler({
-    'interactions:new': interaction => {
+  scope.addListeners({
+    'interactions:new': ({ interaction }) => {
       interaction.autoStartHoldTimer = null
     },
 

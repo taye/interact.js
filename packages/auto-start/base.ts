@@ -33,30 +33,35 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'autoStart:before-start': Interact.SignalArgs['interactions:move']
+    'autoStart:prepared': { interaction: Interact.Interaction }
+  }
+}
+
 export interface AutoStart {
   // Allow this many interactions to happen simultaneously
   maxInteractions: number
   withinInteractionLimit: typeof withinInteractionLimit
   cursorElement: Interact.Element
-  signals: utils.Signals
 }
 
 function install (scope: Interact.Scope) {
   const {
     interact,
-    signals,
     defaults,
   } = scope
 
   scope.usePlugin(InteractableMethods)
 
-  signals.addHandler({
-    'interactions:down': arg => prepareOnDown(arg as Interact.SignalArg, scope),
-    'interactions:move': (arg: Interact.SignalArg) => {
+  scope.addListeners({
+    'interactions:down': arg => prepareOnDown(arg, scope),
+    'interactions:move': arg => {
       prepareOnMove(arg, scope)
       startOnMove(arg, scope)
     },
-    'interactions:stop': arg => clearCursorOnStop(arg as Interact.SignalArg, scope),
+    'interactions:stop': arg => clearCursorOnStop(arg, scope),
   })
 
   defaults.base.actionChecker = null
@@ -92,27 +97,26 @@ function install (scope: Interact.Scope) {
     maxInteractions: Infinity,
     withinInteractionLimit,
     cursorElement: null,
-    signals: new utils.Signals(),
   }
 }
 
-function prepareOnDown ({ interaction, pointer, event, eventTarget }: Interact.SignalArg, scope: Interact.Scope) {
+function prepareOnDown ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
   if (interaction.interacting()) { return }
 
   const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
   prepare(interaction, actionInfo, scope)
 }
 
-function prepareOnMove ({ interaction, pointer, event, eventTarget }: Interact.SignalArg, scope: Interact.Scope) {
+function prepareOnMove ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
   if (interaction.pointerType !== 'mouse' ||
       interaction.pointerIsDown ||
       interaction.interacting()) { return }
 
-  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget, scope)
+  const actionInfo = getActionInfo(interaction, pointer, event, eventTarget as Interact.Element, scope)
   prepare(interaction, actionInfo, scope)
 }
 
-function startOnMove (arg: Interact.SignalArg, scope: Interact.Scope) {
+function startOnMove (arg: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
   const { interaction } = arg
 
   if (!interaction.pointerIsDown ||
@@ -122,7 +126,7 @@ function startOnMove (arg: Interact.SignalArg, scope: Interact.Scope) {
     return
   }
 
-  scope.signals.fire('autoStart:before-start', arg)
+  scope.fire('autoStart:before-start', arg)
 
   const { interactable } = interaction
 
@@ -153,7 +157,7 @@ function validateAction (
   action: Interact.ActionProps,
   interactable: Interact.Interactable,
   element: Interact.Element,
-  eventTarget: Interact.Element,
+  eventTarget: Interact.EventTarget,
   scope: Interact.Scope,
 ) {
   if (interactable.testIgnoreAllow(interactable.options[action.name], element, eventTarget) &&
@@ -171,7 +175,7 @@ function validateMatches (
   event,
   matches: Interact.Interactable[],
   matchElements: Interact.Element[],
-  eventTarget: Interact.Element,
+  eventTarget: Interact.EventTarget,
   scope: Interact.Scope,
 ) {
   for (let i = 0, len = matches.length; i < len; i++) {
@@ -204,7 +208,7 @@ function getActionInfo (
   interaction: Interact.Interaction,
   pointer: Interact.PointerType,
   event: Interact.PointerEventType,
-  eventTarget: Interact.Element,
+  eventTarget: Interact.EventTarget,
   scope: Interact.Scope,
 ) {
   let matches = []
@@ -262,7 +266,7 @@ function prepare (
 
   setInteractionCursor(interaction, scope)
 
-  scope.signals.fire('autoStart:prepared', { interaction })
+  scope.fire('autoStart:prepared', { interaction })
 }
 
 function withinInteractionLimit (interactable: Interact.Interactable, element: Interact.Element, action, scope: Interact.Scope) {

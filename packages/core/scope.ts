@@ -7,11 +7,31 @@ import InteractableSet from './InteractableSet'
 import InteractEvent from './InteractEvent'
 import interactions from './interactions'
 
+export interface SignalArgs {
+  'scope:add-document': DocSignalArg
+  'scope:remove-document': DocSignalArg
+  'interactable:unset': { interactable: InteractableBase }
+  'interactable:set': { interactable: InteractableBase, options: Interact.Options }
+  'interactions:destroy': { interaction: Interact.Interaction }
+}
+
+export type ListenerName = keyof SignalArgs
+
+type ListenerMap = {
+  [P in ListenerName]?: (arg: SignalArgs[P], scope: Scope, signalName: P) => void | boolean
+}
+
+interface DocSignalArg {
+  doc: Document
+  window: Window
+  scope: Scope
+  options?: { [index: string]: any }
+}
+
 const {
   win,
   browser,
   raf,
-  Signals,
   events,
 } = utils
 
@@ -38,7 +58,8 @@ export interface Plugin {
 
 export class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
-  signals = new Signals()
+  listenerMaps: ListenerMap[] = []
+
   browser = browser
   events = events
   utils = utils
@@ -75,10 +96,10 @@ export class Scope {
     ;(this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
       get _defaults () { return scope.defaults }
 
-      set (options: any) {
+      set (options: Interact.Options) {
         super.set(options)
 
-        scope.signals.fire('interactable:set', {
+        scope.fire('interactable:set', {
           options,
           interactable: this,
         })
@@ -93,7 +114,7 @@ export class Scope {
 
           if (interaction.interactable === this) {
             interaction.stop()
-            scope.signals.fire('interactions:destroy', { interaction })
+            scope.fire('interactions:destroy', { interaction })
             interaction.destroy()
 
             if (scope.interactions.list.length > 2) {
@@ -102,7 +123,19 @@ export class Scope {
           }
         }
 
-        scope.signals.fire('interactable:unset', { interactable: this })
+        scope.fire('interactable:unset', { interactable: this })
+      }
+    }
+  }
+
+  addListeners (handlerMap: ListenerMap) {
+    this.listenerMaps.push(handlerMap)
+  }
+
+  fire<T extends ListenerName> (name: T, arg: SignalArgs[T]): void | false {
+    for (const { [name]: listener } of this.listenerMaps) {
+      if (!!listener && listener(arg as any, this, name as never) === false) {
+        return false
       }
     }
   }
@@ -147,7 +180,7 @@ export class Scope {
       events.add(window, 'unload', this.onWindowUnload)
     }
 
-    this.signals.fire('scope:add-document', { doc, window, scope: this, options })
+    this.fire('scope:add-document', { doc, window, scope: this, options })
   }
 
   removeDocument (doc: Document) {
@@ -161,7 +194,7 @@ export class Scope {
     this.documents.splice(index, 1)
     events.documents.splice(index, 1)
 
-    this.signals.fire('scope:remove-document', { doc, window, scope: this, options })
+    this.fire('scope:remove-document', { doc, window, scope: this, options })
   }
 
   getDocIndex (doc: Document) {

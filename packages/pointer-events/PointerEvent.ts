@@ -4,7 +4,7 @@ import pointerUtils from '@interactjs/utils/pointerUtils'
 /** */
 export default class PointerEvent<T extends string> extends BaseEvent {
   type: T
-  originalEvent: Interact.PointerEventType
+  originalEvent: Interact.PointerEventType | PointerEvent<any>
   pointerId: number
   pointerType: string
   double: boolean
@@ -19,7 +19,7 @@ export default class PointerEvent<T extends string> extends BaseEvent {
   constructor (
     type: T,
     pointer: Interact.PointerType | PointerEvent<any>,
-    event: Interact.PointerEventType,
+    event: Interact.PointerEventType | PointerEvent<any>,
     eventTarget: Interact.EventTarget,
     interaction: Interact.Interaction,
     timeStamp: number,

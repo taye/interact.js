@@ -3,7 +3,6 @@ import { merge } from '@interactjs/utils/arr'
 import extend from '@interactjs/utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default
-type EventTargetList = import ('./base').EventTargetList
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -17,20 +16,14 @@ function install (scope: Scope) {
     pointerEvents,
     actions,
     Interactable,
-    signals,
   } = scope
 
-  signals.addHandler({
+  scope.addListeners({
     'pointerEvents:collect-targets': ({
       targets,
       node,
       type,
       eventTarget,
-    }: {
-      targets: EventTargetList
-      node: Node
-      type: string
-      eventTarget: Interact.Element
     }) => {
       scope.interactables.forEachMatch(node, (interactable: Interactable) => {
         const eventable = interactable.events

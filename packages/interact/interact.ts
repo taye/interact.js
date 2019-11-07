@@ -279,7 +279,7 @@ function pointerMoveTolerance (newValue) {
   return scope.interactions.pointerMoveTolerance
 }
 
-scope.signals.addHandler({
+scope.addListeners({
   'interactable:unset': ({ interactable }) => {
     scope.interactables.list.splice(scope.interactables.list.indexOf(interactable), 1)
 

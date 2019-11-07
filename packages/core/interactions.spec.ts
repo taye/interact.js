@@ -1,5 +1,4 @@
 import test from '@interactjs/_dev/test/test'
-import Signals from '@interactjs/utils/Signals'
 import Interaction from './Interaction'
 import interactions from './interactions'
 import * as helpers from './tests/_helpers'

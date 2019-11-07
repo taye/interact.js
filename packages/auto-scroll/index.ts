@@ -35,13 +35,12 @@ function install (scope: Scope) {
   const {
     defaults,
     actions,
-    signals,
   } = scope
 
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:new': ({ interaction }) => {
       interaction.autoScroll = null
     },

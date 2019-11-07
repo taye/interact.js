@@ -26,11 +26,13 @@ test('reflow', t => {
   interactable.rectChecker(() => ({ ...rect }))
 
   // modify move coords
-  scope.signals.on('interactions:before-action-move', ({ interaction }) => {
-    interaction.coords.cur.page = {
-      x: rect.left + 100,
-      y: rect.top - 50,
-    }
+  scope.addListeners({
+    'interactions:before-action-move': ({ interaction }) => {
+      interaction.coords.cur.page = {
+        x: rect.left + 100,
+        y: rect.top - 50,
+      }
+    },
   })
 
   interactable.reflow({ name: 'TEST' })

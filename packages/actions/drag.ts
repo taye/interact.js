@@ -36,10 +36,9 @@ function install (scope: Scope) {
     actions,
     Interactable,
     defaults,
-    signals,
   } = scope
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:before-action-move': beforeMove,
     'interactions:action-resume': beforeMove,
 

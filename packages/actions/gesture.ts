@@ -51,7 +51,7 @@ export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture>
   touches: Interact.PointerType[]
 }
 
-export interface GestureSignalArg extends Interact.SignalArg {
+export interface GestureSignalArg extends Interact.DoPhaseArg {
   iEvent: GestureEvent
   interaction: Interact.Interaction<ActionName.Gesture>
   event: Interact.PointerEventType | GestureEvent
@@ -62,7 +62,6 @@ function install (scope: Scope) {
     actions,
     Interactable,
     defaults,
-    signals,
   } = scope
 
   /**
@@ -106,7 +105,7 @@ function install (scope: Scope) {
     return this.options.gesture as Interact.Options
   } as GesturableMethod
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:action-start': updateGestureProps,
     'interactions:action-move': updateGestureProps,
     'interactions:action-end': updateGestureProps,

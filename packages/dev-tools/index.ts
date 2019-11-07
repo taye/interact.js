@@ -60,11 +60,10 @@ function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
   const {
     Interactable,
     defaults,
-    signals,
   } = scope
   logger = logger || console
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:action-start': ({ interaction }) => {
       for (const check of checks) {
         const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]

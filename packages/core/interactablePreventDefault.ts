@@ -62,7 +62,7 @@ function checkAndPreventDefault (interactable: Interact.Interactable, scope: Int
   event.preventDefault()
 }
 
-function onInteractionEvent ({ interaction, event }: Interact.SignalArg) {
+function onInteractionEvent ({ interaction, event }: { interaction: Interact.Interaction, event: Interact.PointerEventType }) {
   if (interaction.interactable) {
     interaction.interactable.checkAndPreventDefault(event as Event)
   }
@@ -70,7 +70,7 @@ function onInteractionEvent ({ interaction, event }: Interact.SignalArg) {
 
 export function install (scope: Interact.Scope) {
   /** @lends Interactable */
-  const { Interactable, signals } = scope
+  const { Interactable } = scope
 
   /**
    * Returns or sets whether to prevent the browser's default behaviour in
@@ -88,7 +88,7 @@ export function install (scope: Interact.Scope) {
     return checkAndPreventDefault(this, scope, event)
   }
 
-  signals.addHandler(['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
+  scope.addListeners(['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
     acc[`interactions:${eventType}`] = onInteractionEvent
     return acc
   }, {}))

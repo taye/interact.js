@@ -32,7 +32,6 @@ export function install (scope: Scope) {
     /** @lends Interactable */
     // eslint-disable-next-line no-shadow
     Interactable,
-    signals,
   } = scope
 
   // add action reflow event types
@@ -40,7 +39,7 @@ export function install (scope: Scope) {
     actions.eventTypes.push(`${actionName}reflow`)
   }
 
-  signals.addHandler({
+  scope.addListeners({
     // remove completed reflow interactions
     'interactions:stop': ({ interaction }) => {
       if (interaction.pointerType === EventPhase.Reflow) {

@@ -1,10 +1,9 @@
 import test from '@interactjs/_dev/test/test'
-import Interaction from '@interactjs/core/Interaction'
-import { mockSignals } from '@interactjs/core/tests/_helpers'
+import * as helpers from '@interactjs/core/tests/_helpers'
 import restrictEdges from '../restrict/edges'
 
 test('restrictEdges', t => {
-  const interaction = new Interaction({ signals: mockSignals() } as any)
+  const { interaction } = helpers.testEnv()
   interaction.prepared = {} as any
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true }
   interaction.resizeRects = {} as any

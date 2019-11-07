@@ -47,6 +47,31 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'pointerEvents:fired': {
+      interaction: Interaction
+      pointer: Interact.PointerType | PointerEvent<any>
+      event: Interact.PointerEventType | PointerEvent<any>
+      eventTarget: Interact.EventTarget
+      targets?: EventTargetList
+      pointerEvent?: PointerEvent<string>
+      type: string
+    }
+    'pointerEvents:collect-targets': {
+      interaction: Interaction
+      pointer: Interact.PointerType | PointerEvent<any>
+      event: Interact.PointerEventType | PointerEvent<any>
+      eventTarget: Interact.EventTarget
+      targets?: EventTargetList
+      pointerEvent?: PointerEvent<string>
+      type: string
+      path: Node[]
+      node: null
+    }
+  }
+}
+
 const defaults: PointerEventOptions = {
   holdDuration: 600,
   ignoreFrom  : null,
@@ -72,22 +97,25 @@ const pointerEvents = {
   ],
 }
 
-function fire<T extends string> (arg: {
-  interaction: Interaction
-  pointer: Interact.PointerType
-  event: Interact.PointerEventType
-  eventTarget: Interact.EventTarget
-  targets?: EventTargetList
-  pointerEvent?: PointerEvent<T>
-  type: T
-}, scope: Interact.Scope) {
+function fire<T extends string> (
+  arg: {
+    pointer: Interact.PointerType | PointerEvent<any>
+    event: Interact.PointerEventType | PointerEvent<any>
+    eventTarget: Interact.EventTarget
+    interaction: Interaction
+    type: T
+    targets?: EventTargetList
+    pointerEvent?: PointerEvent<T>
+  },
+  scope: Interact.Scope
+) {
   const {
-    interaction, pointer, event, eventTarget,
-    type = (arg as any).pointerEvent.type,
+    interaction,
+    pointer,
+    event,
+    eventTarget,
+    type = arg.pointerEvent.type,
     targets = collectEventTargets(arg, scope),
-  } = arg
-
-  const {
     pointerEvent = new PointerEvent(type, pointer, event, eventTarget, interaction, scope.now()),
   } = arg
 
@@ -125,7 +153,7 @@ function fire<T extends string> (arg: {
     }
   }
 
-  scope.signals.fire('pointerEvents:fired', signalArg)
+  scope.fire('pointerEvents:fired', signalArg)
 
   if (type === 'tap') {
     // if pointerEvent should make a double tap, create and fire a doubletap
@@ -149,8 +177,8 @@ function fire<T extends string> (arg: {
 
 function collectEventTargets<T extends string> ({ interaction, pointer, event, eventTarget, type }: {
   interaction: Interaction
-  pointer: Interact.PointerType
-  event: Interact.PointerEventType
+  pointer: Interact.PointerType | PointerEvent<any>
+  event: Interact.PointerEventType | PointerEvent<any>
   eventTarget: Interact.EventTarget
   type: T
 }, scope: Interact.Scope) {
@@ -179,7 +207,7 @@ function collectEventTargets<T extends string> ({ interaction, pointer, event, e
   for (const node of path) {
     signalArg.node = node
 
-    scope.signals.fire('pointerEvents:collect-targets', signalArg)
+    scope.fire('pointerEvents:collect-targets', signalArg)
   }
 
   if (type === 'hold') {
@@ -195,7 +223,7 @@ function addInteractionProps ({ interaction }) {
   interaction.tapTime = 0     // time of the most recent tap event
 }
 
-function addHoldInfo ({ down, pointerInfo }) {
+function addHoldInfo ({ down, pointerInfo }: Interact.SignalArgs['interactions:update-pointer']) {
   if (!down && pointerInfo.hold) {
     return
   }
@@ -209,10 +237,13 @@ function clearHold ({ interaction, pointerIndex }) {
   }
 }
 
-function moveAndClearHold ({ interaction, pointer, event, eventTarget, duplicateMove }, scope) {
+function moveAndClearHold (
+  { interaction, pointer, event, eventTarget, duplicate }: Interact.SignalArgs['interactions:move'],
+  scope: Interact.Scope
+) {
   const pointerIndex = interaction.getPointerIndex(pointer)
 
-  if (!duplicateMove && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
+  if (!duplicate && (!interaction.pointerIsDown || interaction.pointerWasMoved)) {
     if (interaction.pointerIsDown) {
       clearTimeout(interaction.pointers[pointerIndex].hold.timeout)
     }
@@ -221,13 +252,13 @@ function moveAndClearHold ({ interaction, pointer, event, eventTarget, duplicate
       interaction,
       pointer,
       event,
-      eventTarget,
+      eventTarget: eventTarget as Interact.Element,
       type: 'move',
     }, scope)
   }
 }
 
-function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: Interact.SignalArg, scope: Interact.Scope) {
+function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIndex }: Interact.SignalArgs['interactions:down'], scope: Interact.Scope) {
   const timer = interaction.pointers[pointerIndex].hold
   const path = utils.dom.getPath(eventTarget)
   const signalArg = {
@@ -244,7 +275,7 @@ function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIn
   for (const node of path) {
     signalArg.node = node
 
-    scope.signals.fire('pointerEvents:collect-targets', signalArg)
+    scope.fire('pointerEvents:collect-targets', signalArg)
   }
 
   if (!signalArg.targets.length) { return }
@@ -271,24 +302,20 @@ function downAndStartHold ({ interaction, pointer, event, eventTarget, pointerIn
   }, minDuration)
 }
 
-function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.SignalArg, scope: Interact.Scope) {
+function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.SignalArgs['interactions:up'], scope: Interact.Scope) {
   if (!interaction.pointerWasMoved) {
     fire({ interaction, eventTarget, pointer, event, type: 'tap' }, scope)
   }
 }
 
 function install (scope: Scope) {
-  const {
-    signals,
-  } = scope
-
   scope.pointerEvents = pointerEvents
   scope.defaults.actions.pointerEvents = pointerEvents.defaults
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:new': addInteractionProps,
     'interactions:update-pointer': addHoldInfo,
-    'interactions:move': arg => moveAndClearHold(arg, scope),
+    'interactions:move': moveAndClearHold,
     'interactions:down': arg => {
       downAndStartHold(arg, scope)
       fire(arg, scope)

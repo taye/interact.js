@@ -59,16 +59,24 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:action-resume': {
+      interaction: Interact.Interaction
+      phase: EventPhase.Resume
+    }
+  }
+}
+
 (EventPhase as any).Resume = 'resume'
 ;(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Interact.Scope) {
   const {
     defaults,
-    signals,
   } = scope
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:new': ({ interaction }) => {
       interaction.inertia = {
         active     : false,
@@ -79,8 +87,8 @@ function install (scope: Interact.Scope) {
       }
     },
 
-    'interactions:before-action-end': (arg: Interact.SignalArg) => release(arg, scope),
-    'interactions:down': (arg: Interact.SignalArg) => resume(arg, scope),
+    'interactions:before-action-end': release,
+    'interactions:down': resume,
     'interactions:stop': stop,
   })
 
@@ -97,7 +105,7 @@ function install (scope: Interact.Scope) {
 }
 
 function resume (
-  { interaction, event, pointer, eventTarget }: Interact.SignalArg,
+  { interaction, event, pointer, eventTarget }: Interact.SignalArgs['interactions:down'],
   scope: Interact.Scope
 ) {
   const state = interaction.inertia
@@ -116,7 +124,7 @@ function resume (
         interaction.simulation = null
 
         // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer, event, eventTarget, true)
+        interaction.updatePointer(pointer as Interact.PointerType, event as Interact.PointerEventType, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
           interaction.pointers.map(p => p.pointer),
@@ -126,14 +134,14 @@ function resume (
         // fire appropriate signals
         const signalArg = {
           interaction,
-          phase: EventPhase.Resume,
+          phase: EventPhase.Resume as const,
         }
 
-        scope.signals.fire('interactions:action-resume', signalArg)
+        scope.fire('interactions:action-resume', signalArg)
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, EventPhase.Resume, interaction.element)
+          interaction, event as Interact.PointerEventType, interaction.prepared.name, EventPhase.Resume, interaction.element)
 
         interaction._fireEvent(resumeEvent)
 
@@ -147,7 +155,7 @@ function resume (
 }
 
 function release<T extends Interact.ActionName> (
-  { interaction, event, noPreEnd }: Interact.SignalArg,
+  { interaction, event, noPreEnd }: Interact.DoPhaseArg & { noPreEnd?: boolean },
   scope: Interact.Scope
 ) {
   const state = interaction.inertia
@@ -179,6 +187,9 @@ function release<T extends Interact.ActionName> (
 
   const modifierArg = {
     interaction,
+    interactable: interaction.interactable,
+    element: interaction.element,
+    rect: interaction.rect,
     pageCoords: interaction.coords.cur.page,
     states: inertiaPossible && interaction.modifiers.states.map(
       modifierStatus => utils.extend({}, modifierStatus)
@@ -259,7 +270,7 @@ function release<T extends Interact.ActionName> (
   return false
 }
 
-function stop ({ interaction }: Interact.SignalArg) {
+function stop ({ interaction }: Interact.DoPhaseArg) {
   const state = interaction.inertia
   if (state.active) {
     raf.cancel(state.timeout)

@@ -72,12 +72,11 @@ function install (scope: Scope) {
     /** @lends Interactable */
     Interactable, // eslint-disable-line no-shadow
     defaults,
-    signals,
   } = scope
 
   scope.usePlugin(drag)
 
-  signals.addHandler({
+  scope.addListeners({
     'interactions:before-action-start': ({ interaction }) => {
       if (interaction.prepared.name !== 'drag') { return }
 
@@ -113,8 +112,8 @@ function install (scope: Scope) {
     },
 
     // FIXME proper signal types
-    'interactions:action-move': arg => onEventCreated(arg as any, scope),
-    'interactions:action-end': arg => onEventCreated(arg as any, scope),
+    'interactions:action-move': arg => onEventCreated(arg, scope),
+    'interactions:action-end': arg => onEventCreated(arg, scope),
 
     'interactions:after-action-move': function fireDropAfterMove ({ interaction }) {
       if (interaction.prepared.name !== 'drag') { return }
@@ -404,7 +403,7 @@ function fireDropEvents (interaction: Interact.Interaction, events) {
   dropState.prev.element = cur.element
 }
 
-function onEventCreated ({ interaction, iEvent, event }: Interact.SignalArg, scope) {
+function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg, scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return }
 
   const { dropState } = interaction

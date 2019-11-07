@@ -64,15 +64,13 @@ function install (scope: Scope) {
     browser,
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
-    interactions,
     defaults,
-    signals,
   } = scope
 
   // Less Precision with touch input
 
-  signals.addHandler({
-    'interactions:new': interaction => {
+  scope.addListeners({
+    'interactions:new': ({ interaction }) => {
       interaction.resizeAxes = 'xy'
     },
 
@@ -515,8 +513,8 @@ function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inter
   iEvent.deltaRect = interaction.resizeRects.delta
 }
 
-function updateEventAxes ({ iEvent, interaction, action }: { iEvent: ResizeEvent, interaction: Interaction, action: ActionName }) {
-  if (action !== ActionName.Resize || !interaction.resizeAxes) { return }
+function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+  if (interaction.prepared.name !== ActionName.Resize || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
 

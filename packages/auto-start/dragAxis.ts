@@ -6,7 +6,7 @@ import autoStart from './base'
 type Scope = import ('@interactjs/core/scope').Scope
 
 function install (scope: Scope) {
-  scope.signals.addHandler({ 'autoStart:before-start': beforeStart })
+  scope.addListeners({ 'autoStart:before-start': beforeStart })
 
   function beforeStart ({ interaction, eventTarget, dx, dy }) {
     if (interaction.prepared.name !== 'drag') { return }

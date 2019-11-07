@@ -210,7 +210,7 @@ export class Interactable implements Partial<Eventable> {
     this: Interactable,
     options: { ignoreFrom: IgnoreValue, allowFrom: IgnoreValue },
     targetNode: Node,
-    eventTarget: Interact.Element,
+    eventTarget: Interact.EventTarget,
   ) {
     return (!this.testIgnore(options.ignoreFrom, targetNode, eventTarget) &&
             this.testAllow(options.allowFrom, targetNode, eventTarget))
@@ -220,7 +220,7 @@ export class Interactable implements Partial<Eventable> {
     this: Interactable,
     allowFrom: IgnoreValue,
     targetNode: Node,
-    element: Interact.Element,
+    element: Interact.EventTarget,
   ) {
     if (!allowFrom) { return true }
 
@@ -240,7 +240,7 @@ export class Interactable implements Partial<Eventable> {
     this: Interactable,
     ignoreFrom: IgnoreValue,
     targetNode: Node,
-    element: Interact.Element,
+    element: Interact.EventTarget,
   ) {
     if (!ignoreFrom || !is.element(element)) { return false }
 

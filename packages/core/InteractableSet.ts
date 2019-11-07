@@ -3,6 +3,17 @@ import * as domUtils from '@interactjs/utils/domUtils'
 import extend from '@interactjs/utils/extend'
 import * as is from '@interactjs/utils/is'
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactable:new': {
+      interactable: Interact.Interactable
+      target: Interact.Target
+      options: Interact.OptionsArg
+      win: Window
+    }
+  }
+}
+
 export default class InteractableSet {
   // all set interactables
   list: Interact.Interactable[] = []
@@ -12,19 +23,21 @@ export default class InteractableSet {
   } = {}
 
   constructor (protected scope: Interact.Scope) {
-    scope.signals.on('interactable:unset', ({ interactable }) => {
-      const { target, _context: context } = interactable
-      const targetMappings = is.string(target)
-        ? this.selectorMap[target]
-        : target[this.scope.id]
+    scope.addListeners({
+      'interactable:unset': ({ interactable }) => {
+        const { target, _context: context } = interactable
+        const targetMappings = is.string(target)
+          ? this.selectorMap[target]
+          : target[this.scope.id]
 
-      const targetIndex = targetMappings.findIndex(m => m.context === context)
-      if (targetMappings[targetIndex]) {
+        const targetIndex = targetMappings.findIndex(m => m.context === context)
+        if (targetMappings[targetIndex]) {
         // Destroying mappingInfo's context and interactable
-        targetMappings[targetIndex].context = null
-        targetMappings[targetIndex].interactable = null
-      }
-      targetMappings.splice(targetIndex, 1)
+          targetMappings[targetIndex].context = null
+          targetMappings[targetIndex].interactable = null
+        }
+        targetMappings.splice(targetIndex, 1)
+      },
     })
   }
 
@@ -52,7 +65,7 @@ export default class InteractableSet {
       target[this.scope.id].push(mappingInfo)
     }
 
-    this.scope.signals.fire('interactable:new', {
+    this.scope.fire('interactable:new', {
       target,
       options,
       interactable,
