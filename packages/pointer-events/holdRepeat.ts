@@ -13,11 +13,11 @@ declare module '@interactjs/pointer-events/base' {
 }
 
 function install (scope: Interact.Scope) {
+  scope.usePlugin(basePlugin)
+
   const {
     pointerEvents,
   } = scope
-
-  scope.usePlugin(basePlugin)
 
   scope.addListeners(['move', 'up', 'cancel', 'endall'].reduce(
     (acc, enderTypes) => {

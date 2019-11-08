@@ -6,10 +6,9 @@ import drop from '../drop'
 
 test('actions/drop options', t => {
   const scope = helpers.mockScope()
-  scope.interact = {}
   scope.usePlugin(drop)
 
-  const interactable = scope.interactables.new({ pointerType: 'test' })
+  const interactable = scope.interactables.new({ pointerType: 'test' } as any)
 
   const funcs = Object.freeze({
     drop () {},

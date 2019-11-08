@@ -83,7 +83,7 @@ test('reflow', t => {
 })
 
 test('async reflow', async t => {
-  const scope = helpers.mockScope()
+  const { scope } = helpers.testEnv({ plugins: [reflow] })
 
   Object.assign(scope.actions, { TEST: {}, names: ['TEST'] })
 
@@ -94,24 +94,24 @@ test('async reflow', async t => {
   const rect = Object.freeze({ top: 100, left: 200, bottom: 300, right: 400 })
   interactable.rectChecker(() => ({ ...rect }))
   interactable.fire = (iEvent => { reflowEvent = iEvent }) as any
-  interactable.options.TEST = { enabled: true }
-
-  scope.usePlugin(reflow)
+  (interactable.options as any).TEST = { enabled: true }
 
   // test with Promise implementation
-  scope.window.Promise = PromisePolyfill
+  ;(scope.window as any).Promise = PromisePolyfill
 
   promise = interactable.reflow({ name: 'TEST' })
-  t.ok(promise instanceof scope.window.Promise, 'method returns a Promise if available')
+  t.ok(promise instanceof (scope.window as any).Promise, 'method returns a Promise if available')
   t.notOk(reflowEvent.interaction.interacting(), 'reflow may end synchronously')
 
   t.equal(await promise, interactable, 'returned Promise resolves to interactable')
 
   let stoppedFromTimeout
   // block the end of the reflow interaction and stop it after a timeout
-  scope.signals.on('interactions:before-action-end', ({ interaction }) => {
-    setTimeout(() => { interaction.stop(); stoppedFromTimeout = true }, 0)
-    return false
+  scope.addListeners({
+    'interactions:before-action-end': ({ interaction }) => {
+      setTimeout(() => { interaction.stop(); stoppedFromTimeout = true }, 0)
+      return false
+    },
   })
 
   stoppedFromTimeout = false
@@ -123,7 +123,7 @@ test('async reflow', async t => {
 
   // test without Promise implementation
   stoppedFromTimeout = false
-  scope.window.Promise = undefined
+  ;(scope.window as any).Promise = undefined
 
   promise = interactable.reflow({ name: 'TEST' })
   t.equal(promise, null, 'method returns null if no Proise is avilable')

@@ -11,12 +11,12 @@ test('holdRepeat count', t => {
 
   const { scope } = helpers.testEnv({ plugins: [holdRepeat] })
 
-  scope.fire('pointerEvents:fired', { pointerEvent } as any)
+  scope.fire('pointerEvents:new', { pointerEvent } as any)
   t.equal(pointerEvent.count, 1, 'first hold count is 1 with count previously undefined')
 
   const count = 20
   pointerEvent.count = count
-  scope.fire('pointerEvents:fired', { pointerEvent } as any)
+  scope.fire('pointerEvents:new', { pointerEvent } as any)
   t.equal(pointerEvent.count, count + 1, 'existing hold count is incremented')
 
   t.end()

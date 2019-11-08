@@ -67,7 +67,7 @@ export function mockScope (options = {} as any) {
   const document = options.document || doc
   const window = document.defaultView
 
-  const scope: any = createScope().init(window)
+  const scope = createScope().init(window)
 
   scope.interact = Object.assign(() => {}, { use () {} }) as any
 
