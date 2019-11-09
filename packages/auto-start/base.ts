@@ -55,15 +55,6 @@ function install (scope: Interact.Scope) {
 
   scope.usePlugin(InteractableMethods)
 
-  scope.addListeners({
-    'interactions:down': arg => prepareOnDown(arg, scope),
-    'interactions:move': arg => {
-      prepareOnMove(arg, scope)
-      startOnMove(arg, scope)
-    },
-    'interactions:stop': arg => clearCursorOnStop(arg, scope),
-  })
-
   defaults.base.actionChecker = null
   defaults.base.styleCursor = true
 
@@ -358,6 +349,15 @@ function setInteractionCursor (interaction: Interact.Interaction, scope: Interac
 export default {
   id: 'auto-start/base',
   install,
+  listeners: {
+    'interactions:down': prepareOnDown,
+    'interactions:move': (arg, scope) => {
+      prepareOnMove(arg, scope)
+      startOnMove(arg, scope)
+    },
+    'interactions:stop': clearCursorOnStop,
+  },
+  before: 'ations',
   maxInteractions,
   withinInteractionLimit,
   validateAction,

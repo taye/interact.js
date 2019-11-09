@@ -51,14 +51,19 @@ export function createScope () {
 export type Defaults = typeof defaults
 
 export interface Plugin {
-  id?: string
-  install (scope: Scope, options?: any): void
   [key: string]: any
+  id?: string
+  listeners?: ListenerMap
+  before?: string
+  install? (scope: Scope, options?: any): void
 }
 
 export class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
-  listenerMaps: ListenerMap[] = []
+  listenerMaps: Array<{
+    map: ListenerMap
+    id: string
+  }> = []
 
   browser = browser
   events = events
@@ -87,8 +92,13 @@ export class Scope {
   // all documents being listened to
   documents: Array<{ doc: Document, options: any }> = []
 
-  _plugins: Plugin[] = []
-  _pluginMap: { [id: string]: Plugin } = {}
+  _plugins: {
+    list: Plugin[]
+    map: { [id: string]: Plugin }
+  } = {
+    list: [],
+    map: {},
+  }
 
   constructor () {
     const scope = this as Scope
@@ -128,12 +138,12 @@ export class Scope {
     }
   }
 
-  addListeners (handlerMap: ListenerMap) {
-    this.listenerMaps.push(handlerMap)
+  addListeners (map: ListenerMap, id?: string) {
+    this.listenerMaps.push({ id, map })
   }
 
   fire<T extends ListenerName> (name: T, arg: SignalArgs[T]): void | false {
-    for (const { [name]: listener } of this.listenerMaps) {
+    for (const { map: { [name]: listener } } of this.listenerMaps) {
       if (!!listener && listener(arg as any, this, name as never) === false) {
         return false
       }
@@ -147,7 +157,7 @@ export class Scope {
   }
 
   pluginIsInstalled (plugin: Plugin) {
-    return this._pluginMap[plugin.id] || this._plugins.indexOf(plugin) !== -1
+    return this._plugins.map[plugin.id] || this._plugins.list.indexOf(plugin) !== -1
   }
 
   usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
@@ -155,10 +165,27 @@ export class Scope {
       return this
     }
 
-    if (plugin.id) { this._pluginMap[plugin.id] = plugin }
+    if (plugin.id) { this._plugins.map[plugin.id] = plugin }
+    this._plugins.list.push(plugin)
 
-    plugin.install(this, options)
-    this._plugins.push(plugin)
+    if (plugin.install) {
+      plugin.install(this, options)
+    }
+
+    if (plugin.listeners && plugin.before) {
+      let index = 0
+
+      for (; index < this.listenerMaps.length; index++) {
+        const otherId = this.listenerMaps[index].id
+
+        if (otherId === plugin.before) { break }
+      }
+
+      this.listenerMaps.splice(index, 0, { id: plugin.id, map: plugin.listeners })
+    }
+    else if (plugin.listeners) {
+      this.listenerMaps.push({ id: plugin.id, map: plugin.listeners })
+    }
 
     return this
   }

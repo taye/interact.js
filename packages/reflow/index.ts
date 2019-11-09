@@ -39,19 +39,6 @@ export function install (scope: Scope) {
     actions.eventTypes.push(`${actionName}reflow`)
   }
 
-  scope.addListeners({
-    // remove completed reflow interactions
-    'interactions:stop': ({ interaction }) => {
-      if (interaction.pointerType === EventPhase.Reflow) {
-        if (interaction._reflowResolve) {
-          interaction._reflowResolve()
-        }
-
-        arr.remove(scope.interactions.list, interaction)
-      }
-    },
-  })
-
   /**
    * ```js
    * const interactable = interact(target)
@@ -170,4 +157,16 @@ function startReflow (scope: Scope, interactable: Interactable, element: Interac
 export default {
   id: 'reflow',
   install,
+  listeners: {
+    // remove completed reflow interactions
+    'interactions:stop': ({ interaction }, scope) => {
+      if (interaction.pointerType === EventPhase.Reflow) {
+        if (interaction._reflowResolve) {
+          interaction._reflowResolve()
+        }
+
+        arr.remove(scope.interactions.list, interaction)
+      }
+    },
+  },
 } as Interact.Plugin

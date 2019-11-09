@@ -76,21 +76,7 @@ function install (scope: Interact.Scope) {
     defaults,
   } = scope
 
-  scope.addListeners({
-    'interactions:new': ({ interaction }) => {
-      interaction.inertia = {
-        active     : false,
-        smoothEnd  : false,
-        allowResume: false,
-        upCoords   : {} as any,
-        timeout    : null,
-      }
-    },
-
-    'interactions:before-action-end': release,
-    'interactions:down': resume,
-    'interactions:stop': stop,
-  })
+  scope.usePlugin(modifiers)
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -100,8 +86,6 @@ function install (scope: Interact.Scope) {
     allowResume      : true,  // allow resuming an action in inertia phase
     smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
   }
-
-  scope.usePlugin(modifiers)
 }
 
 function resume (
@@ -397,6 +381,22 @@ function getOptions ({ interactable, prepared }: Interact.Interaction) {
 export default {
   id: 'inertia',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.inertia = {
+        active     : false,
+        smoothEnd  : false,
+        allowResume: false,
+        upCoords   : {} as any,
+        timeout    : null,
+      }
+    },
+
+    'interactions:before-action-end': release,
+    'interactions:down': resume,
+    'interactions:stop': stop,
+  },
+  before: 'modifiers/base',
   calcInertia,
   inertiaTick,
   smothEndTick,

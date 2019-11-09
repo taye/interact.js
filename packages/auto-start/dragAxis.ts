@@ -3,78 +3,72 @@ import { parentNode } from '@interactjs/utils/domUtils'
 import * as is from '@interactjs/utils/is'
 import autoStart from './base'
 
-type Scope = import ('@interactjs/core/scope').Scope
+function beforeStart ({ interaction, eventTarget, dx, dy }: Interact.SignalArgs['interactions:move'], scope: Interact.Scope) {
+  if (interaction.prepared.name !== 'drag') { return }
 
-function install (scope: Scope) {
-  scope.addListeners({ 'autoStart:before-start': beforeStart })
+  // check if a drag is in the correct axis
+  const absX = Math.abs(dx)
+  const absY = Math.abs(dy)
+  const targetOptions = interaction.interactable.options.drag
+  const startAxis = targetOptions.startAxis
+  const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy')
 
-  function beforeStart ({ interaction, eventTarget, dx, dy }) {
-    if (interaction.prepared.name !== 'drag') { return }
+  interaction.prepared.axis = targetOptions.lockAxis === 'start'
+    ? currentAxis[0]  as 'x' | 'y' // always lock to one axis even if currentAxis === 'xy'
+    : targetOptions.lockAxis
 
-    // check if a drag is in the correct axis
-    const absX = Math.abs(dx)
-    const absY = Math.abs(dy)
-    const targetOptions = interaction.interactable.options.drag
-    const startAxis = targetOptions.startAxis
-    const currentAxis = (absX > absY ? 'x' : absX < absY ? 'y' : 'xy')
+  // if the movement isn't in the startAxis of the interactable
+  if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
+    // cancel the prepared action
+    interaction.prepared.name = null
 
-    interaction.prepared.axis = targetOptions.lockAxis === 'start'
-      ? currentAxis[0]  as 'x' | 'y' // always lock to one axis even if currentAxis === 'xy'
-      : targetOptions.lockAxis
+    // then try to get a drag from another ineractable
+    let element = eventTarget
 
-    // if the movement isn't in the startAxis of the interactable
-    if (currentAxis !== 'xy' && startAxis !== 'xy' && startAxis !== currentAxis) {
-      // cancel the prepared action
-      interaction.prepared.name = null
+    const getDraggable = function (interactable) {
+      if (interactable === interaction.interactable) { return }
 
-      // then try to get a drag from another ineractable
-      let element = eventTarget
+      const options = interaction.interactable.options.drag
 
-      const getDraggable = function (interactable) {
-        if (interactable === interaction.interactable) { return }
+      if (!options.manualStart &&
+          interactable.testIgnoreAllow(options, element, eventTarget)) {
+        const action = interactable.getAction(
+          interaction.downPointer, interaction.downEvent, interaction, element)
 
-        const options = interaction.interactable.options.drag
-
-        if (!options.manualStart &&
-            interactable.testIgnoreAllow(options, element, eventTarget)) {
-          const action = interactable.getAction(
-            interaction.downPointer, interaction.downEvent, interaction, element)
-
-          if (action &&
-              action.name === ActionName.Drag &&
-              checkStartAxis(currentAxis, interactable) &&
-              autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
-            return interactable
-          }
+        if (action &&
+            action.name === ActionName.Drag &&
+            checkStartAxis(currentAxis, interactable) &&
+            autoStart.validateAction(action, interactable, element, eventTarget, scope)) {
+          return interactable
         }
-      }
-
-      // check all interactables
-      while (is.element(element)) {
-        const interactable = scope.interactables.forEachMatch(element, getDraggable)
-
-        if (interactable) {
-          interaction.prepared.name = ActionName.Drag
-          interaction.interactable = interactable
-          interaction.element = element
-          break
-        }
-
-        element = parentNode(element)
       }
     }
+
+    // check all interactables
+    while (is.element(element)) {
+      const interactable = scope.interactables.forEachMatch(element, getDraggable)
+
+      if (interactable) {
+        interaction.prepared.name = ActionName.Drag
+        interaction.interactable = interactable
+        interaction.element = element
+        break
+      }
+
+      element = parentNode(element)
+    }
   }
+}
 
-  function checkStartAxis (startAxis, interactable) {
-    if (!interactable) { return false }
+function checkStartAxis (startAxis, interactable) {
+  if (!interactable) { return false }
 
-    const thisAxis = interactable.options[ActionName.Drag].startAxis
+  const thisAxis = interactable.options[ActionName.Drag].startAxis
 
-    return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis)
-  }
+  return (startAxis === 'xy' || thisAxis === 'xy' || thisAxis === startAxis)
 }
 
 export default {
   id: 'auto-start/dragAxis',
-  install,
+  listeners: { 'autoStart:before-start': beforeStart },
 }

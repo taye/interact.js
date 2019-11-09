@@ -18,42 +18,6 @@ function install (scope: Scope) {
     Interactable,
   } = scope
 
-  scope.addListeners({
-    'pointerEvents:collect-targets': ({
-      targets,
-      node,
-      type,
-      eventTarget,
-    }) => {
-      scope.interactables.forEachMatch(node, (interactable: Interactable) => {
-        const eventable = interactable.events
-        const options = eventable.options
-
-        if (
-          eventable.types[type] &&
-          eventable.types[type].length &&
-          interactable.testIgnoreAllow(options, node, eventTarget)) {
-          targets.push({
-            node,
-            eventable,
-            props: { interactable },
-          })
-        }
-      })
-    },
-
-    'interactable:new': ({ interactable }) => {
-      interactable.events.getRect = function (element: Interact.Element) {
-        return interactable.getRect(element)
-      }
-    },
-
-    'interactable:set': ({ interactable, options }) => {
-      extend(interactable.events.options, pointerEvents.defaults)
-      extend(interactable.events.options, options.pointerEvents || {})
-    },
-  })
-
   merge(actions.eventTypes, pointerEvents.types)
 
   Interactable.prototype.pointerEvents = pointerEventsMethod
@@ -77,7 +41,44 @@ function pointerEventsMethod (this: Interactable, options: any) {
   return this
 }
 
-export default {
+const plugin: Interact.Plugin = {
   id: 'pointer-events/interactableTargets',
   install,
+  listeners: {
+    'pointerEvents:collect-targets': ({
+      targets,
+      node,
+      type,
+      eventTarget,
+    }, scope) => {
+      scope.interactables.forEachMatch(node, (interactable: Interactable) => {
+        const eventable = interactable.events
+        const options = eventable.options
+
+        if (
+          eventable.types[type] &&
+          eventable.types[type].length &&
+        interactable.testIgnoreAllow(options, node, eventTarget)) {
+          targets.push({
+            node,
+            eventable,
+            props: { interactable },
+          })
+        }
+      })
+    },
+
+    'interactable:new': ({ interactable }) => {
+      interactable.events.getRect = function (element: Interact.Element) {
+        return interactable.getRect(element)
+      }
+    },
+
+    'interactable:set': ({ interactable, options }, scope) => {
+      extend(interactable.events.options, scope.pointerEvents.defaults)
+      extend(interactable.events.options, options.pointerEvents || {})
+    },
+  },
 }
+
+export default plugin

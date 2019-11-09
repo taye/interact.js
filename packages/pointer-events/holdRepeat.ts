@@ -19,17 +19,6 @@ function install (scope: Interact.Scope) {
     pointerEvents,
   } = scope
 
-  scope.addListeners(['move', 'up', 'cancel', 'endall'].reduce(
-    (acc, enderTypes) => {
-      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat
-      return acc
-    },
-    {
-      'pointerEvents:new': onNew,
-      'pointerEvents:fired': onFired,
-    }
-  ))
-
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0
   pointerEvents.types.push('holdrepeat')
@@ -77,4 +66,14 @@ function endHoldRepeat ({ interaction }) {
 export default {
   id: 'pointer-events/holdRepeat',
   install,
+  listeners: ['move', 'up', 'cancel', 'endall'].reduce(
+    (acc, enderTypes) => {
+      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat
+      return acc
+    },
+    {
+      'pointerEvents:new': onNew,
+      'pointerEvents:fired': onFired,
+    }
+  ),
 } as Interact.Plugin

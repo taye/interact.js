@@ -69,22 +69,6 @@ function install (scope: Scope) {
 
   // Less Precision with touch input
 
-  scope.addListeners({
-    'interactions:new': ({ interaction }) => {
-      interaction.resizeAxes = 'xy'
-    },
-
-    'interactions:action-start': arg => {
-      start(arg)
-      updateEventAxes(arg)
-    },
-    'interactions:action-move': arg => {
-      move(arg)
-      updateEventAxes(arg)
-    },
-    'interactions:action-end': end,
-  })
-
   resize.cursors = initCursors(browser)
   resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10
 
@@ -154,6 +138,22 @@ function install (scope: Scope) {
 const resize = {
   id: 'actions/resize',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.resizeAxes = 'xy'
+    },
+
+    'interactions:action-start': arg => {
+      start(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-move': arg => {
+      move(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-end': end,
+  },
+
   defaults: {
     square: false,
     preserveAspectRatio: false,

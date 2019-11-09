@@ -105,22 +105,6 @@ function install (scope: Scope) {
     return this.options.gesture as Interact.Options
   } as GesturableMethod
 
-  scope.addListeners({
-    'interactions:action-start': updateGestureProps,
-    'interactions:action-move': updateGestureProps,
-    'interactions:action-end': updateGestureProps,
-
-    'interactions:new': ({ interaction }) => {
-      interaction.gesture = {
-        angle: 0,
-        distance: 0,
-        scale: 1,
-        startAngle: 0,
-        startDistance: 0,
-      }
-    },
-  })
-
   actions[ActionName.Gesture] = gesture
   actions.names.push(ActionName.Gesture)
   utils.arr.merge(actions.eventTypes, [
@@ -136,6 +120,22 @@ function install (scope: Scope) {
 const gesture = {
   id: 'actions/gesture',
   install,
+  listeners: {
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
+
+    'interactions:new': ({ interaction }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0,
+      }
+    },
+  },
+
   defaults: {
   },
 

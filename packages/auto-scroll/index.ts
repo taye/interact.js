@@ -40,24 +40,6 @@ function install (scope: Scope) {
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
 
-  scope.addListeners({
-    'interactions:new': ({ interaction }) => {
-      interaction.autoScroll = null
-    },
-
-    'interactions:destroy': ({ interaction }) => {
-      interaction.autoScroll = null
-      autoScroll.stop()
-      if (autoScroll.interaction) {
-        autoScroll.interaction = null
-      }
-    },
-
-    'interactions:stop': autoScroll.stop,
-
-    'interactions:action-move': (arg: any) => autoScroll.onInteractionMove(arg),
-  })
-
   actions.eventTypes.push('autoscroll')
   defaults.perAction.autoScroll = autoScroll.defaults
 }
@@ -255,4 +237,21 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
 export default {
   id: 'auto-scroll',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.autoScroll = null
+    },
+
+    'interactions:destroy': ({ interaction }) => {
+      interaction.autoScroll = null
+      autoScroll.stop()
+      if (autoScroll.interaction) {
+        autoScroll.interaction = null
+      }
+    },
+
+    'interactions:stop': autoScroll.stop,
+
+    'interactions:action-move': (arg: any) => autoScroll.onInteractionMove(arg),
+  },
 }

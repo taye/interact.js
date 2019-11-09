@@ -1,4 +1,3 @@
-import { Scope } from '@interactjs/core/scope'
 import extend from '@interactjs/utils/extend'
 
 declare module '@interactjs/core/scope' {
@@ -79,42 +78,6 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   startOffset?: Interact.Rect
   preEnd?: boolean
   requireEndOnly?: boolean
-}
-
-function install (scope: Scope) {
-  scope.defaults.perAction.modifiers = []
-
-  scope.addListeners({
-    'interactions:new': ({ interaction }) => {
-      interaction.modifiers = {
-        startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
-        offsets: {},
-        states: null,
-        result: null,
-        endPrevented: null,
-        startDelta: null,
-      }
-    },
-
-    'interactions:before-action-start': arg => {
-      start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page)
-      setCoords(arg)
-    },
-
-    'interactions:action-resume': arg => {
-      stop(arg)
-      start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords)
-      beforeMove(arg)
-    },
-
-    'interactions:after-action-move': restoreCoords,
-    'interactions:before-action-move': beforeMove,
-
-    'interactions:after-action-start': restoreCoords,
-
-    'interactions:before-action-end': beforeEnd,
-    'interactions:stop': stop,
-  })
 }
 
 function start (
@@ -504,7 +467,41 @@ export function makeModifier<
 
 export default {
   id: 'modifiers/base',
-  install,
+  install: scope => {
+    scope.defaults.perAction.modifiers = []
+  },
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.modifiers = {
+        startOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+        offsets: {},
+        states: null,
+        result: null,
+        endPrevented: false,
+        startDelta: null,
+      }
+    },
+
+    'interactions:before-action-start': arg => {
+      start(arg, arg.interaction.coords.start.page, arg.interaction.coords.prev.page)
+      setCoords(arg)
+    },
+
+    'interactions:action-resume': arg => {
+      stop(arg)
+      start(arg, arg.interaction.coords.cur.page, arg.interaction.modifiers.result.coords)
+      beforeMove(arg)
+    },
+
+    'interactions:after-action-move': restoreCoords,
+    'interactions:before-action-move': beforeMove,
+
+    'interactions:after-action-start': restoreCoords,
+
+    'interactions:before-action-end': beforeEnd,
+    'interactions:stop': stop,
+  },
+  before: 'ations',
   startAll,
   setAll,
   prepareStates,

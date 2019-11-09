@@ -61,22 +61,8 @@ function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
     Interactable,
     defaults,
   } = scope
-  logger = logger || console
 
-  scope.addListeners({
-    'interactions:action-start': ({ interaction }) => {
-      for (const check of checks) {
-        const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
-
-        if (
-          !(options && options.devTools && options.devTools.ignore[check.name]) &&
-          check.perform(interaction)
-        ) {
-          logger.warn(prefix + check.text, ...check.getInfo(interaction))
-        }
-      }
-    },
-  })
+  scope.logger = logger || console
 
   defaults.base.devTools = {
     ignore: {},
@@ -167,6 +153,20 @@ const defaultExport = isProduction
   : {
     id,
     install,
+    listeners: {
+      'interactions:action-start': ({ interaction }, scope) => {
+        for (const check of checks) {
+          const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
+
+          if (
+            !(options && options.devTools && options.devTools.ignore[check.name]) &&
+            check.perform(interaction)
+          ) {
+            scope.logger.warn(prefix + check.text, ...check.getInfo(interaction))
+          }
+        }
+      },
+    },
     checks,
     CheckName,
     links,

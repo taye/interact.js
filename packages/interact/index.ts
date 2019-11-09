@@ -21,14 +21,14 @@ export function init (window: Window) {
   // inertia
   interact.use(inertia)
 
+  // snap, resize, etc.
+  interact.use(modifiersBase)
+
   // autoStart, hold
   interact.use(autoStart)
 
   // drag and drop, resize, gesture
   interact.use(actions)
-
-  // snap, resize, etc.
-  interact.use(modifiersBase)
 
   // for backwrads compatibility
   for (const type in modifiers) {

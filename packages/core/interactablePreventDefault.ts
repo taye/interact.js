@@ -88,11 +88,6 @@ export function install (scope: Interact.Scope) {
     return checkAndPreventDefault(this, scope, event)
   }
 
-  scope.addListeners(['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
-    acc[`interactions:${eventType}`] = onInteractionEvent
-    return acc
-  }, {}))
-
   // prevent native HTML5 drag on interact.js target elements
   scope.interactions.docEvents.push({
     type: 'dragstart',
@@ -109,9 +104,11 @@ export function install (scope: Interact.Scope) {
   })
 }
 
-export type Install = typeof install
-
 export default {
   id: 'core/interactablePreventDefault',
   install,
+  listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
+    acc[`interactions:${eventType}`] = onInteractionEvent
+    return acc
+  }, {}),
 }

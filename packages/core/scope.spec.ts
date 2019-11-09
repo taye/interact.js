@@ -22,5 +22,17 @@ test('scope', t => {
 
   t.ok(started && stopped, 'interaction is stopped on interactable.unset()')
 
+  const plugin1 = { id: '1', listeners: {} }
+  const plugin2 = { id: '2', listeners: {} }
+  const plugin3 = { id: '3', listeners: {}, before: '2' }
+
+  const initialListeners = scope.listenerMaps.map(l => l.id)
+
+  scope.usePlugin(plugin1)
+  scope.usePlugin(plugin2)
+  scope.usePlugin(plugin3)
+
+  t.deepEqual(scope.listenerMaps.map(l => l.id), [...initialListeners, '1', '3', '2'])
+
   t.end()
 })

@@ -77,11 +77,6 @@ function install (scope: Scope) {
     },
   })
 
-  scope.addListeners({
-    'scope:add-document': arg => onDocSignal(arg, 'add'),
-    'scope:remove-document': arg => onDocSignal(arg, 'remove'),
-  })
-
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
@@ -247,6 +242,10 @@ function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> (
 export default {
   id: 'core/interactions',
   install,
+  listeners: {
+    'scope:add-document': arg => onDocSignal(arg, 'add'),
+    'scope:remove-document': arg => onDocSignal(arg, 'remove'),
+  },
   onDocSignal,
   doOnInteractions,
   methodNames,

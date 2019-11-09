@@ -82,6 +82,24 @@ const defaults: PointerEventOptions = {
 const pointerEvents = {
   id: 'pointer-events/base',
   install,
+  listeners: {
+    'interactions:new': addInteractionProps,
+    'interactions:update-pointer': addHoldInfo,
+    'interactions:move': moveAndClearHold,
+    'interactions:down': (arg, scope) => {
+      downAndStartHold(arg, scope)
+      fire(arg, scope)
+    },
+    'interactions:up': (arg, scope) => {
+      clearHold(arg)
+      fire(arg, scope)
+      tapAfterUp(arg, scope)
+    },
+    'interactions:cancel': (arg, scope) => {
+      clearHold(arg)
+      fire(arg, scope)
+    },
+  },
   PointerEvent,
   fire,
   collectEventTargets,
@@ -313,25 +331,6 @@ function tapAfterUp ({ interaction, pointer, event, eventTarget }: Interact.Sign
 function install (scope: Scope) {
   scope.pointerEvents = pointerEvents
   scope.defaults.actions.pointerEvents = pointerEvents.defaults
-
-  scope.addListeners({
-    'interactions:new': addInteractionProps,
-    'interactions:update-pointer': addHoldInfo,
-    'interactions:move': moveAndClearHold,
-    'interactions:down': arg => {
-      downAndStartHold(arg, scope)
-      fire(arg, scope)
-    },
-    'interactions:up': arg => {
-      clearHold(arg)
-      fire(arg, scope)
-      tapAfterUp(arg, scope)
-    },
-    'interactions:cancel': arg => {
-      clearHold(arg)
-      fire(arg, scope)
-    },
-  })
 }
 
 export default pointerEvents

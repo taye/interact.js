@@ -22,8 +22,22 @@ function install (scope: Interact.Scope) {
 
   defaults.perAction.hold = 0
   defaults.perAction.delay = 0
+}
 
-  scope.addListeners({
+function getHoldDuration (interaction) {
+  const actionName = interaction.prepared && interaction.prepared.name
+
+  if (!actionName) { return null }
+
+  const options = interaction.interactable.options
+
+  return options[actionName].hold || options[actionName].delay
+}
+
+export default {
+  id: 'auto-start/hold',
+  install,
+  listeners: {
     'interactions:new': ({ interaction }) => {
       interaction.autoStartHoldTimer = null
     },
@@ -52,21 +66,6 @@ function install (scope: Interact.Scope) {
         interaction.prepared.name = null
       }
     },
-  })
-}
-
-function getHoldDuration (interaction) {
-  const actionName = interaction.prepared && interaction.prepared.name
-
-  if (!actionName) { return null }
-
-  const options = interaction.interactable.options
-
-  return options[actionName].hold || options[actionName].delay
-}
-
-export default {
-  id: 'auto-start/hold',
-  install,
+  },
   getHoldDuration,
 }
