@@ -1,8 +1,8 @@
 import { Scope } from '../core/scope'
-import drag, { DragEvent } from './drag'
+import drag from './drag'
 import drop from './drop/index'
-import gesture, { GestureEvent } from './gesture'
-import resize, { ResizeEvent } from './resize'
+import gesture from './gesture'
+import resize from './resize'
 
 function install (scope: Scope) {
   scope.usePlugin(gesture)
@@ -17,10 +17,7 @@ export {
   id,
   install,
   gesture,
-  GestureEvent,
   resize,
-  ResizeEvent,
   drag,
-  DragEvent,
   drop,
 }

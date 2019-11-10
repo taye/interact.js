@@ -4,6 +4,7 @@ coverage
 **/*.d.ts
 !packages/types/types.d.ts
 packages/**/*.js
+packages/**/*.js.map
 **/node_modules
 **/lerna-debug.log
 packages/*/.npmignore

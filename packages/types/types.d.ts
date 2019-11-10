@@ -3,7 +3,9 @@
 // Definitions by: Gaspard Bucher <feature-space.com>
 //                  Taye Adeyemi <taye.me>
 
-import * as actions from '@interactjs/actions'
+import * as drag from '@interactjs/actions/drag'
+import * as gesture from '@interactjs/actions/gesture'
+import * as resize from '@interactjs/actions/resize'
 import * as defaults from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractableSet from '@interactjs/core/InteractableSet'
@@ -38,9 +40,9 @@ declare namespace Interact {
   export type SignalArgs = scope.SignalArgs
   export type DoPhaseArg = interaction.DoPhaseArg
 
-  export type DragEvent = actions.DragEvent
-  export type ResizeEvent = actions.ResizeEvent
-  export type GestureEvent = actions.GestureEvent
+  export type DragEvent = InteractEvent<scope.ActionName.Drag>
+  export type ResizeEvent = resize.ResizeEvent
+  export type GestureEvent = gesture.GestureEvent
 
   export interface Point {
     x: number

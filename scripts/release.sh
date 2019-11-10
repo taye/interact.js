@@ -65,7 +65,7 @@ merge_to_release() {
   git pull --ff-only
 
   # clean repo
-  npx tsc --build --clean $ROOT
+  npm run clean
   git clean -fdX
 
 
@@ -90,11 +90,14 @@ run_build() {
     quit "failed to copy LICENSE"
 
   # generate .js and .d.ts files
-  npx tsc --emitDeclarationOnly false -p $ROOT &&
+  npx tsc -p $ROOT &&
 
   # copy .npmignore to all packages
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat ../../.npmignore >> .npmignore" &&
+
+  ## generate esnext .js modules
+  npm run esnext &&
 
   # build interactjs bundle
   npm run build || exit $?

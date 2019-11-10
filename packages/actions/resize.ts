@@ -1,4 +1,4 @@
-import { ActionProps, Interaction } from '../core/Interaction'
+import { Interaction } from '../core/Interaction'
 import { ActionName, Scope } from '../core/scope'
 import * as arr from '../utils/arr'
 import * as dom from '../utils/domUtils'
@@ -232,7 +232,7 @@ const resize = {
 
   cursors: null as ReturnType<typeof initCursors>,
 
-  getCursor ({ edges, axis, name }: ActionProps) {
+  getCursor ({ edges, axis, name }: Interact.ActionProps) {
     const cursors = resize.cursors
     let result: string = null
 
