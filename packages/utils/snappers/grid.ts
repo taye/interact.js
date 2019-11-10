@@ -6,7 +6,7 @@ function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, 
     ['width', 'height'],
   ].filter(([xField, yField]) => xField in grid || yField in grid)
 
-  return function (x, y) {
+  const gridFunc = function snapGrid (x, y) {
     const {
       range,
       limits = {
@@ -30,6 +30,12 @@ function createGrid (grid: (Interact.Rect | Interact.Point) & { range?: number, 
 
     return result
   }
+
+  gridFunc._isSnapGrid = true
+  gridFunc.grid = grid
+  gridFunc.coordFields = coordFields
+
+  return gridFunc
 }
 
 export default createGrid
