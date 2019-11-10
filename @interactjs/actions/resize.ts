@@ -369,44 +369,18 @@ function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Int
     return
   }
 
-  const startRect = extend({}, interaction.rect)
-  const resizeOptions = interaction.interactable.options.resize
-
-  /*
-   * When using the `resizable.square` or `resizable.preserveAspectRatio` options, resizing from one edge
-   * will affect another. E.g. with `resizable.square`, resizing to make the right edge larger will make
-   * the bottom edge larger by the same amount. We call these 'linked' edges. Any linked edges will depend
-   * on the active edges and the edge being interacted with.
-   */
-  if (resizeOptions.square || resizeOptions.preserveAspectRatio) {
-    const linkedEdges = extend({}, interaction.prepared.edges)
-
-    linkedEdges.top    = linkedEdges.top    || (linkedEdges.left   && !linkedEdges.bottom)
-    linkedEdges.left   = linkedEdges.left   || (linkedEdges.top    && !linkedEdges.right)
-    linkedEdges.bottom = linkedEdges.bottom || (linkedEdges.right  && !linkedEdges.top)
-    linkedEdges.right  = linkedEdges.right  || (linkedEdges.bottom && !linkedEdges.left)
-
-    interaction.prepared._linkedEdges = linkedEdges
-  }
-  else {
-    interaction.prepared._linkedEdges = null
-  }
-
-  // if using `resizable.preserveAspectRatio` option, record aspect ratio at the start of the resize
-  if (resizeOptions.preserveAspectRatio) {
-    interaction.resizeStartAspectRatio = startRect.width / startRect.height
-  }
+  const rect = interaction.rect
 
   interaction.resizeRects = {
-    start     : startRect,
+    start     : rect,
     current   : {
-      left: startRect.left,
-      right: startRect.right,
-      top: startRect.top,
-      bottom: startRect.bottom,
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+      bottom: rect.bottom,
     },
-    inverted  : extend({}, startRect),
-    previous  : extend({}, startRect),
+    inverted  : extend({}, rect),
+    previous  : extend({}, rect),
     delta     : {
       left: 0,
       right : 0,
@@ -429,39 +403,12 @@ function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inte
   const invert = resizeOptions.invert
   const invertible = invert === 'reposition' || invert === 'negate'
 
-  let edges = interaction.prepared.edges
-
   // eslint-disable-next-line no-shadow
   const start      = interaction.resizeRects.start
   const current    = interaction.resizeRects.current
   const inverted   = interaction.resizeRects.inverted
   const deltaRect  = interaction.resizeRects.delta
   const previous   = extend(interaction.resizeRects.previous, inverted)
-  const originalEdges = edges
-
-  const eventDelta = extend({}, iEvent.delta)
-
-  if (resizeOptions.preserveAspectRatio || resizeOptions.square) {
-    // `resize.preserveAspectRatio` takes precedence over `resize.square`
-    const startAspectRatio = resizeOptions.preserveAspectRatio
-      ? interaction.resizeStartAspectRatio
-      : 1
-
-    edges = interaction.prepared._linkedEdges
-
-    if ((originalEdges.left && originalEdges.bottom) ||
-        (originalEdges.right && originalEdges.top)) {
-      eventDelta.y = -eventDelta.x / startAspectRatio
-    }
-    else if (originalEdges.left || originalEdges.right) { eventDelta.y = eventDelta.x / startAspectRatio }
-    else if (originalEdges.top  || originalEdges.bottom) { eventDelta.x = eventDelta.y * startAspectRatio }
-  }
-
-  // update the 'current' rect without modifications
-  if (edges.top) { current.top    += eventDelta.y }
-  if (edges.bottom) { current.bottom += eventDelta.y }
-  if (edges.left) { current.left   += eventDelta.x }
-  if (edges.right) { current.right  += eventDelta.x }
 
   if (invertible) {
     // if invertible, copy the current rect
@@ -469,16 +416,14 @@ function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inte
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
-      let swap
-
       if (inverted.top > inverted.bottom) {
-        swap = inverted.top
+        const swap = inverted.top
 
         inverted.top = inverted.bottom
         inverted.bottom = swap
       }
       if (inverted.left > inverted.right) {
-        swap = inverted.left
+        const swap = inverted.left
 
         inverted.left = inverted.right
         inverted.right = swap
