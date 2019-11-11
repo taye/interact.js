@@ -2,7 +2,7 @@ import extend from '../../utils/extend'
 import rectUtils from '../../utils/rect'
 import { ModifierArg, ModifierState } from '../base'
 import restrictEdges, { RestrictEdgesState } from './edges'
-import { RestrictOptions } from './pointer'
+import { getRestrictionRect, RestrictOptions } from './pointer'
 
 const noMin = { width: -Infinity, height: -Infinity }
 const noMax = { width: +Infinity, height: +Infinity }
@@ -35,8 +35,8 @@ function set (arg: ModifierArg<RestrictSizeState>) {
 
   const rect = rectUtils.xywhToTlbr(interaction.resizeRects.inverted)
 
-  const minSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.min, interaction, arg.coords)) || noMin
-  const maxSize = rectUtils.tlbrToXywh(restrictEdges.getRestrictionRect(options.max, interaction, arg.coords)) || noMax
+  const minSize = rectUtils.tlbrToXywh(getRestrictionRect(options.min, interaction, arg.coords)) || noMin
+  const maxSize = rectUtils.tlbrToXywh(getRestrictionRect(options.max, interaction, arg.coords)) || noMax
 
   state.options = {
     endOnly: options.endOnly,

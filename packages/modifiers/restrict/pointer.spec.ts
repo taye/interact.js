@@ -16,7 +16,7 @@ test('restrict larger than restriction', t => {
     elementRect: { left: 0, top: 0, right: 1, bottom: 1 },
   }
   const state = { options, offset: null }
-  const arg = {
+  const arg: any = {
     interaction,
     state,
     rect,

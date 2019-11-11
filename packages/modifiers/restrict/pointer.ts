@@ -1,7 +1,7 @@
 import extend from '../../utils/extend'
 import * as is from '../../utils/is'
 import rectUtils from '../../utils/rect'
-import { ModifierArg, ModifierState } from '../base'
+import { ModifierArg, ModifierModule, ModifierState } from '../base'
 
 export interface RestrictOptions {
   // where to drag over
@@ -55,7 +55,7 @@ function start ({ rect, startOffset, state, interaction, pageCoords }: ModifierA
   state.offset = offset
 }
 
-function set ({ coords, interaction, state }) {
+function set ({ coords, interaction, state }: ModifierArg<RestrictState>) {
   const { options, offset } = state
 
   const restriction = getRestrictionRect(options.restriction, interaction, coords)
@@ -68,7 +68,7 @@ function set ({ coords, interaction, state }) {
   coords.y = Math.max(Math.min(rect.bottom - offset.bottom, coords.y), rect.top  + offset.top)
 }
 
-function getRestrictionRect (value, interaction, coords?: Interact.Point) {
+export function getRestrictionRect (value, interaction, coords?: Interact.Point) {
   if (is.func(value)) {
     return rectUtils.resolveRectLike(value, interaction.interactable, interaction.element, [coords.x, coords.y, interaction])
   } else {
@@ -84,10 +84,9 @@ const defaults: RestrictOptions = {
   enabled: false,
 }
 
-const restrict = {
+const restrict: ModifierModule<RestrictOptions, RestrictState> = {
   start,
   set,
-  getRestrictionRect,
   defaults,
 }
 

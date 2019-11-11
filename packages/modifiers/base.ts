@@ -83,10 +83,8 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
 export interface ModifierModule<
   Defaults extends { enabled?: boolean },
   State extends ModifierState,
-  Name extends string
 > {
   defaults?: Defaults
-  name?: Name
   start? (arg: ModifierArg<State>): void
   set? (arg: ModifierArg<State>): void
   beforeEnd? (arg: ModifierArg<State>): boolean
@@ -441,7 +439,7 @@ export function makeModifier<
   State extends ModifierState,
   Name extends string
 > (
-  module: ModifierModule<Defaults, State, Name>,
+  module: ModifierModule<Defaults, State>,
   name?: Name
 ) {
   const { defaults } = module
