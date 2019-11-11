@@ -80,6 +80,19 @@ export interface ModifierArg<State extends ModifierState = ModifierState> {
   requireEndOnly?: boolean
 }
 
+export interface ModifierModule<
+  Defaults extends { enabled?: boolean },
+  State extends ModifierState,
+  Name extends string
+> {
+  defaults?: Defaults
+  name?: Name
+  start? (arg: ModifierArg<State>): void
+  set? (arg: ModifierArg<State>): void
+  beforeEnd? (arg: ModifierArg<State>): boolean
+  stop? (arg: ModifierArg<State>): void
+}
+
 function start (
   { interaction, phase }: { interaction: Interact.Interaction, phase: Interact.EventPhase },
   pageCoords: Interact.Point,
@@ -89,7 +102,7 @@ function start (
   const modifierList = getModifierList(interaction)
   const states = prepareStates(modifierList)
 
-  const rect = extend({}, interaction.rect)
+  const rect = extend({} as { [key: string]: any }, interaction.rect)
 
   if (!('width'  in rect)) { rect.width  = rect.right  - rect.left }
   if (!('height' in rect)) { rect.height = rect.bottom - rect.top  }
@@ -428,7 +441,7 @@ export function makeModifier<
   State extends ModifierState,
   Name extends string
 > (
-  module: { defaults?: Defaults, [key: string]: any },
+  module: ModifierModule<Defaults, State, Name>,
   name?: Name
 ) {
   const { defaults } = module
