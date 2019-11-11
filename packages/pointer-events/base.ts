@@ -124,7 +124,7 @@ function fire<T extends string> (
     type: T
     targets?: EventTargetList
   },
-  scope: Interact.Scope
+  scope: Interact.Scope,
 ) {
   const {
     interaction,
@@ -259,7 +259,7 @@ function clearHold ({ interaction, pointerIndex }) {
 
 function moveAndClearHold (
   { interaction, pointer, event, eventTarget, duplicate }: Interact.SignalArgs['interactions:move'],
-  scope: Interact.Scope
+  scope: Interact.Scope,
 ) {
   const pointerIndex = interaction.getPointerIndex(pointer)
 

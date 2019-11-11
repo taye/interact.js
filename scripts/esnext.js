@@ -3,8 +3,9 @@ const path = require('path')
 const os = require('os')
 const fs = require('fs')
 const babel = require('@babel/core')
-const glob = require('glob')
 const PQueue = require('p-queue').default
+
+const { getSources } = require('./utils')
 
 let babelrc
 
@@ -32,12 +33,7 @@ const babelOptions = {
 
 const queue = new PQueue({ concurrency: os.cpus().length })
 
-glob('packages/**/*{.ts,.tsx}', {
-  ignore: ['**/node_modules/**', '**/*_*', '**/*.spec.ts', '**/*.d.ts', '**/dist/**'],
-  silent: true,
-}, async (error, sources) => {
-  if (error) { throw error }
-
+getSources().then(async sources => {
   // touch the .js files so they can be resolved successfully
   await Promise.all(sources.map(sourceFile => {
     const jsName = getJsName(sourceFile)

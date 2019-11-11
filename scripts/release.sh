@@ -26,7 +26,7 @@ ensure_clean_index() {
   echo_funcname
 
   # make sure the repo is clean
-  git clean -fx dist/*
+  git clean -fx packages/*/dist/*
   if ! git diff-index HEAD --stat --exit-code; then
     echo
     quit "working directory must be clean" $?
@@ -89,8 +89,8 @@ run_build() {
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
     quit "failed to copy LICENSE"
 
-  # generate .js and .d.ts files
-  npx tsc -p $ROOT &&
+  # generate .d.ts files
+  npx tsc -b -f &&
 
   # copy .npmignore to all packages
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore

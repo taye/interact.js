@@ -90,7 +90,7 @@ function install (scope: Interact.Scope) {
 
 function resume (
   { interaction, event, pointer, eventTarget }: Interact.SignalArgs['interactions:down'],
-  scope: Interact.Scope
+  scope: Interact.Scope,
 ) {
   const state = interaction.inertia
 
@@ -112,7 +112,7 @@ function resume (
         utils.pointer.setCoords(
           interaction.coords.cur,
           interaction.pointers.map(p => p.pointer),
-          interaction._now()
+          interaction._now(),
         )
 
         // fire appropriate signals
@@ -140,7 +140,7 @@ function resume (
 
 function release<T extends Interact.ActionName> (
   { interaction, event, noPreEnd }: Interact.DoPhaseArg & { noPreEnd?: boolean },
-  scope: Interact.Scope
+  scope: Interact.Scope,
 ) {
   const state = interaction.inertia
 
@@ -176,7 +176,7 @@ function release<T extends Interact.ActionName> (
     rect: interaction.rect,
     pageCoords: interaction.coords.cur.page,
     states: inertiaPossible && interaction.modifiers.states.map(
-      modifierStatus => utils.extend({}, modifierStatus)
+      modifierStatus => utils.extend({}, modifierStatus),
     ),
     preEnd: true,
     prevCoords: null,

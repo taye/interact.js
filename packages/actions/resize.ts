@@ -181,7 +181,7 @@ const resize = {
     interactable: Interact.Interactable,
     element: Interact.Element,
     interaction: Interaction,
-    rect: Interact.Rect
+    rect: Interact.Rect,
   ) {
     if (!rect) { return null }
 

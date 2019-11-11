@@ -221,7 +221,7 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
   const scrollContainer = getContainer(
     scrollOptions.container,
     interaction.interactable,
-    element
+    element,
   )
 
   const prevSize = getScroll(scrollContainer)

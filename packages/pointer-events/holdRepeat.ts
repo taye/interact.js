@@ -32,7 +32,7 @@ function onNew ({ pointerEvent }) {
 
 function onFired (
   { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArgs['pointerEvents:fired'],
-  scope: Interact.Scope
+  scope: Interact.Scope,
 ) {
   if (pointerEvent.type !== 'hold' || !targets.length) { return }
 
@@ -74,6 +74,6 @@ export default {
     {
       'pointerEvents:new': onNew,
       'pointerEvents:fired': onFired,
-    }
+    },
   ),
 } as Interact.Plugin

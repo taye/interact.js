@@ -320,7 +320,7 @@ function getModifierList (interaction) {
 
   if (actionModifiers && actionModifiers.length) {
     return actionModifiers.filter(
-      modifier => !modifier.options || modifier.options.enabled !== false
+      modifier => !modifier.options || modifier.options.enabled !== false,
     )
   }
 
@@ -440,7 +440,7 @@ export function makeModifier<
   Name extends string
 > (
   module: ModifierModule<Defaults, State>,
-  name?: Name
+  name?: Name,
 ) {
   const { defaults } = module
   const methods = {

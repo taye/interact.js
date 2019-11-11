@@ -423,7 +423,7 @@ function dropCheckMethod (
   draggable: Interact.Interactable,
   draggableElement: Interact.Element,
   dropElement: Interact.Element,
-  rect: any
+  rect: any,
 ) {
   let dropped = false
 

@@ -19,7 +19,7 @@ export default function normalize (
   if (is.array(type)) {
     return type.reduce<NormalizedListeners>(
       (acc, t) => extend(acc, normalize(t, listeners, result)),
-      result
+      result,
     )
   }
 

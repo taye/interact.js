@@ -2,6 +2,8 @@
 
 const { existsSync } = require('fs')
 
+const { sourcesGlob, sourcesIgnoreGlobs } = require('./utils')
+
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
 
@@ -30,8 +32,8 @@ const argv = require('yargs')
 function getSources () {
   const glob = require('glob')
 
-  const sources = glob.sync('**/*{.js,.ts,.tsx}', {
-    ignore: '**/node_modules/**',
+  const sources = glob.sync(sourcesGlob, {
+    ignore: sourcesIgnoreGlobs,
     silent: true,
   })
 

@@ -14,7 +14,7 @@ export function resolveRectLike<T extends any[]> (
   value: Interact.RectResolvable<T>,
   target?: Interact.HasGetRect,
   element?: Interact.Element,
-  functionArgs?: T
+  functionArgs?: T,
 ) {
   if (is.string(value)) {
     value = getStringOptionResult(value, target, element)

@@ -184,7 +184,7 @@ function set (arg: ModifierArg<SnapState>) {
 function getOrigin (arg: Partial<ModifierArg<SnapState>>) {
   const { element } = arg.interaction
   const optionsOrigin = utils.rect.rectToXY(
-    utils.rect.resolveRectLike(arg.state.options.origin as any, null, null, [element])
+    utils.rect.resolveRectLike(arg.state.options.origin as any, null, null, [element]),
   )
   const origin = optionsOrigin || utils.getOriginXY(
     arg.interactable,
