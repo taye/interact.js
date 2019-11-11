@@ -44,7 +44,7 @@ test('Interactable unset correctly', t => {
 
   const mappingInfo = div[scope.id][0]
 
-  scope.interactables.signals.fire('unset', { interactable })
+  scope.fire('interactable:unset', { interactable })
 
   t.strictEqual(mappingInfo.context, null,
     'unset mappingInfo context')
@@ -64,40 +64,40 @@ test('Interactable copies and extends per action defaults', t => {
 
   scope.actions.methodDict = { test: 'testize' }
 
-  scope.Interactable.prototype.testize = function (options) {
+  ;(scope.Interactable.prototype as any).testize = function (options) {
     this.setPerAction('test', options)
   }
 
-  defaults.perAction.testModifier = {
+  ;(defaults.perAction as any).testOption = {
     fromDefault: { a: 1, b: 2 },
     specified: null,
   }
-  defaults.actions.test = { testModifier: defaults.perAction.testModifier }
+  ;(defaults.actions as any).test = { testOption: (defaults.perAction as any).testOption }
 
   const div = d('div')
   const interactable = scope.interactables.new(div, {})
-  interactable.testize({ testModifier: { specified: 'parent' } })
+  ;(interactable as any).testize({ testOption: { specified: 'parent' } })
 
-  t.deepEqual(interactable.options.test, {
+  t.deepEqual((interactable.options as any).test, {
     enabled: false,
     origin: { x: 0, y: 0 },
 
-    testModifier: {
+    testOption: {
       fromDefault: { a: 1, b: 2 },
       specified: 'parent',
     },
   }, 'specified options are properly set')
   t.deepEqual(
-    interactable.options.test.testModifier.fromDefault,
-    defaults.perAction.testModifier.fromDefault,
+    (interactable.options as any).test.testOption.fromDefault,
+    (defaults.perAction as any).testOption.fromDefault,
     'default options are properly set')
   t.notEqual(
-    interactable.options.test.testModifier.fromDefault,
-    defaults.perAction.testModifier.fromDefault,
+    (interactable.options as any).test.testOption.fromDefault,
+    (defaults.perAction as any).testOption.fromDefault,
     'defaults are not aliased')
 
-  defaults.perAction.testModifier.fromDefault.c = 3
-  t.notOk('c' in interactable.options.test.testModifier.fromDefault,
+  ;(defaults.perAction as any).testOption.fromDefault.c = 3
+  t.notOk('c' in (interactable.options as any).test.testOption.fromDefault,
     'modifying defaults does not affect constructed interactables')
 
   t.end()
@@ -111,11 +111,11 @@ test('Interactable.updatePerActionListeners', t => {
 
   scope.actions.eventTypes.push('teststart', 'testmove', 'testend')
   scope.actions.methodDict = { test: 'testize' }
-  scope.Interactable.prototype.testize = function (options) {
+  ;(scope.Interactable.prototype as any).testize = function (options) {
     this.setPerAction('test', options)
   }
 
-  scope.defaults.actions.test = {}
+  ;(scope.defaults.actions as any).test = {}
 
   const interactable = scope.interactables.new('target')
 

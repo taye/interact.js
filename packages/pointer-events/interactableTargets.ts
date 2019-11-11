@@ -1,9 +1,8 @@
-import { Scope } from '@interactjs/core/scope'
-import { merge } from '@interactjs/utils/arr'
-import extend from '@interactjs/utils/extend'
+import { Scope } from '../core/scope'
+import { merge } from '../utils/arr'
+import extend from '../utils/extend'
 
 type Interactable = import ('@interactjs/core/Interactable').default
-type EventTargetList = import ('./base').EventTargetList
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -17,47 +16,7 @@ function install (scope: Scope) {
     pointerEvents,
     actions,
     Interactable,
-    interactables,
   } = scope
-
-  pointerEvents.signals.on('collect-targets', ({
-    targets,
-    node,
-    type,
-    eventTarget,
-  }: {
-    targets: EventTargetList
-    node: Node
-    type: string
-    eventTarget: Interact.Element
-  }) => {
-    scope.interactables.forEachMatch(node, (interactable: Interactable) => {
-      const eventable = interactable.events
-      const options = eventable.options
-
-      if (
-        eventable.types[type] &&
-        eventable.types[type].length &&
-        interactable.testIgnoreAllow(options, node, eventTarget)) {
-        targets.push({
-          node,
-          eventable,
-          props: { interactable },
-        })
-      }
-    })
-  })
-
-  interactables.signals.on('new', ({ interactable }) => {
-    interactable.events.getRect = function (element: Interact.Element) {
-      return interactable.getRect(element)
-    }
-  })
-
-  interactables.signals.on('set', ({ interactable, options }) => {
-    extend(interactable.events.options, pointerEvents.defaults)
-    extend(interactable.events.options, options.pointerEvents || {})
-  })
 
   merge(actions.eventTypes, pointerEvents.types)
 
@@ -76,13 +35,50 @@ function install (scope: Scope) {
   }
 }
 
-function pointerEventsMethod (this: Interactable, options: any) {
+function pointerEventsMethod (this: Interact.Interactable, options: any) {
   extend(this.events.options, options)
 
   return this
 }
 
-export default {
+const plugin: Interact.Plugin = {
   id: 'pointer-events/interactableTargets',
   install,
+  listeners: {
+    'pointerEvents:collect-targets': ({
+      targets,
+      node,
+      type,
+      eventTarget,
+    }, scope) => {
+      scope.interactables.forEachMatch(node, (interactable: Interactable) => {
+        const eventable = interactable.events
+        const options = eventable.options
+
+        if (
+          eventable.types[type] &&
+          eventable.types[type].length &&
+        interactable.testIgnoreAllow(options, node, eventTarget)) {
+          targets.push({
+            node,
+            eventable,
+            props: { interactable },
+          })
+        }
+      })
+    },
+
+    'interactable:new': ({ interactable }) => {
+      interactable.events.getRect = function (element: Interact.Element) {
+        return interactable.getRect(element)
+      }
+    },
+
+    'interactable:set': ({ interactable, options }, scope) => {
+      extend(interactable.events.options, scope.pointerEvents.defaults)
+      extend(interactable.events.options, options.pointerEvents || {})
+    },
+  },
 }
+
+export default plugin

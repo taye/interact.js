@@ -1,6 +1,6 @@
-import * as arr from '@interactjs/utils/arr'
-import extend from '@interactjs/utils/extend'
-import normalize, { NormalizedListeners } from '@interactjs/utils/normalizeListeners'
+import * as arr from '../utils/arr'
+import extend from '../utils/extend'
+import normalize, { NormalizedListeners } from '../utils/normalizeListeners'
 import { EventPhase, InteractEvent } from './InteractEvent'
 import { ActionName } from './scope'
 

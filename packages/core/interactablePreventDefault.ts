@@ -1,7 +1,7 @@
-import { matchesSelector, nodeContains } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
-import * as is from '@interactjs/utils/is'
-import { getWindow } from '@interactjs/utils/window'
+import { matchesSelector, nodeContains } from '../utils/domUtils'
+import events from '../utils/events'
+import * as is from '../utils/is'
+import { getWindow } from '../utils/window'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -62,7 +62,7 @@ function checkAndPreventDefault (interactable: Interact.Interactable, scope: Int
   event.preventDefault()
 }
 
-function onInteractionEvent ({ interaction, event }: Interact.SignalArg) {
+function onInteractionEvent ({ interaction, event }: { interaction: Interact.Interaction, event: Interact.PointerEventType }) {
   if (interaction.interactable) {
     interaction.interactable.checkAndPreventDefault(event as Event)
   }
@@ -70,7 +70,7 @@ function onInteractionEvent ({ interaction, event }: Interact.SignalArg) {
 
 export function install (scope: Interact.Scope) {
   /** @lends Interactable */
-  const Interactable = scope.Interactable
+  const { Interactable } = scope
 
   /**
    * Returns or sets whether to prevent the browser's default behaviour in
@@ -86,10 +86,6 @@ export function install (scope: Interact.Scope) {
 
   Interactable.prototype.checkAndPreventDefault = function (event) {
     return checkAndPreventDefault(this, scope, event)
-  }
-
-  for (const eventSignal of ['down', 'move', 'up', 'cancel']) {
-    scope.interactions.signals.on(eventSignal, onInteractionEvent)
   }
 
   // prevent native HTML5 drag on interact.js target elements
@@ -108,9 +104,11 @@ export function install (scope: Interact.Scope) {
   })
 }
 
-export type Install = typeof install
-
 export default {
   id: 'core/interactablePreventDefault',
   install,
+  listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
+    acc[`interactions:${eventType}`] = onInteractionEvent
+    return acc
+  }, {}),
 }

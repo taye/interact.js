@@ -3,13 +3,13 @@ import domObjects from './domObjects'
 import * as is from './is'
 import win, { getWindow } from './window'
 
-export function nodeContains (parent: Node, child: Node) {
+export function nodeContains (parent: Node | Interact.EventTarget, child: Node | Interact.EventTarget) {
   while (child) {
     if (child === parent) {
       return true
     }
 
-    child = child.parentNode
+    child = (child as Node).parentNode
   }
 
   return false

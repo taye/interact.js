@@ -26,7 +26,7 @@ ensure_clean_index() {
   echo_funcname
 
   # make sure the repo is clean
-  git clean -fx dist/*
+  git clean -fx packages/*/dist/*
   if ! git diff-index HEAD --stat --exit-code; then
     echo
     quit "working directory must be clean" $?
@@ -65,7 +65,7 @@ merge_to_release() {
   git pull --ff-only
 
   # clean repo
-  npx tsc --build --clean $ROOT
+  npm run clean
   git clean -fdX
 
 
@@ -89,12 +89,15 @@ run_build() {
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
     quit "failed to copy LICENSE"
 
-  # generate .js and .d.ts files
-  npx tsc --emitDeclarationOnly false -p $ROOT &&
+  # generate .d.ts files
+  npx tsc -b -f &&
 
   # copy .npmignore to all packages
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
     cat ../../.npmignore >> .npmignore" &&
+
+  ## generate esnext .js modules
+  npm run esnext &&
 
   # build interactjs bundle
   npm run build || exit $?

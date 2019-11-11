@@ -1,4 +1,4 @@
-import extend from '@interactjs/utils/extend'
+import extend from '../../utils/extend'
 import restrictPointer from './pointer'
 
 const defaults = extend({

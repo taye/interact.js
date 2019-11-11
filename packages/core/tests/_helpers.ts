@@ -1,9 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { doc } from '@interactjs/_dev/test/domator'
-import * as utils from '@interactjs/utils'
-import { MockCoords } from '@interactjs/utils/pointerUtils'
-import Signals from '@interactjs/utils/Signals'
-import Eventable from '../Eventable'
+import * as utils from '../../utils/index'
+import { MockCoords } from '../../utils/pointerUtils'
 import { createScope } from '../scope'
 
 let counter = 0
@@ -69,47 +67,14 @@ export function mockScope (options = {} as any) {
   const document = options.document || doc
   const window = document.defaultView
 
-  const scope: any = createScope().init(window)
+  const scope = createScope().init(window)
 
   scope.interact = Object.assign(() => {}, { use () {} }) as any
 
   return scope
 }
 
-export function mockSignals () {
-  return {
-    on () {},
-    off () {},
-    fire () {},
-  } as unknown as any
-}
-
-export function mockInteractable (props = {}) {
-  return Object.assign(
-    {
-      _signals: new Signals(),
-      _actions: {
-        names: [],
-        methodDict: {},
-      },
-      options: {
-        deltaSource: 'page',
-      },
-      target: {},
-      events: new Eventable(),
-      getRect () {
-        return this.element
-          ? utils.dom.getElementClientRect(this.element)
-          : { left: 0, top: 0, right: 0, bottom: 0 }
-      },
-      fire (event) {
-        this.events.fire(event)
-      },
-    },
-    props) as any
-}
-
-export function getProps<T extends {}, K extends keyof T> (src: T, props: K[]) {
+export function getProps<T extends object, K extends keyof T> (src: T, props: K[]) {
   return props.reduce((acc, prop) => {
     if (prop in src) {
       acc[prop] = src[prop]

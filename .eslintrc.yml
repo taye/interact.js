@@ -32,6 +32,7 @@ rules:
   no-shadow: error
   no-useless-constructor: off
   no-var: error
+  # node/file-extension-in-import: [error, always]
   node/no-extraneous-import: [error, { allowModules: ['@interactjs/_dev'] }]
   node/no-missing-import: error
   node/no-unsupported-features/es-syntax: off

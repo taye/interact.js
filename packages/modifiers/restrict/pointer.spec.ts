@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import * as helpers from '../../core/tests/_helpers'
 import restrict from '../restrict/pointer'
 
 test('restrict larger than restriction', t => {
@@ -16,7 +16,7 @@ test('restrict larger than restriction', t => {
     elementRect: { left: 0, top: 0, right: 1, bottom: 1 },
   }
   const state = { options, offset: null }
-  const arg = {
+  const arg: any = {
     interaction,
     state,
     rect,

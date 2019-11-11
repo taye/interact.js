@@ -1,9 +1,9 @@
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as arr from '@interactjs/utils/arr'
-import * as dom from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
+import { Interaction } from '../core/Interaction'
+import { ActionName, Scope } from '../core/scope'
+import * as arr from '../utils/arr'
+import * as dom from '../utils/domUtils'
+import extend from '../utils/extend'
+import * as is from '../utils/is'
 
 export type EdgeName = 'top' | 'left' | 'bottom' | 'right'
 
@@ -64,22 +64,10 @@ function install (scope: Scope) {
     browser,
     /** @lends Interactable */
     Interactable, // tslint:disable-line no-shadowed-variable
-    interactions,
     defaults,
   } = scope
 
   // Less Precision with touch input
-
-  interactions.signals.on('new', interaction => {
-    interaction.resizeAxes = 'xy'
-  })
-
-  interactions.signals.on('action-start', start)
-  interactions.signals.on('action-move', move)
-  interactions.signals.on('action-end', end)
-
-  interactions.signals.on('action-start', updateEventAxes)
-  interactions.signals.on('action-move', updateEventAxes)
 
   resize.cursors = initCursors(browser)
   resize.defaultMargin = browser.supportsTouch || browser.supportsPointerEvent ? 20 : 10
@@ -150,6 +138,22 @@ function install (scope: Scope) {
 const resize = {
   id: 'actions/resize',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.resizeAxes = 'xy'
+    },
+
+    'interactions:action-start': arg => {
+      start(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-move': arg => {
+      move(arg)
+      updateEventAxes(arg)
+    },
+    'interactions:action-end': end,
+  },
+
   defaults: {
     square: false,
     preserveAspectRatio: false,
@@ -177,7 +181,7 @@ const resize = {
     interactable: Interact.Interactable,
     element: Interact.Element,
     interaction: Interaction,
-    rect: Interact.Rect
+    rect: Interact.Rect,
   ) {
     if (!rect) { return null }
 
@@ -228,7 +232,7 @@ const resize = {
 
   cursors: null as ReturnType<typeof initCursors>,
 
-  getCursor ({ edges, axis, name }: ActionProps) {
+  getCursor ({ edges, axis, name }: Interact.ActionProps) {
     const cursors = resize.cursors
     let result: string = null
 
@@ -509,8 +513,8 @@ function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inter
   iEvent.deltaRect = interaction.resizeRects.delta
 }
 
-function updateEventAxes ({ iEvent, interaction, action }: { iEvent: ResizeEvent, interaction: Interaction, action: ActionName }) {
-  if (action !== ActionName.Resize || !interaction.resizeAxes) { return }
+function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
+  if (interaction.prepared.name !== ActionName.Resize || !interaction.resizeAxes) { return }
 
   const options = interaction.interactable.options
 

@@ -1,8 +1,8 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '@interactjs/actions/drag'
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import inertia from './'
+import drag from '../actions/drag'
+import { EventPhase } from '../core/InteractEvent'
+import * as helpers from '../core/tests/_helpers'
+import inertia from './index'
 
 test('inertia', t => {
   const {

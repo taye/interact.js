@@ -1,8 +1,8 @@
-import * as domUtils from '@interactjs/utils/domUtils'
-import * as is from '@interactjs/utils/is'
-import raf from '@interactjs/utils/raf'
-import { getStringOptionResult } from '@interactjs/utils/rect'
-import { getWindow } from '@interactjs/utils/window'
+import * as domUtils from '../utils/domUtils'
+import * as is from '../utils/is'
+import raf from '../utils/raf'
+import { getStringOptionResult } from '../utils/rect'
+import { getWindow } from '../utils/window'
 
 type Scope = import ('@interactjs/core/scope').Scope
 
@@ -33,29 +33,12 @@ export interface AutoScrollOptions {
 
 function install (scope: Scope) {
   const {
-    interactions,
     defaults,
     actions,
   } = scope
 
   scope.autoScroll = autoScroll
   autoScroll.now = () => scope.now()
-
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.autoScroll = null
-  })
-
-  interactions.signals.on('destroy', ({ interaction }) => {
-    interaction.autoScroll = null
-    autoScroll.stop()
-    if (autoScroll.interaction) {
-      autoScroll.interaction = null
-    }
-  })
-
-  interactions.signals.on('stop', autoScroll.stop)
-
-  interactions.signals.on('action-move', (arg: any) => autoScroll.onInteractionMove(arg))
 
   actions.eventTypes.push('autoscroll')
   defaults.perAction.autoScroll = autoScroll.defaults
@@ -238,7 +221,7 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
   const scrollContainer = getContainer(
     scrollOptions.container,
     interaction.interactable,
-    element
+    element,
   )
 
   const prevSize = getScroll(scrollContainer)
@@ -254,4 +237,21 @@ export function getScrollSizeDelta ({ interaction, element }, func) {
 export default {
   id: 'auto-scroll',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.autoScroll = null
+    },
+
+    'interactions:destroy': ({ interaction }) => {
+      interaction.autoScroll = null
+      autoScroll.stop()
+      if (autoScroll.interaction) {
+        autoScroll.interaction = null
+      }
+    },
+
+    'interactions:stop': autoScroll.stop,
+
+    'interactions:action-move': (arg: any) => autoScroll.onInteractionMove(arg),
+  },
 }

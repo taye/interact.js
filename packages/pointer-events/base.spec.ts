@@ -1,7 +1,6 @@
 import test from '@interactjs/_dev/test/test'
-import Eventable from '@interactjs/core/Eventable'
-import Interaction from '@interactjs/core/Interaction'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import Eventable from '../core/Eventable'
+import * as helpers from '../core/tests/_helpers'
 import pointerEvents, { EventTargetList } from './base'
 import interactableTargets from './interactableTargets'
 
@@ -22,7 +21,7 @@ test('pointerEvents.types', t => {
 })
 
 test('pointerEvents.fire', t => {
-  const scope: Interact.Scope = helpers.mockScope()
+  const { scope, interaction, event, coords } = helpers.testEnv({ plugins: [pointerEvents] })
 
   const eventable = new Eventable(pointerEvents.defaults)
   const type = 'TEST'
@@ -38,7 +37,7 @@ test('pointerEvents.fire', t => {
     },
   }]
 
-  eventable.on(type, event => { firedEvent = event })
+  eventable.on(type, e => { firedEvent = e })
 
   pointerEvents.fire({
     type,
@@ -60,35 +59,24 @@ test('pointerEvents.fire', t => {
   t.equal(firedEvent.TEST_PROP, TEST_PROP,
     'Fired event has props from target.props')
 
-  const tapTime = 500
-  const interaction = Object.assign(
-    scope.interactions.new({}),
-    { tapTime: -1, prevTap: null })
+  scope.now = () => coords.timeStamp
 
-  interaction.updatePointer({} as any, {} as any, null)
+  coords.timeStamp = 0
+  interaction.pointerDown(event, event, scope.document)
+  coords.timeStamp = 500
+  interaction.pointerUp(event, event, scope.document, scope.document)
 
-  const tapEvent = Object.assign(new pointerEvents.PointerEvent('tap', {} as any, {} as any, null, interaction, 0), {
-    timeStamp: tapTime,
-  })
-
-  pointerEvents.fire({
-    pointerEvent: tapEvent,
-    interaction,
-    targets: [{
-      eventable,
-      element,
-    }],
-  } as any, scope)
-
-  t.equal(interaction.tapTime, tapTime,
+  t.equal(interaction.tapTime, 500,
     'interaction.tapTime is updated')
-  t.equal(interaction.prevTap, tapEvent,
+  t.equal(interaction.prevTap.type, 'tap',
     'interaction.prevTap is updated')
 
   t.end()
 })
 
 test('pointerEvents.collectEventTargets', t => {
+  const { scope, interaction } = helpers.testEnv()
+
   const type = 'TEST'
   const TEST_PROP = ['TEST_PROP']
   const target = {
@@ -98,24 +86,25 @@ test('pointerEvents.collectEventTargets', t => {
   }
   let collectedTargets
 
-  function onCollect ({ targets }: { targets: EventTargetList }) {
+  function onCollect ({ targets }: { targets?: EventTargetList }) {
     targets.push(target)
 
     collectedTargets = targets
   }
 
-  pointerEvents.signals.on('collect-targets', onCollect)
+  scope.addListeners({
+    'pointerEvents:collect-targets': onCollect,
+  })
+
   pointerEvents.collectEventTargets({
-    interaction: new Interaction({ signals: helpers.mockSignals() } as any),
+    interaction,
     pointer: {},
     event: {},
     eventTarget: {},
     type,
-  } as any)
+  } as any, scope)
 
   t.deepEqual(collectedTargets, [target])
-
-  pointerEvents.signals.off('collect-targets', onCollect)
 
   t.end()
 })

@@ -9,10 +9,10 @@
 //   },
 // })
 
-import extend from '@interactjs/utils/extend'
-import rectUtils from '@interactjs/utils/rect'
+import extend from '../../utils/extend'
+import rectUtils from '../../utils/rect'
 import { ModifierArg, ModifierState } from '../base'
-import restrict, { RestrictOptions } from './pointer'
+import { getRestrictionRect, RestrictOptions } from './pointer'
 
 export interface RestrictEdgesOptions {
   inner: RestrictOptions['restriction']
@@ -28,7 +28,6 @@ export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
   offset: RestrictEdgesOptions['offset']
 }>
 
-const { getRestrictionRect } = restrict
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
 
@@ -103,7 +102,6 @@ const defaults: RestrictEdgesOptions = {
 const restrictEdges = {
   noInner,
   noOuter,
-  getRestrictionRect,
   start,
   set,
   defaults,

@@ -1,7 +1,7 @@
-import Interactable from '@interactjs/core/Interactable'
-import InteractEvent from '@interactjs/core/InteractEvent'
-import { Scope } from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils'
+import Interactable from '../../core/Interactable'
+import InteractEvent from '../../core/InteractEvent'
+import { Scope } from '../../core/scope'
+import * as utils from '../../utils/index'
 import drag from '../drag'
 import DropEvent from './DropEvent'
 
@@ -71,78 +71,10 @@ function install (scope: Scope) {
     interact,
     /** @lends Interactable */
     Interactable, // eslint-disable-line no-shadow
-    interactions,
     defaults,
   } = scope
 
   scope.usePlugin(drag)
-
-  interactions.signals.on('before-action-start', ({ interaction }) => {
-    if (interaction.prepared.name !== 'drag') { return }
-
-    interaction.dropState = {
-      cur: {
-        dropzone: null,
-        element: null,
-      },
-      prev: {
-        dropzone: null,
-        element: null,
-      },
-      rejected: null,
-      events: null,
-      activeDrops: null,
-    }
-  })
-
-  interactions.signals.on('after-action-start', ({ interaction, event, iEvent: dragEvent }) => {
-    if (interaction.prepared.name !== 'drag') { return }
-
-    const { dropState } = interaction
-
-    // reset active dropzones
-    dropState.activeDrops = null
-    dropState.events = null
-    dropState.activeDrops = getActiveDrops(scope, interaction.element)
-    dropState.events = getDropEvents(interaction, event, dragEvent)
-
-    if (dropState.events.activate) {
-      fireActivationEvents(dropState.activeDrops, dropState.events.activate)
-    }
-  })
-
-  // FIXME proper signal types
-  interactions.signals.on('action-move', arg => onEventCreated(arg as any, scope))
-  interactions.signals.on('action-end', arg => onEventCreated(arg as any, scope))
-
-  interactions.signals.on('after-action-move', ({ interaction }) => {
-    if (interaction.prepared.name !== 'drag') { return }
-
-    fireDropEvents(interaction, interaction.dropState.events)
-    interaction.dropState.events = {}
-  })
-
-  interactions.signals.on('after-action-end', ({ interaction }) => {
-    if (interaction.prepared.name !== 'drag') { return }
-
-    fireDropEvents(interaction, interaction.dropState.events)
-  })
-
-  interactions.signals.on('stop', ({ interaction }) => {
-    if (interaction.prepared.name !== 'drag') { return }
-
-    const { dropState } = interaction
-
-    if (dropState) {
-      dropState.activeDrops = null
-      dropState.events = null
-      dropState.cur.dropzone = null
-      dropState.cur.element = null
-      dropState.prev.dropzone = null
-      dropState.prev.element = null
-      dropState.rejected = false
-    }
-  })
 
   /**
    *
@@ -402,7 +334,7 @@ function fireDropEvents (interaction: Interact.Interaction, events) {
   dropState.prev.element = cur.element
 }
 
-function onEventCreated ({ interaction, iEvent, event }: Interact.SignalArg, scope) {
+function onEventCreated ({ interaction, iEvent, event }: Interact.DoPhaseArg, scope) {
   if (iEvent.type !== 'dragmove' && iEvent.type !== 'dragend') { return }
 
   const { dropState } = interaction
@@ -491,7 +423,7 @@ function dropCheckMethod (
   draggable: Interact.Interactable,
   draggableElement: Interact.Element,
   dropElement: Interact.Element,
-  rect: any
+  rect: any,
 ) {
   let dropped = false
 
@@ -546,6 +478,74 @@ function dropCheckMethod (
 const drop = {
   id: 'actions/drop',
   install,
+  listeners: {
+    'interactions:before-action-start': ({ interaction }) => {
+      if (interaction.prepared.name !== 'drag') { return }
+
+      interaction.dropState = {
+        cur: {
+          dropzone: null,
+          element: null,
+        },
+        prev: {
+          dropzone: null,
+          element: null,
+        },
+        rejected: null,
+        events: null,
+        activeDrops: null,
+      }
+    },
+
+    'interactions:after-action-start': ({ interaction, event, iEvent: dragEvent }, scope) => {
+      if (interaction.prepared.name !== 'drag') { return }
+
+      const { dropState } = interaction
+
+      // reset active dropzones
+      dropState.activeDrops = null
+      dropState.events = null
+      dropState.activeDrops = getActiveDrops(scope, interaction.element)
+      dropState.events = getDropEvents(interaction, event, dragEvent)
+
+      if (dropState.events.activate) {
+        fireActivationEvents(dropState.activeDrops, dropState.events.activate)
+      }
+    },
+
+    // FIXME proper signal types
+    'interactions:action-move': onEventCreated,
+    'interactions:action-end': onEventCreated,
+
+    'interactions:after-action-move': function fireDropAfterMove ({ interaction }) {
+      if (interaction.prepared.name !== 'drag') { return }
+
+      fireDropEvents(interaction, interaction.dropState.events)
+      interaction.dropState.events = {}
+    },
+
+    'interactions:after-action-end': ({ interaction }) => {
+      if (interaction.prepared.name !== 'drag') { return }
+
+      fireDropEvents(interaction, interaction.dropState.events)
+    },
+
+    'interactions:stop': ({ interaction }) => {
+      if (interaction.prepared.name !== 'drag') { return }
+
+      const { dropState } = interaction
+
+      if (dropState) {
+        dropState.activeDrops = null
+        dropState.events = null
+        dropState.cur.dropzone = null
+        dropState.cur.element = null
+        dropState.prev.dropzone = null
+        dropState.prev.element = null
+        dropState.rejected = false
+      }
+    },
+  },
   getActiveDrops,
   getDrop,
   getDropEvents,

@@ -1,8 +1,8 @@
 import test from '@interactjs/_dev/test/test'
-import { drag, resize } from '@interactjs/actions'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils'
-import devTools, { Check, Logger } from './'
+import { drag, resize } from '../actions/index'
+import * as helpers from '../core/tests/_helpers'
+import * as utils from '../utils/index'
+import devTools, { Check, Logger } from './index'
 
 const { checks, links, prefix } = devTools
 const checkMap = checks.reduce((acc, check) => {

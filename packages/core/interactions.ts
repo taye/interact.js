@@ -1,18 +1,16 @@
-import browser from '@interactjs/utils/browser'
-import domObjects from '@interactjs/utils/domObjects'
-import { nodeContains } from '@interactjs/utils/domUtils'
-import events from '@interactjs/utils/events'
-import pointerUtils from '@interactjs/utils/pointerUtils'
-import Signals from '@interactjs/utils/Signals'
+import browser from '../utils/browser'
+import domObjects from '../utils/domObjects'
+import { nodeContains } from '../utils/domUtils'
+import events from '../utils/events'
+import pointerUtils from '../utils/pointerUtils'
 import InteractionBase from './Interaction'
 import finder, { SearchDetails } from './interactionFinder'
 import { Scope } from './scope'
 
-declare module '@interactjs/core/scope' {
+declare module '../core/scope' {
   interface Scope {
     Interaction: typeof InteractionBase
     interactions: {
-      signals: Signals
       new: (options: any) => InteractionBase
       list: InteractionBase[]
       listeners: { [type: string]: Interact.Listener }
@@ -23,14 +21,21 @@ declare module '@interactjs/core/scope' {
   }
 }
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:find': {
+      interaction: InteractionBase
+      searchDetails: SearchDetails
+    }
+  }
+}
+
 const methodNames = [
   'pointerDown', 'pointerMove', 'pointerUp',
   'updatePointer', 'removePointer', 'windowBlur',
 ]
 
 function install (scope: Scope) {
-  const signals = new Signals()
-
   const listeners = {} as any
 
   for (const method of methodNames) {
@@ -72,9 +77,6 @@ function install (scope: Scope) {
     },
   })
 
-  scope.signals.on('add-document', onDocSignal)
-  scope.signals.on('remove-document', onDocSignal)
-
   // for ignoring browser's simulated mouse events
   scope.prevTouchTime = 0
 
@@ -91,11 +93,10 @@ function install (scope: Scope) {
   }
 
   scope.interactions = {
-    signals,
     // all active and idle interactions
     list: [],
-    new (options: { pointerType?: string, signals?: Signals }) {
-      options.signals = signals
+    new (options: { pointerType?: string, scopeFire?: Scope['fire'] }) {
+      options.scopeFire = (name, arg) => scope.fire(name, arg)
 
       const interaction = new scope.Interaction(options as Required<typeof options>)
 
@@ -212,15 +213,14 @@ function getInteraction (searchDetails: SearchDetails) {
   const foundInteraction = finder.search(searchDetails)
   const signalArg = { interaction: foundInteraction, searchDetails }
 
-  scope.interactions.signals.fire('find', signalArg)
+  scope.fire('interactions:find', signalArg)
 
   return signalArg.interaction || scope.interactions.new({ pointerType })
 }
 
-function onDocSignal ({ doc, scope, options }, signalName) {
+function onDocSignal<T extends 'scope:add-document' | 'scope:remove-document'> ({ doc, scope, options }: Interact.SignalArgs[T], eventMethodName: 'add' | 'remove') {
   const { docEvents } = scope.interactions
-  const eventMethod = signalName.indexOf('add') === 0
-    ? events.add : events.remove
+  const eventMethod = events[eventMethodName]
 
   if (scope.browser.isIOS && !options.events) {
     options.events = { passive: false }
@@ -242,6 +242,10 @@ function onDocSignal ({ doc, scope, options }, signalName) {
 export default {
   id: 'core/interactions',
   install,
+  listeners: {
+    'scope:add-document': arg => onDocSignal(arg, 'add'),
+    'scope:remove-document': arg => onDocSignal(arg, 'remove'),
+  },
   onDocSignal,
   doOnInteractions,
   methodNames,

@@ -1,15 +1,14 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import pointerUtils from '@interactjs/utils/pointerUtils'
+import * as helpers from '../../core/tests/_helpers'
+import pointerUtils from '../../utils/pointerUtils'
 import drag from '../drag'
-import drop from '../drop'
+import drop from '../drop/index'
 
 test('actions/drop options', t => {
   const scope = helpers.mockScope()
-  scope.interact = {}
   scope.usePlugin(drop)
 
-  const interactable = scope.interactables.new({ pointerType: 'test' })
+  const interactable = scope.interactables.new({ pointerType: 'test' } as any)
 
   const funcs = Object.freeze({
     drop () {},

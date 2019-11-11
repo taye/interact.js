@@ -13,19 +13,11 @@ declare module '@interactjs/pointer-events/base' {
 }
 
 function install (scope: Interact.Scope) {
-  const {
-    pointerEvents,
-    interactions,
-  } = scope
-
   scope.usePlugin(basePlugin)
 
-  pointerEvents.signals.on('new', onNew)
-  pointerEvents.signals.on('fired', arg => onFired(arg as any, scope))
-
-  for (const signal of ['move', 'up', 'cancel', 'endall']) {
-    interactions.signals.on(signal, endHoldRepeat)
-  }
+  const {
+    pointerEvents,
+  } = scope
 
   // don't repeat by default
   pointerEvents.defaults.holdRepeatInterval = 0
@@ -39,8 +31,8 @@ function onNew ({ pointerEvent }) {
 }
 
 function onFired (
-  { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArg,
-  scope: Interact.Scope
+  { interaction, pointerEvent, eventTarget, targets }: Interact.SignalArgs['pointerEvents:fired'],
+  scope: Interact.Scope,
 ) {
   if (pointerEvent.type !== 'hold' || !targets.length) { return }
 
@@ -74,4 +66,14 @@ function endHoldRepeat ({ interaction }) {
 export default {
   id: 'pointer-events/holdRepeat',
   install,
+  listeners: ['move', 'up', 'cancel', 'endall'].reduce(
+    (acc, enderTypes) => {
+      acc[`pointerEvents:${enderTypes}`] = endHoldRepeat
+      return acc
+    },
+    {
+      'pointerEvents:new': onNew,
+      'pointerEvents:fired': onFired,
+    },
+  ),
 } as Interact.Plugin

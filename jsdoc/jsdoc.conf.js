@@ -1,6 +1,6 @@
 const packagesDir = `${__dirname}/../packages`
 const glob = require('glob')
-const ignore = ['**/node_modules/**', '**/tests/**', '**/*.d.ts', '**/dist/**']
+const ignore = ['**/node_modules/**', '**/*.spec.ts', '**/*.d.ts', '**/dist/**']
 const include = [...new Set([
   ...glob.sync(`${packagesDir}/**/*.ts`, { ignore }),
 ])]

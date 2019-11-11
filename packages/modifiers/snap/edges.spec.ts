@@ -1,5 +1,5 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
+import * as helpers from '../../core/tests/_helpers'
 import snapEdges from '../snap/edges'
 
 test('modifiers/snap/edges', t => {

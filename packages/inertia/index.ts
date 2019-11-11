@@ -1,7 +1,7 @@
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import modifiers, { restoreCoords, setCoords } from '@interactjs/modifiers/base'
-import * as utils from '@interactjs/utils'
-import raf from '@interactjs/utils/raf'
+import { EventPhase } from '../core/InteractEvent'
+import modifiers, { restoreCoords, setCoords } from '../modifiers/base'
+import * as utils from '../utils/index'
+import raf from '../utils/raf'
 
 declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
@@ -59,28 +59,24 @@ declare module '@interactjs/core/defaultOptions' {
   }
 }
 
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:action-resume': {
+      interaction: Interact.Interaction
+      phase: EventPhase.Resume
+    }
+  }
+}
+
 (EventPhase as any).Resume = 'resume'
 ;(EventPhase as any).InertiaStart = 'inertiastart'
 
 function install (scope: Interact.Scope) {
   const {
-    interactions,
     defaults,
   } = scope
 
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.inertia = {
-      active     : false,
-      smoothEnd  : false,
-      allowResume: false,
-      upCoords   : {} as any,
-      timeout    : null,
-    }
-  })
-
-  interactions.signals.on('before-action-end', (arg: Interact.SignalArg) => release(arg, scope))
-  interactions.signals.on('down', (arg: Interact.SignalArg) => resume(arg, scope))
-  interactions.signals.on('stop', stop)
+  scope.usePlugin(modifiers)
 
   defaults.perAction.inertia = {
     enabled          : false,
@@ -90,13 +86,11 @@ function install (scope: Interact.Scope) {
     allowResume      : true,  // allow resuming an action in inertia phase
     smoothEndDuration: 300,   // animate to snap/restrict endOnly if there's no inertia
   }
-
-  scope.usePlugin(modifiers)
 }
 
 function resume (
-  { interaction, event, pointer, eventTarget }: Interact.SignalArg,
-  scope: Interact.Scope
+  { interaction, event, pointer, eventTarget }: Interact.SignalArgs['interactions:down'],
+  scope: Interact.Scope,
 ) {
   const state = interaction.inertia
 
@@ -114,24 +108,24 @@ function resume (
         interaction.simulation = null
 
         // update pointers to the down event's coordinates
-        interaction.updatePointer(pointer, event, eventTarget, true)
+        interaction.updatePointer(pointer as Interact.PointerType, event as Interact.PointerEventType, eventTarget, true)
         utils.pointer.setCoords(
           interaction.coords.cur,
           interaction.pointers.map(p => p.pointer),
-          interaction._now()
+          interaction._now(),
         )
 
         // fire appropriate signals
         const signalArg = {
           interaction,
-          phase: EventPhase.Resume,
+          phase: EventPhase.Resume as const,
         }
 
-        scope.interactions.signals.fire('action-resume', signalArg)
+        scope.fire('interactions:action-resume', signalArg)
 
         // fire a reume event
         const resumeEvent = new scope.InteractEvent(
-          interaction, event, interaction.prepared.name, EventPhase.Resume, interaction.element)
+          interaction, event as Interact.PointerEventType, interaction.prepared.name, EventPhase.Resume, interaction.element)
 
         interaction._fireEvent(resumeEvent)
 
@@ -145,8 +139,8 @@ function resume (
 }
 
 function release<T extends Interact.ActionName> (
-  { interaction, event, noPreEnd }: Interact.SignalArg,
-  scope: Interact.Scope
+  { interaction, event, noPreEnd }: Interact.DoPhaseArg & { noPreEnd?: boolean },
+  scope: Interact.Scope,
 ) {
   const state = interaction.inertia
 
@@ -177,9 +171,12 @@ function release<T extends Interact.ActionName> (
 
   const modifierArg = {
     interaction,
+    interactable: interaction.interactable,
+    element: interaction.element,
+    rect: interaction.rect,
     pageCoords: interaction.coords.cur.page,
     states: inertiaPossible && interaction.modifiers.states.map(
-      modifierStatus => utils.extend({}, modifierStatus)
+      modifierStatus => utils.extend({}, modifierStatus),
     ),
     preEnd: true,
     prevCoords: null,
@@ -257,7 +254,7 @@ function release<T extends Interact.ActionName> (
   return false
 }
 
-function stop ({ interaction }: Interact.SignalArg) {
+function stop ({ interaction }: Interact.DoPhaseArg) {
   const state = interaction.inertia
   if (state.active) {
     raf.cancel(state.timeout)
@@ -384,6 +381,22 @@ function getOptions ({ interactable, prepared }: Interact.Interaction) {
 export default {
   id: 'inertia',
   install,
+  listeners: {
+    'interactions:new': ({ interaction }) => {
+      interaction.inertia = {
+        active     : false,
+        smoothEnd  : false,
+        allowResume: false,
+        upCoords   : {} as any,
+        timeout    : null,
+      }
+    },
+
+    'interactions:before-action-end': release,
+    'interactions:down': resume,
+    'interactions:stop': stop,
+  },
+  before: 'modifiers/base',
   calcInertia,
   inertiaTick,
   smothEndTick,

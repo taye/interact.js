@@ -1,6 +1,6 @@
-import InteractEvent from '@interactjs/core/InteractEvent'
-import { ActionName, Scope } from '@interactjs/core/scope'
-import * as utils from '@interactjs/utils'
+import InteractEvent from '../core/InteractEvent'
+import { ActionName, Scope } from '../core/scope'
+import * as utils from '../utils/index'
 
 export type GesturableMethod = Interact.ActionMethod<Interact.GesturableOptions>
 
@@ -51,7 +51,7 @@ export interface GestureEvent extends Interact.InteractEvent<ActionName.Gesture>
   touches: Interact.PointerType[]
 }
 
-export interface GestureSignalArg extends Interact.SignalArg {
+export interface GestureSignalArg extends Interact.DoPhaseArg {
   iEvent: GestureEvent
   interaction: Interact.Interaction<ActionName.Gesture>
   event: Interact.PointerEventType | GestureEvent
@@ -61,7 +61,6 @@ function install (scope: Scope) {
   const {
     actions,
     Interactable,
-    interactions,
     defaults,
   } = scope
 
@@ -106,20 +105,6 @@ function install (scope: Scope) {
     return this.options.gesture as Interact.Options
   } as GesturableMethod
 
-  interactions.signals.on('action-start', updateGestureProps)
-  interactions.signals.on('action-move', updateGestureProps)
-  interactions.signals.on('action-end', updateGestureProps)
-
-  interactions.signals.on('new', ({ interaction }) => {
-    interaction.gesture = {
-      angle: 0,
-      distance: 0,
-      scale: 1,
-      startAngle: 0,
-      startDistance: 0,
-    }
-  })
-
   actions[ActionName.Gesture] = gesture
   actions.names.push(ActionName.Gesture)
   utils.arr.merge(actions.eventTypes, [
@@ -135,6 +120,22 @@ function install (scope: Scope) {
 const gesture = {
   id: 'actions/gesture',
   install,
+  listeners: {
+    'interactions:action-start': updateGestureProps,
+    'interactions:action-move': updateGestureProps,
+    'interactions:action-end': updateGestureProps,
+
+    'interactions:new': ({ interaction }) => {
+      interaction.gesture = {
+        angle: 0,
+        distance: 0,
+        scale: 1,
+        startAngle: 0,
+        startDistance: 0,
+      }
+    },
+  },
+
   defaults: {
   },
 

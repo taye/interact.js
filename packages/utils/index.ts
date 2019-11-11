@@ -55,5 +55,4 @@ export { default as normalizeListeners } from './normalizeListeners'
 export { default as pointer } from './pointerUtils'
 export { default as raf } from './raf'
 export { default as rect } from './rect'
-export { default as Signals } from './Signals'
 export { win, arr, dom, is }

@@ -1,8 +1,8 @@
-import Interactable from '@interactjs/core/Interactable'
-import { EventPhase } from '@interactjs/core/InteractEvent'
-import { ActionProps, Interaction } from '@interactjs/core/Interaction'
-import { Scope } from '@interactjs/core/scope'
-import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '@interactjs/utils'
+import Interactable from '../core/Interactable'
+import { EventPhase } from '../core/InteractEvent'
+import { ActionProps, Interaction } from '../core/Interaction'
+import { Scope } from '../core/scope'
+import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '../utils/index'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
@@ -29,7 +29,6 @@ declare module '@interactjs/core/InteractEvent' {
 export function install (scope: Scope) {
   const {
     actions,
-    interactions,
     /** @lends Interactable */
     // eslint-disable-next-line no-shadow
     Interactable,
@@ -39,17 +38,6 @@ export function install (scope: Scope) {
   for (const actionName of actions.names) {
     actions.eventTypes.push(`${actionName}reflow`)
   }
-
-  // remove completed reflow interactions
-  interactions.signals.on('stop', ({ interaction }) => {
-    if (interaction.pointerType === EventPhase.Reflow) {
-      if (interaction._reflowResolve) {
-        interaction._reflowResolve()
-      }
-
-      arr.remove(scope.interactions.list, interaction)
-    }
-  })
 
   /**
    * ```js
@@ -65,7 +53,7 @@ export function install (scope: Scope) {
    *
    * @param { Object } action The action to begin
    * @param { string } action.name The name of the action
-   * @returns { Promise<Interactable> }
+   * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
    */
   Interactable.prototype.reflow = function (action) {
     return reflow(this, action, scope)
@@ -169,4 +157,16 @@ function startReflow (scope: Scope, interactable: Interactable, element: Interac
 export default {
   id: 'reflow',
   install,
+  listeners: {
+    // remove completed reflow interactions
+    'interactions:stop': ({ interaction }, scope) => {
+      if (interaction.pointerType === EventPhase.Reflow) {
+        if (interaction._reflowResolve) {
+          interaction._reflowResolve()
+        }
+
+        arr.remove(scope.interactions.list, interaction)
+      }
+    },
+  },
 } as Interact.Plugin

@@ -1,7 +1,6 @@
-import { HasGetRect } from '@interactjs/types/types'
 import { rectToXY, resolveRectLike } from './rect'
 
-export default function (target: HasGetRect & { options: Interact.PerActionDefaults }, element, action?) {
+export default function (target: Interact.HasGetRect & { options: Interact.PerActionDefaults }, element, action?) {
   const actionOptions = target.options[action]
   const actionOrigin = actionOptions && actionOptions.origin
   const origin = actionOrigin || target.options.origin

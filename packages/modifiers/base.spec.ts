@@ -1,6 +1,7 @@
 import test from '@interactjs/_dev/test/test'
-import * as helpers from '@interactjs/core/tests/_helpers'
-import * as utils from '@interactjs/utils'
+import { EventPhase } from '../core/InteractEvent'
+import * as helpers from '../core/tests/_helpers'
+import * as utils from '../utils/index'
 import modifiersBase from './base'
 
 test('modifiers/base', t => {
@@ -139,8 +140,9 @@ test('modifiers/base', t => {
   interaction.pointerMove(moveEvent, moveEvent, element)
 
   t.doesNotThrow(() => {
-    interaction._signals.fire('action-resume', {
+    interaction._scopeFire('interactions:action-resume', {
       interaction,
+      phase: EventPhase.Resume,
     })
   }, 'action-resume doesn\'t throw errors')
 

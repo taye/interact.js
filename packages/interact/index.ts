@@ -1,13 +1,13 @@
-import * as actions from '@interactjs/actions'
-import autoScroll from '@interactjs/auto-scroll'
-import * as autoStart from '@interactjs/auto-start'
-import interactablePreventDefault from '@interactjs/core/interactablePreventDefault'
-import devTools from '@interactjs/dev-tools'
-import inertia from '@interactjs/inertia'
-import * as modifiers from '@interactjs/modifiers'
-import modifiersBase from '@interactjs/modifiers/base'
-import * as pointerEvents from '@interactjs/pointer-events'
-import reflow from '@interactjs/reflow'
+import * as actions from '../actions/index'
+import autoScroll from '../auto-scroll/index'
+import * as autoStart from '../auto-start/index'
+import interactablePreventDefault from '../core/interactablePreventDefault'
+import devTools from '../dev-tools/index'
+import inertia from '../inertia/index'
+import modifiersBase from '../modifiers/base'
+import * as modifiers from '../modifiers/index'
+import * as pointerEvents from '../pointer-events/index'
+import reflow from '../reflow/index'
 import interact, { scope } from './interact'
 
 export function init (window: Window) {
@@ -21,14 +21,14 @@ export function init (window: Window) {
   // inertia
   interact.use(inertia)
 
+  // snap, resize, etc.
+  interact.use(modifiersBase)
+
   // autoStart, hold
   interact.use(autoStart)
 
   // drag and drop, resize, gesture
   interact.use(actions)
-
-  // snap, resize, etc.
-  interact.use(modifiersBase)
 
   // for backwrads compatibility
   for (const type in modifiers) {

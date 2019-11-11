@@ -3,7 +3,9 @@
 // Definitions by: Gaspard Bucher <feature-space.com>
 //                  Taye Adeyemi <taye.me>
 
-import * as actions from '@interactjs/actions'
+import * as drag from '@interactjs/actions/drag'
+import * as gesture from '@interactjs/actions/gesture'
+import * as resize from '@interactjs/actions/resize'
 import * as defaults from '@interactjs/core/defaultOptions'
 import _Interactable from '@interactjs/core/Interactable'
 import _InteractableSet from '@interactjs/core/InteractableSet'
@@ -11,7 +13,6 @@ import * as iEvent from '@interactjs/core/InteractEvent'
 import * as interaction from '@interactjs/core/Interaction'
 import * as scope from '@interactjs/core/scope'
 import interact from '@interactjs/interact/interact'
-import * as signals from '@interactjs/utils/Signals'
 
 declare namespace Interact {
   type OrBoolean<T> = {
@@ -28,6 +29,7 @@ declare namespace Interact {
   export type __InteractableSet = _InteractableSet
   export type Scope = scope.Scope
   export type Interaction<T extends scope.ActionName = any> = interaction.Interaction<T>
+  export type PointerArgProps<T> = interaction.PointerArgProps<T>
   export type InteractEvent<
     T extends scope.ActionName = any,
     P extends iEvent.EventPhase = any,
@@ -35,12 +37,12 @@ declare namespace Interact {
   export type EventPhase = iEvent.EventPhase
   export type Options = defaults.Options
   export type ActionName = scope.ActionName
-  export type SignalArg<T extends scope.ActionName = any> = signals.SignalArg<T>
-  export type SignalListener = signals.SignalListener
+  export type SignalArgs = scope.SignalArgs
+  export type DoPhaseArg = interaction.DoPhaseArg
 
-  export type DragEvent = actions.DragEvent
-  export type ResizeEvent = actions.ResizeEvent
-  export type GestureEvent = actions.GestureEvent
+  export type DragEvent = InteractEvent<scope.ActionName.Drag>
+  export type ResizeEvent = resize.ResizeEvent
+  export type GestureEvent = gesture.GestureEvent
 
   export interface Point {
     x: number

@@ -1,4 +1,4 @@
-import * as utils from '@interactjs/utils'
+import * as utils from '../utils/index'
 import Interactable from './Interactable'
 import InteractEvent, { EventPhase } from './InteractEvent'
 import PointerInfo from './PointerInfo'
@@ -30,6 +30,64 @@ export enum _ProxyMethods {
   interacting = ''
 }
 
+export type PointerArgProps<T extends {} = {}> = {
+  pointer: Interact.PointerType
+  event: Interact.PointerEventType
+  eventTarget: Interact.EventTarget
+  pointerIndex: number
+  interaction: Interaction
+} & T
+
+export interface DoPhaseArg {
+  event: Interact.PointerEventType
+  phase: EventPhase
+  interaction: Interaction
+  iEvent: InteractEvent
+  preEnd?: boolean
+  type?: string
+}
+
+declare module '@interactjs/core/scope' {
+  interface SignalArgs {
+    'interactions:new': { interaction: Interaction }
+    'interactions:down': PointerArgProps<{
+      type: 'down'
+    }>
+    'interactions:move': PointerArgProps<{
+      type: 'move'
+      dx: number
+      dy: number
+      duplicate: boolean
+    }>
+    'interactions:up': PointerArgProps<{
+      type: 'up'
+      curEventTarget: EventTarget
+    }>
+    'interactions:cancel': SignalArgs['interactions:up'] & {
+      type: 'cancel'
+      curEventTarget: EventTarget
+    }
+    'interactions:update-pointer': PointerArgProps<{
+      pointerInfo: PointerInfo
+      down: boolean
+    }>
+    'interactions:remove-pointer': PointerArgProps<{
+      pointerInfo: PointerInfo
+    }>
+    'interactions:blur'
+    'interactions:before-action-start': Omit<DoPhaseArg, 'iEvent'>
+    'interactions:action-start': DoPhaseArg
+    'interactions:after-action-start': DoPhaseArg
+    'interactions:before-action-move': Omit<DoPhaseArg, 'iEvent'>
+    'interactions:action-move': DoPhaseArg
+    'interactions:after-action-move': DoPhaseArg
+    'interactions:before-action-end': Omit<DoPhaseArg, 'iEvent'>
+    'interactions:action-end': DoPhaseArg
+    'interactions:after-action-end': DoPhaseArg
+    'interactions:stop': { interaction: Interaction }
+  }
+}
+
 export type _InteractionProxy = Pick<
 Interaction,
 keyof typeof _ProxyValues | keyof typeof _ProxyMethods
@@ -46,7 +104,7 @@ export class Interaction<T extends ActionName = any> {
     [P in keyof Interact.Rect]?: boolean
   }
 
-  _signals: utils.Signals
+  _scopeFire: Interact.Scope['fire']
 
   // action that's ready to be fired on next move event
   prepared: ActionProps<T> = {
@@ -114,8 +172,11 @@ export class Interaction<T extends ActionName = any> {
   }
 
   /** */
-  constructor ({ pointerType, signals }: { pointerType?: string, signals: utils.Signals }) {
-    this._signals = signals
+  constructor ({ pointerType, scopeFire }: {
+    pointerType?: string
+    scopeFire: Interact.Scope['fire']
+  }) {
+    this._scopeFire = scopeFire
     this.pointerType = pointerType
 
     const that = this
@@ -134,17 +195,18 @@ export class Interaction<T extends ActionName = any> {
       })
     }
 
-    this._signals.fire('new', { interaction: this })
+    this._scopeFire('interactions:new', { interaction: this })
   }
 
-  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
+  pointerDown (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
     const pointerIndex = this.updatePointer(pointer, event, eventTarget, true)
 
-    this._signals.fire('down', {
+    this._scopeFire('interactions:down', {
       pointer,
       event,
       eventTarget,
       pointerIndex,
+      type: 'down',
       interaction: this,
     })
   }
@@ -204,7 +266,7 @@ export class Interaction<T extends ActionName = any> {
     return this._interacting
   }
 
-  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node) {
+  pointerMove (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget) {
     if (!this.simulation && !(this.modifiers && this.modifiers.endPrevented)) {
       this.updatePointer(pointer, event, eventTarget, false)
       utils.pointer.setCoords(this.coords.cur, this.pointers.map(p => p.pointer), this._now())
@@ -230,6 +292,7 @@ export class Interaction<T extends ActionName = any> {
       pointer,
       pointerIndex: this.getPointerIndex(pointer),
       event,
+      type: 'move' as const,
       eventTarget,
       dx,
       dy,
@@ -243,11 +306,12 @@ export class Interaction<T extends ActionName = any> {
       utils.pointer.setCoordVelocity(this.coords.velocity, this.coords.delta)
     }
 
-    this._signals.fire('move', signalArg)
+    this._scopeFire('interactions:move', signalArg)
 
     if (!duplicateMove) {
       // if interacting, fire an 'action-move' signal etc
       if (this.interacting()) {
+        signalArg.type = null
         this.move(signalArg)
       }
 
@@ -289,18 +353,21 @@ export class Interaction<T extends ActionName = any> {
   }
 
   // End interact move events and stop auto-scroll unless simulation is running
-  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, curEventTarget: EventTarget) {
+  pointerUp (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, curEventTarget: Interact.EventTarget) {
     let pointerIndex = this.getPointerIndex(pointer)
 
     if (pointerIndex === -1) {
       pointerIndex = this.updatePointer(pointer, event, eventTarget, false)
     }
 
-    this._signals.fire(/cancel$/i.test(event.type) ? 'cancel' : 'up', {
+    const type = /cancel$/i.test(event.type) ? 'cancel' : 'up'
+
+    this._scopeFire(`interactions:${type}` as 'interactions:up' | 'interactions:cancel', {
       pointer,
       pointerIndex,
       event,
       eventTarget,
+      type: type as any,
       curEventTarget,
       interaction: this,
     })
@@ -315,7 +382,7 @@ export class Interaction<T extends ActionName = any> {
 
   documentBlur (event) {
     this.end(event)
-    this._signals.fire('blur', { event, interaction: this })
+    this._scopeFire('interactions:blur', { event, type: 'blur', interaction: this })
   }
 
   /**
@@ -364,7 +431,7 @@ export class Interaction<T extends ActionName = any> {
 
   /** */
   stop () {
-    this._signals.fire('stop', { interaction: this })
+    this._scopeFire('interactions:stop', { interaction: this })
 
     this.interactable = this.element = null
 
@@ -386,7 +453,7 @@ export class Interaction<T extends ActionName = any> {
     return this.pointers[this.getPointerIndex(pointer)]
   }
 
-  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Node, down?: boolean) {
+  updatePointer (pointer: Interact.PointerType, event: Interact.PointerEventType, eventTarget: Interact.EventTarget, down?: boolean) {
     const id = utils.pointer.getPointerId(pointer)
     let pointerIndex = this.getPointerIndex(pointer)
     let pointerInfo = this.pointers[pointerIndex]
@@ -431,7 +498,7 @@ export class Interaction<T extends ActionName = any> {
 
     this._updateLatestPointer(pointer, event, eventTarget)
 
-    this._signals.fire('update-pointer', {
+    this._scopeFire('interactions:update-pointer', {
       pointer,
       event,
       eventTarget,
@@ -451,9 +518,10 @@ export class Interaction<T extends ActionName = any> {
 
     const pointerInfo = this.pointers[pointerIndex]
 
-    this._signals.fire('remove-pointer', {
+    this._scopeFire('interactions:remove-pointer', {
       pointer,
       event,
+      eventTarget: null,
       pointerIndex,
       pointerInfo,
       interaction: this,
@@ -474,7 +542,7 @@ export class Interaction<T extends ActionName = any> {
     this._latestPointer.eventTarget = null
   }
 
-  _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd: boolean, type: string) {
+  _createPreparedEvent (event: Interact.PointerEventType, phase: EventPhase, preEnd?: boolean, type?: string) {
     const actionName = this.prepared.name
 
     return new InteractEvent(this, event, actionName, phase, this.element, null, preEnd, type)
@@ -488,9 +556,9 @@ export class Interaction<T extends ActionName = any> {
     }
   }
 
-  _doPhase (signalArg: Partial<Interact.SignalArg>) {
+  _doPhase (signalArg: Omit<DoPhaseArg, 'iEvent'> & { iEvent?: InteractEvent<T> }) {
     const { event, phase, preEnd, type } = signalArg
-    const beforeResult = this._signals.fire(`before-action-${phase}`, signalArg)
+    const beforeResult = this._scopeFire(`interactions:before-action-${phase}` as any, signalArg)
 
     if (beforeResult === false) {
       return false
@@ -512,11 +580,11 @@ export class Interaction<T extends ActionName = any> {
       rect.height = rect.bottom - rect.top
     }
 
-    this._signals.fire(`action-${phase}`, signalArg)
+    this._scopeFire(`interactions:action-${phase}` as any, signalArg)
 
     this._fireEvent(iEvent)
 
-    this._signals.fire(`after-action-${phase}`, signalArg)
+    this._scopeFire(`interactions:after-action-${phase}` as any, signalArg)
 
     return true
   }

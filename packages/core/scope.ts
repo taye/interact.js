@@ -1,5 +1,5 @@
-import * as utils from '@interactjs/utils'
-import domObjects from '@interactjs/utils/domObjects'
+import domObjects from '../utils/domObjects'
+import * as utils from '../utils/index'
 import defaults from './defaultOptions'
 import Eventable from './Eventable'
 import InteractableBase from './Interactable'
@@ -7,11 +7,31 @@ import InteractableSet from './InteractableSet'
 import InteractEvent from './InteractEvent'
 import interactions from './interactions'
 
+export interface SignalArgs {
+  'scope:add-document': DocSignalArg
+  'scope:remove-document': DocSignalArg
+  'interactable:unset': { interactable: InteractableBase }
+  'interactable:set': { interactable: InteractableBase, options: Interact.Options }
+  'interactions:destroy': { interaction: Interact.Interaction }
+}
+
+export type ListenerName = keyof SignalArgs
+
+type ListenerMap = {
+  [P in ListenerName]?: (arg: SignalArgs[P], scope: Scope, signalName: P) => void | boolean
+}
+
+interface DocSignalArg {
+  doc: Document
+  window: Window
+  scope: Scope
+  options?: { [index: string]: any }
+}
+
 const {
   win,
   browser,
   raf,
-  Signals,
   events,
 } = utils
 
@@ -31,14 +51,20 @@ export function createScope () {
 export type Defaults = typeof defaults
 
 export interface Plugin {
-  id?: string
-  install (scope: Scope, options?: any): void
   [key: string]: any
+  id?: string
+  listeners?: ListenerMap
+  before?: string
+  install? (scope: Scope, options?: any): void
 }
 
 export class Scope {
   id = `__interact_scope_${Math.floor(Math.random() * 100)}`
-  signals = new Signals()
+  listenerMaps: Array<{
+    map: ListenerMap
+    id: string
+  }> = []
+
   browser = browser
   events = events
   utils = utils
@@ -66,8 +92,13 @@ export class Scope {
   // all documents being listened to
   documents: Array<{ doc: Document, options: any }> = []
 
-  _plugins: Plugin[] = []
-  _pluginMap: { [id: string]: Plugin } = {}
+  _plugins: {
+    list: Plugin[]
+    map: { [id: string]: Plugin }
+  } = {
+    list: [],
+    map: {},
+  }
 
   constructor () {
     const scope = this as Scope
@@ -75,10 +106,10 @@ export class Scope {
     ;(this as { Interactable: typeof InteractableBase }).Interactable = class Interactable extends InteractableBase implements InteractableBase {
       get _defaults () { return scope.defaults }
 
-      set (options: any) {
+      set (options: Interact.Options) {
         super.set(options)
 
-        scope.interactables.signals.fire('set', {
+        scope.fire('interactable:set', {
           options,
           interactable: this,
         })
@@ -93,7 +124,7 @@ export class Scope {
 
           if (interaction.interactable === this) {
             interaction.stop()
-            scope.interactions.signals.fire('destroy', { interaction })
+            scope.fire('interactions:destroy', { interaction })
             interaction.destroy()
 
             if (scope.interactions.list.length > 2) {
@@ -102,7 +133,19 @@ export class Scope {
           }
         }
 
-        scope.interactables.signals.fire('unset', { interactable: this })
+        scope.fire('interactable:unset', { interactable: this })
+      }
+    }
+  }
+
+  addListeners (map: ListenerMap, id?: string) {
+    this.listenerMaps.push({ id, map })
+  }
+
+  fire<T extends ListenerName> (name: T, arg: SignalArgs[T]): void | false {
+    for (const { map: { [name]: listener } } of this.listenerMaps) {
+      if (!!listener && listener(arg as any, this, name as never) === false) {
+        return false
       }
     }
   }
@@ -114,7 +157,7 @@ export class Scope {
   }
 
   pluginIsInstalled (plugin: Plugin) {
-    return this._pluginMap[plugin.id] || this._plugins.indexOf(plugin) !== -1
+    return this._plugins.map[plugin.id] || this._plugins.list.indexOf(plugin) !== -1
   }
 
   usePlugin (plugin: Plugin, options?: { [key: string]: any }) {
@@ -122,10 +165,27 @@ export class Scope {
       return this
     }
 
-    if (plugin.id) { this._pluginMap[plugin.id] = plugin }
+    if (plugin.id) { this._plugins.map[plugin.id] = plugin }
+    this._plugins.list.push(plugin)
 
-    plugin.install(this, options)
-    this._plugins.push(plugin)
+    if (plugin.install) {
+      plugin.install(this, options)
+    }
+
+    if (plugin.listeners && plugin.before) {
+      let index = 0
+
+      for (; index < this.listenerMaps.length; index++) {
+        const otherId = this.listenerMaps[index].id
+
+        if (otherId === plugin.before) { break }
+      }
+
+      this.listenerMaps.splice(index, 0, { id: plugin.id, map: plugin.listeners })
+    }
+    else if (plugin.listeners) {
+      this.listenerMaps.push({ id: plugin.id, map: plugin.listeners })
+    }
 
     return this
   }
@@ -147,7 +207,7 @@ export class Scope {
       events.add(window, 'unload', this.onWindowUnload)
     }
 
-    this.signals.fire('add-document', { doc, window, scope: this, options })
+    this.fire('scope:add-document', { doc, window, scope: this, options })
   }
 
   removeDocument (doc: Document) {
@@ -161,7 +221,7 @@ export class Scope {
     this.documents.splice(index, 1)
     events.documents.splice(index, 1)
 
-    this.signals.fire('remove-document', { doc, window, scope: this, options })
+    this.fire('scope:remove-document', { doc, window, scope: this, options })
   }
 
   getDocIndex (doc: Document) {

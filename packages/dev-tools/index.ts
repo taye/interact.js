@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 /* global process */
-import domObjects from '@interactjs/utils/domObjects'
-import { parentNode } from '@interactjs/utils/domUtils'
-import extend from '@interactjs/utils/extend'
-import * as is from '@interactjs/utils/is'
-import win from '@interactjs/utils/window'
+import domObjects from '../utils/domObjects'
+import { parentNode } from '../utils/domUtils'
+import extend from '../utils/extend'
+import * as is from '../utils/is'
+import win from '../utils/window'
 
 declare module '@interactjs/core/scope' {
   interface Scope {
@@ -58,24 +58,11 @@ const isProduction = process.env.NODE_ENV === 'production'
 // eslint-disable-next-line no-restricted-syntax
 function install (scope: Interact.Scope, { logger }: { logger?: Logger } = {}) {
   const {
-    interactions,
     Interactable,
     defaults,
   } = scope
-  logger = logger || console
 
-  interactions.signals.on('action-start', ({ interaction }) => {
-    for (const check of checks) {
-      const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
-
-      if (
-        !(options && options.devTools && options.devTools.ignore[check.name]) &&
-        check.perform(interaction)
-      ) {
-        logger.warn(prefix + check.text, ...check.getInfo(interaction))
-      }
-    }
-  })
+  scope.logger = logger || console
 
   defaults.base.devTools = {
     ignore: {},
@@ -166,6 +153,20 @@ const defaultExport = isProduction
   : {
     id,
     install,
+    listeners: {
+      'interactions:action-start': ({ interaction }, scope) => {
+        for (const check of checks) {
+          const options = interaction.interactable && interaction.interactable.options[interaction.prepared.name]
+
+          if (
+            !(options && options.devTools && options.devTools.ignore[check.name]) &&
+            check.perform(interaction)
+          ) {
+            scope.logger.warn(prefix + check.text, ...check.getInfo(interaction))
+          }
+        }
+      },
+    },
     checks,
     CheckName,
     links,

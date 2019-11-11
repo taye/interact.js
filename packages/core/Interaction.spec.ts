@@ -1,20 +1,17 @@
 import test from '@interactjs/_dev/test/test'
-import drag from '@interactjs/actions/drag'
-import autoStart from '@interactjs/auto-start/base'
-import pointerUtils from '@interactjs/utils/pointerUtils'
-import Signals from '@interactjs/utils/Signals'
+import drag from '../actions/drag'
+import autoStart from '../auto-start/base'
+import pointerUtils from '../utils/pointerUtils'
 import InteractEvent from './InteractEvent'
 import Interaction from './Interaction'
 import * as helpers from './tests/_helpers'
 
-const makeInteractionAndSignals = () => new Interaction({ signals: new Signals() } as any)
-
 test('Interaction constructor', t => {
   const testType = 'test'
-  const signals = new Signals()
+  const dummyScopeFire = () => {}
   const interaction = new Interaction({
     pointerType: testType,
-    signals,
+    scopeFire: dummyScopeFire,
   })
   const zeroCoords = {
     page     : { x: 0, y: 0 },
@@ -22,8 +19,8 @@ test('Interaction constructor', t => {
     timeStamp: 0,
   }
 
-  t.equal(interaction._signals, signals,
-    'signals option is set assigned to interaction._signals')
+  t.equal(interaction._scopeFire, dummyScopeFire,
+    'scopeFire option is set assigned to interaction._scopeFire')
 
   t.ok(interaction.prepared instanceof Object,
     'interaction.prepared is an object')
@@ -53,7 +50,7 @@ test('Interaction constructor', t => {
 })
 
 test('Interaction destroy', t => {
-  const interaction = makeInteractionAndSignals()
+  const { interaction } = helpers.testEnv()
   const pointer = { pointerId: 10 } as any
   const event = {} as any
 
@@ -74,7 +71,7 @@ test('Interaction destroy', t => {
 })
 
 test('Interaction.getPointerIndex', t => {
-  const interaction = makeInteractionAndSignals()
+  const { interaction } = helpers.testEnv()
 
   interaction.pointers = [2, 4, 5, 0, -1].map(id => ({ id })) as any
 
@@ -87,7 +84,7 @@ test('Interaction.getPointerIndex', t => {
 
 test('Interaction.updatePointer', t => {
   t.test('no existing pointers', st => {
-    const interaction = makeInteractionAndSignals()
+    const { interaction } = helpers.testEnv()
     const pointer = { pointerId: 10 } as any
     const event = {} as any
 
@@ -109,7 +106,7 @@ test('Interaction.updatePointer', t => {
   })
 
   t.test('new pointer with exisiting pointer', st => {
-    const interaction = makeInteractionAndSignals()
+    const { interaction } = helpers.testEnv()
     const existing: any = { pointerId: 0 }
     const event: any = {}
 
@@ -143,7 +140,7 @@ test('Interaction.updatePointer', t => {
   })
 
   t.test('update existing pointers', st => {
-    const interaction = makeInteractionAndSignals()
+    const { interaction } = helpers.testEnv()
 
     const oldPointers = [-3, 10, 2].map(pointerId => ({ pointerId }))
     const newPointers = oldPointers.map(pointer => ({ ...pointer, new: true }))
@@ -168,7 +165,7 @@ test('Interaction.updatePointer', t => {
 })
 
 test('Interaction.removePointer', t => {
-  const interaction = makeInteractionAndSignals()
+  const { interaction } = helpers.testEnv()
   const ids = [0, 1, 2, 3]
   const removals = [
     { id: 0, remain: [1, 2, 3], message: 'first of 4' },
@@ -192,8 +189,7 @@ test('Interaction.removePointer', t => {
 })
 
 test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
-  const signals = new Signals()
-  const interaction = new Interaction({ signals } as any)
+  const { scope, interaction } = helpers.testEnv()
   const eventTarget: any = {}
   const pointer: any = {
     target: eventTarget,
@@ -201,8 +197,10 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
   }
   let info: any = {}
 
-  signals.on('update-pointer', arg => { info.updated = arg.pointerInfo })
-  signals.on('remove-pointer', arg => { info.removed = arg.pointerInfo })
+  scope.addListeners({
+    'interactions:update-pointer': arg => { info.updated = arg.pointerInfo },
+    'interactions:remove-pointer': arg => { info.removed = arg.pointerInfo },
+  })
 
   interaction.coords.cur.timeStamp = 0
   const commonPointerInfo = {
@@ -253,7 +251,7 @@ test('Interaction.pointer{Down,Move,Up} updatePointer', t => {
 })
 
 test('Interaction.pointerDown', t => {
-  const interaction = makeInteractionAndSignals()
+  const { interaction, scope } = helpers.testEnv()
   const coords = helpers.newCoordsSet()
   const eventTarget = {} as Interact.Element
   const event: any = {
@@ -267,7 +265,9 @@ test('Interaction.pointerDown', t => {
     signalArg = arg
   }
 
-  interaction._signals.on('down', signalListener)
+  scope.addListeners({
+    'interactions:down': signalListener,
+  })
 
   const pointerCoords: any = { page: {}, client: {} }
   pointerUtils.setCoords(pointerCoords, [pointer], event.timeStamp)
@@ -348,9 +348,8 @@ test('Interaction.pointerDown', t => {
 })
 
 test('Interaction.start', t => {
-  const interaction = makeInteractionAndSignals()
+  const { interaction, interactable, scope } = helpers.testEnv()
   const action = { name: 'TEST' }
-  const interactable = helpers.mockInteractable()
   const element: any = {}
   const pointer = helpers.newPointer()
   const event: any = {}
@@ -383,7 +382,9 @@ test('Interaction.start', t => {
     // interactingInStartListener = arg.interaction.interacting()
   }
 
-  interaction._signals.on('action-start', signalListener)
+  scope.addListeners({
+    'interactions:action-start': signalListener,
+  })
   interaction.start(action, interactable, element)
 
   t.equal(interaction.prepared.name, action.name, 'action is prepared')
@@ -428,19 +429,17 @@ test('stop interaction from start event', t => {
 })
 
 test('Interaction createPreparedEvent', t => {
-  const scope = helpers.mockScope()
+  const { interaction, interactable, target } = helpers.testEnv()
 
-  const interaction = scope.interactions.new({})
-  const interactable = helpers.mockInteractable()
   const action = { name: 'resize' }
-  const phase = 'TEST_PHASE'
+  const phase = 'TEST_PHASE' as Interact.EventPhase
 
   interaction.prepared = action
   interaction.interactable = interactable
-  interaction.element = interactable.element
-  interaction.prevEvent = { page: {}, client: {}, velocity: {} }
+  interaction.element = target
+  interaction.prevEvent = { page: {}, client: {}, velocity: {} } as any
 
-  const iEvent = interaction._createPreparedEvent({}, phase)
+  const iEvent = interaction._createPreparedEvent({} as any, phase)
 
   t.ok(iEvent instanceof InteractEvent,
     'InteractEvent is fired')
@@ -451,21 +450,21 @@ test('Interaction createPreparedEvent', t => {
   t.equal(iEvent.interactable, interactable,
     'event.interactable')
 
-  t.equal(iEvent.target, interactable.element,
+  t.equal(iEvent.target, interactable.target,
     'event.target')
 
   t.end()
 })
 
 test('Interaction fireEvent', t => {
-  const interaction = new Interaction({ signals: helpers.mockSignals() })
-  const interactable = helpers.mockInteractable()
+  const { interaction, interactable } = helpers.testEnv()
   const iEvent = {} as Interact.InteractEvent
   let firedEvent
 
   // this method should be called from actions.firePrepared
   interactable.fire = event => {
     firedEvent = event
+    return interactable
   }
 
   interaction.interactable = interactable

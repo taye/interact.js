@@ -2,6 +2,8 @@
 
 const { existsSync } = require('fs')
 
+const { sourcesGlob, sourcesIgnoreGlobs } = require('./utils')
+
 const jsExt = /\.js$/
 const dtsExt = /\.d\.ts$/
 
@@ -30,18 +32,12 @@ const argv = require('yargs')
 function getSources () {
   const glob = require('glob')
 
-  const jsAndTs = [
-    '**/*.js',
-    '**/*.ts',
-  ].reduce((acc, pattern) => [
-    ...acc,
-    ...glob.sync(pattern, {
-      ignore: '**/node_modules/**',
-      silent: true,
-    }),
-  ], [])
+  const sources = glob.sync(sourcesGlob, {
+    ignore: sourcesIgnoreGlobs,
+    silent: true,
+  })
 
-  return jsAndTs.filter(source => isNotGenerated(source))
+  return sources.filter(source => isNotGenerated(source))
 }
 
 const CLIEngine = require('eslint').CLIEngine

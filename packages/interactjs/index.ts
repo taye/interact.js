@@ -1,9 +1,9 @@
-import interact, { init as initInteract } from '@interactjs/interact'
-import * as modifiers from '@interactjs/modifiers'
-import { Modifier } from '@interactjs/modifiers/base'
-import '@interactjs/types'
-import extend from '@interactjs/utils/extend'
-import * as snappers from '@interactjs/utils/snappers'
+import interact, { init as initInteract } from '../interact/index'
+import * as modifiers from '../modifiers/index'
+import { Modifier } from '../modifiers/base'
+import '../types/index'
+import extend from '../utils/extend'
+import * as snappers from '../utils/snappers/index'
 
 declare module '@interactjs/interact/interact' {
   interface InteractStatic {
