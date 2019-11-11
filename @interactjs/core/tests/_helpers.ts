@@ -125,3 +125,7 @@ export function testEnv<T extends Interact.Target = HTMLElement> ({
 export function timeout (n) {
   return new Promise(resolve => setTimeout(resolve, n))
 }
+
+export function ltrbwh (left: number, top: number, right: number, bottom: number, width: number, height: number) {
+  return { left, top, right, bottom, width, height }
+}

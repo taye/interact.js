@@ -18,13 +18,6 @@ declare module '@interactjs/core/Interactable' {
 declare module '@interactjs/core/Interaction' {
   interface Interaction {
     resizeAxes: 'x' | 'y' | 'xy'
-    resizeRects: {
-      start: Interact.FullRect
-      current: Interact.Rect
-      inverted: Interact.FullRect
-      previous: Interact.FullRect
-      delta: Interact.FullRect
-    }
     resizeStartAspectRatio: number
   }
 
@@ -135,7 +128,7 @@ function install (scope: Scope) {
   defaults.actions.resize = resize.defaults
 }
 
-const resize = {
+const resize: Interact.Plugin = {
   id: 'actions/resize',
   install,
   listeners: {
@@ -371,17 +364,11 @@ function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Int
 
   const rect = interaction.rect
 
-  interaction.resizeRects = {
-    start     : rect,
-    current   : {
-      left: rect.left,
-      right: rect.right,
-      top: rect.top,
-      bottom: rect.bottom,
-    },
-    inverted  : extend({}, rect),
-    previous  : extend({}, rect),
-    delta     : {
+  interaction._rects = {
+    start: extend({}, rect),
+    corrected: extend({}, rect),
+    previous: extend({}, rect),
+    delta: {
       left: 0,
       right : 0,
       width : 0,
@@ -392,8 +379,8 @@ function start ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Int
   }
 
   iEvent.edges = interaction.prepared.edges
-  iEvent.rect = interaction.resizeRects.inverted
-  iEvent.deltaRect = interaction.resizeRects.delta
+  iEvent.rect = interaction._rects.corrected
+  iEvent.deltaRect = interaction._rects.delta
 }
 
 function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {
@@ -404,49 +391,48 @@ function move ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inte
   const invertible = invert === 'reposition' || invert === 'negate'
 
   // eslint-disable-next-line no-shadow
-  const start      = interaction.resizeRects.start
-  const current    = interaction.resizeRects.current
-  const inverted   = interaction.resizeRects.inverted
-  const deltaRect  = interaction.resizeRects.delta
-  const previous   = extend(interaction.resizeRects.previous, inverted)
+  const current = interaction.rect
+  const { start: startRect, corrected, delta: deltaRect, previous } = interaction._rects
+
+  extend(previous, corrected)
 
   if (invertible) {
     // if invertible, copy the current rect
-    extend(inverted, current)
+    extend(corrected, current)
 
     if (invert === 'reposition') {
       // swap edge values if necessary to keep width/height positive
-      if (inverted.top > inverted.bottom) {
-        const swap = inverted.top
+      if (corrected.top > corrected.bottom) {
+        const swap = corrected.top
 
-        inverted.top = inverted.bottom
-        inverted.bottom = swap
+        corrected.top = corrected.bottom
+        corrected.bottom = swap
       }
-      if (inverted.left > inverted.right) {
-        const swap = inverted.left
+      if (corrected.left > corrected.right) {
+        const swap = corrected.left
 
-        inverted.left = inverted.right
-        inverted.right = swap
+        corrected.left = corrected.right
+        corrected.right = swap
       }
     }
   }
   else {
     // if not invertible, restrict to minimum of 0x0 rect
-    inverted.top    = Math.min(current.top, start.bottom)
-    inverted.bottom = Math.max(current.bottom, start.top)
-    inverted.left   = Math.min(current.left, start.right)
-    inverted.right  = Math.max(current.right, start.left)
+    corrected.top    = Math.min(current.top, startRect.bottom)
+    corrected.bottom = Math.max(current.bottom, startRect.top)
+    corrected.left   = Math.min(current.left, startRect.right)
+    corrected.right  = Math.max(current.right, startRect.left)
   }
 
-  inverted.width  = inverted.right  - inverted.left
-  inverted.height = inverted.bottom - inverted.top
+  corrected.width  = corrected.right  - corrected.left
+  corrected.height = corrected.bottom - corrected.top
 
-  for (const edge in inverted) {
-    deltaRect[edge] = inverted[edge] - previous[edge]
+  for (const edge in corrected) {
+    deltaRect[edge] = corrected[edge] - previous[edge]
   }
 
   iEvent.edges = interaction.prepared.edges
-  iEvent.rect = inverted
+  iEvent.rect = corrected
   iEvent.deltaRect = deltaRect
 }
 
@@ -454,8 +440,8 @@ function end ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Inter
   if (interaction.prepared.name !== 'resize' || !interaction.prepared.edges) { return }
 
   iEvent.edges = interaction.prepared.edges
-  iEvent.rect = interaction.resizeRects.inverted
-  iEvent.deltaRect = interaction.resizeRects.delta
+  iEvent.rect = interaction._rects.corrected
+  iEvent.deltaRect = interaction._rects.delta
 }
 
 function updateEventAxes ({ iEvent, interaction }: { iEvent: ResizeEvent, interaction: Interaction }) {

@@ -31,9 +31,8 @@ export type RestrictEdgesState = ModifierState<RestrictEdgesOptions, {
 const noInner = { top: +Infinity, left: +Infinity, bottom: -Infinity, right: -Infinity }
 const noOuter = { top: -Infinity, left: -Infinity, bottom: +Infinity, right: +Infinity }
 
-function start ({ interaction, state }: ModifierArg<RestrictEdgesState>) {
+function start ({ interaction, startOffset, state }: ModifierArg<RestrictEdgesState>) {
   const { options } = state
-  const startOffset = interaction.modifiers.startOffset
   let offset
 
   if (options) {

@@ -6,8 +6,8 @@ test('restrictEdges', t => {
   const { interaction } = helpers.testEnv()
   interaction.prepared = {} as any
   interaction.prepared.edges = { top: true, bottom: true, left: true, right: true }
-  interaction.resizeRects = {} as any
-  interaction.resizeRects.inverted = { x: 10, y: 20, width: 300, height: 200 } as any
+  interaction._rects = {} as any
+  interaction._rects.corrected = { x: 10, y: 20, width: 300, height: 200 } as any
   interaction._interacting = true
 
   const options: any = { enabled: true }
@@ -25,7 +25,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     arg.coords,
     { x: coords.y + 60, y: coords.y + 60 },
-    'outer restriction is applied correctly'
+    'outer restriction is applied correctly',
   )
 
   arg.coords = { ...coords }
@@ -38,7 +38,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     arg.coords,
     { x: coords.x - 40, y: coords.y - 40 },
-    'inner restriction is applied correctly'
+    'inner restriction is applied correctly',
   )
 
   // offset
@@ -57,12 +57,12 @@ test('restrictEdges', t => {
   t.deepEqual(
     arg.coords,
     { x: coords.x + 160, y: coords.x + 160 },
-    'outer restriction is applied correctly with offset'
+    'outer restriction is applied correctly with offset',
   )
 
   // start
   interaction.modifiers = {} as any
-  interaction.modifiers.startOffset = { top: 5, left: 10, bottom: -8, right: -16 }
+  arg.startOffset = { top: 5, left: 10, bottom: -8, right: -16 }
   interaction.interactable = {
     getRect () {
       return { top: 500, left: 900 }
@@ -75,7 +75,7 @@ test('restrictEdges', t => {
   t.deepEqual(
     arg.state.offset,
     { top: 505, left: 910, bottom: 508, right: 916 },
-    'start gets x/y from selector string'
+    'start gets x/y from selector string',
   )
 
   t.end()

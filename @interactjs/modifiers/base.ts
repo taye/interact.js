@@ -101,10 +101,6 @@ function start (
   const states = prepareStates(modifierList)
 
   const rect = extend({} as { [key: string]: any }, interaction.rect)
-
-  if (!('width'  in rect)) { rect.width  = rect.right  - rect.left }
-  if (!('height' in rect)) { rect.height = rect.bottom - rect.top  }
-
   const startOffset = getRectOffset(rect, pageCoords)
 
   interaction.modifiers.startOffset = startOffset

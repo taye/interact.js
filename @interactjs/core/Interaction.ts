@@ -99,7 +99,13 @@ export class Interaction<T extends ActionName = any> {
 
   // the target element of the interactable
   element: Interact.Element = null
-  rect: Interact.Rect & Interact.Size
+  rect: Interact.FullRect
+  _rects?: {
+    start: Interact.FullRect
+    corrected: Interact.FullRect
+    previous: Interact.FullRect
+    delta: Interact.FullRect
+  }
   edges: {
     [P in keyof Interact.Rect]?: boolean
   }

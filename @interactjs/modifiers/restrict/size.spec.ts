@@ -1,4 +1,5 @@
 import test from '@interactjs/_dev/test/test'
+import extend from '@interactjs/utils/extend'
 import * as helpers from '../../core/tests/_helpers'
 import * as rectUtils from '../../utils/rect'
 import base from './../base'
@@ -9,12 +10,13 @@ test('restrictSize', t => {
     interaction,
   } = helpers.testEnv()
   const edges = { left: true, top: true }
-  const rect = { left: 0, top: 0, right: 200, bottom: 300 }
+  const rect = rectUtils.xywhToTlbr({ left: 0, top: 0, right: 200, bottom: 300 })
 
   interaction.prepared = { name: null }
   interaction.prepared.edges = edges
-  interaction.resizeRects = {} as any
-  interaction.resizeRects.inverted = rectUtils.xywhToTlbr(rect)
+  interaction._rects = {
+    corrected: extend({} as any, rect),
+  } as any
   interaction.modifiers = {} as any
   interaction._interacting = true
 
@@ -31,14 +33,15 @@ test('restrictSize', t => {
   }
   const arg: any = {
     interaction,
+    rect,
+    options,
     states: [state],
     coords: startCoords,
     pageCoords: startCoords,
-    options,
     state: null,
+    startOffset: base.getRectOffset(rect, startCoords),
   }
 
-  interaction.modifiers.startOffset = base.getRectOffset(rect, startCoords)
   base.startAll(arg)
   arg.state = state
 
