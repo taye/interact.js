@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>packages/core/interactablePreventDefault.ts - Documentation</title>
+    <title>@interactjs/actions/drag.ts - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">packages/core/interactablePreventDefault.ts</h1>
+    <h1 class="page-title">@interactjs/actions/drag.ts</h1>
     
 
     
@@ -41,120 +41,199 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import { matchesSelector, nodeContains } from '../utils/domUtils'
-import events from '../utils/events'
+            <pre class="prettyprint source linenums"><code>import { ActionName, Scope } from '../core/scope'
+import * as arr from '../utils/arr'
 import * as is from '../utils/is'
-import { getWindow } from '../utils/window'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    preventDefault: typeof preventDefault
-    checkAndPreventDefault: (event: Event) => void
+    draggable: DraggableMethod
   }
 }
 
-function preventDefault (this: Interact.Interactable, newValue?: 'always' | 'never' | 'auto') {
-  if (/^(always|never|auto)$/.test(newValue)) {
-    this.options.preventDefault = newValue
-    return this
-  }
-
-  if (is.bool(newValue)) {
-    this.options.preventDefault = newValue ? 'always' : 'never'
-    return this
-  }
-
-  return this.options.preventDefault
-}
-
-function checkAndPreventDefault (interactable: Interact.Interactable, scope: Interact.Scope, event: Event) {
-  const setting = interactable.options.preventDefault
-
-  if (setting === 'never') { return }
-
-  if (setting === 'always') {
-    event.preventDefault()
-    return
-  }
-
-  // setting === 'auto'
-
-  // if the browser supports passive event listeners and isn't running on iOS,
-  // don't preventDefault of touch{start,move} events. CSS touch-action and
-  // user-select should be used instead of calling event.preventDefault().
-  if (events.supportsPassive &amp;&amp; /^touch(start|move)$/.test(event.type)) {
-    const doc = getWindow(event.target).document
-    const docOptions = scope.getDocOptions(doc)
-
-    if (!(docOptions &amp;&amp; docOptions.events) || docOptions.events.passive !== false) {
-      return
-    }
-  }
-
-  // don't preventDefault of pointerdown events
-  if (/^(mouse|pointer|touch)*(down|start)/i.test(event.type)) {
-    return
-  }
-
-  // don't preventDefault on editable elements
-  if (is.element(event.target) &amp;&amp;
-      matchesSelector(event.target, 'input,select,textarea,[contenteditable=true],[contenteditable=true] *')) {
-    return
-  }
-
-  event.preventDefault()
-}
-
-function onInteractionEvent ({ interaction, event }: { interaction: Interact.Interaction, event: Interact.PointerEventType }) {
-  if (interaction.interactable) {
-    interaction.interactable.checkAndPreventDefault(event as Event)
+declare module '@interactjs/core/defaultOptions' {
+  interface ActionDefaults {
+    drag: Interact.DraggableOptions
   }
 }
 
-export function install (scope: Interact.Scope) {
-  /** @lends Interactable */
-  const { Interactable } = scope
-
-  /**
-   * Returns or sets whether to prevent the browser's default behaviour in
-   * response to pointer events. Can be set to:
-   *  - `'always'` to always prevent
-   *  - `'never'` to never prevent
-   *  - `'auto'` to let interact.js try to determine what would be best
-   *
-   * @param {string} [newValue] `'always'`, `'never'` or `'auto'`
-   * @return {string | Interactable} The current setting or this Interactable
-   */
-  Interactable.prototype.preventDefault = preventDefault
-
-  Interactable.prototype.checkAndPreventDefault = function (event) {
-    return checkAndPreventDefault(this, scope, event)
+declare module '@interactjs/core/scope' {
+  interface Actions {
+    [ActionName.Drag]?: typeof drag
   }
 
-  // prevent native HTML5 drag on interact.js target elements
-  scope.interactions.docEvents.push({
-    type: 'dragstart',
-    listener (event) {
-      for (const interaction of scope.interactions.list) {
-        if (interaction.element &amp;&amp;
-          (interaction.element === event.target ||
-           nodeContains(interaction.element, event.target))) {
-          interaction.interactable.checkAndPreventDefault(event)
-          return
-        }
-      }
-    },
+  // eslint-disable-next-line no-shadow
+  enum ActionName {
+    Drag = 'drag'
+  }
+}
+
+(ActionName as any).Drag = 'drag'
+
+export type DragEvent = Interact.InteractEvent&lt;ActionName.Drag>
+
+export type DraggableMethod = Interact.ActionMethod&lt;Interact.DraggableOptions>
+
+function install (scope: Scope) {
+  const {
+    actions,
+    Interactable,
+    defaults,
+  } = scope
+
+  scope.addListeners({
+    'interactions:before-action-move': beforeMove,
+    'interactions:action-resume': beforeMove,
+
+    // dragmove
+    'interactions:action-move': move,
   })
+
+  Interactable.prototype.draggable = drag.draggable
+
+  actions[ActionName.Drag] = drag
+  actions.names.push(ActionName.Drag)
+  arr.merge(actions.eventTypes, [
+    'dragstart',
+    'dragmove',
+    'draginertiastart',
+    'dragresume',
+    'dragend',
+  ])
+  actions.methodDict.drag = 'draggable'
+
+  defaults.actions.drag = drag.defaults
 }
 
-export default {
-  id: 'core/interactablePreventDefault',
-  install,
-  listeners: ['down', 'move', 'up', 'cancel'].reduce((acc, eventType) => {
-    acc[`interactions:${eventType}`] = onInteractionEvent
-    return acc
-  }, {}),
+function beforeMove ({ interaction }) {
+  if (interaction.prepared.name !== 'drag') { return }
+
+  const axis = interaction.prepared.axis
+
+  if (axis === 'x') {
+    interaction.coords.cur.page.y   = interaction.coords.start.page.y
+    interaction.coords.cur.client.y = interaction.coords.start.client.y
+
+    interaction.coords.velocity.client.y = 0
+    interaction.coords.velocity.page.y   = 0
+  }
+  else if (axis === 'y') {
+    interaction.coords.cur.page.x   = interaction.coords.start.page.x
+    interaction.coords.cur.client.x = interaction.coords.start.client.x
+
+    interaction.coords.velocity.client.x = 0
+    interaction.coords.velocity.page.x   = 0
+  }
 }
+
+function move ({ iEvent, interaction }) {
+  if (interaction.prepared.name !== 'drag') { return }
+
+  const axis = interaction.prepared.axis
+
+  if (axis === 'x' || axis === 'y') {
+    const opposite = axis === 'x' ? 'y' : 'x'
+
+    iEvent.page[opposite]   = interaction.coords.start.page[opposite]
+    iEvent.client[opposite] = interaction.coords.start.client[opposite]
+    iEvent.delta[opposite] = 0
+  }
+}
+
+/**
+ * ```js
+ * interact(element).draggable({
+ *     onstart: function (event) {},
+ *     onmove : function (event) {},
+ *     onend  : function (event) {},
+ *
+ *     // the axis in which the first movement must be
+ *     // for the drag sequence to start
+ *     // 'xy' by default - any direction
+ *     startAxis: 'x' || 'y' || 'xy',
+ *
+ *     // 'xy' by default - don't restrict to one axis (move in any direction)
+ *     // 'x' or 'y' to restrict movement to either axis
+ *     // 'start' to restrict movement to the axis the drag started in
+ *     lockAxis: 'x' || 'y' || 'xy' || 'start',
+ *
+ *     // max number of drags that can happen concurrently
+ *     // with elements of this Interactable. Infinity by default
+ *     max: Infinity,
+ *
+ *     // max number of drags that can target the same element+Interactable
+ *     // 1 by default
+ *     maxPerElement: 2
+ * })
+ *
+ * var isDraggable = interact('element').draggable(); // true
+ * ```
+ *
+ * Get or set whether drag actions can be performed on the target
+ *
+ * @alias Interactable.prototype.draggable
+ *
+ * @param {boolean | object} [options] true/false or An object with event
+ * listeners to be fired on drag events (object makes the Interactable
+ * draggable)
+ * @return {boolean | Interactable} boolean indicating if this can be the
+ * target of drag events, or this Interctable
+ */
+const draggable: DraggableMethod = function draggable (this: Interact.Interactable, options?: Interact.DraggableOptions | boolean): any {
+  if (is.object(options)) {
+    this.options.drag.enabled = options.enabled !== false
+    this.setPerAction('drag', options)
+    this.setOnEvents('drag', options)
+
+    if (/^(xy|x|y|start)$/.test(options.lockAxis)) {
+      this.options.drag.lockAxis = options.lockAxis
+    }
+    if (/^(xy|x|y)$/.test(options.startAxis)) {
+      this.options.drag.startAxis = options.startAxis
+    }
+
+    return this
+  }
+
+  if (is.bool(options)) {
+    this.options.drag.enabled = options
+
+    return this
+  }
+
+  return this.options.drag
+}
+
+const drag: Interact.Plugin = {
+  id: 'actions/drag',
+  install,
+  draggable,
+  beforeMove,
+  move,
+  defaults: {
+    startAxis : 'xy',
+    lockAxis  : 'xy',
+  } as Interact.DropzoneOptions,
+
+  checker (_pointer, _event, interactable) {
+    const dragOptions = interactable.options.drag
+
+    return dragOptions.enabled
+      ? {
+        name: 'drag',
+        axis: (dragOptions.lockAxis === 'start'
+          ? dragOptions.startAxis
+          : dragOptions.lockAxis),
+      }
+      : null
+  },
+
+  getCursor () {
+    return 'move'
+  },
+}
+
+export default drag
 </code></pre>
         </article>
     </section>

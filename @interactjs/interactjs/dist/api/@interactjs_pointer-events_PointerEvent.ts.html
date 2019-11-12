@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>packages/reflow/index.ts - Documentation</title>
+    <title>@interactjs/pointer-events/PointerEvent.ts - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">packages/reflow/index.ts</h1>
+    <h1 class="page-title">@interactjs/pointer-events/PointerEvent.ts</h1>
     
 
     
@@ -41,178 +41,88 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import Interactable from '../core/Interactable'
-import { EventPhase } from '../core/InteractEvent'
-import { ActionProps, Interaction } from '../core/Interaction'
-import { Scope } from '../core/scope'
-import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '../utils/index'
+            <pre class="prettyprint source linenums"><code>import BaseEvent from '../core/BaseEvent'
+import pointerUtils from '../utils/pointerUtils'
 
-declare module '@interactjs/core/Interactable' {
-  interface Interactable {
-    reflow: (action: ActionProps) => ReturnType&lt;typeof reflow>
+/** */
+export default class PointerEvent&lt;T extends string> extends BaseEvent {
+  type: T
+  originalEvent: Interact.PointerEventType | PointerEvent&lt;any>
+  pointerId: number
+  pointerType: string
+  double: boolean
+  pageX: number
+  pageY: number
+  clientX: number
+  clientY: number
+  dt: number
+  eventable: any
+
+  /** */
+  constructor (
+    type: T,
+    pointer: Interact.PointerType | PointerEvent&lt;any>,
+    event: Interact.PointerEventType | PointerEvent&lt;any>,
+    eventTarget: Interact.EventTarget,
+    interaction: Interact.Interaction,
+    timeStamp: number,
+  ) {
+    super(interaction)
+    pointerUtils.pointerExtend(this, event)
+
+    if (event !== pointer) {
+      pointerUtils.pointerExtend(this, pointer)
+    }
+
+    this.timeStamp     = timeStamp
+    this.originalEvent = event
+    this.type          = type
+    this.pointerId     = pointerUtils.getPointerId(pointer)
+    this.pointerType   = pointerUtils.getPointerType(pointer)
+    this.target        = eventTarget
+    this.currentTarget = null
+
+    if (type === 'tap') {
+      const pointerIndex = interaction.getPointerIndex(pointer)
+      this.dt = this.timeStamp - interaction.pointers[pointerIndex].downTime
+
+      const interval = this.timeStamp - interaction.tapTime
+
+      this.double = !!(interaction.prevTap &amp;&amp;
+        interaction.prevTap.type !== 'doubletap' &amp;&amp;
+        interaction.prevTap.target === this.target &amp;&amp;
+        interval &lt; 500)
+    }
+    else if (type === 'doubletap') {
+      this.dt = (pointer as PointerEvent&lt;'tap'>).timeStamp - interaction.tapTime
+    }
   }
-}
 
-declare module '@interactjs/core/Interaction' {
-  interface Interaction {
-    _reflowPromise: Promise&lt;void>
-    _reflowResolve: () => void
+  _subtractOrigin ({ x: originX, y: originY }) {
+    this.pageX   -= originX
+    this.pageY   -= originY
+    this.clientX -= originX
+    this.clientY -= originY
+
+    return this
   }
-}
 
-declare module '@interactjs/core/InteractEvent' {
-  // eslint-disable-next-line no-shadow
-  enum EventPhase {
-    Reflow = 'reflow',
-  }
-}
+  _addOrigin ({ x: originX, y: originY }) {
+    this.pageX   += originX
+    this.pageY   += originY
+    this.clientX += originX
+    this.clientY += originY
 
-(EventPhase as any).Reflow = 'reflow'
-
-export function install (scope: Scope) {
-  const {
-    actions,
-    /** @lends Interactable */
-    // eslint-disable-next-line no-shadow
-    Interactable,
-  } = scope
-
-  // add action reflow event types
-  for (const actionName of actions.names) {
-    actions.eventTypes.push(`${actionName}reflow`)
+    return this
   }
 
   /**
-   * ```js
-   * const interactable = interact(target)
-   * const drag = { name: drag, axis: 'x' }
-   * const resize = { name: resize, edges: { left: true, bottom: true }
-   *
-   * interactable.reflow(drag)
-   * interactable.reflow(resize)
-   * ```
-   *
-   * Start an action sequence to re-apply modifiers, check drops, etc.
-   *
-   * @param { Object } action The action to begin
-   * @param { string } action.name The name of the action
-   * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
+   * Prevent the default behaviour of the original Event
    */
-  Interactable.prototype.reflow = function (action) {
-    return reflow(this, action, scope)
+  preventDefault () {
+    this.originalEvent.preventDefault()
   }
 }
-
-function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise&lt;Interactable> {
-  const elements = is.string(interactable.target)
-    ? arr.from(interactable._context.querySelectorAll(interactable.target))
-    : [interactable.target]
-
-  // tslint:disable-next-line variable-name
-  const Promise = (win.window as any).Promise
-  const promises: Array&lt;Promise&lt;null>> | null = Promise ? [] : null
-
-  for (const element of elements) {
-    const rect = interactable.getRect(element)
-
-    if (!rect) { break }
-
-    const runningInteraction = arr.find(
-      scope.interactions.list,
-      (interaction: Interaction) => {
-        return interaction.interacting() &amp;&amp;
-          interaction.interactable === interactable &amp;&amp;
-          interaction.element === element &amp;&amp;
-          interaction.prepared.name === action.name
-      })
-    let reflowPromise: Promise&lt;null>
-
-    if (runningInteraction) {
-      runningInteraction.move()
-
-      if (promises) {
-        reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
-          runningInteraction._reflowResolve = resolve
-        })
-      }
-    }
-    else {
-      const xywh = rectUtils.tlbrToXywh(rect)
-      const coords = {
-        page     : { x: xywh.x, y: xywh.y },
-        client   : { x: xywh.x, y: xywh.y },
-        timeStamp: scope.now(),
-      }
-
-      const event = pointerUtils.coordsToEvent(coords)
-      reflowPromise = startReflow(scope, interactable, element, action, event)
-    }
-
-    if (promises) {
-      promises.push(reflowPromise)
-    }
-  }
-
-  return promises &amp;&amp; Promise.all(promises).then(() => interactable)
-}
-
-function startReflow (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps, event: any) {
-  const interaction = scope.interactions.new({ pointerType: 'reflow' })
-  const signalArg = {
-    interaction,
-    event,
-    pointer: event,
-    eventTarget: element,
-    phase: EventPhase.Reflow,
-  }
-
-  interaction.interactable = interactable
-  interaction.element = element
-  interaction.prepared = extend({}, action)
-  interaction.prevEvent = event
-  interaction.updatePointer(event, event, element, true)
-
-  interaction._doPhase(signalArg)
-
-  const reflowPromise = (win.window as unknown as any).Promise
-    ? new (win.window as unknown as any).Promise((resolve: any) => {
-      interaction._reflowResolve = resolve
-    })
-    : null
-
-  interaction._reflowPromise = reflowPromise
-  interaction.start(action, interactable, element)
-
-  if (interaction._interacting) {
-    interaction.move(signalArg)
-    interaction.end(event)
-  }
-  else {
-    interaction.stop()
-  }
-
-  interaction.removePointer(event, event)
-  interaction.pointerIsDown = false
-
-  return reflowPromise
-}
-
-export default {
-  id: 'reflow',
-  install,
-  listeners: {
-    // remove completed reflow interactions
-    'interactions:stop': ({ interaction }, scope) => {
-      if (interaction.pointerType === EventPhase.Reflow) {
-        if (interaction._reflowResolve) {
-          interaction._reflowResolve()
-        }
-
-        arr.remove(scope.interactions.list, interaction)
-      }
-    },
-  },
-} as Interact.Plugin
 </code></pre>
         </article>
     </section>

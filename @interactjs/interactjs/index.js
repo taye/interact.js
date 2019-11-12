@@ -22,11 +22,4 @@ export function init(win) {
   });
 }
 export default interact;
-interact.default = interact // tslint:disable-line no-string-literal
-;
-interact.init = init; // tslint:disable-line no-string-literal
-
-if (typeof module === 'object' && !!module) {
-  module.exports = interact;
-}
 //# sourceMappingURL=index.js.map

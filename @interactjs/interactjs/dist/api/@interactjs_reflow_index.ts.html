@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>packages/actions/gesture.ts - Documentation</title>
+    <title>@interactjs/reflow/index.ts - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -31,7 +31,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">packages/actions/gesture.ts</h1>
+    <h1 class="page-title">@interactjs/reflow/index.ts</h1>
     
 
     
@@ -41,212 +41,178 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import InteractEvent from '../core/InteractEvent'
-import { ActionName, Scope } from '../core/scope'
-import * as utils from '../utils/index'
-
-export type GesturableMethod = Interact.ActionMethod&lt;Interact.GesturableOptions>
-
-declare module '@interactjs/core/Interaction' {
-  interface Interaction {
-    gesture?: {
-      angle: number           // angle from first to second touch
-      distance: number
-      scale: number           // gesture.distance / gesture.startDistance
-      startAngle: number      // angle of line joining two touches
-      startDistance: number   // distance between two touches of touchStart
-    }
-  }
-}
+            <pre class="prettyprint source linenums"><code>import Interactable from '../core/Interactable'
+import { EventPhase } from '../core/InteractEvent'
+import { ActionProps, Interaction } from '../core/Interaction'
+import { Scope } from '../core/scope'
+import { arr, extend, is, pointer as pointerUtils, rect as rectUtils, win } from '../utils/index'
 
 declare module '@interactjs/core/Interactable' {
   interface Interactable {
-    gesturable: GesturableMethod
+    reflow: (action: ActionProps) => ReturnType&lt;typeof reflow>
   }
 }
 
-declare module '@interactjs/core/defaultOptions' {
-  interface ActionDefaults {
-    gesture: Interact.GesturableOptions
+declare module '@interactjs/core/Interaction' {
+  interface Interaction {
+    _reflowPromise: Promise&lt;void>
+    _reflowResolve: () => void
   }
 }
 
-declare module '@interactjs/core/scope' {
-  interface Actions {
-    [ActionName.Gesture]?: typeof gesture
-  }
-
+declare module '@interactjs/core/InteractEvent' {
   // eslint-disable-next-line no-shadow
-  enum ActionName {
-    Gesture = 'gesture'
+  enum EventPhase {
+    Reflow = 'reflow',
   }
 }
 
-(ActionName as any).Gesture = 'gesture'
+(EventPhase as any).Reflow = 'reflow'
 
-export interface GestureEvent extends Interact.InteractEvent&lt;ActionName.Gesture> {
-  distance: number
-  angle: number
-  da: number // angle change
-  scale: number // ratio of distance start to current event
-  ds: number // scale change
-  box: Interact.Rect // enclosing box of all points
-  touches: Interact.PointerType[]
-}
-
-export interface GestureSignalArg extends Interact.DoPhaseArg {
-  iEvent: GestureEvent
-  interaction: Interact.Interaction&lt;ActionName.Gesture>
-  event: Interact.PointerEventType | GestureEvent
-}
-
-function install (scope: Scope) {
+export function install (scope: Scope) {
   const {
     actions,
+    /** @lends Interactable */
+    // eslint-disable-next-line no-shadow
     Interactable,
-    defaults,
   } = scope
+
+  // add action reflow event types
+  for (const actionName of actions.names) {
+    actions.eventTypes.push(`${actionName}reflow`)
+  }
 
   /**
    * ```js
-   * interact(element).gesturable({
-   *     onstart: function (event) {},
-   *     onmove : function (event) {},
-   *     onend  : function (event) {},
+   * const interactable = interact(target)
+   * const drag = { name: drag, axis: 'x' }
+   * const resize = { name: resize, edges: { left: true, bottom: true }
    *
-   *     // limit multiple gestures.
-   *     // See the explanation in {@link Interactable.draggable} example
-   *     max: Infinity,
-   *     maxPerElement: 1,
-   * })
-   *
-   * var isGestureable = interact(element).gesturable()
+   * interactable.reflow(drag)
+   * interactable.reflow(resize)
    * ```
    *
-   * Gets or sets whether multitouch gestures can be performed on the target
+   * Start an action sequence to re-apply modifiers, check drops, etc.
    *
-   * @param {boolean | object} [options] true/false or An object with event
-   * listeners to be fired on gesture events (makes the Interactable gesturable)
-   * @return {boolean | Interactable} A boolean indicating if this can be the
-   * target of gesture events, or this Interactable
+   * @param { Object } action The action to begin
+   * @param { string } action.name The name of the action
+   * @returns { Promise } A promise that resolves to the `Interactable` when actions on all targets have ended
    */
-  Interactable.prototype.gesturable = function (this: Interact.Interactable, options: Interact.GesturableOptions | boolean) {
-    if (utils.is.object(options)) {
-      this.options.gesture.enabled = options.enabled !== false
-      this.setPerAction('gesture', options)
-      this.setOnEvents('gesture', options)
-
-      return this
-    }
-
-    if (utils.is.bool(options)) {
-      this.options.gesture.enabled = options
-
-      return this
-    }
-
-    return this.options.gesture as Interact.Options
-  } as GesturableMethod
-
-  actions[ActionName.Gesture] = gesture
-  actions.names.push(ActionName.Gesture)
-  utils.arr.merge(actions.eventTypes, [
-    'gesturestart',
-    'gesturemove',
-    'gestureend',
-  ])
-  actions.methodDict.gesture = 'gesturable'
-
-  defaults.actions.gesture = gesture.defaults
+  Interactable.prototype.reflow = function (action) {
+    return reflow(this, action, scope)
+  }
 }
 
-const gesture = {
-  id: 'actions/gesture',
+function reflow (interactable: Interactable, action: ActionProps, scope: Scope): Promise&lt;Interactable> {
+  const elements = is.string(interactable.target)
+    ? arr.from(interactable._context.querySelectorAll(interactable.target))
+    : [interactable.target]
+
+  // tslint:disable-next-line variable-name
+  const Promise = (win.window as any).Promise
+  const promises: Array&lt;Promise&lt;null>> | null = Promise ? [] : null
+
+  for (const element of elements) {
+    const rect = interactable.getRect(element)
+
+    if (!rect) { break }
+
+    const runningInteraction = arr.find(
+      scope.interactions.list,
+      (interaction: Interaction) => {
+        return interaction.interacting() &amp;&amp;
+          interaction.interactable === interactable &amp;&amp;
+          interaction.element === element &amp;&amp;
+          interaction.prepared.name === action.name
+      })
+    let reflowPromise: Promise&lt;null>
+
+    if (runningInteraction) {
+      runningInteraction.move()
+
+      if (promises) {
+        reflowPromise = runningInteraction._reflowPromise || new Promise((resolve: any) => {
+          runningInteraction._reflowResolve = resolve
+        })
+      }
+    }
+    else {
+      const xywh = rectUtils.tlbrToXywh(rect)
+      const coords = {
+        page     : { x: xywh.x, y: xywh.y },
+        client   : { x: xywh.x, y: xywh.y },
+        timeStamp: scope.now(),
+      }
+
+      const event = pointerUtils.coordsToEvent(coords)
+      reflowPromise = startReflow(scope, interactable, element, action, event)
+    }
+
+    if (promises) {
+      promises.push(reflowPromise)
+    }
+  }
+
+  return promises &amp;&amp; Promise.all(promises).then(() => interactable)
+}
+
+function startReflow (scope: Scope, interactable: Interactable, element: Interact.Element, action: ActionProps, event: any) {
+  const interaction = scope.interactions.new({ pointerType: 'reflow' })
+  const signalArg = {
+    interaction,
+    event,
+    pointer: event,
+    eventTarget: element,
+    phase: EventPhase.Reflow,
+  }
+
+  interaction.interactable = interactable
+  interaction.element = element
+  interaction.prepared = extend({}, action)
+  interaction.prevEvent = event
+  interaction.updatePointer(event, event, element, true)
+
+  interaction._doPhase(signalArg)
+
+  const reflowPromise = (win.window as unknown as any).Promise
+    ? new (win.window as unknown as any).Promise((resolve: any) => {
+      interaction._reflowResolve = resolve
+    })
+    : null
+
+  interaction._reflowPromise = reflowPromise
+  interaction.start(action, interactable, element)
+
+  if (interaction._interacting) {
+    interaction.move(signalArg)
+    interaction.end(event)
+  }
+  else {
+    interaction.stop()
+  }
+
+  interaction.removePointer(event, event)
+  interaction.pointerIsDown = false
+
+  return reflowPromise
+}
+
+export default {
+  id: 'reflow',
   install,
   listeners: {
-    'interactions:action-start': updateGestureProps,
-    'interactions:action-move': updateGestureProps,
-    'interactions:action-end': updateGestureProps,
+    // remove completed reflow interactions
+    'interactions:stop': ({ interaction }, scope) => {
+      if (interaction.pointerType === EventPhase.Reflow) {
+        if (interaction._reflowResolve) {
+          interaction._reflowResolve()
+        }
 
-    'interactions:new': ({ interaction }) => {
-      interaction.gesture = {
-        angle: 0,
-        distance: 0,
-        scale: 1,
-        startAngle: 0,
-        startDistance: 0,
+        arr.remove(scope.interactions.list, interaction)
       }
     },
   },
-
-  defaults: {
-  },
-
-  checker (_pointer, _event, _interactable, _element, interaction: { pointers: { length: number } }) {
-    if (interaction.pointers.length >= 2) {
-      return { name: 'gesture' }
-    }
-
-    return null
-  },
-
-  getCursor () {
-    return ''
-  },
-}
-
-function updateGestureProps ({ interaction, iEvent, event, phase }: GestureSignalArg) {
-  if (interaction.prepared.name !== 'gesture') { return }
-
-  const pointers = interaction.pointers.map(p => p.pointer)
-  const starting = phase === 'start'
-  const ending = phase === 'end'
-  const deltaSource = interaction.interactable.options.deltaSource
-
-  iEvent.touches = [pointers[0], pointers[1]]
-
-  if (starting) {
-    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
-    iEvent.box      = utils.pointer.touchBBox(pointers)
-    iEvent.scale    = 1
-    iEvent.ds       = 0
-    iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
-    iEvent.da       = 0
-
-    interaction.gesture.startDistance = iEvent.distance
-    interaction.gesture.startAngle = iEvent.angle
-  }
-  else if (ending || event instanceof InteractEvent) {
-    const prevEvent = interaction.prevEvent as GestureEvent
-
-    iEvent.distance = prevEvent.distance
-    iEvent.box      = prevEvent.box
-    iEvent.scale    = prevEvent.scale
-    iEvent.ds       = 0
-    iEvent.angle    = prevEvent.angle
-    iEvent.da       = 0
-  }
-  else {
-    iEvent.distance = utils.pointer.touchDistance(pointers, deltaSource)
-    iEvent.box      = utils.pointer.touchBBox(pointers)
-    iEvent.scale    = iEvent.distance / interaction.gesture.startDistance
-    iEvent.angle    = utils.pointer.touchAngle(pointers, deltaSource)
-
-    iEvent.ds = iEvent.scale - interaction.gesture.scale
-    iEvent.da = iEvent.angle - interaction.gesture.angle
-  }
-
-  interaction.gesture.distance = iEvent.distance
-  interaction.gesture.angle = iEvent.angle
-
-  if (utils.is.number(iEvent.scale) &amp;&amp;
-      iEvent.scale !== Infinity &amp;&amp;
-      !isNaN(iEvent.scale)) {
-    interaction.gesture.scale = iEvent.scale
-  }
-}
-
-export default gesture
+} as Interact.Plugin
 </code></pre>
         </article>
     </section>

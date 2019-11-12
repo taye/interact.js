@@ -1,5 +1,5 @@
 /**
- * interact.js 1.7.0
+ * interact.js 1.7.1
  *
  * Copyright (c) 2012-2019 Taye Adeyemi <dev@taye.me>
  * Released under the MIT License.
@@ -10264,7 +10264,7 @@ function __init_27(window) {
 } // eslint-disable-next-line no-undef
 
 
-_interact["default"].version = "1.7.0";
+_interact["default"].version = "1.7.1";
 var ___default_27 = _interact["default"];
 _$interact_27["default"] = ___default_27;
 
@@ -10360,14 +10360,14 @@ var _grid = ___interopRequireDefault_64(_$grid_63);
 
 function ___interopRequireDefault_64(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var _$index_29 = { exports: {} };
+var _$interactjs_29 = {};
 "use strict";
 
-Object.defineProperty(_$index_29.exports, "__esModule", {
+Object.defineProperty(_$interactjs_29, "__esModule", {
   value: true
 });
-_$index_29.exports.init = __init_29;
-_$index_29.exports["default"] = void 0;
+_$interactjs_29.init = __init_29;
+_$interactjs_29["default"] = void 0;
 
 var ___index_29 = ___interopRequireWildcard_29(_$interact_27);
 
@@ -10404,17 +10404,43 @@ function __init_29(win) {
 }
 
 var ___default_29 = ___index_29["default"];
-_$index_29.exports["default"] = ___default_29;
-___index_29["default"]["default"] = ___index_29["default"] // tslint:disable-line no-string-literal
-;
-___index_29["default"].init = __init_29; // tslint:disable-line no-string-literal
+_$interactjs_29["default"] = ___default_29;
 
-if (("object" === "undefined" ? "undefined" : ___typeof_29(_$index_29)) === 'object' && !!_$index_29) {
-  _$index_29.exports = ___index_29["default"];
+var _$index_66 = { exports: {} };
+"use strict";
+
+Object.defineProperty(_$index_66.exports, "__esModule", {
+  value: true
+});
+
+var ___index_66 = ___interopRequireWildcard_66(_$interactjs_29);
+
+Object.keys(___index_66).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  Object.defineProperty(_$index_66.exports, key, {
+    enumerable: true,
+    get: function get() {
+      return ___index_66[key];
+    }
+  });
+});
+
+function ___getRequireWildcardCache_66() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); ___getRequireWildcardCache_66 = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function ___interopRequireWildcard_66(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || ___typeof_66(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = ___getRequireWildcardCache_66(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+function ___typeof_66(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { ___typeof_66 = function _typeof(obj) { return typeof obj; }; } else { ___typeof_66 = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return ___typeof_66(obj); }
+
+if (("object" === "undefined" ? "undefined" : ___typeof_66(_$index_66)) === 'object' && !!_$index_66) {
+  _$index_66.exports = ___index_66["default"];
 }
 
-_$index_29 = _$index_29.exports
-return _$index_29;
+___index_66["default"]["default"] = ___index_66["default"] // tslint:disable-line no-string-literal
+;
+___index_66["default"].init = ___index_66.init; // tslint:disable-line no-string-literal
+
+_$index_66 = _$index_66.exports
+return _$index_66;
 
 });
 
