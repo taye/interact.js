@@ -1,13 +1,13 @@
 {
   "name": "@interactjs/dev-tools",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "license": "MIT",
   "dependencies": {
-    "@interactjs/utils": "1.7.0"
+    "@interactjs/utils": "1.7.1"
   },
   "devDependencies": {
-    "@interactjs/actions": "1.7.0",
-    "@interactjs/core": "1.7.0"
+    "@interactjs/actions": "1.7.1",
+    "@interactjs/core": "1.7.1"
   },
   "publishConfig": {
     "access": "public"

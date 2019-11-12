@@ -1,3 +1,7 @@
+## v1.7.1
+
+ - reorganized modules for esnext resolution
+
 ## v1.7.0
 
  - fixed hold repeat `event.count`
