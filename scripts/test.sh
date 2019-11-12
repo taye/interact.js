@@ -27,7 +27,7 @@ EXEC_ARGS=${EXEC_ARGS:="--require $PKG_DIR/test/babel-register"}
 NODE_ENV=test $TEST_RUNNER $TEST_RUNNER_ARGS \
   $EXEC_COMMAND \
   $EXEC_ARGS \
-  --require $PKG_DIR/packages/types/index.ts \
+  --require $PKG_DIR/@interactjs/types/index.ts \
   $ENTRY_FILE $@ |
   tap-spec
 

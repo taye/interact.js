@@ -5,7 +5,8 @@
   "license": "MIT",
   "workspaces": [
     ".",
-    "./packages/*"
+    "./@interactjs/*",
+    "./interactjs"
   ],
   "bin": {
     "@build": "scripts/build.js",
@@ -18,8 +19,8 @@
   },
   "scripts": {
     "bootstrap": "npx yarn install",
-    "start": "cd packages/interactjs; NODE_ENV=development ../../scripts/build.js --watch",
-    "build": "cd packages/interactjs; NODE_ENV=production ../../scripts/build.js --docs",
+    "start": "cd interactjs; NODE_ENV=development ../scripts/build.js --watch",
+    "build": "cd interactjs; NODE_ENV=production ../scripts/build.js --docs",
     "esnext": "scripts/esnext.js",
     "docs": "node jsdoc/index.js",
     "clean": "scripts/clean.js",

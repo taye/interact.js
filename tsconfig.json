@@ -20,8 +20,8 @@
     "moduleResolution": "node",               /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
     "baseUrl": "./",                          /* Base directory to resolve non-absolute module names. */
     "paths": {                                /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-      "@interactjs/*": ["./packages/*"],
-      "interactjs": ["./packages/interactjs"],
+      "@interactjs/_dev/*": ["./@interactjs/_dev/*"],
+      "interactjs": ["./@interactjs/interactjs"],
     },
 
     "inlineSourceMap": true,                  /* Emit a single file with source maps instead of having a separate file. */

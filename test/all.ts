@@ -1,5 +1,5 @@
 // tslint:disable no-var-requires
-require('../packages/types/index')
+require('../@interactjs/types/index')
 
 const glob = require('glob')
 const path = require('path')

@@ -5,14 +5,15 @@
   "functions": 58,
   "lines": 64,
   "include": [
-    "packages/**/*.ts"
+    "@interactjs/**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts",
     "**/_*"
   ],
   "extension": [
-    ".ts"
+    ".ts",
+    ".tsx"
   ],
   "reporter": [
     "text",

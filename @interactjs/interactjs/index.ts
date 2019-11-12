@@ -1,6 +1,6 @@
 import interact, { init as initInteract } from '../interact/index'
-import * as modifiers from '../modifiers/index'
 import { Modifier } from '../modifiers/base'
+import * as modifiers from '../modifiers/index'
 import '../types/index'
 import extend from '../utils/extend'
 import * as snappers from '../utils/snappers/index'
@@ -31,9 +31,3 @@ export function init (win: Window) {
 }
 
 export default interact
-;(interact as any).default = interact // tslint:disable-line no-string-literal
-;(interact as any).init = init // tslint:disable-line no-string-literal
-
-if (typeof module === 'object' && !!module) {
-  module.exports = interact
-}
