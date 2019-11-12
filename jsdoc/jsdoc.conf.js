@@ -1,4 +1,4 @@
-const packagesDir = `${__dirname}/../packages`
+const packagesDir = `${__dirname}/../@interactjs`
 const glob = require('glob')
 const ignore = ['**/node_modules/**', '**/*.spec.ts', '**/*.d.ts', '**/dist/**']
 const include = [...new Set([

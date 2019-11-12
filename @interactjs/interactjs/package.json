@@ -1,0 +1,17 @@
+{
+  "name": "@interactjs/interactjs",
+  "version": "1.7.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taye/interact.js.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@interactjs/types": "1.7.0"
+  },
+  "devDependencies": {
+    "@interactjs/interact": "1.7.0",
+    "@interactjs/modifiers": "1.7.0",
+    "@interactjs/utils": "1.7.0"
+  }
+}

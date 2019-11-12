@@ -26,7 +26,7 @@ ensure_clean_index() {
   echo_funcname
 
   # make sure the repo is clean
-  git clean -fx packages/*/dist/*
+  git clean -fx **/dist/*
   if ! git diff-index HEAD --stat --exit-code; then
     echo
     quit "working directory must be clean" $?
@@ -83,7 +83,7 @@ run_build() {
   echo_funcname
 
   # copy README
-  cp $ROOT/README.md packages/interactjs/ &&
+  cp $ROOT/README.md interactjs/ &&
 
   # copy license file
   npx lerna exec --no-private -- cp -v $ROOT/LICENSE . ||
@@ -94,7 +94,7 @@ run_build() {
 
   # copy .npmignore to all packages
   npx lerna exec --no-private -- "echo '# copied from [root]/.npmignore' > .npmignore
-    cat ../../.npmignore >> .npmignore" &&
+    cat $ROOT/.npmignore >> .npmignore" &&
 
   ## generate esnext .js modules
   npm run esnext &&
