@@ -13,5 +13,8 @@
     "@interactjs/interact": "1.7.1",
     "@interactjs/modifiers": "1.7.1",
     "@interactjs/utils": "1.7.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
