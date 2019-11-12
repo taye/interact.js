@@ -1,9 +1,9 @@
 {
   "name": "@interactjs/auto-scroll",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "license": "MIT",
   "peerDependencies": {
-    "@interactjs/utils": "1.6.3"
+    "@interactjs/utils": "1.7.0"
   },
   "publishConfig": {
     "access": "public"
